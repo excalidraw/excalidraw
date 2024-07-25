@@ -5,7 +5,7 @@ import { isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
-import "../../public/fonts/fonts.css";
+import "./fonts/assets/fonts.css";
 import polyfill from "./polyfill";
 
 import type { AppProps, ExcalidrawProps } from "./types";
@@ -62,6 +62,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onContextMenu, //zsviczian
     aiEnabled,
     obsidianHostPlugin,
+    showDeprecatedFonts,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -161,6 +162,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onContextMenu={onContextMenu} //zsviczian
           aiEnabled={aiEnabled !== false}
           obsidianHostPlugin={obsidianHostPlugin} //zsviczian
+          showDeprecatedFonts={showDeprecatedFonts}
         >
           {children}
         </App>

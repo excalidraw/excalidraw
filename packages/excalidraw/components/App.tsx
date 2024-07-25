@@ -324,7 +324,6 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
-  getDefaultLineHeight,
   getLineHeightInPx,
   getMinTextElementWidth,
   isMeasureTextSupported,
@@ -340,7 +339,7 @@ import {
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
-import { Fonts } from "../scene/Fonts";
+import { Fonts, getLineHeight } from "../fonts";
 import {
   getFrameChildren,
   isCursorInFrame,
@@ -446,7 +445,6 @@ import { getTooltipDiv } from "./Tooltip";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
-export let showFourthFont: boolean = false; //zsviczian
 
 const deviceContextInitialValue = {
   viewport: {
@@ -548,8 +546,8 @@ class App extends React.Component<AppProps, AppState> {
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public scene: Scene;
+  public fonts: Fonts;
   public renderer: Renderer;
-  private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -714,7 +712,6 @@ class App extends React.Component<AppProps, AppState> {
         setToast: this.setToast,
         updateContainerSize: this.updateContainerSize, //zsviczian
         id: this.id,
-        setLocalFont: this.setLocalFont, //zsviczian
         selectElements: this.selectElements, //zsviczian
         sendBackward: this.sendBackward, //zsviczian
         bringForward: this.bringForward, //zsviczian
@@ -2406,11 +2403,6 @@ class App extends React.Component<AppProps, AppState> {
         }),
       };
     }
-    // FontFaceSet loadingdone event we listen on may not always fire
-    // (looking at you Safari), so on init we manually load fonts for current
-    // text elements on canvas, and rerender them once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.loadFontsForElements(scene.elements);
 
     this.resetStore();
     this.resetHistory();
@@ -2418,6 +2410,12 @@ class App extends React.Component<AppProps, AppState> {
       ...scene,
       storeAction: StoreAction.UPDATE,
     });
+
+    // FontFaceSet loadingdone event we listen on may not always
+    // fire (looking at you Safari), so on init we manually load all
+    // fonts and rerender scene text elements once done. This also
+    // seems faster even in browsers that do fire the loadingdone event.
+    this.fonts.load();
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2512,6 +2510,10 @@ class App extends React.Component<AppProps, AppState> {
         store: {
           configurable: true,
           value: this.store,
+        },
+        fonts: {
+          configurable: true,
+          value: this.fonts,
         },
       });
     }
@@ -2696,7 +2698,7 @@ class App extends React.Component<AppProps, AppState> {
       // zsviczian In Obsidian this is not needed as I manage font load separately
       /*addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onFontsLoaded(loadedFontFaces);
+        this.fonts.onLoaded(loadedFontFaces);
       }),*/
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -3507,7 +3509,7 @@ class App extends React.Component<AppProps, AppState> {
       fontSize: textElementProps.fontSize,
       fontFamily: textElementProps.fontFamily,
     });
-    const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
+    const lineHeight = getLineHeight(textElementProps.fontFamily);
     const [x1, , x2] = getVisibleSceneBounds(this.state);
     // long texts should not go beyond 800 pixels in width nor should it go below 200 px
     const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
@@ -3525,13 +3527,13 @@ class App extends React.Component<AppProps, AppState> {
           });
 
           let metrics = measureText(originalText, fontString, lineHeight);
-          const isTextWrapped = metrics.width > maxTextWidth;
+          const isTextUnwrapped = metrics.width > maxTextWidth;
 
-          const text = isTextWrapped
+          const text = isTextUnwrapped
             ? wrapText(originalText, fontString, maxTextWidth)
             : originalText;
 
-          metrics = isTextWrapped
+          metrics = isTextUnwrapped
             ? measureText(text, fontString, lineHeight)
             : metrics;
 
@@ -3546,7 +3548,7 @@ class App extends React.Component<AppProps, AppState> {
             rawText: originalText, //zsviczian
             originalText,
             lineHeight,
-            autoResize: !isTextWrapped,
+            autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
@@ -3942,13 +3944,6 @@ class App extends React.Component<AppProps, AppState> {
         this.forceUpdate();
       }
     };
-
-  //zsviczian
-  public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
-    showOnPanel: boolean,
-  ) => {
-    showFourthFont = showOnPanel;
-  };
 
   //zsviczian
   public selectElements: ExcalidrawImperativeAPI["selectElements"] = (
@@ -4422,6 +4417,45 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
         }
+      }
+
+      if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.key.toLowerCase() === KEYS.F
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          this.state.activeTool.type === "text" ||
+          selectedElements.find(
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+          )
+        ) {
+          event.preventDefault();
+          this.setState({ openPopup: "fontFamily" });
+        }
+      }
+
+      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (this.state.activeTool.type === "laser") {
+          this.setActiveTool({ type: "selection" });
+        } else {
+          this.setActiveTool({ type: "laser" });
+        }
+        return;
       }
 
       if (
@@ -5136,7 +5170,7 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
 
     const lineHeight =
-      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+      existingTextElement?.lineHeight || getLineHeight(fontFamily);
     const fontSize = getFontSize(this.state.currentItemFontSize,this.state.zoom.value); //zsviczian
 
     if (

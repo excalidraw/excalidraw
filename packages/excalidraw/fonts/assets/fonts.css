@@ -1,0 +1,34 @@
+/* Only UI fonts here, which are needed before the editor initializes. */
+/* These also cannot be preprended with `EXCALIDRAW_ASSET_PATH`. */
+
+@font-face {
+  font-family: "Assistant";
+  src: url(./Assistant-Regular.woff2) format("woff2");
+  font-weight: 400;
+  style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url(./Assistant-Medium.woff2) format("woff2");
+  font-weight: 500;
+  style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url(./Assistant-SemiBold.woff2) format("woff2");
+  font-weight: 600;
+  style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url(./Assistant-Bold.woff2) format("woff2");
+  font-weight: 700;
+  style: normal;
+  display: swap;
+}

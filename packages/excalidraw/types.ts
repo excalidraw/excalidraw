@@ -182,6 +182,7 @@ export type StaticCanvasAppState = Readonly<
     linkOpacity: AppState["linkOpacity"]; //zsviczian
     gridColor: AppState["gridColor"]; //zsviczian
     frameColor: AppState["frameColor"]; //zsviczian
+    currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
   }
 >;
 
@@ -284,6 +285,7 @@ export interface AppState {
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
+  currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   viewBackgroundColor: string;
   scrollX: number;
@@ -295,7 +297,12 @@ export interface AppState {
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
-  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
+  openPopup:
+    | "canvasBackground"
+    | "elementBackground"
+    | "elementStroke"
+    | "fontFamily"
+    | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
     | null
@@ -568,6 +575,7 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   obsidianHostPlugin: WeakRef<any>; //zsviczian
+  showDeprecatedFonts?: boolean;
 }
 
 export type SceneData = {
@@ -659,6 +667,7 @@ export type AppClassProperties = {
   device: App["device"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
+  fonts: App["fonts"];
   pasteFromClipboard: App["pasteFromClipboard"];
   id: App["id"];
   onInsertElements: App["onInsertElements"];
@@ -762,7 +771,6 @@ export interface ExcalidrawImperativeAPI {
   addFiles: (data: BinaryFileData[]) => void;
   updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
   id: string;
-  setLocalFont: (showOnPanel: boolean) => void; //zsviczian
   selectElements: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   sendBackward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian

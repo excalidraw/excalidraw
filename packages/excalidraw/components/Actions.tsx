@@ -158,10 +158,8 @@ export const SelectedShapeActions = ({
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
-          {renderAction("changeFontSize")}
-
           {renderAction("changeFontFamily")}
-
+          {renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
