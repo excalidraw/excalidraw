@@ -109,6 +109,7 @@
     "share": "共有",
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "個人ライブラリ",
@@ -557,11 +558,19 @@
     "syntax": "Mermaid 構文",
     "preview": "プレビュー"
   },
-  "userList": {
-    "search": {
-      "placeholder": "クイック検索",
-      "empty": "ユーザーが見つかりませんでした"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "ユーザーをクリックしてフォロー",
       "followStatus": "現在このユーザーをフォローしています",
