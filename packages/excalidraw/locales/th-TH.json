@@ -109,6 +109,7 @@
     "share": "แชร์",
     "showStroke": "",
     "showBackground": "",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "คลังของฉัน",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
