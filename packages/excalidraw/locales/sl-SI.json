@@ -109,6 +109,7 @@
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
+    "showFonts": "",
     "toggleTheme": "Preklapljanje med svetlo/temno temo",
     "theme": "Tema",
     "personalLib": "Osebna knjižnica",
@@ -557,11 +558,19 @@
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Hitro iskanje",
-      "empty": "Ni najdenih uporabnikov"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Klikni na uporabnika za sledenje",
       "followStatus": "Trenutno slediš temu uporabniku",
