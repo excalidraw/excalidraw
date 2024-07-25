@@ -109,6 +109,7 @@
     "share": "Partejar",
     "showStroke": "Mostrar lo selector de color de contorn",
     "showBackground": "Mostrar lo selector de color de fons",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "Tèma",
     "personalLib": "Bibliotèca personala",
@@ -557,11 +558,19 @@
     "syntax": "Sintaxi Mermaid",
     "preview": "Apercebut"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Recèrca rapida",
-      "empty": "Cap d’utilizaire pas trobat"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "Clicar l’utilizaire per lo seguir",
       "followStatus": "Seguissètz actualament aqueste utilizaire",
