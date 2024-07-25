@@ -109,6 +109,7 @@
     "share": "साझा करें",
     "showStroke": "कूँची रंग चयक दिखायें",
     "showBackground": "पृष्ठभूमि रंग चयक दिखाये",
+    "showFonts": "",
     "toggleTheme": "अंधेरी/उजेलि संरचना पलटे",
     "theme": "संरचना पद्धति",
     "personalLib": "वैयक्तिक समूहकोष",
@@ -557,11 +558,19 @@
     "syntax": "मर्मेड विन्यास",
     "preview": "पूर्वावलोकन"
   },
-  "userList": {
-    "search": {
-      "placeholder": "त्वरित खोज",
-      "empty": "कोई उपयोक्ता नहीं मिला"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "उपयोक्ता का अनुकरण करने के लिए उसपर क्लिक करें",
       "followStatus": "आप इस उपयोक्ता का अनुकरण कर रहें हैं.",
