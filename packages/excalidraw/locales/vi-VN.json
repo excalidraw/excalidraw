@@ -109,6 +109,7 @@
     "share": "Chia sẻ",
     "showStroke": "Hiển thị chọn màu",
     "showBackground": "Hiện thị chọn màu nền",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Thư viện cá nhân",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
