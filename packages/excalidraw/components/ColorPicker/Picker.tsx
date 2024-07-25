@@ -138,7 +138,7 @@ export const Picker = ({
             event.stopPropagation();
           }
         }}
-        className="color-picker-content"
+        className="color-picker-content properties-content"
         // to allow focusing by clicking but not by tabbing
         tabIndex={-1}
       >
