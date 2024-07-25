@@ -109,6 +109,7 @@
     "share": "Del",
     "showStroke": "Vis fargeveljar for linjer",
     "showBackground": "Vis fargeveljar for bakgrunn",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "",
     "personalLib": "Personleg bibliotek",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": ""
   },
-  "userList": {
-    "search": {
-      "placeholder": "",
-      "empty": ""
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
