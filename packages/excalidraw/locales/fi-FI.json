@@ -109,6 +109,7 @@
     "share": "Jaa",
     "showStroke": "Näytä viivan värin valitsin",
     "showBackground": "Näytä taustavärin valitsin",
+    "showFonts": "",
     "toggleTheme": "",
     "theme": "Teema",
     "personalLib": "Oma kirjasto",
@@ -557,11 +558,19 @@
     "syntax": "",
     "preview": "Esikatsele"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Pikahaku",
-      "empty": "Käyttäjiä ei löytynyt"
+  "quickSearch": {
+    "placeholder": ""
+  },
+  "fontList": {
+    "badge": {
+      "old": ""
     },
+    "sceneFonts": "",
+    "availableFonts": "",
+    "empty": ""
+  },
+  "userList": {
+    "empty": "",
     "hint": {
       "text": "",
       "followStatus": "",
