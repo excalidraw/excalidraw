@@ -740,7 +740,7 @@ class App extends React.Component<AppProps, AppState> {
               method: data.value ? "play" : "pause",
               value: true,
             }),
-            "*",
+            event.origin,
           );
         }
         break;
@@ -823,7 +823,7 @@ class App extends React.Component<AppProps, AppState> {
             event: "listening",
             id: element.id,
           }),
-          "*",
+          "https://www.youtube.com",
         );
       }
       switch (state) {
@@ -835,7 +835,7 @@ class App extends React.Component<AppProps, AppState> {
               func: "pauseVideo",
               args: "",
             }),
-            "*",
+            "https://www.youtube.com",
           );
           break;
         default:
@@ -845,7 +845,7 @@ class App extends React.Component<AppProps, AppState> {
               func: "playVideo",
               args: "",
             }),
-            "*",
+            "https://www.youtube.com",
           );
       }
     }
@@ -855,7 +855,7 @@ class App extends React.Component<AppProps, AppState> {
         JSON.stringify({
           method: "paused", //video play/pause in onWindowMessage handler
         }),
-        "*",
+        "https://player.vimeo.com",
       );
     }
   }

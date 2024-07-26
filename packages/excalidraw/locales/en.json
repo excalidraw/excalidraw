@@ -265,7 +265,7 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
+    "canvasPanning": "Use hand tool, or hold spacebar while dragging to move canvas",
     "linearElement": "Click to start multiple points, drag for single line",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
