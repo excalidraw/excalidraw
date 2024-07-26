@@ -109,7 +109,7 @@
     "share": "共享",
     "showStroke": "顯示線條檢色器",
     "showBackground": "顯示背景檢色器",
-    "showFonts": "",
+    "showFonts": "顯示字型選單",
     "toggleTheme": "切換 亮色/暗色 主題",
     "theme": "佈景主題",
     "personalLib": "個人資料庫",
@@ -559,18 +559,18 @@
     "preview": "預覽"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "快速搜尋"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "舊版"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "在此場景中",
+    "availableFonts": "可用字型",
+    "empty": "找不到字型"
   },
   "userList": {
-    "empty": "",
+    "empty": "找不到使用者",
     "hint": {
       "text": "點擊使用者以進行追蹤",
       "followStatus": "您正在追蹤此使用者",
