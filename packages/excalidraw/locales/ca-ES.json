@@ -109,9 +109,9 @@
     "share": "Comparteix",
     "showStroke": "Mostra el selector de color del traç",
     "showBackground": "Mostra el selector de color de fons",
-    "showFonts": "",
+    "showFonts": "Mostra el selector tipogràfic",
     "toggleTheme": "Alternar tema clar i fosc",
-    "theme": "",
+    "theme": "Tema",
     "personalLib": "Biblioteca personal",
     "excalidrawLib": "Biblioteca d'Excalidraw",
     "decreaseFontSize": "Redueix la mida de la lletra",
@@ -130,7 +130,7 @@
     },
     "lineEditor": {
       "edit": "Editar línia",
-      "editArrow": ""
+      "editArrow": "Edita la fletxa"
     },
     "elementLock": {
       "lock": "Bloca",
@@ -150,7 +150,7 @@
     "zoomToFitViewport": "",
     "zoomToFitSelection": "Zoom per veure la selecció",
     "zoomToFit": "Zoom per veure tots els elements",
-    "installPWA": "",
+    "installPWA": "Instal·la Excalidraw localment (PWA)",
     "autoResize": ""
   },
   "library": {
@@ -272,19 +272,19 @@
     "magicSettings": "Configuració d'IA"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
+    "rectangle": "Rectangle",
+    "diamond": "Rombe",
+    "ellipse": "El·lipse",
+    "arrow": "Fletxa",
+    "line": "Línia",
+    "freedraw": "Dibuix a mà alçada",
+    "text": "Text",
+    "image": "Imatge",
+    "group": "Grup",
+    "frame": "Marc",
     "magicframe": "",
     "embeddable": "",
-    "selection": "",
+    "selection": "Selecció",
     "iframe": ""
   },
   "headings": {
@@ -461,9 +461,9 @@
     "selected": "Seleccionat",
     "storage": "Emmagatzematge",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "title": "Estadístiques",
+    "generalStats": "Estadístiques generals",
+    "elementProperties": "Propietats de l'element",
     "total": "Total",
     "version": "Versió",
     "versionCopy": "Feu clic per a copiar",
@@ -559,18 +559,18 @@
     "preview": "Previsualització"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Cerca ràpida"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "antic"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "En aquesta escena",
+    "availableFonts": "Lletres tipogràfiques disponibles",
+    "empty": "No s'ha trobat cap lletra tipogràfica"
   },
   "userList": {
-    "empty": "",
+    "empty": "No s'ha trobat cap usuari",
     "hint": {
       "text": "Feu clic sobre un usuari per seguir-lo",
       "followStatus": "Ara per ara seguiu aquest usuari",
