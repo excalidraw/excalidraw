@@ -132,6 +132,7 @@
     "size": "yarn build:umd && size-limit"
   },
   "resolutions": {
-    "ws": "8.17.1"
+    "ws": "8.17.1",
+    "braces": "3.0.3"
   }
 }

@@ -91,6 +91,7 @@
   "resolutions": {
     "@babel/traverse": ">=7.23.2",
     "node-fetch": "2.6.7",
-    "ws": "8.17.1"
+    "ws": "8.17.1",
+    "braces": "3.0.3"
   }
 }
