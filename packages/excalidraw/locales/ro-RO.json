@@ -109,7 +109,7 @@
     "share": "Distribuie",
     "showStroke": "Afișare selector culoare contur",
     "showBackground": "Afișare selector culoare fundal",
-    "showFonts": "",
+    "showFonts": "Afișare selector font",
     "toggleTheme": "Comutare temă luminoasă/întunecată",
     "theme": "Temă",
     "personalLib": "Biblioteca personală",
@@ -559,18 +559,18 @@
     "preview": "Previzualizare"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Căutare rapidă"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "vechi"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "În această scenă",
+    "availableFonts": "Fonturi disponibile",
+    "empty": "Niciun font găsit"
   },
   "userList": {
-    "empty": "",
+    "empty": "Niciun utilizator găsit",
     "hint": {
       "text": "Dă clic pe un utilizator pentru a-l urmări",
       "followStatus": "În prezent urmărești acest utilizator",
