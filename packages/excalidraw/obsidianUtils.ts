@@ -41,14 +41,14 @@ export function hideFreedrawPenmodeCursor() {
 export function registerLocalFont(fontMetrics: FontMetadata & {name: string}, uri: string) {
   const _register = register.bind({registered: Fonts.registered});
   FONT_METADATA[FONT_FAMILY["Local Font"]] = {metrics: fontMetrics.metrics, icon: FreedrawIcon};
-  _register("LocalFont", fontMetrics, {uri});
+  _register("Local Font", fontMetrics, {uri});
 }
 
 export function getFontFamilies(): string[] {
   const fontFamilies:string[] = [];
   for (const fontFaces of Fonts.registered.values()) {
     for (const font of fontFaces.fontFaces.filter(font => 
-      //font.fontFace.weight === "400" &&
+      font.fontFace.weight === "400" &&
       font.url.protocol !== LOCAL_FONT_PROTOCOL,
     )) {
       fontFamilies.push(font.fontFace.family);
@@ -73,7 +73,7 @@ export async function registerFontsInCSS() {
 
   for (const fontFaces of Fonts.registered.values()) {
     for (const font of fontFaces.fontFaces.filter(font => 
-      //font.fontFace.weight === "400" &&
+      font.fontFace.weight === "400" &&
       font.url.protocol !== LOCAL_FONT_PROTOCOL,
     )) {
       try {
