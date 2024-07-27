@@ -73,36 +73,12 @@ const test1: SubtypeRecord = {
   disabledNames: [TEST_DISABLE1.name as ActionName],
   actionNames: [TEST_ACTION],
 };
-
-const testAction: Action = {
-  name: makeCustomActionName(TEST_ACTION),
-  label: t("toolBar.test"),
-  trackEvent: false,
-  perform: (elements, appState) => {
-    return {
-      elements,
-      storeAction: "none",
-    };
-  },
-};
-
-const test1Button = SubtypeButton(
-  test1.subtype,
-  test1.parents[0],
-  testSubtypeIcon,
-);
 const test1NonParent = "text" as const;
 
 const test2: SubtypeRecord = {
   subtype: "test2",
   parents: ["text"],
 };
-
-const test2Button = SubtypeButton(
-  test2.subtype,
-  test2.parents[0],
-  testSubtypeIcon,
-);
 
 const test3: SubtypeRecord = {
   subtype: "test3",
@@ -114,11 +90,32 @@ const test3: SubtypeRecord = {
   disabledNames: [TEST_DISABLE3.name as ActionName],
 };
 
-const test3Button = SubtypeButton(
-  test3.subtype,
-  test3.parents[0],
-  testSubtypeIcon,
-);
+let testActions: Action[] | null = null;
+
+const makeTestActions = () => {
+  if (testActions) {
+    return testActions;
+  }
+  const testAction: Action = {
+    name: makeCustomActionName(TEST_ACTION),
+    label: t("toolBar.test"),
+    trackEvent: false,
+    perform: (elements, appState) => {
+      return {
+        elements,
+        storeAction: "none",
+      };
+    },
+  };
+
+  testActions = [
+    testAction,
+    SubtypeButton(test1.subtype, test1.parents[0], testSubtypeIcon),
+    SubtypeButton(test2.subtype, test2.parents[0], testSubtypeIcon),
+    SubtypeButton(test3.subtype, test3.parents[0], testSubtypeIcon),
+  ];
+  return testActions;
+};
 
 const cleanTestElementUpdate = function (updates) {
   const oldUpdates = {};
@@ -137,7 +134,7 @@ const prepareNullSubtype = function () {
   methods.measureText = measureTest2;
   methods.wrapText = wrapTest2;
 
-  const actions = [test1Button, test2Button, test3Button];
+  const actions = makeTestActions().filter((_, index) => index > 0);
   return { actions, methods };
 } as SubtypePrepFn;
 
@@ -152,7 +149,7 @@ const prepareTest1Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerCustomLangData(fallbackLangData, getLangData);
 
-  const actions = [testAction, test1Button];
+  const actions = makeTestActions().filter((_, index) => index < 2);
   actions.forEach((action) => addSubtypeAction(action));
 
   return { actions, methods };
@@ -220,7 +217,7 @@ const prepareTest2Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerCustomLangData(fallbackLangData, getLangData);
 
-  const actions = [test2Button];
+  const actions = [makeTestActions()[2]];
   actions.forEach((action) => addSubtypeAction(action));
 
   onTest2Loaded = onSubtypeLoaded;
@@ -238,7 +235,7 @@ const prepareTest3Subtype = function (
   addLangData(fallbackLangData, getLangData);
   registerCustomLangData(fallbackLangData, getLangData);
 
-  const actions = [test3Button];
+  const actions = [makeTestActions()[3]];
   actions.forEach((action) => addSubtypeAction(action));
 
   return { actions, methods };
@@ -268,7 +265,8 @@ describe("subtype registration", () => {
   it("should return subtype actions and methods correctly", async () => {
     // Check initial registration works
     let prep1 = API.addSubtype(test1, prepareTest1Subtype);
-    expect(prep1.actions).toStrictEqual([testAction, test1Button]);
+    const actions = makeTestActions().filter((_, index) => index < 2);
+    expect(prep1.actions).toStrictEqual(actions);
     expect(prep1.methods).toStrictEqual({ clean: cleanTestElementUpdate });
     // Check repeat registration fails
     prep1 = API.addSubtype(test1, prepareNullSubtype);
@@ -277,7 +275,7 @@ describe("subtype registration", () => {
 
     // Check initial registration works
     let prep2 = API.addSubtype(test2, prepareTest2Subtype);
-    expect(prep2.actions).toStrictEqual([test2Button]);
+    expect(prep2.actions).toStrictEqual([makeTestActions()[2]]);
     expect(prep2.methods).toStrictEqual({
       ensureLoaded: ensureLoadedTest2,
       measureText: measureTest2,
@@ -294,7 +292,7 @@ describe("subtype registration", () => {
 
     // Check initial registration works
     let prep3 = API.addSubtype(test3, prepareTest3Subtype);
-    expect(prep3.actions).toStrictEqual([test3Button]);
+    expect(prep3.actions).toStrictEqual([makeTestActions()[3]]);
     expect(prep3.methods).toStrictEqual({});
     // Check repeat registration fails
     prep3 = API.addSubtype(test3, prepareNullSubtype);
@@ -607,43 +605,43 @@ describe("subtype actions", () => {
   it("should apply to elements with their subtype", async () => {
     h.setState({ selectedElementIds: { A: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(true);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(false);
   });
   it("should apply to elements without a subtype", async () => {
     h.setState({ selectedElementIds: { B: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(false);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(false);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to elements with and without their subtype", async () => {
     h.setState({ selectedElementIds: { A: true, B: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(true);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to elements with a different subtype", async () => {
     h.setState({ selectedElementIds: { C: true, D: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(false);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(false);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to like types with varying subtypes", async () => {
     h.setState({ selectedElementIds: { A: true, C: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(true);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to non-like types with varying subtypes", async () => {
     h.setState({ selectedElementIds: { A: true, D: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(true);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(false);
   });
   it("should apply to like/non-like types with varying subtypes", async () => {
     h.setState({ selectedElementIds: { A: true, B: true, D: true } });
     const am = h.app.actionManager;
-    expect(am.isActionEnabled(testAction, { elements })).toBe(true);
+    expect(am.isActionEnabled(makeTestActions()[0], { elements })).toBe(true);
     expect(am.isActionEnabled(TEST_DISABLE1, { elements })).toBe(true);
   });
   it("should apply to the correct parent type", async () => {
