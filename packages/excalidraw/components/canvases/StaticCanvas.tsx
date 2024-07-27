@@ -105,6 +105,7 @@ const getRelevantAppStateProps = (
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
+  currentHoveredFontFamily: appState.currentHoveredFontFamily,
 });
 
 const areEqual = (

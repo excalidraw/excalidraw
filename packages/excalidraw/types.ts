@@ -176,6 +176,7 @@ export type StaticCanvasAppState = Readonly<
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
     frameRendering: AppState["frameRendering"];
+    currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
   }
 >;
 
@@ -278,6 +279,7 @@ export interface AppState {
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
+  currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
   viewBackgroundColor: string;
   scrollX: number;
@@ -289,7 +291,12 @@ export interface AppState {
   isRotating: boolean;
   zoom: Zoom;
   openMenu: "canvas" | "shape" | null;
-  openPopup: "canvasBackground" | "elementBackground" | "elementStroke" | null;
+  openPopup:
+    | "canvasBackground"
+    | "elementBackground"
+    | "elementStroke"
+    | "fontFamily"
+    | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
     | null
@@ -509,6 +516,7 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element | null;
   aiEnabled?: boolean;
+  showDeprecatedFonts?: boolean;
 }
 
 export type SceneData = {
@@ -600,6 +608,7 @@ export type AppClassProperties = {
   device: App["device"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
+  fonts: App["fonts"];
   pasteFromClipboard: App["pasteFromClipboard"];
   id: App["id"];
   onInsertElements: App["onInsertElements"];
