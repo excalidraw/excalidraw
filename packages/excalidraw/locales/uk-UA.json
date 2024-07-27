@@ -277,15 +277,15 @@
     "ellipse": "Еліпс",
     "arrow": "Стрілка",
     "line": "Лінія",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "freedraw": "Малювання від руки",
+    "text": "Текст",
+    "image": "Зображення",
+    "group": "Група",
+    "frame": "Рамка",
+    "magicframe": "Перетворити у код",
+    "embeddable": "Веб вкладення",
+    "selection": "Виділення",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Дії з полотном",
@@ -330,11 +330,11 @@
     "sceneContent": "Вміст сцени:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Або"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Запросіть людей до співпраці над вашим малюнком.",
+    "desc_privacy": "Не хвилюйтеся, сеанс наскрізно зашифрований і повністю приватний. Навіть наш сервер не бачить, що ви малюєте.",
     "button_startSession": "Почати сесію",
     "button_stopSession": "Закрити сесію",
     "desc_inProgressIntro": "Сесія спільної роботи над кресленням триває.",
@@ -460,10 +460,10 @@
     "scene": "Сцена",
     "selected": "Обрано",
     "storage": "Сховище",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Статистика та властивості елементів",
+    "title": "Статистика",
+    "generalStats": "Загальна статистика",
+    "elementProperties": "Властивості елемента",
     "total": "Всього",
     "version": "Версія",
     "versionCopy": "Натисніть, щоб скопіювати",
@@ -559,39 +559,39 @@
     "preview": "Попередній перегляд"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Швидкий пошук"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "старий"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "На цій сцені",
+    "availableFonts": "Доступні шрифти",
+    "empty": "Шрифти не знайдено"
   },
   "userList": {
-    "empty": "",
+    "empty": "Користувачів не знайдено",
     "hint": {
       "text": "Натисніть на користувача, щоб підписатися",
       "followStatus": "Ви вже підписані на цього користувача",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "inCall": "Користувач здійснює голосовий виклик",
+      "micMuted": "Мікрофон користувача вимкнено",
+      "isSpeaking": "Користувач говорить"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Командна палітра",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Вибрати",
+      "confirm": "Підтвердити",
+      "close": "Закрити"
     },
-    "recents": "",
+    "recents": "Нещодавно використані",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Шукайте меню, команди та відкривайте приховані перлини",
+      "noMatch": "Немає відповідних команд..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Команда недоступна...",
+    "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
   }
 }
