@@ -20,6 +20,8 @@ import {
 } from "./components/icons";
 import { getElementAbsoluteCoords } from "./element";
 import { shouldTestInside } from "./element/collision";
+import { LinearElementEditor } from "./element/linearElementEditor";
+import { getBoundTextElement } from "./element/textElement";
 import type { ElementsMap, ExcalidrawElement } from "./element/types";
 import { KEYS } from "./keys";
 import { ShapeCache } from "./scene/ShapeCache";
@@ -158,4 +160,32 @@ export const getElementShape = (
       return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
     }
   }
+};
+
+export const getBoundTextShape = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): GeometricShape | null => {
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+
+  if (boundTextElement) {
+    if (element.type === "arrow") {
+      return getElementShape(
+        {
+          ...boundTextElement,
+          // arrow's bound text accurate position is not stored in the element's property
+          // but rather calculated and returned from the following static method
+          ...LinearElementEditor.getBoundTextElementPosition(
+            element,
+            boundTextElement,
+            elementsMap,
+          ),
+        },
+        elementsMap,
+      );
+    }
+    return getElementShape(boundTextElement, elementsMap);
+  }
+
+  return null;
 };

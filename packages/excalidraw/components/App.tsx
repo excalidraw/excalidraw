@@ -224,8 +224,7 @@ import type {
   ScrollBars,
 } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey, getElementShape } from "../shapes";
-import type { GeometricShape } from "../../utils/geometry/shape";
+import { findShapeByKey, getBoundTextShape, getElementShape } from "../shapes";
 import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import type {
@@ -4515,37 +4514,6 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
-  private getBoundTextShape(element: ExcalidrawElement): GeometricShape | null {
-    const boundTextElement = getBoundTextElement(
-      element,
-      this.scene.getNonDeletedElementsMap(),
-    );
-
-    if (boundTextElement) {
-      if (element.type === "arrow") {
-        return getElementShape(
-          {
-            ...boundTextElement,
-            // arrow's bound text accurate position is not stored in the element's property
-            // but rather calculated and returned from the following static method
-            ...LinearElementEditor.getBoundTextElementPosition(
-              element,
-              boundTextElement,
-              this.scene.getNonDeletedElementsMap(),
-            ),
-          },
-          this.scene.getNonDeletedElementsMap(),
-        );
-      }
-      return getElementShape(
-        boundTextElement,
-        this.scene.getNonDeletedElementsMap(),
-      );
-    }
-
-    return null;
-  }
-
   private getElementAtPosition(
     x: number,
     y: number,
@@ -4677,7 +4645,7 @@ class App extends React.Component<AppProps, AppState> {
     const hitBoundTextOfElement = hitElementBoundText(
       x,
       y,
-      this.getBoundTextShape(element),
+      getBoundTextShape(element, this.scene.getNonDeletedElementsMap()),
     );
     if (hitBoundTextOfElement) {
       return true;
