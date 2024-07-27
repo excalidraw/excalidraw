@@ -635,8 +635,7 @@ export const getMaxCharWidth = (font: FontString) => {
 
 export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
   return container?.boundElements?.length
-    ? container?.boundElements?.filter((ele) => ele.type === "text")[0]?.id ||
-        null
+    ? container?.boundElements?.find((ele) => ele.type === "text")?.id || null
     : null;
 };
 
