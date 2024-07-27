@@ -559,7 +559,7 @@
     "preview": "Prévisualisation"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Recherche rapide"
   },
   "fontList": {
     "badge": {
@@ -570,7 +570,7 @@
     "empty": ""
   },
   "userList": {
-    "empty": "",
+    "empty": "Aucun utilisateurs trouvé",
     "hint": {
       "text": "Cliquez sur l'utilisateur pour le suivre",
       "followStatus": "Vous suivez actuellement cet utilisateur",
