@@ -11,7 +11,7 @@
     "copyAsPng": "Αντιγραφή στο πρόχειρο ως PNG",
     "copyAsSvg": "Αντιγραφή στο πρόχειρο ως SVG",
     "copyText": "Αντιγραφή στο πρόχειρο ως κείμενο",
-    "copySource": "",
+    "copySource": "Αντιγραφή προέλευσης στο πρόχειρο",
     "convertToCode": "Μετατροπή σε κώδικα",
     "bringForward": "Στο προσκήνιο",
     "sendToBack": "Ένα επίπεδο πίσω",
@@ -109,7 +109,7 @@
     "share": "Κοινοποίηση",
     "showStroke": "Εμφάνιση επιλογέα χρωμάτων πινελιάς",
     "showBackground": "Εμφάνιση επιλογέα χρώματος φόντου",
-    "showFonts": "",
+    "showFonts": "Εμφάνιση επιλογέα γραμματοσειράς",
     "toggleTheme": "Εναλλαγή φωτεινού/σκοτεινού θέματος",
     "theme": "Θέμα",
     "personalLib": "Προσωπική Βιβλιοθήκη",
@@ -118,14 +118,14 @@
     "increaseFontSize": "Αύξηση μεγέθους γραμματοσειράς",
     "unbindText": "Αποσύνδεση κειμένου",
     "bindText": "Δέσμευση κειμένου στο δοχείο",
-    "createContainerFromText": "",
+    "createContainerFromText": "Αναδίπλωση κειμένου σε δοχείο",
     "link": {
       "edit": "Επεξεργασία συνδέσμου",
-      "editEmbed": "",
+      "editEmbed": "Επεξεργασία συνδέσμου & ενσωμάτωση",
       "create": "Δημιουργία συνδέσμου",
-      "createEmbed": "",
+      "createEmbed": "Δημιουργία συνδέσμου & ενσωμάτωση",
       "label": "Σύνδεσμος",
-      "labelEmbed": "",
+      "labelEmbed": "Σύνδεσμος & ενσωμάτωση",
       "empty": "Δεν έχει οριστεί σύνδεσμος"
     },
     "lineEditor": {
@@ -144,14 +144,14 @@
     "removeAllElementsFromFrame": "Αφαίρεση όλων των στοιχείων από το πλαίσιο",
     "eyeDropper": "Διαλέξτε χρώμα απ' τον καμβά",
     "textToDiagram": "Κείμενο σε διάγραμμα",
-    "prompt": "",
+    "prompt": "Εντολή",
     "followUs": "Ακολουθήστε μας",
     "discordChat": "Συνομιλία Discord",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
+    "zoomToFitViewport": "Εστίαση για να χωρέσει στο παράθυρο προβολής",
+    "zoomToFitSelection": "Εστίαση για να χωρέσει στην επιλογή",
+    "zoomToFit": "Εστίαση για να χωρέσει σε όλα τα στοιχεία",
     "installPWA": "Τοπική εγκατάσταση Excalidraw (PWA)",
-    "autoResize": ""
+    "autoResize": "Ενεργοποίηση αυτόματης αλλαγής μεγέθους κειμένου"
   },
   "library": {
     "noItems": "Δεν έχουν προστεθεί αντικείμενα ακόμη...",
@@ -184,14 +184,14 @@
     "fullScreen": "Πλήρης οθόνη",
     "darkMode": "Σκοτεινή λειτουργία",
     "lightMode": "Φωτεινή λειτουργία",
-    "systemMode": "",
+    "systemMode": "Λειτουργία συστήματος",
     "zenMode": "Λειτουργία Zεν",
     "objectsSnapMode": "Προσκόλληση σε αντικείμενα",
     "exitZenMode": "Έξοδος από την λειτουργία Zen",
     "cancel": "Ακύρωση",
     "clear": "Καθαρισμός",
     "remove": "Κατάργηση",
-    "embed": "",
+    "embed": "Εναλλαγή ενσωμάτωσης",
     "publishLibrary": "Δημοσίευση",
     "submit": "Υποβολή",
     "confirm": "Επιβεβαίωση",
@@ -243,7 +243,7 @@
       "iframe": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnRead": "Δεν ήταν δυνατή η επικόλληση (δεν ήταν δυνατή η ανάγνωση από το πρόχειρο του συστήματος).",
     "asyncPasteFailedOnParse": "Αδυναμία επικόλλησης.",
     "copyToSystemClipboardFailed": "Αδυναμία αντιγραφής στο πρόχειρο."
   },
@@ -268,7 +268,7 @@
     "laser": "Δείκτης λέιζερ",
     "hand": "",
     "extraTools": "Περισσότερα εργαλεία",
-    "mermaidToExcalidraw": "",
+    "mermaidToExcalidraw": "Mermaid σε Excalidraw",
     "magicSettings": "Ρυθμίσεις τεχνητής νοημοσύνης"
   },
   "element": {
@@ -284,8 +284,8 @@
     "frame": "Πλαίσιο",
     "magicframe": "",
     "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "selection": "Επιλογή",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Ενέργειες καμβά",
@@ -293,7 +293,7 @@
     "shapes": "Σχήματα"
   },
   "hints": {
-    "canvasPanning": "",
+    "canvasPanning": "Για να μετακινήσετε τον καμβά, κρατήστε πατημένο τον τροχό του ποντικιού ή το πλήκτρο κενού ενώ σύρετε, ή χρησιμοποιήστε το εργαλείο χειρός",
     "linearElement": "Κάνε κλικ για να ξεκινήσεις πολλαπλά σημεία, σύρε για μια γραμμή",
     "freeDraw": "Κάντε κλικ και σύρτε, απελευθερώσατε όταν έχετε τελειώσει",
     "text": "Tip: μπορείτε επίσης να προσθέστε κείμενο με διπλό-κλικ οπουδήποτε με το εργαλείο επιλογών",
