@@ -27,6 +27,7 @@ import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
+import React from "react";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -319,12 +320,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            55.9697848965255,
-            47.442326230998205,
+            "55.96978",
+            "47.44233",
           ],
           [
-            76.08587175006699,
-            43.294165939653226,
+            "76.08587",
+            "43.29417",
           ],
         ]
       `);
@@ -381,12 +382,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            105.96978489652551,
-            67.4423262309982,
+            "105.96978",
+            "67.44233",
           ],
           [
-            126.08587175006699,
-            63.294165939653226,
+            "126.08587",
+            "63.29417",
           ],
         ]
       `);
@@ -627,16 +628,16 @@ describe("Test Linear Elements", () => {
                 0,
               ],
               [
-                85.96978489652551,
-                77.4423262309982,
+                "85.96978",
+                "77.44233",
               ],
               [
                 70,
                 50,
               ],
               [
-                106.08587175006699,
-                73.29416593965323,
+                "106.08587",
+                "73.29417",
               ],
               [
                 40,
@@ -683,12 +684,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              31.884084517616053,
-              23.13275505472383,
+              "31.88408",
+              "23.13276",
             ],
             [
-              77.74792546875662,
-              44.57840982272327,
+              "77.74793",
+              "44.57841",
             ],
           ]
         `);
@@ -769,12 +770,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              55.9697848965255,
-              47.442326230998205,
+              "55.96978",
+              "47.44233",
             ],
             [
-              76.08587175006699,
-              43.294165939653226,
+              "76.08587",
+              "43.29417",
             ],
           ]
         `);
@@ -928,8 +929,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": 85.82201843191861,
-            "y": 75.63461309860818,
+            "x": "85.82202",
+            "y": "75.63461",
           }
         `);
       });
@@ -1051,11 +1052,11 @@ describe("Test Linear Elements", () => {
           arrayToMap(h.elements),
         ),
       ).toMatchInlineSnapshot(`
-          {
-            "x": 75,
-            "y": 60,
-          }
-        `);
+        {
+          "x": 75,
+          "y": 60,
+        }
+      `);
       expect(textElement.text).toMatchInlineSnapshot(`
         "Online whiteboard 
         collaboration made 
@@ -1068,15 +1069,15 @@ describe("Test Linear Elements", () => {
           true,
         ),
       ).toMatchInlineSnapshot(`
-          [
-            20,
-            20,
-            105,
-            80,
-            55.45893770831013,
-            45,
-          ]
-        `);
+        [
+          20,
+          20,
+          105,
+          80,
+          "55.45894",
+          45,
+        ]
+      `);
 
       UI.resize(container, "ne", [300, 200]);
 
@@ -1084,7 +1085,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": 366.11716195150507,
+            "width": "366.11716",
           }
         `);
 
@@ -1095,11 +1096,11 @@ describe("Test Linear Elements", () => {
           arrayToMap(h.elements),
         ),
       ).toMatchInlineSnapshot(`
-          {
-            "x": 271.11716195150507,
-            "y": 45,
-          }
-        `);
+        {
+          "x": "271.11716",
+          "y": 45,
+        }
+      `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
           "Online whiteboard 
@@ -1112,15 +1113,15 @@ describe("Test Linear Elements", () => {
           true,
         ),
       ).toMatchInlineSnapshot(`
-          [
-            20,
-            35,
-            501.11716195150507,
-            95,
-            205.4589377083102,
-            52.5,
-          ]
-        `);
+        [
+          20,
+          35,
+          "501.11716",
+          95,
+          "205.45894",
+          "52.50000",
+        ]
+      `);
     });
 
     it("should resize and position the bound text correctly when 2 pointer linear element resized", () => {
@@ -1347,6 +1348,29 @@ describe("Test Linear Elements", () => {
       expect(arrow.y).toBe(100);
       expect(label.x).toBe(0);
       expect(label.y).toBe(0);
+    });
+  });
+
+  describe("Test moving linear element points", () => {
+    it("should move the endpoint in the negative direction correctly when the start point is also moved in the positive direction", async () => {
+      const line = createThreePointerLinearElement("arrow");
+      const [origStartX, origStartY] = [line.x, line.y];
+
+      LinearElementEditor.movePoints(line, [
+        { index: 0, point: [line.points[0][0] + 10, line.points[0][1] + 10] },
+        {
+          index: line.points.length - 1,
+          point: [
+            line.points[line.points.length - 1][0] - 10,
+            line.points[line.points.length - 1][1] - 10,
+          ],
+        },
+      ]);
+      expect(line.x).toBe(origStartX + 10);
+      expect(line.y).toBe(origStartY + 10);
+
+      expect(line.points[line.points.length - 1][0]).toBe(20);
+      expect(line.points[line.points.length - 1][1]).toBe(-20);
     });
   });
 });

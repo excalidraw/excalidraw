@@ -1,8 +1,8 @@
 import {
   BOUND_TEXT_PADDING,
   ROUNDNESS,
-  VERTICAL_ALIGN,
   TEXT_ALIGN,
+  VERTICAL_ALIGN,
 } from "../constants";
 import { isTextElement, newElement } from "../element";
 import { mutateElement } from "../element/mutateElement";
@@ -140,6 +140,7 @@ export const actionBindText = register({
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
+      autoResize: true,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -294,6 +295,7 @@ export const actionWrapTextInContainer = register({
             verticalAlign: VERTICAL_ALIGN.MIDDLE,
             boundElements: null,
             textAlign: TEXT_ALIGN.CENTER,
+            autoResize: true,
           },
           false,
         );

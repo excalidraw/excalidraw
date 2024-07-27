@@ -88,6 +88,7 @@ import {
   isIOS,
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
+  DEFAULT_TEXT_ALIGN,
 } from "../constants";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -114,7 +115,7 @@ import {
   newTextElement,
   newImageElement,
   transformElements,
-  updateTextElement,
+  refreshTextDimensions,
   redrawTextBoundingBox,
   getElementAbsoluteCoords,
 } from "../element";
@@ -223,16 +224,9 @@ import type {
   ScrollBars,
 } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey } from "../shapes";
+import { findShapeByKey, getElementShape } from "../shapes";
 import type { GeometricShape } from "../../utils/geometry/shape";
-import {
-  getClosedCurveShape,
-  getCurveShape,
-  getEllipseShape,
-  getFreedrawShape,
-  getPolygonShape,
-  getSelectionBoxShape,
-} from "../../utils/geometry/shape";
+import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import type {
   AppClassProperties,
@@ -339,10 +333,12 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
-  getDefaultLineHeight,
   getLineHeightInPx,
+  getMinTextElementWidth,
   isMeasureTextSupported,
   isValidTextContainer,
+  measureText,
+  wrapText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -352,7 +348,7 @@ import {
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
-import { Fonts } from "../scene/Fonts";
+import { Fonts, getLineHeight } from "../fonts";
 import {
   getFrameChildren,
   isCursorInFrame,
@@ -431,7 +427,6 @@ import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-  shouldTestInside,
 } from "../element/collision";
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
@@ -441,6 +436,9 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { getVisibleSceneBounds } from "../element/bounds";
+import { isMaybeMermaidDefinition } from "../mermaid";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -545,8 +543,8 @@ class App extends React.Component<AppProps, AppState> {
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public scene: Scene;
+  public fonts: Fonts;
   public renderer: Renderer;
-  private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -727,10 +725,7 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = new Fonts({
-      scene: this.scene,
-      onSceneUpdated: this.onSceneUpdated,
-    });
+    this.fonts = new Fonts({ scene: this.scene });
     this.history = new History();
 
     this.actionManager.registerAll(actions);
@@ -966,7 +961,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (updated) {
-      this.scene.informMutation();
+      this.scene.triggerUpdate();
     }
 
     // GC
@@ -1478,10 +1473,10 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderCustomStats } = this.props;
 
-    const versionNonce = this.scene.getVersionNonce();
+    const sceneNonce = this.scene.getSceneNonce();
     const { elementsMap, visibleElements } =
       this.renderer.getRenderableElements({
-        versionNonce,
+        sceneNonce,
         zoom: this.state.zoom,
         offsetLeft: this.state.offsetLeft,
         offsetTop: this.state.offsetTop,
@@ -1699,7 +1694,7 @@ class App extends React.Component<AppProps, AppState> {
                           elementsMap={elementsMap}
                           allElementsMap={allElementsMap}
                           visibleElements={visibleElements}
-                          versionNonce={versionNonce}
+                          sceneNonce={sceneNonce}
                           selectionNonce={
                             this.state.selectionElement?.versionNonce
                           }
@@ -1720,8 +1715,9 @@ class App extends React.Component<AppProps, AppState> {
                           canvas={this.interactiveCanvas}
                           elementsMap={elementsMap}
                           visibleElements={visibleElements}
+                          allElementsMap={allElementsMap}
                           selectedElements={selectedElements}
-                          versionNonce={versionNonce}
+                          sceneNonce={sceneNonce}
                           selectionNonce={
                             this.state.selectionElement?.versionNonce
                           }
@@ -1845,7 +1841,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
     this.magicGenerations.set(frameElement.id, data);
-    this.onSceneUpdated();
+    this.triggerRender();
   };
 
   private getTextFromElements(elements: readonly ExcalidrawElement[]) {
@@ -2155,95 +2151,96 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private syncActionResult = withBatchedUpdates(
-    (actionResult: ActionResult) => {
-      if (this.unmounted || actionResult === false) {
-        return;
+  public syncActionResult = withBatchedUpdates((actionResult: ActionResult) => {
+    if (this.unmounted || actionResult === false) {
+      return;
+    }
+
+    if (actionResult.storeAction === StoreAction.UPDATE) {
+      this.store.shouldUpdateSnapshot();
+    } else if (actionResult.storeAction === StoreAction.CAPTURE) {
+      this.store.shouldCaptureIncrement();
+    }
+
+    let didUpdate = false;
+
+    let editingElement: AppState["editingElement"] | null = null;
+    if (actionResult.elements) {
+      actionResult.elements.forEach((element) => {
+        if (
+          this.state.editingElement?.id === element.id &&
+          this.state.editingElement !== element &&
+          isNonDeletedElement(element)
+        ) {
+          editingElement = element;
+        }
+      });
+
+      this.scene.replaceAllElements(actionResult.elements);
+      didUpdate = true;
+    }
+
+    if (actionResult.files) {
+      this.files = actionResult.replaceFiles
+        ? actionResult.files
+        : { ...this.files, ...actionResult.files };
+      this.addNewImagesToImageCache();
+    }
+
+    if (actionResult.appState || editingElement || this.state.contextMenu) {
+      let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
+      let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
+      let gridSize = actionResult?.appState?.gridSize || null;
+      const theme =
+        actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
+      const name = actionResult?.appState?.name ?? this.state.name;
+      const errorMessage =
+        actionResult?.appState?.errorMessage ?? this.state.errorMessage;
+      if (typeof this.props.viewModeEnabled !== "undefined") {
+        viewModeEnabled = this.props.viewModeEnabled;
       }
 
-      let editingElement: AppState["editingElement"] | null = null;
-      if (actionResult.elements) {
-        actionResult.elements.forEach((element) => {
-          if (
-            this.state.editingElement?.id === element.id &&
-            this.state.editingElement !== element &&
-            isNonDeletedElement(element)
-          ) {
-            editingElement = element;
-          }
+      if (typeof this.props.zenModeEnabled !== "undefined") {
+        zenModeEnabled = this.props.zenModeEnabled;
+      }
+
+      if (typeof this.props.gridModeEnabled !== "undefined") {
+        gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
+      }
+
+      editingElement =
+        editingElement || actionResult.appState?.editingElement || null;
+
+      if (editingElement?.isDeleted) {
+        editingElement = null;
+      }
+
+      this.setState((state) => {
+        // using Object.assign instead of spread to fool TS 4.2.2+ into
+        // regarding the resulting type as not containing undefined
+        // (which the following expression will never contain)
+        return Object.assign(actionResult.appState || {}, {
+          // NOTE this will prevent opening context menu using an action
+          // or programmatically from the host, so it will need to be
+          // rewritten later
+          contextMenu: null,
+          editingElement,
+          viewModeEnabled,
+          zenModeEnabled,
+          gridSize,
+          theme,
+          name,
+          errorMessage,
         });
+      });
 
-        if (actionResult.storeAction === StoreAction.UPDATE) {
-          this.store.shouldUpdateSnapshot();
-        } else if (actionResult.storeAction === StoreAction.CAPTURE) {
-          this.store.shouldCaptureIncrement();
-        }
+      didUpdate = true;
+    }
 
-        this.scene.replaceAllElements(actionResult.elements);
-      }
-
-      if (actionResult.files) {
-        this.files = actionResult.replaceFiles
-          ? actionResult.files
-          : { ...this.files, ...actionResult.files };
-        this.addNewImagesToImageCache();
-      }
-
-      if (actionResult.appState || editingElement || this.state.contextMenu) {
-        if (actionResult.storeAction === StoreAction.UPDATE) {
-          this.store.shouldUpdateSnapshot();
-        } else if (actionResult.storeAction === StoreAction.CAPTURE) {
-          this.store.shouldCaptureIncrement();
-        }
-
-        let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
-        let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
-        let gridSize = actionResult?.appState?.gridSize || null;
-        const theme =
-          actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
-        const name = actionResult?.appState?.name ?? this.state.name;
-        const errorMessage =
-          actionResult?.appState?.errorMessage ?? this.state.errorMessage;
-        if (typeof this.props.viewModeEnabled !== "undefined") {
-          viewModeEnabled = this.props.viewModeEnabled;
-        }
-
-        if (typeof this.props.zenModeEnabled !== "undefined") {
-          zenModeEnabled = this.props.zenModeEnabled;
-        }
-
-        if (typeof this.props.gridModeEnabled !== "undefined") {
-          gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
-        }
-
-        editingElement =
-          editingElement || actionResult.appState?.editingElement || null;
-
-        if (editingElement?.isDeleted) {
-          editingElement = null;
-        }
-
-        this.setState((state) => {
-          // using Object.assign instead of spread to fool TS 4.2.2+ into
-          // regarding the resulting type as not containing undefined
-          // (which the following expression will never contain)
-          return Object.assign(actionResult.appState || {}, {
-            // NOTE this will prevent opening context menu using an action
-            // or programmatically from the host, so it will need to be
-            // rewritten later
-            contextMenu: null,
-            editingElement,
-            viewModeEnabled,
-            zenModeEnabled,
-            gridSize,
-            theme,
-            name,
-            errorMessage,
-          });
-        });
-      }
-    },
-  );
+    if (!didUpdate && actionResult.storeAction !== StoreAction.NONE) {
+      this.scene.triggerUpdate();
+    }
+  });
 
   // Lifecycle
 
@@ -2310,7 +2307,11 @@ class App extends React.Component<AppProps, AppState> {
     }
     let initialData = null;
     try {
-      initialData = (await this.props.initialData) || null;
+      if (typeof this.props.initialData === "function") {
+        initialData = (await this.props.initialData()) || null;
+      } else {
+        initialData = (await this.props.initialData) || null;
+      }
       if (initialData?.libraryItems) {
         this.library
           .updateLibrary({
@@ -2359,11 +2360,6 @@ class App extends React.Component<AppProps, AppState> {
         }),
       };
     }
-    // FontFaceSet loadingdone event we listen on may not always fire
-    // (looking at you Safari), so on init we manually load fonts for current
-    // text elements on canvas, and rerender them once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.loadFontsForElements(scene.elements);
 
     this.resetStore();
     this.resetHistory();
@@ -2371,6 +2367,12 @@ class App extends React.Component<AppProps, AppState> {
       ...scene,
       storeAction: StoreAction.UPDATE,
     });
+
+    // FontFaceSet loadingdone event we listen on may not always
+    // fire (looking at you Safari), so on init we manually load all
+    // fonts and rerender scene text elements once done. This also
+    // seems faster even in browsers that do fire the loadingdone event.
+    this.fonts.load();
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2463,6 +2465,10 @@ class App extends React.Component<AppProps, AppState> {
           configurable: true,
           value: this.store,
         },
+        fonts: {
+          configurable: true,
+          value: this.fonts,
+        },
       });
     }
 
@@ -2470,7 +2476,7 @@ class App extends React.Component<AppProps, AppState> {
       this.history.record(increment.elementsChange, increment.appStateChange);
     });
 
-    this.scene.addCallback(this.onSceneUpdated);
+    this.scene.onUpdate(this.triggerRender);
     this.addEventListeners();
 
     if (this.props.autoFocus && this.excalidrawContainerRef.current) {
@@ -2513,15 +2519,17 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    (window as any).launchQueue?.setConsumer(() => {});
     this.renderer.destroy();
+    this.scene.destroy();
     this.scene = new Scene();
+    this.fonts = new Fonts({ scene: this.scene });
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
     this.removeEventListeners();
-    this.scene.destroy();
     this.library.destroy();
     this.laserTrails.stop();
     this.eraserTrail.stop();
@@ -2592,13 +2600,13 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
         document,
-        EVENT.MOUSE_MOVE,
+        EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
       ),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onFontsLoaded(loadedFontFaces);
+        this.fonts.onLoaded(loadedFontFaces);
       }),
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -2621,6 +2629,9 @@ class App extends React.Component<AppProps, AppState> {
       ),
       addEventListener(window, EVENT.FOCUS, () => {
         this.maybeCleanupAfterMissingPointerUp(null);
+        // browsers (chrome?) tend to free up memory a lot, which results
+        // in canvas context being cleared. Thus re-render on focus.
+        this.triggerRender(true);
       }),
     );
 
@@ -2830,7 +2841,7 @@ class App extends React.Component<AppProps, AppState> {
             nonDeletedElementsMap,
           ),
         ),
-        this,
+        this.scene.getNonDeletedElementsMap(),
       );
     }
 
@@ -3068,6 +3079,31 @@ class App extends React.Component<AppProps, AppState> {
           retainSeed: isPlainPaste,
         });
       } else if (data.text) {
+        if (data.text && isMaybeMermaidDefinition(data.text)) {
+          const api = await import("@excalidraw/mermaid-to-excalidraw");
+
+          try {
+            const { elements: skeletonElements, files } =
+              await api.parseMermaidToExcalidraw(data.text);
+
+            const elements = convertToExcalidrawElements(skeletonElements, {
+              regenerateIds: true,
+            });
+
+            this.addElementsFromPasteOrLibrary({
+              elements,
+              files,
+              position: "cursor",
+            });
+
+            return;
+          } catch (err: any) {
+            console.warn(
+              `parsing pasted text as mermaid definition failed: ${err.message}`,
+            );
+          }
+        }
+
         const nonEmptyLines = normalizeEOL(data.text)
           .split(/\n+/)
           .map((s) => s.trim())
@@ -3365,33 +3401,54 @@ class App extends React.Component<AppProps, AppState> {
       text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
-      textAlign: this.state.currentItemTextAlign,
+      textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
       ...selectSubtype(this.state, "text"),
       locked: false,
     };
-
+    const fontString = getFontString({
+      fontSize: textElementProps.fontSize,
+      fontFamily: textElementProps.fontFamily,
+    });
+    const lineHeight = getLineHeight(textElementProps.fontFamily);
+    const [x1, , x2] = getVisibleSceneBounds(this.state);
+    // long texts should not go beyond 800 pixels in width nor should it go below 200 px
+    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
     const LINE_GAP = 10;
     let currentY = y;
 
     const lines = isPlainPaste ? [text] : text.split("\n");
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
-        const text = line.trim();
-
-        const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
-        if (text.length) {
+        const originalText = line.trim();
+        if (originalText.length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
             x,
             y: currentY,
           });
 
+          let metrics = measureText(originalText, fontString, lineHeight);
+          const isTextUnwrapped = metrics.width > maxTextWidth;
+
+          const text = isTextUnwrapped
+            ? wrapText(originalText, fontString, maxTextWidth)
+            : originalText;
+
+          metrics = isTextUnwrapped
+            ? measureText(text, fontString, lineHeight)
+            : metrics;
+
+          const startX = x - metrics.width / 2;
+          const startY = currentY - metrics.height / 2;
+
           const element = newTextElement({
             ...textElementProps,
-            x,
-            y: currentY,
+            x: startX,
+            y: startY,
             text,
+            originalText,
             lineHeight,
+            autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
@@ -3697,7 +3754,7 @@ class App extends React.Component<AppProps, AppState> {
           ShapeCache.delete(element);
         }
       });
-      this.scene.informMutation();
+      this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
     },
@@ -3708,7 +3765,7 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      /** @default StoreAction.CAPTURE */
+      /** @default StoreAction.NONE */
       storeAction?: SceneData["storeAction"];
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
@@ -3757,8 +3814,15 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private onSceneUpdated = () => {
-    this.setState({});
+  private triggerRender = (
+    /** force always re-renders canvas even if no change */
+    force?: boolean,
+  ) => {
+    if (force === true) {
+      this.scene.triggerUpdate();
+    } else {
+      this.setState({});
+    }
   };
 
   /**
@@ -3965,7 +4029,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           suggestedBindings: getSuggestedBindingsForArrows(
             selectedElements,
-            this,
+            this.scene.getNonDeletedElementsMap(),
           ),
         });
 
@@ -4074,6 +4138,36 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.key.toLowerCase() === KEYS.F
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          this.state.activeTool.type === "text" ||
+          selectedElements.find(
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+          )
+        ) {
+          event.preventDefault();
+          this.setState({ openPopup: "fontFamily" });
+        }
+      }
+
       if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
         if (this.state.activeTool.type === "laser") {
           this.setActiveTool({ type: "selection" });
@@ -4136,7 +4230,7 @@ class App extends React.Component<AppProps, AppState> {
     if (isArrowKey(event.key)) {
       bindOrUnbindLinearElements(
         this.scene.getSelectedElements(this.state).filter(isLinearElement),
-        this,
+        this.scene.getNonDeletedElementsMap(),
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
       );
@@ -4327,25 +4421,22 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
-    const updateElement = (
-      text: string,
-      originalText: string,
-      isDeleted: boolean,
-    ) => {
+    const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(
-              _element,
-              getContainerElement(_element, elementsMap),
-              elementsMap,
-              {
-                text,
-                isDeleted,
-                originalText,
-              },
-            );
+            return newElementWith(_element, {
+              originalText: nextOriginalText,
+              isDeleted: isDeleted ?? _element.isDeleted,
+              // returns (wrapped) text and new dimensions
+              ...refreshTextDimensions(
+                _element,
+                getContainerElement(_element, elementsMap),
+                elementsMap,
+                nextOriginalText,
+              ),
+            });
           }
           return _element;
         }),
@@ -4368,15 +4459,15 @@ class App extends React.Component<AppProps, AppState> {
           viewportY - this.state.offsetTop,
         ];
       },
-      onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false);
+      onChange: withBatchedUpdates((nextOriginalText) => {
+        updateElement(nextOriginalText, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element, elementsMap);
         }
       }),
-      onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
-        const isDeleted = !text.trim();
-        updateElement(text, originalText, isDeleted);
+      onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
+        const isDeleted = !nextOriginalText.trim();
+        updateElement(nextOriginalText, isDeleted);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -4415,13 +4506,18 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
+      // when text is selected, it's hard (at least on iOS) to re-position the
+      // caret (i.e. deselect). There's not much use for always selecting
+      // the text on edit anyway (and users can select-all from contextmenu
+      // if needed)
+      autoSelect: !this.device.isTouchScreen,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText, false);
+    updateElement(element.originalText, false);
   }
 
   private deselectElements() {
@@ -4446,59 +4542,6 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
-  /**
-   * get the pure geometric shape of an excalidraw element
-   * which is then used for hit detection
-   */
-  public getElementShape(element: ExcalidrawElement): GeometricShape {
-    switch (element.type) {
-      case "rectangle":
-      case "diamond":
-      case "frame":
-      case "magicframe":
-      case "embeddable":
-      case "image":
-      case "iframe":
-      case "text":
-      case "selection":
-        return getPolygonShape(element);
-      case "arrow":
-      case "line": {
-        const roughShape =
-          ShapeCache.get(element)?.[0] ??
-          ShapeCache.generateElementShape(element, null)[0];
-        const [, , , , cx, cy] = getElementAbsoluteCoords(
-          element,
-          this.scene.getNonDeletedElementsMap(),
-        );
-
-        return shouldTestInside(element)
-          ? getClosedCurveShape(
-              element,
-              roughShape,
-              [element.x, element.y],
-              element.angle,
-              [cx, cy],
-            )
-          : getCurveShape(roughShape, [element.x, element.y], element.angle, [
-              cx,
-              cy,
-            ]);
-      }
-
-      case "ellipse":
-        return getEllipseShape(element);
-
-      case "freedraw": {
-        const [, , , , cx, cy] = getElementAbsoluteCoords(
-          element,
-          this.scene.getNonDeletedElementsMap(),
-        );
-        return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
-      }
-    }
-  }
-
   private getBoundTextShape(element: ExcalidrawElement): GeometricShape | null {
     const boundTextElement = getBoundTextElement(
       element,
@@ -4507,18 +4550,24 @@ class App extends React.Component<AppProps, AppState> {
 
     if (boundTextElement) {
       if (element.type === "arrow") {
-        return this.getElementShape({
-          ...boundTextElement,
-          // arrow's bound text accurate position is not stored in the element's property
-          // but rather calculated and returned from the following static method
-          ...LinearElementEditor.getBoundTextElementPosition(
-            element,
-            boundTextElement,
-            this.scene.getNonDeletedElementsMap(),
-          ),
-        });
+        return getElementShape(
+          {
+            ...boundTextElement,
+            // arrow's bound text accurate position is not stored in the element's property
+            // but rather calculated and returned from the following static method
+            ...LinearElementEditor.getBoundTextElementPosition(
+              element,
+              boundTextElement,
+              this.scene.getNonDeletedElementsMap(),
+            ),
+          },
+          this.scene.getNonDeletedElementsMap(),
+        );
       }
-      return this.getElementShape(boundTextElement);
+      return getElementShape(
+        boundTextElement,
+        this.scene.getNonDeletedElementsMap(),
+      );
     }
 
     return null;
@@ -4557,7 +4606,10 @@ class App extends React.Component<AppProps, AppState> {
         x,
         y,
         element: elementWithHighestZIndex,
-        shape: this.getElementShape(elementWithHighestZIndex),
+        shape: getElementShape(
+          elementWithHighestZIndex,
+          this.scene.getNonDeletedElementsMap(),
+        ),
         // when overlapping, we would like to be more precise
         // this also avoids the need to update past tests
         threshold: this.getElementHitThreshold() / 2,
@@ -4662,7 +4714,7 @@ class App extends React.Component<AppProps, AppState> {
       x,
       y,
       element,
-      shape: this.getElementShape(element),
+      shape: getElementShape(element, this.scene.getNonDeletedElementsMap()),
       threshold: this.getElementHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
@@ -4694,7 +4746,10 @@ class App extends React.Component<AppProps, AppState> {
           x,
           y,
           element: elements[index],
-          shape: this.getElementShape(elements[index]),
+          shape: getElementShape(
+            elements[index],
+            this.scene.getNonDeletedElementsMap(),
+          ),
           threshold: this.getElementHitThreshold(),
         })
       ) {
@@ -4714,6 +4769,7 @@ class App extends React.Component<AppProps, AppState> {
     sceneY,
     insertAtParentCenter = true,
     container,
+    autoEdit = true,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -4722,6 +4778,7 @@ class App extends React.Component<AppProps, AppState> {
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
+    autoEdit?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -4765,7 +4822,7 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
 
     const lineHeight =
-      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+      existingTextElement?.lineHeight || getLineHeight(fontFamily);
     const fontSize = this.state.currentItemFontSize;
 
     if (
@@ -4855,13 +4912,16 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    this.setState({
-      editingElement: element,
-    });
-
-    this.handleTextWysiwyg(element, {
-      isExistingElement: !!existingTextElement,
-    });
+    if (autoEdit || existingTextElement || container) {
+      this.handleTextWysiwyg(element, {
+        isExistingElement: !!existingTextElement,
+      });
+    } else {
+      this.setState({
+        draggingElement: element,
+        multiElement: null,
+      });
+    }
   };
 
   private handleCanvasDoubleClick = (
@@ -4948,7 +5008,10 @@ class App extends React.Component<AppProps, AppState> {
             x: sceneX,
             y: sceneY,
             element: container,
-            shape: this.getElementShape(container),
+            shape: getElementShape(
+              container,
+              this.scene.getNonDeletedElementsMap(),
+            ),
             threshold: this.getElementHitThreshold(),
           })
         ) {
@@ -5129,8 +5192,11 @@ class App extends React.Component<AppProps, AppState> {
 
         this.translateCanvas({
           zoom: zoomState.zoom,
-          scrollX: zoomState.scrollX + deltaX / nextZoom,
-          scrollY: zoomState.scrollY + deltaY / nextZoom,
+          // 2x multiplier is just a magic number that makes this work correctly
+          // on touchscreen devices (note: if we get report that panning is slower/faster
+          // than actual movement, consider swapping with devicePixelRatio)
+          scrollX: zoomState.scrollX + 2 * (deltaX / nextZoom),
+          scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
           shouldCacheIgnoreZoom: true,
         });
       });
@@ -5605,7 +5671,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.elementsPendingErasure = new Set(this.elementsPendingErasure);
-      this.onSceneUpdated();
+      this.triggerRender();
     }
   };
 
@@ -5637,7 +5703,10 @@ class App extends React.Component<AppProps, AppState> {
           x: scenePointerX,
           y: scenePointerY,
           element,
-          shape: this.getElementShape(element),
+          shape: getElementShape(
+            element,
+            this.scene.getNonDeletedElementsMap(),
+          ),
         })
       ) {
         hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
@@ -5893,7 +5962,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
-      return;
     } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
@@ -6014,6 +6082,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
+
     if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
@@ -6687,6 +6756,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       insertAtParentCenter: !event.altKey,
       container,
+      autoEdit: false,
     });
 
     resetCursor(this.interactiveCanvas);
@@ -6755,7 +6825,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
-      this,
+      this.scene.getNonDeletedElementsMap(),
     );
     this.scene.insertElement(element);
     this.setState({
@@ -7019,7 +7089,7 @@ class App extends React.Component<AppProps, AppState> {
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
-        this,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       this.scene.insertElement(element);
@@ -7490,7 +7560,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             suggestedBindings: getSuggestedBindingsForArrows(
               selectedElements,
-              this,
+              this.scene.getNonDeletedElementsMap(),
             ),
           });
 
@@ -8011,7 +8081,7 @@ class App extends React.Component<AppProps, AppState> {
               draggingElement,
               this.state,
               pointerCoords,
-              this,
+              this.scene.getNonDeletedElementsMap(),
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -8038,6 +8108,28 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
         return;
+      }
+
+      if (isTextElement(draggingElement)) {
+        const minWidth = getMinTextElementWidth(
+          getFontString({
+            fontSize: draggingElement.fontSize,
+            fontFamily: draggingElement.fontFamily,
+          }),
+          draggingElement.lineHeight,
+        );
+
+        if (draggingElement.width < minWidth) {
+          mutateElement(draggingElement, {
+            autoResize: true,
+          });
+        }
+
+        this.resetCursor();
+
+        this.handleTextWysiwyg(draggingElement, {
+          isExistingElement: true,
+        });
       }
 
       if (
@@ -8100,7 +8192,7 @@ class App extends React.Component<AppProps, AppState> {
                     this.scene.getNonDeletedElementsMap(),
                   );
 
-                  this.scene.informMutation();
+                  this.scene.triggerUpdate();
                 }
               }
             }
@@ -8479,7 +8571,10 @@ class App extends React.Component<AppProps, AppState> {
               x: pointerDownState.origin.x,
               y: pointerDownState.origin.y,
               element: hitElement,
-              shape: this.getElementShape(hitElement),
+              shape: getElementShape(
+                hitElement,
+                this.scene.getNonDeletedElementsMap(),
+              ),
               threshold: this.getElementHitThreshold(),
               frameNameBound: isFrameLikeElement(hitElement)
                 ? this.frameNameBoundsCache.get(hitElement)
@@ -8547,7 +8642,7 @@ class App extends React.Component<AppProps, AppState> {
 
         bindOrUnbindLinearElements(
           linearElements,
-          this,
+          this.scene.getNonDeletedElementsMap(),
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
         );
@@ -8595,7 +8690,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private restoreReadyToEraseElements = () => {
     this.elementsPendingErasure = new Set();
-    this.onSceneUpdated();
+    this.triggerRender();
   };
 
   private eraseElements = () => {
@@ -9009,7 +9104,7 @@ class App extends React.Component<AppProps, AppState> {
         files,
       );
       if (updatedFiles.size) {
-        this.scene.informMutation();
+        this.scene.triggerUpdate();
       }
     }
   };
@@ -9035,7 +9130,7 @@ class App extends React.Component<AppProps, AppState> {
   }): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
-      this,
+      this.scene.getNonDeletedElementsMap(),
     );
     this.setState({
       suggestedBindings:
@@ -9062,7 +9157,7 @@ class App extends React.Component<AppProps, AppState> {
       (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
         const hoveredBindableElement = getHoveredElementForBinding(
           coords,
-          this,
+          this.scene.getNonDeletedElementsMap(),
         );
         if (
           hoveredBindableElement != null &&
@@ -9407,6 +9502,7 @@ class App extends React.Component<AppProps, AppState> {
         distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state.zoom.value,
       );
     } else {
       let [gridX, gridY] = getGridPoint(
@@ -9464,6 +9560,7 @@ class App extends React.Component<AppProps, AppState> {
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
+        this.state.zoom.value,
         aspectRatio,
         this.state.originSnapOffset,
       );
@@ -9592,7 +9689,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
-        this,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
@@ -9720,6 +9817,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     return [
+      CONTEXT_MENU_SEPARATOR,
       actionCut,
       actionCopy,
       actionPaste,
@@ -9732,6 +9830,7 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionTextAutoResize,
       actionUnbindText,
       actionBindText,
       actionWrapTextInContainer,

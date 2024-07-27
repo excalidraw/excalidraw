@@ -228,6 +228,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 1`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -238,7 +239,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -273,6 +274,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -283,7 +285,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -378,12 +380,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 4`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id48",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -478,12 +481,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
 exports[`Test Transform > Test arrow bindings > should bind arrows to shapes when start / end provided without ids 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id37",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -652,12 +656,13 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id41",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -692,6 +697,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 3`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -702,7 +708,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -737,6 +743,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
 exports[`Test Transform > Test arrow bindings > should bind arrows to text when start / end provided without ids 4`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": [
     {
@@ -747,7 +754,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -1194,12 +1201,13 @@ exports[`Test Transform > should transform regular shapes 6`] = `
 exports[`Test Transform > should transform text element 1`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -1234,12 +1242,13 @@ exports[`Test Transform > should transform text element 1`] = `
 exports[`Test Transform > should transform text element 2`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": null,
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -1566,12 +1575,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 7`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "B",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [
@@ -1608,12 +1618,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 8`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "A",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [
@@ -1650,12 +1661,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 9`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Alice",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [
@@ -1692,12 +1704,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 10`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Bob",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [
@@ -1734,12 +1747,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 11`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Bob_Alice",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -1774,12 +1788,13 @@ exports[`Test Transform > should transform the elements correctly when linear el
 exports[`Test Transform > should transform the elements correctly when linear elements have single point 12`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "Bob_B",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2022,12 +2037,13 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 5`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id25",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2062,12 +2078,13 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 6`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id26",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2102,12 +2119,13 @@ exports[`Test Transform > should transform to labelled arrows when label provide
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 7`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id27",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2143,12 +2161,13 @@ LABELLED ARROW",
 exports[`Test Transform > should transform to labelled arrows when label provided for arrows 8`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id28",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2406,12 +2425,13 @@ exports[`Test Transform > should transform to text containers when label provide
 exports[`Test Transform > should transform to text containers when label provided 7`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id13",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2446,12 +2466,13 @@ exports[`Test Transform > should transform to text containers when label provide
 exports[`Test Transform > should transform to text containers when label provided 8`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id14",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2487,12 +2508,13 @@ CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 9`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id15",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2530,12 +2552,13 @@ CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 10`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id16",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2571,12 +2594,13 @@ TEXT CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 11`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id17",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
@@ -2613,12 +2637,13 @@ CONTAINER",
 exports[`Test Transform > should transform to text containers when label provided 12`] = `
 {
   "angle": 0,
+  "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
   "containerId": "id18",
   "customData": undefined,
   "fillStyle": "solid",
-  "fontFamily": 1,
+  "fontFamily": 5,
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],

@@ -6,7 +6,7 @@ import {
 import type { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
-import { LanguageList } from "./LanguageList";
+import { LanguageList } from "../app-language/LanguageList";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -34,7 +34,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${
-          import.meta.env.VITE_APP_PLUS_APP
+          import.meta.env.VITE_APP_PLUS_LP
         }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
         className=""
       >

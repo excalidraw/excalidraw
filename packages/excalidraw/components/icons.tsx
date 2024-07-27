@@ -698,14 +698,18 @@ export const BringForwardIcon = createIcon(arrownNarrowUpJSX, tablerIconProps);
 
 export const SendBackwardIcon = createIcon(arrownNarrowUpJSX, {
   ...tablerIconProps,
-  transform: "rotate(180)",
+  style: {
+    transform: "rotate(180deg)",
+  },
 });
 
 export const BringToFrontIcon = createIcon(arrowBarToTopJSX, tablerIconProps);
 
 export const SendToBackIcon = createIcon(arrowBarToTopJSX, {
   ...tablerIconProps,
-  transform: "rotate(180)",
+  style: {
+    transform: "rotate(180deg)",
+  },
 });
 
 //
@@ -1434,6 +1438,27 @@ export const fontSizeIcon = createIcon(
   tablerIconProps,
 );
 
+export const FontFamilyHeadingIcon = createIcon(
+  <>
+    <g
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M7 12h10" />
+      <path d="M7 5v14" />
+      <path d="M17 5v14" />
+      <path d="M15 19h4" />
+      <path d="M15 5h4" />
+      <path d="M5 19h4" />
+      <path d="M5 5h4" />
+    </g>
+  </>,
+  tablerIconProps,
+);
+
 export const FontFamilyNormalIcon = createIcon(
   <>
     <g
@@ -1567,6 +1592,18 @@ export const TextAlignMiddleIcon = React.memo(({ theme }: { theme: Theme }) =>
     </g>,
     tablerIconProps,
   ),
+);
+
+export const angleIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M21 19h-18l9 -15" />
+    <path d="M20.615 15.171h.015" />
+    <path d="M19.515 11.771h.015" />
+    <path d="M17.715 8.671h.015" />
+    <path d="M15.415 5.971h.015" />
+  </g>,
+  tablerIconProps,
 );
 
 export const publishIcon = createIcon(
@@ -2054,6 +2091,22 @@ export const lineEditorIcon = createIcon(
     <path d="M17 3m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
     <path d="M3 17m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
     <path d="M17 5c-6.627 0 -12 5.373 -12 12" />
+  </g>,
+  tablerIconProps,
+);
+
+export const collapseDownIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 9l6 6l6 -6" />
+  </g>,
+  tablerIconProps,
+);
+
+export const collapseUpIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 15l6 -6l6 6" />
   </g>,
   tablerIconProps,
 );

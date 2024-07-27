@@ -17,7 +17,6 @@ import {
   getBoundTextElement,
   getContainerElement,
   getLineHeightInPx,
-  getVerticalOffset,
 } from "../element/textElement";
 import {
   isArrowElement,
@@ -38,6 +37,7 @@ import type { AppState, BinaryFiles } from "../types";
 import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 import { getSubtypeMethods } from "../element/subtypes";
+import { getVerticalOffset } from "../fonts";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,

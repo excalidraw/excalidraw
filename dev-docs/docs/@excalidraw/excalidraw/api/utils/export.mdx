@@ -90,7 +90,7 @@ function App() {
         <img src={canvasUrl} alt="" />
       </div>
       <div style={{ height: "400px" }}>
-        <Excalidraw ref={(api) => setExcalidrawAPI(api)}
+        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}
 />
       </div>
     </>

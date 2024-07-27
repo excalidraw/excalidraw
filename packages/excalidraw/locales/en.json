@@ -109,6 +109,7 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
+    "showFonts": "Show font picker",
     "toggleTheme": "Toggle light/dark theme",
     "theme": "Theme",
     "personalLib": "Personal Library",
@@ -148,7 +149,9 @@
     "discordChat": "Discord chat",
     "zoomToFitViewport": "Zoom to fit in viewport",
     "zoomToFitSelection": "Zoom to fit selection",
-    "zoomToFit": "Zoom to fit all elements"
+    "zoomToFit": "Zoom to fit all elements",
+    "installPWA": "Install Excalidraw locally (PWA)",
+    "autoResize": "Enable text auto-resizing"
   },
   "library": {
     "noItems": "No items added yet...",
@@ -267,6 +270,22 @@
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "magicSettings": "AI settings"
+  },
+  "element": {
+    "rectangle": "Rectangle",
+    "diamond": "Diamond",
+    "ellipse": "Ellipse",
+    "arrow": "Arrow",
+    "line": "Line",
+    "freedraw": "Freedraw",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group",
+    "frame": "Frame",
+    "magicframe": "Wireframe to code",
+    "embeddable": "Web Embed",
+    "selection": "Selection",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -441,7 +460,10 @@
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
-    "title": "Stats for nerds",
+    "fullTitle": "Stats & Element properties",
+    "title": "Stats",
+    "generalStats": "General stats",
+    "elementProperties": "Element properties",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",
@@ -536,11 +558,19 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Quick search",
-      "empty": "No users found"
+  "quickSearch": {
+    "placeholder": "Quick search"
+  },
+  "fontList": {
+    "badge": {
+      "old": "old"
     },
+    "sceneFonts": "In this scene",
+    "availableFonts": "Available fonts",
+    "empty": "No fonts found"
+  },
+  "userList": {
+    "empty": "No users found",
     "hint": {
       "text": "Click on user to follow",
       "followStatus": "You're currently following this user",

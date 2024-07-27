@@ -115,7 +115,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   }
 
   if (informMutation) {
-    Scene.getScene(element)?.informMutation();
+    Scene.getScene(element)?.triggerUpdate();
   }
 
   return element;
@@ -124,6 +124,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 export const newElementWith = <TElement extends ExcalidrawElement>(
   element: TElement,
   updates: ElementUpdate<TElement>,
+  /** pass `true` to always regenerate */
+  force = false,
 ): TElement => {
   let didChange = false;
   let increment = false;
@@ -143,7 +145,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     }
   }
 
-  if (!didChange) {
+  if (!didChange && !force) {
     return element;
   }
 

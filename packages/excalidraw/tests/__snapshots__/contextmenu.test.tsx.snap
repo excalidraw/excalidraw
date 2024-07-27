@@ -12,6 +12,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"
@@ -26,7 +27,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -129,7 +130,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -181,7 +182,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -247,7 +248,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -287,7 +288,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -320,6 +321,16 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -387,11 +398,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -438,7 +453,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -482,11 +497,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -535,7 +554,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -584,7 +603,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -624,7 +643,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -776,10 +795,11 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "top": 40,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -855,10 +875,13 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -974,10 +997,11 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1047,10 +1071,13 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": {
@@ -1182,10 +1209,11 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1255,10 +1283,13 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -1505,10 +1536,11 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1578,10 +1610,13 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -1828,10 +1863,11 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1901,10 +1937,13 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": {
@@ -2036,10 +2075,11 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -2107,10 +2147,13 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2268,10 +2311,11 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -2341,10 +2385,13 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2561,10 +2608,11 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -2639,10 +2687,13 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2922,10 +2973,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "#a5d8ff",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "cross-hatch",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 60,
   "currentItemRoughness": 2,
@@ -2995,10 +3047,13 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": {
@@ -3389,10 +3444,11 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -3462,10 +3518,13 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3704,10 +3763,11 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -3777,10 +3837,13 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -4019,10 +4082,11 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -4095,10 +4159,13 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -4414,6 +4481,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"
@@ -4428,7 +4496,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4531,7 +4599,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4583,7 +4651,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4649,7 +4717,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4689,7 +4757,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4722,6 +4790,16 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -4789,11 +4867,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4840,7 +4922,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4884,11 +4966,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4937,7 +5023,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -4986,7 +5072,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5026,7 +5112,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5178,10 +5264,11 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "top": -7,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -5254,10 +5341,13 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -5514,6 +5604,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"
@@ -5528,7 +5619,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5631,7 +5722,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5683,7 +5774,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5749,7 +5840,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5789,7 +5880,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5822,6 +5913,16 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -5889,11 +5990,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5940,7 +6045,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -5984,11 +6089,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6037,7 +6146,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6086,7 +6195,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6126,7 +6235,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6278,10 +6387,11 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "top": -7,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -6356,10 +6466,13 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -6684,7 +6797,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6736,7 +6849,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -6948,7 +7061,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7004,7 +7117,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7048,7 +7161,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7101,7 +7214,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           <g
             fill="none"
             stroke="currentColor"
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7143,7 +7256,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7186,7 +7299,12 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           </g>
         </svg>,
         "keyTest": [Function],
-        "label": "stats.title",
+        "keywords": [
+          "edit",
+          "attributes",
+          "customize",
+        ],
+        "label": "stats.fullTitle",
         "name": "stats",
         "paletteName": "Toggle stats",
         "perform": [Function],
@@ -7200,10 +7318,11 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "top": -9,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -7274,10 +7393,13 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -7321,6 +7443,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"
@@ -7335,7 +7458,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7438,7 +7561,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7490,7 +7613,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7556,7 +7679,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7596,7 +7719,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7629,6 +7752,16 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7696,11 +7829,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7747,7 +7884,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7791,11 +7928,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7844,7 +7985,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7893,7 +8034,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -7933,7 +8074,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8085,10 +8226,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "top": -7,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -8158,10 +8300,13 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8188,6 +8333,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "collaborators": Map {},
   "contextMenu": {
     "items": [
+      "separator",
       {
         "icon": <svg
           aria-hidden="true"
@@ -8202,7 +8348,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8305,7 +8451,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8357,7 +8503,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8423,7 +8569,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8463,7 +8609,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8496,6 +8642,16 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "keyTest": [Function],
         "label": "labels.group",
         "name": "group",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      {
+        "icon": null,
+        "label": "labels.autoResize",
+        "name": "autoResize",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -8563,11 +8719,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8614,7 +8774,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8658,11 +8818,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          transform="rotate(180)"
+          style={
+            {
+              "transform": "rotate(180deg)",
+            }
+          }
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8711,7 +8875,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.5}
+            strokeWidth={"1.50000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8760,7 +8924,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8800,7 +8964,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           viewBox="0 0 24 24"
         >
           <g
-            strokeWidth={1.25}
+            strokeWidth={"1.25000"}
           >
             <path
               d="M0 0h24v24H0z"
@@ -8952,10 +9116,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "top": 90,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -9028,10 +9193,13 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
   "showHyperlinkPopup": false,
-  "showStats": false,
   "showWelcomeScreen": true,
   "snapLines": [],
   "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,

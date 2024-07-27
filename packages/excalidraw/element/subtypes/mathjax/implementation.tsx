@@ -6,7 +6,6 @@ import {
   getBoundTextElement,
   getBoundTextMaxWidth,
   getContainerElement,
-  getDefaultLineHeight,
   getTextWidth,
   measureText,
   wrapText,
@@ -20,6 +19,7 @@ import type {
   ExcalidrawTextElement,
   NonDeleted,
 } from "../../../element/types";
+import { getLineHeight } from "../../../fonts";
 import { newElementWith } from "../../../element/mutateElement";
 import { getElementAbsoluteCoords } from "../../../element/bounds";
 import Scene from "../../../scene/Scene";
@@ -904,7 +904,7 @@ const cleanMathElementUpdate = function (updates) {
     }
   }
   (updates as any).fontFamily = FONT_FAMILY_MATH;
-  (updates as any).lineHeight = getDefaultLineHeight(FONT_FAMILY_MATH);
+  (updates as any).lineHeight = getLineHeight(FONT_FAMILY_MATH);
   return oldUpdates;
 } as SubtypeMethods["clean"];
 
@@ -1025,7 +1025,7 @@ const renderMathElement = function (element, elementMap, context) {
               if (isMathJaxLoaded) {
                 imageCache[imgKey] = img;
               }
-              Scene.getScene(element)?.informMutation();
+              Scene.getScene(element)?.triggerUpdate();
             };
             img.src = reader.result as string;
           },

@@ -28,7 +28,6 @@ import {
 } from "../textElement";
 import { ShapeCache } from "../../scene/ShapeCache";
 import Scene from "../../scene/Scene";
-import type { RenderableElementsMap } from "../../scene/types";
 
 // Use "let" instead of "const" so we can dynamically add subtypes
 let subtypeNames: readonly Subtype[] = [];
@@ -267,14 +266,14 @@ export type SubtypeMethods = {
   ) => { width: number; height: number };
   render: (
     element: NonDeleted<ExcalidrawElement>,
-    elementsMap: RenderableElementsMap,
+    elementsMap: ElementsMap,
     context: CanvasRenderingContext2D,
   ) => void;
   renderSvg: (
     svgRoot: SVGElement,
     addToRoot: (node: SVGElement, element: ExcalidrawElement) => void,
     element: NonDeleted<ExcalidrawElement>,
-    elementsMap: RenderableElementsMap,
+    elementsMap: ElementsMap,
     opt?: { offsetX?: number; offsetY?: number },
   ) => void;
   wrapText: (
@@ -507,6 +506,7 @@ export const checkRefreshOnSubtypeLoad = (
           element,
           getContainerElement(element, elementsMap),
           elementsMap,
+          false,
         );
       }
       refreshNeeded = true;
@@ -518,7 +518,7 @@ export const checkRefreshOnSubtypeLoad = (
     }
   });
   // Only inform each scene once
-  scenes.forEach((scene) => scene.informMutation());
+  scenes.forEach((scene) => scene.triggerUpdate());
   return refreshNeeded;
 };
 

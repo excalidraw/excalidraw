@@ -10,8 +10,9 @@ import { Excalidraw } from "../index";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import type { AppState, ExcalidrawImperativeAPI } from "../types";
 import { arrayToMap, resolvablePromise } from "../utils";
@@ -49,7 +50,6 @@ const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
     `[${name}] number of renders`,
   );
-
   // `scrolledOutside` does not appear to be stable between test runs
   // `selectedLinearElemnt` includes `startBindingElement` containing seed and versionNonce
   const {
@@ -1687,6 +1687,129 @@ describe("history", () => {
           }),
         ]);
       });
+    });
+
+    it("should disable undo/redo buttons when stacks empty", async () => {
+      const { container } = await render(
+        <Excalidraw
+          initialData={{
+            elements: [API.createElement({ type: "rectangle", id: "A" })],
+          }}
+        />,
+      );
+
+      const undoAction = createUndoAction(h.history, h.store);
+      const redoAction = createRedoAction(h.history, h.store);
+
+      await waitFor(() => {
+        expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+        expect(h.history.isUndoStackEmpty).toBeTruthy();
+        expect(h.history.isRedoStackEmpty).toBeTruthy();
+      });
+
+      const undoButton = queryByTestId(container, "button-undo");
+      const redoButton = queryByTestId(container, "button-redo");
+
+      expect(undoButton).toBeDisabled();
+      expect(redoButton).toBeDisabled();
+
+      const rectangle = UI.createElement("rectangle");
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: rectangle.id }),
+      ]);
+
+      expect(h.history.isUndoStackEmpty).toBeFalsy();
+      expect(h.history.isRedoStackEmpty).toBeTruthy();
+      expect(undoButton).not.toBeDisabled();
+      expect(redoButton).toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(undoAction));
+
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
+      expect(h.history.isRedoStackEmpty).toBeFalsy();
+      expect(undoButton).toBeDisabled();
+      expect(redoButton).not.toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(redoAction));
+
+      expect(h.history.isUndoStackEmpty).toBeFalsy();
+      expect(h.history.isRedoStackEmpty).toBeTruthy();
+      expect(undoButton).not.toBeDisabled();
+      expect(redoButton).toBeDisabled();
+    });
+
+    it("remounting undo/redo buttons should initialize undo/redo state correctly", async () => {
+      const { container } = await render(
+        <Excalidraw
+          initialData={{
+            elements: [API.createElement({ type: "rectangle", id: "A" })],
+          }}
+        />,
+      );
+
+      const undoAction = createUndoAction(h.history, h.store);
+
+      await waitFor(() => {
+        expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+        expect(h.history.isUndoStackEmpty).toBeTruthy();
+        expect(h.history.isRedoStackEmpty).toBeTruthy();
+      });
+
+      expect(queryByTestId(container, "button-undo")).toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).toBeDisabled();
+
+      // testing undo button
+      // -----------------------------------------------------------------------
+
+      const rectangle = UI.createElement("rectangle");
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: rectangle.id }),
+      ]);
+
+      expect(h.history.isUndoStackEmpty).toBeFalsy();
+      expect(h.history.isRedoStackEmpty).toBeTruthy();
+      expect(queryByTestId(container, "button-undo")).not.toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(true);
+
+      expect(queryByTestId(container, "button-undo")).toBeNull();
+      expect(queryByTestId(container, "button-redo")).toBeNull();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(false);
+
+      await waitFor(() => {
+        expect(queryByTestId(container, "button-undo")).not.toBeDisabled();
+        expect(queryByTestId(container, "button-redo")).toBeDisabled();
+      });
+
+      // testing redo button
+      // -----------------------------------------------------------------------
+
+      act(() => h.app.actionManager.executeAction(undoAction));
+
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
+      expect(h.history.isRedoStackEmpty).toBeFalsy();
+      expect(queryByTestId(container, "button-undo")).toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(true);
+
+      expect(queryByTestId(container, "button-undo")).toBeNull();
+      expect(queryByTestId(container, "button-redo")).toBeNull();
+
+      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      expect(h.state.viewModeEnabled).toBe(false);
+
+      expect(h.history.isUndoStackEmpty).toBeTruthy();
+      expect(h.history.isRedoStackEmpty).toBeFalsy();
+      expect(queryByTestId(container, "button-undo")).toBeDisabled();
+      expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
     });
   });
 

@@ -9,7 +9,10 @@ import type {
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
@@ -19,7 +22,8 @@ type InteractiveCanvasProps = {
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
-  versionNonce: number | undefined;
+  allElementsMap: NonDeletedSceneElementsMap;
+  sceneNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
   appState: InteractiveCanvasAppState;
@@ -122,6 +126,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         elementsMap: props.elementsMap,
         visibleElements: props.visibleElements,
         selectedElements: props.selectedElements,
+        allElementsMap: props.allElementsMap,
         scale: window.devicePixelRatio,
         appState: props.appState,
         renderConfig: {
@@ -197,6 +202,7 @@ const getRelevantAppStateProps = (
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
+  editingElement: appState.editingElement,
 });
 
 const areEqual = (
@@ -206,10 +212,10 @@ const areEqual = (
   // This could be further optimised if needed, as we don't have to render interactive canvas on each scene mutation
   if (
     prevProps.selectionNonce !== nextProps.selectionNonce ||
-    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.sceneNonce !== nextProps.sceneNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if versionNonce didn't change (e.g. we filter elements out based
+    // even if sceneNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements ||

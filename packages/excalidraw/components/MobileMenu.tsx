@@ -21,8 +21,6 @@ import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
-import { Stats } from "./Stats";
-import { actionToggleStats } from "../actions";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
@@ -159,17 +157,6 @@ export const MobileMenu = ({
     <>
       {renderSidebars()}
       {!appState.viewModeEnabled && renderToolbar()}
-      {!appState.openMenu && appState.showStats && (
-        <Stats
-          appState={appState}
-          setAppState={setAppState}
-          elements={elements}
-          onClose={() => {
-            actionManager.executeAction(actionToggleStats);
-          }}
-          renderCustomStats={renderCustomStats}
-        />
-      )}
       <div
         className="App-bottom-bar"
         style={{
@@ -196,6 +183,7 @@ export const MobileMenu = ({
               !appState.openMenu &&
               !appState.openSidebar && (
                 <button
+                  type="button"
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({

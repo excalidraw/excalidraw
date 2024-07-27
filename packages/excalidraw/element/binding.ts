@@ -25,7 +25,7 @@ import type {
 } from "./types";
 
 import { getElementAbsoluteCoords } from "./bounds";
-import type { AppClassProperties, AppState, Point } from "../types";
+import type { AppState, Point } from "../types";
 import { isPointOnShape } from "../../utils/collision";
 import { getElementAtPosition } from "../scene";
 import {
@@ -43,6 +43,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import { getElementShape } from "../shapes";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -179,19 +180,19 @@ const bindOrUnbindLinearElementEdge = (
 const getOriginalBindingIfStillCloseOfLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   edge: "start" | "end",
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): NonDeleted<ExcalidrawElement> | null => {
-  const elementsMap = app.scene.getNonDeletedElementsMap();
   const coors = getLinearElementEdgeCoors(linearElement, edge, elementsMap);
   const elementId =
     edge === "start"
       ? linearElement.startBinding?.elementId
       : linearElement.endBinding?.elementId;
   if (elementId) {
-    const element = elementsMap.get(
-      elementId,
-    ) as NonDeleted<ExcalidrawBindableElement>;
-    if (bindingBorderTest(element, coors, app)) {
+    const element = elementsMap.get(elementId);
+    if (
+      isBindableElement(element) &&
+      bindingBorderTest(element, coors, elementsMap)
+    ) {
       return element;
     }
   }
@@ -201,13 +202,13 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
 
 const getOriginalBindingsIfStillCloseToArrowEnds = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): (NonDeleted<ExcalidrawElement> | null)[] =>
   ["start", "end"].map((edge) =>
     getOriginalBindingIfStillCloseOfLinearElementEdge(
       linearElement,
       edge as "start" | "end",
-      app,
+      elementsMap,
     ),
   );
 
@@ -215,7 +216,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
   selectedElement: NonDeleted<ExcalidrawLinearElement>,
   isBindingEnabled: boolean,
   draggingPoints: readonly number[],
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
   const startIdx = 0;
   const endIdx = selectedElement.points.length - 1;
@@ -223,37 +224,57 @@ const getBindingStrategyForDraggingArrowEndpoints = (
   const endDragged = draggingPoints.findIndex((i) => i === endIdx) > -1;
   const start = startDragged
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(selectedElement, "start", app)
+      ? getElligibleElementForBindingElement(
+          selectedElement,
+          "start",
+          elementsMap,
+        )
       : null // If binding is disabled and start is dragged, break all binds
     : // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(selectedElement, "start", app);
+      getElligibleElementForBindingElement(
+        selectedElement,
+        "start",
+        elementsMap,
+      );
   const end = endDragged
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(selectedElement, "end", app)
+      ? getElligibleElementForBindingElement(
+          selectedElement,
+          "end",
+          elementsMap,
+        )
       : null // If binding is disabled and end is dragged, break all binds
     : // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(selectedElement, "end", app);
+      getElligibleElementForBindingElement(selectedElement, "end", elementsMap);
 
   return [start, end];
 };
 
 const getBindingStrategyForDraggingArrowOrJoints = (
   selectedElement: NonDeleted<ExcalidrawLinearElement>,
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
   isBindingEnabled: boolean,
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
   const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
     selectedElement,
-    app,
+    elementsMap,
   );
   const start = startIsClose
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(selectedElement, "start", app)
+      ? getElligibleElementForBindingElement(
+          selectedElement,
+          "start",
+          elementsMap,
+        )
       : null
     : null;
   const end = endIsClose
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(selectedElement, "end", app)
+      ? getElligibleElementForBindingElement(
+          selectedElement,
+          "end",
+          elementsMap,
+        )
       : null
     : null;
 
@@ -262,7 +283,7 @@ const getBindingStrategyForDraggingArrowOrJoints = (
 
 export const bindOrUnbindLinearElements = (
   selectedElements: NonDeleted<ExcalidrawLinearElement>[],
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
   isBindingEnabled: boolean,
   draggingPoints: readonly number[] | null,
 ): void => {
@@ -273,27 +294,22 @@ export const bindOrUnbindLinearElements = (
           selectedElement,
           isBindingEnabled,
           draggingPoints ?? [],
-          app,
+          elementsMap,
         )
       : // The arrow itself (the shaft) or the inner joins are dragged
         getBindingStrategyForDraggingArrowOrJoints(
           selectedElement,
-          app,
+          elementsMap,
           isBindingEnabled,
         );
 
-    bindOrUnbindLinearElement(
-      selectedElement,
-      start,
-      end,
-      app.scene.getNonDeletedElementsMap(),
-    );
+    bindOrUnbindLinearElement(selectedElement, start, end, elementsMap);
   });
 };
 
 export const getSuggestedBindingsForArrows = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): SuggestedBinding[] => {
   // HOT PATH: Bail out if selected elements list is too large
   if (selectedElements.length > 50) {
@@ -304,7 +320,7 @@ export const getSuggestedBindingsForArrows = (
     selectedElements
       .filter(isLinearElement)
       .flatMap((element) =>
-        getOriginalBindingsIfStillCloseToArrowEnds(element, app),
+        getOriginalBindingsIfStillCloseToArrowEnds(element, elementsMap),
       )
       .filter(
         (element): element is NonDeleted<ExcalidrawBindableElement> =>
@@ -326,17 +342,20 @@ export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
   pointerCoords: { x: number; y: number },
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): void => {
   if (appState.startBoundElement != null) {
     bindLinearElement(
       linearElement,
       appState.startBoundElement,
       "start",
-      app.scene.getNonDeletedElementsMap(),
+      elementsMap,
     );
   }
-  const hoveredElement = getHoveredElementForBinding(pointerCoords, app);
+  const hoveredElement = getHoveredElementForBinding(
+    pointerCoords,
+    elementsMap,
+  );
   if (
     hoveredElement != null &&
     !isLinearElementSimpleAndAlreadyBoundOnOppositeEdge(
@@ -345,12 +364,7 @@ export const maybeBindLinearElement = (
       "end",
     )
   ) {
-    bindLinearElement(
-      linearElement,
-      hoveredElement,
-      "end",
-      app.scene.getNonDeletedElementsMap(),
-    );
+    bindLinearElement(linearElement, hoveredElement, "end", elementsMap);
   }
 };
 
@@ -360,6 +374,9 @@ export const bindLinearElement = (
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
 ): void => {
+  if (!isArrowElement(linearElement)) {
+    return;
+  }
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
       elementId: hoveredElement.id,
@@ -431,13 +448,13 @@ export const getHoveredElementForBinding = (
     x: number;
     y: number;
   },
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const hoveredElement = getElementAtPosition(
-    app.scene.getNonDeletedElements(),
+    [...elementsMap].map(([_, value]) => value),
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(element, pointerCoords, app),
+      bindingBorderTest(element, pointerCoords, elementsMap),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
@@ -661,15 +678,11 @@ const maybeCalculateNewGapWhenScaling = (
 const getElligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
-  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   return getHoveredElementForBinding(
-    getLinearElementEdgeCoors(
-      linearElement,
-      startOrEnd,
-      app.scene.getNonDeletedElementsMap(),
-    ),
-    app,
+    getLinearElementEdgeCoors(linearElement, startOrEnd, elementsMap),
+    elementsMap,
   );
 };
 
@@ -706,6 +719,9 @@ export const fixBindingsAfterDuplication = (
   const allBoundElementIds: Set<ExcalidrawElement["id"]> = new Set();
   const allBindableElementIds: Set<ExcalidrawElement["id"]> = new Set();
   const shouldReverseRoles = duplicatesServeAsOld === "duplicatesServeAsOld";
+  const duplicateIdToOldId = new Map(
+    [...oldIdToDuplicatedId].map(([key, value]) => [value, key]),
+  );
   oldElements.forEach((oldElement) => {
     const { boundElements } = oldElement;
     if (boundElements != null && boundElements.length > 0) {
@@ -755,7 +771,11 @@ export const fixBindingsAfterDuplication = (
   sceneElements
     .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
-      const { boundElements } = bindableElement;
+      const oldElementId = duplicateIdToOldId.get(bindableElement.id);
+      const { boundElements } = sceneElements.find(
+        ({ id }) => id === oldElementId,
+      )!;
+
       if (boundElements != null && boundElements.length > 0) {
         mutateElement(bindableElement, {
           boundElements: boundElements.map((boundElement) =>
@@ -826,10 +846,10 @@ const newBoundElements = (
 const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   { x, y }: { x: number; y: number },
-  app: AppClassProperties,
+  elementsMap: ElementsMap,
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height);
-  const shape = app.getElementShape(element);
+  const shape = getElementShape(element, elementsMap);
   return isPointOnShape([x, y], shape, threshold);
 };
 
