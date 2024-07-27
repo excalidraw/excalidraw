@@ -38,6 +38,10 @@ export function hideFreedrawPenmodeCursor() {
   return !hostPlugin.settings.penModeCrosshairVisible;
 }
 
+export function getOpenAIDefaultVisionModel() {
+  return hostPlugin.settings.openAIDefaultVisionModel;
+}
+
 export function registerLocalFont(fontMetrics: FontMetadata & {name: string}, uri: string) {
   const _register = register.bind({registered: Fonts.registered});
   FONT_METADATA[FONT_FAMILY["Local Font"]] = {metrics: fontMetrics.metrics, icon: FreedrawIcon};

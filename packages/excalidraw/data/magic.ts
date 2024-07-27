@@ -1,5 +1,6 @@
 import { THEME } from "../constants";
 import type { Theme } from "../element/types";
+import { getOpenAIDefaultVisionModel } from "../obsidianUtils";
 import type { DataURL } from "../types";
 import type { OpenAIInput, OpenAIOutput } from "./ai/types";
 
@@ -48,7 +49,7 @@ export async function diagramToHTML({
   theme?: Theme;
 }) {
   const body: OpenAIInput.ChatCompletionCreateParamsBase = {
-    model: "gpt-4-vision-preview",
+    model: getOpenAIDefaultVisionModel(), //"gpt-4-vision-preview", //zsviczian
     // 4096 are max output tokens allowed for `gpt-4-vision-preview` currently
     max_tokens: 4096,
     temperature: 0.1,
