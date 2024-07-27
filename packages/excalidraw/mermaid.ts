@@ -2,6 +2,7 @@
 export const isMaybeMermaidDefinition = (text: string) => {
   const chartTypes = [
     "flowchart",
+    "graph",
     "sequenceDiagram",
     "classDiagram",
     "stateDiagram",
@@ -23,9 +24,9 @@ export const isMaybeMermaidDefinition = (text: string) => {
   ];
 
   const re = new RegExp(
-    `^(?:%%{.*?}%%[\\s\\n]*)?\\b${chartTypes
-      .map((x) => `${x}(-beta)?`)
-      .join("|")}\\b`,
+    `^(?:%%{.*?}%%[\\s\\n]*)?\\b(?:${chartTypes
+      .map((x) => `\\s*${x}(-beta)?`)
+      .join("|")})\\b`,
   );
 
   return re.test(text.trim());
