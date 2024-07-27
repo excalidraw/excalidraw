@@ -112,6 +112,6 @@ export const hitElementBoundText = (
   x: number,
   y: number,
   textShape: GeometricShape | null,
-) => {
-  return textShape && isPointInShape([x, y], textShape);
+): boolean => {
+  return !!textShape && isPointInShape([x, y], textShape);
 };
