@@ -82,7 +82,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
 
   if (activeTool.type === "selection") {
     if (
-      appState.draggingElement?.type === "selection" &&
+      appState.newElement?.type === "selection" &&
       !selectedElements.length &&
       !appState.editingElement &&
       !appState.editingLinearElement
@@ -90,7 +90,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
       return t("hints.deepBoxSelect");
     }
 
-    if (appState.gridSize && appState.draggingElement) {
+    if (appState.gridSize && appState.newElement) {
       return t("hints.disableSnapping");
     }
 
@@ -108,7 +108,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
         return t("hints.lineEditor_info");
       }
       if (
-        !appState.draggingElement &&
+        !appState.newElement &&
         isTextBindableContainer(selectedElements[0])
       ) {
         return t("hints.bindTextToElement");

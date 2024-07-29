@@ -21,7 +21,7 @@ const writeData = (
     !appState.multiElement &&
     !appState.resizingElement &&
     !appState.editingElement &&
-    !appState.draggingElement
+    !appState.newElement
   ) {
     const result = updater();
 

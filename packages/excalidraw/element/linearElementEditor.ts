@@ -142,7 +142,7 @@ export class LinearElementEditor {
   ) {
     if (
       !appState.editingLinearElement ||
-      appState.draggingElement?.type !== "selection"
+      appState.newElement?.type !== "selection"
     ) {
       return false;
     }
@@ -155,7 +155,7 @@ export class LinearElementEditor {
     }
 
     const [selectionX1, selectionY1, selectionX2, selectionY2] =
-      getElementAbsoluteCoords(appState.draggingElement, elementsMap);
+      getElementAbsoluteCoords(appState.newElement, elementsMap);
 
     const pointsSceneCoords = LinearElementEditor.getPointsGlobalCoordinates(
       element,

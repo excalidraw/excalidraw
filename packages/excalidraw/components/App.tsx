@@ -819,7 +819,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         activeEmbeddable: { element, state: "active" },
         selectedElementIds: { [element.id]: true },
-        draggingElement: null,
+        newElement: null,
         selectionElement: null,
       });
     }, 100);
@@ -1468,7 +1468,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.editingElement && isLinearElement(this.state.editingElement)
       ) &&
       (this.state.selectionElement ||
-        this.state.draggingElement ||
+        this.state.newElement ||
         this.state.resizingElement ||
         (this.state.activeTool.type === "laser" &&
           // technically we can just test on this once we make it more safe
@@ -1624,7 +1624,7 @@ class App extends React.Component<AppProps, AppState> {
                                         selectedElementIds: {
                                           [firstSelectedElement.id]: true,
                                         },
-                                        draggingElement: null,
+                                        newElement: null,
                                         selectionElement: null,
                                       });
                                     } catch (err: any) {
@@ -4057,7 +4057,7 @@ class App extends React.Component<AppProps, AppState> {
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
-        this.state.draggingElement === null
+        this.state.newElement === null
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
@@ -4466,7 +4466,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         this.setState({
-          draggingElement: null,
+          newElement: null,
           editingElement: null,
         });
         if (this.state.activeTool.locked) {
@@ -4858,7 +4858,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     } else {
       this.setState({
-        draggingElement: element,
+        newElement: element,
         multiElement: null,
       });
     }
@@ -5163,7 +5163,7 @@ class App extends React.Component<AppProps, AppState> {
       event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
-    if (!this.state.draggingElement && !this.state.multiElement) {
+    if (!this.state.newElement && !this.state.multiElement) {
       if (isOverScrollBar) {
         resetCursor(this.interactiveCanvas);
       } else {
@@ -5175,7 +5175,7 @@ class App extends React.Component<AppProps, AppState> {
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
 
     if (
-      !this.state.draggingElement &&
+      !this.state.newElement &&
       isActiveToolNonLinearSnappable(this.state.activeTool.type)
     ) {
       const { originOffset, snapLines } = getSnapLinesAtPointer(
@@ -5206,7 +5206,7 @@ class App extends React.Component<AppProps, AppState> {
           originSnapOffset: nextOriginOffset,
         };
       });
-    } else if (!this.state.draggingElement) {
+    } else if (!this.state.newElement) {
       this.setState((prevState) => {
         if (prevState.snapLines.length) {
           return {
@@ -5255,10 +5255,10 @@ class App extends React.Component<AppProps, AppState> {
     if (isBindingElementType(this.state.activeTool.type)) {
       // Hovering with a selected tool or creating new linear element via click
       // and point
-      const { draggingElement } = this.state;
-      if (isBindingElement(draggingElement, false)) {
+      const { newElement } = this.state;
+      if (isBindingElement(newElement, false)) {
         this.maybeSuggestBindingsForLinearElementAtCoords(
-          draggingElement,
+          newElement,
           [scenePointer],
           this.state.startBoundElement,
         );
@@ -5729,10 +5729,10 @@ class App extends React.Component<AppProps, AppState> {
     // finger is lifted
     if (
       event.pointerType === "touch" &&
-      this.state.draggingElement &&
-      this.state.draggingElement.type === "freedraw"
+      this.state.newElement &&
+      this.state.newElement.type === "freedraw"
     ) {
-      const element = this.state.draggingElement as ExcalidrawFreeDrawElement;
+      const element = this.state.newElement as ExcalidrawFreeDrawElement;
       this.updateScene({
         ...(element.points.length < 10
           ? {
@@ -5742,7 +5742,7 @@ class App extends React.Component<AppProps, AppState> {
             }
           : {}),
         appState: {
-          draggingElement: null,
+          newElement: null,
           editingElement: null,
           startBoundElement: null,
           suggestedBindings: [],
@@ -5925,7 +5925,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.setState({
-        draggingElement: pendingImageElement,
+        newElement: pendingImageElement,
         editingElement: pendingImageElement,
         pendingImageElementId: null,
         multiElement: null,
@@ -6769,7 +6769,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.scene.insertElement(element);
     this.setState({
-      draggingElement: element,
+      newElement: element,
       editingElement: element,
       startBoundElement: boundElement,
       suggestedBindings: [],
@@ -7032,7 +7032,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.scene.insertElement(element);
       this.setState({
-        draggingElement: element,
+        newElement: element,
         editingElement: element,
         startBoundElement: boundElement,
         suggestedBindings: [],
@@ -7106,13 +7106,13 @@ class App extends React.Component<AppProps, AppState> {
     if (element.type === "selection") {
       this.setState({
         selectionElement: element,
-        draggingElement: element,
+        newElement: element,
       });
     } else {
       this.scene.insertElement(element);
       this.setState({
         multiElement: null,
-        draggingElement: element,
+        newElement: element,
         editingElement: element,
       });
     }
@@ -7147,7 +7147,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({
       multiElement: null,
-      draggingElement: frame,
+      newElement: frame,
       editingElement: frame,
     });
   };
@@ -7593,62 +7593,63 @@ class App extends React.Component<AppProps, AppState> {
 
       // It is very important to read this.state within each move event,
       // otherwise we would read a stale one!
-      const draggingElement = this.state.draggingElement;
-      if (!draggingElement) {
+      const newElement = this.state.newElement;
+
+      if (!newElement) {
         return;
       }
 
-      if (draggingElement.type === "freedraw") {
-        const points = draggingElement.points;
-        const dx = pointerCoords.x - draggingElement.x;
-        const dy = pointerCoords.y - draggingElement.y;
+      if (newElement.type === "freedraw") {
+        const points = newElement.points;
+        const dx = pointerCoords.x - newElement.x;
+        const dy = pointerCoords.y - newElement.y;
 
         const lastPoint = points.length > 0 && points[points.length - 1];
         const discardPoint =
           lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
         if (!discardPoint) {
-          const pressures = draggingElement.simulatePressure
-            ? draggingElement.pressures
-            : [...draggingElement.pressures, event.pressure];
+          const pressures = newElement.simulatePressure
+            ? newElement.pressures
+            : [...newElement.pressures, event.pressure];
 
-          mutateElement(draggingElement, {
+          mutateElement(newElement, {
             points: [...points, [dx, dy]],
             pressures,
           });
         }
-      } else if (isLinearElement(draggingElement)) {
+      } else if (isLinearElement(newElement)) {
         pointerDownState.drag.hasOccurred = true;
         this.setState({
           selectedElementsAreBeingDragged: true,
         });
-        const points = draggingElement.points;
-        let dx = gridX - draggingElement.x;
-        let dy = gridY - draggingElement.y;
+        const points = newElement.points;
+        let dx = gridX - newElement.x;
+        let dy = gridY - newElement.y;
 
         if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
           ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
-            draggingElement.x,
-            draggingElement.y,
+            newElement.x,
+            newElement.y,
             pointerCoords.x,
             pointerCoords.y,
           ));
         }
 
         if (points.length === 1) {
-          mutateElement(draggingElement, {
+          mutateElement(newElement, {
             points: [...points, [dx, dy]],
           });
         } else if (points.length === 2) {
-          mutateElement(draggingElement, {
+          mutateElement(newElement, {
             points: [...points.slice(0, -1), [dx, dy]],
           });
         }
 
-        if (isBindingElement(draggingElement, false)) {
+        if (isBindingElement(newElement, false)) {
           // When creating a linear element by dragging
           this.maybeSuggestBindingsForLinearElementAtCoords(
-            draggingElement,
+            newElement,
             [pointerCoords],
             this.state.startBoundElement,
           );
@@ -7700,7 +7701,7 @@ class App extends React.Component<AppProps, AppState> {
           }
           const elementsWithinSelection = getElementsWithinSelection(
             elements,
-            draggingElement,
+            newElement,
             this.scene.getNonDeletedElementsMap(),
           );
 
@@ -7795,7 +7796,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onMove.flush();
       }
       const {
-        draggingElement,
+        newElement,
         resizingElement,
         multiElement,
         activeTool,
@@ -7925,15 +7926,15 @@ class App extends React.Component<AppProps, AppState> {
         childEvent,
       );
 
-      if (draggingElement?.type === "freedraw") {
+      if (newElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
         );
 
-        const points = draggingElement.points;
-        let dx = pointerCoords.x - draggingElement.x;
-        let dy = pointerCoords.y - draggingElement.y;
+        const points = newElement.points;
+        let dx = pointerCoords.x - newElement.x;
+        let dy = pointerCoords.y - newElement.y;
 
         // Allows dots to avoid being flagged as infinitely small
         if (dx === points[0][0] && dy === points[0][1]) {
@@ -7941,11 +7942,11 @@ class App extends React.Component<AppProps, AppState> {
           dx += 0.0001;
         }
 
-        const pressures = draggingElement.simulatePressure
+        const pressures = newElement.simulatePressure
           ? []
-          : [...draggingElement.pressures, childEvent.pressure];
+          : [...newElement.pressures, childEvent.pressure];
 
-        mutateElement(draggingElement, {
+        mutateElement(newElement, {
           points: [...points, [dx, dy]],
           pressures,
           lastCommittedPoint: [dx, dy],
@@ -7955,8 +7956,8 @@ class App extends React.Component<AppProps, AppState> {
 
         return;
       }
-      if (isImageElement(draggingElement)) {
-        const imageElement = draggingElement;
+      if (isImageElement(newElement)) {
+        const imageElement = newElement;
         try {
           this.initializeImageDimensions(imageElement);
           this.setState(
@@ -7982,8 +7983,8 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (isLinearElement(draggingElement)) {
-        if (draggingElement!.points.length > 1) {
+      if (isLinearElement(newElement)) {
+        if (newElement!.points.length > 1) {
           this.store.shouldCaptureIncrement();
         }
         const pointerCoords = viewportCoordsToSceneCoords(
@@ -7991,31 +7992,24 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (
-          !pointerDownState.drag.hasOccurred &&
-          draggingElement &&
-          !multiElement
-        ) {
-          mutateElement(draggingElement, {
+        if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
+          mutateElement(newElement, {
             points: [
-              ...draggingElement.points,
-              [
-                pointerCoords.x - draggingElement.x,
-                pointerCoords.y - draggingElement.y,
-              ],
+              ...newElement.points,
+              [pointerCoords.x - newElement.x, pointerCoords.y - newElement.y],
             ],
           });
           this.setState({
-            multiElement: draggingElement,
-            editingElement: this.state.draggingElement,
+            multiElement: newElement,
+            editingElement: this.state.newElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
             isBindingEnabled(this.state) &&
-            isBindingElement(draggingElement, false)
+            isBindingElement(newElement, false)
           ) {
             maybeBindLinearElement(
-              draggingElement,
+              newElement,
               this.state,
               pointerCoords,
               this.scene.getNonDeletedElementsMap(),
@@ -8025,63 +8019,63 @@ class App extends React.Component<AppProps, AppState> {
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
             this.setState((prevState) => ({
-              draggingElement: null,
+              newElement: null,
               activeTool: updateActiveTool(this.state, {
                 type: "selection",
               }),
               selectedElementIds: makeNextSelectedElementIds(
                 {
                   ...prevState.selectedElementIds,
-                  [draggingElement.id]: true,
+                  [newElement.id]: true,
                 },
                 prevState,
               ),
-              selectedLinearElement: new LinearElementEditor(draggingElement),
+              selectedLinearElement: new LinearElementEditor(newElement),
             }));
           } else {
             this.setState((prevState) => ({
-              draggingElement: null,
+              newElement: null,
             }));
           }
         }
         return;
       }
 
-      if (isTextElement(draggingElement)) {
+      if (isTextElement(newElement)) {
         const minWidth = getMinTextElementWidth(
           getFontString({
-            fontSize: draggingElement.fontSize,
-            fontFamily: draggingElement.fontFamily,
+            fontSize: newElement.fontSize,
+            fontFamily: newElement.fontFamily,
           }),
-          draggingElement.lineHeight,
+          newElement.lineHeight,
         );
 
-        if (draggingElement.width < minWidth) {
-          mutateElement(draggingElement, {
+        if (newElement.width < minWidth) {
+          mutateElement(newElement, {
             autoResize: true,
           });
         }
 
         this.resetCursor();
 
-        this.handleTextWysiwyg(draggingElement, {
+        this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
         });
       }
 
       if (
         activeTool.type !== "selection" &&
-        draggingElement &&
-        isInvisiblySmallElement(draggingElement)
+        newElement &&
+        isInvisiblySmallElement(newElement)
       ) {
         // remove invisible element which was added in onPointerDown
         // update the store snapshot, so that invisible elements are not captured by the store
         this.updateScene({
           elements: this.scene
             .getElementsIncludingDeleted()
-            .filter((el) => el.id !== draggingElement.id),
+            .filter((el) => el.id !== newElement.id),
           appState: {
-            draggingElement: null,
+            newElement: null,
           },
           storeAction: StoreAction.UPDATE,
         });
@@ -8089,7 +8083,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (draggingElement) {
+      if (newElement) {
         if (pointerDownState.drag.hasOccurred) {
           const sceneCoords = viewportCoordsToSceneCoords(
             childEvent,
@@ -8224,10 +8218,10 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (isFrameLikeElement(draggingElement)) {
+        if (isFrameLikeElement(newElement)) {
           const elementsInsideFrame = getElementsInNewFrame(
             this.scene.getElementsIncludingDeleted(),
-            draggingElement,
+            newElement,
             this.scene.getNonDeletedElementsMap(),
           );
 
@@ -8235,15 +8229,12 @@ class App extends React.Component<AppProps, AppState> {
             addElementsToFrame(
               this.scene.getElementsMapIncludingDeleted(),
               elementsInsideFrame,
-              draggingElement,
+              newElement,
             ),
           );
         }
 
-        mutateElement(
-          draggingElement,
-          getNormalizedDimensions(draggingElement),
-        );
+        mutateElement(newElement, getNormalizedDimensions(newElement));
       }
 
       if (resizingElement) {
@@ -8541,19 +8532,19 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !activeTool.locked &&
         activeTool.type !== "freedraw" &&
-        draggingElement &&
-        draggingElement.type !== "selection"
+        newElement &&
+        newElement.type !== "selection"
       ) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
             {
               ...prevState.selectedElementIds,
-              [draggingElement.id]: true,
+              [newElement.id]: true,
             },
             prevState,
           ),
           showHyperlinkPopup:
-            isEmbeddableElement(draggingElement) && !draggingElement.link
+            isEmbeddableElement(newElement) && !newElement.link
               ? "editor"
               : prevState.showHyperlinkPopup,
         }));
@@ -8593,13 +8584,13 @@ class App extends React.Component<AppProps, AppState> {
       if (!activeTool.locked && activeTool.type !== "freedraw") {
         resetCursor(this.interactiveCanvas);
         this.setState({
-          draggingElement: null,
+          newElement: null,
           suggestedBindings: [],
           activeTool: updateActiveTool(this.state, { type: "selection" }),
         });
       } else {
         this.setState({
-          draggingElement: null,
+          newElement: null,
           suggestedBindings: [],
         });
       }
@@ -8762,7 +8753,7 @@ class App extends React.Component<AppProps, AppState> {
           }
           if (
             this.state.pendingImageElementId !== imageElement.id &&
-            this.state.draggingElement?.id !== imageElement.id
+            this.state.newElement?.id !== imageElement.id
           ) {
             this.initializeImageDimensions(imageElement, true);
           }
@@ -9419,17 +9410,17 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): void => {
-    const draggingElement = this.state.draggingElement;
+    const newElement = this.state.newElement;
     const pointerCoords = pointerDownState.lastCoords;
-    if (!draggingElement) {
+    if (!newElement) {
       return;
     }
     if (
-      draggingElement.type === "selection" &&
+      newElement.type === "selection" &&
       this.state.activeTool.type !== "eraser"
     ) {
       dragNewElement(
-        draggingElement,
+        newElement,
         this.state.activeTool.type,
         pointerDownState.origin.x,
         pointerDownState.origin.y,
@@ -9449,17 +9440,17 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       const image =
-        isInitializedImageElement(draggingElement) &&
-        this.imageCache.get(draggingElement.fileId)?.image;
+        isInitializedImageElement(newElement) &&
+        this.imageCache.get(newElement.fileId)?.image;
       const aspectRatio =
         image && !(image instanceof Promise)
           ? image.width / image.height
           : null;
 
-      this.maybeCacheReferenceSnapPoints(event, [draggingElement]);
+      this.maybeCacheReferenceSnapPoints(event, [newElement]);
 
       const { snapOffset, snapLines } = snapNewElement(
-        draggingElement,
+        newElement,
         this.state,
         event,
         {
@@ -9485,7 +9476,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       dragNewElement(
-        draggingElement,
+        newElement,
         this.state.activeTool.type,
         pointerDownState.originInGrid.x,
         pointerDownState.originInGrid.y,
@@ -9493,7 +9484,7 @@ class App extends React.Component<AppProps, AppState> {
         gridY,
         distance(pointerDownState.originInGrid.x, gridX),
         distance(pointerDownState.originInGrid.y, gridY),
-        isImageElement(draggingElement)
+        isImageElement(newElement)
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter(event),
@@ -9510,7 +9501,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           elementsToHighlight: getElementsInResizingFrame(
             this.scene.getNonDeletedElements(),
-            draggingElement as ExcalidrawFrameLikeElement,
+            newElement as ExcalidrawFrameLikeElement,
             this.state,
             this.scene.getNonDeletedElementsMap(),
           ),
