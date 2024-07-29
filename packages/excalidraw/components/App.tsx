@@ -6770,7 +6770,6 @@ class App extends React.Component<AppProps, AppState> {
     this.scene.insertElement(element);
     this.setState({
       newElement: element,
-      editingElement: element,
       startBoundElement: boundElement,
       suggestedBindings: [],
     });
@@ -7113,7 +7112,6 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         multiElement: null,
         newElement: element,
-        editingElement: element,
       });
     }
   };
@@ -7148,7 +7146,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       multiElement: null,
       newElement: frame,
-      editingElement: frame,
     });
   };
 
