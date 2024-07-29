@@ -74,6 +74,8 @@ export const actionFinalize = register({
       ? appState.multiElement
       : appState.editingElement?.type === "freedraw"
       ? appState.editingElement
+      : appState.draggingElement?.type === "freedraw"
+      ? appState.draggingElement
       : null;
 
     if (multiPointElement) {

@@ -593,6 +593,7 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   interactiveCanvas: HTMLCanvasElement | null;
+  newElementCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
   focusContainer(): void;

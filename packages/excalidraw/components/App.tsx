@@ -427,6 +427,7 @@ import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
+import NewElementCanvas from "./canvases/NewElementCanvas";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -523,6 +524,7 @@ const gesture: Gesture = {
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
+  newElementCanvas: AppClassProperties["newElementCanvas"] = null;
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -1678,6 +1680,25 @@ class App extends React.Component<AppProps, AppState> {
                             imageCache: this.imageCache,
                             isExporting: false,
                             renderGrid: true,
+                            canvasBackgroundColor:
+                              this.state.viewBackgroundColor,
+                            embedsValidationStatus: this.embedsValidationStatus,
+                            elementsPendingErasure: this.elementsPendingErasure,
+                          }}
+                        />
+                        <NewElementCanvas
+                          newElement={this.state.draggingElement}
+                          appState={this.state}
+                          scale={window.devicePixelRatio}
+                          canvas={this.newElementCanvas}
+                          handleCanvasRef={this.handleNewElementCanvasRef}
+                          rc={this.rc}
+                          elementsMap={elementsMap}
+                          allElementsMap={allElementsMap}
+                          renderConfig={{
+                            imageCache: this.imageCache,
+                            isExporting: false,
+                            renderGrid: false,
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
@@ -6799,10 +6820,10 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene.getNonDeletedElementsMap(),
     );
-    this.scene.insertElement(element);
+    // this.scene.insertElement(element);
     this.setState({
       draggingElement: element,
-      editingElement: element,
+      // editingElement: element,
       startBoundElement: boundElement,
       suggestedBindings: [],
     });
@@ -7141,7 +7162,7 @@ class App extends React.Component<AppProps, AppState> {
         draggingElement: element,
       });
     } else {
-      this.scene.insertElement(element);
+      // this.scene.insertElement(element);
       this.setState({
         multiElement: null,
         draggingElement: element,
@@ -7644,9 +7665,14 @@ class App extends React.Component<AppProps, AppState> {
             ? draggingElement.pressures
             : [...draggingElement.pressures, event.pressure];
 
-          mutateElement(draggingElement, {
+          const _draggingElement = newElementWith(draggingElement, {
             points: [...points, [dx, dy]],
             pressures,
+          });
+
+          // ANCHOR
+          this.setState({
+            draggingElement: _draggingElement,
           });
         }
       } else if (isLinearElement(draggingElement)) {
@@ -7956,6 +7982,10 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
         childEvent,
       );
+
+      if (draggingElement && draggingElement.type !== "selection") {
+        this.scene.insertElement(draggingElement);
+      }
 
       if (draggingElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
@@ -9196,6 +9226,12 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.TOUCH_END,
         this.onTouchEnd,
       );
+    }
+  };
+
+  private handleNewElementCanvasRef = (canvas: HTMLCanvasElement | null) => {
+    if (canvas !== null) {
+      this.newElementCanvas = canvas;
     }
   };
 
