@@ -167,13 +167,25 @@ export const mutateElbowArrow = (
   const startElementBounds = hoveredStartElement
     ? aabbForElement(
         hoveredStartElement,
-        offsetFromHeading(startHeading, FIXED_BINDING_DISTANCE * 4, 1),
+        offsetFromHeading(
+          startHeading,
+          arrow.startArrowhead
+            ? FIXED_BINDING_DISTANCE * 6
+            : FIXED_BINDING_DISTANCE * 2,
+          1,
+        ),
       )
     : startPointBounds;
   const endElementBounds = hoveredEndElement
     ? aabbForElement(
         hoveredEndElement,
-        offsetFromHeading(endHeading, FIXED_BINDING_DISTANCE * 4, 1),
+        offsetFromHeading(
+          endHeading,
+          arrow.endArrowhead
+            ? FIXED_BINDING_DISTANCE * 6
+            : FIXED_BINDING_DISTANCE * 2,
+          1,
+        ),
       )
     : endPointBounds;
   const boundsOverlap =
@@ -214,7 +226,10 @@ export const mutateElbowArrow = (
           startHeading,
           !hoveredStartElement && !hoveredEndElement
             ? 0
-            : BASE_PADDING - FIXED_BINDING_DISTANCE * 4,
+            : BASE_PADDING -
+                (arrow.startArrowhead
+                  ? FIXED_BINDING_DISTANCE * 6
+                  : FIXED_BINDING_DISTANCE * 2),
           BASE_PADDING,
         ),
     boundsOverlap
@@ -227,7 +242,10 @@ export const mutateElbowArrow = (
           endHeading,
           !hoveredStartElement && !hoveredEndElement
             ? 0
-            : BASE_PADDING - FIXED_BINDING_DISTANCE * 4,
+            : BASE_PADDING -
+                (arrow.endArrowhead
+                  ? FIXED_BINDING_DISTANCE * 6
+                  : FIXED_BINDING_DISTANCE * 2),
           BASE_PADDING,
         ),
     boundsOverlap,
