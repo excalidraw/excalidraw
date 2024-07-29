@@ -47,22 +47,21 @@ import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getElementShape } from "../shapes";
-import { headingForPointFromElement } from "./routing";
-import type { Heading } from "../math";
 import {
   aabbForElement,
-  compareHeading,
-  HEADING_DOWN,
-  HEADING_LEFT,
-  HEADING_RIGHT,
-  HEADING_UP,
+  distanceSq2d,
+  getCenterForElement,
   pointInsideBounds,
   pointToVector,
   rotatePoint,
-  scaleVector,
-  translatePoint,
-  vectorToHeading,
 } from "../math";
+import {
+  HEADING_LEFT,
+  HEADING_RIGHT,
+  headingForPointFromElement,
+  vectorToHeading,
+  type Heading,
+} from "./heading";
 import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
@@ -678,13 +677,39 @@ const getSimultaneouslyUpdatedElementIds = (
   return new Set((simultaneouslyUpdated || []).map((element) => element.id));
 };
 
-const getHeadingForElbowArrowSnap = (
-  point: Point,
-  otherPoint: Point,
-  bindableElement: ExcalidrawBindableElement,
-  aabb: Bounds,
+export const getHeadingForElbowArrowSnap = (
+  point: Readonly<Point>,
+  otherPoint: Readonly<Point>,
+  bindableElement: ExcalidrawBindableElement | undefined | null,
+  aabb: Bounds | undefined | null,
   elementsMap: ElementsMap,
-): Heading | null => {
+): Heading => {
+  const otherPointHeading = vectorToHeading(pointToVector(otherPoint, point));
+
+  if (!bindableElement || !aabb) {
+    return otherPointHeading;
+  }
+
+  const distance = getDistanceForBinding(point, bindableElement, elementsMap);
+
+  if (!distance) {
+    return otherPointHeading;
+  }
+
+  const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
+  const isInner =
+    otherPointHeading === HEADING_LEFT || otherPointHeading === HEADING_RIGHT
+      ? distance < bindableElement.width * -0.2
+      : distance < bindableElement.height * -0.2;
+
+  return isInner ? otherPointHeading : pointHeading;
+};
+
+const getDistanceForBinding = (
+  point: Readonly<Point>,
+  bindableElement: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+) => {
   const distance = distanceToBindableElement(
     bindableElement,
     point,
@@ -696,66 +721,73 @@ const getHeadingForElbowArrowSnap = (
     bindableElement.height,
   );
 
-  if (distance > bindDistance) {
-    return null;
-  }
-  const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
-  const otherPointHeading = scaleVector(
-    vectorToHeading(pointToVector(point, otherPoint)),
-    -1,
-  ) as Heading;
-  const isInner =
-    otherPointHeading === HEADING_LEFT || otherPointHeading === HEADING_RIGHT
-      ? distance < bindableElement.width * -0.2
-      : distance < bindableElement.height * -0.2;
-
-  return isInner ? otherPointHeading : pointHeading;
+  return distance > bindDistance ? null : distance;
 };
 
 export const bindPointToSnapToElementOutline = (
-  point: Point,
+  point: Readonly<Point>,
   otherPoint: Point,
-  bindableElement: ExcalidrawBindableElement,
+  bindableElement: ExcalidrawBindableElement | undefined,
   elementsMap: ElementsMap,
 ): Point => {
-  const aabb = aabbForElement(bindableElement);
-  const heading = getHeadingForElbowArrowSnap(
-    point,
-    otherPoint,
-    bindableElement,
-    aabb,
-    elementsMap,
-  );
+  const aabb = bindableElement && aabbForElement(bindableElement);
+  // const heading = getHeadingForElbowArrowSnap(
+  //   point,
+  //   otherPoint,
+  //   bindableElement,
+  //   aabb,
+  //   elementsMap,
+  // );
 
-  if (heading) {
-    const headingIsVertical =
-      compareHeading(heading, HEADING_UP) ||
-      compareHeading(heading, HEADING_DOWN);
-    const intersections = intersectElementWithLine(
-      bindableElement,
-      headingIsVertical ? [point[0], aabb[1]] : [aabb[0], point[1]],
-      headingIsVertical ? [point[0], aabb[3]] : [aabb[2], point[1]],
-      FIXED_BINDING_DISTANCE,
-      elementsMap,
+  if (bindableElement && aabb) {
+    // const headingIsVertical =
+    //   compareHeading(heading, HEADING_UP) ||
+    //   compareHeading(heading, HEADING_DOWN);
+
+    // TODO: Dirty hack until tangents are properly calculated
+    const intersections = [
+      ...intersectElementWithLine(
+        bindableElement,
+        [point[0], point[1] - 2 * bindableElement.height],
+        [point[0], point[1] + 2 * bindableElement.height],
+        FIXED_BINDING_DISTANCE,
+        elementsMap,
+      ),
+      ...intersectElementWithLine(
+        bindableElement,
+        [point[0] - 2 * bindableElement.width, point[1]],
+        [point[0] + 2 * bindableElement.width, point[1]],
+        FIXED_BINDING_DISTANCE,
+        elementsMap,
+      ),
+    ];
+
+    intersections.sort(
+      (a, b) => distanceSq2d(a, point) - distanceSq2d(b, point),
     );
 
-    if (intersections.length === 2) {
-      // TODO: Hack to circumvent bug in intersectElementWithLine transposing
-      // second intersect point on rectanguloid shapes
-      if (
-        bindableElement.type !== "ellipse" &&
-        bindableElement.type !== "diamond"
-      ) {
-        return compareHeading(heading, HEADING_UP) ||
-          compareHeading(heading, HEADING_LEFT)
-          ? intersections[0]
-          : [-1 * intersections[1][0], -1 * intersections[1][1]];
-      }
-      return compareHeading(heading, HEADING_UP) ||
-        compareHeading(heading, HEADING_LEFT)
-        ? intersections[0]
-        : intersections[1];
-    }
+    return intersections[0] ?? point;
+
+    // if (intersections.length === 2) {
+    //   //intersections.forEach((point) => debugDrawPoint(point, "red"));
+
+    //   // TODO: Hack to circumvent bug in intersectElementWithLine transposing
+    //   // second intersect point on rectanguloid shapes
+    //   // if (
+    //   //   bindableElement.type !== "ellipse" &&
+    //   //   bindableElement.type !== "diamond"
+    //   // ) {
+    //   //   return compareHeading(heading, HEADING_UP) ||
+    //   //     compareHeading(heading, HEADING_LEFT)
+    //   //     ? intersections[0]
+    //   //     : [-1 * intersections[1][0], -1 * intersections[1][1]];
+    //   // }
+
+    //   return compareHeading(heading, HEADING_UP) ||
+    //     compareHeading(heading, HEADING_LEFT)
+    //     ? intersections[0]
+    //     : intersections[1];
+    // }
   }
 
   return point;
@@ -765,35 +797,87 @@ export const avoidRectangularCorner = (
   element: ExcalidrawBindableElement,
   p: Point,
 ): Point => {
-  // NOTE: Only relevant at angle = 0, so no rotation
+  const center = getCenterForElement(element);
+  const nonRotatedPoint = rotatePoint(p, center, -element.angle);
 
-  if (p[0] < element.x && p[1] < element.y) {
+  if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
     // Top left
-    if (p[1] - element.y > -5) {
-      return [element.x - 5, element.y];
+    if (nonRotatedPoint[1] - element.y > -FIXED_BINDING_DISTANCE) {
+      return rotatePoint(
+        [element.x - FIXED_BINDING_DISTANCE, element.y],
+        center,
+        element.angle,
+      );
     }
-    return [element.x, element.y - 5];
-  } else if (p[0] < element.x && p[1] > element.y + element.height) {
-    // Bottom left
-    if (p[0] - element.x > -5) {
-      return [element.x, element.y + element.height + 5];
-    }
-    return [element.x - 5, element.y + element.height];
+    return rotatePoint(
+      [element.x, element.y - FIXED_BINDING_DISTANCE],
+      center,
+      element.angle,
+    );
   } else if (
-    p[0] > element.x + element.width &&
-    p[1] > element.y + element.height
+    nonRotatedPoint[0] < element.x &&
+    nonRotatedPoint[1] > element.y + element.height
+  ) {
+    // Bottom left
+    if (nonRotatedPoint[0] - element.x > -FIXED_BINDING_DISTANCE) {
+      return rotatePoint(
+        [element.x, element.y + element.height + FIXED_BINDING_DISTANCE],
+        center,
+        element.angle,
+      );
+    }
+    return rotatePoint(
+      [element.x - FIXED_BINDING_DISTANCE, element.y + element.height],
+      center,
+      element.angle,
+    );
+  } else if (
+    nonRotatedPoint[0] > element.x + element.width &&
+    nonRotatedPoint[1] > element.y + element.height
   ) {
     // Bottom right
-    if (p[0] - element.x < element.width + 5) {
-      return [element.x + element.width, element.y + element.height + 5];
+    console.log("BR");
+    if (
+      nonRotatedPoint[0] - element.x <
+      element.width + FIXED_BINDING_DISTANCE
+    ) {
+      return rotatePoint(
+        [
+          element.x + element.width,
+          element.y + element.height + FIXED_BINDING_DISTANCE,
+        ],
+        center,
+        element.angle,
+      );
     }
-    return [element.x + element.width + 5, element.y + element.height];
-  } else if (p[0] > element.x + element.width && p[1] < element.y) {
+    return rotatePoint(
+      [
+        element.x + element.width + FIXED_BINDING_DISTANCE,
+        element.y + element.height,
+      ],
+      center,
+      element.angle,
+    );
+  } else if (
+    nonRotatedPoint[0] > element.x + element.width &&
+    nonRotatedPoint[1] < element.y
+  ) {
     // Top right
-    if (p[0] - element.x < element.width + 5) {
-      return [element.x + element.width, element.y - 5];
+    if (
+      nonRotatedPoint[0] - element.x <
+      element.width + FIXED_BINDING_DISTANCE
+    ) {
+      return rotatePoint(
+        [element.x + element.width, element.y - FIXED_BINDING_DISTANCE],
+        center,
+        element.angle,
+      );
     }
-    return [element.x + element.width + 5, element.y];
+    return rotatePoint(
+      [element.x + element.width + FIXED_BINDING_DISTANCE, element.y],
+      center,
+      element.angle,
+    );
   }
 
   return p;

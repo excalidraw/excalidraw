@@ -48,7 +48,9 @@ export const close = (polygon: Polygon) => {
 
 // convert radians to degress
 export const angleToDegrees = (angle: number) => {
-  return (angle * 180) / Math.PI;
+  const theta = (angle * 180) / Math.PI;
+
+  return theta < 0 ? 360 + theta : theta;
 };
 
 // convert degrees to radians

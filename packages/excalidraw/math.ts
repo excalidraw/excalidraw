@@ -543,29 +543,6 @@ export const pointToVector = (p: Point, origin: Point = [0, 0]): Vector => [
   p[1] - origin[1],
 ];
 
-export const HEADING_RIGHT = [1, 0] as Heading;
-export const HEADING_DOWN = [0, 1] as Heading;
-export const HEADING_LEFT = [-1, 0] as Heading;
-export const HEADING_UP = [0, -1] as Heading;
-export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
-
-export const vectorToHeading = (vec: Vector): Heading => {
-  const [x, y] = vec;
-  const absX = Math.abs(x);
-  const absY = Math.abs(y);
-  if (x > absY) {
-    return HEADING_RIGHT;
-  } else if (x <= -absY) {
-    return HEADING_LEFT;
-  } else if (y > absX) {
-    return HEADING_DOWN;
-  }
-  return HEADING_UP;
-};
-
-export const compareHeading = (a: Heading, b: Heading) =>
-  a[0] === b[0] && a[1] === b[1];
-
 export const scalePointFromOrigin = (
   p: Point,
   mid: Point,
@@ -614,7 +591,7 @@ export const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
  * Get the axis-aligned bounding box for a given element
  */
 export const aabbForElement = (
-  element: ExcalidrawElement,
+  element: Readonly<ExcalidrawElement>,
   offset?: [number, number, number, number],
 ) => {
   const bbox = {
@@ -702,3 +679,23 @@ export const isPointOnSymmetricArc = (
         endAngle >= angle
     : startAngle <= angle || endAngle >= angle;
 };
+
+export const getCenterForBounds = (bounds: Bounds): Point => [
+  bounds[0] + (bounds[2] - bounds[0]) / 2,
+  bounds[1] + (bounds[3] - bounds[1]) / 2,
+];
+
+export const getCenterForElement = (element: ExcalidrawElement): Point => [
+  element.x + element.width / 2,
+  element.y + element.height / 2,
+];
+
+export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
+  pointInsideBounds([a[0], a[1]], b) ||
+  pointInsideBounds([a[2], a[1]], b) ||
+  pointInsideBounds([a[2], a[3]], b) ||
+  pointInsideBounds([a[0], a[3]], b) ||
+  pointInsideBounds([b[0], b[1]], a) ||
+  pointInsideBounds([b[2], b[1]], a) ||
+  pointInsideBounds([b[2], b[3]], a) ||
+  pointInsideBounds([b[0], b[3]], a);

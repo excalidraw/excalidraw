@@ -160,6 +160,7 @@ export const isRectanguloidElement = (
   return (
     element != null &&
     (element.type === "rectangle" ||
+      element.type === "diamond" ||
       element.type === "iframe" ||
       element.type === "embeddable" ||
       element.type === "frame" ||
