@@ -7585,12 +7585,18 @@ class App extends React.Component<AppProps, AppState> {
           //   !pointerDownState.drag.hasOccurred ||
           //   !!this.state.editingLinearElement
           // ) {
-          this.setState({
-            suggestedBindings: getSuggestedBindingsForArrows(
-              selectedElements,
-              this.scene.getNonDeletedElementsMap(),
-            ),
-          });
+          if (
+            selectedElements.length !== 1 ||
+            !isElbowArrow(selectedElements[0])
+          ) {
+            this.setState({
+              suggestedBindings: getSuggestedBindingsForArrows(
+                selectedElements,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+            });
+          }
+
           //}
 
           // We duplicate the selected element if alt is pressed on pointer move

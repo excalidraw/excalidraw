@@ -19,7 +19,7 @@ import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
-  selectedElements: NonDeletedExcalidrawElement[],
+  _selectedElements: NonDeletedExcalidrawElement[],
   offset: { x: number; y: number },
   scene: Scene,
   snapOffset: {
@@ -29,13 +29,16 @@ export const dragSelectedElements = (
   gridSize: AppState["gridSize"],
 ) => {
   if (
-    selectedElements.length === 1 &&
-    isArrowElement(selectedElements[0]) &&
-    isElbowArrow(selectedElements[0]) &&
-    (selectedElements[0].startBinding || selectedElements[0].endBinding)
+    _selectedElements.length === 1 &&
+    isArrowElement(_selectedElements[0]) &&
+    isElbowArrow(_selectedElements[0]) &&
+    (_selectedElements[0].startBinding || _selectedElements[0].endBinding)
   ) {
     return;
   }
+
+  const selectedElements = _selectedElements.filter((el) => !isElbowArrow(el));
+
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
   // in the frame twice, hence the use of set
