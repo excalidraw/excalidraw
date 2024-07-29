@@ -62,7 +62,6 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -761,9 +760,6 @@ export const bindPointToSnapToElementOutline = (
     intersections.sort(
       (a, b) => distanceSq2d(a, point) - distanceSq2d(b, point),
     );
-
-    //intersections.forEach((point) => debugDrawPoint(point, "red", true));
-    debugDrawPoint(point, "green");
 
     return intersections[0] ?? point;
   }

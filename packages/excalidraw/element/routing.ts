@@ -18,7 +18,6 @@ import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -253,13 +252,6 @@ export const mutateElbowArrow = (
     endHeading,
     commonBounds,
   );
-
-  // dynamicAABBs.forEach((bbox) => debugDrawBounds(bbox));
-  // [startElementBounds, endElementBounds]
-  //   .filter((aabb) => aabb !== null)
-  //   .forEach((bbox) => debugDrawBounds(bbox, "red"));
-  // debugDrawBounds(commonBounds, "cyan");
-  // grid.data.forEach((node) => node && debugDrawPoint(node.pos));
 
   const startDongle =
     startDonglePosition && pointToGridNode(startDonglePosition, grid);

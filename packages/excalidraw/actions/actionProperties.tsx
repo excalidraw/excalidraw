@@ -110,7 +110,7 @@ import {
   bindPointToSnapToElementOutline,
   getHoveredElementForBinding,
 } from "../element/binding";
-import { getArrowLocalFixedPoints, mutateElbowArrow } from "../element/routing";
+import { mutateElbowArrow } from "../element/routing";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1566,18 +1566,16 @@ export const actionChangeArrowType = register({
 
         if (value === "elbow") {
           const elementsMap = app.scene.getNonDeletedElementsMap();
-          const [startPoint, endPoint] = getArrowLocalFixedPoints(
-            newElement,
-            elementsMap,
-          );
+
           const startGlobalPoint = [
-            newElement.x + startPoint[0],
-            newElement.y + startPoint[1],
+            newElement.x + newElement.points[0][0],
+            newElement.y + newElement.points[0][1],
           ] as Point;
           const endGlobalPoint = [
-            newElement.x + endPoint[0],
-            newElement.y + endPoint[1],
+            newElement.x + newElement.points[newElement.points.length - 1][0],
+            newElement.y + newElement.points[newElement.points.length - 1][1],
           ] as Point;
+
           const startElement =
             !newElement.startBinding &&
             getHoveredElementForBinding(
@@ -1586,14 +1584,6 @@ export const actionChangeArrowType = register({
               elementsMap,
               true,
             );
-          const finalStartPoint = startElement
-            ? bindPointToSnapToElementOutline(
-                startGlobalPoint,
-                endGlobalPoint,
-                startElement,
-                elementsMap,
-              )
-            : startGlobalPoint;
           const endElement =
             !newElement.endBinding &&
             getHoveredElementForBinding(
@@ -1602,6 +1592,15 @@ export const actionChangeArrowType = register({
               elementsMap,
               true,
             );
+
+          const finalStartPoint = startElement
+            ? bindPointToSnapToElementOutline(
+                startGlobalPoint,
+                endGlobalPoint,
+                startElement,
+                elementsMap,
+              )
+            : startGlobalPoint;
           const finalEndPoint = endElement
             ? bindPointToSnapToElementOutline(
                 endGlobalPoint,
@@ -1610,6 +1609,7 @@ export const actionChangeArrowType = register({
                 elementsMap,
               )
             : endGlobalPoint;
+
           startElement &&
             bindLinearElement(newElement, startElement, "start", elementsMap);
           endElement &&
