@@ -34,9 +34,22 @@ import { arrayToMap } from "./utils";
  */
 export const validateFractionalIndices = (
   elements: readonly ExcalidrawElement[],
-  { shouldThrow = false, includeBoundTextValidation = false },
+  {
+    shouldThrow = false,
+    includeBoundTextValidation = false,
+    reconciliationContext,
+  }: {
+    shouldThrow: boolean;
+    includeBoundTextValidation: boolean;
+    reconciliationContext?: {
+      localElements: ReadonlyArray<ExcalidrawElement>;
+      remoteElements: ReadonlyArray<ExcalidrawElement>;
+    };
+  },
 ) => {
-  let foundError = false;
+  const errorMessages = [];
+  const stringifyElement = (element: ExcalidrawElement | void) =>
+    `${element?.index}:${element?.id}:${element?.type}:${element?.isDeleted}:${element?.version}:${element?.versionNonce}`;
 
   const indices = elements.map((x) => x.index);
   for (const [i, index] of indices.entries()) {
@@ -44,14 +57,12 @@ export const validateFractionalIndices = (
     const successorIndex = indices[i + 1];
 
     if (!isValidFractionalIndex(index, predecessorIndex, successorIndex)) {
-      foundError = true;
-      console.error(
-        `Fractional indices invariant for element has been compromised: "${
-          elements[i - 1]?.index
-        }", "${elements[i]?.index}", "${elements[i + 1]?.index}"`,
-        elements[i - 1],
-        elements[i],
-        elements[i + 1],
+      errorMessages.push(
+        `Fractional indices invariant has been compromised: "${stringifyElement(
+          elements[i - 1],
+        )}", "${stringifyElement(elements[i])}", "${stringifyElement(
+          elements[i + 1],
+        )}"`,
       );
     }
 
@@ -61,23 +72,41 @@ export const validateFractionalIndices = (
       const text = getBoundTextElement(container, arrayToMap(elements));
 
       if (text && text.index! <= container.index!) {
-        foundError = true;
-        console.error(
-          `Fractional indices invariant for bound elements has been compromised: : "${text.index}", "${container.index}"`,
-          text,
-          container,
+        errorMessages.push(
+          `Fractional indices invariant for bound elements has been compromised: "${stringifyElement(
+            text,
+          )}", "${stringifyElement(container)}"`,
         );
       }
     }
   }
 
-  if (foundError) {
-    console.error("Passed elements:", elements);
-  }
+  if (errorMessages.length) {
+    const error = new InvalidFractionalIndexError();
+    const additionalContext = [];
 
-  if (shouldThrow && foundError) {
-    // if enabled, gather all the errors first, throw once
-    throw new InvalidFractionalIndexError();
+    if (reconciliationContext) {
+      additionalContext.push("Additional reconciliation context:");
+      additionalContext.push(
+        reconciliationContext.localElements.map((x) => stringifyElement(x)),
+      );
+      additionalContext.push(
+        reconciliationContext.remoteElements.map((x) => stringifyElement(x)),
+      );
+    }
+
+    // report just once and with the stacktrace
+    console.error(
+      errorMessages.join("\n\n"),
+      error.stack,
+      elements.map((x) => stringifyElement(x)),
+      ...additionalContext,
+    );
+
+    if (shouldThrow) {
+      // if enabled, gather all the errors first, throw once
+      throw error;
+    }
   }
 };
 

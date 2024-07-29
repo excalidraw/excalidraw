@@ -82,25 +82,20 @@ export const reconcileElements = (
     import.meta.env.MODE === ENV.TEST ||
     window?.DEBUG_FRACTIONAL_INDICES
   ) {
-    try {
-      const elements = syncInvalidIndices(
-        // create new instances due to the mutation
-        orderedElements.map((x) => ({ ...x })),
-      );
+    const elements = syncInvalidIndices(
+      // create new instances due to the mutation
+      orderedElements.map((x) => ({ ...x })),
+    );
 
-      validateFractionalIndices(elements, {
-        shouldThrow: true,
-        includeBoundTextValidation: true,
-      });
-    } catch (e) {
-      console.error("Local elements:", localElements);
-      console.error("Remote elements:", remoteElements);
-
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
-        // re-throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        throw e;
-      }
-    }
+    validateFractionalIndices(elements, {
+      // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+      shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+      includeBoundTextValidation: true,
+      reconciliationContext: {
+        localElements,
+        remoteElements,
+      },
+    });
   }
 
   // de-duplicate indices
