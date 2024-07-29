@@ -693,7 +693,9 @@ export const getHeadingForElbowArrowSnap = (
   const distance = getDistanceForBinding(point, bindableElement, elementsMap);
 
   if (!distance) {
-    return otherPointHeading;
+    return vectorToHeading(
+      pointToVector(point, getCenterForElement(bindableElement)),
+    );
   }
 
   const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
@@ -731,19 +733,8 @@ export const bindPointToSnapToElementOutline = (
   elementsMap: ElementsMap,
 ): Point => {
   const aabb = bindableElement && aabbForElement(bindableElement);
-  // const heading = getHeadingForElbowArrowSnap(
-  //   point,
-  //   otherPoint,
-  //   bindableElement,
-  //   aabb,
-  //   elementsMap,
-  // );
 
   if (bindableElement && aabb) {
-    // const headingIsVertical =
-    //   compareHeading(heading, HEADING_UP) ||
-    //   compareHeading(heading, HEADING_DOWN);
-
     // TODO: Dirty hack until tangents are properly calculated
     const intersections = [
       ...intersectElementWithLine(
@@ -760,34 +751,21 @@ export const bindPointToSnapToElementOutline = (
         FIXED_BINDING_DISTANCE,
         elementsMap,
       ),
-    ];
+    ].map((i) =>
+      distanceToBindableElement(bindableElement, i, elementsMap) >
+      Math.min(bindableElement.width, bindableElement.height) / 2
+        ? ([-1 * i[0], -1 * i[1]] as Point)
+        : i,
+    );
 
     intersections.sort(
       (a, b) => distanceSq2d(a, point) - distanceSq2d(b, point),
     );
 
+    //intersections.forEach((point) => debugDrawPoint(point, "red", true));
+    debugDrawPoint(point, "green");
+
     return intersections[0] ?? point;
-
-    // if (intersections.length === 2) {
-    //   //intersections.forEach((point) => debugDrawPoint(point, "red"));
-
-    //   // TODO: Hack to circumvent bug in intersectElementWithLine transposing
-    //   // second intersect point on rectanguloid shapes
-    //   // if (
-    //   //   bindableElement.type !== "ellipse" &&
-    //   //   bindableElement.type !== "diamond"
-    //   // ) {
-    //   //   return compareHeading(heading, HEADING_UP) ||
-    //   //     compareHeading(heading, HEADING_LEFT)
-    //   //     ? intersections[0]
-    //   //     : [-1 * intersections[1][0], -1 * intersections[1][1]];
-    //   // }
-
-    //   return compareHeading(heading, HEADING_UP) ||
-    //     compareHeading(heading, HEADING_LEFT)
-    //     ? intersections[0]
-    //     : intersections[1];
-    // }
   }
 
   return point;
@@ -836,7 +814,6 @@ export const avoidRectangularCorner = (
     nonRotatedPoint[1] > element.y + element.height
   ) {
     // Bottom right
-    console.log("BR");
     if (
       nonRotatedPoint[0] - element.x <
       element.width + FIXED_BINDING_DISTANCE

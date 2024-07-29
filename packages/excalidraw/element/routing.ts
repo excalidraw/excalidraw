@@ -18,7 +18,7 @@ import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
 import { toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawPoint } from "../visualdebug";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -140,7 +140,6 @@ export const mutateElbowArrow = (
     hoveredEndElement,
     options?.isDragging,
   );
-  //debugDrawPoint(endGlobalPoint, "green");
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
@@ -154,7 +153,6 @@ export const mutateElbowArrow = (
     hoveredEndElement,
   );
 
-  // Calculate bounds needed for routing
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
@@ -975,9 +973,15 @@ const getGlobalFixedPoints = (
   elementsMap: ElementsMap,
 ) => {
   const startElement =
-    arrow.startBinding && elementsMap.get(arrow.startBinding.elementId);
+    arrow.startBinding &&
+    (elementsMap.get(arrow.startBinding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined);
   const endElement =
-    arrow.endBinding && elementsMap.get(arrow.endBinding.elementId);
+    arrow.endBinding &&
+    (elementsMap.get(arrow.endBinding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined);
   const startPoint: Point =
     startElement && arrow.startBinding
       ? getGlobalFixedPointForBindableElement(
@@ -1043,31 +1047,51 @@ const getGlobalPoint = (
 ): Point => {
   if (isDragging) {
     if (hoveredElement) {
-      const snapPoint = bindPointToSnapToElementOutline(
+      const snapPoint = getSnapPoint(
         initialPoint,
         otherPoint,
         hoveredElement,
         elementsMap,
       );
-      debugDrawPoint(snapPoint, "green");
 
-      return snapToMid(
-        hoveredElement,
-        isRectanguloidElement(hoveredElement)
-          ? avoidRectangularCorner(hoveredElement, snapPoint)
-          : snapPoint,
-      );
+      return snapToMid(hoveredElement, snapPoint);
     }
 
     return initialPoint;
   }
 
   if (boundElement && fixedPointRatio) {
-    return getGlobalFixedPointForBindableElement(fixedPointRatio, boundElement);
+    const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
+      fixedPointRatio,
+      boundElement,
+    );
+
+    // NOTE: Resize scales the binding position point too, so we need to update it
+    return Math.abs(
+      distanceToBindableElement(boundElement, fixedGlobalPoint, elementsMap) -
+        FIXED_BINDING_DISTANCE,
+    ) > 0.01
+      ? getSnapPoint(initialPoint, otherPoint, boundElement, elementsMap)
+      : fixedGlobalPoint;
   }
 
   return initialPoint;
 };
+
+const getSnapPoint = (
+  point: Point,
+  otherPoint: Point,
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+) =>
+  bindPointToSnapToElementOutline(
+    isRectanguloidElement(element)
+      ? avoidRectangularCorner(element, point)
+      : point,
+    otherPoint,
+    element,
+    elementsMap,
+  );
 
 const getBindPointHeading = (
   point: Point,
