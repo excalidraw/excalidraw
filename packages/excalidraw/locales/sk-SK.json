@@ -109,7 +109,7 @@
     "share": "Zdieľať",
     "showStroke": "Zobraziť výber farby pre obrys",
     "showBackground": "Zobraziť výber farby pre pozadie",
-    "showFonts": "",
+    "showFonts": "Zobraziť výber písma",
     "toggleTheme": "Prepnúť svetlú/tmavú tému",
     "theme": "Téma",
     "personalLib": "Moja knižnica",
@@ -559,18 +559,18 @@
     "preview": "Ukážka"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Rýchle vyhľadávanie"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "staré"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "V tejto scéne",
+    "availableFonts": "Dostupné písma",
+    "empty": "Nenašli sa žiadne písma"
   },
   "userList": {
-    "empty": "",
+    "empty": "Nenašli sa žiadni používatelia",
     "hint": {
       "text": "Kliknite na používateľa pre jeho sledovanie",
       "followStatus": "Aktuálne sledujete tohto používateľa",
