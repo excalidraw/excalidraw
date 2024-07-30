@@ -1,6 +1,10 @@
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
-import type { ExcalidrawTextElement, FontFamilyValues } from "../element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  FontFamilyValues,
+} from "../element/types";
 import { ShapeCache } from "../scene/ShapeCache";
 import { isTextElement } from "../element";
 import { getFontString } from "../utils";
@@ -44,10 +48,19 @@ export class Fonts {
       >
     | undefined;
 
+  private static _initialized: boolean = false;
+
   public static get registered() {
+    // lazy load the font registration
     if (!Fonts._registered) {
-      // lazy load the fonts
       Fonts._registered = Fonts.init();
+    } else if (!Fonts._initialized) {
+      // case when host app register fonts before they are lazy loaded
+      // don't override whatever has been previously registered
+      Fonts._registered = new Map([
+        ...Fonts.init().entries(),
+        ...Fonts._registered.entries(),
+      ]);
     }
 
     return Fonts._registered;
@@ -58,17 +71,6 @@ export class Fonts {
   }
 
   private readonly scene: Scene;
-
-  public get sceneFamilies() {
-    return Array.from(
-      this.scene.getNonDeletedElements().reduce((families, element) => {
-        if (isTextElement(element)) {
-          families.add(element.fontFamily);
-        }
-        return families;
-      }, new Set<number>()),
-    );
-  }
 
   constructor({ scene }: { scene: Scene }) {
     this.scene = scene;
@@ -119,7 +121,36 @@ export class Fonts {
     }
   };
 
-  public load = async () => {
+  /**
+   * Load font faces for a given scene and trigger scene update.
+   */
+  public loadSceneFonts = async (): Promise<FontFace[]> => {
+    const sceneFamilies = this.getSceneFontFamilies();
+    const loaded = await Fonts.loadFontFaces(sceneFamilies);
+    this.onLoaded(loaded);
+    return loaded;
+  };
+
+  /**
+   * Gets all the font families for the given scene.
+   */
+  public getSceneFontFamilies = () => {
+    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
+  };
+
+  /**
+   * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
+   */
+  public static loadFontsForElements = async (
+    elements: readonly ExcalidrawElement[],
+  ): Promise<FontFace[]> => {
+    const fontFamilies = Fonts.getFontFamilies(elements);
+    return await Fonts.loadFontFaces(fontFamilies);
+  };
+
+  private static async loadFontFaces(
+    fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
+  ) {
     // Add all registered font faces into the `document.fonts` (if not added already)
     for (const { fonts } of Fonts.registered.values()) {
       for (const { fontFace } of fonts) {
@@ -129,8 +160,8 @@ export class Fonts {
       }
     }
 
-    const loaded = await Promise.all(
-      this.sceneFamilies.map(async (fontFamily) => {
+    const loadedFontFaces = await Promise.all(
+      fontFamilies.map(async (fontFamily) => {
         const fontString = getFontString({
           fontFamily,
           fontSize: 16,
@@ -157,8 +188,8 @@ export class Fonts {
       }),
     );
 
-    this.onLoaded(loaded.flat().filter(Boolean) as FontFace[]);
-  };
+    return loadedFontFaces.flat().filter(Boolean) as FontFace[];
+  }
 
   /**
    * WARN: should be called just once on init, even across multiple instances.
@@ -171,6 +202,7 @@ export class Fonts {
       >(),
     };
 
+    // TODO: let's tweak this once we know how `register` will be exposed as part of the custom fonts API
     const _register = register.bind(fonts);
 
     _register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
@@ -235,7 +267,22 @@ export class Fonts {
       },
     );
 
+    Fonts._initialized = true;
+
     return fonts.registered;
+  }
+
+  private static getFontFamilies(
+    elements: ReadonlyArray<ExcalidrawElement>,
+  ): Array<ExcalidrawTextElement["fontFamily"]> {
+    return Array.from(
+      elements.reduce((families, element) => {
+        if (isTextElement(element)) {
+          families.add(element.fontFamily);
+        }
+        return families;
+      }, new Set<number>()),
+    );
   }
 }
 

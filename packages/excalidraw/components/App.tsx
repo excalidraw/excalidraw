@@ -2345,7 +2345,7 @@ class App extends React.Component<AppProps, AppState> {
     // fire (looking at you Safari), so on init we manually load all
     // fonts and rerender scene text elements once done. This also
     // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.load();
+    this.fonts.loadSceneFonts();
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {

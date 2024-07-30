@@ -187,7 +187,13 @@ export const exportToCanvas = async (
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
   },
+  loadFonts: () => Promise<void> = async () => {
+    await Fonts.loadFontsForElements(elements);
+  },
 ) => {
+  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
+  await loadFonts();
+
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
     appState.frameRendering ?? null,
