@@ -307,7 +307,7 @@ describe("Test Linear Elements", () => {
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `9`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
       const midPointsWithRoundEdge = LinearElementEditor.getEditorMidPoints(
         h.elements[0] as ExcalidrawLinearElement,
@@ -365,7 +365,7 @@ describe("Test Linear Elements", () => {
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `12`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
       expect([line.x, line.y]).toEqual([
         points[0][0] + deltaX,
@@ -427,7 +427,7 @@ describe("Test Linear Elements", () => {
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `16`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
         expect(line.points.length).toEqual(5);
 
@@ -478,7 +478,7 @@ describe("Test Linear Elements", () => {
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `12`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
@@ -519,7 +519,7 @@ describe("Test Linear Elements", () => {
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `12`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
@@ -567,7 +567,7 @@ describe("Test Linear Elements", () => {
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `18`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
         const newMidPoints = LinearElementEditor.getEditorMidPoints(
           line,
@@ -617,7 +617,7 @@ describe("Test Linear Elements", () => {
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `16`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
         expect(line.points.length).toEqual(5);
 
         expect((h.elements[0] as ExcalidrawLinearElement).points)
@@ -715,7 +715,7 @@ describe("Test Linear Elements", () => {
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `12`,
         );
-        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
+        expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
@@ -929,8 +929,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": "85.82202",
-            "y": "75.63461",
+            "x": 125,
+            "y": 110,
           }
         `);
       });
@@ -973,8 +973,8 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard
-          collaboration made
+          "Online whiteboard 
+          collaboration made 
           easy"
         `);
     });
@@ -1007,8 +1007,8 @@ describe("Test Linear Elements", () => {
       ]);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard
-          collaboration made
+          "Online whiteboard 
+          collaboration made 
           easy"
         `);
     });
@@ -1142,8 +1142,8 @@ describe("Test Linear Elements", () => {
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard
-        collaboration made
+        "Online whiteboard 
+        collaboration made 
         easy"
       `);
       const points = LinearElementEditor.getPointsGlobalCoordinates(
@@ -1170,7 +1170,7 @@ describe("Test Linear Elements", () => {
           }
         `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard
+        "Online whiteboard 
         collaboration made easy"
       `);
     });
@@ -1222,7 +1222,7 @@ describe("Test Linear Elements", () => {
           getBoundTextMaxWidth(arrow, null),
         ),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard
+        "Online whiteboard 
         collaboration made easy"
       `);
       const handleBindTextResizeSpy = vi.spyOn(

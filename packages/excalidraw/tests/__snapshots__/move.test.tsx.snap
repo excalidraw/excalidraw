@@ -173,7 +173,7 @@ exports[`move element > rectangles with binding arrow 6`] = `
   "type": "rectangle",
   "updated": 1,
   "version": 7,
-  "versionNonce": 2066753033,
+  "versionNonce": 745419401,
   "width": 300,
   "x": 201,
   "y": 2,
@@ -191,8 +191,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "endBinding": {
     "elementId": "id1",
     "fixedPoint": [
-      -10,
-      130,
+      "-0.01667",
+      "0.43333",
     ],
     "focus": "-0.46667",
     "gap": 10,
@@ -200,7 +200,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "81.48231",
+  "height": "81.47368",
   "id": "id2",
   "index": "a2",
   "isDeleted": false,
@@ -215,7 +215,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
     ],
     [
       81,
-      "81.48231",
+      "81.47368",
     ],
   ],
   "roughness": 1,
@@ -227,8 +227,8 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "startBinding": {
     "elementId": "id0",
     "fixedPoint": [
-      110,
-      50,
+      "1.05000",
+      "0.50000",
     ],
     "focus": "-0.60000",
     "gap": 10,
@@ -238,10 +238,10 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 17,
-  "versionNonce": 453187241,
+  "version": 11,
+  "versionNonce": 1996028265,
   "width": 81,
   "x": 110,
-  "y": "49.98179",
+  "y": 50,
 }
 `;

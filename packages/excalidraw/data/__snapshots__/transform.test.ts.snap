@@ -88,8 +88,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endBinding": {
     "elementId": "ellipse-1",
     "fixedPoint": [
-      12,
-      139,
+      -0.015363949069004927,
+      0.4633333333333333,
     ],
     "focus": -0.008153707962747813,
     "gap": 1,
@@ -122,8 +122,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startBinding": {
     "elementId": "id47",
     "fixedPoint": [
-      300,
-      150,
+      1.0166666666666666,
+      0.5,
     ],
     "focus": -0.08139534883720931,
     "gap": 1,
@@ -151,8 +151,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endBinding": {
     "elementId": "ellipse-1",
     "fixedPoint": [
-      -3,
-      134,
+      -0.013906606301183804,
+      0.44666666666666666,
     ],
     "focus": 0.10666666666666667,
     "gap": 3.834326468444573,
@@ -185,8 +185,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startBinding": {
     "elementId": "diamond-1",
     "fixedPoint": [
-      131,
-      50,
+      0.9357142857142857,
+      0.37426910523540985,
     ],
     "focus": 0,
     "gap": 1,
@@ -348,8 +348,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endBinding": {
     "elementId": "text-2",
     "fixedPoint": [
-      -205,
-      12.5,
+      -0.05,
+      0.5,
     ],
     "focus": 0,
     "gap": 205,
@@ -382,8 +382,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "startBinding": {
     "elementId": "text-1",
     "fixedPoint": [
-      70,
-      12.5,
+      1.0714285714285714,
+      0.5,
     ],
     "focus": 0,
     "gap": 1,
@@ -457,8 +457,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "endBinding": {
     "elementId": "id40",
     "fixedPoint": [
-      0,
-      50,
+      -0.05,
+      0.5,
     ],
     "focus": 0,
     "gap": 1,
@@ -491,8 +491,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "startBinding": {
     "elementId": "id39",
     "fixedPoint": [
-      100,
-      50,
+      1.05,
+      0.5,
     ],
     "focus": 0,
     "gap": 1,
@@ -640,8 +640,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "endBinding": {
     "elementId": "id44",
     "fixedPoint": [
-      0,
-      12.5,
+      -0.05,
+      0.5,
     ],
     "focus": 0,
     "gap": 1,
@@ -674,8 +674,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "startBinding": {
     "elementId": "id43",
     "fixedPoint": [
-      70,
-      12.5,
+      1.0714285714285714,
+      0.5,
     ],
     "focus": 0,
     "gap": 1,
@@ -1507,8 +1507,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endBinding": {
     "elementId": "Alice",
     "fixedPoint": [
-      -5.299874999999986,
-      22,
+      -0.07115855014454081,
+      0.5,
     ],
     "focus": 0,
     "gap": 5.299874999999986,
@@ -1543,8 +1543,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startBinding": {
     "elementId": "Bob",
     "fixedPoint": [
-      56.49246875,
-      22,
+      1.0885078135804176,
+      0.5,
     ],
     "focus": 0,
     "gap": 1,
@@ -1577,8 +1577,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endBinding": {
     "elementId": "B",
     "fixedPoint": [
-      77.017,
-      79,
+      0,
+      0.4993865030674847,
     ],
     "focus": 0,
     "gap": 1,
@@ -1609,8 +1609,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startBinding": {
     "elementId": "Bob",
     "fixedPoint": [
-      22.247468749999996,
-      44,
+      0.39381496335223337,
+      1.1136363636363635,
     ],
     "focus": 0,
     "gap": 1,

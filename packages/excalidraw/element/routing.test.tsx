@@ -1,7 +1,7 @@
 import React from "react";
 import Scene from "../scene/Scene";
 import { API } from "../tests/helpers/api";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { Pointer, UI } from "../tests/helpers/ui";
 import {
   fireEvent,
   GlobalTestState,
@@ -15,7 +15,6 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
 } from "./types";
-import { KEYS } from "../keys";
 
 const { h } = window;
 
