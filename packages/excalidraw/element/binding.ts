@@ -2096,3 +2096,64 @@ export class BindableElement {
     );
   };
 }
+
+export const getGlobalFixedPointForBindableElement = (
+  fixedPointRatio: [number, number],
+  element: ExcalidrawBindableElement,
+) => {
+  return rotatePoint(
+    [
+      element.x + element.width * fixedPointRatio[0],
+      element.y + element.height * fixedPointRatio[1],
+    ],
+    getCenterForElement(element),
+    element.angle,
+  );
+};
+
+const getGlobalFixedPoints = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+) => {
+  const startElement =
+    arrow.startBinding &&
+    (elementsMap.get(arrow.startBinding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined);
+  const endElement =
+    arrow.endBinding &&
+    (elementsMap.get(arrow.endBinding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined);
+  const startPoint: Point =
+    startElement && arrow.startBinding
+      ? getGlobalFixedPointForBindableElement(
+          arrow.startBinding.fixedPoint,
+          startElement as ExcalidrawBindableElement,
+        )
+      : [arrow.x + arrow.points[0][0], arrow.y + arrow.points[0][1]];
+  const endPoint: Point =
+    endElement && arrow.endBinding
+      ? getGlobalFixedPointForBindableElement(
+          arrow.endBinding.fixedPoint,
+          endElement as ExcalidrawBindableElement,
+        )
+      : [
+          arrow.x + arrow.points[arrow.points.length - 1][0],
+          arrow.y + arrow.points[arrow.points.length - 1][1],
+        ];
+
+  return [startPoint, endPoint];
+};
+
+export const getArrowLocalFixedPoints = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+) => {
+  const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
+
+  return [
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
+  ];
+};

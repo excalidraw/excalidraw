@@ -1,23 +1,18 @@
-import { type LineSegment } from "../../utils";
 import { cross } from "../../utils/geometry/geometry";
 import BinaryHeap from "../binaryheap";
 import {
   aabbForElement,
-  addVectors,
   arePointsEqual,
-  getCenterForElement,
   pointInsideBounds,
   pointToVector,
-  rotatePoint,
   scalePointFromOrigin,
   scaleVector,
-  subtractVectors,
   translatePoint,
 } from "../math";
 import { getSizeFromPoints } from "../points";
 import type Scene from "../scene/Scene";
 import type { Point } from "../types";
-import { toBrandedType, tupleToCoors } from "../utils";
+import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -26,6 +21,7 @@ import {
   getHoveredElementForBinding,
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
+  getGlobalFixedPointForBindableElement,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -36,7 +32,6 @@ import {
   HEADING_UP,
   vectorToHeading,
 } from "./heading";
-import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type {
@@ -339,7 +334,7 @@ const offsetFromHeading = (
 };
 
 /**
- * Routing algorithm.
+ * Routing algorithm based on the A* path search algorithm.
  */
 const astar = (
   start: Node,
@@ -469,7 +464,8 @@ const m_dist = (a: Point, b: Point) =>
 
 /**
  * Create dynamically resizing, always touching
- * bounding boxes for the given static bounds.
+ * bounding boxes having a minimum extent represented
+ * by the given static bounds.
  */
 const generateDynamicAABBs = (
   a: Bounds,
@@ -626,8 +622,8 @@ const generateDynamicAABBs = (
 };
 
 /**
- * Calculates the grid from which the node points are placed on
- * based on the axis-aligned bounding boxes.
+ * Calculates the grid which is used as nodes at
+ * the grid line intersections by the A* algorithm.
  */
 const calculateGrid = (
   aabbs: Bounds[],
@@ -686,9 +682,6 @@ const calculateGrid = (
   };
 };
 
-const isAnyTrue = (...args: boolean[]): boolean =>
-  Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
-
 const getDonglePosition = (
   bounds: Bounds,
   heading: Heading,
@@ -704,38 +697,6 @@ const getDonglePosition = (
   }
   return [bounds[0], point[1]];
 };
-
-export const segmentsIntersectAt = (
-  a: Readonly<LineSegment>,
-  b: Readonly<LineSegment>,
-): Point | null => {
-  const r = subtractVectors(a[1], a[0]);
-  const s = subtractVectors(b[1], b[0]);
-  const denominator = crossProduct(r, s);
-
-  if (denominator === 0) {
-    return null;
-  }
-
-  const i = subtractVectors(b[0], a[0]);
-  const u = crossProduct(i, r) / denominator;
-  const t = crossProduct(i, s) / denominator;
-
-  if (u === 0) {
-    return null;
-  }
-
-  const p = addVectors(a[0], scaleVector(r, t));
-
-  if (t > 0 && t < 1 && u > 0 && u < 1) {
-    return p;
-  }
-
-  return null;
-};
-
-export const crossProduct = (a: Point, b: Point): number =>
-  a[0] * b[1] - a[1] * b[0];
 
 const estimateSegmentCount = (
   start: Node,
@@ -962,67 +923,6 @@ const neighborIndexToHeading = (idx: number): Heading => {
       return HEADING_DOWN;
   }
   return HEADING_LEFT;
-};
-
-const getGlobalFixedPointForBindableElement = (
-  fixedPointRatio: [number, number],
-  element: ExcalidrawBindableElement,
-) => {
-  return rotatePoint(
-    [
-      element.x + element.width * fixedPointRatio[0],
-      element.y + element.height * fixedPointRatio[1],
-    ],
-    getCenterForElement(element),
-    element.angle,
-  );
-};
-
-const getGlobalFixedPoints = (
-  arrow: ExcalidrawArrowElement,
-  elementsMap: ElementsMap,
-) => {
-  const startElement =
-    arrow.startBinding &&
-    (elementsMap.get(arrow.startBinding.elementId) as
-      | ExcalidrawBindableElement
-      | undefined);
-  const endElement =
-    arrow.endBinding &&
-    (elementsMap.get(arrow.endBinding.elementId) as
-      | ExcalidrawBindableElement
-      | undefined);
-  const startPoint: Point =
-    startElement && arrow.startBinding
-      ? getGlobalFixedPointForBindableElement(
-          arrow.startBinding.fixedPoint,
-          startElement as ExcalidrawBindableElement,
-        )
-      : [arrow.x + arrow.points[0][0], arrow.y + arrow.points[0][1]];
-  const endPoint: Point =
-    endElement && arrow.endBinding
-      ? getGlobalFixedPointForBindableElement(
-          arrow.endBinding.fixedPoint,
-          endElement as ExcalidrawBindableElement,
-        )
-      : [
-          arrow.x + arrow.points[arrow.points.length - 1][0],
-          arrow.y + arrow.points[arrow.points.length - 1][1],
-        ];
-
-  return [startPoint, endPoint];
-};
-
-export const getArrowLocalFixedPoints = (
-  arrow: ExcalidrawArrowElement,
-  elementsMap: ElementsMap,
-) => {
-  const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
-
-  return [
-    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
-    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
-  ];
 };
 
 const getAllElementsMap = (
