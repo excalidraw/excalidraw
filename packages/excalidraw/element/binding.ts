@@ -50,18 +50,23 @@ import { getElementShape } from "../shapes";
 import {
   aabbForElement,
   distanceSq2d,
+  getCenterForBounds,
   getCenterForElement,
   pointInsideBounds,
   pointToVector,
   rotatePoint,
 } from "../math";
 import {
+  compareHeading,
+  HEADING_DOWN,
   HEADING_LEFT,
   HEADING_RIGHT,
+  HEADING_UP,
   headingForPointFromElement,
   vectorToHeading,
   type Heading,
 } from "./heading";
+import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -682,6 +687,7 @@ export const getHeadingForElbowArrowSnap = (
   bindableElement: ExcalidrawBindableElement | undefined | null,
   aabb: Bounds | undefined | null,
   elementsMap: ElementsMap,
+  origPoint: Point,
 ): Heading => {
   const otherPointHeading = vectorToHeading(pointToVector(otherPoint, point));
 
@@ -689,7 +695,11 @@ export const getHeadingForElbowArrowSnap = (
     return otherPointHeading;
   }
 
-  const distance = getDistanceForBinding(point, bindableElement, elementsMap);
+  const distance = getDistanceForBinding(
+    origPoint,
+    bindableElement,
+    elementsMap,
+  );
 
   if (!distance) {
     return vectorToHeading(
@@ -698,12 +708,8 @@ export const getHeadingForElbowArrowSnap = (
   }
 
   const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
-  const isInner =
-    otherPointHeading === HEADING_LEFT || otherPointHeading === HEADING_RIGHT
-      ? distance < bindableElement.width * -0.2
-      : distance < bindableElement.height * -0.2;
 
-  return isInner ? otherPointHeading : pointHeading;
+  return pointHeading;
 };
 
 const getDistanceForBinding = (
@@ -727,7 +733,7 @@ const getDistanceForBinding = (
 
 export const bindPointToSnapToElementOutline = (
   point: Readonly<Point>,
-  otherPoint: Point,
+  otherPoint: Readonly<Point>,
   bindableElement: ExcalidrawBindableElement | undefined,
   elementsMap: ElementsMap,
 ): Point => {
@@ -757,22 +763,65 @@ export const bindPointToSnapToElementOutline = (
         : i,
     );
 
+    const heading = headingForPointFromElement(bindableElement, aabb, point);
+    const isVertical =
+      compareHeading(heading, HEADING_LEFT) ||
+      compareHeading(heading, HEADING_RIGHT);
+    const dist = distanceToBindableElement(bindableElement, point, elementsMap);
+    const isInner = isVertical
+      ? dist < bindableElement.width * -0.1
+      : dist < bindableElement.height * -0.1;
+
     intersections.sort(
       (a, b) => distanceSq2d(a, point) - distanceSq2d(b, point),
     );
-
-    const heading = headingForPointFromElement(bindableElement, aabb, point);
-
-    return (
-      intersections.filter((i) =>
-        heading === HEADING_LEFT || heading === HEADING_RIGHT
-          ? Math.abs(point[0] - i[0]) < 0.01
-          : Math.abs(point[1] - i[1]) < 0.01,
-      )[0] ?? point
-    );
+    debugDrawPoint(otherPoint);
+    return isInner
+      ? headingToMidBindPoint(otherPoint, bindableElement, aabb)
+      : intersections.filter((i) =>
+          isVertical
+            ? Math.abs(point[1] - i[1]) < 0.1
+            : Math.abs(point[0] - i[0]) < 0.1,
+        )[0] ?? point;
   }
 
   return point;
+};
+
+const headingToMidBindPoint = (
+  point: Point,
+  bindableElement: ExcalidrawBindableElement,
+  aabb: Bounds,
+): Point => {
+  const center = getCenterForBounds(aabb);
+  const heading = vectorToHeading(pointToVector(point, center));
+
+  switch (true) {
+    case compareHeading(heading, HEADING_UP):
+      return rotatePoint(
+        [(aabb[0] + aabb[2]) / 2 + 0.1, aabb[1]],
+        center,
+        bindableElement.angle,
+      );
+    case compareHeading(heading, HEADING_RIGHT):
+      return rotatePoint(
+        [aabb[2], (aabb[1] + aabb[3]) / 2 + 0.1],
+        center,
+        bindableElement.angle,
+      );
+    case compareHeading(heading, HEADING_DOWN):
+      return rotatePoint(
+        [(aabb[0] + aabb[2]) / 2 - 0.1, aabb[3]],
+        center,
+        bindableElement.angle,
+      );
+    default:
+      return rotatePoint(
+        [aabb[0], (aabb[1] + aabb[3]) / 2 - 0.1],
+        center,
+        bindableElement.angle,
+      );
+  }
 };
 
 export const avoidRectangularCorner = (
@@ -1021,38 +1070,38 @@ const calculateFixedPointForElbowArrowBinding = (
   ] as Bounds;
   const edgePointIndex =
     startOrEnd === "start" ? 0 : linearElement.points.length - 1;
-  const otherPointIndex =
-    startOrEnd === "end" ? 0 : linearElement.points.length - 1;
   const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
     linearElement,
     edgePointIndex,
+    elementsMap,
+  );
+  const otherGlobalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    edgePointIndex,
+    elementsMap,
+  );
+  const snappedPoint = bindPointToSnapToElementOutline(
+    globalPoint,
+    otherGlobalPoint,
+    hoveredElement,
     elementsMap,
   );
   const globalMidPoint = [
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   ] as Point;
-  const nonRotatedGlobalPoint = rotatePoint(
-    globalPoint,
+  const nonRotatedSnappedGlobalPoint = rotatePoint(
+    snappedPoint,
     globalMidPoint,
     -hoveredElement.angle,
   ) as Point;
-  const otherPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    otherPointIndex,
-    elementsMap,
-  );
-  const snappedPoint = bindPointToSnapToElementOutline(
-    nonRotatedGlobalPoint,
-    otherPoint,
-    hoveredElement,
-    elementsMap,
-  );
 
   return {
     fixedPoint: [
-      (snappedPoint[0] - hoveredElement.x) / hoveredElement.width,
-      (snappedPoint[1] - hoveredElement.y) / hoveredElement.height,
+      (nonRotatedSnappedGlobalPoint[0] - hoveredElement.x) /
+        hoveredElement.width,
+      (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
+        hoveredElement.height,
     ] as Point,
   };
 };

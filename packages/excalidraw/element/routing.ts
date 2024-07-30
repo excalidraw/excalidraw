@@ -17,7 +17,6 @@ import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   avoidRectangularCorner,
-  snapToMid,
   getHoveredElementForBinding,
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
@@ -139,14 +138,15 @@ export const mutateElbowArrow = (
     endGlobalPoint,
     elementsMap,
     hoveredStartElement,
+    origStartGlobalPoint,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
     elementsMap,
     hoveredEndElement,
+    origEndGlobalPoint,
   );
-
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
@@ -964,7 +964,7 @@ const getGlobalPoint = (
         elementsMap,
       );
 
-      return snapToMid(hoveredElement, snapPoint);
+      return snapPoint; //snapToMid(hoveredElement, snapPoint);
     }
 
     return initialPoint;
@@ -1007,7 +1007,8 @@ const getBindPointHeading = (
   point: Point,
   otherPoint: Point,
   elementsMap: NonDeletedSceneElementsMap,
-  hoveredElement?: ExcalidrawBindableElement | null,
+  hoveredElement: ExcalidrawBindableElement | null | undefined,
+  origPoint: Point,
 ) =>
   getHeadingForElbowArrowSnap(
     point,
@@ -1021,4 +1022,5 @@ const getBindPointHeading = (
         ) as [number, number, number, number],
       ),
     elementsMap,
+    origPoint,
   );
