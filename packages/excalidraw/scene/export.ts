@@ -188,7 +188,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
   loadFonts: () => Promise<void> = async () => {
-    await Fonts.load(elements);
+    await Fonts.loadFontsForElements(elements);
   },
 ) => {
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)

@@ -72,23 +72,6 @@ export class Fonts {
 
   private readonly scene: Scene;
 
-  public get sceneFamilies() {
-    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
-  }
-
-  private static getFontFamilies(
-    elements: ReadonlyArray<ExcalidrawElement>,
-  ): Array<ExcalidrawTextElement["fontFamily"]> {
-    return Array.from(
-      elements.reduce((families, element) => {
-        if (isTextElement(element)) {
-          families.add(element.fontFamily);
-        }
-        return families;
-      }, new Set<number>()),
-    );
-  }
-
   constructor({ scene }: { scene: Scene }) {
     this.scene = scene;
   }
@@ -141,16 +124,24 @@ export class Fonts {
   /**
    * Load font faces for a given scene and trigger scene update.
    */
-  public load = async (): Promise<FontFace[]> => {
-    const loaded = await Fonts.loadFontFaces(this.sceneFamilies);
+  public loadSceneFonts = async (): Promise<FontFace[]> => {
+    const sceneFamilies = this.getSceneFontFamilies();
+    const loaded = await Fonts.loadFontFaces(sceneFamilies);
     this.onLoaded(loaded);
     return loaded;
   };
 
   /**
+   * Gets all the font families for the given scene.
+   */
+  public getSceneFontFamilies = () => {
+    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
+  };
+
+  /**
    * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
    */
-  public static load = async (
+  public static loadFontsForElements = async (
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
     const fontFamilies = Fonts.getFontFamilies(elements);
@@ -211,6 +202,7 @@ export class Fonts {
       >(),
     };
 
+    // TODO: let's tweak this once we know how `register` will be exposed as part of the custom fonts API
     const _register = register.bind(fonts);
 
     _register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
@@ -278,6 +270,19 @@ export class Fonts {
     Fonts._initialized = true;
 
     return fonts.registered;
+  }
+
+  private static getFontFamilies(
+    elements: ReadonlyArray<ExcalidrawElement>,
+  ): Array<ExcalidrawTextElement["fontFamily"]> {
+    return Array.from(
+      elements.reduce((families, element) => {
+        if (isTextElement(element)) {
+          families.add(element.fontFamily);
+        }
+        return families;
+      }, new Set<number>()),
+    );
   }
 }
 
