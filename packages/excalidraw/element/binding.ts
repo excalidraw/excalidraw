@@ -761,7 +761,15 @@ export const bindPointToSnapToElementOutline = (
       (a, b) => distanceSq2d(a, point) - distanceSq2d(b, point),
     );
 
-    return intersections[0] ?? point;
+    const heading = headingForPointFromElement(bindableElement, aabb, point);
+
+    return (
+      intersections.filter((i) =>
+        heading === HEADING_LEFT || heading === HEADING_RIGHT
+          ? Math.abs(point[0] - i[0]) < 0.01
+          : Math.abs(point[1] - i[1]) < 0.01,
+      )[0] ?? point
+    );
   }
 
   return point;
