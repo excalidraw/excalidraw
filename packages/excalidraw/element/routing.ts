@@ -21,6 +21,7 @@ import {
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
+  snapToMid,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -964,7 +965,7 @@ const getGlobalPoint = (
         elementsMap,
       );
 
-      return snapPoint; //snapToMid(hoveredElement, snapPoint);
+      return snapToMid(hoveredElement, snapPoint);
     }
 
     return initialPoint;

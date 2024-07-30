@@ -66,7 +66,6 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -775,7 +774,7 @@ export const bindPointToSnapToElementOutline = (
     intersections.sort(
       (a, b) => distanceSq2d(a, point) - distanceSq2d(b, point),
     );
-    debugDrawPoint(otherPoint);
+
     return isInner
       ? headingToMidBindPoint(otherPoint, bindableElement, aabb)
       : intersections.filter((i) =>
