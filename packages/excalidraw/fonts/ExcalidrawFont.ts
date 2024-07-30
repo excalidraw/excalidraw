@@ -32,7 +32,7 @@ export class ExcalidrawFont implements Font {
   }
 
   /**
-   * Tries to fetches woff2 content based on the registered url (browser).
+   * Tries to fetch woff2 content, based on the registered urls.
    * Returns last defined url in case of errors.
    *
    * Note: uses browser APIs for base64 encoding - use dataurl outside the browser environment.

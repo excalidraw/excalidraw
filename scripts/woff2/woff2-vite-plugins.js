@@ -47,8 +47,8 @@ module.exports.woff2BrowserPlugin = () => {
 
       // use CDN for Assistant
       if (!isDev && id.endsWith("/excalidraw/fonts/assets/fonts.css")) {
-        return `/* These also cannot be preprended with \`EXCALIDRAW_ASSET_PATH\`. */
-      
+        return `/* WARN: The following content is generated during excalidraw-app build */
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-Regular-DVxZuzxb.woff2)
