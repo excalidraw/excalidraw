@@ -34,11 +34,7 @@ import {
 import { newTextElement } from "../element";
 import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import {
-  isFrameElement,
-  isFrameLikeElement,
-  isTextElement,
-} from "../element/typeChecks";
+import { isFrameLikeElement, isTextElement } from "../element/typeChecks";
 import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
@@ -88,15 +84,8 @@ const addFrameLabelsAsTextElements = (
   opts: Pick<AppState, "exportWithDarkMode">,
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
-  let frameIndex = 0;
-  let magicFrameIndex = 0;
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      if (isFrameElement(element)) {
-        frameIndex++;
-      } else {
-        magicFrameIndex++;
-      }
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
@@ -107,10 +96,7 @@ const addFrameLabelsAsTextElements = (
         strokeColor: opts.exportWithDarkMode
           ? FRAME_STYLE.nameColorDarkTheme
           : FRAME_STYLE.nameColorLightTheme,
-        text: getFrameLikeTitle(
-          element,
-          isFrameElement(element) ? frameIndex : magicFrameIndex,
-        ),
+        text: getFrameLikeTitle(element),
       });
       textElement.y -= textElement.height;
 
