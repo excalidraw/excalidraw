@@ -39,7 +39,7 @@ export class Fonts {
         number,
         {
           metadata: FontMetadata;
-          fontFaces: Font[];
+          fonts: Font[];
         }
       >
     | undefined;
@@ -121,12 +121,9 @@ export class Fonts {
 
   public load = async () => {
     // Add all registered font faces into the `document.fonts` (if not added already)
-    for (const { fontFaces } of Fonts.registered.values()) {
-      for (const { fontFace, url } of fontFaces) {
-        if (
-          url.protocol !== LOCAL_FONT_PROTOCOL &&
-          !window.document.fonts.has(fontFace)
-        ) {
+    for (const { fonts } of Fonts.registered.values()) {
+      for (const { fontFace } of fonts) {
+        if (!window.document.fonts.has(fontFace)) {
           window.document.fonts.add(fontFace);
         }
       }
@@ -148,8 +145,10 @@ export class Fonts {
           } catch (e) {
             // don't let it all fail if just one font fails to load
             console.error(
-              `Failed to load font: "${fontString}" with error "${e}", given the following registered font:`,
-              JSON.stringify(Fonts.registered.get(fontFamily), undefined, 2),
+              `Failed to load font "${fontString}" from urls "${Fonts.registered
+                .get(fontFamily)
+                ?.fonts.map((x) => x.urls)}"`,
+              e,
             );
           }
         }
@@ -168,7 +167,7 @@ export class Fonts {
     const fonts = {
       registered: new Map<
         ValueOf<typeof FONT_FAMILY>,
-        { metadata: FontMetadata; fontFaces: Font[] }
+        { metadata: FontMetadata; fonts: Font[] }
       >(),
     };
 
@@ -253,7 +252,7 @@ function register(
     | {
         registered: Map<
           ValueOf<typeof FONT_FAMILY>,
-          { metadata: FontMetadata; fontFaces: Font[] }
+          { metadata: FontMetadata; fonts: Font[] }
         >;
       },
   family: string,
@@ -267,7 +266,7 @@ function register(
   if (!registeredFamily) {
     this.registered.set(familyId, {
       metadata,
-      fontFaces: params.map(
+      fonts: params.map(
         ({ uri, descriptors }) => new ExcalidrawFont(family, uri, descriptors),
       ),
     });

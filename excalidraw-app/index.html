@@ -95,6 +95,11 @@
         color: #fff;
       }
     </style>
+
+    <!-- Warmup the connection for Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <!------------------------------------------------------------------------->
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <script>
@@ -114,52 +119,16 @@
       ) {
         window.location.href = "https://app.excalidraw.com";
       }
-
-      // point into our CDN in prod
-      window.EXCALIDRAW_ASSET_PATH =
-        "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/";
     </script>
+
+    <!-- Following placeholder is replaced during the build step -->
+    <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
+
     <% } else { %>
     <script>
       window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
-    <% } %>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-
-    <!-- Excalidraw version -->
-    <meta name="version" content="{version}" />
-
-    <!-- Warmup the connection for Google fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Preload all default fonts and Virgil for backwards compatibility to avoid swap on init -->
-    <% if (typeof PROD != 'undefined' && PROD == true) { %>
-    <link
-      rel="preload"
-      href="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/Excalifont-Regular-C9eKQy_N.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/Virgil-Regular-hO16qHwV.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/fonts/oss/ComicShanns-Regular-D0c8wzsC.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <% } else { %>
     <!-- in DEV we need to preload from the local server and without the hash -->
     <link
       rel="preload"
@@ -184,7 +153,7 @@
     />
     <% } %>
 
-    <!-- For Nunito only preload the latin range, which should be enough for now -->
+    <!-- For Nunito only preload the latin range, which should be good enough for now -->
     <link
       rel="preload"
       href="https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2"
@@ -199,6 +168,13 @@
       href="../packages/excalidraw/fonts/assets/fonts.css"
       type="text/css"
     />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- Excalidraw version -->
+    <meta name="version" content="{version}" />
 
     <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
     VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
