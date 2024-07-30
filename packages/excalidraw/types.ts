@@ -234,7 +234,6 @@ export interface AppState {
     state: "hover" | "active";
   } | null;
   newElement: NonDeletedExcalidrawElement | null;
-  draggingelement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
   selectionElement: NonDeletedExcalidrawElement | null;
