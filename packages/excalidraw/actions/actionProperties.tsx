@@ -1646,16 +1646,19 @@ export const actionChangeArrowType = register({
               value: "sharp",
               text: t("labels.arrowtype_sharp"),
               icon: arrowUpRightIcon,
+              testId: "sharp-arrow",
             },
             {
               value: "round",
               text: t("labels.arrowtype_round"),
               icon: arrowCurveRight,
+              testId: "round-arrow",
             },
             {
               value: "elbow",
               text: t("labels.arrowtype_elbowed"),
               icon: arrowGuideIcon,
+              testId: "elbow-arrow",
             },
           ]}
           value={getFormValue(
