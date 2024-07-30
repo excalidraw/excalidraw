@@ -763,7 +763,7 @@ export const getFrameLikeTitle = (
   return element.name === null
     ? isFrameElement(element)
       ? `Frame ${frameIdx}`
-      : `AI Frame $${frameIdx}`
+      : `AI Frame ${frameIdx}`
     : element.name;
 };
 

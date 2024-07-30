@@ -1157,3 +1157,11 @@ export const promiseTry = async <TValue, TArgs extends unknown[]>(
     resolve(fn(...args));
   });
 };
+
+export const safelyParseJSON = (json: string): Record<string, any> | null => {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+};

@@ -45,7 +45,7 @@ export {
   dragNewElement,
 } from "./dragElements";
 export { isTextElement, isExcalidrawElement } from "./typeChecks";
-export { redrawTextBoundingBox } from "./textElement";
+export { redrawTextBoundingBox, getTextFromElements } from "./textElement";
 export {
   getPerfectElementSize,
   getLockedLinearCursorAlignSize,

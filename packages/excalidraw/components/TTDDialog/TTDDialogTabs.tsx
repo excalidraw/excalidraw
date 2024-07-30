@@ -7,10 +7,7 @@ import { isMemberOf } from "../../utils";
 const TTDDialogTabs = (
   props: {
     children: ReactNode;
-  } & (
-    | { dialog: "ttd"; tab: "text-to-diagram" | "mermaid" }
-    | { dialog: "settings"; tab: "text-to-diagram" | "diagram-to-code" }
-  ),
+  } & { dialog: "ttd"; tab: "text-to-diagram" | "mermaid" },
 ) => {
   const setAppState = useExcalidrawSetAppState();
 
@@ -39,13 +36,6 @@ const TTDDialogTabs = (
           }
         }
         if (
-          props.dialog === "settings" &&
-          isMemberOf(["text-to-diagram", "diagram-to-code"], tab)
-        ) {
-          setAppState({
-            openDialog: { name: props.dialog, tab, source: "settings" },
-          });
-        } else if (
           props.dialog === "ttd" &&
           isMemberOf(["text-to-diagram", "mermaid"], tab)
         ) {

@@ -13,6 +13,7 @@ const DropdownMenuItemLink = ({
   onSelect,
   className = "",
   selected,
+  rel = "noreferrer",
   ...rest
 }: {
   href: string;
@@ -22,6 +23,7 @@ const DropdownMenuItemLink = ({
   className?: string;
   selected?: boolean;
   onSelect?: (event: Event) => void;
+  rel?: string;
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   const handleClick = useHandleDropdownMenuItemClick(rest.onClick, onSelect);
 
