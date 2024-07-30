@@ -274,9 +274,17 @@ class Scene {
         : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
-      // throw on invalid indices in test / dev to potentially detect cases were we forgot to sync moved elements
-      validateFractionalIndices(_nextElements.map((x) => x.index));
+    if (
+      import.meta.env.DEV ||
+      import.meta.env.MODE === ENV.TEST ||
+      window?.DEBUG_FRACTIONAL_INDICES
+    ) {
+      validateFractionalIndices(_nextElements, {
+        // validate everything
+        includeBoundTextValidation: true,
+        // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+      });
     }
 
     this.elements = syncInvalidIndices(_nextElements);

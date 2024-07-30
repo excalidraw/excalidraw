@@ -6,6 +6,9 @@ import type {
   OrderedExcalidrawElement,
 } from "./element/types";
 import { InvalidFractionalIndexError } from "./errors";
+import { hasBoundTextElement } from "./element/typeChecks";
+import { getBoundTextElement } from "./element/textElement";
+import { arrayToMap } from "./utils";
 
 /**
  * Envisioned relation between array order and fractional indices:
@@ -30,16 +33,79 @@ import { InvalidFractionalIndexError } from "./errors";
  * @throws `InvalidFractionalIndexError` if invalid index is detected.
  */
 export const validateFractionalIndices = (
-  indices: (ExcalidrawElement["index"] | undefined)[],
+  elements: readonly ExcalidrawElement[],
+  {
+    shouldThrow = false,
+    includeBoundTextValidation = false,
+    reconciliationContext,
+  }: {
+    shouldThrow: boolean;
+    includeBoundTextValidation: boolean;
+    reconciliationContext?: {
+      localElements: ReadonlyArray<ExcalidrawElement>;
+      remoteElements: ReadonlyArray<ExcalidrawElement>;
+    };
+  },
 ) => {
+  const errorMessages = [];
+  const stringifyElement = (element: ExcalidrawElement | void) =>
+    `${element?.index}:${element?.id}:${element?.type}:${element?.isDeleted}:${element?.version}:${element?.versionNonce}`;
+
+  const indices = elements.map((x) => x.index);
   for (const [i, index] of indices.entries()) {
     const predecessorIndex = indices[i - 1];
     const successorIndex = indices[i + 1];
 
     if (!isValidFractionalIndex(index, predecessorIndex, successorIndex)) {
-      throw new InvalidFractionalIndexError(
-        `Fractional indices invariant for element has been compromised - ["${predecessorIndex}", "${index}", "${successorIndex}"] [predecessor, current, successor]`,
+      errorMessages.push(
+        `Fractional indices invariant has been compromised: "${stringifyElement(
+          elements[i - 1],
+        )}", "${stringifyElement(elements[i])}", "${stringifyElement(
+          elements[i + 1],
+        )}"`,
       );
+    }
+
+    // disabled by default, as we don't fix it
+    if (includeBoundTextValidation && hasBoundTextElement(elements[i])) {
+      const container = elements[i];
+      const text = getBoundTextElement(container, arrayToMap(elements));
+
+      if (text && text.index! <= container.index!) {
+        errorMessages.push(
+          `Fractional indices invariant for bound elements has been compromised: "${stringifyElement(
+            text,
+          )}", "${stringifyElement(container)}"`,
+        );
+      }
+    }
+  }
+
+  if (errorMessages.length) {
+    const error = new InvalidFractionalIndexError();
+    const additionalContext = [];
+
+    if (reconciliationContext) {
+      additionalContext.push("Additional reconciliation context:");
+      additionalContext.push(
+        reconciliationContext.localElements.map((x) => stringifyElement(x)),
+      );
+      additionalContext.push(
+        reconciliationContext.remoteElements.map((x) => stringifyElement(x)),
+      );
+    }
+
+    // report just once and with the stacktrace
+    console.error(
+      errorMessages.join("\n\n"),
+      error.stack,
+      elements.map((x) => stringifyElement(x)),
+      ...additionalContext,
+    );
+
+    if (shouldThrow) {
+      // if enabled, gather all the errors first, throw once
+      throw error;
     }
   }
 };
@@ -83,10 +149,15 @@ export const syncMovedIndices = (
 
     // try generatating indices, throws on invalid movedElements
     const elementsUpdates = generateIndices(elements, indicesGroups);
+    const elementsCandidates = elements.map((x) =>
+      elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
+    );
 
     // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
-      elements.map((x) => elementsUpdates.get(x)?.index || x.index),
+      elementsCandidates,
+      // we don't autofix invalid bound text indices, hence don't include it in the validation
+      { includeBoundTextValidation: false, shouldThrow: true },
     );
 
     // split mutation so we don't end up in an incosistent state
