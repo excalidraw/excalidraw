@@ -28,7 +28,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingelement": null,
   "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,

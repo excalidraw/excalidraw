@@ -7617,9 +7617,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (isLinearElement(newElement)) {
         pointerDownState.drag.hasOccurred = true;
-        this.setState({
-          selectedElementsAreBeingDragged: true,
-        });
         const points = newElement.points;
         let dx = gridX - newElement.x;
         let dy = gridY - newElement.y;
