@@ -182,6 +182,7 @@ import type {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   Ordered,
+  ExcalidrawNonSelectionElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -5925,7 +5926,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.setState({
-        newElement: pendingImageElement,
+        newElement: pendingImageElement as ExcalidrawNonSelectionElement,
         editingElement: pendingImageElement,
         pendingImageElementId: null,
         multiElement: null,
@@ -7105,7 +7106,6 @@ class App extends React.Component<AppProps, AppState> {
     if (element.type === "selection") {
       this.setState({
         selectionElement: element,
-        newElement: element,
       });
     } else {
       this.scene.insertElement(element);
@@ -7422,9 +7422,7 @@ class App extends React.Component<AppProps, AppState> {
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
         pointerDownState.drag.hasOccurred = true;
-        this.setState({
-          selectedElementsAreBeingDragged: true,
-        });
+
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
         // Checking for editingElement to avoid jump while editing on mobile #6503
@@ -7496,6 +7494,10 @@ class App extends React.Component<AppProps, AppState> {
               selectedElements,
               this.scene.getNonDeletedElementsMap(),
             ),
+            selectedElementsAreBeingDragged: true,
+            // element is being dragged and selectionElement that was created on pointer down
+            // should be removed
+            selectionElement: null,
           });
 
           // We duplicate the selected element if alt is pressed on pointer move
@@ -7588,70 +7590,76 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      // It is very important to read this.state within each move event,
-      // otherwise we would read a stale one!
-      const newElement = this.state.newElement;
-
-      if (!newElement) {
-        return;
-      }
-
-      if (newElement.type === "freedraw") {
-        const points = newElement.points;
-        const dx = pointerCoords.x - newElement.x;
-        const dy = pointerCoords.y - newElement.y;
-
-        const lastPoint = points.length > 0 && points[points.length - 1];
-        const discardPoint =
-          lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
-
-        if (!discardPoint) {
-          const pressures = newElement.simulatePressure
-            ? newElement.pressures
-            : [...newElement.pressures, event.pressure];
-
-          mutateElement(newElement, {
-            points: [...points, [dx, dy]],
-            pressures,
-          });
-        }
-      } else if (isLinearElement(newElement)) {
-        pointerDownState.drag.hasOccurred = true;
-        const points = newElement.points;
-        let dx = gridX - newElement.x;
-        let dy = gridY - newElement.y;
-
-        if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
-          ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
-            newElement.x,
-            newElement.y,
-            pointerCoords.x,
-            pointerCoords.y,
-          ));
-        }
-
-        if (points.length === 1) {
-          mutateElement(newElement, {
-            points: [...points, [dx, dy]],
-          });
-        } else if (points.length === 2) {
-          mutateElement(newElement, {
-            points: [...points.slice(0, -1), [dx, dy]],
-          });
-        }
-
-        if (isBindingElement(newElement, false)) {
-          // When creating a linear element by dragging
-          this.maybeSuggestBindingsForLinearElementAtCoords(
-            newElement,
-            [pointerCoords],
-            this.state.startBoundElement,
-          );
-        }
-      } else {
+      if (this.state.selectionElement) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         this.maybeDragNewGenericElement(pointerDownState, event);
+      } else {
+        // It is very important to read this.state within each move event,
+        // otherwise we would read a stale one!
+        const newElement = this.state.newElement;
+
+        if (!newElement) {
+          return;
+        }
+
+        if (newElement.type === "freedraw") {
+          const points = newElement.points;
+          const dx = pointerCoords.x - newElement.x;
+          const dy = pointerCoords.y - newElement.y;
+
+          const lastPoint = points.length > 0 && points[points.length - 1];
+          const discardPoint =
+            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+
+          if (!discardPoint) {
+            const pressures = newElement.simulatePressure
+              ? newElement.pressures
+              : [...newElement.pressures, event.pressure];
+
+            mutateElement(newElement, {
+              points: [...points, [dx, dy]],
+              pressures,
+            });
+          }
+        } else if (isLinearElement(newElement)) {
+          pointerDownState.drag.hasOccurred = true;
+          const points = newElement.points;
+          let dx = gridX - newElement.x;
+          let dy = gridY - newElement.y;
+
+          if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
+            ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
+              newElement.x,
+              newElement.y,
+              pointerCoords.x,
+              pointerCoords.y,
+            ));
+          }
+
+          if (points.length === 1) {
+            mutateElement(newElement, {
+              points: [...points, [dx, dy]],
+            });
+          } else if (points.length === 2) {
+            mutateElement(newElement, {
+              points: [...points.slice(0, -1), [dx, dy]],
+            });
+          }
+
+          if (isBindingElement(newElement, false)) {
+            // When creating a linear element by dragging
+            this.maybeSuggestBindingsForLinearElementAtCoords(
+              newElement,
+              [pointerCoords],
+              this.state.startBoundElement,
+            );
+          }
+        } else {
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
+          this.maybeDragNewGenericElement(pointerDownState, event);
+        }
       }
 
       if (this.state.activeTool.type === "selection") {
@@ -7693,11 +7701,13 @@ class App extends React.Component<AppProps, AppState> {
               shouldReuseSelection = false;
             }
           }
-          const elementsWithinSelection = getElementsWithinSelection(
-            elements,
-            newElement,
-            this.scene.getNonDeletedElementsMap(),
-          );
+          const elementsWithinSelection = this.state.selectionElement
+            ? getElementsWithinSelection(
+                elements,
+                this.state.selectionElement,
+                this.scene.getNonDeletedElementsMap(),
+              )
+            : [];
 
           this.setState((prevState) => {
             const nextSelectedElementIds = {
@@ -8523,12 +8533,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (
-        !activeTool.locked &&
-        activeTool.type !== "freedraw" &&
-        newElement &&
-        newElement.type !== "selection"
-      ) {
+      if (!activeTool.locked && activeTool.type !== "freedraw" && newElement) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -9404,17 +9409,11 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): void => {
-    const newElement = this.state.newElement;
+    const selectionElement = this.state.selectionElement;
     const pointerCoords = pointerDownState.lastCoords;
-    if (!newElement) {
-      return;
-    }
-    if (
-      newElement.type === "selection" &&
-      this.state.activeTool.type !== "eraser"
-    ) {
+    if (selectionElement && this.state.activeTool.type !== "eraser") {
       dragNewElement(
-        newElement,
+        selectionElement,
         this.state.activeTool.type,
         pointerDownState.origin.x,
         pointerDownState.origin.y,
@@ -9426,81 +9425,85 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter(event),
         this.state.zoom.value,
       );
-    } else {
-      let [gridX, gridY] = getGridPoint(
-        pointerCoords.x,
-        pointerCoords.y,
-        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
-      );
+      return;
+    }
 
-      const image =
-        isInitializedImageElement(newElement) &&
-        this.imageCache.get(newElement.fileId)?.image;
-      const aspectRatio =
-        image && !(image instanceof Promise)
-          ? image.width / image.height
-          : null;
+    const newElement = this.state.newElement;
+    if (!newElement) {
+      return;
+    }
 
-      this.maybeCacheReferenceSnapPoints(event, [newElement]);
+    let [gridX, gridY] = getGridPoint(
+      pointerCoords.x,
+      pointerCoords.y,
+      event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+    );
 
-      const { snapOffset, snapLines } = snapNewElement(
-        newElement,
-        this.state,
-        event,
-        {
-          x:
-            pointerDownState.originInGrid.x +
-            (this.state.originSnapOffset?.x ?? 0),
-          y:
-            pointerDownState.originInGrid.y +
-            (this.state.originSnapOffset?.y ?? 0),
-        },
-        {
-          x: gridX - pointerDownState.originInGrid.x,
-          y: gridY - pointerDownState.originInGrid.y,
-        },
-        this.scene.getNonDeletedElementsMap(),
-      );
+    const image =
+      isInitializedImageElement(newElement) &&
+      this.imageCache.get(newElement.fileId)?.image;
+    const aspectRatio =
+      image && !(image instanceof Promise) ? image.width / image.height : null;
 
-      gridX += snapOffset.x;
-      gridY += snapOffset.y;
+    this.maybeCacheReferenceSnapPoints(event, [newElement]);
 
+    const { snapOffset, snapLines } = snapNewElement(
+      newElement,
+      this.state,
+      event,
+      {
+        x:
+          pointerDownState.originInGrid.x +
+          (this.state.originSnapOffset?.x ?? 0),
+        y:
+          pointerDownState.originInGrid.y +
+          (this.state.originSnapOffset?.y ?? 0),
+      },
+      {
+        x: gridX - pointerDownState.originInGrid.x,
+        y: gridY - pointerDownState.originInGrid.y,
+      },
+      this.scene.getNonDeletedElementsMap(),
+    );
+
+    gridX += snapOffset.x;
+    gridY += snapOffset.y;
+
+    this.setState({
+      snapLines,
+    });
+
+    dragNewElement(
+      newElement,
+      this.state.activeTool.type,
+      pointerDownState.originInGrid.x,
+      pointerDownState.originInGrid.y,
+      gridX,
+      gridY,
+      distance(pointerDownState.originInGrid.x, gridX),
+      distance(pointerDownState.originInGrid.y, gridY),
+      isImageElement(newElement)
+        ? !shouldMaintainAspectRatio(event)
+        : shouldMaintainAspectRatio(event),
+      shouldResizeFromCenter(event),
+      this.state.zoom.value,
+      aspectRatio,
+      this.state.originSnapOffset,
+    );
+
+    // highlight elements that are to be added to frames on frames creation
+    if (
+      this.state.activeTool.type === TOOL_TYPE.frame ||
+      this.state.activeTool.type === TOOL_TYPE.magicframe
+    ) {
       this.setState({
-        snapLines,
+        elementsToHighlight: getElementsInResizingFrame(
+          this.scene.getNonDeletedElements(),
+          newElement as ExcalidrawFrameLikeElement,
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
+        ),
       });
-
-      dragNewElement(
-        newElement,
-        this.state.activeTool.type,
-        pointerDownState.originInGrid.x,
-        pointerDownState.originInGrid.y,
-        gridX,
-        gridY,
-        distance(pointerDownState.originInGrid.x, gridX),
-        distance(pointerDownState.originInGrid.y, gridY),
-        isImageElement(newElement)
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter(event),
-        this.state.zoom.value,
-        aspectRatio,
-        this.state.originSnapOffset,
-      );
-
-      // highlight elements that are to be added to frames on frames creation
-      if (
-        this.state.activeTool.type === TOOL_TYPE.frame ||
-        this.state.activeTool.type === TOOL_TYPE.magicframe
-      ) {
-        this.setState({
-          elementsToHighlight: getElementsInResizingFrame(
-            this.scene.getNonDeletedElements(),
-            newElement as ExcalidrawFrameLikeElement,
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          ),
-        });
-      }
     }
   };
 

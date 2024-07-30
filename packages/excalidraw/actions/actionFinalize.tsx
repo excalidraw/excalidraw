@@ -175,6 +175,7 @@ export const actionFinalize = register({
             : activeTool,
         activeEmbeddable: null,
         newElement: null,
+        selectionElement: null,
         multiElement: null,
         editingElement: null,
         startBoundElement: null,

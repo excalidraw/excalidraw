@@ -21,6 +21,7 @@ import type {
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
+  ExcalidrawNonSelectionElement,
 } from "./element/types";
 import type { Action } from "./actions/types";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -233,7 +234,7 @@ export interface AppState {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
-  newElement: NonDeletedExcalidrawElement | null;
+  newElement: NonDeleted<ExcalidrawNonSelectionElement> | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
   selectionElement: NonDeletedExcalidrawElement | null;

@@ -82,7 +82,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
 
   if (activeTool.type === "selection") {
     if (
-      appState.newElement?.type === "selection" &&
+      appState.selectionElement &&
       !selectedElements.length &&
       !appState.editingElement &&
       !appState.editingLinearElement
@@ -90,7 +90,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
       return t("hints.deepBoxSelect");
     }
 
-    if (appState.gridSize && appState.newElement) {
+    if (appState.gridSize && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping");
     }
 
