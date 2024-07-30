@@ -1,6 +1,10 @@
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
-import type { ExcalidrawTextElement, FontFamilyValues } from "../element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  FontFamilyValues,
+} from "../element/types";
 import { ShapeCache } from "../scene/ShapeCache";
 import { isTextElement } from "../element";
 import { getFontString } from "../utils";
@@ -44,10 +48,19 @@ export class Fonts {
       >
     | undefined;
 
+  private static _initialized: boolean = false;
+
   public static get registered() {
+    // lazy load the font registration
     if (!Fonts._registered) {
-      // lazy load the fonts
       Fonts._registered = Fonts.init();
+    } else if (!Fonts._initialized) {
+      // case when host app register fonts before they are lazy loaded
+      // don't override whatever has been previously registered
+      Fonts._registered = new Map([
+        ...Fonts.init().entries(),
+        ...Fonts._registered.entries(),
+      ]);
     }
 
     return Fonts._registered;
@@ -60,8 +73,14 @@ export class Fonts {
   private readonly scene: Scene;
 
   public get sceneFamilies() {
+    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
+  }
+
+  private static getFontFamilies(
+    elements: ReadonlyArray<ExcalidrawElement>,
+  ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
-      this.scene.getNonDeletedElements().reduce((families, element) => {
+      elements.reduce((families, element) => {
         if (isTextElement(element)) {
           families.add(element.fontFamily);
         }
@@ -119,7 +138,28 @@ export class Fonts {
     }
   };
 
-  public load = async () => {
+  /**
+   * Load font faces for a given scene and trigger scene update.
+   */
+  public load = async (): Promise<FontFace[]> => {
+    const loaded = await Fonts.loadFontFaces(this.sceneFamilies);
+    this.onLoaded(loaded);
+    return loaded;
+  };
+
+  /**
+   * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
+   */
+  public static load = async (
+    elements: readonly ExcalidrawElement[],
+  ): Promise<FontFace[]> => {
+    const fontFamilies = Fonts.getFontFamilies(elements);
+    return await Fonts.loadFontFaces(fontFamilies);
+  };
+
+  private static async loadFontFaces(
+    fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
+  ) {
     // Add all registered font faces into the `document.fonts` (if not added already)
     for (const { fonts } of Fonts.registered.values()) {
       for (const { fontFace } of fonts) {
@@ -129,8 +169,8 @@ export class Fonts {
       }
     }
 
-    const loaded = await Promise.all(
-      this.sceneFamilies.map(async (fontFamily) => {
+    const loadedFontFaces = await Promise.all(
+      fontFamilies.map(async (fontFamily) => {
         const fontString = getFontString({
           fontFamily,
           fontSize: 16,
@@ -157,8 +197,8 @@ export class Fonts {
       }),
     );
 
-    this.onLoaded(loaded.flat().filter(Boolean) as FontFace[]);
-  };
+    return loadedFontFaces.flat().filter(Boolean) as FontFace[];
+  }
 
   /**
    * WARN: should be called just once on init, even across multiple instances.
@@ -234,6 +274,8 @@ export class Fonts {
         descriptors: { unicodeRange: RANGES.LATIN, weight: "500" },
       },
     );
+
+    Fonts._initialized = true;
 
     return fonts.registered;
   }
