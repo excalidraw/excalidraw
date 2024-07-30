@@ -5,7 +5,7 @@ import type {
   ExcalidrawTextElementWithContainer,
   FontString,
 } from "../element/types";
-import { Excalidraw } from "../index";
+import { Excalidraw, mutateElement } from "../index";
 import { centerPoint } from "../math";
 import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
@@ -107,6 +107,7 @@ describe("Test Linear Elements", () => {
       ],
       roundness,
     });
+    mutateElement(line, { points: line.points });
     h.elements = [line];
     mouse.clickAt(p1[0], p1[1]);
     return line;
@@ -843,6 +844,7 @@ describe("Test Linear Elements", () => {
           id: textElement.id,
         }),
       };
+
       const elements: ExcalidrawElement[] = [];
       h.elements.forEach((element) => {
         if (element.id === container.id) {
@@ -929,8 +931,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": 125,
-            "y": 110,
+            "x": "85.82202",
+            "y": "75.63461",
           }
         `);
       });
@@ -1058,8 +1060,8 @@ describe("Test Linear Elements", () => {
         }
       `);
       expect(textElement.text).toMatchInlineSnapshot(`
-        "Online whiteboard
-        collaboration made
+        "Online whiteboard 
+        collaboration made 
         easy"
       `);
       expect(
@@ -1103,7 +1105,7 @@ describe("Test Linear Elements", () => {
       `);
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text)
         .toMatchInlineSnapshot(`
-          "Online whiteboard
+          "Online whiteboard 
           collaboration made easy"
         `);
       expect(
@@ -1235,7 +1237,7 @@ describe("Test Linear Elements", () => {
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
 
-      expect(arrow.width).toBe(200);
+      expect(arrow.width).toBe(205);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
@@ -1251,8 +1253,8 @@ describe("Test Linear Elements", () => {
           getBoundTextMaxWidth(arrow, null),
         ),
       ).toMatchInlineSnapshot(`
-        "Online whiteboard
-        collaboration made
+        "Online whiteboard 
+        collaboration made 
         easy"
       `);
     });
