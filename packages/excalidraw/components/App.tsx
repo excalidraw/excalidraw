@@ -7117,6 +7117,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
+        isElbowArrow(element),
       );
 
       this.scene.insertElement(element);
