@@ -84,7 +84,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "ellipse-1",
     "fixedPoint": [
@@ -147,7 +148,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "ellipse-1",
     "fixedPoint": [
@@ -344,7 +346,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "text-2",
     "fixedPoint": [
@@ -453,7 +456,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id40",
     "fixedPoint": [
@@ -636,7 +640,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id44",
     "fixedPoint": [
@@ -864,7 +869,8 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -911,7 +917,8 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "triangle",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -937,7 +944,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
-  "startArrowhead": null,
+  "startArrowhead": "dot",
   "startBinding": null,
   "strokeColor": "#1971c2",
   "strokeStyle": "solid",
@@ -1503,7 +1510,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "Alice",
     "fixedPoint": [
@@ -1573,7 +1581,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "B",
     "fixedPoint": [
@@ -1893,7 +1902,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -1945,7 +1955,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -1997,7 +2008,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
@@ -2049,7 +2061,8 @@ exports[`Test Transform > should transform to labelled arrows when label provide
     },
   ],
   "customData": undefined,
-  "endArrowhead": null,
+  "elbowed": false,
+  "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,

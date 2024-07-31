@@ -13,6 +13,7 @@ import {
 import { bindLinearElement } from "../element/binding";
 import type { ElementConstructorOpts } from "../element/newElement";
 import {
+  newArrowElement,
   newFrameElement,
   newImageElement,
   newMagicFrameElement,
@@ -545,7 +546,7 @@ export const convertToExcalidrawElements = (
       case "arrow": {
         const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        excalidrawElement = newLinearElement({
+        excalidrawElement = newArrowElement({
           width,
           height,
           endArrowhead: "arrow",
@@ -554,6 +555,7 @@ export const convertToExcalidrawElements = (
             [width, height],
           ],
           ...element,
+          type: "arrow",
         });
 
         Object.assign(
