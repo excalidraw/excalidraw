@@ -12,7 +12,6 @@ import type { SceneElementsMap } from "../element/types";
 import type { Store } from "../store";
 import { StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
-import type Scene from "../scene/Scene";
 
 const writeData = (
   appState: Readonly<AppState>,
@@ -43,9 +42,9 @@ const writeData = (
   return { storeAction: StoreAction.NONE };
 };
 
-type ActionCreator = (history: History, store: Store, scene: Scene) => Action;
+type ActionCreator = (history: History, store: Store) => Action;
 
-export const createUndoAction: ActionCreator = (history, store, scene) => ({
+export const createUndoAction: ActionCreator = (history, store) => ({
   name: "undo",
   label: "buttons.undo",
   icon: UndoIcon,
@@ -87,19 +86,19 @@ export const createUndoAction: ActionCreator = (history, store, scene) => ({
   },
 });
 
-export const createRedoAction: ActionCreator = (history, store, scene) => ({
+export const createRedoAction: ActionCreator = (history, store) => ({
   name: "redo",
   label: "buttons.redo",
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState) =>
+  perform: (elements, appState, _, app) =>
     writeData(appState, () =>
       history.redo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
-        scene,
+        app.scene,
       ),
     ),
   keyTest: (event) =>

@@ -126,7 +126,7 @@ describe("collaboration", () => {
       expect(h.elements).toEqual([expect.objectContaining(rect1Props)]);
     });
 
-    const undoAction = createUndoAction(h.history, h.store, h.scene);
+    const undoAction = createUndoAction(h.history, h.store);
     act(() => h.app.actionManager.executeAction(undoAction));
 
     // with explicit undo (as addition) we expect our item to be restored from the snapshot!
@@ -158,7 +158,7 @@ describe("collaboration", () => {
       expect(h.elements).toEqual([expect.objectContaining(rect1Props)]);
     });
 
-    const redoAction = createRedoAction(h.history, h.store, h.scene);
+    const redoAction = createRedoAction(h.history, h.store);
     act(() => h.app.actionManager.executeAction(redoAction));
 
     // with explicit redo (as removal) we again restore the element from the snapshot!

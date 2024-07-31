@@ -441,8 +441,8 @@ describe("history", () => {
         expect(h.history.isUndoStackEmpty).toBeTruthy();
       });
 
-      const undoAction = createUndoAction(h.history, h.store, h.scene);
-      const redoAction = createRedoAction(h.history, h.store, h.scene);
+      const undoAction = createUndoAction(h.history, h.store);
+      const redoAction = createRedoAction(h.history, h.store);
       // noop
       act(() => h.app.actionManager.executeAction(undoAction));
       expect(h.elements).toEqual([
@@ -518,8 +518,8 @@ describe("history", () => {
         expect.objectContaining({ id: "B", isDeleted: false }),
       ]);
 
-      const undoAction = createUndoAction(h.history, h.store, h.scene);
-      const redoAction = createRedoAction(h.history, h.store, h.scene);
+      const undoAction = createUndoAction(h.history, h.store);
+      const redoAction = createRedoAction(h.history, h.store);
       act(() => h.app.actionManager.executeAction(undoAction));
 
       expect(API.getSnapshot()).toEqual([
@@ -1753,8 +1753,8 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store, h.scene);
-      const redoAction = createRedoAction(h.history, h.store, h.scene);
+      const undoAction = createUndoAction(h.history, h.store);
+      const redoAction = createRedoAction(h.history, h.store);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -1803,7 +1803,7 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store, h.scene);
+      const undoAction = createUndoAction(h.history, h.store);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
