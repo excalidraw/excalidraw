@@ -101,7 +101,7 @@ const repairBinding = (binding: PointBinding | null): PointBinding | null => {
   return {
     ...binding,
     focus: binding.focus || 0,
-    fixedPoint: [0, 0] as [number, number],
+    fixedPoint: binding.fixedPoint ?? ([0, 0] as [number, number]),
   };
 };
 
