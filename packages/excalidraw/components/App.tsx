@@ -4906,7 +4906,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (!this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !== selectedElements[0].id)
+          this.state.editingLinearElement.elementId !==
+            selectedElements[0].id) &&
+        !isElbowArrow(selectedElements[0])
       ) {
         this.store.shouldCaptureIncrement();
         this.setState({
