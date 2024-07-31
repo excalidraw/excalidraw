@@ -93,12 +93,16 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (binding: PointBinding | null) => {
+const repairBinding = (binding: PointBinding | null): PointBinding | null => {
   if (!binding) {
     return null;
   }
 
-  return { ...binding, focus: binding.focus || 0, focusPoint: [0, 0] };
+  return {
+    ...binding,
+    focus: binding.focus || 0,
+    fixedPoint: [0, 0] as [number, number],
+  };
 };
 
 const restoreElementWithProperties = <

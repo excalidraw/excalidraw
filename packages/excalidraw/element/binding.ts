@@ -982,14 +982,14 @@ const updateBoundPoint = (
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
 
   if (isElbowArrow(linearElement)) {
-    const { fixedPoint } =
-      binding ??
+    const fixedPoint =
+      binding.fixedPoint ??
       calculateFixedPointForElbowArrowBinding(
         linearElement,
         bindableElement,
         startOrEnd === "startBinding" ? "start" : "end",
         elementsMap,
-      );
+      ).fixedPoint;
     const globalMidPoint = [
       bindableElement.x + bindableElement.width / 2,
       bindableElement.y + bindableElement.height / 2,
@@ -1055,12 +1055,12 @@ const updateBoundPoint = (
   );
 };
 
-const calculateFixedPointForElbowArrowBinding = (
+export const calculateFixedPointForElbowArrowBinding = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-) => {
+): { fixedPoint: [number, number] } => {
   const bounds = [
     hoveredElement.x,
     hoveredElement.y,
@@ -1101,7 +1101,7 @@ const calculateFixedPointForElbowArrowBinding = (
         hoveredElement.width,
       (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
         hoveredElement.height,
-    ] as Point,
+    ] as [number, number],
   };
 };
 

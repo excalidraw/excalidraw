@@ -78,6 +78,7 @@ import {
 } from "../element/typeChecks";
 import type {
   Arrowhead,
+  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -108,6 +109,7 @@ import { Fonts, getLineHeight } from "../fonts";
 import {
   bindLinearElement,
   bindPointToSnapToElementOutline,
+  calculateFixedPointForElbowArrowBinding,
   getHoveredElementForBinding,
 } from "../element/binding";
 import { mutateElbowArrow } from "../element/routing";
@@ -1576,7 +1578,7 @@ export const actionChangeArrowType = register({
             newElement.y + newElement.points[newElement.points.length - 1][1],
           ] as Point;
 
-          const startElement =
+          const startHoveredElement =
             !newElement.startBinding &&
             getHoveredElementForBinding(
               tupleToCoors(startGlobalPoint),
@@ -1584,7 +1586,7 @@ export const actionChangeArrowType = register({
               elementsMap,
               true,
             );
-          const endElement =
+          const endHoveredElement =
             !newElement.endBinding &&
             getHoveredElementForBinding(
               tupleToCoors(endGlobalPoint),
@@ -1592,28 +1594,51 @@ export const actionChangeArrowType = register({
               elementsMap,
               true,
             );
+          const startElement = startHoveredElement
+            ? startHoveredElement
+            : newElement.startBinding &&
+              (elementsMap.get(
+                newElement.startBinding.elementId,
+              ) as ExcalidrawBindableElement);
+          const endElement = endHoveredElement
+            ? endHoveredElement
+            : newElement.endBinding &&
+              (elementsMap.get(
+                newElement.endBinding.elementId,
+              ) as ExcalidrawBindableElement);
 
-          const finalStartPoint = startElement
+          const finalStartPoint = startHoveredElement
             ? bindPointToSnapToElementOutline(
                 startGlobalPoint,
                 endGlobalPoint,
-                startElement,
+                startHoveredElement,
                 elementsMap,
               )
             : startGlobalPoint;
-          const finalEndPoint = endElement
+          const finalEndPoint = endHoveredElement
             ? bindPointToSnapToElementOutline(
                 endGlobalPoint,
                 startGlobalPoint,
-                endElement,
+                endHoveredElement,
                 elementsMap,
               )
             : endGlobalPoint;
 
-          startElement &&
-            bindLinearElement(newElement, startElement, "start", elementsMap);
-          endElement &&
-            bindLinearElement(newElement, endElement, "end", elementsMap);
+          startHoveredElement &&
+            bindLinearElement(
+              newElement,
+              startHoveredElement,
+              "start",
+              elementsMap,
+            );
+          endHoveredElement &&
+            bindLinearElement(
+              newElement,
+              endHoveredElement,
+              "end",
+              elementsMap,
+            );
+
           mutateElbowArrow(
             newElement,
             app.scene,
@@ -1622,6 +1647,36 @@ export const actionChangeArrowType = register({
                 [point[0] - newElement.x, point[1] - newElement.y] as Point,
             ),
             [0, 0],
+            {
+              ...(startElement && newElement.startBinding
+                ? {
+                    startBinding: {
+                      // @ts-ignore TS cannot discern check above
+                      ...newElement.startBinding!,
+                      ...calculateFixedPointForElbowArrowBinding(
+                        newElement,
+                        startElement,
+                        "start",
+                        elementsMap,
+                      ),
+                    },
+                  }
+                : {}),
+              ...(endElement && newElement.endBinding
+                ? {
+                    endBinding: {
+                      // @ts-ignore TS cannot discern check above
+                      ...newElement.endBinding,
+                      ...calculateFixedPointForElbowArrowBinding(
+                        newElement,
+                        endElement,
+                        "end",
+                        elementsMap,
+                      ),
+                    },
+                  }
+                : {}),
+            },
           );
         }
 
