@@ -29,6 +29,8 @@ Please add the latest change on the top under the correct section.
 
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
 
+- Extended `window.EXCALIDRAW_ASSET_PATH` to accept array of paths `string[]` as a value, allowing to specify multiple base `URL` fallbacks. [#8286](https://github.com/excalidraw/excalidraw/pull/8286)
+
 ### Fixes
 
 - Keep customData when converting to ExcalidrawElement. [#7656](https://github.com/excalidraw/excalidraw/pull/7656)
