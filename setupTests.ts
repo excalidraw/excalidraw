@@ -72,12 +72,14 @@ vi.mock(
       ...mod,
       ExcalidrawFont: class extends ExcalidrawFontImpl {
         public async getContent(): Promise<string> {
-          if (this.url.protocol !== "file:") {
+          const url = this.urls[0];
+
+          if (url.protocol !== "file:") {
             return super.getContent();
           }
 
           // read local assets directly, without running a server
-          const content = await fs.promises.readFile(this.url);
+          const content = await fs.promises.readFile(url);
           return `data:font/woff2;base64,${content.toString("base64")}`;
         }
       },
