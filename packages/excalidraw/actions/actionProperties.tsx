@@ -1569,6 +1569,8 @@ export const actionChangeArrowType = register({
         if (value === "elbow") {
           const elementsMap = app.scene.getNonDeletedElementsMap();
 
+          app.dismissLinearEditor();
+
           const startGlobalPoint = [
             newElement.x + newElement.points[0][0],
             newElement.y + newElement.points[0][1],

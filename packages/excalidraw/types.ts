@@ -625,6 +625,7 @@ export type AppClassProperties = {
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
+  dismissLinearEditor: App["dismissLinearEditor"];
 };
 
 export type PointerDownState = Readonly<{

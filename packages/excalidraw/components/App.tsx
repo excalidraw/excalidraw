@@ -2128,6 +2128,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  public dismissLinearEditor = () => {
+    setTimeout(() => {
+      this.setState({
+        editingLinearElement: null,
+      });
+    });
+  };
+
   public syncActionResult = withBatchedUpdates((actionResult: ActionResult) => {
     if (this.unmounted || actionResult === false) {
       return;
