@@ -21,6 +21,9 @@ import type {
   ExcalidrawIframeLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
+  PointBinding,
+  FixedPointBinding,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -106,7 +109,9 @@ export const isArrowElement = (
   return element != null && element.type === "arrow";
 };
 
-export const isElbowArrow = (element?: ExcalidrawElement): boolean => {
+export const isElbowArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawElbowArrowElement => {
   return isArrowElement(element) && element.elbowed;
 };
 
@@ -282,4 +287,10 @@ export const getDefaultRoundnessTypeForElement = (
   }
 
   return null;
+};
+
+export const isFixedPointBinding = (
+  binding: PointBinding,
+): binding is FixedPointBinding => {
+  return binding.fixedPoint != null;
 };

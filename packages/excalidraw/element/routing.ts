@@ -35,15 +35,15 @@ import {
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type {
+  ExcalidrawElbowArrowElement,
+  FixedPointBinding,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
-import {
-  type ElementsMap,
-  type ExcalidrawArrowElement,
-  type ExcalidrawBindableElement,
-  type OrderedExcalidrawElement,
-  type PointBinding,
+import type {
+  ElementsMap,
+  ExcalidrawBindableElement,
+  OrderedExcalidrawElement,
 } from "./types";
 
 type Node = {
@@ -66,13 +66,13 @@ type Grid = {
 const BASE_PADDING = 40;
 
 export const mutateElbowArrow = (
-  arrow: ExcalidrawArrowElement,
+  arrow: ExcalidrawElbowArrowElement,
   scene: Scene,
   nextPoints: readonly Point[],
   offset?: Point,
   otherUpdates?: {
-    startBinding?: PointBinding | null;
-    endBinding?: PointBinding | null;
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
   },
   options?: {
     changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -948,7 +948,7 @@ const getAllElements = (
     : scene.getNonDeletedElements();
 
 const getGlobalPoint = (
-  fixedPointRatio: [number, number] | undefined,
+  fixedPointRatio: [number, number] | undefined | null,
   initialPoint: Point,
   otherPoint: Point,
   elementsMap: NonDeletedSceneElementsMap,

@@ -1566,7 +1566,7 @@ export const actionChangeArrowType = register({
               : el.points,
         });
 
-        if (value === "elbow") {
+        if (isElbowArrow(newElement)) {
           const elementsMap = app.scene.getNonDeletedElementsMap();
 
           app.dismissLinearEditor();

@@ -25,6 +25,7 @@ import {
 } from "../element";
 import {
   isArrowElement,
+  isElbowArrow,
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -93,7 +94,10 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (binding: PointBinding | null): PointBinding | null => {
+const repairBinding = (
+  element: ExcalidrawLinearElement,
+  binding: PointBinding | null,
+): PointBinding | null => {
   if (!binding) {
     return null;
   }
@@ -101,7 +105,9 @@ const repairBinding = (binding: PointBinding | null): PointBinding | null => {
   return {
     ...binding,
     focus: binding.focus || 0,
-    fixedPoint: binding.fixedPoint ?? ([0, 0] as [number, number]),
+    fixedPoint: isElbowArrow(element)
+      ? binding.fixedPoint ?? ([0, 0] as [number, number])
+      : null,
   };
 };
 
@@ -268,8 +274,8 @@ const restoreElement = (
           (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: repairBinding(element.startBinding),
-        endBinding: repairBinding(element.endBinding),
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
@@ -297,8 +303,8 @@ const restoreElement = (
       // TODO: Separate arrow from linear element
       return restoreElementWithProperties(element as ExcalidrawArrowElement, {
         type: element.type,
-        startBinding: repairBinding(element.startBinding),
-        endBinding: repairBinding(element.endBinding),
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,

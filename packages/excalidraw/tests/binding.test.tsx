@@ -62,7 +62,7 @@ describe("element binding", () => {
 
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
-      fixedPoint: [expect.toBeNonNaNNumber(), expect.toBeNonNaNNumber()],
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
@@ -75,13 +75,13 @@ describe("element binding", () => {
     // Both the start and the end points should be bound
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
-      fixedPoint: [expect.toBeNonNaNNumber(), expect.toBeNonNaNNumber()],
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
     expect(arrow.endBinding).toEqual({
       elementId: rect.id,
-      fixedPoint: [expect.toBeNonNaNNumber(), expect.toBeNonNaNNumber()],
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });

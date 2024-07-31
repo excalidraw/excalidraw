@@ -14,6 +14,7 @@ import { mutateElbowArrow } from "./routing";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
+  ExcalidrawElbowArrowElement,
 } from "./types";
 
 const { h } = window;
@@ -47,7 +48,7 @@ describe("elbow arrow routing", () => {
     const arrow = API.createElement({
       type: "arrow",
       elbowed: true,
-    }) as ExcalidrawArrowElement;
+    }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
     mutateElbowArrow(arrow, scene, [
       [-45 - arrow.x, -100.1 - arrow.y],
@@ -91,7 +92,7 @@ describe("elbow arrow routing", () => {
         [0, 0],
         [90, 200],
       ],
-    }) as ExcalidrawArrowElement;
+    }) as ExcalidrawElbowArrowElement;
     scene.insertElement(rectangle1);
     scene.insertElement(rectangle2);
     scene.insertElement(arrow);

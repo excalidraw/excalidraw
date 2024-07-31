@@ -288,10 +288,7 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id162",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": "0.00990",
                 "gap": 1,
               },
@@ -308,10 +305,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id161",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.51000",
-                ],
+                "fixedPoint": null,
                 "focus": "0.02970",
                 "gap": 1,
               },
@@ -319,10 +313,7 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id162",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.51000",
-                ],
+                "fixedPoint": null,
                 "focus": "-0.02000",
                 "gap": 1,
               },
@@ -339,10 +330,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id161",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.51000",
-                ],
+                "fixedPoint": null,
                 "focus": "0.02000",
                 "gap": 1,
               },
@@ -416,10 +404,7 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id162",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": "0.00990",
                 "gap": 1,
               },
@@ -436,10 +421,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id161",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.51000",
-                ],
+                "fixedPoint": null,
                 "focus": "0.02970",
                 "gap": 1,
               },
@@ -749,7 +731,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 19,
+  "version": 9,
   "width": 100,
   "x": 150,
   "y": -50,
@@ -781,7 +763,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 19,
+  "version": 9,
   "width": 100,
   "x": 150,
   "y": -50,
@@ -829,7 +811,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 40,
+  "version": 30,
   "width": 0,
   "x": 251,
   "y": 0,
@@ -858,15 +840,6 @@ History {
         "updated": Map {
           "id158" => Delta {
             "deleted": {
-              "endBinding": {
-                "elementId": "id157",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
               "points": [
                 [
                   0,
@@ -877,45 +850,18 @@ History {
                   0,
                 ],
               ],
-              "startBinding": {
-                "elementId": "id156",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
             },
             "inserted": {
-              "endBinding": {
-                "elementId": "id157",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  0,
+                  100,
                   0,
                 ],
               ],
-              "startBinding": {
-                "elementId": "id156",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
             },
           },
         },
@@ -976,10 +922,7 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id157",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -995,10 +938,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id156",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -2346,10 +2286,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id176",
-    "fixedPoint": [
-      "-0.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -2381,10 +2318,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id175",
-    "fixedPoint": [
-      "0.95000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -2514,10 +2448,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id176",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -2548,10 +2479,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id175",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -14448,10 +14376,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id52",
-    "fixedPoint": [
-      "-0.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -14483,10 +14408,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id50",
-    "fixedPoint": [
-      "0.95000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -14529,15 +14451,6 @@ History {
         "removed": Map {
           "id55" => Delta {
             "deleted": {
-              "endBinding": {
-                "elementId": "id52",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
               "isDeleted": false,
               "points": [
                 [
@@ -14549,26 +14462,8 @@ History {
                   0,
                 ],
               ],
-              "startBinding": {
-                "elementId": "id50",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
             },
             "inserted": {
-              "endBinding": {
-                "elementId": "id52",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
               "isDeleted": true,
               "points": [
                 [
@@ -14580,15 +14475,6 @@ History {
                   0,
                 ],
               ],
-              "startBinding": {
-                "elementId": "id50",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
             },
           },
         },
@@ -14861,10 +14747,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id52",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -14895,10 +14778,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id50",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15189,10 +15069,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id46",
-    "fixedPoint": [
-      "-0.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15224,10 +15101,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id44",
-    "fixedPoint": [
-      "0.95000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15490,10 +15364,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id46",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15524,10 +15395,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id44",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15818,10 +15686,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id58",
-    "fixedPoint": [
-      "-0.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15853,10 +15718,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id56",
-    "fixedPoint": [
-      "0.95000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16119,10 +15981,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id58",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16153,10 +16012,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id56",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16445,10 +16301,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id64",
-    "fixedPoint": [
-      "-0.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16480,10 +16333,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id62",
-    "fixedPoint": [
-      "0.95000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16544,15 +16394,6 @@ History {
         "updated": Map {
           "id67" => Delta {
             "deleted": {
-              "endBinding": {
-                "elementId": "id64",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
               "points": [
                 [
                   0,
@@ -16565,24 +16406,12 @@ History {
               ],
               "startBinding": {
                 "elementId": "id62",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
             },
             "inserted": {
-              "endBinding": {
-                "elementId": "id64",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
-                "focus": 0,
-                "gap": 1,
-              },
               "points": [
                 [
                   0,
@@ -16838,10 +16667,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id64",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16872,10 +16698,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id62",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17190,10 +17013,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id71",
-    "fixedPoint": [
-      "-0.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -17225,10 +17045,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id69",
-    "fixedPoint": [
-      "0.95000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -17300,10 +17117,7 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id71",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17319,10 +17133,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id69",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17584,10 +17395,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id71",
-                "fixedPoint": [
-                  "-0.05000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17618,10 +17426,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id69",
-                "fixedPoint": [
-                  "0.95000",
-                  "0.50000",
-                ],
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },

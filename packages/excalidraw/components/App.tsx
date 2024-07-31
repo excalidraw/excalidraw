@@ -5374,7 +5374,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (isElbowArrow(multiElement)) {
           mutateElbowArrow(
-            multiElement as ExcalidrawArrowElement,
+            multiElement,
             this.scene,
             [
               ...points.slice(0, -1),
@@ -7745,7 +7745,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         } else if (points.length > 1 && isElbowArrow(draggingElement)) {
           mutateElbowArrow(
-            draggingElement as ExcalidrawArrowElement,
+            draggingElement,
             this.scene,
             [...points.slice(0, -1), [dx, dy]],
             [0, 0],

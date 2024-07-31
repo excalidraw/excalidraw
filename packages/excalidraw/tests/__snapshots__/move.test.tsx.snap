@@ -190,10 +190,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id1",
-    "fixedPoint": [
-      "-0.01667",
-      "0.43333",
-    ],
+    "fixedPoint": null,
     "focus": "-0.46667",
     "gap": 10,
   },
@@ -226,10 +223,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
-    "fixedPoint": [
-      "1.05000",
-      "0.50000",
-    ],
+    "fixedPoint": null,
     "focus": "-0.60000",
     "gap": 10,
   },

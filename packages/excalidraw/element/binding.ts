@@ -23,6 +23,8 @@ import type {
   ExcalidrawTextElement,
   ExcalidrawArrowElement,
   OrderedExcalidrawElement,
+  ExcalidrawElbowArrowElement,
+  FixedPoint,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -426,22 +428,26 @@ export const bindLinearElement = (
   if (!isArrowElement(linearElement)) {
     return;
   }
+  const binding: PointBinding = {
+    elementId: hoveredElement.id,
+    ...calculateFocusAndGap(
+      linearElement,
+      hoveredElement,
+      startOrEnd,
+      elementsMap,
+    ),
+    ...(isElbowArrow(linearElement)
+      ? calculateFixedPointForElbowArrowBinding(
+          linearElement,
+          hoveredElement,
+          startOrEnd,
+          elementsMap,
+        )
+      : { fixedPoint: null }),
+  };
+
   mutateElement(linearElement, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: {
-      elementId: hoveredElement.id,
-      ...calculateFocusAndGap(
-        linearElement,
-        hoveredElement,
-        startOrEnd,
-        elementsMap,
-      ),
-      ...calculateFixedPointForElbowArrowBinding(
-        linearElement,
-        hoveredElement,
-        startOrEnd,
-        elementsMap,
-      ),
-    } as PointBinding,
+    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
   });
 
   const boundElementsMap = arrayToMap(hoveredElement.boundElements || []);
@@ -1062,11 +1068,11 @@ const updateBoundPoint = (
 };
 
 export const calculateFixedPointForElbowArrowBinding = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
+  linearElement: NonDeleted<ExcalidrawElbowArrowElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-): { fixedPoint: [number, number] } => {
+): { fixedPoint: FixedPoint } => {
   const bounds = [
     hoveredElement.x,
     hoveredElement.y,
@@ -1119,18 +1125,18 @@ const maybeCalculateNewGapWhenScaling = (
   if (currentBinding == null || newSize == null) {
     return currentBinding;
   }
-  const { gap, focus, elementId, fixedPoint } = currentBinding;
   const { width: newWidth, height: newHeight } = newSize;
   const { width, height } = changedElement;
   const newGap = Math.max(
     1,
     Math.min(
       maxBindingGap(changedElement, newWidth, newHeight),
-      gap * (newWidth < newHeight ? newWidth / width : newHeight / height),
+      currentBinding.gap *
+        (newWidth < newHeight ? newWidth / width : newHeight / height),
     ),
   );
 
-  return { elementId, gap: newGap, focus, fixedPoint };
+  return { ...currentBinding, gap: newGap };
 };
 
 const getElligibleElementForBindingElement = (
@@ -1258,12 +1264,9 @@ const newBindingAfterDuplication = (
   if (binding == null) {
     return null;
   }
-  const { elementId, focus, gap, fixedPoint } = binding;
   return {
-    focus,
-    gap,
-    fixedPoint,
-    elementId: oldIdToDuplicatedId.get(elementId) ?? elementId,
+    ...binding,
+    elementId: oldIdToDuplicatedId.get(binding.elementId) ?? binding.elementId,
   };
 };
 
@@ -2160,21 +2163,19 @@ export class BindableElement {
 }
 
 export const getGlobalFixedPointForBindableElement = (
-  fixedPointRatio: [number, number],
+  fixedPointRatio: [number, number] | null,
   element: ExcalidrawBindableElement,
 ) => {
+  const [fixedX, fixedY] = fixedPointRatio ?? [0.5, 0.5];
   return rotatePoint(
-    [
-      element.x + element.width * fixedPointRatio[0],
-      element.y + element.height * fixedPointRatio[1],
-    ],
+    [element.x + element.width * fixedX, element.y + element.height * fixedY],
     getCenterForElement(element),
     element.angle,
   );
 };
 
 const getGlobalFixedPoints = (
-  arrow: ExcalidrawArrowElement,
+  arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
 ) => {
   const startElement =
@@ -2209,7 +2210,7 @@ const getGlobalFixedPoints = (
 };
 
 export const getArrowLocalFixedPoints = (
-  arrow: ExcalidrawArrowElement,
+  arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
 ) => {
   const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);

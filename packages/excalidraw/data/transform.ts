@@ -52,6 +52,7 @@ import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
+import { isArrowElement } from "../element/typeChecks";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -657,7 +658,7 @@ export const convertToExcalidrawElements = (
           elementStore.add(container);
           elementStore.add(text);
 
-          if (container.type === "arrow") {
+          if (isArrowElement(container)) {
             const originalStart =
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
@@ -676,7 +677,7 @@ export const convertToExcalidrawElements = (
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
-                container as ExcalidrawArrowElement,
+                container,
                 originalStart,
                 originalEnd,
                 elementStore,
