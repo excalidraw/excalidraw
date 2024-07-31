@@ -49,6 +49,7 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getElementShape } from "../shapes";
 import {
   aabbForElement,
+  clamp,
   distanceSq2d,
   getCenterForBounds,
   getCenterForElement,
@@ -921,24 +922,29 @@ export const snapToMid = (
   const center = [x + width / 2 - 0.1, y + height / 2 - 0.1] as Point;
   const nonRotated = rotatePoint(p, center, -angle);
 
+  // snap-to-center point is adaptive to element size, but we don't want to go
+  // above and below certain px distance
+  const verticalThrehsold = clamp(tolerance * height, 5, 80);
+  const horizontalThrehsold = clamp(tolerance * width, 5, 80);
+
   if (
     nonRotated[0] <= x + width / 2 &&
-    nonRotated[1] > center[1] - tolerance * height &&
-    nonRotated[1] < center[1] + tolerance * height
+    nonRotated[1] > center[1] - verticalThrehsold &&
+    nonRotated[1] < center[1] + verticalThrehsold
   ) {
     // LEFT
     return rotatePoint([x - FIXED_BINDING_DISTANCE, center[1]], center, angle);
   } else if (
     nonRotated[1] <= y + height / 2 &&
-    nonRotated[0] > center[0] - tolerance * width &&
-    nonRotated[0] < center[0] + tolerance * width
+    nonRotated[0] > center[0] - horizontalThrehsold &&
+    nonRotated[0] < center[0] + horizontalThrehsold
   ) {
     // TOP
     return rotatePoint([center[0], y - FIXED_BINDING_DISTANCE], center, angle);
   } else if (
     nonRotated[0] >= x + width / 2 &&
-    nonRotated[1] > center[1] - tolerance * height &&
-    nonRotated[1] < center[1] + tolerance * height
+    nonRotated[1] > center[1] - verticalThrehsold &&
+    nonRotated[1] < center[1] + verticalThrehsold
   ) {
     // RIGHT
     return rotatePoint(
@@ -948,8 +954,8 @@ export const snapToMid = (
     );
   } else if (
     nonRotated[1] >= y + height / 2 &&
-    nonRotated[0] > center[0] - tolerance * width &&
-    nonRotated[0] < center[0] + tolerance * width
+    nonRotated[0] > center[0] - horizontalThrehsold &&
+    nonRotated[0] < center[0] + horizontalThrehsold
   ) {
     // DOWN
     return rotatePoint(

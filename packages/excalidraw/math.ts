@@ -699,3 +699,7 @@ export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
   pointInsideBounds([b[2], b[1]], a) ||
   pointInsideBounds([b[2], b[3]], a) ||
   pointInsideBounds([b[0], b[3]], a);
+
+export const clamp = (value: number, min: number, max: number) => {
+  return Math.min(Math.max(value, min), max);
+};
