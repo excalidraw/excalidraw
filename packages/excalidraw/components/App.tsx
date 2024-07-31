@@ -7591,13 +7591,6 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          // TODO: Check if needed to re-add this
-          // if (
-          //   selectedElements.length !== 1 ||
-          //   !isArrowElement(selectedElements[0]) ||
-          //   !pointerDownState.drag.hasOccurred ||
-          //   !!this.state.editingLinearElement
-          // ) {
           if (
             selectedElements.length !== 1 ||
             !isElbowArrow(selectedElements[0])
