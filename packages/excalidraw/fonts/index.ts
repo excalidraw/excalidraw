@@ -171,7 +171,11 @@ export class Fonts {
         });
 
         // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
-        if (!window.document.fonts.check(fontString)) {
+        if (
+          !window.document.fonts.check(fontString) &&
+          !fontString.startsWith("16px Local Font") && //zsviczian (added "Local Font") if font is registered I cannot change it dymamically via stylesheet
+          !fontString.startsWith("16px Helvetica") //zsviczian there is an error loading Helvetica font
+        ) {
           try {
             // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
             // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood

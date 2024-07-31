@@ -49,16 +49,15 @@ export function registerLocalFont(fontMetrics: FontMetadata & {name: string}, ur
 }
 
 export function getFontFamilies(): string[] {
-  const fontFamilies:string[] = [];
+  const fontFamilies: Set<string> = new Set();
   for (const fontFaces of Fonts.registered.values()) {
-    for (const font of fontFaces.fontFaces.filter(font => 
-      font.fontFace.weight === "400" &&
-      font.url.protocol !== LOCAL_FONT_PROTOCOL,
-    )) {
-      fontFamilies.push(font.fontFace.family);
+    if(fontFaces.metadata.local) continue;
+    for (const font of fontFaces.fonts) {
+      if(font.fontFace.family === "Local Font") continue;
+      fontFamilies.add(font.fontFace.family);
     }
   }
-  return fontFamilies;
+  return Array.from(fontFamilies);
 }
 
 export async function registerFontsInCSS() {
@@ -76,16 +75,14 @@ export async function registerFontsInCSS() {
   let cssContent = '';
 
   for (const fontFaces of Fonts.registered.values()) {
-    for (const font of fontFaces.fontFaces.filter(font => 
-      font.fontFace.weight === "400" &&
-      font.url.protocol !== LOCAL_FONT_PROTOCOL,
-    )) {
+    if (fontFaces.metadata.local) continue;
+    for (const font of fontFaces.fonts) {
       try {
         const content = await font.getContent();
         cssContent += `@font-face {font-family: ${font.fontFace.family}; src: url(${content});}\n`;
       } catch (e) {
         console.error(
-          `Skipped inlining font with URL "${font.url.toString()}"`,
+          `Skipped inlining font "${font.toString()}"`,
           e,
         );
       }
@@ -95,10 +92,9 @@ export async function registerFontsInCSS() {
 }
 
 export async function getFontDefinition(fontFamily: number): Promise<string> {
-  const fontFaces = Fonts.registered.get(fontFamily)?.fontFaces;
+  const fontFaces = Fonts.registered.get(fontFamily)?.fonts;
   if (!fontFaces) return "";
-  const fontFace = fontFaces.find(font => font.url.protocol !== LOCAL_FONT_PROTOCOL && font.fontFace.weight === "400") 
-    ?? fontFaces.find(font => font.url.protocol !== LOCAL_FONT_PROTOCOL);
+  const fontFace = fontFaces[0];
   if (!fontFace) return "";
   return await fontFace.getContent();
 }
