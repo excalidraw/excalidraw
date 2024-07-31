@@ -755,15 +755,12 @@ export const isElementInFrame = (
   return false;
 };
 
-export const getFrameLikeTitle = (
-  element: ExcalidrawFrameLikeElement,
-  frameIdx: number,
-) => {
+export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
   // TODO name frames "AI" only if specific to AI frames
   return element.name === null
     ? isFrameElement(element)
-      ? `Frame ${frameIdx}`
-      : `AI Frame $${frameIdx}`
+      ? "Frame"
+      : "AI Frame"
     : element.name;
 };
 

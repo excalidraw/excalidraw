@@ -156,7 +156,6 @@ import {
   isLinearElement,
   isLinearElementType,
   isUsingAdaptiveRadius,
-  isFrameElement,
   isIframeElement,
   isIframeLikeElement,
   isMagicFrameElement,
@@ -1288,15 +1287,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const isDarkTheme = this.state.theme === THEME.DARK;
 
-    let frameIndex = 0;
-    let magicFrameIndex = 0;
-
     return this.scene.getNonDeletedFramesLikes().map((f) => {
-      if (isFrameElement(f)) {
-        frameIndex++;
-      } else {
-        magicFrameIndex++;
-      }
       if (
         !isElementInViewport(
           f,
@@ -1330,10 +1321,7 @@ class App extends React.Component<AppProps, AppState> {
 
       let frameNameJSX;
 
-      const frameName = getFrameLikeTitle(
-        f,
-        isFrameElement(f) ? frameIndex : magicFrameIndex,
-      );
+      const frameName = getFrameLikeTitle(f);
 
       if (f.id === this.state.editingFrame) {
         const frameNameInEdit = frameName;
