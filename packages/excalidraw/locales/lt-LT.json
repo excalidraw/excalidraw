@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Šrifto dydis",
     "fontFamily": "Šriftas",
     "addWatermark": "Sukurta su Excalidraw",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "Paspaudimai sukurs papildomus taškus, nepertraukiamas tempimas sukurs liniją",
+    "arrowTool": "",
     "freeDraw": "Spausk ir tempk, paleisk kai norėsi pabaigti",
     "text": "Užuomina: tekstą taip pat galima pridėti bet kur su dvigubu pelės paspaudimu, kol parinkas žymėjimo įrankis",
     "embeddable": "",
