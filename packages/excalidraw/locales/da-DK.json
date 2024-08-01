@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Skrifttypefamilie",
     "addWatermark": "Tilføj \"Lavet med Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "",
+    "arrowTool": "",
     "freeDraw": "Klik og træk, slip når du er færdig",
     "text": "",
     "embeddable": "",
