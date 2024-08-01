@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "三角箭头（空心）",
     "arrowhead_diamond": "菱形",
     "arrowhead_diamond_outline": "菱形（空心）",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowtypes": "箭头类型",
+    "arrowtype_sharp": "直箭头",
+    "arrowtype_round": "曲线箭头",
+    "arrowtype_elbowed": "拐角箭头",
     "fontSize": "字体大小",
     "fontFamily": "字体",
     "addWatermark": "添加 “使用 Excalidraw 创建” 水印",
@@ -113,7 +113,7 @@
     "share": "分享",
     "showStroke": "显示描边颜色选择器",
     "showBackground": "显示背景颜色选择器",
-    "showFonts": "",
+    "showFonts": "显示字体选择器",
     "toggleTheme": "切换浅色/深色主题",
     "theme": "主题",
     "personalLib": "个人素材库",
@@ -299,7 +299,7 @@
   "hints": {
     "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键同时拖拽鼠标，或使用抓手工具。",
     "linearElement": "点击创建多个点 拖动创建直线",
-    "arrowTool": "",
+    "arrowTool": "点击创建多个点，拖动创建直线。按 {{arrowShortcut}} 切换箭头类型。",
     "freeDraw": "点击并拖动，完成时松开",
     "text": "提示：您也可以使用选择工具双击任意位置来添加文字",
     "embeddable": "点击并拖动以创建嵌入网页",
@@ -564,18 +564,18 @@
     "preview": "预览"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "快速搜索"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "旧的"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "画布中的",
+    "availableFonts": "可用字体",
+    "empty": "未找到字体"
   },
   "userList": {
-    "empty": "",
+    "empty": "未找到用户",
     "hint": {
       "text": "点击关注用户",
       "followStatus": "您已关注此用户",
