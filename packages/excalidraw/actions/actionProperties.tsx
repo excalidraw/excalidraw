@@ -114,6 +114,7 @@ import {
   getHoveredElementForBinding,
 } from "../element/binding";
 import { mutateElbowArrow } from "../element/routing";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1572,15 +1573,18 @@ export const actionChangeArrowType = register({
 
           app.dismissLinearEditor();
 
-          const startGlobalPoint = [
-            newElement.x + newElement.points[0][0],
-            newElement.y + newElement.points[0][1],
-          ] as Point;
-          const endGlobalPoint = [
-            newElement.x + newElement.points[newElement.points.length - 1][0],
-            newElement.y + newElement.points[newElement.points.length - 1][1],
-          ] as Point;
-
+          const startGlobalPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              newElement,
+              0,
+              elementsMap,
+            );
+          const endGlobalPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              newElement,
+              -1,
+              elementsMap,
+            );
           const startHoveredElement =
             !newElement.startBinding &&
             getHoveredElementForBinding(
