@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "ਫੌਂਟ ਅਕਾਰ",
     "fontFamily": "ਫੌਂਟ ਪਰਿਵਾਰ",
     "addWatermark": "\"Excalidraw ਨਾਲ ਬਣਾਇਆ\" ਜੋੜੋ",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਲਕੀਰ ਲਈ ਘਸੀਟੋ",
+    "arrowTool": "",
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
     "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",
     "embeddable": "",
