@@ -2115,19 +2115,13 @@ export const elbowArrowIcon = createIcon(
   tablerIconProps,
 );
 
-// arrow-wave-right-up (rotated)
+// arrow-ramp-right-2 (heavily modified)
 export const roundArrowIcon = createIcon(
   <g>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M17 10h4v4" />
-    <path d="M3 12c.887 -1.284 2.48 -2.033 4 -2c1.52 -.033 3.113 .716 4 2s2.48 2.033 4 2c1.52 .033 3 -1 4 -2l2 -2" />
+    <path d="M16,12L20,9L16,6" />
+    <path d="M6 20c0 -6.075 4.925 -11 11 -11h3" />
   </g>,
-  {
-    ...tablerIconProps,
-    style: {
-      transform: "rotate(-45deg)",
-    },
-  },
+  tablerIconProps,
 );
 
 export const collapseDownIcon = createIcon(
