@@ -1,3 +1,5 @@
+import "../global.d.ts";
+import React from "react";
 import * as StaticScene from "../renderer/staticScene";
 import {
   GlobalTestState,
@@ -24,6 +26,7 @@ import {
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import type {
+  ExcalidrawElbowArrowElement,
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
@@ -2005,6 +2008,110 @@ describe("history", () => {
       Keyboard.undo();
       expect(h.elements).toEqual([
         expect.objectContaining({ backgroundColor: transparent }),
+      ]);
+    });
+
+    it("should redraw arrows on undo", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "KPrBI4g_v9qUB1XxYLgSz",
+        x: 873,
+        y: 212,
+        width: 157,
+        height: 126,
+      });
+      const diamond = API.createElement({
+        id: "u2JGnnmoJ0VATV4vCNJE5",
+        type: "diamond",
+        x: 1152,
+        y: 516,
+        width: 124,
+        height: 129,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "6Rm4g567UQM4WjLwej2Vc",
+        elbowed: true,
+      });
+
+      excalidrawAPI.updateScene({
+        elements: [rect, diamond],
+        storeAction: StoreAction.CAPTURE,
+      });
+
+      // Connect the arrow
+      excalidrawAPI.updateScene({
+        elements: [
+          {
+            ...rect,
+            boundElements: [
+              {
+                id: "6Rm4g567UQM4WjLwej2Vc",
+                type: "arrow",
+              },
+            ],
+          },
+          {
+            ...diamond,
+            boundElements: [
+              {
+                id: "6Rm4g567UQM4WjLwej2Vc",
+                type: "arrow",
+              },
+            ],
+          },
+          {
+            ...arrow,
+            x: 1035,
+            y: 274.9,
+            width: 178.9000000000001,
+            height: 236.10000000000002,
+            points: [
+              [0, 0],
+              [178.9000000000001, 0],
+              [178.9000000000001, 236.10000000000002],
+            ],
+            startBinding: {
+              elementId: "KPrBI4g_v9qUB1XxYLgSz",
+              focus: -0.001587301587301948,
+              gap: 5,
+              fixedPoint: [1.0318471337579618, 0.49920634920634904],
+            },
+            endBinding: {
+              elementId: "u2JGnnmoJ0VATV4vCNJE5",
+              focus: -0.0016129032258049847,
+              gap: 3.537079145500037,
+              fixedPoint: [0.4991935483870975, -0.03875193720914723],
+            },
+          },
+        ],
+        storeAction: StoreAction.CAPTURE,
+      });
+
+      Keyboard.undo();
+
+      excalidrawAPI.updateScene({
+        elements: h.elements.map((el) =>
+          el.id === "KPrBI4g_v9qUB1XxYLgSz"
+            ? {
+                ...el,
+                x: 600,
+                y: 0,
+              }
+            : el,
+        ),
+        storeAction: StoreAction.UPDATE,
+      });
+
+      Keyboard.redo();
+
+      const modifiedArrow = h.elements.filter(
+        (el) => el.type === "arrow",
+      )[0] as ExcalidrawElbowArrowElement;
+      expect(modifiedArrow.points).toEqual([
+        [0, 0],
+        [451.9000000000001, 0],
+        [451.9000000000001, 448.10100010002003],
       ]);
     });
 
