@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Üçbucaq (kontur)",
     "arrowhead_diamond": "Almaz",
     "arrowhead_diamond_outline": "Almaz (kontur)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Şrift ölçüsü",
     "fontFamily": "Şrift qrupu",
     "addWatermark": "\"Made with Excalidraw\" əlavə et",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "",
+    "arrowTool": "",
     "freeDraw": "",
     "text": "",
     "embeddable": "",
