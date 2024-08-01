@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triángulo (contorno)",
     "arrowhead_diamond": "Diamante",
     "arrowhead_diamond_outline": "Diamante (contorno)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tamaño de la fuente",
     "fontFamily": "Tipo de fuente",
     "addWatermark": "Agregar \"Hecho con Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra o utilice la herramienta de mano",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
+    "arrowTool": "",
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "embeddable": "Haga clic y arrastre para crear un sitio web incrustado",
