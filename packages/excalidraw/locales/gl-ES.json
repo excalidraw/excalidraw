@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triángulo (contorno)",
     "arrowhead_diamond": "Diamante",
     "arrowhead_diamond_outline": "Diamante (contorno)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tamaño da fonte",
     "fontFamily": "Tipo de fonte",
     "addWatermark": "Engadir \"Feito con Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Para mover o lenzo, manteña pulsada a roda do rato ou a barra de espazo mentres arrastra, ou utilice a ferramenta da man",
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
+    "arrowTool": "",
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
     "embeddable": "Faga clic e arrastre para crear un sitio web embebido",
