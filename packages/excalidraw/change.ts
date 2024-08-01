@@ -29,6 +29,7 @@ import type {
 } from "./element/types";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
+import type Scene from "./scene/Scene";
 import { getObservedAppState } from "./store";
 import type {
   AppState,
@@ -1053,6 +1054,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
   public applyTo(
     elements: SceneElementsMap,
     snapshot: Map<string, OrderedExcalidrawElement>,
+    scene: Scene,
   ): [SceneElementsMap, boolean] {
     let nextElements = toBrandedType<SceneElementsMap>(new Map(elements));
     let changedElements: Map<string, OrderedExcalidrawElement>;
@@ -1100,7 +1102,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     try {
       // TODO: #7348 refactor away mutations below, so that we couldn't end up in an incosistent state
       ElementsChange.redrawTextBoundingBoxes(nextElements, changedElements);
-      ElementsChange.redrawBoundArrows(nextElements, changedElements);
+      ElementsChange.redrawBoundArrows(nextElements, changedElements, scene);
 
       // the following reorder performs also mutations, but only on new instances of changed elements
       // (unless something goes really bad and it fallbacks to fixing all invalid indices)
@@ -1457,10 +1459,13 @@ export class ElementsChange implements Change<SceneElementsMap> {
   private static redrawBoundArrows(
     elements: SceneElementsMap,
     changed: Map<string, OrderedExcalidrawElement>,
+    scene: Scene,
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
-        updateBoundElements(element, elements);
+        updateBoundElements(element, elements, scene, {
+          changedElements: changed,
+        });
       }
     }
   }

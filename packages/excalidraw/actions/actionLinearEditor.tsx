@@ -1,6 +1,6 @@
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { isLinearElement } from "../element/typeChecks";
+import { isElbowArrow, isLinearElement } from "../element/typeChecks";
 import type { ExcalidrawLinearElement } from "../element/types";
 import { StoreAction } from "../store";
 import { register } from "./register";
@@ -29,7 +29,8 @@ export const actionToggleLinearEditor = register({
     if (
       !appState.editingLinearElement &&
       selectedElements.length === 1 &&
-      isLinearElement(selectedElements[0])
+      isLinearElement(selectedElements[0]) &&
+      !isElbowArrow(selectedElements[0])
     ) {
       return true;
     }

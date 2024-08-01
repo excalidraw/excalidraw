@@ -2095,6 +2095,35 @@ export const lineEditorIcon = createIcon(
   tablerIconProps,
 );
 
+// arrow-up-right (modified)
+export const sharpArrowIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 18l12 -12" />
+    <path d="M18 10v-4h-4" />
+  </g>,
+  tablerIconProps,
+);
+
+// arrow-guide (modified)
+export const elbowArrowIcon = createIcon(
+  <g>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M4,19L10,19C11.097,19 12,18.097 12,17L12,9C12,7.903 12.903,7 14,7L21,7" />
+    <path d="M18 4l3 3l-3 3" />
+  </g>,
+  tablerIconProps,
+);
+
+// arrow-ramp-right-2 (heavily modified)
+export const roundArrowIcon = createIcon(
+  <g>
+    <path d="M16,12L20,9L16,6" />
+    <path d="M6 20c0 -6.075 4.925 -11 11 -11h3" />
+  </g>,
+  tablerIconProps,
+);
+
 export const collapseDownIcon = createIcon(
   <g>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

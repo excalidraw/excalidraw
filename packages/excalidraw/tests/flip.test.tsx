@@ -149,8 +149,6 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
       [-922.4761962890625, 300.3277587890625],
       [828.0126953125, 410.51605224609375],
     ],
-    startArrowhead: null,
-    endArrowhead: null,
   });
 };
 
@@ -183,8 +181,6 @@ const createLinearElementsWithCurveOutsideMinMaxPoints = (
       [-591.2804897585779, 36.09360810181511],
       [-148.56510566829502, 53.96308359105342],
     ],
-    startArrowhead: null,
-    endArrowhead: null,
     ...extraProps,
   });
 };

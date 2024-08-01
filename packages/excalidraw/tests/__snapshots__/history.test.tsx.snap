@@ -13,6 +13,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -72,13 +73,13 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id163": true,
+    "id166": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id163": true,
+    "id166": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -116,7 +117,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id161",
+  "id": "id164",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -148,7 +149,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id162",
+  "id": "id165",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -176,9 +177,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id166",
+    "elementId": "id169",
+    "fixedPoint": [
+      "0.50000",
+      1,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -186,7 +192,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": "99.19726",
-  "id": "id163",
+  "id": "id166",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -214,7 +220,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 54,
+  "version": 40,
   "width": "98.40368",
   "x": 1,
   "y": 0,
@@ -227,7 +233,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id163",
+      "id": "id166",
       "type": "arrow",
     },
   ],
@@ -236,7 +242,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id166",
+  "id": "id169",
   "index": "a3",
   "isDeleted": false,
   "link": null,
@@ -278,14 +284,15 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id163" => Delta {
+          "id166" => Delta {
             "deleted": {
               "endBinding": {
-                "elementId": "id162",
+                "elementId": "id165",
+                "fixedPoint": null,
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": "0.98000",
+              "height": "0.98017",
               "points": [
                 [
                   0,
@@ -293,22 +300,24 @@ History {
                 ],
                 [
                   98,
-                  "-0.98000",
+                  "-0.98017",
                 ],
               ],
               "startBinding": {
-                "elementId": "id161",
+                "elementId": "id164",
+                "fixedPoint": null,
                 "focus": "0.02970",
                 "gap": 1,
               },
             },
             "inserted": {
               "endBinding": {
-                "elementId": "id162",
+                "elementId": "id165",
+                "fixedPoint": null,
                 "focus": "-0.02000",
                 "gap": 1,
               },
-              "height": "0.00025",
+              "height": "0.00169",
               "points": [
                 [
                   0,
@@ -316,11 +325,12 @@ History {
                 ],
                 [
                   98,
-                  "0.00025",
+                  "0.00169",
                 ],
               ],
               "startBinding": {
-                "elementId": "id161",
+                "elementId": "id164",
+                "fixedPoint": null,
                 "focus": "0.02000",
                 "gap": 1,
               },
@@ -340,36 +350,40 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id161" => Delta {
+          "id164" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id163",
+                  "id": "id166",
                   "type": "arrow",
                 },
               ],
             },
           },
-          "id162" => Delta {
+          "id165" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id163",
+                  "id": "id166",
                   "type": "arrow",
                 },
               ],
             },
           },
-          "id163" => Delta {
+          "id166" => Delta {
             "deleted": {
               "endBinding": {
-                "elementId": "id166",
+                "elementId": "id169",
+                "fixedPoint": [
+                  "0.50000",
+                  1,
+                ],
                 "focus": 0,
                 "gap": 1,
               },
@@ -389,11 +403,12 @@ History {
             },
             "inserted": {
               "endBinding": {
-                "elementId": "id162",
+                "elementId": "id165",
+                "fixedPoint": null,
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": "0.98024",
+              "height": "0.98161",
               "points": [
                 [
                   0,
@@ -401,22 +416,23 @@ History {
                 ],
                 [
                   98,
-                  "-0.98024",
+                  "-0.98161",
                 ],
               ],
               "startBinding": {
-                "elementId": "id161",
+                "elementId": "id164",
+                "fixedPoint": null,
                 "focus": "0.02970",
                 "gap": 1,
               },
-              "y": "0.99037",
+              "y": "0.99245",
             },
           },
-          "id166" => Delta {
+          "id169" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id163",
+                  "id": "id166",
                   "type": "arrow",
                 },
               ],
@@ -440,7 +456,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id161" => Delta {
+          "id164" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -471,7 +487,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id162" => Delta {
+          "id165" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -511,9 +527,9 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id163": true,
+              "id166": true,
             },
-            "selectedLinearElementId": "id163",
+            "selectedLinearElementId": "id166",
           },
           "inserted": {
             "selectedElementIds": {},
@@ -524,12 +540,13 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id163" => Delta {
+          "id166" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": null,
               "fillStyle": "solid",
@@ -595,6 +612,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -654,13 +672,13 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id158": true,
+    "id161": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id158": true,
+    "id161": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -698,7 +716,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id156",
+  "id": "id159",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -730,7 +748,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id157",
+  "id": "id160",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -758,13 +776,14 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 0,
-  "id": "id158",
+  "id": "id161",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -792,7 +811,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 34,
+  "version": 30,
   "width": 0,
   "x": 251,
   "y": 0,
@@ -819,7 +838,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id158" => Delta {
+          "id161" => Delta {
             "deleted": {
               "points": [
                 [
@@ -859,33 +878,33 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id156" => Delta {
+          "id159" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id158",
+                  "id": "id161",
                   "type": "arrow",
                 },
               ],
             },
           },
-          "id157" => Delta {
+          "id160" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id158",
+                  "id": "id161",
                   "type": "arrow",
                 },
               ],
             },
           },
-          "id158" => Delta {
+          "id161" => Delta {
             "deleted": {
               "endBinding": null,
               "points": [
@@ -902,7 +921,8 @@ History {
             },
             "inserted": {
               "endBinding": {
-                "elementId": "id157",
+                "elementId": "id160",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -917,7 +937,8 @@ History {
                 ],
               ],
               "startBinding": {
-                "elementId": "id156",
+                "elementId": "id159",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -938,7 +959,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id156" => Delta {
+          "id159" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -969,7 +990,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id157" => Delta {
+          "id160" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1009,9 +1030,9 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id158": true,
+              "id161": true,
             },
-            "selectedLinearElementId": "id158",
+            "selectedLinearElementId": "id161",
           },
           "inserted": {
             "selectedElementIds": {},
@@ -1022,12 +1043,13 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id158" => Delta {
+          "id161" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": null,
               "fillStyle": "solid",
@@ -1093,6 +1115,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -1191,17 +1214,22 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": null,
   "endBinding": {
-    "elementId": "id168",
+    "elementId": "id171",
+    "fixedPoint": [
+      "0.50000",
+      1,
+    ],
     "focus": 0,
     "gap": 1,
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "0.03596",
-  "id": "id169",
+  "height": "2.61991",
+  "id": "id172",
   "index": "Zz",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -1215,7 +1243,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     ],
     [
       98,
-      "-0.03596",
+      "-2.61991",
     ],
   ],
   "roughness": 1,
@@ -1224,7 +1252,11 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id167",
+    "elementId": "id170",
+    "fixedPoint": [
+      1,
+      "0.50000",
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -1233,10 +1265,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 15,
+  "version": 11,
   "width": 98,
   "x": 1,
-  "y": "0.05467",
+  "y": "3.98333",
 }
 `;
 
@@ -1246,7 +1278,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id169",
+      "id": "id172",
       "type": "arrow",
     },
   ],
@@ -1255,7 +1287,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id167",
+  "id": "id170",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -1283,7 +1315,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id169",
+      "id": "id172",
       "type": "arrow",
     },
   ],
@@ -1292,7 +1324,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id168",
+  "id": "id171",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1334,7 +1366,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id167" => Delta {
+          "id170" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1365,7 +1397,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id168" => Delta {
+          "id171" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1398,15 +1430,23 @@ History {
           },
         },
         "updated": Map {
-          "id169" => Delta {
+          "id172" => Delta {
             "deleted": {
               "endBinding": {
-                "elementId": "id168",
+                "elementId": "id171",
+                "fixedPoint": [
+                  "0.50000",
+                  1,
+                ],
                 "focus": 0,
                 "gap": 1,
               },
               "startBinding": {
-                "elementId": "id167",
+                "elementId": "id170",
+                "fixedPoint": [
+                  1,
+                  "0.50000",
+                ],
                 "focus": 0,
                 "gap": 1,
               },
@@ -1440,6 +1480,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -1538,17 +1579,22 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": null,
   "endBinding": {
-    "elementId": "id171",
+    "elementId": "id174",
+    "fixedPoint": [
+      1,
+      "0.50000",
+    ],
     "focus": 0,
     "gap": 1,
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "0.03596",
-  "id": "id172",
+  "height": "2.61991",
+  "id": "id175",
   "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -1562,7 +1608,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     ],
     [
       98,
-      "-0.03596",
+      "-2.61991",
     ],
   ],
   "roughness": 1,
@@ -1571,7 +1617,11 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id170",
+    "elementId": "id173",
+    "fixedPoint": [
+      "0.50000",
+      1,
+    ],
     "focus": 0,
     "gap": 1,
   },
@@ -1580,10 +1630,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 15,
+  "version": 11,
   "width": 98,
   "x": 1,
-  "y": "0.05467",
+  "y": "3.98333",
 }
 `;
 
@@ -1593,7 +1643,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id172",
+      "id": "id175",
       "type": "arrow",
     },
   ],
@@ -1602,7 +1652,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id170",
+  "id": "id173",
   "index": "a0V",
   "isDeleted": false,
   "link": null,
@@ -1630,7 +1680,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id172",
+      "id": "id175",
       "type": "arrow",
     },
   ],
@@ -1639,7 +1689,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id171",
+  "id": "id174",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1681,22 +1731,27 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id172" => Delta {
+          "id175" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": null,
               "endBinding": {
-                "elementId": "id171",
+                "elementId": "id174",
+                "fixedPoint": [
+                  1,
+                  "0.50000",
+                ],
                 "focus": 0,
                 "gap": 1,
               },
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": "2.61991",
+              "height": "22.36242",
               "index": "a0",
               "isDeleted": false,
               "lastCommittedPoint": null,
@@ -1710,7 +1765,7 @@ History {
                 ],
                 [
                   98,
-                  "-2.61991",
+                  "-22.36242",
                 ],
               ],
               "roughness": 1,
@@ -1719,7 +1774,11 @@ History {
               },
               "startArrowhead": null,
               "startBinding": {
-                "elementId": "id170",
+                "elementId": "id173",
+                "fixedPoint": [
+                  "0.50000",
+                  1,
+                ],
                 "focus": 0,
                 "gap": 1,
               },
@@ -1729,7 +1788,7 @@ History {
               "type": "arrow",
               "width": 98,
               "x": 1,
-              "y": "3.98333",
+              "y": "34.00000",
             },
             "inserted": {
               "isDeleted": true,
@@ -1737,11 +1796,11 @@ History {
           },
         },
         "updated": Map {
-          "id170" => Delta {
+          "id173" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id172",
+                  "id": "id175",
                   "type": "arrow",
                 },
               ],
@@ -1750,11 +1809,11 @@ History {
               "boundElements": [],
             },
           },
-          "id171" => Delta {
+          "id174" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id172",
+                  "id": "id175",
                   "type": "arrow",
                 },
               ],
@@ -1787,6 +1846,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -1889,7 +1949,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id173",
+  "id": "id176",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -1921,7 +1981,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id174",
+  "id": "id177",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -1963,7 +2023,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id173" => Delta {
+          "id176" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -1994,7 +2054,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id174" => Delta {
+          "id177" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2050,6 +2110,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -2113,7 +2174,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id177": true,
+    "id180": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2147,7 +2208,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id177",
+      "id": "id180",
       "type": "arrow",
     },
   ],
@@ -2156,7 +2217,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id175",
+  "id": "id178",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -2184,7 +2245,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id177",
+      "id": "id180",
       "type": "arrow",
     },
   ],
@@ -2193,7 +2254,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id176",
+  "id": "id179",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -2221,17 +2282,19 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id176",
+    "elementId": "id179",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "373.79942",
-  "id": "id177",
+  "height": "408.19672",
+  "id": "id180",
   "index": "a2",
   "isDeleted": false,
   "lastCommittedPoint": null,
@@ -2245,7 +2308,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
     ],
     [
       498,
-      "-373.79942",
+      "-408.19672",
     ],
   ],
   "roughness": 1,
@@ -2254,7 +2317,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   },
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id175",
+    "elementId": "id178",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -2263,10 +2327,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": 498,
   "x": 1,
-  "y": "-37.91991",
+  "y": 0,
 }
 `;
 
@@ -2290,7 +2354,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id175" => Delta {
+          "id178" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2321,7 +2385,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id176" => Delta {
+          "id179" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2361,9 +2425,9 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id177": true,
+              "id180": true,
             },
-            "selectedLinearElementId": "id177",
+            "selectedLinearElementId": "id180",
           },
           "inserted": {
             "selectedElementIds": {},
@@ -2374,15 +2438,17 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id177" => Delta {
+          "id180" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": {
-                "elementId": "id176",
+                "elementId": "id179",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -2412,7 +2478,8 @@ History {
               },
               "startArrowhead": null,
               "startBinding": {
-                "elementId": "id175",
+                "elementId": "id178",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -2430,11 +2497,11 @@ History {
           },
         },
         "updated": Map {
-          "id175" => Delta {
+          "id178" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id177",
+                  "id": "id180",
                   "type": "arrow",
                 },
               ],
@@ -2443,11 +2510,11 @@ History {
               "boundElements": [],
             },
           },
-          "id176" => Delta {
+          "id179" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id177",
+                  "id": "id180",
                   "type": "arrow",
                 },
               ],
@@ -2480,6 +2547,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -2578,7 +2646,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id144",
+      "id": "id147",
       "type": "text",
     },
   ],
@@ -2587,7 +2655,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id142",
+  "id": "id145",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -2623,7 +2691,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id143",
+  "id": "id146",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -2656,7 +2724,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id142",
+  "containerId": "id145",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -2664,7 +2732,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id144",
+  "id": "id147",
   "index": "a2",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -2711,7 +2779,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id142" => Delta {
+          "id145" => Delta {
             "deleted": {
               "isDeleted": false,
             },
@@ -2742,7 +2810,7 @@ History {
               "y": 10,
             },
           },
-          "id143" => Delta {
+          "id146" => Delta {
             "deleted": {
               "containerId": null,
             },
@@ -2775,6 +2843,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -2873,7 +2942,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id147",
+      "id": "id150",
       "type": "text",
     },
   ],
@@ -2882,7 +2951,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id145",
+  "id": "id148",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -2910,7 +2979,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id145",
+  "containerId": "id148",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -2918,7 +2987,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id146",
+  "id": "id149",
   "index": "a0",
   "isDeleted": true,
   "lineHeight": "1.25000",
@@ -2951,7 +3020,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id145",
+  "containerId": "id148",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -2959,7 +3028,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id147",
+  "id": "id150",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -3004,9 +3073,9 @@ History {
       },
       "elementsChange": ElementsChange {
         "added": Map {
-          "id146" => Delta {
+          "id149" => Delta {
             "deleted": {
-              "containerId": "id145",
+              "containerId": "id148",
               "isDeleted": true,
             },
             "inserted": {
@@ -3017,14 +3086,14 @@ History {
         },
         "removed": Map {},
         "updated": Map {
-          "id145" => Delta {
+          "id148" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id146",
+                  "id": "id149",
                   "type": "text",
                 },
               ],
@@ -3055,6 +3124,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -3153,7 +3223,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id134",
+      "id": "id137",
       "type": "text",
     },
   ],
@@ -3162,7 +3232,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id132",
+  "id": "id135",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -3190,7 +3260,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id132",
+  "containerId": "id135",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -3198,7 +3268,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id134",
+  "id": "id137",
   "index": "a0V",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -3239,7 +3309,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id133",
+  "id": "id136",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -3286,11 +3356,11 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id132" => Delta {
+          "id135" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id134",
+                  "id": "id137",
                   "type": "text",
                 },
               ],
@@ -3298,23 +3368,23 @@ History {
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id133",
+                  "id": "id136",
                   "type": "text",
                 },
               ],
             },
           },
-          "id133" => Delta {
+          "id136" => Delta {
             "deleted": {
               "containerId": null,
             },
             "inserted": {
-              "containerId": "id132",
+              "containerId": "id135",
             },
           },
-          "id134" => Delta {
+          "id137" => Delta {
             "deleted": {
-              "containerId": "id132",
+              "containerId": "id135",
             },
             "inserted": {
               "containerId": null,
@@ -3345,6 +3415,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -3447,7 +3518,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id135",
+  "id": "id138",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -3475,7 +3546,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id136",
+      "id": "id139",
       "type": "text",
     },
   ],
@@ -3484,7 +3555,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 60,
-  "id": "id137",
+  "id": "id140",
   "index": "a0V",
   "isDeleted": false,
   "link": null,
@@ -3512,7 +3583,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id137",
+  "containerId": "id140",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -3520,7 +3591,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id136",
+  "id": "id139",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -3568,32 +3639,32 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id135" => Delta {
+          "id138" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id136",
+                  "id": "id139",
                   "type": "text",
                 },
               ],
             },
           },
-          "id136" => Delta {
+          "id139" => Delta {
             "deleted": {
-              "containerId": "id137",
+              "containerId": "id140",
             },
             "inserted": {
-              "containerId": "id135",
+              "containerId": "id138",
             },
           },
-          "id137" => Delta {
+          "id140" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id136",
+                  "id": "id139",
                   "type": "text",
                 },
               ],
@@ -3627,6 +3698,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -3729,7 +3801,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id130",
+  "id": "id133",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -3765,7 +3837,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id131",
+  "id": "id134",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -3812,25 +3884,25 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id130" => Delta {
+          "id133" => Delta {
             "deleted": {
               "boundElements": [],
             },
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id131",
+                  "id": "id134",
                   "type": "text",
                 },
               ],
             },
           },
-          "id131" => Delta {
+          "id134" => Delta {
             "deleted": {
               "containerId": null,
             },
             "inserted": {
-              "containerId": "id130",
+              "containerId": "id133",
             },
           },
         },
@@ -3858,6 +3930,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -3956,7 +4029,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id139",
+      "id": "id142",
       "type": "text",
     },
   ],
@@ -3965,7 +4038,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id138",
+  "id": "id141",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -3993,7 +4066,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id138",
+  "containerId": "id141",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -4001,7 +4074,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id139",
+  "id": "id142",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -4048,7 +4121,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id138" => Delta {
+          "id141" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -4081,9 +4154,9 @@ History {
           },
         },
         "updated": Map {
-          "id139" => Delta {
+          "id142" => Delta {
             "deleted": {
-              "containerId": "id138",
+              "containerId": "id141",
             },
             "inserted": {
               "containerId": null,
@@ -4113,6 +4186,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -4211,7 +4285,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id141",
+      "id": "id144",
       "type": "text",
     },
   ],
@@ -4220,7 +4294,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id140",
+  "id": "id143",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -4248,7 +4322,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id140",
+  "containerId": "id143",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -4256,7 +4330,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id141",
+  "id": "id144",
   "index": "a0",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -4303,13 +4377,13 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id141" => Delta {
+          "id144" => Delta {
             "deleted": {
               "angle": 0,
               "autoResize": true,
               "backgroundColor": "transparent",
               "boundElements": null,
-              "containerId": "id140",
+              "containerId": "id143",
               "customData": undefined,
               "fillStyle": "solid",
               "fontFamily": 5,
@@ -4345,11 +4419,11 @@ History {
           },
         },
         "updated": Map {
-          "id140" => Delta {
+          "id143" => Delta {
             "deleted": {
               "boundElements": [
                 {
-                  "id": "id141",
+                  "id": "id144",
                   "type": "text",
                 },
               ],
@@ -4382,6 +4456,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -4480,7 +4555,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id155",
+      "id": "id158",
       "type": "text",
     },
   ],
@@ -4489,7 +4564,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id154",
+  "id": "id157",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -4517,7 +4592,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id154",
+  "containerId": "id157",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -4525,7 +4600,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id155",
+  "id": "id158",
   "index": "a0",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -4572,7 +4647,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id155" => Delta {
+          "id158" => Delta {
             "deleted": {
               "angle": 0,
               "x": 15,
@@ -4609,6 +4684,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -4707,7 +4783,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id153",
+      "id": "id156",
       "type": "text",
     },
   ],
@@ -4716,7 +4792,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id152",
+  "id": "id155",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -4744,7 +4820,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id152",
+  "containerId": "id155",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -4752,7 +4828,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 25,
-  "id": "id153",
+  "id": "id156",
   "index": "a1",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -4800,7 +4876,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id152" => Delta {
+          "id155" => Delta {
             "deleted": {
               "angle": 90,
               "x": 200,
@@ -4836,6 +4912,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -4938,7 +5015,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id148",
+  "id": "id151",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -4966,7 +5043,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id148",
+  "containerId": "id151",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -4974,7 +5051,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id149",
+  "id": "id152",
   "index": "a1",
   "isDeleted": true,
   "lineHeight": "1.25000",
@@ -5021,7 +5098,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id148" => Delta {
+          "id151" => Delta {
             "deleted": {
               "boundElements": [],
               "isDeleted": false,
@@ -5029,7 +5106,7 @@ History {
             "inserted": {
               "boundElements": [
                 {
-                  "id": "id149",
+                  "id": "id152",
                   "type": "text",
                 },
               ],
@@ -5061,6 +5138,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -5159,7 +5237,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id151",
+      "id": "id154",
       "type": "text",
     },
   ],
@@ -5168,7 +5246,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id150",
+  "id": "id153",
   "index": "Zz",
   "isDeleted": true,
   "link": null,
@@ -5204,7 +5282,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id151",
+  "id": "id154",
   "index": "a0",
   "isDeleted": false,
   "lineHeight": "1.25000",
@@ -5251,13 +5329,13 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id151" => Delta {
+          "id154" => Delta {
             "deleted": {
               "containerId": null,
               "isDeleted": false,
             },
             "inserted": {
-              "containerId": "id150",
+              "containerId": "id153",
               "isDeleted": true,
             },
           },
@@ -5286,6 +5364,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -5388,7 +5467,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id179",
+  "id": "id182",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
@@ -5420,7 +5499,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "frameId": null,
   "groupIds": [],
   "height": 500,
-  "id": "id178",
+  "id": "id181",
   "index": "a0",
   "isDeleted": true,
   "link": null,
@@ -5463,7 +5542,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id179" => Delta {
+          "id182" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -5509,9 +5588,9 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id179" => Delta {
+          "id182" => Delta {
             "deleted": {
-              "frameId": "id178",
+              "frameId": "id181",
             },
             "inserted": {
               "frameId": null,
@@ -5541,6 +5620,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -5600,7 +5680,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id107": true,
+    "id110": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -5644,7 +5724,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "A",
   ],
   "height": 100,
-  "id": "id106",
+  "id": "id109",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -5678,7 +5758,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "A",
   ],
   "height": 100,
-  "id": "id107",
+  "id": "id110",
   "index": "a1",
   "isDeleted": true,
   "link": null,
@@ -5715,8 +5795,8 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id106": true,
-              "id107": true,
+              "id109": true,
+              "id110": true,
             },
             "selectedGroupIds": {
               "A": true,
@@ -5732,7 +5812,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id106" => Delta {
+          "id109" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -5765,7 +5845,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id107" => Delta {
+          "id110" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -5812,7 +5892,7 @@ History {
           "inserted": {
             "editingGroupId": null,
             "selectedElementIds": {
-              "id106": true,
+              "id109": true,
             },
             "selectedGroupIds": {
               "A": true,
@@ -5836,7 +5916,7 @@ History {
           "inserted": {
             "editingGroupId": "A",
             "selectedElementIds": {
-              "id107": true,
+              "id110": true,
             },
           },
         },
@@ -5868,6 +5948,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -5927,7 +6008,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id94": true,
+    "id97": true,
   },
   "resizingElement": null,
   "scrollX": 0,
@@ -5969,7 +6050,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id92",
+  "id": "id95",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -6001,7 +6082,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id93",
+  "id": "id96",
   "index": "a1",
   "isDeleted": true,
   "link": null,
@@ -6033,7 +6114,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id94",
+  "id": "id97",
   "index": "a2",
   "isDeleted": true,
   "link": null,
@@ -6070,7 +6151,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id92": true,
+              "id95": true,
             },
           },
           "inserted": {
@@ -6081,7 +6162,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id92" => Delta {
+          "id95" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -6121,12 +6202,12 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id93": true,
+              "id96": true,
             },
           },
           "inserted": {
             "selectedElementIds": {
-              "id92": true,
+              "id95": true,
             },
           },
         },
@@ -6135,7 +6216,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id93" => Delta {
+          "id96" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "#ffc9c9",
@@ -6180,7 +6261,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id93" => Delta {
+          "id96" => Delta {
             "deleted": {
               "backgroundColor": "#ffc9c9",
             },
@@ -6196,12 +6277,12 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id94": true,
+              "id97": true,
             },
           },
           "inserted": {
             "selectedElementIds": {
-              "id93": true,
+              "id96": true,
             },
           },
         },
@@ -6210,7 +6291,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id94" => Delta {
+          "id97" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "#ffc9c9",
@@ -6255,7 +6336,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id94" => Delta {
+          "id97" => Delta {
             "deleted": {
               "x": 50,
               "y": 50,
@@ -6289,6 +6370,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -6348,14 +6430,14 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id97": true,
+    "id100": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id97": true,
-    "id98": true,
+    "id100": true,
+    "id101": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -6393,7 +6475,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id96",
+  "id": "id99",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -6425,7 +6507,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id97",
+  "id": "id100",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -6457,7 +6539,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id98",
+  "id": "id101",
   "index": "a2",
   "isDeleted": false,
   "link": null,
@@ -6494,7 +6576,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id96": true,
+              "id99": true,
             },
           },
           "inserted": {
@@ -6505,7 +6587,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id96" => Delta {
+          "id99" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -6536,7 +6618,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id97" => Delta {
+          "id100" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -6567,7 +6649,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id98" => Delta {
+          "id101" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -6607,12 +6689,12 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id97": true,
+              "id100": true,
             },
           },
           "inserted": {
             "selectedElementIds": {
-              "id96": true,
+              "id99": true,
             },
           },
         },
@@ -6628,7 +6710,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id98": true,
+              "id101": true,
             },
           },
           "inserted": {
@@ -6663,6 +6745,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -6729,10 +6812,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id102": true,
-    "id103": true,
-    "id104": true,
     "id105": true,
+    "id106": true,
+    "id107": true,
+    "id108": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {
@@ -6775,7 +6858,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "A",
   ],
   "height": 100,
-  "id": "id102",
+  "id": "id105",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -6809,7 +6892,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "A",
   ],
   "height": 100,
-  "id": "id103",
+  "id": "id106",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -6843,7 +6926,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "B",
   ],
   "height": 100,
-  "id": "id104",
+  "id": "id107",
   "index": "a2",
   "isDeleted": false,
   "link": null,
@@ -6877,7 +6960,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
     "B",
   ],
   "height": 100,
-  "id": "id105",
+  "id": "id108",
   "index": "a3",
   "isDeleted": false,
   "link": null,
@@ -6914,8 +6997,8 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id102": true,
-              "id103": true,
+              "id105": true,
+              "id106": true,
             },
             "selectedGroupIds": {
               "A": true,
@@ -6938,8 +7021,8 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id104": true,
-              "id105": true,
+              "id107": true,
+              "id108": true,
             },
             "selectedGroupIds": {
               "B": true,
@@ -6978,6 +7061,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -7073,13 +7157,14 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id110",
+  "id": "id113",
   "index": "a0",
   "isDeleted": true,
   "lastCommittedPoint": [
@@ -7132,7 +7217,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id110": true,
+              "id113": true,
             },
           },
           "inserted": {
@@ -7144,12 +7229,13 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id110" => Delta {
+          "id113" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": null,
               "fillStyle": "solid",
@@ -7200,7 +7286,7 @@ History {
       "appStateChange": AppStateChange {
         "delta": Delta {
           "deleted": {
-            "selectedLinearElementId": "id110",
+            "selectedLinearElementId": "id113",
           },
           "inserted": {
             "selectedLinearElementId": null,
@@ -7217,7 +7303,7 @@ History {
       "appStateChange": AppStateChange {
         "delta": Delta {
           "deleted": {
-            "editingLinearElementId": "id110",
+            "editingLinearElementId": "id113",
           },
           "inserted": {
             "editingLinearElementId": null,
@@ -7238,8 +7324,8 @@ History {
             "selectedLinearElementId": null,
           },
           "inserted": {
-            "editingLinearElementId": "id110",
-            "selectedLinearElementId": "id110",
+            "editingLinearElementId": "id113",
+            "selectedLinearElementId": "id113",
           },
         },
       },
@@ -7270,6 +7356,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -7369,7 +7456,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id91",
+  "id": "id94",
   "index": "a0",
   "isDeleted": true,
   "link": null,
@@ -7406,7 +7493,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id91": true,
+              "id94": true,
             },
           },
           "inserted": {
@@ -7418,7 +7505,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id91" => Delta {
+          "id94" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "#ffec99",
@@ -7463,7 +7550,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id91" => Delta {
+          "id94" => Delta {
             "deleted": {
               "backgroundColor": "#ffec99",
             },
@@ -7495,6 +7582,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -7594,7 +7682,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id116",
+  "id": "id119",
   "index": "a1",
   "isDeleted": true,
   "link": null,
@@ -7626,7 +7714,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id117",
+  "id": "id120",
   "index": "a3V",
   "isDeleted": true,
   "link": null,
@@ -7658,7 +7746,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id115",
+  "id": "id118",
   "index": "a4",
   "isDeleted": true,
   "link": null,
@@ -7700,7 +7788,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id116" => Delta {
+          "id119" => Delta {
             "deleted": {
               "index": "a1",
             },
@@ -7719,14 +7807,14 @@ History {
           },
           "inserted": {
             "selectedElementIds": {
-              "id116": true,
+              "id119": true,
             },
           },
         },
       },
       "elementsChange": ElementsChange {
         "added": Map {
-          "id115" => Delta {
+          "id118" => Delta {
             "deleted": {
               "isDeleted": true,
             },
@@ -7757,7 +7845,7 @@ History {
               "y": 10,
             },
           },
-          "id116" => Delta {
+          "id119" => Delta {
             "deleted": {
               "isDeleted": true,
             },
@@ -7788,7 +7876,7 @@ History {
               "y": 20,
             },
           },
-          "id117" => Delta {
+          "id120" => Delta {
             "deleted": {
               "isDeleted": true,
             },
@@ -7846,6 +7934,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -7945,7 +8034,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id111",
+  "id": "id114",
   "index": "Zx",
   "isDeleted": true,
   "link": null,
@@ -7977,7 +8066,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id113",
+  "id": "id116",
   "index": "Zy",
   "isDeleted": true,
   "link": null,
@@ -8009,7 +8098,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id112",
+  "id": "id115",
   "index": "a1",
   "isDeleted": true,
   "link": null,
@@ -8051,7 +8140,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id112" => Delta {
+          "id115" => Delta {
             "deleted": {
               "index": "a1",
             },
@@ -8070,14 +8159,14 @@ History {
           },
           "inserted": {
             "selectedElementIds": {
-              "id112": true,
+              "id115": true,
             },
           },
         },
       },
       "elementsChange": ElementsChange {
         "added": Map {
-          "id111" => Delta {
+          "id114" => Delta {
             "deleted": {
               "isDeleted": true,
             },
@@ -8108,7 +8197,7 @@ History {
               "y": 10,
             },
           },
-          "id112" => Delta {
+          "id115" => Delta {
             "deleted": {
               "isDeleted": true,
             },
@@ -8139,7 +8228,7 @@ History {
               "y": 20,
             },
           },
-          "id113" => Delta {
+          "id116" => Delta {
             "deleted": {
               "isDeleted": true,
             },
@@ -8197,6 +8286,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -8256,15 +8346,15 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "penMode": false,
   "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id124": true,
-    "id125": true,
+    "id127": true,
+    "id128": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id124": true,
-    "id125": true,
+    "id127": true,
+    "id128": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8302,7 +8392,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id124",
+  "id": "id127",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -8334,7 +8424,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id125",
+  "id": "id128",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -8366,7 +8456,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id129",
+  "id": "id132",
   "index": "a2",
   "isDeleted": false,
   "link": null,
@@ -8403,7 +8493,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id124": true,
+              "id127": true,
             },
           },
           "inserted": {
@@ -8414,7 +8504,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id124" => Delta {
+          "id127" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -8454,12 +8544,12 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id125": true,
+              "id128": true,
             },
           },
           "inserted": {
             "selectedElementIds": {
-              "id124": true,
+              "id127": true,
             },
           },
         },
@@ -8467,7 +8557,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id125" => Delta {
+          "id128" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -8507,12 +8597,12 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id124": true,
+              "id127": true,
             },
           },
           "inserted": {
             "selectedElementIds": {
-              "id125": true,
+              "id128": true,
             },
           },
         },
@@ -8528,7 +8618,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id125": true,
+              "id128": true,
             },
           },
           "inserted": {
@@ -8553,7 +8643,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id124" => Delta {
+          "id127" => Delta {
             "deleted": {
               "x": 90,
               "y": 90,
@@ -8563,7 +8653,7 @@ History {
               "y": 10,
             },
           },
-          "id125" => Delta {
+          "id128" => Delta {
             "deleted": {
               "x": 110,
               "y": 110,
@@ -8597,6 +8687,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -8696,7 +8787,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id119",
+  "id": "id122",
   "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
@@ -8755,7 +8846,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id120",
+  "id": "id123",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -8797,7 +8888,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id119" => Delta {
+          "id122" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -8880,6 +8971,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -8943,7 +9035,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id121": true,
+    "id124": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8981,7 +9073,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 90,
-  "id": "id121",
+  "id": "id124",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -9013,7 +9105,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "frameId": null,
   "groupIds": [],
   "height": 100,
-  "id": "id123",
+  "id": "id126",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -9050,7 +9142,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id121": true,
+              "id124": true,
             },
           },
           "inserted": {
@@ -9061,7 +9153,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id121" => Delta {
+          "id124" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -9107,7 +9199,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id121" => Delta {
+          "id124" => Delta {
             "deleted": {
               "height": 90,
               "width": 90,
@@ -9141,6 +9233,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -9401,6 +9494,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#ffc9c9",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -9628,6 +9722,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -9733,7 +9828,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
     "B",
   ],
   "height": 100,
-  "id": "id85",
+  "id": "id88",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -9768,7 +9863,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
     "B",
   ],
   "height": 100,
-  "id": "id86",
+  "id": "id89",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -9802,7 +9897,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
     "B",
   ],
   "height": 100,
-  "id": "id87",
+  "id": "id90",
   "index": "a2",
   "isDeleted": false,
   "link": null,
@@ -9836,7 +9931,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
     "B",
   ],
   "height": 100,
-  "id": "id88",
+  "id": "id91",
   "index": "a3",
   "isDeleted": false,
   "link": null,
@@ -9879,7 +9974,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id85" => Delta {
+          "id88" => Delta {
             "deleted": {
               "groupIds": [
                 "A",
@@ -9890,7 +9985,7 @@ History {
               "groupIds": [],
             },
           },
-          "id86" => Delta {
+          "id89" => Delta {
             "deleted": {
               "groupIds": [
                 "A",
@@ -9925,6 +10020,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -9988,7 +10084,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "scrollX": 0,
   "scrollY": 0,
   "selectedElementIds": {
-    "id89": true,
+    "id92": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10022,13 +10118,14 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
-  "id": "id89",
+  "height": 30,
+  "id": "id92",
   "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
@@ -10071,8 +10168,8 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 14,
-  "width": 20,
+  "version": 13,
+  "width": 30,
   "x": 0,
   "y": 0,
 }
@@ -10093,7 +10190,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id89": true,
+              "id92": true,
             },
           },
           "inserted": {
@@ -10104,12 +10201,13 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id89" => Delta {
+          "id92" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": null,
               "fillStyle": "solid",
@@ -10168,7 +10266,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id89" => Delta {
+          "id92" => Delta {
             "deleted": {
               "height": 30,
               "lastCommittedPoint": [
@@ -10225,7 +10323,7 @@ History {
       "appStateChange": AppStateChange {
         "delta": Delta {
           "deleted": {
-            "selectedLinearElementId": "id89",
+            "selectedLinearElementId": "id92",
           },
           "inserted": {
             "selectedLinearElementId": null,
@@ -10259,6 +10357,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -10358,7 +10457,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id90",
+  "id": "id93",
   "index": "a0",
   "isDeleted": false,
   "link": null,
@@ -10395,7 +10494,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id90": true,
+              "id93": true,
             },
           },
           "inserted": {
@@ -10406,7 +10505,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id90" => Delta {
+          "id93" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "#ffec99",
@@ -10449,7 +10548,7 @@ History {
           },
           "inserted": {
             "selectedElementIds": {
-              "id90": true,
+              "id93": true,
             },
           },
         },
@@ -10458,7 +10557,7 @@ History {
         "added": Map {},
         "removed": Map {},
         "updated": Map {
-          "id90" => Delta {
+          "id93" => Delta {
             "deleted": {
               "isDeleted": false,
             },
@@ -10477,6 +10576,456 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
 
 exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] number of renders 1`] = `12`;
 
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeTool": {
+    "customType": null,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "collaborators": Map {},
+  "contextMenu": null,
+  "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "round",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeWidth": 2,
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "draggingElement": null,
+  "editingElement": null,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingLinearElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "followedBy": Set {},
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridSize": null,
+  "height": 0,
+  "isBindingEnabled": true,
+  "isLoading": false,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "multiElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": {
+    "x": 0,
+    "y": 0,
+  },
+  "pasteDialog": {
+    "data": null,
+    "shown": false,
+  },
+  "penDetected": false,
+  "penMode": false,
+  "pendingImageElementId": null,
+  "previousSelectedElementIds": {},
+  "resizingElement": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "selectedElementIds": {},
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "startBoundElement": null,
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBindings": [],
+  "theme": "light",
+  "toast": null,
+  "userToFollow": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "6Rm4g567UQM4WjLwej2Vc",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 126,
+  "id": "KPrBI4g_v9qUB1XxYLgSz",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 6,
+  "width": 157,
+  "x": 600,
+  "y": 0,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] element 1 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "6Rm4g567UQM4WjLwej2Vc",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 129,
+  "id": "u2JGnnmoJ0VATV4vCNJE5",
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": {
+    "type": 3,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "diamond",
+  "updated": 1,
+  "version": 6,
+  "width": 124,
+  "x": 1152,
+  "y": 516,
+}
+`;
+
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] element 2 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "elbowed": true,
+  "endArrowhead": null,
+  "endBinding": {
+    "elementId": "u2JGnnmoJ0VATV4vCNJE5",
+    "fixedPoint": [
+      "0.49919",
+      "-0.03875",
+    ],
+    "focus": "-0.00161",
+    "gap": "3.53708",
+  },
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": "448.10100",
+  "id": "6Rm4g567UQM4WjLwej2Vc",
+  "index": "a2",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      "451.90000",
+      0,
+    ],
+    [
+      "451.90000",
+      "448.10100",
+    ],
+  ],
+  "roughness": 1,
+  "roundness": {
+    "type": 2,
+  },
+  "startArrowhead": null,
+  "startBinding": {
+    "elementId": "KPrBI4g_v9qUB1XxYLgSz",
+    "fixedPoint": [
+      "1.03185",
+      "0.49921",
+    ],
+    "focus": "-0.00159",
+    "gap": 5,
+  },
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 6,
+  "width": "451.90000",
+  "x": 762,
+  "y": "62.90000",
+}
+`;
+
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] history 1`] = `
+History {
+  "onHistoryChangedEmitter": Emitter {
+    "subscribers": [
+      [Function],
+      [Function],
+    ],
+  },
+  "redoStack": [],
+  "undoStack": [
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "KPrBI4g_v9qUB1XxYLgSz" => Delta {
+            "deleted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 126,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 157,
+              "x": 873,
+              "y": 212,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+          "u2JGnnmoJ0VATV4vCNJE5" => Delta {
+            "deleted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 129,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "diamond",
+              "width": 124,
+              "x": 1152,
+              "y": 516,
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {},
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {
+          "6Rm4g567UQM4WjLwej2Vc" => Delta {
+            "deleted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "elbowed": true,
+              "endArrowhead": null,
+              "endBinding": {
+                "elementId": "u2JGnnmoJ0VATV4vCNJE5",
+                "fixedPoint": [
+                  "0.49919",
+                  "-0.03875",
+                ],
+                "focus": "-0.00161",
+                "gap": "3.53708",
+              },
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": "236.10000",
+              "index": "a2",
+              "isDeleted": false,
+              "lastCommittedPoint": null,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  "178.90000",
+                  0,
+                ],
+                [
+                  "178.90000",
+                  "236.10000",
+                ],
+              ],
+              "roughness": 1,
+              "roundness": {
+                "type": 2,
+              },
+              "startArrowhead": null,
+              "startBinding": {
+                "elementId": "KPrBI4g_v9qUB1XxYLgSz",
+                "fixedPoint": [
+                  "1.03185",
+                  "0.49921",
+                ],
+                "focus": "-0.00159",
+                "gap": 5,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "arrow",
+              "width": "178.90000",
+              "x": 1035,
+              "y": "274.90000",
+            },
+            "inserted": {
+              "isDeleted": true,
+            },
+          },
+        },
+        "updated": Map {
+          "KPrBI4g_v9qUB1XxYLgSz" => Delta {
+            "deleted": {
+              "boundElements": [
+                {
+                  "id": "6Rm4g567UQM4WjLwej2Vc",
+                  "type": "arrow",
+                },
+              ],
+            },
+            "inserted": {
+              "boundElements": [],
+            },
+          },
+          "u2JGnnmoJ0VATV4vCNJE5" => Delta {
+            "deleted": {
+              "boundElements": [
+                {
+                  "id": "6Rm4g567UQM4WjLwej2Vc",
+                  "type": "arrow",
+                },
+              ],
+            },
+            "inserted": {
+              "boundElements": [],
+            },
+          },
+        },
+      },
+    },
+  ],
+}
+`;
+
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] number of elements 1`] = `3`;
+
+exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] number of renders 1`] = `8`;
+
 exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
@@ -10490,6 +11039,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -10740,6 +11290,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -10975,6 +11526,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -11212,6 +11764,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -11609,6 +12162,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -11852,6 +12406,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -12089,6 +12644,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -12326,6 +12882,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -12569,6 +13126,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -12897,6 +13455,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -13065,6 +13624,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -13349,6 +13909,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -13612,6 +14173,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -13883,6 +14445,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -14040,6 +14603,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -14258,9 +14822,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id52",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -14292,6 +14858,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id50",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -14300,7 +14867,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": 98,
   "x": 1,
   "y": 0,
@@ -14626,9 +15193,11 @@ History {
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id52",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -14659,6 +15228,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id50",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -14726,6 +15296,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -14944,9 +15515,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id46",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -14978,6 +15551,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id44",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -14986,7 +15560,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": 98,
   "x": 1,
   "y": 0,
@@ -15236,9 +15810,11 @@ History {
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id46",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15269,6 +15845,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id44",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15336,6 +15913,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -15554,9 +16132,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id58",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15588,6 +16168,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id56",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15596,7 +16177,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": 98,
   "x": 1,
   "y": 0,
@@ -15846,9 +16427,11 @@ History {
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id58",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15879,6 +16462,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id56",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15946,6 +16530,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -16162,9 +16747,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id64",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16196,6 +16783,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id62",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16204,7 +16792,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": 98,
   "x": 1,
   "y": 0,
@@ -16268,6 +16856,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id62",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16524,9 +17113,11 @@ History {
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id64",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16557,6 +17148,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id62",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16647,6 +17239,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -16866,9 +17459,11 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id71",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16900,6 +17495,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id69",
+    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16908,7 +17504,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 13,
+  "version": 11,
   "width": 98,
   "x": 1,
   "y": 0,
@@ -16971,6 +17567,7 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id71",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16986,6 +17583,7 @@ History {
               ],
               "startBinding": {
                 "elementId": "id69",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17243,9 +17841,11 @@ History {
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id71",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17276,6 +17876,7 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id69",
+                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17385,6 +17986,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -17855,6 +18457,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -18373,6 +18976,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -18825,6 +19429,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
@@ -18924,6 +19529,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "backgroundColor": "transparent",
   "boundElements": null,
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
@@ -19004,6 +19610,7 @@ History {
               "backgroundColor": "transparent",
               "boundElements": null,
               "customData": undefined,
+              "elbowed": false,
               "endArrowhead": "arrow",
               "endBinding": null,
               "fillStyle": "solid",

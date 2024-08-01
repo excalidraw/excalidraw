@@ -30,10 +30,13 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.eraserRevert");
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
-    if (!multiMode) {
-      return t("hints.linearElement");
+    if (multiMode) {
+      return t("hints.linearElementMulti");
     }
-    return t("hints.linearElementMulti");
+    if (activeTool.type === "arrow") {
+      return t("hints.arrowTool", { arrowShortcut: getShortcutKey("A") });
+    }
+    return t("hints.linearElement");
   }
 
   if (activeTool.type === "freedraw") {

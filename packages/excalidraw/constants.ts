@@ -1,5 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
-import type { AppProps } from "./types";
+import type { AppProps, AppState } from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
@@ -421,3 +421,9 @@ export const DEFAULT_FILENAME = "Untitled";
 export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 
 export const MIN_WIDTH_OR_HEIGHT = 1;
+
+export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
+  sharp: "sharp",
+  round: "round",
+  elbow: "elbow",
+};

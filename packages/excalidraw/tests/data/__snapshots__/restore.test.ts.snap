@@ -6,6 +6,7 @@ exports[`restoreElements > should restore arrow element correctly 1`] = `
   "backgroundColor": "transparent",
   "boundElements": [],
   "customData": undefined,
+  "elbowed": false,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",

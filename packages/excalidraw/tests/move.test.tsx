@@ -13,6 +13,7 @@ import type {
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
+import type Scene from "../scene/Scene";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -85,6 +86,7 @@ describe("move element", () => {
       rectA.get() as ExcalidrawRectangleElement,
       rectB.get() as ExcalidrawRectangleElement,
       elementsMap,
+      {} as Scene,
     );
 
     // select the second rectangle

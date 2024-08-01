@@ -11,6 +11,7 @@ export {
   newTextElement,
   refreshTextDimensions,
   newLinearElement,
+  newArrowElement,
   newImageElement,
   duplicateElement,
 } from "./newElement";

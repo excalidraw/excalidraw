@@ -19,6 +19,7 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import {
+  newArrowElement,
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
@@ -146,6 +147,7 @@ export class API {
     endBinding?: T extends "arrow"
       ? ExcalidrawLinearElement["endBinding"]
       : never;
+    elbowed?: boolean;
   }): T extends "arrow" | "line"
     ? ExcalidrawLinearElement
     : T extends "freedraw"
@@ -250,14 +252,24 @@ export class API {
         });
         break;
       case "arrow":
+        element = newArrowElement({
+          ...base,
+          width,
+          height,
+          type,
+          points: rest.points ?? [
+            [0, 0],
+            [100, 100],
+          ],
+          elbowed: rest.elbowed ?? false,
+        });
+        break;
       case "line":
         element = newLinearElement({
           ...base,
           width,
           height,
           type,
-          startArrowhead: null,
-          endArrowhead: null,
           points: rest.points ?? [
             [0, 0],
             [100, 100],

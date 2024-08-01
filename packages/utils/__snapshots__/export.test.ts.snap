@@ -13,6 +13,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "contextMenu": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",

@@ -120,11 +120,14 @@ const flipElements = (
     true,
     flipDirection === "horizontal" ? maxX : minX,
     flipDirection === "horizontal" ? minY : maxY,
+    app.scene,
   );
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
     elementsMap,
+    app.scene.getNonDeletedElements(),
+    app.scene,
     isBindingEnabled(appState),
     [],
   );

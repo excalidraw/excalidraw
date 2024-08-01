@@ -6,7 +6,12 @@ import type {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import type { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
+import type {
+  MakeBrand,
+  MarkNonNullable,
+  Merge,
+  ValueOf,
+} from "../utility-types";
 import type { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
@@ -228,11 +233,21 @@ export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
 } & ExcalidrawTextElement;
 
+export type FixedPoint = [number, number];
+
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;
   gap: number;
+  // Represents the fixed point binding information in form of a vertical and
+  // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
+  // gives the user selected fixed point by multiplying the bound element width
+  // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
+  // bound element-local point coordinate.
+  fixedPoint: FixedPoint | null;
 };
+
+export type FixedPointBinding = Merge<PointBinding, { fixedPoint: FixedPoint }>;
 
 export type Arrowhead =
   | "arrow"
@@ -259,7 +274,17 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
+    elbowed: boolean;
   }>;
+
+export type ExcalidrawElbowArrowElement = Merge<
+  ExcalidrawArrowElement,
+  {
+    elbowed: true;
+    startBinding: FixedPointBinding | null;
+    endBinding: FixedPointBinding | null;
+  }
+>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{

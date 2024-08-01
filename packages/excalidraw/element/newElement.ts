@@ -17,6 +17,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
   ElementsMap,
+  ExcalidrawArrowElement,
 } from "./types";
 import {
   arrayToMap,
@@ -388,8 +389,6 @@ export const newFreeDrawElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startArrowhead?: Arrowhead | null;
-    endArrowhead?: Arrowhead | null;
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
@@ -399,8 +398,29 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
+    startArrowhead: null,
+    endArrowhead: null,
+  };
+};
+
+export const newArrowElement = (
+  opts: {
+    type: ExcalidrawArrowElement["type"];
+    startArrowhead?: Arrowhead | null;
+    endArrowhead?: Arrowhead | null;
+    points?: ExcalidrawArrowElement["points"];
+    elbowed?: boolean;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawArrowElement> => {
+  return {
+    ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
+    points: opts.points || [],
+    lastCommittedPoint: null,
+    startBinding: null,
+    endBinding: null,
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
+    elbowed: opts.elbowed || false,
   };
 };
 
