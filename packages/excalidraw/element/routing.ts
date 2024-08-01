@@ -93,14 +93,12 @@ export const mutateElbowArrow = (
     arrow.y + (offset ? offset[1] : 0),
   ]);
 
-  const startElement = otherUpdates?.startBinding
-    ? getBindableElementForId(otherUpdates.startBinding.elementId, elementsMap)
-    : arrow.startBinding &&
-      getBindableElementForId(arrow.startBinding.elementId, elementsMap);
-  const endElement = otherUpdates?.endBinding
-    ? getBindableElementForId(otherUpdates.endBinding.elementId, elementsMap)
-    : arrow.endBinding &&
-      getBindableElementForId(arrow.endBinding.elementId, elementsMap);
+  const startElement =
+    arrow.startBinding &&
+    getBindableElementForId(arrow.startBinding.elementId, elementsMap);
+  const endElement =
+    arrow.endBinding &&
+    getBindableElementForId(arrow.endBinding.elementId, elementsMap);
   const hoveredStartElement = options?.isDragging
     ? getHoveredElementForBinding(
         tupleToCoors(origStartGlobalPoint),
@@ -118,7 +116,7 @@ export const mutateElbowArrow = (
       )
     : endElement;
   const startGlobalPoint = getGlobalPoint(
-    otherUpdates?.endBinding?.fixedPoint ?? arrow.startBinding?.fixedPoint,
+    arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
     origEndGlobalPoint,
     elementsMap,
@@ -127,7 +125,7 @@ export const mutateElbowArrow = (
     options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
-    otherUpdates?.endBinding?.fixedPoint ?? arrow.endBinding?.fixedPoint,
+    arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
     origStartGlobalPoint,
     elementsMap,
