@@ -1,0 +1,15 @@
+{
+  "labels": {
+    "changeMathOnly": "Math display",
+    "mathOnlyTrue": "Math only",
+    "mathOnlyFalse": "Mixed text",
+    "resetUseTex": "Reset math input type",
+    "useTexTrueActive": "✔ Standard input",
+    "useTexTrueInactive": "Standard input",
+    "useTexFalseActive": "✔ Simplified input",
+    "useTexFalseInactive": "Simplified input"
+  },
+  "toolBar": {
+    "math": "Math"
+  }
+}

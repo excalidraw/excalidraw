@@ -87,6 +87,17 @@ if (import.meta.env.DEV) {
 let currentLang: Language = defaultLang;
 let currentLangData = {};
 
+let fallbackCustomLangData = {};
+const langLoaders: LangLdr[] = [];
+export type LangLdr = (langCode: string) => Promise<{}>;
+
+export const registerCustomLangData = (fallbackLangData: {}, ldr: LangLdr) => {
+  if (!langLoaders.includes(ldr)) {
+    fallbackCustomLangData = { ...fallbackLangData, ...fallbackCustomLangData };
+    langLoaders.push(ldr);
+  }
+};
+
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
   document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
@@ -100,6 +111,14 @@ export const setLanguage = async (lang: Language) => {
     } catch (error: any) {
       console.error(`Failed to load language ${lang.code}:`, error.message);
       currentLangData = fallbackLangData;
+    }
+    const auxData = langLoaders.map((fn) => fn(currentLang.code));
+    while (auxData.length > 0) {
+      try {
+        currentLangData = { ...(await auxData.pop()), ...currentLangData };
+      } catch (error: any) {
+        console.error(`Error loading ${lang.code} extra data:`, error.message);
+      }
     }
   }
 
@@ -123,7 +142,9 @@ const findPartsForData = (data: any, parts: string[]) => {
 };
 
 export const t = (
-  path: NestedKeyOf<typeof fallbackLangData>,
+  path:
+    | NestedKeyOf<typeof fallbackLangData>
+    | `${NestedKeyOf<typeof fallbackLangData>}.${string}`,
   replacement?: { [key: string]: string | number } | null,
   fallback?: string,
 ) => {
@@ -138,6 +159,7 @@ export const t = (
   let translation =
     findPartsForData(currentLangData, parts) ||
     findPartsForData(fallbackLangData, parts) ||
+    findPartsForData(fallbackCustomLangData, parts) ||
     fallback;
   if (translation === undefined) {
     const errorMessage = `Can't find translation for ${path}`;

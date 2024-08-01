@@ -72,6 +72,7 @@ type _ExcalidrawElementBase = Readonly<{
   updated: number;
   link: string | null;
   locked: boolean;
+  subtype?: string;
   customData?: Record<string, any>;
 }>;
 

@@ -35,6 +35,12 @@ import type { ClipboardData } from "./clipboard";
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type { MaybeTransformHandleType } from "./element/transformHandles";
 import type Library from "./data/library";
+import type {
+  SubtypeMethods,
+  Subtype,
+  SubtypePrepFn,
+  SubtypeRecord,
+} from "./element/subtypes";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
@@ -253,6 +259,10 @@ export interface AppState {
   // (e.g. text element when typing into the input)
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
+  activeSubtypes?: Subtype[];
+  customData?: {
+    [subtype: Subtype]: ExcalidrawElement["customData"];
+  };
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the
@@ -704,6 +714,10 @@ export interface ExcalidrawImperativeAPI {
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
   registerAction: (action: Action) => void;
+  addSubtype: (
+    record: SubtypeRecord,
+    subtypePrepFn: SubtypePrepFn,
+  ) => { actions: readonly Action[] | null; methods: Partial<SubtypeMethods> };
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;

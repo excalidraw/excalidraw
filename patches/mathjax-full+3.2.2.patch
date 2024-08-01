@@ -1,0 +1,130 @@
+diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
+index 41f6a1f..25096c6 100644
+--- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
++++ b/node_modules/mathjax-full/js/input/asciimath/mathjax2/input/AsciiMath.js
+@@ -1,4 +1,4 @@
+-MathJax = Object.assign(global.MathJax || {}, require("../legacy/MathJax.js").MathJax);
++window.MathJax = Object.assign(window.MathJax || {}, require("../legacy/MathJax.js").MathJax);
+ 
+ //
+ //  Load component-based configuration, if any
+@@ -13,11 +13,13 @@ MathJax.Ajax.Preloading(
+   "[MathJax]/jax/element/mml/jax.js"
+ );
+ 
+-require("../legacy/jax/element/mml/jax.js");
+-require("../legacy/jax/input/AsciiMath/config.js");
+-require("../legacy/jax/input/AsciiMath/jax.js");
++exports.LegacyAsciiMath = void 0;
++(async () => {
++  await import("../legacy/jax/element/mml/jax.js");
++  await import("../legacy/jax/input/AsciiMath/config.js");
++  await import("../legacy/jax/input/AsciiMath/jax.js");
+ 
+-require("../legacy/jax/element/MmlNode.js");
++  await import("../legacy/jax/element/MmlNode.js");
+ 
+ var MmlFactory = require("../../../../core/MmlTree/MmlFactory.js").MmlFactory;
+ var factory = new MmlFactory();
+@@ -37,3 +38,4 @@ exports.LegacyAsciiMath = {
+     return this.Compile(am,display);
+   }
+ };
++})();
+diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
+index 903ede2..504ae4f 100644
+--- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
++++ b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/MathJax.js
+@@ -19,7 +19,7 @@ exports.MathJax = MathJax;
+     return obj;
+   };
+   var CONSTRUCTOR = function () {
+-    return function () {return arguments.callee.Init.call(this,arguments)};
++    return function fn() {return fn.Init.call(this,Object.assign(arguments,{call:fn}))};
+   };
+ 
+   BASE.Object = OBJECT({
+@@ -40,7 +40,7 @@ exports.MathJax = MathJax;
+     Init: function (args) {
+       var obj = this;
+       if (args.length === 1 && args[0] === PROTO) {return obj}
+-      if (!(obj instanceof args.callee)) {obj = new args.callee(PROTO)}
++      if (!(obj instanceof args.call)) {obj = new args.call(PROTO)}
+       return obj.Init.apply(obj,args) || obj;
+     },
+     
+@@ -65,7 +65,7 @@ exports.MathJax = MathJax;
+   
+     prototype: {
+       Init: function () {},
+-      SUPER: function (fn) {return fn.callee.SUPER},
++      SUPER: function (fn) {return fn.SUPER},
+       can: function (method) {return typeof(this[method]) === "function"},
+       has: function (property) {return typeof(this[property]) !== "undefined"},
+       isa: function (obj) {return (obj instanceof Object) && (this instanceof obj)}
+@@ -177,7 +177,7 @@ exports.MathJax = MathJax;
+   //  Create a callback from an associative array
+   //
+   var CALLBACK = function (data) {
+-    var cb = function () {return arguments.callee.execute.apply(arguments.callee,arguments)};
++    var cb = function fn() {return fn.execute.apply(fn,arguments)};
+     for (var id in CALLBACK.prototype) {
+       if (CALLBACK.prototype.hasOwnProperty(id)) {
+         if (typeof(data[id]) !== 'undefined') {cb[id] = data[id]}
+diff --git a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/jax/element/mml/jax.js b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/jax/element/mml/jax.js
+index 96fb918..473aca1 100644
+--- a/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/jax/element/mml/jax.js
++++ b/node_modules/mathjax-full/js/input/asciimath/mathjax2/legacy/jax/element/mml/jax.js
+@@ -813,9 +813,9 @@ MathJax.ElementJax.mml.Augment({
+       if (!(this.isEmbellished()) || typeof(this.core) === "undefined") {return this}
+       return this.data[this.core].CoreMO();
+     },
+-    toString: function () {
++    toString: function fn() {
+       if (this.inferred) {return '[' + this.data.join(',') + ']'}
+-      return this.SUPER(arguments).toString.call(this);
++      return this.SUPER(fn).toString.call(this);
+     },
+     setTeXclass: function (prev) {
+       var i, m = this.data.length;
+@@ -1196,12 +1196,12 @@ MathJax.ElementJax.mml.Augment({
+       }
+     },
+     linebreakContainer: true,
+-    Append: function () {
++    Append: function fn() {
+       for (var i = 0, m = arguments.length; i < m; i++) {
+         if (!((arguments[i] instanceof MML.mtr) ||
+               (arguments[i] instanceof MML.mlabeledtr))) {arguments[i] = MML.mtr(arguments[i])}
+       }
+-      this.SUPER(arguments).Append.apply(this,arguments);
++      this.SUPER(fn).Append.apply(this,arguments);
+     },
+     setTeXclass: MML.mbase.setSeparateTeXclasses
+   });
+@@ -1221,11 +1221,11 @@ MathJax.ElementJax.mml.Augment({
+       mtable: {rowalign: true, columnalign: true, groupalign: true}
+     },
+     linebreakContainer: true,
+-    Append: function () {
++    Append: function fn() {
+       for (var i = 0, m = arguments.length; i < m; i++) {
+         if (!(arguments[i] instanceof MML.mtd)) {arguments[i] = MML.mtd(arguments[i])}
+       }
+-      this.SUPER(arguments).Append.apply(this,arguments);
++      this.SUPER(fn).Append.apply(this,arguments);
+     },
+     setTeXclass: MML.mbase.setSeparateTeXclasses
+   });
+@@ -1420,9 +1420,9 @@ MathJax.ElementJax.mml.Augment({
+   
+   MML.xml = MML.mbase.Subclass({
+     type: "xml",
+-    Init: function () {
++    Init: function fn() {
+       this.div = document.createElement("div");
+-      return this.SUPER(arguments).Init.apply(this,arguments);
++      return this.SUPER(fn).Init.apply(this,arguments);
+     },
+     Append: function () {
+       for (var i = 0, m = arguments.length; i < m; i++) {

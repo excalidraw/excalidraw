@@ -36,6 +36,7 @@ import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
+import { getSubtypeMethods } from "../element/subtypes";
 import { getVerticalOffset } from "../fonts";
 
 const roughSVGDrawWithPrecision = (
@@ -124,6 +125,15 @@ const renderElementToSvg = (
     }
     root.appendChild(node);
   };
+
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.renderSvg) {
+    map.renderSvg(svgRoot, addToRoot, element, elementsMap, {
+      offsetX,
+      offsetY,
+    });
+    return;
+  }
 
   const opacity =
     ((getContainingFrame(element, elementsMap)?.opacity ?? 100) *
