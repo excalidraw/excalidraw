@@ -2163,10 +2163,10 @@ export class BindableElement {
 }
 
 export const getGlobalFixedPointForBindableElement = (
-  fixedPointRatio: [number, number] | null,
+  fixedPointRatio: [number, number],
   element: ExcalidrawBindableElement,
 ) => {
-  const [fixedX, fixedY] = fixedPointRatio ?? [0.5, 0.5];
+  const [fixedX, fixedY] = fixedPointRatio;
   return rotatePoint(
     [element.x + element.width * fixedX, element.y + element.height * fixedY],
     getCenterForElement(element),

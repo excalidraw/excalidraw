@@ -308,7 +308,6 @@ export const mutateElbowArrow = (
         ...otherUpdates,
         ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
         angle: 0,
-        roundness: null,
       },
       options?.informMutation,
     );
@@ -971,9 +970,9 @@ const getGlobalPoint = (
     return initialPoint;
   }
 
-  if (boundElement && fixedPointRatio) {
+  if (boundElement) {
     const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
-      fixedPointRatio,
+      fixedPointRatio || [0, 0],
       boundElement,
     );
 
