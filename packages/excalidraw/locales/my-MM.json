@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "စာလုံးအရွယ်",
     "fontFamily": "စာလုံးပုံစံ",
     "addWatermark": "\"Excalidraw ဖြင့်ဖန်တီးသည်။\" စာသားထည့်",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "အမှတ်များချမှတ်ရေးဆွဲရန်ကလစ်နှိပ်ပါ၊ မျဉ်းတစ်ကြောင်းတည်းအတွက် တရွတ်ဆွဲပါ။",
+    "arrowTool": "",
     "freeDraw": "ကလစ်နှိပ်၍ တရွတ်ဆွဲပါ၊ ပြီးလျှင်လွှတ်ပါ။",
     "text": "မှတ်ချက်။ ။မည်သည့်ကိရိယာရွေးထားသည်ဖြစ်စေ ကလစ်နှစ်ချက်နှိပ်၍စာသားထည့်နိုင်သည်",
     "embeddable": "",
