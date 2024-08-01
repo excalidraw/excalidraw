@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Üçgen (anahat)",
     "arrowhead_diamond": "Elmas",
     "arrowhead_diamond_outline": "Elmas (anahat)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Yazı tipi boyutu",
     "fontFamily": "Yazı tipi ailesi",
     "addWatermark": "\"Excalidraw ile yapıldı\" yazısını ekle",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Tuvali taşımak için sürüklerken fare tekerleğine veya boşluk çubuğuna basılı tutun veya el aracını kullanın",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
+    "arrowTool": "",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
