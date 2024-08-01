@@ -971,9 +971,9 @@ const getGlobalPoint = (
     return initialPoint;
   }
 
-  if (boundElement && fixedPointRatio) {
+  if (boundElement) {
     const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
-      fixedPointRatio,
+      fixedPointRatio || [0, 0],
       boundElement,
     );
 
