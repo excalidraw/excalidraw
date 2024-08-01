@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (contirn)",
     "arrowhead_diamond": "Lausange",
     "arrowhead_diamond_outline": "Lausange (contorn)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Talha polissa",
     "fontFamily": "Familha de polissa",
     "addWatermark": "Apondre « Fabricat amb Excalidraw »",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
+    "arrowTool": "",
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "embeddable": "",
