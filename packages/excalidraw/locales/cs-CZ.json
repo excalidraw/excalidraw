@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Velikost písma",
     "fontFamily": "Písmo",
     "addWatermark": "Přidat \"Vyrobeno s Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Chcete-li přesunout plátno, podržte kolečko nebo mezerník při tažení nebo použijte nástroj Ruka",
     "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
+    "arrowTool": "",
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
     "embeddable": "",
