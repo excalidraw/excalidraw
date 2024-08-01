@@ -50,9 +50,9 @@ import {
   ArrowheadDiamondIcon,
   ArrowheadDiamondOutlineIcon,
   fontSizeIcon,
-  arrowUpRightIcon,
-  arrowCurveRight,
-  arrowGuideIcon,
+  sharpArrowIcon,
+  roundArrowIcon,
+  elbowArrowIcon,
 } from "../components/icons";
 import {
   ARROW_TYPE,
@@ -1719,19 +1719,19 @@ export const actionChangeArrowType = register({
             {
               value: ARROW_TYPE.sharp,
               text: t("labels.arrowtype_sharp"),
-              icon: arrowUpRightIcon,
+              icon: sharpArrowIcon,
               testId: "sharp-arrow",
             },
             {
               value: ARROW_TYPE.round,
               text: t("labels.arrowtype_round"),
-              icon: arrowCurveRight,
+              icon: roundArrowIcon,
               testId: "round-arrow",
             },
             {
               value: ARROW_TYPE.elbow,
               text: t("labels.arrowtype_elbowed"),
-              icon: arrowGuideIcon,
+              icon: elbowArrowIcon,
               testId: "elbow-arrow",
             },
           ]}

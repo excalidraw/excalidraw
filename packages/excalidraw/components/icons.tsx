@@ -2095,35 +2095,39 @@ export const lineEditorIcon = createIcon(
   tablerIconProps,
 );
 
-// arrow-up-right
-export const arrowUpRightIcon = createIcon(
+// arrow-up-right (modified)
+export const sharpArrowIcon = createIcon(
   <g>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M8.464 15.536l9.536 -9.536" />
+    <path d="M6 18l12 -12" />
     <path d="M18 10v-4h-4" />
-    <path d="M8.414 15.586a2 2 0 1 0 -2.828 2.828a2 2 0 0 0 2.828 -2.828" />
   </g>,
   tablerIconProps,
 );
 
-// arrow-guide
-export const arrowGuideIcon = createIcon(
+// arrow-guide (modified)
+export const elbowArrowIcon = createIcon(
   <g>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M5 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-    <path d="M7 19h3a2 2 0 0 0 2 -2v-8a2 2 0 0 1 2 -2h7" />
+    <path d="M4,19L10,19C11.097,19 12,18.097 12,17L12,9C12,7.903 12.903,7 14,7L21,7" />
     <path d="M18 4l3 3l-3 3" />
   </g>,
   tablerIconProps,
 );
 
-export const arrowCurveRight = createIcon(
+// arrow-wave-right-up (rotated)
+export const roundArrowIcon = createIcon(
   <g>
-    <path d="M15.6819 3.18201L18.6819 6.18201L15.6819 9.18201" />
-    <path d="M8.24264 18.2426C9.02369 17.4615 9.02369 16.1952 8.24264 15.4142C7.46159 14.6331 6.19526 14.6331 5.41421 15.4142C4.63316 16.1952 4.63316 17.4615 5.41421 18.2426C6.19526 19.0236 7.46159 19.0236 8.24264 18.2426Z" />
-    <path d="M7.00011 15.0001C7.00011 15.0001 6.06372 9.82945 8.5 7.5C11.1852 4.93253 18.0001 6.00005 18.0001 6.00005" />
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M17 10h4v4" />
+    <path d="M3 12c.887 -1.284 2.48 -2.033 4 -2c1.52 -.033 3.113 .716 4 2s2.48 2.033 4 2c1.52 .033 3 -1 4 -2l2 -2" />
   </g>,
-  tablerIconProps,
+  {
+    ...tablerIconProps,
+    style: {
+      transform: "rotate(-45deg)",
+    },
+  },
 );
 
 export const collapseDownIcon = createIcon(
