@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triângulo (contorno)",
     "arrowhead_diamond": "Losango",
     "arrowhead_diamond_outline": "Losango (contorno)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tamanho do tipo de letra",
     "fontFamily": "Família do tipo de letra",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Para mover a área de desenho, carregue na roda do rato ou na barra de espaço enquanto arrasta, ou use a ferramenta da mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "arrowTool": "",
     "freeDraw": "Clique e arraste, largue quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar uma incorporação do site",
