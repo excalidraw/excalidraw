@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Trojuholník (obrys)",
     "arrowhead_diamond": "Diamant",
     "arrowhead_diamond_outline": "Diamant (obrys)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Veľkosť písma",
     "fontFamily": "Písmo",
     "addWatermark": "Pridať \"Vytvorené s Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania, alebo použite nástroj ruka",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
+    "arrowTool": "",
     "freeDraw": "Kliknite a ťahajte, pustite na ukončenie",
     "text": "Tip: text môžete pridať aj dvojklikom kdekoľvek, ak je zvolený nástroj výber",
     "embeddable": "Kliknite a ťahajte pre zapustenie webovej stránky",
