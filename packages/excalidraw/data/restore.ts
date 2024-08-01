@@ -1,4 +1,5 @@
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawElementType,
   ExcalidrawLinearElement,
@@ -24,6 +25,7 @@ import {
 } from "../element";
 import {
   isArrowElement,
+  isElbowArrow,
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -92,11 +94,21 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (binding: PointBinding | null) => {
+const repairBinding = (
+  element: ExcalidrawLinearElement,
+  binding: PointBinding | null,
+): PointBinding | null => {
   if (!binding) {
     return null;
   }
-  return { ...binding, focus: binding.focus || 0 };
+
+  return {
+    ...binding,
+    focus: binding.focus || 0,
+    fixedPoint: isElbowArrow(element)
+      ? binding.fixedPoint ?? ([0, 0] as [number, number])
+      : null,
+  };
 };
 
 const restoreElementWithProperties = <
@@ -242,11 +254,7 @@ const restoreElement = (
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-    case "arrow": {
-      const {
-        startArrowhead = null,
-        endArrowhead = element.type === "arrow" ? "arrow" : null,
-      } = element;
+      const { startArrowhead = null, endArrowhead = null } = element;
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one
@@ -266,14 +274,44 @@ const restoreElement = (
           (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: repairBinding(element.startBinding),
-        endBinding: repairBinding(element.endBinding),
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
         points,
         x,
         y,
+        ...getSizeFromPoints(points),
+      });
+    case "arrow": {
+      const { startArrowhead = null, endArrowhead = "arrow" } = element;
+      let x = element.x;
+      let y = element.y;
+      let points = // migrate old arrow model to new one
+        !Array.isArray(element.points) || element.points.length < 2
+          ? [
+              [0, 0],
+              [element.width, element.height],
+            ]
+          : element.points;
+
+      if (points[0][0] !== 0 || points[0][1] !== 0) {
+        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+      }
+
+      // TODO: Separate arrow from linear element
+      return restoreElementWithProperties(element as ExcalidrawArrowElement, {
+        type: element.type,
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
+        lastCommittedPoint: null,
+        startArrowhead,
+        endArrowhead,
+        points,
+        x,
+        y,
+        elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
       });
     }

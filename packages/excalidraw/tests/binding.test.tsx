@@ -62,6 +62,7 @@ describe("element binding", () => {
 
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
@@ -74,11 +75,13 @@ describe("element binding", () => {
     // Both the start and the end points should be bound
     expect(arrow.startBinding).toEqual({
       elementId: rect.id,
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
     expect(arrow.endBinding).toEqual({
       elementId: rect.id,
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
@@ -318,11 +321,13 @@ describe("element binding", () => {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       endBinding: {
         elementId: "text1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [1, 0.5],
       },
     });
 
@@ -337,11 +342,13 @@ describe("element binding", () => {
         elementId: "text1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       endBinding: {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [1, 0.5],
       },
     });
 

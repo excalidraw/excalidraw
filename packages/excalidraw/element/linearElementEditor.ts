@@ -7,6 +7,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
   NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
+  FixedPointBinding,
 } from "./types";
 import {
   distance2d,
@@ -33,7 +35,6 @@ import type {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
-  AppClassProperties,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -43,13 +44,19 @@ import {
   isBindingEnabled,
 } from "./binding";
 import { tupleToCoors } from "../utils";
-import { isBindingElement } from "./typeChecks";
+import {
+  isBindingElement,
+  isElbowArrow,
+  isFixedPointBinding,
+} from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
+import { mutateElbowArrow } from "./routing";
+import type Scene from "../scene/Scene";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -67,6 +74,7 @@ export class LinearElementEditor {
     prevSelectedPointsIndices: readonly number[] | null;
     /** index */
     lastClickedPoint: number;
+    lastClickedIsEndPoint: boolean;
     origin: Readonly<{ x: number; y: number }> | null;
     segmentMidpoint: {
       value: Point | null;
@@ -91,7 +99,9 @@ export class LinearElementEditor {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
-    LinearElementEditor.normalizePoints(element);
+    if (!arePointsEqual(element.points[0], [0, 0])) {
+      console.error("Linear element is not normalized", Error().stack);
+    }
 
     this.selectedPointsIndices = null;
     this.lastUncommittedPoint = null;
@@ -102,6 +112,7 @@ export class LinearElementEditor {
     this.pointerDownState = {
       prevSelectedPointsIndices: null,
       lastClickedPoint: -1,
+      lastClickedIsEndPoint: false,
       origin: null,
 
       segmentMidpoint: {
@@ -162,8 +173,8 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    const nextSelectedPoints = pointsSceneCoords.reduce(
-      (acc: number[], point, index) => {
+    const nextSelectedPoints = pointsSceneCoords
+      .reduce((acc: number[], point, index) => {
         if (
           (point[0] >= selectionX1 &&
             point[0] <= selectionX2 &&
@@ -175,9 +186,17 @@ export class LinearElementEditor {
         }
 
         return acc;
-      },
-      [],
-    );
+      }, [])
+      .filter((index) => {
+        if (
+          isElbowArrow(element) &&
+          index !== 0 &&
+          index !== element.points.length - 1
+        ) {
+          return false;
+        }
+        return true;
+      });
 
     setState({
       editingLinearElement: {
@@ -200,21 +219,52 @@ export class LinearElementEditor {
       pointSceneCoords: { x: number; y: number }[],
     ) => void,
     linearElementEditor: LinearElementEditor,
-    elementsMap: NonDeletedSceneElementsMap,
+    scene: Scene,
   ): boolean {
     if (!linearElementEditor) {
       return false;
     }
-    const { selectedPointsIndices, elementId } = linearElementEditor;
+    const { elementId } = linearElementEditor;
+    const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return false;
     }
 
+    if (
+      isElbowArrow(element) &&
+      !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
+      linearElementEditor.pointerDownState.lastClickedPoint !== 0
+    ) {
+      return false;
+    }
+
+    const selectedPointsIndices = isElbowArrow(element)
+      ? linearElementEditor.selectedPointsIndices
+          ?.reduce(
+            (startEnd, index) =>
+              (index === 0
+                ? [0, startEnd[1]]
+                : [startEnd[0], element.points.length - 1]) as [
+                boolean | number,
+                boolean | number,
+              ],
+            [false, false] as [number | boolean, number | boolean],
+          )
+          .filter(
+            (idx: number | boolean): idx is number => typeof idx === "number",
+          )
+      : linearElementEditor.selectedPointsIndices;
+    const lastClickedPoint = isElbowArrow(element)
+      ? linearElementEditor.pointerDownState.lastClickedPoint > 0
+        ? element.points.length - 1
+        : 0
+      : linearElementEditor.pointerDownState.lastClickedPoint;
+
     // point that's being dragged (out of all selected points)
-    const draggingPoint = element.points[
-      linearElementEditor.pointerDownState.lastClickedPoint
-    ] as [number, number] | undefined;
+    const draggingPoint = element.points[lastClickedPoint] as
+      | [number, number]
+      | undefined;
 
     if (selectedPointsIndices && draggingPoint) {
       if (
@@ -234,15 +284,17 @@ export class LinearElementEditor {
           event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
         );
 
-        LinearElementEditor.movePoints(element, [
-          {
-            index: selectedIndex,
-            point: [width + referencePoint[0], height + referencePoint[1]],
-            isDragging:
-              selectedIndex ===
-              linearElementEditor.pointerDownState.lastClickedPoint,
-          },
-        ]);
+        LinearElementEditor.movePoints(
+          element,
+          [
+            {
+              index: selectedIndex,
+              point: [width + referencePoint[0], height + referencePoint[1]],
+              isDragging: selectedIndex === lastClickedPoint,
+            },
+          ],
+          scene,
+        );
       } else {
         const newDraggingPointPosition = LinearElementEditor.createPointAt(
           element,
@@ -259,8 +311,7 @@ export class LinearElementEditor {
           element,
           selectedPointsIndices.map((pointIndex) => {
             const newPointPosition =
-              pointIndex ===
-              linearElementEditor.pointerDownState.lastClickedPoint
+              pointIndex === lastClickedPoint
                 ? LinearElementEditor.createPointAt(
                     element,
                     elementsMap,
@@ -275,11 +326,10 @@ export class LinearElementEditor {
             return {
               index: pointIndex,
               point: newPointPosition,
-              isDragging:
-                pointIndex ===
-                linearElementEditor.pointerDownState.lastClickedPoint,
+              isDragging: pointIndex === lastClickedPoint,
             };
           }),
+          scene,
         );
       }
 
@@ -334,9 +384,10 @@ export class LinearElementEditor {
     event: PointerEvent,
     editingLinearElement: LinearElementEditor,
     appState: AppState,
-    app: AppClassProperties,
+    scene: Scene,
   ): LinearElementEditor {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const elementsMap = scene.getNonDeletedElementsMap();
+    const elements = scene.getNonDeletedElements();
 
     const { elementId, selectedPointsIndices, isDragging, pointerDownState } =
       editingLinearElement;
@@ -361,15 +412,19 @@ export class LinearElementEditor {
           selectedPoint === element.points.length - 1
         ) {
           if (isPathALoop(element.points, appState.zoom.value)) {
-            LinearElementEditor.movePoints(element, [
-              {
-                index: selectedPoint,
-                point:
-                  selectedPoint === 0
-                    ? element.points[element.points.length - 1]
-                    : element.points[0],
-              },
-            ]);
+            LinearElementEditor.movePoints(
+              element,
+              [
+                {
+                  index: selectedPoint,
+                  point:
+                    selectedPoint === 0
+                      ? element.points[element.points.length - 1]
+                      : element.points[0],
+                },
+              ],
+              scene,
+            );
           }
 
           const bindingElement = isBindingEnabled(appState)
@@ -381,6 +436,7 @@ export class LinearElementEditor {
                     elementsMap,
                   ),
                 ),
+                elements,
                 elementsMap,
               )
             : null;
@@ -645,13 +701,14 @@ export class LinearElementEditor {
     store: Store,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
-    app: AppClassProperties,
+    scene: Scene,
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const elementsMap = scene.getNonDeletedElementsMap();
+    const elements = scene.getNonDeletedElements();
 
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
@@ -685,7 +742,10 @@ export class LinearElementEditor {
       );
     }
     if (event.altKey && appState.editingLinearElement) {
-      if (linearElementEditor.lastUncommittedPoint == null) {
+      if (
+        linearElementEditor.lastUncommittedPoint == null ||
+        !isElbowArrow(element)
+      ) {
         mutateElement(element, {
           points: [
             ...element.points,
@@ -706,6 +766,7 @@ export class LinearElementEditor {
         pointerDownState: {
           prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
           lastClickedPoint: -1,
+          lastClickedIsEndPoint: false,
           origin: { x: scenePointer.x, y: scenePointer.y },
           segmentMidpoint: {
             value: segmentMidpoint,
@@ -717,6 +778,7 @@ export class LinearElementEditor {
         lastUncommittedPoint: null,
         endBindingElement: getHoveredElementForBinding(
           scenePointer,
+          elements,
           elementsMap,
         ),
       };
@@ -749,6 +811,7 @@ export class LinearElementEditor {
           startBindingElement,
           endBindingElement,
           elementsMap,
+          scene,
         );
       }
     }
@@ -781,6 +844,7 @@ export class LinearElementEditor {
       pointerDownState: {
         prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
         lastClickedPoint: clickedPointIndex,
+        lastClickedIsEndPoint: clickedPointIndex === element.points.length - 1,
         origin: { x: scenePointer.x, y: scenePointer.y },
         segmentMidpoint: {
           value: segmentMidpoint,
@@ -815,12 +879,13 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     appState: AppState,
-    elementsMap: ElementsMap,
+    scene: Scene,
   ): LinearElementEditor | null {
     if (!appState.editingLinearElement) {
       return null;
     }
     const { elementId, lastUncommittedPoint } = appState.editingLinearElement;
+    const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return appState.editingLinearElement;
@@ -831,7 +896,7 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        LinearElementEditor.deletePoints(element, [points.length - 1]);
+        LinearElementEditor.deletePoints(element, [points.length - 1], scene);
       }
       return {
         ...appState.editingLinearElement,
@@ -862,19 +927,30 @@ export class LinearElementEditor {
         elementsMap,
         scenePointerX - appState.editingLinearElement.pointerOffset.x,
         scenePointerY - appState.editingLinearElement.pointerOffset.y,
-        event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+        event[KEYS.CTRL_OR_CMD] || isElbowArrow(element)
+          ? null
+          : appState.gridSize,
       );
     }
 
     if (lastPoint === lastUncommittedPoint) {
-      LinearElementEditor.movePoints(element, [
-        {
-          index: element.points.length - 1,
-          point: newPoint,
-        },
-      ]);
+      LinearElementEditor.movePoints(
+        element,
+        [
+          {
+            index: element.points.length - 1,
+            point: newPoint,
+          },
+        ],
+        scene,
+      );
     } else {
-      LinearElementEditor.addPoints(element, appState, [{ point: newPoint }]);
+      LinearElementEditor.addPoints(
+        element,
+        appState,
+        [{ point: newPoint }],
+        scene,
+      );
     }
     return {
       ...appState.editingLinearElement,
@@ -938,6 +1014,11 @@ export class LinearElementEditor {
     absoluteCoords: Point,
     elementsMap: ElementsMap,
   ): Point {
+    if (isElbowArrow(element)) {
+      // No rotation for elbow arrows
+      return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
+    }
+
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -1028,13 +1109,13 @@ export class LinearElementEditor {
     mutateElement(element, LinearElementEditor.getNormalizedPoints(element));
   }
 
-  static duplicateSelectedPoints(appState: AppState, elementsMap: ElementsMap) {
+  static duplicateSelectedPoints(appState: AppState, scene: Scene) {
     if (!appState.editingLinearElement) {
       return false;
     }
 
     const { selectedPointsIndices, elementId } = appState.editingLinearElement;
-
+    const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
 
     if (!element || selectedPointsIndices === null) {
@@ -1077,12 +1158,16 @@ export class LinearElementEditor {
     // potentially expanding the bounding box
     if (pointAddedToEnd) {
       const lastPoint = element.points[element.points.length - 1];
-      LinearElementEditor.movePoints(element, [
-        {
-          index: element.points.length - 1,
-          point: [lastPoint[0] + 30, lastPoint[1] + 30],
-        },
-      ]);
+      LinearElementEditor.movePoints(
+        element,
+        [
+          {
+            index: element.points.length - 1,
+            point: [lastPoint[0] + 30, lastPoint[1] + 30],
+          },
+        ],
+        scene,
+      );
     }
 
     return {
@@ -1099,6 +1184,7 @@ export class LinearElementEditor {
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
     pointIndices: readonly number[],
+    scene: Scene,
   ) {
     let offsetX = 0;
     let offsetY = 0;
@@ -1126,25 +1212,46 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
+    LinearElementEditor._updatePoints(
+      element,
+      nextPoints,
+      offsetX,
+      offsetY,
+      scene,
+    );
   }
 
   static addPoints(
     element: NonDeleted<ExcalidrawLinearElement>,
     appState: AppState,
     targetPoints: { point: Point }[],
+    scene: Scene,
   ) {
     const offsetX = 0;
     const offsetY = 0;
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
-    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
+    LinearElementEditor._updatePoints(
+      element,
+      nextPoints,
+      offsetX,
+      offsetY,
+      scene,
+    );
   }
 
   static movePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
     targetPoints: { index: number; point: Point; isDragging?: boolean }[],
-    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
+    scene: Scene,
+    otherUpdates?: {
+      startBinding?: PointBinding | null;
+      endBinding?: PointBinding | null;
+    },
+    options?: {
+      changedElements?: Map<string, OrderedExcalidrawElement>;
+      isDragging?: boolean;
+    },
   ) {
     const { points } = element;
 
@@ -1192,7 +1299,16 @@ export class LinearElementEditor {
       nextPoints,
       offsetX,
       offsetY,
+      scene,
       otherUpdates,
+      {
+        isDragging: targetPoints.reduce(
+          (dragging, targetPoint): boolean =>
+            dragging || targetPoint.isDragging === true,
+          false,
+        ),
+        changedElements: options?.changedElements,
+      },
     );
   }
 
@@ -1206,6 +1322,11 @@ export class LinearElementEditor {
       linearElementEditor.elementId,
       elementsMap,
     );
+
+    // Elbow arrows don't allow midpoints
+    if (element && isElbowArrow(element)) {
+      return false;
+    }
 
     if (!element) {
       return false;
@@ -1266,7 +1387,7 @@ export class LinearElementEditor {
       elementsMap,
       pointerCoords.x,
       pointerCoords.y,
-      snapToGrid ? appState.gridSize : null,
+      snapToGrid && !isElbowArrow(element) ? appState.gridSize : null,
     );
     const points = [
       ...element.points.slice(0, segmentMidpoint.index!),
@@ -1295,23 +1416,61 @@ export class LinearElementEditor {
     nextPoints: readonly Point[],
     offsetX: number,
     offsetY: number,
-    otherUpdates?: { startBinding?: PointBinding; endBinding?: PointBinding },
+    scene: Scene,
+    otherUpdates?: {
+      startBinding?: PointBinding | null;
+      endBinding?: PointBinding | null;
+    },
+    options?: {
+      changedElements?: Map<string, OrderedExcalidrawElement>;
+      isDragging?: boolean;
+    },
   ) {
-    const nextCoords = getElementPointsCoords(element, nextPoints);
-    const prevCoords = getElementPointsCoords(element, element.points);
-    const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
-    const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
-    const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
-    const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
-    const dX = prevCenterX - nextCenterX;
-    const dY = prevCenterY - nextCenterY;
-    const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
-    mutateElement(element, {
-      ...otherUpdates,
-      points: nextPoints,
-      x: element.x + rotated[0],
-      y: element.y + rotated[1],
-    });
+    if (isElbowArrow(element)) {
+      const bindings: {
+        startBinding?: FixedPointBinding | null;
+        endBinding?: FixedPointBinding | null;
+      } = {};
+      if (otherUpdates?.startBinding !== undefined) {
+        bindings.startBinding =
+          otherUpdates.startBinding !== null &&
+          isFixedPointBinding(otherUpdates.startBinding)
+            ? otherUpdates.startBinding
+            : null;
+      }
+      if (otherUpdates?.endBinding !== undefined) {
+        bindings.endBinding =
+          otherUpdates.endBinding !== null &&
+          isFixedPointBinding(otherUpdates.endBinding)
+            ? otherUpdates.endBinding
+            : null;
+      }
+
+      mutateElbowArrow(
+        element,
+        scene,
+        nextPoints,
+        [offsetX, offsetY],
+        bindings,
+        options,
+      );
+    } else {
+      const nextCoords = getElementPointsCoords(element, nextPoints);
+      const prevCoords = getElementPointsCoords(element, element.points);
+      const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
+      const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
+      const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
+      const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
+      const dX = prevCenterX - nextCenterX;
+      const dY = prevCenterY - nextCenterY;
+      const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
+      mutateElement(element, {
+        ...otherUpdates,
+        points: nextPoints,
+        x: element.x + rotated[0],
+        y: element.y + rotated[1],
+      });
+    }
   }
 
   private static _getShiftLockedDelta(
@@ -1326,6 +1485,13 @@ export class LinearElementEditor {
       referencePoint,
       elementsMap,
     );
+
+    if (isElbowArrow(element)) {
+      return [
+        scenePointer[0] - referencePointCoords[0],
+        scenePointer[1] - referencePointCoords[1],
+      ];
+    }
 
     const [gridX, gridY] = getGridPoint(
       scenePointer[0],
