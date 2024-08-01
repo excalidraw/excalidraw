@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Kolmio (ääriviiva)",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Kirjasinkoko",
     "fontFamily": "Kirjasintyyppi",
     "addWatermark": "Lisää \"Tehty Excalidrawilla\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Piirtoalueen liikuttamiseksi pidä hiiren pyörää tai välilyöntiä pohjassa tai käytä käsityökalua",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
+    "arrowTool": "",
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "embeddable": "",
