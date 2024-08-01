@@ -308,7 +308,6 @@ export const mutateElbowArrow = (
         ...otherUpdates,
         ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
         angle: 0,
-        roundness: null,
       },
       options?.informMutation,
     );

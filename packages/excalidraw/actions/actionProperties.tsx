@@ -55,6 +55,7 @@ import {
   arrowGuideIcon,
 } from "../components/icons";
 import {
+  ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
@@ -1554,14 +1555,14 @@ export const actionChangeArrowType = register({
         }
         const newElement = newElementWith(el, {
           roundness:
-            value === "round"
+            value === ARROW_TYPE.round
               ? {
                   type: ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
               : null,
-          elbowed: value === "elbow",
+          elbowed: value === ARROW_TYPE.elbow,
           points:
-            value === "elbow" || el.elbowed
+            value === ARROW_TYPE.elbow || el.elbowed
               ? [el.points[0], el.points[el.points.length - 1]]
               : el.points,
         });
@@ -1699,8 +1700,7 @@ export const actionChangeArrowType = register({
       }),
       appState: {
         ...appState,
-        currentItemRoundness: value === "round" ? value : null,
-        currentItemElbowArrow: value === "elbow",
+        currentItemArrowType: value,
       },
       storeAction: StoreAction.CAPTURE,
     };
@@ -1713,19 +1713,19 @@ export const actionChangeArrowType = register({
           group="arrowtypes"
           options={[
             {
-              value: "sharp",
+              value: ARROW_TYPE.sharp,
               text: t("labels.arrowtype_sharp"),
               icon: arrowUpRightIcon,
               testId: "sharp-arrow",
             },
             {
-              value: "round",
+              value: ARROW_TYPE.round,
               text: t("labels.arrowtype_round"),
               icon: arrowCurveRight,
               testId: "round-arrow",
             },
             {
-              value: "elbow",
+              value: ARROW_TYPE.elbow,
               text: t("labels.arrowtype_elbowed"),
               icon: arrowGuideIcon,
               testId: "elbow-arrow",
@@ -1737,23 +1737,17 @@ export const actionChangeArrowType = register({
             (element) => {
               if (isArrowElement(element)) {
                 return element.elbowed
-                  ? "elbow"
+                  ? ARROW_TYPE.elbow
                   : element.roundness
-                  ? "round"
-                  : "sharp";
+                  ? ARROW_TYPE.round
+                  : ARROW_TYPE.sharp;
               }
 
               return null;
             },
             (element) => isArrowElement(element),
             (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemElbowArrow
-                ? "elbow"
-                : appState.currentItemRoundness
-                ? "round"
-                : "sharp",
+              hasSelection ? null : appState.currentItemArrowType,
           )}
           onChange={(value) => updateData(value)}
         />

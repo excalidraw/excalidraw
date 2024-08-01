@@ -16,6 +16,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
 } from "./types";
+import { ARROW_TYPE } from "../constants";
 
 const { h } = window;
 
@@ -139,7 +140,7 @@ describe("elbow arrow ui", () => {
     UI.clickTool("arrow");
     UI.clickOnTestId("elbow-arrow");
 
-    expect(h.state.currentItemElbowArrow).toBe(true);
+    expect(h.state.currentItemArrowType).toBe(ARROW_TYPE.elbow);
 
     mouse.reset();
     mouse.moveTo(-43, -99);

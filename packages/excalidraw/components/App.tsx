@@ -48,7 +48,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import type { EXPORT_IMAGE_TYPES } from "../constants";
+import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -7079,14 +7079,16 @@ class App extends React.Component<AppProps, AppState> {
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
               roundness:
-                this.state.currentItemRoundness === "round"
+                this.state.currentItemArrowType === ARROW_TYPE.round
                   ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-                  : null,
+                  : // note, roundness doesn't have any effect for elbow arrows,
+                    // but it's best to set it to null as well
+                    null,
               startArrowhead,
               endArrowhead,
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
-              elbowed: this.state.currentItemElbowArrow,
+              elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
             })
           : newLinearElement({
               type: elementType,
@@ -7106,6 +7108,7 @@ class App extends React.Component<AppProps, AppState> {
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
             });
+
       this.setState((prevState) => {
         const nextSelectedElementIds = {
           ...prevState.selectedElementIds,
