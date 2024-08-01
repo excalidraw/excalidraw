@@ -201,6 +201,7 @@ const getRelevantAppStateProps = (
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
   editingElement: appState.editingElement,
+  gridColor: appState.gridColor, //zsviczian
 });
 
 const areEqual = (

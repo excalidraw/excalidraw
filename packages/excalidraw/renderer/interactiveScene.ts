@@ -211,6 +211,7 @@ const renderBindingHighlightForBindableElement = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
+  highlightedColor: string, //zsviczian
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const width = x2 - x1;
@@ -219,7 +220,7 @@ const renderBindingHighlightForBindableElement = (
 
   // So that we don't overlap the element itself
   const strokeOffset = 4;
-  context.strokeStyle = "rgba(128,128,128,.1)"; //zsviczian
+  context.strokeStyle = highlightedColor ?? "rgba(128,128,128,.1)"; //zsviczian
   context.lineWidth = thickness - strokeOffset;
   const padding = strokeOffset / 2 + thickness / 2;
 
@@ -279,6 +280,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
   context: CanvasRenderingContext2D,
   suggestedBinding: SuggestedPointBinding,
   elementsMap: ElementsMap,
+  highlightedColor: string, //zsviczian
 ) => {
   const [element, startOrEnd, bindableElement] = suggestedBinding;
 
@@ -289,7 +291,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
   );
 
   context.strokeStyle = "rgba(0,0,0,0)";
-  context.fillStyle = "rgba(128,128,128,.1)"; //zsviczian "rgba(0,0,0,.05)";
+  context.fillStyle = highlightedColor ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0,0,0,.05)";
 
   const pointIndices =
     startOrEnd === "both" ? [0, -1] : startOrEnd === "start" ? [0] : [-1];
@@ -380,7 +382,7 @@ const renderBindingHighlight = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  renderHighlight(context, suggestedBinding as any, elementsMap);
+  renderHighlight(context, suggestedBinding as any, elementsMap, appState.gridColor.Regular); //zsviczian
 
   context.restore();
 };
@@ -437,7 +439,7 @@ const renderElementsBoxHighlight = (
       elementX2,
       elementY1,
       elementY2,
-      selectionColors: ["rgb(0,118,255)"],
+      selectionColors: [appState.gridColor.Bold??"rgb(0,118,255)"], //zsviczian
       dashed: false,
       cx: elementX1 + (elementX2 - elementX1) / 2,
       cy: elementY1 + (elementY2 - elementY1) / 2,

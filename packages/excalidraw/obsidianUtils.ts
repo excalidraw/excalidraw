@@ -1,7 +1,7 @@
 import { FreedrawIcon } from "./components/icons";
 import { FONT_FAMILY } from "./constants";
 import { Fonts, register } from "./fonts";
-import { FONT_METADATA, FontMetadata, LOCAL_FONT_PROTOCOL } from "./fonts/metadata";
+import { FONT_METADATA, FontMetadata } from "./fonts/metadata";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
