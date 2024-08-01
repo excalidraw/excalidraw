@@ -105,7 +105,6 @@ const repairBinding = (
   return {
     ...binding,
     focus: binding.focus || 0,
-    // fixedPoint: binding.fixedPoint ?? ([0, 0] as [number, number]),
     fixedPoint: isElbowArrow(element)
       ? binding.fixedPoint ?? ([0, 0] as [number, number])
       : null,
