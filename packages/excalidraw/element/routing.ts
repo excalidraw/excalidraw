@@ -336,6 +336,14 @@ const offsetFromHeading = (
 
 /**
  * Routing algorithm based on the A* path search algorithm.
+ * @see https://www.geeksforgeeks.org/a-search-algorithm/
+ *
+ * Binary heap is used to optimize node lookup.
+ * See {@link calculateGrid} for the grid calculation details.
+ *
+ * Additional modifications added due to aesthetic route reasons:
+ * 1) Arrow segment direction change is penalized by specific linear constant (bendMultiplier)
+ * 2) Arrow segments are not allowed to go "backwards", overlapping with the previous segment
  */
 const astar = (
   start: Node,
@@ -625,6 +633,9 @@ const generateDynamicAABBs = (
 /**
  * Calculates the grid which is used as nodes at
  * the grid line intersections by the A* algorithm.
+ *
+ * NOTE: This is not a uniform grid. It is built at
+ * various intersections of bounding boxes.
  */
 const calculateGrid = (
   aabbs: Bounds[],
@@ -660,8 +671,8 @@ const calculateGrid = (
   vertical.add(common[1]);
   vertical.add(common[3]);
 
-  const _vertical = Array.from(vertical).sort((a, b) => a - b); // TODO: Do we need sorting?
-  const _horizontal = Array.from(horizontal).sort((a, b) => a - b); // TODO: Do we need sorting?
+  const _vertical = Array.from(vertical).sort((a, b) => a - b);
+  const _horizontal = Array.from(horizontal).sort((a, b) => a - b);
 
   return {
     row: _vertical.length,
