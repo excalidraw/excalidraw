@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triunghi (contur)",
     "arrowhead_diamond": "Romb",
     "arrowhead_diamond_outline": "Romb (contur)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Dimensiune font",
     "fontFamily": "Familia de fonturi",
     "addWatermark": "Adaugă „Realizat cu Excalidraw”",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu sau folosește instrumentul în formă de mână",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
+    "arrowTool": "",
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "embeddable": "Dă clic și trage pentru a crea un cod de încorporare de pagină web",
