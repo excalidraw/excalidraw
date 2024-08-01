@@ -151,8 +151,13 @@ export class Fonts {
   private static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
   ) {
-    // Add all registered font faces into the `document.fonts` (if not added already)
-    for (const { fonts } of Fonts.registered.values()) {
+    // add all registered font faces into the `document.fonts` (if not added already)
+    for (const { fonts, metadata } of Fonts.registered.values()) {
+      // skip registering font faces for local fonts (i.e. Helvetica)
+      if (metadata.local) {
+        continue;
+      }
+
       for (const { fontFace } of fonts) {
         if (!window.document.fonts.has(fontFace)) {
           window.document.fonts.add(fontFace);
