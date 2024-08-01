@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "ទំហំពុម្ពអក្សរ",
     "fontFamily": "ក្រុម​ពុម្ពអក្សរ",
     "addWatermark": "បន្ថែមវ៉ាត់ធើម៉ាក \"Made with Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "ដើម្បីផ្លាស់ទីបាវ សូមសង្កត់កង់កណ្ដុរឬគ្រាប់ចុចspacebarខណៈពេលកំពុងអូស ឬប្រើឧបករណ៍ដៃ។",
     "linearElement": "ចុចដើម្បីបង្កើតចំណុចច្រើន អូសដើម្បីបង្កើតបន្ទាត់មួយ",
+    "arrowTool": "",
     "freeDraw": "ចុច​ហើយ​អូស លែង​ពេល​រួចរាល់",
     "text": "គន្លឹះ៖ អ្នកក៏អាចបន្ថែមអត្ថបទដោយចុចពីរដងនៅកន្លែងណាមួយដោយប្រើឧបករណ៍ជ្រើសរើស",
     "embeddable": "",
