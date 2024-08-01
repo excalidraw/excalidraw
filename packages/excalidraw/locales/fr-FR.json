@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (contour)",
     "arrowhead_diamond": "Losange",
     "arrowhead_diamond_outline": "Losange (contour)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser, ou utiliser l'outil main.",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
+    "arrowTool": "",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
