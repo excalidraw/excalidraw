@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "مثلث (مخطط)",
     "arrowhead_diamond": "ألماسة",
     "arrowhead_diamond_outline": "ألماسة (مخططة)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "حجم الخط",
     "fontFamily": "نوع الخط",
     "addWatermark": "إضافة \"مصنوعة بواسطة Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "لتحريك القماش، اضغط على عجلة الفأرة أو مفتاح المسافة أثناء السحب، أو استخدم أداة اليد",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
+    "arrowTool": "",
     "freeDraw": "انقر واسحب، افرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
     "embeddable": "اضغط مع السحب لإنشاء موقع ويب مضمّن",
