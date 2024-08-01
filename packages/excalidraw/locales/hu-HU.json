@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Betűméret",
     "fontFamily": "Betűkészlet család",
     "addWatermark": "Add hozzá, hogy \"Excalidraw-val készült\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "Kattintással görbe, az eger húzásával pedig egyenes nyilat rajzolhatsz",
+    "arrowTool": "",
     "freeDraw": "Kattints és húzd, majd engedd el, amikor végeztél",
     "text": "Tipp: A kijelölés eszközzel a dupla kattintás új szöveget hoz létre",
     "embeddable": "",
