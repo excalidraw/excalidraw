@@ -741,7 +741,13 @@ const _renderInteractiveScene = ({
 
   if (
     appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0
+    appState.selectedLinearElement.hoverPointIndex >= 0 &&
+    !(
+      isElbowArrow(selectedElements[0]) &&
+      appState.selectedLinearElement.hoverPointIndex > 0 &&
+      appState.selectedLinearElement.hoverPointIndex <
+        selectedElements[0].points.length - 1
+    )
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
   }
