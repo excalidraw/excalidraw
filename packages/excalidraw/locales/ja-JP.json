@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "三角 (中抜き)",
     "arrowhead_diamond": "ひし形",
     "arrowhead_diamond_outline": "ひし形 (中抜き)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "フォントの大きさ",
     "fontFamily": "フォントの種類",
     "addWatermark": "\"Made with Excalidraw\"と表示",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "キャンバスを移動するには、マウスホイールまたはスペースバーを押しながらドラッグするか、手ツールを使用します",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
+    "arrowTool": "",
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
     "embeddable": "クリックしてドラッグし、ウェブサイトを埋め込む",
