@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Skriftstørrelse",
     "fontFamily": "Fontfamilie",
     "addWatermark": "Legg til \"Laget med Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "For å flytte lerretet, hold musehjulet eller mellomromstasten mens du drar, eller bruk hånd-verktøyet",
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
+    "arrowTool": "",
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
     "embeddable": "Klikk og dra for å opprette en nettside innebygd",
