@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangel (kontur)",
     "arrowhead_diamond": "Romb",
     "arrowhead_diamond_outline": "Romb (kontur)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Teckenstorlek",
     "fontFamily": "Teckensnitt",
     "addWatermark": "Lägg till \"Skapad med Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "För att flytta whiteboarden, håll mushjulet eller mellanslagstangenten medan du drar eller använd handverktyget",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
+    "arrowTool": "",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
     "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",
