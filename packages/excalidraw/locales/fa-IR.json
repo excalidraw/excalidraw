@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "مثلث (پیرامون)",
     "arrowhead_diamond": "الماس",
     "arrowhead_diamond_outline": "الماس (پیرامون)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "برای حرکت دادن بوم، چرخ ماوس یا فاصله را در حین کشیدن نگه دارید یا از ابزار دستی استفاده کنید",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
+    "arrowTool": "",
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "embeddable": "کلیک-درگ برای ساخت افزونه وب",
