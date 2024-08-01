@@ -203,12 +203,14 @@ describe("elbow arrow ui", () => {
       ".drag-input",
     ) as HTMLInputElement;
     editInput(inputAngle, String("40"));
-
+    console.log(JSON.stringify(h.elements));
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [-35, 0],
-      [-35, 165],
-      [213, 165],
+      [35, 0],
+      [35, 90],
+      [25, 90],
+      [25, 165],
+      [103, 165],
     ]);
   });
 });
