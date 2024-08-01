@@ -13,6 +13,7 @@ import {
 import { bindLinearElement } from "../element/binding";
 import type { ElementConstructorOpts } from "../element/newElement";
 import {
+  newArrowElement,
   newFrameElement,
   newImageElement,
   newMagicFrameElement,
@@ -51,6 +52,7 @@ import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
+import { isArrowElement } from "../element/typeChecks";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -545,7 +547,7 @@ export const convertToExcalidrawElements = (
       case "arrow": {
         const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        excalidrawElement = newLinearElement({
+        excalidrawElement = newArrowElement({
           width,
           height,
           endArrowhead: "arrow",
@@ -554,6 +556,7 @@ export const convertToExcalidrawElements = (
             [width, height],
           ],
           ...element,
+          type: "arrow",
         });
 
         Object.assign(
@@ -655,7 +658,7 @@ export const convertToExcalidrawElements = (
           elementStore.add(container);
           elementStore.add(text);
 
-          if (container.type === "arrow") {
+          if (isArrowElement(container)) {
             const originalStart =
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
@@ -674,7 +677,7 @@ export const convertToExcalidrawElements = (
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
-                container as ExcalidrawArrowElement,
+                container,
                 originalStart,
                 originalEnd,
                 elementStore,

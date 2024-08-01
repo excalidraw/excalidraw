@@ -50,12 +50,13 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   icon: UndoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState) =>
+  perform: (elements, appState, value, app) =>
     writeData(appState, () =>
       history.undo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
+        app.scene,
       ),
     ),
   keyTest: (event) =>
@@ -91,12 +92,13 @@ export const createRedoAction: ActionCreator = (history, store) => ({
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState) =>
+  perform: (elements, appState, _, app) =>
     writeData(appState, () =>
       history.redo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
+        app.scene,
       ),
     ),
   keyTest: (event) =>

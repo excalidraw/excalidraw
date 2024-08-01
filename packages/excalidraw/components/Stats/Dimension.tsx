@@ -31,6 +31,7 @@ const handleDimensionChange: DragInputCallbackType<
   scene,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   if (origElement) {
     const keepAspectRatio =
@@ -61,6 +62,8 @@ const handleDimensionChange: DragInputCallbackType<
         keepAspectRatio,
         origElement,
         elementsMap,
+        elements,
+        scene,
       );
 
       return;
@@ -103,6 +106,8 @@ const handleDimensionChange: DragInputCallbackType<
       keepAspectRatio,
       origElement,
       elementsMap,
+      elements,
+      scene,
     );
   }
 };

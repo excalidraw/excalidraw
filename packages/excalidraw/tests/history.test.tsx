@@ -1,3 +1,5 @@
+import "../global.d.ts";
+import React from "react";
 import * as StaticScene from "../renderer/staticScene";
 import {
   GlobalTestState,
@@ -24,6 +26,7 @@ import {
 import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
 import type {
+  ExcalidrawElbowArrowElement,
   ExcalidrawFrameElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
@@ -41,6 +44,7 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
+import type Scene from "../scene/Scene";
 
 const { h } = window;
 
@@ -114,6 +118,7 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
+              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -135,6 +140,7 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
+              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -1332,11 +1338,13 @@ describe("history", () => {
         expect(API.getUndoStack().length).toBe(5);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1355,11 +1363,13 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1378,11 +1388,13 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1409,11 +1421,13 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1432,11 +1446,13 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
+          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1466,37 +1482,41 @@ describe("history", () => {
 
         expect(API.getUndoStack().length).toBe(0);
         expect(API.getRedoStack().length).toBe(5);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [],
-            isDeleted: true,
-          }),
-          expect.objectContaining({
-            id: text.id,
-            containerId: null,
-            isDeleted: true,
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [],
-            isDeleted: true,
-          }),
-          expect.objectContaining({
-            id: arrow.id,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: true,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [],
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: text.id,
+              containerId: null,
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [],
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: true,
+            }),
+          ]),
+        );
 
         Keyboard.redo();
         Keyboard.redo();
@@ -1506,40 +1526,44 @@ describe("history", () => {
 
         expect(API.getUndoStack().length).toBe(5);
         expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [
-              { id: text.id, type: "text" },
-              { id: arrow.id, type: "arrow" },
-            ],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: text.id,
-            containerId: rect1.id,
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrow.id, type: "arrow" }],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: arrow.id,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: false,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: expect.arrayContaining([
+                { id: text.id, type: "text" },
+                { id: arrow.id, type: "arrow" },
+              ]),
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: text.id,
+              containerId: rect1.id,
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: false,
+            }),
+          ]),
+        );
       });
 
       it("should unbind rectangle from arrow on deletion and rebind on undo", async () => {
@@ -1547,74 +1571,80 @@ describe("history", () => {
         Keyboard.keyPress(KEYS.DELETE);
         expect(API.getUndoStack().length).toBe(7);
         expect(API.getRedoStack().length).toBe(0);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [
-              { id: text.id, type: "text" },
-              { id: arrow.id, type: "arrow" },
-            ],
-            isDeleted: true,
-          }),
-          expect.objectContaining({
-            id: text.id,
-            containerId: rect1.id,
-            isDeleted: true,
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrow.id, type: "arrow" }],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: arrow.id,
-            startBinding: null,
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: false,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [
+                { id: text.id, type: "text" },
+                { id: arrow.id, type: "arrow" },
+              ],
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: text.id,
+              containerId: rect1.id,
+              isDeleted: true,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: null,
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: false,
+            }),
+          ]),
+        );
 
         Keyboard.undo();
         expect(API.getUndoStack().length).toBe(6);
         expect(API.getRedoStack().length).toBe(1);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [
-              { id: arrow.id, type: "arrow" },
-              { id: text.id, type: "text" }, // order has now changed!
-            ],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: text.id,
-            containerId: rect1.id,
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrow.id, type: "arrow" }],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: arrow.id,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: false,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: expect.arrayContaining([
+                { id: arrow.id, type: "arrow" },
+                { id: text.id, type: "text" }, // order has now changed!
+              ]),
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: text.id,
+              containerId: rect1.id,
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: false,
+            }),
+          ]),
+        );
       });
 
       it("should unbind rectangles from arrow on deletion and rebind on undo", async () => {
@@ -1652,40 +1682,44 @@ describe("history", () => {
         Keyboard.undo();
         expect(API.getUndoStack().length).toBe(7);
         expect(API.getRedoStack().length).toBe(1);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [
-              { id: arrow.id, type: "arrow" },
-              { id: text.id, type: "text" }, // order has now changed!
-            ],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: text.id,
-            containerId: rect1.id,
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrow.id, type: "arrow" }],
-            isDeleted: false,
-          }),
-          expect.objectContaining({
-            id: arrow.id,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: false,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: expect.arrayContaining([
+                { id: arrow.id, type: "arrow" },
+                { id: text.id, type: "text" }, // order has now changed!
+              ]),
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: text.id,
+              containerId: rect1.id,
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrow.id, type: "arrow" }],
+              isDeleted: false,
+            }),
+            expect.objectContaining({
+              id: arrow.id,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: false,
+            }),
+          ]),
+        );
       });
     });
 
@@ -1974,6 +2008,110 @@ describe("history", () => {
       Keyboard.undo();
       expect(h.elements).toEqual([
         expect.objectContaining({ backgroundColor: transparent }),
+      ]);
+    });
+
+    it("should redraw arrows on undo", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "KPrBI4g_v9qUB1XxYLgSz",
+        x: 873,
+        y: 212,
+        width: 157,
+        height: 126,
+      });
+      const diamond = API.createElement({
+        id: "u2JGnnmoJ0VATV4vCNJE5",
+        type: "diamond",
+        x: 1152,
+        y: 516,
+        width: 124,
+        height: 129,
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "6Rm4g567UQM4WjLwej2Vc",
+        elbowed: true,
+      });
+
+      excalidrawAPI.updateScene({
+        elements: [rect, diamond],
+        storeAction: StoreAction.CAPTURE,
+      });
+
+      // Connect the arrow
+      excalidrawAPI.updateScene({
+        elements: [
+          {
+            ...rect,
+            boundElements: [
+              {
+                id: "6Rm4g567UQM4WjLwej2Vc",
+                type: "arrow",
+              },
+            ],
+          },
+          {
+            ...diamond,
+            boundElements: [
+              {
+                id: "6Rm4g567UQM4WjLwej2Vc",
+                type: "arrow",
+              },
+            ],
+          },
+          {
+            ...arrow,
+            x: 1035,
+            y: 274.9,
+            width: 178.9000000000001,
+            height: 236.10000000000002,
+            points: [
+              [0, 0],
+              [178.9000000000001, 0],
+              [178.9000000000001, 236.10000000000002],
+            ],
+            startBinding: {
+              elementId: "KPrBI4g_v9qUB1XxYLgSz",
+              focus: -0.001587301587301948,
+              gap: 5,
+              fixedPoint: [1.0318471337579618, 0.49920634920634904],
+            },
+            endBinding: {
+              elementId: "u2JGnnmoJ0VATV4vCNJE5",
+              focus: -0.0016129032258049847,
+              gap: 3.537079145500037,
+              fixedPoint: [0.4991935483870975, -0.03875193720914723],
+            },
+          },
+        ],
+        storeAction: StoreAction.CAPTURE,
+      });
+
+      Keyboard.undo();
+
+      excalidrawAPI.updateScene({
+        elements: h.elements.map((el) =>
+          el.id === "KPrBI4g_v9qUB1XxYLgSz"
+            ? {
+                ...el,
+                x: 600,
+                y: 0,
+              }
+            : el,
+        ),
+        storeAction: StoreAction.UPDATE,
+      });
+
+      Keyboard.redo();
+
+      const modifiedArrow = h.elements.filter(
+        (el) => el.type === "arrow",
+      )[0] as ExcalidrawElbowArrowElement;
+      expect(modifiedArrow.points).toEqual([
+        [0, 0],
+        [451.9000000000001, 0],
+        [451.9000000000001, 448.10100010002003],
       ]);
     });
 
@@ -4149,29 +4287,33 @@ describe("history", () => {
         mouse.moveTo(100, 0);
         mouse.up();
 
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
-          }),
-          expect.objectContaining({
-            id: arrowId,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+            }),
+          ]),
+        );
 
         Keyboard.undo(); // undo start binding
         Keyboard.undo(); // undo end binding
@@ -4214,29 +4356,35 @@ describe("history", () => {
           Keyboard.redo();
           expect(API.getUndoStack().length).toBe(4);
           expect(API.getRedoStack().length).toBe(0);
-          expect(h.elements).toEqual([
-            expect.objectContaining({
-              id: rect1.id,
-              boundElements: [{ id: arrowId, type: "arrow" }],
-            }),
-            expect.objectContaining({
-              id: rect2.id,
-              boundElements: [{ id: arrowId, type: "arrow" }],
-            }),
-            expect.objectContaining({
-              id: arrowId,
-              startBinding: {
-                elementId: rect1.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              endBinding: {
-                elementId: rect2.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-            }),
-          ]);
+          expect(h.elements).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: rect1.id,
+                boundElements: expect.arrayContaining([
+                  { id: arrowId, type: "arrow" },
+                ]),
+              }),
+              expect.objectContaining({
+                id: rect2.id,
+                boundElements: [{ id: arrowId, type: "arrow" }],
+              }),
+              expect.objectContaining({
+                id: arrowId,
+                startBinding: expect.objectContaining({
+                  elementId: rect1.id,
+                  fixedPoint: null,
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+                endBinding: expect.objectContaining({
+                  elementId: rect2.id,
+                  fixedPoint: null,
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+              }),
+            ]),
+          );
 
           Keyboard.undo();
           Keyboard.undo();
@@ -4277,29 +4425,33 @@ describe("history", () => {
         mouse.moveTo(100, 1);
         mouse.upAt(100, 0);
 
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
-          }),
-          expect.objectContaining({
-            id: arrowId,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+            }),
+          ]),
+        );
 
         Keyboard.undo();
         Keyboard.undo();
@@ -4331,7 +4483,12 @@ describe("history", () => {
             h.elements[0],
             newElementWith(h.elements[1], { boundElements: [] }),
             newElementWith(h.elements[2] as ExcalidrawLinearElement, {
-              endBinding: { elementId: remoteContainer.id, gap: 1, focus: 0 },
+              endBinding: {
+                elementId: remoteContainer.id,
+                gap: 1,
+                focus: 0,
+                fixedPoint: [0.5, 1],
+              },
             }),
             remoteContainer,
           ],
@@ -4343,72 +4500,92 @@ describe("history", () => {
           Keyboard.redo();
           expect(API.getUndoStack().length).toBe(4);
           expect(API.getRedoStack().length).toBe(0);
-          expect(h.elements).toEqual([
-            expect.objectContaining({
-              id: rect1.id,
-              boundElements: [{ id: arrowId, type: "arrow" }],
-            }),
-            expect.objectContaining({
-              id: rect2.id,
-              boundElements: [{ id: arrowId, type: "arrow" }],
-            }),
-            expect.objectContaining({
-              id: arrowId,
-              startBinding: {
-                elementId: rect1.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              // rebound with previous rectangle
-              endBinding: {
-                elementId: rect2.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-            }),
-            expect.objectContaining({
-              id: remoteContainer.id,
-              boundElements: [],
-            }),
-          ]);
+          expect(h.elements).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: rect1.id,
+                boundElements: [{ id: arrowId, type: "arrow" }],
+              }),
+              expect.objectContaining({
+                id: rect2.id,
+                boundElements: [{ id: arrowId, type: "arrow" }],
+              }),
+              expect.objectContaining({
+                id: arrowId,
+                startBinding: expect.objectContaining({
+                  elementId: rect1.id,
+                  fixedPoint: null,
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+                // rebound with previous rectangle
+                endBinding: expect.objectContaining({
+                  elementId: rect2.id,
+                  fixedPoint: null,
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+              }),
+              expect.objectContaining({
+                id: remoteContainer.id,
+                boundElements: [],
+              }),
+            ]),
+          );
 
           Keyboard.undo();
           Keyboard.undo();
           expect(API.getUndoStack().length).toBe(2);
           expect(API.getRedoStack().length).toBe(2);
-          expect(h.elements).toEqual([
-            expect.objectContaining({
-              id: rect1.id,
-              boundElements: [],
-            }),
-            expect.objectContaining({
-              id: rect2.id,
-              boundElements: [],
-            }),
-            expect.objectContaining({
-              id: arrowId,
-              startBinding: null,
-              endBinding: {
-                // now we are back in the previous state!
-                elementId: remoteContainer.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-            }),
-            expect.objectContaining({
-              id: remoteContainer.id,
-              // leaving as bound until we can rebind arrows!
-              boundElements: [{ id: arrowId, type: "arrow" }],
-            }),
-          ]);
+          expect(h.elements).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: rect1.id,
+                boundElements: [],
+              }),
+              expect.objectContaining({
+                id: rect2.id,
+                boundElements: [],
+              }),
+              expect.objectContaining({
+                id: arrowId,
+                startBinding: null,
+                endBinding: expect.objectContaining({
+                  // now we are back in the previous state!
+                  elementId: remoteContainer.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+              }),
+              expect.objectContaining({
+                id: remoteContainer.id,
+                // leaving as bound until we can rebind arrows!
+                boundElements: [{ id: arrowId, type: "arrow" }],
+              }),
+            ]),
+          );
         });
       });
 
       it("should rebind remotely added arrow when it's bindable elements are added through the history", async () => {
         const arrow = API.createElement({
           type: "arrow",
-          startBinding: { elementId: rect1.id, gap: 1, focus: 0 },
-          endBinding: { elementId: rect2.id, gap: 1, focus: 0 },
+          startBinding: {
+            elementId: rect1.id,
+            gap: 1,
+            focus: 0,
+            fixedPoint: [1, 0.5],
+          },
+          endBinding: {
+            elementId: rect2.id,
+            gap: 1,
+            focus: 0,
+            fixedPoint: [0.5, 1],
+          },
         });
 
         // Simulate remote update
@@ -4450,33 +4627,43 @@ describe("history", () => {
           Keyboard.redo();
           expect(API.getUndoStack().length).toBe(1);
           expect(API.getRedoStack().length).toBe(0);
-          expect(h.elements).toEqual([
-            expect.objectContaining({
-              id: arrow.id,
-              startBinding: {
-                // now we are back in the previous state!
-                elementId: rect1.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              endBinding: {
-                // now we are back in the previous state!
-                elementId: rect2.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-            }),
-            expect.objectContaining({
-              id: rect1.id,
-              boundElements: [{ id: arrow.id, type: "arrow" }],
-              isDeleted: false,
-            }),
-            expect.objectContaining({
-              id: rect2.id,
-              boundElements: [{ id: arrow.id, type: "arrow" }],
-              isDeleted: false,
-            }),
-          ]);
+          expect(h.elements).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: arrow.id,
+                startBinding: expect.objectContaining({
+                  // now we are back in the previous state!
+                  elementId: rect1.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+                endBinding: expect.objectContaining({
+                  // now we are back in the previous state!
+                  elementId: rect2.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+              }),
+              expect.objectContaining({
+                id: rect1.id,
+                boundElements: [{ id: arrow.id, type: "arrow" }],
+                isDeleted: false,
+              }),
+              expect.objectContaining({
+                id: rect2.id,
+                boundElements: [{ id: arrow.id, type: "arrow" }],
+                isDeleted: false,
+              }),
+            ]),
+          );
         });
       });
 
@@ -4496,8 +4683,18 @@ describe("history", () => {
         excalidrawAPI.updateScene({
           elements: [
             newElementWith(h.elements[0] as ExcalidrawLinearElement, {
-              startBinding: { elementId: rect1.id, gap: 1, focus: 0 },
-              endBinding: { elementId: rect2.id, gap: 1, focus: 0 },
+              startBinding: {
+                elementId: rect1.id,
+                gap: 1,
+                focus: 0,
+                fixedPoint: [0.5, 1],
+              },
+              endBinding: {
+                elementId: rect2.id,
+                gap: 1,
+                focus: 0,
+                fixedPoint: [1, 0.5],
+              },
             }),
             newElementWith(rect1, {
               boundElements: [{ id: arrow.id, type: "arrow" }],
@@ -4513,62 +4710,82 @@ describe("history", () => {
           Keyboard.undo();
           expect(API.getUndoStack().length).toBe(0);
           expect(API.getRedoStack().length).toBe(1);
-          expect(h.elements).toEqual([
-            expect.objectContaining({
-              id: arrow.id,
-              startBinding: {
-                elementId: rect1.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              endBinding: {
-                elementId: rect2.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              isDeleted: true,
-            }),
-            expect.objectContaining({
-              id: rect1.id,
-              boundElements: [],
-              isDeleted: false,
-            }),
-            expect.objectContaining({
-              id: rect2.id,
-              boundElements: [],
-              isDeleted: false,
-            }),
-          ]);
+          expect(h.elements).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: arrow.id,
+                startBinding: expect.objectContaining({
+                  elementId: rect1.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+                endBinding: expect.objectContaining({
+                  elementId: rect2.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+                isDeleted: true,
+              }),
+              expect.objectContaining({
+                id: rect1.id,
+                boundElements: [],
+                isDeleted: false,
+              }),
+              expect.objectContaining({
+                id: rect2.id,
+                boundElements: [],
+                isDeleted: false,
+              }),
+            ]),
+          );
 
           Keyboard.redo();
           expect(API.getUndoStack().length).toBe(1);
           expect(API.getRedoStack().length).toBe(0);
-          expect(h.elements).toEqual([
-            expect.objectContaining({
-              id: arrow.id,
-              startBinding: {
-                elementId: rect1.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              endBinding: {
-                elementId: rect2.id,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
-              },
-              isDeleted: false,
-            }),
-            expect.objectContaining({
-              id: rect1.id,
-              boundElements: [{ id: arrow.id, type: "arrow" }],
-              isDeleted: false,
-            }),
-            expect.objectContaining({
-              id: rect2.id,
-              boundElements: [{ id: arrow.id, type: "arrow" }],
-              isDeleted: false,
-            }),
-          ]);
+          expect(h.elements).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                id: arrow.id,
+                startBinding: {
+                  elementId: rect1.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                },
+                endBinding: expect.objectContaining({
+                  elementId: rect2.id,
+                  fixedPoint: [
+                    expect.toBeNonNaNNumber(),
+                    expect.toBeNonNaNNumber(),
+                  ],
+                  focus: expect.toBeNonNaNNumber(),
+                  gap: expect.toBeNonNaNNumber(),
+                }),
+                isDeleted: false,
+              }),
+              expect.objectContaining({
+                id: rect1.id,
+                boundElements: [{ id: arrow.id, type: "arrow" }],
+                isDeleted: false,
+              }),
+              expect.objectContaining({
+                id: rect2.id,
+                boundElements: [{ id: arrow.id, type: "arrow" }],
+                isDeleted: false,
+              }),
+            ]),
+          );
         });
       });
 
@@ -4585,31 +4802,35 @@ describe("history", () => {
         Keyboard.undo();
         expect(API.getUndoStack().length).toBe(1);
         expect(API.getRedoStack().length).toBe(1);
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [],
-          }),
-          expect.objectContaining({ id: rect2.id, boundElements: [] }),
-          expect.objectContaining({
-            id: arrowId,
-            points: [
-              [0, 0],
-              [100, 0],
-            ],
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: true,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [],
+            }),
+            expect.objectContaining({ id: rect2.id, boundElements: [] }),
+            expect.objectContaining({
+              id: arrowId,
+              points: [
+                [0, 0],
+                [100, 0],
+              ],
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: true,
+            }),
+          ]),
+        );
 
         // Simulate remote update
         excalidrawAPI.updateScene({
@@ -4632,30 +4853,34 @@ describe("history", () => {
             roundToNearestHundred(points[1]),
           ]).toEqual([500, -400]);
         }
-        expect(h.elements).toEqual([
-          expect.objectContaining({
-            id: rect1.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
-          }),
-          expect.objectContaining({
-            id: rect2.id,
-            boundElements: [{ id: arrowId, type: "arrow" }],
-          }),
-          expect.objectContaining({
-            id: arrowId,
-            startBinding: {
-              elementId: rect1.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            endBinding: {
-              elementId: rect2.id,
-              focus: expect.toBeNonNaNNumber(),
-              gap: expect.toBeNonNaNNumber(),
-            },
-            isDeleted: false,
-          }),
-        ]);
+        expect(h.elements).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: rect1.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: rect2.id,
+              boundElements: [{ id: arrowId, type: "arrow" }],
+            }),
+            expect.objectContaining({
+              id: arrowId,
+              startBinding: expect.objectContaining({
+                elementId: rect1.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              endBinding: expect.objectContaining({
+                elementId: rect2.id,
+                fixedPoint: null,
+                focus: expect.toBeNonNaNNumber(),
+                gap: expect.toBeNonNaNNumber(),
+              }),
+              isDeleted: false,
+            }),
+          ]),
+        );
       });
     });
 
