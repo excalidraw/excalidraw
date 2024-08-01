@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Trikotnik (oris)",
     "arrowhead_diamond": "Diamant",
     "arrowhead_diamond_outline": "Diamant (oris)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
+    "arrowTool": "",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
     "embeddable": "Kliknite in povlecite, da ustvarite spletno vdelavo",
