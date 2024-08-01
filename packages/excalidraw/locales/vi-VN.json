@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Tam giác (đường viền)",
     "arrowhead_diamond": "Kim cương",
     "arrowhead_diamond_outline": "Kim cương (đường viền)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Cỡ chữ",
     "fontFamily": "Phông chữ",
     "addWatermark": "Làm với Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Để di chuyển canvas, giữ con lăn chuột hoặc phím cách trong khi kéo, hoặc sử dụng công cụ cầm tay",
     "linearElement": "Ấn để bắt đầu nhiểm điểm vẽ, kéo để vẽ một đường thẳng",
+    "arrowTool": "",
     "freeDraw": "Ấn bà kéo, thả khi bạn xong",
     "text": "Mẹo: bạn có thể thêm văn bản tại bất cứ đâu bằng cách ấn hai lần bằng tool lựa chọn",
     "embeddable": "",
