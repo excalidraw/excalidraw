@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tekstgrootte",
     "fontFamily": "Lettertype",
     "addWatermark": "Voeg \"Gemaakt met Excalidraw\" toe",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
+    "arrowTool": "",
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",
