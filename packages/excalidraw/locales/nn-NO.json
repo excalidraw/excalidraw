@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Skriftstorleik",
     "fontFamily": "Skrifttype",
     "addWatermark": "Legg til «Laga med Excalidraw»",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
+    "arrowTool": "",
     "freeDraw": "Klikk og drag, slepp når du er ferdig",
     "text": "Tips: du kan òg leggje til tekst ved å dobbeltklikke kor som helst med utvalgsverktyet",
     "embeddable": "",
