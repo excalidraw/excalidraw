@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "قەبارەی فۆنت",
     "fontFamily": "خێزانی فۆنت",
     "addWatermark": "زیادبکە \"Made with Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "بۆ جوڵاندنی تابلۆ، ویلی ماوسەکەت یان دوگمەی سپەیس بگرە لەکاتی ڕاکێشاندە، یانیش ئامرازی دەستەکە بەکاربهێنە",
     "linearElement": "کرتە بکە بۆ دەستپێکردنی چەند خاڵێک، ڕایبکێشە بۆ یەک هێڵ",
+    "arrowTool": "",
     "freeDraw": "کرتە بکە و ڕایبکێشە، کاتێک تەواو بوویت دەست هەڵگرە",
     "text": "زانیاری: هەروەها دەتوانیت دەق زیادبکەیت بە دوو کرتەکردن لە هەر شوێنێک لەگەڵ ئامڕازی دەستنیشانکردن",
     "embeddable": "",
