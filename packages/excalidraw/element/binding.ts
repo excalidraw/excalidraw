@@ -38,6 +38,7 @@ import {
   isBindingElement,
   isBoundToContainer,
   isElbowArrow,
+  isFrameLikeElement,
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
@@ -517,7 +518,14 @@ export const getHoveredElementForBinding = (
     elements,
     (element) =>
       isBindableElement(element, false) &&
-      bindingBorderTest(element, pointerCoords, elementsMap, fullShape),
+      bindingBorderTest(
+        element,
+        pointerCoords,
+        elementsMap,
+        // disable fullshape snapping for frame elements so we
+        // can bind to frame children
+        fullShape && !isFrameLikeElement(element),
+      ),
   );
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
