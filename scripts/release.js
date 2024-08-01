@@ -6,9 +6,13 @@ const pkg = require(excalidrawPackage);
 
 const publish = () => {
   try {
+    console.info("Installing the dependencies in root folder...");
     execSync(`yarn  --frozen-lockfile`);
+    console.info("Installing the dependencies in excalidraw directory...");
     execSync(`yarn --frozen-lockfile`, { cwd: excalidrawDir });
-    execSync(`yarn run build:umd`, { cwd: excalidrawDir });
+    console.info("Building ESM Package...");
+    execSync(`yarn run build:esm`, { cwd: excalidrawDir });
+    console.info("Publishing the package...");
     execSync(`yarn --cwd ${excalidrawDir} publish`);
   } catch (error) {
     console.error(error);
