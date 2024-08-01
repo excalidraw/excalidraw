@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Tamanho da fonte",
     "fontFamily": "Família da fonte",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta ou use a ferramenta de mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
+    "arrowTool": "",
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "",
