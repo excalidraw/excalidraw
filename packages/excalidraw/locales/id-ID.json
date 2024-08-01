@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "",
     "arrowhead_diamond": "",
     "arrowhead_diamond_outline": "",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Ukuran font",
     "fontFamily": "Jenis font",
     "addWatermark": "Tambahkan \"Dibuat dengan Excalidraw\"",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
+    "arrowTool": "",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "embeddable": "",
