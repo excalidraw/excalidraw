@@ -69,7 +69,6 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import { renderVisualDebug } from "../visualdebug";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -975,8 +974,6 @@ const _renderInteractiveScene = ({
     });
     context.restore();
   }
-
-  renderVisualDebug(context, appState);
 
   return {
     scrollBars,
