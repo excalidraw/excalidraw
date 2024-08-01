@@ -17,6 +17,8 @@
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "1.13.1",
+    "patch-package": "8.0.0",
+    "postinstall-postinstall": "2.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "socket.io-client": "4.7.2"
@@ -71,6 +73,7 @@
     "locales-coverage": "node scripts/build-locales-coverage.js",
     "locales-coverage:description": "node scripts/locales-coverage-description.js",
     "prepare": "husky install",
+    "postinstall": "patch-package",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "start": "yarn --cwd ./excalidraw-app start",
     "start:app:production": "npm run build && npx http-server build -a localhost -p 5001 -o",

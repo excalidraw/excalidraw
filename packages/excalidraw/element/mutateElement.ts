@@ -6,11 +6,22 @@ import type { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { maybeGetSubtypeProps } from "./newElement";
+import { getSubtypeMethods } from "./subtypes";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
   "id" | "version" | "versionNonce" | "updated"
 >;
+
+const cleanUpdates = <TElement extends Mutable<ExcalidrawElement>>(
+  element: TElement,
+  updates: ElementUpdate<TElement>,
+): ElementUpdate<TElement> => {
+  const subtype = maybeGetSubtypeProps(element, element.type).subtype;
+  const map = getSubtypeMethods(subtype);
+  return map?.clean ? (map.clean(updates) as typeof updates) : updates;
+};
 
 // This function tracks updates of text elements for the purposes for collaboration.
 // The version is used to compare updates when more than one user is working in
@@ -22,6 +33,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   informMutation = true,
 ): TElement => {
   let didChange = false;
+  let increment = false;
+  const oldUpdates = cleanUpdates(element, updates);
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
@@ -70,6 +83,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
             }
           }
           if (!didChangePoints) {
+            key in oldUpdates && (increment = true);
             continue;
           }
         }
@@ -77,6 +91,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
       (element as any)[key] = value;
       didChange = true;
+      key in oldUpdates && (increment = true);
     }
   }
 
@@ -93,9 +108,11 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     ShapeCache.delete(element);
   }
 
-  element.version++;
-  element.versionNonce = randomInteger();
-  element.updated = getUpdatedTimestamp();
+  if (increment) {
+    element.version++;
+    element.versionNonce = randomInteger();
+    element.updated = getUpdatedTimestamp();
+  }
 
   if (informMutation) {
     Scene.getScene(element)?.triggerUpdate();
@@ -111,6 +128,8 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   force = false,
 ): TElement => {
   let didChange = false;
+  let increment = false;
+  const oldUpdates = cleanUpdates(element, updates);
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
@@ -122,6 +141,7 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
         continue;
       }
       didChange = true;
+      key in oldUpdates && (increment = true);
     }
   }
 
@@ -129,6 +149,9 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
     return element;
   }
 
+  if (!increment) {
+    return { ...element, ...updates };
+  }
   return {
     ...element,
     ...updates,

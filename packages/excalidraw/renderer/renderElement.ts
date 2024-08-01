@@ -23,7 +23,6 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 
 import type {
   StaticCanvasRenderConfig,
-  RenderableElementsMap,
   InteractiveCanvasRenderConfig,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
@@ -37,6 +36,7 @@ import type {
   ElementsPendingErasure,
 } from "../types";
 import { getDefaultAppState } from "../appState";
+import { getSubtypeMethods } from "../element/subtypes";
 import {
   BOUND_TEXT_PADDING,
   ELEMENT_READY_TO_ERASE_OPACITY,
@@ -243,7 +243,14 @@ const generateElementCanvas = (
     context.filter = IMAGE_INVERT_FILTER;
   }
 
-  drawElementOnCanvas(element, rc, context, renderConfig, appState);
+  drawElementOnCanvas(
+    element,
+    elementsMap,
+    rc,
+    context,
+    renderConfig,
+    appState,
+  );
 
   context.restore();
 
@@ -366,11 +373,22 @@ const drawImagePlaceholder = (
 
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  context.globalAlpha =
+    ((getContainingFrame(element, elementsMap)?.opacity ?? 100) *
+      element.opacity) /
+    10000;
+  const map = getSubtypeMethods(element.subtype);
+  if (map?.render) {
+    map.render(element, elementsMap, context);
+    context.globalAlpha = 1;
+    return;
+  }
   switch (element.type) {
     case "rectangle":
     case "iframe":
@@ -661,7 +679,7 @@ export const renderSelectionElement = (
 
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
-  elementsMap: RenderableElementsMap,
+  elementsMap: ElementsMap,
   allElementsMap: NonDeletedSceneElementsMap,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
@@ -729,7 +747,14 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig, appState);
+        drawElementOnCanvas(
+          element,
+          elementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+        );
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -820,6 +845,7 @@ export const renderElement = (
 
           drawElementOnCanvas(
             element,
+            elementsMap,
             tempRc,
             tempCanvasContext,
             renderConfig,
@@ -863,7 +889,14 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, appState);
+          drawElementOnCanvas(
+            element,
+            elementsMap,
+            rc,
+            context,
+            renderConfig,
+            appState,
+          );
         }
 
         context.restore();

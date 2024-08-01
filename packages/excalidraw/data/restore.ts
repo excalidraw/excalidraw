@@ -100,7 +100,8 @@ const repairBinding = (binding: PointBinding | null) => {
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<Omit<ExcalidrawElement, "subtype" | "customData">> & {
+    subtype?: ExcalidrawElement["subtype"];
     customData?: ExcalidrawElement["customData"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -163,6 +164,9 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
   };
 
+  if ("subtype" in element) {
+    base.subtype = element.subtype;
+  }
   if ("customData" in element || "customData" in extra) {
     base.customData =
       "customData" in extra ? extra.customData : element.customData;
@@ -556,6 +560,12 @@ export const restoreAppState = (
         : defaultValue;
   }
 
+  if ("activeSubtypes" in appState) {
+    nextAppState.activeSubtypes = appState.activeSubtypes;
+  }
+  if ("customData" in appState) {
+    nextAppState.customData = appState.customData;
+  }
   return {
     ...nextAppState,
     cursorButton: localAppState?.cursorButton || "up",

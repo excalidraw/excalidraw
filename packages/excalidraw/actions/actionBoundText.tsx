@@ -10,7 +10,7 @@ import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
-  measureText,
+  measureTextElement,
   redrawTextBoundingBox,
 } from "../element/textElement";
 import {
@@ -31,7 +31,7 @@ import type {
 } from "../element/types";
 import type { AppState } from "../types";
 import type { Mutable } from "../utility-types";
-import { arrayToMap, getFontString } from "../utils";
+import { arrayToMap } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
 import { StoreAction } from "../store";
@@ -51,11 +51,9 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        const { width, height } = measureText(
-          boundTextElement.originalText,
-          getFontString(boundTextElement),
-          boundTextElement.lineHeight,
-        );
+        const { width, height } = measureTextElement(boundTextElement, {
+          text: boundTextElement.originalText,
+        });
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
         );
