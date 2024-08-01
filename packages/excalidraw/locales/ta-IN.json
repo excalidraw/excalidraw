@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "முக்கோணம் (எல்லைக்கோடு)",
     "arrowhead_diamond": "வைரம்",
     "arrowhead_diamond_outline": "வைரம் (எல்லைக்கோடு)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "எழுத்துரு அளவு",
     "fontFamily": "எழுத்துருக் குடும்பம்",
     "addWatermark": "\"எக்ஸ்கேலிட்ரா கொண்டு ஆனது\"-ஐச் சேர்",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "",
     "linearElement": "பல புள்ளிகளைத் துவக்க சொடுக்கு, ஒற்றை வரிக்கு பிடித்திழு",
+    "arrowTool": "",
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
     "embeddable": "",
