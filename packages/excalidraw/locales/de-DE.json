@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Dreieck (Umrandung)",
     "arrowhead_diamond": "Raute",
     "arrowhead_diamond_outline": "Raute (Umrandung)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens, oder verwende das Hand-Werkzeug",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
+    "arrowTool": "",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
