@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "משולש (קו מתאר)",
     "arrowhead_diamond": "יהלום",
     "arrowhead_diamond_outline": "יהלום (קו מתאר)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
     "addWatermark": "הוספת „נוצר באמצעות Excalidraw”",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "כדי להזיז את הקנבס, החזק את גלגל העכבר לחוץ או את מקש הרווח לחוץ תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
+    "arrowTool": "",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "embeddable": "",
