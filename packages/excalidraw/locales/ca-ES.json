@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (vora)",
     "arrowhead_diamond": "Rombe",
     "arrowhead_diamond_outline": "Rombe (vora)",
+    "arrowtypes": "",
+    "arrowtype_sharp": "",
+    "arrowtype_round": "",
+    "arrowtype_elbowed": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
@@ -295,6 +299,7 @@
   "hints": {
     "canvasPanning": "Per moure el llenç, manteniu premuda la roda del ratolí o la barra espaiadora mentre arrossegueu o utilitzeu l'eina manual",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
+    "arrowTool": "",
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
     "embeddable": "",
