@@ -31,6 +31,7 @@ import {
   isInGroup,
 } from "../../groups";
 import { rotate } from "../../math";
+import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 import { getFontString } from "../../utils";
 
@@ -124,6 +125,8 @@ export const resizeElement = (
   keepAspectRatio: boolean,
   origElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
+  scene: Scene,
   shouldInformMutation = true,
 ) => {
   const latestElement = elementsMap.get(origElement.id);
@@ -146,6 +149,8 @@ export const resizeElement = (
     nextHeight = Math.max(nextHeight, minHeight);
   }
 
+  const { width: oldWidth, height: oldHeight } = latestElement;
+
   mutateElement(
     latestElement,
     {
@@ -164,7 +169,7 @@ export const resizeElement = (
     },
     shouldInformMutation,
   );
-  updateBindings(latestElement, elementsMap, {
+  updateBindings(latestElement, elementsMap, elements, scene, {
     newSize: {
       width: nextWidth,
       height: nextHeight,
@@ -193,6 +198,10 @@ export const resizeElement = (
     }
   }
 
+  updateBoundElements(latestElement, elementsMap, scene, {
+    oldSize: { width: oldWidth, height: oldHeight },
+  });
+
   if (boundTextElement && boundTextFont) {
     mutateElement(boundTextElement, {
       fontSize: boundTextFont.fontSize,
@@ -206,6 +215,8 @@ export const moveElement = (
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
+  scene: Scene,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
@@ -244,7 +255,7 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
-  updateBindings(latestElement, elementsMap);
+  updateBindings(latestElement, elementsMap, elements, scene);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -288,14 +299,23 @@ export const getAtomicUnits = (
 export const updateBindings = (
   latestElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
+  scene: Scene,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
   },
 ) => {
   if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements([latestElement], elementsMap, true, []);
+    bindOrUnbindLinearElements(
+      [latestElement],
+      elementsMap,
+      elements,
+      scene,
+      true,
+      [],
+    );
   } else {
-    updateBoundElements(latestElement, elementsMap, options);
+    updateBoundElements(latestElement, elementsMap, scene, options);
   }
 };

@@ -1,6 +1,7 @@
 import type { AppStateChange, ElementsChange } from "./change";
 import type { SceneElementsMap } from "./element/types";
 import { Emitter } from "./emitter";
+import type Scene from "./scene/Scene";
 import type { Snapshot } from "./store";
 import type { AppState } from "./types";
 
@@ -64,6 +65,7 @@ export class History {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: Readonly<Snapshot>,
+    scene: Scene,
   ) {
     return this.perform(
       elements,
@@ -71,6 +73,7 @@ export class History {
       snapshot,
       () => History.pop(this.undoStack),
       (entry: HistoryEntry) => History.push(this.redoStack, entry, elements),
+      scene,
     );
   }
 
@@ -78,6 +81,7 @@ export class History {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: Readonly<Snapshot>,
+    scene: Scene,
   ) {
     return this.perform(
       elements,
@@ -85,6 +89,7 @@ export class History {
       snapshot,
       () => History.pop(this.redoStack),
       (entry: HistoryEntry) => History.push(this.undoStack, entry, elements),
+      scene,
     );
   }
 
@@ -94,6 +99,7 @@ export class History {
     snapshot: Readonly<Snapshot>,
     pop: () => HistoryEntry | null,
     push: (entry: HistoryEntry) => void,
+    scene: Scene,
   ): [SceneElementsMap, AppState] | void {
     try {
       let historyEntry = pop();
@@ -110,7 +116,7 @@ export class History {
       while (historyEntry) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =
-            historyEntry.applyTo(nextElements, nextAppState, snapshot);
+            historyEntry.applyTo(nextElements, nextAppState, snapshot, scene);
         } finally {
           // make sure to always push / pop, even if the increment is corrupted
           push(historyEntry);
@@ -181,9 +187,10 @@ export class HistoryEntry {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: Readonly<Snapshot>,
+    scene: Scene,
   ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] =
-      this.elementsChange.applyTo(elements, snapshot.elements);
+      this.elementsChange.applyTo(elements, snapshot.elements, scene);
 
     const [nextAppState, appStateContainsVisibleChange] =
       this.appStateChange.applyTo(appState, nextElements);

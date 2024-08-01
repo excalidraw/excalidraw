@@ -10,9 +10,11 @@ import type {
   ExcalidrawLinearElement,
   NonDeleted,
 } from "./element/types";
+import type { Bounds } from "./element/bounds";
 import { getCurvePathOps } from "./element/bounds";
 import type { Mutable } from "./utility-types";
 import { ShapeCache } from "./scene/ShapeCache";
+import type { Vector } from "../utils/geometry/shape";
 
 export const rotate = (
   // target point to rotate
@@ -151,6 +153,12 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   const xd = x2 - x1;
   const yd = y2 - y1;
   return Math.hypot(xd, yd);
+};
+
+export const distanceSq2d = (p1: Point, p2: Point) => {
+  const xd = p2[0] - p1[0];
+  const yd = p2[1] - p1[1];
+  return xd * xd + yd * yd;
 };
 
 export const centerPoint = (a: Point, b: Point): Point => {
@@ -518,4 +526,180 @@ export const rangeIntersection = (
 
 export const isValueInRange = (value: number, min: number, max: number) => {
   return value >= min && value <= max;
+};
+
+export const translatePoint = (p: Point, v: Vector): Point => [
+  p[0] + v[0],
+  p[1] + v[1],
+];
+
+export const scaleVector = (v: Vector, scalar: number): Vector => [
+  v[0] * scalar,
+  v[1] * scalar,
+];
+
+export const pointToVector = (p: Point, origin: Point = [0, 0]): Vector => [
+  p[0] - origin[0],
+  p[1] - origin[1],
+];
+
+export const scalePointFromOrigin = (
+  p: Point,
+  mid: Point,
+  multiplier: number,
+) => translatePoint(mid, scaleVector(pointToVector(p, mid), multiplier));
+
+const triangleSign = (p1: Point, p2: Point, p3: Point): number =>
+  (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
+
+export const PointInTriangle = (pt: Point, v1: Point, v2: Point, v3: Point) => {
+  const d1 = triangleSign(pt, v1, v2);
+  const d2 = triangleSign(pt, v2, v3);
+  const d3 = triangleSign(pt, v3, v1);
+
+  const has_neg = d1 < 0 || d2 < 0 || d3 < 0;
+  const has_pos = d1 > 0 || d2 > 0 || d3 > 0;
+
+  return !(has_neg && has_pos);
+};
+
+export const magnitudeSq = (vector: Vector) =>
+  vector[0] * vector[0] + vector[1] * vector[1];
+
+export const magnitude = (vector: Vector) => Math.sqrt(magnitudeSq(vector));
+
+export const normalize = (vector: Vector): Vector => {
+  const m = magnitude(vector);
+
+  return [vector[0] / m, vector[1] / m];
+};
+
+export const addVectors = (
+  vec1: Readonly<Vector>,
+  vec2: Readonly<Vector>,
+): Vector => [vec1[0] + vec2[0], vec1[1] + vec2[1]];
+
+export const subtractVectors = (
+  vec1: Readonly<Vector>,
+  vec2: Readonly<Vector>,
+): Vector => [vec1[0] - vec2[0], vec1[1] - vec2[1]];
+
+export const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
+  p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
+
+/**
+ * Get the axis-aligned bounding box for a given element
+ */
+export const aabbForElement = (
+  element: Readonly<ExcalidrawElement>,
+  offset?: [number, number, number, number],
+) => {
+  const bbox = {
+    minX: element.x,
+    minY: element.y,
+    maxX: element.x + element.width,
+    maxY: element.y + element.height,
+    midX: element.x + element.width / 2,
+    midY: element.y + element.height / 2,
+  };
+
+  const center = [bbox.midX, bbox.midY] as Point;
+  const [topLeftX, topLeftY] = rotatePoint(
+    [bbox.minX, bbox.minY],
+    center,
+    element.angle,
+  );
+  const [topRightX, topRightY] = rotatePoint(
+    [bbox.maxX, bbox.minY],
+    center,
+    element.angle,
+  );
+  const [bottomRightX, bottomRightY] = rotatePoint(
+    [bbox.maxX, bbox.maxY],
+    center,
+    element.angle,
+  );
+  const [bottomLeftX, bottomLeftY] = rotatePoint(
+    [bbox.minX, bbox.maxY],
+    center,
+    element.angle,
+  );
+
+  const bounds = [
+    Math.min(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.min(topLeftY, topRightY, bottomRightY, bottomLeftY),
+    Math.max(topLeftX, topRightX, bottomRightX, bottomLeftX),
+    Math.max(topLeftY, topRightY, bottomRightY, bottomLeftY),
+  ] as Bounds;
+
+  if (offset) {
+    const [topOffset, rightOffset, downOffset, leftOffset] = offset;
+    return [
+      bounds[0] - leftOffset,
+      bounds[1] - topOffset,
+      bounds[2] + rightOffset,
+      bounds[3] + downOffset,
+    ] as Bounds;
+  }
+
+  return bounds;
+};
+
+type PolarCoords = [number, number];
+
+/**
+ * Return the polar coordinates for the given carthesian point represented by
+ * (x, y) for the center point 0,0 where the first number returned is the radius,
+ * the second is the angle in radians.
+ */
+export const carthesian2Polar = ([x, y]: Point): PolarCoords => [
+  Math.hypot(x, y),
+  Math.atan2(y, x),
+];
+
+/**
+ * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
+ * corresponds to (1, 0) carthesian coordinates (point), i.e. to the "right".
+ */
+type SymmetricArc = { radius: number; startAngle: number; endAngle: number };
+
+/**
+ * Determines if a carthesian point lies on a symmetric arc, i.e. an arc which
+ * is part of a circle contour centered on 0, 0.
+ */
+export const isPointOnSymmetricArc = (
+  { radius: arcRadius, startAngle, endAngle }: SymmetricArc,
+  point: Point,
+): boolean => {
+  const [radius, angle] = carthesian2Polar(point);
+
+  return startAngle < endAngle
+    ? Math.abs(radius - arcRadius) < 0.0000001 &&
+        startAngle <= angle &&
+        endAngle >= angle
+    : startAngle <= angle || endAngle >= angle;
+};
+
+export const getCenterForBounds = (bounds: Bounds): Point => [
+  bounds[0] + (bounds[2] - bounds[0]) / 2,
+  bounds[1] + (bounds[3] - bounds[1]) / 2,
+];
+
+export const getCenterForElement = (element: ExcalidrawElement): Point => [
+  element.x + element.width / 2,
+  element.y + element.height / 2,
+];
+
+export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
+  pointInsideBounds([a[0], a[1]], b) ||
+  pointInsideBounds([a[2], a[1]], b) ||
+  pointInsideBounds([a[2], a[3]], b) ||
+  pointInsideBounds([a[0], a[3]], b) ||
+  pointInsideBounds([b[0], b[1]], a) ||
+  pointInsideBounds([b[2], b[1]], a) ||
+  pointInsideBounds([b[2], b[3]], a) ||
+  pointInsideBounds([b[0], b[3]], a);
+
+export const clamp = (value: number, min: number, max: number) => {
+  return Math.min(Math.max(value, min), max);
 };

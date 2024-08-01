@@ -798,6 +798,7 @@ describe("multiple selection", () => {
       width: 100,
       height: 0,
     });
+
     const rightBoundArrow = UI.createElement("arrow", {
       x: 210,
       y: 50,
@@ -822,11 +823,16 @@ describe("multiple selection", () => {
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(140, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(137.5, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();
-    expect(leftBoundArrow.endBinding).toMatchObject(leftArrowBinding);
+    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(12.352);
+    expect(leftBoundArrow.endBinding?.elementId).toBe(
+      leftArrowBinding.elementId,
+    );
+    expect(leftBoundArrow.endBinding?.fixedPoint).toBeNull();
+    expect(leftBoundArrow.endBinding?.focus).toBe(leftArrowBinding.focus);
 
     expect(rightBoundArrow.x).toBeCloseTo(210);
     expect(rightBoundArrow.y).toBeCloseTo(
@@ -836,7 +842,12 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.height).toBeCloseTo(0);
     expect(rightBoundArrow.angle).toEqual(0);
     expect(rightBoundArrow.startBinding).toBeNull();
-    expect(rightBoundArrow.endBinding).toMatchObject(rightArrowBinding);
+    expect(rightBoundArrow.endBinding?.gap).toBeCloseTo(8.0952);
+    expect(rightBoundArrow.endBinding?.elementId).toBe(
+      rightArrowBinding.elementId,
+    );
+    expect(rightBoundArrow.endBinding?.fixedPoint).toBeNull();
+    expect(rightBoundArrow.endBinding?.focus).toBe(rightArrowBinding.focus);
   });
 
   it("resizes with labeled arrows", async () => {

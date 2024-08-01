@@ -9,7 +9,11 @@ import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import { rotate } from "../math";
 import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
-import { isFrameLikeElement, isLinearElement } from "./typeChecks";
+import {
+  isElbowArrow,
+  isFrameLikeElement,
+  isLinearElement,
+} from "./typeChecks";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   isAndroid,
@@ -262,7 +266,11 @@ export const getTransformHandles = (
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
   // you can't move/resize
-  if (element.locked) {
+  if (
+    element.locked ||
+    // Elbow arrows cannot be rotated
+    isElbowArrow(element)
+  ) {
     return {};
   }
 
@@ -312,6 +320,9 @@ export const shouldShowBoundingBox = (
     return true;
   }
   const element = elements[0];
+  if (isElbowArrow(element)) {
+    return false;
+  }
   if (!isLinearElement(element)) {
     return true;
   }

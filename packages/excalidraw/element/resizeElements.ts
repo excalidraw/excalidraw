@@ -22,6 +22,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isIframeLikeElement,
@@ -31,7 +32,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
-import { updateBoundElements } from "./binding";
+import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
@@ -52,6 +53,7 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
+import { mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -76,18 +78,21 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  scene: Scene,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
-      rotateSingleElement(
-        element,
-        elementsMap,
-        pointerX,
-        pointerY,
-        shouldRotateWithDiscreteAngle,
-      );
-      updateBoundElements(element, elementsMap);
+      if (!isElbowArrow(element)) {
+        rotateSingleElement(
+          element,
+          elementsMap,
+          pointerX,
+          pointerY,
+          shouldRotateWithDiscreteAngle,
+        );
+        updateBoundElements(element, elementsMap, scene);
+      }
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         originalElements,
@@ -98,7 +103,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      updateBoundElements(element, elementsMap);
+      updateBoundElements(element, elementsMap, scene);
     } else if (transformHandleType) {
       resizeSingleElement(
         originalElements,
@@ -109,6 +114,7 @@ export const transformElements = (
         shouldResizeFromCenter,
         pointerX,
         pointerY,
+        scene,
       );
     }
 
@@ -124,6 +130,7 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
         centerX,
         centerY,
+        scene,
       );
       return true;
     } else if (transformHandleType) {
@@ -136,6 +143,7 @@ export const transformElements = (
         shouldMaintainAspectRatio,
         pointerX,
         pointerY,
+        scene,
       );
       return true;
     }
@@ -432,10 +440,20 @@ export const resizeSingleElement = (
   shouldResizeFromCenter: boolean,
   pointerX: number,
   pointerY: number,
+  scene: Scene,
 ) => {
   if (element.customData?.isAnchored) {
     return;
   } //zsviczian
+  // Elbow arrows cannot be resized when bound on either end
+  if (
+    isArrowElement(element) &&
+    isElbowArrow(element) &&
+    (element.startBinding || element.endBinding)
+  ) {
+    return;
+  }
+
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
@@ -721,8 +739,11 @@ export const resizeSingleElement = (
   ) {
     mutateElement(element, resizedElement);
 
-    updateBoundElements(element, elementsMap, {
-      newSize: { width: resizedElement.width, height: resizedElement.height },
+    updateBoundElements(element, elementsMap, scene, {
+      oldSize: {
+        width: stateAtResizeStart.width,
+        height: stateAtResizeStart.height,
+      },
     });
 
     if (boundTextElement && boundTextFont != null) {
@@ -748,6 +769,7 @@ export const resizeMultipleElements = (
   shouldMaintainAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
+  scene: Scene,
 ) => {
   // map selected elements to the original elements. While it never should
   // happen that pointerDownState.originalElements won't contain the selected
@@ -977,13 +999,20 @@ export const resizeMultipleElements = (
     element,
     update: { boundTextFontSize, ...update },
   } of elementsAndUpdates) {
-    const { width, height, angle } = update;
+    const { angle } = update;
+    const { width: oldWidth, height: oldHeight } = element;
 
     mutateElement(element, update, false);
 
-    updateBoundElements(element, elementsMap, {
+    if (isArrowElement(element) && isElbowArrow(element)) {
+      mutateElbowArrow(element, scene, element.points, undefined, undefined, {
+        informMutation: false,
+      });
+    }
+
+    updateBoundElements(element, elementsMap, scene, {
       simultaneouslyUpdated: elementsToUpdate,
-      newSize: { width, height },
+      oldSize: { width: oldWidth, height: oldHeight },
     });
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
@@ -1012,6 +1041,7 @@ const rotateMultipleElements = (
   shouldRotateWithDiscreteAngle: boolean,
   centerX: number,
   centerY: number,
+  scene: Scene,
 ) => {
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
@@ -1035,16 +1065,23 @@ const rotateMultipleElements = (
         centerY,
         centerAngle + origAngle - element.angle,
       );
-      mutateElement(
-        element,
-        {
-          x: element.x + (rotatedCX - cx),
-          y: element.y + (rotatedCY - cy),
-          angle: normalizeAngle(centerAngle + origAngle),
-        },
-        false,
-      );
-      updateBoundElements(element, elementsMap, {
+
+      if (isArrowElement(element) && isElbowArrow(element)) {
+        const points = getArrowLocalFixedPoints(element, elementsMap);
+        mutateElbowArrow(element, scene, points);
+      } else {
+        mutateElement(
+          element,
+          {
+            x: element.x + (rotatedCX - cx),
+            y: element.y + (rotatedCY - cy),
+            angle: normalizeAngle(centerAngle + origAngle),
+          },
+          false,
+        );
+      }
+
+      updateBoundElements(element, elementsMap, scene, {
         simultaneouslyUpdated: elements,
       });
 
