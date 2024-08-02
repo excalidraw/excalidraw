@@ -766,6 +766,7 @@ function test(
         validateFractionalIndices(elements, {
           shouldThrow: true,
           includeBoundTextValidation: true,
+          ignoreLogs: true,
         }),
       ).toThrowError(InvalidFractionalIndexError);
     }
@@ -783,6 +784,7 @@ function test(
       validateFractionalIndices(syncedElements, {
         shouldThrow: true,
         includeBoundTextValidation: true,
+        ignoreLogs: true,
       }),
     ).not.toThrowError(InvalidFractionalIndexError);
 
