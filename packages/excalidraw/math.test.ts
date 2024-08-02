@@ -1,4 +1,9 @@
-import { rangeIntersection, rangesOverlap, rotate } from "./math";
+import {
+  isPointOnSymmetricArc,
+  rangeIntersection,
+  rangesOverlap,
+  rotate,
+} from "./math";
 
 describe("rotate", () => {
   it("should rotate over (x2, y2) and return the rotated coordinates for (x1, y1)", () => {
@@ -51,5 +56,44 @@ describe("range intersection", () => {
 
   it("should not intersect", () => {
     expect(rangeIntersection([1, 4], [5, 7])).toEqual(null);
+  });
+});
+
+describe("point on arc", () => {
+  it("should detect point on simple arc", () => {
+    expect(
+      isPointOnSymmetricArc(
+        {
+          radius: 1,
+          startAngle: -Math.PI / 4,
+          endAngle: Math.PI / 4,
+        },
+        [0.92291667, 0.385],
+      ),
+    ).toBe(true);
+  });
+  it("should not detect point outside of a simple arc", () => {
+    expect(
+      isPointOnSymmetricArc(
+        {
+          radius: 1,
+          startAngle: -Math.PI / 4,
+          endAngle: Math.PI / 4,
+        },
+        [-0.92291667, 0.385],
+      ),
+    ).toBe(false);
+  });
+  it("should not detect point with good angle but incorrect radius", () => {
+    expect(
+      isPointOnSymmetricArc(
+        {
+          radius: 1,
+          startAngle: -Math.PI / 4,
+          endAngle: Math.PI / 4,
+        },
+        [-0.5, 0.5],
+      ),
+    ).toBe(false);
   });
 });

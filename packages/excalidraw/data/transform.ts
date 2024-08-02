@@ -13,16 +13,13 @@ import {
 import { bindLinearElement } from "../element/binding";
 import type { ElementConstructorOpts } from "../element/newElement";
 import {
+  newArrowElement,
   newFrameElement,
   newImageElement,
   newMagicFrameElement,
   newTextElement,
 } from "../element/newElement";
-import {
-  getDefaultLineHeight,
-  measureText,
-  normalizeText,
-} from "../element/textElement";
+import { measureText, normalizeText } from "../element/textElement";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -54,6 +51,8 @@ import {
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
+import { getLineHeight } from "../fonts";
+import { isArrowElement } from "../element/typeChecks";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -548,7 +547,7 @@ export const convertToExcalidrawElements = (
       case "arrow": {
         const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        excalidrawElement = newLinearElement({
+        excalidrawElement = newArrowElement({
           width,
           height,
           endArrowhead: "arrow",
@@ -557,6 +556,7 @@ export const convertToExcalidrawElements = (
             [width, height],
           ],
           ...element,
+          type: "arrow",
         });
 
         Object.assign(
@@ -568,8 +568,7 @@ export const convertToExcalidrawElements = (
       case "text": {
         const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
-        const lineHeight =
-          element?.lineHeight || getDefaultLineHeight(fontFamily);
+        const lineHeight = element?.lineHeight || getLineHeight(fontFamily);
         const text = element.text ?? "";
         const normalizedText = normalizeText(text);
         const metrics = measureText(
@@ -659,7 +658,7 @@ export const convertToExcalidrawElements = (
           elementStore.add(container);
           elementStore.add(text);
 
-          if (container.type === "arrow") {
+          if (isArrowElement(container)) {
             const originalStart =
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
@@ -678,7 +677,7 @@ export const convertToExcalidrawElements = (
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
-                container as ExcalidrawArrowElement,
+                container,
                 originalStart,
                 originalEnd,
                 elementStore,

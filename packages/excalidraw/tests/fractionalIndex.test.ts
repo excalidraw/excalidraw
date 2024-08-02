@@ -763,7 +763,11 @@ function test(
     // ensure the input is invalid (unless the flag is on)
     if (!expectValidInput) {
       expect(() =>
-        validateFractionalIndices(elements.map((x) => x.index)),
+        validateFractionalIndices(elements, {
+          shouldThrow: true,
+          includeBoundTextValidation: true,
+          ignoreLogs: true,
+        }),
       ).toThrowError(InvalidFractionalIndexError);
     }
 
@@ -777,7 +781,11 @@ function test(
 
     expect(syncedElements.length).toBe(elements.length);
     expect(() =>
-      validateFractionalIndices(syncedElements.map((x) => x.index)),
+      validateFractionalIndices(syncedElements, {
+        shouldThrow: true,
+        includeBoundTextValidation: true,
+        ignoreLogs: true,
+      }),
     ).not.toThrowError(InvalidFractionalIndexError);
 
     syncedElements.forEach((synced, index) => {

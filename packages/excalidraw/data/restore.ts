@@ -1,6 +1,8 @@
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawElementType,
+  ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -21,7 +23,13 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isLinearElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -38,13 +46,11 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
-import {
-  detectLineHeight,
-  getContainerElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+import { detectLineHeight, getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
+import { getSizeFromPoints } from "../points";
+import { getLineHeight } from "../fonts";
 
 type RestoredAppState = Omit<
   AppState,
@@ -88,11 +94,21 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (binding: PointBinding | null) => {
+const repairBinding = (
+  element: ExcalidrawLinearElement,
+  binding: PointBinding | null,
+): PointBinding | null => {
   if (!binding) {
     return null;
   }
-  return { ...binding, focus: binding.focus || 0 };
+
+  return {
+    ...binding,
+    focus: binding.focus || 0,
+    fixedPoint: isElbowArrow(element)
+      ? binding.fixedPoint ?? ([0, 0] as [number, number])
+      : null,
+  };
 };
 
 const restoreElementWithProperties = <
@@ -199,7 +215,7 @@ const restoreElement = (
             detectLineHeight(element)
           : // no element height likely means programmatic use, so default
             // to a fixed line height
-            getDefaultLineHeight(element.fontFamily));
+            getLineHeight(element.fontFamily));
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -238,11 +254,7 @@ const restoreElement = (
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-    case "arrow": {
-      const {
-        startArrowhead = null,
-        endArrowhead = element.type === "arrow" ? "arrow" : null,
-      } = element;
+      const { startArrowhead = null, endArrowhead = null } = element;
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one
@@ -262,14 +274,45 @@ const restoreElement = (
           (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: repairBinding(element.startBinding),
-        endBinding: repairBinding(element.endBinding),
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
         points,
         x,
         y,
+        ...getSizeFromPoints(points),
+      });
+    case "arrow": {
+      const { startArrowhead = null, endArrowhead = "arrow" } = element;
+      let x = element.x;
+      let y = element.y;
+      let points = // migrate old arrow model to new one
+        !Array.isArray(element.points) || element.points.length < 2
+          ? [
+              [0, 0],
+              [element.width, element.height],
+            ]
+          : element.points;
+
+      if (points[0][0] !== 0 || points[0][1] !== 0) {
+        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+      }
+
+      // TODO: Separate arrow from linear element
+      return restoreElementWithProperties(element as ExcalidrawArrowElement, {
+        type: element.type,
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
+        lastCommittedPoint: null,
+        startArrowhead,
+        endArrowhead,
+        points,
+        x,
+        y,
+        elbowed: (element as ExcalidrawArrowElement).elbowed,
+        ...getSizeFromPoints(points),
       });
     }
 
@@ -457,6 +500,23 @@ export const restoreElements = (
           restoredElementsMap,
         ),
       );
+    }
+
+    if (isLinearElement(element)) {
+      if (
+        element.startBinding &&
+        (!restoredElementsMap.has(element.startBinding.elementId) ||
+          !isArrowElement(element))
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).startBinding = null;
+      }
+      if (
+        element.endBinding &&
+        (!restoredElementsMap.has(element.endBinding.elementId) ||
+          !isArrowElement(element))
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
+      }
     }
   }
 

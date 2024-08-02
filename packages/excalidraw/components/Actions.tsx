@@ -21,10 +21,11 @@ import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { hasStrokeColor } from "../scene/comparisons";
+import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import {
   hasBoundTextElement,
+  isElbowArrow,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
@@ -121,7 +122,8 @@ export const SelectedShapeActions = ({
   const showLineEditorAction =
     !appState.editingLinearElement &&
     targetElements.length === 1 &&
-    isLinearElement(targetElements[0]);
+    isLinearElement(targetElements[0]) &&
+    !isElbowArrow(targetElements[0]);
 
   return (
     <div className="panelColumn">
@@ -155,13 +157,16 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
+      {(toolIsArrow(appState.activeTool.type) ||
+        targetElements.some((element) => toolIsArrow(element.type))) && (
+        <>{renderAction("changeArrowType")}</>
+      )}
+
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
-          {renderAction("changeFontSize")}
-
           {renderAction("changeFontFamily")}
-
+          {renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}

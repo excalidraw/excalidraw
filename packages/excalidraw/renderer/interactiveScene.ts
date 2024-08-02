@@ -47,13 +47,20 @@ import {
   getNormalizedCanvasDimensions,
 } from "./helpers";
 import oc from "open-color";
-import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isFrameLikeElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawLinearElement,
+  ExcalidrawTextElement,
   GroupId,
   NonDeleted,
 } from "../element/types";
@@ -62,6 +69,7 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
+import { getCornerRadius } from "../math";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -207,13 +215,18 @@ const renderBindingHighlightForBindableElement = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const width = x2 - x1;
   const height = y2 - y1;
-  const threshold = maxBindingGap(element, width, height);
+  const thickness = 10;
 
   // So that we don't overlap the element itself
   const strokeOffset = 4;
   context.strokeStyle = "rgba(0,0,0,.05)";
-  context.lineWidth = threshold - strokeOffset;
-  const padding = strokeOffset / 2 + threshold / 2;
+  context.lineWidth = thickness - strokeOffset;
+  const padding = strokeOffset / 2 + thickness / 2;
+
+  const radius = getCornerRadius(
+    Math.min(element.width, element.height),
+    element,
+  );
 
   switch (element.type) {
     case "rectangle":
@@ -232,6 +245,8 @@ const renderBindingHighlightForBindableElement = (
         x1 + width / 2,
         y1 + height / 2,
         element.angle,
+        undefined,
+        radius,
       );
       break;
     case "diamond":
@@ -303,7 +318,6 @@ const renderSelectionBorder = (
     cy: number;
     activeEmbeddable: boolean;
   },
-  padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2,
 ) => {
   const {
     angle,
@@ -319,6 +333,8 @@ const renderSelectionBorder = (
   } = elementProperties;
   const elementWidth = elementX2 - elementX1;
   const elementHeight = elementY2 - elementY1;
+
+  const padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
   const linePadding = padding / appState.zoom.value;
   const lineWidth = 8 / appState.zoom.value;
@@ -468,6 +484,10 @@ const renderLinearPointHandles = (
     ? POINT_HANDLE_SIZE
     : POINT_HANDLE_SIZE / 2;
   points.forEach((point, idx) => {
+    if (isElbowArrow(element) && idx !== 0 && idx !== points.length - 1) {
+      return;
+    }
+
     const isSelected =
       !!appState.editingLinearElement?.selectedPointsIndices?.includes(idx);
 
@@ -570,11 +590,34 @@ const renderTransformHandles = (
   });
 };
 
+const renderTextBox = (
+  text: NonDeleted<ExcalidrawTextElement>,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+) => {
+  context.save();
+  const padding = (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const width = text.width + padding * 2;
+  const height = text.height + padding * 2;
+  const cx = text.x + width / 2;
+  const cy = text.y + height / 2;
+  const shiftX = -(width / 2 + padding);
+  const shiftY = -(height / 2 + padding);
+  context.translate(cx + appState.scrollX, cy + appState.scrollY);
+  context.rotate(text.angle);
+  context.lineWidth = 1 / appState.zoom.value;
+  context.strokeStyle = selectionColor;
+  context.strokeRect(shiftX, shiftY, width, height);
+  context.restore();
+};
+
 const _renderInteractiveScene = ({
   canvas,
   elementsMap,
   visibleElements,
   selectedElements,
+  allElementsMap,
   scale,
   appState,
   renderConfig,
@@ -626,9 +669,28 @@ const _renderInteractiveScene = ({
   // Paint selection element
   if (appState.selectionElement) {
     try {
-      renderSelectionElement(appState.selectionElement, context, appState);
+      renderSelectionElement(
+        appState.selectionElement,
+        context,
+        appState,
+        renderConfig.selectionColor,
+      );
     } catch (error: any) {
       console.error(error);
+    }
+  }
+
+  if (appState.editingElement && isTextElement(appState.editingElement)) {
+    const textElement = allElementsMap.get(appState.editingElement.id) as
+      | ExcalidrawTextElement
+      | undefined;
+    if (textElement && !textElement.autoResize) {
+      renderTextBox(
+        textElement,
+        context,
+        appState,
+        renderConfig.selectionColor,
+      );
     }
   }
 
@@ -679,7 +741,13 @@ const _renderInteractiveScene = ({
 
   if (
     appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0
+    appState.selectedLinearElement.hoverPointIndex >= 0 &&
+    !(
+      isElbowArrow(selectedElements[0]) &&
+      appState.selectedLinearElement.hoverPointIndex > 0 &&
+      appState.selectedLinearElement.hoverPointIndex <
+        selectedElements[0].points.length - 1
+    )
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
   }
@@ -723,27 +791,39 @@ const _renderInteractiveScene = ({
 
       for (const element of elementsMap.values()) {
         const selectionColors = [];
-        // local user
-        if (
-          locallySelectedIds.has(element.id) &&
-          !isSelectedViaGroup(appState, element)
-        ) {
-          selectionColors.push(selectionColor);
-        }
-        // remote users
         const remoteClients = renderConfig.remoteSelectedElementIds.get(
           element.id,
         );
-        if (remoteClients) {
-          selectionColors.push(
-            ...remoteClients.map((socketId) => {
-              const background = getClientColor(
-                socketId,
-                appState.collaborators.get(socketId),
-              );
-              return background;
-            }),
-          );
+        if (
+          !(
+            // Elbow arrow elements cannot be selected when bound on either end
+            (
+              isSingleLinearElementSelected &&
+              isArrowElement(element) &&
+              isElbowArrow(element) &&
+              (element.startBinding || element.endBinding)
+            )
+          )
+        ) {
+          // local user
+          if (
+            locallySelectedIds.has(element.id) &&
+            !isSelectedViaGroup(appState, element)
+          ) {
+            selectionColors.push(selectionColor);
+          }
+          // remote users
+          if (remoteClients) {
+            selectionColors.push(
+              ...remoteClients.map((socketId) => {
+                const background = getClientColor(
+                  socketId,
+                  appState.collaborators.get(socketId),
+                );
+                return background;
+              }),
+            );
+          }
         }
 
         if (selectionColors.length) {
@@ -810,7 +890,12 @@ const _renderInteractiveScene = ({
         "mouse", // when we render we don't know which pointer type so use mouse,
         getOmitSidesForDevice(device),
       );
-      if (!appState.viewModeEnabled && showBoundingBox) {
+      if (
+        !appState.viewModeEnabled &&
+        showBoundingBox &&
+        // do not show transform handles when text is being edited
+        !isTextElement(appState.editingElement)
+      ) {
         renderTransformHandles(
           context,
           renderConfig,

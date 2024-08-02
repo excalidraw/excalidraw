@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (outline)",
     "arrowhead_diamond": "Diamond",
     "arrowhead_diamond_outline": "Diamond (outline)",
+    "arrowtypes": "Arrow type",
+    "arrowtype_sharp": "Sharp arrow",
+    "arrowtype_round": "Curved arrow",
+    "arrowtype_elbowed": "Elbow arrow",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "addWatermark": "Add \"Made with Excalidraw\"",
@@ -109,6 +113,7 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
+    "showFonts": "Show font picker",
     "toggleTheme": "Toggle light/dark theme",
     "theme": "Theme",
     "personalLib": "Personal Library",
@@ -270,6 +275,22 @@
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "magicSettings": "AI settings"
   },
+  "element": {
+    "rectangle": "Rectangle",
+    "diamond": "Diamond",
+    "ellipse": "Ellipse",
+    "arrow": "Arrow",
+    "line": "Line",
+    "freedraw": "Freedraw",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group",
+    "frame": "Frame",
+    "magicframe": "Wireframe to code",
+    "embeddable": "Web Embed",
+    "selection": "Selection",
+    "iframe": "IFrame"
+  },
   "headings": {
     "canvasActions": "Canvas actions",
     "selectedShapeActions": "Selected shape actions",
@@ -278,6 +299,7 @@
   "hints": {
     "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
+    "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
@@ -443,7 +465,10 @@
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
-    "title": "Stats for nerds",
+    "fullTitle": "Stats & Element properties",
+    "title": "Stats",
+    "generalStats": "General stats",
+    "elementProperties": "Element properties",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",
@@ -538,11 +563,19 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Quick search",
-      "empty": "No users found"
+  "quickSearch": {
+    "placeholder": "Quick search"
+  },
+  "fontList": {
+    "badge": {
+      "old": "old"
     },
+    "sceneFonts": "In this scene",
+    "availableFonts": "Available fonts",
+    "empty": "No fonts found"
+  },
+  "userList": {
+    "empty": "No users found",
     "hint": {
       "text": "Click on user to follow",
       "followStatus": "You're currently following this user",
