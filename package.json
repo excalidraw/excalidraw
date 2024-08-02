@@ -9,19 +9,8 @@
     "examples/excalidraw",
     "examples/excalidraw/*"
   ],
-  "dependencies": {
-    "@excalidraw/random-username": "1.0.0",
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
-    "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.4",
-    "idb-keyval": "6.0.3",
-    "jotai": "1.13.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "socket.io-client": "4.7.2"
-  },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.3.0",
@@ -51,7 +40,7 @@
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",
     "vite-plugin-svgr": "2.4.0",
-    "vitest": "1.5.3",
+    "vitest": "1.6.0",
     "vitest-canvas-mock": "0.3.2"
   },
   "engines": {
@@ -88,5 +77,8 @@
     "prerelease:excalidraw": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
     "release:excalidraw": "node scripts/release.js"
+  },
+  "resolutions": {
+    "@types/react": "18.2.0"
   }
 }

@@ -1,3 +1,4 @@
+import throttle from "lodash.throttle";
 import { ENV } from "../constants";
 import type { OrderedExcalidrawElement } from "../element/types";
 import {
@@ -38,6 +39,37 @@ const shouldDiscardRemoteElement = (
   return false;
 };
 
+const validateIndicesThrottled = throttle(
+  (
+    orderedElements: readonly OrderedExcalidrawElement[],
+    localElements: readonly OrderedExcalidrawElement[],
+    remoteElements: readonly RemoteExcalidrawElement[],
+  ) => {
+    if (
+      import.meta.env.DEV ||
+      import.meta.env.MODE === ENV.TEST ||
+      window?.DEBUG_FRACTIONAL_INDICES
+    ) {
+      // create new instances due to the mutation
+      const elements = syncInvalidIndices(
+        orderedElements.map((x) => ({ ...x })),
+      );
+
+      validateFractionalIndices(elements, {
+        // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        includeBoundTextValidation: true,
+        reconciliationContext: {
+          localElements,
+          remoteElements,
+        },
+      });
+    }
+  },
+  1000 * 60,
+  { leading: true, trailing: false },
+);
+
 export const reconcileElements = (
   localElements: readonly OrderedExcalidrawElement[],
   remoteElements: readonly RemoteExcalidrawElement[],
@@ -77,26 +109,7 @@ export const reconcileElements = (
 
   const orderedElements = orderByFractionalIndex(reconciledElements);
 
-  if (
-    import.meta.env.DEV ||
-    import.meta.env.MODE === ENV.TEST ||
-    window?.DEBUG_FRACTIONAL_INDICES
-  ) {
-    const elements = syncInvalidIndices(
-      // create new instances due to the mutation
-      orderedElements.map((x) => ({ ...x })),
-    );
-
-    validateFractionalIndices(elements, {
-      // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-      shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
-      includeBoundTextValidation: true,
-      reconciliationContext: {
-        localElements,
-        remoteElements,
-      },
-    });
-  }
+  validateIndicesThrottled(orderedElements, localElements, remoteElements);
 
   // de-duplicate indices
   syncInvalidIndices(orderedElements);
