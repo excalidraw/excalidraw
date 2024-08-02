@@ -46,9 +46,9 @@
     "arrowhead_triangle_outline": "Triangle (vora)",
     "arrowhead_diamond": "Rombe",
     "arrowhead_diamond_outline": "Rombe (vora)",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
+    "arrowtypes": "Tipus de fletxa",
+    "arrowtype_sharp": "Fletxa Esmolada",
+    "arrowtype_round": "Fletxa corba",
     "arrowtype_elbowed": "",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
@@ -91,7 +91,7 @@
     "group": "Agrupa la selecció",
     "ungroup": "Desagrupa la selecció",
     "collaborators": "Col·laboradors",
-    "toggleGrid": "",
+    "toggleGrid": "Alterna la quadrícula",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
     "libraryLoadingMessage": "S'està carregant la biblioteca…",
@@ -155,7 +155,7 @@
     "zoomToFitSelection": "Zoom per veure la selecció",
     "zoomToFit": "Zoom per veure tots els elements",
     "installPWA": "Instal·la Excalidraw localment (PWA)",
-    "autoResize": ""
+    "autoResize": "Activa la redimensió de text automàtica"
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
