@@ -382,7 +382,7 @@ const renderBindingHighlight = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  renderHighlight(context, suggestedBinding as any, elementsMap, appState.gridColor.Regular); //zsviczian
+  renderHighlight(context, suggestedBinding as any, elementsMap, appState.gridColor.Regular + "80"); //zsviczian
 
   context.restore();
 };
