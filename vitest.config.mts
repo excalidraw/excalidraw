@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import { woff2BrowserPlugin } from "./scripts/woff2/woff2-vite-plugins";
+import { woff2BrowserPlugin } from "./excalidraw-app/scripts/woff2-vite-plugins";
 
 export default defineConfig({
   plugins: [

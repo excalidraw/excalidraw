@@ -5,7 +5,7 @@ const OSS_FONTS_CDN =
  * Custom vite plugin to convert url woff2 imports into a text.
  * Other woff2 imports are automatically served and resolved as a file uri.
  *
- * @returns {import("vite").PluginOption}
+ * @returns {import("vitest").PluginOption}
  */
 module.exports.woff2BrowserPlugin = () => {
   // for now limited to woff2 only, might be extended to any assets in the future
@@ -58,7 +58,7 @@ module.exports.woff2BrowserPlugin = () => {
         style: normal;
         display: swap;
       }
-      
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-Medium-DrcxCXg3.woff2)
@@ -68,7 +68,7 @@ module.exports.woff2BrowserPlugin = () => {
         style: normal;
         display: swap;
       }
-      
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-SemiBold-SCI4bEL9.woff2)
@@ -78,7 +78,7 @@ module.exports.woff2BrowserPlugin = () => {
         style: normal;
         display: swap;
       }
-      
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-Bold-gm-uSS1B.woff2)

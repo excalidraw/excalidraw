@@ -5,7 +5,7 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
-import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+import { woff2BrowserPlugin } from "./scripts/woff2-vite-plugins";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
