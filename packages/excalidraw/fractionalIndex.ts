@@ -37,10 +37,12 @@ export const validateFractionalIndices = (
   {
     shouldThrow = false,
     includeBoundTextValidation = false,
+    ignoreLogs,
     reconciliationContext,
   }: {
     shouldThrow: boolean;
     includeBoundTextValidation: boolean;
+    ignoreLogs?: true;
     reconciliationContext?: {
       localElements: ReadonlyArray<ExcalidrawElement>;
       remoteElements: ReadonlyArray<ExcalidrawElement>;
@@ -95,13 +97,15 @@ export const validateFractionalIndices = (
       );
     }
 
-    // report just once and with the stacktrace
-    console.error(
-      errorMessages.join("\n\n"),
-      error.stack,
-      elements.map((x) => stringifyElement(x)),
-      ...additionalContext,
-    );
+    if (!ignoreLogs) {
+      // report just once and with the stacktrace
+      console.error(
+        errorMessages.join("\n\n"),
+        error.stack,
+        elements.map((x) => stringifyElement(x)),
+        ...additionalContext,
+      );
+    }
 
     if (shouldThrow) {
       // if enabled, gather all the errors first, throw once
@@ -157,7 +161,11 @@ export const syncMovedIndices = (
     validateFractionalIndices(
       elementsCandidates,
       // we don't autofix invalid bound text indices, hence don't include it in the validation
-      { includeBoundTextValidation: false, shouldThrow: true },
+      {
+        includeBoundTextValidation: false,
+        shouldThrow: true,
+        ignoreLogs: true,
+      },
     );
 
     // split mutation so we don't end up in an incosistent state
