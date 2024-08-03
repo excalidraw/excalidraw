@@ -1252,7 +1252,7 @@ export const fixBindingsAfterDuplication = (
         ({ id }) => id === oldElementId,
       )?.boundElements;
 
-      if (boundElements != null && boundElements.length > 0) {
+      if (boundElements && boundElements.length > 0) {
         mutateElement(bindableElement, {
           boundElements: boundElements.map((boundElement) =>
             oldIdToDuplicatedId.has(boundElement.id)
