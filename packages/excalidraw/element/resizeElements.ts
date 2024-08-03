@@ -31,7 +31,11 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
-import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
+import {
+  boundElementsVisitor,
+  getArrowLocalFixedPoints,
+  updateBoundElements,
+} from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
@@ -621,6 +625,36 @@ export const resizeSingleElement = (
     if (transformHandleDirection.includes("w")) {
       newTopLeft[0] += Math.abs(newBoundsWidth);
     }
+
+    //const origElement = originalElements.get(element.id).x > pointerX;
+    // .forEach({
+    //         if (el.type === "rectangle") {
+    //           console.log(el.x, pointerX);
+    //         }
+    //       });
+    boundElementsVisitor(elementsMap, element, (el) => {
+      if (isElbowArrow(el)) {
+        if (element.id === el.startBinding?.elementId) {
+          // mutateElement(el, {
+          //   startBinding: {
+          //     ...el.startBinding,
+          //     fixedPoint: [
+          //       -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5,
+          //       el.startBinding.fixedPoint[1],
+          //     ],
+          //   },
+          // });
+          //console.log("start", originalElements);
+          originalElements.forEach((el) => {
+            if (el.type === "rectangle") {
+              console.log(el.x, pointerX);
+            }
+          });
+        } else if (element.id === el.endBinding?.elementId) {
+          console.log("end");
+        }
+      }
+    });
   }
 
   // Flip vertically
@@ -631,6 +665,7 @@ export const resizeSingleElement = (
     if (transformHandleDirection.includes("n")) {
       newTopLeft[1] += Math.abs(newBoundsHeight);
     }
+    console.log("Y");
   }
 
   if (shouldResizeFromCenter) {

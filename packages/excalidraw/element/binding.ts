@@ -1893,7 +1893,7 @@ type BindableElementVisitingFunc<T> = (
 /**
  * Tries to visit each bound element (does not have to be found).
  */
-const boundElementsVisitor = (
+export const boundElementsVisitor = (
   elements: ElementsMap,
   element: ExcalidrawElement,
   visit: BoundElementsVisitingFunc,
