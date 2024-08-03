@@ -369,7 +369,8 @@ export const getFileHandle = async (
   if (nativeFileSystemSupported) {
     try {
       const item = event.dataTransfer.items[0];
-      if (!item) { //zsviczian (Obsidian move tab to new pane generates a drop event without an item)
+      if (!item) {
+        //zsviczian (Obsidian move tab to new pane generates a drop event without an item)
         return null;
       }
       const handle: FileSystemHandle | null =

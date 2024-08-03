@@ -1,6 +1,6 @@
 import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
 import type { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
-import { 
+import {
   DEFAULT_EXPORT_PADDING,
   DEFAULT_FONT_SIZE,
   EDITOR_LS_KEYS,
@@ -87,7 +87,7 @@ export const convertMermaidToExcalidraw = async ({
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
         {
-          fontSize: DEFAULT_FONT_SIZE, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226 
+          fontSize: DEFAULT_FONT_SIZE, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
         },
       );
     }

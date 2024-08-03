@@ -159,7 +159,7 @@ const restoreElementWithProperties = <
     frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
-      : (element.strokeSharpness === "round" && element.type !== "image")
+      : element.strokeSharpness === "round" && element.type !== "image"
       ? {
           // for old elements that would now use adaptive radius algo,
           // use legacy algo instead

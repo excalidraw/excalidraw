@@ -25,7 +25,11 @@ import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type { AppClassProperties, AppState, NormalizedZoomValue } from "../types";
+import type {
+  AppClassProperties,
+  AppState,
+  NormalizedZoomValue,
+} from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
@@ -569,7 +573,8 @@ export const actionToggleHandTool = register({
     !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });
 
-export const actionToggleLaserPointer = register({ //zsviczian - did I really add this? Delta compared to excalidraw.com
+export const actionToggleLaserPointer = register({
+  //zsviczian - did I really add this? Delta compared to excalidraw.com
   name: "toggleLaserPointerTool",
   viewMode: true,
   trackEvent: { category: "menu" },

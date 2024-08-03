@@ -93,7 +93,7 @@ const addFrameLabelsAsTextElements = (
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-        strokeColor: 
+        strokeColor:
           element.customData?.frameColor?.nameColor ?? //zsviczian
           (opts.exportWithDarkMode
             ? FRAME_STYLE.nameColorDarkTheme

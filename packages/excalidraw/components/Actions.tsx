@@ -396,7 +396,9 @@ export const ShapesSwitcher = ({
           {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
           {renderMermaid && ( //zsviczian
             <DropdownMenu.Item
-              onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
+              onSelect={() =>
+                app.setOpenDialog({ name: "ttd", tab: "mermaid" })
+              }
               icon={mermaidLogoIcon}
               data-testid="toolbar-embeddable"
             >

@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 import type { BinaryFiles } from "../../types";
 import { useApp } from "../App";
-import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
 import { ArrowRightIcon } from "../icons";
 import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";
@@ -16,7 +19,8 @@ import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
-import { MermaidOptions, parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
+import { parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw";
 import { DEFAULT_FONT_SIZE } from "../../constants";
 import { convertToExcalidrawElements } from "../../data/transform";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
@@ -179,6 +183,6 @@ export const mermaidToExcalidraw = async (
   } catch (e: any) {
     return {
       error: e.message,
-    }
+    };
   }
 };

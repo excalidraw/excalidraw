@@ -41,7 +41,7 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf } from "./utility-types";
-import { ColorPaletteCustom } from "./colors"; //zsviczian
+import type { ColorPaletteCustom } from "./colors"; //zsviczian
 import type { StoreActionType } from "./store";
 
 export type Point = Readonly<RoughPoint>;
@@ -528,7 +528,7 @@ export interface ExcalidrawProps {
     nextText: string, //wrapped
     nextOriginalText: string,
     isDeleted: boolean,
-  ) => {updatedNextOriginalText: string, nextLink: string}; //zsviczian [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
+  ) => { updatedNextOriginalText: string; nextLink: string }; //zsviczian [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void; //zsviczian
   onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian
@@ -762,7 +762,7 @@ export interface ExcalidrawImperativeAPI {
     clear: InstanceType<typeof App>["resetHistory"];
   };
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
-  startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian  
+  startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];

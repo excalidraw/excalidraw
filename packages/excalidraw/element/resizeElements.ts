@@ -691,7 +691,8 @@ export const resizeSingleElement = (
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
-    if (isIframeLikeElement(element)) { //zsviczian
+    if (isIframeLikeElement(element)) {
+      //zsviczian
       if (shouldMaintainAspectRatio) {
         const scale: [number, number] = [
           Math.abs(
@@ -929,7 +930,9 @@ export const resizeMultipleElements = (
       continue;
     }
 
-    const width = orig.customData?.isAnchored ? orig.width : orig.width * scaleX; //zsviczian
+    const width = orig.customData?.isAnchored
+      ? orig.width
+      : orig.width * scaleX; //zsviczian
     const height = orig.customData?.isAnchored
       ? orig.height
       : orig.height * scaleY; //zsviczian

@@ -382,7 +382,12 @@ const renderBindingHighlight = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  renderHighlight(context, suggestedBinding as any, elementsMap, appState.gridColor.Regular + "80"); //zsviczian
+  renderHighlight(
+    context,
+    suggestedBinding as any,
+    elementsMap,
+    `${appState.gridColor.Regular}80`,
+  ); //zsviczian
 
   context.restore();
 };
@@ -439,7 +444,7 @@ const renderElementsBoxHighlight = (
       elementX2,
       elementY1,
       elementY2,
-      selectionColors: [appState.gridColor.Bold??"rgb(0,118,255)"], //zsviczian
+      selectionColors: [appState.gridColor.Bold ?? "rgb(0,118,255)"], //zsviczian
       dashed: false,
       cx: elementX1 + (elementX2 - elementX1) / 2,
       cy: elementY1 + (elementY2 - elementY1) / 2,

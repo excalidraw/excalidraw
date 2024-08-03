@@ -8,8 +8,9 @@ export const normalizeLink = (link: string) => {
   if (!link) {
     return link;
   }
-  link = link.trim();//zsviczian
-  if(link?.startsWith("data:text/html")) { //zsviczian
+  link = link.trim(); //zsviczian
+  if (link?.startsWith("data:text/html")) {
+    //zsviczian
     return link;
   }
   return sanitizeUrl(sanitizeHTMLAttribute(link));

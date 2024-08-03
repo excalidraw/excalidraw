@@ -122,29 +122,27 @@ const Heading = ({
   color,
   message,
 }: {
-  children: React.ReactNode
-  color?: string
-  message?: string
+  children: React.ReactNode;
+  color?: string;
+  message?: string;
 }) => {
-  if(color && message) {
+  if (color && message) {
     return (
       <div
         className="welcome-screen-center__heading welcome-screen-decor excalifont"
         style={{
-            color: color,
-            marginTop: "-1.5rem",
+          color,
+          marginTop: "-1.5rem",
         }}
       >
         {children}
-        <div style={{fontSize: "0.7rem"}}>{message}</div>
+        <div style={{ fontSize: "0.7rem" }}>{message}</div>
       </div>
     );
-  } 
+  }
 
   return (
-    <div
-      className="welcome-screen-center__heading welcome-screen-decor excalifont"
-    >
+    <div className="welcome-screen-center__heading welcome-screen-decor excalifont">
       {children}
     </div>
   );

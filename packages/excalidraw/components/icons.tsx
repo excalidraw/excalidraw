@@ -437,7 +437,7 @@ export const MoonIcon = createIcon(
 );
 
 export const SunIcon = createIcon(
-  <g 
+  <g
     stroke="var(--icon-fill-color)" //zsviczian
     strokeLinejoin="round"
   >

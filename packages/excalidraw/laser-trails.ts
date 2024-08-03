@@ -45,7 +45,7 @@ export class LaserTrails implements Trail {
       streamline: 0.4,
       sizeMapping: (c) => {
         const DECAY_TIME = getDecayTime(); //zsviczian
-        const DECAY_LENGTH = getDecayLength(); //zsviczian 
+        const DECAY_LENGTH = getDecayLength(); //zsviczian
         const t = Math.max(
           0,
           1 - (performance.now() - c.pressure) / DECAY_TIME,

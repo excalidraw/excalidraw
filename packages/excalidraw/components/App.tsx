@@ -424,7 +424,12 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
-import { getExcalidrawContentEl, hideFreedrawPenmodeCursor, hostPlugin, initializeObsidianUtils } from "../obsidianUtils";
+import {
+  getExcalidrawContentEl,
+  hideFreedrawPenmodeCursor,
+  hostPlugin,
+  initializeObsidianUtils,
+} from "../obsidianUtils";
 import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
@@ -831,9 +836,10 @@ class App extends React.Component<AppProps, AppState> {
   private getHTMLIFrameElement(
     element: ExcalidrawIframeLikeElement | string, //zsviczian
   ): HTMLIFrameElement | undefined {
-    if (typeof element === "string") { //zsviczian
-      return this.iFrameRefs.get(element)
-    } 
+    //zsviczian
+    if (typeof element === "string") {
+      return this.iFrameRefs.get(element);
+    }
     return this.iFrameRefs.get(element.id);
   }
 
@@ -1176,7 +1182,7 @@ class App extends React.Component<AppProps, AppState> {
             !embedLink?.link?.startsWith?.("https://player.vimeo.com");
 
           // Modify the scale based on el.scale property
-          const [xScale, yScale] = el.scale ?? [1,1]; //zsviczian
+          const [xScale, yScale] = el.scale ?? [1, 1]; //zsviczian
           const scaledTransform = `scale(${scale * xScale}, ${scale * yScale})`;
 
           return (
@@ -1197,8 +1203,8 @@ class App extends React.Component<AppProps, AppState> {
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                 ),
-                ["--embeddable-radius" as string]: `${getCornerRadius(
-                  Math.min(el.width, el.height), el) / xScale //zsviczian
+                ["--embeddable-radius" as string]: `${
+                  getCornerRadius(Math.min(el.width, el.height), el) / xScale //zsviczian
                 }px`,
               }}
             >
@@ -1237,48 +1243,52 @@ class App extends React.Component<AppProps, AppState> {
                 <div
                   className="excalidraw__embeddable__outer"
                   style={{
-                    padding: `${el.strokeWidth / (4*el.scale[0])}px`, //zsviczian MDEmbeddable round border cutoff issue
+                    padding: `${el.strokeWidth / (4 * el.scale[0])}px`, //zsviczian MDEmbeddable round border cutoff issue
                   }}
                 >
                   {(isEmbeddableElement(el)
                     ? this.props.renderEmbeddable?.(el, this.state) //zsviczian
-                    : null) ?? (
-                      isWebview ? ( //zsviczian
+                    : null) ??
+                    (isWebview ? ( //zsviczian
                       <webview
                         ref={(ref) =>
-                          this.cacheEmbeddableRef(
-                            el,
-                            ref as HTMLIFrameElement,
-                          )
+                          this.cacheEmbeddableRef(el, ref as HTMLIFrameElement)
                         }
                         className="excalidraw__embeddable"
-                        src={(embedLink?.type === "generic" || embedLink?.type === "video") ? embedLink.link : ""}
+                        src={
+                          embedLink?.type === "generic" ||
+                          embedLink?.type === "video"
+                            ? embedLink.link
+                            : ""
+                        }
                         title="Excalidraw Embedded Content"
                         allowFullScreen={true}
                       />
                     ) : (
-                    <iframe
-                      ref={(ref) => this.cacheEmbeddableRef(el, ref)}
-                      className="excalidraw__embeddable"
-                      srcDoc={
-                        src?.type === "document"
-                          ? src.srcdoc(this.state.theme)
-                          : undefined
-                      }
-                      src={
-                        src?.type !== "document" ? src?.link ?? "" : undefined
-                      }
-                      // https://stackoverflow.com/q/18470015
-                      scrolling="no"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                      sandbox={`${
-                        src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
-                      } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
-                    />
-                  ))}
+                      <iframe
+                        ref={(ref) => this.cacheEmbeddableRef(el, ref)}
+                        className="excalidraw__embeddable"
+                        srcDoc={
+                          src?.type === "document"
+                            ? src.srcdoc(this.state.theme)
+                            : undefined
+                        }
+                        src={
+                          src?.type !== "document" ? src?.link ?? "" : undefined
+                        }
+                        // https://stackoverflow.com/q/18470015
+                        scrolling="no"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Excalidraw Embedded Content"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen={true}
+                        sandbox={`${
+                          src?.sandbox?.allowSameOrigin
+                            ? "allow-same-origin"
+                            : ""
+                        } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                      />
+                    ))}
                 </div>
               </div>
             </div>
@@ -1420,7 +1430,9 @@ class App extends React.Component<AppProps, AppState> {
               color: "var(--color-gray-80)",
               overflow: "hidden",
               maxWidth: `${
-                getExcalidrawContentEl().clientWidth - x1 - FRAME_NAME_EDIT_PADDING //zsviczian was document.body
+                getExcalidrawContentEl().clientWidth -
+                x1 -
+                FRAME_NAME_EDIT_PADDING //zsviczian was document.body
               }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
@@ -1893,8 +1905,10 @@ class App extends React.Component<AppProps, AppState> {
     source: "button" | "upstream",
   ) {
     if (!this.OPENAI_KEY) {
-      this.setToast({ //zsviczian
-        message: "You must first configure your OpenAI API key in plugin settings",
+      //zsviczian
+      this.setToast({
+        message:
+          "You must first configure your OpenAI API key in plugin settings",
         duration: 5000,
       });
       return;
@@ -2020,9 +2034,11 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   //zsviczian - ugly hack
-  private get OPENAI_KEY():string | null { return hostPlugin.settings.openAIAPIToken };
-  private set OPENAI_KEY(value:string | null) { return; };
-  
+  private get OPENAI_KEY(): string | null {
+    return hostPlugin.settings.openAIAPIToken;
+  }
+  private set OPENAI_KEY(value: string | null) {}
+
   private OPENAI_KEY_IS_PERSISTED: boolean =
     EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
 
@@ -2073,8 +2089,10 @@ class App extends React.Component<AppProps, AppState> {
 
   public onMagicframeToolSelect = () => {
     if (!this.OPENAI_KEY) {
-      this.setToast({ //zsviczian
-        message: "You must first configure your OpenAI API key in plugin settings",
+      //zsviczian
+      this.setToast({
+        message:
+          "You must first configure your OpenAI API key in plugin settings",
         duration: 5000,
       });
       return;
@@ -2434,7 +2452,6 @@ class App extends React.Component<AppProps, AppState> {
 
     const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
       getExcalidrawContentEl(); //zsviczian was document.body;
-      
 
     const prevViewportState = this.device.viewport;
 
@@ -2600,9 +2617,9 @@ class App extends React.Component<AppProps, AppState> {
     this.initializedEmbeds.clear(); //zsviczian
     //@ts-ignore
     this.initializedEmbeds = null; //zsviczian
-    this.elementsPendingErasure.clear(); //zsviczian 
+    this.elementsPendingErasure.clear(); //zsviczian
     //@ts-ignore
-    this.elementsPendingErasure = null; //zsviczian    
+    this.elementsPendingErasure = null; //zsviczian
     this.lastPointerDownEvent = null; //zsviczian
     this.lastPointerUpEvent = null; //zsviczian
     this.lastPointerMoveEvent = null; //zsviczian
@@ -2622,7 +2639,7 @@ class App extends React.Component<AppProps, AppState> {
     //@ts-ignore
     this.excalidrawContainerRef.current = undefined; //zsviczian
     this.nearestScrollableContainer = undefined; //zsviczian
-    this.excalidrawContainerValue = { container: null, id:"unknown" }; //zsviczian
+    this.excalidrawContainerValue = { container: null, id: "unknown" }; //zsviczian
     //@ts-ignore
     // this.laserTrails.terminate(); //zsviczian
     // this.eraserTrail.terminate(); //zsviczian
@@ -2687,7 +2704,9 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.POINTER_UP, this.removePointer), // #3553
       addEventListener(document, EVENT.COPY, this.onCopy),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
-      addEventListener(window,"focus", ()=>this.triggerRender(true), { passive: true }), //zsviczian
+      addEventListener(window, "focus", () => this.triggerRender(true), {
+        passive: true,
+      }), //zsviczian
       addEventListener(
         document,
         EVENT.POINTER_MOVE,
@@ -3180,10 +3199,11 @@ class App extends React.Component<AppProps, AppState> {
 
           try {
             const { elements: skeletonElements, files } =
-              await api.parseMermaidToExcalidraw(data.text, { //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
+              await api.parseMermaidToExcalidraw(data.text, {
+                //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
                 fontSize: DEFAULT_FONT_SIZE,
               });
-              //await api.parseMermaidToExcalidraw(data.text);
+            //await api.parseMermaidToExcalidraw(data.text);
 
             const elements = convertToExcalidrawElements(skeletonElements, {
               regenerateIds: true,
@@ -3499,7 +3519,10 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       text,
       rawText: text,
-      fontSize: getFontSize(this.state.currentItemFontSize,this.state.zoom.value),//zsviczian
+      fontSize: getFontSize(
+        this.state.currentItemFontSize,
+        this.state.zoom.value,
+      ), //zsviczian
       fontFamily: this.state.currentItemFontFamily,
       textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
@@ -3671,7 +3694,7 @@ class App extends React.Component<AppProps, AppState> {
 
   onHandToolToggle = () => {
     //zsviczian added timeout because button won't select otherwise
-    setTimeout(()=>this.actionManager.executeAction(actionToggleHandTool));
+    setTimeout(() => this.actionManager.executeAction(actionToggleHandTool));
   };
 
   /**
@@ -4052,16 +4075,14 @@ class App extends React.Component<AppProps, AppState> {
 
       //zsviczian forceFlushSync is set to true in ExcalidrawView.updateScene.
       //without this e.g. text search did not select the elements
-      if(sceneData.forceFlushSync === true) {
+      if (sceneData.forceFlushSync === true) {
         flushSync(() => {
           if (sceneData.appState) {
             this.setState(sceneData.appState);
           }
         });
-      } else {
-        if (sceneData.appState) {
-          this.setState(sceneData.appState);
-        }
+      } else if (sceneData.appState) {
+        this.setState(sceneData.appState);
       }
 
       if (sceneData.elements) {
@@ -4130,7 +4151,11 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
-      if (this.state.activeTool.type === "selection"  && this.state.resizingElement && (event.shiftKey || event.altKey)) {
+      if (
+        this.state.activeTool.type === "selection" &&
+        this.state.resizingElement &&
+        (event.shiftKey || event.altKey)
+      ) {
         event.stopPropagation(); //zsviczian shift fires repeatedly causing slowdown when resizing sticky notes
         return;
       }
@@ -4373,9 +4398,10 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               editingFrame: selectedElement.id,
             });
-          } else if (isEmbeddableElement(selectedElement)) {//zsviczian
+          } else if (isEmbeddableElement(selectedElement)) {
+            //zsviczian
             this.setState({
-              activeEmbeddable: { element: selectedElement, state: "active" }
+              activeEmbeddable: { element: selectedElement, state: "active" },
             });
           }
         }
@@ -4629,7 +4655,7 @@ class App extends React.Component<AppProps, AppState> {
           activeTool: nextActiveTool,
           ...commonResets,
         };
-      });//zsviczian added timeout because button won't select otherwise
+      }); //zsviczian added timeout because button won't select otherwise
     });
   };
 
@@ -4823,19 +4849,22 @@ class App extends React.Component<AppProps, AppState> {
         const rawText = nextOriginalText; //should this be originalText??
         let link = undefined;
         if (this.props.onBeforeTextSubmit) {
-          const _element = this.scene.getElementsIncludingDeleted().find((el) => 
-            (el.id === element.id && isTextElement(el))) as ExcalidrawTextElement;
-          if(_element) {
+          const _element = this.scene
+            .getElementsIncludingDeleted()
+            .find(
+              (el) => el.id === element.id && isTextElement(el),
+            ) as ExcalidrawTextElement;
+          if (_element) {
             const dismensionsData = refreshTextDimensions(
               _element,
               getContainerElement(_element, elementsMap),
               elementsMap,
               nextOriginalText,
             );
-            const {updatedNextOriginalText, nextLink} =
+            const { updatedNextOriginalText, nextLink } =
               this.props.onBeforeTextSubmit(
                 element,
-                dismensionsData?.text??nextOriginalText, //should never be undefined
+                dismensionsData?.text ?? nextOriginalText, //should never be undefined
                 nextOriginalText,
                 isDeleted,
               );
@@ -5169,7 +5198,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const lineHeight =
       existingTextElement?.lineHeight || getLineHeight(fontFamily);
-    const fontSize = getFontSize(this.state.currentItemFontSize,this.state.zoom.value); //zsviczian
+    const fontSize = getFontSize(
+      this.state.currentItemFontSize,
+      this.state.zoom.value,
+    ); //zsviczian
 
     if (
       !existingTextElement &&
@@ -5291,7 +5323,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if ( //zsviczian - double click eraser
+    if (
+      //zsviczian - double click eraser
       this.state.penMode &&
       this.lastPointerDownEvent?.pointerType === "touch" &&
       this.state.activeTool.type !== "selection"
@@ -5302,7 +5335,7 @@ class App extends React.Component<AppProps, AppState> {
         //Once from the onTouchStart event handler, once from the double click event handler
         return;
       }
-      this.debounceDoubleClickTimestamp = now;  
+      this.debounceDoubleClickTimestamp = now;
       this.updateScene(actionToggleEraserTool.perform([] as any, this.state));
       return;
     } // zsviczian - end
@@ -5602,11 +5635,16 @@ class App extends React.Component<AppProps, AppState> {
       event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
-    const isPenFreedraw = this.state.activeTool.type === "freedraw" && event.pointerType === "pen"; //zsviczian
+    const isPenFreedraw =
+      this.state.activeTool.type === "freedraw" && event.pointerType === "pen"; //zsviczian
     if (!this.state.draggingElement && !this.state.multiElement) {
       if (isOverScrollBar) {
         resetCursor(this.interactiveCanvas);
-      } else if (isPenFreedraw && this.interactiveCanvas && hideFreedrawPenmodeCursor()) {
+      } else if (
+        isPenFreedraw &&
+        this.interactiveCanvas &&
+        hideFreedrawPenmodeCursor()
+      ) {
         //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1659
         this.interactiveCanvas.style.cursor = "none";
       } else {
@@ -7263,8 +7301,8 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (strokeOptions?.highlighter) {
       //zsviczian
-      this.scene.insertElement(element,0);
-/*      this.scene.replaceAllElements([
+      this.scene.insertElement(element, 0);
+      /*      this.scene.replaceAllElements([
         element,
         ...this.scene.getElementsIncludingDeleted(),
       ]);*/

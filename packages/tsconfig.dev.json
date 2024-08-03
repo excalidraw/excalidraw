@@ -7,6 +7,6 @@
     "jsx": "react-jsx",
     "sourceMap": true,
     "allowJs": true,
-    "lib": ["es2017", "dom"], // Ensure this is compatible with iOS 15
+    "lib": ["es2017", "dom"] // Ensure this is compatible with iOS 15
   }
 }

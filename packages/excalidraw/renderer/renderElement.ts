@@ -311,7 +311,7 @@ const generateElementCanvas = (
         scale,
     );
   }
-  
+
   return {
     element,
     canvas,

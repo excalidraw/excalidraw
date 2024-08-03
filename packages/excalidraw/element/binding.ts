@@ -1248,9 +1248,9 @@ export const fixBindingsAfterDuplication = (
     .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
       const oldElementId = duplicateIdToOldId.get(bindableElement.id);
-      const { boundElements } = sceneElements.find(
+      const boundElements = sceneElements.find(
         ({ id }) => id === oldElementId,
-      )!;
+      )?.boundElements;
 
       if (boundElements != null && boundElements.length > 0) {
         mutateElement(bindableElement, {
@@ -1519,7 +1519,8 @@ const coordsCenter = (
 // all focus points lie, so it's a number between -1 and 1.
 // The line going through `a` and `b` is a tangent to the "focus image"
 // of the element.
-export const determineFocusDistance = ( //zsviczian added export
+export const determineFocusDistance = (
+  //zsviczian added export
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,
@@ -1600,7 +1601,8 @@ const determineFocusPoint = (
 
 // Returns 2 or 0 intersection points between line going through `a` and `b`
 // and the `element`, in ascending order of distance from `a`.
-export const intersectElementWithLine = ( //zsviczian added export
+export const intersectElementWithLine = (
+  //zsviczian added export
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,

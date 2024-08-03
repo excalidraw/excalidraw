@@ -620,7 +620,7 @@ export const textWysiwyg = ({
       (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
         event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
         event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`));
-  
+
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");

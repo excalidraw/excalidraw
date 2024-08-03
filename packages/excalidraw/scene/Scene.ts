@@ -394,7 +394,8 @@ class Scene {
     this.replaceAllElements(nextElements);
   }
 
-  insertElement = (element: ExcalidrawElement, idx?: number) => { //zsviczian idx
+  insertElement = (element: ExcalidrawElement, idx?: number) => {
+    //zsviczian idx
     const index = element.frameId
       ? this.getElementIndex(element.frameId)
       : this.elements.length;

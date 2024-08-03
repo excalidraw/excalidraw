@@ -675,22 +675,46 @@ let useFibonacci = false; //zsviczian
 //zsviczian
 //with a random noise of +-0.05 to avoid duplicates
 const fibonacciValues = [
-  [177.38,109.63,67.75,41.9,25.91,16,9.9,6.14,3.83,2.29,1.47,0.9,0.57],
-  [287.06,177.43,109.64,67.73,41.92,26,16.01,9.92,6.1,3.75,2.34,1.41,0.87],
-  [464.44,287.11,177.44,109.65,67.76,42,25.9,15.97,9.93,6.12,3.82,2.3,1.46],
-  [751.52,464.45,287.08,177.42,109.67,68,41.89,25.93,15.99,9.88,6.07,3.77,2.35]
-]
+  [
+    177.38, 109.63, 67.75, 41.9, 25.91, 16, 9.9, 6.14, 3.83, 2.29, 1.47, 0.9,
+    0.57,
+  ],
+  [
+    287.06, 177.43, 109.64, 67.73, 41.92, 26, 16.01, 9.92, 6.1, 3.75, 2.34,
+    1.41, 0.87,
+  ],
+  [
+    464.44, 287.11, 177.44, 109.65, 67.76, 42, 25.9, 15.97, 9.93, 6.12, 3.82,
+    2.3, 1.46,
+  ],
+  [
+    751.52, 464.45, 287.08, 177.42, 109.67, 68, 41.89, 25.93, 15.99, 9.88, 6.07,
+    3.77, 2.35,
+  ],
+];
 
 //zsviczian
 const normalValues = [
-  [182.22,121.46,80,53,35.99,23.96,16,10.68,7.1,4.74,3.16,2.11,1.45,0.97,0.66],
-  [227.82,151.88,101.25,67.51,44.95,29.98,20,13.31,8.85,5.97,3.95,2.68,1.77,1.19,0.82],
-  [318.96,212.59,141.8,94.51,62.98,42.01,28,18.63,12.45,8.26,5.52,3.7,2.47,1.61,1.07],
-  [410.02,273.42,182.28,121.5,81,54,36,24.01,16.05,10.69,7.13,4.78,3.12,2.07,1.38]
-]
+  [
+    182.22, 121.46, 80, 53, 35.99, 23.96, 16, 10.68, 7.1, 4.74, 3.16, 2.11,
+    1.45, 0.97, 0.66,
+  ],
+  [
+    227.82, 151.88, 101.25, 67.51, 44.95, 29.98, 20, 13.31, 8.85, 5.97, 3.95,
+    2.68, 1.77, 1.19, 0.82,
+  ],
+  [
+    318.96, 212.59, 141.8, 94.51, 62.98, 42.01, 28, 18.63, 12.45, 8.26, 5.52,
+    3.7, 2.47, 1.61, 1.07,
+  ],
+  [
+    410.02, 273.42, 182.28, 121.5, 81, 54, 36, 24.01, 16.05, 10.69, 7.13, 4.78,
+    3.12, 2.07, 1.38,
+  ],
+];
 
 //zsviczian
-const valueToIndex: { [key: number]: number }  = {
+const valueToIndex: { [key: number]: number } = {
   16: 0,
   20: 1,
   28: 2,
@@ -698,23 +722,25 @@ const valueToIndex: { [key: number]: number }  = {
 };
 
 //zsviczian
-const getFibonacciFontSize = (zoom:number, buttonValue:number):number => {
+const getFibonacciFontSize = (zoom: number, buttonValue: number): number => {
   const index = valueToIndex[buttonValue];
-  if(typeof index !== "number") return buttonValue;
+  if (typeof index !== "number") {
+    return buttonValue;
+  }
   const range = [
-    [0,0.12],
-    [0.12,0.19],
-    [0.19,0.31],
-    [0.31,0.5],
-    [0.5,0.81],
-    [0.81,1.31],
-    [1.31,2.12],
-    [2.12,3.43],
-    [3.43,5.54],
-    [5.54,8.97],
-    [8.97,14.52],
-    [14.52,23.49],
-    [23.49,100]
+    [0, 0.12],
+    [0.12, 0.19],
+    [0.19, 0.31],
+    [0.31, 0.5],
+    [0.5, 0.81],
+    [0.81, 1.31],
+    [1.31, 2.12],
+    [2.12, 3.43],
+    [3.43, 5.54],
+    [5.54, 8.97],
+    [8.97, 14.52],
+    [14.52, 23.49],
+    [23.49, 100],
   ];
   for (let i = 0; i < range.length; i++) {
     const [from, to] = range[i];
@@ -724,28 +750,30 @@ const getFibonacciFontSize = (zoom:number, buttonValue:number):number => {
     }
   }
   return buttonValue;
-}
+};
 
 //zsviczian
-const getScaledFontSize = (zoom:number, buttonValue:number):number => {
+const getScaledFontSize = (zoom: number, buttonValue: number): number => {
   const index = valueToIndex[buttonValue];
-  if(typeof index !== "number") return buttonValue;
+  if (typeof index !== "number") {
+    return buttonValue;
+  }
   const range = [
-    [0,0.11],
-    [0.11,0.16],
-    [0.16,0.25],
-    [0.25,0.37],
-    [0.37,0.56],
-    [0.56,0.83],
-    [0.83,1.25],
-    [1.25,1.88],
-    [1.88,2.81],
-    [2.81,4.22],
-    [4.22,6.33],
-    [6.33,9.49],
-    [9.49,14.24],
-    [14.24,21.36],
-    [21.36,100],    
+    [0, 0.11],
+    [0.11, 0.16],
+    [0.16, 0.25],
+    [0.25, 0.37],
+    [0.37, 0.56],
+    [0.56, 0.83],
+    [0.83, 1.25],
+    [1.25, 1.88],
+    [1.88, 2.81],
+    [2.81, 4.22],
+    [4.22, 6.33],
+    [6.33, 9.49],
+    [9.49, 14.24],
+    [14.24, 21.36],
+    [21.36, 100],
   ];
   for (let i = 0; i < range.length; i++) {
     const [from, to] = range[i];
@@ -755,10 +783,10 @@ const getScaledFontSize = (zoom:number, buttonValue:number):number => {
     }
   }
   return buttonValue;
-}
+};
 
 //zsviczian
-const findIndex = (values: number[][], value: number):number|null => {
+const findIndex = (values: number[][], value: number): number | null => {
   for (let i = 0; i < values.length; i++) {
     const idx = values[i].indexOf(value);
     if (idx !== -1) {
@@ -769,19 +797,21 @@ const findIndex = (values: number[][], value: number):number|null => {
 };
 
 //zsviczian
-export const getFontSize = (size:number, zoom: number):number => {
+export const getFontSize = (size: number, zoom: number): number => {
   zoom = scaleFontSize ? zoom : 1;
   let normalizedSizeIdx = findIndex(fibonacciValues, size);
-  if(!normalizedSizeIdx) {
+  if (!normalizedSizeIdx) {
     normalizedSizeIdx = findIndex(normalValues, size);
   }
-  if(normalizedSizeIdx === null) return size;
-  size = [16,20,28,36][normalizedSizeIdx];
+  if (normalizedSizeIdx === null) {
+    return size;
+  }
+  size = [16, 20, 28, 36][normalizedSizeIdx];
   const nextValue = useFibonacci
     ? getFibonacciFontSize(zoom, size)
     : getScaledFontSize(zoom, size);
-  return nextValue??size;
-}
+  return nextValue ?? size;
+};
 
 export const actionChangeFontSize = register({
   name: "changeFontSize",
@@ -792,15 +822,19 @@ export const actionChangeFontSize = register({
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
     //zsviczian
-    let selectedElements = getSelectedElements(elements, appState).filter(el=>isTextElement(el)) as ExcalidrawTextElement[];
-    if(selectedElements.length === 0) {
+    let selectedElements = getSelectedElements(elements, appState).filter(
+      (el) => isTextElement(el),
+    ) as ExcalidrawTextElement[];
+    if (selectedElements.length === 0) {
       selectedElements = (
-        appState.editingElement?.type === "text" ? [appState.editingElement] : []
+        appState.editingElement?.type === "text"
+          ? [appState.editingElement]
+          : []
       ) as ExcalidrawTextElement[];
     }
     const size = selectedElements[0]?.fontSize;
-    let idx:number|null = null;
-    if (size && selectedElements.every(el=>el.fontSize===size)) {
+    let idx: number | null = null;
+    if (size && selectedElements.every((el) => el.fontSize === size)) {
       idx = findIndex(normalValues, size);
       if (idx === null) {
         idx = findIndex(fibonacciValues, size);
@@ -811,79 +845,86 @@ export const actionChangeFontSize = register({
     const isLarge = idx === 2;
     const isVeryLarge = idx === 3;
 
-    return ( //zsviczian
-    <fieldset>
-      <legend>{t("labels.fontSize")}</legend>
-      <ButtonIconSelect
-        type="button" //zsviczian
-        //group="font-size" //zsviczian
-        options={[
-          {
-            value: 16,
-            text: t("labels.small") + "\nSHIFT: zoomed, ALT/OPT: Fibonacci", //zsviczian
-            icon: FontSizeSmallIcon,
-            testId: "fontSize-small",
-            active: isSmall ? true : undefined, //zsviczian
-          },
-          {
-            value: 20,
-            text: t("labels.medium") + "\nSHIFT: zoomed, ALT/OPT: Fibonacci", //zsviczian
-            icon: FontSizeMediumIcon,
-            testId: "fontSize-medium",
-            active: isMedium ? true : undefined, //zsviczian
-          },
-          {
-            value: 28,
-            text: t("labels.large") + "\nSHIFT: zoomed, ALT/OPT: Fibonacci", //zsviczian
-            icon: FontSizeLargeIcon,
-            testId: "fontSize-large",
-            active: isLarge ? true : undefined, //zsviczian
-          },
-          {
-            value: 36,
-            text: t("labels.veryLarge") + "\nSHIFT: zoomed, ALT/OPT: Fibonacci", //zsviczian
-            icon: FontSizeExtraLargeIcon,
-            testId: "fontSize-veryLarge",
-            active: isVeryLarge ? true : undefined, //zsviczian
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => {
-            if (isTextElement(element)) {
-              return element.fontSize;
-            }
-            const boundTextElement = getBoundTextElement(
-              element,
-              app.scene.getNonDeletedElementsMap(),
-            );
-            if (boundTextElement) {
-              return boundTextElement.fontSize;
-            }
-            return null;
-          },
-          (element) =>
-            isTextElement(element) ||
-            getBoundTextElement(
-              element,
-              app.scene.getNonDeletedElementsMap(),
-            ) !== null,
-          (hasSelection) =>
-            hasSelection
-              ? null
-              : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-        )}
-        //zsviczian onClick
-        onClick={(value:number, event:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-          scaleFontSize = event.shiftKey;
-          useFibonacci = event.altKey;
-          updateData(getFontSize(value, appState.zoom.value));
-        }}
-        //onChange={(value) => updateData(value)} //zsviczian
-      />
-    </fieldset>
-  )},
+    return (
+      //zsviczian
+      <fieldset>
+        <legend>{t("labels.fontSize")}</legend>
+        <ButtonIconSelect
+          type="button" //zsviczian
+          //group="font-size" //zsviczian
+          options={[
+            {
+              value: 16,
+              text: `${t("labels.small")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+              icon: FontSizeSmallIcon,
+              testId: "fontSize-small",
+              active: isSmall ? true : undefined, //zsviczian
+            },
+            {
+              value: 20,
+              text: `${t("labels.medium")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+              icon: FontSizeMediumIcon,
+              testId: "fontSize-medium",
+              active: isMedium ? true : undefined, //zsviczian
+            },
+            {
+              value: 28,
+              text: `${t("labels.large")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+              icon: FontSizeLargeIcon,
+              testId: "fontSize-large",
+              active: isLarge ? true : undefined, //zsviczian
+            },
+            {
+              value: 36,
+              text: `${t(
+                "labels.veryLarge",
+              )}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+              icon: FontSizeExtraLargeIcon,
+              testId: "fontSize-veryLarge",
+              active: isVeryLarge ? true : undefined, //zsviczian
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontSize;
+              }
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
+              if (boundTextElement) {
+                return boundTextElement.fontSize;
+              }
+              return null;
+            },
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+          )}
+          //zsviczian onClick
+          onClick={(
+            value: number,
+            event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+          ) => {
+            scaleFontSize = event.shiftKey;
+            useFibonacci = event.altKey;
+            updateData(getFontSize(value, appState.zoom.value));
+          }}
+          //onChange={(value) => updateData(value)} //zsviczian
+        />
+      </fieldset>
+    );
+  },
 });
 
 export const actionDecreaseFontSize = register({
@@ -1639,7 +1680,7 @@ const getArrowheadOptions = (flip: boolean) => {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
-      keyBinding: "v",//zsviczian was null
+      keyBinding: "v", //zsviczian was null
       showInPicker: true, //zsviczian
     },
   ] as const;

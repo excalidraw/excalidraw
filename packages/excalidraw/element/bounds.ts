@@ -598,17 +598,19 @@ export const getArrowheadPoints = (
   const xs = x2 - nx * minSize;
   const ys = y2 - ny * minSize;
 
-  if (arrowhead === "dot") { //zsviczian
+  if (arrowhead === "dot") {
+    //zsviczian
     const diameter = Math.hypot(ys - y2, xs - x2) + element.strokeWidth - 2;
-    return [x2, y2, diameter*0.8]; //zsviczian
+    return [x2, y2, diameter * 0.8]; //zsviczian
   }
 
-  if (//zsviczian removed "dot"
+  if (
+    //zsviczian removed "dot"
     arrowhead === "circle" ||
     arrowhead === "circle_outline"
   ) {
     const diameter = Math.hypot(ys - y2, xs - x2) + element.strokeWidth - 2;
-    return [x2, y2, diameter*1.2]; //zsviczian
+    return [x2, y2, diameter * 1.2]; //zsviczian
   }
 
   const angle = getArrowheadAngle(arrowhead);

@@ -322,7 +322,8 @@ export function register( //zsviczian (changed from private to export)
   const familyId = FONT_FAMILY[family as keyof typeof FONT_FAMILY];
   const registeredFamily = this.registered.get(familyId);
 
-  if (!registeredFamily || familyId === FONT_FAMILY["Local Font"]) { //zsviczian (added "Local Font")
+  if (!registeredFamily || familyId === FONT_FAMILY["Local Font"]) {
+    //zsviczian (added "Local Font")
     this.registered.set(familyId, {
       metadata,
       fonts: params.map(

@@ -139,14 +139,11 @@ export const MobileMenu = ({
           app={app}
         />
         <div //zsviczian
-          className={clsx(
-            "layer-ui__wrapper__top-right zen-mode-transition",
-            {
-              "transition-right": appState.zenModeEnabled,
-            },
-          )}
+          className={clsx("layer-ui__wrapper__top-right zen-mode-transition", {
+            "transition-right": appState.zenModeEnabled,
+          })}
           style={{
-            marginRight: "4rem"
+            marginRight: "4rem",
           }}
         >
           {shouldShowStats && ( //zsviczian
@@ -157,7 +154,7 @@ export const MobileMenu = ({
               }}
               renderCustomStats={renderCustomStats}
             />
-          )}          
+          )}
         </div>
       </FixedSideContainer>
     );

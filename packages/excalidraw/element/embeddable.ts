@@ -86,8 +86,14 @@ export const getEmbedLink = (
 
   const allowSameOrigin = true; //zsviczian I don't worry about same origin in Obsidian
 
-  if (link.startsWith("data:text/html")) { //zsviczian
-    return { link, intrinsicSize: { w: 550, h: 720 }, type: "generic", sandbox: { allowSameOrigin }, };
+  if (link.startsWith("data:text/html")) {
+    //zsviczian
+    return {
+      link,
+      intrinsicSize: { w: 550, h: 720 },
+      type: "generic",
+      sandbox: { allowSameOrigin },
+    };
   }
 
   if (embeddedLinkCache.has(link)) {

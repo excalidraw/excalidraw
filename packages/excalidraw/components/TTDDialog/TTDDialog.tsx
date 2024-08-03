@@ -88,8 +88,8 @@ export const TTDDialogBase = withInternalFallback(
     | { __fallback: true }
   )) => {
     const app = useApp();
-    const appState = useUIAppState();//zsviczian
-    const appProps = useAppProps();//zsviczian
+    const appState = useUIAppState(); //zsviczian
+    const appProps = useAppProps(); //zsviczian
     const setAppState = useExcalidrawSetAppState();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);

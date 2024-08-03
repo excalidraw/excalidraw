@@ -35,9 +35,10 @@ export const setCursor = (
 
 let eraserCanvasCache: any;
 
-export const clearEraserCanvasCache = () => { //zsviczian
+//zsviczian
+export const clearEraserCanvasCache = () => {
   eraserCanvasCache = null;
-}
+};
 
 let previewDataURL: string;
 export const setEraserCursor = (
