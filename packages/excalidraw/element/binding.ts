@@ -1246,6 +1246,9 @@ export const fixBindingsAfterDuplication = (
     .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
       const oldElementId = duplicateIdToOldId.get(bindableElement.id);
+      if (!oldElementId) {
+        return; //if no bound element is found
+      }
       const { boundElements } = sceneElements.find(
         ({ id }) => id === oldElementId,
       )!;
