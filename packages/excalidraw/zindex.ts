@@ -80,29 +80,37 @@ const getTargetIndexAccountingForBinding = (
   direction: "left" | "right",
 ) => {
   if ("containerId" in nextElement && nextElement.containerId) {
-    if (direction === "left") {
-      const containerElement = Scene.getScene(nextElement)!.getElement(
-        nextElement.containerId,
-      );
-      if (containerElement) {
-        return elements.indexOf(containerElement);
-      }
-    } else {
-      return elements.indexOf(nextElement);
+    const containerElement = Scene.getScene(nextElement)!.getElement(
+      nextElement.containerId,
+    );
+    if (containerElement) {
+      return direction === "left"
+        ? Math.min(
+            elements.indexOf(containerElement),
+            elements.indexOf(nextElement),
+          )
+        : Math.max(
+            elements.indexOf(containerElement),
+            elements.indexOf(nextElement),
+          );
     }
   } else {
     const boundElementId = nextElement.boundElements?.find(
       (binding) => binding.type !== "arrow",
     )?.id;
     if (boundElementId) {
-      if (direction === "left") {
-        return elements.indexOf(nextElement);
-      }
-
       const boundTextElement =
         Scene.getScene(nextElement)!.getElement(boundElementId);
       if (boundTextElement) {
-        return elements.indexOf(boundTextElement);
+        return direction === "left"
+          ? Math.min(
+              elements.indexOf(boundTextElement),
+              elements.indexOf(nextElement),
+            )
+          : Math.max(
+              elements.indexOf(boundTextElement),
+              elements.indexOf(nextElement),
+            );
       }
     }
   }
