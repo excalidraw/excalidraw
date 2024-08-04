@@ -37,7 +37,7 @@ describe("element binding", () => {
         [100, 0],
       ],
     });
-    h.elements = [rect, arrow];
+    API.setElements([rect, arrow]);
     expect(arrow.startBinding).toBe(null);
 
     // select arrow
@@ -225,7 +225,7 @@ describe("element binding", () => {
       height: 100,
     });
 
-    h.elements = [text];
+    API.setElements([text]);
 
     const arrow = UI.createElement("arrow", {
       x: 0,
@@ -267,7 +267,7 @@ describe("element binding", () => {
       height: 100,
     });
 
-    h.elements = [text];
+    API.setElements([text]);
 
     const arrow = UI.createElement("arrow", {
       x: 0,
@@ -362,13 +362,13 @@ describe("element binding", () => {
       ],
     });
 
-    h.elements = [rectangle1, arrow1, arrow2, text1];
+    API.setElements([rectangle1, arrow1, arrow2, text1]);
 
     API.setSelectedElements([text1]);
 
     expect(h.state.selectedElementIds[text1.id]).toBe(true);
 
-    h.app.actionManager.executeAction(actionWrapTextInContainer);
+    API.executeAction(actionWrapTextInContainer);
 
     // new text container will be placed before the text element
     const container = h.elements.at(-2)!;

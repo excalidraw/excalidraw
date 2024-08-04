@@ -279,7 +279,7 @@ describe("pasting & frames", () => {
     });
     const rect = API.createElement({ type: "rectangle" });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect],
@@ -318,7 +318,7 @@ describe("pasting & frames", () => {
       y: 100,
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2],
@@ -361,7 +361,7 @@ describe("pasting & frames", () => {
       groupIds: ["g1"],
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2],
@@ -412,7 +412,7 @@ describe("pasting & frames", () => {
       frameId: frame2.id,
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2, frame2],

@@ -159,7 +159,7 @@ describe("contextMenu element", () => {
       width: 200,
       backgroundColor: "red",
     });
-    h.elements = [rect1, rect2];
+    API.setElements([rect1, rect2]);
     API.setSelectedElements([rect1]);
 
     // lower z-index
@@ -607,7 +607,7 @@ describe("contextMenu element", () => {
       fillStyle: "solid",
       groupIds: ["g1"],
     });
-    h.elements = [rectangle1, rectangle2];
+    API.setElements([rectangle1, rectangle2]);
 
     mouse.rightClickAt(50, 50);
     expect(API.getSelectedElements().length).toBe(2);

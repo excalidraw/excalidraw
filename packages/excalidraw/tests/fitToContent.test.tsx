@@ -1,10 +1,21 @@
-import { render } from "./test-utils";
+import { act, render } from "./test-utils";
 import { API } from "./helpers/api";
 
 import { Excalidraw } from "../index";
 import { vi } from "vitest";
 
 const { h } = window;
+
+const waitForNextAnimationFrame = () => {
+  return act(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      }),
+  );
+};
 
 describe("fitToContent", () => {
   it("should zoom to fit the selected element", async () => {
@@ -22,7 +33,9 @@ describe("fitToContent", () => {
 
     expect(h.state.zoom.value).toBe(1);
 
-    h.app.scrollToContent(rectElement, { fitToContent: true });
+    act(() => {
+      h.app.scrollToContent(rectElement, { fitToContent: true });
+    });
 
     // element is 10x taller than the viewport size,
     // zoom should be at least 1/10
@@ -51,8 +64,10 @@ describe("fitToContent", () => {
 
     expect(h.state.zoom.value).toBe(1);
 
-    h.app.scrollToContent([topLeft, bottomRight], {
-      fitToContent: true,
+    act(() => {
+      h.app.scrollToContent([topLeft, bottomRight], {
+        fitToContent: true,
+      });
     });
 
     // elements take 100x100, which is 10x bigger than the viewport size,
@@ -77,7 +92,9 @@ describe("fitToContent", () => {
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
-    h.app.scrollToContent(rectElement);
+    act(() => {
+      h.app.scrollToContent(rectElement);
+    });
 
     // zoom level should stay the same
     expect(h.state.zoom.value).toBe(1);
@@ -87,14 +104,6 @@ describe("fitToContent", () => {
     expect(h.state.scrollY).not.toBe(0);
   });
 });
-
-const waitForNextAnimationFrame = () => {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(resolve);
-    });
-  });
-};
 
 describe("fitToContent animated", () => {
   beforeEach(() => {
@@ -118,7 +127,9 @@ describe("fitToContent animated", () => {
       y: -100,
     });
 
-    h.app.scrollToContent(rectElement, { animate: true });
+    act(() => {
+      h.app.scrollToContent(rectElement, { animate: true });
+    });
 
     expect(window.requestAnimationFrame).toHaveBeenCalled();
 
@@ -157,7 +168,9 @@ describe("fitToContent animated", () => {
     expect(h.state.scrollX).toBe(0);
     expect(h.state.scrollY).toBe(0);
 
-    h.app.scrollToContent(rectElement, { animate: true, fitToContent: true });
+    act(() => {
+      h.app.scrollToContent(rectElement, { animate: true, fitToContent: true });
+    });
 
     expect(window.requestAnimationFrame).toHaveBeenCalled();
 

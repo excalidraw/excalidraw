@@ -16,7 +16,7 @@ const h = window.h;
 describe("element locking", () => {
   beforeEach(async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
-    h.elements = [];
+    API.setElements([]);
   });
 
   it("click-selecting a locked element is disabled", () => {
@@ -28,7 +28,7 @@ describe("element locking", () => {
       locked: true,
     });
 
-    h.elements = [lockedRectangle];
+    API.setElements([lockedRectangle]);
 
     mouse.clickAt(50, 50);
     expect(API.getSelectedElements().length).toBe(0);
@@ -45,7 +45,7 @@ describe("element locking", () => {
       y: 100,
     });
 
-    h.elements = [lockedRectangle];
+    API.setElements([lockedRectangle]);
 
     mouse.downAt(50, 50);
     mouse.moveTo(250, 250);
@@ -62,7 +62,7 @@ describe("element locking", () => {
       locked: true,
     });
 
-    h.elements = [lockedRectangle];
+    API.setElements([lockedRectangle]);
 
     mouse.downAt(50, 50);
     mouse.moveTo(100, 100);
@@ -85,7 +85,7 @@ describe("element locking", () => {
       locked: true,
     });
 
-    h.elements = [rectangle, lockedRectangle];
+    API.setElements([rectangle, lockedRectangle]);
 
     mouse.downAt(50, 50);
     mouse.moveTo(100, 100);
@@ -97,11 +97,11 @@ describe("element locking", () => {
   });
 
   it("selectAll shouldn't select locked elements", () => {
-    h.elements = [
+    API.setElements([
       API.createElement({ type: "rectangle" }),
       API.createElement({ type: "rectangle", locked: true }),
-    ];
-    h.app.actionManager.executeAction(actionSelectAll);
+    ]);
+    API.executeAction(actionSelectAll);
     expect(API.getSelectedElements().length).toBe(1);
   });
 
@@ -120,7 +120,7 @@ describe("element locking", () => {
       locked: true,
     });
 
-    h.elements = [rectangle, lockedRectangle];
+    API.setElements([rectangle, lockedRectangle]);
     expect(API.getSelectedElements().length).toBe(0);
     mouse.clickAt(50, 50);
     expect(API.getSelectedElements().length).toBe(1);
@@ -142,7 +142,7 @@ describe("element locking", () => {
       locked: true,
     });
 
-    h.elements = [rectangle, lockedRectangle];
+    API.setElements([rectangle, lockedRectangle]);
     expect(API.getSelectedElements().length).toBe(0);
     mouse.rightClickAt(50, 50);
     expect(API.getSelectedElements().length).toBe(1);
@@ -172,7 +172,7 @@ describe("element locking", () => {
       locked: true,
     });
 
-    h.elements = [rectangle, lockedRectangle];
+    API.setElements([rectangle, lockedRectangle]);
     API.setSelectedElements([rectangle]);
     expect(API.getSelectedElements().length).toBe(1);
     expect(API.getSelectedElement().id).toBe(rectangle.id);
@@ -203,7 +203,7 @@ describe("element locking", () => {
       y: 200,
     });
 
-    h.elements = [rectangle, lockedRectangle];
+    API.setElements([rectangle, lockedRectangle]);
 
     mouse.clickAt(250, 250);
     expect(API.getSelectedElements().length).toBe(0);
@@ -228,7 +228,7 @@ describe("element locking", () => {
       containerId: container.id,
       locked: true,
     });
-    h.elements = [container, text];
+    API.setElements([container, text]);
     API.setSelectedElements([container]);
     Keyboard.keyPress(KEYS.ENTER);
     expect(h.state.editingElement?.id).not.toBe(text.id);
@@ -245,7 +245,7 @@ describe("element locking", () => {
       height: 100,
       locked: true,
     });
-    h.elements = [text];
+    API.setElements([text]);
     UI.clickTool("text");
     mouse.clickAt(text.x + 50, text.y + 50);
     const editor = document.querySelector(
@@ -267,7 +267,7 @@ describe("element locking", () => {
       height: 100,
       locked: true,
     });
-    h.elements = [text];
+    API.setElements([text]);
     UI.clickTool("selection");
     mouse.doubleClickAt(text.x + 50, text.y + 50);
     const editor = document.querySelector(
@@ -298,7 +298,7 @@ describe("element locking", () => {
       boundElements: [{ id: text.id, type: "text" }],
     });
 
-    h.elements = [container, text];
+    API.setElements([container, text]);
 
     UI.clickTool("selection");
     mouse.clickAt(container.x + 10, container.y + 10);
@@ -338,7 +338,7 @@ describe("element locking", () => {
     mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
-    h.elements = [container, text];
+    API.setElements([container, text]);
 
     UI.clickTool("selection");
     mouse.doubleClickAt(container.width / 2, container.height / 2);
@@ -372,7 +372,7 @@ describe("element locking", () => {
     mutateElement(container, {
       boundElements: [{ id: text.id, type: "text" }],
     });
-    h.elements = [container, text];
+    API.setElements([container, text]);
 
     UI.clickTool("text");
     mouse.clickAt(container.width / 2, container.height / 2);

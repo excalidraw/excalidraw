@@ -2141,16 +2141,6 @@ class App extends React.Component<AppProps, AppState> {
 
     let editingElement: AppState["editingElement"] | null = null;
     if (actionResult.elements) {
-      actionResult.elements.forEach((element) => {
-        if (
-          this.state.editingElement?.id === element.id &&
-          this.state.editingElement !== element &&
-          isNonDeletedElement(element)
-        ) {
-          editingElement = element;
-        }
-      });
-
       this.scene.replaceAllElements(actionResult.elements);
       didUpdate = true;
     }
@@ -2183,8 +2173,20 @@ class App extends React.Component<AppProps, AppState> {
         gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
       }
 
-      editingElement =
-        editingElement || actionResult.appState?.editingElement || null;
+      editingElement = actionResult.appState?.editingElement || null;
+
+      // make sure editingElement points to latest element reference
+      if (actionResult.elements && editingElement) {
+        actionResult.elements.forEach((element) => {
+          if (
+            editingElement?.id === element.id &&
+            editingElement !== element &&
+            isNonDeletedElement(element)
+          ) {
+            editingElement = element;
+          }
+        });
+      }
 
       if (editingElement?.isDeleted) {
         editingElement = null;
@@ -4479,15 +4481,22 @@ class App extends React.Component<AppProps, AppState> {
           const elementIdToSelect = element.containerId
             ? element.containerId
             : element.id;
-          this.setState((prevState) => ({
-            selectedElementIds: makeNextSelectedElementIds(
-              {
-                ...prevState.selectedElementIds,
-                [elementIdToSelect]: true,
-              },
-              prevState,
-            ),
-          }));
+
+          // needed to ensure state is updated before "finalize" action
+          // that's invoked on keyboard-submit as well
+          // TODO either move this into finalize as well, or handle all state
+          // updates in one place, skipping finalize action
+          flushSync(() => {
+            this.setState((prevState) => ({
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  ...prevState.selectedElementIds,
+                  [elementIdToSelect]: true,
+                },
+                prevState,
+              ),
+            }));
+          });
         }
         if (isDeleted) {
           fixBindingsAfterDeletion(this.scene.getNonDeletedElements(), [
