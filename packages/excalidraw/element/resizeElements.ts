@@ -11,6 +11,7 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
   ElementsMap,
+  ExcalidrawArrowElement,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -35,6 +36,7 @@ import { getFontString } from "../utils";
 import {
   flipFixedPointBinding,
   getArrowLocalFixedPoints,
+  getFlippedFixedPointBindingsForArrow,
   updateBoundElements,
 } from "./binding";
 import type {
@@ -632,14 +634,14 @@ export const resizeSingleElement = (
   if (doFixedPointFlipY) {
     alreadyFlippedY = !alreadyFlippedY;
   }
-  (doFixedPointFlipX || doFixedPointFlipY) &&
-    isBindableElement(element) &&
+  if ((doFixedPointFlipX || doFixedPointFlipY) && isBindableElement(element)) {
     flipFixedPointBinding(
       element,
       elementsMap,
       doFixedPointFlipX,
       doFixedPointFlipY,
     );
+  }
 
   // Flip horizontally
   if (flipX) {
@@ -928,6 +930,8 @@ export const resizeMultipleElements = (
       fontSize?: ExcalidrawTextElement["fontSize"];
       scale?: ExcalidrawImageElement["scale"];
       boundTextFontSize?: ExcalidrawTextElement["fontSize"];
+      startBinding?: ExcalidrawArrowElement["startBinding"];
+      endBinding?: ExcalidrawArrowElement["endBinding"];
     };
   }[] = [];
 
@@ -936,6 +940,16 @@ export const resizeMultipleElements = (
     if (isTextElement(orig) && isBoundToContainer(orig)) {
       continue;
     }
+
+    // Mirror fixed point binding if needed
+    const refreshedBindings = isArrowElement(orig)
+      ? getFlippedFixedPointBindingsForArrow(
+          orig,
+          elementsMap,
+          isFlippedByX,
+          isFlippedByY,
+        )
+      : {};
 
     const width = orig.width * scaleX;
     const height = orig.height * scaleY;
@@ -963,6 +977,7 @@ export const resizeMultipleElements = (
       height,
       angle,
       ...rescaledPoints,
+      ...refreshedBindings,
     };
 
     if (isImageElement(orig)) {

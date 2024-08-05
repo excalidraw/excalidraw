@@ -43,6 +43,14 @@ export const actionFlipHorizontal = register({
     };
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
+  predicate: (_, appState) => {
+    if (appState.selectedLinearElement) {
+      // No flippin' single selected elbow arrows!
+      return !appState.selectedLinearElement?.elbowed;
+    }
+
+    return true;
+  },
 });
 
 export const actionFlipVertical = register({
@@ -69,6 +77,14 @@ export const actionFlipVertical = register({
   },
   keyTest: (event) =>
     event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
+  predicate: (_, appState) => {
+    if (appState.selectedLinearElement) {
+      // No flippin' single selected elbow arrows!
+      return !appState.selectedLinearElement?.elbowed;
+    }
+
+    return true;
+  },
 });
 
 const flipSelectedElements = (
