@@ -1893,7 +1893,7 @@ type BindableElementVisitingFunc<T> = (
 /**
  * Tries to visit each bound element (does not have to be found).
  */
-export const boundElementsVisitor = (
+const boundElementsVisitor = (
   elements: ElementsMap,
   element: ExcalidrawElement,
   visit: BoundElementsVisitingFunc,
@@ -2227,4 +2227,66 @@ export const getArrowLocalFixedPoints = (
     LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
     LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
   ];
+};
+
+/**
+ * During flipping, mirroring and resizing when sides change relation to each other
+ * the `fixedPoint` in ExcalidrawArrowElement bindings associated with the bindable
+ * element (if any) must be mirrored to have a consistent behavor, which is
+ * accomplished by this function.
+ *
+ * @param element The flipped, mirrored or resized bindable element
+ * @param elementsMap
+ * @param flipX
+ * @param flipY
+ */
+export const flipFixedPointBinding = (
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  flipX: boolean,
+  flipY: boolean,
+) => {
+  // Gather all bound arrow elements to the targeted bindable [element]
+  boundElementsVisitor(elementsMap, element, (el) => {
+    if (isArrowElement(el)) {
+      mutateElement(el, {
+        // If [element] is the startBinding of this arrow...
+        ...(element.id === el.startBinding?.elementId && {
+          startBinding: {
+            ...el.startBinding,
+            fixedPoint: el.startBinding.fixedPoint
+              ? [
+                  // Flip over the X direction if needed
+                  flipX
+                    ? -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5
+                    : el.startBinding.fixedPoint[0],
+                  // Flip over the Y direction if needed
+                  flipY
+                    ? -1 * (el.startBinding.fixedPoint[1] - 0.5) + 0.5
+                    : el.startBinding.fixedPoint[1],
+                ]
+              : null,
+          },
+        }),
+        // If [element] is the endBinding of this arrow...
+        ...(element.id === el.endBinding?.elementId && {
+          endBinding: {
+            ...el.endBinding,
+            fixedPoint: el.endBinding.fixedPoint
+              ? [
+                  // Flip over the X direction if needed
+                  flipX
+                    ? -1 * (el.endBinding.fixedPoint[0] - 0.5) + 0.5
+                    : el.endBinding.fixedPoint[0],
+                  // Flip over the Y direction if needed
+                  flipY
+                    ? -1 * (el.endBinding.fixedPoint[1] - 0.5) + 0.5
+                    : el.endBinding.fixedPoint[1],
+                ]
+              : null,
+          },
+        }),
+      });
+    }
+  });
 };

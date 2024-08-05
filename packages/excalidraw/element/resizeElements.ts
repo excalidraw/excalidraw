@@ -21,6 +21,7 @@ import {
 } from "./bounds";
 import {
   isArrowElement,
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
@@ -32,7 +33,7 @@ import {
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
 import {
-  boundElementsVisitor,
+  flipFixedPointBinding,
   getArrowLocalFixedPoints,
   updateBoundElements,
 } from "./binding";
@@ -57,6 +58,9 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
 import { mutateElbowArrow } from "./routing";
+
+let alreadyFlippedX = false;
+let alreadyFlippedY = false;
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -617,6 +621,26 @@ export const resizeSingleElement = (
   const flipX = eleNewWidth < 0;
   const flipY = eleNewHeight < 0;
 
+  // Mirror fixed point binding if needed
+  const doFixedPointFlipX =
+    (flipX && !alreadyFlippedX) || (!flipX && alreadyFlippedX);
+  const doFixedPointFlipY =
+    (flipY && !alreadyFlippedY) || (!flipY && alreadyFlippedY);
+  if (doFixedPointFlipX) {
+    alreadyFlippedX = !alreadyFlippedX;
+  }
+  if (doFixedPointFlipY) {
+    alreadyFlippedY = !alreadyFlippedY;
+  }
+  (doFixedPointFlipX || doFixedPointFlipY) &&
+    isBindableElement(element) &&
+    flipFixedPointBinding(
+      element,
+      elementsMap,
+      doFixedPointFlipX,
+      doFixedPointFlipY,
+    );
+
   // Flip horizontally
   if (flipX) {
     if (transformHandleDirection.includes("e")) {
@@ -625,36 +649,6 @@ export const resizeSingleElement = (
     if (transformHandleDirection.includes("w")) {
       newTopLeft[0] += Math.abs(newBoundsWidth);
     }
-
-    //const origElement = originalElements.get(element.id).x > pointerX;
-    // .forEach({
-    //         if (el.type === "rectangle") {
-    //           console.log(el.x, pointerX);
-    //         }
-    //       });
-    boundElementsVisitor(elementsMap, element, (el) => {
-      if (isElbowArrow(el)) {
-        if (element.id === el.startBinding?.elementId) {
-          // mutateElement(el, {
-          //   startBinding: {
-          //     ...el.startBinding,
-          //     fixedPoint: [
-          //       -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5,
-          //       el.startBinding.fixedPoint[1],
-          //     ],
-          //   },
-          // });
-          //console.log("start", originalElements);
-          originalElements.forEach((el) => {
-            if (el.type === "rectangle") {
-              console.log(el.x, pointerX);
-            }
-          });
-        } else if (element.id === el.endBinding?.elementId) {
-          console.log("end");
-        }
-      }
-    });
   }
 
   // Flip vertically
@@ -665,7 +659,6 @@ export const resizeSingleElement = (
     if (transformHandleDirection.includes("n")) {
       newTopLeft[1] += Math.abs(newBoundsHeight);
     }
-    console.log("Y");
   }
 
   if (shouldResizeFromCenter) {
