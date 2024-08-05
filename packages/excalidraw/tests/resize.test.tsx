@@ -3,6 +3,7 @@ import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
@@ -15,6 +16,7 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
+import React from "react";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -335,6 +337,34 @@ describe("arrow element", () => {
     );
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
+  });
+
+  it("flips the fixed point binding on negative resize", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize(rectangle, "se", [-200, -150]);
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
 
