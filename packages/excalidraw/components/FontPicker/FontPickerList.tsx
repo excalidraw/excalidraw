@@ -63,15 +63,15 @@ export const FontPickerList = React.memo(
       () =>
         Array.from(Fonts.registered.entries())
           .filter(([_, { metadata }]) => !metadata.serverSide)
-          .map(([familyId, { metadata, fontFaces }]) => {
-            const font = {
+          .map(([familyId, { metadata, fonts }]) => {
+            const fontDescriptor = {
               value: familyId,
               icon: metadata.icon,
-              text: fontFaces[0].fontFace.family,
+              text: fonts[0].fontFace.family,
             };
 
             if (metadata.deprecated) {
-              Object.assign(font, {
+              Object.assign(fontDescriptor, {
                 deprecated: metadata.deprecated,
                 badge: {
                   type: DropDownMenuItemBadgeType.RED,
@@ -80,7 +80,7 @@ export const FontPickerList = React.memo(
               });
             }
 
-            return font as FontDescriptor;
+            return fontDescriptor as FontDescriptor;
           })
           .sort((a, b) =>
             a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1,
@@ -89,7 +89,7 @@ export const FontPickerList = React.memo(
     );
 
     const sceneFamilies = useMemo(
-      () => new Set(fonts.sceneFamilies),
+      () => new Set(fonts.getSceneFontFamilies()),
       // cache per selected font family, so hover re-render won't mess it up
       // eslint-disable-next-line react-hooks/exhaustive-deps
       [selectedFontFamily],

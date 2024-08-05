@@ -10,6 +10,7 @@ import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import {
   isArrowElement,
+  isElbowArrow,
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
@@ -18,9 +19,8 @@ import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
-  selectedElements: NonDeletedExcalidrawElement[],
+  _selectedElements: NonDeletedExcalidrawElement[],
   offset: { x: number; y: number },
-  appState: AppState,
   scene: Scene,
   snapOffset: {
     x: number;
@@ -28,6 +28,25 @@ export const dragSelectedElements = (
   },
   gridSize: AppState["gridSize"],
 ) => {
+  if (
+    _selectedElements.length === 1 &&
+    isArrowElement(_selectedElements[0]) &&
+    isElbowArrow(_selectedElements[0]) &&
+    (_selectedElements[0].startBinding || _selectedElements[0].endBinding)
+  ) {
+    return;
+  }
+
+  const selectedElements = _selectedElements.filter(
+    (el) =>
+      !(
+        isArrowElement(el) &&
+        isElbowArrow(el) &&
+        el.startBinding &&
+        el.endBinding
+      ),
+  );
+
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
   // in the frame twice, hence the use of set
@@ -72,9 +91,14 @@ export const dragSelectedElements = (
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
-    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
-      simultaneouslyUpdated: Array.from(elementsToUpdate),
-    });
+    updateBoundElements(
+      element,
+      scene.getElementsMapIncludingDeleted(),
+      scene,
+      {
+        simultaneouslyUpdated: Array.from(elementsToUpdate),
+      },
+    );
   });
 };
 

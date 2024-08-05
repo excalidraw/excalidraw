@@ -1,6 +1,10 @@
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
-import type { ExcalidrawTextElement, FontFamilyValues } from "../element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  FontFamilyValues,
+} from "../element/types";
 import { ShapeCache } from "../scene/ShapeCache";
 import { isTextElement } from "../element";
 import { getFontString } from "../utils";
@@ -16,7 +20,7 @@ import { getContainerElement } from "../element/textElement";
 
 import Virgil from "./assets/Virgil-Regular.woff2";
 import Excalifont from "./assets/Excalifont-Regular.woff2";
-import Cascadia from "./assets/CascadiaMono-Regular.woff2";
+import Cascadia from "./assets/CascadiaCode-Regular.woff2";
 import ComicShanns from "./assets/ComicShanns-Regular.woff2";
 import LiberationSans from "./assets/LiberationSans-Regular.woff2";
 
@@ -39,15 +43,24 @@ export class Fonts {
         number,
         {
           metadata: FontMetadata;
-          fontFaces: Font[];
+          fonts: Font[];
         }
       >
     | undefined;
 
+  private static _initialized: boolean = false;
+
   public static get registered() {
+    // lazy load the font registration
     if (!Fonts._registered) {
-      // lazy load the fonts
       Fonts._registered = Fonts.init();
+    } else if (!Fonts._initialized) {
+      // case when host app register fonts before they are lazy loaded
+      // don't override whatever has been previously registered
+      Fonts._registered = new Map([
+        ...Fonts.init().entries(),
+        ...Fonts._registered.entries(),
+      ]);
     }
 
     return Fonts._registered;
@@ -58,17 +71,6 @@ export class Fonts {
   }
 
   private readonly scene: Scene;
-
-  public get sceneFamilies() {
-    return Array.from(
-      this.scene.getNonDeletedElements().reduce((families, element) => {
-        if (isTextElement(element)) {
-          families.add(element.fontFamily);
-        }
-        return families;
-      }, new Set<number>()),
-    );
-  }
 
   constructor({ scene }: { scene: Scene }) {
     this.scene = scene;
@@ -119,21 +121,52 @@ export class Fonts {
     }
   };
 
-  public load = async () => {
-    // Add all registered font faces into the `document.fonts` (if not added already)
-    for (const { fontFaces } of Fonts.registered.values()) {
-      for (const { fontFace, url } of fontFaces) {
-        if (
-          url.protocol !== LOCAL_FONT_PROTOCOL &&
-          !window.document.fonts.has(fontFace)
-        ) {
+  /**
+   * Load font faces for a given scene and trigger scene update.
+   */
+  public loadSceneFonts = async (): Promise<FontFace[]> => {
+    const sceneFamilies = this.getSceneFontFamilies();
+    const loaded = await Fonts.loadFontFaces(sceneFamilies);
+    this.onLoaded(loaded);
+    return loaded;
+  };
+
+  /**
+   * Gets all the font families for the given scene.
+   */
+  public getSceneFontFamilies = () => {
+    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
+  };
+
+  /**
+   * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
+   */
+  public static loadFontsForElements = async (
+    elements: readonly ExcalidrawElement[],
+  ): Promise<FontFace[]> => {
+    const fontFamilies = Fonts.getFontFamilies(elements);
+    return await Fonts.loadFontFaces(fontFamilies);
+  };
+
+  private static async loadFontFaces(
+    fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
+  ) {
+    // add all registered font faces into the `document.fonts` (if not added already)
+    for (const { fonts, metadata } of Fonts.registered.values()) {
+      // skip registering font faces for local fonts (i.e. Helvetica)
+      if (metadata.local) {
+        continue;
+      }
+
+      for (const { fontFace } of fonts) {
+        if (!window.document.fonts.has(fontFace)) {
           window.document.fonts.add(fontFace);
         }
       }
     }
 
-    const loaded = await Promise.all(
-      this.sceneFamilies.map(async (fontFamily) => {
+    const loadedFontFaces = await Promise.all(
+      fontFamilies.map(async (fontFamily) => {
         const fontString = getFontString({
           fontFamily,
           fontSize: 16,
@@ -148,8 +181,10 @@ export class Fonts {
           } catch (e) {
             // don't let it all fail if just one font fails to load
             console.error(
-              `Failed to load font: "${fontString}" with error "${e}", given the following registered font:`,
-              JSON.stringify(Fonts.registered.get(fontFamily), undefined, 2),
+              `Failed to load font "${fontString}" from urls "${Fonts.registered
+                .get(fontFamily)
+                ?.fonts.map((x) => x.urls)}"`,
+              e,
             );
           }
         }
@@ -158,8 +193,8 @@ export class Fonts {
       }),
     );
 
-    this.onLoaded(loaded.flat().filter(Boolean) as FontFace[]);
-  };
+    return loadedFontFaces.flat().filter(Boolean) as FontFace[];
+  }
 
   /**
    * WARN: should be called just once on init, even across multiple instances.
@@ -168,10 +203,11 @@ export class Fonts {
     const fonts = {
       registered: new Map<
         ValueOf<typeof FONT_FAMILY>,
-        { metadata: FontMetadata; fontFaces: Font[] }
+        { metadata: FontMetadata; fonts: Font[] }
       >(),
     };
 
+    // TODO: let's tweak this once we know how `register` will be exposed as part of the custom fonts API
     const _register = register.bind(fonts);
 
     _register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
@@ -236,7 +272,22 @@ export class Fonts {
       },
     );
 
+    Fonts._initialized = true;
+
     return fonts.registered;
+  }
+
+  private static getFontFamilies(
+    elements: ReadonlyArray<ExcalidrawElement>,
+  ): Array<ExcalidrawTextElement["fontFamily"]> {
+    return Array.from(
+      elements.reduce((families, element) => {
+        if (isTextElement(element)) {
+          families.add(element.fontFamily);
+        }
+        return families;
+      }, new Set<number>()),
+    );
   }
 }
 
@@ -253,7 +304,7 @@ function register(
     | {
         registered: Map<
           ValueOf<typeof FONT_FAMILY>,
-          { metadata: FontMetadata; fontFaces: Font[] }
+          { metadata: FontMetadata; fonts: Font[] }
         >;
       },
   family: string,
@@ -267,7 +318,7 @@ function register(
   if (!registeredFamily) {
     this.registered.set(familyId, {
       metadata,
-      fontFaces: params.map(
+      fonts: params.map(
         ({ uri, descriptors }) => new ExcalidrawFont(family, uri, descriptors),
       ),
     });

@@ -1,3 +1,4 @@
+import throttle from "lodash.throttle";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -49,6 +50,24 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   }
   return { elementsMap, elements };
 };
+
+const validateIndicesThrottled = throttle(
+  (elements: readonly ExcalidrawElement[]) => {
+    if (
+      import.meta.env.DEV ||
+      import.meta.env.MODE === ENV.TEST ||
+      window?.DEBUG_FRACTIONAL_INDICES
+    ) {
+      validateFractionalIndices(elements, {
+        // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        includeBoundTextValidation: true,
+      });
+    }
+  },
+  1000 * 60,
+  { leading: true, trailing: false },
+);
 
 const hashSelectionOpts = (
   opts: Parameters<InstanceType<typeof Scene>["getSelectedElements"]>[0],
@@ -274,10 +293,7 @@ class Scene {
         : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
-      // throw on invalid indices in test / dev to potentially detect cases were we forgot to sync moved elements
-      validateFractionalIndices(_nextElements.map((x) => x.index));
-    }
+    validateIndicesThrottled(_nextElements);
 
     this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();

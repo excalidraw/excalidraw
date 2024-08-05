@@ -21,6 +21,7 @@ import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
+import { isElbowArrow } from "../../element/typeChecks";
 
 interface StatsProps {
   scene: Scene;
@@ -209,12 +210,14 @@ export const StatsInner = memo(
                         scene={scene}
                         appState={appState}
                       />
-                      <Angle
-                        property="angle"
-                        element={singleElement}
-                        scene={scene}
-                        appState={appState}
-                      />
+                      {!isElbowArrow(singleElement) && (
+                        <Angle
+                          property="angle"
+                          element={singleElement}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      )}
                       <FontSize
                         property="fontSize"
                         element={singleElement}
