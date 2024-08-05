@@ -109,6 +109,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
       }
       if (
         !appState.newElement &&
+        !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
         return t("hints.bindTextToElement");
