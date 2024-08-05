@@ -1246,11 +1246,11 @@ export const fixBindingsAfterDuplication = (
     .filter(({ id }) => allBindableElementIds.has(id))
     .forEach((bindableElement) => {
       const oldElementId = duplicateIdToOldId.get(bindableElement.id);
-      const { boundElements } = sceneElements.find(
+      const boundElements = sceneElements.find(
         ({ id }) => id === oldElementId,
-      )!;
+      )?.boundElements;
 
-      if (boundElements != null && boundElements.length > 0) {
+      if (boundElements && boundElements.length > 0) {
         mutateElement(bindableElement, {
           boundElements: boundElements.map((boundElement) =>
             oldIdToDuplicatedId.has(boundElement.id)
