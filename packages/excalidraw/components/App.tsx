@@ -1462,6 +1462,7 @@ class App extends React.Component<AppProps, AppState> {
       ) &&
       (this.state.selectionElement ||
         this.state.newElement ||
+        this.state.selectedElementsAreBeingDragged ||
         this.state.resizingElement ||
         (this.state.activeTool.type === "laser" &&
           // technically we can just test on this once we make it more safe
@@ -4075,7 +4076,9 @@ class App extends React.Component<AppProps, AppState> {
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
-        this.state.newElement === null
+        !this.state.newElement &&
+        !this.state.selectionElement &&
+        !this.state.selectedElementsAreBeingDragged
       ) {
         const shape = findShapeByKey(event.key);
         if (shape) {
@@ -5195,7 +5198,12 @@ class App extends React.Component<AppProps, AppState> {
       event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
-    if (!this.state.newElement && !this.state.multiElement) {
+    if (
+      !this.state.newElement &&
+      !this.state.selectionElement &&
+      !this.state.selectedElementsAreBeingDragged &&
+      !this.state.multiElement
+    ) {
       if (isOverScrollBar) {
         resetCursor(this.interactiveCanvas);
       } else {
@@ -5238,7 +5246,11 @@ class App extends React.Component<AppProps, AppState> {
           originSnapOffset: nextOriginOffset,
         };
       });
-    } else if (!this.state.newElement) {
+    } else if (
+      !this.state.newElement &&
+      !this.state.selectedElementsAreBeingDragged &&
+      !this.state.selectionElement
+    ) {
       this.setState((prevState) => {
         if (prevState.snapLines.length) {
           return {
@@ -7747,6 +7759,17 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(newElement, {
               points: [...points, [dx, dy]],
             });
+          } else if (points.length > 1 && isElbowArrow(newElement)) {
+            mutateElbowArrow(
+              newElement,
+              this.scene,
+              [...points.slice(0, -1), [dx, dy]],
+              [0, 0],
+              undefined,
+              {
+                isDragging: true,
+              },
+            );
           } else if (points.length === 2) {
             mutateElement(newElement, {
               points: [...points.slice(0, -1), [dx, dy]],
