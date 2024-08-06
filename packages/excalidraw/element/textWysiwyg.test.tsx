@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
 import { GlobalTestState, render, screen } from "../tests/test-utils";
@@ -16,7 +17,6 @@ import type {
   ExcalidrawTextElementWithContainer,
 } from "./types";
 import { API } from "../tests/helpers/api";
-import { mutateElement } from "./mutateElement";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
 
@@ -33,7 +33,7 @@ describe("textWysiwyg", () => {
     const { h } = window;
     beforeEach(async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
-      h.elements = [];
+      API.setElements([]);
     });
 
     it("should prefer editing selected text element (non-bindable container present)", async () => {
@@ -55,7 +55,7 @@ describe("textWysiwyg", () => {
         width: textSize,
         height: textSize,
       });
-      h.elements = [text, line];
+      API.setElements([text, line]);
 
       API.setSelectedElements([text]);
 
@@ -95,9 +95,9 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      h.elements = [container, boundText, boundText2];
+      API.setElements([container, boundText, boundText2]);
 
-      mutateElement(container, {
+      API.updateElement(container, {
         boundElements: [{ type: "text", id: boundText.id }],
       });
 
@@ -123,11 +123,11 @@ describe("textWysiwyg", () => {
         height: textSize,
         containerId: container.id,
       });
-      mutateElement(container, {
+      API.updateElement(container, {
         boundElements: [{ type: "text", id: text.id }],
       });
 
-      h.elements = [container, text];
+      API.setElements([container, text]);
 
       API.setSelectedElements([container]);
 
@@ -164,9 +164,9 @@ describe("textWysiwyg", () => {
         containerId: container.id,
       });
 
-      h.elements = [container, boundText, boundText2];
+      API.setElements([container, boundText, boundText2]);
 
-      mutateElement(container, {
+      API.updateElement(container, {
         boundElements: [{ type: "text", id: boundText.id }],
       });
 
@@ -187,7 +187,7 @@ describe("textWysiwyg", () => {
         height: 100,
       });
 
-      h.elements = [text];
+      API.setElements([text]);
       UI.clickTool("text");
 
       mouse.clickAt(text.x + 50, text.y + 50);
@@ -209,7 +209,7 @@ describe("textWysiwyg", () => {
         height: 100,
       });
 
-      h.elements = [text];
+      API.setElements([text]);
       UI.clickTool("selection");
 
       mouse.doubleClickAt(text.x + 50, text.y + 50);
@@ -251,7 +251,7 @@ describe("textWysiwyg", () => {
       // @ts-ignore
       h.app.refreshEditorBreakpoints();
 
-      h.elements = [];
+      API.setElements([]);
     });
 
     afterAll(() => {
@@ -264,7 +264,7 @@ describe("textWysiwyg", () => {
         text: "Excalidraw\nEditor",
       });
 
-      h.elements = [text];
+      API.setElements([text]);
 
       const prevWidth = text.width;
       const prevHeight = text.height;
@@ -291,18 +291,15 @@ describe("textWysiwyg", () => {
 
       const nextText = `${wrappedText} is great!`;
       updateTextEditor(editor, nextText);
-      await new Promise((cb) => setTimeout(cb, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       expect(h.elements[0].width).toEqual(wrappedWidth);
       expect(h.elements[0].height).toBeGreaterThan(wrappedHeight);
 
       // remove all texts and then add it back editing
       updateTextEditor(editor, "");
-      await new Promise((cb) => setTimeout(cb, 0));
       updateTextEditor(editor, nextText);
-      await new Promise((cb) => setTimeout(cb, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       expect(h.elements[0].width).toEqual(wrappedWidth);
     });
@@ -313,7 +310,7 @@ describe("textWysiwyg", () => {
         type: "text",
         text: originalText,
       });
-      h.elements = [text];
+      API.setElements([text]);
 
       // wrap
       UI.resize(text, "e", [-40, 0]);
@@ -321,7 +318,7 @@ describe("textWysiwyg", () => {
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
       const editor = await getTextEditor(textEditorSelector);
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       // restore after unwrapping
       UI.resize(text, "e", [40, 0]);
       expect((h.elements[0] as ExcalidrawTextElement).text).toBe(originalText);
@@ -332,14 +329,12 @@ describe("textWysiwyg", () => {
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
       updateTextEditor(editor, `${wrappedText}\nA new line!`);
-      await new Promise((cb) => setTimeout(cb, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       // remove the newly added line
       UI.clickTool("selection");
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
       updateTextEditor(editor, wrappedText);
-      await new Promise((cb) => setTimeout(cb, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       // unwrap
       UI.resize(text, "e", [30, 0]);
       // expect the text to be restored the same
@@ -376,12 +371,11 @@ describe("textWysiwyg", () => {
     });
 
     it("should add a tab at the start of the first line", () => {
-      const event = new KeyboardEvent("keydown", { key: KEYS.TAB });
       textarea.value = "Line#1\nLine#2";
       // cursor: "|Line#1\nLine#2"
       textarea.selectionStart = 0;
       textarea.selectionEnd = 0;
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, { key: KEYS.TAB });
 
       expect(textarea.value).toEqual(`${tab}Line#1\nLine#2`);
       // cursor: "    |Line#1\nLine#2"
@@ -390,13 +384,12 @@ describe("textWysiwyg", () => {
     });
 
     it("should add a tab at the start of the second line", () => {
-      const event = new KeyboardEvent("keydown", { key: KEYS.TAB });
       textarea.value = "Line#1\nLine#2";
       // cursor: "Line#1\nLin|e#2"
       textarea.selectionStart = 10;
       textarea.selectionEnd = 10;
 
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, { key: KEYS.TAB });
 
       expect(textarea.value).toEqual(`Line#1\n${tab}Line#2`);
 
@@ -406,13 +399,12 @@ describe("textWysiwyg", () => {
     });
 
     it("should add a tab at the start of the first and second line", () => {
-      const event = new KeyboardEvent("keydown", { key: KEYS.TAB });
       textarea.value = "Line#1\nLine#2\nLine#3";
       // cursor: "Li|ne#1\nLi|ne#2\nLine#3"
       textarea.selectionStart = 2;
       textarea.selectionEnd = 9;
 
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, { key: KEYS.TAB });
 
       expect(textarea.value).toEqual(`${tab}Line#1\n${tab}Line#2\nLine#3`);
 
@@ -422,16 +414,15 @@ describe("textWysiwyg", () => {
     });
 
     it("should remove a tab at the start of the first line", () => {
-      const event = new KeyboardEvent("keydown", {
-        key: KEYS.TAB,
-        shiftKey: true,
-      });
       textarea.value = `${tab}Line#1\nLine#2`;
       // cursor: "|    Line#1\nLine#2"
       textarea.selectionStart = 0;
       textarea.selectionEnd = 0;
 
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
 
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
 
@@ -441,16 +432,15 @@ describe("textWysiwyg", () => {
     });
 
     it("should remove a tab at the start of the second line", () => {
-      const event = new KeyboardEvent("keydown", {
-        key: KEYS.TAB,
-        shiftKey: true,
-      });
       // cursor: "Line#1\n    Lin|e#2"
       textarea.value = `Line#1\n${tab}Line#2`;
       textarea.selectionStart = 15;
       textarea.selectionEnd = 15;
 
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
 
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
       // cursor: "Line#1\nLin|e#2"
@@ -459,16 +449,15 @@ describe("textWysiwyg", () => {
     });
 
     it("should remove a tab at the start of the first and second line", () => {
-      const event = new KeyboardEvent("keydown", {
-        key: KEYS.TAB,
-        shiftKey: true,
-      });
       // cursor: "    Li|ne#1\n    Li|ne#2\nLine#3"
       textarea.value = `${tab}Line#1\n${tab}Line#2\nLine#3`;
       textarea.selectionStart = 6;
       textarea.selectionEnd = 17;
 
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
 
       expect(textarea.value).toEqual(`Line#1\nLine#2\nLine#3`);
       // cursor: "Li|ne#1\nLi|ne#2\nLine#3"
@@ -477,45 +466,41 @@ describe("textWysiwyg", () => {
     });
 
     it("should remove a tab at the start of the second line and cursor stay on this line", () => {
-      const event = new KeyboardEvent("keydown", {
-        key: KEYS.TAB,
-        shiftKey: true,
-      });
       // cursor: "Line#1\n  |  Line#2"
       textarea.value = `Line#1\n${tab}Line#2`;
       textarea.selectionStart = 9;
       textarea.selectionEnd = 9;
-      textarea.dispatchEvent(event);
-
-      // cursor: "Line#1\n|Line#2"
-      expect(textarea.selectionStart).toEqual(7);
-      // expect(textarea.selectionEnd).toEqual(7);
-    });
-
-    it("should remove partial tabs", () => {
-      const event = new KeyboardEvent("keydown", {
+      fireEvent.keyDown(textarea, {
         key: KEYS.TAB,
         shiftKey: true,
       });
+
+      // cursor: "Line#1\n|Line#2"
+      expect(textarea.selectionStart).toEqual(7);
+    });
+
+    it("should remove partial tabs", () => {
       // cursor: "Line#1\n  Line#|2"
       textarea.value = `Line#1\n  Line#2`;
       textarea.selectionStart = 15;
       textarea.selectionEnd = 15;
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
 
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
     });
 
     it("should remove nothing", () => {
-      const event = new KeyboardEvent("keydown", {
-        key: KEYS.TAB,
-        shiftKey: true,
-      });
       // cursor: "Line#1\n  Li|ne#2"
       textarea.value = `Line#1\nLine#2`;
       textarea.selectionStart = 9;
       textarea.selectionEnd = 9;
-      textarea.dispatchEvent(event);
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
 
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
     });
@@ -523,54 +508,42 @@ describe("textWysiwyg", () => {
     it("should resize text via shortcuts while in wysiwyg", () => {
       textarea.value = "abc def";
       const origFontSize = textElement.fontSize;
-      textarea.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          key: KEYS.CHEVRON_RIGHT,
-          ctrlKey: true,
-          shiftKey: true,
-        }),
-      );
+      fireEvent.keyDown(textarea, {
+        key: KEYS.CHEVRON_RIGHT,
+        ctrlKey: true,
+        shiftKey: true,
+      });
       expect(textElement.fontSize).toBe(origFontSize * 1.1);
 
-      textarea.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          key: KEYS.CHEVRON_LEFT,
-          ctrlKey: true,
-          shiftKey: true,
-        }),
-      );
+      fireEvent.keyDown(textarea, {
+        key: KEYS.CHEVRON_LEFT,
+        ctrlKey: true,
+        shiftKey: true,
+      });
       expect(textElement.fontSize).toBe(origFontSize);
     });
 
     it("zooming via keyboard should zoom canvas", () => {
       expect(h.state.zoom.value).toBe(1);
-      textarea.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          code: CODES.MINUS,
-          ctrlKey: true,
-        }),
-      );
+      fireEvent.keyDown(textarea, {
+        code: CODES.MINUS,
+        ctrlKey: true,
+      });
       expect(h.state.zoom.value).toBe(0.9);
-      textarea.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          code: CODES.NUM_SUBTRACT,
-          ctrlKey: true,
-        }),
-      );
+      fireEvent.keyDown(textarea, {
+        code: CODES.NUM_SUBTRACT,
+        ctrlKey: true,
+      });
       expect(h.state.zoom.value).toBe(0.8);
-      textarea.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          code: CODES.NUM_ADD,
-          ctrlKey: true,
-        }),
-      );
+      fireEvent.keyDown(textarea, {
+        code: CODES.NUM_ADD,
+        ctrlKey: true,
+      });
       expect(h.state.zoom.value).toBe(0.9);
-      textarea.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          code: CODES.EQUAL,
-          ctrlKey: true,
-        }),
-      );
+      fireEvent.keyDown(textarea, {
+        code: CODES.EQUAL,
+        ctrlKey: true,
+      });
       expect(h.state.zoom.value).toBe(1);
     });
 
@@ -583,8 +556,8 @@ describe("textWysiwyg", () => {
         textarea,
         "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
       );
-      await new Promise((cb) => setTimeout(cb, 0));
-      textarea.blur();
+      Keyboard.exitTextEditor(textarea);
+
       expect(textarea.style.width).toBe("792px");
       expect(h.elements[0].width).toBe(1000);
     });
@@ -596,7 +569,7 @@ describe("textWysiwyg", () => {
 
     beforeEach(async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
-      h.elements = [];
+      API.setElements([]);
 
       rectangle = UI.createElement("rectangle", {
         x: 10,
@@ -615,7 +588,7 @@ describe("textWysiwyg", () => {
         height: 75,
         backgroundColor: "red",
       });
-      h.elements = [rectangle];
+      API.setElements([rectangle]);
 
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
@@ -634,8 +607,7 @@ describe("textWysiwyg", () => {
 
       updateTextEditor(editor, "Hello World!");
 
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -648,7 +620,7 @@ describe("textWysiwyg", () => {
         height: 75,
         angle: 45,
       });
-      h.elements = [rectangle];
+      API.setElements([rectangle]);
       mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.type).toBe("text");
@@ -662,8 +634,7 @@ describe("textWysiwyg", () => {
 
       updateTextEditor(editor, "Hello World!");
 
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -677,7 +648,7 @@ describe("textWysiwyg", () => {
         width: 90,
         height: 75,
       });
-      h.elements = [diamond];
+      API.setElements([diamond]);
 
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(diamond.id);
@@ -687,7 +658,6 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor(textEditorSelector, true);
 
-      await new Promise((r) => setTimeout(r, 0));
       const value = new Array(1000).fill("1").join("\n");
 
       // Pasting large text to simulate height increase
@@ -712,7 +682,7 @@ describe("textWysiwyg", () => {
         height: 75,
         backgroundColor: "transparent",
       });
-      h.elements = [rectangle];
+      API.setElements([rectangle]);
 
       mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
       expect(h.elements.length).toBe(2);
@@ -721,8 +691,7 @@ describe("textWysiwyg", () => {
       expect(text.containerId).toBe(null);
       mouse.down();
       let editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       mouse.doubleClickAt(
         rectangle.x + rectangle.width / 2,
@@ -738,8 +707,7 @@ describe("textWysiwyg", () => {
       editor = await getTextEditor(textEditorSelector, true);
 
       updateTextEditor(editor, "Hello World!");
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -759,10 +727,8 @@ describe("textWysiwyg", () => {
       expect(text.containerId).toBe(rectangle.id);
       const editor = await getTextEditor(textEditorSelector, true);
 
-      await new Promise((r) => setTimeout(r, 0));
-
       updateTextEditor(editor, "Hello World!");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -777,7 +743,7 @@ describe("textWysiwyg", () => {
         height: 75,
         strokeWidth: 4,
       });
-      h.elements = [rectangle];
+      API.setElements([rectangle]);
 
       expect(h.elements.length).toBe(1);
       expect(h.elements[0].id).toBe(rectangle.id);
@@ -795,8 +761,7 @@ describe("textWysiwyg", () => {
       const editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello World!");
 
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -808,7 +773,7 @@ describe("textWysiwyg", () => {
         width: 100,
         height: 0,
       });
-      h.elements = [freedraw];
+      API.setElements([freedraw]);
 
       UI.clickTool("text");
 
@@ -819,7 +784,7 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello World!");
-      fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
+      Keyboard.exitTextEditor(editor);
 
       expect(freedraw.boundElements).toBe(null);
       expect(h.elements[1].type).toBe("text");
@@ -828,7 +793,7 @@ describe("textWysiwyg", () => {
 
     ["freedraw", "line"].forEach((type: any) => {
       it(`shouldn't create text element when pressing 'Enter' key on ${type} `, async () => {
-        h.elements = [];
+        API.setElements([]);
         const element = UI.createElement(type, {
           width: 100,
           height: 50,
@@ -855,8 +820,7 @@ describe("textWysiwyg", () => {
 
       updateTextEditor(editor, "Hello World!");
 
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toBe(null);
     });
 
@@ -872,7 +836,6 @@ describe("textWysiwyg", () => {
         editor,
         "Excalidraw is an opensource virtual collaborative whiteboard",
       );
-      await new Promise((cb) => setTimeout(cb, 0));
       expect(h.elements.length).toBe(2);
       expect(h.elements[1].type).toBe("text");
 
@@ -908,14 +871,18 @@ describe("textWysiwyg", () => {
         rectangle.x + rectangle.width / 2,
         rectangle.y + rectangle.height / 2,
       );
-      mouse.down();
 
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       const editor = await getTextEditor(textEditorSelector, true);
 
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello World!");
-      editor.blur();
+
+      Keyboard.exitTextEditor(editor);
+
+      expect(await getTextEditor(textEditorSelector, false)).toBe(null);
+
+      expect(h.state.editingElement).toBe(null);
+
       expect(text.fontFamily).toEqual(FONT_FAMILY.Excalifont);
 
       fireEvent.click(screen.getByTitle(/code/i));
@@ -950,8 +917,7 @@ describe("textWysiwyg", () => {
 
       updateTextEditor(editor, "Hello World!");
 
-      await new Promise((cb) => setTimeout(cb, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.text).toBe("Hello \nWorld!");
       expect(text.originalText).toBe("Hello World!");
@@ -970,9 +936,7 @@ describe("textWysiwyg", () => {
       editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello");
 
-      await new Promise((r) => setTimeout(r, 0));
-
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
 
       expect(text.text).toBe("Hello");
@@ -998,10 +962,8 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor(textEditorSelector, true);
 
-      await new Promise((r) => setTimeout(r, 0));
-
       updateTextEditor(editor, "Hello World!");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -1034,9 +996,8 @@ describe("textWysiwyg", () => {
       const text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(rectangle.id);
       const editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello World!");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
       ]);
@@ -1055,9 +1016,8 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
 
       let editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       // should center align horizontally and vertically by default
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
@@ -1076,12 +1036,8 @@ describe("textWysiwyg", () => {
       editor.select();
 
       fireEvent.click(screen.getByTitle("Left"));
-      await new Promise((r) => setTimeout(r, 0));
-
       fireEvent.click(screen.getByTitle("Align bottom"));
-      await new Promise((r) => setTimeout(r, 0));
-
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       // should left align horizontally and bottom vertically after resize
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
@@ -1101,9 +1057,7 @@ describe("textWysiwyg", () => {
       fireEvent.click(screen.getByTitle("Right"));
       fireEvent.click(screen.getByTitle("Align top"));
 
-      await new Promise((r) => setTimeout(r, 0));
-
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       // should right align horizontally and top vertically after resize
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
@@ -1136,8 +1090,7 @@ describe("textWysiwyg", () => {
 
       updateTextEditor(editor, "Hello World!");
 
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle2.boundElements).toBeNull();
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -1148,9 +1101,8 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
 
       const editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       const textElement = h.elements[1] as ExcalidrawTextElement;
       expect(rectangle.width).toBe(90);
       expect(rectangle.height).toBe(75);
@@ -1168,9 +1120,8 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
 
       const editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(h.elements.length).toBe(2);
 
       mouse.select(rectangle);
@@ -1200,9 +1151,8 @@ describe("textWysiwyg", () => {
     it("undo should work", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       const editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([
         { id: h.elements[1].id, type: "text" },
       ]);
@@ -1237,10 +1187,9 @@ describe("textWysiwyg", () => {
     it("should not allow bound text with only whitespaces", async () => {
       Keyboard.keyPress(KEYS.ENTER);
       const editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
 
       updateTextEditor(editor, "   ");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.boundElements).toStrictEqual([]);
       expect(h.elements[1].isDeleted).toBe(true);
     });
@@ -1259,7 +1208,7 @@ describe("textWysiwyg", () => {
         text: "Online whiteboard collaboration made easy",
       });
 
-      h.elements = [container, text];
+      API.setElements([container, text]);
       API.setSelectedElements([container, text]);
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
@@ -1292,9 +1241,8 @@ describe("textWysiwyg", () => {
       Keyboard.keyPress(KEYS.ENTER);
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBe(75);
       let editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect(rectangle.height).toBeCloseTo(155, 8);
@@ -1305,8 +1253,7 @@ describe("textWysiwyg", () => {
 
       editor = await getTextEditor(textEditorSelector, true);
 
-      await new Promise((r) => setTimeout(r, 0));
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(rectangle.height).toBeCloseTo(155, 8);
       // cache updated again
       expect(getOriginalContainerHeightFromCache(rectangle.id)).toBeCloseTo(
@@ -1321,7 +1268,7 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello World!");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       mouse.select(rectangle);
       Keyboard.keyPress(KEYS.ENTER);
@@ -1346,7 +1293,7 @@ describe("textWysiwyg", () => {
 
       const editor = await getTextEditor(textEditorSelector, true);
       updateTextEditor(editor, "Hello World!");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).lineHeight,
       ).toEqual(1.25);
@@ -1378,7 +1325,7 @@ describe("textWysiwyg", () => {
         Keyboard.keyPress(KEYS.ENTER);
         editor = await getTextEditor(textEditorSelector, true);
         updateTextEditor(editor, "Hello");
-        editor.blur();
+        Keyboard.exitTextEditor(editor);
         mouse.select(rectangle);
         Keyboard.keyPress(KEYS.ENTER);
         editor = await getTextEditor(textEditorSelector, true);
@@ -1498,13 +1445,11 @@ describe("textWysiwyg", () => {
         editor,
         "Excalidraw is an opensource virtual collaborative whiteboard",
       );
-      await new Promise((cb) => setTimeout(cb, 0));
 
       editor.select();
       fireEvent.click(screen.getByTitle("Left"));
-      await new Promise((r) => setTimeout(r, 0));
 
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       const textElement = h.elements[1] as ExcalidrawTextElement;
       expect(textElement.width).toBe(600);
@@ -1581,16 +1526,14 @@ describe("textWysiwyg", () => {
       let text = h.elements[1] as ExcalidrawTextElementWithContainer;
       expect(text.containerId).toBe(rectangle.id);
       let editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Hello!");
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).verticalAlign,
       ).toBe(VERTICAL_ALIGN.MIDDLE);
 
       fireEvent.click(screen.getByTitle("Align bottom"));
-      await new Promise((r) => setTimeout(r, 0));
 
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       expect(rectangle.boundElements).toStrictEqual([
         { id: text.id, type: "text" },
@@ -1606,9 +1549,8 @@ describe("textWysiwyg", () => {
         rectangle.y + rectangle.height / 2,
       );
       editor = await getTextEditor(textEditorSelector, true);
-      await new Promise((r) => setTimeout(r, 0));
       updateTextEditor(editor, "Excalidraw");
-      editor.blur();
+      Keyboard.exitTextEditor(editor);
 
       expect(h.elements.length).toBe(3);
       expect(rectangle.boundElements).toStrictEqual([
