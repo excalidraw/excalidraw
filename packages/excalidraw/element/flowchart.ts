@@ -23,11 +23,7 @@ import type {
 import { KEYS } from "../keys";
 import type { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
-import {
-  elementOverlapsWithFrame,
-  elementsAreInFrameBounds,
-  isElementInFrame,
-} from "../frame";
+import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 const VERTICAL_OFFSET = 100;
