@@ -45,6 +45,7 @@ import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
 import type Scene from "../scene/Scene";
+import { createPasteEvent } from "../clipboard";
 
 const { h } = window;
 
@@ -81,9 +82,21 @@ const blue = COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const yellow = COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const violet = COLOR_PALETTE.violet[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 
+const pasteImage = async () => {
+  const sendPasteEvent = (file?: File) => {
+    const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });
+    document.dispatchEvent(clipboardEvent);
+  };
+
+  sendPasteEvent(await API.loadFile("./fixtures/deer.png"));
+};
+
 describe("history", () => {
   beforeEach(() => {
     renderStaticScene.mockClear();
+    Object.assign(document, {
+      elementFromPoint: () => GlobalTestState.canvas,
+    });
   });
 
   afterEach(() => {
@@ -1826,6 +1839,20 @@ describe("history", () => {
       expect(h.history.isRedoStackEmpty).toBeFalsy();
       expect(queryByTestId(container, "button-undo")).toBeDisabled();
       expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
+    });
+
+    it("should record history when pasting an image", async () => {
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+      pasteImage();
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(0);
+        expect(API.getRedoStack().length).toBe(1);
+      });
     });
   });
 
