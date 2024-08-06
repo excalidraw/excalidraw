@@ -441,12 +441,8 @@ export const resizeSingleElement = (
   pointerY: number,
   scene: Scene,
 ) => {
-  // Elbow arrows cannot be resized when bound on either end
-  if (
-    isArrowElement(element) &&
-    isElbowArrow(element) &&
-    (element.startBinding || element.endBinding)
-  ) {
+  // Elbow arrows cannot be resized
+  if (isElbowArrow(element)) {
     return;
   }
 
