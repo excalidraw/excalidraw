@@ -22,7 +22,9 @@ const writeData = (
     !appState.multiElement &&
     !appState.resizingElement &&
     !appState.editingElement &&
-    !appState.draggingElement
+    !appState.newElement &&
+    !appState.selectedElementsAreBeingDragged &&
+    !appState.selectionElement
   ) {
     const result = updater();
 
@@ -57,7 +59,7 @@ export const createUndoAction: ActionCreator = (history, store, scene) => ({
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
-        app.scene,
+        scene,
       ),
     ),
   keyTest: (event) =>

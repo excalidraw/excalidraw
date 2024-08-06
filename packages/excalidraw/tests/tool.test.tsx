@@ -1,7 +1,8 @@
+import React from "react";
 import { Excalidraw } from "../index";
 import type { ExcalidrawImperativeAPI } from "../types";
 import { resolvablePromise } from "../utils";
-import { render } from "./test-utils";
+import { act, render } from "./test-utils";
 import { Pointer } from "./helpers/ui";
 
 describe("setActiveTool()", () => {
@@ -28,7 +29,9 @@ describe("setActiveTool()", () => {
 
   it("should set the active tool type", async () => {
     expect(h.state.activeTool.type).toBe("selection");
-    excalidrawAPI.setActiveTool({ type: "rectangle" });
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "rectangle" });
+    });
     expect(h.state.activeTool.type).toBe("rectangle");
 
     mouse.down(10, 10);
@@ -39,7 +42,9 @@ describe("setActiveTool()", () => {
 
   it("should support tool locking", async () => {
     expect(h.state.activeTool.type).toBe("selection");
-    excalidrawAPI.setActiveTool({ type: "rectangle", locked: true });
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "rectangle", locked: true });
+    });
     expect(h.state.activeTool.type).toBe("rectangle");
 
     mouse.down(10, 10);
@@ -50,7 +55,9 @@ describe("setActiveTool()", () => {
 
   it("should set custom tool", async () => {
     expect(h.state.activeTool.type).toBe("selection");
-    excalidrawAPI.setActiveTool({ type: "custom", customType: "comment" });
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "custom", customType: "comment" });
+    });
     expect(h.state.activeTool.type).toBe("custom");
     expect(h.state.activeTool.customType).toBe("comment");
   });

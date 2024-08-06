@@ -92,7 +92,7 @@ const getHints = ({
 
   if (activeTool.type === "selection") {
     if (
-      appState.draggingElement?.type === "selection" &&
+      appState.selectionElement &&
       !selectedElements.length &&
       !appState.editingElement &&
       !appState.editingLinearElement
@@ -100,7 +100,7 @@ const getHints = ({
       return t("hints.deepBoxSelect");
     }
 
-    if (appState.gridSize && appState.draggingElement) {
+    if (appState.gridSize && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping");
     }
 
@@ -118,7 +118,8 @@ const getHints = ({
         return t("hints.lineEditor_info");
       }
       if (
-        !appState.draggingElement &&
+        !appState.newElement &&
+        !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
         if (isGenericElement(selectedElements[0])) {

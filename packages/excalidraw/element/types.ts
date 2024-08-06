@@ -176,6 +176,11 @@ export type ExcalidrawElement =
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
 
+export type ExcalidrawNonSelectionElement = Exclude<
+  ExcalidrawElement,
+  ExcalidrawSelectionElement
+>;
+
 export type Ordered<TElement extends ExcalidrawElement> = TElement & {
   index: FractionalIndex;
 };

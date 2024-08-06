@@ -151,10 +151,7 @@ export class LinearElementEditor {
     setState: React.Component<any, AppState>["setState"],
     elementsMap: NonDeletedSceneElementsMap,
   ) {
-    if (
-      !appState.editingLinearElement ||
-      appState.draggingElement?.type !== "selection"
-    ) {
+    if (!appState.editingLinearElement || !appState.selectionElement) {
       return false;
     }
     const { editingLinearElement } = appState;
@@ -166,7 +163,7 @@ export class LinearElementEditor {
     }
 
     const [selectionX1, selectionY1, selectionX2, selectionY2] =
-      getElementAbsoluteCoords(appState.draggingElement, elementsMap);
+      getElementAbsoluteCoords(appState.selectionElement, elementsMap);
 
     const pointsSceneCoords = LinearElementEditor.getPointsGlobalCoordinates(
       element,

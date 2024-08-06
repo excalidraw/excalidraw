@@ -1,6 +1,7 @@
+import React from "react";
 import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
-import { queryByTestId } from "@testing-library/react";
+import { act, queryByTestId } from "@testing-library/react";
 
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
@@ -43,7 +44,9 @@ vi.mock("../data/filesystem.ts", async (importOriginal) => {
 describe("library", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
-    h.app.library.resetLibrary();
+    await act(() => {
+      return h.app.library.resetLibrary();
+    });
   });
 
   it("import library via drag&drop", async () => {
@@ -208,7 +211,7 @@ describe("library menu", () => {
         "dropdown-menu-button",
       )!,
     );
-    queryByTestId(container, "lib-dropdown--load")!.click();
+    fireEvent.click(queryByTestId(container, "lib-dropdown--load")!);
 
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);
 
