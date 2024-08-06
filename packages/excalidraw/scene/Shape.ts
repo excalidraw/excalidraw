@@ -11,7 +11,7 @@ import type {
 } from "../element/types";
 import { isPathALoop, getCornerRadius, distanceSq2d } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
-import { isTransparent, assertNever, distance } from "../utils";
+import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
 import { ROUGHNESS } from "../constants";
 import {
