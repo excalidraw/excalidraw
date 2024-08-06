@@ -732,10 +732,10 @@ class App extends React.Component<AppProps, AppState> {
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(
-      createUndoAction(this.history, this.store, this.scene),
+      createUndoAction(this.history, this.store),
     );
     this.actionManager.registerAction(
-      createRedoAction(this.history, this.store, this.scene),
+      createRedoAction(this.history, this.store),
     );
   }
 
