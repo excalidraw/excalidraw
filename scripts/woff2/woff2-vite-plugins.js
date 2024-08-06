@@ -58,7 +58,7 @@ module.exports.woff2BrowserPlugin = () => {
         style: normal;
         display: swap;
       }
-      
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-Medium-DrcxCXg3.woff2)
@@ -68,7 +68,7 @@ module.exports.woff2BrowserPlugin = () => {
         style: normal;
         display: swap;
       }
-      
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-SemiBold-SCI4bEL9.woff2)
@@ -78,7 +78,7 @@ module.exports.woff2BrowserPlugin = () => {
         style: normal;
         display: swap;
       }
-      
+
       @font-face {
         font-family: "Assistant";
         src: url(${OSS_FONTS_CDN}Assistant-Bold-gm-uSS1B.woff2)
