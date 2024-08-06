@@ -15,12 +15,19 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   ExcalidrawGenericElement,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
 import type { AppState } from "../types";
+import { mutateElement } from "./mutateElement";
+import {
+  elementOverlapsWithFrame,
+  elementsAreInFrameBounds,
+  isElementInFrame,
+} from "../frame";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 const VERTICAL_OFFSET = 100;
@@ -695,6 +702,32 @@ export class FlowChartCreator {
       this.isCreatingChart = true;
       this.direction = direction;
       this.pendingNodes = newNodes;
+    }
+
+    // add pending nodes to the same frame as the start node
+    // if every pending node is at least intersecting with the frame
+    if (startNode.frameId) {
+      const frame = elementsMap.get(
+        startNode.frameId!,
+      ) as ExcalidrawFrameLikeElement;
+      if (
+        frame &&
+        this.pendingNodes.every(
+          (node) =>
+            elementsAreInFrameBounds([node], frame, elementsMap) ||
+            elementOverlapsWithFrame(node, frame, elementsMap),
+        )
+      ) {
+        this.pendingNodes = this.pendingNodes.map((node) =>
+          mutateElement(
+            node,
+            {
+              frameId: startNode.frameId,
+            },
+            false,
+          ),
+        );
+      }
     }
   }
 
