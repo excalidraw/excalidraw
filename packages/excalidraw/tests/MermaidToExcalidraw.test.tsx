@@ -90,7 +90,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
   it("should open mermaid popup when active tool is mermaid", async () => {
     const dialog = document.querySelector(".ttd-dialog")!;
-    await waitFor(() => dialog.querySelector("canvas"));
+    await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
     expect(dialog.outerHTML).toMatchSnapshot();
   });
 
