@@ -1,4 +1,5 @@
-import { act, render, waitFor } from "./test-utils";
+import React from "react";
+import { render, waitFor } from "./test-utils";
 import { Excalidraw } from "../index";
 import { expect } from "vitest";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
@@ -89,7 +90,7 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
   it("should open mermaid popup when active tool is mermaid", async () => {
     const dialog = document.querySelector(".ttd-dialog")!;
-    await waitFor(() => dialog.querySelector("canvas"));
+    await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
     expect(dialog.outerHTML).toMatchSnapshot();
   });
 
@@ -103,19 +104,9 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
-    expect(editor.textContent).toMatchInlineSnapshot(`
-      "flowchart TD
-       A[Christmas] -->|Get money| B(Go shopping)
-       B --> C{Let me think}
-       C -->|One| D[Laptop]
-       C -->|Two| E[iPhone]
-       C -->|Three| F[Car]"
-    `);
+    expect(editor.textContent).toMatchSnapshot();
 
-    await act(async () => {
-      updateTextEditor(editor, "flowchart TD1");
-      await new Promise((cb) => setTimeout(cb, 0));
-    });
+    updateTextEditor(editor, "flowchart TD1");
     editor = await getTextEditor(selector, false);
 
     expect(editor.textContent).toBe("flowchart TD1");
