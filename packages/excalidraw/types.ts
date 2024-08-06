@@ -234,9 +234,17 @@ export interface AppState {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
+  // for a newly created element
+  // - set on pointer down, updated during pointer move, used on pointer up
   newElement: NonDeleted<ExcalidrawNonSelectionElement> | null;
+  // for a single element that's being resized
+  // - set on pointer down when it's selected and the active tool is selection
   resizingElement: NonDeletedExcalidrawElement | null;
+  // multiElement is for multi-point linear element that's created by clicking as opposed to dragging
+  // when set and present, the editor will handle linear element creation logic accordingly
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
+  // decoupled from newElement, dragging selection only creates selectionElement
+  // - set on pointer down, updated during pointer move
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
