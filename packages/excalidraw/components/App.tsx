@@ -3920,24 +3920,14 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        if (selectedElements.length === 1) {
+        if (selectedElements.length === 1 && arrowKeyPressed) {
           let nextId: string | null = null;
-
-          if (event.key === KEYS.ENTER) {
-            event.preventDefault();
-            nextId = this.flowChartNavigator.exploreByBreadth(
-              selectedElements[0] as ExcalidrawGenericElement,
-              this.scene.getNonDeletedElementsMap(),
-              // getSuccessorDirectionFromKey(event.key),
-            );
-          } else if (arrowKeyPressed) {
-            event.preventDefault();
-            nextId = this.flowChartNavigator.exploreByDirection(
-              selectedElements[0] as ExcalidrawGenericElement,
-              this.scene.getNonDeletedElementsMap(),
-              getLinkDirectionFromKey(event.key),
-            );
-          }
+          event.preventDefault();
+          nextId = this.flowChartNavigator.exploreByDirection(
+            selectedElements[0] as ExcalidrawGenericElement,
+            this.scene.getNonDeletedElementsMap(),
+            getLinkDirectionFromKey(event.key),
+          );
 
           if (nextId) {
             this.setState((prevState) => ({
@@ -4350,7 +4340,6 @@ class App extends React.Component<AppProps, AppState> {
     if (!event.altKey) {
       if (this.flowChartNavigator.isExploring) {
         this.flowChartNavigator.clear();
-        this.flowChartNavigator.clearSearch();
         this.syncActionResult({ storeAction: StoreAction.CAPTURE });
       }
     }

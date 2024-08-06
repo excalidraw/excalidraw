@@ -547,8 +547,6 @@ export class FlowChartNavigator {
     this.sameLevelIndex = 0;
     this.direction = null;
     this.visitedNodes.clear();
-    this.queue = [];
-    this.visited = null;
   }
 
   exploreByDirection(
@@ -654,71 +652,6 @@ export class FlowChartNavigator {
     }
 
     return null;
-  }
-
-  private queue: ExcalidrawGenericElement[] = [];
-  private visited: Set<ExcalidrawElement["id"]> | null = null;
-
-  exploreByBreadth(
-    element: ExcalidrawGenericElement,
-    elementsMap: ElementsMap,
-  ) {
-    const setUp = (startNode: ExcalidrawGenericElement) => {
-      if (!this.visited) {
-        this.visited = new Set();
-        this.visited.add(startNode.id);
-        this.isExploring = true;
-        addLinkedNodes(element);
-      }
-    };
-
-    const addLinkedNodes = (startNode: ExcalidrawGenericElement) => {
-      (
-        ["up", "right", "down", "left"]
-          .map((direction) => [
-            ...getSuccessors(
-              startNode,
-              elementsMap,
-              direction as LinkDirection,
-            ),
-            ...getPredecessors(
-              startNode,
-              elementsMap,
-              direction as LinkDirection,
-            ),
-          ])
-          .flat() as ExcalidrawGenericElement[]
-      ).forEach((linkedNode) => this.queue.push(linkedNode));
-    };
-
-    const goToNextNode = (elementsMap: ElementsMap) => {
-      while (this.queue.length > 0 && this.visited) {
-        const currentNode = this.queue.shift() as ExcalidrawGenericElement;
-
-        if (!this.visited.has(currentNode.id)) {
-          this.visited.add(currentNode.id);
-          addLinkedNodes(currentNode);
-          return currentNode.id;
-        }
-      }
-
-      return null;
-    };
-
-    setUp(element);
-    const nextNode = goToNextNode(elementsMap);
-
-    if (nextNode) {
-      return nextNode;
-    }
-    this.clear();
-    setUp(element);
-    return goToNextNode(elementsMap);
-  }
-
-  clearSearch() {
-    this.queue = [];
-    this.visited = null;
   }
 }
 
