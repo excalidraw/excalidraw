@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import type { AppClassProperties, Device, UIAppState } from "../types";
 import {
+  isGenericElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
@@ -10,6 +11,7 @@ import { getShortcutKey } from "../utils";
 import { isEraserActive } from "../appState";
 
 import "./HintViewer.scss";
+import { isNodeInFlowchart } from "../element/flowchart";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -18,7 +20,12 @@ interface HintViewerProps {
   app: AppClassProperties;
 }
 
-const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
+const getHints = ({
+  appState,
+  isMobile,
+  device,
+  app,
+}: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
@@ -114,6 +121,23 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
         !appState.draggingElement &&
         isTextBindableContainer(selectedElements[0])
       ) {
+        if (isGenericElement(selectedElements[0])) {
+          if (
+            isNodeInFlowchart(
+              selectedElements[0],
+              app.scene.getNonDeletedElementsMap(),
+            )
+          ) {
+            return [
+              t("hints.bindTextToElement"),
+              t("hints.createFlowchart"),
+              t("hints.navigateFlowchart"),
+            ];
+          }
+
+          return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+        }
+
         return t("hints.bindTextToElement");
       }
     }
@@ -128,21 +152,25 @@ export const HintViewer = ({
   device,
   app,
 }: HintViewerProps) => {
-  let hint = getHints({
+  let hints = getHints({
     appState,
     isMobile,
     device,
     app,
   });
-  if (!hint) {
+  if (!hints) {
     return null;
   }
 
-  hint = getShortcutKey(hint);
+  hints = Array.isArray(hints)
+    ? hints.map((hint) => getShortcutKey(hint))
+    : [getShortcutKey(hints)];
 
   return (
     <div className="HintViewer">
-      <span>{hint}</span>
+      {hints.map((hint) => (
+        <div key={hint}>{hint}</div>
+      ))}
     </div>
   );
 };

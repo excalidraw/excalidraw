@@ -705,3 +705,17 @@ export class FlowChartCreator {
     this.numberOfNodes = 0;
   }
 }
+
+export const isNodeInFlowchart = (
+  element: ExcalidrawGenericElement,
+  elementsMap: ElementsMap,
+) => {
+  return (
+    [...elementsMap.values()].filter(
+      (el) =>
+        el.type === "arrow" &&
+        ((el.startBinding && el.endBinding?.elementId === element.id) ||
+          (el.endBinding && el.startBinding?.elementId === element.id)),
+    ).length > 0
+  );
+};
