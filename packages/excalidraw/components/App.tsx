@@ -8218,158 +8218,154 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (isFrameLikeElement(newElement)) {
+        const elementsInsideFrame = getElementsInNewFrame(
+          this.scene.getElementsIncludingDeleted(),
+          newElement,
+          this.scene.getNonDeletedElementsMap(),
+        );
+
+        this.scene.replaceAllElements(
+          addElementsToFrame(
+            this.scene.getElementsMapIncludingDeleted(),
+            elementsInsideFrame,
+            newElement,
+          ),
+        );
+      }
+
       if (newElement) {
-        if (pointerDownState.drag.hasOccurred) {
-          const sceneCoords = viewportCoordsToSceneCoords(
-            childEvent,
-            this.state,
+        mutateElement(newElement, getNormalizedDimensions(newElement));
+      }
+
+      if (pointerDownState.drag.hasOccurred) {
+        const sceneCoords = viewportCoordsToSceneCoords(childEvent, this.state);
+
+        // when editing the points of a linear element, we check if the
+        // linear element still is in the frame afterwards
+        // if not, the linear element will be removed from its frame (if any)
+        if (
+          this.state.selectedLinearElement &&
+          this.state.selectedLinearElement.isDragging
+        ) {
+          const linearElement = this.scene.getElement(
+            this.state.selectedLinearElement.elementId,
           );
 
-          // when editing the points of a linear element, we check if the
-          // linear element still is in the frame afterwards
-          // if not, the linear element will be removed from its frame (if any)
-          if (
-            this.state.selectedLinearElement &&
-            this.state.selectedLinearElement.isDragging
-          ) {
-            const linearElement = this.scene.getElement(
-              this.state.selectedLinearElement.elementId,
-            );
+          if (linearElement?.frameId) {
+            const frame = getContainingFrame(linearElement, elementsMap);
 
-            if (linearElement?.frameId) {
-              const frame = getContainingFrame(linearElement, elementsMap);
+            if (frame && linearElement) {
+              if (
+                !elementOverlapsWithFrame(
+                  linearElement,
+                  frame,
+                  this.scene.getNonDeletedElementsMap(),
+                )
+              ) {
+                // remove the linear element from all groups
+                // before removing it from the frame as well
+                mutateElement(linearElement, {
+                  groupIds: [],
+                });
 
-              if (frame && linearElement) {
-                if (
-                  !elementOverlapsWithFrame(
-                    linearElement,
-                    frame,
-                    this.scene.getNonDeletedElementsMap(),
-                  )
-                ) {
-                  // remove the linear element from all groups
-                  // before removing it from the frame as well
-                  mutateElement(linearElement, {
-                    groupIds: [],
-                  });
+                removeElementsFromFrame(
+                  [linearElement],
+                  this.scene.getNonDeletedElementsMap(),
+                );
 
-                  removeElementsFromFrame(
-                    [linearElement],
-                    this.scene.getNonDeletedElementsMap(),
-                  );
-
-                  this.scene.triggerUpdate();
-                }
+                this.scene.triggerUpdate();
               }
             }
-          } else {
-            // update the relationships between selected elements and frames
-            const topLayerFrame =
-              this.getTopLayerFrameAtSceneCoords(sceneCoords);
+          }
+        } else {
+          // update the relationships between selected elements and frames
+          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
-            const selectedElements = this.scene.getSelectedElements(this.state);
-            let nextElements = this.scene.getElementsMapIncludingDeleted();
+          const selectedElements = this.scene.getSelectedElements(this.state);
+          let nextElements = this.scene.getElementsMapIncludingDeleted();
 
-            const updateGroupIdsAfterEditingGroup = (
-              elements: ExcalidrawElement[],
-            ) => {
-              if (elements.length > 0) {
-                for (const element of elements) {
-                  const index = element.groupIds.indexOf(
-                    this.state.editingGroupId!,
-                  );
+          const updateGroupIdsAfterEditingGroup = (
+            elements: ExcalidrawElement[],
+          ) => {
+            if (elements.length > 0) {
+              for (const element of elements) {
+                const index = element.groupIds.indexOf(
+                  this.state.editingGroupId!,
+                );
 
+                mutateElement(
+                  element,
+                  {
+                    groupIds: element.groupIds.slice(0, index),
+                  },
+                  false,
+                );
+              }
+
+              nextElements.forEach((element) => {
+                if (
+                  element.groupIds.length &&
+                  getElementsInGroup(
+                    nextElements,
+                    element.groupIds[element.groupIds.length - 1],
+                  ).length < 2
+                ) {
                   mutateElement(
                     element,
                     {
-                      groupIds: element.groupIds.slice(0, index),
+                      groupIds: [],
                     },
                     false,
                   );
                 }
+              });
 
-                nextElements.forEach((element) => {
-                  if (
-                    element.groupIds.length &&
-                    getElementsInGroup(
-                      nextElements,
-                      element.groupIds[element.groupIds.length - 1],
-                    ).length < 2
-                  ) {
-                    mutateElement(
-                      element,
-                      {
-                        groupIds: [],
-                      },
-                      false,
-                    );
-                  }
-                });
-
-                this.setState({
-                  editingGroupId: null,
-                });
-              }
-            };
-
-            if (
-              topLayerFrame &&
-              !this.state.selectedElementIds[topLayerFrame.id]
-            ) {
-              const elementsToAdd = selectedElements.filter(
-                (element) =>
-                  element.frameId !== topLayerFrame.id &&
-                  isElementInFrame(element, nextElements, this.state),
-              );
-
-              if (this.state.editingGroupId) {
-                updateGroupIdsAfterEditingGroup(elementsToAdd);
-              }
-
-              nextElements = addElementsToFrame(
-                nextElements,
-                elementsToAdd,
-                topLayerFrame,
-              );
-            } else if (!topLayerFrame) {
-              if (this.state.editingGroupId) {
-                const elementsToRemove = selectedElements.filter(
-                  (element) =>
-                    element.frameId &&
-                    !isElementInFrame(element, nextElements, this.state),
-                );
-
-                updateGroupIdsAfterEditingGroup(elementsToRemove);
-              }
+              this.setState({
+                editingGroupId: null,
+              });
             }
+          };
 
-            nextElements = updateFrameMembershipOfSelectedElements(
-              nextElements,
-              this.state,
-              this,
+          if (
+            topLayerFrame &&
+            !this.state.selectedElementIds[topLayerFrame.id]
+          ) {
+            const elementsToAdd = selectedElements.filter(
+              (element) =>
+                element.frameId !== topLayerFrame.id &&
+                isElementInFrame(element, nextElements, this.state),
             );
 
-            this.scene.replaceAllElements(nextElements);
+            if (this.state.editingGroupId) {
+              updateGroupIdsAfterEditingGroup(elementsToAdd);
+            }
+
+            nextElements = addElementsToFrame(
+              nextElements,
+              elementsToAdd,
+              topLayerFrame,
+            );
+          } else if (!topLayerFrame) {
+            if (this.state.editingGroupId) {
+              const elementsToRemove = selectedElements.filter(
+                (element) =>
+                  element.frameId &&
+                  !isElementInFrame(element, nextElements, this.state),
+              );
+
+              updateGroupIdsAfterEditingGroup(elementsToRemove);
+            }
           }
-        }
 
-        if (isFrameLikeElement(newElement)) {
-          const elementsInsideFrame = getElementsInNewFrame(
-            this.scene.getElementsIncludingDeleted(),
-            newElement,
-            this.scene.getNonDeletedElementsMap(),
+          nextElements = updateFrameMembershipOfSelectedElements(
+            nextElements,
+            this.state,
+            this,
           );
 
-          this.scene.replaceAllElements(
-            addElementsToFrame(
-              this.scene.getElementsMapIncludingDeleted(),
-              elementsInsideFrame,
-              newElement,
-            ),
-          );
+          this.scene.replaceAllElements(nextElements);
         }
-
-        mutateElement(newElement, getNormalizedDimensions(newElement));
       }
 
       if (resizingElement) {
