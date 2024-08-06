@@ -9651,7 +9651,12 @@ class App extends React.Component<AppProps, AppState> {
 
     const transformHandleType = pointerDownState.resize.handleType;
 
-    if (selectedFrames.length > 0 && transformHandleType === "rotation") {
+    if (
+      // Frames cannot be rotated
+      (selectedFrames.length > 0 && transformHandleType === "rotation") ||
+      // Elbow arrows cannot be transformed (resized or rotated)
+      (selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
+    ) {
       return false;
     }
 

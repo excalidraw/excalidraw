@@ -441,11 +441,6 @@ export const resizeSingleElement = (
   pointerY: number,
   scene: Scene,
 ) => {
-  // Elbow arrows cannot be resized
-  if (isElbowArrow(element)) {
-    return;
-  }
-
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
