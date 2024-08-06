@@ -5,7 +5,7 @@ const OSS_FONTS_CDN =
  * Custom vite plugin to convert url woff2 imports into a text.
  * Other woff2 imports are automatically served and resolved as a file uri.
  *
- * @returns {import("vitest").PluginOption}
+ * @returns {import("vite").PluginOption}
  */
 module.exports.woff2BrowserPlugin = () => {
   // for now limited to woff2 only, might be extended to any assets in the future
