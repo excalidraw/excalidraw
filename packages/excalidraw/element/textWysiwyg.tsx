@@ -357,7 +357,8 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
-      onChange(normalizeText(editable.value));
+      editable.value = normalizeText(editable.value);
+      onChange(editable.value);
     };
   }
 
