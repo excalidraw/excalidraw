@@ -1,13 +1,12 @@
 import "pepjs";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
+import { act } from "@testing-library/react";
 import { render, queries, waitFor, fireEvent } from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
 import type { ImportedDataState } from "../data/types";
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
-
-import type { SceneData } from "../types";
 import { getSelectedElements } from "../scene/selection";
 import type { ExcalidrawElement } from "../element/types";
 import { UI } from "./helpers/ui";
@@ -67,6 +66,12 @@ const renderApp: TestRenderFn = async (ui, options) => {
     if (!interactiveCanvas) {
       throw new Error("not initialized yet");
     }
+
+    // hack-awaiting app.initialScene() which solves some test race conditions
+    // (later we may switch this with proper event listener)
+    if (window.h.state.isLoading) {
+      throw new Error("still loading");
+    }
   });
 
   return renderResult;
@@ -118,10 +123,6 @@ const initLocalStorage = (data: ImportedDataState) => {
   }
 };
 
-export const updateSceneData = (data: SceneData) => {
-  (window.collab as any).excalidrawAPI.updateScene(data);
-};
-
 const originalGetBoundingClientRect =
   global.window.HTMLDivElement.prototype.getBoundingClientRect;
 
@@ -166,20 +167,24 @@ export const withExcalidrawDimensions = async (
   cb: () => void,
 ) => {
   mockBoundingClientRect(dimensions);
-  // @ts-ignore
-  h.app.refreshViewportBreakpoints();
-  // @ts-ignore
-  h.app.refreshEditorBreakpoints();
-  window.h.app.refresh();
+  act(() => {
+    // @ts-ignore
+    h.app.refreshViewportBreakpoints();
+    // @ts-ignore
+    h.app.refreshEditorBreakpoints();
+    window.h.app.refresh();
+  });
 
   await cb();
 
   restoreOriginalGetBoundingClientRect();
-  // @ts-ignore
-  h.app.refreshViewportBreakpoints();
-  // @ts-ignore
-  h.app.refreshEditorBreakpoints();
-  window.h.app.refresh();
+  act(() => {
+    // @ts-ignore
+    h.app.refreshViewportBreakpoints();
+    // @ts-ignore
+    h.app.refreshEditorBreakpoints();
+    window.h.app.refresh();
+  });
 };
 
 export const restoreOriginalGetBoundingClientRect = () => {

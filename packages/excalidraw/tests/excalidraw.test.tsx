@@ -1,3 +1,4 @@
+import React from "react";
 import { fireEvent, GlobalTestState, toggleMenu, render } from "./test-utils";
 import { Excalidraw, Footer, MainMenu } from "../index";
 import { queryByText, queryByTestId } from "@testing-library/react";

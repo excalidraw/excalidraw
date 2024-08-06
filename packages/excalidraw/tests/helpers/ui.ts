@@ -20,7 +20,7 @@ import {
   type TransformHandleDirection,
 } from "../../element/transformHandles";
 import { KEYS } from "../../keys";
-import { fireEvent, GlobalTestState, screen } from "../test-utils";
+import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
 import { API } from "./api";
 import {
@@ -124,6 +124,10 @@ export class Keyboard {
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
       Keyboard.keyPress("z");
     });
+  };
+
+  static exitTextEditor = (textarea: HTMLTextAreaElement) => {
+    fireEvent.keyDown(textarea, { key: KEYS.ESCAPE });
   };
 }
 
@@ -299,14 +303,16 @@ const transform = (
   keyboardModifiers: KeyboardModifiers = {},
 ) => {
   const elements = Array.isArray(element) ? element : [element];
-  h.setState({
-    selectedElementIds: elements.reduce(
-      (acc, e) => ({
-        ...acc,
-        [e.id]: true,
-      }),
-      {},
-    ),
+  act(() => {
+    h.setState({
+      selectedElementIds: elements.reduce(
+        (acc, e) => ({
+          ...acc,
+          [e.id]: true,
+        }),
+        {},
+      ),
+    });
   });
   let handleCoords: TransformHandle | undefined;
   if (elements.length === 1) {
@@ -487,7 +493,9 @@ export class UI {
     const origElement = h.elements[h.elements.length - 1] as any;
 
     if (angle !== 0) {
-      mutateElement(origElement, { angle });
+      act(() => {
+        mutateElement(origElement, { angle });
+      });
     }
 
     return proxy(origElement);
@@ -511,8 +519,9 @@ export class UI {
     }
 
     fireEvent.input(editor, { target: { value: text } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    editor.blur();
+    act(() => {
+      editor.blur();
+    });
 
     return isTextElement(element)
       ? element
@@ -522,6 +531,14 @@ export class UI {
           ] as ExcalidrawTextElementWithContainer,
         );
   }
+
+  static updateInput = (input: HTMLInputElement, value: string | number) => {
+    act(() => {
+      input.focus();
+      fireEvent.change(input, { target: { value: String(value) } });
+      input.blur();
+    });
+  };
 
   static resize(
     element: ExcalidrawElement | ExcalidrawElement[],

@@ -1,3 +1,4 @@
+import React from "react";
 import { KEYS } from "../keys";
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";

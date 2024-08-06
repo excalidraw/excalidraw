@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import * as StaticScene from "../renderer/staticScene";
 import { reseed } from "../random";

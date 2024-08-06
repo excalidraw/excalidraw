@@ -22,12 +22,6 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-const editInput = (input: HTMLInputElement, value: string) => {
-  input.focus();
-  fireEvent.change(input, { target: { value } });
-  input.blur();
-};
-
 const getStatsProperty = (label: string) => {
   const elementStats = UI.queryStats()?.querySelector("#elementStats");
 
@@ -202,7 +196,7 @@ describe("elbow arrow ui", () => {
     const inputAngle = getStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
-    editInput(inputAngle, String("40"));
+    UI.updateInput(inputAngle, String("40"));
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],

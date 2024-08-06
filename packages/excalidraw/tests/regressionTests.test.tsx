@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
@@ -55,7 +56,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await render(<Excalidraw handleKeyboardGlobally={true} />);
-  h.setState({ height: 768, width: 1024 });
+  API.setAppState({ height: 768, width: 1024 });
 });
 
 afterEach(() => {
@@ -757,7 +758,7 @@ describe("regression tests", () => {
         width: 500,
         height: 500,
       });
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
 
       mouse.select(rect1);
 
@@ -793,7 +794,7 @@ describe("regression tests", () => {
         width: 500,
         height: 500,
       });
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
 
       mouse.select(rect1);
 
