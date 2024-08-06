@@ -3890,7 +3890,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const arrowKeyPressed = isArrowKey(event.key);
 
-      if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed) {
+      if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
         event.preventDefault();
 
         const selectedElements = getSelectedElements(
