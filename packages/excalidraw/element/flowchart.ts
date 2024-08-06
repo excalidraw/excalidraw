@@ -3,6 +3,7 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
+  compareHeading,
   headingForPointFromElement,
 } from "./heading";
 import type Scene from "../scene/Scene";
@@ -24,6 +25,7 @@ import { KEYS } from "../keys";
 import type { AppState } from "../types";
 import { mutateElement } from "./mutateElement";
 import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
+import { isElbowArrow } from "./typeChecks";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 const VERTICAL_OFFSET = 100;
@@ -63,16 +65,13 @@ const getSuccessors = (
   direction: LinkDirection = "right",
 ) => {
   const boundElbowArrows = element.boundElements
-    ?.filter((boundEl) => boundEl.type === "arrow")
-    .map(
-      (boundArrow) => elementsMap.get(boundArrow.id) as ExcalidrawArrowElement,
-    )
+    ?.map((boundEl) => elementsMap.get(boundEl.id))
     .filter(
-      (boundArrow) =>
-        boundArrow?.elbowed &&
-        boundArrow.startBinding?.elementId === element.id &&
-        boundArrow.endBinding,
-    );
+      (boundEl) =>
+        isElbowArrow(boundEl) &&
+        boundEl.startBinding?.elementId === element.id &&
+        boundEl.endBinding,
+    ) as ExcalidrawArrowElement[];
 
   if (!boundElbowArrows || boundElbowArrows.length === 0) {
     return [];
@@ -95,36 +94,20 @@ const getSuccessors = (
   switch (direction) {
     case "up":
       return successorsAndHeadingFors
-        .filter(
-          (successorAndHeadingFor) =>
-            successorAndHeadingFor.headingFor[0] === HEADING_UP[0] &&
-            successorAndHeadingFor.headingFor[1] === HEADING_UP[1],
-        )
-        .map((successorAndHeadingFor) => successorAndHeadingFor.successor);
+        .filter((item) => compareHeading(item.headingFor, HEADING_UP))
+        .map((item) => item.successor);
     case "down":
       return successorsAndHeadingFors
-        .filter(
-          (successorAndHeadingFor) =>
-            successorAndHeadingFor.headingFor[0] === HEADING_DOWN[0] &&
-            successorAndHeadingFor.headingFor[1] === HEADING_DOWN[1],
-        )
-        .map((successorAndHeadingFor) => successorAndHeadingFor.successor);
+        .filter((item) => compareHeading(item.headingFor, HEADING_DOWN))
+        .map((item) => item.successor);
     case "right":
       return successorsAndHeadingFors
-        .filter(
-          (successorAndHeadingFor) =>
-            successorAndHeadingFor.headingFor[0] === HEADING_RIGHT[0] &&
-            successorAndHeadingFor.headingFor[1] === HEADING_RIGHT[1],
-        )
-        .map((successorAndHeadingFor) => successorAndHeadingFor.successor);
+        .filter((item) => compareHeading(item.headingFor, HEADING_RIGHT))
+        .map((item) => item.successor);
     case "left":
       return successorsAndHeadingFors
-        .filter(
-          (successorAndHeadingFor) =>
-            successorAndHeadingFor.headingFor[0] === HEADING_LEFT[0] &&
-            successorAndHeadingFor.headingFor[1] === HEADING_LEFT[1],
-        )
-        .map((successorAndHeadingFor) => successorAndHeadingFor.successor);
+        .filter((item) => compareHeading(item.headingFor, HEADING_LEFT))
+        .map((item) => item.successor);
   }
 };
 
@@ -137,7 +120,7 @@ export const getPredecessors = (
   const comingInArrows = [...elementsMap.values()]
     .filter(
       (el) =>
-        el.type === "arrow" &&
+        isElbowArrow(el) &&
         el.startBinding &&
         el.endBinding?.elementId === element.id,
     )
@@ -162,44 +145,20 @@ export const getPredecessors = (
   switch (direction) {
     case "up":
       return predecessorsAndHeadingFors
-        .filter(
-          (predecessorAndHeadingFor) =>
-            predecessorAndHeadingFor.headingFor[0] === HEADING_UP[0] &&
-            predecessorAndHeadingFor.headingFor[1] === HEADING_UP[1],
-        )
-        .map(
-          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
-        );
+        .filter((item) => compareHeading(item.headingFor, HEADING_UP))
+        .map((item) => item.predecessor);
     case "down":
       return predecessorsAndHeadingFors
-        .filter(
-          (predecessorAndHeadingFor) =>
-            predecessorAndHeadingFor.headingFor[0] === HEADING_DOWN[0] &&
-            predecessorAndHeadingFor.headingFor[1] === HEADING_DOWN[1],
-        )
-        .map(
-          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
-        );
+        .filter((item) => compareHeading(item.headingFor, HEADING_DOWN))
+        .map((item) => item.predecessor);
     case "right":
       return predecessorsAndHeadingFors
-        .filter(
-          (predecessorAndHeadingFor) =>
-            predecessorAndHeadingFor.headingFor[0] === HEADING_RIGHT[0] &&
-            predecessorAndHeadingFor.headingFor[1] === HEADING_RIGHT[1],
-        )
-        .map(
-          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
-        );
+        .filter((item) => compareHeading(item.headingFor, HEADING_RIGHT))
+        .map((item) => item.predecessor);
     case "left":
       return predecessorsAndHeadingFors
-        .filter(
-          (predecessorAndHeadingFor) =>
-            predecessorAndHeadingFor.headingFor[0] === HEADING_LEFT[0] &&
-            predecessorAndHeadingFor.headingFor[1] === HEADING_LEFT[1],
-        )
-        .map(
-          (predecessorAndHeadingFor) => predecessorAndHeadingFor.predecessor,
-        );
+        .filter((item) => compareHeading(item.headingFor, HEADING_LEFT))
+        .map((item) => item.predecessor);
   }
 };
 
