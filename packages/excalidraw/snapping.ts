@@ -1209,16 +1209,14 @@ export const snapResizingElements = (
 };
 
 export const snapNewElement = (
-  draggingElement: ExcalidrawElement,
+  newElement: ExcalidrawElement,
   appState: AppState,
   event: KeyboardModifiersObject,
   origin: Vector2D,
   dragOffset: Vector2D,
   elementsMap: ElementsMap,
 ) => {
-  if (
-    !isSnappingEnabled({ event, selectedElements: [draggingElement], appState })
-  ) {
+  if (!isSnappingEnabled({ event, selectedElements: [newElement], appState })) {
     return {
       snapOffset: { x: 0, y: 0 },
       snapLines: [],
@@ -1240,7 +1238,7 @@ export const snapNewElement = (
   const nearestSnapsY: Snaps = [];
 
   getPointSnaps(
-    [draggingElement],
+    [newElement],
     selectionSnapPoints,
     appState,
     event,
@@ -1259,13 +1257,13 @@ export const snapNewElement = (
   nearestSnapsX.length = 0;
   nearestSnapsY.length = 0;
 
-  const corners = getElementsCorners([draggingElement], elementsMap, {
+  const corners = getElementsCorners([newElement], elementsMap, {
     boundingBoxCorners: true,
     omitCenter: true,
   });
 
   getPointSnaps(
-    [draggingElement],
+    [newElement],
     corners,
     appState,
     event,

@@ -21,6 +21,7 @@ import type {
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
+  ExcalidrawNonSelectionElement,
 } from "./element/types";
 import type { Action } from "./actions/types";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -233,9 +234,25 @@ export interface AppState {
     element: NonDeletedExcalidrawElement;
     state: "hover" | "active";
   } | null;
-  draggingElement: NonDeletedExcalidrawElement | null;
+  /**
+   * for a newly created element
+   * - set on pointer down, updated during pointer move, used on pointer up
+   */
+  newElement: NonDeleted<ExcalidrawNonSelectionElement> | null;
+  /**
+   * for a single element that's being resized
+   * - set on pointer down when it's selected and the active tool is selection
+   */
   resizingElement: NonDeletedExcalidrawElement | null;
+  /**
+   * multiElement is for multi-point linear element that's created by clicking as opposed to dragging
+   * - when set and present, the editor will handle linear element creation logic accordingly
+   */
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
+  /**
+   * decoupled from newElement, dragging selection only creates selectionElement
+   * - set on pointer down, updated during pointer move
+   */
   selectionElement: NonDeletedExcalidrawElement | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
@@ -249,8 +266,13 @@ export interface AppState {
   };
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
-  // element being edited, but not necessarily added to elements array yet
-  // (e.g. text element when typing into the input)
+  /**
+   * currently set for:
+   * - text elements while in wysiwyg
+   * - newly created linear elements while in line editor (not set for existing
+   *   elements in line editor)
+   * - and new images while being placed on canvas
+   */
   editingElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   activeTool: {
