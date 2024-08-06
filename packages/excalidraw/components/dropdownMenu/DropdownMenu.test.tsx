@@ -1,3 +1,4 @@
+import React from "react";
 import { Excalidraw } from "../../index";
 import { KEYS } from "../../keys";
 import { Keyboard } from "../../tests/helpers/ui";

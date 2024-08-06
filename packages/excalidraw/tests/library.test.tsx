@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
 import { act, queryByTestId } from "@testing-library/react";

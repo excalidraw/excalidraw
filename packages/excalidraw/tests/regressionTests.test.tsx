@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";

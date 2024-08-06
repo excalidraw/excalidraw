@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import { Excalidraw, StoreAction } from "../../index";
 import type { ExcalidrawImperativeAPI } from "../../types";

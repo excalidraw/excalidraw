@@ -1,3 +1,4 @@
+import React from "react";
 import { Excalidraw } from "../index";
 import type { ExcalidrawImperativeAPI } from "../types";
 import { resolvablePromise } from "../utils";

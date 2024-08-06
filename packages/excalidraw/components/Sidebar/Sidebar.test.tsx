@@ -1,3 +1,4 @@
+import React from "react";
 import { DEFAULT_SIDEBAR } from "../../constants";
 import { Excalidraw, Sidebar } from "../../index";
 import {

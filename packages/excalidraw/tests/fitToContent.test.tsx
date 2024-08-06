@@ -1,3 +1,4 @@
+import React from "react";
 import { act, render } from "./test-utils";
 import { API } from "./helpers/api";
 

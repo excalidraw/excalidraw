@@ -1,3 +1,4 @@
+import React from "react";
 import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getStepSizedValue } from "./utils";

@@ -1,3 +1,4 @@
+import React from "react";
 import type { ExcalidrawElement } from "./element/types";
 import { convertToExcalidrawElements, Excalidraw } from "./index";
 import { API } from "./tests/helpers/api";

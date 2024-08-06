@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
 import { render } from "../tests/test-utils";

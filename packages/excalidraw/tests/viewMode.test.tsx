@@ -1,3 +1,4 @@
+import React from "react";
 import { render, GlobalTestState } from "./test-utils";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";

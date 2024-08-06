@@ -1,5 +1,5 @@
+import React from "react";
 import { fireEvent, queryByTestId, render, waitFor } from "./test-utils";
-
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";

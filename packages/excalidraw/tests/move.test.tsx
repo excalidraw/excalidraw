@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import { render, fireEvent, act } from "./test-utils";
 import { Excalidraw } from "../index";

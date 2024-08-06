@@ -1,3 +1,4 @@
+import React from "react";
 import { fireEvent, render } from "./test-utils";
 import { Excalidraw, isLinearElement } from "../index";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import type {
   ExcalidrawElement,
@@ -27,7 +28,6 @@ import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
-import React from "react";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

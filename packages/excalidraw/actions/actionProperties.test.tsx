@@ -1,3 +1,4 @@
+import React from "react";
 import { Excalidraw } from "../index";
 import { queryByTestId } from "@testing-library/react";
 import { render } from "../tests/test-utils";

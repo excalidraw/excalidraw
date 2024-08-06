@@ -1,3 +1,4 @@
+import React from "react";
 import "../global.d.ts";
 import * as StaticScene from "../renderer/staticScene";
 import {

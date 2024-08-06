@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import ReactDOM from "react-dom";
 import { render, waitFor, GlobalTestState } from "./test-utils";
