@@ -69,7 +69,7 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import { renderVisualDebug } from "../visualdebug";
+import { getCornerRadius } from "../math";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -215,13 +215,18 @@ const renderBindingHighlightForBindableElement = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const width = x2 - x1;
   const height = y2 - y1;
-  const threshold = maxBindingGap(element, width, height);
+  const thickness = 10;
 
   // So that we don't overlap the element itself
   const strokeOffset = 4;
   context.strokeStyle = "rgba(0,0,0,.05)";
-  context.lineWidth = threshold - strokeOffset;
-  const padding = strokeOffset / 2 + threshold / 2;
+  context.lineWidth = thickness - strokeOffset;
+  const padding = strokeOffset / 2 + thickness / 2;
+
+  const radius = getCornerRadius(
+    Math.min(element.width, element.height),
+    element,
+  );
 
   switch (element.type) {
     case "rectangle":
@@ -240,6 +245,8 @@ const renderBindingHighlightForBindableElement = (
         x1 + width / 2,
         y1 + height / 2,
         element.angle,
+        undefined,
+        radius,
       );
       break;
     case "diamond":
@@ -735,7 +742,12 @@ const _renderInteractiveScene = ({
   if (
     appState.selectedLinearElement &&
     appState.selectedLinearElement.hoverPointIndex >= 0 &&
-    !isElbowArrow(selectedElements[0])
+    !(
+      isElbowArrow(selectedElements[0]) &&
+      appState.selectedLinearElement.hoverPointIndex > 0 &&
+      appState.selectedLinearElement.hoverPointIndex <
+        selectedElements[0].points.length - 1
+    )
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
   }
@@ -976,8 +988,6 @@ const _renderInteractiveScene = ({
     });
     context.restore();
   }
-
-  renderVisualDebug(context, appState);
 
   return {
     scrollBars,

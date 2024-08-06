@@ -7,8 +7,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
   NonDeletedSceneElementsMap,
-  ExcalidrawArrowElement,
   OrderedExcalidrawElement,
+  FixedPointBinding,
 } from "./types";
 import {
   distance2d,
@@ -44,7 +44,11 @@ import {
   isBindingEnabled,
 } from "./binding";
 import { tupleToCoors } from "../utils";
-import { isBindingElement, isElbowArrow } from "./typeChecks";
+import {
+  isBindingElement,
+  isElbowArrow,
+  isFixedPointBinding,
+} from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
@@ -1423,12 +1427,31 @@ export class LinearElementEditor {
     },
   ) {
     if (isElbowArrow(element)) {
+      const bindings: {
+        startBinding?: FixedPointBinding | null;
+        endBinding?: FixedPointBinding | null;
+      } = {};
+      if (otherUpdates?.startBinding !== undefined) {
+        bindings.startBinding =
+          otherUpdates.startBinding !== null &&
+          isFixedPointBinding(otherUpdates.startBinding)
+            ? otherUpdates.startBinding
+            : null;
+      }
+      if (otherUpdates?.endBinding !== undefined) {
+        bindings.endBinding =
+          otherUpdates.endBinding !== null &&
+          isFixedPointBinding(otherUpdates.endBinding)
+            ? otherUpdates.endBinding
+            : null;
+      }
+
       mutateElbowArrow(
-        element as ExcalidrawArrowElement,
+        element,
         scene,
         nextPoints,
         [offsetX, offsetY],
-        otherUpdates,
+        bindings,
         options,
       );
     } else {

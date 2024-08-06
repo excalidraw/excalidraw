@@ -93,13 +93,13 @@ export const createRedoAction: ActionCreator = (history, store, scene) => ({
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState) =>
+  perform: (elements, appState, _, app) =>
     writeData(appState, () =>
       history.redo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
-        scene,
+        app.scene,
       ),
     ),
   keyTest: (event) =>

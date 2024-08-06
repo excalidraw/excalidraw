@@ -48,7 +48,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import type { EXPORT_IMAGE_TYPES } from "../constants";
+import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -157,7 +157,6 @@ import {
   isLinearElement,
   isLinearElementType,
   isUsingAdaptiveRadius,
-  isFrameElement,
   isIframeElement,
   isIframeLikeElement,
   isMagicFrameElement,
@@ -231,8 +230,7 @@ import type {
   ScrollBars,
 } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey, getElementShape } from "../shapes";
-import type { GeometricShape } from "../../utils/geometry/shape";
+import { findShapeByKey, getBoundTextShape, getElementShape } from "../shapes";
 import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import type {
@@ -328,7 +326,6 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
-  getDefaultLineHeight,
   getLineHeightInPx,
   getMinTextElementWidth,
   isMeasureTextSupported,
@@ -344,7 +341,7 @@ import {
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
-import { Fonts } from "../scene/Fonts";
+import { Fonts, getLineHeight } from "../fonts";
 import {
   getFrameChildren,
   isCursorInFrame,
@@ -545,8 +542,8 @@ class App extends React.Component<AppProps, AppState> {
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public scene: Scene;
+  public fonts: Fonts;
   public renderer: Renderer;
-  private fonts: Fonts;
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -1306,15 +1303,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const isDarkTheme = this.state.theme === THEME.DARK;
 
-    let frameIndex = 0;
-    let magicFrameIndex = 0;
-
     return this.scene.getNonDeletedFramesLikes().map((f) => {
-      if (isFrameElement(f)) {
-        frameIndex++;
-      } else {
-        magicFrameIndex++;
-      }
       if (
         !isElementInViewport(
           f,
@@ -1348,10 +1337,7 @@ class App extends React.Component<AppProps, AppState> {
 
       let frameNameJSX;
 
-      const frameName = getFrameLikeTitle(
-        f,
-        isFrameElement(f) ? frameIndex : magicFrameIndex,
-      );
+      const frameName = getFrameLikeTitle(f);
 
       if (f.id === this.state.editingFrame) {
         const frameNameInEdit = frameName;
@@ -2144,6 +2130,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  public dismissLinearEditor = () => {
+    setTimeout(() => {
+      this.setState({
+        editingLinearElement: null,
+      });
+    });
+  };
+
   public syncActionResult = withBatchedUpdates((actionResult: ActionResult) => {
     if (this.unmounted || actionResult === false) {
       return;
@@ -2353,11 +2347,6 @@ class App extends React.Component<AppProps, AppState> {
         }),
       };
     }
-    // FontFaceSet loadingdone event we listen on may not always fire
-    // (looking at you Safari), so on init we manually load fonts for current
-    // text elements on canvas, and rerender them once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.loadFontsForElements(scene.elements);
 
     this.resetStore();
     this.resetHistory();
@@ -2365,6 +2354,12 @@ class App extends React.Component<AppProps, AppState> {
       ...scene,
       storeAction: StoreAction.UPDATE,
     });
+
+    // FontFaceSet loadingdone event we listen on may not always
+    // fire (looking at you Safari), so on init we manually load all
+    // fonts and rerender scene text elements once done. This also
+    // seems faster even in browsers that do fire the loadingdone event.
+    this.fonts.loadSceneFonts();
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2456,6 +2451,10 @@ class App extends React.Component<AppProps, AppState> {
         store: {
           configurable: true,
           value: this.store,
+        },
+        fonts: {
+          configurable: true,
+          value: this.fonts,
         },
       });
     }
@@ -2594,7 +2593,7 @@ class App extends React.Component<AppProps, AppState> {
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onFontsLoaded(loadedFontFaces);
+        this.fonts.onLoaded(loadedFontFaces);
       }),
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -3398,7 +3397,7 @@ class App extends React.Component<AppProps, AppState> {
       fontSize: textElementProps.fontSize,
       fontFamily: textElementProps.fontFamily,
     });
-    const lineHeight = getDefaultLineHeight(textElementProps.fontFamily);
+    const lineHeight = getLineHeight(textElementProps.fontFamily);
     const [x1, , x2] = getVisibleSceneBounds(this.state);
     // long texts should not go beyond 800 pixels in width nor should it go below 200 px
     const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
@@ -3416,13 +3415,13 @@ class App extends React.Component<AppProps, AppState> {
           });
 
           let metrics = measureText(originalText, fontString, lineHeight);
-          const isTextWrapped = metrics.width > maxTextWidth;
+          const isTextUnwrapped = metrics.width > maxTextWidth;
 
-          const text = isTextWrapped
+          const text = isTextUnwrapped
             ? wrapText(originalText, fontString, maxTextWidth)
             : originalText;
 
-          metrics = isTextWrapped
+          metrics = isTextUnwrapped
             ? measureText(text, fontString, lineHeight)
             : metrics;
 
@@ -3436,7 +3435,7 @@ class App extends React.Component<AppProps, AppState> {
             text,
             originalText,
             lineHeight,
-            autoResize: !isTextWrapped,
+            autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
           });
           acc.push(element);
@@ -4197,6 +4196,16 @@ class App extends React.Component<AppProps, AppState> {
               })`,
             );
           }
+          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
+            this.setState((prevState) => ({
+              currentItemArrowType:
+                prevState.currentItemArrowType === ARROW_TYPE.sharp
+                  ? ARROW_TYPE.round
+                  : prevState.currentItemArrowType === ARROW_TYPE.round
+                  ? ARROW_TYPE.elbow
+                  : ARROW_TYPE.sharp,
+            }));
+          }
           this.setActiveTool({ type: shape });
           event.stopPropagation();
         } else if (event.key === KEYS.Q) {
@@ -4234,6 +4243,36 @@ class App extends React.Component<AppProps, AppState> {
         if (event.key === KEYS.S) {
           this.setState({ openPopup: "elementStroke" });
           event.stopPropagation();
+        }
+      }
+
+      if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        event.shiftKey &&
+        event.key.toLowerCase() === KEYS.F
+      ) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+
+        if (
+          this.state.activeTool.type === "selection" &&
+          !selectedElements.length
+        ) {
+          return;
+        }
+
+        if (
+          this.state.activeTool.type === "text" ||
+          selectedElements.find(
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+          )
+        ) {
+          event.preventDefault();
+          this.setState({ openPopup: "fontFamily" });
         }
       }
 
@@ -4666,37 +4705,6 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
-  private getBoundTextShape(element: ExcalidrawElement): GeometricShape | null {
-    const boundTextElement = getBoundTextElement(
-      element,
-      this.scene.getNonDeletedElementsMap(),
-    );
-
-    if (boundTextElement) {
-      if (element.type === "arrow") {
-        return getElementShape(
-          {
-            ...boundTextElement,
-            // arrow's bound text accurate position is not stored in the element's property
-            // but rather calculated and returned from the following static method
-            ...LinearElementEditor.getBoundTextElementPosition(
-              element,
-              boundTextElement,
-              this.scene.getNonDeletedElementsMap(),
-            ),
-          },
-          this.scene.getNonDeletedElementsMap(),
-        );
-      }
-      return getElementShape(
-        boundTextElement,
-        this.scene.getNonDeletedElementsMap(),
-      );
-    }
-
-    return null;
-  }
-
   private getElementAtPosition(
     x: number,
     y: number,
@@ -4828,7 +4836,7 @@ class App extends React.Component<AppProps, AppState> {
     const hitBoundTextOfElement = hitElementBoundText(
       x,
       y,
-      this.getBoundTextShape(element),
+      getBoundTextShape(element, this.scene.getNonDeletedElementsMap()),
     );
     if (hitBoundTextOfElement) {
       return true;
@@ -4946,7 +4954,7 @@ class App extends React.Component<AppProps, AppState> {
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
 
     const lineHeight =
-      existingTextElement?.lineHeight || getDefaultLineHeight(fontFamily);
+      existingTextElement?.lineHeight || getLineHeight(fontFamily);
     const fontSize = this.state.currentItemFontSize;
 
     if (
@@ -5066,7 +5074,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (!this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !== selectedElements[0].id)
+          this.state.editingLinearElement.elementId !==
+            selectedElements[0].id) &&
+        !isElbowArrow(selectedElements[0])
       ) {
         this.store.shouldCaptureIncrement();
         this.setState({
@@ -5524,7 +5534,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (isElbowArrow(multiElement)) {
           mutateElbowArrow(
-            multiElement as ExcalidrawArrowElement,
+            multiElement,
             this.scene,
             [
               ...points.slice(0, -1),
@@ -7229,14 +7239,16 @@ class App extends React.Component<AppProps, AppState> {
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
               roundness:
-                this.state.currentItemRoundness === "round"
+                this.state.currentItemArrowType === ARROW_TYPE.round
                   ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-                  : null,
+                  : // note, roundness doesn't have any effect for elbow arrows,
+                    // but it's best to set it to null as well
+                    null,
               startArrowhead,
               endArrowhead,
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
-              elbowed: this.state.currentItemElbowArrow,
+              elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
             })
           : newLinearElement({
               type: elementType,
@@ -7275,6 +7287,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
+        isElbowArrow(element),
       );
 
       this.scene.insertElement(element);
@@ -7740,19 +7753,18 @@ class App extends React.Component<AppProps, AppState> {
               event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
             );
 
-          // TODO: Check if needed to re-add this
-          // if (
-          //   selectedElements.length !== 1 ||
-          //   !isArrowElement(selectedElements[0]) ||
-          //   !pointerDownState.drag.hasOccurred ||
-          //   !!this.state.editingLinearElement
-          // ) {
-          this.setState({
-            suggestedBindings: getSuggestedBindingsForArrows(
-              selectedElements,
-              this.scene.getNonDeletedElementsMap(),
-            ),
-          });
+          if (
+            selectedElements.length !== 1 ||
+            !isElbowArrow(selectedElements[0])
+          ) {
+            this.setState({
+              suggestedBindings: getSuggestedBindingsForArrows(
+                selectedElements,
+                this.scene.getNonDeletedElementsMap(),
+              ),
+            });
+          }
+
           //}
 
           // We duplicate the selected element if alt is pressed on pointer move
@@ -7895,7 +7907,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         } else if (points.length > 1 && isElbowArrow(draggingElement)) {
           mutateElbowArrow(
-            draggingElement as ExcalidrawArrowElement,
+            draggingElement,
             this.scene,
             [...points.slice(0, -1), [dx, dy]],
             [0, 0],

@@ -3,13 +3,13 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
-  aabbForElement,
-} from "../math";
+  headingForPointFromElement,
+} from "./heading";
 import type Scene from "../scene/Scene";
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
-import { headingForPointFromElement } from "./routing";
+import { aabbForElement } from "../math";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,

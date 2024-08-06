@@ -1,5 +1,6 @@
 import { COLOR_PALETTE } from "./colors";
 import {
+  ARROW_TYPE,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -33,10 +34,11 @@ export const getDefaultAppState = (): Omit<
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemRoundness: "round",
-    currentItemElbowArrow: false,
+    currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
+    currentHoveredFontFamily: null,
     cursorButton: "up",
     activeEmbeddable: null,
     draggingElement: null,
@@ -143,7 +145,7 @@ const APP_STATE_STORAGE_CONF = (<
     export: false,
     server: false,
   },
-  currentItemElbowArrow: {
+  currentItemArrowType: {
     browser: true,
     export: false,
     server: false,
@@ -155,6 +157,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidth: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
+  currentHoveredFontFamily: { browser: false, export: false, server: false },
   cursorButton: { browser: true, export: false, server: false },
   activeEmbeddable: { browser: false, export: false, server: false },
   draggingElement: { browser: false, export: false, server: false },

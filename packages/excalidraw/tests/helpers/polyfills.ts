@@ -1,3 +1,5 @@
+import { URL } from "node:url";
+
 class ClipboardEvent {
   constructor(
     type: "paste" | "copy",
@@ -88,4 +90,6 @@ export const testPolyfills = {
   ClipboardEvent,
   DataTransfer,
   DataTransferItem,
+  // https://github.com/vitest-dev/vitest/pull/4164#issuecomment-2172729965
+  URL,
 };

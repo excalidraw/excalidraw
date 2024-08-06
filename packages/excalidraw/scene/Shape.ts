@@ -9,12 +9,7 @@ import type {
   ExcalidrawLinearElement,
   Arrowhead,
 } from "../element/types";
-import {
-  isPathALoop,
-  getCornerRadius,
-  distanceSq2d,
-  distance2d,
-} from "../math";
+import { isPathALoop, getCornerRadius, distanceSq2d } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever, distance } from "../utils";
 import { simplify } from "points-on-curve";

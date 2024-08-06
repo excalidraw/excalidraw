@@ -1,5 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
-import type { AppProps } from "./types";
+import type { AppProps, AppState } from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
@@ -114,12 +114,24 @@ export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
 };
 
-// 1-based in case we ever do `if(element.fontFamily)`
+/**
+ * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
+ *
+ * Let's think this through and consider:
+ * - https://developer.mozilla.org/en-US/docs/Web/CSS/generic-family
+ * - https://drafts.csswg.org/css-fonts-4/#font-family-prop
+ * - https://learn.microsoft.com/en-us/typography/opentype/spec/ibmfc
+ */
 export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
-  Assistant: 4,
+  // leave 4 unused as it was historically used for Assistant (which we don't use anymore) or custom font (Obsidian)
+  Excalifont: 5,
+  Nunito: 6,
+  "Lilita One": 7,
+  "Comic Shanns": 8,
+  "Liberation Sans": 9,
 };
 
 export const THEME = {
@@ -147,7 +159,7 @@ export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Virgil;
+export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
@@ -409,3 +421,9 @@ export const DEFAULT_FILENAME = "Untitled";
 export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 
 export const MIN_WIDTH_OR_HEIGHT = 1;
+
+export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
+  sharp: "sharp",
+  round: "round",
+  elbow: "elbow",
+};

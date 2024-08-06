@@ -27,7 +27,7 @@ export default class BinaryHeap<T> {
       const child2N = (idx + 1) << 1;
       const child1N = child2N - 1;
       let swap = null;
-      let child1Score = 0; // MARK
+      let child1Score = 0;
 
       if (child1N < length) {
         const child1 = this.content[child1N];
@@ -84,7 +84,6 @@ export default class BinaryHeap<T> {
     const i = this.content.indexOf(node);
     const end = this.content.pop()!;
 
-    // MARK
     if (i < this.content.length) {
       this.content[i] = end;
 
