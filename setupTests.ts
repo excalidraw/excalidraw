@@ -72,12 +72,14 @@ vi.mock(
       ...mod,
       ExcalidrawFont: class extends ExcalidrawFontImpl {
         public async getContent(): Promise<string> {
-          if (this.url.protocol !== "file:") {
+          const url = this.urls[0];
+
+          if (url.protocol !== "file:") {
             return super.getContent();
           }
 
           // read local assets directly, without running a server
-          const content = await fs.promises.readFile(this.url);
+          const content = await fs.promises.readFile(url);
           return `data:font/woff2;base64,${content.toString("base64")}`;
         }
       },
@@ -95,3 +97,19 @@ vi.mock("nanoid", () => {
 const element = document.createElement("div");
 element.id = "root";
 document.body.appendChild(element);
+
+const logger = console.error.bind(console);
+console.error = (...args) => {
+  // the react's act() warning usually doesn't contain any useful stack trace
+  // so we're catching the log and re-logging the message with the test name,
+  // also stripping the actual component stack trace as it's not useful
+  if (args[0]?.includes("act(")) {
+    logger(
+      `<<< WARNING: test "${
+        expect.getState().currentTestName
+      }" does not wrap some state update in act() >>>`,
+    );
+  } else {
+    logger(...args);
+  }
+};

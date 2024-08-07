@@ -30,10 +30,13 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.eraserRevert");
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
-    if (!multiMode) {
-      return t("hints.linearElement");
+    if (multiMode) {
+      return t("hints.linearElementMulti");
     }
-    return t("hints.linearElementMulti");
+    if (activeTool.type === "arrow") {
+      return t("hints.arrowTool", { arrowShortcut: getShortcutKey("A") });
+    }
+    return t("hints.linearElement");
   }
 
   if (activeTool.type === "freedraw") {
@@ -82,7 +85,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
 
   if (activeTool.type === "selection") {
     if (
-      appState.draggingElement?.type === "selection" &&
+      appState.selectionElement &&
       !selectedElements.length &&
       !appState.editingElement &&
       !appState.editingLinearElement
@@ -90,7 +93,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
       return t("hints.deepBoxSelect");
     }
 
-    if (appState.gridSize && appState.draggingElement) {
+    if (appState.gridSize && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping");
     }
 
@@ -108,7 +111,8 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
         return t("hints.lineEditor_info");
       }
       if (
-        !appState.draggingElement &&
+        !appState.newElement &&
+        !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
         return t("hints.bindTextToElement");
