@@ -97,3 +97,19 @@ vi.mock("nanoid", () => {
 const element = document.createElement("div");
 element.id = "root";
 document.body.appendChild(element);
+
+const logger = console.error.bind(console);
+console.error = (...args) => {
+  // the react's act() warning usually doesn't contain any useful stack trace
+  // so we're catching the log and re-logging the message with the test name,
+  // also stripping the actual component stack trace as it's not useful
+  if (args[0]?.includes("act(")) {
+    logger(
+      `<<< WARNING: test "${
+        expect.getState().currentTestName
+      }" does not wrap some state update in act() >>>`,
+    );
+  } else {
+    logger(...args);
+  }
+};

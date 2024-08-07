@@ -1,7 +1,13 @@
+import React from "react";
 import { Excalidraw } from "../../index";
 import { KEYS } from "../../keys";
 import { Keyboard } from "../../tests/helpers/ui";
-import { render, waitFor, getByTestId } from "../../tests/test-utils";
+import {
+  render,
+  waitFor,
+  getByTestId,
+  fireEvent,
+} from "../../tests/test-utils";
 
 describe("Test <DropdownMenu/>", () => {
   it("should", async () => {
@@ -9,7 +15,7 @@ describe("Test <DropdownMenu/>", () => {
 
     expect(window.h.state.openMenu).toBe(null);
 
-    getByTestId(container, "main-menu-trigger").click();
+    fireEvent.click(getByTestId(container, "main-menu-trigger"));
     expect(window.h.state.openMenu).toBe("canvas");
 
     await waitFor(() => {

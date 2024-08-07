@@ -1,5 +1,5 @@
-import "../global.d.ts";
 import React from "react";
+import "../global.d.ts";
 import * as StaticScene from "../renderer/staticScene";
 import {
   GlobalTestState,
@@ -16,8 +16,8 @@ import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
-import type { AppState, ExcalidrawImperativeAPI } from "../types";
-import { arrayToMap, resolvablePromise } from "../utils";
+import type { AppState } from "../types";
+import { arrayToMap } from "../utils";
 import {
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
@@ -95,7 +95,7 @@ describe("history", () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       const rect = API.createElement({ type: "rectangle" });
 
-      h.elements = [rect];
+      API.setElements([rect]);
 
       const corrupedEntry = HistoryEntry.create(
         AppStateChange.empty(),
@@ -158,7 +158,7 @@ describe("history", () => {
       const rect1 = API.createElement({ type: "rectangle", groupIds: ["A"] });
       const rect2 = API.createElement({ type: "rectangle", groupIds: ["A"] });
 
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
       mouse.select(rect1);
       assertSelectedElements([rect1, rect2]);
       expect(h.state.selectedGroupIds).toEqual({ A: true });
@@ -173,19 +173,12 @@ describe("history", () => {
     });
 
     it("should not end up with history entry when there are no elements changes", async () => {
-      const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
-      await render(
-        <Excalidraw
-          excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
-          handleKeyboardGlobally={true}
-        />,
-      );
-      const excalidrawAPI = await excalidrawAPIPromise;
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
 
       const rect1 = API.createElement({ type: "rectangle" });
       const rect2 = API.createElement({ type: "rectangle" });
 
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [rect1, rect2],
         storeAction: StoreAction.CAPTURE,
       });
@@ -197,7 +190,7 @@ describe("history", () => {
         expect.objectContaining({ id: rect2.id, isDeleted: false }),
       ]);
 
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [rect1, rect2],
         storeAction: StoreAction.CAPTURE, // even though the flag is on, same elements are passed, nothing to commit
       });
@@ -447,7 +440,7 @@ describe("history", () => {
       const undoAction = createUndoAction(h.history, h.store);
       const redoAction = createRedoAction(h.history, h.store);
       // noop
-      act(() => h.app.actionManager.executeAction(undoAction));
+      API.executeAction(undoAction);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: "A", isDeleted: false }),
       ]);
@@ -456,21 +449,21 @@ describe("history", () => {
         expect.objectContaining({ id: "A" }),
         expect.objectContaining({ id: rectangle.id }),
       ]);
-      act(() => h.app.actionManager.executeAction(undoAction));
+      API.executeAction(undoAction);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: "A", isDeleted: false }),
         expect.objectContaining({ id: rectangle.id, isDeleted: true }),
       ]);
 
       // noop
-      act(() => h.app.actionManager.executeAction(undoAction));
+      API.executeAction(undoAction);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: "A", isDeleted: false }),
         expect.objectContaining({ id: rectangle.id, isDeleted: true }),
       ]);
       expect(API.getUndoStack().length).toBe(0);
 
-      act(() => h.app.actionManager.executeAction(redoAction));
+      API.executeAction(redoAction);
       expect(h.elements).toEqual([
         expect.objectContaining({ id: "A", isDeleted: false }),
         expect.objectContaining({ id: rectangle.id, isDeleted: false }),
@@ -495,7 +488,7 @@ describe("history", () => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]),
       );
 
-      API.drop(
+      await API.drop(
         new Blob(
           [
             JSON.stringify({
@@ -523,7 +516,7 @@ describe("history", () => {
 
       const undoAction = createUndoAction(h.history, h.store);
       const redoAction = createRedoAction(h.history, h.store);
-      act(() => h.app.actionManager.executeAction(undoAction));
+      API.executeAction(undoAction);
 
       expect(API.getSnapshot()).toEqual([
         expect.objectContaining({ id: "A", isDeleted: false }),
@@ -535,7 +528,7 @@ describe("history", () => {
       ]);
       expect(h.state.viewBackgroundColor).toBe("#FFF");
 
-      act(() => h.app.actionManager.executeAction(redoAction));
+      API.executeAction(redoAction);
       expect(h.state.viewBackgroundColor).toBe("#000");
       expect(API.getSnapshot()).toEqual([
         expect.objectContaining({ id: "A", isDeleted: true }),
@@ -548,10 +541,8 @@ describe("history", () => {
     });
 
     it("should support appstate name or viewBackgroundColor change", async () => {
-      const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
       await render(
         <Excalidraw
-          excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
           handleKeyboardGlobally={true}
           initialData={{
             appState: {
@@ -561,9 +552,11 @@ describe("history", () => {
           }}
         />,
       );
-      const excalidrawAPI = await excalidrawAPIPromise;
 
-      excalidrawAPI.updateScene({
+      expect(h.state.isLoading).toBe(false);
+      expect(h.state.name).toBe("Old name");
+
+      API.updateScene({
         appState: {
           name: "New name",
         },
@@ -574,7 +567,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.name).toBe("New name");
 
-      excalidrawAPI.updateScene({
+      API.updateScene({
         appState: {
           viewBackgroundColor: "#000",
         },
@@ -586,7 +579,7 @@ describe("history", () => {
       expect(h.state.viewBackgroundColor).toBe("#000");
 
       // just to double check that same change is not recorded
-      excalidrawAPI.updateScene({
+      API.updateScene({
         appState: {
           name: "New name",
           viewBackgroundColor: "#000",
@@ -1060,7 +1053,7 @@ describe("history", () => {
         x: 100,
       });
 
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
       mouse.select(rect1);
       assertSelectedElements([rect1, rect2]);
       expect(API.getUndoStack().length).toBe(1);
@@ -1203,7 +1196,7 @@ describe("history", () => {
       const rect2 = UI.createElement("rectangle", { x: 20, y: 20 });
       const rect3 = UI.createElement("rectangle", { x: 40, y: 40 });
 
-      act(() => h.app.actionManager.executeAction(actionSendBackward));
+      API.executeAction(actionSendBackward);
 
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
@@ -1234,7 +1227,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       assertSelectedElements([rect1, rect3]);
 
-      act(() => h.app.actionManager.executeAction(actionBringForward));
+      API.executeAction(actionBringForward);
 
       expect(API.getUndoStack().length).toBe(7);
       expect(API.getRedoStack().length).toBe(0);
@@ -1262,8 +1255,6 @@ describe("history", () => {
     });
 
     describe("should support bidirectional bindings", async () => {
-      let excalidrawAPI: ExcalidrawImperativeAPI;
-
       let rect1: ExcalidrawGenericElement;
       let rect2: ExcalidrawGenericElement;
       let text: ExcalidrawTextElement;
@@ -1292,22 +1283,13 @@ describe("history", () => {
       } as const;
 
       beforeEach(async () => {
-        const excalidrawAPIPromise =
-          resolvablePromise<ExcalidrawImperativeAPI>();
-
-        await render(
-          <Excalidraw
-            excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
-            handleKeyboardGlobally={true}
-          />,
-        );
-        excalidrawAPI = await excalidrawAPIPromise;
+        await render(<Excalidraw handleKeyboardGlobally={true} />);
 
         rect1 = API.createElement({ ...rect1Props });
         text = API.createElement({ ...textProps });
         rect2 = API.createElement({ ...rect2Props });
 
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [rect1, text, rect2],
           storeAction: StoreAction.CAPTURE,
         });
@@ -1758,14 +1740,14 @@ describe("history", () => {
       expect(undoButton).not.toBeDisabled();
       expect(redoButton).toBeDisabled();
 
-      act(() => h.app.actionManager.executeAction(undoAction));
+      API.executeAction(undoAction);
 
       expect(h.history.isUndoStackEmpty).toBeTruthy();
       expect(h.history.isRedoStackEmpty).toBeFalsy();
       expect(undoButton).toBeDisabled();
       expect(redoButton).not.toBeDisabled();
 
-      act(() => h.app.actionManager.executeAction(redoAction));
+      API.executeAction(redoAction);
 
       expect(h.history.isUndoStackEmpty).toBeFalsy();
       expect(h.history.isRedoStackEmpty).toBeTruthy();
@@ -1807,13 +1789,13 @@ describe("history", () => {
       expect(queryByTestId(container, "button-undo")).not.toBeDisabled();
       expect(queryByTestId(container, "button-redo")).toBeDisabled();
 
-      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      API.executeAction(actionToggleViewMode);
       expect(h.state.viewModeEnabled).toBe(true);
 
       expect(queryByTestId(container, "button-undo")).toBeNull();
       expect(queryByTestId(container, "button-redo")).toBeNull();
 
-      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      API.executeAction(actionToggleViewMode);
       expect(h.state.viewModeEnabled).toBe(false);
 
       await waitFor(() => {
@@ -1824,20 +1806,20 @@ describe("history", () => {
       // testing redo button
       // -----------------------------------------------------------------------
 
-      act(() => h.app.actionManager.executeAction(undoAction));
+      API.executeAction(undoAction);
 
       expect(h.history.isUndoStackEmpty).toBeTruthy();
       expect(h.history.isRedoStackEmpty).toBeFalsy();
       expect(queryByTestId(container, "button-undo")).toBeDisabled();
       expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
 
-      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      API.executeAction(actionToggleViewMode);
       expect(h.state.viewModeEnabled).toBe(true);
 
       expect(queryByTestId(container, "button-undo")).toBeNull();
       expect(queryByTestId(container, "button-redo")).toBeNull();
 
-      act(() => h.app.actionManager.executeAction(actionToggleViewMode));
+      API.executeAction(actionToggleViewMode);
       expect(h.state.viewModeEnabled).toBe(false);
 
       expect(h.history.isUndoStackEmpty).toBeTruthy();
@@ -1848,8 +1830,6 @@ describe("history", () => {
   });
 
   describe("multiplayer undo/redo", () => {
-    let excalidrawAPI: ExcalidrawImperativeAPI;
-
     // Util to check that we end up in the same state after series of undo / redo
     function runTwice(callback: () => void) {
       for (let i = 0; i < 2; i++) {
@@ -1858,15 +1838,9 @@ describe("history", () => {
     }
 
     beforeEach(async () => {
-      const excalidrawAPIPromise = resolvablePromise<ExcalidrawImperativeAPI>();
       await render(
-        <Excalidraw
-          excalidrawAPI={(api) => excalidrawAPIPromise.resolve(api as any)}
-          handleKeyboardGlobally={true}
-          isCollaborating={true}
-        />,
+        <Excalidraw handleKeyboardGlobally={true} isCollaborating={true} />,
       );
-      excalidrawAPI = await excalidrawAPIPromise;
     });
 
     it("should not override remote changes on different elements", async () => {
@@ -1881,7 +1855,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           ...h.elements,
           API.createElement({
@@ -1921,7 +1895,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(2);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             strokeColor: yellow,
@@ -1969,7 +1943,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             backgroundColor: yellow,
@@ -1985,7 +1959,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             backgroundColor: violet,
@@ -2034,13 +2008,13 @@ describe("history", () => {
         elbowed: true,
       });
 
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [rect, diamond],
         storeAction: StoreAction.CAPTURE,
       });
 
       // Connect the arrow
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           {
             ...rect,
@@ -2090,7 +2064,7 @@ describe("history", () => {
 
       Keyboard.undo();
 
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: h.elements.map((el) =>
           el.id === "KPrBI4g_v9qUB1XxYLgSz"
             ? {
@@ -2122,13 +2096,13 @@ describe("history", () => {
       const rect2 = API.createElement({ type: "rectangle" });
 
       // Initialize scene
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [rect1, rect2],
         storeAction: StoreAction.UPDATE,
       });
 
       // Simulate local update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], { groupIds: ["A"] }),
           newElementWith(h.elements[1], { groupIds: ["A"] }),
@@ -2140,7 +2114,7 @@ describe("history", () => {
       const rect4 = API.createElement({ type: "rectangle", groupIds: ["B"] });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], { groupIds: ["A", "B"] }),
           newElementWith(h.elements[1], { groupIds: ["A", "B"] }),
@@ -2181,7 +2155,7 @@ describe("history", () => {
       Keyboard.keyPress(KEYS.ENTER);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0] as ExcalidrawLinearElement, {
             points: [
@@ -2281,7 +2255,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update & restore
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             backgroundColor: yellow,
@@ -2358,7 +2332,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update & deletion
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             backgroundColor: yellow,
@@ -2417,7 +2391,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(5);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           h.elements[0],
           newElementWith(h.elements[1], {
@@ -2482,7 +2456,7 @@ describe("history", () => {
       const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 });
       const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 });
 
-      h.elements = [rect1, rect2, rect3];
+      API.setElements([rect1, rect2, rect3]);
       mouse.select(rect1);
       mouse.select([rect2, rect3]);
 
@@ -2493,7 +2467,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           h.elements[0],
           newElementWith(h.elements[1], {
@@ -2532,7 +2506,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           h.elements[0],
           newElementWith(h.elements[1], {
@@ -2586,7 +2560,7 @@ describe("history", () => {
       });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [rect1, rect2],
         storeAction: StoreAction.UPDATE,
       });
@@ -2596,7 +2570,7 @@ describe("history", () => {
       });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [h.elements[0], h.elements[1], rect3, rect4],
         storeAction: StoreAction.UPDATE,
       });
@@ -2610,7 +2584,7 @@ describe("history", () => {
       expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             isDeleted: true,
@@ -2635,7 +2609,7 @@ describe("history", () => {
       Keyboard.undo();
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             isDeleted: false,
@@ -2653,7 +2627,7 @@ describe("history", () => {
       expect(h.state.selectedGroupIds).toEqual({ A: true });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [h.elements[0], h.elements[1], rect3, rect4],
         storeAction: StoreAction.UPDATE,
       });
@@ -2676,7 +2650,7 @@ describe("history", () => {
         x: 100,
       });
 
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
       mouse.select(rect1);
 
       // inside the editing group
@@ -2692,7 +2666,7 @@ describe("history", () => {
       expect(h.state.editingGroupId).toBeNull();
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             isDeleted: true,
@@ -2715,7 +2689,7 @@ describe("history", () => {
       expect(h.state.editingGroupId).toBeNull();
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             isDeleted: false,
@@ -2759,7 +2733,7 @@ describe("history", () => {
       expect(h.state.selectedLinearElement).toBeNull();
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[0], {
             isDeleted: true,
@@ -2786,11 +2760,11 @@ describe("history", () => {
       const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 }); // b "a1"
       const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 }); // c "a2"
 
-      h.elements = [rect1, rect2, rect3];
+      API.setElements([rect1, rect2, rect3]);
 
       mouse.select(rect2);
 
-      act(() => h.app.actionManager.executeAction(actionSendToBack));
+      API.executeAction(actionSendToBack);
 
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -2802,7 +2776,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[2], { index: "Zy" as FractionalIndex }),
           h.elements[0],
@@ -2841,7 +2815,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           newElementWith(h.elements[2], { index: "Zx" as FractionalIndex }),
           h.elements[0],
@@ -2876,11 +2850,11 @@ describe("history", () => {
       const rect2 = API.createElement({ type: "rectangle", x: 20, y: 20 });
       const rect3 = API.createElement({ type: "rectangle", x: 30, y: 30 });
 
-      h.elements = [rect1, rect2, rect3];
+      API.setElements([rect1, rect2, rect3]);
 
       mouse.select(rect2);
 
-      act(() => h.app.actionManager.executeAction(actionSendToBack));
+      API.executeAction(actionSendToBack);
 
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -2892,7 +2866,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update (fixes all invalid z-indices)
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           h.elements[2], // rect3
           h.elements[0], // rect2
@@ -2922,7 +2896,7 @@ describe("history", () => {
       ]);
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [
           h.elements[1], // rect2
           h.elements[0], // rect3
@@ -2956,7 +2930,7 @@ describe("history", () => {
       const rect = API.createElement({ ...rectProps });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [...h.elements, rect],
         storeAction: StoreAction.UPDATE,
       });
@@ -3008,7 +2982,7 @@ describe("history", () => {
       const rect3 = API.createElement({ ...rect3Props });
 
       // // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [...h.elements, rect3],
         storeAction: StoreAction.UPDATE,
       });
@@ -3098,7 +3072,7 @@ describe("history", () => {
       const rect3 = API.createElement({ ...rect3Props });
 
       // Simulate remote update
-      excalidrawAPI.updateScene({
+      API.updateScene({
         elements: [...h.elements, rect3],
         storeAction: StoreAction.UPDATE,
       });
@@ -3275,13 +3249,13 @@ describe("history", () => {
 
       it("should rebind bindings when both are updated through the history and there no conflicting updates in the meantime", async () => {
         // Initialize the scene
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container, text],
           storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3310,7 +3284,7 @@ describe("history", () => {
         ]);
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               // no conflicting updates
@@ -3362,13 +3336,13 @@ describe("history", () => {
       // TODO: #7348 we do rebind now, when we have bi-directional binding in history, to eliminate potential data-integrity issues, but we should consider not rebinding in the future
       it("should rebind bindings when both are updated through the history and the container got bound to a different text in the meantime", async () => {
         // Initialize the scene
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container, text],
           storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3403,7 +3377,7 @@ describe("history", () => {
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: remoteText.id, type: "text" }],
@@ -3465,13 +3439,13 @@ describe("history", () => {
       // TODO: #7348 we do rebind now, when we have bi-directional binding in history, to eliminate potential data-integrity issues, but we should consider not rebinding in the future
       it("should rebind bindings when both are updated through the history and the text got bound to a different container in the meantime", async () => {
         // Initialize the scene
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container, text],
           storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3507,7 +3481,7 @@ describe("history", () => {
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             h.elements[0],
             newElementWith(remoteContainer, {
@@ -3573,13 +3547,13 @@ describe("history", () => {
 
       it("should rebind remotely added bound text when it's container is added through the history", async () => {
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3634,13 +3608,13 @@ describe("history", () => {
 
       it("should rebind remotely added container when it's bound text is added through the history", async () => {
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [text],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(container, {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3694,13 +3668,13 @@ describe("history", () => {
 
       it("should preserve latest remotely added binding and unbind previous one when the container is added through the history", async () => {
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3736,7 +3710,7 @@ describe("history", () => {
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: remoteText.id, type: "text" }],
@@ -3801,13 +3775,13 @@ describe("history", () => {
 
       it("should preserve latest remotely added binding and unbind previous one when the text is added through history", async () => {
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [text],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(container, {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3843,7 +3817,7 @@ describe("history", () => {
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: remoteText.id, type: "text" }],
@@ -3907,13 +3881,13 @@ describe("history", () => {
 
       it("should unbind remotely deleted bound text from container when the container is added through the history", async () => {
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -3964,13 +3938,13 @@ describe("history", () => {
 
       it("should unbind remotely deleted container from bound text when the text is added through the history", async () => {
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [text],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(container, {
               boundElements: [{ id: text.id, type: "text" }],
@@ -4021,13 +3995,13 @@ describe("history", () => {
 
       it("should redraw remotely added bound text when it's container is updated through the history", async () => {
         // Initialize the scene
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [container],
           storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               x: 200,
@@ -4041,7 +4015,7 @@ describe("history", () => {
         Keyboard.undo();
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               boundElements: [{ id: text.id, type: "text" }],
@@ -4139,13 +4113,13 @@ describe("history", () => {
       // TODO: #7348 this leads to empty undo/redo and could be confusing - instead we might consider redrawing container based on the text dimensions
       it("should redraw bound text to match container dimensions when the bound text is updated through the history", async () => {
         // Initialize the scene
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [text],
           storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               x: 205,
@@ -4159,7 +4133,7 @@ describe("history", () => {
         Keyboard.undo();
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(container, {
               boundElements: [{ id: text.id, type: "text" }],
@@ -4257,7 +4231,7 @@ describe("history", () => {
         rect2 = API.createElement({ ...rect2Props });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [rect1, rect2],
           storeAction: StoreAction.CAPTURE,
         });
@@ -4333,7 +4307,7 @@ describe("history", () => {
         ]);
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               // no conflicting updates
@@ -4478,7 +4452,7 @@ describe("history", () => {
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             h.elements[0],
             newElementWith(h.elements[1], { boundElements: [] }),
@@ -4589,7 +4563,7 @@ describe("history", () => {
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             arrow,
             newElementWith(h.elements[0], {
@@ -4674,13 +4648,13 @@ describe("history", () => {
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [arrow],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0] as ExcalidrawLinearElement, {
               startBinding: {
@@ -4833,7 +4807,7 @@ describe("history", () => {
         );
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             h.elements[0],
             newElementWith(h.elements[1], { x: 500, y: -500 }),
@@ -4909,19 +4883,19 @@ describe("history", () => {
 
       it("should not rebind frame child with frame when frame was remotely deleted and frame child is added back through the history ", async () => {
         // Initialize the scene
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [frame],
           storeAction: StoreAction.UPDATE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [rect, h.elements[0]],
           storeAction: StoreAction.CAPTURE,
         });
 
         // Simulate local update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             newElementWith(h.elements[0], {
               frameId: frame.id,
@@ -4965,7 +4939,7 @@ describe("history", () => {
         Keyboard.undo();
 
         // Simulate remote update
-        excalidrawAPI.updateScene({
+        API.updateScene({
           elements: [
             h.elements[0],
             newElementWith(h.elements[1], {
