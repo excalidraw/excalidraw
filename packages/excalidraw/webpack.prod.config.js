@@ -28,7 +28,7 @@ module.exports = {
     rules: [
       {
         test: /\.(sa|sc|c)ss$/,
-        //exclude: /node_modules/, //ios compatibility
+        exclude: /node_modules/,
         use: [
           MiniCssExtractPlugin.loader, //zsviczian replacase "style-loader"
           {
@@ -57,8 +57,8 @@ module.exports = {
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
-        /*exclude:
-          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfill))/,*/ //ios compatibility
+        exclude:
+          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfill))/,
         use: [
           {
             loader: "import-meta-loader",
@@ -73,12 +73,8 @@ module.exports = {
           {
             loader: "babel-loader",
             options: {
-              presets: [ //ios compatibility
-                ["@babel/preset-env", {
-                  targets: {
-                    ios: "15",
-                  },
-                }],
+              presets: [
+                "@babel/preset-env", 
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
