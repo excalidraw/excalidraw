@@ -285,7 +285,7 @@ class Scene {
     return didChange;
   }
 
-  replaceAllElements(nextElements: ElementsMapOrArray) {
+  replaceAllElements(nextElements: ElementsMapOrArray, triggerUpdate = true) {
     const _nextElements =
       // ts doesn't like `Array.isArray` of `instanceof Map`
       nextElements instanceof Array
@@ -311,7 +311,9 @@ class Scene {
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
 
-    this.triggerUpdate();
+    if (triggerUpdate) {
+      this.triggerUpdate();
+    }
   }
 
   triggerUpdate() {
@@ -358,7 +360,11 @@ class Scene {
     this.callbacks.clear();
   }
 
-  insertElementAtIndex(element: ExcalidrawElement, index: number) {
+  insertElementAtIndex(
+    element: ExcalidrawElement,
+    index: number,
+    triggerUpdate = true,
+  ) {
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
@@ -373,10 +379,14 @@ class Scene {
 
     syncMovedIndices(nextElements, arrayToMap([element]));
 
-    this.replaceAllElements(nextElements);
+    this.replaceAllElements(nextElements, triggerUpdate);
   }
 
-  insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+  insertElementsAtIndex(
+    elements: ExcalidrawElement[],
+    index: number,
+    triggerUpdate = true,
+  ) {
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
@@ -391,23 +401,23 @@ class Scene {
 
     syncMovedIndices(nextElements, arrayToMap(elements));
 
-    this.replaceAllElements(nextElements);
+    this.replaceAllElements(nextElements, triggerUpdate);
   }
 
-  insertElement = (element: ExcalidrawElement) => {
+  insertElement = (element: ExcalidrawElement, triggerUpdate = true) => {
     const index = element.frameId
       ? this.getElementIndex(element.frameId)
       : this.elements.length;
 
-    this.insertElementAtIndex(element, index);
+    this.insertElementAtIndex(element, index, triggerUpdate);
   };
 
-  insertElements = (elements: ExcalidrawElement[]) => {
+  insertElements = (elements: ExcalidrawElement[], triggerUpdate = true) => {
     const index = elements[0].frameId
       ? this.getElementIndex(elements[0].frameId)
       : this.elements.length;
 
-    this.insertElementsAtIndex(elements, index);
+    this.insertElementsAtIndex(elements, index, triggerUpdate);
   };
 
   getElementIndex(elementId: string) {
