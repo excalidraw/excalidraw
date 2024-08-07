@@ -106,7 +106,11 @@ const repairBinding = (
     ...binding,
     focus: binding.focus || 0,
     fixedPoint: isElbowArrow(element)
-      ? binding.fixedPoint ?? ([0, 0] as [number, number])
+      ? ((binding.fixedPoint ?? [0, 0]).map((ratio) =>
+          // Do not allow a precise 0.5 for fixed point ratio
+          // to avoid jumping arrow heading due to FP imprecision
+          ratio === 0.5 ? 0.5001 : ratio,
+        ) as [number, number])
       : null,
   };
 };

@@ -1003,7 +1003,11 @@ const updateBoundPoint = (
 
   if (isElbowArrow(linearElement)) {
     const fixedPoint =
-      binding.fixedPoint ??
+      binding.fixedPoint?.map((ratio) =>
+        // Do not allow a precise 0.5 for fixed point ratio
+        // to avoid jumping arrow heading due to FP imprecision
+        ratio === 0.5 ? 0.5001 : ratio,
+      ) ??
       calculateFixedPointForElbowArrowBinding(
         linearElement,
         bindableElement,
@@ -1121,7 +1125,11 @@ export const calculateFixedPointForElbowArrowBinding = (
         hoveredElement.width,
       (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
         hoveredElement.height,
-    ] as [number, number],
+    ].map((ratio) =>
+      // Do not allow a precise 0.5 for fixed point ratio
+      // to avoid jumping arrow heading due to FP imprecision
+      ratio === 0.5 ? 0.5001 : ratio,
+    ) as [number, number],
   };
 };
 
@@ -2174,7 +2182,12 @@ export const getGlobalFixedPointForBindableElement = (
   fixedPointRatio: [number, number],
   element: ExcalidrawBindableElement,
 ) => {
-  const [fixedX, fixedY] = fixedPointRatio;
+  const [fixedX, fixedY] = fixedPointRatio.map((ratio) =>
+    // Do not allow a precise 0.5 for fixed point ratio
+    // to avoid jumping arrow heading due to FP imprecision
+    ratio === 0.5 ? 0.5001 : ratio,
+  );
+
   return rotatePoint(
     [element.x + element.width * fixedX, element.y + element.height * fixedY],
     getCenterForElement(element),
