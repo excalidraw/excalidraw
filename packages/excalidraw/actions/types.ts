@@ -70,6 +70,7 @@ export type ActionName =
   | "changeSloppiness"
   | "changeStrokeStyle"
   | "changeArrowhead"
+  | "changeArrowType"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"
@@ -135,7 +136,8 @@ export type ActionName =
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"
-  | "autoResize";
+  | "autoResize"
+  | "elementStats";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

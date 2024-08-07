@@ -1,4 +1,5 @@
 import { BOUND_TEXT_PADDING, FONT_FAMILY } from "../constants";
+import { getLineHeight } from "../fonts";
 import { API } from "../tests/helpers/api";
 import {
   computeContainerDimensionForBoundText,
@@ -8,7 +9,6 @@ import {
   wrapText,
   detectLineHeight,
   getLineHeightInPx,
-  getDefaultLineHeight,
   parseTokens,
 } from "./textElement";
 import type { ExcalidrawTextElementWithContainer, FontString } from "./types";
@@ -418,15 +418,15 @@ describe("Test getLineHeightInPx", () => {
 describe("Test getDefaultLineHeight", () => {
   it("should return line height using default font family when not passed", () => {
     //@ts-ignore
-    expect(getDefaultLineHeight()).toBe(1.25);
+    expect(getLineHeight()).toBe(1.25);
   });
 
   it("should return line height using default font family for unknown font", () => {
     const UNKNOWN_FONT = 5;
-    expect(getDefaultLineHeight(UNKNOWN_FONT)).toBe(1.25);
+    expect(getLineHeight(UNKNOWN_FONT)).toBe(1.25);
   });
 
   it("should return correct line height", () => {
-    expect(getDefaultLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
+    expect(getLineHeight(FONT_FAMILY.Cascadia)).toBe(1.2);
   });
 });

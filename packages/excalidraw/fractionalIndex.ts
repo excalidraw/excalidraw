@@ -6,20 +6,23 @@ import type {
   OrderedExcalidrawElement,
 } from "./element/types";
 import { InvalidFractionalIndexError } from "./errors";
+import { hasBoundTextElement } from "./element/typeChecks";
+import { getBoundTextElement } from "./element/textElement";
+import { arrayToMap } from "./utils";
 
 /**
  * Envisioned relation between array order and fractional indices:
  *
  * 1) Array (or array-like ordered data structure) should be used as a cache of elements order, hiding the internal fractional indices implementation.
- * - it's undesirable to to perform reorder for each related operation, thefeore it's necessary to cache the order defined by fractional indices into an ordered data structure
+ * - it's undesirable to perform reorder for each related operation, therefore it's necessary to cache the order defined by fractional indices into an ordered data structure
  * - it's easy enough to define the order of the elements from the outside (boundaries), without worrying about the underlying structure of fractional indices (especially for the host apps)
  * - it's necessary to always keep the array support for backwards compatibility (restore) - old scenes, old libraries, supporting multiple excalidraw versions etc.
  * - it's necessary to always keep the fractional indices in sync with the array order
  * - elements with invalid indices should be detected and synced, without altering the already valid indices
  *
  * 2) Fractional indices should be used to reorder the elements, whenever the cached order is expected to be invalidated.
- * - as the fractional indices are encoded as part of the elements, it opens up possibilties for incremental-like APIs
- * - re-order based on fractional indices should be part of (multiplayer) operations such as reconcillitation & undo/redo
+ * - as the fractional indices are encoded as part of the elements, it opens up possibilities for incremental-like APIs
+ * - re-order based on fractional indices should be part of (multiplayer) operations such as reconciliation & undo/redo
  * - technically all the z-index actions could perform also re-order based on fractional indices,but in current state it would not bring much benefits,
  *   as it's faster & more efficient to perform re-order based on array manipulation and later synchronisation of moved indices with the array order
  */
@@ -30,16 +33,83 @@ import { InvalidFractionalIndexError } from "./errors";
  * @throws `InvalidFractionalIndexError` if invalid index is detected.
  */
 export const validateFractionalIndices = (
-  indices: (ExcalidrawElement["index"] | undefined)[],
+  elements: readonly ExcalidrawElement[],
+  {
+    shouldThrow = false,
+    includeBoundTextValidation = false,
+    ignoreLogs,
+    reconciliationContext,
+  }: {
+    shouldThrow: boolean;
+    includeBoundTextValidation: boolean;
+    ignoreLogs?: true;
+    reconciliationContext?: {
+      localElements: ReadonlyArray<ExcalidrawElement>;
+      remoteElements: ReadonlyArray<ExcalidrawElement>;
+    };
+  },
 ) => {
+  const errorMessages = [];
+  const stringifyElement = (element: ExcalidrawElement | void) =>
+    `${element?.index}:${element?.id}:${element?.type}:${element?.isDeleted}:${element?.version}:${element?.versionNonce}`;
+
+  const indices = elements.map((x) => x.index);
   for (const [i, index] of indices.entries()) {
     const predecessorIndex = indices[i - 1];
     const successorIndex = indices[i + 1];
 
     if (!isValidFractionalIndex(index, predecessorIndex, successorIndex)) {
-      throw new InvalidFractionalIndexError(
-        `Fractional indices invariant for element has been compromised - ["${predecessorIndex}", "${index}", "${successorIndex}"] [predecessor, current, successor]`,
+      errorMessages.push(
+        `Fractional indices invariant has been compromised: "${stringifyElement(
+          elements[i - 1],
+        )}", "${stringifyElement(elements[i])}", "${stringifyElement(
+          elements[i + 1],
+        )}"`,
       );
+    }
+
+    // disabled by default, as we don't fix it
+    if (includeBoundTextValidation && hasBoundTextElement(elements[i])) {
+      const container = elements[i];
+      const text = getBoundTextElement(container, arrayToMap(elements));
+
+      if (text && text.index! <= container.index!) {
+        errorMessages.push(
+          `Fractional indices invariant for bound elements has been compromised: "${stringifyElement(
+            text,
+          )}", "${stringifyElement(container)}"`,
+        );
+      }
+    }
+  }
+
+  if (errorMessages.length) {
+    const error = new InvalidFractionalIndexError();
+    const additionalContext = [];
+
+    if (reconciliationContext) {
+      additionalContext.push("Additional reconciliation context:");
+      additionalContext.push(
+        reconciliationContext.localElements.map((x) => stringifyElement(x)),
+      );
+      additionalContext.push(
+        reconciliationContext.remoteElements.map((x) => stringifyElement(x)),
+      );
+    }
+
+    if (!ignoreLogs) {
+      // report just once and with the stacktrace
+      console.error(
+        errorMessages.join("\n\n"),
+        error.stack,
+        elements.map((x) => stringifyElement(x)),
+        ...additionalContext,
+      );
+    }
+
+    if (shouldThrow) {
+      // if enabled, gather all the errors first, throw once
+      throw error;
     }
   }
 };
@@ -83,10 +153,19 @@ export const syncMovedIndices = (
 
     // try generatating indices, throws on invalid movedElements
     const elementsUpdates = generateIndices(elements, indicesGroups);
+    const elementsCandidates = elements.map((x) =>
+      elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
+    );
 
     // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
-      elements.map((x) => elementsUpdates.get(x)?.index || x.index),
+      elementsCandidates,
+      // we don't autofix invalid bound text indices, hence don't include it in the validation
+      {
+        includeBoundTextValidation: false,
+        shouldThrow: true,
+        ignoreLogs: true,
+      },
     );
 
     // split mutation so we don't end up in an incosistent state

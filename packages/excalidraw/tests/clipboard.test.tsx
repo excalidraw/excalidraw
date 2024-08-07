@@ -1,18 +1,18 @@
+import React from "react";
 import { vi } from "vitest";
 import ReactDOM from "react-dom";
 import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
-import {
-  getDefaultLineHeight,
-  getLineHeightInPx,
-} from "../element/textElement";
+import { getLineHeightInPx } from "../element/textElement";
 import { getElementBounds } from "../element";
 import type { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 import { arrayToMap } from "../utils";
+import { mockMermaidToExcalidraw } from "./helpers/mocks";
+import { getLineHeight } from "../fonts";
 
 const { h } = window;
 
@@ -145,7 +145,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getDefaultLineHeight(h.state.currentItemFontFamily),
+        getLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -167,7 +167,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getDefaultLineHeight(h.state.currentItemFontFamily),
+        getLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -280,7 +280,7 @@ describe("pasting & frames", () => {
     });
     const rect = API.createElement({ type: "rectangle" });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect],
@@ -319,7 +319,7 @@ describe("pasting & frames", () => {
       y: 100,
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2],
@@ -362,7 +362,7 @@ describe("pasting & frames", () => {
       groupIds: ["g1"],
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2],
@@ -413,7 +413,7 @@ describe("pasting & frames", () => {
       frameId: frame2.id,
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2, frame2],
@@ -432,6 +432,86 @@ describe("pasting & frames", () => {
       expect(h.elements[2].frameId).toBe(h.elements[3].id);
       expect(h.elements[3].type).toBe(frame2.type);
       expect(h.elements[3].frameId).toBe(null);
+    });
+  });
+});
+
+describe("clipboard - pasting mermaid definition", () => {
+  beforeAll(() => {
+    mockMermaidToExcalidraw({
+      parseMermaidToExcalidraw: async (definition) => {
+        const lines = definition.split("\n");
+        return new Promise((resolve, reject) => {
+          if (lines.some((line) => line === "flowchart TD")) {
+            resolve({
+              elements: [
+                {
+                  id: "rect1",
+                  type: "rectangle",
+                  groupIds: [],
+                  x: 0,
+                  y: 0,
+                  width: 69.703125,
+                  height: 44,
+                  strokeWidth: 2,
+                  label: {
+                    groupIds: [],
+                    text: "A",
+                    fontSize: 20,
+                  },
+                  link: null,
+                },
+              ],
+            });
+          } else {
+            reject(new Error("ERROR"));
+          }
+        });
+      },
+    });
+  });
+
+  it("should detect and paste as mermaid", async () => {
+    const text = "flowchart TD\nA";
+
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
+  it("should support directives", async () => {
+    const text = "%%{init: { **config** } }%%\nflowchart TD\nA";
+
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
+  it("should paste as normal text if invalid mermaid", async () => {
+    const text = "flowchart TD xx\nA";
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "text", text: "flowchart TD xx" }),
+          expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
     });
   });
 });

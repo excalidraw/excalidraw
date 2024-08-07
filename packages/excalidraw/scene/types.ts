@@ -2,7 +2,6 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -55,7 +54,7 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
-  selectionColor?: string;
+  selectionColor: string;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;
@@ -83,6 +82,7 @@ export type InteractiveSceneRenderConfig = {
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
   selectedElements: readonly NonDeletedExcalidrawElement[];
+  allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
   appState: InteractiveCanvasAppState;
   renderConfig: InteractiveCanvasRenderConfig;
@@ -94,10 +94,6 @@ export type SceneScroll = {
   scrollX: number;
   scrollY: number;
 };
-
-export interface Scene {
-  elements: ExcalidrawTextElement[];
-}
 
 export type ExportType =
   | "png"
