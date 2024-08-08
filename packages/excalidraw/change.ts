@@ -19,13 +19,13 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./element/typeChecks";
-import {
-  type ExcalidrawElement,
-  type ExcalidrawLinearElement,
-  type ExcalidrawTextElement,
-  type NonDeleted,
-  type OrderedExcalidrawElement,
-  type SceneElementsMap,
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
 } from "./element/types";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
@@ -536,7 +536,7 @@ export class AppStateChange implements Change<AppState> {
         inserted,
         "selectedElementIds",
         // ts language server has a bit trouble resolving this, so we are giving it a little push
-        () => true as ValueOf<T["selectedElementIds"]>,
+        (_) => true as ValueOf<T["selectedElementIds"]>,
       );
       Delta.diffObjects(
         deleted,
