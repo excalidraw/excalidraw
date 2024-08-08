@@ -22,7 +22,7 @@ import type {
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
-import type { AppState } from "../types";
+import type { AppState, PendingExcalidrawElements } from "../types";
 import { mutateElement } from "./mutateElement";
 import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 import { isElbowArrow } from "./typeChecks";
@@ -621,7 +621,7 @@ export class FlowChartCreator {
   isCreatingChart: boolean = false;
   private numberOfNodes: number = 0;
   private direction: LinkDirection | null = "right";
-  pendingNodes: ExcalidrawElement[] = [];
+  pendingNodes: PendingExcalidrawElements | null = null;
 
   createNodes(
     startNode: ExcalidrawGenericElement,
@@ -688,7 +688,7 @@ export class FlowChartCreator {
 
   clear() {
     this.isCreatingChart = false;
-    this.pendingNodes = [];
+    this.pendingNodes = null;
     this.direction = null;
     this.numberOfNodes = 0;
   }

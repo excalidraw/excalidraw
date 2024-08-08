@@ -35,6 +35,7 @@ import type {
   Zoom,
   InteractiveCanvasAppState,
   ElementsPendingErasure,
+  PendingExcalidrawElements,
 } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
@@ -104,7 +105,7 @@ export const getRenderOpacity = (
   element: ExcalidrawElement,
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
-  pendingNodes?: ExcalidrawElement[],
+  pendingNodes: Readonly<PendingExcalidrawElements> | null,
 ) => {
   // multiplying frame opacity with element opacity to combine them
   // (e.g. frame 50% and element 50% opacity should result in 25% opacity)

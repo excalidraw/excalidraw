@@ -1166,6 +1166,7 @@ class App extends React.Component<AppProps, AppState> {
                   el,
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
+                  null,
                 ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
@@ -4347,11 +4348,11 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!event[KEYS.CTRL_OR_CMD]) {
       if (this.flowChartCreator.isCreatingChart) {
-        if (this.flowChartCreator.pendingNodes.length > 0) {
+        if (this.flowChartCreator.pendingNodes?.length) {
           this.scene.insertElements(this.flowChartCreator.pendingNodes);
         }
 
-        const firstNode = this.flowChartCreator.pendingNodes[0];
+        const firstNode = this.flowChartCreator.pendingNodes?.[0];
 
         if (firstNode) {
           this.setState((prevState) => ({

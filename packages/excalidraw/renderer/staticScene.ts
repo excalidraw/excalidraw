@@ -372,7 +372,7 @@ const _renderStaticScene = ({
     });
 
   // render pending nodes for flowcharts
-  renderConfig.pendingFlowchartNodes.forEach((element) => {
+  renderConfig.pendingFlowchartNodes?.forEach((element) => {
     try {
       renderElement(
         element,

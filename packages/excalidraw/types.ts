@@ -828,3 +828,5 @@ export type EmbedsValidationStatus = Map<
 >;
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
+
+export type PendingExcalidrawElements = ExcalidrawElement[];

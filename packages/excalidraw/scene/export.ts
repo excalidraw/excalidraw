@@ -242,7 +242,7 @@ export const exportToCanvas = async (
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
-      pendingFlowchartNodes: [],
+      pendingFlowchartNodes: null,
     },
   });
 
