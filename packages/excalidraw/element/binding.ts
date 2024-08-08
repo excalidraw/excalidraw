@@ -1000,7 +1000,7 @@ const updateBoundPoint = (
 
   if (isElbowArrow(linearElement)) {
     const fixedPoint =
-      binding.fixedPoint ??
+      normalizeFixedPoint(binding.fixedPoint) ??
       calculateFixedPointForElbowArrowBinding(
         linearElement,
         bindableElement,
@@ -1113,12 +1113,12 @@ export const calculateFixedPointForElbowArrowBinding = (
   ) as Point;
 
   return {
-    fixedPoint: [
+    fixedPoint: normalizeFixedPoint([
       (nonRotatedSnappedGlobalPoint[0] - hoveredElement.x) /
         hoveredElement.width,
       (nonRotatedSnappedGlobalPoint[1] - hoveredElement.y) /
         hoveredElement.height,
-    ] as [number, number],
+    ]),
   };
 };
 
@@ -2171,7 +2171,8 @@ export const getGlobalFixedPointForBindableElement = (
   fixedPointRatio: [number, number],
   element: ExcalidrawBindableElement,
 ) => {
-  const [fixedX, fixedY] = fixedPointRatio;
+  const [fixedX, fixedY] = normalizeFixedPoint(fixedPointRatio);
+
   return rotatePoint(
     [element.x + element.width * fixedX, element.y + element.height * fixedY],
     getCenterForElement(element),
@@ -2224,4 +2225,17 @@ export const getArrowLocalFixedPoints = (
     LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
     LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
   ];
+};
+
+export const normalizeFixedPoint = <T extends FixedPoint | null>(
+  fixedPoint: T,
+): T extends null ? null : FixedPoint => {
+  // Do not allow a precise 0.5 for fixed point ratio
+  // to avoid jumping arrow heading due to floating point imprecision
+  if (fixedPoint && (fixedPoint[0] === 0.5 || fixedPoint[1] === 0.5)) {
+    return fixedPoint.map((ratio) =>
+      ratio === 0.5 ? 0.5001 : ratio,
+    ) as T extends null ? null : FixedPoint;
+  }
+  return fixedPoint as any as T extends null ? null : FixedPoint;
 };
