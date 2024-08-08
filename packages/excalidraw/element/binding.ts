@@ -25,6 +25,7 @@ import type {
   OrderedExcalidrawElement,
   ExcalidrawElbowArrowElement,
   FixedPoint,
+  SceneElementsMap,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -124,7 +125,6 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
-    scene,
   );
   bindOrUnbindLinearElementEdge(
     linearElement,
@@ -134,7 +134,6 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
-    scene,
   );
 
   const onlyUnbound = Array.from(unboundFromElementIds).filter(
@@ -161,7 +160,6 @@ const bindOrUnbindLinearElementEdge = (
   // Is mutated
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   elementsMap: NonDeletedSceneElementsMap,
-  scene: Scene,
 ): void => {
   // "keep" is for method chaining convenience, a "no-op", so just bail out
   if (bindableElement === "keep") {
@@ -571,8 +569,7 @@ const calculateFocusAndGap = (
 // in explicitly.
 export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
-  scene: Scene,
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     oldSize?: { width: number; height: number };
@@ -658,7 +655,7 @@ export const updateBoundElements = (
     LinearElementEditor.movePoints(
       element,
       updates,
-      scene,
+      elementsMap,
       {
         ...(changedElement.id === element.startBinding?.elementId
           ? { startBinding: bindings.startBinding }
