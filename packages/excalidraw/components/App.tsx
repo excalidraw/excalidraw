@@ -3889,7 +3889,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (event.key === KEYS.ESCAPE && this.flowChartCreator.isCreatingChart) {
         this.flowChartCreator.clear();
-        this.triggerRender();
+        this.triggerRender(true);
         return;
       }
 
