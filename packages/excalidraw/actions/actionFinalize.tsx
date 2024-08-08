@@ -50,7 +50,6 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
-            selectedLinearElement: null,
           },
           storeAction: StoreAction.CAPTURE,
         };

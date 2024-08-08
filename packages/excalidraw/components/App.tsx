@@ -429,6 +429,7 @@ import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
+import NewElementCanvas from "./canvases/NewElementCanvas";
 import { mutateElbowArrow } from "../element/routing";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -526,6 +527,7 @@ const gesture: Gesture = {
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
+  newElementCanvas: AppClassProperties["newElementCanvas"] = null;
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -1677,6 +1679,28 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                           }}
                         />
+                        {this.state.newElement && (
+                          <NewElementCanvas
+                            appState={this.state}
+                            scale={window.devicePixelRatio}
+                            canvas={this.newElementCanvas}
+                            handleCanvasRef={this.handleNewElementCanvasRef}
+                            rc={this.rc}
+                            elementsMap={elementsMap}
+                            allElementsMap={allElementsMap}
+                            renderConfig={{
+                              imageCache: this.imageCache,
+                              isExporting: false,
+                              renderGrid: false,
+                              canvasBackgroundColor:
+                                this.state.viewBackgroundColor,
+                              embedsValidationStatus:
+                                this.embedsValidationStatus,
+                              elementsPendingErasure:
+                                this.elementsPendingErasure,
+                            }}
+                          />
+                        )}
                         <InteractiveCanvas
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
@@ -5335,8 +5359,16 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint[1],
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
-          mutateElement(multiElement, {
-            points: [...points, [scenePointerX - rx, scenePointerY - ry]],
+          mutateElement(
+            multiElement,
+            {
+              points: [...points, [scenePointerX - rx, scenePointerY - ry]],
+            },
+            false,
+          );
+          this.setState({
+            multiElement,
+            newElement: multiElement,
           });
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -5354,8 +5386,16 @@ class App extends React.Component<AppProps, AppState> {
         ) < LINE_CONFIRM_THRESHOLD
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        mutateElement(multiElement, {
-          points: points.slice(0, -1),
+        mutateElement(
+          multiElement,
+          {
+            points: points.slice(0, -1),
+          },
+          false,
+        );
+        this.setState({
+          multiElement,
+          newElement: multiElement,
         });
       } else {
         const [gridX, gridY] = getGridPoint(
@@ -5402,20 +5442,29 @@ class App extends React.Component<AppProps, AppState> {
             undefined,
             {
               isDragging: true,
+              informMutation: false,
             },
           );
         } else {
           // update last uncommitted point
-          mutateElement(multiElement, {
-            points: [
-              ...points.slice(0, -1),
-              [
-                lastCommittedX + dxFromLastCommitted,
-                lastCommittedY + dyFromLastCommitted,
+          mutateElement(
+            multiElement,
+            {
+              points: [
+                ...points.slice(0, -1),
+                [
+                  lastCommittedX + dxFromLastCommitted,
+                  lastCommittedY + dyFromLastCommitted,
+                ],
               ],
-            ],
-          });
+            },
+            false,
+          );
         }
+        this.setState({
+          multiElement,
+          newElement: multiElement,
+        });
       }
 
       return;
@@ -6001,7 +6050,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         newElement: pendingImageElement as ExcalidrawNonSelectionElement,
-        editingElement: pendingImageElement,
         pendingImageElementId: null,
         multiElement: null,
       });
@@ -6836,17 +6884,21 @@ class App extends React.Component<AppProps, AppState> {
       ? element.pressures
       : [...element.pressures, event.pressure];
 
-    mutateElement(element, {
-      points: [[0, 0]],
-      pressures,
-    });
+    mutateElement(
+      element,
+      {
+        points: [[0, 0]],
+        pressures,
+      },
+      false,
+    );
 
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
     );
-    this.scene.insertElement(element);
+    this.scene.insertElement(element, false);
     this.setState({
       newElement: element,
       startBoundElement: boundElement,
@@ -7005,10 +7057,14 @@ class App extends React.Component<AppProps, AppState> {
         multiElement.type === "line" &&
         isPathALoop(multiElement.points, this.state.zoom.value)
       ) {
-        mutateElement(multiElement, {
-          lastCommittedPoint:
-            multiElement.points[multiElement.points.length - 1],
-        });
+        mutateElement(
+          multiElement,
+          {
+            lastCommittedPoint:
+              multiElement.points[multiElement.points.length - 1],
+          },
+          false,
+        );
         this.actionManager.executeAction(actionFinalize);
         return;
       }
@@ -7052,9 +7108,14 @@ class App extends React.Component<AppProps, AppState> {
       }));
       // clicking outside commit zone → update reference for last committed
       // point
-      mutateElement(multiElement, {
-        lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
-      });
+      mutateElement(
+        multiElement,
+        {
+          lastCommittedPoint:
+            multiElement.points[multiElement.points.length - 1],
+        },
+        false,
+      );
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
@@ -7135,9 +7196,13 @@ class App extends React.Component<AppProps, AppState> {
           ),
         };
       });
-      mutateElement(element, {
-        points: [...element.points, [0, 0]],
-      });
+      mutateElement(
+        element,
+        {
+          points: [...element.points, [0, 0]],
+        },
+        false,
+      );
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
@@ -7145,10 +7210,9 @@ class App extends React.Component<AppProps, AppState> {
         isElbowArrow(element),
       );
 
-      this.scene.insertElement(element);
+      this.scene.insertElement(element, false);
       this.setState({
         newElement: element,
-        editingElement: element,
         startBoundElement: boundElement,
         suggestedBindings: [],
       });
@@ -7223,7 +7287,7 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
-      this.scene.insertElement(element);
+      this.scene.insertElement(element, false);
       this.setState({
         multiElement: null,
         newElement: element,
@@ -7739,9 +7803,17 @@ class App extends React.Component<AppProps, AppState> {
               ? newElement.pressures
               : [...newElement.pressures, event.pressure];
 
-            mutateElement(newElement, {
-              points: [...points, [dx, dy]],
-              pressures,
+            mutateElement(
+              newElement,
+              {
+                points: [...points, [dx, dy]],
+                pressures,
+              },
+              false,
+            );
+
+            this.setState({
+              newElement,
             });
           }
         } else if (isLinearElement(newElement)) {
@@ -7760,9 +7832,13 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           if (points.length === 1) {
-            mutateElement(newElement, {
-              points: [...points, [dx, dy]],
-            });
+            mutateElement(
+              newElement,
+              {
+                points: [...points, [dx, dy]],
+              },
+              false,
+            );
           } else if (points.length > 1 && isElbowArrow(newElement)) {
             mutateElbowArrow(
               newElement,
@@ -7772,13 +7848,22 @@ class App extends React.Component<AppProps, AppState> {
               undefined,
               {
                 isDragging: true,
+                informMutation: false,
               },
             );
           } else if (points.length === 2) {
-            mutateElement(newElement, {
-              points: [...points.slice(0, -1), [dx, dy]],
-            });
+            mutateElement(
+              newElement,
+              {
+                points: [...points.slice(0, -1), [dx, dy]],
+              },
+              false,
+            );
           }
+
+          this.setState({
+            newElement,
+          });
 
           if (isBindingElement(newElement, false)) {
             // When creating a linear element by dragging
@@ -7791,7 +7876,7 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
-          this.maybeDragNewGenericElement(pointerDownState, event);
+          this.maybeDragNewGenericElement(pointerDownState, event, false);
         }
       }
 
@@ -8131,15 +8216,22 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          mutateElement(newElement, {
-            points: [
-              ...newElement.points,
-              [pointerCoords.x - newElement.x, pointerCoords.y - newElement.y],
-            ],
-          });
+          mutateElement(
+            newElement,
+            {
+              points: [
+                ...newElement.points,
+                [
+                  pointerCoords.x - newElement.x,
+                  pointerCoords.y - newElement.y,
+                ],
+              ],
+            },
+            false,
+          );
           this.setState({
             multiElement: newElement,
-            editingElement: this.state.newElement,
+            newElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
@@ -8176,6 +8268,8 @@ class App extends React.Component<AppProps, AppState> {
               newElement: null,
             }));
           }
+          // so that the scene gets rendered again to display the newly drawn linear as well
+          this.scene.triggerUpdate();
         }
         return;
       }
@@ -8240,6 +8334,8 @@ class App extends React.Component<AppProps, AppState> {
 
       if (newElement) {
         mutateElement(newElement, getNormalizedDimensions(newElement));
+        // the above does not guarantee the scene to be rendered again, hence the trigger below
+        this.scene.triggerUpdate();
       }
 
       if (pointerDownState.drag.hasOccurred) {
@@ -9293,6 +9389,12 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private handleNewElementCanvasRef = (canvas: HTMLCanvasElement | null) => {
+    if (canvas !== null) {
+      this.newElementCanvas = canvas;
+    }
+  };
+
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
@@ -9544,23 +9646,25 @@ class App extends React.Component<AppProps, AppState> {
   private maybeDragNewGenericElement = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
+    informMutation = true,
   ): void => {
     const selectionElement = this.state.selectionElement;
     const pointerCoords = pointerDownState.lastCoords;
     if (selectionElement && this.state.activeTool.type !== "eraser") {
-      dragNewElement(
-        selectionElement,
-        this.state.activeTool.type,
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        pointerCoords.x,
-        pointerCoords.y,
-        distance(pointerDownState.origin.x, pointerCoords.x),
-        distance(pointerDownState.origin.y, pointerCoords.y),
-        shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter(event),
-        this.state.zoom.value,
-      );
+      dragNewElement({
+        newElement: selectionElement,
+        elementType: this.state.activeTool.type,
+        originX: pointerDownState.origin.x,
+        originY: pointerDownState.origin.y,
+        x: pointerCoords.x,
+        y: pointerCoords.y,
+        width: distance(pointerDownState.origin.x, pointerCoords.x),
+        height: distance(pointerDownState.origin.y, pointerCoords.y),
+        shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
+        shouldResizeFromCenter: shouldResizeFromCenter(event),
+        zoom: this.state.zoom.value,
+        informMutation,
+      });
       return;
     }
 
@@ -9609,23 +9713,28 @@ class App extends React.Component<AppProps, AppState> {
       snapLines,
     });
 
-    dragNewElement(
+    dragNewElement({
       newElement,
-      this.state.activeTool.type,
-      pointerDownState.originInGrid.x,
-      pointerDownState.originInGrid.y,
-      gridX,
-      gridY,
-      distance(pointerDownState.originInGrid.x, gridX),
-      distance(pointerDownState.originInGrid.y, gridY),
-      isImageElement(newElement)
+      elementType: this.state.activeTool.type,
+      originX: pointerDownState.originInGrid.x,
+      originY: pointerDownState.originInGrid.y,
+      x: gridX,
+      y: gridY,
+      width: distance(pointerDownState.originInGrid.x, gridX),
+      height: distance(pointerDownState.originInGrid.y, gridY),
+      shouldMaintainAspectRatio: isImageElement(newElement)
         ? !shouldMaintainAspectRatio(event)
         : shouldMaintainAspectRatio(event),
-      shouldResizeFromCenter(event),
-      this.state.zoom.value,
-      aspectRatio,
-      this.state.originSnapOffset,
-    );
+      shouldResizeFromCenter: shouldResizeFromCenter(event),
+      zoom: this.state.zoom.value,
+      widthAspectRatio: aspectRatio,
+      originOffset: this.state.originSnapOffset,
+      informMutation,
+    });
+
+    this.setState({
+      newElement,
+    });
 
     // highlight elements that are to be added to frames on frames creation
     if (
