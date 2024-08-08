@@ -430,6 +430,7 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { mutateElbowArrow } from "../element/routing";
+import DebugCanvas from "./canvases/DebugCanvas";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1677,6 +1678,13 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                           }}
                         />
+                        {(import.meta.env.MODE === ENV.TEST ||
+                          import.meta.env.DEV) && (
+                          <DebugCanvas
+                            appState={this.state}
+                            scale={window.devicePixelRatio}
+                          />
+                        )}
                         <InteractiveCanvas
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}

@@ -1,5 +1,6 @@
 import React from "react";
 import type { AppState } from "../../types";
+import { t } from "../../i18n";
 
 interface DebugCanvasProps {
   appState: AppState;
@@ -16,7 +17,7 @@ const DebugCanvas = React.forwardRef<HTMLCanvasElement, DebugCanvasProps>(
         height={height * scale}
         ref={ref}
       >
-        DEBUG CANVAS
+        {t("labels.debugCanvas")}
       </canvas>
     );
   },
