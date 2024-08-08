@@ -7124,7 +7124,9 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "selectedElementIds": {},
+  "selectedElementIds": {
+    "id113": true,
+  },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectionElement": null,
@@ -7195,7 +7197,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 8,
+  "version": 7,
   "width": 10,
   "x": -10,
   "y": -10,
@@ -7227,8 +7229,7 @@ History {
       },
       "elementsChange": ElementsChange {
         "added": Map {},
-        "removed": Map {},
-        "updated": Map {
+        "removed": Map {
           "id113" => Delta {
             "deleted": {
               "angle": 0,
@@ -7243,7 +7244,7 @@ History {
               "groupIds": [],
               "height": 10,
               "index": "a0",
-              "isDeleted": true,
+              "isDeleted": false,
               "lastCommittedPoint": [
                 10,
                 10,
@@ -7280,6 +7281,7 @@ History {
             },
           },
         },
+        "updated": Map {},
       },
     },
     HistoryEntry {
@@ -7321,11 +7323,9 @@ History {
         "delta": Delta {
           "deleted": {
             "editingLinearElementId": null,
-            "selectedLinearElementId": null,
           },
           "inserted": {
             "editingLinearElementId": "id113",
-            "selectedLinearElementId": "id113",
           },
         },
       },
@@ -19801,11 +19801,9 @@ History {
         "delta": Delta {
           "deleted": {
             "editingLinearElementId": null,
-            "selectedLinearElementId": null,
           },
           "inserted": {
             "editingLinearElementId": "id27",
-            "selectedLinearElementId": "id27",
           },
         },
       },
