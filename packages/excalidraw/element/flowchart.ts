@@ -5,6 +5,7 @@ import {
   HEADING_UP,
   compareHeading,
   headingForPointFromElement,
+  type Heading,
 } from "./heading";
 import type Scene from "../scene/Scene";
 import { bindLinearElement } from "./binding";
@@ -13,7 +14,6 @@ import { newArrowElement, newElement } from "./newElement";
 import { aabbForElement } from "../math";
 import type {
   ElementsMap,
-  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFlowchartElement,
@@ -22,7 +22,7 @@ import type {
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
-import type { AppState, PendingExcalidrawElements } from "../types";
+import type { AppState, PendingExcalidrawElements, Point } from "../types";
 import { mutateElement } from "./mutateElement";
 import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 import {
@@ -64,107 +64,88 @@ export const getLinkDirectionFromKey = (key: string): LinkDirection => {
   }
 };
 
-const getSuccessors = (
-  element: ExcalidrawBindableElement,
+const getNodeRelatives = (
+  type: "predecessors" | "successors",
+  node: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  direction: LinkDirection = "right",
+  direction: LinkDirection,
 ) => {
-  const boundElbowArrows = element.boundElements
-    ?.map((boundEl) => elementsMap.get(boundEl.id))
-    .filter(
-      (boundEl) =>
-        isElbowArrow(boundEl) &&
-        boundEl.startBinding?.elementId === element.id &&
-        boundEl.endBinding,
-    ) as ExcalidrawArrowElement[];
+  const items = [...elementsMap.values()].reduce(
+    (acc: { relative: ExcalidrawBindableElement; heading: Heading }[], el) => {
+      let oppositeBinding;
+      if (
+        isElbowArrow(el) &&
+        // we want check existence of the opposite binding, in the direction
+        // we're interested in
+        (oppositeBinding =
+          el[type === "predecessors" ? "startBinding" : "endBinding"]) &&
+        // similarly, we need to filter only arrows bound to target node
+        el[type === "predecessors" ? "endBinding" : "startBinding"]
+          ?.elementId === node.id
+      ) {
+        const relative = elementsMap.get(oppositeBinding.elementId);
 
-  if (!boundElbowArrows || boundElbowArrows.length === 0) {
-    return [];
-  }
+        if (!relative) {
+          return acc;
+        }
 
-  const successorsAndHeadingFors = boundElbowArrows.map((boundArrow) => {
-    const successor = elementsMap.get(boundArrow.endBinding!.elementId)!;
-    const headingFor = headingForPointFromElement(
-      element as ExcalidrawBindableElement,
-      aabbForElement(element),
-      [boundArrow.x, boundArrow.y],
-    );
+        invariant(
+          isBindableElement(relative),
+          "not an ExcalidrawBindableElement",
+        );
 
-    return {
-      successor,
-      headingFor,
-    };
-  });
+        const edgePoint: Point =
+          type === "predecessors" ? el.points[el.points.length - 1] : [0, 0];
+
+        const heading = headingForPointFromElement(node, aabbForElement(node), [
+          edgePoint[0] + el.x,
+          edgePoint[1] + el.y,
+        ]);
+
+        acc.push({
+          relative,
+          heading,
+        });
+      }
+      return acc;
+    },
+    [],
+  );
 
   switch (direction) {
     case "up":
-      return successorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_UP))
-        .map((item) => item.successor);
+      return items
+        .filter((item) => compareHeading(item.heading, HEADING_UP))
+        .map((item) => item.relative);
     case "down":
-      return successorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_DOWN))
-        .map((item) => item.successor);
+      return items
+        .filter((item) => compareHeading(item.heading, HEADING_DOWN))
+        .map((item) => item.relative);
     case "right":
-      return successorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_RIGHT))
-        .map((item) => item.successor);
+      return items
+        .filter((item) => compareHeading(item.heading, HEADING_RIGHT))
+        .map((item) => item.relative);
     case "left":
-      return successorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_LEFT))
-        .map((item) => item.successor);
+      return items
+        .filter((item) => compareHeading(item.heading, HEADING_LEFT))
+        .map((item) => item.relative);
   }
 };
 
-export const getPredecessors = (
-  element: ExcalidrawBindableElement,
+const getSuccessors = (
+  node: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  direction: LinkDirection = "right",
+  direction: LinkDirection,
 ) => {
-  // find elbow arrows whose endBinding is the given element
-  const comingInArrows = [...elementsMap.values()]
-    .filter(
-      (el) =>
-        isElbowArrow(el) &&
-        el.startBinding &&
-        el.endBinding?.elementId === element.id,
-    )
-    .map((arrow) => elementsMap.get(arrow.id)) as ExcalidrawArrowElement[];
+  return getNodeRelatives("successors", node, elementsMap, direction);
+};
 
-  const predecessorsAndHeadingFors = comingInArrows.map((elbowArrow) => {
-    const predecessor = elementsMap.get(elbowArrow.startBinding!.elementId)!;
-    const lastPoint = elbowArrow.points[elbowArrow.points.length - 1];
-
-    const headingFor = headingForPointFromElement(
-      element as ExcalidrawBindableElement,
-      aabbForElement(element),
-      [lastPoint[0] + elbowArrow.x, lastPoint[1] + elbowArrow.y],
-    );
-
-    return {
-      predecessor,
-      headingFor,
-    };
-  });
-
-  switch (direction) {
-    case "up":
-      return predecessorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_UP))
-        .map((item) => item.predecessor);
-    case "down":
-      return predecessorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_DOWN))
-        .map((item) => item.predecessor);
-    case "right":
-      return predecessorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_RIGHT))
-        .map((item) => item.predecessor);
-    case "left":
-      return predecessorsAndHeadingFors
-        .filter((item) => compareHeading(item.headingFor, HEADING_LEFT))
-        .map((item) => item.predecessor);
-  }
+export const getPredecessors = (
+  node: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  direction: LinkDirection,
+) => {
+  return getNodeRelatives("predecessors", node, elementsMap, direction);
 };
 
 const getOffsets = (
@@ -262,7 +243,7 @@ const addNewNode = (
   elementsMap: ElementsMap,
   scene: Scene,
   appState: AppState,
-  direction: LinkDirection = "right",
+  direction: LinkDirection,
 ) => {
   const successors = getSuccessors(element, elementsMap, direction);
   const predeccessors = getPredecessors(element, elementsMap, direction);
@@ -601,14 +582,17 @@ export class FlowChartNavigator {
         this.visitedNodes.add(element.id);
       }
 
-      const otherDirections = ["up", "right", "down", "left"].filter(
-        (dir) => dir !== direction,
-      ) as LinkDirection[];
+      const otherDirections: LinkDirection[] = [
+        "up",
+        "right",
+        "down",
+        "left",
+      ].filter((dir): dir is LinkDirection => dir !== direction);
 
       const otherLinkedNodes = otherDirections
         .map((dir) => [
-          ...getSuccessors(element, elementsMap, dir as LinkDirection),
-          ...getPredecessors(element, elementsMap, dir as LinkDirection),
+          ...getSuccessors(element, elementsMap, dir),
+          ...getPredecessors(element, elementsMap, dir),
         ])
         .flat()
         .filter((linkedNode) => !this.visitedNodes.has(linkedNode.id));
