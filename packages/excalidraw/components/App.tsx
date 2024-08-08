@@ -162,6 +162,7 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
   isElbowArrow,
+  isFlowchartNodeElement,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -206,7 +207,10 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { isElementInViewport } from "../element/sizeHelpers";
+import {
+  isElementCompletelyInViewport,
+  isElementInViewport,
+} from "../element/sizeHelpers";
 import {
   distance2d,
   getCornerRadius,
@@ -430,6 +434,11 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { mutateElbowArrow } from "../element/routing";
+import {
+  FlowChartCreator,
+  FlowChartNavigator,
+  getLinkDirectionFromKey,
+} from "../element/flowchart";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -563,6 +572,9 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
+
+  public flowChartCreator: FlowChartCreator = new FlowChartCreator();
+  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -1154,6 +1166,7 @@ class App extends React.Component<AppProps, AppState> {
                   el,
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
+                  null,
                 ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
@@ -1675,6 +1688,8 @@ class App extends React.Component<AppProps, AppState> {
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
                             elementsPendingErasure: this.elementsPendingErasure,
+                            pendingFlowchartNodes:
+                              this.flowChartCreator.pendingNodes,
                           }}
                         />
                         <InteractiveCanvas
@@ -3872,6 +3887,90 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      if (event.key === KEYS.ESCAPE && this.flowChartCreator.isCreatingChart) {
+        this.flowChartCreator.clear();
+        this.triggerRender(true);
+        return;
+      }
+
+      const arrowKeyPressed = isArrowKey(event.key);
+
+      if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
+        event.preventDefault();
+
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (
+          selectedElements.length === 1 &&
+          isFlowchartNodeElement(selectedElements[0])
+        ) {
+          this.flowChartCreator.createNodes(
+            selectedElements[0],
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+            getLinkDirectionFromKey(event.key),
+          );
+        }
+
+        return;
+      }
+
+      if (event.altKey) {
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (selectedElements.length === 1 && arrowKeyPressed) {
+          event.preventDefault();
+
+          const nextId = this.flowChartNavigator.exploreByDirection(
+            selectedElements[0],
+            this.scene.getNonDeletedElementsMap(),
+            getLinkDirectionFromKey(event.key),
+          );
+
+          if (nextId) {
+            this.setState((prevState) => ({
+              selectedElementIds: makeNextSelectedElementIds(
+                {
+                  [nextId]: true,
+                },
+                prevState,
+              ),
+            }));
+
+            const nextNode = this.scene.getNonDeletedElementsMap().get(nextId);
+
+            if (
+              nextNode &&
+              !isElementCompletelyInViewport(
+                nextNode,
+                this.canvas.width / window.devicePixelRatio,
+                this.canvas.height / window.devicePixelRatio,
+                {
+                  offsetLeft: this.state.offsetLeft,
+                  offsetTop: this.state.offsetTop,
+                  scrollX: this.state.scrollX,
+                  scrollY: this.state.scrollY,
+                  zoom: this.state.zoom,
+                },
+                this.scene.getNonDeletedElementsMap(),
+              )
+            ) {
+              this.scrollToContent(nextNode, {
+                animate: true,
+                duration: 300,
+              });
+            }
+          }
+          return;
+        }
+      }
+
       if (
         event[KEYS.CTRL_OR_CMD] &&
         event.key === KEYS.P &&
@@ -4237,6 +4336,58 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
       );
       this.setState({ suggestedBindings: [] });
+    }
+
+    if (!event.altKey) {
+      if (this.flowChartNavigator.isExploring) {
+        this.flowChartNavigator.clear();
+        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      }
+    }
+
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      if (this.flowChartCreator.isCreatingChart) {
+        if (this.flowChartCreator.pendingNodes?.length) {
+          this.scene.insertElements(this.flowChartCreator.pendingNodes);
+        }
+
+        const firstNode = this.flowChartCreator.pendingNodes?.[0];
+
+        if (firstNode) {
+          this.setState((prevState) => ({
+            selectedElementIds: makeNextSelectedElementIds(
+              {
+                [firstNode.id]: true,
+              },
+              prevState,
+            ),
+          }));
+
+          if (
+            !isElementCompletelyInViewport(
+              firstNode,
+              this.canvas.width / window.devicePixelRatio,
+              this.canvas.height / window.devicePixelRatio,
+              {
+                offsetLeft: this.state.offsetLeft,
+                offsetTop: this.state.offsetTop,
+                scrollX: this.state.scrollX,
+                scrollY: this.state.scrollY,
+                zoom: this.state.zoom,
+              },
+              this.scene.getNonDeletedElementsMap(),
+            )
+          ) {
+            this.scrollToContent(firstNode, {
+              animate: true,
+              duration: 300,
+            });
+          }
+        }
+
+        this.flowChartCreator.clear();
+        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      }
     }
   });
 
@@ -7122,7 +7273,6 @@ class App extends React.Component<AppProps, AppState> {
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
             });
-
       this.setState((prevState) => {
         const nextSelectedElementIds = {
           ...prevState.selectedElementIds,
