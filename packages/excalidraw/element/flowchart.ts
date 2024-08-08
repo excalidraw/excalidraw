@@ -7,7 +7,6 @@ import {
   headingForPointFromElement,
   type Heading,
 } from "./heading";
-import type Scene from "../scene/Scene";
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
@@ -33,21 +32,9 @@ import {
 import { invariant } from "../utils";
 
 type LinkDirection = "up" | "right" | "down" | "left";
+
 const VERTICAL_OFFSET = 100;
 const HORIZONTAL_OFFSET = 100;
-
-export const oppositeDirection = (direction: LinkDirection): LinkDirection => {
-  switch (direction) {
-    case "up":
-      return "down";
-    case "down":
-      return "up";
-    case "left":
-      return "right";
-    case "right":
-      return "left";
-  }
-};
 
 export const getLinkDirectionFromKey = (key: string): LinkDirection => {
   switch (key) {
@@ -241,7 +228,6 @@ const getOffsets = (
 const addNewNode = (
   element: ExcalidrawFlowchartElement,
   elementsMap: ElementsMap,
-  scene: Scene,
   appState: AppState,
   direction: LinkDirection,
 ) => {
@@ -287,7 +273,6 @@ const addNewNode = (
 export const addNewNodes = (
   startNode: ExcalidrawFlowchartElement,
   elementsMap: ElementsMap,
-  scene: Scene,
   appState: AppState,
   direction: LinkDirection,
   numberOfNodes: number,
@@ -620,7 +605,6 @@ export class FlowChartCreator {
   createNodes(
     startNode: ExcalidrawFlowchartElement,
     elementsMap: ElementsMap,
-    scene: Scene,
     appState: AppState,
     direction: LinkDirection,
   ) {
@@ -628,7 +612,6 @@ export class FlowChartCreator {
       const { nextNode, bindingArrow } = addNewNode(
         startNode,
         elementsMap,
-        scene,
         appState,
         direction,
       );
@@ -642,7 +625,6 @@ export class FlowChartCreator {
       const newNodes = addNewNodes(
         startNode,
         elementsMap,
-        scene,
         appState,
         direction,
         this.numberOfNodes,

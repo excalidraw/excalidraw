@@ -3910,7 +3910,6 @@ class App extends React.Component<AppProps, AppState> {
           this.flowChartCreator.createNodes(
             selectedElements[0],
             this.scene.getNonDeletedElementsMap(),
-            this.scene,
             this.state,
             getLinkDirectionFromKey(event.key),
           );
