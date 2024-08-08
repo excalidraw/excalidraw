@@ -678,12 +678,15 @@ export const isNodeInFlowchart = (
   element: ExcalidrawFlowchartElement,
   elementsMap: ElementsMap,
 ) => {
-  return (
-    [...elementsMap.values()].filter(
-      (el) =>
-        el.type === "arrow" &&
-        ((el.startBinding && el.endBinding?.elementId === element.id) ||
-          (el.endBinding && el.startBinding?.elementId === element.id)),
-    ).length > 0
-  );
+  for (const [, el] of elementsMap) {
+    if (
+      el.type === "arrow" &&
+      (el.startBinding?.elementId === element.id ||
+        el.endBinding?.elementId === element.id)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 };
