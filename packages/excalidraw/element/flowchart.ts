@@ -16,7 +16,6 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFlowchartElement,
-  ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
 } from "./types";
@@ -27,6 +26,7 @@ import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 import {
   isBindableElement,
   isElbowArrow,
+  isFrameElement,
   supportsFlowchart,
 } from "./typeChecks";
 import { invariant } from "../utils";
@@ -422,13 +422,13 @@ const createBindingArrow = (
 
   bindLinearElement(
     bindingArrow,
-    startBindingElement as ExcalidrawBindableElement,
+    startBindingElement,
     "start",
     elementsMap as NonDeletedSceneElementsMap,
   );
   bindLinearElement(
     bindingArrow,
-    endBindingElement as ExcalidrawBindableElement,
+    endBindingElement,
     "end",
     elementsMap as NonDeletedSceneElementsMap,
   );
@@ -638,9 +638,13 @@ export class FlowChartCreator {
     // add pending nodes to the same frame as the start node
     // if every pending node is at least intersecting with the frame
     if (startNode.frameId) {
-      const frame = elementsMap.get(
-        startNode.frameId!,
-      ) as ExcalidrawFrameLikeElement;
+      const frame = elementsMap.get(startNode.frameId);
+
+      invariant(
+        frame && isFrameElement(frame),
+        "not an ExcalidrawFrameElement",
+      );
+
       if (
         frame &&
         this.pendingNodes.every(
