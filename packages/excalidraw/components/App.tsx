@@ -1679,25 +1679,28 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                           }}
                         />
-                        <NewElementCanvas
-                          newElement={this.state.newElement}
-                          appState={this.state}
-                          scale={window.devicePixelRatio}
-                          canvas={this.newElementCanvas}
-                          handleCanvasRef={this.handleNewElementCanvasRef}
-                          rc={this.rc}
-                          elementsMap={elementsMap}
-                          allElementsMap={allElementsMap}
-                          renderConfig={{
-                            imageCache: this.imageCache,
-                            isExporting: false,
-                            renderGrid: false,
-                            canvasBackgroundColor:
-                              this.state.viewBackgroundColor,
-                            embedsValidationStatus: this.embedsValidationStatus,
-                            elementsPendingErasure: this.elementsPendingErasure,
-                          }}
-                        />
+                        {this.state.newElement && (
+                          <NewElementCanvas
+                            appState={this.state}
+                            scale={window.devicePixelRatio}
+                            canvas={this.newElementCanvas}
+                            handleCanvasRef={this.handleNewElementCanvasRef}
+                            rc={this.rc}
+                            elementsMap={elementsMap}
+                            allElementsMap={allElementsMap}
+                            renderConfig={{
+                              imageCache: this.imageCache,
+                              isExporting: false,
+                              renderGrid: false,
+                              canvasBackgroundColor:
+                                this.state.viewBackgroundColor,
+                              embedsValidationStatus:
+                                this.embedsValidationStatus,
+                              elementsPendingErasure:
+                                this.elementsPendingErasure,
+                            }}
+                          />
+                        )}
                         <InteractiveCanvas
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}

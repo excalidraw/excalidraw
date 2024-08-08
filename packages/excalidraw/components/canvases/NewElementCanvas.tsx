@@ -1,8 +1,5 @@
 import { useEffect } from "react";
-import type {
-  ExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../../element/types";
+import type { NonDeletedSceneElementsMap } from "../../element/types";
 import { t } from "../../i18n";
 import type { AppState } from "../../types";
 import type {
@@ -13,7 +10,6 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import { renderNewElementScene } from "../../renderer/renderNewElementScene";
 
 interface NewElementCanvasProps {
-  newElement: ExcalidrawElement | null;
   canvas: HTMLCanvasElement | null;
   appState: AppState;
   elementsMap: RenderableElementsMap;
@@ -25,13 +21,11 @@ interface NewElementCanvasProps {
 }
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
-  // handle collab
-
   useEffect(() => {
     renderNewElementScene({
       canvas: props.canvas,
       scale: props.scale,
-      newElement: props.newElement,
+      newElement: props.appState.newElement,
       elementsMap: props.elementsMap,
       allElementsMap: props.allElementsMap,
       rc: props.rc,
