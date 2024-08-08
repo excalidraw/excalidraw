@@ -5,6 +5,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPoint,
   FontFamilyValues,
   OrderedExcalidrawElement,
   PointBinding,
@@ -51,7 +52,19 @@ import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
-import { normalizeFixedPoint } from "../element/binding";
+
+export const normalizeFixedPoint = <T extends FixedPoint | null>(
+  fixedPoint: T,
+): T extends null ? null : FixedPoint => {
+  // Do not allow a precise 0.5 for fixed point ratio
+  // to avoid jumping arrow heading due to floating point imprecision
+  if (fixedPoint && (fixedPoint[0] === 0.5 || fixedPoint[1] === 0.5)) {
+    return fixedPoint.map((ratio) =>
+      ratio === 0.5 ? 0.5001 : ratio,
+    ) as T extends null ? null : FixedPoint;
+  }
+  return fixedPoint as any as T extends null ? null : FixedPoint;
+};
 
 type RestoredAppState = Omit<
   AppState,
