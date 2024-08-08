@@ -79,7 +79,6 @@ export class History {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: Readonly<Snapshot>,
-    scene: Scene,
   ) {
     return this.perform(
       elements,
