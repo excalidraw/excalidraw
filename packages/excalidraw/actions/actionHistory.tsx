@@ -58,7 +58,6 @@ export const createUndoAction: ActionCreator = (history, store) => ({
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
-        app.scene,
       ),
     ),
   keyTest: (event) =>

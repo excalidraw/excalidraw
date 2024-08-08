@@ -118,7 +118,6 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
-              {} as Scene,
             ) as any,
         );
       } catch (e) {

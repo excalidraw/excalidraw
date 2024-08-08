@@ -65,7 +65,6 @@ export class History {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: Readonly<Snapshot>,
-    scene: Scene,
   ) {
     return this.perform(
       elements,
@@ -73,7 +72,6 @@ export class History {
       snapshot,
       () => History.pop(this.undoStack),
       (entry: HistoryEntry) => History.push(this.redoStack, entry, elements),
-      scene,
     );
   }
 
@@ -89,7 +87,6 @@ export class History {
       snapshot,
       () => History.pop(this.redoStack),
       (entry: HistoryEntry) => History.push(this.undoStack, entry, elements),
-      scene,
     );
   }
 
@@ -99,7 +96,6 @@ export class History {
     snapshot: Readonly<Snapshot>,
     pop: () => HistoryEntry | null,
     push: (entry: HistoryEntry) => void,
-    scene: Scene,
   ): [SceneElementsMap, AppState] | void {
     try {
       let historyEntry = pop();
@@ -116,7 +112,7 @@ export class History {
       while (historyEntry) {
         try {
           [nextElements, nextAppState, containsVisibleChange] =
-            historyEntry.applyTo(nextElements, nextAppState, snapshot, scene);
+            historyEntry.applyTo(nextElements, nextAppState, snapshot);
         } finally {
           // make sure to always push / pop, even if the increment is corrupted
           push(historyEntry);
@@ -187,10 +183,9 @@ export class HistoryEntry {
     elements: SceneElementsMap,
     appState: AppState,
     snapshot: Readonly<Snapshot>,
-    scene: Scene,
   ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] =
-      this.elementsChange.applyTo(elements, snapshot.elements, scene);
+      this.elementsChange.applyTo(elements, snapshot.elements);
 
     const [nextAppState, appStateContainsVisibleChange] =
       this.appStateChange.applyTo(appState, nextElements);

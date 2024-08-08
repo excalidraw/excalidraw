@@ -91,14 +91,9 @@ export const dragSelectedElements = (
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
-    updateBoundElements(
-      element,
-      scene.getElementsMapIncludingDeleted(),
-      scene,
-      {
-        simultaneouslyUpdated: Array.from(elementsToUpdate),
-      },
-    );
+    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
+      simultaneouslyUpdated: Array.from(elementsToUpdate),
+    });
   });
 };
 
