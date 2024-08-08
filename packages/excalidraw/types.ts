@@ -648,6 +648,7 @@ export type AppClassProperties = {
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
+  flowChartCreator: App["flowChartCreator"];
 };
 
 export type PointerDownState = Readonly<{

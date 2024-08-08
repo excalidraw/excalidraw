@@ -573,7 +573,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
-  private flowChartCreator: FlowChartCreator = new FlowChartCreator();
+  public flowChartCreator: FlowChartCreator = new FlowChartCreator();
   private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
 
   hitLinkElement?: NonDeletedExcalidrawElement;
