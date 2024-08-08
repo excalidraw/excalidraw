@@ -51,8 +51,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -83,8 +83,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
 
       expect(h.state.selectionElement).toBeNull();
 
@@ -116,8 +116,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -148,8 +148,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -184,8 +184,8 @@ describe("Test dragCreate", () => {
       // finish (position does not matter)
       fireEvent.pointerUp(canvas);
 
-      expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
 
       expect(h.elements.length).toEqual(1);
@@ -226,7 +226,7 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -246,7 +246,7 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -266,7 +266,7 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(5);
-      expect(renderStaticScene).toHaveBeenCalledTimes(5);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -293,7 +293,7 @@ describe("Test dragCreate", () => {
       });
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
@@ -320,7 +320,7 @@ describe("Test dragCreate", () => {
       });
 
       expect(renderInteractiveScene).toHaveBeenCalledTimes(6);
-      expect(renderStaticScene).toHaveBeenCalledTimes(6);
+      expect(renderStaticScene).toHaveBeenCalledTimes(4);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(0);
     });
