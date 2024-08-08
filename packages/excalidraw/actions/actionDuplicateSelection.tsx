@@ -44,7 +44,7 @@ export const actionDuplicateSelection = register({
     if (appState.editingLinearElement) {
       const ret = LinearElementEditor.duplicateSelectedPoints(
         appState,
-        app.scene,
+        app.scene.getNonDeletedElementsMap(),
       );
 
       if (!ret) {

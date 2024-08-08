@@ -1648,7 +1648,7 @@ export const actionChangeArrowType = register({
 
           mutateElbowArrow(
             newElement,
-            app.scene,
+            elementsMap,
             [finalStartPoint, finalEndPoint].map(
               (point) =>
                 [point[0] - newElement.x, point[1] - newElement.y] as Point,

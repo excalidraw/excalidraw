@@ -4005,14 +4005,9 @@ class App extends React.Component<AppProps, AppState> {
             y: element.y + offsetY,
           });
 
-          updateBoundElements(
-            element,
-            this.scene.getNonDeletedElementsMap(),
-            this.scene,
-            {
-              simultaneouslyUpdated: selectedElements,
-            },
-          );
+          updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
+            simultaneouslyUpdated: selectedElements,
+          });
         });
 
         this.setState({
@@ -4469,7 +4464,7 @@ class App extends React.Component<AppProps, AppState> {
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false);
         if (isNonDeletedElement(element)) {
-          updateBoundElements(element, elementsMap, this.scene);
+          updateBoundElements(element, this.scene.getNonDeletedElementsMap());
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
@@ -5279,7 +5274,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerX,
         scenePointerY,
         this.state,
-        this.scene,
+        this.scene.getNonDeletedElementsMap(),
       );
 
       if (
@@ -5395,7 +5390,7 @@ class App extends React.Component<AppProps, AppState> {
         if (isElbowArrow(multiElement)) {
           mutateElbowArrow(
             multiElement,
-            this.scene,
+            this.scene.getNonDeletedElementsMap(),
             [
               ...points.slice(0, -1),
               [
@@ -7771,7 +7766,7 @@ class App extends React.Component<AppProps, AppState> {
           } else if (points.length > 1 && isElbowArrow(newElement)) {
             mutateElbowArrow(
               newElement,
-              this.scene,
+              elementsMap,
               [...points.slice(0, -1), [dx, dy]],
               [0, 0],
               undefined,
@@ -9756,7 +9751,6 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
-        this.scene,
       )
     ) {
       const suggestedBindings = getSuggestedBindingsForArrows(

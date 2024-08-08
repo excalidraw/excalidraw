@@ -198,7 +198,7 @@ export const resizeElement = (
     }
   }
 
-  updateBoundElements(latestElement, elementsMap, scene, {
+  updateBoundElements(latestElement, elementsMap, {
     oldSize: { width: oldWidth, height: oldHeight },
   });
 
@@ -316,6 +316,6 @@ export const updateBindings = (
       [],
     );
   } else {
-    updateBoundElements(latestElement, elementsMap, scene, options);
+    updateBoundElements(latestElement, elementsMap, options);
   }
 };
