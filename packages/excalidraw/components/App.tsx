@@ -3907,7 +3907,6 @@ class App extends React.Component<AppProps, AppState> {
           true,
           x,
           y,
-          this.scene,
         );
       });
     },
