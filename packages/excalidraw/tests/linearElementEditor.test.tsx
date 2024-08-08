@@ -5,6 +5,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FontString,
+  SceneElementsMap,
 } from "../element/types";
 import { Excalidraw, mutateElement } from "../index";
 import { centerPoint } from "../math";
@@ -1344,7 +1345,7 @@ describe("Test Linear Elements", () => {
               ],
             },
           ],
-          h.scene,
+          new Map() as SceneElementsMap,
         );
       });
       expect(line.x).toBe(origStartX + 10);

@@ -709,6 +709,7 @@ export type AppClassProperties = {
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
+  flowChartCreator: App["flowChartCreator"];
 };
 
 export type PointerDownState = Readonly<{
@@ -899,3 +900,5 @@ export type EmbedsValidationStatus = Map<
 >;
 
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
+
+export type PendingExcalidrawElements = ExcalidrawElement[];
