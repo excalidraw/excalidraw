@@ -160,7 +160,7 @@ export type ExcalidrawGenericElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
-export type ExcalidrawFlowchartElement =
+export type ExcalidrawFlowchartNodeElement =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;

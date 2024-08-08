@@ -24,7 +24,7 @@ import type {
   ExcalidrawElbowArrowElement,
   PointBinding,
   FixedPointBinding,
-  ExcalidrawFlowchartElement,
+  ExcalidrawFlowchartNodeElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -220,6 +220,16 @@ export const isExcalidrawElement = (
   }
 };
 
+export const isFlowchartNodeElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawFlowchartNodeElement => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond"
+  );
+};
+
 export const hasBoundTextElement = (
   element: ExcalidrawElement | null,
 ): element is MarkNonNullable<ExcalidrawBindableElement, "boundElements"> => {
@@ -288,16 +298,6 @@ export const getDefaultRoundnessTypeForElement = (
   }
 
   return null;
-};
-
-export const supportsFlowchart = (
-  element: ExcalidrawElement,
-): element is ExcalidrawFlowchartElement => {
-  return (
-    element.type === "rectangle" ||
-    element.type === "ellipse" ||
-    element.type === "diamond"
-  );
 };
 
 export const isFixedPointBinding = (

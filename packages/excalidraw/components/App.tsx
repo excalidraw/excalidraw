@@ -162,7 +162,7 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
   isElbowArrow,
-  supportsFlowchart,
+  isFlowchartNodeElement,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -3905,7 +3905,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (
           selectedElements.length === 1 &&
-          supportsFlowchart(selectedElements[0])
+          isFlowchartNodeElement(selectedElements[0])
         ) {
           this.flowChartCreator.createNodes(
             selectedElements[0],

@@ -1,7 +1,7 @@
 import { t } from "../i18n";
 import type { AppClassProperties, Device, UIAppState } from "../types";
 import {
-  supportsFlowchart,
+  isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
@@ -122,7 +122,7 @@ const getHints = ({
         !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
-        if (supportsFlowchart(selectedElements[0])) {
+        if (isFlowchartNodeElement(selectedElements[0])) {
           if (
             isNodeInFlowchart(
               selectedElements[0],
