@@ -51,6 +51,7 @@ import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
+import { normalizeFixedPoint } from "../element/binding";
 
 type RestoredAppState = Omit<
   AppState,
@@ -106,11 +107,7 @@ const repairBinding = (
     ...binding,
     focus: binding.focus || 0,
     fixedPoint: isElbowArrow(element)
-      ? ((binding.fixedPoint ?? [0, 0]).map((ratio) =>
-          // Do not allow a precise 0.5 for fixed point ratio
-          // to avoid jumping arrow heading due to FP imprecision
-          ratio === 0.5 ? 0.5001 : ratio,
-        ) as [number, number])
+      ? normalizeFixedPoint(binding.fixedPoint ?? [0, 0])
       : null,
   };
 };
