@@ -44,7 +44,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { tupleToCoors } from "../utils";
+import { toBrandedType, tupleToCoors } from "../utils";
 import {
   isBindingElement,
   isElbowArrow,
@@ -1447,9 +1447,17 @@ export class LinearElementEditor {
             : null;
       }
 
+      console.warn("movePoints", options?.changedElements);
+
+      const mergedElementsMap = options?.changedElements
+        ? toBrandedType<SceneElementsMap>(
+            new Map([...elementsMap, ...options.changedElements]),
+          )
+        : elementsMap;
+
       mutateElbowArrow(
         element,
-        elementsMap,
+        mergedElementsMap,
         nextPoints,
         [offsetX, offsetY],
         bindings,

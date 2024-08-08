@@ -24,6 +24,7 @@ import type {
   ExcalidrawElbowArrowElement,
   PointBinding,
   FixedPointBinding,
+  ExcalidrawFlowchartNodeElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -217,6 +218,16 @@ export const isExcalidrawElement = (
       return false;
     }
   }
+};
+
+export const isFlowchartNodeElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawFlowchartNodeElement => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond"
+  );
 };
 
 export const hasBoundTextElement = (

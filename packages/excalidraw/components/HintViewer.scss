@@ -9,6 +9,7 @@ $wide-viewport-width: 1000px;
     box-sizing: border-box;
     position: absolute;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     left: 0;
     top: 100%;

@@ -55,6 +55,43 @@ export const isElementInViewport = (
   );
 };
 
+export const isElementCompletelyInViewport = (
+  element: ExcalidrawElement,
+  width: number,
+  height: number,
+  viewTransformations: {
+    zoom: Zoom;
+    offsetLeft: number;
+    offsetTop: number;
+    scrollX: number;
+    scrollY: number;
+  },
+  elementsMap: ElementsMap,
+) => {
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
+  const topLeftSceneCoords = viewportCoordsToSceneCoords(
+    {
+      clientX: viewTransformations.offsetLeft,
+      clientY: viewTransformations.offsetTop,
+    },
+    viewTransformations,
+  );
+  const bottomRightSceneCoords = viewportCoordsToSceneCoords(
+    {
+      clientX: viewTransformations.offsetLeft + width,
+      clientY: viewTransformations.offsetTop + height,
+    },
+    viewTransformations,
+  );
+
+  return (
+    x1 >= topLeftSceneCoords.x &&
+    y1 >= topLeftSceneCoords.y &&
+    x2 <= bottomRightSceneCoords.x &&
+    y2 <= bottomRightSceneCoords.y
+  );
+};
+
 /**
  * Makes a perfect shape or diagonal/horizontal/vertical line
  */

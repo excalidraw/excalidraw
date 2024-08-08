@@ -16,6 +16,7 @@ import type {
   SocketId,
   UserIdleState,
   Device,
+  PendingExcalidrawElements,
 } from "../types";
 import type { MakeBrand } from "../utility-types";
 
@@ -33,6 +34,7 @@ export type StaticCanvasRenderConfig = {
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
+  pendingFlowchartNodes: PendingExcalidrawElements | null;
 };
 
 export type SVGRenderConfig = {

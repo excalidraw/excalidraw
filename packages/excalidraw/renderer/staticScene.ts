@@ -370,6 +370,23 @@ const _renderStaticScene = ({
         console.error(error);
       }
     });
+
+  // render pending nodes for flowcharts
+  renderConfig.pendingFlowchartNodes?.forEach((element) => {
+    try {
+      renderElement(
+        element,
+        elementsMap,
+        allElementsMap,
+        rc,
+        context,
+        renderConfig,
+        appState,
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  });
 };
 
 /** throttled to animation framerate */
