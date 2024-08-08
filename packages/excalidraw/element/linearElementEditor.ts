@@ -1447,6 +1447,8 @@ export class LinearElementEditor {
             : null;
       }
 
+      console.warn("movePoints", options?.changedElements);
+
       const mergedElementsMap = options?.changedElements
         ? toBrandedType<SceneElementsMap>(
             new Map([...elementsMap, ...options.changedElements]),

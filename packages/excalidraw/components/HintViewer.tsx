@@ -129,11 +129,7 @@ const getHints = ({
               app.scene.getNonDeletedElementsMap(),
             )
           ) {
-            return [
-              t("hints.bindTextToElement"),
-              t("hints.createFlowchart"),
-              t("hints.navigateFlowchart"),
-            ];
+            return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
           }
 
           return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
@@ -153,25 +149,28 @@ export const HintViewer = ({
   device,
   app,
 }: HintViewerProps) => {
-  let hints = getHints({
+  const hints = getHints({
     appState,
     isMobile,
     device,
     app,
   });
+
   if (!hints) {
     return null;
   }
 
-  hints = Array.isArray(hints)
-    ? hints.map((hint) => getShortcutKey(hint))
-    : [getShortcutKey(hints)];
+  const hint = Array.isArray(hints)
+    ? hints
+        .map((hint) => {
+          return getShortcutKey(hint).replace(/\. ?$/, "");
+        })
+        .join(". ")
+    : getShortcutKey(hints);
 
   return (
     <div className="HintViewer">
-      {hints.map((hint) => (
-        <div key={hint}>{hint}</div>
-      ))}
+      <span>{hint}</span>
     </div>
   );
 };
