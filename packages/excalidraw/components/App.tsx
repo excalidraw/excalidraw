@@ -3925,10 +3925,9 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (selectedElements.length === 1 && arrowKeyPressed) {
-          let nextId: string | null = null;
           event.preventDefault();
 
-          nextId = this.flowChartNavigator.exploreByDirection(
+          const nextId = this.flowChartNavigator.exploreByDirection(
             selectedElements[0],
             this.scene.getNonDeletedElementsMap(),
             getLinkDirectionFromKey(event.key),
@@ -3938,7 +3937,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState((prevState) => ({
               selectedElementIds: makeNextSelectedElementIds(
                 {
-                  [nextId as string]: true,
+                  [nextId]: true,
                 },
                 prevState,
               ),

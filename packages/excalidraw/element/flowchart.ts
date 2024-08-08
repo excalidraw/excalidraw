@@ -493,7 +493,7 @@ export class FlowChartNavigator {
     element: ExcalidrawElement,
     elementsMap: ElementsMap,
     direction: LinkDirection,
-  ): string | null {
+  ): ExcalidrawElement["id"] | null {
     if (!isBindableElement(element)) {
       return null;
     }
