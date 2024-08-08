@@ -24,6 +24,7 @@ import type {
   ExcalidrawElbowArrowElement,
   PointBinding,
   FixedPointBinding,
+  ExcalidrawFlowchartElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -289,12 +290,13 @@ export const getDefaultRoundnessTypeForElement = (
   return null;
 };
 
-export const isGenericElement = (element: ExcalidrawElement) => {
+export const supportsFlowchart = (
+  element: ExcalidrawElement,
+): element is ExcalidrawFlowchartElement => {
   return (
     element.type === "rectangle" ||
     element.type === "ellipse" ||
-    element.type === "diamond" ||
-    element.type === "selection"
+    element.type === "diamond"
   );
 };
 

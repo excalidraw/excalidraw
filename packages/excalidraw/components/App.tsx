@@ -162,7 +162,7 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
   isElbowArrow,
-  isGenericElement,
+  supportsFlowchart,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -3905,10 +3905,10 @@ class App extends React.Component<AppProps, AppState> {
 
         if (
           selectedElements.length === 1 &&
-          isGenericElement(selectedElements[0])
+          supportsFlowchart(selectedElements[0])
         ) {
           this.flowChartCreator.createNodes(
-            selectedElements[0] as ExcalidrawGenericElement,
+            selectedElements[0],
             this.scene.getNonDeletedElementsMap(),
             this.scene,
             this.state,
@@ -3928,8 +3928,9 @@ class App extends React.Component<AppProps, AppState> {
         if (selectedElements.length === 1 && arrowKeyPressed) {
           let nextId: string | null = null;
           event.preventDefault();
+
           nextId = this.flowChartNavigator.exploreByDirection(
-            selectedElements[0] as ExcalidrawGenericElement,
+            selectedElements[0],
             this.scene.getNonDeletedElementsMap(),
             getLinkDirectionFromKey(event.key),
           );
