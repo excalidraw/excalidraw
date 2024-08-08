@@ -5444,6 +5444,7 @@ class App extends React.Component<AppProps, AppState> {
             undefined,
             {
               isDragging: true,
+              informMutation: false,
             },
           );
         } else {
@@ -5461,11 +5462,11 @@ class App extends React.Component<AppProps, AppState> {
             },
             false,
           );
-          this.setState({
-            multiElement,
-            newElement: multiElement,
-          });
         }
+        this.setState({
+          multiElement,
+          newElement: multiElement,
+        });
       }
 
       return;
@@ -7094,7 +7095,7 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint[1],
         ) < LINE_CONFIRM_THRESHOLD
       ) {
-        // this.actionManager.executeAction(actionFinalize);
+        this.actionManager.executeAction(actionFinalize);
         return;
       }
 
@@ -7840,9 +7841,6 @@ class App extends React.Component<AppProps, AppState> {
               },
               false,
             );
-            this.setState({
-              newElement,
-            });
           } else if (points.length > 1 && isElbowArrow(newElement)) {
             mutateElbowArrow(
               newElement,
@@ -7852,6 +7850,7 @@ class App extends React.Component<AppProps, AppState> {
               undefined,
               {
                 isDragging: true,
+                informMutation: false,
               },
             );
           } else if (points.length === 2) {
@@ -7862,11 +7861,11 @@ class App extends React.Component<AppProps, AppState> {
               },
               false,
             );
-
-            this.setState({
-              newElement,
-            });
           }
+
+          this.setState({
+            newElement,
+          });
 
           if (isBindingElement(newElement, false)) {
             // When creating a linear element by dragging
