@@ -759,6 +759,11 @@ export const bindPointToSnapToElementOutline = (
         [point[0], point[1] + 2 * bindableElement.height],
         FIXED_BINDING_DISTANCE,
         elementsMap,
+      ).map((i) =>
+        distanceToBindableElement(bindableElement, i, elementsMap) >=
+        bindableElement.height / 2
+          ? ([point[0], -1 * i[1]] as Point)
+          : ([point[0], i[1]] as Point),
       ),
       ...intersectElementWithLine(
         bindableElement,
@@ -766,13 +771,13 @@ export const bindPointToSnapToElementOutline = (
         [point[0] + 2 * bindableElement.width, point[1]],
         FIXED_BINDING_DISTANCE,
         elementsMap,
+      ).map((i) =>
+        distanceToBindableElement(bindableElement, i, elementsMap) >=
+        bindableElement.width / 2
+          ? ([-1 * i[0], point[1]] as Point)
+          : ([i[0], point[1]] as Point),
       ),
-    ].map((i) =>
-      distanceToBindableElement(bindableElement, i, elementsMap) >
-      Math.min(bindableElement.width, bindableElement.height) / 2
-        ? ([-1 * i[0], -1 * i[1]] as Point)
-        : i,
-    );
+    ];
 
     const heading = headingForPointFromElement(bindableElement, aabb, point);
     const isVertical =
