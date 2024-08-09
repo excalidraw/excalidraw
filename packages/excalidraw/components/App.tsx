@@ -332,6 +332,7 @@ import {
   isMeasureTextSupported,
   isValidTextContainer,
   measureText,
+  normalizeText,
   wrapText,
 } from "../element/textElement";
 import {
@@ -3412,7 +3413,7 @@ class App extends React.Component<AppProps, AppState> {
     const lines = isPlainPaste ? [text] : text.split("\n");
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
-        const originalText = line.trim();
+        const originalText = normalizeText(line).trim();
         if (originalText.length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
             x,
