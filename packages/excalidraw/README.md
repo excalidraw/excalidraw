@@ -20,7 +20,7 @@ After installation you will see a folder `excalidraw-assets` and `excalidraw-ass
 
 Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
 
-By default it will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist)
+By default it will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/prod/`](https://unpkg.com/@excalidraw/excalidraw/dist/prod/)
 
 If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
 
