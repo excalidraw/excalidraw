@@ -3,6 +3,7 @@ import BinaryHeap from "../binaryheap";
 import {
   aabbForElement,
   arePointsEqual,
+  distanceSq2d,
   pointInsideBounds,
   pointToVector,
   scalePointFromOrigin,
@@ -25,6 +26,7 @@ import {
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
 import {
+  compareHeading,
   HEADING_DOWN,
   HEADING_LEFT,
   HEADING_RIGHT,
@@ -890,12 +892,12 @@ const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
     .slice(2)
     .reduce(
       (result, point) =>
-        arePointsEqual(
+        compareHeading(
           vectorToHeading(
             pointToVector(result[result.length - 1], result[result.length - 2]),
           ),
           vectorToHeading(pointToVector(point, result[result.length - 1])),
-        )
+        ) || distanceSq2d(result[result.length - 1], point) < 5
           ? [...result.slice(0, -1), point]
           : [...result, point],
       [points[0] ?? [0, 0], points[1] ?? [1, 0]],
