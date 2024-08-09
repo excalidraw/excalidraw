@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/browser";
 import * as SentryIntegrations from "@sentry/integrations";
 
-const SentryEnvHostnameMap: { [key: string]: string } = {
+const SentryEnvHostnameMap: Record<string, string> = {
   "excalidraw.com": "production",
   "vercel.app": "staging",
 };

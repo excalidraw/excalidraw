@@ -573,7 +573,7 @@ export const wrapText = (
 };
 
 export const charWidth = (() => {
-  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
+  const cachedCharWidth: Record<FontString, Array<number>> = {};
 
   const calculate = (char: string, font: FontString) => {
     const ascii = char.charCodeAt(0);
