@@ -11,7 +11,7 @@
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
     "copyText": "Скопировать в буфер обмена как текст",
-    "copySource": "Копировать источник в буфер обмена",
+    "copySource": "",
     "convertToCode": "Преобразовать в код",
     "bringForward": "Переместить вперед",
     "sendToBack": "На задний план",
@@ -21,7 +21,9 @@
     "copyStyles": "Скопировать стили",
     "pasteStyles": "Вставить стили",
     "stroke": "Обводка",
+    "changeStroke": "Изменить цвет обводки",
     "background": "Фон",
+    "changeBackground": "Изменить цвет фона",
     "fill": "Заливка",
     "strokeWidth": "Толщина штриха",
     "strokeStyle": "Стиль обводки",
@@ -38,12 +40,16 @@
     "arrowhead_none": "Нет",
     "arrowhead_arrow": "Cтрелка",
     "arrowhead_bar": "Черта",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "Круг",
+    "arrowhead_circle_outline": "Круг (контур)",
     "arrowhead_triangle": "Треугольник",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "Треугольник (контур)",
+    "arrowhead_diamond": "Ромб",
+    "arrowhead_diamond_outline": "Ромб (контур)",
+    "arrowtypes": "Тип стрелки",
+    "arrowtype_sharp": "Острая стрелка",
+    "arrowtype_round": "Изогнутая стрелка",
+    "arrowtype_elbowed": "Прямоугольная стрелка",
     "fontSize": "Размер шрифта",
     "fontFamily": "Семейство шрифтов",
     "addWatermark": "Добавить «Создано в Excalidraw»",
@@ -72,6 +78,7 @@
     "canvasColors": "Используется на холсте",
     "canvasBackground": "Фон холста",
     "drawingCanvas": "Полотно",
+    "clearCanvas": "Очистить холст",
     "layers": "Слои",
     "actions": "Действия",
     "language": "Язык",
@@ -84,12 +91,13 @@
     "group": "Сгруппировать выделение",
     "ungroup": "Разделить выделение",
     "collaborators": "Участники",
-    "showGrid": "Показать сетку",
+    "toggleGrid": "",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
     "libraryLoadingMessage": "Загрузка библиотеки…",
     "libraries": "Просмотреть библиотеки",
     "loadingScene": "Загрузка сцены…",
+    "loadScene": "Загрузить сцену из файла",
     "align": "Выровнять",
     "alignTop": "Выровнять по верхнему краю",
     "alignBottom": "Выровнять по нижнему краю",
@@ -105,7 +113,9 @@
     "share": "Поделиться",
     "showStroke": "Показать выбор цвета обводки",
     "showBackground": "Показать выбор цвета фона",
-    "toggleTheme": "Переключить тему",
+    "showFonts": "Показать выбор шрифта",
+    "toggleTheme": "Переключить светлую/темную тему",
+    "theme": "Тема",
     "personalLib": "Личная библиотека",
     "excalidrawLib": "Библиотека Excalidraw",
     "decreaseFontSize": "Уменьшить шрифт",
@@ -115,16 +125,16 @@
     "createContainerFromText": "Поместить текст в контейнер",
     "link": {
       "edit": "Редактировать ссылку",
-      "editEmbed": "",
+      "editEmbed": "Редактировать ссылку и встроить",
       "create": "Создать ссылку",
-      "createEmbed": "",
+      "createEmbed": "Создать ссылку и встроить",
       "label": "Ссылка",
       "labelEmbed": "",
       "empty": ""
     },
     "lineEditor": {
       "edit": "Редактирование строки",
-      "exit": "Выход из редактора строки"
+      "editArrow": "Изменить стрелку"
     },
     "elementLock": {
       "lock": "Блокировать",
@@ -137,8 +147,15 @@
     "selectAllElementsInFrame": "",
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Взять образец цвета с холста",
-    "textToDiagram": "Текст в диаграмму",
-    "prompt": ""
+    "textToDiagram": "",
+    "prompt": "",
+    "followUs": "Подписаться",
+    "discordChat": "Чат в Discord",
+    "zoomToFitViewport": "",
+    "zoomToFitSelection": "Увеличить до выделенного",
+    "zoomToFit": "",
+    "installPWA": "Установить Excalidraw локально (PWA)",
+    "autoResize": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -171,17 +188,18 @@
     "fullScreen": "Полный экран",
     "darkMode": "Темная тема",
     "lightMode": "Светлая тема",
+    "systemMode": "",
     "zenMode": "Режим Дзен",
     "objectsSnapMode": "Привязка к объектам",
     "exitZenMode": "Выключить режим концентрации внимания",
     "cancel": "Отменить",
     "clear": "Очистить",
     "remove": "Удалить",
-    "embed": "",
+    "embed": "Включить встраивание",
     "publishLibrary": "Опубликовать",
     "submit": "Отправить",
     "confirm": "Подтвердить",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "Нажмите для взаимодействия"
   },
   "alerts": {
     "clearReset": "Это очистит весь холст. Вы уверены?",
@@ -212,9 +230,9 @@
     "fileTooBig": "Очень большой файл. Максимально разрешенный размер {{maxSize}}.",
     "svgImageInsertError": "Не удалось вставить изображение SVG. Разметка SVG выглядит недействительной.",
     "failedToFetchImage": "Не удалось получить изображение.",
-    "invalidSVGString": "Некорректный SVG.",
     "cannotResolveCollabServer": "Не удалось подключиться к серверу совместного редактирования. Перезагрузите страницу и повторите попытку.",
     "importLibraryError": "Не удалось загрузить библиотеку",
+    "saveLibraryError": "Не удалось сохранить библиотеку в хранилище. Пожалуйста, сохраните библиотеку в файл локально, чтобы не потерять изменения.",
     "collabSaveFailed": "Не удалось сохранить в базу данных. Если проблема повторится, нужно будет сохранить файл локально, чтобы быть уверенным, что вы не потеряете вашу работу.",
     "collabSaveFailed_sizeExceeded": "Не удалось сохранить в базу данных. Похоже, что холст слишком большой. Нужно сохранить файл локально, чтобы быть уверенным, что вы не потеряете вашу работу.",
     "imageToolNotSupported": "Изображения отключены.",
@@ -226,12 +244,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "",
-      "iframe": "Элементы IFrame не могут быть добавлены в библиотеку.",
+      "iframe": "",
       "image": ""
     },
-    "asyncPasteFailedOnRead": "Не удалось вставить (невозможно прочитать из системного буфера обмена).",
-    "asyncPasteFailedOnParse": "Не удалось вставить.",
-    "copyToSystemClipboardFailed": "Не удалось скопировать в буфер обмена."
+    "asyncPasteFailedOnRead": "",
+    "asyncPasteFailedOnParse": "",
+    "copyToSystemClipboardFailed": ""
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -246,16 +264,32 @@
     "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования",
     "penMode": "Режим пера - предотвращение касания",
-    "link": "Добавить/обновить ссылку для выбранной фигуры",
+    "link": "",
     "eraser": "Ластик",
     "frame": "",
     "magicframe": "",
-    "embeddable": "",
+    "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
     "extraTools": "",
-    "mermaidToExcalidraw": "Из Mermaid в Excalidraw",
-    "magicSettings": "Параметры AI"
+    "mermaidToExcalidraw": "",
+    "magicSettings": ""
+  },
+  "element": {
+    "rectangle": "Прямоугольник",
+    "diamond": "",
+    "ellipse": "",
+    "arrow": "",
+    "line": "",
+    "freedraw": "",
+    "text": "Текст",
+    "image": "Изображение",
+    "group": "",
+    "frame": "",
+    "magicframe": "",
+    "embeddable": "",
+    "selection": "Выделение",
+    "iframe": ""
   },
   "headings": {
     "canvasActions": "Операции холста",
@@ -265,6 +299,7 @@
   "hints": {
     "canvasPanning": "Чтобы двигать холст, удерживайте колесо мыши или пробел во время перетаскивания, или используйте инструмент \"Рука\"",
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
+    "arrowTool": "",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
     "embeddable": "",
@@ -281,6 +316,7 @@
     "placeImage": "Щелкните, чтобы разместить изображение, или нажмите и перетащите, чтобы установить его размер вручную",
     "publishLibrary": "Опубликовать свою собственную библиотеку",
     "bindTextToElement": "Нажмите Enter для добавления текста",
+    "createFlowchart": "",
     "deepBoxSelect": "Удерживайте Ctrl или Cmd для глубокого выделения, чтобы предотвратить перетаскивание",
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\".",
@@ -299,9 +335,12 @@
     "openIssueMessage": "Для безопасности информация о вашей сцене не включена в ошибку. Если в сцене нет ничего конфиденциального, пожалуйста следуйте нашим <button>баг трекере.</button> Пожалуйста, приложите информацию ниже, скопировав и вставив её, в issue GitHub.",
     "sceneContent": "Содержание сцены:"
   },
+  "shareDialog": {
+    "or": "Или"
+  },
   "roomDialog": {
-    "desc_intro": "Вы можете пригласить людей в текущую сцену для совместной работы.",
-    "desc_privacy": "Не беспокойтесь — во время сеанса используется сквозное шифрование. Всё, что вы нарисуете, останется конфиденциальным и не будет доступно даже нашему серверу.",
+    "desc_intro": "",
+    "desc_privacy": "",
     "button_startSession": "Начать сеанс",
     "button_stopSession": "Завершить сеанс",
     "desc_inProgressIntro": "Сеанс совместной работы запущен.",
@@ -328,6 +367,8 @@
     "click": "нажать",
     "deepSelect": "Глубокое выделение",
     "deepBoxSelect": "Глубокое выделение рамкой, и предотвращение перетаскивания",
+    "createFlowchart": "",
+    "navigateFlowchart": "",
     "curvedArrow": "Изогнутая стрелка",
     "curvedLine": "Изогнутая линия",
     "documentation": "Документация",
@@ -410,8 +451,8 @@
       "copyPngToClipboard": "Скопировать PNG в буфер обмена"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "exportToPng": "",
+      "exportToSvg": "",
       "copyPngToClipboard": "Скопировать в буфер обмена"
     }
   },
@@ -427,7 +468,10 @@
     "scene": "Сцены",
     "selected": "Выбран",
     "storage": "Хранилище",
-    "title": "Статистика для ботаников",
+    "fullTitle": "",
+    "title": "",
+    "generalStats": "",
+    "elementProperties": "",
     "total": "Всего",
     "version": "Версия",
     "versionCopy": "Копировать",
@@ -497,7 +541,7 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "Excalidraw+",
+        "title": "",
         "button": "Экспорт в Excalidraw+",
         "description": ""
       }
@@ -516,10 +560,46 @@
     }
   },
   "mermaid": {
-    "title": "Из Mermaid в Excalidraw",
-    "button": "Вставить",
+    "title": "",
+    "button": "",
     "description": "",
-    "syntax": "Синтаксис Mermaid",
-    "preview": "Предпросмотр"
+    "syntax": "",
+    "preview": ""
+  },
+  "quickSearch": {
+    "placeholder": "Быстрый поиск"
+  },
+  "fontList": {
+    "badge": {
+      "old": "старый"
+    },
+    "sceneFonts": "В этой сцене",
+    "availableFonts": "Доступные шрифты",
+    "empty": "Шрифты не найдены"
+  },
+  "userList": {
+    "empty": "Пользователи не найдены",
+    "hint": {
+      "text": "Нажмите на пользователя, чтобы подписаться",
+      "followStatus": "Вы подписаны на этого пользователя",
+      "inCall": "",
+      "micMuted": "Микрофон пользователя заглушен",
+      "isSpeaking": "Пользователь говорит"
+    }
+  },
+  "commandPalette": {
+    "title": "Палитра команд",
+    "shortcuts": {
+      "select": "",
+      "confirm": "",
+      "close": "Закрыть"
+    },
+    "recents": "Недавно использованные",
+    "search": {
+      "placeholder": "",
+      "noMatch": ""
+    },
+    "itemNotAvailable": "",
+    "shortcutHint": "Используйте {{shortcut}} для командной палитры"
   }
 }
