@@ -49,6 +49,9 @@
       ]
     }
   ],
+  "rewrites": [
+    {"source": "/plus/", "destination": "https://plus.excalidraw.com/"}
+  ],
   "redirects": [
     {
       "source": "/webex/:match*",
