@@ -123,10 +123,26 @@ export const loadSceneOrLibraryFromBlob = async (
   fileHandle?: FileSystemHandle | null,
 ) => {
   const contents = await parseFileContents(blob);
+
   let data;
+
+  // assume Obsidian excalidraw plugin file
+  if (blob.name?.endsWith(".excalidraw.md")) {
+    if (contents.indexOf("```compressed-json") > -1) {
+      let str = contents.slice(
+        contents.indexOf("```compressed-json") + '"```compressed-json'.length,
+      );
+      str = str.slice(0, str.indexOf("```"));
+      str = str.replace(/\n/g, "").replace(/\r/g, "");
+      const LZString = await import("lz-string");
+
+      data = JSON.parse(LZString.decompressFromBase64(str));
+    }
+  }
+
   try {
     try {
-      data = JSON.parse(contents);
+      data = data || JSON.parse(contents);
     } catch (error: any) {
       if (isSupportedImageFile(blob)) {
         throw new ImageSceneDataError(
