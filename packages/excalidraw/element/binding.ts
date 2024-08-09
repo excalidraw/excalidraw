@@ -751,7 +751,7 @@ export const bindPointToSnapToElementOutline = (
   const aabb = bindableElement && aabbForElement(bindableElement);
 
   if (bindableElement && aabb) {
-    // TODO: Dirty hack until tangents are properly calculated
+    // TODO: Dirty hacks until tangents are properly calculated
     const intersections = [
       ...intersectElementWithLine(
         bindableElement,
@@ -761,7 +761,7 @@ export const bindPointToSnapToElementOutline = (
         elementsMap,
       ).map((i) => {
         const d = distanceToBindableElement(bindableElement, i, elementsMap);
-        return d >= bindableElement.height / 2 || d < 0
+        return d >= bindableElement.height / 2 || d < FIXED_BINDING_DISTANCE
           ? ([point[0], -1 * i[1]] as Point)
           : ([point[0], i[1]] as Point);
       }),
@@ -773,7 +773,7 @@ export const bindPointToSnapToElementOutline = (
         elementsMap,
       ).map((i) => {
         const d = distanceToBindableElement(bindableElement, i, elementsMap);
-        return d >= bindableElement.width / 2 || d < 0
+        return d >= bindableElement.width / 2 || d < FIXED_BINDING_DISTANCE
           ? ([-1 * i[0], point[1]] as Point)
           : ([i[0], point[1]] as Point);
       }),
