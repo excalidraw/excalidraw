@@ -16,7 +16,6 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
-import React from "react";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -595,7 +594,7 @@ describe("text element", () => {
 describe("image element", () => {
   it("resizes", async () => {
     const image = API.createElement({ type: "image", width: 100, height: 100 });
-    h.elements = [image];
+    API.setElements([image]);
     UI.resize(image, "ne", [-20, -30]);
 
     expect(image.x).toBeCloseTo(0);
@@ -608,7 +607,7 @@ describe("image element", () => {
 
   it("flips while resizing", async () => {
     const image = API.createElement({ type: "image", width: 100, height: 100 });
-    h.elements = [image];
+    API.setElements([image]);
     UI.resize(image, "sw", [150, -150]);
 
     expect(image.x).toBeCloseTo(100);
@@ -621,7 +620,7 @@ describe("image element", () => {
 
   it("resizes with locked/unlocked aspect ratio", async () => {
     const image = API.createElement({ type: "image", width: 100, height: 100 });
-    h.elements = [image];
+    API.setElements([image]);
     UI.resize(image, "ne", [30, -20]);
 
     expect(image.x).toBeCloseTo(0);
@@ -639,7 +638,7 @@ describe("image element", () => {
 
   it("resizes from center", async () => {
     const image = API.createElement({ type: "image", width: 100, height: 100 });
-    h.elements = [image];
+    API.setElements([image]);
     UI.resize(image, "nw", [25, 15], { alt: true });
 
     expect(image.x).toBeCloseTo(15);
@@ -656,7 +655,7 @@ describe("image element", () => {
       width: 100,
       height: 100,
     });
-    h.elements = [image];
+    API.setElements([image]);
     const arrow = UI.createElement("arrow", {
       x: -30,
       y: 50,
@@ -1029,7 +1028,7 @@ describe("multiple selection", () => {
       width: 120,
       height: 80,
     });
-    h.elements = [topImage, bottomImage];
+    API.setElements([topImage, bottomImage]);
 
     const selectionWidth = 200;
     const selectionHeight = 230;
@@ -1101,7 +1100,7 @@ describe("multiple selection", () => {
       height: 100,
       angle: (Math.PI * 7) / 6,
     });
-    h.elements = [image];
+    API.setElements([image]);
 
     const line = UI.createElement("line", {
       x: 60,

@@ -13,7 +13,7 @@ import type {
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
 import { getDefaultAppState } from "../../appState";
-import { GlobalTestState, createEvent, fireEvent } from "../test-utils";
+import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
 import fs from "fs";
 import util from "util";
 import path from "path";
@@ -27,12 +27,15 @@ import {
   newImageElement,
   newMagicFrameElement,
 } from "../../element/newElement";
-import type { Point } from "../../types";
+import type { AppState, Point } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import type { Mutable } from "../../utility-types";
 import { assertNever } from "../../utils";
+import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
+import type { Action } from "../../actions/types";
+import { mutateElement } from "../../element/mutateElement";
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
@@ -41,12 +44,42 @@ createTestHook();
 const { h } = window;
 
 export class API {
+  static updateScene: InstanceType<typeof App>["updateScene"] = (...args) => {
+    act(() => {
+      h.app.updateScene(...args);
+    });
+  };
+  static setAppState: React.Component<any, AppState>["setState"] = (
+    state,
+    cb,
+  ) => {
+    act(() => {
+      h.setState(state, cb);
+    });
+  };
+
+  static setElements = (elements: readonly ExcalidrawElement[]) => {
+    act(() => {
+      h.elements = elements;
+    });
+  };
+
   static setSelectedElements = (elements: ExcalidrawElement[]) => {
-    h.setState({
-      selectedElementIds: elements.reduce((acc, element) => {
-        acc[element.id] = true;
-        return acc;
-      }, {} as Record<ExcalidrawElement["id"], true>),
+    act(() => {
+      h.setState({
+        selectedElementIds: elements.reduce((acc, element) => {
+          acc[element.id] = true;
+          return acc;
+        }, {} as Record<ExcalidrawElement["id"], true>),
+      });
+    });
+  };
+
+  static updateElement = (
+    ...[element, updates]: Parameters<typeof mutateElement>
+  ) => {
+    act(() => {
+      mutateElement(element, updates);
     });
   };
 
@@ -85,8 +118,10 @@ export class API {
   };
 
   static clearSelection = () => {
-    // @ts-ignore
-    h.app.clearSelection(null);
+    act(() => {
+      // @ts-ignore
+      h.app.clearSelection(null);
+    });
     expect(API.getSelectedElements().length).toBe(0);
   };
 
@@ -361,6 +396,12 @@ export class API {
         },
       },
     });
-    fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
+    await fireEvent(GlobalTestState.interactiveCanvas, fileDropEvent);
+  };
+
+  static executeAction = (action: Action) => {
+    act(() => {
+      h.app.actionManager.executeAction(action);
+    });
   };
 }

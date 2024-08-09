@@ -36,7 +36,7 @@ export const ElementCanvasButtons = ({
 
   if (
     appState.contextMenu ||
-    appState.draggingElement ||
+    appState.newElement ||
     appState.resizingElement ||
     appState.isRotating ||
     appState.openMenu ||

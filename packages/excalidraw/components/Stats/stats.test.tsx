@@ -1,4 +1,5 @@
-import { fireEvent, queryByTestId } from "@testing-library/react";
+import React from "react";
+import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getStepSizedValue } from "./utils";
 import {
@@ -24,19 +25,12 @@ import { getCommonBounds, isTextElement } from "../../element";
 import { API } from "../../tests/helpers/api";
 import { actionGroup } from "../../actions";
 import { isInGroup } from "../../groups";
-import React from "react";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 let stats: HTMLElement | null = null;
 let elementStats: HTMLElement | null | undefined = null;
-
-const editInput = (input: HTMLInputElement, value: string) => {
-  input.focus();
-  fireEvent.change(input, { target: { value } });
-  input.blur();
-};
 
 const getStatsProperty = (label: string) => {
   const elementStats = UI.queryStats()?.querySelector("#elementStats");
@@ -65,7 +59,7 @@ const testInputProperty = (
   ) as HTMLInputElement;
   expect(input).toBeDefined();
   expect(input.value).toBe(initialValue.toString());
-  editInput(input, String(nextValue));
+  UI.updateInput(input, String(nextValue));
   if (property === "angle") {
     expect(element[property]).toBe(degreeToRadian(Number(nextValue)));
   } else if (property === "fontSize" && isTextElement(element)) {
@@ -110,7 +104,7 @@ describe("binding with linear elements", () => {
 
     await render(<Excalidraw handleKeyboardGlobally={true} />);
 
-    h.elements = [];
+    API.setElements([]);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -148,7 +142,7 @@ describe("binding with linear elements", () => {
 
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    editInput(inputX, String("204"));
+    UI.updateInput(inputX, String("204"));
     expect(linear.startBinding).not.toBe(null);
   });
 
@@ -159,7 +153,7 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
 
     expect(linear.startBinding).not.toBe(null);
-    editInput(inputAngle, String("1"));
+    UI.updateInput(inputAngle, String("1"));
     expect(linear.startBinding).not.toBe(null);
   });
 
@@ -171,7 +165,7 @@ describe("binding with linear elements", () => {
 
     expect(linear.startBinding).not.toBe(null);
     expect(inputX).not.toBeNull();
-    editInput(inputX, String("254"));
+    UI.updateInput(inputX, String("254"));
     expect(linear.startBinding).toBe(null);
   });
 
@@ -182,7 +176,7 @@ describe("binding with linear elements", () => {
     ) as HTMLInputElement;
 
     expect(linear.startBinding).not.toBe(null);
-    editInput(inputAngle, String("45"));
+    UI.updateInput(inputAngle, String("45"));
     expect(linear.startBinding).toBe(null);
   });
 });
@@ -197,7 +191,7 @@ describe("stats for a generic element", () => {
 
     await render(<Excalidraw handleKeyboardGlobally={true} />);
 
-    h.elements = [];
+    API.setElements([]);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -268,13 +262,13 @@ describe("stats for a generic element", () => {
     ) as HTMLInputElement;
     expect(input).toBeDefined();
     expect(input.value).toBe(rectangle.width.toString());
-    editInput(input, "123.123");
+    UI.updateInput(input, "123.123");
     expect(h.elements.length).toBe(1);
     expect(rectangle.id).toBe(rectangleId);
     expect(input.value).toBe("123.12");
     expect(rectangle.width).toBe(123.12);
 
-    editInput(input, "88.98766");
+    UI.updateInput(input, "88.98766");
     expect(input.value).toBe("88.99");
     expect(rectangle.width).toBe(88.99);
   });
@@ -387,7 +381,7 @@ describe("stats for a non-generic element", () => {
 
     await render(<Excalidraw handleKeyboardGlobally={true} />);
 
-    h.elements = [];
+    API.setElements([]);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -412,9 +406,10 @@ describe("stats for a non-generic element", () => {
     mouse.clickAt(20, 30);
     const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
     const editor = await getTextEditor(textEditorSelector, true);
-    await new Promise((r) => setTimeout(r, 0));
     updateTextEditor(editor, "Hello!");
-    editor.blur();
+    act(() => {
+      editor.blur();
+    });
 
     const text = h.elements[0] as ExcalidrawTextElement;
     mouse.clickOn(text);
@@ -427,7 +422,7 @@ describe("stats for a non-generic element", () => {
     ) as HTMLInputElement;
     expect(input).toBeDefined();
     expect(input.value).toBe(text.fontSize.toString());
-    editInput(input, "36");
+    UI.updateInput(input, "36");
     expect(text.fontSize).toBe(36);
 
     // cannot change width or height
@@ -437,7 +432,7 @@ describe("stats for a non-generic element", () => {
     expect(height).toBeUndefined();
 
     // min font size is 4
-    editInput(input, "0");
+    UI.updateInput(input, "0");
     expect(text.fontSize).not.toBe(0);
     expect(text.fontSize).toBe(4);
   });
@@ -449,8 +444,8 @@ describe("stats for a non-generic element", () => {
       x: 150,
       width: 150,
     });
-    h.elements = [frame];
-    h.setState({
+    API.setElements([frame]);
+    API.setAppState({
       selectedElementIds: {
         [frame.id]: true,
       },
@@ -471,9 +466,9 @@ describe("stats for a non-generic element", () => {
 
   it("image element", () => {
     const image = API.createElement({ type: "image", width: 200, height: 100 });
-    h.elements = [image];
+    API.setElements([image]);
     mouse.clickOn(image);
-    h.setState({
+    API.setAppState({
       selectedElementIds: {
         [image.id]: true,
       },
@@ -508,7 +503,7 @@ describe("stats for a non-generic element", () => {
     mutateElement(container, {
       boundElements: [{ type: "text", id: text.id }],
     });
-    h.elements = [container, text];
+    API.setElements([container, text]);
 
     API.setSelectedElements([container]);
     const fontSize = getStatsProperty("F")?.querySelector(
@@ -516,7 +511,7 @@ describe("stats for a non-generic element", () => {
     ) as HTMLInputElement;
     expect(fontSize).toBeDefined();
 
-    editInput(fontSize, "40");
+    UI.updateInput(fontSize, "40");
 
     expect(text.fontSize).toBe(40);
   });
@@ -533,7 +528,7 @@ describe("stats for multiple elements", () => {
 
     await render(<Excalidraw handleKeyboardGlobally={true} />);
 
-    h.elements = [];
+    API.setElements([]);
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
@@ -566,7 +561,7 @@ describe("stats for multiple elements", () => {
     mouse.down(-100, -100);
     mouse.up(125, 145);
 
-    h.setState({
+    API.setAppState({
       selectedElementIds: h.elements.reduce((acc, el) => {
         acc[el.id] = true;
         return acc;
@@ -588,12 +583,12 @@ describe("stats for multiple elements", () => {
     ) as HTMLInputElement;
     expect(angle.value).toBe("0");
 
-    editInput(width, "250");
+    UI.updateInput(width, "250");
     h.elements.forEach((el) => {
       expect(el.width).toBe(250);
     });
 
-    editInput(height, "450");
+    UI.updateInput(height, "450");
     h.elements.forEach((el) => {
       expect(el.height).toBe(450);
     });
@@ -605,9 +600,10 @@ describe("stats for multiple elements", () => {
     mouse.clickAt(20, 30);
     const textEditorSelector = ".excalidraw-textEditorContainer > textarea";
     const editor = await getTextEditor(textEditorSelector, true);
-    await new Promise((r) => setTimeout(r, 0));
     updateTextEditor(editor, "Hello!");
-    editor.blur();
+    act(() => {
+      editor.blur();
+    });
 
     UI.clickTool("rectangle");
     mouse.down();
@@ -619,12 +615,12 @@ describe("stats for multiple elements", () => {
       width: 150,
     });
 
-    h.elements = [...h.elements, frame];
+    API.setElements([...h.elements, frame]);
 
     const text = h.elements.find((el) => el.type === "text");
     const rectangle = h.elements.find((el) => el.type === "rectangle");
 
-    h.setState({
+    API.setAppState({
       selectedElementIds: h.elements.reduce((acc, el) => {
         acc[el.id] = true;
         return acc;
@@ -657,13 +653,13 @@ describe("stats for multiple elements", () => {
     expect(fontSize).toBeDefined();
 
     // changing width does not affect text
-    editInput(width, "200");
+    UI.updateInput(width, "200");
 
     expect(rectangle?.width).toBe(200);
     expect(frame.width).toBe(200);
     expect(text?.width).not.toBe(200);
 
-    editInput(angle, "40");
+    UI.updateInput(angle, "40");
 
     const angleInRadian = degreeToRadian(40);
     expect(rectangle?.angle).toBeCloseTo(angleInRadian, 4);
@@ -686,7 +682,7 @@ describe("stats for multiple elements", () => {
         mouse.click();
       });
 
-      h.app.actionManager.executeAction(actionGroup);
+      API.executeAction(actionGroup);
     };
 
     createAndSelectGroup();
@@ -703,7 +699,7 @@ describe("stats for multiple elements", () => {
     expect(x).toBeDefined();
     expect(Number(x.value)).toBe(x1);
 
-    editInput(x, "300");
+    UI.updateInput(x, "300");
 
     expect(h.elements[0].x).toBe(300);
     expect(h.elements[1].x).toBe(400);
@@ -716,7 +712,7 @@ describe("stats for multiple elements", () => {
     expect(y).toBeDefined();
     expect(Number(y.value)).toBe(y1);
 
-    editInput(y, "200");
+    UI.updateInput(y, "200");
 
     expect(h.elements[0].y).toBe(200);
     expect(h.elements[1].y).toBe(300);
@@ -734,20 +730,20 @@ describe("stats for multiple elements", () => {
     expect(height).toBeDefined();
     expect(Number(height.value)).toBe(200);
 
-    editInput(width, "400");
+    UI.updateInput(width, "400");
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     let newGroupWidth = x2 - x1;
 
     expect(newGroupWidth).toBeCloseTo(400, 4);
 
-    editInput(width, "300");
+    UI.updateInput(width, "300");
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     newGroupWidth = x2 - x1;
     expect(newGroupWidth).toBeCloseTo(300, 4);
 
-    editInput(height, "500");
+    UI.updateInput(height, "500");
 
     [x1, y1, x2, y2] = getCommonBounds(elementsInGroup);
     const newGroupHeight = y2 - y1;

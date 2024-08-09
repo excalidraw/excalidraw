@@ -91,14 +91,9 @@ export const dragSelectedElements = (
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
     }
-    updateBoundElements(
-      element,
-      scene.getElementsMapIncludingDeleted(),
-      scene,
-      {
-        simultaneouslyUpdated: Array.from(elementsToUpdate),
-      },
-    );
+    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
+      simultaneouslyUpdated: Array.from(elementsToUpdate),
+    });
   });
 };
 
@@ -160,7 +155,7 @@ export const getDragOffsetXY = (
 };
 
 export const dragNewElement = (
-  draggingElement: NonDeletedExcalidrawElement,
+  newElement: NonDeletedExcalidrawElement,
   elementType: AppState["activeTool"]["type"],
   originX: number,
   originY: number,
@@ -179,7 +174,7 @@ export const dragNewElement = (
     y: number;
   } | null = null,
 ) => {
-  if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
+  if (shouldMaintainAspectRatio && newElement.type !== "selection") {
     if (widthAspectRatio) {
       height = width / widthAspectRatio;
     } else {
@@ -218,17 +213,14 @@ export const dragNewElement = (
 
   let textAutoResize = null;
 
-  // NOTE this should apply only to creating text elements, not existing
-  // (once we rewrite appState.draggingElement to actually mean dragging
-  // elements)
-  if (isTextElement(draggingElement)) {
-    height = draggingElement.height;
+  if (isTextElement(newElement)) {
+    height = newElement.height;
     const minWidth = getMinTextElementWidth(
       getFontString({
-        fontSize: draggingElement.fontSize,
-        fontFamily: draggingElement.fontFamily,
+        fontSize: newElement.fontSize,
+        fontFamily: newElement.fontFamily,
       }),
-      draggingElement.lineHeight,
+      newElement.lineHeight,
     );
     width = Math.max(width, minWidth);
 
@@ -245,7 +237,7 @@ export const dragNewElement = (
   }
 
   if (width !== 0 && height !== 0) {
-    mutateElement(draggingElement, {
+    mutateElement(newElement, {
       x: newX + (originOffset?.x ?? 0),
       y: newY + (originOffset?.y ?? 0),
       width,

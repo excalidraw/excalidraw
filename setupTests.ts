@@ -5,6 +5,7 @@ import fs from "fs";
 import { vi } from "vitest";
 import polyfill from "./packages/excalidraw/polyfill";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
+import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
 
 Object.assign(globalThis, testPolyfills);
 
@@ -97,3 +98,21 @@ vi.mock("nanoid", () => {
 const element = document.createElement("div");
 element.id = "root";
 document.body.appendChild(element);
+
+const _consoleError = console.error.bind(console);
+console.error = (...args) => {
+  // the react's act() warning usually doesn't contain any useful stack trace
+  // so we're catching the log and re-logging the message with the test name,
+  // also stripping the actual component stack trace as it's not useful
+  if (args[0]?.includes("act(")) {
+    _consoleError(
+      yellow(
+        `<<< WARNING: test "${
+          expect.getState().currentTestName
+        }" does not wrap some state update in act() >>>`,
+      ),
+    );
+  } else {
+    _consoleError(...args);
+  }
+};

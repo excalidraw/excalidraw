@@ -51,6 +51,7 @@ import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
+import { normalizeFixedPoint } from "../element/binding";
 
 type RestoredAppState = Omit<
   AppState,
@@ -106,7 +107,7 @@ const repairBinding = (
     ...binding,
     focus: binding.focus || 0,
     fixedPoint: isElbowArrow(element)
-      ? binding.fixedPoint ?? ([0, 0] as [number, number])
+      ? normalizeFixedPoint(binding.fixedPoint ?? [0, 0])
       : null,
   };
 };

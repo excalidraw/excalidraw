@@ -160,6 +160,11 @@ export type ExcalidrawGenericElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
+export type ExcalidrawFlowchartNodeElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement;
+
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
  * no computed data. The list of all ExcalidrawElements should be shareable
@@ -175,6 +180,11 @@ export type ExcalidrawElement =
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
+
+export type ExcalidrawNonSelectionElement = Exclude<
+  ExcalidrawElement,
+  ExcalidrawSelectionElement
+>;
 
 export type Ordered<TElement extends ExcalidrawElement> = TElement & {
   index: FractionalIndex;
