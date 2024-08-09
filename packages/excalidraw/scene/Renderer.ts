@@ -64,11 +64,11 @@ export class Renderer {
 
     const getRenderableElements = ({
       elements,
-      editingElement,
+      editingTextElement,
       pendingImageElementId,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
-      editingElement: AppState["editingElement"];
+      editingTextElement: AppState["editingTextElement"];
       pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
       const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
@@ -86,9 +86,9 @@ export class Renderer {
         // we don't want to render text element that's being currently edited
         // (it's rendered on remote only)
         if (
-          !editingElement ||
-          editingElement.type !== "text" ||
-          element.id !== editingElement.id
+          !editingTextElement ||
+          editingTextElement.type !== "text" ||
+          element.id !== editingTextElement.id
         ) {
           elementsMap.set(element.id, element);
         }
@@ -105,7 +105,7 @@ export class Renderer {
         scrollY,
         height,
         width,
-        editingElement,
+        editingTextElement,
         pendingImageElementId,
         // cache-invalidation nonce
         sceneNonce: _sceneNonce,
@@ -117,7 +117,7 @@ export class Renderer {
         scrollY: AppState["scrollY"];
         height: AppState["height"];
         width: AppState["width"];
-        editingElement: AppState["editingElement"];
+        editingTextElement: AppState["editingTextElement"];
         pendingImageElementId: AppState["pendingImageElementId"];
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
@@ -125,7 +125,7 @@ export class Renderer {
 
         const elementsMap = getRenderableElements({
           elements,
-          editingElement,
+          editingTextElement,
           pendingImageElementId,
         });
 

@@ -133,7 +133,7 @@ export const changeProperty = (
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
-      element.id === appState.editingElement?.id
+      element.id === appState.editingTextElement?.id
     ) {
       return callback(element);
     }
@@ -148,13 +148,13 @@ export const getFormValue = function <T extends Primitive>(
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
-  const editingElement = appState.editingElement;
+  const editingTextElement = appState.editingTextElement;
   const nonDeletedElements = getNonDeletedElements(elements);
 
   let ret: T | null = null;
 
-  if (editingElement) {
-    ret = getAttribute(editingElement);
+  if (editingTextElement) {
+    ret = getAttribute(editingTextElement);
   }
 
   if (!ret) {
@@ -1076,19 +1076,20 @@ export const actionChangeFontFamily = register({
               // open, populate the cache from scratch
               cachedElementsRef.current.clear();
 
-              const { editingElement } = appState;
+              const { editingTextElement } = appState;
 
-              if (editingElement?.type === "text") {
-                // retrieve the latest version from the scene, as `editingElement` isn't mutated
-                const latestEditingElement = app.scene.getElement(
-                  editingElement.id,
+              // still check type to be safe
+              if (editingTextElement?.type === "text") {
+                // retrieve the latest version from the scene, as `editingTextElement` isn't mutated
+                const latesteditingTextElement = app.scene.getElement(
+                  editingTextElement.id,
                 );
 
                 // inside the wysiwyg editor
                 cachedElementsRef.current.set(
-                  editingElement.id,
+                  editingTextElement.id,
                   newElementWith(
-                    latestEditingElement || editingElement,
+                    latesteditingTextElement || editingTextElement,
                     {},
                     true,
                   ),

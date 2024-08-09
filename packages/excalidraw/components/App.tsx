@@ -1452,25 +1452,20 @@ class App extends React.Component<AppProps, AppState> {
         scrollY: this.state.scrollY,
         height: this.state.height,
         width: this.state.width,
-        editingElement: this.state.editingElement,
+        editingTextElement: this.state.editingTextElement,
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
     const shouldBlockPointerEvents =
-      !(
-        this.state.editingElement && isLinearElement(this.state.editingElement)
-      ) &&
-      (this.state.selectionElement ||
-        this.state.newElement ||
-        this.state.selectedElementsAreBeingDragged ||
-        this.state.resizingElement ||
-        (this.state.activeTool.type === "laser" &&
-          // technically we can just test on this once we make it more safe
-          this.state.cursorButton === "down") ||
-        (this.state.editingElement &&
-          !isTextElement(this.state.editingElement)));
+      this.state.selectionElement ||
+      this.state.newElement ||
+      this.state.selectedElementsAreBeingDragged ||
+      this.state.resizingElement ||
+      (this.state.activeTool.type === "laser" &&
+        // technically we can just test on this once we make it more safe
+        this.state.cursorButton === "down");
 
     const firstSelectedElement = selectedElements[0];
 
@@ -2163,7 +2158,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let didUpdate = false;
 
-    let editingElement: AppState["editingElement"] | null = null;
+    let editingTextElement: AppState["editingTextElement"] | null = null;
     if (actionResult.elements) {
       this.scene.replaceAllElements(actionResult.elements);
       didUpdate = true;
@@ -2176,7 +2171,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     }
 
-    if (actionResult.appState || editingElement || this.state.contextMenu) {
+    if (actionResult.appState || editingTextElement || this.state.contextMenu) {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
       let gridSize = actionResult?.appState?.gridSize || null;
@@ -2197,23 +2192,24 @@ class App extends React.Component<AppProps, AppState> {
         gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
       }
 
-      editingElement = actionResult.appState?.editingElement || null;
+      editingTextElement = actionResult.appState?.editingTextElement || null;
 
-      // make sure editingElement points to latest element reference
-      if (actionResult.elements && editingElement) {
+      // make sure editingTextElement points to latest element reference
+      if (actionResult.elements && editingTextElement) {
         actionResult.elements.forEach((element) => {
           if (
-            editingElement?.id === element.id &&
-            editingElement !== element &&
-            isNonDeletedElement(element)
+            editingTextElement?.id === element.id &&
+            editingTextElement !== element &&
+            isNonDeletedElement(element) &&
+            isTextElement(element)
           ) {
-            editingElement = element;
+            editingTextElement = element;
           }
         });
       }
 
-      if (editingElement?.isDeleted) {
-        editingElement = null;
+      if (editingTextElement?.isDeleted) {
+        editingTextElement = null;
       }
 
       this.setState((state) => {
@@ -2225,7 +2221,7 @@ class App extends React.Component<AppProps, AppState> {
           // or programmatically from the host, so it will need to be
           // rewritten later
           contextMenu: null,
-          editingElement,
+          editingTextElement,
           viewModeEnabled,
           zenModeEnabled,
           gridSize,
@@ -2811,9 +2807,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // failsafe in case the state is being updated in incorrect order resulting
-    // in the editingElement being now a deleted element
-    if (this.state.editingElement?.isDeleted) {
-      this.setState({ editingElement: null });
+    // in the editingTextElement being now a deleted element
+    if (this.state.editingTextElement?.isDeleted) {
+      this.setState({ editingTextElement: null });
     }
 
     if (
@@ -2869,7 +2865,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scrolledOutside =
       // hide when editing text
-      isTextElement(this.state.editingElement)
+      isTextElement(this.state.editingTextElement)
         ? false
         : !atLeastOneVisibleElement && elementsMap.size > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -4533,7 +4529,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.setState({
           newElement: null,
-          editingElement: null,
+          editingTextElement: null,
         });
         if (this.state.activeTool.locked) {
           setCursorForShape(this.interactiveCanvas, this.state);
@@ -4907,7 +4903,7 @@ class App extends React.Component<AppProps, AppState> {
         }),
       });
     }
-    this.setState({ editingElement: element });
+    this.setState({ editingTextElement: element });
 
     if (!existingTextElement) {
       if (container && shouldBindToContainer) {
@@ -5872,7 +5868,7 @@ class App extends React.Component<AppProps, AppState> {
           : {}),
         appState: {
           newElement: null,
-          editingElement: null,
+          editingTextElement: null,
           startBoundElement: null,
           suggestedBindings: [],
           selectedElementIds: makeNextSelectedElementIds(
@@ -6260,7 +6256,7 @@ class App extends React.Component<AppProps, AppState> {
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       ) ||
-      isTextElement(this.state.editingElement)
+      this.state.editingTextElement
     ) {
       return false;
     }
@@ -6804,7 +6800,7 @@ class App extends React.Component<AppProps, AppState> {
     // if we're currently still editing text, clicking outside
     // should only finalize it, not create another (irrespective
     // of state.activeTool.locked)
-    if (isTextElement(this.state.editingElement)) {
+    if (this.state.editingTextElement) {
       return;
     }
     let sceneX = pointerDownState.origin.x;
@@ -7609,11 +7605,11 @@ class App extends React.Component<AppProps, AppState> {
 
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
-        // Checking for editingElement to avoid jump while editing on mobile #6503
+        // Checking for editingTextElement to avoid jump while editing on mobile #6503
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
-          !this.state.editingElement &&
+          !this.state.editingTextElement &&
           this.state.activeEmbeddable?.state !== "active"
         ) {
           const dragOffset = {
@@ -8039,12 +8035,6 @@ class App extends React.Component<AppProps, AppState> {
         frameToHighlight: null,
         elementsToHighlight: null,
         cursorButton: "up",
-        // text elements are reset on finalize, and resetting on pointerup
-        // may cause issues with double taps
-        editingElement:
-          multiElement || isTextElement(this.state.editingElement)
-            ? this.state.editingElement
-            : null,
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
       }));
@@ -9149,7 +9139,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState(
         {
           pendingImageElementId: null,
-          editingElement: null,
+          newElement: null,
           activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
         () => {

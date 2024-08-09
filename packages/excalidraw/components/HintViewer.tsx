@@ -79,7 +79,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.text_selected");
   }
 
-  if (appState.editingElement && isTextElement(appState.editingElement)) {
+  if (appState.editingTextElement) {
     return t("hints.text_editing");
   }
 
@@ -87,7 +87,7 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     if (
       appState.selectionElement &&
       !selectedElements.length &&
-      !appState.editingElement &&
+      !appState.editingTextElement &&
       !appState.editingLinearElement
     ) {
       return t("hints.deepBoxSelect");

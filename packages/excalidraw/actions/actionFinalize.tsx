@@ -178,7 +178,7 @@ export const actionFinalize = register({
         newElement: null,
         selectionElement: null,
         multiElement: null,
-        editingElement: null,
+        editingTextElement: null,
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:

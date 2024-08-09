@@ -20,7 +20,8 @@ const writeData = (
   if (
     !appState.multiElement &&
     !appState.resizingElement &&
-    !appState.editingElement &&
+    // MARK: do check this again
+    !appState.editingTextElement &&
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
     !appState.selectionElement
