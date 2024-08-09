@@ -246,6 +246,20 @@ describe("z-index manipulation", () => {
       ],
     });
 
+    // elements should not duplicate
+    assertZindex({
+      elements: [
+        { id: "A", containerId: "C" },
+        { id: "B" },
+        { id: "C", isSelected: true },
+      ],
+      operations: [
+        [actionSendBackward, ["A", "C", "B"]],
+        // noop
+        [actionSendBackward, ["A", "C", "B"]],
+      ],
+    });
+
     // grouped elements should be atomic
     // -------------------------------------------------------------------------
 
