@@ -1,16 +1,19 @@
-import { stringToBase64, toByteString } from "../data/encode";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
 
 export interface Font {
   urls: URL[];
   fontFace: FontFace;
-  getContent(): Promise<string>;
+  getContent(codePoints: ReadonlySet<number>): Promise<string>;
 }
 export const UNPKG_PROD_URL = `https://unpkg.com/${
   import.meta.env.VITE_PKG_NAME
     ? `${import.meta.env.VITE_PKG_NAME}@${import.meta.env.PKG_VERSION}` // should be provided by vite during package build
     : "@excalidraw/excalidraw" // fallback to latest package version (i.e. for app)
 }/dist/prod/`;
+
+/** caches for lazy loaded chunks, reused across concurrent calls and separate editor instances */
+let fontEditorCache: Promise<typeof import("fonteditor-core")> | null = null;
+let brotliCache: Promise<typeof import("fonteditor-core").woff2> | null = null;
 
 export class ExcalidrawFont implements Font {
   public readonly urls: URL[];
@@ -33,20 +36,31 @@ export class ExcalidrawFont implements Font {
 
   /**
    * Tries to fetch woff2 content, based on the registered urls.
-   * Returns last defined url in case of errors.
    *
-   * Note: uses browser APIs for base64 encoding - use dataurl outside the browser environment.
+   * NOTE: assumes usage of `dataurl` outside the browser environment
+   *
+   * @returns base64 with subsetted glyphs based on the passed codepoint, last defined url otherwise
    */
-  public async getContent(): Promise<string> {
+  public async getContent(codePoints: ReadonlySet<number>): Promise<string> {
     let i = 0;
     const errorMessages = [];
 
     while (i < this.urls.length) {
       const url = this.urls[i];
 
+      // it's dataurl, the font is inlined as base64, no need to fetch
       if (url.protocol === "data:") {
-        // it's dataurl, the font is inlined as base64, no need to fetch
-        return url.toString();
+        const arrayBuffer = Buffer.from(
+          url.toString().split(",")[1],
+          "base64",
+        ).buffer;
+
+        const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
+          arrayBuffer,
+          codePoints,
+        );
+
+        return base64;
       }
 
       try {
@@ -57,13 +71,12 @@ export class ExcalidrawFont implements Font {
         });
 
         if (response.ok) {
-          const mimeType = await response.headers.get("Content-Type");
-          const buffer = await response.arrayBuffer();
-
-          return `data:${mimeType};base64,${await stringToBase64(
-            await toByteString(buffer),
-            true,
-          )}`;
+          const arrayBuffer = await response.arrayBuffer();
+          const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
+            arrayBuffer,
+            codePoints,
+          );
+          return base64;
         }
 
         // response not ok, try to continue
@@ -87,6 +100,45 @@ export class ExcalidrawFont implements Font {
     // in case of issues, at least return the last url as a content
     // defaults to unpkg for bundled fonts (so that we don't have to host them forever) and http url for others
     return this.urls.length ? this.urls[this.urls.length - 1].toString() : "";
+  }
+
+  /**
+   * Converts a font data as arraybuffer into a dataurl (base64) with subsetted glyphs based on the specified `codePoints`.
+   *
+   * NOTE: only glyphs are subsetted, other metadata as GPOS tables stay, consider filtering those as well in the future
+   *
+   * @param arrayBuffer font data buffer, preferrably in the woff2 format, though others should work as well
+   * @param codePoints codepoints used to subset the glyphs
+   *
+   * @returns font with subsetted glyphs converted into a dataurl
+   */
+  private static async subsetGlyphsByCodePoints(
+    arrayBuffer: ArrayBuffer,
+    codePoints: ReadonlySet<number>,
+  ): Promise<string> {
+    // checks for the cache first to avoid triggering the import multiple times in case of concurrent calls
+    if (!fontEditorCache) {
+      fontEditorCache = import("fonteditor-core");
+    }
+
+    const { Font, woff2 } = await fontEditorCache;
+
+    // checks for the cache first to avoid triggering the init multiple times in case of concurrent calls
+    if (!brotliCache) {
+      brotliCache = woff2.init("/wasm/woff2.wasm");
+    }
+
+    await brotliCache;
+
+    const font = Font.create(arrayBuffer, {
+      type: "woff2",
+      kerning: true,
+      hinting: true,
+      // subset the glyhs based on the specified codepoints!
+      subset: [...codePoints],
+    });
+
+    return font.toBase64({ type: "woff2", hinting: true });
   }
 
   private static createUrls(uri: string): URL[] {
