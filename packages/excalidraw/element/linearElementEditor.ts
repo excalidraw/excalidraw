@@ -95,6 +95,7 @@ export class LinearElementEditor {
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: Point | null;
+  public readonly elbowed: boolean;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     this.elementId = element.id as string & {
@@ -124,6 +125,7 @@ export class LinearElementEditor {
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
+    this.elbowed = isElbowArrow(element) && element.elbowed;
   }
 
   // ---------------------------------------------------------------------------

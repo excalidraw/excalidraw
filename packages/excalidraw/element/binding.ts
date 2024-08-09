@@ -2253,3 +2253,119 @@ export const normalizeFixedPoint = <T extends FixedPoint | null>(
   }
   return fixedPoint as any as T extends null ? null : FixedPoint;
 };
+
+/**
+ * During flipping, mirroring and resizing when sides change relation to each
+ * other the `fixedPoint` in ExcalidrawArrowElement bindings associated with the
+ * bindable element (if any) must be mirrored to have a consistent behavor,
+ * which is accomplished by this function.
+ *
+ * @param element The flipped, mirrored or resized bindable element
+ * @param elementsMap
+ * @param flipX
+ * @param flipY
+ */
+export const flipFixedPointBinding = (
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  flipX: boolean,
+  flipY: boolean,
+) => {
+  // Gather all bound arrow elements to the targeted bindable [element]
+  boundElementsVisitor(elementsMap, element, (el) => {
+    if (isArrowElement(el)) {
+      mutateElement(el, {
+        ...getFlippedFixedPointBindings(el, element, flipX, flipY),
+      });
+    }
+  });
+};
+
+/**
+ * Generates the startBinding and endBinding for fixedPoint flipping.
+ *
+ * @see flipFixedPointBinding for the main reasn this function exists
+ *
+ * @param el The arrow element for which the binding updates are generated for
+ * @param element The binding to derive fixedPoint from. @see FixedPointBinding
+ * @param flipX Whether to flip across the X axis
+ * @param flipY Whether to flip across the Y axis
+ * @returns The PointBinding element updates you use for @see mutateElement
+ */
+export const getFlippedFixedPointBindings = (
+  el: ExcalidrawArrowElement,
+  element: ExcalidrawBindableElement,
+  flipX: boolean,
+  flipY: boolean,
+): { startBinding?: PointBinding; endBinding?: PointBinding } => ({
+  // If [element] is the startBinding of this arrow...
+  ...(element.id === el.startBinding?.elementId && {
+    startBinding: {
+      ...el.startBinding,
+      fixedPoint: el.startBinding.fixedPoint
+        ? [
+            // Flip over the X direction if needed
+            flipX
+              ? -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5
+              : el.startBinding.fixedPoint[0],
+            // Flip over the Y direction if needed
+            flipY
+              ? -1 * (el.startBinding.fixedPoint[1] - 0.5) + 0.5
+              : el.startBinding.fixedPoint[1],
+          ]
+        : null,
+    },
+  }),
+  // If [element] is the endBinding of this arrow...
+  ...(element.id === el.endBinding?.elementId && {
+    endBinding: {
+      ...el.endBinding,
+      fixedPoint: el.endBinding.fixedPoint
+        ? [
+            // Flip over the X direction if needed
+            flipX
+              ? -1 * (el.endBinding.fixedPoint[0] - 0.5) + 0.5
+              : el.endBinding.fixedPoint[0],
+            // Flip over the Y direction if needed
+            flipY
+              ? -1 * (el.endBinding.fixedPoint[1] - 0.5) + 0.5
+              : el.endBinding.fixedPoint[1],
+          ]
+        : null,
+    },
+  }),
+});
+
+/**
+ * Gets the flipped fixedPoint binding data from an arrow.
+ *
+ * @param arrow The arrow to get the binding data for
+ * @param elementsMap The elementsMap to load the start and end bindings
+ * @param flipX Whether to flip across the X axis
+ * @param flipY Whether to flip across the Y axis
+ * @returns The PointBinding element updates you use for @see mutateElement
+ */
+export const getFlippedFixedPointBindingsForArrow = (
+  arrow: ExcalidrawArrowElement,
+  elementsMap: ElementsMap,
+  flipX: boolean,
+  flipY: boolean,
+): { startBinding?: PointBinding; endBinding?: PointBinding } => {
+  const startElement =
+    arrow.startBinding &&
+    (elementsMap.get(arrow.startBinding.elementId) as
+      | undefined
+      | ExcalidrawBindableElement);
+  const endElement =
+    arrow.endBinding &&
+    (elementsMap.get(arrow.endBinding.elementId) as
+      | undefined
+      | ExcalidrawBindableElement);
+
+  return {
+    ...(startElement &&
+      getFlippedFixedPointBindings(arrow, startElement, flipX, flipY)),
+    ...(endElement &&
+      getFlippedFixedPointBindings(arrow, endElement, flipX, flipY)),
+  };
+};
