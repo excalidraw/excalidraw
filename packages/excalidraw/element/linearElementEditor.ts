@@ -741,7 +741,7 @@ export class LinearElementEditor {
     }
     if (event.altKey && appState.editingLinearElement) {
       if (
-        linearElementEditor.lastUncommittedPoint == null ||
+        linearElementEditor.lastUncommittedPoint == null &&
         !isElbowArrow(element)
       ) {
         mutateElement(element, {
