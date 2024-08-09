@@ -36,7 +36,7 @@ describe("flow chart creation", () => {
       height: 100,
     });
 
-    h.elements = [rectangle];
+    API.setElements([rectangle]);
     API.setSelectedElements([rectangle]);
   });
 
@@ -166,7 +166,7 @@ describe("flow chart navigation", () => {
       height: 100,
     });
 
-    h.elements = [rectangle];
+    API.setElements([rectangle]);
     API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -234,7 +234,7 @@ describe("flow chart navigation", () => {
       height: 100,
     });
 
-    h.elements = [rectangle];
+    API.setElements([rectangle]);
     API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -325,7 +325,7 @@ describe("flow chart navigation", () => {
       height: 100,
     });
 
-    h.elements = [rectangle];
+    API.setElements([rectangle]);
     API.setSelectedElements([rectangle]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {

@@ -23,7 +23,6 @@ const handleDimensionChange: DragInputCallbackType<
 > = ({
   accumulatedChange,
   originalElements,
-  originalElementsMap,
   shouldKeepAspectRatio,
   shouldChangeByStepSize,
   nextValue,

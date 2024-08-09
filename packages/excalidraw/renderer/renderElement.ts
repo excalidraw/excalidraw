@@ -201,7 +201,7 @@ const generateElementCanvas = (
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
-): ExcalidrawElementWithCanvas => {
+): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
@@ -211,6 +211,10 @@ const generateElementCanvas = (
     elementsMap,
     zoom,
   );
+
+  if (!width || !height) {
+    return null;
+  }
 
   canvas.width = width;
   canvas.height = height;
@@ -552,6 +556,10 @@ const generateElementWithCanvas = (
       appState,
     );
 
+    if (!elementWithCanvas) {
+      return null;
+    }
+
     elementWithCanvasCache.set(element, elementWithCanvas);
 
     return elementWithCanvas;
@@ -761,6 +769,10 @@ export const renderElement = (
           renderConfig,
           appState,
         );
+        if (!elementWithCanvas) {
+          return;
+        }
+
         drawElementFromCanvas(
           elementWithCanvas,
           context,
@@ -899,6 +911,10 @@ export const renderElement = (
           renderConfig,
           appState,
         );
+
+        if (!elementWithCanvas) {
+          return;
+        }
 
         const currentImageSmoothingStatus = context.imageSmoothingEnabled;
 

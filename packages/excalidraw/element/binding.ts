@@ -41,6 +41,7 @@ import {
   isElbowArrow,
   isFrameLikeElement,
   isLinearElement,
+  isRectangularElement,
   isTextElement,
 } from "./typeChecks";
 import type { ElementUpdate } from "./mutateElement";
@@ -753,7 +754,7 @@ export const bindPointToSnapToElementOutline = (
   const aabb = bindableElement && aabbForElement(bindableElement);
 
   if (bindableElement && aabb) {
-    // TODO: Dirty hack until tangents are properly calculated
+    // TODO: Dirty hacks until tangents are properly calculated
     const intersections = [
       ...intersectElementWithLine(
         bindableElement,
@@ -761,20 +762,33 @@ export const bindPointToSnapToElementOutline = (
         [point[0], point[1] + 2 * bindableElement.height],
         FIXED_BINDING_DISTANCE,
         elementsMap,
-      ),
+      ).map((i) => {
+        if (!isRectangularElement(bindableElement)) {
+          return i;
+        }
+
+        const d = distanceToBindableElement(bindableElement, i, elementsMap);
+        return d >= bindableElement.height / 2 || d < FIXED_BINDING_DISTANCE
+          ? ([point[0], -1 * i[1]] as Point)
+          : ([point[0], i[1]] as Point);
+      }),
       ...intersectElementWithLine(
         bindableElement,
         [point[0] - 2 * bindableElement.width, point[1]],
         [point[0] + 2 * bindableElement.width, point[1]],
         FIXED_BINDING_DISTANCE,
         elementsMap,
-      ),
-    ].map((i) =>
-      distanceToBindableElement(bindableElement, i, elementsMap) >
-      Math.min(bindableElement.width, bindableElement.height) / 2
-        ? ([-1 * i[0], -1 * i[1]] as Point)
-        : i,
-    );
+      ).map((i) => {
+        if (!isRectangularElement(bindableElement)) {
+          return i;
+        }
+
+        const d = distanceToBindableElement(bindableElement, i, elementsMap);
+        return d >= bindableElement.width / 2 || d < FIXED_BINDING_DISTANCE
+          ? ([-1 * i[0], point[1]] as Point)
+          : ([i[0], point[1]] as Point);
+      }),
+    ];
 
     const heading = headingForPointFromElement(bindableElement, aabb, point);
     const isVertical =
