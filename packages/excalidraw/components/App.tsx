@@ -8392,7 +8392,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...newElement.pressures,
                   strokeOptions?.constantPressure ? 1 : event.pressure,
                 ];
-  
+
             mutateElement(newElement, {
               points: [...points, [dx, dy]],
               pressures,

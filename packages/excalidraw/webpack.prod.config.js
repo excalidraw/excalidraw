@@ -38,9 +38,7 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [
-                  autoprefixer(),
-                ],
+                plugins: [autoprefixer()],
               },
             },
           },
@@ -74,7 +72,7 @@ module.exports = {
             loader: "babel-loader",
             options: {
               presets: [
-                "@babel/preset-env", 
+                "@babel/preset-env",
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
@@ -111,7 +109,8 @@ module.exports = {
     },*/ //zsviczian: not required
   },
   plugins: [
-    new MiniCssExtractPlugin({ //zsviczian export to file
+    new MiniCssExtractPlugin({
+      //zsviczian export to file
       filename: "styles.production.css",
     }),
     new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }), //zsviczian

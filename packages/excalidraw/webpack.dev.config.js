@@ -38,9 +38,7 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                plugins: [
-                  autoprefixer(),
-                ],
+                plugins: [autoprefixer()],
               },
             },
           },
@@ -78,7 +76,7 @@ module.exports = {
       },
     ],
   },
- optimization: {
+  optimization: {
     /*//sideEffects: false, //zsviczian https://github.com/storybookjs/storybook/issues/15221
     splitChunks: {
       chunks: "async",
@@ -88,10 +86,12 @@ module.exports = {
           name: "vendor",
         },
       },
-    },*/ //zsviczian: not required
+    },*/
+    //zsviczian: not required
   },
   plugins: [
-    new MiniCssExtractPlugin({ //zsviczian export to file
+    new MiniCssExtractPlugin({
+      //zsviczian export to file
       filename: "styles.development.css",
     }),
     new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }), //zsviczian

@@ -1,4 +1,5 @@
-if (process.env.NODE_ENV === "development") { //zsviczian
+if (process.env.NODE_ENV === "development") {
+  //zsviczian
   module.exports = require("./dist/excalidraw.development.js");
   //import("./dist/dev/index.js"); //zsviczian
 } else {
