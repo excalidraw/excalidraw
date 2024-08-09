@@ -3887,87 +3887,94 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      if (event.key === KEYS.ESCAPE && this.flowChartCreator.isCreatingChart) {
-        this.flowChartCreator.clear();
-        this.triggerRender(true);
-        return;
-      }
-
-      const arrowKeyPressed = isArrowKey(event.key);
-
-      if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
-        event.preventDefault();
-
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-        );
-
+      if (!isInputLike(event.target)) {
         if (
-          selectedElements.length === 1 &&
-          isFlowchartNodeElement(selectedElements[0])
+          event.key === KEYS.ESCAPE &&
+          this.flowChartCreator.isCreatingChart
         ) {
-          this.flowChartCreator.createNodes(
-            selectedElements[0],
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-            getLinkDirectionFromKey(event.key),
-          );
+          this.flowChartCreator.clear();
+          this.triggerRender(true);
+          return;
         }
 
-        return;
-      }
+        const arrowKeyPressed = isArrowKey(event.key);
 
-      if (event.altKey) {
-        const selectedElements = getSelectedElements(
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-        );
-
-        if (selectedElements.length === 1 && arrowKeyPressed) {
+        if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
           event.preventDefault();
 
-          const nextId = this.flowChartNavigator.exploreByDirection(
-            selectedElements[0],
+          const selectedElements = getSelectedElements(
             this.scene.getNonDeletedElementsMap(),
-            getLinkDirectionFromKey(event.key),
+            this.state,
           );
 
-          if (nextId) {
-            this.setState((prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  [nextId]: true,
-                },
-                prevState,
-              ),
-            }));
-
-            const nextNode = this.scene.getNonDeletedElementsMap().get(nextId);
-
-            if (
-              nextNode &&
-              !isElementCompletelyInViewport(
-                nextNode,
-                this.canvas.width / window.devicePixelRatio,
-                this.canvas.height / window.devicePixelRatio,
-                {
-                  offsetLeft: this.state.offsetLeft,
-                  offsetTop: this.state.offsetTop,
-                  scrollX: this.state.scrollX,
-                  scrollY: this.state.scrollY,
-                  zoom: this.state.zoom,
-                },
-                this.scene.getNonDeletedElementsMap(),
-              )
-            ) {
-              this.scrollToContent(nextNode, {
-                animate: true,
-                duration: 300,
-              });
-            }
+          if (
+            selectedElements.length === 1 &&
+            isFlowchartNodeElement(selectedElements[0])
+          ) {
+            this.flowChartCreator.createNodes(
+              selectedElements[0],
+              this.scene.getNonDeletedElementsMap(),
+              this.state,
+              getLinkDirectionFromKey(event.key),
+            );
           }
+
           return;
+        }
+
+        if (event.altKey) {
+          const selectedElements = getSelectedElements(
+            this.scene.getNonDeletedElementsMap(),
+            this.state,
+          );
+
+          if (selectedElements.length === 1 && arrowKeyPressed) {
+            event.preventDefault();
+
+            const nextId = this.flowChartNavigator.exploreByDirection(
+              selectedElements[0],
+              this.scene.getNonDeletedElementsMap(),
+              getLinkDirectionFromKey(event.key),
+            );
+
+            if (nextId) {
+              this.setState((prevState) => ({
+                selectedElementIds: makeNextSelectedElementIds(
+                  {
+                    [nextId]: true,
+                  },
+                  prevState,
+                ),
+              }));
+
+              const nextNode = this.scene
+                .getNonDeletedElementsMap()
+                .get(nextId);
+
+              if (
+                nextNode &&
+                !isElementCompletelyInViewport(
+                  nextNode,
+                  this.canvas.width / window.devicePixelRatio,
+                  this.canvas.height / window.devicePixelRatio,
+                  {
+                    offsetLeft: this.state.offsetLeft,
+                    offsetTop: this.state.offsetTop,
+                    scrollX: this.state.scrollX,
+                    scrollY: this.state.scrollY,
+                    zoom: this.state.zoom,
+                  },
+                  this.scene.getNonDeletedElementsMap(),
+                )
+              ) {
+                this.scrollToContent(nextNode, {
+                  animate: true,
+                  duration: 300,
+                });
+              }
+            }
+            return;
+          }
         }
       }
 
