@@ -482,7 +482,7 @@ export const getBoundsFromPoints = (
   return [minX, minY, maxX, maxY];
 };
 
-const getFreeDrawElementAbsoluteCoords = (
+export const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number, number, number, number, number] => {
   const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
