@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
+  return <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />;
 }
 ```
 
@@ -110,12 +110,14 @@ function App() {
   };
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
   return (
-    <div style={{ height: "500px" }}>
+    <div>
       <p style={{ fontSize: "16px" }}> Click to update the scene</p>
       <button className="custom-button" onClick={updateScene}>
         Update Scene
       </button>
-      <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
+      <div style={{ height: "500px" }}>
+        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
+      </div>
     </div>
   );
 }
@@ -160,7 +162,7 @@ function App() {
   }, [excalidrawAPI]);
 
   return (
-    <div style={{ height: "500px" }}>
+    <div>
       <p style={{ fontSize: "16px" }}> Click to update the library items</p>
       <button
         className="custom-button"
@@ -187,14 +189,16 @@ function App() {
       >
         Update Library
       </button>
-      <Excalidraw
-        excalidrawAPI={(api) => setExcalidrawAPI(api)}
-        // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
-        initialData={{
-          libraryItems: initialData.libraryItems,
-          appState: { openSidebar: "library" },
-        }}
-      />
+      <div style={{ height: "500px" }}>
+        <Excalidraw
+          excalidrawAPI={(api) => setExcalidrawAPI(api)}
+          // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
+          initialData={{
+            libraryItems: initialData.libraryItems,
+            appState: { openSidebar: "library" },
+          }}
+        />
+      </div>
     </div>
   );
 }
