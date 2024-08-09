@@ -357,7 +357,15 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
-      editable.value = normalizeText(editable.value);
+      const normalized = normalizeText(editable.value);
+      if (editable.value !== normalized) {
+        const selectionStart = editable.selectionStart;
+        editable.value = normalized;
+        // put the cursor at some position close to where it was before
+        // normalization (otherwise it'll end up at the end of the text)
+        editable.selectionStart = selectionStart;
+        editable.selectionEnd = selectionStart;
+      }
       onChange(editable.value);
     };
   }
