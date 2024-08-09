@@ -41,6 +41,7 @@ import {
   isElbowArrow,
   isFrameLikeElement,
   isLinearElement,
+  isRectangularElement,
   isTextElement,
 } from "./typeChecks";
 import type { ElementUpdate } from "./mutateElement";
@@ -760,6 +761,10 @@ export const bindPointToSnapToElementOutline = (
         FIXED_BINDING_DISTANCE,
         elementsMap,
       ).map((i) => {
+        if (!isRectangularElement(bindableElement)) {
+          return i;
+        }
+
         const d = distanceToBindableElement(bindableElement, i, elementsMap);
         return d >= bindableElement.height / 2 || d < FIXED_BINDING_DISTANCE
           ? ([point[0], -1 * i[1]] as Point)
@@ -772,6 +777,10 @@ export const bindPointToSnapToElementOutline = (
         FIXED_BINDING_DISTANCE,
         elementsMap,
       ).map((i) => {
+        if (!isRectangularElement(bindableElement)) {
+          return i;
+        }
+
         const d = distanceToBindableElement(bindableElement, i, elementsMap);
         return d >= bindableElement.width / 2 || d < FIXED_BINDING_DISTANCE
           ? ([-1 * i[0], point[1]] as Point)
