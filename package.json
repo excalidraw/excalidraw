@@ -83,5 +83,10 @@
   },
   "resolutions": {
     "@types/react": "18.2.0"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.17.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }

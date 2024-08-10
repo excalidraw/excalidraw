@@ -12,7 +12,7 @@ const flatten = (object = {}, result = {}, extraKey = "") => {
   return result;
 };
 
-const locales = files.filter(
+const locales = files.filter(~
   (file) => file !== "README.md" && file !== "percentages.json",
 );
 
