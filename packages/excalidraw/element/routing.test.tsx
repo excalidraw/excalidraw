@@ -141,7 +141,7 @@ describe("elbow arrow ui", () => {
     ]);
   });
 
-  it.only("can follow bound rotated shapes", async () => {
+  it("can follow bound rotated shapes", async () => {
     UI.createElement("rectangle", {
       x: -150,
       y: -150,
