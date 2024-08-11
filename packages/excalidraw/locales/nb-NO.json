@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "element": "",
-    "elements": "Elementer",
+    "shapes": "",
     "height": "Høyde",
     "scene": "",
     "selected": "Valgt",
