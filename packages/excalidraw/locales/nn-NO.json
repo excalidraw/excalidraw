@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Vinkel",
-    "element": "",
-    "elements": "Element",
+    "shapes": "",
     "height": "Høgde",
     "scene": "",
     "selected": "Valde",
