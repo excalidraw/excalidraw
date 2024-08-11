@@ -15,4 +15,8 @@ export {
   getElementAtPosition,
   getElementsAtPosition,
 } from "./comparisons";
-export { getNormalizedZoom } from "./zoom";
+export {
+  getNormalizedZoom,
+  getNormalizedGridSize,
+  getNormalizedGridStep,
+} from "./normalize";

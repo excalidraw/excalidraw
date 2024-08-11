@@ -38,6 +38,7 @@ import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
+import { clamp } from "../math";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -104,6 +105,8 @@ export const actionClearCanvas = register({
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
+        gridStep: appState.gridStep,
+        gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
         pasteDialog: appState.pasteDialog,
         activeTool:
@@ -292,8 +295,9 @@ export const zoomToFitBounds = ({
       ) * Math.min(1, Math.max(viewportZoomFactor, 0.1));
 
     // Apply clamping to newZoomValue to be between 10% and 3000%
-    newZoomValue = Math.min(
-      Math.max(newZoomValue, MIN_ZOOM),
+    newZoomValue = clamp(
+      newZoomValue,
+      MIN_ZOOM,
       MAX_ZOOM,
     ) as NormalizedZoomValue;
 
