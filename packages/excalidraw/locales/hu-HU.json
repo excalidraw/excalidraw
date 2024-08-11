@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Szög",
-    "element": "Elem",
-    "elements": "Elemek",
+    "shapes": "",
     "height": "Magasság",
     "scene": "Jelenet",
     "selected": "Kijelölt",
