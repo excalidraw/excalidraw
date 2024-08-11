@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "זווית",
-    "element": "רכיב",
-    "elements": "רכיבים",
+    "shapes": "",
     "height": "גובה",
     "scene": "תצוגה",
     "selected": "נבחר",
