@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "각도",
-    "element": "요소",
-    "elements": "요소",
+    "shapes": "",
     "height": "높이",
     "scene": "화면",
     "selected": "선택됨",
