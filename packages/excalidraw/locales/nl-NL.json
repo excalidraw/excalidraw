@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Hoek",
-    "element": "Element",
-    "elements": "Elementen",
+    "shapes": "",
     "height": "Hoogte",
     "scene": "Scene",
     "selected": "Geselecteerd",
