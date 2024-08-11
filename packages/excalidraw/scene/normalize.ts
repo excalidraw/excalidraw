@@ -7,9 +7,9 @@ export const getNormalizedZoom = (zoom: number): NormalizedZoomValue => {
 };
 
 export const getNormalizedGridSize = (gridStep: number) => {
-  return clamp(gridStep, 1, 100);
+  return clamp(Math.round(gridStep), 1, 100);
 };
 
 export const getNormalizedGridStep = (gridStep: number) => {
-  return clamp(gridStep, 1, 100);
+  return clamp(Math.round(gridStep), 1, 100);
 };
