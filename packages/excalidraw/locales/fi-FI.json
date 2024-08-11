@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Kulma",
-    "element": "Elementti",
-    "elements": "Elementit",
+    "shapes": "",
     "height": "Korkeus",
     "scene": "Teos",
     "selected": "Valitut",
