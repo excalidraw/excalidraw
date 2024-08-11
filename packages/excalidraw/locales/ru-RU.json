@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Угол",
-    "element": "Элемент",
-    "elements": "Элементы",
+    "shapes": "",
     "height": "Высота",
     "scene": "Сцены",
     "selected": "Выбран",
