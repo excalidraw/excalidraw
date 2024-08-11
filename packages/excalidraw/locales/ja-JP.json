@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "角度",
-    "element": "要素",
-    "elements": "要素",
+    "shapes": "",
     "height": "高さ",
     "scene": "シーン",
     "selected": "選択済み",
