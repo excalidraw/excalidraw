@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "زاویه",
-    "element": "اِلمان",
-    "elements": "اِلمان ها",
+    "shapes": "",
     "height": "ارتفاع",
     "scene": "صحنه",
     "selected": "انتخاب شده",
