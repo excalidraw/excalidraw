@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Ângulo",
-    "element": "Elemento",
-    "elements": "Elementos",
+    "shapes": "",
     "height": "Altura",
     "scene": "Cena",
     "selected": "Selecionado",
