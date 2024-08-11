@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "الزاوية",
-    "element": "عنصر",
-    "elements": "العناصر",
+    "shapes": "",
     "height": "الارتفاع",
     "scene": "المشهد",
     "selected": "المحدد",
