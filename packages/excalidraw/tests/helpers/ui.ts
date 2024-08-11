@@ -579,7 +579,23 @@ export class UI {
 
   static queryStats = () => {
     return GlobalTestState.renderResult.container.querySelector(
-      ".Stats",
+      ".exc-stats",
     ) as HTMLElement | null;
+  };
+
+  static queryStatsProperty = (label: string) => {
+    const elementStats = UI.queryStats()?.querySelector("#elementStats");
+
+    expect(elementStats).not.toBeNull();
+
+    if (elementStats) {
+      return (
+        elementStats?.querySelector(
+          `.exc-stats__row .drag-input-container[data-testid="${label}"]`,
+        ) || null
+      );
+    }
+
+    return null;
   };
 }

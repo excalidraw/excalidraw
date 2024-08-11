@@ -271,6 +271,7 @@ export { MainMenu };
 export { useDevice } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
+export { Stats } from "./components/Stats";
 
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
