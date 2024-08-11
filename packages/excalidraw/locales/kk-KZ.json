@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Бұрыш",
-    "element": "Элемент",
-    "elements": "Элементтер",
+    "shapes": "",
     "height": "Биіктігі",
     "scene": "Сахна",
     "selected": "Таңдалды",
