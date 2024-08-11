@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "கோணம்",
-    "element": "உறுப்பு",
-    "elements": "உறுப்புகள்",
+    "shapes": "",
     "height": "உயரம்",
     "scene": "காட்சி",
     "selected": "தேர்ந்தவை",
