@@ -462,8 +462,7 @@
   },
   "stats": {
     "angle": "Úhel",
-    "element": "Prvek",
-    "elements": "Prvky",
+    "shapes": "",
     "height": "Výška",
     "scene": "Scéna",
     "selected": "Vybráno",
