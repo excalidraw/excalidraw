@@ -765,7 +765,18 @@ export const bindPointToSnapToElementOutline = (
           return i;
         }
 
-        const d = distanceToBindableElement(bindableElement, i, elementsMap);
+        const d = distanceToBindableElement(
+          {
+            ...bindableElement,
+            x: Math.round(bindableElement.x),
+            y: Math.round(bindableElement.y),
+            width: Math.round(bindableElement.width),
+            height: Math.round(bindableElement.height),
+          },
+          [Math.round(i[0]), Math.round(i[1])],
+          new Map(),
+        );
+
         return d >= bindableElement.height / 2 || d < FIXED_BINDING_DISTANCE
           ? ([point[0], -1 * i[1]] as Point)
           : ([point[0], i[1]] as Point);
@@ -781,7 +792,18 @@ export const bindPointToSnapToElementOutline = (
           return i;
         }
 
-        const d = distanceToBindableElement(bindableElement, i, elementsMap);
+        const d = distanceToBindableElement(
+          {
+            ...bindableElement,
+            x: Math.round(bindableElement.x),
+            y: Math.round(bindableElement.y),
+            width: Math.round(bindableElement.width),
+            height: Math.round(bindableElement.height),
+          },
+          [Math.round(i[0]), Math.round(i[1])],
+          new Map(),
+        );
+
         return d >= bindableElement.width / 2 || d < FIXED_BINDING_DISTANCE
           ? ([-1 * i[0], point[1]] as Point)
           : ([i[0], point[1]] as Point);
