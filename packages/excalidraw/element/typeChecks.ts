@@ -176,6 +176,23 @@ export const isRectanguloidElement = (
   );
 };
 
+// TODO: Remove this when proper distance calculation is introduced
+// @see binding.ts:distanceToBindableElement()
+export const isRectangularElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawBindableElement => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "image" ||
+      element.type === "text" ||
+      element.type === "iframe" ||
+      element.type === "embeddable" ||
+      element.type === "frame" ||
+      element.type === "magicframe")
+  );
+};
+
 export const isTextBindableContainer = (
   element: ExcalidrawElement | null,
   includeLocked = true,

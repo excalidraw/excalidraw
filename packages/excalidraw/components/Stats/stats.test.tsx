@@ -32,21 +32,6 @@ const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 let stats: HTMLElement | null = null;
 let elementStats: HTMLElement | null | undefined = null;
 
-const getStatsProperty = (label: string) => {
-  const elementStats = UI.queryStats()?.querySelector("#elementStats");
-
-  if (elementStats) {
-    const properties = elementStats?.querySelector(".statsItem");
-    return (
-      properties?.querySelector?.(
-        `.drag-input-container[data-testid="${label}"]`,
-      ) || null
-    );
-  }
-
-  return null;
-};
-
 const testInputProperty = (
   element: ExcalidrawElement,
   property: "x" | "y" | "width" | "height" | "angle" | "fontSize",
@@ -54,7 +39,7 @@ const testInputProperty = (
   initialValue: number,
   nextValue: number,
 ) => {
-  const input = getStatsProperty(label)?.querySelector(
+  const input = UI.queryStatsProperty(label)?.querySelector(
     ".drag-input",
   ) as HTMLInputElement;
   expect(input).toBeDefined();
@@ -136,7 +121,7 @@ describe("binding with linear elements", () => {
 
   it("should remain bound to linear element on small position change", async () => {
     const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputX = getStatsProperty("X")?.querySelector(
+    const inputX = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -148,7 +133,7 @@ describe("binding with linear elements", () => {
 
   it("should remain bound to linear element on small angle change", async () => {
     const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputAngle = getStatsProperty("A")?.querySelector(
+    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -159,7 +144,7 @@ describe("binding with linear elements", () => {
 
   it("should unbind linear element on large position change", async () => {
     const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputX = getStatsProperty("X")?.querySelector(
+    const inputX = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -171,7 +156,7 @@ describe("binding with linear elements", () => {
 
   it("should remain bound to linear element on small angle change", async () => {
     const linear = h.elements[1] as ExcalidrawLinearElement;
-    const inputAngle = getStatsProperty("A")?.querySelector(
+    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -225,18 +210,14 @@ describe("stats for a generic element", () => {
     expect(title?.lastChild?.nodeValue)?.toBe(t("stats.elementProperties"));
 
     // element type
-    const elementType = elementStats?.querySelector(".elementType");
+    const elementType = queryByTestId(elementStats!, "stats-element-type");
     expect(elementType).toBeDefined();
     expect(elementType?.lastChild?.nodeValue).toBe(t("element.rectangle"));
 
     // properties
-    const properties = elementStats?.querySelector(".statsItem");
-    expect(properties?.childNodes).toBeDefined();
     ["X", "Y", "W", "H", "A"].forEach((label) => () => {
       expect(
-        properties?.querySelector?.(
-          `.drag-input-container[data-testid="${label}"]`,
-        ),
+        stats!.querySelector?.(`.drag-input-container[data-testid="${label}"]`),
       ).toBeDefined();
     });
   });
@@ -257,7 +238,7 @@ describe("stats for a generic element", () => {
     const rectangle = h.elements[0];
     const rectangleId = rectangle.id;
 
-    const input = getStatsProperty("W")?.querySelector(
+    const input = UI.queryStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(input).toBeDefined();
@@ -287,11 +268,11 @@ describe("stats for a generic element", () => {
       rectangle.angle,
     );
 
-    const xInput = getStatsProperty("X")?.querySelector(
+    const xInput = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
-    const yInput = getStatsProperty("Y")?.querySelector(
+    const yInput = UI.queryStatsProperty("Y")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -417,7 +398,7 @@ describe("stats for a non-generic element", () => {
     elementStats = stats?.querySelector("#elementStats");
 
     // can change font size
-    const input = getStatsProperty("F")?.querySelector(
+    const input = UI.queryStatsProperty("F")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(input).toBeDefined();
@@ -426,9 +407,9 @@ describe("stats for a non-generic element", () => {
     expect(text.fontSize).toBe(36);
 
     // cannot change width or height
-    const width = getStatsProperty("W")?.querySelector(".drag-input");
+    const width = UI.queryStatsProperty("W")?.querySelector(".drag-input");
     expect(width).toBeUndefined();
-    const height = getStatsProperty("H")?.querySelector(".drag-input");
+    const height = UI.queryStatsProperty("H")?.querySelector(".drag-input");
     expect(height).toBeUndefined();
 
     // min font size is 4
@@ -456,7 +437,7 @@ describe("stats for a non-generic element", () => {
     expect(elementStats).toBeDefined();
 
     // cannot change angle
-    const angle = getStatsProperty("A")?.querySelector(".drag-input");
+    const angle = UI.queryStatsProperty("A")?.querySelector(".drag-input");
     expect(angle).toBeUndefined();
 
     // can change width or height
@@ -506,7 +487,7 @@ describe("stats for a non-generic element", () => {
     API.setElements([container, text]);
 
     API.setSelectedElements([container]);
-    const fontSize = getStatsProperty("F")?.querySelector(
+    const fontSize = UI.queryStatsProperty("F")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(fontSize).toBeDefined();
@@ -570,15 +551,15 @@ describe("stats for multiple elements", () => {
 
     elementStats = stats?.querySelector("#elementStats");
 
-    const width = getStatsProperty("W")?.querySelector(
+    const width = UI.queryStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(width?.value).toBe("Mixed");
-    const height = getStatsProperty("H")?.querySelector(
+    const height = UI.queryStatsProperty("H")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(height?.value).toBe("Mixed");
-    const angle = getStatsProperty("A")?.querySelector(
+    const angle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(angle.value).toBe("0");
@@ -629,25 +610,25 @@ describe("stats for multiple elements", () => {
 
     elementStats = stats?.querySelector("#elementStats");
 
-    const width = getStatsProperty("W")?.querySelector(
+    const width = UI.queryStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(width).toBeDefined();
     expect(width.value).toBe("Mixed");
 
-    const height = getStatsProperty("H")?.querySelector(
+    const height = UI.queryStatsProperty("H")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(height).toBeDefined();
     expect(height.value).toBe("Mixed");
 
-    const angle = getStatsProperty("A")?.querySelector(
+    const angle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(angle).toBeDefined();
     expect(angle.value).toBe("0");
 
-    const fontSize = getStatsProperty("F")?.querySelector(
+    const fontSize = UI.queryStatsProperty("F")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(fontSize).toBeDefined();
@@ -692,7 +673,7 @@ describe("stats for multiple elements", () => {
 
     elementStats = stats?.querySelector("#elementStats");
 
-    const x = getStatsProperty("X")?.querySelector(
+    const x = UI.queryStatsProperty("X")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -705,7 +686,7 @@ describe("stats for multiple elements", () => {
     expect(h.elements[1].x).toBe(400);
     expect(x.value).toBe("300");
 
-    const y = getStatsProperty("Y")?.querySelector(
+    const y = UI.queryStatsProperty("Y")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
 
@@ -718,13 +699,13 @@ describe("stats for multiple elements", () => {
     expect(h.elements[1].y).toBe(300);
     expect(y.value).toBe("200");
 
-    const width = getStatsProperty("W")?.querySelector(
+    const width = UI.queryStatsProperty("W")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(width).toBeDefined();
     expect(Number(width.value)).toBe(200);
 
-    const height = getStatsProperty("H")?.querySelector(
+    const height = UI.queryStatsProperty("H")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     expect(height).toBeDefined();
