@@ -1011,6 +1011,15 @@ export const segmentsIntersectAt = (
   return null;
 };
 
+/**
+ * Determine intersection of a rectangular shaped element and a
+ * line segment.
+ *
+ * @param element The rectangular element to test against
+ * @param segment The segment intersecting the element
+ * @param gap Optional value to inflate the shape before testing
+ * @returns An array of intersections
+ */
 // TODO: Replace with final rounded rectangle code
 export const segmentIntersectRectangleElement = (
   element: ExcalidrawBindableElement,
