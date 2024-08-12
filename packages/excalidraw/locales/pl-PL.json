@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Trójkąt (pusty)",
     "arrowhead_diamond": "Romb",
     "arrowhead_diamond_outline": "Romb (pusty)",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowtypes": "Typ strzałki",
+    "arrowtype_sharp": "Ostra strzałka",
+    "arrowtype_round": "Zaokrąglona strzałka",
+    "arrowtype_elbowed": "Łamana strzałka",
     "fontSize": "Rozmiar tekstu",
     "fontFamily": "Krój pisma",
     "addWatermark": "Dodaj \"Zrobione w Excalidraw\"",
@@ -113,7 +113,7 @@
     "share": "Udostępnij",
     "showStroke": "Pokaż próbnik kolorów obrysu",
     "showBackground": "Pokaż próbnik koloru tła",
-    "showFonts": "",
+    "showFonts": "Pokaż selektor czcionek",
     "toggleTheme": "Przełącz motyw jasny / ciemny",
     "theme": "Motyw",
     "personalLib": "Biblioteka prywatna",
@@ -299,7 +299,7 @@
   "hints": {
     "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
-    "arrowTool": "",
+    "arrowTool": "Kliknij, aby rozpocząć dodawanie wielu punktów, przeciągnij, aby narysować pojedynczą linię. Naciśnij przycisk {{arrowShortcut}} ponownie, aby zmienić typ strzałki.",
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",
@@ -367,8 +367,8 @@
     "click": "kliknięcie",
     "deepSelect": "Wybór w obrębie grupy",
     "deepBoxSelect": "Wybór w obrębie grupy i unikanie przeciągania",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Twórz diagram używając generycznych elementów",
+    "navigateFlowchart": "Nawiguj diagram",
     "curvedArrow": "Zakrzywiona strzałka",
     "curvedLine": "Zakrzywiona linia",
     "documentation": "Dokumentacja",
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "Kąt",
-    "shapes": "",
+    "shapes": "Kształty",
     "height": "Wysokość",
     "scene": "Scena",
     "selected": "Zaznaczenie",
     "storage": "Pamięć",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Właściwości płótna i kształtu",
+    "title": "Właściwości",
+    "generalStats": "Ogólne",
+    "elementProperties": "Właściwości kształtu",
     "total": "Łącznie",
     "version": "Wersja",
     "versionCopy": "Kliknij, aby skopiować",
@@ -566,18 +566,18 @@
     "preview": "Podgląd"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Szybkie wyszukiwanie"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "stara"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "W tej scenie",
+    "availableFonts": "Dostępne czcionki",
+    "empty": "Nie znaleziono czcionek"
   },
   "userList": {
-    "empty": "",
+    "empty": "Nie znaleziono użytkowników",
     "hint": {
       "text": "Kliknij na użytkownika, aby obserwować",
       "followStatus": "Obserwujesz tego użytkownika",
