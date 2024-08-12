@@ -44,7 +44,6 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
-import type Scene from "../scene/Scene";
 
 const { h } = window;
 
@@ -118,7 +117,6 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
-              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -140,7 +138,6 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
-              {} as Scene,
             ) as any,
         );
       } catch (e) {

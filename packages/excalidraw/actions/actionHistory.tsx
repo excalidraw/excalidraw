@@ -4,7 +4,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import type { History } from "../history";
 import { HistoryChangedEvent } from "../history";
-import type { AppState } from "../types";
+import type { AppClassProperties, AppState } from "../types";
 import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
@@ -13,7 +13,8 @@ import type { Store } from "../store";
 import { StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
-const writeData = (
+const executeHistoryAction = (
+  app: AppClassProperties,
   appState: Readonly<AppState>,
   updater: () => [SceneElementsMap, AppState] | void,
 ): ActionResult => {
@@ -24,7 +25,8 @@ const writeData = (
     !appState.editingTextElement &&
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
-    !appState.selectionElement
+    !appState.selectionElement &&
+    !app.flowChartCreator.isCreatingChart
   ) {
     const result = updater();
 
@@ -54,12 +56,11 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   trackEvent: { category: "history" },
   viewMode: false,
   perform: (elements, appState, value, app) =>
-    writeData(appState, () =>
+    executeHistoryAction(app, appState, () =>
       history.undo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
-        app.scene,
       ),
     ),
   keyTest: (event) =>
@@ -96,12 +97,11 @@ export const createRedoAction: ActionCreator = (history, store) => ({
   trackEvent: { category: "history" },
   viewMode: false,
   perform: (elements, appState, _, app) =>
-    writeData(appState, () =>
+    executeHistoryAction(app, appState, () =>
       history.redo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
         store.snapshot,
-        app.scene,
       ),
     ),
   keyTest: (event) =>

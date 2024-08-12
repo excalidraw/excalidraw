@@ -35,6 +35,7 @@ import type {
   Zoom,
   InteractiveCanvasAppState,
   ElementsPendingErasure,
+  PendingExcalidrawElements,
 } from "../types";
 import { getDefaultAppState } from "../appState";
 import {
@@ -104,6 +105,7 @@ export const getRenderOpacity = (
   element: ExcalidrawElement,
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
+  pendingNodes: Readonly<PendingExcalidrawElements> | null,
 ) => {
   // multiplying frame opacity with element opacity to combine them
   // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
@@ -113,6 +115,7 @@ export const getRenderOpacity = (
   // (so that erasing always results in lower opacity than original)
   if (
     elementsPendingErasure.has(element.id) ||
+    (pendingNodes && pendingNodes.some((node) => node.id === element.id)) ||
     (containingFrame && elementsPendingErasure.has(containingFrame.id))
   ) {
     opacity *= ELEMENT_READY_TO_ERASE_OPACITY / 100;
@@ -196,7 +199,7 @@ const generateElementCanvas = (
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
-): ExcalidrawElementWithCanvas => {
+): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
@@ -206,6 +209,10 @@ const generateElementCanvas = (
     elementsMap,
     zoom,
   );
+
+  if (!width || !height) {
+    return null;
+  }
 
   canvas.width = width;
   canvas.height = height;
@@ -537,6 +544,10 @@ const generateElementWithCanvas = (
       appState,
     );
 
+    if (!elementWithCanvas) {
+      return null;
+    }
+
     elementWithCanvasCache.set(element, elementWithCanvas);
 
     return elementWithCanvas;
@@ -672,6 +683,7 @@ export const renderElement = (
     element,
     getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
+    renderConfig.pendingFlowchartNodes,
   );
 
   switch (element.type) {
@@ -738,6 +750,10 @@ export const renderElement = (
           renderConfig,
           appState,
         );
+        if (!elementWithCanvas) {
+          return;
+        }
+
         drawElementFromCanvas(
           elementWithCanvas,
           context,
@@ -876,6 +892,10 @@ export const renderElement = (
           renderConfig,
           appState,
         );
+
+        if (!elementWithCanvas) {
+          return;
+        }
 
         const currentImageSmoothingStatus = context.imageSmoothingEnabled;
 

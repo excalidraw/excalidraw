@@ -929,6 +929,12 @@ export const assertNever = (
   throw new Error(message);
 };
 
+export function invariant(condition: any, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
 /**
  * Memoizes on values of `opts` object (strict equality).
  */
