@@ -2865,7 +2865,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scrolledOutside =
       // hide when editing text
-      isTextElement(this.state.editingTextElement)
+      this.state.editingTextElement
         ? false
         : !atLeastOneVisibleElement && elementsMap.size > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {

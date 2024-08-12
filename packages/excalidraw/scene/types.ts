@@ -97,7 +97,6 @@ export type NewElementSceneRenderConfig = {
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
-  // TODO: narrow down so that unrelated state is not taken into consideration
   appState: AppState;
   renderConfig: StaticCanvasRenderConfig;
 };
