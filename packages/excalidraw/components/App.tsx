@@ -3860,24 +3860,41 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private getEditorUIOffsets = () => {
-    const topOffset =
+  private getEditorUIOffsets = (): {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  } => {
+    const toolbarBottom =
       this.excalidrawContainerRef?.current
         ?.querySelector(".App-toolbar")
         ?.getBoundingClientRect()?.bottom ?? 0;
-    const rightOffset = Math.max(
+    const sidebarWidth = Math.max(
       this.excalidrawContainerRef?.current
         ?.querySelector(".default-sidebar")
         ?.getBoundingClientRect()?.width ?? 0,
     );
-    const leftOffset = Math.max(
+    const propertiesPanelWidth = Math.max(
       this.excalidrawContainerRef?.current
         ?.querySelector(".App-menu__left")
-        ?.getBoundingClientRect()?.right ?? 0,
+        ?.getBoundingClientRect()?.width ?? 0,
       0,
     );
 
-    return { top: topOffset, right: rightOffset, bottom: 0, left: leftOffset };
+    return getLanguage().rtl
+      ? {
+          top: toolbarBottom,
+          right: propertiesPanelWidth,
+          bottom: 0,
+          left: sidebarWidth,
+        }
+      : {
+          top: toolbarBottom,
+          right: sidebarWidth,
+          bottom: 0,
+          left: propertiesPanelWidth,
+        };
   };
 
   // Input handling
