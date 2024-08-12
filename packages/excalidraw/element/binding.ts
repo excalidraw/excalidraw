@@ -775,7 +775,9 @@ export const bindPointToSnapToElementOutline = (
     const isVertical =
       compareHeading(heading, HEADING_LEFT) ||
       compareHeading(heading, HEADING_RIGHT);
-    const dist = distanceToBindableElement(bindableElement, point, elementsMap);
+    const dist = Math.abs(
+      distanceToBindableElement(bindableElement, point, elementsMap),
+    );
     const isInner = isVertical
       ? dist < bindableElement.width * -0.1
       : dist < bindableElement.height * -0.1;

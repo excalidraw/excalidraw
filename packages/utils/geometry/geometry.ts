@@ -1024,8 +1024,8 @@ export const segmentIntersectRectangleElement = (
     element.y + element.height + gap,
   ];
   const center = [
-    (element.x + element.width) / 2,
-    (element.y + element.height) / 2,
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
   ] as Point;
 
   return [
