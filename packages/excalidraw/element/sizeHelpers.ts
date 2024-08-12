@@ -3,7 +3,7 @@ import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
 import type { AppState, Zoom } from "../types";
-import { getElementBounds } from "./bounds";
+import { getCommonBounds, getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
@@ -56,7 +56,7 @@ export const isElementInViewport = (
 };
 
 export const isElementCompletelyInViewport = (
-  element: ExcalidrawElement,
+  elements: ExcalidrawElement[],
   width: number,
   height: number,
   viewTransformations: {
@@ -67,19 +67,25 @@ export const isElementCompletelyInViewport = (
     scrollY: number;
   },
   elementsMap: ElementsMap,
+  padding?: Partial<{
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  }>,
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
+  const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
     {
-      clientX: viewTransformations.offsetLeft,
-      clientY: viewTransformations.offsetTop,
+      clientX: viewTransformations.offsetLeft + (padding?.left || 0),
+      clientY: viewTransformations.offsetTop + (padding?.top || 0),
     },
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
     {
-      clientX: viewTransformations.offsetLeft + width,
-      clientY: viewTransformations.offsetTop + height,
+      clientX: viewTransformations.offsetLeft + width - (padding?.right || 0),
+      clientY: viewTransformations.offsetTop + height - (padding?.bottom || 0),
     },
     viewTransformations,
   );
