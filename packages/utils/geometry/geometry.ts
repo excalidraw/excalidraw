@@ -1,4 +1,13 @@
-import { distance2d } from "../../excalidraw/math";
+import type { ExcalidrawBindableElement } from "../../excalidraw/element/types";
+import {
+  addVectors,
+  distance2d,
+  rotatePoint,
+  scaleVector,
+  subtractVectors,
+} from "../../excalidraw/math";
+import type { LineSegment } from "../bbox";
+import { crossProduct } from "../bbox";
 import type {
   Point,
   Line,
@@ -967,4 +976,85 @@ export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
       (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
     1
   );
+};
+
+/**
+ * Calculates the point two line segments with a definite start and end point
+ * intersect at.
+ */
+export const segmentsIntersectAt = (
+  a: Readonly<LineSegment>,
+  b: Readonly<LineSegment>,
+): Point | null => {
+  const r = subtractVectors(a[1], a[0]);
+  const s = subtractVectors(b[1], b[0]);
+  const denominator = crossProduct(r, s);
+
+  if (denominator === 0) {
+    return null;
+  }
+
+  const i = subtractVectors(b[0], a[0]);
+  const u = crossProduct(i, r) / denominator;
+  const t = crossProduct(i, s) / denominator;
+
+  if (u === 0) {
+    return null;
+  }
+
+  const p = addVectors(a[0], scaleVector(r, t));
+
+  if (t >= 0 && t < 1 && u >= 0 && u < 1) {
+    return p;
+  }
+
+  return null;
+};
+
+/**
+ * Determine intersection of a rectangular shaped element and a
+ * line segment.
+ *
+ * @param element The rectangular element to test against
+ * @param segment The segment intersecting the element
+ * @param gap Optional value to inflate the shape before testing
+ * @returns An array of intersections
+ */
+// TODO: Replace with final rounded rectangle code
+export const segmentIntersectRectangleElement = (
+  element: ExcalidrawBindableElement,
+  segment: LineSegment,
+  gap: number = 0,
+): Point[] => {
+  const bounds = [
+    element.x - gap,
+    element.y - gap,
+    element.x + element.width + gap,
+    element.y + element.height + gap,
+  ];
+  const center = [
+    (bounds[0] + bounds[2]) / 2,
+    (bounds[1] + bounds[3]) / 2,
+  ] as Point;
+
+  return [
+    [
+      rotatePoint([bounds[0], bounds[1]], center, element.angle),
+      rotatePoint([bounds[2], bounds[1]], center, element.angle),
+    ] as LineSegment,
+    [
+      rotatePoint([bounds[2], bounds[1]], center, element.angle),
+      rotatePoint([bounds[2], bounds[3]], center, element.angle),
+    ] as LineSegment,
+    [
+      rotatePoint([bounds[2], bounds[3]], center, element.angle),
+      rotatePoint([bounds[0], bounds[3]], center, element.angle),
+    ] as LineSegment,
+    [
+      rotatePoint([bounds[0], bounds[3]], center, element.angle),
+      rotatePoint([bounds[0], bounds[1]], center, element.angle),
+    ] as LineSegment,
+  ]
+    .map((s) => segmentsIntersectAt(segment, s))
+    .filter((i): i is Point => !!i);
 };
