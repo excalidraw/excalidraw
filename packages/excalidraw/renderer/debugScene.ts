@@ -172,15 +172,15 @@ const addToCurrentFrame = (element: DebugElement) => {
 
 const renderLine = (
   context: CanvasRenderingContext2D,
-
+  zoom: number,
   segment: LineSegment,
   color: string,
 ) => {
   context.save();
   context.strokeStyle = color;
   context.beginPath();
-  context.moveTo(segment[0][0], segment[0][1]);
-  context.lineTo(segment[1][0], segment[1][1]);
+  context.moveTo(segment[0][0] * zoom, segment[0][1] * zoom);
+  context.lineTo(segment[1][0] * zoom, segment[1][1] * zoom);
   context.stroke();
   context.restore();
 };
@@ -228,7 +228,7 @@ const _debugRenderer = (
     frame.forEach((el) => {
       switch (true) {
         case isLineSegment(el.data):
-          renderLine(context, el.data, el.color);
+          renderLine(context, appState.zoom.value, el.data, el.color);
           break;
       }
     });
