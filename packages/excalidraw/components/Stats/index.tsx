@@ -199,16 +199,18 @@ export const StatsInner = memo(
                 <div>{t("stats.height")}</div>
                 <div>{sceneDimension.height}</div>
               </StatsRow>
-              <StatsRow heading>Canvas</StatsRow>
               {gridModeEnabled && (
-                <StatsRow>
-                  <CanvasGrid
-                    property="gridStep"
-                    scene={scene}
-                    appState={appState}
-                    setAppState={setAppState}
-                  />
-                </StatsRow>
+                <>
+                  <StatsRow heading>Canvas</StatsRow>
+                  <StatsRow>
+                    <CanvasGrid
+                      property="gridStep"
+                      scene={scene}
+                      appState={appState}
+                      setAppState={setAppState}
+                    />
+                  </StatsRow>
+                </>
               )}
             </StatsRows>
 
