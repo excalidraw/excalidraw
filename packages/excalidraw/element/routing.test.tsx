@@ -22,21 +22,6 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-const getStatsProperty = (label: string) => {
-  const elementStats = UI.queryStats()?.querySelector("#elementStats");
-
-  if (elementStats) {
-    const properties = elementStats?.querySelector(".statsItem");
-    return (
-      properties?.querySelector?.(
-        `.drag-input-container[data-testid="${label}"]`,
-      ) || null
-    );
-  }
-
-  return null;
-};
-
 describe("elbow arrow routing", () => {
   it("can properly generate orthogonal arrow points", () => {
     const scene = new Scene();
@@ -193,7 +178,7 @@ describe("elbow arrow ui", () => {
 
     mouse.click(51, 51);
 
-    const inputAngle = getStatsProperty("A")?.querySelector(
+    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
