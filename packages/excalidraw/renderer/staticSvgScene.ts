@@ -8,6 +8,7 @@ import {
 } from "../constants";
 import { normalizeLink, toValidURL } from "../data/url";
 import { getElementAbsoluteCoords } from "../element";
+import { getElementPointsCoords } from "../element/bounds";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
@@ -22,6 +23,7 @@ import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
+  isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
 import type {
@@ -86,7 +88,9 @@ const renderElementToSvg = (
   renderConfig: SVGRenderConfig,
 ) => {
   const offset = { x: offsetX, y: offsetY };
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+  const [x1, y1, x2, y2] = isLinearElement(element)
+    ? getElementPointsCoords(element, element.points)
+    : getElementAbsoluteCoords(element, elementsMap);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
   if (isTextElement(element)) {
