@@ -28,7 +28,6 @@ import { getStateForZoom } from "../scene/zoom";
 import type {
   AppClassProperties,
   AppState,
-  NormalizedZoomValue,
 } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
@@ -47,6 +46,7 @@ import { excludeElementsInFramesFromSelection } from "../scene/selection"; //zsv
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
+import { clamp } from "../math";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -267,6 +267,7 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
+  viewportZoomFactor: number = 1, // default to 1 if not provided
   maxZoom: number = 1, //zsviczian
 ) => {
   const [x1, y1, x2, y2] = bounds;
@@ -275,20 +276,25 @@ const zoomValueToFitBoundsOnViewport = (
   const commonBoundsHeight = y2 - y1;
   const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
   const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
+
+  const adjustedZoomValue =
+    smallestZoomValue * clamp(viewportZoomFactor, 0.1, 1);
+
   const zoomAdjustedToSteps =
-    Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
-  const clampedZoomValueToFitElements = Math.min(
+    Math.floor(adjustedZoomValue / ZOOM_STEP) * ZOOM_STEP;
+
+  //return getNormalizedZoom(Math.min(zoomAdjustedToSteps, 1));
+  return getNormalizedZoom(Math.min(
     Math.max(zoomAdjustedToSteps, MIN_ZOOM),
     maxZoom, //zsviczian
-  );
-  return clampedZoomValueToFitElements as NormalizedZoomValue;
+  ));
 };
 
 export const zoomToFitBounds = ({
   bounds,
   appState,
   fitToViewport = false,
-  viewportZoomFactor = 0.7,
+  viewportZoomFactor = 1,
 }: {
   bounds: SceneBounds;
   appState: Readonly<AppState>;
@@ -313,13 +319,10 @@ export const zoomToFitBounds = ({
       Math.min(
         appState.width / commonBoundsWidth,
         appState.height / commonBoundsHeight,
-      ) * Math.min(1, Math.max(viewportZoomFactor, 0.1));
+      ) * clamp(viewportZoomFactor, 0.1, 1);
 
     // Apply clamping to newZoomValue to be between 10% and 3000%
-    newZoomValue = Math.min(
-      Math.max(newZoomValue, MIN_ZOOM),
-      MAX_ZOOM,
-    ) as NormalizedZoomValue;
+    newZoomValue = getNormalizedZoom(newZoomValue);
 
     let appStateWidth = appState.width;
 
@@ -338,10 +341,14 @@ export const zoomToFitBounds = ({
     scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
-      width: appState.width,
-      height: appState.height,
-    });
+    newZoomValue = zoomValueToFitBoundsOnViewport(
+      bounds,
+      {
+        width: appState.width,
+        height: appState.height,
+      },
+      viewportZoomFactor,
+    );
 
     const centerScroll = centerScrollOn({
       scenePoint: { x: centerX, y: centerY },
@@ -432,6 +439,7 @@ export const actionZoomToFitSelection = register({
         userToFollow: null,
       },
       fitToViewport: true,
+      viewportZoomFactor: 0.7,
     });
   },
   // NOTE this action should use shift-2 per figma, alas
@@ -642,6 +650,7 @@ export const zoomToFitElements = (
         width: appState.width - appState.width * margin,
         height: appState.height - appState.height * margin,
       },
+      1,
       maxZoom,
     ),
   };

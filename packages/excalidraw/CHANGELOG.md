@@ -39,6 +39,8 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking Changes
 
+- Stats container CSS changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout.
+
 - `updateScene` API has changed due to the added `Store` component as part of the multiplayer undo / redo initiative. Specifically, `sceneData` property `commitToHistory: boolean` was replaced with `storeAction: StoreActionType`. Make sure to update all instances of `updateScene` according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
 
 |  | Before `commitToHistory` | After `storeAction` | Notes |

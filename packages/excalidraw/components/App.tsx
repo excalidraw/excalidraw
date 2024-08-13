@@ -3746,7 +3746,7 @@ class App extends React.Component<AppProps, AppState> {
       | {
           fitToContent?: boolean;
           fitToViewport?: never;
-          viewportZoomFactor?: never;
+          viewportZoomFactor?: number;
           animate?: boolean;
           duration?: number;
         }
@@ -4167,6 +4167,43 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  private getEditorUIOffsets = (): {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  } => {
+    const toolbarBottom =
+      this.excalidrawContainerRef?.current
+        ?.querySelector(".App-toolbar")
+        ?.getBoundingClientRect()?.bottom ?? 0;
+    const sidebarWidth = Math.max(
+      this.excalidrawContainerRef?.current
+        ?.querySelector(".default-sidebar")
+        ?.getBoundingClientRect()?.width ?? 0,
+    );
+    const propertiesPanelWidth = Math.max(
+      this.excalidrawContainerRef?.current
+        ?.querySelector(".App-menu__left")
+        ?.getBoundingClientRect()?.width ?? 0,
+      0,
+    );
+
+    return getLanguage().rtl
+      ? {
+          top: toolbarBottom,
+          right: propertiesPanelWidth,
+          bottom: 0,
+          left: sidebarWidth,
+        }
+      : {
+          top: toolbarBottom,
+          right: sidebarWidth,
+          bottom: 0,
+          left: propertiesPanelWidth,
+        };
+  };
+
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
@@ -4234,6 +4271,31 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
 
+          if (
+            this.flowChartCreator.pendingNodes?.length &&
+            !isElementCompletelyInViewport(
+              this.flowChartCreator.pendingNodes,
+              this.canvas.width / window.devicePixelRatio,
+              this.canvas.height / window.devicePixelRatio,
+              {
+                offsetLeft: this.state.offsetLeft,
+                offsetTop: this.state.offsetTop,
+                scrollX: this.state.scrollX,
+                scrollY: this.state.scrollY,
+                zoom: this.state.zoom,
+              },
+              this.scene.getNonDeletedElementsMap(),
+              this.getEditorUIOffsets(),
+            )
+          ) {
+            this.scrollToContent(this.flowChartCreator.pendingNodes, {
+              animate: true,
+              duration: 300,
+              fitToContent: true,
+              viewportZoomFactor: 0.8,
+            });
+          }
+
           return;
         }
 
@@ -4269,7 +4331,7 @@ class App extends React.Component<AppProps, AppState> {
               if (
                 nextNode &&
                 !isElementCompletelyInViewport(
-                  nextNode,
+                  [nextNode],
                   this.canvas.width / window.devicePixelRatio,
                   this.canvas.height / window.devicePixelRatio,
                   {
@@ -4280,6 +4342,7 @@ class App extends React.Component<AppProps, AppState> {
                     zoom: this.state.zoom,
                   },
                   this.scene.getNonDeletedElementsMap(),
+                  this.getEditorUIOffsets(),
                 )
               ) {
                 this.scrollToContent(nextNode, {
@@ -4707,7 +4770,7 @@ class App extends React.Component<AppProps, AppState> {
 
           if (
             !isElementCompletelyInViewport(
-              firstNode,
+              [firstNode],
               this.canvas.width / window.devicePixelRatio,
               this.canvas.height / window.devicePixelRatio,
               {
@@ -4718,6 +4781,7 @@ class App extends React.Component<AppProps, AppState> {
                 zoom: this.state.zoom,
               },
               this.scene.getNonDeletedElementsMap(),
+              this.getEditorUIOffsets(),
             )
           ) {
             this.scrollToContent(firstNode, {
