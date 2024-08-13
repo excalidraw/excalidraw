@@ -176,4 +176,81 @@ describe("export", () => {
     // src/tests/fixtures/svg-image-exporting-reference.svg
     expect(svgText).toMatchSnapshot(`svg export output`);
   });
+
+  it("exporting svg containing rotated curved linear elements", async () => {
+    const normalizeAngle = (angle: number) => (angle / 180) * Math.PI;
+
+    const elements = [
+      API.createElement({
+        type: "line",
+        angle: normalizeAngle(180),
+        x: 0,
+        y: 0,
+        roughness: 0,
+        strokeColor: "red",
+        roundness: { type: 2 },
+        points: [
+          [0, 0],
+          [0, 600],
+          [600, 600],
+        ],
+      }),
+      API.createElement({
+        type: "line",
+        angle: 0,
+        x: -44,
+        y: 44,
+        roughness: 0,
+        strokeStyle: "dotted",
+        strokeColor: "gray",
+        roundness: { type: 2 },
+        points: [
+          [0, 0],
+          [600, 0],
+          [600, 600],
+        ],
+      }),
+      API.createElement({
+        type: "arrow",
+        angle: normalizeAngle(180),
+        x: 656,
+        y: 744,
+        roughness: 0,
+        strokeColor: "blue",
+        roundness: { type: 2 },
+        points: [
+          [0, 0],
+          [0, -600],
+          [-600, -600],
+        ],
+      }),
+      API.createElement({
+        type: "arrow",
+        angle: 0,
+        x: 700,
+        y: 700,
+        roughness: 0,
+        strokeStyle: "dotted",
+        strokeColor: "gray",
+        roundness: { type: 2 },
+        points: [
+          [0, 0],
+          [-600, 0],
+          [-600, -600],
+        ],
+      }),
+    ];
+
+    const appState = { ...getDefaultAppState(), exportBackground: false };
+
+    const svg = await exportToSvg(elements, appState, null);
+
+    const svgText = svg.outerHTML;
+
+    // in case of regressions, save the SVG to a file and visually compare to:
+    // ./fixtures/svg-linear-exporting-reference.svg
+    expect(svgText).toMatchSnapshot(
+      `rotated curved linear elements svg export`,
+    );
+  });
 });
