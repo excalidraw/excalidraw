@@ -24,7 +24,7 @@ import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type { AppState, NormalizedZoomValue } from "../types";
+import type { AppState } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
@@ -247,6 +247,7 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
+  viewportZoomFactor: number = 1, // default to 1 if not provided
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -254,20 +255,21 @@ const zoomValueToFitBoundsOnViewport = (
   const commonBoundsHeight = y2 - y1;
   const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
   const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
+
+  const adjustedZoomValue =
+    smallestZoomValue * clamp(viewportZoomFactor, 0.1, 1);
+
   const zoomAdjustedToSteps =
-    Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
-  const clampedZoomValueToFitElements = Math.min(
-    Math.max(zoomAdjustedToSteps, MIN_ZOOM),
-    1,
-  );
-  return clampedZoomValueToFitElements as NormalizedZoomValue;
+    Math.floor(adjustedZoomValue / ZOOM_STEP) * ZOOM_STEP;
+
+  return getNormalizedZoom(Math.min(zoomAdjustedToSteps, 1));
 };
 
 export const zoomToFitBounds = ({
   bounds,
   appState,
   fitToViewport = false,
-  viewportZoomFactor = 0.7,
+  viewportZoomFactor = 1,
 }: {
   bounds: SceneBounds;
   appState: Readonly<AppState>;
@@ -292,14 +294,9 @@ export const zoomToFitBounds = ({
       Math.min(
         appState.width / commonBoundsWidth,
         appState.height / commonBoundsHeight,
-      ) * Math.min(1, Math.max(viewportZoomFactor, 0.1));
+      ) * clamp(viewportZoomFactor, 0.1, 1);
 
-    // Apply clamping to newZoomValue to be between 10% and 3000%
-    newZoomValue = clamp(
-      newZoomValue,
-      MIN_ZOOM,
-      MAX_ZOOM,
-    ) as NormalizedZoomValue;
+    newZoomValue = getNormalizedZoom(newZoomValue);
 
     let appStateWidth = appState.width;
 
@@ -318,10 +315,14 @@ export const zoomToFitBounds = ({
     scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
-      width: appState.width,
-      height: appState.height,
-    });
+    newZoomValue = zoomValueToFitBoundsOnViewport(
+      bounds,
+      {
+        width: appState.width,
+        height: appState.height,
+      },
+      viewportZoomFactor,
+    );
 
     const centerScroll = centerScrollOn({
       scenePoint: { x: centerX, y: centerY },
@@ -412,6 +413,7 @@ export const actionZoomToFitSelection = register({
         userToFollow: null,
       },
       fitToViewport: true,
+      viewportZoomFactor: 0.7,
     });
   },
   // NOTE this action should use shift-2 per figma, alas
