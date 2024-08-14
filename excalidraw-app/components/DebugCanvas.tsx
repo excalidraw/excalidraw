@@ -13,9 +13,7 @@ import {
   CloseIcon,
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
-
-// The global data holder to collect the debug operations
-window.visualDebugData = [] as DebugElement[][];
+import { STORAGE_KEYS } from "../app_constants";
 
 const renderLine = (
   context: CanvasRenderingContext2D,
@@ -86,35 +84,49 @@ const _debugRenderer = (
   renderOrigin(context, appState.zoom.value);
 
   if (
-    window.visualDebugCurrentFrame &&
-    window.visualDebugData &&
-    window.visualDebugData.length > 0
+    window.visualDebug?.currentFrame &&
+    window.visualDebug?.data &&
+    window.visualDebug.data.length > 0
   ) {
     // Render only one frame
     const [idx] = debugFrameData();
 
-    render(window.visualDebugData[idx], context, appState);
+    render(window.visualDebug.data[idx], context, appState);
   } else {
     // Render all debug frames
-    window.visualDebugData?.forEach((frame) => {
+    window.visualDebug?.data.forEach((frame) => {
       render(frame, context, appState);
     });
   }
 
-  window.visualDebugData = window.visualDebugData?.map((frame) =>
-    frame.filter((el) => el.permanent),
-  );
+  if (window.visualDebug) {
+    window.visualDebug!.data =
+      window.visualDebug?.data.map((frame) =>
+        frame.filter((el) => el.permanent),
+      ) ?? [];
+  }
 };
 
 const debugFrameData = (): [number, number] => {
-  const currentFrame = window.visualDebugCurrentFrame ?? 0;
-  const frameCount = window.visualDebugData?.length ?? 0;
+  const currentFrame = window.visualDebug?.currentFrame ?? 0;
+  const frameCount = window.visualDebug?.data.length ?? 0;
 
   if (frameCount > 0) {
-    return [currentFrame % frameCount, window.visualDebugCurrentFrame ?? 0];
+    return [currentFrame % frameCount, window.visualDebug?.currentFrame ?? 0];
   }
 
   return [0, 0];
+};
+
+export const saveDebugState = (debug: { enabled: boolean }) => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_DEBUG,
+      JSON.stringify(debug),
+    );
+  } catch (error: any) {
+    console.error(error);
+  }
 };
 
 export const debugRenderer = throttleRAF(
@@ -124,38 +136,56 @@ export const debugRenderer = throttleRAF(
   { trailing: true },
 );
 
+export const loadSavedDebugState = () => {
+  let debug;
+  try {
+    const savedDebugState = localStorage.getItem(
+      STORAGE_KEYS.LOCAL_STORAGE_DEBUG,
+    );
+    if (savedDebugState) {
+      debug = JSON.parse(savedDebugState) as { enabled: boolean };
+    }
+  } catch (error: any) {
+    console.error(error);
+  }
+
+  return debug ?? { enabled: false };
+};
+
 export const isVisualDebuggerEnabled = () =>
-  Array.isArray(window.visualDebugData);
+  Array.isArray(window.visualDebug?.data);
 
 export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
   const moveForward = useCallback(() => {
     if (
-      !window.visualDebugCurrentFrame ||
-      isNaN(window.visualDebugCurrentFrame ?? -1)
+      !window.visualDebug?.currentFrame ||
+      isNaN(window.visualDebug?.currentFrame ?? -1)
     ) {
-      window.visualDebugCurrentFrame = 0;
+      window.visualDebug!.currentFrame = 0;
     }
-    window.visualDebugCurrentFrame += 1;
+    window.visualDebug!.currentFrame += 1;
     onChange();
   }, [onChange]);
   const moveBackward = useCallback(() => {
     if (
-      !window.visualDebugCurrentFrame ||
-      isNaN(window.visualDebugCurrentFrame ?? -1) ||
-      window.visualDebugCurrentFrame < 1
+      !window.visualDebug?.currentFrame ||
+      isNaN(window.visualDebug?.currentFrame ?? -1) ||
+      window.visualDebug?.currentFrame < 1
     ) {
-      window.visualDebugCurrentFrame = 1;
+      window.visualDebug!.currentFrame = 1;
     }
-    window.visualDebugCurrentFrame -= 1;
+    window.visualDebug!.currentFrame -= 1;
     onChange();
   }, [onChange]);
   const reset = useCallback(() => {
-    window.visualDebugCurrentFrame = undefined;
+    window.visualDebug!.currentFrame = undefined;
     onChange();
   }, [onChange]);
   const trashFrames = useCallback(() => {
-    window.visualDebugCurrentFrame = undefined;
-    window.visualDebugData = [];
+    if (window.visualDebug) {
+      window.visualDebug.currentFrame = undefined;
+      window.visualDebug.data = [];
+    }
     onChange();
   }, [onChange]);
 

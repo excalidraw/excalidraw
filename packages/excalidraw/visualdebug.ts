@@ -5,8 +5,10 @@ import { isBounds, isLineSegment, type Point } from "./types";
 // The global data holder to collect the debug operations
 declare global {
   interface Window {
-    visualDebugData?: DebugElement[][];
-    visualDebugCurrentFrame?: number;
+    visualDebug?: {
+      data: DebugElement[][];
+      currentFrame?: number;
+    };
   }
 }
 
@@ -136,19 +138,19 @@ export const debugDrawBounds = (
 };
 
 export const debugCloseFrame = () => {
-  window.visualDebugData?.push([]);
+  window.visualDebug?.data.push([]);
 };
 
 export const debugClear = () => {
-  if (window.visualDebugData) {
-    window.visualDebugData = [];
+  if (window.visualDebug?.data) {
+    window.visualDebug.data = [];
   }
 };
 
 const addToCurrentFrame = (element: DebugElement) => {
-  if (window.visualDebugData && window.visualDebugData.length === 0) {
-    window.visualDebugData[0] = [];
+  if (window.visualDebug?.data && window.visualDebug.data.length === 0) {
+    window.visualDebug.data[0] = [];
   }
-  window.visualDebugData &&
-    window.visualDebugData[window.visualDebugData.length - 1].push(element);
+  window.visualDebug?.data &&
+    window.visualDebug.data[window.visualDebug.data.length - 1].push(element);
 };

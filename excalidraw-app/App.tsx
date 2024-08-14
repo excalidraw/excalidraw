@@ -122,7 +122,10 @@ import {
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
-import DebugCanvas, { debugRenderer } from "./components/DebugCanvas";
+import DebugCanvas, {
+  debugRenderer,
+  loadSavedDebugState,
+} from "./components/DebugCanvas";
 
 polyfill();
 
@@ -365,6 +368,23 @@ const ExcalidrawWrapper = () => {
     // TODO maybe remove this in several months (shipped: 24-03-11)
     migrationAdapter: LibraryLocalStorageMigrationAdapter,
   });
+
+  const [, forceRefresh] = useState(false);
+
+  useEffect(() => {
+    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+      const debugState = loadSavedDebugState();
+
+      if (debugState.enabled && !window.visualDebug) {
+        window.visualDebug = {
+          data: [],
+        };
+      } else {
+        delete window.visualDebug;
+      }
+      forceRefresh((prev) => !prev);
+    }
+  }, [excalidrawAPI]);
 
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
@@ -829,6 +849,7 @@ const ExcalidrawWrapper = () => {
           isCollabEnabled={!isCollabDisabled}
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
+          refresh={() => forceRefresh((prev) => !prev)}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
@@ -1142,6 +1163,7 @@ const ExcalidrawWrapper = () => {
           ]}
         />
         {(import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) &&
+          window.visualDebug &&
           excalidrawAPI && (
             <DebugCanvas
               appState={excalidrawAPI.getAppState()}
