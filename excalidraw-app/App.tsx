@@ -1162,15 +1162,13 @@ const ExcalidrawWrapper = () => {
             },
           ]}
         />
-        {(import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) &&
-          window.visualDebug &&
-          excalidrawAPI && (
-            <DebugCanvas
-              appState={excalidrawAPI.getAppState()}
-              scale={window.devicePixelRatio}
-              ref={debugCanvasRef}
-            />
-          )}
+        {import.meta.env.DEV && window.visualDebug && excalidrawAPI && (
+          <DebugCanvas
+            appState={excalidrawAPI.getAppState()}
+            scale={window.devicePixelRatio}
+            ref={debugCanvasRef}
+          />
+        )}
       </Excalidraw>
     </div>
   );

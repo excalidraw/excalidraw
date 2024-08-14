@@ -55,7 +55,7 @@ export const AppMainMenu: React.FC<{
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       </MainMenu.ItemLink>
-      {(import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) && (
+      {import.meta.env.DEV && (
         <MainMenu.Item
           icon={eyeIcon}
           onClick={() => {
