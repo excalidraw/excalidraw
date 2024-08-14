@@ -44,6 +44,7 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
+import { createPasteEvent } from "../clipboard";
 
 const { h } = window;
 
@@ -80,9 +81,21 @@ const blue = COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const yellow = COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const violet = COLOR_PALETTE.violet[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 
+const pasteImage = async () => {
+  const sendPasteEvent = (file?: File) => {
+    const clipboardEvent = createPasteEvent({ files: file ? [file] : [] });
+    document.dispatchEvent(clipboardEvent);
+  };
+
+  sendPasteEvent(await API.loadFile("./fixtures/smiley_embedded_v2.png"));
+};
+
 describe("history", () => {
   beforeEach(() => {
     renderStaticScene.mockClear();
+    Object.assign(document, {
+      elementFromPoint: () => GlobalTestState.canvas,
+    });
   });
 
   afterEach(() => {
@@ -1824,6 +1837,24 @@ describe("history", () => {
       expect(queryByTestId(container, "button-undo")).toBeDisabled();
       expect(queryByTestId(container, "button-redo")).not.toBeDisabled();
     });
+
+    it("should record history when pasting an image", async () => {
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+      await pasteImage();
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+      });
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+    });
   });
 
   describe("multiplayer undo/redo", () => {
@@ -3217,6 +3248,40 @@ describe("history", () => {
         }),
         expect.objectContaining(rect3Props),
       ]);
+    });
+
+    it("paste image", async () => {
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+      await pasteImage();
+      await waitFor(() => {
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+      });
+
+      const remoteImage = API.createElement({
+        type: "image",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.updateScene({
+        elements: [h.elements[0], remoteImage],
+        storeAction: StoreAction.UPDATE,
+      });
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
+
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(0);
+      expect(API.getRedoStack().length).toBe(1);
+
+      Keyboard.redo();
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(0);
     });
 
     describe("conflicts in bound text elements and their containers", () => {

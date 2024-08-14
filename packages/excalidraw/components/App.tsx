@@ -3024,7 +3024,9 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         const imageElement = this.createImageElement({ sceneX, sceneY });
-        this.insertImageElement(imageElement, file);
+        this.insertImageElement(imageElement, file).finally(() => {
+          this.store.shouldCaptureIncrement();
+        });
         this.initializeImageDimensions(imageElement);
         this.setState({
           selectedElementIds: makeNextSelectedElementIds(
