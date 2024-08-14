@@ -42,6 +42,8 @@ import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf } from "./utility-types";
 import type { StoreActionType } from "./store";
+import type { Bounds } from "./element/bounds";
+import type { LineSegment } from "../utils";
 
 export type Point = Readonly<RoughPoint>;
 
@@ -831,3 +833,20 @@ export type EmbedsValidationStatus = Map<
 export type ElementsPendingErasure = Set<ExcalidrawElement["id"]>;
 
 export type PendingExcalidrawElements = ExcalidrawElement[];
+
+export const isPoint = (point: unknown): point is Point =>
+  Array.isArray(point) && point.length === 2;
+
+export const isBounds = (box: unknown): box is Bounds =>
+  Array.isArray(box) &&
+  box.length === 4 &&
+  typeof box[0] === "number" &&
+  typeof box[1] === "number" &&
+  typeof box[2] === "number" &&
+  typeof box[3] === "number";
+
+export const isLineSegment = (segment: unknown): segment is LineSegment =>
+  Array.isArray(segment) &&
+  segment.length === 2 &&
+  isPoint(segment[0]) &&
+  isPoint(segment[0]);

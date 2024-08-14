@@ -6,6 +6,7 @@ import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import {
   APP_NAME,
+  ENV,
   EVENT,
   THEME,
   TITLE_TIMEOUT,
@@ -121,6 +122,7 @@ import {
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
+import DebugCanvas, { debugRenderer } from "./components/DebugCanvas";
 
 polyfill();
 
@@ -336,6 +338,8 @@ const ExcalidrawWrapper = () => {
     initialStatePromiseRef.current.promise =
       resolvablePromise<ExcalidrawInitialDataState | null>();
   }
+
+  const debugCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
@@ -621,6 +625,11 @@ const ExcalidrawWrapper = () => {
           }
         }
       });
+    }
+
+    // Render the debug scene if the debug canvas is available
+    if (debugCanvasRef.current) {
+      debugRenderer(debugCanvasRef.current, appState, window.devicePixelRatio);
     }
   };
 
@@ -1132,6 +1141,14 @@ const ExcalidrawWrapper = () => {
             },
           ]}
         />
+        {(import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) &&
+          excalidrawAPI && (
+            <DebugCanvas
+              appState={excalidrawAPI.getAppState()}
+              scale={window.devicePixelRatio}
+              ref={debugCanvasRef}
+            />
+          )}
       </Excalidraw>
     </div>
   );
