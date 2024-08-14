@@ -179,7 +179,8 @@ export const COLOR_VOICE_CALL = "#a2f1a6";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
-export const GRID_SIZE = 20; // TODO make it configurable?
+export const DEFAULT_GRID_SIZE = 20;
+export const DEFAULT_GRID_STEP = 5;
 
 export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",
@@ -234,7 +235,7 @@ export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
-export const MAX_ZOOM = 30.0;
+export const MAX_ZOOM = 30;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds

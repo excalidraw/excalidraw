@@ -31,53 +31,77 @@ import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { throttleRAF } from "../utils";
 import { getBoundTextElement } from "../element/textElement";
 
+const GridLineColor = {
+  Bold: "#dddddd",
+  Regular: "#e5e5e5",
+} as const;
+
 const strokeGrid = (
   context: CanvasRenderingContext2D,
+  /** grid cell pixel size */
   gridSize: number,
+  /** setting to 1 will disble bold lines */
+  gridStep: number,
   scrollX: number,
   scrollY: number,
   zoom: Zoom,
   width: number,
   height: number,
 ) => {
-  const BOLD_LINE_FREQUENCY = 5;
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
 
-  enum GridLineColor {
-    Bold = "#cccccc",
-    Regular = "#e5e5e5",
-  }
-
-  const offsetX =
-    -Math.round(zoom.value / gridSize) * gridSize + (scrollX % gridSize);
-  const offsetY =
-    -Math.round(zoom.value / gridSize) * gridSize + (scrollY % gridSize);
-
-  const lineWidth = Math.min(1 / zoom.value, 1);
+  const actualGridSize = gridSize * zoom.value;
 
   const spaceWidth = 1 / zoom.value;
-  const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
   context.save();
-  context.lineWidth = lineWidth;
 
+  // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
+  // We only do this when zoomed to 100% because otherwise the offset is
+  // fractional, and also visibly offsets the elements.
+  // We also do this per-axis, as each axis may already be offset by 0.5.
+  if (zoom.value === 1) {
+    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
+  }
+
+  // vertical lines
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
     const isBold =
-      Math.round(x - scrollX) % (BOLD_LINE_FREQUENCY * gridSize) === 0;
+      gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
+    // don't render regular lines when zoomed out and they're barely visible
+    if (!isBold && actualGridSize < 10) {
+      continue;
+    }
+
+    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+    context.lineWidth = lineWidth;
+    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+
     context.beginPath();
     context.setLineDash(isBold ? [] : lineDash);
     context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
     context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, offsetY + height + gridSize * 2);
+    context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
     context.stroke();
   }
+
   for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
     const isBold =
-      Math.round(y - scrollY) % (BOLD_LINE_FREQUENCY * gridSize) === 0;
+      gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
+    if (!isBold && actualGridSize < 10) {
+      continue;
+    }
+
+    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+    context.lineWidth = lineWidth;
+    const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
+
     context.beginPath();
     context.setLineDash(isBold ? [] : lineDash);
     context.strokeStyle = isBold ? GridLineColor.Bold : GridLineColor.Regular;
     context.moveTo(offsetX - gridSize, y);
-    context.lineTo(offsetX + width + gridSize * 2, y);
+    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
     context.stroke();
   }
   context.restore();
@@ -199,10 +223,11 @@ const _renderStaticScene = ({
   context.scale(appState.zoom.value, appState.zoom.value);
 
   // Grid
-  if (renderGrid && appState.gridSize) {
+  if (renderGrid) {
     strokeGrid(
       context,
       appState.gridSize,
+      appState.gridStep,
       appState.scrollX,
       appState.scrollY,
       appState.zoom,

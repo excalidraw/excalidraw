@@ -360,7 +360,7 @@ const LayerUI = ({
               )}
             {shouldShowStats && (
               <Stats
-                scene={app.scene}
+                app={app}
                 onClose={() => {
                   actionManager.executeAction(actionToggleStats);
                 }}

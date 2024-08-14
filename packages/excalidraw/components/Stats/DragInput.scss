@@ -18,7 +18,8 @@
     flex-shrink: 0;
     border: 1px solid var(--default-border-color);
     border-right: 0;
-    width: 2rem;
+    padding: 0 0.5rem 0 0.75rem;
+    min-width: 1rem;
     height: 2rem;
     box-sizing: border-box;
     color: var(--popup-text-color);
