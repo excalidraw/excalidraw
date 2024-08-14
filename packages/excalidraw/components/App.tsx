@@ -431,6 +431,7 @@ import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
 import {
+  allowDoubleTapEraser,
   getExcalidrawContentEl,
   hideFreedrawPenmodeCursor,
   hostPlugin,
@@ -5556,6 +5557,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       //zsviczian - double click eraser
       this.state.penMode &&
+      allowDoubleTapEraser() &&
       this.lastPointerDownEvent?.pointerType === "touch" &&
       this.state.activeTool.type !== "selection"
     ) {

@@ -23,6 +23,10 @@ export function getWidthHeightLimit() {
   return hostPlugin.excalidrawConfig.widthHeightLimit ?? 32767;
 }
 
+export function allowDoubleTapEraser() {
+  return hostPlugin.settings.penModeDoubleTapEraser;
+}
+
 export function isExcaliBrainView() {
   const excalidrawView = hostPlugin.activeExcalidrawView;
   if (!excalidrawView) {
