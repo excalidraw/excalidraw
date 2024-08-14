@@ -5,7 +5,8 @@ import { isBounds, isLineSegment, type Point } from "./types";
 // The global data holder to collect the debug operations
 declare global {
   interface Window {
-    visualDebugData: DebugElement[][] | undefined;
+    visualDebugData?: DebugElement[][];
+    visualDebugCurrentFrame?: number;
   }
 }
 

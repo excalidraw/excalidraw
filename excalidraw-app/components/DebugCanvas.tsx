@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { isLineSegment, type AppState } from "../../packages/excalidraw/types";
 import { t } from "../../packages/excalidraw/i18n";
 import { throttleRAF } from "../../packages/excalidraw/utils";
@@ -8,16 +8,13 @@ import {
   getNormalizedCanvasDimensions,
 } from "../../packages/excalidraw/renderer/helpers";
 import type { DebugElement } from "../../packages/excalidraw/visualdebug";
+import {
+  ArrowheadArrowIcon,
+  CloseIcon,
+} from "../../packages/excalidraw/components/icons";
 
 // The global data holder to collect the debug operations
 window.visualDebugData = [] as DebugElement[][];
-
-export const debugRenderer = throttleRAF(
-  (canvas: HTMLCanvasElement, appState: AppState, scale: number) => {
-    _debugRenderer(canvas, appState, scale);
-  },
-  { trailing: true },
-);
 
 const renderLine = (
   context: CanvasRenderingContext2D,
@@ -86,6 +83,90 @@ const _debugRenderer = (
 
   window.visualDebugData = window.visualDebugData?.map((frame) =>
     frame.filter((el) => el.permanent),
+  );
+};
+
+export const debugRenderer = throttleRAF(
+  (canvas: HTMLCanvasElement, appState: AppState, scale: number) => {
+    _debugRenderer(canvas, appState, scale);
+  },
+  { trailing: true },
+);
+
+export const isVisualDebuggerEnabled = () =>
+  Array.isArray(window.visualDebugData);
+
+export const DebugFooter = () => {
+  const moveForward = useCallback(() => {
+    const frameCount = window.visualDebugData?.length ?? 0;
+    const currentFrame = window.visualDebugCurrentFrame || -1;
+
+    window.visualDebugCurrentFrame = (currentFrame + 1) % frameCount;
+    if (isNaN(window.visualDebugCurrentFrame)) {
+      window.visualDebugCurrentFrame = 0;
+    }
+  }, []);
+  const moveBackward = useCallback(() => {
+    const frameCount = window.visualDebugData?.length ?? 0;
+    const currentFrame = window.visualDebugCurrentFrame ?? -1;
+
+    window.visualDebugCurrentFrame = (currentFrame + 1) % frameCount;
+    if (isNaN(window.visualDebugCurrentFrame)) {
+      window.visualDebugCurrentFrame = 0;
+    }
+  }, []);
+  const reset = useCallback(() => {
+    window.visualDebugCurrentFrame = undefined;
+  }, []);
+
+  return (
+    <>
+      <button
+        className="ToolIcon_type_button"
+        data-testid="debug-forward"
+        aria-label="Move forward"
+        type="button"
+        onClick={moveForward}
+      >
+        <div
+          className="ToolIcon__icon"
+          aria-hidden="true"
+          aria-disabled="false"
+        >
+          <ArrowheadArrowIcon flip />
+        </div>
+      </button>
+      <button
+        className="ToolIcon_type_button"
+        data-testid="debug-forward"
+        aria-label="Move forward"
+        type="button"
+        onClick={reset}
+      >
+        <div
+          className="ToolIcon__icon"
+          aria-hidden="true"
+          aria-disabled="false"
+        >
+          {CloseIcon}
+        </div>
+      </button>
+      <button
+        className="ToolIcon_type_button"
+        data-testid="debug-backward"
+        aria-label="Move backward"
+        type="button"
+        onClick={moveBackward}
+      >
+        <div
+          className="ToolIcon__icon"
+          aria-hidden="true"
+          aria-disabled="false"
+        >
+          <ArrowheadArrowIcon />
+        </div>
+      </button>
+    </>
   );
 };
 
