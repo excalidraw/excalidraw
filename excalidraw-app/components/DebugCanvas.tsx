@@ -11,6 +11,7 @@ import type { DebugElement } from "../../packages/excalidraw/visualdebug";
 import {
   ArrowheadArrowIcon,
   CloseIcon,
+  TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 
 // The global data holder to collect the debug operations
@@ -43,6 +44,20 @@ const renderOrigin = (context: CanvasRenderingContext2D, zoom: number) => {
   context.save();
 };
 
+const render = (
+  frame: DebugElement[],
+  context: CanvasRenderingContext2D,
+  appState: AppState,
+) => {
+  frame.forEach((el) => {
+    switch (true) {
+      case isLineSegment(el.data):
+        renderLine(context, appState.zoom.value, el.data, el.color);
+        break;
+    }
+  });
+};
+
 const _debugRenderer = (
   canvas: HTMLCanvasElement,
   appState: AppState,
@@ -70,20 +85,36 @@ const _debugRenderer = (
 
   renderOrigin(context, appState.zoom.value);
 
-  // Render all debug frames
-  window.visualDebugData?.forEach((frame) => {
-    frame.forEach((el) => {
-      switch (true) {
-        case isLineSegment(el.data):
-          renderLine(context, appState.zoom.value, el.data, el.color);
-          break;
-      }
+  if (
+    window.visualDebugCurrentFrame &&
+    window.visualDebugData &&
+    window.visualDebugData.length > 0
+  ) {
+    // Render only one frame
+    const [idx] = debugFrameData();
+
+    render(window.visualDebugData[idx], context, appState);
+  } else {
+    // Render all debug frames
+    window.visualDebugData?.forEach((frame) => {
+      render(frame, context, appState);
     });
-  });
+  }
 
   window.visualDebugData = window.visualDebugData?.map((frame) =>
     frame.filter((el) => el.permanent),
   );
+};
+
+const debugFrameData = (): [number, number] => {
+  const currentFrame = window.visualDebugCurrentFrame ?? 0;
+  const frameCount = window.visualDebugData?.length ?? 0;
+
+  if (frameCount > 0) {
+    return [currentFrame % frameCount, window.visualDebugCurrentFrame ?? 0];
+  }
+
+  return [0, 0];
 };
 
 export const debugRenderer = throttleRAF(
@@ -96,28 +127,37 @@ export const debugRenderer = throttleRAF(
 export const isVisualDebuggerEnabled = () =>
   Array.isArray(window.visualDebugData);
 
-export const DebugFooter = () => {
+export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
   const moveForward = useCallback(() => {
-    const frameCount = window.visualDebugData?.length ?? 0;
-    const currentFrame = window.visualDebugCurrentFrame || -1;
-
-    window.visualDebugCurrentFrame = (currentFrame + 1) % frameCount;
-    if (isNaN(window.visualDebugCurrentFrame)) {
+    if (
+      !window.visualDebugCurrentFrame ||
+      isNaN(window.visualDebugCurrentFrame ?? -1)
+    ) {
       window.visualDebugCurrentFrame = 0;
     }
-  }, []);
+    window.visualDebugCurrentFrame += 1;
+    onChange();
+  }, [onChange]);
   const moveBackward = useCallback(() => {
-    const frameCount = window.visualDebugData?.length ?? 0;
-    const currentFrame = window.visualDebugCurrentFrame ?? -1;
-
-    window.visualDebugCurrentFrame = (currentFrame + 1) % frameCount;
-    if (isNaN(window.visualDebugCurrentFrame)) {
-      window.visualDebugCurrentFrame = 0;
+    if (
+      !window.visualDebugCurrentFrame ||
+      isNaN(window.visualDebugCurrentFrame ?? -1) ||
+      window.visualDebugCurrentFrame < 1
+    ) {
+      window.visualDebugCurrentFrame = 1;
     }
-  }, []);
+    window.visualDebugCurrentFrame -= 1;
+    onChange();
+  }, [onChange]);
   const reset = useCallback(() => {
     window.visualDebugCurrentFrame = undefined;
-  }, []);
+    onChange();
+  }, [onChange]);
+  const trashFrames = useCallback(() => {
+    window.visualDebugCurrentFrame = undefined;
+    window.visualDebugData = [];
+    onChange();
+  }, [onChange]);
 
   return (
     <>
@@ -126,7 +166,22 @@ export const DebugFooter = () => {
         data-testid="debug-forward"
         aria-label="Move forward"
         type="button"
-        onClick={moveForward}
+        onClick={trashFrames}
+      >
+        <div
+          className="ToolIcon__icon"
+          aria-hidden="true"
+          aria-disabled="false"
+        >
+          {TrashIcon}
+        </div>
+      </button>
+      <button
+        className="ToolIcon_type_button"
+        data-testid="debug-forward"
+        aria-label="Move forward"
+        type="button"
+        onClick={moveBackward}
       >
         <div
           className="ToolIcon__icon"
@@ -156,7 +211,7 @@ export const DebugFooter = () => {
         data-testid="debug-backward"
         aria-label="Move backward"
         type="button"
-        onClick={moveBackward}
+        onClick={moveForward}
       >
         <div
           className="ToolIcon__icon"

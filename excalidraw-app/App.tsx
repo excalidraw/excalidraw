@@ -628,7 +628,7 @@ const ExcalidrawWrapper = () => {
     }
 
     // Render the debug scene if the debug canvas is available
-    if (debugCanvasRef.current) {
+    if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(debugCanvasRef.current, appState, window.devicePixelRatio);
     }
   };
@@ -854,7 +854,7 @@ const ExcalidrawWrapper = () => {
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
-        <AppFooter />
+        <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         <TTDDialog
           onTextSubmit={async (input) => {
             try {
