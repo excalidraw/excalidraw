@@ -9,7 +9,6 @@ import { MainMenu, useI18n } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
 import { saveDebugState } from "./DebugCanvas";
-import { ENV } from "../../packages/excalidraw/constants";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
