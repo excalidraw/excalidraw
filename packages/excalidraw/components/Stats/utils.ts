@@ -41,7 +41,8 @@ export type StatsInputProperty =
   | "width"
   | "height"
   | "angle"
-  | "fontSize";
+  | "fontSize"
+  | "gridStep";
 
 export const SMALLEST_DELTA = 0.01;
 

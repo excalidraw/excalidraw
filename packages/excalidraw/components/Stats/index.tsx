@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState, memo } from "react";
 import { getCommonBounds } from "../../element/bounds";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
-import type { AppState, ExcalidrawProps } from "../../types";
+import type {
+  AppClassProperties,
+  AppState,
+  ExcalidrawProps,
+} from "../../types";
 import { CloseIcon } from "../icons";
 import { Island } from "../Island";
 import { throttle } from "lodash";
@@ -16,17 +20,17 @@ import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
 import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
-import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
 import { isElbowArrow } from "../../element/typeChecks";
+import CanvasGrid from "./CanvasGrid";
 import clsx from "clsx";
 
 import "./Stats.scss";
 
 interface StatsProps {
-  scene: Scene;
+  app: AppClassProperties;
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
@@ -35,11 +39,13 @@ const STATS_TIMEOUT = 50;
 
 export const Stats = (props: StatsProps) => {
   const appState = useExcalidrawAppState();
-  const sceneNonce = props.scene.getSceneNonce() || 1;
-  const selectedElements = props.scene.getSelectedElements({
+  const sceneNonce = props.app.scene.getSceneNonce() || 1;
+  const selectedElements = props.app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
     includeBoundTextElement: false,
   });
+  const gridModeEnabled =
+    props.app.props.gridModeEnabled ?? appState.gridModeEnabled;
 
   return (
     <StatsInner
@@ -47,6 +53,7 @@ export const Stats = (props: StatsProps) => {
       appState={appState}
       sceneNonce={sceneNonce}
       selectedElements={selectedElements}
+      gridModeEnabled={gridModeEnabled}
     />
   );
 };
@@ -97,17 +104,20 @@ Stats.StatsRows = StatsRows;
 
 export const StatsInner = memo(
   ({
-    scene,
+    app,
     onClose,
     renderCustomStats,
     selectedElements,
     appState,
     sceneNonce,
+    gridModeEnabled,
   }: StatsProps & {
     sceneNonce: number;
     selectedElements: readonly NonDeletedExcalidrawElement[];
     appState: AppState;
+    gridModeEnabled: boolean;
   }) => {
+    const scene = app.scene;
     const elements = scene.getNonDeletedElements();
     const elementsMap = scene.getNonDeletedElementsMap();
     const setAppState = useExcalidrawSetAppState();
@@ -189,6 +199,19 @@ export const StatsInner = memo(
                 <div>{t("stats.height")}</div>
                 <div>{sceneDimension.height}</div>
               </StatsRow>
+              {gridModeEnabled && (
+                <>
+                  <StatsRow heading>Canvas</StatsRow>
+                  <StatsRow>
+                    <CanvasGrid
+                      property="gridStep"
+                      scene={scene}
+                      appState={appState}
+                      setAppState={setAppState}
+                    />
+                  </StatsRow>
+                </>
+              )}
             </StatsRows>
 
             {renderCustomStats?.(elements, appState)}
@@ -362,7 +385,9 @@ export const StatsInner = memo(
     return (
       prev.sceneNonce === next.sceneNonce &&
       prev.selectedElements === next.selectedElements &&
-      prev.appState.stats.panels === next.appState.stats.panels
+      prev.appState.stats.panels === next.appState.stats.panels &&
+      prev.gridModeEnabled === next.gridModeEnabled &&
+      prev.appState.gridStep === next.appState.gridStep
     );
   },
 );

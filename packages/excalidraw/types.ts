@@ -40,7 +40,7 @@ import type { FileSystemHandle } from "./data/filesystem";
 import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
-import type { Merge, MaybePromise, ValueOf } from "./utility-types";
+import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type { StoreActionType } from "./store";
 import type { Bounds } from "./element/bounds";
 import type { LineSegment } from "../utils";
@@ -178,6 +178,7 @@ export type StaticCanvasAppState = Readonly<
     exportScale: AppState["exportScale"];
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
+    gridStep: AppState["gridStep"];
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
   }
@@ -353,7 +354,10 @@ export interface AppState {
   toast: { message: string; closable?: boolean; duration?: number } | null;
   zenModeEnabled: boolean;
   theme: Theme;
-  gridSize: number | null;
+  /** grid cell px size */
+  gridSize: number;
+  gridStep: number;
+  gridModeEnabled: boolean;
   viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
@@ -617,6 +621,7 @@ export type AppProps = Merge<
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
   props: AppProps;
+  state: AppState;
   interactiveCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
@@ -651,6 +656,7 @@ export type AppClassProperties = {
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowChartCreator: App["flowChartCreator"];
+  getEffectiveGridSize: App["getEffectiveGridSize"];
 };
 
 export type PointerDownState = Readonly<{
@@ -850,3 +856,8 @@ export const isLineSegment = (segment: unknown): segment is LineSegment =>
   segment.length === 2 &&
   isPoint(segment[0]) &&
   isPoint(segment[0]);
+
+/** Runtime gridSize value. Null indicates disabled grid. */
+export type NullableGridSize =
+  | (AppState["gridSize"] & MakeBrand<"NullableGridSize">)
+  | null;
