@@ -72,6 +72,7 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
+import { segmentIntersectRectangleElement } from "../../utils/geometry/geometry";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -753,6 +754,7 @@ export const bindPointToSnapToElementOutline = (
 
   if (bindableElement && aabb) {
     // TODO: Dirty hacks until tangents are properly calculated
+    const heading = headingForPointFromElement(bindableElement, aabb, point);
     const intersections = [
       ...intersectElementWithLine(
         bindableElement,
@@ -760,39 +762,22 @@ export const bindPointToSnapToElementOutline = (
         [point[0], point[1] + 2 * bindableElement.height],
         FIXED_BINDING_DISTANCE,
         elementsMap,
-      ).map((i) => {
-        if (!isRectangularElement(bindableElement)) {
-          return i;
-        }
-
-        const d = distanceToBindableElement(bindableElement, i, elementsMap);
-        return d >= bindableElement.height / 2 || d < FIXED_BINDING_DISTANCE
-          ? ([point[0], -1 * i[1]] as Point)
-          : ([point[0], i[1]] as Point);
-      }),
+      ),
       ...intersectElementWithLine(
         bindableElement,
         [point[0] - 2 * bindableElement.width, point[1]],
         [point[0] + 2 * bindableElement.width, point[1]],
         FIXED_BINDING_DISTANCE,
         elementsMap,
-      ).map((i) => {
-        if (!isRectangularElement(bindableElement)) {
-          return i;
-        }
-
-        const d = distanceToBindableElement(bindableElement, i, elementsMap);
-        return d >= bindableElement.width / 2 || d < FIXED_BINDING_DISTANCE
-          ? ([-1 * i[0], point[1]] as Point)
-          : ([i[0], point[1]] as Point);
-      }),
+      ),
     ];
 
-    const heading = headingForPointFromElement(bindableElement, aabb, point);
     const isVertical =
       compareHeading(heading, HEADING_LEFT) ||
       compareHeading(heading, HEADING_RIGHT);
-    const dist = distanceToBindableElement(bindableElement, point, elementsMap);
+    const dist = Math.abs(
+      distanceToBindableElement(bindableElement, point, elementsMap),
+    );
     const isInner = isVertical
       ? dist < bindableElement.width * -0.1
       : dist < bindableElement.height * -0.1;
@@ -1619,6 +1604,10 @@ const intersectElementWithLine = (
   gap: number = 0,
   elementsMap: ElementsMap,
 ): Point[] => {
+  if (isRectangularElement(element)) {
+    return segmentIntersectRectangleElement(element, [a, b], gap);
+  }
+
   const relateToCenter = relativizationToElementCenter(element, elementsMap);
   const aRel = GATransform.apply(relateToCenter, GAPoint.from(a));
   const bRel = GATransform.apply(relateToCenter, GAPoint.from(b));

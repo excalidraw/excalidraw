@@ -36,6 +36,8 @@ import type {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
+  AppClassProperties,
+  NullableGridSize,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -211,7 +213,7 @@ export class LinearElementEditor {
   /** @returns whether point was dragged */
   static handlePointDragging(
     event: PointerEvent,
-    appState: AppState,
+    app: AppClassProperties,
     scenePointerX: number,
     scenePointerY: number,
     maybeSuggestBinding: (
@@ -281,7 +283,7 @@ export class LinearElementEditor {
           elementsMap,
           referencePoint,
           [scenePointerX, scenePointerY],
-          event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+          event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
         );
 
         LinearElementEditor.movePoints(
@@ -301,7 +303,7 @@ export class LinearElementEditor {
           elementsMap,
           scenePointerX - linearElementEditor.pointerOffset.x,
           scenePointerY - linearElementEditor.pointerOffset.y,
-          event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+          event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
         );
 
         const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
@@ -317,7 +319,7 @@ export class LinearElementEditor {
                     elementsMap,
                     scenePointerX - linearElementEditor.pointerOffset.x,
                     scenePointerY - linearElementEditor.pointerOffset.y,
-                    event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+                    event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
                   )
                 : ([
                     element.points[pointIndex][0] + deltaX,
@@ -697,7 +699,7 @@ export class LinearElementEditor {
 
   static handlePointerDown(
     event: React.PointerEvent<HTMLElement>,
-    appState: AppState,
+    app: AppClassProperties,
     store: Store,
     scenePointer: { x: number; y: number },
     linearElementEditor: LinearElementEditor,
@@ -707,6 +709,7 @@ export class LinearElementEditor {
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
+    const appState = app.state;
     const elementsMap = scene.getNonDeletedElementsMap();
     const elements = scene.getNonDeletedElements();
 
@@ -754,7 +757,7 @@ export class LinearElementEditor {
               elementsMap,
               scenePointer.x,
               scenePointer.y,
-              event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+              event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
             ),
           ],
         });
@@ -878,9 +881,10 @@ export class LinearElementEditor {
     event: React.PointerEvent<HTMLCanvasElement>,
     scenePointerX: number,
     scenePointerY: number,
-    appState: AppState,
+    app: AppClassProperties,
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   ): LinearElementEditor | null {
+    const appState = app.state;
     if (!appState.editingLinearElement) {
       return null;
     }
@@ -917,7 +921,7 @@ export class LinearElementEditor {
         elementsMap,
         lastCommittedPoint,
         [scenePointerX, scenePointerY],
-        event[KEYS.CTRL_OR_CMD] ? null : appState.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
       );
 
       newPoint = [
@@ -932,7 +936,7 @@ export class LinearElementEditor {
         scenePointerY - appState.editingLinearElement.pointerOffset.y,
         event[KEYS.CTRL_OR_CMD] || isElbowArrow(element)
           ? null
-          : appState.gridSize,
+          : app.getEffectiveGridSize(),
       );
     }
 
@@ -1067,7 +1071,7 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
     scenePointerX: number,
     scenePointerY: number,
-    gridSize: number | null,
+    gridSize: NullableGridSize,
   ): Point {
     const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -1365,7 +1369,7 @@ export class LinearElementEditor {
   static addMidpoint(
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
-    appState: AppState,
+    app: AppClassProperties,
     snapToGrid: boolean,
     elementsMap: ElementsMap,
   ) {
@@ -1390,7 +1394,7 @@ export class LinearElementEditor {
       elementsMap,
       pointerCoords.x,
       pointerCoords.y,
-      snapToGrid && !isElbowArrow(element) ? appState.gridSize : null,
+      snapToGrid && !isElbowArrow(element) ? app.getEffectiveGridSize() : null,
     );
     const points = [
       ...element.points.slice(0, segmentMidpoint.index!),
@@ -1487,7 +1491,7 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
     referencePoint: Point,
     scenePointer: Point,
-    gridSize: number | null,
+    gridSize: NullableGridSize,
   ) {
     const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
       element,
