@@ -384,6 +384,7 @@ import {
   getVisibleGaps,
   getReferenceSnapPoints,
   SnapCache,
+  isGridModeEnabled,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -818,9 +819,7 @@ class App extends React.Component<AppProps, AppState> {
    */
   public getEffectiveGridSize = () => {
     return (
-      this.props.gridModeEnabled ?? this.state.gridModeEnabled
-        ? this.state.gridSize
-        : null
+      isGridModeEnabled(this) ? this.state.gridSize : null
     ) as NullableGridSize;
   };
 
@@ -1696,9 +1695,7 @@ class App extends React.Component<AppProps, AppState> {
                           renderConfig={{
                             imageCache: this.imageCache,
                             isExporting: false,
-                            renderGrid:
-                              this.props.gridModeEnabled ??
-                              this.state.gridModeEnabled,
+                            renderGrid: isGridModeEnabled(this),
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
@@ -5452,7 +5449,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const { originOffset, snapLines } = getSnapLinesAtPointer(
         this.scene.getNonDeletedElements(),
-        this.state,
+        this,
         {
           x: scenePointerX,
           y: scenePointerY,
@@ -7499,7 +7496,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       isSnappingEnabled({
         event,
-        appState: this.state,
+        app: this,
         selectedElements,
       }) &&
       (recomputeAnyways || !SnapCache.getReferenceSnapPoints())
@@ -7523,7 +7520,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       isSnappingEnabled({
         event,
-        appState: this.state,
+        app: this,
         selectedElements,
       }) &&
       (recomputeAnyways || !SnapCache.getVisibleGaps())
@@ -7811,7 +7808,7 @@ class App extends React.Component<AppProps, AppState> {
           const { snapOffset, snapLines } = snapDraggedElements(
             originalElements,
             dragOffset,
-            this.state,
+            this,
             event,
             this.scene.getNonDeletedElementsMap(),
           );
@@ -9812,7 +9809,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const { snapOffset, snapLines } = snapNewElement(
       newElement,
-      this.state,
+      this,
       event,
       {
         x:
@@ -9949,7 +9946,7 @@ class App extends React.Component<AppProps, AppState> {
       const { snapOffset, snapLines } = snapResizingElements(
         selectedElements,
         getSelectedElements(originalElements, this.state),
-        this.state,
+        this,
         event,
         dragOffset,
         transformHandleType,
