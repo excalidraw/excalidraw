@@ -4,7 +4,12 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
-import type { AppState, NormalizedZoomValue, PointerDownState } from "../types";
+import type {
+  AppState,
+  NormalizedZoomValue,
+  NullableGridSize,
+  PointerDownState,
+} from "../types";
 import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
@@ -26,7 +31,7 @@ export const dragSelectedElements = (
     x: number;
     y: number;
   },
-  gridSize: AppState["gridSize"],
+  gridSize: NullableGridSize,
 ) => {
   if (
     _selectedElements.length === 1 &&
@@ -101,7 +106,7 @@ const calculateOffset = (
   commonBounds: Bounds,
   dragOffset: { x: number; y: number },
   snapOffset: { x: number; y: number },
-  gridSize: AppState["gridSize"],
+  gridSize: NullableGridSize,
 ): { x: number; y: number } => {
   const [x, y] = commonBounds;
   let nextX = x + dragOffset.x + snapOffset.x;

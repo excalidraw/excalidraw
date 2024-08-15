@@ -5,9 +5,11 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_GRID_SIZE,
   EXPORT_SCALES,
   STATS_PANELS,
   THEME,
+  DEFAULT_GRID_STEP,
 } from "./constants";
 import type { AppState, NormalizedZoomValue } from "./types";
 
@@ -59,7 +61,9 @@ export const getDefaultAppState = (): Omit<
     exportEmbedScene: false,
     exportWithDarkMode: false,
     fileHandle: null,
-    gridSize: null,
+    gridSize: DEFAULT_GRID_SIZE,
+    gridStep: DEFAULT_GRID_STEP,
+    gridModeEnabled: false,
     isBindingEnabled: true,
     defaultSidebarDockedPreference: false,
     isLoading: false,
@@ -174,6 +178,8 @@ const APP_STATE_STORAGE_CONF = (<
   exportWithDarkMode: { browser: true, export: false, server: false },
   fileHandle: { browser: false, export: false, server: false },
   gridSize: { browser: true, export: true, server: true },
+  gridStep: { browser: true, export: true, server: true },
+  gridModeEnabled: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
   defaultSidebarDockedPreference: {
