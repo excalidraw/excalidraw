@@ -122,10 +122,12 @@ import {
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
+// #if [DEV]
 import DebugCanvas, {
   debugRenderer,
   loadSavedDebugState,
 } from "./components/DebugCanvas";
+// #endif
 
 polyfill();
 
@@ -342,7 +344,9 @@ const ExcalidrawWrapper = () => {
       resolvablePromise<ExcalidrawInitialDataState | null>();
   }
 
+  // #if [DEV]
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
+  // #endif
 
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
@@ -647,10 +651,12 @@ const ExcalidrawWrapper = () => {
       });
     }
 
+    // #if [DEV]
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(debugCanvasRef.current, appState, window.devicePixelRatio);
     }
+    // #endif
   };
 
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
@@ -1162,13 +1168,17 @@ const ExcalidrawWrapper = () => {
             },
           ]}
         />
-        {import.meta.env.DEV && window.visualDebug && excalidrawAPI && (
-          <DebugCanvas
-            appState={excalidrawAPI.getAppState()}
-            scale={window.devicePixelRatio}
-            ref={debugCanvasRef}
-          />
-        )}
+        {
+          // #if [DEV]
+          window.visualDebug && excalidrawAPI && (
+            <DebugCanvas
+              appState={excalidrawAPI.getAppState()}
+              scale={window.devicePixelRatio}
+              ref={debugCanvasRef}
+            />
+          )
+          // #endif
+        }
       </Excalidraw>
     </div>
   );
