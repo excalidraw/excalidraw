@@ -6,6 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+import vitePluginConditionalCompile from "vite-plugin-conditional-compile";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
@@ -50,6 +51,7 @@ export default defineConfig({
     sourcemap: true,
   },
   plugins: [
+    vitePluginConditionalCompile(),
     woff2BrowserPlugin(),
     react(),
     checker({
