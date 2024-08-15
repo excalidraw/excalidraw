@@ -19,7 +19,12 @@ import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,
 } from "./scene/selection";
-import type { AppState, KeyboardModifiersObject, Point } from "./types";
+import type {
+  AppClassProperties,
+  AppState,
+  KeyboardModifiersObject,
+  Point,
+} from "./types";
 
 const SNAP_DISTANCE = 8;
 
@@ -139,21 +144,24 @@ export class SnapCache {
 
 // -----------------------------------------------------------------------------
 
+export const isGridModeEnabled = (app: AppClassProperties): boolean =>
+  app.props.gridModeEnabled ?? app.state.gridModeEnabled;
+
 export const isSnappingEnabled = ({
   event,
-  appState,
+  app,
   selectedElements,
 }: {
-  appState: AppState;
+  app: AppClassProperties;
   event: KeyboardModifiersObject;
   selectedElements: NonDeletedExcalidrawElement[];
 }) => {
   if (event) {
     return (
-      (appState.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!appState.objectsSnapModeEnabled &&
+      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+      (!app.state.objectsSnapModeEnabled &&
         event[KEYS.CTRL_OR_CMD] &&
-        appState.gridSize === null)
+        !isGridModeEnabled(app))
     );
   }
 
@@ -161,7 +169,7 @@ export const isSnappingEnabled = ({
   if (selectedElements.length === 1 && selectedElements[0].type === "arrow") {
     return false;
   }
-  return appState.objectsSnapModeEnabled;
+  return app.state.objectsSnapModeEnabled;
 };
 
 export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
@@ -406,13 +414,13 @@ export const getVisibleGaps = (
 const getGapSnaps = (
   selectedElements: ExcalidrawElement[],
   dragOffset: Vector2D,
-  appState: AppState,
+  app: AppClassProperties,
   event: KeyboardModifiersObject,
   nearestSnapsX: Snaps,
   nearestSnapsY: Snaps,
   minOffset: Vector2D,
 ) => {
-  if (!isSnappingEnabled({ appState, event, selectedElements })) {
+  if (!isSnappingEnabled({ app, event, selectedElements })) {
     return [];
   }
 
@@ -596,14 +604,14 @@ export const getReferenceSnapPoints = (
 const getPointSnaps = (
   selectedElements: ExcalidrawElement[],
   selectionSnapPoints: Point[],
-  appState: AppState,
+  app: AppClassProperties,
   event: KeyboardModifiersObject,
   nearestSnapsX: Snaps,
   nearestSnapsY: Snaps,
   minOffset: Vector2D,
 ) => {
   if (
-    !isSnappingEnabled({ appState, event, selectedElements }) ||
+    !isSnappingEnabled({ app, event, selectedElements }) ||
     (selectedElements.length === 0 && selectionSnapPoints.length === 0)
   ) {
     return [];
@@ -652,13 +660,14 @@ const getPointSnaps = (
 export const snapDraggedElements = (
   elements: ExcalidrawElement[],
   dragOffset: Vector2D,
-  appState: AppState,
+  app: AppClassProperties,
   event: KeyboardModifiersObject,
   elementsMap: ElementsMap,
 ) => {
+  const appState = app.state;
   const selectedElements = getSelectedElements(elements, appState);
   if (
-    !isSnappingEnabled({ appState, event, selectedElements }) ||
+    !isSnappingEnabled({ app, event, selectedElements }) ||
     selectedElements.length === 0
   ) {
     return {
@@ -687,7 +696,7 @@ export const snapDraggedElements = (
   getPointSnaps(
     selectedElements,
     selectionPoints,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -697,7 +706,7 @@ export const snapDraggedElements = (
   getGapSnaps(
     selectedElements,
     dragOffset,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -732,7 +741,7 @@ export const snapDraggedElements = (
     getElementsCorners(selectedElements, elementsMap, {
       dragOffset: newDragOffset,
     }),
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -742,7 +751,7 @@ export const snapDraggedElements = (
   getGapSnaps(
     selectedElements,
     newDragOffset,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -1075,13 +1084,13 @@ export const snapResizingElements = (
   selectedElements: ExcalidrawElement[],
   // while using the original elements to appy dragOffset to calculate snaps
   selectedOriginalElements: ExcalidrawElement[],
-  appState: AppState,
+  app: AppClassProperties,
   event: KeyboardModifiersObject,
   dragOffset: Vector2D,
   transformHandle: MaybeTransformHandleType,
 ) => {
   if (
-    !isSnappingEnabled({ event, selectedElements, appState }) ||
+    !isSnappingEnabled({ event, selectedElements, app }) ||
     selectedElements.length === 0 ||
     (selectedElements.length === 1 &&
       !areRoughlyEqual(selectedElements[0].angle, 0))
@@ -1147,7 +1156,7 @@ export const snapResizingElements = (
     }
   }
 
-  const snapDistance = getSnapDistance(appState.zoom.value);
+  const snapDistance = getSnapDistance(app.state.zoom.value);
 
   const minOffset = {
     x: snapDistance,
@@ -1160,7 +1169,7 @@ export const snapResizingElements = (
   getPointSnaps(
     selectedOriginalElements,
     selectionSnapPoints,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -1193,7 +1202,7 @@ export const snapResizingElements = (
   getPointSnaps(
     selectedElements,
     corners,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -1210,13 +1219,13 @@ export const snapResizingElements = (
 
 export const snapNewElement = (
   newElement: ExcalidrawElement,
-  appState: AppState,
+  app: AppClassProperties,
   event: KeyboardModifiersObject,
   origin: Vector2D,
   dragOffset: Vector2D,
   elementsMap: ElementsMap,
 ) => {
-  if (!isSnappingEnabled({ event, selectedElements: [newElement], appState })) {
+  if (!isSnappingEnabled({ event, selectedElements: [newElement], app })) {
     return {
       snapOffset: { x: 0, y: 0 },
       snapLines: [],
@@ -1227,7 +1236,7 @@ export const snapNewElement = (
     [origin.x + dragOffset.x, origin.y + dragOffset.y],
   ];
 
-  const snapDistance = getSnapDistance(appState.zoom.value);
+  const snapDistance = getSnapDistance(app.state.zoom.value);
 
   const minOffset = {
     x: snapDistance,
@@ -1240,7 +1249,7 @@ export const snapNewElement = (
   getPointSnaps(
     [newElement],
     selectionSnapPoints,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -1265,7 +1274,7 @@ export const snapNewElement = (
   getPointSnaps(
     [newElement],
     corners,
-    appState,
+    app,
     event,
     nearestSnapsX,
     nearestSnapsY,
@@ -1282,12 +1291,12 @@ export const snapNewElement = (
 
 export const getSnapLinesAtPointer = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  app: AppClassProperties,
   pointer: Vector2D,
   event: KeyboardModifiersObject,
   elementsMap: ElementsMap,
 ) => {
-  if (!isSnappingEnabled({ event, selectedElements: [], appState })) {
+  if (!isSnappingEnabled({ event, selectedElements: [], app })) {
     return {
       originOffset: { x: 0, y: 0 },
       snapLines: [],
@@ -1297,11 +1306,11 @@ export const getSnapLinesAtPointer = (
   const referenceElements = getVisibleAndNonSelectedElements(
     elements,
     [],
-    appState,
+    app.state,
     elementsMap,
   );
 
-  const snapDistance = getSnapDistance(appState.zoom.value);
+  const snapDistance = getSnapDistance(app.state.zoom.value);
 
   const minOffset = {
     x: snapDistance,

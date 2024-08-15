@@ -12,6 +12,7 @@ import { isEraserActive } from "../appState";
 
 import "./HintViewer.scss";
 import { isNodeInFlowchart } from "../element/flowchart";
+import { isGridModeEnabled } from "../snapping";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -100,7 +101,7 @@ const getHints = ({
       return t("hints.deepBoxSelect");
     }
 
-    if (appState.gridSize && appState.selectedElementsAreBeingDragged) {
+    if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping");
     }
 

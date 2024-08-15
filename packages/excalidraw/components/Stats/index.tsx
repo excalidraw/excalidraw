@@ -28,6 +28,7 @@ import CanvasGrid from "./CanvasGrid";
 import clsx from "clsx";
 
 import "./Stats.scss";
+import { isGridModeEnabled } from "../../snapping";
 
 interface StatsProps {
   app: AppClassProperties;
@@ -44,8 +45,7 @@ export const Stats = (props: StatsProps) => {
     selectedElementIds: appState.selectedElementIds,
     includeBoundTextElement: false,
   });
-  const gridModeEnabled =
-    props.app.props.gridModeEnabled ?? appState.gridModeEnabled;
+  const gridModeEnabled = isGridModeEnabled(props.app);
 
   return (
     <StatsInner
