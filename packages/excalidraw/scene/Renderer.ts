@@ -1,6 +1,7 @@
 import { isElementInViewport } from "../element/sizeHelpers";
 import { isImageElement } from "../element/typeChecks";
 import type {
+  ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "../element/types";
@@ -65,10 +66,12 @@ export class Renderer {
     const getRenderableElements = ({
       elements,
       editingTextElement,
+      newElementId,
       pendingImageElementId,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
       editingTextElement: AppState["editingTextElement"];
+      newElementId: ExcalidrawElement["id"] | undefined;
       pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
       const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
@@ -81,6 +84,10 @@ export class Renderer {
           ) {
             continue;
           }
+        }
+
+        if (newElementId === element.id) {
+          continue;
         }
 
         // we don't want to render text element that's being currently edited
@@ -106,6 +113,7 @@ export class Renderer {
         height,
         width,
         editingTextElement,
+        newElementId,
         pendingImageElementId,
         // cache-invalidation nonce
         sceneNonce: _sceneNonce,
@@ -118,6 +126,7 @@ export class Renderer {
         height: AppState["height"];
         width: AppState["width"];
         editingTextElement: AppState["editingTextElement"];
+        newElementId: ExcalidrawElement["id"] | undefined;
         pendingImageElementId: AppState["pendingImageElementId"];
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
@@ -126,6 +135,7 @@ export class Renderer {
         const elementsMap = getRenderableElements({
           elements,
           editingTextElement,
+          newElementId,
           pendingImageElementId,
         });
 

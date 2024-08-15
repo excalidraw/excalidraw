@@ -129,6 +129,7 @@ class Portal {
           return element;
         }),
       storeAction: StoreAction.UPDATE,
+      triggerUpdate: false,
     });
   }, FILE_UPLOAD_TIMEOUT);
 

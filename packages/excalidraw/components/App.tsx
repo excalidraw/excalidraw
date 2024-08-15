@@ -1467,6 +1467,7 @@ class App extends React.Component<AppProps, AppState> {
         height: this.state.height,
         width: this.state.width,
         editingTextElement: this.state.editingTextElement,
+        newElementId: this.state.newElement?.id,
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
@@ -3781,6 +3782,7 @@ class App extends React.Component<AppProps, AppState> {
       collaborators?: SceneData["collaborators"];
       /** @default StoreAction.NONE */
       storeAction?: SceneData["storeAction"];
+      triggerUpdate?: boolean;
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
@@ -3819,7 +3821,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        this.scene.replaceAllElements(nextElements);
+        this.scene.replaceAllElements(nextElements, sceneData.triggerUpdate);
       }
 
       if (sceneData.collaborators) {
