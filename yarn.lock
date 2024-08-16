@@ -6194,6 +6194,13 @@ fonteditor-core@2.4.0:
   dependencies:
     "@xmldom/xmldom" "^0.8.3"
 
+fonteditor-core@2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/fonteditor-core/-/fonteditor-core-2.4.1.tgz#ff4b3cd04b50f98026bedad353d0ef6692464bc9"
+  integrity sha512-nKDDt6kBQGq665tQO5tCRQUClJG/2MAF9YT1eKHl+I4NasdSb6DgXrv/gMjNxjo9NyaVEv9KU9VZxLHMstN1wg==
+  dependencies:
+    "@xmldom/xmldom" "^0.8.3"
+
 for-each@^0.3.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/for-each/-/for-each-0.3.3.tgz#69b447e88a0a5d32c3e7084f3f1710034b21376e"
@@ -6456,6 +6463,11 @@ hachure-fill@^0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/hachure-fill/-/hachure-fill-0.5.2.tgz#d19bc4cc8750a5962b47fb1300557a85fcf934cc"
   integrity sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==
+
+harfbuzzjs@0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/harfbuzzjs/-/harfbuzzjs-0.3.6.tgz#97865c861aa7734af5bd1904570712e9d753fda9"
+  integrity sha512-dzf7y6NS8fiAIvPAL/VKwY8wx2HCzUB0vUfOo6h1J5UilFEEf7iYqFsvgwjHwvM3whbjfOMadNvQekU3KuRnWQ==
 
 has-ansi@^2.0.0:
   version "2.0.0"
