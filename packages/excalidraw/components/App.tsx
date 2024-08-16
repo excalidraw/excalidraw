@@ -61,7 +61,6 @@ import {
   ENV,
   EVENT,
   FRAME_STYLE,
-  GRID_SIZE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
   isBrave,
@@ -261,6 +260,7 @@ import type {
   UnsubscribeCallback,
   EmbedsValidationStatus,
   ElementsPendingErasure,
+  NullableGridSize,
 } from "../types";
 import {
   debounce,
@@ -393,6 +393,7 @@ import {
   getVisibleGaps,
   getReferenceSnapPoints,
   SnapCache,
+  isGridModeEnabled,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -685,7 +686,7 @@ class App extends React.Component<AppProps, AppState> {
       viewModeEnabled,
       zenModeEnabled,
       objectsSnapModeEnabled,
-      gridSize: gridModeEnabled ? GRID_SIZE : null,
+      gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
       name,
       width: window.innerWidth,
       height: window.innerHeight,
@@ -847,6 +848,16 @@ class App extends React.Component<AppProps, AppState> {
       this.iFrameRefs.set(element.id, ref);
     }
   }
+
+  /**
+   * Returns gridSize taking into account `gridModeEnabled`.
+   * If disabled, returns null.
+   */
+  public getEffectiveGridSize = () => {
+    return (
+      isGridModeEnabled(this) ? this.state.gridSize : null
+    ) as NullableGridSize;
+  };
 
   private getHTMLIFrameElement(
     element: ExcalidrawIframeLikeElement | string, //zsviczian
@@ -1762,7 +1773,7 @@ class App extends React.Component<AppProps, AppState> {
                           renderConfig={{
                             imageCache: this.imageCache,
                             isExporting: false,
-                            renderGrid: true,
+                            renderGrid: isGridModeEnabled(this),
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
@@ -2259,7 +2270,6 @@ class App extends React.Component<AppProps, AppState> {
     if (actionResult.appState || editingElement || this.state.contextMenu) {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
-      let gridSize = actionResult?.appState?.gridSize || null;
       const theme =
         actionResult?.appState?.theme || this.props.theme || THEME.LIGHT;
       const name = actionResult?.appState?.name ?? this.state.name;
@@ -2271,10 +2281,6 @@ class App extends React.Component<AppProps, AppState> {
 
       if (typeof this.props.zenModeEnabled !== "undefined") {
         zenModeEnabled = this.props.zenModeEnabled;
-      }
-
-      if (typeof this.props.gridModeEnabled !== "undefined") {
-        gridSize = this.props.gridModeEnabled ? GRID_SIZE : null;
       }
 
       editingElement = actionResult.appState?.editingElement || null;
@@ -2308,7 +2314,6 @@ class App extends React.Component<AppProps, AppState> {
           editingElement,
           viewModeEnabled,
           zenModeEnabled,
-          gridSize,
           theme,
           name,
           errorMessage,
@@ -2915,12 +2920,6 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ theme: this.props.theme });
     }
 
-    if (prevProps.gridModeEnabled !== this.props.gridModeEnabled) {
-      this.setState({
-        gridSize: this.props.gridModeEnabled ? GRID_SIZE : null,
-      });
-    }
-
     this.excalidrawContainerRef.current?.classList.toggle(
       "theme--dark",
       this.state.theme === THEME.DARK,
@@ -3331,7 +3330,7 @@ class App extends React.Component<AppProps, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    const [gridX, gridY] = getGridPoint(dx, dy, this.state.gridSize);
+    const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
     const newElements = duplicateElements(
       elements.map((element) => {
@@ -3722,7 +3721,10 @@ class App extends React.Component<AppProps, AppState> {
    * Zooms on canvas viewport center
    */
   zoomCanvas = (
-    /** decimal fraction between 0.1 (10% zoom) and 30 (3000% zoom) */
+    /**
+     * Decimal fraction, auto-clamped between MIN_ZOOM and MAX_ZOOM.
+     * 1 = 100% zoom, 2 = 200% zoom, 0.5 = 50% zoom
+     */
     value: number,
   ) => {
     this.setState({
@@ -4478,10 +4480,10 @@ class App extends React.Component<AppProps, AppState> {
           ? elbowArrow.startBinding || elbowArrow.endBinding
             ? 0
             : ELEMENT_TRANSLATE_AMOUNT
-          : (this.state.gridSize &&
+          : (this.getEffectiveGridSize() &&
               (event.shiftKey
                 ? ELEMENT_TRANSLATE_AMOUNT
-                : this.state.gridSize)) ||
+                : this.getEffectiveGridSize())) ||
             (event.shiftKey
               ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
               : ELEMENT_TRANSLATE_AMOUNT);
@@ -5898,7 +5900,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const { originOffset, snapLines } = getSnapLinesAtPointer(
         this.scene.getNonDeletedElements(),
-        this.state,
+        this,
         {
           x: scenePointerX,
           y: scenePointerY,
@@ -5947,7 +5949,7 @@ class App extends React.Component<AppProps, AppState> {
         event,
         scenePointerX,
         scenePointerY,
-        this.state,
+        this,
         this.scene.getNonDeletedElementsMap(),
       );
 
@@ -6037,7 +6039,7 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerY,
           event[KEYS.CTRL_OR_CMD] || isElbowArrow(multiElement)
             ? null
-            : this.state.gridSize,
+            : this.getEffectiveGridSize(),
         );
 
         const [lastCommittedX, lastCommittedY] =
@@ -7013,7 +7015,7 @@ class App extends React.Component<AppProps, AppState> {
           origin.y,
           event[KEYS.CTRL_OR_CMD] || isElbowArrowOnly
             ? null
-            : this.state.gridSize,
+            : this.getEffectiveGridSize(),
         ),
       ),
       scrollbars: isOverScrollBars(
@@ -7190,7 +7192,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.editingLinearElement || this.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
             event,
-            this.state,
+            this,
             this.store,
             pointerDownState.origin,
             linearElementEditor,
@@ -7573,7 +7575,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
-        : this.state.gridSize,
+        : this.getEffectiveGridSize(),
     );
 
     const element = newIframeElement({
@@ -7613,7 +7615,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
-        : this.state.gridSize,
+        : this.getEffectiveGridSize(),
     );
 
     const embedLink = getEmbedLink(link);
@@ -7666,7 +7668,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
-        : this.state.gridSize,
+        : this.getEffectiveGridSize(),
     );
 
     const topLayerFrame = addToFrameUnderCursor
@@ -7763,7 +7765,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
-        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
       const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -7884,7 +7886,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
-        : this.state.gridSize,
+        : this.getEffectiveGridSize(),
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -7942,7 +7944,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
-        : this.state.gridSize,
+        : this.getEffectiveGridSize(),
     );
 
     const constructorOpts = {
@@ -7982,7 +7984,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       isSnappingEnabled({
         event,
-        appState: this.state,
+        app: this,
         selectedElements,
       }) &&
       (recomputeAnyways || !SnapCache.getReferenceSnapPoints())
@@ -8006,7 +8008,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       isSnappingEnabled({
         event,
-        appState: this.state,
+        app: this,
         selectedElements,
       }) &&
       (recomputeAnyways || !SnapCache.getVisibleGaps())
@@ -8091,7 +8093,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
       // for arrows/lines, don't start dragging until a given threshold
@@ -8138,7 +8140,7 @@ class App extends React.Component<AppProps, AppState> {
           const ret = LinearElementEditor.addMidpoint(
             this.state.selectedLinearElement,
             pointerCoords,
-            this.state,
+            this,
             !event[KEYS.CTRL_OR_CMD],
             elementsMap,
           );
@@ -8181,7 +8183,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const didDrag = LinearElementEditor.handlePointDragging(
           event,
-          this.state,
+          this,
           pointerCoords.x,
           pointerCoords.y,
           (element, pointsSceneCoords) => {
@@ -8299,7 +8301,7 @@ class App extends React.Component<AppProps, AppState> {
           const { snapOffset, snapLines } = snapDraggedElements(
             originalElements,
             dragOffset,
-            this.state,
+            this,
             event,
             this.scene.getNonDeletedElementsMap(),
           );
@@ -8315,7 +8317,7 @@ class App extends React.Component<AppProps, AppState> {
               dragOffset,
               this.scene,
               snapOffset,
-              event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+              event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
             );
 
           this.setState({
@@ -10328,7 +10330,7 @@ class App extends React.Component<AppProps, AppState> {
     let [gridX, gridY] = getGridPoint(
       pointerCoords.x,
       pointerCoords.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
     );
 
     const image =
@@ -10341,7 +10343,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const { snapOffset, snapLines } = snapNewElement(
       newElement,
-      this.state,
+      this,
       event,
       {
         x:
@@ -10432,7 +10434,7 @@ class App extends React.Component<AppProps, AppState> {
     let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
     );
 
     const frameElementsOffsetsMap = new Map<
@@ -10463,7 +10465,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        event[KEYS.CTRL_OR_CMD] ? null : this.state.gridSize,
+        event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
       const dragOffset = {
@@ -10478,7 +10480,7 @@ class App extends React.Component<AppProps, AppState> {
       const { snapOffset, snapLines } = snapResizingElements(
         selectedElements,
         getSelectedElements(originalElements, this.state),
-        this.state,
+        this,
         event,
         dragOffset,
         transformHandleType,

@@ -101,6 +101,7 @@ const getRelevantAppStateProps = (
   exportScale: appState.exportScale,
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,
+  gridStep: appState.gridStep,
   frameRendering: appState.frameRendering,
   linkOpacity: appState.linkOpacity, //zsviczian
   gridColor: appState.gridColor, //zsviczian
