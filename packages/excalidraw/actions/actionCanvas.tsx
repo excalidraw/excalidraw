@@ -121,6 +121,8 @@ export const actionClearCanvas = register({
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
+        gridStep: appState.gridStep,
+        gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
         pasteDialog: appState.pasteDialog,
         activeTool:
@@ -321,7 +323,6 @@ export const zoomToFitBounds = ({
         appState.height / commonBoundsHeight,
       ) * clamp(viewportZoomFactor, 0.1, 1);
 
-    // Apply clamping to newZoomValue to be between 10% and 3000%
     newZoomValue = getNormalizedZoom(newZoomValue);
 
     let appStateWidth = appState.width;
