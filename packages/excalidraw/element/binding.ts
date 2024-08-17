@@ -73,6 +73,7 @@ import {
   type Heading,
 } from "./heading";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/geometry";
+import type { GlobalPoint } from "@excalidraw/math";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -720,7 +721,11 @@ export const getHeadingForElbowArrowSnap = (
     );
   }
 
-  const pointHeading = headingForPointFromElement(bindableElement, aabb, point);
+  const pointHeading = headingForPointFromElement(
+    bindableElement,
+    aabb,
+    point as GlobalPoint,
+  );
 
   return pointHeading;
 };
@@ -754,7 +759,11 @@ export const bindPointToSnapToElementOutline = (
 
   if (bindableElement && aabb) {
     // TODO: Dirty hacks until tangents are properly calculated
-    const heading = headingForPointFromElement(bindableElement, aabb, point);
+    const heading = headingForPointFromElement(
+      bindableElement,
+      aabb,
+      point as GlobalPoint,
+    );
     const intersections = [
       ...intersectElementWithLine(
         bindableElement,

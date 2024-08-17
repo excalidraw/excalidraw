@@ -20,7 +20,7 @@ import type {
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
-import type { AppState, PendingExcalidrawElements, Point } from "../types";
+import type { AppState, PendingExcalidrawElements } from "../types";
 import { mutateElement } from "./mutateElement";
 import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 import {
@@ -30,6 +30,7 @@ import {
   isFlowchartNodeElement,
 } from "./typeChecks";
 import { invariant } from "../utils";
+import type { LocalPoint } from "@excalidraw/math";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -81,13 +82,14 @@ const getNodeRelatives = (
           "not an ExcalidrawBindableElement",
         );
 
-        const edgePoint: Point =
-          type === "predecessors" ? el.points[el.points.length - 1] : [0, 0];
+        const edgePoint = (
+          type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
+        ) as Readonly<LocalPoint>;
 
         const heading = headingForPointFromElement(node, aabbForElement(node), [
           edgePoint[0] + el.x,
           edgePoint[1] + el.y,
-        ]);
+        ] as Readonly<LocalPoint>);
 
         acc.push({
           relative,

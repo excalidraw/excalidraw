@@ -1,11 +1,8 @@
 import { lineAngle } from "../../utils/geometry/geometry";
-import type { Point, Vector } from "../../utils/geometry/shape";
-import {
-  getCenterForBounds,
-  PointInTriangle,
-  rotatePoint,
-  scalePointFromOrigin,
-} from "../math";
+import type { Vector } from "../../utils/geometry/shape";
+import { getCenterForBounds, rotatePoint, scalePointFromOrigin } from "../math";
+import type { Point, Triangle } from "@excalidraw/math";
+import { triangleIncludesPoint } from "@excalidraw/math";
 import type { Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
 
@@ -75,7 +72,7 @@ export const headingForPointFromElement = (
       ),
       midPoint,
       element.angle,
-    );
+    ) as Point;
     const right = rotatePoint(
       scalePointFromOrigin(
         [element.x + element.width, element.y + element.height / 2],
@@ -84,7 +81,7 @@ export const headingForPointFromElement = (
       ),
       midPoint,
       element.angle,
-    );
+    ) as Point;
     const bottom = rotatePoint(
       scalePointFromOrigin(
         [element.x + element.width / 2, element.y + element.height],
@@ -93,7 +90,7 @@ export const headingForPointFromElement = (
       ),
       midPoint,
       element.angle,
-    );
+    ) as Point;
     const left = rotatePoint(
       scalePointFromOrigin(
         [element.x, element.y + element.height / 2],
@@ -102,13 +99,19 @@ export const headingForPointFromElement = (
       ),
       midPoint,
       element.angle,
-    );
+    ) as Point;
 
-    if (PointInTriangle(point, top, right, midPoint)) {
+    if (
+      triangleIncludesPoint([top, right, midPoint] as Triangle<Point>, point)
+    ) {
       return headingForDiamond(top, right);
-    } else if (PointInTriangle(point, right, bottom, midPoint)) {
+    } else if (
+      triangleIncludesPoint([right, bottom, midPoint] as Triangle<Point>, point)
+    ) {
       return headingForDiamond(right, bottom);
-    } else if (PointInTriangle(point, bottom, left, midPoint)) {
+    } else if (
+      triangleIncludesPoint([bottom, left, midPoint] as Triangle<Point>, point)
+    ) {
       return headingForDiamond(bottom, left);
     }
 
@@ -119,28 +122,37 @@ export const headingForPointFromElement = (
     [aabb[0], aabb[1]],
     midPoint,
     SEARCH_CONE_MULTIPLIER,
-  );
+  ) as Point;
   const topRight = scalePointFromOrigin(
     [aabb[2], aabb[1]],
     midPoint,
     SEARCH_CONE_MULTIPLIER,
-  );
+  ) as Point;
   const bottomLeft = scalePointFromOrigin(
     [aabb[0], aabb[3]],
     midPoint,
     SEARCH_CONE_MULTIPLIER,
-  );
+  ) as Point;
   const bottomRight = scalePointFromOrigin(
     [aabb[2], aabb[3]],
     midPoint,
     SEARCH_CONE_MULTIPLIER,
-  );
+  ) as Point;
 
-  return PointInTriangle(point, topLeft, topRight, midPoint)
+  return triangleIncludesPoint(
+    [topLeft, topRight, midPoint] as Triangle<Point>,
+    point,
+  )
     ? HEADING_UP
-    : PointInTriangle(point, topRight, bottomRight, midPoint)
+    : triangleIncludesPoint(
+        [topRight, bottomRight, midPoint] as Triangle<Point>,
+        point,
+      )
     ? HEADING_RIGHT
-    : PointInTriangle(point, bottomRight, bottomLeft, midPoint)
+    : triangleIncludesPoint(
+        [bottomRight, bottomLeft, midPoint] as Triangle<Point>,
+        point,
+      )
     ? HEADING_DOWN
     : HEADING_LEFT;
 };

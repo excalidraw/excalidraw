@@ -1,0 +1,2 @@
+export const INVERSE_PRECISION = 10_000;
+export const PRECISION = 1 / INVERSE_PRECISION;
