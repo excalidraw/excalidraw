@@ -148,7 +148,7 @@ export const MobileMenu = ({
         >
           {shouldShowStats && ( //zsviczian
             <Stats
-              scene={app.scene}
+              app={app}
               onClose={() => {
                 actionManager.executeAction(actionToggleStats);
               }}

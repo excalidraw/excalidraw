@@ -29,6 +29,7 @@ import clsx from "clsx";
 
 import "./Stats.scss";
 import { isGridModeEnabled } from "../../snapping";
+import CanvasGridSize from "./CanvasGridSize";
 
 interface StatsProps {
   app: AppClassProperties;
@@ -202,6 +203,14 @@ export const StatsInner = memo(
               {gridModeEnabled && (
                 <>
                   <StatsRow heading>Canvas</StatsRow>
+                  <StatsRow>
+                    <CanvasGridSize //zsviczian
+                      property="gridSize"
+                      scene={scene}
+                      appState={appState}
+                      setAppState={setAppState}
+                    />
+                  </StatsRow>
                   <StatsRow>
                     <CanvasGrid
                       property="gridStep"

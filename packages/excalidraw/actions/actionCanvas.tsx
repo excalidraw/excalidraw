@@ -25,10 +25,7 @@ import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type {
-  AppClassProperties,
-  AppState,
-} from "../types";
+import type { AppClassProperties, AppState } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
@@ -286,10 +283,12 @@ const zoomValueToFitBoundsOnViewport = (
     Math.floor(adjustedZoomValue / ZOOM_STEP) * ZOOM_STEP;
 
   //return getNormalizedZoom(Math.min(zoomAdjustedToSteps, 1));
-  return getNormalizedZoom(Math.min(
-    Math.max(zoomAdjustedToSteps, MIN_ZOOM),
-    maxZoom, //zsviczian
-  ));
+  return getNormalizedZoom(
+    Math.min(
+      Math.max(zoomAdjustedToSteps, MIN_ZOOM),
+      maxZoom, //zsviczian
+    ),
+  );
 };
 
 export const zoomToFitBounds = ({

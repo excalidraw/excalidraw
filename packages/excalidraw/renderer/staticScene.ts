@@ -47,9 +47,8 @@ const strokeGrid = (
   zoom: Zoom,
   width: number,
   height: number,
-  GridLineColor: { Bold: string; Regular: string; MajorGridFrequency?: number }, //zsviczian
+  GridLineColor: { Bold: string; Regular: string }, //zsviczian
 ) => {
-  const BOLD_LINE_FREQUENCY = GridLineColor?.MajorGridFrequency ?? 5; //zsviczian
   const offsetX = (scrollX % gridSize) - gridSize;
   const offsetY = (scrollY % gridSize) - gridSize;
 

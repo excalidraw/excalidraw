@@ -413,7 +413,7 @@ export interface AppState {
   customPens?: any[]; //zsviczian
   currentStrokeOptions?: any; //zsviczian
   resetCustomPen?: any; //zsviczian
-  gridColor: { Bold: string; Regular: string; MajorGridFrequency?: number }; //zsviczian
+  gridColor: { Bold: string; Regular: string }; //zsviczian
   dynamicStyle: { [x: string]: string }; //zsviczian
   frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian
   invertBindingBehaviour: boolean; //zsviczian

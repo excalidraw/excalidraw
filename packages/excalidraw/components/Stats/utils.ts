@@ -42,7 +42,8 @@ export type StatsInputProperty =
   | "height"
   | "angle"
   | "fontSize"
-  | "gridStep";
+  | "gridStep"
+  | "gridSize"; //zsviczian
 
 export const SMALLEST_DELTA = 0.01;
 
