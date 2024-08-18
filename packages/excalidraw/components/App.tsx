@@ -4146,10 +4146,24 @@ class App extends React.Component<AppProps, AppState> {
           | ExcalidrawArrowElement
           | undefined;
 
-        const step = elbowArrow
-          ? elbowArrow.startBinding || elbowArrow.endBinding
-            ? 0
-            : ELEMENT_TRANSLATE_AMOUNT
+        const preventKeyboardMove = selectedElements
+          .filter(isElbowArrow)
+          .find((arrow) => {
+            const startMissing =
+              arrow.startBinding &&
+              !selectedElements.find(
+                (el) => el.id === arrow.startBinding?.elementId,
+              );
+            const endMissing =
+              arrow.endBinding &&
+              !selectedElements.find(
+                (el) => el.id === arrow.endBinding?.elementId,
+              );
+            return startMissing || endMissing;
+          });
+
+        const step = preventKeyboardMove
+          ? 0
           : (this.getEffectiveGridSize() &&
               (event.shiftKey
                 ? ELEMENT_TRANSLATE_AMOUNT
