@@ -2187,8 +2187,6 @@ class App extends React.Component<AppProps, AppState> {
       const name = actionResult?.appState?.name ?? this.state.name;
       const errorMessage =
         actionResult?.appState?.errorMessage ?? this.state.errorMessage;
-      const contextMenu =
-        actionResult?.appState?.contextMenu ?? this.state.contextMenu;
       if (typeof this.props.viewModeEnabled !== "undefined") {
         viewModeEnabled = this.props.viewModeEnabled;
       }
@@ -2224,7 +2222,7 @@ class App extends React.Component<AppProps, AppState> {
           // NOTE this will prevent opening context menu using an action
           // or programmatically from the host, so it will need to be
           // rewritten later
-          contextMenu,
+          contextMenu: null,
           editingElement,
           viewModeEnabled,
           zenModeEnabled,
