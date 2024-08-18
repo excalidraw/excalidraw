@@ -4136,7 +4136,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
-        const selectedElements = this.scene.getSelectedElements({
+        let selectedElements = this.scene.getSelectedElements({
           selectedElementIds: this.state.selectedElementIds,
           includeBoundTextElement: true,
           includeElementsInFrames: true,
@@ -4146,9 +4146,11 @@ class App extends React.Component<AppProps, AppState> {
           | ExcalidrawArrowElement
           | undefined;
 
-        const preventKeyboardMove = selectedElements
+        const arrowIdsToRemove = new Set<string>();
+
+        selectedElements
           .filter(isElbowArrow)
-          .some((arrow) => {
+          .filter((arrow) => {
             const startElementNotInSelection =
               arrow.startBinding &&
               !selectedElements.some(
@@ -4160,17 +4162,21 @@ class App extends React.Component<AppProps, AppState> {
                 (el) => el.id === arrow.endBinding?.elementId,
               );
             return startElementNotInSelection || endElementNotInSelection;
-          });
+          })
+          .forEach((arrow) => arrowIdsToRemove.add(arrow.id));
 
-        const step = preventKeyboardMove
-          ? 0
-          : (this.getEffectiveGridSize() &&
-              (event.shiftKey
-                ? ELEMENT_TRANSLATE_AMOUNT
-                : this.getEffectiveGridSize())) ||
+        selectedElements = selectedElements.filter(
+          (el) => !arrowIdsToRemove.has(el.id),
+        );
+
+        const step =
+          (this.getEffectiveGridSize() &&
             (event.shiftKey
-              ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-              : ELEMENT_TRANSLATE_AMOUNT);
+              ? ELEMENT_TRANSLATE_AMOUNT
+              : this.getEffectiveGridSize())) ||
+          (event.shiftKey
+            ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+            : ELEMENT_TRANSLATE_AMOUNT);
 
         let offsetX = 0;
         let offsetY = 0;
