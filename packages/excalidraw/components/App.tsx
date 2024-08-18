@@ -4150,12 +4150,10 @@ class App extends React.Component<AppProps, AppState> {
           .filter(isElbowArrow)
           .some((arrow) => {
             const startElementNotInSelection =
-              arrow.startBinding &&
               !selectedElements.some(
                 (el) => el.id === arrow.startBinding?.elementId,
               );
             const endElementNotInSelection =
-              arrow.endBinding &&
               !selectedElements.some(
                 (el) => el.id === arrow.endBinding?.elementId,
               );
