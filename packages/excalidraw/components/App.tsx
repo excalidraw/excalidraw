@@ -4149,14 +4149,12 @@ class App extends React.Component<AppProps, AppState> {
         const preventKeyboardMove = selectedElements
           .filter(isElbowArrow)
           .some((arrow) => {
-            const startElementNotInSelection =
-              !selectedElements.some(
-                (el) => el.id === arrow.startBinding?.elementId,
-              );
-            const endElementNotInSelection =
-              !selectedElements.some(
-                (el) => el.id === arrow.endBinding?.elementId,
-              );
+            const startElementNotInSelection = !selectedElements.some(
+              (el) => el.id === arrow.startBinding?.elementId,
+            );
+            const endElementNotInSelection = !selectedElements.some(
+              (el) => el.id === arrow.endBinding?.elementId,
+            );
             return startElementNotInSelection || endElementNotInSelection;
           });
 
