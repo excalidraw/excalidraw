@@ -248,28 +248,28 @@ const StatsDragInput = <
               };
             };
 
+            const onPointerUp = () => {
+              window.removeEventListener(
+                EVENT.POINTER_MOVE,
+                onPointerMove,
+                false,
+              );
+
+              app.syncActionResult({ storeAction: StoreAction.CAPTURE });
+
+              lastPointer = null;
+              accumulatedChange = 0;
+              stepChange = 0;
+              originalElements = null;
+              originalElementsMap = null;
+
+              document.body.classList.remove("excalidraw-cursor-resize");
+
+              window.removeEventListener(EVENT.POINTER_UP, onPointerUp, false);
+            };
+
             window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, false);
-            window.addEventListener(
-              EVENT.POINTER_UP,
-              () => {
-                window.removeEventListener(
-                  EVENT.POINTER_MOVE,
-                  onPointerMove,
-                  false,
-                );
-
-                app.syncActionResult({ storeAction: StoreAction.CAPTURE });
-
-                lastPointer = null;
-                accumulatedChange = 0;
-                stepChange = 0;
-                originalElements = null;
-                originalElementsMap = null;
-
-                document.body.classList.remove("excalidraw-cursor-resize");
-              },
-              false,
-            );
+            window.addEventListener(EVENT.POINTER_UP, onPointerUp, false);
           }
         }}
         onPointerEnter={() => {
