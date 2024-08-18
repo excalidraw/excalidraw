@@ -4148,18 +4148,18 @@ class App extends React.Component<AppProps, AppState> {
 
         const preventKeyboardMove = selectedElements
           .filter(isElbowArrow)
-          .find((arrow) => {
-            const startMissing =
+          .some((arrow) => {
+            const startElementNotInSelection =
               arrow.startBinding &&
               !selectedElements.find(
                 (el) => el.id === arrow.startBinding?.elementId,
               );
-            const endMissing =
+            const endElementNotInSelection =
               arrow.endBinding &&
               !selectedElements.find(
                 (el) => el.id === arrow.endBinding?.elementId,
               );
-            return startMissing || endMissing;
+            return startElementNotInSelection || endElementNotInSelection;
           });
 
         const step = preventKeyboardMove
