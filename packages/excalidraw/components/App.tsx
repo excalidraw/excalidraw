@@ -4151,12 +4151,12 @@ class App extends React.Component<AppProps, AppState> {
           .some((arrow) => {
             const startElementNotInSelection =
               arrow.startBinding &&
-              !selectedElements.find(
+              !selectedElements.some(
                 (el) => el.id === arrow.startBinding?.elementId,
               );
             const endElementNotInSelection =
               arrow.endBinding &&
-              !selectedElements.find(
+              !selectedElements.some(
                 (el) => el.id === arrow.endBinding?.elementId,
               );
             return startElementNotInSelection || endElementNotInSelection;
