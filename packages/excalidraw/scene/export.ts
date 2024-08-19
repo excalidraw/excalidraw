@@ -39,6 +39,7 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
+import type { Font } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -355,7 +356,8 @@ export const exportToSvg = async (
         </clipPath>`;
   }
 
-  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
+  const shouldInlineFonts = !opts?.skipInliningFonts;
+  const fontFaces = await getFontFaces(elements, shouldInlineFonts);
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
@@ -436,9 +438,12 @@ export const getExportSize = (
 
 const getFontFaces = async (
   elements: readonly ExcalidrawElement[],
+  shouldInlineFonts: boolean,
 ): Promise<string[]> => {
   const fontFamilies = new Set<number>();
   const codePoints = new Set<number>();
+
+  let getSource: (font: Font) => string | Promise<string>;
 
   for (const element of elements) {
     if (!isTextElement(element)) {
@@ -447,13 +452,24 @@ const getFontFaces = async (
 
     fontFamilies.add(element.fontFamily);
 
-    for (const codePoint of Array.from(element.originalText, (u) =>
-      u.codePointAt(0),
-    )) {
-      if (codePoint) {
-        codePoints.add(codePoint);
+    // gather unique codepoints only when inlining fonts
+    if (shouldInlineFonts) {
+      for (const codePoint of Array.from(element.originalText, (u) =>
+        u.codePointAt(0),
+      )) {
+        if (codePoint) {
+          codePoints.add(codePoint);
+        }
       }
     }
+  }
+
+  if (shouldInlineFonts) {
+    // retrieve font source as dataurl based on the used codepoints
+    getSource = (font: Font) => font.getContent(codePoints);
+  } else {
+    // retrieve font source as a url otherwise
+    getSource = (font: Font) => font.urls[0].toString();
   }
 
   const fontFaces = await Promise.all(
@@ -477,7 +493,7 @@ const getFontFaces = async (
         fonts.map(
           async (font) => `@font-face {
         font-family: ${font.fontFace.family};
-        src: url(${await font.getContent(codePoints)});
+        src: url(${await getSource(font)});
           }`,
         ),
       );
