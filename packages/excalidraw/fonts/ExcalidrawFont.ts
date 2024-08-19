@@ -3,7 +3,6 @@ import { LOCAL_FONT_PROTOCOL } from "./metadata";
 import loadWoff2 from "./wasm/woff2.loader";
 import loadHbSubset from "./wasm/hb-subset.loader";
 
-// import init, * as brotli from "../../../node_modules/brotli-wasm/pkg.web/brotli_wasm.js";
 export interface Font {
   urls: URL[];
   fontFace: FontFace;
@@ -55,7 +54,7 @@ export class ExcalidrawFont implements Font {
           "base64",
         ).buffer;
 
-        const base64 = await ExcalidrawFont.trySubsetGlyphsByCodePoints(
+        const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
           arrayBuffer,
           codePoints,
         );
@@ -72,7 +71,7 @@ export class ExcalidrawFont implements Font {
 
         if (response.ok) {
           const arrayBuffer = await response.arrayBuffer();
-          const base64 = await ExcalidrawFont.trySubsetGlyphsByCodePoints(
+          const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
             arrayBuffer,
             codePoints,
           );
@@ -104,14 +103,14 @@ export class ExcalidrawFont implements Font {
   }
 
   /**
-   * Tries to convert a font data as arraybuffer into a dataurl (base64) with subsetted glyphs based on the specified `codePoints`.
+   * Tries to subset glyphs in a font based on the used codepoints, returning the font as daturl.
    *
    * @param arrayBuffer font data buffer, preferrably in the woff2 format, though others should work as well
    * @param codePoints codepoints used to subset the glyphs
    *
-   * @returns font with subsetted glyphs converted into a dataurl
+   * @returns font with subsetted glyphs (all glyphs in case of errors) converted into a dataurl
    */
-  private static async trySubsetGlyphsByCodePoints(
+  private static async subsetGlyphsByCodePoints(
     arrayBuffer: ArrayBuffer,
     codePoints: ReadonlySet<number>,
   ): Promise<string> {

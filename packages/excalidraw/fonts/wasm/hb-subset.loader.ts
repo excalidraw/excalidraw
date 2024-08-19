@@ -1,3 +1,6 @@
+/**
+ * Lazy loads wasm and respective bindings for font subsetting based on the harfbuzzjs.
+ */
 let loadedWasm: ReturnType<typeof load> | null = null;
 
 // TODO: add support for fetching the wasm from an URL (external CDN, data URL, etc.)

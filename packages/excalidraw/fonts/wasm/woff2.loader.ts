@@ -1,3 +1,6 @@
+/**
+ * Lazy loads wasm and respective bindings for woff2 compression and decompression.
+ */
 type Vector = any;
 
 let loadedWasm: ReturnType<typeof load> | null = null;

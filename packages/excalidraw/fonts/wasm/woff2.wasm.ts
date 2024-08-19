@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-/* eslint-disable prettier/prettier */
+/* eslint-disable */
 // @ts-nocheck
 
 /**
