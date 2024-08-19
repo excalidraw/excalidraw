@@ -223,5 +223,5 @@ export {
   registerLocalFont,
   getFontFamilies,
   registerFontsInCSS,
-  getFontDefinition,
+  getCSSFontDefinition,
 } from "../excalidraw/obsidianUtils"; //zsviczian

@@ -268,7 +268,7 @@ export {
   getFontFamilies, //zsviczian
   getFontFamilyString, //zsviczian
   registerFontsInCSS, //zsviczian
-  getFontDefinition, //zsviczian
+  getCSSFontDefinition, //zsviczian
 } from "../utils/export";
 
 export { refreshTextDimensions } from "./element/newElement"; //zsviczian

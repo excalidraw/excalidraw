@@ -112,7 +112,7 @@ export async function registerFontsInCSS() {
   styleElement.textContent = cssContent;
 }
 
-export async function getFontDefinition(fontFamily: number): Promise<string> {
+export async function getCSSFontDefinition(fontFamily: number): Promise<string> {
   const fontFaces = Fonts.registered.get(fontFamily)?.fonts;
   if (!fontFaces) {
     return "";
@@ -121,5 +121,6 @@ export async function getFontDefinition(fontFamily: number): Promise<string> {
   if (!fontFace) {
     return "";
   }
-  return await fontFace.getContent();
+  const content = await fontFace.getContent();
+  return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`
 }
