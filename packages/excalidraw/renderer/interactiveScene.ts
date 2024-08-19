@@ -344,7 +344,8 @@ const renderSelectionBorder = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.lineWidth = (activeEmbeddable ? 4 : 1) / appState.zoom.value;
+  const thick = activeEmbeddable || appState.highlightSearchResult; //zsviczian
+  context.lineWidth = (thick ? 4 : 1) / appState.zoom.value; //zsviczian
 
   const count = selectionColors.length;
   for (let index = 0; index < count; ++index) {

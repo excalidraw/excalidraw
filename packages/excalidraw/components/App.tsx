@@ -2275,8 +2275,6 @@ class App extends React.Component<AppProps, AppState> {
       const name = actionResult?.appState?.name ?? this.state.name;
       const errorMessage =
         actionResult?.appState?.errorMessage ?? this.state.errorMessage;
-      const contextMenu =
-        actionResult?.appState?.contextMenu ?? this.state.contextMenu;
 
       if (typeof this.props.viewModeEnabled !== "undefined") {
         viewModeEnabled = this.props.viewModeEnabled;
@@ -2313,7 +2311,7 @@ class App extends React.Component<AppProps, AppState> {
           // NOTE this will prevent opening context menu using an action
           // or programmatically from the host, so it will need to be
           // rewritten later
-          contextMenu,
+          contextMenu: null,
           editingElement,
           viewModeEnabled,
           zenModeEnabled,
@@ -2874,6 +2872,17 @@ class App extends React.Component<AppProps, AppState> {
           action: "FOLLOW",
         });
       }
+    }
+
+    // zsviczian
+    if (
+      this.state.highlightSearchResult &&
+      !this.debounceClearHighlightSearchResults &&
+      prevState.selectedElementIds !== this.state.selectedElementIds
+    ) {
+      this.setState({
+        highlightSearchResult: false,
+      });
     }
 
     if (
@@ -3995,9 +4004,18 @@ class App extends React.Component<AppProps, AppState> {
     };
 
   //zsviczian
+  private debounceClearHighlightSearchResults: boolean = false;
   public selectElements: ExcalidrawImperativeAPI["selectElements"] = (
     elements: readonly ExcalidrawElement[],
+    highlightSearchResult: boolean = false, //zsviczian (search result highlighting)
   ) => {
+    //zsviczian
+    if (highlightSearchResult) {
+      this.debounceClearHighlightSearchResults = true;
+      setTimeout(() => {
+        this.debounceClearHighlightSearchResults = false;
+      }, 500);
+    }
     this.updateScene({
       appState: {
         ...this.state,
@@ -4006,6 +4024,7 @@ class App extends React.Component<AppProps, AppState> {
           map[element.id] = true;
           return map;
         }, {} as any),
+        highlightSearchResult, //zsviczian 
       },
       storeAction: StoreAction.NONE,
       forceFlushSync: true,

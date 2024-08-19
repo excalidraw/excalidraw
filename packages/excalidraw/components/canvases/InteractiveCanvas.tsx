@@ -202,6 +202,7 @@ const getRelevantAppStateProps = (
   zenModeEnabled: appState.zenModeEnabled,
   editingElement: appState.editingElement,
   gridColor: appState.gridColor, //zsviczian
+  highlightSearchResult: appState.highlightSearchResult, //zsviczian
 });
 
 const areEqual = (
