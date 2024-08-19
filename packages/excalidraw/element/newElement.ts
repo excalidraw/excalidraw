@@ -17,6 +17,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
   ElementsMap,
+  ExcalidrawArrowElement,
 } from "./types";
 import {
   arrayToMap,
@@ -36,7 +37,6 @@ import {
   normalizeText,
   wrapText,
   getBoundTextMaxWidth,
-  getDefaultLineHeight,
 } from "./textElement";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -47,6 +47,7 @@ import {
   VERTICAL_ALIGN,
 } from "../constants";
 import type { MarkOptional, Merge, Mutable } from "../utility-types";
+import { getLineHeight } from "../fonts";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -228,7 +229,7 @@ export const newTextElement = (
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
-  const lineHeight = opts.lineHeight || getDefaultLineHeight(fontFamily);
+  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
@@ -388,8 +389,6 @@ export const newFreeDrawElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startArrowhead?: Arrowhead | null;
-    endArrowhead?: Arrowhead | null;
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
@@ -399,8 +398,29 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
+    startArrowhead: null,
+    endArrowhead: null,
+  };
+};
+
+export const newArrowElement = (
+  opts: {
+    type: ExcalidrawArrowElement["type"];
+    startArrowhead?: Arrowhead | null;
+    endArrowhead?: Arrowhead | null;
+    points?: ExcalidrawArrowElement["points"];
+    elbowed?: boolean;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawArrowElement> => {
+  return {
+    ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
+    points: opts.points || [],
+    lastCommittedPoint: null,
+    startBinding: null,
+    endBinding: null,
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
+    elbowed: opts.elbowed || false,
   };
 };
 
@@ -514,7 +534,7 @@ export const regenerateId = (
     if (
       window.h?.app
         ?.getSceneElementsIncludingDeleted()
-        .find((el) => el.id === nextId)
+        .find((el: ExcalidrawElement) => el.id === nextId)
     ) {
       nextId += "_copy";
     }

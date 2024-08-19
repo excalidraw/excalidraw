@@ -19,7 +19,7 @@ describe("embedding scene data", () => {
         elements: sourceElements,
         appState: {
           viewBackgroundColor: "#ffffff",
-          gridSize: null,
+          gridModeEnabled: false,
           exportEmbedScene: true,
         },
         files: null,
@@ -50,7 +50,7 @@ describe("embedding scene data", () => {
         elements: sourceElements,
         appState: {
           viewBackgroundColor: "#ffffff",
-          gridSize: null,
+          gridModeEnabled: false,
           exportEmbedScene: true,
         },
         files: null,

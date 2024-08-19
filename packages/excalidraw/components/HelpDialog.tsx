@@ -305,6 +305,16 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             caption={t("helpDialog.editor")}
           >
             <Shortcut
+              label={t("helpDialog.createFlowchart")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+Arrow Key`)]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.navigateFlowchart")}
+              shortcuts={[getShortcutKey(`Alt+Arrow Key`)]}
+              isOr={true}
+            />
+            <Shortcut
               label={t("labels.moveCanvas")}
               shortcuts={[
                 getShortcutKey(`Space+${t("helpDialog.drag")}`),
@@ -457,6 +467,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("labels.showBackground")}
               shortcuts={[getShortcutKey("G")]}
+            />
+            <Shortcut
+              label={t("labels.showFonts")}
+              shortcuts={[getShortcutKey("Shift+F")]}
             />
             <Shortcut
               label={t("labels.decreaseFontSize")}

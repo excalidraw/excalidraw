@@ -15,7 +15,7 @@ import {
 import type { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import type { ActionResult } from "./types";
-import { GRID_SIZE } from "../constants";
+import { DEFAULT_GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
@@ -40,12 +40,11 @@ export const actionDuplicateSelection = register({
   icon: DuplicateIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
       const ret = LinearElementEditor.duplicateSelectedPoints(
         appState,
-        elementsMap,
+        app.scene.getNonDeletedElementsMap(),
       );
 
       if (!ret) {
@@ -100,8 +99,8 @@ const duplicateElements = (
       groupIdMap,
       element,
       {
-        x: element.x + GRID_SIZE / 2,
-        y: element.y + GRID_SIZE / 2,
+        x: element.x + DEFAULT_GRID_SIZE / 2,
+        y: element.y + DEFAULT_GRID_SIZE / 2,
       },
     );
     duplicatedElementsMap.set(newElement.id, newElement);

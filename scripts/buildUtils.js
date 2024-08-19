@@ -1,13 +1,17 @@
+const fs = require("fs");
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
-
-const fs = require("fs");
+const {
+  woff2BrowserPlugin,
+  woff2ServerPlugin,
+} = require("./woff2/woff2-esbuild-plugins");
 
 const browserConfig = {
   entryPoints: ["index.ts"],
   bundle: true,
   format: "esm",
-  plugins: [sassPlugin()],
+  plugins: [sassPlugin(), woff2BrowserPlugin()],
+  assetNames: "assets/[name]",
 };
 
 // Will be used later for treeshaking
@@ -79,7 +83,6 @@ const rawConfig = {
   bundle: true,
   format: "esm",
   packages: "external",
-  plugins: [sassPlugin()],
 };
 
 // const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;
@@ -100,6 +103,7 @@ const createESMRawBuild = async () => {
     outdir: "dist/dev",
     sourcemap: true,
     metafile: true,
+    plugins: [sassPlugin(), woff2ServerPlugin({ outdir: "dist/dev/assets" })],
     define: {
       "import.meta.env": JSON.stringify({ DEV: true }),
     },
@@ -112,6 +116,10 @@ const createESMRawBuild = async () => {
     outdir: "dist/prod",
     minify: true,
     metafile: true,
+    plugins: [
+      sassPlugin(),
+      woff2ServerPlugin({ outdir: "dist/prod/assets", generateTtf: true }),
+    ],
     define: {
       "import.meta.env": JSON.stringify({ PROD: true }),
     },

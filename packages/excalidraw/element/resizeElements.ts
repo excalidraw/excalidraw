@@ -11,6 +11,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
   ElementsMap,
+  NonDeletedSceneElementsMap,
+  SceneElementsMap,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -22,6 +24,7 @@ import {
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
@@ -30,7 +33,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
-import { updateBoundElements } from "./binding";
+import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
@@ -51,6 +54,7 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
+import { mutateElbowArrow } from "./routing";
 
 export const normalizeAngle = (angle: number): number => {
   if (angle < 0) {
@@ -67,7 +71,7 @@ export const transformElements = (
   originalElements: PointerDownState["originalElements"],
   transformHandleType: MaybeTransformHandleType,
   selectedElements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: SceneElementsMap,
   shouldRotateWithDiscreteAngle: boolean,
   shouldResizeFromCenter: boolean,
   shouldMaintainAspectRatio: boolean,
@@ -79,14 +83,16 @@ export const transformElements = (
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
-      rotateSingleElement(
-        element,
-        elementsMap,
-        pointerX,
-        pointerY,
-        shouldRotateWithDiscreteAngle,
-      );
-      updateBoundElements(element, elementsMap);
+      if (!isElbowArrow(element)) {
+        rotateSingleElement(
+          element,
+          elementsMap,
+          pointerX,
+          pointerY,
+          shouldRotateWithDiscreteAngle,
+        );
+        updateBoundElements(element, elementsMap);
+      }
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         originalElements,
@@ -426,7 +432,7 @@ export const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
+  elementsMap: SceneElementsMap,
   transformHandleDirection: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
   pointerX: number,
@@ -702,7 +708,10 @@ export const resizeSingleElement = (
     mutateElement(element, resizedElement);
 
     updateBoundElements(element, elementsMap, {
-      newSize: { width: resizedElement.width, height: resizedElement.height },
+      oldSize: {
+        width: stateAtResizeStart.width,
+        height: stateAtResizeStart.height,
+      },
     });
 
     if (boundTextElement && boundTextFont != null) {
@@ -722,7 +731,7 @@ export const resizeSingleElement = (
 export const resizeMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   selectedElements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   transformHandleType: TransformHandleDirection,
   shouldResizeFromCenter: boolean,
   shouldMaintainAspectRatio: boolean,
@@ -955,13 +964,27 @@ export const resizeMultipleElements = (
     element,
     update: { boundTextFontSize, ...update },
   } of elementsAndUpdates) {
-    const { width, height, angle } = update;
+    const { angle } = update;
+    const { width: oldWidth, height: oldHeight } = element;
 
     mutateElement(element, update, false);
 
+    if (isArrowElement(element) && isElbowArrow(element)) {
+      mutateElbowArrow(
+        element,
+        elementsMap,
+        element.points,
+        undefined,
+        undefined,
+        {
+          informMutation: false,
+        },
+      );
+    }
+
     updateBoundElements(element, elementsMap, {
       simultaneouslyUpdated: elementsToUpdate,
-      newSize: { width, height },
+      oldSize: { width: oldWidth, height: oldHeight },
     });
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
@@ -984,7 +1007,7 @@ export const resizeMultipleElements = (
 const rotateMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   elements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: SceneElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -1013,15 +1036,22 @@ const rotateMultipleElements = (
         centerY,
         centerAngle + origAngle - element.angle,
       );
-      mutateElement(
-        element,
-        {
-          x: element.x + (rotatedCX - cx),
-          y: element.y + (rotatedCY - cy),
-          angle: normalizeAngle(centerAngle + origAngle),
-        },
-        false,
-      );
+
+      if (isArrowElement(element) && isElbowArrow(element)) {
+        const points = getArrowLocalFixedPoints(element, elementsMap);
+        mutateElbowArrow(element, elementsMap, points);
+      } else {
+        mutateElement(
+          element,
+          {
+            x: element.x + (rotatedCX - cx),
+            y: element.y + (rotatedCY - cy),
+            angle: normalizeAngle(centerAngle + origAngle),
+          },
+          false,
+        );
+      }
+
       updateBoundElements(element, elementsMap, {
         simultaneouslyUpdated: elements,
       });

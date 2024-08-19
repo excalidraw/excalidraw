@@ -5,20 +5,27 @@ import { t } from "../i18n";
 import { register } from "./register";
 import { getNonDeletedElements } from "../element";
 import type { ExcalidrawElement } from "../element/types";
-import type { AppState } from "../types";
-import { newElementWith } from "../element/mutateElement";
+import type { AppClassProperties, AppState } from "../types";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
+import {
+  isBoundToContainer,
+  isElbowArrow,
+  isFrameLikeElement,
+} from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
 import { StoreAction } from "../store";
+import { mutateElbowArrow } from "../element/routing";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  app: AppClassProperties,
 ) => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
   const framesToBeDeleted = new Set(
     getSelectedElements(
       elements.filter((el) => isFrameLikeElement(el)),
@@ -29,6 +36,26 @@ const deleteSelectedElements = (
   return {
     elements: elements.map((el) => {
       if (appState.selectedElementIds[el.id]) {
+        if (el.boundElements) {
+          el.boundElements.forEach((candidate) => {
+            const bound = app.scene
+              .getNonDeletedElementsMap()
+              .get(candidate.id);
+            if (bound && isElbowArrow(bound)) {
+              mutateElement(bound, {
+                startBinding:
+                  el.id === bound.startBinding?.elementId
+                    ? null
+                    : bound.startBinding,
+                endBinding:
+                  el.id === bound.endBinding?.elementId
+                    ? null
+                    : bound.endBinding,
+              });
+              mutateElbowArrow(bound, elementsMap, bound.points);
+            }
+          });
+        }
         return newElementWith(el, { isDeleted: true });
       }
 
@@ -130,7 +157,11 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        element,
+        selectedPointsIndices,
+        elementsMap,
+      );
 
       return {
         elements,
@@ -149,7 +180,7 @@ export const actionDeleteSelected = register({
       };
     }
     let { elements: nextElements, appState: nextAppState } =
-      deleteSelectedElements(elements, appState);
+      deleteSelectedElements(elements, appState, app);
     fixBindingsAfterDeletion(
       nextElements,
       elements.filter(({ id }) => appState.selectedElementIds[id]),

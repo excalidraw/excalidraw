@@ -21,6 +21,10 @@ import type {
   ExcalidrawIframeLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
+  PointBinding,
+  FixedPointBinding,
+  ExcalidrawFlowchartNodeElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -106,6 +110,12 @@ export const isArrowElement = (
   return element != null && element.type === "arrow";
 };
 
+export const isElbowArrow = (
+  element?: ExcalidrawElement,
+): element is ExcalidrawElbowArrowElement => {
+  return isArrowElement(element) && element.elbowed;
+};
+
 export const isLinearElementType = (
   elementType: ElementOrToolType,
 ): boolean => {
@@ -147,6 +157,39 @@ export const isBindableElement = (
       element.type === "frame" ||
       element.type === "magicframe" ||
       (element.type === "text" && !element.containerId))
+  );
+};
+
+export const isRectanguloidElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawBindableElement => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "diamond" ||
+      element.type === "image" ||
+      element.type === "iframe" ||
+      element.type === "embeddable" ||
+      element.type === "frame" ||
+      element.type === "magicframe" ||
+      (element.type === "text" && !element.containerId))
+  );
+};
+
+// TODO: Remove this when proper distance calculation is introduced
+// @see binding.ts:distanceToBindableElement()
+export const isRectangularElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawBindableElement => {
+  return (
+    element != null &&
+    (element.type === "rectangle" ||
+      element.type === "image" ||
+      element.type === "text" ||
+      element.type === "iframe" ||
+      element.type === "embeddable" ||
+      element.type === "frame" ||
+      element.type === "magicframe")
   );
 };
 
@@ -192,6 +235,16 @@ export const isExcalidrawElement = (
       return false;
     }
   }
+};
+
+export const isFlowchartNodeElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawFlowchartNodeElement => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond"
+  );
 };
 
 export const hasBoundTextElement = (
@@ -262,4 +315,10 @@ export const getDefaultRoundnessTypeForElement = (
   }
 
   return null;
+};
+
+export const isFixedPointBinding = (
+  binding: PointBinding,
+): binding is FixedPointBinding => {
+  return binding.fixedPoint != null;
 };

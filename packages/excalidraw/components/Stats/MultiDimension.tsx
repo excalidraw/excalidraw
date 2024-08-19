@@ -68,6 +68,7 @@ const resizeElementInGroup = (
   originalElementsMap: ElementsMap,
 ) => {
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
+  const { width: oldWidth, height: oldHeight } = latestElement;
 
   mutateElement(latestElement, updates, false);
   const boundTextElement = getBoundTextElement(
@@ -77,7 +78,7 @@ const resizeElementInGroup = (
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
     updateBoundElements(latestElement, elementsMap, {
-      newSize: { width: updates.width, height: updates.height },
+      oldSize: { width: oldWidth, height: oldHeight },
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
@@ -149,6 +150,7 @@ const handleDimensionChange: DragInputCallbackType<
   property,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+  const elements = scene.getNonDeletedElements();
   const atomicUnits = getAtomicUnits(originalElements, originalAppState);
   if (nextValue !== undefined) {
     for (const atomicUnit of atomicUnits) {
@@ -227,6 +229,8 @@ const handleDimensionChange: DragInputCallbackType<
             false,
             origElement,
             elementsMap,
+            elements,
+            scene,
             false,
           );
         }
@@ -320,7 +324,15 @@ const handleDimensionChange: DragInputCallbackType<
         nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
         nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
 
-        resizeElement(nextWidth, nextHeight, false, origElement, elementsMap);
+        resizeElement(
+          nextWidth,
+          nextHeight,
+          false,
+          origElement,
+          elementsMap,
+          elements,
+          scene,
+        );
       }
     }
   }

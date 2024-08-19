@@ -4,12 +4,18 @@ import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import type { NonDeletedExcalidrawElement } from "./types";
-import type { AppState, NormalizedZoomValue, PointerDownState } from "../types";
+import type {
+  AppState,
+  NormalizedZoomValue,
+  NullableGridSize,
+  PointerDownState,
+} from "../types";
 import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
 import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import {
   isArrowElement,
+  isElbowArrow,
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
@@ -18,16 +24,34 @@ import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
-  selectedElements: NonDeletedExcalidrawElement[],
+  _selectedElements: NonDeletedExcalidrawElement[],
   offset: { x: number; y: number },
-  appState: AppState,
   scene: Scene,
   snapOffset: {
     x: number;
     y: number;
   },
-  gridSize: AppState["gridSize"],
+  gridSize: NullableGridSize,
 ) => {
+  if (
+    _selectedElements.length === 1 &&
+    isArrowElement(_selectedElements[0]) &&
+    isElbowArrow(_selectedElements[0]) &&
+    (_selectedElements[0].startBinding || _selectedElements[0].endBinding)
+  ) {
+    return;
+  }
+
+  const selectedElements = _selectedElements.filter(
+    (el) =>
+      !(
+        isArrowElement(el) &&
+        isElbowArrow(el) &&
+        el.startBinding &&
+        el.endBinding
+      ),
+  );
+
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
   // in the frame twice, hence the use of set
@@ -82,7 +106,7 @@ const calculateOffset = (
   commonBounds: Bounds,
   dragOffset: { x: number; y: number },
   snapOffset: { x: number; y: number },
-  gridSize: AppState["gridSize"],
+  gridSize: NullableGridSize,
 ): { x: number; y: number } => {
   const [x, y] = commonBounds;
   let nextX = x + dragOffset.x + snapOffset.x;
@@ -136,7 +160,7 @@ export const getDragOffsetXY = (
 };
 
 export const dragNewElement = (
-  draggingElement: NonDeletedExcalidrawElement,
+  newElement: NonDeletedExcalidrawElement,
   elementType: AppState["activeTool"]["type"],
   originX: number,
   originY: number,
@@ -155,7 +179,7 @@ export const dragNewElement = (
     y: number;
   } | null = null,
 ) => {
-  if (shouldMaintainAspectRatio && draggingElement.type !== "selection") {
+  if (shouldMaintainAspectRatio && newElement.type !== "selection") {
     if (widthAspectRatio) {
       height = width / widthAspectRatio;
     } else {
@@ -194,17 +218,14 @@ export const dragNewElement = (
 
   let textAutoResize = null;
 
-  // NOTE this should apply only to creating text elements, not existing
-  // (once we rewrite appState.draggingElement to actually mean dragging
-  // elements)
-  if (isTextElement(draggingElement)) {
-    height = draggingElement.height;
+  if (isTextElement(newElement)) {
+    height = newElement.height;
     const minWidth = getMinTextElementWidth(
       getFontString({
-        fontSize: draggingElement.fontSize,
-        fontFamily: draggingElement.fontFamily,
+        fontSize: newElement.fontSize,
+        fontFamily: newElement.fontFamily,
       }),
-      draggingElement.lineHeight,
+      newElement.lineHeight,
     );
     width = Math.max(width, minWidth);
 
@@ -221,7 +242,7 @@ export const dragNewElement = (
   }
 
   if (width !== 0 && height !== 0) {
-    mutateElement(draggingElement, {
+    mutateElement(newElement, {
       x: newX + (originOffset?.x ?? 0),
       y: newY + (originOffset?.y ?? 0),
       width,
