@@ -1,4 +1,3 @@
-import type { Point } from "../types";
 import type {
   FONT_FAMILY,
   ROUNDNESS,
@@ -13,6 +12,7 @@ import type {
   ValueOf,
 } from "../utility-types";
 import type { MagicCacheData } from "../data/magic";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -50,7 +50,7 @@ type _ExcalidrawElementBase = Readonly<{
   opacity: number;
   width: number;
   height: number;
-  angle: number;
+  angle: Radians;
   /** Random integer used to seed shape generation so that the roughjs shape
       doesn't differ across renders. */
   seed: number;
@@ -273,8 +273,8 @@ export type Arrowhead =
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
-    points: readonly Point[];
-    lastCommittedPoint: Point | null;
+    points: readonly LocalPoint[];
+    lastCommittedPoint: LocalPoint | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
@@ -299,10 +299,10 @@ export type ExcalidrawElbowArrowElement = Merge<
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
-    points: readonly Point[];
+    points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    lastCommittedPoint: Point | null;
+    lastCommittedPoint: LocalPoint | null;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

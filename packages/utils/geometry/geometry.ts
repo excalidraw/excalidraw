@@ -1,13 +1,14 @@
-import type { ExcalidrawBindableElement } from "../../excalidraw/element/types";
+import type { LineSegment } from "@excalidraw/math";
 import {
-  addVectors,
-  distance2d,
-  rotatePoint,
-  scaleVector,
-  subtractVectors,
-} from "../../excalidraw/math";
-import type { LineSegment } from "../bbox";
-import { crossProduct } from "../bbox";
+  point,
+  pointRotateRads,
+  vectorCross,
+  type GlobalPoint,
+  type LocalPoint,
+  createLineSegment,
+} from "@excalidraw/math";
+import type { ExcalidrawBindableElement } from "../../excalidraw/element/types";
+import { distance2d, scaleVector } from "../../excalidraw/math";
 import type {
   Point,
   Line,
@@ -982,21 +983,21 @@ export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
  * Calculates the point two line segments with a definite start and end point
  * intersect at.
  */
-export const segmentsIntersectAt = (
-  a: Readonly<LineSegment>,
-  b: Readonly<LineSegment>,
+export const segmentsIntersectAt = <Point extends GlobalPoint | LocalPoint>(
+  a: Readonly<LineSegment<Point>>,
+  b: Readonly<LineSegment<Point>>,
 ): Point | null => {
   const r = subtractVectors(a[1], a[0]);
   const s = subtractVectors(b[1], b[0]);
-  const denominator = crossProduct(r, s);
+  const denominator = vectorCross(r, s);
 
   if (denominator === 0) {
     return null;
   }
 
   const i = subtractVectors(b[0], a[0]);
-  const u = crossProduct(i, r) / denominator;
-  const t = crossProduct(i, s) / denominator;
+  const u = vectorCross(i, r) / denominator;
+  const t = vectorCross(i, s) / denominator;
 
   if (u === 0) {
     return null;
@@ -1021,9 +1022,11 @@ export const segmentsIntersectAt = (
  * @returns An array of intersections
  */
 // TODO: Replace with final rounded rectangle code
-export const segmentIntersectRectangleElement = (
+export const segmentIntersectRectangleElement = <
+  Point extends LocalPoint | GlobalPoint,
+>(
   element: ExcalidrawBindableElement,
-  segment: LineSegment,
+  segment: LineSegment<Point>,
   gap: number = 0,
 ): Point[] => {
   const bounds = [
@@ -1032,28 +1035,28 @@ export const segmentIntersectRectangleElement = (
     element.x + element.width + gap,
     element.y + element.height + gap,
   ];
-  const center = [
+  const center = point(
     (bounds[0] + bounds[2]) / 2,
     (bounds[1] + bounds[3]) / 2,
-  ] as Point;
+  );
 
   return [
-    [
-      rotatePoint([bounds[0], bounds[1]], center, element.angle),
-      rotatePoint([bounds[2], bounds[1]], center, element.angle),
-    ] as LineSegment,
-    [
-      rotatePoint([bounds[2], bounds[1]], center, element.angle),
-      rotatePoint([bounds[2], bounds[3]], center, element.angle),
-    ] as LineSegment,
-    [
-      rotatePoint([bounds[2], bounds[3]], center, element.angle),
-      rotatePoint([bounds[0], bounds[3]], center, element.angle),
-    ] as LineSegment,
-    [
-      rotatePoint([bounds[0], bounds[3]], center, element.angle),
-      rotatePoint([bounds[0], bounds[1]], center, element.angle),
-    ] as LineSegment,
+    createLineSegment(
+      pointRotateRads(point(bounds[0], bounds[1]), center, element.angle),
+      pointRotateRads(point(bounds[2], bounds[1]), center, element.angle),
+    ),
+    createLineSegment(
+      pointRotateRads(point(bounds[2], bounds[1]), center, element.angle),
+      pointRotateRads(point(bounds[2], bounds[3]), center, element.angle),
+    ),
+    createLineSegment(
+      pointRotateRads(point(bounds[2], bounds[3]), center, element.angle),
+      pointRotateRads(point(bounds[0], bounds[3]), center, element.angle),
+    ),
+    createLineSegment(
+      pointRotateRads(point(bounds[0], bounds[3]), center, element.angle),
+      pointRotateRads(point(bounds[0], bounds[1]), center, element.angle),
+    ),
   ]
     .map((s) => segmentsIntersectAt(segment, s))
     .filter((i): i is Point => !!i);

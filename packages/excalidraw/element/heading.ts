@@ -1,8 +1,12 @@
 import { lineAngle } from "../../utils/geometry/geometry";
 import type { Vector } from "../../utils/geometry/shape";
-import { getCenterForBounds, rotatePoint, scalePointFromOrigin } from "../math";
-import type { Point, Triangle } from "@excalidraw/math";
-import { triangleIncludesPoint } from "@excalidraw/math";
+import { getCenterForBounds, scalePointFromOrigin } from "../math";
+import type { LocalPoint, GlobalPoint, Triangle } from "@excalidraw/math";
+import {
+  point,
+  pointRotateRads,
+  triangleIncludesPoint,
+} from "@excalidraw/math";
 import type { Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
 
@@ -12,7 +16,10 @@ export const HEADING_LEFT = [-1, 0] as Heading;
 export const HEADING_UP = [0, -1] as Heading;
 export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
 
-export const headingForDiamond = (a: Point, b: Point) => {
+export const headingForDiamond = (
+  a: LocalPoint | GlobalPoint,
+  b: LocalPoint | GlobalPoint,
+) => {
   const angle = lineAngle([a, b]);
   if (angle >= 315 || angle < 45) {
     return HEADING_UP;
@@ -44,73 +51,73 @@ export const compareHeading = (a: Heading, b: Heading) =>
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
-export const headingForPointFromElement = (
+export const headingForPointFromElement = <
+  Point extends GlobalPoint | LocalPoint,
+>(
   element: Readonly<ExcalidrawBindableElement>,
   aabb: Readonly<Bounds>,
-  point: Readonly<Point>,
+  p: Readonly<LocalPoint | GlobalPoint>,
 ): Heading => {
   const SEARCH_CONE_MULTIPLIER = 2;
 
   const midPoint = getCenterForBounds(aabb);
 
   if (element.type === "diamond") {
-    if (point[0] < element.x) {
+    if (p[0] < element.x) {
       return HEADING_LEFT;
-    } else if (point[1] < element.y) {
+    } else if (p[1] < element.y) {
       return HEADING_UP;
-    } else if (point[0] > element.x + element.width) {
+    } else if (p[0] > element.x + element.width) {
       return HEADING_RIGHT;
-    } else if (point[1] > element.y + element.height) {
+    } else if (p[1] > element.y + element.height) {
       return HEADING_DOWN;
     }
 
-    const top = rotatePoint(
+    const top = pointRotateRads(
       scalePointFromOrigin(
-        [element.x + element.width / 2, element.y],
+        point(element.x + element.width / 2, element.y),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
       midPoint,
       element.angle,
-    ) as Point;
-    const right = rotatePoint(
+    );
+    const right = pointRotateRads(
       scalePointFromOrigin(
-        [element.x + element.width, element.y + element.height / 2],
+        point(element.x + element.width, element.y + element.height / 2),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
       midPoint,
       element.angle,
-    ) as Point;
-    const bottom = rotatePoint(
+    );
+    const bottom = pointRotateRads(
       scalePointFromOrigin(
-        [element.x + element.width / 2, element.y + element.height],
+        point(element.x + element.width / 2, element.y + element.height),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
       midPoint,
       element.angle,
-    ) as Point;
-    const left = rotatePoint(
+    );
+    const left = pointRotateRads(
       scalePointFromOrigin(
-        [element.x, element.y + element.height / 2],
+        point(element.x, element.y + element.height / 2),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
       midPoint,
       element.angle,
-    ) as Point;
+    );
 
-    if (
-      triangleIncludesPoint([top, right, midPoint] as Triangle<Point>, point)
-    ) {
+    if (triangleIncludesPoint([top, right, midPoint] as Triangle<Point>, p)) {
       return headingForDiamond(top, right);
     } else if (
-      triangleIncludesPoint([right, bottom, midPoint] as Triangle<Point>, point)
+      triangleIncludesPoint([right, bottom, midPoint] as Triangle<Point>, p)
     ) {
       return headingForDiamond(right, bottom);
     } else if (
-      triangleIncludesPoint([bottom, left, midPoint] as Triangle<Point>, point)
+      triangleIncludesPoint([bottom, left, midPoint] as Triangle<Point>, p)
     ) {
       return headingForDiamond(bottom, left);
     }
@@ -119,40 +126,49 @@ export const headingForPointFromElement = (
   }
 
   const topLeft = scalePointFromOrigin(
-    [aabb[0], aabb[1]],
+    point(aabb[0], aabb[1]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
   const topRight = scalePointFromOrigin(
-    [aabb[2], aabb[1]],
+    point(aabb[2], aabb[1]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
   const bottomLeft = scalePointFromOrigin(
-    [aabb[0], aabb[3]],
+    point(aabb[0], aabb[3]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
   const bottomRight = scalePointFromOrigin(
-    [aabb[2], aabb[3]],
+    point(aabb[2], aabb[3]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
 
   return triangleIncludesPoint(
     [topLeft, topRight, midPoint] as Triangle<Point>,
-    point,
+    p,
   )
     ? HEADING_UP
     : triangleIncludesPoint(
         [topRight, bottomRight, midPoint] as Triangle<Point>,
-        point,
+        p,
       )
     ? HEADING_RIGHT
     : triangleIncludesPoint(
         [bottomRight, bottomLeft, midPoint] as Triangle<Point>,
-        point,
+        p,
       )
     ? HEADING_DOWN
     : HEADING_LEFT;
 };
+
+export const flipHeading = (h: Heading): Heading =>
+  [
+    h[0] === 0 ? 0 : h[0] > 0 ? -1 : 1,
+    h[1] === 0 ? 0 : h[1] > 0 ? -1 : 1,
+  ] as Heading;
+
+export const headingEqual = (a: Heading, b: Heading): boolean =>
+  a[0] === b[0] && a[1] === b[1];

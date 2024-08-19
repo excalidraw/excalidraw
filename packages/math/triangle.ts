@@ -1,11 +1,15 @@
-import type { Point } from "./point";
+import type { GlobalPoint, LocalPoint } from "./types";
 
 // Types
 
 /**
  * A triangle represented by 3 points
  */
-export type Triangle<P extends Point> = [a: P, b: P, c: P] & {
+export type Triangle<P extends GlobalPoint | LocalPoint> = [
+  a: P,
+  b: P,
+  c: P,
+] & {
   _brand: "excalimath__triangle";
 };
 
@@ -18,7 +22,7 @@ export type Triangle<P extends Point> = [a: P, b: P, c: P] & {
  * @param p The point to test whether is in the triangle
  * @returns TRUE if the point is inside of the triangle
  */
-export function triangleIncludesPoint<P extends Point>(
+export function triangleIncludesPoint<P extends GlobalPoint | LocalPoint>(
   [a, b, c]: Triangle<P>,
   p: P,
 ): boolean {
@@ -34,7 +38,11 @@ export function triangleIncludesPoint<P extends Point>(
 
 // Utils
 
-function _triangleSign<P extends Point>(p1: P, p2: P, p3: P): number {
+function _triangleSign<P extends GlobalPoint | LocalPoint>(
+  p1: P,
+  p2: P,
+  p3: P,
+): number {
   "inline";
 
   return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);

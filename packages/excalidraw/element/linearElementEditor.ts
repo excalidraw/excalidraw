@@ -13,11 +13,8 @@ import type {
 } from "./types";
 import {
   distance2d,
-  rotate,
   isPathALoop,
   getGridPoint,
-  rotatePoint,
-  centerPoint,
   getControlPointsForBezierCurve,
   getBezierXY,
   getBezierCurveLength,
@@ -32,7 +29,6 @@ import {
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
 import type {
-  Point,
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
@@ -46,7 +42,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { toBrandedType, tupleToCoors } from "../utils";
+import { invariant, toBrandedType, tupleToCoors } from "../utils";
 import {
   isBindingElement,
   isElbowArrow,
@@ -60,10 +56,19 @@ import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
 import { mutateElbowArrow } from "./routing";
 import type Scene from "../scene/Scene";
+import type { Radians } from "@excalidraw/math";
+import {
+  centerPoint,
+  point,
+  pointRotateRads,
+  pointsEqual,
+  type GlobalPoint,
+  type LocalPoint,
+} from "@excalidraw/math";
 
 const editorMidPointsCache: {
   version: number | null;
-  points: (Point | null)[];
+  points: (GlobalPoint | null)[];
   zoom: number | null;
 } = { version: null, points: [], zoom: null };
 export class LinearElementEditor {
@@ -80,7 +85,7 @@ export class LinearElementEditor {
     lastClickedIsEndPoint: boolean;
     origin: Readonly<{ x: number; y: number }> | null;
     segmentMidpoint: {
-      value: Point | null;
+      value: LocalPoint | null;
       index: number | null;
       added: boolean;
     };
@@ -88,7 +93,7 @@ export class LinearElementEditor {
 
   /** whether you're dragging a point */
   public readonly isDragging: boolean;
-  public readonly lastUncommittedPoint: Point | null;
+  public readonly lastUncommittedPoint: LocalPoint | null;
   public readonly pointerOffset: Readonly<{ x: number; y: number }>;
   public readonly startBindingElement:
     | ExcalidrawBindableElement
@@ -96,13 +101,13 @@ export class LinearElementEditor {
     | "keep";
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
-  public readonly segmentMidPointHoveredCoords: Point | null;
+  public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     this.elementId = element.id as string & {
       _brand: "excalidrawLinearElementId";
     };
-    if (!arePointsEqual(element.points[0], [0, 0])) {
+    if (!pointsEqual(element.points[0], point(0, 0))) {
       console.error("Linear element is not normalized", Error().stack);
     }
 
@@ -515,7 +520,7 @@ export class LinearElementEditor {
     );
 
     let index = 0;
-    const midpoints: (Point | null)[] = [];
+    const midpoints: (GlobalPoint | null)[] = [];
     while (index < points.length - 1) {
       if (
         LinearElementEditor.isSegmentTooShort(
@@ -612,8 +617,8 @@ export class LinearElementEditor {
 
   static isSegmentTooShort(
     element: NonDeleted<ExcalidrawLinearElement>,
-    startPoint: Point,
-    endPoint: Point,
+    startPoint: GlobalPoint | LocalPoint,
+    endPoint: GlobalPoint | LocalPoint,
     zoom: AppState["zoom"],
   ) {
     let distance = distance2d(
@@ -631,8 +636,8 @@ export class LinearElementEditor {
 
   static getSegmentMidPoint(
     element: NonDeleted<ExcalidrawLinearElement>,
-    startPoint: Point,
-    endPoint: Point,
+    startPoint: GlobalPoint,
+    endPoint: GlobalPoint,
     endPointIndex: number,
     elementsMap: ElementsMap,
   ) {
@@ -965,30 +970,36 @@ export class LinearElementEditor {
   /** scene coords */
   static getPointGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
-    point: Point,
+    p: LocalPoint,
     elementsMap: ElementsMap,
   ) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
 
-    let { x, y } = element;
-    [x, y] = rotate(x + point[0], y + point[1], cx, cy, element.angle);
-    return [x, y] as const;
+    const { x, y } = element;
+    return pointRotateRads(
+      point(x + p[0], y + p[1]),
+      point(cx, cy),
+      element.angle,
+    );
   }
 
   /** scene coords */
   static getPointsGlobalCoordinates(
     element: NonDeleted<ExcalidrawLinearElement>,
     elementsMap: ElementsMap,
-  ): Point[] {
+  ): GlobalPoint[] {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    return element.points.map((point) => {
-      let { x, y } = element;
-      [x, y] = rotate(x + point[0], y + point[1], cx, cy, element.angle);
-      return [x, y] as const;
+    return element.points.map((p) => {
+      const { x, y } = element;
+      return pointRotateRads(
+        point(x + p[0], y + p[1]),
+        point(cx, cy),
+        element.angle,
+      );
     });
   }
 
@@ -997,7 +1008,7 @@ export class LinearElementEditor {
 
     indexMaybeFromEnd: number, // -1 for last element
     elementsMap: ElementsMap,
-  ): Point {
+  ): GlobalPoint {
     const index =
       indexMaybeFromEnd < 0
         ? element.points.length + indexMaybeFromEnd
@@ -1005,35 +1016,36 @@ export class LinearElementEditor {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-
-    const point = element.points[index];
+    const p = element.points[index];
     const { x, y } = element;
-    return point
-      ? rotate(x + point[0], y + point[1], cx, cy, element.angle)
-      : rotate(x, y, cx, cy, element.angle);
+
+    return p
+      ? pointRotateRads(point(x + p[0], y + p[1]), point(cx, cy), element.angle)
+      : pointRotateRads(point(x, y), point(cx, cy), element.angle);
   }
 
   static pointFromAbsoluteCoords(
     element: NonDeleted<ExcalidrawLinearElement>,
-    absoluteCoords: Point,
+    absoluteCoords: GlobalPoint,
     elementsMap: ElementsMap,
-  ): Point {
+  ): LocalPoint {
     if (isElbowArrow(element)) {
       // No rotation for elbow arrows
-      return [absoluteCoords[0] - element.x, absoluteCoords[1] - element.y];
+      return point(
+        absoluteCoords[0] - element.x,
+        absoluteCoords[1] - element.y,
+      );
     }
 
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    const [x, y] = rotate(
-      absoluteCoords[0],
-      absoluteCoords[1],
-      cx,
-      cy,
-      -element.angle,
+    const [x, y] = pointRotateRads(
+      point(absoluteCoords[0], absoluteCoords[1]),
+      point(cx, cy),
+      -element.angle as Radians,
     );
-    return [x - element.x, y - element.y];
+    return point(x - element.x, y - element.y);
   }
 
   static getPointIndexUnderCursor(
@@ -1070,20 +1082,18 @@ export class LinearElementEditor {
     scenePointerX: number,
     scenePointerY: number,
     gridSize: NullableGridSize,
-  ): Point {
+  ): LocalPoint {
     const pointerOnGrid = getGridPoint(scenePointerX, scenePointerY, gridSize);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    const [rotatedX, rotatedY] = rotate(
-      pointerOnGrid[0],
-      pointerOnGrid[1],
-      cx,
-      cy,
-      -element.angle,
+    const [rotatedX, rotatedY] = pointRotateRads(
+      point(pointerOnGrid[0], pointerOnGrid[1]),
+      point(cx, cy),
+      -element.angle as Radians,
     );
 
-    return [rotatedX - element.x, rotatedY - element.y];
+    return point(rotatedX - element.x, rotatedY - element.y);
   }
 
   /**
@@ -1091,15 +1101,17 @@ export class LinearElementEditor {
    * expected in various parts of the codebase. Also returns new x/y to account
    * for the potential normalization.
    */
-  static getNormalizedPoints(element: ExcalidrawLinearElement) {
+  static getNormalizedPoints(
+    element: ExcalidrawLinearElement,
+  ): Partial<ExcalidrawLinearElement> {
     const { points } = element;
 
     const offsetX = points[0][0];
     const offsetY = points[0][1];
 
     return {
-      points: points.map((point) => {
-        return [point[0] - offsetX, point[1] - offsetY] as const;
+      points: points.map((p) => {
+        return point(p[0] - offsetX, p[1] - offsetY);
       }),
       x: element.x + offsetX,
       y: element.y + offsetY,
@@ -1116,17 +1128,23 @@ export class LinearElementEditor {
   static duplicateSelectedPoints(
     appState: AppState,
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  ) {
-    if (!appState.editingLinearElement) {
-      return false;
-    }
+  ): AppState {
+    invariant(
+      appState.editingLinearElement,
+      "Not currently editing a linear element",
+    );
 
     const { selectedPointsIndices, elementId } = appState.editingLinearElement;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
 
-    if (!element || selectedPointsIndices === null) {
-      return false;
-    }
+    invariant(
+      element,
+      "The linear element does not exist in the provided Scene",
+    );
+    invariant(
+      selectedPointsIndices != null,
+      "There are no selected points to duplicate",
+    );
 
     const { points } = element;
 
@@ -1134,9 +1152,9 @@ export class LinearElementEditor {
 
     let pointAddedToEnd = false;
     let indexCursor = -1;
-    const nextPoints = points.reduce((acc: Point[], point, index) => {
+    const nextPoints = points.reduce((acc: LocalPoint[], p, index) => {
       ++indexCursor;
-      acc.push(point);
+      acc.push(p);
 
       const isSelected = selectedPointsIndices.includes(index);
       if (isSelected) {
@@ -1147,8 +1165,8 @@ export class LinearElementEditor {
         }
         acc.push(
           nextPoint
-            ? [(point[0] + nextPoint[0]) / 2, (point[1] + nextPoint[1]) / 2]
-            : [point[0], point[1]],
+            ? point((p[0] + nextPoint[0]) / 2, (p[1] + nextPoint[1]) / 2)
+            : point(p[0], p[1]),
         );
 
         nextSelectedIndices.push(indexCursor + 1);
@@ -1177,12 +1195,10 @@ export class LinearElementEditor {
     }
 
     return {
-      appState: {
-        ...appState,
-        editingLinearElement: {
-          ...appState.editingLinearElement,
-          selectedPointsIndices: nextSelectedIndices,
-        },
+      ...appState,
+      editingLinearElement: {
+        ...appState.editingLinearElement,
+        selectedPointsIndices: nextSelectedIndices,
       },
     };
   }
@@ -1209,10 +1225,10 @@ export class LinearElementEditor {
       }
     }
 
-    const nextPoints = element.points.reduce((acc: Point[], point, idx) => {
+    const nextPoints = element.points.reduce((acc: LocalPoint[], p, idx) => {
       if (!pointIndices.includes(idx)) {
         acc.push(
-          !acc.length ? [0, 0] : [point[0] - offsetX, point[1] - offsetY],
+          !acc.length ? point(0, 0) : point(p[0] - offsetX, p[1] - offsetY),
         );
       }
       return acc;

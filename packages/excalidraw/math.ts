@@ -1,9 +1,4 @@
-import type {
-  NormalizedZoomValue,
-  NullableGridSize,
-  Point,
-  Zoom,
-} from "./types";
+import type { NormalizedZoomValue, NullableGridSize, Zoom } from "./types";
 import {
   DEFAULT_ADAPTIVE_RADIUS,
   LINE_CONFIRM_THRESHOLD,
@@ -17,32 +12,21 @@ import type {
 } from "./element/types";
 import type { Bounds } from "./element/bounds";
 import { getCurvePathOps } from "./element/bounds";
-import type { Mutable } from "./utility-types";
 import { ShapeCache } from "./scene/ShapeCache";
 import type { Vector } from "../utils/geometry/shape";
-
-export const rotate = (
-  // target point to rotate
-  x: number,
-  y: number,
-  // point to rotate against
-  cx: number,
-  cy: number,
-  angle: number,
-): [number, number] =>
-  // 𝑎′𝑥=(𝑎𝑥−𝑐𝑥)cos𝜃−(𝑎𝑦−𝑐𝑦)sin𝜃+𝑐𝑥
-  // 𝑎′𝑦=(𝑎𝑥−𝑐𝑥)sin𝜃+(𝑎𝑦−𝑐𝑦)cos𝜃+𝑐𝑦.
-  // https://math.stackexchange.com/questions/2204520/how-do-i-rotate-a-line-segment-in-a-specific-point-on-the-line
-  [
-    (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
-    (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
-  ];
-
-export const rotatePoint = (
-  point: Point,
-  center: Point,
-  angle: number,
-): [number, number] => rotate(point[0], point[1], center[0], center[1], angle);
+import {
+  type LocalPoint,
+  type GlobalPoint,
+  point,
+  pointRotateRads,
+  vectorScale,
+  vectorFromPoint,
+  pointFromPair,
+  isPoint,
+  pointsEqual,
+  pointTranslate,
+} from "@excalidraw/math";
+import { invariant } from "./utils";
 
 export const adjustXYWithRotation = (
   sides: {
@@ -91,7 +75,10 @@ export const adjustXYWithRotation = (
   return [x, y];
 };
 
-export const getPointOnAPath = (point: Point, path: Point[]) => {
+export const getPointOnAPath = <P extends LocalPoint | GlobalPoint>(
+  point: P,
+  path: P[],
+) => {
   const [px, py] = point;
   const [start, ...other] = path;
   let [lastX, lastY] = start;
@@ -160,14 +147,13 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
   return Math.hypot(xd, yd);
 };
 
-export const distanceSq2d = (p1: Point, p2: Point) => {
+export const distanceSq2d = <P extends LocalPoint | GlobalPoint>(
+  p1: P,
+  p2: P,
+) => {
   const xd = p2[0] - p1[0];
   const yd = p2[1] - p1[1];
   return xd * xd + yd * yd;
-};
-
-export const centerPoint = (a: Point, b: Point): Point => {
-  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
 };
 
 // Checks if the first and last point are close enough
@@ -191,8 +177,8 @@ export const isPathALoop = (
 // Draw a line from the point to the right till infiinty
 // Check how many lines of the polygon does this infinite line intersects with
 // If the number of intersections is odd, point is in the polygon
-export const isPointInPolygon = (
-  points: Point[],
+export const isPointInPolygon = <P extends GlobalPoint | LocalPoint>(
+  points: P[],
   x: number,
   y: number,
 ): boolean => {
@@ -202,8 +188,8 @@ export const isPointInPolygon = (
   if (vertices < 3) {
     return false;
   }
-  const extreme: Point = [Number.MAX_SAFE_INTEGER, y];
-  const p: Point = [x, y];
+  const extreme = point(Number.MAX_SAFE_INTEGER, y);
+  const p = point(x, y);
   let count = 0;
   for (let i = 0; i < vertices; i++) {
     const current = points[i];
@@ -221,7 +207,11 @@ export const isPointInPolygon = (
 
 // Returns whether `q` lies inside the segment/rectangle defined by `p` and `r`.
 // This is an approximation to "does `q` lie on a segment `pr`" check.
-export const isPointWithinBounds = (p: Point, q: Point, r: Point) => {
+export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  q: P,
+  r: P,
+) => {
   return (
     q[0] <= Math.max(p[0], r[0]) &&
     q[0] >= Math.min(p[0], r[0]) &&
@@ -234,7 +224,11 @@ export const isPointWithinBounds = (p: Point, q: Point, r: Point) => {
 // 0 if p, q, r are colinear
 // 1 if Clockwise
 // 2 if counterclickwise
-const orderedColinearOrientation = (p: Point, q: Point, r: Point) => {
+const orderedColinearOrientation = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  q: P,
+  r: P,
+) => {
   const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
   if (val === 0) {
     return 0;
@@ -243,7 +237,12 @@ const orderedColinearOrientation = (p: Point, q: Point, r: Point) => {
 };
 
 // Check is p1q1 intersects with p2q2
-const doSegmentsIntersect = (p1: Point, q1: Point, p2: Point, q2: Point) => {
+const doSegmentsIntersect = <P extends GlobalPoint | LocalPoint>(
+  p1: P,
+  q1: P,
+  p2: P,
+  q2: P,
+) => {
   const o1 = orderedColinearOrientation(p1, q1, p2);
   const o2 = orderedColinearOrientation(p1, q1, q2);
   const o3 = orderedColinearOrientation(p2, q2, p1);
@@ -314,9 +313,11 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   return 0;
 };
 
-export const getControlPointsForBezierCurve = (
+export const getControlPointsForBezierCurve = <
+  P extends GlobalPoint | LocalPoint,
+>(
   element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: Point,
+  endPoint: P,
 ) => {
   const shape = ShapeCache.generateElementShape(element, null);
   if (!shape) {
@@ -324,21 +325,25 @@ export const getControlPointsForBezierCurve = (
   }
 
   const ops = getCurvePathOps(shape[0]);
-  let currentP: Mutable<Point> = [0, 0];
+  let currentP = point<P>(0, 0);
   let index = 0;
   let minDistance = Infinity;
-  let controlPoints: Mutable<Point>[] | null = null;
+  let controlPoints: P[] | null = null;
 
   while (index < ops.length) {
     const { op, data } = ops[index];
     if (op === "move") {
-      currentP = data as unknown as Mutable<Point>;
+      invariant(
+        isPoint(data),
+        "The returned ops is not compatible with a point",
+      );
+      currentP = pointFromPair(data);
     }
     if (op === "bcurveTo") {
       const p0 = currentP;
-      const p1 = [data[0], data[1]] as Mutable<Point>;
-      const p2 = [data[2], data[3]] as Mutable<Point>;
-      const p3 = [data[4], data[5]] as Mutable<Point>;
+      const p1 = point<P>(data[0], data[1]);
+      const p2 = point<P>(data[2], data[3]);
+      const p3 = point<P>(data[4], data[5]);
       const distance = distance2d(p3[0], p3[1], endPoint[0], endPoint[1]);
       if (distance < minDistance) {
         minDistance = distance;
@@ -352,11 +357,11 @@ export const getControlPointsForBezierCurve = (
   return controlPoints;
 };
 
-export const getBezierXY = (
-  p0: Point,
-  p1: Point,
-  p2: Point,
-  p3: Point,
+export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
+  p0: P,
+  p1: P,
+  p2: P,
+  p3: P,
   t: number,
 ) => {
   const equation = (t: number, idx: number) =>
@@ -369,42 +374,39 @@ export const getBezierXY = (
   return [tx, ty];
 };
 
-export const getPointsInBezierCurve = (
+export const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: Point,
+  endPoint: P,
 ) => {
-  const controlPoints: Mutable<Point>[] = getControlPointsForBezierCurve(
-    element,
-    endPoint,
-  )!;
+  const controlPoints: P[] = getControlPointsForBezierCurve(element, endPoint)!;
   if (!controlPoints) {
     return [];
   }
-  const pointsOnCurve: Mutable<Point>[] = [];
+  const pointsOnCurve: P[] = [];
   let t = 1;
   // Take 20 points on curve for better accuracy
   while (t > 0) {
-    const point = getBezierXY(
+    const p = getBezierXY(
       controlPoints[0],
       controlPoints[1],
       controlPoints[2],
       controlPoints[3],
       t,
     );
-    pointsOnCurve.push([point[0], point[1]]);
+    pointsOnCurve.push(point(p[0], p[1]));
     t -= 0.05;
   }
   if (pointsOnCurve.length) {
-    if (arePointsEqual(pointsOnCurve.at(-1)!, endPoint)) {
-      pointsOnCurve.push([endPoint[0], endPoint[1]]);
+    if (pointsEqual(pointsOnCurve.at(-1)!, endPoint)) {
+      pointsOnCurve.push(point(endPoint[0], endPoint[1]));
     }
   }
   return pointsOnCurve;
 };
 
-export const getBezierCurveArcLengths = (
+export const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: Point,
+  endPoint: P,
 ) => {
   const arcLengths: number[] = [];
   arcLengths[0] = 0;
@@ -426,18 +428,18 @@ export const getBezierCurveArcLengths = (
   return arcLengths;
 };
 
-export const getBezierCurveLength = (
+export const getBezierCurveLength = <P extends GlobalPoint | LocalPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: Point,
+  endPoint: P,
 ) => {
   const arcLengths = getBezierCurveArcLengths(element, endPoint);
   return arcLengths.at(-1) as number;
 };
 
 // This maps interval to actual interval t on the curve so that when t = 0.5, its actually the point at 50% of the length
-export const mapIntervalToBezierT = (
+export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
-  endPoint: Point,
+  endPoint: P,
   interval: number, // The interval between 0 to 1 for which you want to find the point on the curve,
 ) => {
   const arcLengths = getBezierCurveArcLengths(element, endPoint);
@@ -470,10 +472,6 @@ export const mapIntervalToBezierT = (
         (arcLengths[index + 1] - arcLengths[index])) /
       pointsCount
   );
-};
-
-export const arePointsEqual = (p1: Point, p2: Point) => {
-  return p1[0] === p2[0] && p1[1] === p2[1];
 };
 
 export const isRightAngle = (angle: number) => {
@@ -533,26 +531,11 @@ export const isValueInRange = (value: number, min: number, max: number) => {
   return value >= min && value <= max;
 };
 
-export const translatePoint = (p: Point, v: Vector): Point => [
-  p[0] + v[0],
-  p[1] + v[1],
-];
-
-export const scaleVector = (v: Vector, scalar: number): Vector => [
-  v[0] * scalar,
-  v[1] * scalar,
-];
-
-export const pointToVector = (p: Point, origin: Point = [0, 0]): Vector => [
-  p[0] - origin[0],
-  p[1] - origin[1],
-];
-
-export const scalePointFromOrigin = (
-  p: Point,
-  mid: Point,
+export const scalePointFromOrigin = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  mid: P,
   multiplier: number,
-) => translatePoint(mid, scaleVector(pointToVector(p, mid), multiplier));
+) => pointTranslate(mid, vectorScale(vectorFromPoint(p, mid), multiplier));
 
 export const magnitudeSq = (vector: Vector) =>
   vector[0] * vector[0] + vector[1] * vector[1];
@@ -565,17 +548,10 @@ export const normalize = (vector: Vector): Vector => {
   return [vector[0] / m, vector[1] / m];
 };
 
-export const addVectors = (
-  vec1: Readonly<Vector>,
-  vec2: Readonly<Vector>,
-): Vector => [vec1[0] + vec2[0], vec1[1] + vec2[1]];
-
-export const subtractVectors = (
-  vec1: Readonly<Vector>,
-  vec2: Readonly<Vector>,
-): Vector => [vec1[0] - vec2[0], vec1[1] - vec2[1]];
-
-export const pointInsideBounds = (p: Point, bounds: Bounds): boolean =>
+export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
 /**
@@ -594,24 +570,24 @@ export const aabbForElement = (
     midY: element.y + element.height / 2,
   };
 
-  const center = [bbox.midX, bbox.midY] as Point;
-  const [topLeftX, topLeftY] = rotatePoint(
-    [bbox.minX, bbox.minY],
+  const center = point(bbox.midX, bbox.midY);
+  const [topLeftX, topLeftY] = pointRotateRads(
+    point(bbox.minX, bbox.minY),
     center,
     element.angle,
   );
-  const [topRightX, topRightY] = rotatePoint(
-    [bbox.maxX, bbox.minY],
+  const [topRightX, topRightY] = pointRotateRads(
+    point(bbox.maxX, bbox.minY),
     center,
     element.angle,
   );
-  const [bottomRightX, bottomRightY] = rotatePoint(
-    [bbox.maxX, bbox.maxY],
+  const [bottomRightX, bottomRightY] = pointRotateRads(
+    point(bbox.maxX, bbox.maxY),
     center,
     element.angle,
   );
-  const [bottomLeftX, bottomLeftY] = rotatePoint(
-    [bbox.minX, bbox.maxY],
+  const [bottomLeftX, bottomLeftY] = pointRotateRads(
+    point(bbox.minX, bbox.maxY),
     center,
     element.angle,
   );
@@ -643,10 +619,10 @@ type PolarCoords = [number, number];
  * (x, y) for the center point 0,0 where the first number returned is the radius,
  * the second is the angle in radians.
  */
-export const carthesian2Polar = ([x, y]: Point): PolarCoords => [
-  Math.hypot(x, y),
-  Math.atan2(y, x),
-];
+export const carthesian2Polar = <P extends GlobalPoint | LocalPoint>([
+  x,
+  y,
+]: P): PolarCoords => [Math.hypot(x, y), Math.atan2(y, x)];
 
 /**
  * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
@@ -658,9 +634,9 @@ type SymmetricArc = { radius: number; startAngle: number; endAngle: number };
  * Determines if a carthesian point lies on a symmetric arc, i.e. an arc which
  * is part of a circle contour centered on 0, 0.
  */
-export const isPointOnSymmetricArc = (
+export const isPointOnSymmetricArc = <P extends GlobalPoint | LocalPoint>(
   { radius: arcRadius, startAngle, endAngle }: SymmetricArc,
-  point: Point,
+  point: P,
 ): boolean => {
   const [radius, angle] = carthesian2Polar(point);
 
@@ -671,25 +647,24 @@ export const isPointOnSymmetricArc = (
     : startAngle <= angle || endAngle >= angle;
 };
 
-export const getCenterForBounds = (bounds: Bounds): Point => [
-  bounds[0] + (bounds[2] - bounds[0]) / 2,
-  bounds[1] + (bounds[3] - bounds[1]) / 2,
-];
+export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
+  point(
+    bounds[0] + (bounds[2] - bounds[0]) / 2,
+    bounds[1] + (bounds[3] - bounds[1]) / 2,
+  );
 
-export const getCenterForElement = (element: ExcalidrawElement): Point => [
-  element.x + element.width / 2,
-  element.y + element.height / 2,
-];
+export const getCenterForElement = (element: ExcalidrawElement): GlobalPoint =>
+  point(element.x + element.width / 2, element.y + element.height / 2);
 
 export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
-  pointInsideBounds([a[0], a[1]], b) ||
-  pointInsideBounds([a[2], a[1]], b) ||
-  pointInsideBounds([a[2], a[3]], b) ||
-  pointInsideBounds([a[0], a[3]], b) ||
-  pointInsideBounds([b[0], b[1]], a) ||
-  pointInsideBounds([b[2], b[1]], a) ||
-  pointInsideBounds([b[2], b[3]], a) ||
-  pointInsideBounds([b[0], b[3]], a);
+  pointInsideBounds(point(a[0], a[1]), b) ||
+  pointInsideBounds(point(a[2], a[1]), b) ||
+  pointInsideBounds(point(a[2], a[3]), b) ||
+  pointInsideBounds(point(a[0], a[3]), b) ||
+  pointInsideBounds(point(b[0], b[1]), a) ||
+  pointInsideBounds(point(b[2], b[1]), a) ||
+  pointInsideBounds(point(b[2], b[3]), a) ||
+  pointInsideBounds(point(b[0], b[3]), a);
 
 export const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max);
