@@ -272,8 +272,7 @@
     "laser": "Laserový ukazovateľ",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje",
-    "mermaidToExcalidraw": "Mermaid do Excalidraw",
-    "magicSettings": "AI nastavenia"
+    "mermaidToExcalidraw": "Mermaid do Excalidraw"
   },
   "element": {
     "rectangle": "Obdĺžnik",
