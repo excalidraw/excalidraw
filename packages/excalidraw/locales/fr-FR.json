@@ -272,8 +272,7 @@
     "laser": "Pointeur laser",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
-    "mermaidToExcalidraw": "De Mermaid à Excalidraw",
-    "magicSettings": "Paramètres IA"
+    "mermaidToExcalidraw": "De Mermaid à Excalidraw"
   },
   "element": {
     "rectangle": "Rectangle",
