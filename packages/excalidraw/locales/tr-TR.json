@@ -272,8 +272,7 @@
     "laser": "Lazer işaretçisi",
     "hand": "El (hareket aracı)",
     "extraTools": "Daha fazla araç",
-    "mermaidToExcalidraw": "Mermaid'den Excalidraw'a",
-    "magicSettings": "Yapay Zeka Ayarları"
+    "mermaidToExcalidraw": "Mermaid'den Excalidraw'a"
   },
   "element": {
     "rectangle": "Dikdörtgen",
