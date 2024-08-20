@@ -272,8 +272,7 @@
     "laser": "Laserosoitin",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": "Lisää työkaluja",
-    "mermaidToExcalidraw": "Mermaid Excalidrawiksi",
-    "magicSettings": "AI asetukset"
+    "mermaidToExcalidraw": "Mermaid Excalidrawiksi"
   },
   "element": {
     "rectangle": "",
