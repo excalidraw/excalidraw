@@ -213,6 +213,7 @@ export {
   hashString,
   isInvisiblySmallElement,
   getNonDeletedElements,
+  getTextFromElements,
 } from "./element";
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
@@ -287,3 +288,6 @@ export {
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
 } from "../utils/withinBounds";
+
+export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
+export { getDataURL } from "./data/blob";

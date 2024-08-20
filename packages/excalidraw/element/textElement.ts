@@ -886,3 +886,19 @@ export const getMinTextElementWidth = (
 ) => {
   return measureText("", font, lineHeight).width + BOUND_TEXT_PADDING * 2;
 };
+
+/** retrieves text from text elements and concatenates to a single string */
+export const getTextFromElements = (
+  elements: readonly ExcalidrawElement[],
+  separator = "\n\n",
+) => {
+  const text = elements
+    .reduce((acc: string[], element) => {
+      if (isTextElement(element)) {
+        acc.push(element.text);
+      }
+      return acc;
+    }, [])
+    .join(separator);
+  return text;
+};
