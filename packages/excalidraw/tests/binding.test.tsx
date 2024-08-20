@@ -8,7 +8,6 @@ import { KEYS } from "../keys";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { arrayToMap } from "../utils";
 import { point } from "@excalidraw/math";
-import "../global";
 
 const { h } = window;
 
