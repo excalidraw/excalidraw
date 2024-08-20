@@ -272,8 +272,7 @@
     "laser": "Laserpekare",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
-    "mermaidToExcalidraw": "Mermaid till Excalidraw",
-    "magicSettings": "AI-inställningar"
+    "mermaidToExcalidraw": "Mermaid till Excalidraw"
   },
   "element": {
     "rectangle": "Rektangel",
