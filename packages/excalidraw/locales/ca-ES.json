@@ -272,8 +272,7 @@
     "laser": "Punter làser",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "Més eines",
-    "mermaidToExcalidraw": "Mermaid a Excalidraw",
-    "magicSettings": "Configuració d'IA"
+    "mermaidToExcalidraw": "Mermaid a Excalidraw"
   },
   "element": {
     "rectangle": "Rectangle",
