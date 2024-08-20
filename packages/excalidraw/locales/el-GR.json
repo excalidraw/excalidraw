@@ -272,8 +272,7 @@
     "laser": "Δείκτης λέιζερ",
     "hand": "Χέρι (εργαλείο μετακίνησης)",
     "extraTools": "Περισσότερα εργαλεία",
-    "mermaidToExcalidraw": "Mermaid σε Excalidraw",
-    "magicSettings": "Ρυθμίσεις τεχνητής νοημοσύνης"
+    "mermaidToExcalidraw": "Mermaid σε Excalidraw"
   },
   "element": {
     "rectangle": "Ορθογώνιο",
