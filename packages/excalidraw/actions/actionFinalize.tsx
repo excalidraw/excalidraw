@@ -16,7 +16,6 @@ import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { makeNextSelectedElementIds } from "../scene/selection";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -52,7 +51,6 @@ export const actionFinalize = register({
             cursorButton: "up",
             editingLinearElement: null,
             selectedLinearElement: null,
-            //selectedElementIds: makeNextSelectedElementIds({}, appState),
             selectionElement: null,
           },
           storeAction: StoreAction.CAPTURE,
