@@ -272,8 +272,7 @@
     "laser": "レーザーポインター",
     "hand": "手 (パンニングツール)",
     "extraTools": "その他のツール",
-    "mermaidToExcalidraw": "Mermaid を Excalidraw に変換",
-    "magicSettings": "AI 設定"
+    "mermaidToExcalidraw": "Mermaid を Excalidraw に変換"
   },
   "element": {
     "rectangle": "",
