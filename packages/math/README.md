@@ -19,4 +19,3 @@ pnpm add @excalidraw/math
 ```
 
 ## API
-

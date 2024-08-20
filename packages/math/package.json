@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Excalidraw math functions",
-    "publishConfig": {
+  "publishConfig": {
     "access": "public"
   },
   "license": "MIT",
-    "keywords": [
+  "keywords": [
     "excalidraw",
     "excalidraw-math",
     "math",
@@ -15,7 +15,7 @@
     "algebra",
     "2d"
   ],
-    "browserslist": {
+  "browserslist": {
     "production": [
       ">0.2%",
       "not dead",
