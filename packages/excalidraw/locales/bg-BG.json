@@ -272,8 +272,7 @@
     "laser": "Лазерна показалка",
     "hand": "",
     "extraTools": "Още инструменти",
-    "mermaidToExcalidraw": "Mermaid към Excalidraw",
-    "magicSettings": "AI настройки"
+    "mermaidToExcalidraw": "Mermaid към Excalidraw"
   },
   "element": {
     "rectangle": "Правоъгълник",
