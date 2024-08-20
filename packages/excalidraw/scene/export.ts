@@ -356,8 +356,7 @@ export const exportToSvg = async (
         </clipPath>`;
   }
 
-  const shouldInlineFonts = !opts?.skipInliningFonts;
-  const fontFaces = await getFontFaces(elements, shouldInlineFonts);
+  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
@@ -438,12 +437,9 @@ export const getExportSize = (
 
 const getFontFaces = async (
   elements: readonly ExcalidrawElement[],
-  shouldInlineFonts: boolean,
 ): Promise<string[]> => {
   const fontFamilies = new Set<number>();
   const codePoints = new Set<number>();
-
-  let getSource: (font: Font) => string | Promise<string>;
 
   for (const element of elements) {
     if (!isTextElement(element)) {
@@ -453,24 +449,24 @@ const getFontFaces = async (
     fontFamilies.add(element.fontFamily);
 
     // gather unique codepoints only when inlining fonts
-    if (shouldInlineFonts) {
-      for (const codePoint of Array.from(element.originalText, (u) =>
-        u.codePointAt(0),
-      )) {
-        if (codePoint) {
-          codePoints.add(codePoint);
-        }
+    for (const codePoint of Array.from(element.originalText, (u) =>
+      u.codePointAt(0),
+    )) {
+      if (codePoint) {
+        codePoints.add(codePoint);
       }
     }
   }
 
-  if (shouldInlineFonts) {
-    // retrieve font source as dataurl based on the used codepoints
-    getSource = (font: Font) => font.getContent(codePoints);
-  } else {
-    // retrieve font source as a url otherwise
-    getSource = (font: Font) => font.urls[0].toString();
-  }
+  const getSource = (font: Font) => {
+    try {
+      // retrieve font source as dataurl based on the used codepoints
+      return font.getContent(codePoints);
+    } catch {
+      // fallback to font source as a url
+      return font.urls[0].toString();
+    }
+  };
 
   const fontFaces = await Promise.all(
     Array.from(fontFamilies).map(async (x) => {

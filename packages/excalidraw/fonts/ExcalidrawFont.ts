@@ -134,7 +134,7 @@ export class ExcalidrawFont implements Font {
   private static async toBase64(arrayBuffer: ArrayBuffer) {
     let base64: string;
 
-    if (Buffer) {
+    if (typeof Buffer !== "undefined") {
       // node + server-side
       base64 = Buffer.from(arrayBuffer).toString("base64");
     } else {
