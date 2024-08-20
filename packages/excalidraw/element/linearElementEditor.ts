@@ -1549,7 +1549,7 @@ export class LinearElementEditor {
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
     elementsMap: ElementsMap,
-  ): GlobalPoint => {
+  ): { x: number; y: number } => {
     const points = LinearElementEditor.getPointsGlobalCoordinates(
       element,
       elementsMap,
@@ -1590,7 +1590,7 @@ export class LinearElementEditor {
       x = midSegmentMidpoint[0] - boundTextElement.width / 2;
       y = midSegmentMidpoint[1] - boundTextElement.height / 2;
     }
-    return point(x, y);
+    return { x, y };
   };
 
   static getMinMaxXYWithBoundText = (
@@ -1602,7 +1602,7 @@ export class LinearElementEditor {
     let [x1, y1, x2, y2] = elementBounds;
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    const [boundTextX1, boundTextY1] =
+    const { x: boundTextX1, y: boundTextY1 } =
       LinearElementEditor.getBoundTextElementPosition(
         element,
         boundTextElement,

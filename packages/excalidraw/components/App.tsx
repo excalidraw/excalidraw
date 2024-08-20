@@ -441,6 +441,8 @@ import {
   FlowChartNavigator,
   getLinkDirectionFromKey,
 } from "../element/flowchart";
+import type { LocalPoint, Radians } from "@excalidraw/math";
+import { point, vector } from "@excalidraw/math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -5091,7 +5093,7 @@ class App extends React.Component<AppProps, AppState> {
           containerId: shouldBindToContainer ? container?.id : undefined,
           groupIds: container?.groupIds ?? [],
           lineHeight,
-          angle: container?.angle ?? 0,
+          angle: container?.angle ?? (0 as Radians),
           frameId: topLayerFrame ? topLayerFrame.id : null,
         });
 
@@ -5259,7 +5261,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.scene.getNonDeletedElementsMap(),
           this.state,
-          [scenePointer.x, scenePointer.y],
+          point(scenePointer.x, scenePointer.y),
           this.device.editor.isMobile,
         )
       );
@@ -5293,7 +5295,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       elementsMap,
       this.state,
-      [lastPointerDownCoords.x, lastPointerDownCoords.y],
+      point(lastPointerDownCoords.x, lastPointerDownCoords.y),
       this.device.editor.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
@@ -5304,7 +5306,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       elementsMap,
       this.state,
-      [lastPointerUpCoords.x, lastPointerUpCoords.y],
+      point(lastPointerUpCoords.x, lastPointerUpCoords.y),
       this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
@@ -5561,7 +5563,10 @@ class App extends React.Component<AppProps, AppState> {
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
-            points: [...points, [scenePointerX - rx, scenePointerY - ry]],
+            points: [
+              ...points,
+              point<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
+            ],
           });
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -5618,10 +5623,10 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
             [
               ...points.slice(0, -1),
-              [
+              point<LocalPoint>(
                 lastCommittedX + dxFromLastCommitted,
                 lastCommittedY + dyFromLastCommitted,
-              ],
+              ),
             ],
             undefined,
             undefined,
@@ -5634,10 +5639,10 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(multiElement, {
             points: [
               ...points.slice(0, -1),
-              [
+              point<LocalPoint>(
                 lastCommittedX + dxFromLastCommitted,
                 lastCommittedY + dyFromLastCommitted,
-              ],
+              ),
             ],
           });
         }
@@ -6364,7 +6369,7 @@ class App extends React.Component<AppProps, AppState> {
           this.hitLinkElement,
           this.scene.getNonDeletedElementsMap(),
           this.state,
-          [scenePointer.x, scenePointer.y],
+          point(scenePointer.x, scenePointer.y),
         )
       ) {
         this.handleEmbeddableCenterClick(this.hitLinkElement);
@@ -7062,7 +7067,7 @@ class App extends React.Component<AppProps, AppState> {
       : [...element.pressures, event.pressure];
 
     mutateElement(element, {
-      points: [[0, 0]],
+      points: [point<LocalPoint>(0, 0)],
       pressures,
     });
 
@@ -7360,7 +7365,7 @@ class App extends React.Component<AppProps, AppState> {
         };
       });
       mutateElement(element, {
-        points: [...element.points, [0, 0]],
+        points: [...element.points, point<LocalPoint>(0, 0)],
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
@@ -7964,7 +7969,7 @@ class App extends React.Component<AppProps, AppState> {
               : [...newElement.pressures, event.pressure];
 
             mutateElement(newElement, {
-              points: [...points, [dx, dy]],
+              points: [...points, point<LocalPoint>(dx, dy)],
               pressures,
             });
           }
@@ -7985,14 +7990,14 @@ class App extends React.Component<AppProps, AppState> {
 
           if (points.length === 1) {
             mutateElement(newElement, {
-              points: [...points, [dx, dy]],
+              points: [...points, point<LocalPoint>(dx, dy)],
             });
           } else if (points.length > 1 && isElbowArrow(newElement)) {
             mutateElbowArrow(
               newElement,
               elementsMap,
-              [...points.slice(0, -1), [dx, dy]],
-              [0, 0],
+              [...points.slice(0, -1), point<LocalPoint>(dx, dy)],
+              vector(0, 0),
               undefined,
               {
                 isDragging: true,
@@ -8000,7 +8005,7 @@ class App extends React.Component<AppProps, AppState> {
             );
           } else if (points.length === 2) {
             mutateElement(newElement, {
-              points: [...points.slice(0, -1), [dx, dy]],
+              points: [...points.slice(0, -1), point<LocalPoint>(dx, dy)],
             });
           }
 
@@ -8309,9 +8314,9 @@ class App extends React.Component<AppProps, AppState> {
           : [...newElement.pressures, childEvent.pressure];
 
         mutateElement(newElement, {
-          points: [...points, [dx, dy]],
+          points: [...points, point<LocalPoint>(dx, dy)],
           pressures,
-          lastCommittedPoint: [dx, dy],
+          lastCommittedPoint: point<LocalPoint>(dx, dy),
         });
 
         this.actionManager.executeAction(actionFinalize);
@@ -8358,7 +8363,10 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(newElement, {
             points: [
               ...newElement.points,
-              [pointerCoords.x - newElement.x, pointerCoords.y - newElement.y],
+              point<LocalPoint>(
+                pointerCoords.x - newElement.x,
+                pointerCoords.y - newElement.y,
+              ),
             ],
           });
           this.setState({

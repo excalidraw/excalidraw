@@ -1,3 +1,4 @@
+export * from "./angle";
 export * from "./line";
 export * from "./point";
 export * from "./segment";

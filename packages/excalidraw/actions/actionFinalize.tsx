@@ -16,6 +16,7 @@ import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
+import { point } from "@excalidraw/math";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -113,10 +114,10 @@ export const actionFinalize = register({
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
           mutateElement(multiPointElement, {
-            points: linePoints.map((point, index) =>
+            points: linePoints.map((p, index) =>
               index === linePoints.length - 1
-                ? ([firstPoint[0], firstPoint[1]] as const)
-                : point,
+                ? point(firstPoint[0], firstPoint[1])
+                : p,
             ),
           });
         }

@@ -11,16 +11,17 @@ import {
   isLinearElement,
   isTextElement,
 } from "../excalidraw/element/typeChecks";
-import { isValueInRange, rotatePoint } from "../excalidraw/math";
-import type { Point } from "../excalidraw/types";
+import { isValueInRange } from "../excalidraw/math";
 import type { Bounds } from "../excalidraw/element/bounds";
 import { getElementBounds } from "../excalidraw/element/bounds";
 import { arrayToMap } from "../excalidraw/utils";
+import type { LocalPoint } from "@excalidraw/math";
+import { point, pointRotateRads } from "@excalidraw/math";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
 
-type Points = readonly Point[];
+type Points = readonly LocalPoint[];
 
 /** @returns vertices relative to element's top-left [0,0] position  */
 const getNonLinearElementRelativePoints = (
@@ -28,20 +29,25 @@ const getNonLinearElementRelativePoints = (
     Element,
     ExcalidrawLinearElement | ExcalidrawFreeDrawElement
   >,
-): [TopLeft: Point, TopRight: Point, BottomRight: Point, BottomLeft: Point] => {
+): [
+  TopLeft: LocalPoint,
+  TopRight: LocalPoint,
+  BottomRight: LocalPoint,
+  BottomLeft: LocalPoint,
+] => {
   if (element.type === "diamond") {
     return [
-      [element.width / 2, 0],
-      [element.width, element.height / 2],
-      [element.width / 2, element.height],
-      [0, element.height / 2],
+      point(element.width / 2, 0),
+      point(element.width, element.height / 2),
+      point(element.width / 2, element.height),
+      point(0, element.height / 2),
     ];
   }
   return [
-    [0, 0],
-    [0 + element.width, 0],
-    [0 + element.width, element.height],
-    [0, element.height],
+    point(0, 0),
+    point(0 + element.width, 0),
+    point(0 + element.width, element.height),
+    point(0, element.height),
   ];
 };
 
@@ -84,10 +90,10 @@ const getRotatedBBox = (element: Element): Bounds => {
   const points = getElementRelativePoints(element);
 
   const { cx, cy } = getMinMaxPoints(points);
-  const centerPoint: Point = [cx, cy];
+  const centerPoint = point<LocalPoint>(cx, cy);
 
-  const rotatedPoints = points.map((point) =>
-    rotatePoint([point[0], point[1]], centerPoint, element.angle),
+  const rotatedPoints = points.map((p) =>
+    pointRotateRads(p, centerPoint, element.angle),
   );
   const { minX, minY, maxX, maxY } = getMinMaxPoints(rotatedPoints);
 

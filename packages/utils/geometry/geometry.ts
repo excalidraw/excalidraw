@@ -5,10 +5,15 @@ import {
   vectorCross,
   type GlobalPoint,
   type LocalPoint,
-  createLineSegment,
+  lineSegment,
+  vectorSubtract,
+  vectorFromPoint,
+  vectorScale,
+  vectorAdd,
+  pointFromVector,
 } from "@excalidraw/math";
 import type { ExcalidrawBindableElement } from "../../excalidraw/element/types";
-import { distance2d, scaleVector } from "../../excalidraw/math";
+import { distance2d } from "../../excalidraw/math";
 import type {
   Point,
   Line,
@@ -987,15 +992,19 @@ export const segmentsIntersectAt = <Point extends GlobalPoint | LocalPoint>(
   a: Readonly<LineSegment<Point>>,
   b: Readonly<LineSegment<Point>>,
 ): Point | null => {
-  const r = subtractVectors(a[1], a[0]);
-  const s = subtractVectors(b[1], b[0]);
+  const a0 = vectorFromPoint(a[0]);
+  const a1 = vectorFromPoint(a[1]);
+  const b0 = vectorFromPoint(b[0]);
+  const b1 = vectorFromPoint(b[1]);
+  const r = vectorSubtract(a1, a0);
+  const s = vectorSubtract(b1, b0);
   const denominator = vectorCross(r, s);
 
   if (denominator === 0) {
     return null;
   }
 
-  const i = subtractVectors(b[0], a[0]);
+  const i = vectorSubtract(vectorFromPoint(b[0]), vectorFromPoint(a[0]));
   const u = vectorCross(i, r) / denominator;
   const t = vectorCross(i, s) / denominator;
 
@@ -1003,10 +1012,10 @@ export const segmentsIntersectAt = <Point extends GlobalPoint | LocalPoint>(
     return null;
   }
 
-  const p = addVectors(a[0], scaleVector(r, t));
+  const p = vectorAdd(a0, vectorScale(r, t));
 
   if (t >= 0 && t < 1 && u >= 0 && u < 1) {
-    return p;
+    return pointFromVector<Point>(p);
   }
 
   return null;
@@ -1041,19 +1050,19 @@ export const segmentIntersectRectangleElement = <
   );
 
   return [
-    createLineSegment(
+    lineSegment(
       pointRotateRads(point(bounds[0], bounds[1]), center, element.angle),
       pointRotateRads(point(bounds[2], bounds[1]), center, element.angle),
     ),
-    createLineSegment(
+    lineSegment(
       pointRotateRads(point(bounds[2], bounds[1]), center, element.angle),
       pointRotateRads(point(bounds[2], bounds[3]), center, element.angle),
     ),
-    createLineSegment(
+    lineSegment(
       pointRotateRads(point(bounds[2], bounds[3]), center, element.angle),
       pointRotateRads(point(bounds[0], bounds[3]), center, element.angle),
     ),
-    createLineSegment(
+    lineSegment(
       pointRotateRads(point(bounds[0], bounds[3]), center, element.angle),
       pointRotateRads(point(bounds[0], bounds[1]), center, element.angle),
     ),

@@ -52,6 +52,19 @@ export function pointFromPair<Point extends GlobalPoint | LocalPoint>(
 }
 
 /**
+ * Convert a vector to a point.
+ *
+ * @param v The vector to convert
+ * @returns The point the vector points at with origin 0,0
+ */
+export function pointFromVector<P extends GlobalPoint | LocalPoint>(
+  v: Vector,
+): P {
+  "inline";
+  return v as unknown as P;
+}
+
+/**
  * Checks if the provided value has the shape of a Point.
  *
  * @param p The value to attempt verification on
