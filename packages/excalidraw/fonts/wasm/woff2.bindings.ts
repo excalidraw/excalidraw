@@ -6,6 +6,7 @@
  * 
  * CHANGELOG:
  * - replaced existing exports with default esm export (`export default Module;`)
+ * - replaced "instanceof ArrayBuffer" with "Object.prototype.toString.call(d) === "[object ArrayBuffer]", due to unreliability of different ArrayBuffer instances depending on the context (i.e. inside VM)
 
 The MIT License (MIT)
 
@@ -2780,7 +2781,7 @@ const Module = (function () {
           return str;
         },
         toWireType(destructors, value) {
-          if (value instanceof ArrayBuffer) {
+          if (Object.prototype.toString.call(d) === "[object ArrayBuffer]") {
             value = new Uint8Array(value);
           }
           let getLength;
