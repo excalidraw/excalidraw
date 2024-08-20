@@ -272,8 +272,7 @@
     "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
-    "mermaidToExcalidraw": "Mermaid zu Excalidraw",
-    "magicSettings": "KI-Einstellungen"
+    "mermaidToExcalidraw": "Mermaid zu Excalidraw"
   },
   "element": {
     "rectangle": "Rechteck",
