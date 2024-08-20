@@ -290,3 +290,4 @@ export {
 } from "../utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
+export { getDataURL } from "./data/blob";
