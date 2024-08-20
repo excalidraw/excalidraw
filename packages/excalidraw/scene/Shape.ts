@@ -1,3 +1,4 @@
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { RoughGenerator } from "roughjs/bin/generator";
 import { getDiamondPoints, getArrowheadPoints } from "../element";
@@ -23,6 +24,7 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
+import { point, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -399,12 +401,14 @@ export const _generateElementShape = (
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
-      const points = element.points.length ? element.points : [[0, 0]];
+      const points = element.points.length
+        ? element.points
+        : [point<LocalPoint>(0, 0)];
 
       if (isElbowArrow(element)) {
         shape = [
           generator.path(
-            generateElbowArrowShape(points as [number, number][], 16),
+            generateElbowArrowShape(points, 16),
             generateRoughOptions(element, true),
           ),
         ];
@@ -412,12 +416,16 @@ export const _generateElementShape = (
         // curve is always the first element
         // this simplifies finding the curve for an element
         if (options.fill) {
-          shape = [generator.polygon(points as [number, number][], options)];
+          shape = [
+            generator.polygon(points as unknown as RoughPoint[], options),
+          ];
         } else {
-          shape = [generator.linearPath(points as [number, number][], options)];
+          shape = [
+            generator.linearPath(points as unknown as RoughPoint[], options),
+          ];
         }
       } else {
-        shape = [generator.curve(points as [number, number][], options)];
+        shape = [generator.curve(points as unknown as RoughPoint[], options)];
       }
 
       // add lines only in arrow
@@ -491,8 +499,8 @@ export const _generateElementShape = (
   }
 };
 
-const generateElbowArrowShape = (
-  points: [number, number][],
+const generateElbowArrowShape = <Point extends GlobalPoint | LocalPoint>(
+  points: readonly Point[],
   radius: number,
 ) => {
   const subpoints = [] as [number, number][];

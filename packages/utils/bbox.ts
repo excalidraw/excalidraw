@@ -1,6 +1,10 @@
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+import {
+  vectorCross,
+  vectorFromPoint,
+  type GlobalPoint,
+  type LocalPoint,
+} from "@excalidraw/math";
 import type { Bounds } from "../excalidraw/element/bounds";
-import type { Point } from "../excalidraw/types";
 
 export type LineSegment<P extends LocalPoint | GlobalPoint> = [P, P];
 
@@ -15,16 +19,8 @@ export function getBBox<P extends LocalPoint | GlobalPoint>(
   ];
 }
 
-export function crossProduct(a: Point, b: Point) {
-  return a[0] * b[1] - b[0] * a[1];
-}
-
 export function doBBoxesIntersect(a: Bounds, b: Bounds) {
   return a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
-}
-
-export function translate(a: Point, b: Point): Point {
-  return [a[0] - b[0], a[1] - b[1]];
 }
 
 const EPSILON = 0.000001;
@@ -33,10 +29,10 @@ export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
   l: LineSegment<P>,
   p: P,
 ) {
-  const p1 = translate(l[1], l[0]);
-  const p2 = translate(p, l[0]);
+  const p1 = vectorFromPoint(l[1], l[0]);
+  const p2 = vectorFromPoint(p, l[0]);
 
-  const r = crossProduct(p1, p2);
+  const r = vectorCross(p1, p2);
 
   return Math.abs(r) < EPSILON;
 }
@@ -45,10 +41,10 @@ export function isPointRightOfLine<P extends GlobalPoint | LocalPoint>(
   l: LineSegment<P>,
   p: P,
 ) {
-  const p1 = translate(l[1], l[0]);
-  const p2 = translate(p, l[0]);
+  const p1 = vectorFromPoint(l[1], l[0]);
+  const p2 = vectorFromPoint(p, l[0]);
 
-  return crossProduct(p1, p2) < 0;
+  return vectorCross(p1, p2) < 0;
 }
 
 export function isLineSegmentTouchingOrCrossingLine<

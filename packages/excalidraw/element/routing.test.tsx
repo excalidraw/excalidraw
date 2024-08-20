@@ -69,10 +69,7 @@ describe("elbow arrow routing", () => {
       y: -100.1,
       width: 90,
       height: 200,
-      points: [
-        [0, 0],
-        [90, 200],
-      ],
+      points: [point(0, 0), point(90, 200)],
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(rectangle1);
     scene.insertElement(rectangle2);
