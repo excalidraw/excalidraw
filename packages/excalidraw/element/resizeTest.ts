@@ -27,6 +27,7 @@ import {
 } from "../../utils/geometry/geometry";
 import type { Line, Point } from "../../utils/geometry/shape";
 import { isLinearElement } from "./typeChecks";
+import type { Radians } from "@excalidraw/math";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,
@@ -147,7 +148,7 @@ export const getTransformHandleTypeFromCoords = (
 ): MaybeTransformHandleType => {
   const transformHandles = getTransformHandlesFromCoords(
     [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
-    0,
+    0 as Radians,
     zoom,
     pointerType,
     getOmitSidesForDevice(device),

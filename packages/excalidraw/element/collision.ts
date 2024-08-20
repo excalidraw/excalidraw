@@ -19,6 +19,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { getBoundTextShape } from "../shapes";
+import { point } from "@excalidraw/math";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -89,7 +90,7 @@ export const hitElementBoundingBox = (
   y1 -= tolerance;
   x2 += tolerance;
   y2 += tolerance;
-  return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
+  return isPointWithinBounds(point(x1, y1), point(x, y), point(x2, y2));
 };
 
 export const hitElementBoundingBoxOnly = (

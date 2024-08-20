@@ -30,7 +30,7 @@ import {
   isFlowchartNodeElement,
 } from "./typeChecks";
 import { invariant } from "../utils";
-import type { LocalPoint } from "@excalidraw/math";
+import { point, type LocalPoint } from "@excalidraw/math";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -421,10 +421,7 @@ const createBindingArrow = (
     strokeColor: appState.currentItemStrokeColor,
     strokeStyle: appState.currentItemStrokeStyle,
     strokeWidth: appState.currentItemStrokeWidth,
-    points: [
-      [0, 0],
-      [endX, endY],
-    ],
+    points: [point(0, 0), point(endX, endY)],
     elbowed: true,
   });
 

@@ -1107,9 +1107,11 @@ export class LinearElementEditor {
    * expected in various parts of the codebase. Also returns new x/y to account
    * for the potential normalization.
    */
-  static getNormalizedPoints(
-    element: ExcalidrawLinearElement,
-  ): Partial<ExcalidrawLinearElement> {
+  static getNormalizedPoints(element: ExcalidrawLinearElement): {
+    points: LocalPoint[];
+    x: number;
+    y: number;
+  } {
     const { points } = element;
 
     const offsetX = points[0][0];

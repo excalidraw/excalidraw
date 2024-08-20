@@ -1,8 +1,9 @@
+import type { Radians } from "@excalidraw/math";
+import { point, pointRotateRads } from "@excalidraw/math";
 import {
   isPointOnSymmetricArc,
   rangeIntersection,
   rangesOverlap,
-  rotate,
 } from "./math";
 
 describe("rotate", () => {
@@ -11,10 +12,18 @@ describe("rotate", () => {
     const y1 = 20;
     const x2 = 20;
     const y2 = 30;
-    const angle = Math.PI / 2;
-    const [rotatedX, rotatedY] = rotate(x1, y1, x2, y2, angle);
+    const angle = (Math.PI / 2) as Radians;
+    const [rotatedX, rotatedY] = pointRotateRads(
+      point(x1, y1),
+      point(x2, y2),
+      angle,
+    );
     expect([rotatedX, rotatedY]).toEqual([30, 20]);
-    const res2 = rotate(rotatedX, rotatedY, x2, y2, -angle);
+    const res2 = pointRotateRads(
+      point(rotatedX, rotatedY),
+      point(x2, y2),
+      -angle as Radians,
+    );
     expect(res2).toEqual([x1, x2]);
   });
 });
@@ -68,7 +77,7 @@ describe("point on arc", () => {
           startAngle: -Math.PI / 4,
           endAngle: Math.PI / 4,
         },
-        [0.92291667, 0.385],
+        point(0.92291667, 0.385),
       ),
     ).toBe(true);
   });
@@ -80,7 +89,7 @@ describe("point on arc", () => {
           startAngle: -Math.PI / 4,
           endAngle: Math.PI / 4,
         },
-        [-0.92291667, 0.385],
+        point(-0.92291667, 0.385),
       ),
     ).toBe(false);
   });
@@ -92,7 +101,7 @@ describe("point on arc", () => {
           startAngle: -Math.PI / 4,
           endAngle: Math.PI / 4,
         },
-        [-0.5, 0.5],
+        point(-0.5, 0.5),
       ),
     ).toBe(false);
   });

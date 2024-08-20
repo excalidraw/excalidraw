@@ -216,7 +216,7 @@ export const getElementAbsoluteCoords = (
       ? getContainerElement(element, elementsMap)
       : null;
     if (isArrowElement(container)) {
-      const [x, y] = LinearElementEditor.getBoundTextElementPosition(
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,
         elementsMap,

@@ -48,6 +48,7 @@ import {
 } from "../constants";
 import type { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getLineHeight } from "../fonts";
+import type { Radians } from "@excalidraw/math";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -88,7 +89,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
-    angle = 0,
+    angle = 0 as Radians,
     groupIds = [],
     frameId = null,
     index = null,
