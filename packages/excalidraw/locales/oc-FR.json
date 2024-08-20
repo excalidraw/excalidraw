@@ -272,8 +272,7 @@
     "laser": "Puntador laser",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
-    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
-    "magicSettings": "Paramètres IA"
+    "mermaidToExcalidraw": "De Mermaid cap a Excalidraw"
   },
   "element": {
     "rectangle": "Rectangle",
