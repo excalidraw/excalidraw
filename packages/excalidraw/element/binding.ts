@@ -73,10 +73,9 @@ import {
 import { segmentIntersectRectangleElement } from "../../utils/geometry/geometry";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
-  createLineSegment,
+  lineSegment,
   point,
   pointRotateRads,
-  pointFromArray,
   type GlobalPoint,
   vectorFromPoint,
   pointFromPair,
@@ -768,20 +767,20 @@ export const bindPointToSnapToElementOutline = (
     // TODO: Dirty hacks until tangents are properly calculated
     const heading = headingForPointFromElement(bindableElement, aabb, p);
     const intersections = [
-      ...intersectElementWithLine(
+      ...(intersectElementWithLine(
         bindableElement,
         point(p[0], p[1] - 2 * bindableElement.height),
         point(p[0], p[1] + 2 * bindableElement.height),
         FIXED_BINDING_DISTANCE,
         elementsMap,
-      ),
-      ...intersectElementWithLine(
+      ) ?? []),
+      ...(intersectElementWithLine(
         bindableElement,
         point(p[0] - 2 * bindableElement.width, p[1]),
         point(p[0] + 2 * bindableElement.width, p[1]),
         FIXED_BINDING_DISTANCE,
         elementsMap,
-      ),
+      ) ?? []),
     ];
 
     const isVertical =
@@ -1119,15 +1118,15 @@ export const calculateFixedPointForElbowArrowBinding = (
     hoveredElement,
     elementsMap,
   );
-  const globalMidPoint = [
+  const globalMidPoint = point(
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,
-  ] as Point;
+  );
   const nonRotatedSnappedGlobalPoint = pointRotateRads(
     snappedPoint,
     globalMidPoint,
-    -hoveredElement.angle,
-  ) as Point;
+    -hoveredElement.angle as Radians,
+  );
 
   return {
     fixedPoint: normalizeFixedPoint([
@@ -1385,12 +1384,12 @@ const distanceToRectangle = (
     | ExcalidrawImageElement
     | ExcalidrawIframeLikeElement
     | ExcalidrawFrameLikeElement,
-  point: Point,
+  p: GlobalPoint,
   elementsMap: ElementsMap,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(
     element,
-    point,
+    p,
     elementsMap,
   );
   return Math.max(
@@ -1401,7 +1400,7 @@ const distanceToRectangle = (
 
 const distanceToDiamond = (
   element: ExcalidrawDiamondElement,
-  point: Point,
+  point: GlobalPoint,
   elementsMap: ElementsMap,
 ): number => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(
@@ -1415,7 +1414,7 @@ const distanceToDiamond = (
 
 const distanceToEllipse = (
   element: ExcalidrawEllipseElement,
-  point: Point,
+  point: GlobalPoint,
   elementsMap: ElementsMap,
 ): number => {
   const [pointRel, tangent] = ellipseParamsForTest(element, point, elementsMap);
@@ -1424,7 +1423,7 @@ const distanceToEllipse = (
 
 const ellipseParamsForTest = (
   element: ExcalidrawEllipseElement,
-  point: Point,
+  point: GlobalPoint,
   elementsMap: ElementsMap,
 ): [GA.Point, GA.Line] => {
   const [, pointRel, hwidth, hheight] = pointRelativeToElement(
@@ -1486,7 +1485,7 @@ const ellipseParamsForTest = (
 // so we only need to perform hit tests for the positive quadrant.
 const pointRelativeToElement = (
   element: ExcalidrawElement,
-  pointTuple: Point,
+  pointTuple: GlobalPoint,
   elementsMap: ElementsMap,
 ): [GA.Point, GA.Point, number, number] => {
   const point = GAPoint.from(pointTuple);
@@ -1535,9 +1534,9 @@ const coordsCenter = (
 const determineFocusDistance = (
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
-  a: Point,
+  a: GlobalPoint,
   // Another point on the line, in absolute coordinates (closer to element)
-  b: Point,
+  b: GlobalPoint,
   elementsMap: ElementsMap,
 ): number => {
   const relateToCenter = relativizationToElementCenter(element, elementsMap);
@@ -1578,13 +1577,13 @@ const determineFocusPoint = (
   // The oriented, relative distance from the center of `element` of the
   // returned focusPoint
   focus: number,
-  adjecentPoint: Point,
+  adjecentPoint: GlobalPoint,
   elementsMap: ElementsMap,
-): Point => {
+): GlobalPoint => {
   if (focus === 0) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const center = coordsCenter(x1, y1, x2, y2);
-    return GAPoint.toTuple(center);
+    return pointFromPair(GAPoint.toTuple(center));
   }
   const relateToCenter = relativizationToElementCenter(element, elementsMap);
   const adjecentPointRel = GATransform.apply(
@@ -1608,7 +1607,9 @@ const determineFocusPoint = (
       point = findFocusPointForEllipse(element, focus, adjecentPointRel);
       break;
   }
-  return GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, point));
+  return pointFromPair(
+    GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, point)),
+  );
 };
 
 // Returns 2 or 0 intersection points between line going through `a` and `b`
@@ -1624,11 +1625,7 @@ const intersectElementWithLine = (
   elementsMap: ElementsMap,
 ): GlobalPoint[] | undefined => {
   if (isRectangularElement(element)) {
-    return segmentIntersectRectangleElement(
-      element,
-      createLineSegment(a, b),
-      gap,
-    );
+    return segmentIntersectRectangleElement(element, lineSegment(a, b), gap);
   }
 
   const relateToCenter = relativizationToElementCenter(element, elementsMap);

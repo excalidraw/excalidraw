@@ -363,7 +363,7 @@ export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
   p2: P,
   p3: P,
   t: number,
-) => {
+): P => {
   const equation = (t: number, idx: number) =>
     Math.pow(1 - t, 3) * p3[idx] +
     3 * t * Math.pow(1 - t, 2) * p2[idx] +
@@ -371,7 +371,7 @@ export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
     p0[idx] * Math.pow(t, 3);
   const tx = equation(t, 0);
   const ty = equation(t, 1);
-  return [tx, ty];
+  return point(tx, ty);
 };
 
 export const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(

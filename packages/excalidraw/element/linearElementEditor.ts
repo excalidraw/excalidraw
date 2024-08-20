@@ -19,7 +19,6 @@ import {
   getBezierXY,
   getBezierCurveLength,
   mapIntervalToBezierT,
-  arePointsEqual,
 } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
@@ -62,6 +61,7 @@ import {
   point,
   pointRotateRads,
   pointsEqual,
+  vector,
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
@@ -85,7 +85,7 @@ export class LinearElementEditor {
     lastClickedIsEndPoint: boolean;
     origin: Readonly<{ x: number; y: number }> | null;
     segmentMidpoint: {
-      value: LocalPoint | null;
+      value: GlobalPoint | null;
       index: number | null;
       added: boolean;
     };
@@ -285,7 +285,7 @@ export class LinearElementEditor {
           element,
           elementsMap,
           referencePoint,
-          [scenePointerX, scenePointerY],
+          point(scenePointerX, scenePointerY),
           event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
         );
 
@@ -294,7 +294,10 @@ export class LinearElementEditor {
           [
             {
               index: selectedIndex,
-              point: [width + referencePoint[0], height + referencePoint[1]],
+              point: point(
+                width + referencePoint[0],
+                height + referencePoint[1],
+              ),
               isDragging: selectedIndex === lastClickedPoint,
             },
           ],
@@ -315,7 +318,7 @@ export class LinearElementEditor {
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
-            const newPointPosition =
+            const newPointPosition: LocalPoint =
               pointIndex === lastClickedPoint
                 ? LinearElementEditor.createPointAt(
                     element,
@@ -324,10 +327,10 @@ export class LinearElementEditor {
                     scenePointerY - linearElementEditor.pointerOffset.y,
                     event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
                   )
-                : ([
+                : point(
                     element.points[pointIndex][0] + deltaX,
                     element.points[pointIndex][1] + deltaY,
-                  ] as const);
+                  );
             return {
               index: pointIndex,
               point: newPointPosition,
@@ -554,7 +557,7 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     appState: AppState,
     elementsMap: ElementsMap,
-  ) => {
+  ): GlobalPoint | null => {
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
@@ -640,7 +643,7 @@ export class LinearElementEditor {
     endPoint: GlobalPoint,
     endPointIndex: number,
     elementsMap: ElementsMap,
-  ) {
+  ): GlobalPoint {
     let segmentMidPoint = centerPoint(startPoint, endPoint);
     if (element.points.length > 2 && element.roundness) {
       const controlPoints = getControlPointsForBezierCurve(
@@ -654,16 +657,15 @@ export class LinearElementEditor {
           0.5,
         );
 
-        const [tx, ty] = getBezierXY(
-          controlPoints[0],
-          controlPoints[1],
-          controlPoints[2],
-          controlPoints[3],
-          t,
-        );
         segmentMidPoint = LinearElementEditor.getPointGlobalCoordinates(
           element,
-          [tx, ty],
+          getBezierXY(
+            controlPoints[0],
+            controlPoints[1],
+            controlPoints[2],
+            controlPoints[3],
+            t,
+          ),
           elementsMap,
         );
       }
@@ -675,7 +677,7 @@ export class LinearElementEditor {
   static getSegmentMidPointIndex(
     linearElementEditor: LinearElementEditor,
     appState: AppState,
-    midPoint: Point,
+    midPoint: GlobalPoint,
     elementsMap: ElementsMap,
   ) {
     const element = LinearElementEditor.getElement(
@@ -827,11 +829,12 @@ export class LinearElementEditor {
     const cy = (y1 + y2) / 2;
     const targetPoint =
       clickedPointIndex > -1 &&
-      rotate(
-        element.x + element.points[clickedPointIndex][0],
-        element.y + element.points[clickedPointIndex][1],
-        cx,
-        cy,
+      pointRotateRads(
+        point(
+          element.x + element.points[clickedPointIndex][0],
+          element.y + element.points[clickedPointIndex][1],
+        ),
+        point(cx, cy),
         element.angle,
       );
 
@@ -870,14 +873,17 @@ export class LinearElementEditor {
     return ret;
   }
 
-  static arePointsEqual(point1: Point | null, point2: Point | null) {
+  static arePointsEqual<Point extends LocalPoint | GlobalPoint>(
+    point1: Point | null,
+    point2: Point | null,
+  ) {
     if (!point1 && !point2) {
       return true;
     }
     if (!point1 || !point2) {
       return false;
     }
-    return arePointsEqual(point1, point2);
+    return pointsEqual(point1, point2);
   }
 
   static handlePointerMove(
@@ -914,7 +920,7 @@ export class LinearElementEditor {
       };
     }
 
-    let newPoint: Point;
+    let newPoint: LocalPoint;
 
     if (shouldRotateWithDiscreteAngle(event) && points.length >= 2) {
       const lastCommittedPoint = points[points.length - 2];
@@ -923,14 +929,14 @@ export class LinearElementEditor {
         element,
         elementsMap,
         lastCommittedPoint,
-        [scenePointerX, scenePointerY],
+        point(scenePointerX, scenePointerY),
         event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
       );
 
-      newPoint = [
+      newPoint = point(
         width + lastCommittedPoint[0],
         height + lastCommittedPoint[1],
-      ];
+      );
     } else {
       newPoint = LinearElementEditor.createPointAt(
         element,
@@ -972,7 +978,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     p: LocalPoint,
     elementsMap: ElementsMap,
-  ) {
+  ): GlobalPoint {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
@@ -1187,7 +1193,7 @@ export class LinearElementEditor {
         [
           {
             index: element.points.length - 1,
-            point: [lastPoint[0] + 30, lastPoint[1] + 30],
+            point: point(lastPoint[0] + 30, lastPoint[1] + 30),
           },
         ],
         elementsMap,
@@ -1245,7 +1251,7 @@ export class LinearElementEditor {
 
   static addPoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    targetPoints: { point: Point }[],
+    targetPoints: { point: LocalPoint }[],
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   ) {
     const offsetX = 0;
@@ -1263,7 +1269,7 @@ export class LinearElementEditor {
 
   static movePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    targetPoints: { index: number; point: Point; isDragging?: boolean }[],
+    targetPoints: { index: number; point: LocalPoint; isDragging?: boolean }[],
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
     otherUpdates?: {
       startBinding?: PointBinding | null;
@@ -1293,11 +1299,11 @@ export class LinearElementEditor {
         selectedOriginPoint.point[1] + points[selectedOriginPoint.index][1];
     }
 
-    const nextPoints = points.map((point, idx) => {
-      const selectedPointData = targetPoints.find((p) => p.index === idx);
+    const nextPoints: LocalPoint[] = points.map((p, idx) => {
+      const selectedPointData = targetPoints.find((t) => t.index === idx);
       if (selectedPointData) {
         if (selectedPointData.index === 0) {
-          return point;
+          return p;
         }
 
         const deltaX =
@@ -1305,14 +1311,9 @@ export class LinearElementEditor {
         const deltaY =
           selectedPointData.point[1] - points[selectedPointData.index][1];
 
-        return [
-          point[0] + deltaX - offsetX,
-          point[1] + deltaY - offsetY,
-        ] as const;
+        return point(p[0] + deltaX - offsetX, p[1] + deltaY - offsetY);
       }
-      return offsetX || offsetY
-        ? ([point[0] - offsetX, point[1] - offsetY] as const)
-        : point;
+      return offsetX || offsetY ? point(p[0] - offsetX, p[1] - offsetY) : p;
     });
 
     LinearElementEditor._updatePoints(
@@ -1434,7 +1435,7 @@ export class LinearElementEditor {
 
   private static _updatePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
-    nextPoints: readonly Point[],
+    nextPoints: readonly LocalPoint[],
     offsetX: number,
     offsetY: number,
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
@@ -1477,7 +1478,7 @@ export class LinearElementEditor {
         element,
         mergedElementsMap,
         nextPoints,
-        [offsetX, offsetY],
+        vector(offsetX, offsetY),
         bindings,
         options,
       );
@@ -1490,7 +1491,11 @@ export class LinearElementEditor {
       const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
       const dX = prevCenterX - nextCenterX;
       const dY = prevCenterY - nextCenterY;
-      const rotated = rotate(offsetX, offsetY, dX, dY, element.angle);
+      const rotated = pointRotateRads(
+        point(offsetX, offsetY),
+        point(dX, dY),
+        element.angle,
+      );
       mutateElement(element, {
         ...otherUpdates,
         points: nextPoints,
@@ -1503,8 +1508,8 @@ export class LinearElementEditor {
   private static _getShiftLockedDelta(
     element: NonDeleted<ExcalidrawLinearElement>,
     elementsMap: ElementsMap,
-    referencePoint: Point,
-    scenePointer: Point,
+    referencePoint: LocalPoint,
+    scenePointer: GlobalPoint,
     gridSize: NullableGridSize,
   ) {
     const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
@@ -1533,14 +1538,18 @@ export class LinearElementEditor {
       gridY,
     );
 
-    return rotatePoint([width, height], [0, 0], -element.angle);
+    return pointRotateRads(
+      point(width, height),
+      point(0, 0),
+      -element.angle as Radians,
+    );
   }
 
   static getBoundTextElementPosition = (
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
     elementsMap: ElementsMap,
-  ): { x: number; y: number } => {
+  ): GlobalPoint => {
     const points = LinearElementEditor.getPointsGlobalCoordinates(
       element,
       elementsMap,
@@ -1581,7 +1590,7 @@ export class LinearElementEditor {
       x = midSegmentMidpoint[0] - boundTextElement.width / 2;
       y = midSegmentMidpoint[1] - boundTextElement.height / 2;
     }
-    return { x, y };
+    return point(x, y);
   };
 
   static getMinMaxXYWithBoundText = (
@@ -1593,7 +1602,7 @@ export class LinearElementEditor {
     let [x1, y1, x2, y2] = elementBounds;
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    const { x: boundTextX1, y: boundTextY1 } =
+    const [boundTextX1, boundTextY1] =
       LinearElementEditor.getBoundTextElementPosition(
         element,
         boundTextElement,
@@ -1601,37 +1610,38 @@ export class LinearElementEditor {
       );
     const boundTextX2 = boundTextX1 + boundTextElement.width;
     const boundTextY2 = boundTextY1 + boundTextElement.height;
+    const centerPoint = point(cx, cy);
 
-    const topLeftRotatedPoint = rotatePoint([x1, y1], [cx, cy], element.angle);
-    const topRightRotatedPoint = rotatePoint([x2, y1], [cx, cy], element.angle);
-
-    const counterRotateBoundTextTopLeft = rotatePoint(
-      [boundTextX1, boundTextY1],
-
-      [cx, cy],
-
-      -element.angle,
+    const topLeftRotatedPoint = pointRotateRads(
+      point(x1, y1),
+      centerPoint,
+      element.angle,
     );
-    const counterRotateBoundTextTopRight = rotatePoint(
-      [boundTextX2, boundTextY1],
-
-      [cx, cy],
-
-      -element.angle,
+    const topRightRotatedPoint = pointRotateRads(
+      point(x2, y1),
+      centerPoint,
+      element.angle,
     );
-    const counterRotateBoundTextBottomLeft = rotatePoint(
-      [boundTextX1, boundTextY2],
 
-      [cx, cy],
-
-      -element.angle,
+    const counterRotateBoundTextTopLeft = pointRotateRads(
+      point(boundTextX1, boundTextY1),
+      centerPoint,
+      -element.angle as Radians,
     );
-    const counterRotateBoundTextBottomRight = rotatePoint(
-      [boundTextX2, boundTextY2],
-
-      [cx, cy],
-
-      -element.angle,
+    const counterRotateBoundTextTopRight = pointRotateRads(
+      point(boundTextX2, boundTextY1),
+      centerPoint,
+      -element.angle as Radians,
+    );
+    const counterRotateBoundTextBottomLeft = pointRotateRads(
+      point(boundTextX1, boundTextY2),
+      centerPoint,
+      -element.angle as Radians,
+    );
+    const counterRotateBoundTextBottomRight = pointRotateRads(
+      point(boundTextX2, boundTextY2),
+      centerPoint,
+      -element.angle as Radians,
     );
 
     if (

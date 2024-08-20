@@ -31,7 +31,7 @@ export function point<Point extends GlobalPoint | LocalPoint>(
  */
 export function pointFromArray<Point extends GlobalPoint | LocalPoint>(
   numberArray: number[],
-): GlobalPoint | LocalPoint | undefined {
+): Point | undefined {
   "inline";
   return numberArray.length === 2
     ? point<Point>(numberArray[0], numberArray[1])

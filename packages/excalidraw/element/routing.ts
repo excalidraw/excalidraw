@@ -76,8 +76,8 @@ export const mutateElbowArrow = (
   nextPoints: readonly LocalPoint[],
   offset?: Vector,
   otherUpdates?: {
-    startBinding?: FixedPointBinding;
-    endBinding?: FixedPointBinding;
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
   },
   options?: {
     isDragging?: boolean;
@@ -85,14 +85,14 @@ export const mutateElbowArrow = (
     informMutation?: boolean;
   },
 ) => {
-  const origStartGlobalPoint = pointTranslate(
+  const origStartGlobalPoint: GlobalPoint = pointTranslate(
     pointTranslate<LocalPoint, GlobalPoint>(
       nextPoints[0],
       vector(arrow.x, arrow.y),
     ),
     offset,
   );
-  const origEndGlobalPoint = pointTranslate(
+  const origEndGlobalPoint: GlobalPoint = pointTranslate(
     pointTranslate<LocalPoint, GlobalPoint>(
       nextPoints[nextPoints.length - 1],
       vector(arrow.x, arrow.y),
@@ -987,36 +987,34 @@ const getGlobalPoint = (
 };
 
 const getSnapPoint = (
-  point: Point,
-  otherPoint: Point,
+  p: GlobalPoint,
+  otherPoint: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ) =>
   bindPointToSnapToElementOutline(
-    isRectanguloidElement(element)
-      ? avoidRectangularCorner(element, point)
-      : point,
+    isRectanguloidElement(element) ? avoidRectangularCorner(element, p) : p,
     otherPoint,
     element,
     elementsMap,
   );
 
 const getBindPointHeading = (
-  point: Point,
-  otherPoint: Point,
+  p: GlobalPoint,
+  otherPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
-  origPoint: Point,
+  origPoint: GlobalPoint,
 ) =>
   getHeadingForElbowArrowSnap(
-    point,
+    p,
     otherPoint,
     hoveredElement,
     hoveredElement &&
       aabbForElement(
         hoveredElement,
         Array(4).fill(
-          distanceToBindableElement(hoveredElement, point, elementsMap),
+          distanceToBindableElement(hoveredElement, p, elementsMap),
         ) as [number, number, number, number],
       ),
     elementsMap,
@@ -1024,8 +1022,8 @@ const getBindPointHeading = (
   );
 
 const getHoveredElements = (
-  origStartGlobalPoint: Point,
-  origEndGlobalPoint: Point,
+  origStartGlobalPoint: GlobalPoint,
+  origEndGlobalPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
 ) => {
   // TODO: Might be a performance bottleneck and the Map type
