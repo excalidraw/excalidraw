@@ -272,8 +272,7 @@
     "laser": "雷射筆",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
-    "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
-    "magicSettings": "AI 設定"
+    "mermaidToExcalidraw": "Mermaid 至 Excalidraw"
   },
   "element": {
     "rectangle": "矩形",
