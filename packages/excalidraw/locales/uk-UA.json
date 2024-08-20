@@ -272,8 +272,7 @@
     "laser": "Лазерний вказівник",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
-    "mermaidToExcalidraw": "Mermaid у Excalidraw",
-    "magicSettings": "Налаштування AI"
+    "mermaidToExcalidraw": "Mermaid у Excalidraw"
   },
   "element": {
     "rectangle": "Прямокутник",
