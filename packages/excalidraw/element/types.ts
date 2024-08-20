@@ -12,7 +12,6 @@ import type {
   Merge,
   ValueOf,
 } from "../utility-types";
-import type { MagicCacheData } from "../data/magic";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -101,11 +100,22 @@ export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
     type: "embeddable";
   }>;
 
+export type MagicGenerationData =
+  | {
+      status: "pending";
+    }
+  | { status: "done"; html: string }
+  | {
+      status: "error";
+      message?: string;
+      code: "ERR_GENERATION_INTERRUPTED" | string;
+    };
+
 export type ExcalidrawIframeElement = _ExcalidrawElementBase &
   Readonly<{
     type: "iframe";
     // TODO move later to AI-specific frame
-    customData?: { generationData?: MagicCacheData };
+    customData?: { generationData?: MagicGenerationData };
   }>;
 
 export type ExcalidrawIframeLikeElement =
