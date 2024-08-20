@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Triângulo (contorno)",
     "arrowhead_diamond": "Losango",
     "arrowhead_diamond_outline": "Losango (contorno)",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowtypes": "Tipo de seta",
+    "arrowtype_sharp": "Seta retilínea",
+    "arrowtype_round": "Seta curva",
+    "arrowtype_elbowed": "Seta em cotovelo",
     "fontSize": "Tamanho do tipo de letra",
     "fontFamily": "Família do tipo de letra",
     "addWatermark": "Adicionar \"Feito com Excalidraw\"",
@@ -113,7 +113,7 @@
     "share": "Partilhar",
     "showStroke": "Mostrar seletor de cores do traço",
     "showBackground": "Mostrar seletor de cores do fundo",
-    "showFonts": "",
+    "showFonts": "Mostrar seletor de fonte",
     "toggleTheme": "Alternar tema claro/escuro",
     "theme": "Tema",
     "personalLib": "Biblioteca pessoal",
@@ -299,7 +299,7 @@
   "hints": {
     "canvasPanning": "Para mover a área de desenho, carregue na roda do rato ou na barra de espaço enquanto arrasta, ou use a ferramenta da mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
-    "arrowTool": "",
+    "arrowTool": "Clique para iniciar vários pontos, arraste para uma única linha. Prima {{arrowShortcut}} novamente para mudar o tipo de seta.",
     "freeDraw": "Clique e arraste, largue quando terminar",
     "text": "Dica: também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar uma incorporação do site",
@@ -316,7 +316,7 @@
     "placeImage": "Clique para colocar a imagem ou clique e arraste para definir o tamanho manualmente",
     "publishLibrary": "Publique a sua própria biblioteca",
     "bindTextToElement": "Carregue em Enter para acrescentar texto",
-    "createFlowchart": "",
+    "createFlowchart": "Mantenha premidas as teclas CtrlOrCmd e Seta para criar um fluxograma",
     "deepBoxSelect": "Mantenha a tecla CtrlOrCmd carregada para selecção profunda, impedindo o arrastamento",
     "eraserRevert": "Mantenha premida a tecla Alt para reverter os elementos marcados para eliminação",
     "firefox_clipboard_write": "Esta função pode provavelmente ser ativada definindo a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
@@ -367,8 +367,8 @@
     "click": "clicar",
     "deepSelect": "Seleção profunda",
     "deepBoxSelect": "Seleção profunda dentro da caixa, impedindo que seja arrastada",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Criar um fluxograma a partir de um elemento genérico",
+    "navigateFlowchart": "Navegar num fluxograma",
     "curvedArrow": "Seta curva",
     "curvedLine": "Linha curva",
     "documentation": "Documentação",
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "Ângulo",
-    "shapes": "",
+    "shapes": "Formas",
     "height": "Altura",
     "scene": "Cena",
     "selected": "Selecionado",
     "storage": "Armazenamento",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Área de desenho e propriedades da forma",
+    "title": "Propriedades",
+    "generalStats": "Geral",
+    "elementProperties": "Propriedades da forma",
     "total": "Total",
     "version": "Versão",
     "versionCopy": "Clique para copiar",
@@ -566,18 +566,18 @@
     "preview": "Pré-visualizar"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Pesquisa rápida"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "antigo"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "Nesta cena",
+    "availableFonts": "Fontes disponíveis",
+    "empty": "Nenhuma fonte encontrada"
   },
   "userList": {
-    "empty": "",
+    "empty": "Nenhum utilizador encontrado",
     "hint": {
       "text": "Clique no utilizador para o seguir",
       "followStatus": "Está a seguir este utilizador",
