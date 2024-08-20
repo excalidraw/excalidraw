@@ -272,8 +272,7 @@
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
-    "mermaidToExcalidraw": "",
-    "magicSettings": ""
+    "mermaidToExcalidraw": ""
   },
   "element": {
     "rectangle": "",
