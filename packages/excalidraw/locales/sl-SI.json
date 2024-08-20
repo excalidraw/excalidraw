@@ -272,8 +272,7 @@
     "laser": "Laserski kazalec",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
-    "mermaidToExcalidraw": "Mermaid v Excalidraw",
-    "magicSettings": "Nastavitve AI"
+    "mermaidToExcalidraw": "Mermaid v Excalidraw"
   },
   "element": {
     "rectangle": "Pravokotnik",
