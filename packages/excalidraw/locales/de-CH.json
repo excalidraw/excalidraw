@@ -272,8 +272,7 @@
     "laser": "Laserpointer",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
-    "mermaidToExcalidraw": "Mermaid zu Excalidraw",
-    "magicSettings": "KI-Einstellungen"
+    "mermaidToExcalidraw": "Mermaid zu Excalidraw"
   },
   "element": {
     "rectangle": "Rechteck",
@@ -462,15 +461,15 @@
   },
   "stats": {
     "angle": "Winkel",
-    "shapes": "",
+    "shapes": "Formen",
     "height": "Höhe",
     "scene": "Zeichnung",
     "selected": "Ausgewählt",
     "storage": "Speicher",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Zeichenflächen- & Formeigenschaften",
+    "title": "Eigenschaften",
+    "generalStats": "Allgemein",
+    "elementProperties": "Formeigenschaften",
     "total": "Gesamt",
     "version": "Version",
     "versionCopy": "Zum Kopieren klicken",
