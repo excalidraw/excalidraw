@@ -272,8 +272,7 @@
     "laser": "Wskaźnik laserowy",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
-    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
-    "magicSettings": "Ustawienia AI"
+    "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw"
   },
   "element": {
     "rectangle": "Prostokąt",
