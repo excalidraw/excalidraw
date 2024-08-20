@@ -272,8 +272,7 @@
     "laser": "Ponteiro laser",
     "hand": "Mão (ferramenta de deslocar vista)",
     "extraTools": "Mais ferramentas",
-    "mermaidToExcalidraw": "Mermaid para Excalidraw",
-    "magicSettings": "Configurações de IA"
+    "mermaidToExcalidraw": "Mermaid para Excalidraw"
   },
   "element": {
     "rectangle": "Retângulo",
