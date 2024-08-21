@@ -598,6 +598,6 @@
       "noMatch": "No hi ha ordres coincidents..."
     },
     "itemNotAvailable": "Ordre no disponible...",
-    "shortcutHint": ""
+    "shortcutHint": "Per obrir la paleta d'ordres, utilitza {{shortcut}}"
   }
 }
