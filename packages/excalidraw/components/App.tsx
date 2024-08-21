@@ -2146,8 +2146,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public dismissLinearEditor = () => {
-    this.state.editingLinearElement &&
-      this.actionManager.executeAction(actionFinalize);
+    this.setState({
+      editingLinearElement: null,
+    });
   };
 
   public syncActionResult = withBatchedUpdates((actionResult: ActionResult) => {

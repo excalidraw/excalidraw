@@ -125,7 +125,7 @@ export const actionDeleteSelected = register({
       }
 
       // case: deleting last remaining point
-      if (element.points.length < 2) {
+      if (element.points.length <= 2) {
         const nextElements = elements.map((el) => {
           if (el.id === element.id) {
             return newElementWith(el, { isDeleted: true });
