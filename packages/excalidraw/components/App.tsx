@@ -2053,10 +2053,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public dismissLinearEditor = () => {
-    setTimeout(() => {
-      this.setState({
-        editingLinearElement: null,
-      });
+    this.setState({
+      editingLinearElement: null,
     });
   };
 
@@ -2699,13 +2697,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
       // defer so that the storeAction flag isn't reset via current update
-      setTimeout(() => {
-        // execute only if the condition still holds when the deferred callback
-        // executes (it can be scheduled multiple times depending on how
-        // many times the component renders)
-        this.state.editingLinearElement &&
-          this.actionManager.executeAction(actionFinalize);
-      });
+      setTimeout(() => this.dismissLinearEditor());
     }
 
     // failsafe in case the state is being updated in incorrect order resulting
@@ -4104,22 +4096,11 @@ class App extends React.Component<AppProps, AppState> {
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD]) {
-            if (isLinearElement(selectedElement)) {
-              if (
-                !this.state.editingLinearElement ||
-                this.state.editingLinearElement.elementId !==
-                  selectedElements[0].id
-              ) {
-                this.store.shouldCaptureIncrement();
-                if (!isElbowArrow(selectedElement)) {
-                  this.setState({
-                    editingLinearElement: new LinearElementEditor(
-                      selectedElement,
-                    ),
-                  });
-                }
-              }
-            }
+            this.actionManager.isActionEnabled(actionToggleLinearEditor) &&
+              this.actionManager.executeAction(
+                actionToggleLinearEditor,
+                "keyboard",
+              );
           } else if (
             isTextElement(selectedElement) ||
             isValidTextContainer(selectedElement)
@@ -5046,22 +5027,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const selectedElements = this.scene.getSelectedElements(this.state);
-
-    if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-      if (
-        event[KEYS.CTRL_OR_CMD] &&
-        (!this.state.editingLinearElement ||
-          this.state.editingLinearElement.elementId !==
-            selectedElements[0].id) &&
-        !isElbowArrow(selectedElements[0])
-      ) {
-        this.store.shouldCaptureIncrement();
-        this.setState({
-          editingLinearElement: new LinearElementEditor(selectedElements[0]),
-        });
-        return;
-      }
+    if (event[KEYS.CTRL_OR_CMD]) {
+      this.actionManager.isActionEnabled(actionToggleLinearEditor) &&
+        this.actionManager.executeAction(actionToggleLinearEditor, "keyboard");
+      return;
     }
 
     resetCursor(this.interactiveCanvas);
@@ -8107,7 +8076,7 @@ class App extends React.Component<AppProps, AppState> {
           pointerDownState.hit?.element?.id !==
             this.state.editingLinearElement.elementId
         ) {
-          this.actionManager.executeAction(actionFinalize);
+          this.dismissLinearEditor();
         } else {
           const editingLinearElement = LinearElementEditor.handlePointerUp(
             childEvent,
@@ -8780,7 +8749,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements))
       ) {
         if (this.state.editingLinearElement) {
-          this.setState({ editingLinearElement: null });
+          this.dismissLinearEditor();
         } else {
           // Deselect selected elements
           this.setState({

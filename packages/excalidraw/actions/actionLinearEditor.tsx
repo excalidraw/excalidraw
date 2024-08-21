@@ -27,9 +27,10 @@ export const actionToggleLinearEditor = register({
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     if (
-      !appState.editingLinearElement &&
       selectedElements.length === 1 &&
       isLinearElement(selectedElements[0]) &&
+      (!appState.editingLinearElement ||
+        appState.editingLinearElement.elementId !== selectedElements[0].id) &&
       !isElbowArrow(selectedElements[0])
     ) {
       return true;

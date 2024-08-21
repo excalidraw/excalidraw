@@ -51,6 +51,7 @@ export const actionFinalize = register({
             cursorButton: "up",
             editingLinearElement: null,
             selectedLinearElement: null,
+            selectionElement: null,
           },
           storeAction: StoreAction.CAPTURE,
         };

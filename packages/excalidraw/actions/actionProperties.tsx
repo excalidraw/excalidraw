@@ -1571,7 +1571,8 @@ export const actionChangeArrowType = register({
         if (isElbowArrow(newElement)) {
           const elementsMap = app.scene.getNonDeletedElementsMap();
 
-          app.dismissLinearEditor();
+          //defer so that previous changes don't get overwritten
+          setTimeout(() => app.dismissLinearEditor());
 
           const startGlobalPoint =
             LinearElementEditor.getPointAtIndexGlobalCoordinates(
