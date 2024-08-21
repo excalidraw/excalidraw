@@ -28,7 +28,7 @@ import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 import type { GlobalPoint } from "@excalidraw/math";
-import { centerPoint, point } from "@excalidraw/math";
+import { pointCenter, point } from "@excalidraw/math";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -59,7 +59,7 @@ describe("Test Linear Elements", () => {
 
   const p1 = point<GlobalPoint>(20, 20);
   const p2 = point<GlobalPoint>(60, 20);
-  const midpoint = centerPoint<GlobalPoint>(p1, p2);
+  const midpoint = pointCenter<GlobalPoint>(p1, p2);
   const delta = 50;
   const mouse = new Pointer("mouse");
 
@@ -353,7 +353,7 @@ describe("Test Linear Elements", () => {
         h.state,
       );
 
-      const startPoint = centerPoint(points[0], midPoints[0]!);
+      const startPoint = pointCenter(points[0], midPoints[0]!);
       const deltaX = 50;
       const deltaY = 20;
       const endPoint = point<GlobalPoint>(

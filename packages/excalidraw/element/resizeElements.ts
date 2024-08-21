@@ -55,7 +55,7 @@ import { isInGroup } from "../groups";
 import { mutateElbowArrow } from "./routing";
 import type { GlobalPoint } from "@excalidraw/math";
 import {
-  centerPoint,
+  pointCenter,
   normalizeRadians,
   point,
   pointFromPair,
@@ -342,7 +342,7 @@ const resizeSingleTextElement = (
     );
     const startTopLeft = point<GlobalPoint>(x1, y1);
     const startBottomRight = point<GlobalPoint>(x2, y2);
-    const startCenter = centerPoint(startTopLeft, startBottomRight);
+    const startCenter = pointCenter(startTopLeft, startBottomRight);
 
     const rotatedPointer = pointRotateRads(
       point(pointerX, pointerY),
@@ -462,7 +462,7 @@ export const resizeSingleElement = (
   );
   const startTopLeft = point(x1, y1);
   const startBottomRight = point(x2, y2);
-  const startCenter = centerPoint(startTopLeft, startBottomRight);
+  const startCenter = pointCenter(startTopLeft, startBottomRight);
 
   // Calculate new dimensions based on cursor position
   const rotatedPointer = pointRotateRads(

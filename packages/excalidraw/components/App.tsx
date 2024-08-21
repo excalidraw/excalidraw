@@ -210,12 +210,7 @@ import {
   isElementCompletelyInViewport,
   isElementInViewport,
 } from "../element/sizeHelpers";
-import {
-  distance2d,
-  getCornerRadius,
-  getGridPoint,
-  isPathALoop,
-} from "../math";
+import { getCornerRadius, getGridPoint, isPathALoop } from "../math";
 import {
   calculateScrollCenter,
   getElementsWithinSelection,
@@ -442,7 +437,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import type { LocalPoint, Radians } from "@excalidraw/math";
-import { point, vector } from "@excalidraw/math";
+import { point, pointDistance, vector } from "@excalidraw/math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -5272,11 +5267,12 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     isTouchScreen: boolean,
   ) => {
-    const draggedDistance = distance2d(
-      this.lastPointerDownEvent!.clientX,
-      this.lastPointerDownEvent!.clientY,
-      this.lastPointerUpEvent!.clientX,
-      this.lastPointerUpEvent!.clientY,
+    const draggedDistance = pointDistance(
+      point(
+        this.lastPointerDownEvent!.clientX,
+        this.lastPointerDownEvent!.clientY,
+      ),
+      point(this.lastPointerUpEvent!.clientX, this.lastPointerUpEvent!.clientY),
     );
     if (
       !this.hitLinkElement ||
@@ -5555,11 +5551,9 @@ class App extends React.Component<AppProps, AppState> {
         // if we haven't yet created a temp point and we're beyond commit-zone
         // threshold, add a point
         if (
-          distance2d(
-            scenePointerX - rx,
-            scenePointerY - ry,
-            lastPoint[0],
-            lastPoint[1],
+          pointDistance(
+            point(scenePointerX - rx, scenePointerY - ry),
+            lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
           mutateElement(multiElement, {
@@ -5576,11 +5570,9 @@ class App extends React.Component<AppProps, AppState> {
       } else if (
         points.length > 2 &&
         lastCommittedPoint &&
-        distance2d(
-          scenePointerX - rx,
-          scenePointerY - ry,
-          lastCommittedPoint[0],
-          lastCommittedPoint[1],
+        pointDistance(
+          point(scenePointerX - rx, scenePointerY - ry),
+          lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
@@ -5860,17 +5852,15 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    const distance = distance2d(
-      pointerDownState.lastCoords.x,
-      pointerDownState.lastCoords.y,
-      scenePointer.x,
-      scenePointer.y,
+    const distance = pointDistance(
+      point(pointerDownState.lastCoords.x, pointerDownState.lastCoords.y),
+      point(scenePointer.x, scenePointer.y),
     );
     const threshold = this.getElementHitThreshold();
-    const point = { ...pointerDownState.lastCoords };
+    const p = { ...pointerDownState.lastCoords };
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
-      const hitElements = this.getElementsAtPosition(point.x, point.y);
+      const hitElements = this.getElementsAtPosition(p.x, p.y);
       processElements(hitElements);
 
       // Exit since we reached current point
@@ -5882,12 +5872,10 @@ class App extends React.Component<AppProps, AppState> {
       samplingInterval = Math.min(samplingInterval + threshold, distance);
 
       const distanceRatio = samplingInterval / distance;
-      const nextX =
-        (1 - distanceRatio) * point.x + distanceRatio * scenePointer.x;
-      const nextY =
-        (1 - distanceRatio) * point.y + distanceRatio * scenePointer.y;
-      point.x = nextX;
-      point.y = nextY;
+      const nextX = (1 - distanceRatio) * p.x + distanceRatio * scenePointer.x;
+      const nextY = (1 - distanceRatio) * p.y + distanceRatio * scenePointer.y;
+      p.x = nextX;
+      p.y = nextY;
     }
 
     pointerDownState.lastCoords.x = scenePointer.x;
@@ -7260,11 +7248,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         multiElement.points.length > 1 &&
         lastCommittedPoint &&
-        distance2d(
-          pointerDownState.origin.x - rx,
-          pointerDownState.origin.y - ry,
-          lastCommittedPoint[0],
-          lastCommittedPoint[1],
+        pointDistance(
+          point(pointerDownState.origin.x - rx, pointerDownState.origin.y - ry),
+          lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
         this.actionManager.executeAction(actionFinalize);
@@ -7618,11 +7604,9 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeTool.type === "line")
       ) {
         if (
-          distance2d(
-            pointerCoords.x,
-            pointerCoords.y,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+          pointDistance(
+            point(pointerCoords.x, pointerCoords.y),
+            point(pointerDownState.origin.x, pointerDownState.origin.y),
           ) < DRAGGING_THRESHOLD
         ) {
           return;
@@ -8672,11 +8656,9 @@ class App extends React.Component<AppProps, AppState> {
       if (isEraserActive(this.state) && pointerStart && pointerEnd) {
         this.eraserTrail.endPath();
 
-        const draggedDistance = distance2d(
-          pointerStart.clientX,
-          pointerStart.clientY,
-          pointerEnd.clientX,
-          pointerEnd.clientY,
+        const draggedDistance = pointDistance(
+          point(pointerStart.clientX, pointerStart.clientY),
+          point(pointerEnd.clientX, pointerEnd.clientY),
         );
 
         if (draggedDistance === 0) {

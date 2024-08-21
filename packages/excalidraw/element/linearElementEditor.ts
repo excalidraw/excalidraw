@@ -57,7 +57,7 @@ import { mutateElbowArrow } from "./routing";
 import type Scene from "../scene/Scene";
 import type { Radians } from "@excalidraw/math";
 import {
-  centerPoint,
+  pointCenter,
   point,
   pointRotateRads,
   pointsEqual,
@@ -644,7 +644,7 @@ export class LinearElementEditor {
     endPointIndex: number,
     elementsMap: ElementsMap,
   ): GlobalPoint {
-    let segmentMidPoint = centerPoint(startPoint, endPoint);
+    let segmentMidPoint = pointCenter(startPoint, endPoint);
     if (element.points.length > 2 && element.roundness) {
       const controlPoints = getControlPointsForBezierCurve(
         element,
@@ -1575,7 +1575,7 @@ export class LinearElementEditor {
 
       let midSegmentMidpoint = editorMidPointsCache.points[index];
       if (element.points.length === 2) {
-        midSegmentMidpoint = centerPoint(points[0], points[1]);
+        midSegmentMidpoint = pointCenter(points[0], points[1]);
       }
       if (
         !midSegmentMidpoint ||

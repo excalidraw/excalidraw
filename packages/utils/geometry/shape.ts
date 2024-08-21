@@ -12,6 +12,12 @@
  * to pure shapes
  */
 
+import {
+  point,
+  type GlobalPoint,
+  type Line,
+  type LocalPoint,
+} from "@excalidraw/math";
 import { getElementAbsoluteCoords } from "../../excalidraw/element";
 import type {
   ElementsMap,
@@ -32,63 +38,61 @@ import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";
 
-// a point is specified by its coordinate (x, y)
-export type Point = [number, number];
-export type Vector = Point;
-
-// a line (segment) is defined by two endpoints
-export type Line = [Point, Point];
-
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
 // be used to model other elements
-export type Polyline = Line[];
+export type Polyline<Point extends GlobalPoint | LocalPoint> = Line<Point>[];
 
 // cubic bezier curve with four control points
-export type Curve = [Point, Point, Point, Point];
+export type Curve<Point extends GlobalPoint | LocalPoint> = [
+  Point,
+  Point,
+  Point,
+  Point,
+];
 
 // a polycurve is a curve consisting of ther curves, this corresponds to a complex
 // curve on the canvas
-export type Polycurve = Curve[];
+export type Polycurve<Point extends GlobalPoint | LocalPoint> = Curve<Point>[];
 
 // a polygon is a closed shape by connecting the given points
 // rectangles and diamonds are modelled by polygons
-export type Polygon = Point[];
+export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[];
 
 // an ellipse is specified by its center, angle, and its major and minor axes
 // but for the sake of simplicity, we've used halfWidth and halfHeight instead
 // in replace of semi major and semi minor axes
-export type Ellipse = {
+export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
   center: Point;
   angle: number;
   halfWidth: number;
   halfHeight: number;
 };
 
-export type GeometricShape =
+export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
   | {
       type: "line";
-      data: Line;
+      data: Line<Point>;
     }
   | {
       type: "polygon";
-      data: Polygon;
+      data: Polygon<Point>;
     }
   | {
       type: "curve";
-      data: Curve;
+      data: Curve<Point>;
     }
   | {
       type: "ellipse";
-      data: Ellipse;
+      data: Ellipse<Point>;
     }
   | {
       type: "polyline";
-      data: Polyline;
+      data: Polyline<Point>;
     }
   | {
       type: "polycurve";
-      data: Polycurve;
+      data: Polycurve<Point>;
     };
 
 type RectangularElement =
@@ -102,17 +106,17 @@ type RectangularElement =
   | ExcalidrawSelectionElement;
 
 // polygon
-export const getPolygonShape = (
+export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
   element: RectangularElement,
-): GeometricShape => {
+): GeometricShape<Point> => {
   const { angle, width, height, x, y } = element;
   const angleInDegrees = angleToDegrees(angle);
   const cx = x + width / 2;
   const cy = y + height / 2;
 
-  const center: Point = [cx, cy];
+  const center: Point = point(cx, cy);
 
-  let data: Polygon = [];
+  let data: Polygon<Point> = [];
 
   if (element.type === "diamond") {
     data = [
@@ -120,14 +124,14 @@ export const getPolygonShape = (
       pointRotate([x + width, cy], angleInDegrees, center),
       pointRotate([cx, y + height], angleInDegrees, center),
       pointRotate([x, cy], angleInDegrees, center),
-    ] as Polygon;
+    ];
   } else {
     data = [
       pointRotate([x, y], angleInDegrees, center),
       pointRotate([x + width, y], angleInDegrees, center),
       pointRotate([x + width, y + height], angleInDegrees, center),
       pointRotate([x, y + height], angleInDegrees, center),
-    ] as Polygon;
+    ];
   }
 
   return {
@@ -154,7 +158,7 @@ export const getSelectionBoxShape = (
   y2 += padding;
 
   const angleInDegrees = angleToDegrees(element.angle);
-  const center: Point = [cx, cy];
+  const center = point(cx, cy);
   const topLeft = pointRotate([x1, y1], angleInDegrees, center);
   const topRight = pointRotate([x2, y1], angleInDegrees, center);
   const bottomLeft = pointRotate([x1, y2], angleInDegrees, center);

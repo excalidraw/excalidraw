@@ -155,6 +155,7 @@ export function pointTranslate<
   From extends GlobalPoint | LocalPoint,
   To extends GlobalPoint | LocalPoint,
 >(p: From, v: Vector = [0, 0] as Vector): To {
+  "inline";
   return point(p[0] + v[0], p[1] + v[1]);
 }
 
@@ -165,9 +166,39 @@ export function pointTranslate<
  * @param b
  * @returns
  */
-export const centerPoint = <P extends LocalPoint | GlobalPoint>(
+export function pointCenter<P extends LocalPoint | GlobalPoint>(a: P, b: P): P {
+  "inline";
+  return point((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+}
+
+/**
+ * Calculate the distance between two points.
+ *
+ * @param a First point
+ * @param b Second point
+ * @returns The euclidean distance between the two points.
+ */
+export function pointDistance<P extends LocalPoint | GlobalPoint>(
   a: P,
   b: P,
-): P => {
-  return point((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
-};
+): number {
+  "inline";
+  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+}
+
+/**
+ * Calculate the squared distance between two points.
+ *
+ * Note: Use this if you only compare distances, it saves a square root.
+ *
+ * @param a First point
+ * @param b Second point
+ * @returns The euclidean distance between the two points.
+ */
+export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
+  a: P,
+  b: P,
+): number {
+  "inline";
+  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+}

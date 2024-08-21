@@ -11,18 +11,10 @@ import {
   vectorScale,
   vectorAdd,
   pointFromVector,
+  pointDistance,
 } from "@excalidraw/math";
 import type { ExcalidrawBindableElement } from "../../excalidraw/element/types";
-import { distance2d } from "../../excalidraw/math";
-import type {
-  Point,
-  Line,
-  Polygon,
-  Curve,
-  Ellipse,
-  Polycurve,
-  Polyline,
-} from "./shape";
+import type { Polygon, Curve, Ellipse, Polycurve, Polyline } from "./shape";
 
 const DEFAULT_THRESHOLD = 10e-5;
 
@@ -30,22 +22,22 @@ const DEFAULT_THRESHOLD = 10e-5;
  * utils
  */
 
-// the two vectors are ao and bo
-export const cross = (
-  a: Readonly<Point>,
-  b: Readonly<Point>,
-  o: Readonly<Point>,
-) => {
-  return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-};
+// // the two vectors are ao and bo
+// export const cross = (
+//   a: Readonly<Point>,
+//   b: Readonly<Point>,
+//   o: Readonly<Point>,
+// ) => {
+//   return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+// };
 
-export const dot = (
-  a: Readonly<Point>,
-  b: Readonly<Point>,
-  o: Readonly<Point>,
-) => {
-  return (a[0] - o[0]) * (b[0] - o[0]) + (a[1] - o[1]) * (b[1] - o[1]);
-};
+// export const dot = (
+//   a: Readonly<Point>,
+//   b: Readonly<Point>,
+//   o: Readonly<Point>,
+// ) => {
+//   return (a[0] - o[0]) * (b[0] - o[0]) + (a[1] - o[1]) * (b[1] - o[1]);
+// };
 
 export const isClosed = (polygon: Polygon) => {
   const first = polygon[0];
@@ -128,7 +120,7 @@ export const pointAdd = (pointA: Point, pointB: Point): Point => {
 };
 
 export const distanceToPoint = (p1: Point, p2: Point) => {
-  return distance2d(...p1, ...p2);
+  return pointDistance(p1, p2);
 };
 
 /**

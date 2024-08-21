@@ -13,7 +13,7 @@ import type {
 import type { Bounds } from "./element/bounds";
 import { getCurvePathOps } from "./element/bounds";
 import { ShapeCache } from "./scene/ShapeCache";
-import type { Vector } from "../utils/geometry/shape";
+import type { Vector } from "@excalidraw/math";
 import {
   type LocalPoint,
   type GlobalPoint,
@@ -25,6 +25,8 @@ import {
   isPoint,
   pointsEqual,
   pointTranslate,
+  pointDistance,
+  vector,
 } from "@excalidraw/math";
 import { invariant } from "./utils";
 
@@ -141,21 +143,6 @@ export const getPointOnAPath = <P extends LocalPoint | GlobalPoint>(
   return null;
 };
 
-export const distance2d = (x1: number, y1: number, x2: number, y2: number) => {
-  const xd = x2 - x1;
-  const yd = y2 - y1;
-  return Math.hypot(xd, yd);
-};
-
-export const distanceSq2d = <P extends LocalPoint | GlobalPoint>(
-  p1: P,
-  p2: P,
-) => {
-  const xd = p2[0] - p1[0];
-  const yd = p2[1] - p1[1];
-  return xd * xd + yd * yd;
-};
-
 // Checks if the first and last point are close enough
 // to be considered a loop
 export const isPathALoop = (
@@ -165,7 +152,7 @@ export const isPathALoop = (
 ): boolean => {
   if (points.length >= 3) {
     const [first, last] = [points[0], points[points.length - 1]];
-    const distance = distance2d(first[0], first[1], last[0], last[1]);
+    const distance = pointDistance(first, last);
 
     // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
     // really close we make the threshold smaller, and vice versa.
@@ -344,7 +331,7 @@ export const getControlPointsForBezierCurve = <
       const p1 = point<P>(data[0], data[1]);
       const p2 = point<P>(data[2], data[3]);
       const p3 = point<P>(data[4], data[5]);
-      const distance = distance2d(p3[0], p3[1], endPoint[0], endPoint[1]);
+      const distance = pointDistance(p3, endPoint);
       if (distance < minDistance) {
         minDistance = distance;
         controlPoints = [p0, p1, p2, p3];
@@ -414,12 +401,7 @@ export const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
   let index = 0;
   let distance = 0;
   while (index < points.length - 1) {
-    const segmentDistance = distance2d(
-      points[index][0],
-      points[index][1],
-      points[index + 1][0],
-      points[index + 1][1],
-    );
+    const segmentDistance = pointDistance(points[index], points[index + 1]);
     distance += segmentDistance;
     arcLengths.push(distance);
     index++;
@@ -529,15 +511,14 @@ export const scalePointFromOrigin = <P extends GlobalPoint | LocalPoint>(
   multiplier: number,
 ) => pointTranslate(mid, vectorScale(vectorFromPoint(p, mid), multiplier));
 
-export const magnitudeSq = (vector: Vector) =>
-  vector[0] * vector[0] + vector[1] * vector[1];
+export const magnitudeSq = (v: Vector) => v[0] * v[0] + v[1] * v[1];
 
-export const magnitude = (vector: Vector) => Math.sqrt(magnitudeSq(vector));
+export const magnitude = (v: Vector) => Math.sqrt(magnitudeSq(v));
 
-export const normalize = (vector: Vector): Vector => {
-  const m = magnitude(vector);
+export const normalize = (v: Vector): Vector => {
+  const m = magnitude(v);
 
-  return [vector[0] / m, vector[1] / m];
+  return vector(v[0] / m, v[1] / m);
 };
 
 export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
