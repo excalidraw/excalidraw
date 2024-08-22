@@ -104,7 +104,9 @@ export const SelectedShapeActions = ({
   ) {
     isSingleElementBoundContainer = true;
   }
-  const isEditingText = Boolean(appState.editingTextElement);
+  const isEditingTextOrNewElement = Boolean(
+    appState.editingTextElement || appState.newElement,
+  );
   const device = useDevice();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
@@ -234,7 +236,7 @@ export const SelectedShapeActions = ({
           </div>
         </fieldset>
       )}
-      {!isEditingText && targetElements.length > 0 && (
+      {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
