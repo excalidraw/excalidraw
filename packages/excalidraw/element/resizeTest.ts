@@ -22,7 +22,7 @@ import { getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
 import {
   angleToDegrees,
-  pointOnLine,
+  pointOnLineSegment,
   pointRotate,
 } from "../../utils/geometry/geometry";
 import type { Line, Point } from "../../utils/geometry/shape";
@@ -100,7 +100,7 @@ export const resizeTest = (
 
       for (const [dir, side] of Object.entries(sides)) {
         // test to see if x, y are on the line segment
-        if (pointOnLine([x, y], side as Line, SPACING)) {
+        if (pointOnLineSegment([x, y], side as Line, SPACING)) {
           return dir as TransformHandleType;
         }
       }
@@ -182,7 +182,7 @@ export const getTransformHandleTypeFromCoords = (
 
     for (const [dir, side] of Object.entries(sides)) {
       // test to see if x, y are on the line segment
-      if (pointOnLine([scenePointerX, scenePointerY], side as Line, SPACING)) {
+      if (pointOnLineSegment([scenePointerX, scenePointerY], side as Line, SPACING)) {
         return dir as TransformHandleType;
       }
     }

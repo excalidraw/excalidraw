@@ -4,11 +4,11 @@ import {
   pointInPolygon,
   pointOnCurve,
   pointOnEllipse,
-  pointOnLine,
+  pointOnLineSegment,
   pointOnPolycurve,
   pointOnPolygon,
   pointOnPolyline,
-  close,
+  closePolygon,
 } from "./geometry/geometry";
 
 // check if the given point is considered on the given shape's border
@@ -25,7 +25,7 @@ export const isPointOnShape = (
     case "ellipse":
       return pointOnEllipse(point, shape.data, tolerance);
     case "line":
-      return pointOnLine(point, shape.data, tolerance);
+      return pointOnLineSegment(point, shape.data, tolerance);
     case "polyline":
       return pointOnPolyline(point, shape.data, tolerance);
     case "curve":
@@ -49,7 +49,7 @@ export const isPointInShape = (point: Point, shape: GeometricShape) => {
     case "ellipse":
       return pointInEllipse(point, shape.data);
     case "polyline": {
-      const polygon = close(shape.data.flat()) as Polygon;
+      const polygon = closePolygon(shape.data.flat()) as Polygon;
       return pointInPolygon(point, polygon);
     }
     case "polycurve": {

@@ -1,4 +1,10 @@
-import type { LineSegment } from "@excalidraw/math";
+import type {
+  Curve,
+  Line,
+  LineSegment,
+  Polygon,
+  Radians,
+} from "@excalidraw/math";
 import {
   point,
   pointRotateRads,
@@ -12,9 +18,15 @@ import {
   vectorAdd,
   pointFromVector,
   pointDistance,
+  line,
+  pointCenter,
+  pointTranslate,
+  vector,
+  polygonIsClosed,
+  polygonFromPoints,
 } from "@excalidraw/math";
 import type { ExcalidrawBindableElement } from "../../excalidraw/element/types";
-import type { Polygon, Curve, Ellipse, Polycurve, Polyline } from "./shape";
+import type { Ellipse, Polycurve, Polyline } from "./shape";
 
 const DEFAULT_THRESHOLD = 10e-5;
 
@@ -39,31 +51,27 @@ const DEFAULT_THRESHOLD = 10e-5;
 //   return (a[0] - o[0]) * (b[0] - o[0]) + (a[1] - o[1]) * (b[1] - o[1]);
 // };
 
-export const isClosed = (polygon: Polygon) => {
-  const first = polygon[0];
-  const last = polygon[polygon.length - 1];
-  return first[0] === last[0] && first[1] === last[1];
-};
-
-export const close = (polygon: Polygon) => {
-  return isClosed(polygon) ? polygon : [...polygon, polygon[0]];
+export const closePolygon = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+) => {
+  return polygonIsClosed(polygon) ? polygon : [...polygon, polygon[0]];
 };
 
 /**
  * angles
  */
 
-// convert radians to degress
-export const angleToDegrees = (angle: number) => {
-  const theta = (angle * 180) / Math.PI;
+// // convert radians to degress
+// export const angleToDegrees = (angle: number) => {
+//   const theta = (angle * 180) / Math.PI;
 
-  return theta < 0 ? 360 + theta : theta;
-};
+//   return theta < 0 ? 360 + theta : theta;
+// };
 
-// convert degrees to radians
-export const angleToRadians = (angle: number) => {
-  return (angle / 180) * Math.PI;
-};
+// // convert degrees to radians
+// export const angleToRadians = (angle: number) => {
+//   return (angle / 180) * Math.PI;
+// };
 
 // return the angle of reflection given an angle of incidence and a surface angle in degrees
 export const angleReflect = (incidenceAngle: number, surfaceAngle: number) => {
@@ -75,51 +83,59 @@ export const angleReflect = (incidenceAngle: number, surfaceAngle: number) => {
  * points
  */
 
-const rotate = (point: Point, angle: number): Point => {
-  return [
-    point[0] * Math.cos(angle) - point[1] * Math.sin(angle),
-    point[0] * Math.sin(angle) + point[1] * Math.cos(angle),
-  ];
-};
+// const rotate = (point: Point, angle: number): Point => {
+//   return [
+//     point[0] * Math.cos(angle) - point[1] * Math.sin(angle),
+//     point[0] * Math.sin(angle) + point[1] * Math.cos(angle),
+//   ];
+// };
 
-const isOrigin = (point: Point) => {
-  return point[0] === 0 && point[1] === 0;
-};
+// const isOrigin = (point: Point) => {
+//   return point[0] === 0 && point[1] === 0;
+// };
 
 // rotate a given point about a given origin at the given angle
-export const pointRotate = (
-  point: Point,
-  angle: number,
-  origin?: Point,
+// export const pointRotate = (
+//   point: Point,
+//   angle: number,
+//   origin?: Point,
+// ): Point => {
+//   const r = angleToRadians(angle);
+
+//   if (!origin || isOrigin(origin)) {
+//     return rotate(point, r);
+//   }
+//   return rotate(point.map((c, i) => c - origin[i]) as Point, r).map(
+//     (c, i) => c + origin[i],
+//   ) as Point;
+// };
+
+// // translate a point by an angle (in degrees) and distance
+// export const pointTranslate = (point: Point, angle = 0, distance = 0) => {
+//   const r = angleToRadians(angle);
+//   return [
+//     point[0] + distance * Math.cos(r),
+//     point[1] + distance * Math.sin(r),
+//   ] as Point;
+// };
+
+export const pointInverse = <Point extends LocalPoint | GlobalPoint>(
+  p: Point,
 ): Point => {
-  const r = angleToRadians(angle);
-
-  if (!origin || isOrigin(origin)) {
-    return rotate(point, r);
-  }
-  return rotate(point.map((c, i) => c - origin[i]) as Point, r).map(
-    (c, i) => c + origin[i],
-  ) as Point;
+  return point(-p[0], -p[1]);
 };
 
-// translate a point by an angle (in degrees) and distance
-export const pointTranslate = (point: Point, angle = 0, distance = 0) => {
-  const r = angleToRadians(angle);
-  return [
-    point[0] + distance * Math.cos(r),
-    point[1] + distance * Math.sin(r),
-  ] as Point;
+export const pointAdd = <Point extends LocalPoint | GlobalPoint>(
+  pointA: Point,
+  pointB: Point,
+): Point => {
+  return point(pointA[0] + pointB[0], pointA[1] + pointB[1]);
 };
 
-export const pointInverse = (point: Point) => {
-  return [-point[0], -point[1]] as Point;
-};
-
-export const pointAdd = (pointA: Point, pointB: Point): Point => {
-  return [pointA[0] + pointB[0], pointA[1] + pointB[1]];
-};
-
-export const distanceToPoint = (p1: Point, p2: Point) => {
+export const distanceToPoint = <Point extends LocalPoint | GlobalPoint>(
+  p1: Point,
+  p2: Point,
+) => {
   return pointDistance(p1, p2);
 };
 
@@ -128,56 +144,77 @@ export const distanceToPoint = (p1: Point, p2: Point) => {
  */
 
 // return the angle of a line, in degrees
-export const lineAngle = (line: Line) => {
-  return angleToDegrees(
-    Math.atan2(line[1][1] - line[0][1], line[1][0] - line[0][0]),
-  );
+export const lineAngle = <Point extends LocalPoint | GlobalPoint>(
+  line: Line<Point>,
+): Radians => {
+  return Math.atan2(
+    line[1][1] - line[0][1],
+    line[1][0] - line[0][0],
+  ) as Radians;
 };
 
 // get the distance between the endpoints of a line segment
-export const lineLength = (line: Line) => {
+export const lineLength = <Point extends LocalPoint | GlobalPoint>(
+  line: Line<Point>,
+) => {
   return Math.sqrt(
     Math.pow(line[1][0] - line[0][0], 2) + Math.pow(line[1][1] - line[0][1], 2),
   );
 };
 
-// get the midpoint of a line segment
-export const lineMidpoint = (line: Line) => {
-  return [
-    (line[0][0] + line[1][0]) / 2,
-    (line[0][1] + line[1][1]) / 2,
-  ] as Point;
-};
+// // get the midpoint of a line segment
+// export const lineMidpoint = <Point extends LocalPoint | GlobalPoint>(
+//   line: Line<Point>,
+// ) => {
+//   return point((line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2);
+// };
 
 // return the coordinates resulting from rotating the given line about an origin by an angle in degrees
 // note that when the origin is not given, the midpoint of the given line is used as the origin
-export const lineRotate = (line: Line, angle: number, origin?: Point): Line => {
-  return line.map((point) =>
-    pointRotate(point, angle, origin || lineMidpoint(line)),
-  ) as Line;
+export const lineRotate = <Point extends LocalPoint | GlobalPoint>(
+  l: Line<Point>,
+  angle: Radians,
+  origin?: Point,
+): Line<Point> => {
+  return line(
+    pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
+    pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
+  );
 };
 
 // returns the coordinates resulting from translating a line by an angle in degrees and a distance.
-export const lineTranslate = (line: Line, angle: number, distance: number) => {
-  return line.map((point) => pointTranslate(point, angle, distance));
+export const lineTranslate = <Point extends LocalPoint | GlobalPoint>(
+  line: Line<Point>,
+  angle: Radians,
+  distance: number,
+) => {
+  return line.map((p) =>
+    pointTranslate(
+      pointRotateRads(p, point(0, 0), angle),
+      vector(distance, distance),
+    ),
+  ); //(p, angle, distance));
 };
 
-export const lineInterpolate = (line: Line, clamp = false) => {
+export const lineInterpolate = <Point extends LocalPoint | GlobalPoint>(
+  line: Line<Point>,
+  clamp = false,
+) => {
   const [[x1, y1], [x2, y2]] = line;
-  return (t: number) => {
+  return <P extends GlobalPoint | LocalPoint>(t: number) => {
     const t0 = clamp ? (t < 0 ? 0 : t > 1 ? 1 : t) : t;
-    return [(x2 - x1) * t0 + x1, (y2 - y1) * t0 + y1] as Point;
+    return point<P>((x2 - x1) * t0 + x1, (y2 - y1) * t0 + y1);
   };
 };
 
 /**
  * curves
  */
-function clone(p: Point): Point {
+function clone<Point extends LocalPoint | GlobalPoint>(p: Point): Point {
   return [...p] as Point;
 }
 
-export const curveToBezier = (
+export const curveToBezier = <Point extends LocalPoint | GlobalPoint>(
   pointsIn: readonly Point[],
   curveTightness = 0,
 ): Point[] => {
@@ -207,27 +244,34 @@ export const curveToBezier = (
     out.push(clone(points[0]));
     for (let i = 1; i + 2 < points.length; i++) {
       const cachedVertArray = points[i];
-      b[0] = [cachedVertArray[0], cachedVertArray[1]];
-      b[1] = [
+      b[0] = point(cachedVertArray[0], cachedVertArray[1]);
+      b[1] = point(
         cachedVertArray[0] + (s * points[i + 1][0] - s * points[i - 1][0]) / 6,
         cachedVertArray[1] + (s * points[i + 1][1] - s * points[i - 1][1]) / 6,
-      ];
-      b[2] = [
+      );
+      b[2] = point(
         points[i + 1][0] + (s * points[i][0] - s * points[i + 2][0]) / 6,
         points[i + 1][1] + (s * points[i][1] - s * points[i + 2][1]) / 6,
-      ];
-      b[3] = [points[i + 1][0], points[i + 1][1]];
+      );
+      b[3] = point(points[i + 1][0], points[i + 1][1]);
       out.push(b[1], b[2], b[3]);
     }
   }
   return out;
 };
 
-export const curveRotate = (curve: Curve, angle: number, origin: Point) => {
-  return curve.map((p) => pointRotate(p, angle, origin));
+export const curveRotate = <Point extends LocalPoint | GlobalPoint>(
+  curve: Curve<Point>,
+  angle: Radians,
+  origin: Point,
+) => {
+  return curve.map((p) => pointRotateRads(p, origin, angle));
 };
 
-export const cubicBezierPoint = (t: number, controlPoints: Curve): Point => {
+export const cubicBezierPoint = <Point extends LocalPoint | GlobalPoint>(
+  t: number,
+  controlPoints: Curve<Point>,
+): Point => {
   const [p0, p1, p2, p3] = controlPoints;
 
   const x =
@@ -242,7 +286,7 @@ export const cubicBezierPoint = (t: number, controlPoints: Curve): Point => {
     3 * (1 - t) * Math.pow(t, 2) * p2[1] +
     Math.pow(t, 3) * p3[1];
 
-  return [x, y];
+  return point(x, y);
 };
 
 const solveCubicEquation = (a: number, b: number, c: number, d: number) => {
@@ -285,7 +329,10 @@ const solveCubicEquation = (a: number, b: number, c: number, d: number) => {
   return roots;
 };
 
-const findClosestParameter = (point: Point, controlPoints: Curve) => {
+const findClosestParameter = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  controlPoints: Curve<Point>,
+) => {
   // This function finds the parameter t that minimizes the distance between the point
   // and any point on the cubic Bezier curve.
 
@@ -335,7 +382,10 @@ const findClosestParameter = (point: Point, controlPoints: Curve) => {
   return closestT;
 };
 
-export const cubicBezierDistance = (point: Point, controlPoints: Curve) => {
+export const cubicBezierDistance = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  controlPoints: Curve<Point>,
+) => {
   // Calculate the closest point on the Bezier curve to the given point
   const t = findClosestParameter(point, controlPoints);
 
@@ -354,15 +404,17 @@ export const cubicBezierDistance = (point: Point, controlPoints: Curve) => {
  * polygons
  */
 
-export const polygonRotate = (
-  polygon: Polygon,
-  angle: number,
+export const polygonRotate = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+  angle: Radians,
   origin: Point,
 ) => {
-  return polygon.map((p) => pointRotate(p, angle, origin));
+  return polygon.map((p) => pointRotateRads(p, origin, angle));
 };
 
-export const polygonBounds = (polygon: Polygon) => {
+export const polygonBounds = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+) => {
   let xMin = Infinity;
   let xMax = -Infinity;
   let yMin = Infinity;
@@ -392,10 +444,12 @@ export const polygonBounds = (polygon: Polygon) => {
   return [
     [xMin, yMin],
     [xMax, yMax],
-  ] as [Point, Point];
+  ];
 };
 
-export const polygonCentroid = (vertices: Point[]) => {
+export const polygonCentroid = <Point extends LocalPoint | GlobalPoint>(
+  vertices: Point[],
+) => {
   let a = 0;
   let x = 0;
   let y = 0;
@@ -417,8 +471,32 @@ export const polygonCentroid = (vertices: Point[]) => {
   return [x / d, y / d] as Point;
 };
 
-export const polygonScale = (
-  polygon: Polygon,
+export const polygonScale = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+  scale: number,
+  origin?: Point,
+): Polygon<Point> => {
+  if (!origin) {
+    origin = polygonCentroid(polygon);
+  }
+
+  const p: Point[] = [];
+
+  for (let i = 0, l = polygon.length; i < l; i++) {
+    const v = polygon[i];
+    const d = lineLength(line(origin, v));
+    const a = lineAngle(line(origin, v));
+    p[i] = pointTranslate(
+      pointRotateRads(origin, point(0, 0), a as Radians),
+      vector(d * scale, d * scale),
+    );
+  }
+
+  return polygonFromPoints(p);
+};
+
+export const polygonScaleX = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
   scale: number,
   origin?: Point,
 ) => {
@@ -426,79 +504,66 @@ export const polygonScale = (
     origin = polygonCentroid(polygon);
   }
 
-  const p: Polygon = [];
+  const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
     const v = polygon[i];
-    const d = lineLength([origin, v]);
-    const a = lineAngle([origin, v]);
+    const d = lineLength(line(origin, v));
+    const a = lineAngle(line(origin, v));
+    const t = pointTranslate(
+      pointRotateRads(origin, point(0, 0), a),
+      vector(d * scale, d * scale),
+    );
 
-    p[i] = pointTranslate(origin, a, d * scale);
+    p[i] = point(t[0], v[1]);
   }
 
-  return p;
+  return polygonFromPoints(p);
 };
 
-export const polygonScaleX = (
-  polygon: Polygon,
+export const polygonScaleY = <Point extends LocalPoint | GlobalPoint>(
+  poly: Polygon<Point>,
   scale: number,
   origin?: Point,
 ) => {
   if (!origin) {
-    origin = polygonCentroid(polygon);
+    origin = polygonCentroid(poly);
   }
 
-  const p: Polygon = [];
+  const p: Point[] = [];
 
-  for (let i = 0, l = polygon.length; i < l; i++) {
-    const v = polygon[i];
-    const d = lineLength([origin, v]);
-    const a = lineAngle([origin, v]);
-    const t = pointTranslate(origin, a, d * scale);
+  for (let i = 0, l = poly.length; i < l; i++) {
+    const v = poly[i];
+    const d = lineLength(line(origin, v));
+    const a = lineAngle(line(origin, v));
+    const t = pointTranslate(
+      pointRotateRads(origin, point(0, 0), a),
+      vector(d * scale, d * scale),
+    );
 
-    p[i] = [t[0], v[1]];
+    p[i] = point(v[0], t[1]);
   }
 
-  return p;
+  return polygonFromPoints<Point>(p);
 };
 
-export const polygonScaleY = (
-  polygon: Polygon,
-  scale: number,
-  origin?: Point,
+export const polygonReflectX = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+  reflectFactor = 1,
 ) => {
-  if (!origin) {
-    origin = polygonCentroid(polygon);
-  }
-
-  const p: Polygon = [];
-
-  for (let i = 0, l = polygon.length; i < l; i++) {
-    const v = polygon[i];
-    const d = lineLength([origin, v]);
-    const a = lineAngle([origin, v]);
-    const t = pointTranslate(origin, a, d * scale);
-
-    p[i] = [v[0], t[1]];
-  }
-
-  return p;
-};
-
-export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
   const [[min], [max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
     const [x, y] = polygon[i];
-    const r: Point = [min + max - x, y];
+    const r: Point = point(min + max - x, y);
 
     if (reflectFactor === 0) {
-      p[i] = [x, y];
+      p[i] = point(x, y);
     } else if (reflectFactor === 1) {
       p[i] = r;
     } else {
-      const t = lineInterpolate([[x, y], r]);
+      const t = lineInterpolate(line(point(x, y), r));
       p[i] = t(Math.max(Math.min(reflectFactor, 1), 0));
     }
   }
@@ -506,40 +571,50 @@ export const polygonReflectX = (polygon: Polygon, reflectFactor = 1) => {
   return p;
 };
 
-export const polygonReflectY = (polygon: Polygon, reflectFactor = 1) => {
+export const polygonReflectY = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+  reflectFactor = 1,
+): Point[] => {
   const [[, min], [, max]] = polygonBounds(polygon);
   const p: Point[] = [];
 
   for (let i = 0, l = polygon.length; i < l; i++) {
     const [x, y] = polygon[i];
-    const r: Point = [x, min + max - y];
+    const r: Point = point(x, min + max - y);
 
     if (reflectFactor === 0) {
-      p[i] = [x, y];
+      p[i] = point(x, y);
     } else if (reflectFactor === 1) {
       p[i] = r;
     } else {
-      const t = lineInterpolate([[x, y], r]);
-      p[i] = t(Math.max(Math.min(reflectFactor, 1), 0));
+      const t = lineInterpolate(line(point(x, y), r));
+      p[i] = t<Point>(Math.max(Math.min(reflectFactor, 1), 0));
     }
   }
 
   return p;
 };
 
-export const polygonTranslate = (
-  polygon: Polygon,
+export const polygonTranslate = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
   angle: number,
   distance: number,
 ) => {
-  return polygon.map((p) => pointTranslate(p, angle, distance));
+  return polygon.map((p) =>
+    pointTranslate(
+      pointRotateRads(p, point(0, 0), angle as Radians),
+      vector(distance, distance),
+    ),
+  );
 };
 
 /**
  * ellipses
  */
 
-export const ellipseAxes = (ellipse: Ellipse) => {
+export const ellipseAxes = <Point extends LocalPoint | GlobalPoint>(
+  ellipse: Ellipse<Point>,
+) => {
   const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
 
   const majorAxis = widthGreaterThanHeight
@@ -555,13 +630,17 @@ export const ellipseAxes = (ellipse: Ellipse) => {
   };
 };
 
-export const ellipseFocusToCenter = (ellipse: Ellipse) => {
+export const ellipseFocusToCenter = <Point extends LocalPoint | GlobalPoint>(
+  ellipse: Ellipse<Point>,
+) => {
   const { majorAxis, minorAxis } = ellipseAxes(ellipse);
 
   return Math.sqrt(majorAxis ** 2 - minorAxis ** 2);
 };
 
-export const ellipseExtremes = (ellipse: Ellipse) => {
+export const ellipseExtremes = <Point extends LocalPoint | GlobalPoint>(
+  ellipse: Ellipse<Point>,
+) => {
   const { center, angle } = ellipse;
   const { majorAxis, minorAxis } = ellipseAxes(ellipse);
 
@@ -582,43 +661,57 @@ export const ellipseExtremes = (ellipse: Ellipse) => {
     (majorAxis ** 2 * cos ** 2 + minorAxis ** 2 * sin ** 2);
 
   return [
-    pointAdd([xAtYMax, yMax], center),
-    pointAdd(pointInverse([xAtYMax, yMax]), center),
-    pointAdd([xMax, yAtXMax], center),
-    pointAdd([xMax, yAtXMax], center),
+    pointAdd(point(xAtYMax, yMax), center),
+    pointAdd(pointInverse(point(xAtYMax, yMax)), center),
+    pointAdd(point(xMax, yAtXMax), center),
+    pointAdd(point(xMax, yAtXMax), center),
   ];
 };
 
-export const pointRelativeToCenter = (
-  point: Point,
+export const pointRelativeToCenter = <Point extends LocalPoint | GlobalPoint>(
+  p: Point,
   center: Point,
-  angle: number,
+  angle: Radians,
 ): Point => {
-  const translated = pointAdd(point, pointInverse(center));
-  const rotated = pointRotate(translated, -angleToDegrees(angle));
+  const translated = pointAdd<Point>(p, pointInverse<Point>(center));
 
-  return rotated;
+  return pointRotateRads(translated, point(0, 0), -angle as Radians);
 };
 
 /**
  * relationships
  */
 
-const topPointFirst = (line: Line) => {
+const topPointFirst = <Point extends LocalPoint | GlobalPoint>(
+  line: Line<Point>,
+) => {
   return line[1][1] > line[0][1] ? line : [line[1], line[0]];
 };
 
-export const pointLeftofLine = (point: Point, line: Line) => {
+export const pointLeftofLine = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  line: Line<Point>,
+) => {
   const t = topPointFirst(line);
-  return cross(point, t[1], t[0]) < 0;
+  return (
+    vectorCross(vectorFromPoint(point, t[0]), vectorFromPoint(t[1], t[0])) < 0
+  );
 };
 
-export const pointRightofLine = (point: Point, line: Line) => {
+export const pointRightofLine = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  line: Line<Point>,
+) => {
   const t = topPointFirst(line);
-  return cross(point, t[1], t[0]) > 0;
+  return (
+    vectorCross(vectorFromPoint(point, t[0]), vectorFromPoint(t[1], t[0])) > 0
+  );
 };
 
-export const distanceToSegment = (point: Point, line: Line) => {
+export const distanceToLineSegment = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  line: LineSegment<Point>,
+) => {
   const [x, y] = point;
   const [[x1, y1], [x2, y2]] = line;
 
@@ -653,12 +746,12 @@ export const distanceToSegment = (point: Point, line: Line) => {
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-export const pointOnLine = (
+export const pointOnLineSegment = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
-  line: Line,
+  line: LineSegment<Point>,
   threshold = DEFAULT_THRESHOLD,
 ) => {
-  const distance = distanceToSegment(point, line);
+  const distance = distanceToLineSegment(point, line);
 
   if (distance === 0) {
     return true;
@@ -667,15 +760,18 @@ export const pointOnLine = (
   return distance < threshold;
 };
 
-export const pointOnPolyline = (
+export const pointOnPolyline = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
-  polyline: Polyline,
+  polyline: Polyline<Point>,
   threshold = DEFAULT_THRESHOLD,
 ) => {
-  return polyline.some((line) => pointOnLine(point, line, threshold));
+  return polyline.some((line) => pointOnLineSegment(point, line, threshold));
 };
 
-export const lineIntersectsLine = (lineA: Line, lineB: Line) => {
+export const lineIntersectsLine = <Point extends LocalPoint | GlobalPoint>(
+  lineA: LineSegment<Point>,
+  lineB: LineSegment<Point>,
+) => {
   const [[a0x, a0y], [a1x, a1y]] = lineA;
   const [[b0x, b0y], [b1x, b1y]] = lineB;
 
@@ -688,10 +784,16 @@ export const lineIntersectsLine = (lineA: Line, lineB: Line) => {
   }
 
   // point on line
-  if (pointOnLine(lineA[0], lineB) || pointOnLine(lineA[1], lineB)) {
+  if (
+    pointOnLineSegment(lineA[0], lineB) ||
+    pointOnLineSegment(lineA[1], lineB)
+  ) {
     return true;
   }
-  if (pointOnLine(lineB[0], lineA) || pointOnLine(lineB[1], lineA)) {
+  if (
+    pointOnLineSegment(lineB[0], lineA) ||
+    pointOnLineSegment(lineB[1], lineA)
+  ) {
     return true;
   }
 
@@ -711,17 +813,20 @@ export const lineIntersectsLine = (lineA: Line, lineB: Line) => {
   return quotA > 0 && quotA < 1 && quotB > 0 && quotB < 1;
 };
 
-export const lineIntersectsPolygon = (line: Line, polygon: Polygon) => {
+export const lineIntersectsPolygon = <Point extends LocalPoint | GlobalPoint>(
+  line: LineSegment<Point>,
+  polygon: Polygon<Point>,
+) => {
   let intersects = false;
-  const closed = close(polygon);
+  const closed = closePolygon(polygon);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
     const v0 = closed[i];
     const v1 = closed[i + 1];
 
     if (
-      lineIntersectsLine(line, [v0, v1]) ||
-      (pointOnLine(v0, line) && pointOnLine(v1, line))
+      lineIntersectsLine(line, lineSegment(v0, v1)) ||
+      (pointOnLineSegment(v0, line) && pointOnLineSegment(v1, line))
     ) {
       intersects = true;
       break;
@@ -731,7 +836,7 @@ export const lineIntersectsPolygon = (line: Line, polygon: Polygon) => {
   return intersects;
 };
 
-export const pointInBezierEquation = (
+export const pointInBezierEquation = <Point extends LocalPoint | GlobalPoint>(
   p0: Point,
   p1: Point,
   p2: Point,
@@ -758,7 +863,7 @@ export const pointInBezierEquation = (
       return true;
     }
 
-    lineSegmentPoints.push([tx, ty]);
+    lineSegmentPoints.push(point(tx, ty));
 
     t += 0.1;
   }
@@ -768,7 +873,9 @@ export const pointInBezierEquation = (
   return false;
 };
 
-export const cubicBezierEquation = (curve: Curve) => {
+export const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(
+  curve: Curve<Point>,
+) => {
   const [p0, p1, p2, p3] = curve;
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
   return (t: number, idx: number) =>
@@ -778,18 +885,21 @@ export const cubicBezierEquation = (curve: Curve) => {
     p0[idx] * Math.pow(t, 3);
 };
 
-export const polyLineFromCurve = (curve: Curve, segments = 10): Polyline => {
+export const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
+  curve: Curve<Point>,
+  segments = 10,
+): Polyline<Point> => {
   const equation = cubicBezierEquation(curve);
   let startingPoint = [equation(0, 0), equation(0, 1)] as Point;
-  const lineSegments: Polyline = [];
+  const lineSegments: Polyline<Point> = [];
   let t = 0;
   const increment = 1 / segments;
 
   for (let i = 0; i < segments; i++) {
     t += increment;
     if (t <= 1) {
-      const nextPoint: Point = [equation(t, 0), equation(t, 1)];
-      lineSegments.push([startingPoint, nextPoint]);
+      const nextPoint: Point = point(equation(t, 0), equation(t, 1));
+      lineSegments.push(lineSegment(startingPoint, nextPoint));
       startingPoint = nextPoint;
     }
   }
@@ -797,23 +907,26 @@ export const polyLineFromCurve = (curve: Curve, segments = 10): Polyline => {
   return lineSegments;
 };
 
-export const pointOnCurve = (
+export const pointOnCurve = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
-  curve: Curve,
+  curve: Curve<Point>,
   threshold = DEFAULT_THRESHOLD,
 ) => {
   return pointOnPolyline(point, polyLineFromCurve(curve), threshold);
 };
 
-export const pointOnPolycurve = (
+export const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
-  polycurve: Polycurve,
+  polycurve: Polycurve<Point>,
   threshold = DEFAULT_THRESHOLD,
 ) => {
   return polycurve.some((curve) => pointOnCurve(point, curve, threshold));
 };
 
-export const pointInPolygon = (point: Point, polygon: Polygon) => {
+export const pointInPolygon = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  polygon: Polygon<Point>,
+) => {
   const x = point[0];
   const y = point[1];
   let inside = false;
@@ -835,16 +948,22 @@ export const pointInPolygon = (point: Point, polygon: Polygon) => {
   return inside;
 };
 
-export const pointOnPolygon = (
+export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
-  polygon: Polygon,
+  polygon: Polygon<Point>,
   threshold = DEFAULT_THRESHOLD,
 ) => {
   let on = false;
-  const closed = close(polygon);
+  const closed = closePolygon(polygon);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
-    if (pointOnLine(point, [closed[i], closed[i + 1]], threshold)) {
+    if (
+      pointOnLineSegment(
+        point,
+        lineSegment(closed[i], closed[i + 1]),
+        threshold,
+      )
+    ) {
       on = true;
       break;
     }
@@ -853,9 +972,12 @@ export const pointOnPolygon = (
   return on;
 };
 
-export const polygonInPolygon = (polygonA: Polygon, polygonB: Polygon) => {
+export const polygonInPolygon = <Point extends LocalPoint | GlobalPoint>(
+  polygonA: Polygon<Point>,
+  polygonB: Polygon<Point>,
+) => {
   let inside = true;
-  const closed = close(polygonA);
+  const closed = closePolygon(polygonA);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
     const v0 = closed[i];
@@ -867,7 +989,7 @@ export const polygonInPolygon = (polygonA: Polygon, polygonB: Polygon) => {
     }
 
     // Lines test
-    if (lineIntersectsPolygon([v0, closed[i + 1]], polygonB)) {
+    if (lineIntersectsPolygon(lineSegment(v0, closed[i + 1]), polygonB)) {
       inside = false;
       break;
     }
@@ -876,19 +998,19 @@ export const polygonInPolygon = (polygonA: Polygon, polygonB: Polygon) => {
   return inside;
 };
 
-export const polygonIntersectPolygon = (
-  polygonA: Polygon,
-  polygonB: Polygon,
+export const polygonIntersectPolygon = <Point extends LocalPoint | GlobalPoint>(
+  polygonA: Polygon<Point>,
+  polygonB: Polygon<Point>,
 ) => {
   let intersects = false;
   let onCount = 0;
-  const closed = close(polygonA);
+  const closed = closePolygon(polygonA);
 
   for (let i = 0, l = closed.length - 1; i < l; i++) {
     const v0 = closed[i];
     const v1 = closed[i + 1];
 
-    if (lineIntersectsPolygon([v0, v1], polygonB)) {
+    if (lineIntersectsPolygon(lineSegment(v0, v1), polygonB)) {
       intersects = true;
       break;
     }
@@ -906,12 +1028,15 @@ export const polygonIntersectPolygon = (
   return intersects;
 };
 
-const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
+const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
+  p: Point,
+  ellipse: Ellipse<Point>,
+) => {
   const { angle, halfWidth, halfHeight, center } = ellipse;
   const a = halfWidth;
   const b = halfHeight;
   const [rotatedPointX, rotatedPointY] = pointRelativeToCenter(
-    point,
+    p,
     center,
     angle,
   );
@@ -950,18 +1075,21 @@ const distanceToEllipse = (point: Point, ellipse: Ellipse) => {
     b * ty * Math.sign(rotatedPointY),
   ];
 
-  return distanceToPoint([rotatedPointX, rotatedPointY], [minX, minY]);
+  return pointDistance(point(rotatedPointX, rotatedPointY), point(minX, minY));
 };
 
-export const pointOnEllipse = (
+export const pointOnEllipse = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
-  ellipse: Ellipse,
+  ellipse: Ellipse<Point>,
   threshold = DEFAULT_THRESHOLD,
 ) => {
   return distanceToEllipse(point, ellipse) <= threshold;
 };
 
-export const pointInEllipse = (point: Point, ellipse: Ellipse) => {
+export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  ellipse: Ellipse<Point>,
+) => {
   const { center, angle, halfWidth, halfHeight } = ellipse;
   const [rotatedPointX, rotatedPointY] = pointRelativeToCenter(
     point,

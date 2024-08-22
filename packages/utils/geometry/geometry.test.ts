@@ -6,7 +6,7 @@ import {
   pointLeftofLine,
   pointOnCurve,
   pointOnEllipse,
-  pointOnLine,
+  pointOnLineSegment,
   pointOnPolygon,
   pointOnPolyline,
   pointRightofLine,
@@ -31,9 +31,9 @@ describe("point and line", () => {
   });
 
   it("point on the line", () => {
-    expect(pointOnLine([0, 1], line)).toBe(false);
-    expect(pointOnLine([1, 1], line, 0)).toBe(true);
-    expect(pointOnLine([2, 1], line)).toBe(false);
+    expect(pointOnLineSegment([0, 1], line)).toBe(false);
+    expect(pointOnLineSegment([1, 1], line, 0)).toBe(true);
+    expect(pointOnLineSegment([2, 1], line)).toBe(false);
   });
 });
 

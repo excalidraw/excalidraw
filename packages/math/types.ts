@@ -62,3 +62,31 @@ export type LineSegment<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
 export type Vector = [u: number, v: number] & {
   _brand: "excalimath__vector";
 };
+
+//
+// Polygon
+//
+
+/**
+ * A polygon is a closed shape by connecting the given points
+ * rectangles and diamonds are modelled by polygons
+ */
+export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[] & {
+  _brand: "excalimath_polygon";
+};
+
+//
+// Curve
+//
+
+/**
+ * Cubic bezier curve with four control points
+ */
+export type Curve<Point extends GlobalPoint | LocalPoint> = [
+  Point,
+  Point,
+  Point,
+  Point,
+] & {
+  _brand: "excalimath_curve";
+};

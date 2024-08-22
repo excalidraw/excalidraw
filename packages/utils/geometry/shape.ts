@@ -12,8 +12,12 @@
  * to pure shapes
  */
 
+import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
 import {
+  curve,
   point,
+  pointRotateRads,
+  polygon,
   type GlobalPoint,
   type Line,
   type LocalPoint,
@@ -34,37 +38,26 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "../../excalidraw/element/types";
-import { angleToDegrees, close, pointAdd, pointRotate } from "./geometry";
+import { closePolygon, pointAdd } from "./geometry";
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";
 
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
 // be used to model other elements
-export type Polyline<Point extends GlobalPoint | LocalPoint> = Line<Point>[];
-
-// cubic bezier curve with four control points
-export type Curve<Point extends GlobalPoint | LocalPoint> = [
-  Point,
-  Point,
-  Point,
-  Point,
-];
+export type Polyline<Point extends GlobalPoint | LocalPoint> =
+  LineSegment<Point>[];
 
 // a polycurve is a curve consisting of ther curves, this corresponds to a complex
 // curve on the canvas
 export type Polycurve<Point extends GlobalPoint | LocalPoint> = Curve<Point>[];
-
-// a polygon is a closed shape by connecting the given points
-// rectangles and diamonds are modelled by polygons
-export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[];
 
 // an ellipse is specified by its center, angle, and its major and minor axes
 // but for the sake of simplicity, we've used halfWidth and halfHeight instead
 // in replace of semi major and semi minor axes
 export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
   center: Point;
-  angle: number;
+  angle: Radians;
   halfWidth: number;
   halfHeight: number;
 };
@@ -110,28 +103,28 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
   element: RectangularElement,
 ): GeometricShape<Point> => {
   const { angle, width, height, x, y } = element;
-  const angleInDegrees = angleToDegrees(angle);
+
   const cx = x + width / 2;
   const cy = y + height / 2;
 
   const center: Point = point(cx, cy);
 
-  let data: Polygon<Point> = [];
+  let data: Polygon<Point>;
 
   if (element.type === "diamond") {
-    data = [
-      pointRotate([cx, y], angleInDegrees, center),
-      pointRotate([x + width, cy], angleInDegrees, center),
-      pointRotate([cx, y + height], angleInDegrees, center),
-      pointRotate([x, cy], angleInDegrees, center),
-    ];
+    data = polygon(
+      pointRotateRads(point(cx, y), center, angle),
+      pointRotateRads(point(x + width, cy), center, angle),
+      pointRotateRads(point(cx, y + height), center, angle),
+      pointRotateRads(point(x, cy), center, angle),
+    );
   } else {
-    data = [
-      pointRotate([x, y], angleInDegrees, center),
-      pointRotate([x + width, y], angleInDegrees, center),
-      pointRotate([x + width, y + height], angleInDegrees, center),
-      pointRotate([x, y + height], angleInDegrees, center),
-    ];
+    data = polygon(
+      pointRotateRads(point(x, y), center, angle),
+      pointRotateRads(point(x + width, y), center, angle),
+      pointRotateRads(point(x + width, y + height), center, angle),
+      pointRotateRads(point(x, y + height), center, angle),
+    );
   }
 
   return {
@@ -141,7 +134,7 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
 };
 
 // return the selection box for an element, possibly rotated as well
-export const getSelectionBoxShape = (
+export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   padding = 10,
@@ -157,29 +150,29 @@ export const getSelectionBoxShape = (
   y1 -= padding;
   y2 += padding;
 
-  const angleInDegrees = angleToDegrees(element.angle);
+  //const angleInDegrees = angleToDegrees(element.angle);
   const center = point(cx, cy);
-  const topLeft = pointRotate([x1, y1], angleInDegrees, center);
-  const topRight = pointRotate([x2, y1], angleInDegrees, center);
-  const bottomLeft = pointRotate([x1, y2], angleInDegrees, center);
-  const bottomRight = pointRotate([x2, y2], angleInDegrees, center);
+  const topLeft = pointRotateRads(point(x1, y1), center, element.angle);
+  const topRight = pointRotateRads(point(x2, y1), center, element.angle);
+  const bottomLeft = pointRotateRads(point(x1, y2), center, element.angle);
+  const bottomRight = pointRotateRads(point(x2, y2), center, element.angle);
 
   return {
     type: "polygon",
     data: [topLeft, topRight, bottomRight, bottomLeft],
-  } as GeometricShape;
+  } as GeometricShape<Point>;
 };
 
 // ellipse
-export const getEllipseShape = (
+export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawEllipseElement,
-): GeometricShape => {
+): GeometricShape<Point> => {
   const { width, height, angle, x, y } = element;
 
   return {
     type: "ellipse",
     data: {
-      center: [x + width / 2, y + height / 2],
+      center: point(x + width / 2, y + height / 2),
       angle,
       halfWidth: width / 2,
       halfHeight: height / 2,
@@ -197,32 +190,32 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 };
 
 // linear
-export const getCurveShape = (
+export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   roughShape: Drawable,
-  startingPoint: Point = [0, 0],
-  angleInRadian: number,
+  startingPoint: Point = point(0, 0),
+  angleInRadian: Radians,
   center: Point,
-): GeometricShape => {
+): GeometricShape<Point> => {
   const transform = (p: Point) =>
-    pointRotate(
-      [p[0] + startingPoint[0], p[1] + startingPoint[1]],
-      angleToDegrees(angleInRadian),
+    pointRotateRads(
+      point(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
+      angleInRadian,
     );
 
   const ops = getCurvePathOps(roughShape);
-  const polycurve: Polycurve = [];
-  let p0: Point = [0, 0];
+  let polycurve: Polycurve<Point>;
+  let p0 = point(0, 0);
 
   for (const op of ops) {
     if (op.op === "move") {
       p0 = transform(op.data as Point);
     }
     if (op.op === "bcurveTo") {
-      const p1: Point = transform([op.data[0], op.data[1]]);
-      const p2: Point = transform([op.data[2], op.data[3]]);
-      const p3: Point = transform([op.data[4], op.data[5]]);
-      polycurve.push([p0, p1, p2, p3]);
+      const p1 = transform(point(op.data[0], op.data[1]));
+      const p2 = transform(point(op.data[2], op.data[3]));
+      const p3 = transform(point(op.data[4], op.data[5]));
+      polycurve.push(curve(p0, p1, p2, p3));
       p0 = p3;
     }
   }
@@ -262,7 +255,7 @@ export const getFreedrawShape = (
   return isClosed
     ? {
         type: "polygon",
-        data: close(polyline.flat()) as Polygon,
+        data: closePolygon(polyline.flat()) as Polygon,
       }
     : {
         type: "polyline",
@@ -287,7 +280,7 @@ export const getClosedCurveShape = (
   if (element.roundness === null) {
     return {
       type: "polygon",
-      data: close(element.points.map((p) => transform(p as Point))),
+      data: closePolygon(element.points.map((p) => transform(p as Point))),
     };
   }
 
