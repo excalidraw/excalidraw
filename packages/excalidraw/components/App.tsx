@@ -537,7 +537,6 @@ const gesture: Gesture = {
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
-  newElementCanvas: AppClassProperties["newElementCanvas"] = null;
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -1709,8 +1708,6 @@ class App extends React.Component<AppProps, AppState> {
                           <NewElementCanvas
                             appState={this.state}
                             scale={window.devicePixelRatio}
-                            canvas={this.newElementCanvas}
-                            handleCanvasRef={this.handleNewElementCanvasRef}
                             rc={this.rc}
                             elementsMap={elementsMap}
                             allElementsMap={allElementsMap}
@@ -9605,12 +9602,6 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.TOUCH_END,
         this.onTouchEnd,
       );
-    }
-  };
-
-  private handleNewElementCanvasRef = (canvas: HTMLCanvasElement | null) => {
-    if (canvas !== null) {
-      this.newElementCanvas = canvas;
     }
   };
 

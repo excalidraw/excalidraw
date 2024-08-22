@@ -617,7 +617,6 @@ export type AppClassProperties = {
   props: AppProps;
   state: AppState;
   interactiveCanvas: HTMLCanvasElement | null;
-  newElementCanvas: HTMLCanvasElement | null;
   /** static canvas */
   canvas: HTMLCanvasElement;
   focusContainer(): void;

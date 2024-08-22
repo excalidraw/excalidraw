@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { NonDeletedSceneElementsMap } from "../../element/types";
-import { t } from "../../i18n";
 import type { AppState } from "../../types";
 import type {
   RenderableElementsMap,
@@ -11,21 +10,23 @@ import { renderNewElementScene } from "../../renderer/renderNewElementScene";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 
 interface NewElementCanvasProps {
-  canvas: HTMLCanvasElement | null;
   appState: AppState;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
   rc: RoughCanvas;
   renderConfig: StaticCanvasRenderConfig;
-  handleCanvasRef: (canvas: HTMLCanvasElement | null) => void;
 }
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
+    if (!canvasRef.current) {
+      return;
+    }
     renderNewElementScene(
       {
-        canvas: props.canvas,
+        canvas: canvasRef.current,
         scale: props.scale,
         newElement: props.appState.newElement,
         elementsMap: props.elementsMap,
@@ -46,10 +47,8 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
-      ref={props.handleCanvasRef}
-    >
-      {t("labels.newElementCanvas")}
-    </canvas>
+      ref={canvasRef}
+    />
   );
 };
 
