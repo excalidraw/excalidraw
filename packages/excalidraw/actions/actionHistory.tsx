@@ -21,7 +21,6 @@ const executeHistoryAction = (
   if (
     !appState.multiElement &&
     !appState.resizingElement &&
-    // MARK: do check this again
     !appState.editingTextElement &&
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
