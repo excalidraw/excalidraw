@@ -3787,7 +3787,6 @@ class App extends React.Component<AppProps, AppState> {
       collaborators?: SceneData["collaborators"];
       /** @default StoreAction.NONE */
       storeAction?: SceneData["storeAction"];
-      triggerUpdate?: boolean;
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
@@ -3826,7 +3825,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (sceneData.elements) {
-        this.scene.replaceAllElements(nextElements, sceneData.triggerUpdate);
+        this.scene.replaceAllElements(nextElements);
       }
 
       if (sceneData.collaborators) {
