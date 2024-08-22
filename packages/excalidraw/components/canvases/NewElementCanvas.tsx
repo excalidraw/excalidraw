@@ -8,6 +8,7 @@ import type {
 } from "../../scene/types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import { renderNewElementScene } from "../../renderer/renderNewElementScene";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
 
 interface NewElementCanvasProps {
   canvas: HTMLCanvasElement | null;
@@ -22,16 +23,19 @@ interface NewElementCanvasProps {
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
   useEffect(() => {
-    renderNewElementScene({
-      canvas: props.canvas,
-      scale: props.scale,
-      newElement: props.appState.newElement,
-      elementsMap: props.elementsMap,
-      allElementsMap: props.allElementsMap,
-      rc: props.rc,
-      renderConfig: props.renderConfig,
-      appState: props.appState,
-    });
+    renderNewElementScene(
+      {
+        canvas: props.canvas,
+        scale: props.scale,
+        newElement: props.appState.newElement,
+        elementsMap: props.elementsMap,
+        allElementsMap: props.allElementsMap,
+        rc: props.rc,
+        renderConfig: props.renderConfig,
+        appState: props.appState,
+      },
+      isRenderThrottlingEnabled(),
+    );
   });
 
   return (
