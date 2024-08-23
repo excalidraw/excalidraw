@@ -5589,10 +5589,6 @@ class App extends React.Component<AppProps, AppState> {
             },
             false,
           );
-          this.setState({
-            multiElement,
-            newElement: multiElement,
-          });
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
@@ -5616,10 +5612,6 @@ class App extends React.Component<AppProps, AppState> {
           },
           false,
         );
-        this.setState({
-          multiElement,
-          newElement: multiElement,
-        });
       } else {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
@@ -5684,10 +5676,11 @@ class App extends React.Component<AppProps, AppState> {
             false,
           );
         }
-        this.setState({
-          multiElement,
-          newElement: multiElement,
-        });
+
+        // in this path, we're mutating multiElement to reflect
+        // how it will be after adding pointer position as the next point
+        // trigger update here so that new element canvas renders again to reflect this
+        this.scene.triggerUpdate(false);
       }
 
       return;
