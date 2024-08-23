@@ -218,10 +218,15 @@ export const getSelectedElements = (
 
 export const getTargetElements = (
   elements: ElementsMapOrArray,
-  appState: Pick<AppState, "selectedElementIds" | "editingElement">,
+  appState: Pick<
+    AppState,
+    "selectedElementIds" | "editingTextElement" | "newElement"
+  >,
 ) =>
-  appState.editingElement
-    ? [appState.editingElement]
+  appState.editingTextElement
+    ? [appState.editingTextElement]
+    : appState.newElement
+    ? [appState.newElement]
     : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
       });

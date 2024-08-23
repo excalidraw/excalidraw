@@ -680,8 +680,11 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (appState.editingElement && isTextElement(appState.editingElement)) {
-    const textElement = allElementsMap.get(appState.editingElement.id) as
+  if (
+    appState.editingTextElement &&
+    isTextElement(appState.editingTextElement)
+  ) {
+    const textElement = allElementsMap.get(appState.editingTextElement.id) as
       | ExcalidrawTextElement
       | undefined;
     if (textElement && !textElement.autoResize) {
@@ -894,7 +897,7 @@ const _renderInteractiveScene = ({
         !appState.viewModeEnabled &&
         showBoundingBox &&
         // do not show transform handles when text is being edited
-        !isTextElement(appState.editingElement)
+        !isTextElement(appState.editingTextElement)
       ) {
         renderTransformHandles(
           context,
