@@ -382,6 +382,10 @@ class Scene {
   }
 
   insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+    if (!elements.length) {
+      return;
+    }
+
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
@@ -408,6 +412,10 @@ class Scene {
   };
 
   insertElements = (elements: ExcalidrawElement[]) => {
+    if (!elements.length) {
+      return;
+    }
+
     const index = elements[0].frameId
       ? this.getElementIndex(elements[0].frameId)
       : this.elements.length;
