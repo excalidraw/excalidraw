@@ -285,10 +285,7 @@ class Scene {
     return didChange;
   }
 
-  replaceAllElements(
-    nextElements: ElementsMapOrArray,
-    updateSceneNonce = true,
-  ) {
+  replaceAllElements(nextElements: ElementsMapOrArray) {
     const _nextElements =
       // ts doesn't like `Array.isArray` of `instanceof Map`
       nextElements instanceof Array
@@ -314,13 +311,11 @@ class Scene {
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
 
-    this.triggerUpdate(updateSceneNonce);
+    this.triggerUpdate();
   }
 
-  triggerUpdate(updateSceneNonce = true) {
-    if (updateSceneNonce) {
-      this.sceneNonce = randomInteger();
-    }
+  triggerUpdate() {
+    this.sceneNonce = randomInteger();
 
     for (const callback of Array.from(this.callbacks)) {
       callback();
@@ -416,7 +411,7 @@ class Scene {
       return;
     }
 
-    const index = elements[0].frameId
+    const index = elements[0]?.frameId
       ? this.getElementIndex(elements[0].frameId)
       : this.elements.length;
 

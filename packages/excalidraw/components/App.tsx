@@ -5680,7 +5680,7 @@ class App extends React.Component<AppProps, AppState> {
         // in this path, we're mutating multiElement to reflect
         // how it will be after adding pointer position as the next point
         // trigger update here so that new element canvas renders again to reflect this
-        this.scene.triggerUpdate(false);
+        this.triggerRender(false);
       }
 
       return;
