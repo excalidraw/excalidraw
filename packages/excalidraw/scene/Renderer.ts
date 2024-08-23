@@ -126,6 +126,8 @@ export class Renderer {
         height: AppState["height"];
         width: AppState["width"];
         editingTextElement: AppState["editingTextElement"];
+        /** note: first render of newElement will always bust the cache
+         * (we'd have to prefilter elements outside of this function) */
         newElementId: ExcalidrawElement["id"] | undefined;
         pendingImageElementId: AppState["pendingImageElementId"];
         sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;

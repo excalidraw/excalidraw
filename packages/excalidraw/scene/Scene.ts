@@ -363,11 +363,7 @@ class Scene {
     this.callbacks.clear();
   }
 
-  insertElementAtIndex(
-    element: ExcalidrawElement,
-    index: number,
-    updateSceneNonce = true,
-  ) {
+  insertElementAtIndex(element: ExcalidrawElement, index: number) {
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
@@ -382,14 +378,10 @@ class Scene {
 
     syncMovedIndices(nextElements, arrayToMap([element]));
 
-    this.replaceAllElements(nextElements, updateSceneNonce);
+    this.replaceAllElements(nextElements);
   }
 
-  insertElementsAtIndex(
-    elements: ExcalidrawElement[],
-    index: number,
-    updateSceneNonce = true,
-  ) {
+  insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
@@ -404,23 +396,23 @@ class Scene {
 
     syncMovedIndices(nextElements, arrayToMap(elements));
 
-    this.replaceAllElements(nextElements, updateSceneNonce);
+    this.replaceAllElements(nextElements);
   }
 
-  insertElement = (element: ExcalidrawElement, updateSceneNonce = true) => {
+  insertElement = (element: ExcalidrawElement) => {
     const index = element.frameId
       ? this.getElementIndex(element.frameId)
       : this.elements.length;
 
-    this.insertElementAtIndex(element, index, updateSceneNonce);
+    this.insertElementAtIndex(element, index);
   };
 
-  insertElements = (elements: ExcalidrawElement[], updateSceneNonce = true) => {
+  insertElements = (elements: ExcalidrawElement[]) => {
     const index = elements[0].frameId
       ? this.getElementIndex(elements[0].frameId)
       : this.elements.length;
 
-    this.insertElementsAtIndex(elements, index, updateSceneNonce);
+    this.insertElementsAtIndex(elements, index);
   };
 
   getElementIndex(elementId: string) {

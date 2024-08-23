@@ -3034,7 +3034,7 @@ exports[`regression tests > click on an element and drag it > [dragged] element 
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 1150084233,
+  "versionNonce": 1116226695,
   "width": 10,
   "x": 20,
   "y": 20,
@@ -4435,7 +4435,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "roundness": {
       "type": 2,
     },
-    "seed": 400692809,
+    "seed": 1505387817,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -4962,7 +4962,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "roundness": {
       "type": 2,
     },
-    "seed": 2019559783,
+    "seed": 1150084233,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -6724,7 +6724,7 @@ History {
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `31`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `33`;
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] appState 1`] = `
 {
@@ -13330,7 +13330,7 @@ exports[`regression tests > switches from group of selected elements to another 
     "roundness": {
       "type": 2,
     },
-    "seed": 915032327,
+    "seed": 1723083209,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -13663,7 +13663,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "roundness": {
       "type": 2,
     },
-    "seed": 238820263,
+    "seed": 1604849351,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
     "strokeWidth": 2,
@@ -14312,7 +14312,7 @@ History {
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] appState 1`] = `
 {

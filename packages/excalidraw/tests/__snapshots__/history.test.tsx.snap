@@ -7387,7 +7387,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of renders 1`] = `9`;
+exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of renders 1`] = `10`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] appState 1`] = `
 {
@@ -8885,7 +8885,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 8,
+  "version": 7,
   "width": 50,
   "x": 10,
   "y": 10,
@@ -10408,7 +10408,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `14`;
+exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `15`;
 
 exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] appState 1`] = `
 {
@@ -12011,7 +12011,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 6,
+  "version": 5,
   "width": 50,
   "x": 60,
   "y": 0,
@@ -12065,7 +12065,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 5,
+  "version": 4,
   "width": 50,
   "x": 150,
   "y": -10,
@@ -19935,4 +19935,4 @@ History {
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `20`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `21`;

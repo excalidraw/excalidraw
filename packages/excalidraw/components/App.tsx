@@ -7066,6 +7066,8 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
+    const simulatePressure = event.pressure === 0.5;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -7078,10 +7080,14 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
-      simulatePressure: event.pressure === 0.5,
+      simulatePressure,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      points: [[0, 0]],
+      pressures: simulatePressure ? [] : [event.pressure],
     });
+
+    this.scene.insertElement(element);
 
     this.setState((prevState) => {
       const nextSelectedElementIds = {
@@ -7096,25 +7102,12 @@ class App extends React.Component<AppProps, AppState> {
       };
     });
 
-    const pressures = element.simulatePressure
-      ? element.pressures
-      : [...element.pressures, event.pressure];
-
-    mutateElement(
-      element,
-      {
-        points: [[0, 0]],
-        pressures,
-      },
-      false,
-    );
-
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
     );
-    this.scene.insertElement(element, false);
+
     this.setState({
       newElement: element,
       startBoundElement: boundElement,
@@ -7273,14 +7266,10 @@ class App extends React.Component<AppProps, AppState> {
         multiElement.type === "line" &&
         isPathALoop(multiElement.points, this.state.zoom.value)
       ) {
-        mutateElement(
-          multiElement,
-          {
-            lastCommittedPoint:
-              multiElement.points[multiElement.points.length - 1],
-          },
-          false,
-        );
+        mutateElement(multiElement, {
+          lastCommittedPoint:
+            multiElement.points[multiElement.points.length - 1],
+        });
         this.actionManager.executeAction(actionFinalize);
         return;
       }
@@ -7324,14 +7313,9 @@ class App extends React.Component<AppProps, AppState> {
       }));
       // clicking outside commit zone → update reference for last committed
       // point
-      mutateElement(
-        multiElement,
-        {
-          lastCommittedPoint:
-            multiElement.points[multiElement.points.length - 1],
-        },
-        false,
-      );
+      mutateElement(multiElement, {
+        lastCommittedPoint: multiElement.points[multiElement.points.length - 1],
+      });
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
@@ -7411,13 +7395,9 @@ class App extends React.Component<AppProps, AppState> {
           ),
         };
       });
-      mutateElement(
-        element,
-        {
-          points: [...element.points, [0, 0]],
-        },
-        false,
-      );
+      mutateElement(element, {
+        points: [...element.points, [0, 0]],
+      });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
@@ -7425,7 +7405,7 @@ class App extends React.Component<AppProps, AppState> {
         isElbowArrow(element),
       );
 
-      this.scene.insertElement(element, false);
+      this.scene.insertElement(element);
       this.setState({
         newElement: element,
         startBoundElement: boundElement,
@@ -7502,7 +7482,7 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
-      this.scene.insertElement(element, false);
+      this.scene.insertElement(element);
       this.setState({
         multiElement: null,
         newElement: element,
@@ -8425,19 +8405,12 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          mutateElement(
-            newElement,
-            {
-              points: [
-                ...newElement.points,
-                [
-                  pointerCoords.x - newElement.x,
-                  pointerCoords.y - newElement.y,
-                ],
-              ],
-            },
-            false,
-          );
+          mutateElement(newElement, {
+            points: [
+              ...newElement.points,
+              [pointerCoords.x - newElement.x, pointerCoords.y - newElement.y],
+            ],
+          });
           this.setState({
             multiElement: newElement,
             newElement,
