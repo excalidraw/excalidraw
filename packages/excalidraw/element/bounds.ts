@@ -7,7 +7,6 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
 } from "./types";
-import { distance2d } from "../math";
 import rough from "roughjs/bin/rough";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Op } from "roughjs/bin/core";
@@ -36,6 +35,7 @@ import {
   degreesToRadians,
   lineSegment,
   point,
+  pointDistance,
   pointFromArray,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -931,7 +931,10 @@ export const getClosestElementBounds = (
   const elementsMap = arrayToMap(elements);
   elements.forEach((element) => {
     const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-    const distance = distance2d((x1 + x2) / 2, (y1 + y2) / 2, from.x, from.y);
+    const distance = pointDistance(
+      point((x1 + x2) / 2, (y1 + y2) / 2),
+      point(from.x, from.y),
+    );
 
     if (distance < minDistance) {
       minDistance = distance;

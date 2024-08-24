@@ -162,26 +162,6 @@ export const lineLength = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-// // get the midpoint of a line segment
-// export const lineMidpoint = <Point extends LocalPoint | GlobalPoint>(
-//   line: Line<Point>,
-// ) => {
-//   return point((line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2);
-// };
-
-// return the coordinates resulting from rotating the given line about an origin by an angle in degrees
-// note that when the origin is not given, the midpoint of the given line is used as the origin
-export const lineRotate = <Point extends LocalPoint | GlobalPoint>(
-  l: Line<Point>,
-  angle: Radians,
-  origin?: Point,
-): Line<Point> => {
-  return line(
-    pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
-    pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
-  );
-};
-
 // returns the coordinates resulting from translating a line by an angle in degrees and a distance.
 export const lineTranslate = <Point extends LocalPoint | GlobalPoint>(
   line: Line<Point>,

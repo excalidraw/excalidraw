@@ -15,11 +15,13 @@
 import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
 import {
   curve,
+  lineSegment,
   point,
+  pointFromArray,
   pointRotateRads,
   polygon,
+  polygonFromPoints,
   type GlobalPoint,
-  type Line,
   type LocalPoint,
 } from "@excalidraw/math";
 import { getElementAbsoluteCoords } from "../../excalidraw/element";
@@ -41,6 +43,7 @@ import type {
 import { closePolygon, pointAdd } from "./geometry";
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";
+import { invariant } from "../../excalidraw/utils";
 
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
@@ -65,7 +68,7 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
 export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
   | {
       type: "line";
-      data: Line<Point>;
+      data: LineSegment<Point>;
     }
   | {
       type: "polygon";
@@ -196,7 +199,7 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   angleInRadian: Radians,
   center: Point,
 ): GeometricShape<Point> => {
-  const transform = (p: Point) =>
+  const transform = (p: Point): Point =>
     pointRotateRads(
       point(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
@@ -204,18 +207,20 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
     );
 
   const ops = getCurvePathOps(roughShape);
-  let polycurve: Polycurve<Point>;
-  let p0 = point(0, 0);
+  const polycurve: Polycurve<Point> = [];
+  let p0 = point<Point>(0, 0);
 
   for (const op of ops) {
     if (op.op === "move") {
-      p0 = transform(op.data as Point);
+      const p = pointFromArray<Point>(op.data);
+      invariant(p != null, "Ops data is not a point");
+      p0 = transform(p);
     }
     if (op.op === "bcurveTo") {
-      const p1 = transform(point(op.data[0], op.data[1]));
-      const p2 = transform(point(op.data[2], op.data[3]));
-      const p3 = transform(point(op.data[4], op.data[5]));
-      polycurve.push(curve(p0, p1, p2, p3));
+      const p1 = transform(point<Point>(op.data[0], op.data[1]));
+      const p2 = transform(point<Point>(op.data[2], op.data[3]));
+      const p3 = transform(point<Point>(op.data[4], op.data[5]));
+      polycurve.push(curve<Point>(p0, p1, p2, p3));
       p0 = p3;
     }
   }
@@ -226,27 +231,32 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
-const polylineFromPoints = (points: Point[]) => {
-  let previousPoint = points[0];
-  const polyline: Polyline = [];
+const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
+  points: Point[],
+): Polyline<Point> => {
+  let previousPoint: Point = points[0];
+  const polyline: LineSegment<Point>[] = [];
 
   for (let i = 1; i < points.length; i++) {
     const nextPoint = points[i];
-    polyline.push([previousPoint, nextPoint]);
+    polyline.push(lineSegment<Point>(previousPoint, nextPoint));
     previousPoint = nextPoint;
   }
 
   return polyline;
 };
 
-export const getFreedrawShape = (
+export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawFreeDrawElement,
   center: Point,
   isClosed: boolean = false,
-): GeometricShape => {
-  const angle = angleToDegrees(element.angle);
+): GeometricShape<Point> => {
   const transform = (p: Point) =>
-    pointRotate(pointAdd(p, [element.x, element.y] as Point), angle, center);
+    pointRotateRads(
+      pointAdd(p, point(element.x, element.y)),
+      center,
+      element.angle,
+    );
 
   const polyline = polylineFromPoints(
     element.points.map((p) => transform(p as Point)),
@@ -255,7 +265,7 @@ export const getFreedrawShape = (
   return isClosed
     ? {
         type: "polygon",
-        data: closePolygon(polyline.flat()) as Polygon,
+        data: closePolygon(polyline.flat() as Polygon<Point>) as Polygon<Point>,
       }
     : {
         type: "polyline",
@@ -263,24 +273,26 @@ export const getFreedrawShape = (
       };
 };
 
-export const getClosedCurveShape = (
+export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawLinearElement,
   roughShape: Drawable,
-  startingPoint: Point = [0, 0],
-  angleInRadian: number,
+  startingPoint: Point = point<Point>(0, 0),
+  angleInRadian: Radians,
   center: Point,
-): GeometricShape => {
+): GeometricShape<Point> => {
   const transform = (p: Point) =>
-    pointRotate(
-      [p[0] + startingPoint[0], p[1] + startingPoint[1]],
-      angleToDegrees(angleInRadian),
+    pointRotateRads(
+      point(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
+      angleInRadian,
     );
 
   if (element.roundness === null) {
     return {
       type: "polygon",
-      data: closePolygon(element.points.map((p) => transform(p as Point))),
+      data: closePolygon(
+        element.points.map((p) => transform(p as Point)) as Polygon<Point>,
+      ) as Polygon<Point>,
     };
   }
 
@@ -292,27 +304,27 @@ export const getClosedCurveShape = (
     if (operation.op === "move") {
       odd = !odd;
       if (odd) {
-        points.push([operation.data[0], operation.data[1]]);
+        points.push(point(operation.data[0], operation.data[1]));
       }
     } else if (operation.op === "bcurveTo") {
       if (odd) {
-        points.push([operation.data[0], operation.data[1]]);
-        points.push([operation.data[2], operation.data[3]]);
-        points.push([operation.data[4], operation.data[5]]);
+        points.push(point(operation.data[0], operation.data[1]));
+        points.push(point(operation.data[2], operation.data[3]));
+        points.push(point(operation.data[4], operation.data[5]));
       }
     } else if (operation.op === "lineTo") {
       if (odd) {
-        points.push([operation.data[0], operation.data[1]]);
+        points.push(point(operation.data[0], operation.data[1]));
       }
     }
   }
 
   const polygonPoints = pointsOnBezierCurves(points, 10, 5).map((p) =>
-    transform(p),
-  );
+    transform(p as Point),
+  ) as Point[];
 
   return {
     type: "polygon",
-    data: polygonPoints,
+    data: polygonFromPoints<Point>(polygonPoints),
   };
 };

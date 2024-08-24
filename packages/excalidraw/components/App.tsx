@@ -4823,7 +4823,7 @@ class App extends React.Component<AppProps, AppState> {
         this.getElementHitThreshold(),
       );
 
-      return isPointInShape([x, y], selectionShape);
+      return isPointInShape(point(x, y), selectionShape);
     }
 
     // take bound text element into consideration for hit collision as well

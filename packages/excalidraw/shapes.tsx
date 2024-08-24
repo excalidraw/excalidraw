@@ -1,3 +1,4 @@
+import { point, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 import {
   getClosedCurveShape,
   getCurveShape,
@@ -116,10 +117,10 @@ export const findShapeByKey = (key: string) => {
  * get the pure geometric shape of an excalidraw element
  * which is then used for hit detection
  */
-export const getElementShape = (
+export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape => {
+): GeometricShape<Point> => {
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -139,17 +140,19 @@ export const getElementShape = (
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
-        ? getClosedCurveShape(
+        ? getClosedCurveShape<Point>(
             element,
             roughShape,
-            [element.x, element.y],
+            point<Point>(element.x, element.y),
             element.angle,
-            [cx, cy],
+            point(cx, cy),
           )
-        : getCurveShape(roughShape, [element.x, element.y], element.angle, [
-            cx,
-            cy,
-          ]);
+        : getCurveShape<Point>(
+            roughShape,
+            point<Point>(element.x, element.y),
+            element.angle,
+            point(cx, cy),
+          );
     }
 
     case "ellipse":
@@ -157,15 +160,19 @@ export const getElementShape = (
 
     case "freedraw": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
-      return getFreedrawShape(element, [cx, cy], shouldTestInside(element));
+      return getFreedrawShape(
+        element,
+        point(cx, cy),
+        shouldTestInside(element),
+      );
     }
   }
 };
 
-export const getBoundTextShape = (
+export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape | null => {
+): GeometricShape<Point> | null => {
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (boundTextElement) {

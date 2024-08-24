@@ -1,4 +1,4 @@
-import type { Point, Polygon, GeometricShape } from "./geometry/shape";
+import type { GeometricShape } from "./geometry/shape";
 import {
   pointInEllipse,
   pointInPolygon,
@@ -10,11 +10,12 @@ import {
   pointOnPolyline,
   closePolygon,
 } from "./geometry/geometry";
+import type { GlobalPoint, LocalPoint, Polygon } from "@excalidraw/math";
 
 // check if the given point is considered on the given shape's border
-export const isPointOnShape = (
+export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
   point: Point,
-  shape: GeometricShape,
+  shape: GeometricShape<Point>,
   tolerance = 0,
 ) => {
   // get the distance from the given point to the given element
@@ -38,7 +39,10 @@ export const isPointOnShape = (
 };
 
 // check if the given point is considered inside the element's border
-export const isPointInShape = (point: Point, shape: GeometricShape) => {
+export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
+  point: Point,
+  shape: GeometricShape<Point>,
+) => {
   switch (shape.type) {
     case "polygon":
       return pointInPolygon(point, shape.data);
@@ -49,7 +53,9 @@ export const isPointInShape = (point: Point, shape: GeometricShape) => {
     case "ellipse":
       return pointInEllipse(point, shape.data);
     case "polyline": {
-      const polygon = closePolygon(shape.data.flat()) as Polygon;
+      const polygon = closePolygon(
+        shape.data.flat() as Polygon<Point>,
+      ) as Polygon<Point>;
       return pointInPolygon(point, polygon);
     }
     case "polycurve": {
@@ -61,6 +67,9 @@ export const isPointInShape = (point: Point, shape: GeometricShape) => {
 };
 
 // check if the given element is in the given bounds
-export const isPointInBounds = (point: Point, bounds: Polygon) => {
+export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
+  point: Point,
+  bounds: Polygon<Point>,
+) => {
   return pointInPolygon(point, bounds);
 };

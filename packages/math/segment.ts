@@ -1,4 +1,5 @@
-import type { GlobalPoint, LineSegment, LocalPoint } from "./types";
+import { pointCenter, pointRotateRads } from "./point";
+import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
 
 /**
  * Create a line segment from two points.
@@ -22,3 +23,16 @@ export function lineSegmentFromPointArray<P extends GlobalPoint | LocalPoint>(
     ? lineSegment<P>(pointArray[0], pointArray[1])
     : undefined;
 }
+
+// return the coordinates resulting from rotating the given line about an origin by an angle in degrees
+// note that when the origin is not given, the midpoint of the given line is used as the origin
+export const lineSegmentRotate = <Point extends LocalPoint | GlobalPoint>(
+  l: LineSegment<Point>,
+  angle: Radians,
+  origin?: Point,
+): LineSegment<Point> => {
+  return lineSegment(
+    pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
+    pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
+  );
+};

@@ -1,8 +1,13 @@
 import { lineAngle } from "../../utils/geometry/geometry";
-import type { Vector } from "../../utils/geometry/shape";
 import { getCenterForBounds, scalePointFromOrigin } from "../math";
-import type { LocalPoint, GlobalPoint, Triangle } from "@excalidraw/math";
+import type {
+  LocalPoint,
+  GlobalPoint,
+  Triangle,
+  Vector,
+} from "@excalidraw/math";
 import {
+  line,
   point,
   pointRotateRads,
   triangleIncludesPoint,
@@ -16,11 +21,11 @@ export const HEADING_LEFT = [-1, 0] as Heading;
 export const HEADING_UP = [0, -1] as Heading;
 export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
 
-export const headingForDiamond = (
-  a: LocalPoint | GlobalPoint,
-  b: LocalPoint | GlobalPoint,
+export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
+  a: Point,
+  b: Point,
 ) => {
-  const angle = lineAngle([a, b]);
+  const angle = lineAngle(line(a, b));
   if (angle >= 315 || angle < 45) {
     return HEADING_UP;
   } else if (angle >= 45 && angle < 135) {

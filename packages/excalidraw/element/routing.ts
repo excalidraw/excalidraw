@@ -3,13 +3,14 @@ import {
   point,
   pointTranslate,
   vector,
+  vectorCross,
   vectorFromPoint,
   vectorScale,
+  vectorSubtract,
   type GlobalPoint,
   type LocalPoint,
   type Vector,
 } from "@excalidraw/math";
-import { cross } from "../../utils/geometry/geometry";
 import BinaryHeap from "../binaryheap";
 import {
   aabbForElement,
@@ -560,7 +561,12 @@ const generateDynamicAABBs = (
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
-      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[2] - endCenterX, a[1] - endCenterY),
+          vector(a[0] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [first[0], first[1], cX, first[3]],
           [cX, second[1], second[2], second[3]],
@@ -576,7 +582,12 @@ const generateDynamicAABBs = (
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
-      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[0] - endCenterX, a[1] - endCenterY),
+          vector(a[2] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [first[0], first[1], first[2], cY],
           [second[0], cY, second[2], second[3]],
@@ -592,7 +603,12 @@ const generateDynamicAABBs = (
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
-      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[2] - endCenterX, a[1] - endCenterY),
+          vector(a[0] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [cX, first[1], first[2], first[3]],
           [second[0], second[1], cX, second[3]],
@@ -608,7 +624,12 @@ const generateDynamicAABBs = (
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
-      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[0] - endCenterX, a[1] - endCenterY),
+          vector(a[2] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [cX, first[1], first[2], first[3]],
           [second[0], second[1], cX, second[3]],

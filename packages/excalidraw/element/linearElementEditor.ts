@@ -12,7 +12,6 @@ import type {
   SceneElementsMap,
 } from "./types";
 import {
-  distance2d,
   isPathALoop,
   getGridPoint,
   getControlPointsForBezierCurve,
@@ -64,6 +63,7 @@ import {
   vector,
   type GlobalPoint,
   type LocalPoint,
+  pointDistance,
 } from "@excalidraw/math";
 
 const editorMidPointsCache: {
@@ -587,11 +587,12 @@ export class LinearElementEditor {
     const existingSegmentMidpointHitCoords =
       linearElementEditor.segmentMidPointHoveredCoords;
     if (existingSegmentMidpointHitCoords) {
-      const distance = distance2d(
-        existingSegmentMidpointHitCoords[0],
-        existingSegmentMidpointHitCoords[1],
-        scenePointer.x,
-        scenePointer.y,
+      const distance = pointDistance(
+        point(
+          existingSegmentMidpointHitCoords[0],
+          existingSegmentMidpointHitCoords[1],
+        ),
+        point(scenePointer.x, scenePointer.y),
       );
       if (distance <= threshold) {
         return existingSegmentMidpointHitCoords;
@@ -602,11 +603,9 @@ export class LinearElementEditor {
       LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
-        const distance = distance2d(
-          midPoints[index]![0],
-          midPoints[index]![1],
-          scenePointer.x,
-          scenePointer.y,
+        const distance = pointDistance(
+          point(midPoints[index]![0], midPoints[index]![1]),
+          point(scenePointer.x, scenePointer.y),
         );
         if (distance <= threshold) {
           return midPoints[index];
@@ -624,11 +623,9 @@ export class LinearElementEditor {
     endPoint: GlobalPoint | LocalPoint,
     zoom: AppState["zoom"],
   ) {
-    let distance = distance2d(
-      startPoint[0],
-      startPoint[1],
-      endPoint[0],
-      endPoint[1],
+    let distance = pointDistance(
+      point(startPoint[0], startPoint[1]),
+      point(endPoint[0], endPoint[1]),
     );
     if (element.points.length > 2 && element.roundness) {
       distance = getBezierCurveLength(element, endPoint);
@@ -1070,9 +1067,9 @@ export class LinearElementEditor {
     // points on the left, thus should take precedence when clicking, if they
     // overlap
     while (--idx > -1) {
-      const point = pointHandles[idx];
+      const p = pointHandles[idx];
       if (
-        distance2d(x, y, point[0], point[1]) * zoom.value <
+        pointDistance(point(x, y), point(p[0], p[1])) * zoom.value <
         // +1px to account for outline stroke
         LinearElementEditor.POINT_HANDLE_SIZE + 1
       ) {
@@ -1368,11 +1365,9 @@ export class LinearElementEditor {
     }
 
     const origin = linearElementEditor.pointerDownState.origin!;
-    const dist = distance2d(
-      origin.x,
-      origin.y,
-      pointerCoords.x,
-      pointerCoords.y,
+    const dist = pointDistance(
+      point(origin.x, origin.y),
+      point(pointerCoords.x, pointerCoords.y),
     );
     if (
       !appState.editingLinearElement &&

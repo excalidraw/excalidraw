@@ -55,7 +55,6 @@ import { getElementShape } from "../shapes";
 import {
   aabbForElement,
   clamp,
-  distanceSq2d,
   getCenterForBounds,
   getCenterForElement,
   pointInsideBounds,
@@ -79,6 +78,7 @@ import {
   type GlobalPoint,
   vectorFromPoint,
   pointFromPair,
+  pointDistanceSq,
 } from "@excalidraw/math";
 
 export type SuggestedBinding =
@@ -793,7 +793,7 @@ export const bindPointToSnapToElementOutline = (
       ? dist < bindableElement.width * -0.1
       : dist < bindableElement.height * -0.1;
 
-    intersections.sort((a, b) => distanceSq2d(a, p) - distanceSq2d(b, p));
+    intersections.sort((a, b) => pointDistanceSq(a, p) - pointDistanceSq(b, p));
 
     return isInner
       ? headingToMidBindPoint(otherPoint, bindableElement, aabb)
@@ -1337,7 +1337,7 @@ export const bindingBorderTest = (
   const threshold = maxBindingGap(element, element.width, element.height);
   const shape = getElementShape(element, elementsMap);
   return (
-    isPointOnShape([x, y], shape, threshold) ||
+    isPointOnShape(point(x, y), shape, threshold) ||
     (fullShape === true &&
       pointInsideBounds(point(x, y), aabbForElement(element)))
   );

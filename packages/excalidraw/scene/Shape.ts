@@ -10,7 +10,7 @@ import type {
   ExcalidrawLinearElement,
   Arrowhead,
 } from "../element/types";
-import { isPathALoop, getCornerRadius, distanceSq2d } from "../math";
+import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
@@ -24,7 +24,12 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
-import { point, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
+import {
+  point,
+  pointDistance,
+  type GlobalPoint,
+  type LocalPoint,
+} from "@excalidraw/math";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -509,8 +514,8 @@ const generateElbowArrowShape = <Point extends GlobalPoint | LocalPoint>(
     const next = points[i + 1];
     const corner = Math.min(
       radius,
-      Math.sqrt(distanceSq2d(points[i], next)) / 2,
-      Math.sqrt(distanceSq2d(points[i], prev)) / 2,
+      pointDistance(points[i], next) / 2,
+      pointDistance(points[i], prev) / 2,
     );
 
     if (prev[0] < points[i][0] && prev[1] === points[i][1]) {
