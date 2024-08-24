@@ -1166,3 +1166,11 @@ export const promiseTry = async <TValue, TArgs extends unknown[]>(
 
 export const isAnyTrue = (...args: boolean[]): boolean =>
   Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
+
+export const safelyParseJSON = (json: string): Record<string, any> | null => {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+};

@@ -116,20 +116,26 @@ class Portal {
       }
     }
 
-    this.collab.excalidrawAPI.updateScene({
-      elements: this.collab.excalidrawAPI
-        .getSceneElementsIncludingDeleted()
-        .map((element) => {
-          if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
-            // this will signal collaborators to pull image data from server
-            // (using mutation instead of newElementWith otherwise it'd break
-            // in-progress dragging)
-            return newElementWith(element, { status: "saved" });
-          }
-          return element;
-        }),
-      storeAction: StoreAction.UPDATE,
-    });
+    let isChanged = false;
+    const newElements = this.collab.excalidrawAPI
+      .getSceneElementsIncludingDeleted()
+      .map((element) => {
+        if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
+          isChanged = true;
+          // this will signal collaborators to pull image data from server
+          // (using mutation instead of newElementWith otherwise it'd break
+          // in-progress dragging)
+          return newElementWith(element, { status: "saved" });
+        }
+        return element;
+      });
+
+    if (isChanged) {
+      this.collab.excalidrawAPI.updateScene({
+        elements: newElements,
+        storeAction: StoreAction.UPDATE,
+      });
+    }
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (
