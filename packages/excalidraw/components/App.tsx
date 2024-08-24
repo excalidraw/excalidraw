@@ -84,7 +84,6 @@ import {
   ZOOM_STEP,
   POINTER_EVENTS,
   TOOL_TYPE,
-  EDITOR_LS_KEYS,
   isIOS,
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
@@ -185,6 +184,7 @@ import type {
   ExcalidrawIframeElement,
   ExcalidrawEmbeddableElement,
   Ordered,
+  MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
 } from "../element/types";
@@ -260,6 +260,7 @@ import type {
   UnsubscribeCallback,
   EmbedsValidationStatus,
   ElementsPendingErasure,
+  GenerateDiagramToCode,
   NullableGridSize,
 } from "../types";
 import {
@@ -415,13 +416,9 @@ import {
 } from "../cursor";
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
-import type { MagicCacheData } from "../data/magic";
-import { diagramToHTML } from "../data/magic";
-import { exportToBlob } from "../../utils/export";
 import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
-import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -456,6 +453,7 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { getTooltipDiv } from "./Tooltip";
+import NewElementCanvas from "./canvases/NewElementCanvas";
 import { mutateElbowArrow } from "../element/routing";
 import {
   FlowChartCreator,
@@ -1059,7 +1057,7 @@ class App extends React.Component<AppProps, AppState> {
           if (isIframeElement(el)) {
             src = null;
 
-            const data: MagicCacheData = (el.customData?.generationData ??
+            const data: MagicGenerationData = (el.customData?.generationData ??
               this.magicGenerations.get(el.id)) || {
               status: "error",
               message: "No generation data",
@@ -1546,27 +1544,26 @@ class App extends React.Component<AppProps, AppState> {
         scrollY: this.state.scrollY,
         height: this.state.height,
         width: this.state.width,
-        editingElement: this.state.editingElement,
+        editingTextElement: this.state.editingTextElement,
+        newElementId: this.state.newElement?.id,
         pendingImageElementId: this.state.pendingImageElementId,
       });
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
     const shouldBlockPointerEvents =
-      !(
-        this.state.editingElement && isLinearElement(this.state.editingElement)
-      ) &&
-      (this.state.selectionElement ||
-        this.state.newElement ||
-        this.state.selectedElementsAreBeingDragged ||
-        this.state.resizingElement ||
-        (this.state.activeTool.type === "laser" &&
-          // technically we can just test on this once we make it more safe
-          this.state.cursorButton === "down") ||
-        (this.state.editingElement &&
-          !isTextElement(this.state.editingElement)));
+      this.state.selectionElement ||
+      this.state.newElement ||
+      this.state.selectedElementsAreBeingDragged ||
+      this.state.resizingElement ||
+      (this.state.activeTool.type === "laser" &&
+        // technically we can just test on this once we make it more safe
+        this.state.cursorButton === "down");
 
     const firstSelectedElement = selectedElements[0];
+
+    //zsviczian
+    const isHighlighter = this.state.newElement?.customData?.strokeOptions?.highlighter;
 
     return (
       <div
@@ -1637,10 +1634,6 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           app={this}
                           isCollaborating={this.props.isCollaborating}
-                          openAIKey={this.OPENAI_KEY}
-                          isOpenAIKeyPersisted={this.OPENAI_KEY_IS_PERSISTED}
-                          onOpenAIAPIKeyChange={this.onOpenAIKeyChange}
-                          onMagicSettingsConfirm={this.onMagicSettingsConfirm}
                         >
                           {this.props.children}
                         </LayerUI>
@@ -1758,6 +1751,27 @@ class App extends React.Component<AppProps, AppState> {
                             }}
                           />
                         )}
+                        {this.state.newElement && isHighlighter && ( //zsviczian
+                          <NewElementCanvas
+                            appState={this.state}
+                            scale={window.devicePixelRatio}
+                            rc={this.rc}
+                            elementsMap={elementsMap}
+                            allElementsMap={allElementsMap}
+                            renderConfig={{
+                              imageCache: this.imageCache,
+                              isExporting: false,
+                              renderGrid: false,
+                              canvasBackgroundColor:
+                                this.state.viewBackgroundColor,
+                              embedsValidationStatus:
+                                this.embedsValidationStatus,
+                              elementsPendingErasure:
+                                this.elementsPendingErasure,
+                              pendingFlowchartNodes: null,
+                            }}
+                          />
+                        )}                        
                         <StaticCanvas
                           canvas={this.canvas}
                           rc={this.rc}
@@ -1782,6 +1796,27 @@ class App extends React.Component<AppProps, AppState> {
                               this.flowChartCreator.pendingNodes,
                           }}
                         />
+                        {this.state.newElement && !isHighlighter( //zsviczian
+                          <NewElementCanvas
+                            appState={this.state}
+                            scale={window.devicePixelRatio}
+                            rc={this.rc}
+                            elementsMap={elementsMap}
+                            allElementsMap={allElementsMap}
+                            renderConfig={{
+                              imageCache: this.imageCache,
+                              isExporting: false,
+                              renderGrid: false,
+                              canvasBackgroundColor:
+                                this.state.viewBackgroundColor,
+                              embedsValidationStatus:
+                                this.embedsValidationStatus,
+                              elementsPendingErasure:
+                                this.elementsPendingErasure,
+                              pendingFlowchartNodes: null,
+                            }}
+                          />
+                        )}
                         <InteractiveCanvas
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
@@ -1887,7 +1922,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private magicGenerations = new Map<
     ExcalidrawIframeElement["id"],
-    MagicCacheData
+    MagicGenerationData
   >();
 
   private updateMagicGeneration = ({
@@ -1895,7 +1930,7 @@ class App extends React.Component<AppProps, AppState> {
     data,
   }: {
     frameElement: ExcalidrawIframeElement;
-    data: MagicCacheData;
+    data: MagicGenerationData;
   }) => {
     if (data.status === "pending") {
       // We don't wanna persist pending state to storage. It should be in-app
@@ -1918,38 +1953,26 @@ class App extends React.Component<AppProps, AppState> {
     this.triggerRender();
   };
 
-  private getTextFromElements(elements: readonly ExcalidrawElement[]) {
-    const text = elements
-      .reduce((acc: string[], element) => {
-        if (isTextElement(element)) {
-          acc.push(element.text);
-        }
-        return acc;
-      }, [])
-      .join("\n\n");
-    return text;
+  public plugins: {
+    diagramToCode?: {
+      generate: GenerateDiagramToCode;
+    };
+  } = {};
+
+  public setPlugins(plugins: Partial<App["plugins"]>) {
+    Object.assign(this.plugins, plugins);
   }
 
   private async onMagicFrameGenerate(
     magicFrame: ExcalidrawMagicFrameElement,
     source: "button" | "upstream",
   ) {
-    if (!this.OPENAI_KEY) {
-      //zsviczian
-      this.setToast({
-        message:
-          "You must first configure your OpenAI API key in plugin settings",
-        duration: 5000,
-      });
-      return;
+    const generateDiagramToCode = this.plugins.diagramToCode?.generate;
+
+    if (!generateDiagramToCode) {
       this.setState({
-        openDialog: {
-          name: "settings",
-          tab: "diagram-to-code",
-          source: "generation",
-        },
+        errorMessage: "No diagram to code plugin found",
       });
-      trackEvent("ai", "generate (missing key)", "d2c");
       return;
     }
 
@@ -1988,68 +2011,50 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: { [frameElement.id]: true },
     });
 
-    const blob = await exportToBlob({
-      elements: this.scene.getNonDeletedElements(),
-      appState: {
-        ...this.state,
-        exportBackground: true,
-        viewBackgroundColor: this.state.viewBackgroundColor,
-      },
-      exportingFrame: magicFrame,
-      files: this.files,
-    });
-
-    const dataURL = await getDataURL(blob);
-
-    const textFromFrameChildren = this.getTextFromElements(magicFrameChildren);
-
     trackEvent("ai", "generate (start)", "d2c");
+    try {
+      const { html } = await generateDiagramToCode({
+        frame: magicFrame,
+        children: magicFrameChildren,
+      });
 
-    const result = await diagramToHTML({
-      image: dataURL,
-      apiKey: this.OPENAI_KEY,
-      text: textFromFrameChildren,
-      theme: this.state.theme,
-    });
+      trackEvent("ai", "generate (success)", "d2c");
 
-    if (!result.ok) {
+      if (!html.trim()) {
+        this.updateMagicGeneration({
+          frameElement,
+          data: {
+            status: "error",
+            code: "ERR_OAI",
+            message: "Nothing genereated :(",
+          },
+        });
+        return;
+      }
+
+      const parsedHtml =
+        html.includes("<!DOCTYPE html>") && html.includes("</html>")
+          ? html.slice(
+              html.indexOf("<!DOCTYPE html>"),
+              html.indexOf("</html>") + "</html>".length,
+            )
+          : html;
+
+      this.updateMagicGeneration({
+        frameElement,
+        data: { status: "done", html: parsedHtml },
+      });
+    } catch (error: any) {
       trackEvent("ai", "generate (failed)", "d2c");
-      console.error(result.error);
       this.updateMagicGeneration({
         frameElement,
         data: {
           status: "error",
           code: "ERR_OAI",
-          message: result.error?.message || "Unknown error during generation",
+          message: error.message || "Unknown error during generation",
         },
       });
-      return;
     }
-    trackEvent("ai", "generate (success)", "d2c");
-
-    if (result.choices[0].message.content == null) {
-      this.updateMagicGeneration({
-        frameElement,
-        data: {
-          status: "error",
-          code: "ERR_OAI",
-          message: "Nothing genereated :(",
-        },
-      });
-      return;
-    }
-
-    const message = result.choices[0].message.content;
-
-    const html = message.slice(
-      message.indexOf("<!DOCTYPE html>"),
-      message.indexOf("</html>") + "</html>".length,
-    );
-
-    this.updateMagicGeneration({
-      frameElement,
-      data: { status: "done", html },
-    });
   }
 
   private onIframeSrcCopy(element: ExcalidrawIframeElement) {
@@ -2063,71 +2068,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  //zsviczian - ugly hack
-  private get OPENAI_KEY(): string | null {
-    return hostPlugin.settings.openAIAPIToken;
-  }
-  private set OPENAI_KEY(value: string | null) {}
-
-  private OPENAI_KEY_IS_PERSISTED: boolean =
-    EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
-
-  private onOpenAIKeyChange = (
-    openAIKey: string | null,
-    shouldPersist: boolean,
-  ) => {
-    this.OPENAI_KEY = openAIKey || null;
-    if (shouldPersist) {
-      const didPersist = EditorLocalStorage.set(
-        EDITOR_LS_KEYS.OAI_API_KEY,
-        openAIKey,
-      );
-      this.OPENAI_KEY_IS_PERSISTED = didPersist;
-    } else {
-      this.OPENAI_KEY_IS_PERSISTED = false;
-    }
-  };
-
-  private onMagicSettingsConfirm = (
-    apiKey: string,
-    shouldPersist: boolean,
-    source: "tool" | "generation" | "settings",
-  ) => {
-    this.OPENAI_KEY = apiKey || null;
-    this.onOpenAIKeyChange(this.OPENAI_KEY, shouldPersist);
-
-    if (source === "settings") {
-      return;
-    }
-
-    const selectedElements = this.scene.getSelectedElements({
-      selectedElementIds: this.state.selectedElementIds,
-    });
-
-    if (apiKey) {
-      if (selectedElements.length) {
-        this.onMagicframeToolSelect();
-      } else {
-        this.setActiveTool({ type: "magicframe" });
-      }
-    } else if (!isMagicFrameElement(selectedElements[0])) {
-      // even if user didn't end up setting api key, let's pick the tool
-      // so they can draw up a frame and move forward
-      this.setActiveTool({ type: "magicframe" });
-    }
-  };
-
   public onMagicframeToolSelect = () => {
-    if (!this.OPENAI_KEY) {
-      //zsviczian
-      this.setToast({
-        message:
-          "You must first configure your OpenAI API key in plugin settings",
-        duration: 5000,
-      });
-      return;
-    }
-
     const selectedElements = this.scene.getSelectedElements({
       selectedElementIds: this.state.selectedElementIds,
     });
@@ -2254,7 +2195,7 @@ class App extends React.Component<AppProps, AppState> {
 
     let didUpdate = false;
 
-    let editingElement: AppState["editingElement"] | null = null;
+    let editingTextElement: AppState["editingTextElement"] | null = null;
     if (actionResult.elements) {
       this.scene.replaceAllElements(actionResult.elements);
       didUpdate = true;
@@ -2267,7 +2208,7 @@ class App extends React.Component<AppProps, AppState> {
       this.addNewImagesToImageCache();
     }
 
-    if (actionResult.appState || editingElement || this.state.contextMenu) {
+    if (actionResult.appState || editingTextElement || this.state.contextMenu) {
       let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
       let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
       const theme =
@@ -2284,23 +2225,24 @@ class App extends React.Component<AppProps, AppState> {
         zenModeEnabled = this.props.zenModeEnabled;
       }
 
-      editingElement = actionResult.appState?.editingElement || null;
+      editingTextElement = actionResult.appState?.editingTextElement || null;
 
-      // make sure editingElement points to latest element reference
-      if (actionResult.elements && editingElement) {
+      // make sure editingTextElement points to latest element reference
+      if (actionResult.elements && editingTextElement) {
         actionResult.elements.forEach((element) => {
           if (
-            editingElement?.id === element.id &&
-            editingElement !== element &&
-            isNonDeletedElement(element)
+            editingTextElement?.id === element.id &&
+            editingTextElement !== element &&
+            isNonDeletedElement(element) &&
+            isTextElement(element)
           ) {
-            editingElement = element;
+            editingTextElement = element;
           }
         });
       }
 
-      if (editingElement?.isDeleted) {
-        editingElement = null;
+      if (editingTextElement?.isDeleted) {
+        editingTextElement = null;
       }
 
       this.setState((state) => {
@@ -2312,7 +2254,7 @@ class App extends React.Component<AppProps, AppState> {
           // or programmatically from the host, so it will need to be
           // rewritten later
           contextMenu: null,
-          editingElement,
+          editingTextElement,
           viewModeEnabled,
           zenModeEnabled,
           theme,
@@ -2952,9 +2894,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // failsafe in case the state is being updated in incorrect order resulting
-    // in the editingElement being now a deleted element
-    if (this.state.editingElement?.isDeleted) {
-      this.setState({ editingElement: null });
+    // in the editingTextElement being now a deleted element
+    if (this.state.editingTextElement?.isDeleted) {
+      this.setState({ editingTextElement: null });
     }
 
     if (
@@ -3014,7 +2956,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const scrolledOutside =
       // hide when editing text
-      isTextElement(this.state.editingElement)
+      this.state.editingTextElement
         ? false
         : !atLeastOneVisibleElement && elementsMap.size > 0;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -5176,7 +5118,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.setState({
           newElement: null,
-          editingElement: null,
+          editingTextElement: null,
         });
         if (this.state.activeTool.locked) {
           setCursorForShape(this.interactiveCanvas, this.state);
@@ -5565,7 +5507,7 @@ class App extends React.Component<AppProps, AppState> {
         }),
       });
     }
-    this.setState({ editingElement: element });
+    this.setState({ editingTextElement: element });
 
     if (!existingTextElement) {
       if (container && shouldBindToContainer) {
@@ -6053,9 +5995,13 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint[1],
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
-          mutateElement(multiElement, {
-            points: [...points, [scenePointerX - rx, scenePointerY - ry]],
-          });
+          mutateElement(
+            multiElement,
+            {
+              points: [...points, [scenePointerX - rx, scenePointerY - ry]],
+            },
+            false,
+          );
         } else {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
@@ -6072,9 +6018,13 @@ class App extends React.Component<AppProps, AppState> {
         ) < LINE_CONFIRM_THRESHOLD
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        mutateElement(multiElement, {
-          points: points.slice(0, -1),
-        });
+        mutateElement(
+          multiElement,
+          {
+            points: points.slice(0, -1),
+          },
+          false,
+        );
       } else {
         const [gridX, gridY] = getGridPoint(
           scenePointerX,
@@ -6120,20 +6070,30 @@ class App extends React.Component<AppProps, AppState> {
             undefined,
             {
               isDragging: true,
+              informMutation: false,
             },
           );
         } else {
           // update last uncommitted point
-          mutateElement(multiElement, {
-            points: [
-              ...points.slice(0, -1),
-              [
-                lastCommittedX + dxFromLastCommitted,
-                lastCommittedY + dyFromLastCommitted,
+          mutateElement(
+            multiElement,
+            {
+              points: [
+                ...points.slice(0, -1),
+                [
+                  lastCommittedX + dxFromLastCommitted,
+                  lastCommittedY + dyFromLastCommitted,
+                ],
               ],
-            ],
-          });
+            },
+            false,
+          );
         }
+
+        // in this path, we're mutating multiElement to reflect
+        // how it will be after adding pointer position as the next point
+        // trigger update here so that new element canvas renders again to reflect this
+        this.triggerRender(false);
       }
 
       return;
@@ -6540,7 +6500,7 @@ class App extends React.Component<AppProps, AppState> {
           : {}),
         appState: {
           newElement: null,
-          editingElement: null,
+          editingTextElement: null,
           startBoundElement: null,
           suggestedBindings: [],
           selectedElementIds: makeNextSelectedElementIds(
@@ -6727,7 +6687,6 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setState({
         newElement: pendingImageElement as ExcalidrawNonSelectionElement,
-        editingElement: pendingImageElement,
         pendingImageElementId: null,
         multiElement: null,
       });
@@ -6934,7 +6893,7 @@ class App extends React.Component<AppProps, AppState> {
           isHandToolActive(this.state) ||
           (this.state.viewModeEnabled && !isLaserPointerActive(this.state)))
       ) ||
-      isTextElement(this.state.editingElement)
+      this.state.editingTextElement
     ) {
       return false;
     }
@@ -7478,7 +7437,7 @@ class App extends React.Component<AppProps, AppState> {
     // if we're currently still editing text, clicking outside
     // should only finalize it, not create another (irrespective
     // of state.activeTool.locked)
-    if (isTextElement(this.state.editingElement)) {
+    if (this.state.editingTextElement) {
       return;
     }
     let sceneX = pointerDownState.origin.x;
@@ -7523,15 +7482,15 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       null,
     );
-    const strokeOptions = this.state.currentStrokeOptions; //zsviczian
-    const simulatePressure = strokeOptions?.constantPressure
-      ? false
-      : event.pressure === 0.5;
-
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
       x: gridX,
       y: gridY,
     });
+
+    const strokeOptions = this.state.currentStrokeOptions; //zsviczian
+    const simulatePressure = strokeOptions?.constantPressure //zsviczian
+      ? false
+      : event.pressure === 0.5;
 
     const element = newFreeDrawElement({
       type: elementType,
@@ -7545,13 +7504,22 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
-      simulatePressure, //zsviczian
+      simulatePressure,
       locked: false,
       ...(strokeOptions //zsviczian
         ? { customData: { strokeOptions } }
         : {}),
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      points: [[0, 0]],
+      pressures: simulatePressure ? [] : [strokeOptions?.constantPressure ? 1 : event.pressure], //zsviczian
     });
+
+    //zsviczian
+    if (strokeOptions?.highlighter) {
+      this.scene.insertElement(element, 0);
+    } else {
+      this.scene.insertElement(element);
+    }
 
     this.setState((prevState) => {
       const nextSelectedElementIds = {
@@ -7566,34 +7534,11 @@ class App extends React.Component<AppProps, AppState> {
       };
     });
 
-    const pressures = element.simulatePressure
-      ? element.pressures
-      : [
-          //zsviczian
-          ...element.pressures,
-          strokeOptions?.constantPressure ? 1 : event.pressure,
-        ];
-
-    mutateElement(element, {
-      points: [[0, 0]],
-      pressures,
-    });
-
     const boundElement = getHoveredElementForBinding(
       pointerDownState.origin,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
     );
-    if (strokeOptions?.highlighter) {
-      //zsviczian
-      this.scene.insertElement(element, 0);
-      /*      this.scene.replaceAllElements([
-        element,
-        ...this.scene.getElementsIncludingDeleted(),
-      ]);*/
-    } else {
-      this.scene.insertElement(element);
-    }
     this.setState({
       newElement: element,
       startBoundElement: boundElement,
@@ -7894,7 +7839,6 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.insertElement(element);
       this.setState({
         newElement: element,
-        editingElement: element,
         startBoundElement: boundElement,
         suggestedBindings: [],
       });
@@ -8299,11 +8243,11 @@ class App extends React.Component<AppProps, AppState> {
 
         // prevent dragging even if we're no longer holding cmd/ctrl otherwise
         // it would have weird results (stuff jumping all over the screen)
-        // Checking for editingElement to avoid jump while editing on mobile #6503
+        // Checking for editingTextElement to avoid jump while editing on mobile #6503
         if (
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
-          !this.state.editingElement &&
+          !this.state.editingTextElement &&
           this.state.activeEmbeddable?.state !== "active"
         ) {
           const dragOffset = {
@@ -8503,9 +8447,17 @@ class App extends React.Component<AppProps, AppState> {
                   strokeOptions?.constantPressure ? 1 : event.pressure,
                 ];
 
-            mutateElement(newElement, {
-              points: [...points, [dx, dy]],
-              pressures,
+            mutateElement(
+              newElement,
+              {
+                points: [...points, [dx, dy]],
+                pressures,
+              },
+              false,
+            );
+
+            this.setState({
+              newElement,
             });
           }
         } else if (isLinearElement(newElement)) {
@@ -8524,9 +8476,13 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           if (points.length === 1) {
-            mutateElement(newElement, {
-              points: [...points, [dx, dy]],
-            });
+            mutateElement(
+              newElement,
+              {
+                points: [...points, [dx, dy]],
+              },
+              false,
+            );
           } else if (points.length > 1 && isElbowArrow(newElement)) {
             mutateElbowArrow(
               newElement,
@@ -8536,13 +8492,22 @@ class App extends React.Component<AppProps, AppState> {
               undefined,
               {
                 isDragging: true,
+                informMutation: false,
               },
             );
           } else if (points.length === 2) {
-            mutateElement(newElement, {
-              points: [...points.slice(0, -1), [dx, dy]],
-            });
+            mutateElement(
+              newElement,
+              {
+                points: [...points.slice(0, -1), [dx, dy]],
+              },
+              false,
+            );
           }
+
+          this.setState({
+            newElement,
+          });
 
           if (isBindingElement(newElement, false)) {
             // When creating a linear element by dragging
@@ -8555,7 +8520,7 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
-          this.maybeDragNewGenericElement(pointerDownState, event);
+          this.maybeDragNewGenericElement(pointerDownState, event, false);
         }
       }
 
@@ -8713,12 +8678,6 @@ class App extends React.Component<AppProps, AppState> {
         frameToHighlight: null,
         elementsToHighlight: null,
         cursorButton: "up",
-        // text elements are reset on finalize, and resetting on pointerup
-        // may cause issues with double taps
-        editingElement:
-          multiElement || isTextElement(this.state.editingElement)
-            ? this.state.editingElement
-            : null,
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
       }));
@@ -8903,7 +8862,7 @@ class App extends React.Component<AppProps, AppState> {
           });
           this.setState({
             multiElement: newElement,
-            editingElement: this.state.newElement,
+            newElement,
           });
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
           if (
@@ -8940,6 +8899,8 @@ class App extends React.Component<AppProps, AppState> {
               newElement: null,
             }));
           }
+          // so that the scene gets rendered again to display the newly drawn linear as well
+          this.scene.triggerUpdate();
         }
         return;
       }
@@ -9004,6 +8965,8 @@ class App extends React.Component<AppProps, AppState> {
 
       if (newElement) {
         mutateElement(newElement, getNormalizedDimensions(newElement));
+        // the above does not guarantee the scene to be rendered again, hence the trigger below
+        this.scene.triggerUpdate();
       }
 
       if (pointerDownState.drag.hasOccurred) {
@@ -9812,7 +9775,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState(
         {
           pendingImageElementId: null,
-          editingElement: null,
+          newElement: null,
           activeTool: updateActiveTool(this.state, { type: "selection" }),
         },
         () => {
@@ -10344,23 +10307,25 @@ class App extends React.Component<AppProps, AppState> {
   private maybeDragNewGenericElement = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
+    informMutation = true,
   ): void => {
     const selectionElement = this.state.selectionElement;
     const pointerCoords = pointerDownState.lastCoords;
     if (selectionElement && this.state.activeTool.type !== "eraser") {
-      dragNewElement(
-        selectionElement,
-        this.state.activeTool.type,
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        pointerCoords.x,
-        pointerCoords.y,
-        distance(pointerDownState.origin.x, pointerCoords.x),
-        distance(pointerDownState.origin.y, pointerCoords.y),
-        shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter(event),
-        this.state.zoom.value,
-      );
+      dragNewElement({
+        newElement: selectionElement,
+        elementType: this.state.activeTool.type,
+        originX: pointerDownState.origin.x,
+        originY: pointerDownState.origin.y,
+        x: pointerCoords.x,
+        y: pointerCoords.y,
+        width: distance(pointerDownState.origin.x, pointerCoords.x),
+        height: distance(pointerDownState.origin.y, pointerCoords.y),
+        shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
+        shouldResizeFromCenter: shouldResizeFromCenter(event),
+        zoom: this.state.zoom.value,
+        informMutation,
+      });
       return;
     }
 
@@ -10409,23 +10374,28 @@ class App extends React.Component<AppProps, AppState> {
       snapLines,
     });
 
-    dragNewElement(
+    dragNewElement({
       newElement,
-      this.state.activeTool.type,
-      pointerDownState.originInGrid.x,
-      pointerDownState.originInGrid.y,
-      gridX,
-      gridY,
-      distance(pointerDownState.originInGrid.x, gridX),
-      distance(pointerDownState.originInGrid.y, gridY),
-      isImageElement(newElement)
+      elementType: this.state.activeTool.type,
+      originX: pointerDownState.originInGrid.x,
+      originY: pointerDownState.originInGrid.y,
+      x: gridX,
+      y: gridY,
+      width: distance(pointerDownState.originInGrid.x, gridX),
+      height: distance(pointerDownState.originInGrid.y, gridY),
+      shouldMaintainAspectRatio: isImageElement(newElement)
         ? !shouldMaintainAspectRatio(event)
         : shouldMaintainAspectRatio(event),
-      shouldResizeFromCenter(event),
-      this.state.zoom.value,
-      aspectRatio,
-      this.state.originSnapOffset,
-    );
+      shouldResizeFromCenter: shouldResizeFromCenter(event),
+      zoom: this.state.zoom.value,
+      widthAspectRatio: aspectRatio,
+      originOffset: this.state.originSnapOffset,
+      informMutation,
+    });
+
+    this.setState({
+      newElement,
+    });
 
     // highlight elements that are to be added to frames on frames creation
     if (

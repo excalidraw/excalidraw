@@ -45,7 +45,6 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
-  OpenAIIcon,
   MagicIcon,
 } from "./icons";
 import { KEYS } from "../keys";
@@ -104,7 +103,9 @@ export const SelectedShapeActions = ({
   ) {
     isSingleElementBoundContainer = true;
   }
-  const isEditing = Boolean(appState.editingElement);
+  const isEditingTextOrNewElement = Boolean(
+    appState.editingTextElement || appState.newElement,
+  );
   const device = useDevice();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
@@ -234,7 +235,7 @@ export const SelectedShapeActions = ({
           </div>
         </fieldset>
       )}
-      {!isEditing && targetElements.length > 0 && (
+      {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
@@ -396,16 +397,14 @@ export const ShapesSwitcher = ({
           {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
           {renderMermaid && ( //zsviczian
             <DropdownMenu.Item
-              onSelect={() =>
-                app.setOpenDialog({ name: "ttd", tab: "mermaid" })
-              }
+              onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
               icon={mermaidLogoIcon}
               data-testid="toolbar-embeddable"
             >
               {t("toolBar.mermaidToExcalidraw")}
             </DropdownMenu.Item>
           )}
-          {app.props.aiEnabled !== false && (
+          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
             <>
               <DropdownMenu.Item
                 onSelect={() => app.onMagicframeToolSelect()}
@@ -415,20 +414,6 @@ export const ShapesSwitcher = ({
                 {t("toolBar.magicframe")}
                 <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
               </DropdownMenu.Item>
-              {/*<DropdownMenu.Item //zsviczian
-                onSelect={() => {
-                  trackEvent("ai", "open-settings", "d2c");
-                  app.setOpenDialog({
-                    name: "settings",
-                    source: "settings",
-                    tab: "diagram-to-code",
-                  });
-                }}
-                icon={OpenAIIcon}
-                data-testid="toolbar-magicSettings"
-              >
-                {t("toolBar.magicSettings")}
-              </DropdownMenu.Item>*/}
             </>
           )}
         </DropdownMenu.Content>

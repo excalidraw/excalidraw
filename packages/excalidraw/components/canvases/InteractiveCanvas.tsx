@@ -200,7 +200,7 @@ const getRelevantAppStateProps = (
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
-  editingElement: appState.editingElement,
+  editingTextElement: appState.editingTextElement,
   gridColor: appState.gridColor, //zsviczian
   highlightSearchResult: appState.highlightSearchResult, //zsviczian
 });

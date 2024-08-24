@@ -50,7 +50,6 @@ export const actionFinalize = register({
             ...appState,
             cursorButton: "up",
             editingLinearElement: null,
-            selectedLinearElement: null,
           },
           storeAction: StoreAction.CAPTURE,
         };
@@ -177,7 +176,7 @@ export const actionFinalize = register({
         newElement: null,
         selectionElement: null,
         multiElement: null,
-        editingElement: null,
+        editingTextElement: null,
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
