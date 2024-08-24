@@ -19,11 +19,14 @@ const _renderNewElementScene = ({
       scale,
     );
 
+    const { isHighlighterPenDrawing = false } = renderConfig; //zsviczian
+
     const context = bootstrapCanvas({
       canvas,
       scale,
       normalizedWidth,
       normalizedHeight,
+      viewBackgroundColor: isHighlighterPenDrawing ?  appState.viewBackgroundColor : "transparent", //zsviczian
     });
 
     // Apply zoom

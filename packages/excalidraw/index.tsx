@@ -307,6 +307,7 @@ export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
+  safelyParseJSON, //zsviczian
 } from "./utils";
 
 export { getEmbedLink } from "./element/embeddable"; //zsviczian - not sure if I use it any more
