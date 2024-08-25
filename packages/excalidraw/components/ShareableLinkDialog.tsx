@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import * as Popover from "@radix-ui/react-popover";
 
 import { copyTextToSystemClipboard } from "../clipboard";
 import { useI18n } from "../i18n";
@@ -7,9 +6,9 @@ import { useI18n } from "../i18n";
 import { Dialog } from "./Dialog";
 import { TextField } from "./TextField";
 import { FilledButton } from "./FilledButton";
-import { copyIcon, tablerCheckIcon } from "./icons";
 
 import "./ShareableLinkDialog.scss";
+import { useCopiedIndicator } from "../hooks/useCopiedIndicator";
 
 export type ShareableLinkDialogProps = {
   link: string;
@@ -24,7 +23,7 @@ export const ShareableLinkDialog = ({
   setErrorMessage,
 }: ShareableLinkDialogProps) => {
   const { t } = useI18n();
-  const [justCopied, setJustCopied] = useState(false);
+  const [, setJustCopied] = useState(false);
   const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
 
@@ -46,7 +45,7 @@ export const ShareableLinkDialog = ({
 
     ref.current?.select();
   };
-
+  const { icon, setcopyCheck, copyCheck } = useCopiedIndicator();
   return (
     <Dialog onCloseRequest={onCloseRequest} title={false} size="small">
       <div className="ShareableLinkDialog">
@@ -60,26 +59,17 @@ export const ShareableLinkDialog = ({
             value={link}
             selectOnRender
           />
-          <Popover.Root open={justCopied}>
-            <Popover.Trigger asChild>
-              <FilledButton
-                size="large"
-                label="Copy link"
-                icon={copyIcon}
-                onClick={copyRoomLink}
-              />
-            </Popover.Trigger>
-            <Popover.Content
-              onOpenAutoFocus={(event) => event.preventDefault()}
-              onCloseAutoFocus={(event) => event.preventDefault()}
-              className="ShareableLinkDialog__popover"
-              side="top"
-              align="end"
-              sideOffset={5.5}
-            >
-              {tablerCheckIcon} copied
-            </Popover.Content>
-          </Popover.Root>
+          <FilledButton
+            size="large"
+            label={copyCheck ? "" : "Copy link"}
+            icon={icon}
+            copyCheck={copyCheck}
+            paddingCopyCheck={2.22}
+            onClick={() => {
+              setcopyCheck(true);
+              copyRoomLink();
+            }}
+          />
         </div>
         <div className="ShareableLinkDialog__description">
           🔒 {t("alerts.uploadedSecurly")}

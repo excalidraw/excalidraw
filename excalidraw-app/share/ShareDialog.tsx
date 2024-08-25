@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import * as Popover from "@radix-ui/react-popover";
 import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
 import { trackEvent } from "../../packages/excalidraw/analytics";
 import { getFrame } from "../../packages/excalidraw/utils";
@@ -7,14 +6,12 @@ import { useI18n } from "../../packages/excalidraw/i18n";
 import { KEYS } from "../../packages/excalidraw/keys";
 import { Dialog } from "../../packages/excalidraw/components/Dialog";
 import {
-  copyIcon,
   LinkIcon,
   playerPlayIcon,
   playerStopFilledIcon,
   share,
   shareIOS,
   shareWindows,
-  tablerCheckIcon,
 } from "../../packages/excalidraw/components/icons";
 import { TextField } from "../../packages/excalidraw/components/TextField";
 import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
@@ -24,6 +21,7 @@ import { atom, useAtom, useAtomValue } from "jotai";
 
 import "./ShareDialog.scss";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
+import { useCopiedIndicator } from "../../packages/excalidraw/hooks/useCopiedIndicator";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
@@ -63,10 +61,11 @@ const ActiveRoomDialog = ({
   handleClose: () => void;
 }) => {
   const { t } = useI18n();
-  const [justCopied, setJustCopied] = useState(false);
+  const [, setJustCopied] = useState(false);
   const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
+  const { icon, setcopyCheck, copyCheck } = useCopiedIndicator();
 
   const copyRoomLink = async () => {
     try {
@@ -130,26 +129,17 @@ const ActiveRoomDialog = ({
             onClick={shareRoomLink}
           />
         )}
-        <Popover.Root open={justCopied}>
-          <Popover.Trigger asChild>
-            <FilledButton
-              size="large"
-              label="Copy link"
-              icon={copyIcon}
-              onClick={copyRoomLink}
-            />
-          </Popover.Trigger>
-          <Popover.Content
-            onOpenAutoFocus={(event) => event.preventDefault()}
-            onCloseAutoFocus={(event) => event.preventDefault()}
-            className="ShareDialog__popover"
-            side="top"
-            align="end"
-            sideOffset={5.5}
-          >
-            {tablerCheckIcon} copied
-          </Popover.Content>
-        </Popover.Root>
+        <FilledButton
+          size="large"
+          label={copyCheck ? "" : "Copy link"}
+          icon={icon}
+          copyCheck={copyCheck}
+          paddingCopyCheck={2.22}
+          onClick={() => {
+            setcopyCheck(true);
+            copyRoomLink();
+          }}
+        />
       </div>
       <div className="ShareDialog__active__description">
         <p>

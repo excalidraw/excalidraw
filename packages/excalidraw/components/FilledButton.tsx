@@ -23,6 +23,8 @@ export type FilledButtonProps = {
   fullWidth?: boolean;
 
   icon?: React.ReactNode;
+  copyCheck?: boolean;
+  paddingCopyCheck?: number;
 };
 
 export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
@@ -37,6 +39,8 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       size = "medium",
       fullWidth,
       className,
+      copyCheck,
+      paddingCopyCheck,
     },
     ref,
   ) => {
@@ -76,8 +80,13 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
         aria-label={label}
         ref={ref}
         disabled={isLoading}
+        style={copyCheck ? { backgroundColor: "green" } : {}}
       >
-        <div className="ExcButton__contents">
+        <div
+          // eslint-disable-next-line
+          style={copyCheck ? { 'padding': `0 ${paddingCopyCheck}rem`} : {}}
+          className="ExcButton__contents"
+        >
           {isLoading && <Spinner />}
           {icon && (
             <div className="ExcButton__icon" aria-hidden>

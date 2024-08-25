@@ -25,7 +25,7 @@ import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../../utils/export";
 
-import { copyIcon, downloadIcon, helpIcon } from "./icons";
+import { downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";
@@ -35,6 +35,7 @@ import "./ImageExportDialog.scss";
 import { FilledButton } from "./FilledButton";
 import { cloneJSON } from "../utils";
 import { prepareElementsForExport } from "../data";
+import { useCopiedIndicator } from "../hooks/useCopiedIndicator";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -88,6 +89,8 @@ const ImageExportModal = ({
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
+
+  const { icon, setcopyCheck, copyCheck } = useCopiedIndicator();
 
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elementsSnapshot,
@@ -294,14 +297,23 @@ const ImageExportModal = ({
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
               label={t("imageExportDialog.title.copyPngToClipboard")}
-              onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements, {
-                  exportingFrame,
-                })
-              }
-              icon={copyIcon}
+              copyCheck={copyCheck}
+              paddingCopyCheck={3.06}
+              onClick={() => {
+                setcopyCheck(true);
+                return onExportImage(
+                  EXPORT_IMAGE_TYPES.clipboard,
+                  exportedElements,
+                  {
+                    exportingFrame,
+                  },
+                );
+              }}
+              icon={icon}
             >
-              {t("imageExportDialog.button.copyPngToClipboard")}
+              {copyCheck
+                ? ""
+                : t("imageExportDialog.button.copyPngToClipboard")}
             </FilledButton>
           )}
         </div>
