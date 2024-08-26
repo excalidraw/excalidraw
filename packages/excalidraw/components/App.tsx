@@ -4062,7 +4062,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
-        const selectedElements = this.scene.getSelectedElements({
+        let selectedElements = this.scene.getSelectedElements({
           selectedElementIds: this.state.selectedElementIds,
           includeBoundTextElement: true,
           includeElementsInFrames: true,
@@ -4072,17 +4072,37 @@ class App extends React.Component<AppProps, AppState> {
           | ExcalidrawArrowElement
           | undefined;
 
-        const step = elbowArrow
-          ? elbowArrow.startBinding || elbowArrow.endBinding
-            ? 0
-            : ELEMENT_TRANSLATE_AMOUNT
-          : (this.getEffectiveGridSize() &&
-              (event.shiftKey
-                ? ELEMENT_TRANSLATE_AMOUNT
-                : this.getEffectiveGridSize())) ||
+        const arrowIdsToRemove = new Set<string>();
+
+        selectedElements
+          .filter(isElbowArrow)
+          .filter((arrow) => {
+            const startElementNotInSelection =
+              arrow.startBinding &&
+              !selectedElements.some(
+                (el) => el.id === arrow.startBinding?.elementId,
+              );
+            const endElementNotInSelection =
+              arrow.endBinding &&
+              !selectedElements.some(
+                (el) => el.id === arrow.endBinding?.elementId,
+              );
+            return startElementNotInSelection || endElementNotInSelection;
+          })
+          .forEach((arrow) => arrowIdsToRemove.add(arrow.id));
+
+        selectedElements = selectedElements.filter(
+          (el) => !arrowIdsToRemove.has(el.id),
+        );
+
+        const step =
+          (this.getEffectiveGridSize() &&
             (event.shiftKey
-              ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-              : ELEMENT_TRANSLATE_AMOUNT);
+              ? ELEMENT_TRANSLATE_AMOUNT
+              : this.getEffectiveGridSize())) ||
+          (event.shiftKey
+            ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
+            : ELEMENT_TRANSLATE_AMOUNT);
 
         let offsetX = 0;
         let offsetY = 0;
