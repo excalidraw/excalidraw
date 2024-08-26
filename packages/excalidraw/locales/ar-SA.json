@@ -168,6 +168,7 @@
     "exportImage": "تصدير الصورة...",
     "export": "حفظ إلى...",
     "copyToClipboard": "نسخ إلى الحافظة",
+    "copyLink": "",
     "save": "احفظ للملف الحالي",
     "saveAs": "حفظ كـ",
     "load": "فتح",
