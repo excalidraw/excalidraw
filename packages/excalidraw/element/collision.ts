@@ -1,11 +1,9 @@
 import { isPathALoop, isPointWithinBounds } from "../math";
-
 import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
 } from "./types";
-
 import { getElementBounds } from "./bounds";
 import type { FrameNameBounds } from "../types";
 import type { GeometricShape } from "../../utils/geometry/shape";

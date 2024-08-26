@@ -434,8 +434,8 @@ import {
   FlowChartNavigator,
   getLinkDirectionFromKey,
 } from "../element/flowchart";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import { point, pointDistance, vector } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "../../math";
+import { point, pointDistance, vector } from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

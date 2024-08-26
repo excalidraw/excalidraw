@@ -58,8 +58,8 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import { point } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "../../math";
+import { point } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,

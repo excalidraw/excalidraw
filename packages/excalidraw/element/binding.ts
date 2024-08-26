@@ -54,7 +54,6 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { getElementShape } from "../shapes";
 import {
   aabbForElement,
-  clamp,
   getCenterForBounds,
   getCenterForElement,
   pointInsideBounds,
@@ -69,7 +68,7 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { LocalPoint, Radians } from "../../math";
 import {
   lineSegment,
   point,
@@ -78,7 +77,8 @@ import {
   vectorFromPoint,
   pointFromPair,
   pointDistanceSq,
-} from "@excalidraw/math";
+  clamp,
+} from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
 
 export type SuggestedBinding =

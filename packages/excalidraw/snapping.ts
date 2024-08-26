@@ -1,4 +1,4 @@
-import { point, pointRotateRads, type GlobalPoint } from "@excalidraw/math";
+import { point, pointRotateRads, type GlobalPoint } from "../math";
 import { TOOL_TYPE } from "./constants";
 import type { Bounds } from "./element/bounds";
 import {

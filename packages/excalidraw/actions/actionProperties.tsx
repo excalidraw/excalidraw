@@ -115,8 +115,8 @@ import {
 } from "../element/binding";
 import { mutateElbowArrow } from "../element/routing";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import type { LocalPoint } from "@excalidraw/math";
-import { point, vector } from "@excalidraw/math";
+import type { LocalPoint } from "../../math";
+import { point, vector } from "../../math";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

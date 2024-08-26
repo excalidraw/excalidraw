@@ -16,7 +16,7 @@ import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { point } from "@excalidraw/math";
+import { point } from "../../math";
 
 export const actionFinalize = register({
   name: "finalize",

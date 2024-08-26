@@ -36,7 +36,7 @@ import { trackEvent } from "../../analytics";
 import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
-import { point, type GlobalPoint } from "@excalidraw/math";
+import { point, type GlobalPoint } from "../../../math";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;

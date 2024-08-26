@@ -1,4 +1,4 @@
-import { point, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
+import { point, type GlobalPoint, type LocalPoint } from "../math";
 import {
   getClosedCurveShape,
   getCurveShape,

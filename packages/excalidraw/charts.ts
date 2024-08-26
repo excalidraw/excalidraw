@@ -1,5 +1,5 @@
-import type { Radians } from "@excalidraw/math";
-import { point } from "@excalidraw/math";
+import type { Radians } from "../math";
+import { point } from "../math";
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,

@@ -4,7 +4,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import { point, pointRotateRads } from "@excalidraw/math";
+import { point, pointRotateRads } from "../../../math";
 
 interface PositionProps {
   property: "x" | "y";

@@ -8,8 +8,8 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import type { Degrees } from "@excalidraw/math";
-import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
+import type { Degrees } from "../../../math";
+import { degreesToRadians, radiansToDegrees } from "../../../math";
 
 interface AngleProps {
   element: ExcalidrawElement;

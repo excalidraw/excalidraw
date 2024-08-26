@@ -13,7 +13,7 @@ import type {
 import type { Bounds } from "./element/bounds";
 import { getCurvePathOps } from "./element/bounds";
 import { ShapeCache } from "./scene/ShapeCache";
-import type { Vector } from "@excalidraw/math";
+import type { Vector } from "../math";
 import {
   type LocalPoint,
   type GlobalPoint,
@@ -27,7 +27,7 @@ import {
   pointTranslate,
   pointDistance,
   vector,
-} from "@excalidraw/math";
+} from "../math";
 import { invariant } from "./utils";
 
 export const adjustXYWithRotation = (
@@ -161,37 +161,6 @@ export const isPathALoop = (
   return false;
 };
 
-// Draw a line from the point to the right till infiinty
-// Check how many lines of the polygon does this infinite line intersects with
-// If the number of intersections is odd, point is in the polygon
-export const isPointInPolygon = <P extends GlobalPoint | LocalPoint>(
-  points: P[],
-  x: number,
-  y: number,
-): boolean => {
-  const vertices = points.length;
-
-  // There must be at least 3 vertices in polygon
-  if (vertices < 3) {
-    return false;
-  }
-  const extreme = point(Number.MAX_SAFE_INTEGER, y);
-  const p = point(x, y);
-  let count = 0;
-  for (let i = 0; i < vertices; i++) {
-    const current = points[i];
-    const next = points[(i + 1) % vertices];
-    if (doSegmentsIntersect(current, next, p, extreme)) {
-      if (orderedColinearOrientation(current, p, next) === 0) {
-        return isPointWithinBounds(current, p, next);
-      }
-      count++;
-    }
-  }
-  // true if count is off
-  return count % 2 === 1;
-};
-
 // Returns whether `q` lies inside the segment/rectangle defined by `p` and `r`.
 // This is an approximation to "does `q` lie on a segment `pr`" check.
 export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
@@ -211,56 +180,56 @@ export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
 // 0 if p, q, r are colinear
 // 1 if Clockwise
 // 2 if counterclickwise
-const orderedColinearOrientation = <P extends GlobalPoint | LocalPoint>(
-  p: P,
-  q: P,
-  r: P,
-) => {
-  const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
-  if (val === 0) {
-    return 0;
-  }
-  return val > 0 ? 1 : 2;
-};
+// const orderedColinearOrientation = <P extends GlobalPoint | LocalPoint>(
+//   p: P,
+//   q: P,
+//   r: P,
+// ) => {
+//   const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
+//   if (val === 0) {
+//     return 0;
+//   }
+//   return val > 0 ? 1 : 2;
+// };
 
-// Check is p1q1 intersects with p2q2
-const doSegmentsIntersect = <P extends GlobalPoint | LocalPoint>(
-  p1: P,
-  q1: P,
-  p2: P,
-  q2: P,
-) => {
-  const o1 = orderedColinearOrientation(p1, q1, p2);
-  const o2 = orderedColinearOrientation(p1, q1, q2);
-  const o3 = orderedColinearOrientation(p2, q2, p1);
-  const o4 = orderedColinearOrientation(p2, q2, q1);
+// // Check is p1q1 intersects with p2q2
+// const doSegmentsIntersect = <P extends GlobalPoint | LocalPoint>(
+//   p1: P,
+//   q1: P,
+//   p2: P,
+//   q2: P,
+// ) => {
+//   const o1 = orderedColinearOrientation(p1, q1, p2);
+//   const o2 = orderedColinearOrientation(p1, q1, q2);
+//   const o3 = orderedColinearOrientation(p2, q2, p1);
+//   const o4 = orderedColinearOrientation(p2, q2, q1);
 
-  if (o1 !== o2 && o3 !== o4) {
-    return true;
-  }
+//   if (o1 !== o2 && o3 !== o4) {
+//     return true;
+//   }
 
-  // p1, q1 and p2 are colinear and p2 lies on segment p1q1
-  if (o1 === 0 && isPointWithinBounds(p1, p2, q1)) {
-    return true;
-  }
+//   // p1, q1 and p2 are colinear and p2 lies on segment p1q1
+//   if (o1 === 0 && isPointWithinBounds(p1, p2, q1)) {
+//     return true;
+//   }
 
-  // p1, q1 and p2 are colinear and q2 lies on segment p1q1
-  if (o2 === 0 && isPointWithinBounds(p1, q2, q1)) {
-    return true;
-  }
+//   // p1, q1 and p2 are colinear and q2 lies on segment p1q1
+//   if (o2 === 0 && isPointWithinBounds(p1, q2, q1)) {
+//     return true;
+//   }
 
-  // p2, q2 and p1 are colinear and p1 lies on segment p2q2
-  if (o3 === 0 && isPointWithinBounds(p2, p1, q2)) {
-    return true;
-  }
+//   // p2, q2 and p1 are colinear and p1 lies on segment p2q2
+//   if (o3 === 0 && isPointWithinBounds(p2, p1, q2)) {
+//     return true;
+//   }
 
-  // p2, q2 and q1 are colinear and q1 lies on segment p2q2
-  if (o4 === 0 && isPointWithinBounds(p2, q1, q2)) {
-    return true;
-  }
+//   // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+//   if (o4 === 0 && isPointWithinBounds(p2, q1, q2)) {
+//     return true;
+//   }
 
-  return false;
-};
+//   return false;
+// };
 
 // TODO: Rounding this point causes some shake when free drawing
 export const getGridPoint = (
@@ -638,12 +607,3 @@ export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
   pointInsideBounds(point(b[2], b[1]), a) ||
   pointInsideBounds(point(b[2], b[3]), a) ||
   pointInsideBounds(point(b[0], b[3]), a);
-
-export const clamp = (value: number, min: number, max: number) => {
-  return Math.min(Math.max(value, min), max);
-};
-
-export const round = (value: number, precision: number) => {
-  const multiplier = Math.pow(10, precision);
-  return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
-};
