@@ -1,5 +1,5 @@
-import type { LocalPoint } from "@excalidraw/math";
-import { point } from "@excalidraw/math";
+import type { LocalPoint } from "../../math";
+import { point } from "../../math";
 import { ROUNDNESS } from "../constants";
 import { arrayToMap } from "../utils";
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";

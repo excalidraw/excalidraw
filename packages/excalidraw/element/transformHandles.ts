@@ -18,8 +18,8 @@ import {
   isAndroid,
   isIOS,
 } from "../constants";
-import type { Radians } from "@excalidraw/math";
-import { point, pointRotateRads } from "@excalidraw/math";
+import type { Radians } from "../../math";
+import { point, pointRotateRads } from "../../math";
 
 export type TransformHandleDirection =
   | "n"

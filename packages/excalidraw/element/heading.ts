@@ -5,13 +5,13 @@ import type {
   Triangle,
   Vector,
   Radians,
-} from "@excalidraw/math";
+} from "../../math";
 import {
   point,
   pointRotateRads,
   radiansToDegrees,
   triangleIncludesPoint,
-} from "@excalidraw/math";
+} from "../../math";
 import type { Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
 

@@ -29,7 +29,7 @@ import {
   pointDistance,
   type GlobalPoint,
   type LocalPoint,
-} from "@excalidraw/math";
+} from "../../math";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 

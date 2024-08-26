@@ -2,7 +2,7 @@ import { vi } from "vitest";
 import type { ExcalidrawElementSkeleton } from "./transform";
 import { convertToExcalidrawElements } from "./transform";
 import type { ExcalidrawArrowElement } from "../element/types";
-import { point } from "@excalidraw/math";
+import { point } from "../../math";
 
 const opts = { regenerateIds: false };
 

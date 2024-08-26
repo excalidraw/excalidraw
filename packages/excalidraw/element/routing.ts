@@ -1,4 +1,4 @@
-import type { Radians } from "@excalidraw/math";
+import type { Radians } from "../../math";
 import {
   point,
   pointTranslate,
@@ -6,11 +6,10 @@ import {
   vectorCross,
   vectorFromPoint,
   vectorScale,
-  vectorSubtract,
   type GlobalPoint,
   type LocalPoint,
   type Vector,
-} from "@excalidraw/math";
+} from "../../math";
 import BinaryHeap from "../binaryheap";
 import {
   aabbForElement,

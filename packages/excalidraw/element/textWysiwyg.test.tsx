@@ -19,7 +19,7 @@ import type {
 import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import { point } from "@excalidraw/math";
+import { point } from "../../math";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);

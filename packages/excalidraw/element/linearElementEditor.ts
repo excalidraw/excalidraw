@@ -54,7 +54,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
 import { mutateElbowArrow } from "./routing";
 import type Scene from "../scene/Scene";
-import type { Radians } from "@excalidraw/math";
+import type { Radians } from "../../math";
 import {
   pointCenter,
   point,
@@ -64,7 +64,7 @@ import {
   type GlobalPoint,
   type LocalPoint,
   pointDistance,
-} from "@excalidraw/math";
+} from "../../math";
 
 const editorMidPointsCache: {
   version: number | null;

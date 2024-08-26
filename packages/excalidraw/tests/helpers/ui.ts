@@ -33,8 +33,8 @@ import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
-import { point, pointRotateRads } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
+import { point, pointRotateRads } from "../../../math";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();

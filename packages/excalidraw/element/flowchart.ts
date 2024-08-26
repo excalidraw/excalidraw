@@ -30,7 +30,7 @@ import {
   isFlowchartNodeElement,
 } from "./typeChecks";
 import { invariant } from "../utils";
-import { point, type LocalPoint } from "@excalidraw/math";
+import { point, type LocalPoint } from "../../math";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 

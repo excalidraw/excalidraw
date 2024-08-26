@@ -17,7 +17,7 @@ import type {
   ExcalidrawElbowArrowElement,
 } from "./types";
 import { ARROW_TYPE } from "../constants";
-import { point } from "@excalidraw/math";
+import { point } from "../../math";
 
 const { h } = window;
 

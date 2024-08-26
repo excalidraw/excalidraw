@@ -1,9 +1,4 @@
-import type {
-  GlobalPoint,
-  LineSegment,
-  Polygon,
-  Radians,
-} from "@excalidraw/math";
+import type { GlobalPoint, LineSegment, Polygon, Radians } from "../../math";
 import {
   point,
   lineSegment,
@@ -12,7 +7,7 @@ import {
   pointOnPolygon,
   pointInPolygon,
   segmentsIntersectAt,
-} from "@excalidraw/math";
+} from "../../math";
 import { pointInEllipse, pointOnEllipse, type Ellipse } from "./shape";
 
 describe("point and line", () => {

@@ -17,8 +17,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { getBoundTextShape } from "../shapes";
-import type { GlobalPoint, LocalPoint, Polygon } from "@excalidraw/math";
-import { point } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
+import { point } from "../../math";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {

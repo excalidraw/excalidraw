@@ -36,7 +36,7 @@ import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
 import type { Action } from "../../actions/types";
 import { mutateElement } from "../../element/mutateElement";
-import { point, type LocalPoint, type Radians } from "@excalidraw/math";
+import { point, type LocalPoint, type Radians } from "../../../math";
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.

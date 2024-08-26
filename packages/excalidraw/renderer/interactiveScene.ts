@@ -70,7 +70,7 @@ import type {
   RenderableElementsMap,
 } from "../scene/types";
 import { getCornerRadius } from "../math";
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "../../math";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,

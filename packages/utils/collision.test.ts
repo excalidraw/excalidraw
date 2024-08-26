@@ -1,4 +1,4 @@
-import type { Curve, Degrees, GlobalPoint } from "@excalidraw/math";
+import type { Curve, Degrees, GlobalPoint } from "../math";
 import {
   curve,
   degreesToRadians,
@@ -6,7 +6,7 @@ import {
   lineSegmentRotate,
   point,
   pointRotateDegs,
-} from "@excalidraw/math";
+} from "../math";
 import { pointOnCurve, pointOnPolyline } from "./collision";
 import type { Polyline } from "./geometry/shape";
 

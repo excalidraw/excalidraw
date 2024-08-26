@@ -28,8 +28,8 @@ import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
 import { arrayToMap, cloneJSON } from "../utils";
-import type { LocalPoint } from "@excalidraw/math";
-import { point, type Radians } from "@excalidraw/math";
+import type { LocalPoint } from "../../math";
+import { point, type Radians } from "../../math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

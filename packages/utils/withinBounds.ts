@@ -15,8 +15,8 @@ import { isValueInRange } from "../excalidraw/math";
 import type { Bounds } from "../excalidraw/element/bounds";
 import { getElementBounds } from "../excalidraw/element/bounds";
 import { arrayToMap } from "../excalidraw/utils";
-import type { LocalPoint } from "@excalidraw/math";
-import { point, pointRotateRads } from "@excalidraw/math";
+import type { LocalPoint } from "../math";
+import { point, pointRotateRads } from "../math";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];

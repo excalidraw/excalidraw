@@ -4,8 +4,8 @@ import { API } from "../tests/helpers/api";
 import { FONT_FAMILY, ROUNDNESS } from "../constants";
 import { isPrimitive } from "../utils";
 import type { ExcalidrawLinearElement } from "./types";
-import type { LocalPoint } from "@excalidraw/math";
-import { point } from "@excalidraw/math";
+import type { LocalPoint } from "../../math";
+import { point } from "../../math";
 
 const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {

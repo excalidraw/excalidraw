@@ -53,7 +53,7 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
 import { mutateElbowArrow } from "./routing";
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint } from "../../math";
 import {
   pointCenter,
   normalizeRadians,
@@ -61,7 +61,7 @@ import {
   pointFromPair,
   pointRotateRads,
   type Radians,
-} from "@excalidraw/math";
+} from "../../math";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
