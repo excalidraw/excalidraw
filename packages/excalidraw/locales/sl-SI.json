@@ -168,6 +168,7 @@
     "exportImage": "Izvozi sliko...",
     "export": "Shrani v...",
     "copyToClipboard": "Kopiraj v odložišče",
+    "copyLink": "",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
     "load": "Odpri",
