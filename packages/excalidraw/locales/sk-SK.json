@@ -168,6 +168,7 @@
     "exportImage": "Exportovať obrázok...",
     "export": "Uložiť do...",
     "copyToClipboard": "Kopírovať do schránky",
+    "copyLink": "",
     "save": "Uložiť do aktuálneho súboru",
     "saveAs": "Uložiť ako",
     "load": "Otvoriť",
