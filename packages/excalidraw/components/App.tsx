@@ -2903,8 +2903,10 @@ class App extends React.Component<AppProps, AppState> {
         this.lastViewportPosition.x,
         this.lastViewportPosition.y,
       );
+
+      const data = await parseClipboard(event, isPlainPaste);
       if (
-        event &&
+        event && data.text &&
         (!(elementUnderCursor instanceof HTMLCanvasElement) ||
           isWritableElement(target))
       ) {
@@ -2923,7 +2925,6 @@ class App extends React.Component<AppProps, AppState> {
       // event else some browsers (FF...) will clear the clipboardData
       // (something something security)
       let file = event?.clipboardData?.files[0];
-      const data = await parseClipboard(event, isPlainPaste);
       if (!file && !isPlainPaste) {
         if (data.mixedContent) {
           return this.addElementsFromMixedContentPaste(data.mixedContent, {
@@ -2991,12 +2992,18 @@ class App extends React.Component<AppProps, AppState> {
             : data.elements
         ) as readonly ExcalidrawElement[];
         // TODO remove formatting from elements if isPlainPaste
+        const position = isWritableElement(target) && this.lastPointerDownEvent
+        ? { clientX: this.lastPointerDownEvent.pageX, clientY: this.lastPointerDownEvent.pageY }
+        : "cursor";
         this.addElementsFromPasteOrLibrary({
           elements,
           files: data.files || null,
-          position: "cursor",
+          position,
           retainSeed: isPlainPaste,
         });
+        if(isWritableElement(target)){
+          this.focusContainer();
+        }
       } else if (data.text) {
         if (data.text && isMaybeMermaidDefinition(data.text)) {
           const api = await import("@excalidraw/mermaid-to-excalidraw");
