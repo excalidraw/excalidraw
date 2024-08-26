@@ -22,7 +22,7 @@ export const searchItemInFocusAtom = atom<number | null>(null);
 export const SearchMenu = () => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
-  const [keyWord, setKeyWord] = useState("s");
+  const [keyWord, setKeyWord] = useState("");
   const [matches, setMatches] = useState<SearchMatch[]>([]);
   const [focusIndex, setFocusIndex] = useAtom(
     searchItemInFocusAtom,
