@@ -6,6 +6,7 @@ import { useI18n } from "../../packages/excalidraw/i18n";
 import { KEYS } from "../../packages/excalidraw/keys";
 import { Dialog } from "../../packages/excalidraw/components/Dialog";
 import {
+  copyIcon,
   LinkIcon,
   playerPlayIcon,
   playerStopFilledIcon,
@@ -21,7 +22,7 @@ import { atom, useAtom, useAtomValue } from "jotai";
 
 import "./ShareDialog.scss";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
-import { useCopiedIndicator } from "../../packages/excalidraw/hooks/useCopiedIndicator";
+import { useCopyStatus } from "../../packages/excalidraw/hooks/useCopiedIndicator";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
@@ -65,7 +66,7 @@ const ActiveRoomDialog = ({
   const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
-  const { icon, setcopyCheck, copyCheck } = useCopiedIndicator();
+  const { onCopy, copyStatus } = useCopyStatus();
 
   const copyRoomLink = async () => {
     try {
@@ -131,13 +132,12 @@ const ActiveRoomDialog = ({
         )}
         <FilledButton
           size="large"
-          label={copyCheck ? "" : "Copy link"}
-          icon={icon}
-          copyCheck={copyCheck}
-          paddingCopyCheck={2.22}
+          label={t("buttons.copyLink")}
+          icon={copyIcon}
+          status={copyStatus}
           onClick={() => {
-            setcopyCheck(true);
             copyRoomLink();
+            onCopy();
           }}
         />
       </div>

@@ -6,9 +6,10 @@ import { useI18n } from "../i18n";
 import { Dialog } from "./Dialog";
 import { TextField } from "./TextField";
 import { FilledButton } from "./FilledButton";
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
+import { copyIcon } from "./icons";
 
 import "./ShareableLinkDialog.scss";
-import { useCopiedIndicator } from "../hooks/useCopiedIndicator";
 
 export type ShareableLinkDialogProps = {
   link: string;
@@ -45,7 +46,7 @@ export const ShareableLinkDialog = ({
 
     ref.current?.select();
   };
-  const { icon, setcopyCheck, copyCheck } = useCopiedIndicator();
+  const { onCopy, copyStatus } = useCopyStatus();
   return (
     <Dialog onCloseRequest={onCloseRequest} title={false} size="small">
       <div className="ShareableLinkDialog">
@@ -61,12 +62,11 @@ export const ShareableLinkDialog = ({
           />
           <FilledButton
             size="large"
-            label={copyCheck ? "" : "Copy link"}
-            icon={icon}
-            copyCheck={copyCheck}
-            paddingCopyCheck={2.22}
+            label={t("buttons.copyLink")}
+            icon={copyIcon}
+            status={copyStatus}
             onClick={() => {
-              setcopyCheck(true);
+              onCopy();
               copyRoomLink();
             }}
           />
