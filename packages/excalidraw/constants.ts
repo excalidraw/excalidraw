@@ -374,6 +374,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";
+export const SEARCH_SIDEBAR_TAB = "search";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",

@@ -203,6 +203,7 @@ const getRelevantAppStateProps = (
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
   editingElement: appState.editingElement,
+  searchMatches: appState.searchMatches,
 });
 
 const areEqual = (

@@ -948,6 +948,38 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
+  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+    const element = elementsMap.get(id);
+
+    if (element && isTextElement(element)) {
+      const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
+        getElementAbsoluteCoords(element, elementsMap, true);
+
+      context.save();
+      if (focus) {
+        context.fillStyle = "rgba(255, 172, 28, 0.4)";
+      } else {
+        context.fillStyle = "rgba(255, 255, 0, 0.4)"; // Yellow color with some transparency
+      }
+
+      // Draw a rectangle to resemble the highlight marker
+      context.translate(appState.scrollX, appState.scrollY);
+      context.translate(cx, cy);
+      context.rotate(element.angle);
+
+      matchedLines.forEach((matchedLine) => {
+        context.fillRect(
+          elementX1 + matchedLine.offsetX - cx,
+          elementY1 + matchedLine.offsetY - cy,
+          matchedLine.width,
+          matchedLine.height,
+        );
+      });
+
+      context.restore();
+    }
+  });
+
   renderSnaps(context, appState);
 
   // Reset zoom

@@ -48,7 +48,13 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
+import {
+  ARROW_TYPE,
+  DEFAULT_SIDEBAR,
+  LIBRARY_SIDEBAR_TAB,
+  SEARCH_SIDEBAR_TAB,
+  type EXPORT_IMAGE_TYPES,
+} from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -440,6 +446,7 @@ import {
   FlowChartNavigator,
   getLinkDirectionFromKey,
 } from "../element/flowchart";
+import { searchItemInFocusAtom } from "./SearchMenu";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -4057,6 +4064,27 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
+        event.preventDefault();
+
+        if (
+          this.state.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+          this.state.openSidebar.tab === SEARCH_SIDEBAR_TAB
+        ) {
+          this.setState({
+            openSidebar: null,
+            searchMatches: [],
+          });
+        } else {
+          this.setState({
+            openSidebar: {
+              name: DEFAULT_SIDEBAR.name,
+              tab: SEARCH_SIDEBAR_TAB,
+            },
+          });
+        }
+      }
+
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {
         IS_PLAIN_PASTE = event.shiftKey;
         clearTimeout(IS_PLAIN_PASTE_TIMER);
@@ -6005,6 +6033,16 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
+
+    if (this.state.searchMatches) {
+      this.setState((state) => ({
+        searchMatches: state.searchMatches.map((searchMatch) => ({
+          ...searchMatch,
+          focus: false,
+        })),
+      }));
+      jotaiStore.set(searchItemInFocusAtom, null);
+    }
 
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
