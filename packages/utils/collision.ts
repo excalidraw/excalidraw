@@ -1,16 +1,21 @@
-import type { GeometricShape } from "./geometry/shape";
+import type { Polycurve, Polyline } from "./geometry/shape";
 import {
   pointInEllipse,
-  pointInPolygon,
-  pointOnCurve,
   pointOnEllipse,
-  pointOnLineSegment,
-  pointOnPolycurve,
-  pointOnPolygon,
-  pointOnPolyline,
+  type GeometricShape,
+} from "./geometry/shape";
+import type { Curve } from "@excalidraw/math";
+import {
   closePolygon,
-} from "./geometry/geometry";
-import type { GlobalPoint, LocalPoint, Polygon } from "@excalidraw/math";
+  lineSegment,
+  point,
+  pointInPolygon,
+  pointOnLineSegment,
+  pointOnPolygon,
+  type GlobalPoint,
+  type LocalPoint,
+  type Polygon,
+} from "@excalidraw/math";
 
 // check if the given point is considered on the given shape's border
 export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
@@ -72,4 +77,62 @@ export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
   bounds: Polygon<Point>,
 ) => {
   return pointInPolygon(point, bounds);
+};
+
+const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  polycurve: Polycurve<Point>,
+  tolerance: number,
+) => {
+  return polycurve.some((curve) => pointOnCurve(point, curve, tolerance));
+};
+
+const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(
+  curve: Curve<Point>,
+) => {
+  const [p0, p1, p2, p3] = curve;
+  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
+  return (t: number, idx: number) =>
+    Math.pow(1 - t, 3) * p3[idx] +
+    3 * t * Math.pow(1 - t, 2) * p2[idx] +
+    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+    p0[idx] * Math.pow(t, 3);
+};
+
+const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
+  curve: Curve<Point>,
+  segments = 10,
+): Polyline<Point> => {
+  const equation = cubicBezierEquation(curve);
+  let startingPoint = [equation(0, 0), equation(0, 1)] as Point;
+  const lineSegments: Polyline<Point> = [];
+  let t = 0;
+  const increment = 1 / segments;
+
+  for (let i = 0; i < segments; i++) {
+    t += increment;
+    if (t <= 1) {
+      const nextPoint: Point = point(equation(t, 0), equation(t, 1));
+      lineSegments.push(lineSegment(startingPoint, nextPoint));
+      startingPoint = nextPoint;
+    }
+  }
+
+  return lineSegments;
+};
+
+export const pointOnCurve = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  curve: Curve<Point>,
+  threshold: number,
+) => {
+  return pointOnPolyline(point, polyLineFromCurve(curve), threshold);
+};
+
+export const pointOnPolyline = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  polyline: Polyline<Point>,
+  threshold = 10e-5,
+) => {
+  return polyline.some((line) => pointOnLineSegment(point, line, threshold));
 };

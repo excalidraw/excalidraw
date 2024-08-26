@@ -20,10 +20,14 @@ import type { AppState, Device, Zoom } from "../types";
 import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
-import { pointOnLineSegment } from "../../utils/geometry/geometry";
 import { isLinearElement } from "./typeChecks";
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
-import { point, pointRotateRads, type Radians } from "@excalidraw/math";
+import {
+  point,
+  pointOnLineSegment,
+  pointRotateRads,
+  type Radians,
+} from "@excalidraw/math";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,

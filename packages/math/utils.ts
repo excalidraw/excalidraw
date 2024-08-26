@@ -1,6 +1,13 @@
-import type { Degrees, Radians } from "./types";
+import { polygonIsClosed } from "./polygon";
+import type {
+  Degrees,
+  GlobalPoint,
+  LocalPoint,
+  Polygon,
+  Radians,
+} from "./types";
 
-export const INVERSE_PRECISION = 10_000;
+export const INVERSE_PRECISION = 100_000;
 export const PRECISION = 1 / INVERSE_PRECISION;
 
 export function degreesToRadians(degrees: Degrees): Radians {
@@ -13,14 +20,20 @@ export function radiansToDegrees(degrees: Radians): Degrees {
   return ((degrees * 180) / Math.PI) as Degrees;
 }
 
-export const clamp = (value: number, min: number, max: number) => {
+export function clamp(value: number, min: number, max: number) {
   "inline";
   return Math.min(Math.max(value, min), max);
-};
+}
 
-export const round = (value: number, precision: number) => {
+export function round(value: number, precision: number) {
   "inline";
   const multiplier = Math.pow(10, precision);
 
   return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
+}
+
+export const closePolygon = <Point extends LocalPoint | GlobalPoint>(
+  polygon: Polygon<Point>,
+) => {
+  return polygonIsClosed(polygon) ? polygon : [...polygon, polygon[0]];
 };

@@ -69,7 +69,6 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import { segmentIntersectRectangleElement } from "../../utils/geometry/geometry";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
   lineSegment,
@@ -80,6 +79,7 @@ import {
   pointFromPair,
   pointDistanceSq,
 } from "@excalidraw/math";
+import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

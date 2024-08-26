@@ -1,15 +1,15 @@
-import { lineAngle } from "../../utils/geometry/geometry";
 import { getCenterForBounds, scalePointFromOrigin } from "../math";
 import type {
   LocalPoint,
   GlobalPoint,
   Triangle,
   Vector,
+  Radians,
 } from "@excalidraw/math";
 import {
-  line,
   point,
   pointRotateRads,
+  radiansToDegrees,
   triangleIncludesPoint,
 } from "@excalidraw/math";
 import type { Bounds } from "./bounds";
@@ -25,7 +25,9 @@ export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
   a: Point,
   b: Point,
 ) => {
-  const angle = lineAngle(line(a, b));
+  const angle = radiansToDegrees(
+    Math.atan2(b[1] - a[1], b[0] - a[0]) as Radians,
+  );
   if (angle >= 315 || angle < 45) {
     return HEADING_UP;
   } else if (angle >= 45 && angle < 135) {

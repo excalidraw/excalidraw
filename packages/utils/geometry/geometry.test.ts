@@ -1,49 +1,32 @@
 import type {
-  Curve,
-  Degrees,
   GlobalPoint,
-  Line,
   LineSegment,
   Polygon,
   Radians,
 } from "@excalidraw/math";
 import {
   point,
-  line,
   lineSegment,
-  lineRotate,
-  lineSegmentRotate,
-  degreesToRadians,
-  pointRotateDegs,
   polygon,
-  curve,
-} from "@excalidraw/math";
-import {
-  lineIntersectsLine,
-  pointInEllipse,
-  pointInPolygon,
-  pointLeftofLine,
-  pointOnCurve,
-  pointOnEllipse,
   pointOnLineSegment,
   pointOnPolygon,
-  pointOnPolyline,
-  pointRightofLine,
-} from "./geometry";
-import type { Ellipse, Polyline } from "./shape";
+  pointInPolygon,
+  segmentsIntersectAt,
+} from "@excalidraw/math";
+import { pointInEllipse, pointOnEllipse, type Ellipse } from "./shape";
 
 describe("point and line", () => {
-  const l: Line<GlobalPoint> = line(point(1, 0), point(1, 2));
+  // const l: Line<GlobalPoint> = line(point(1, 0), point(1, 2));
 
-  it("point on left or right of line", () => {
-    expect(pointLeftofLine(point(0, 1), l)).toBe(true);
-    expect(pointLeftofLine(point(1, 1), l)).toBe(false);
-    expect(pointLeftofLine(point(2, 1), l)).toBe(false);
+  // it("point on left or right of line", () => {
+  //   expect(pointLeftofLine(point(0, 1), l)).toBe(true);
+  //   expect(pointLeftofLine(point(1, 1), l)).toBe(false);
+  //   expect(pointLeftofLine(point(2, 1), l)).toBe(false);
 
-    expect(pointRightofLine(point(0, 1), l)).toBe(false);
-    expect(pointRightofLine(point(1, 1), l)).toBe(false);
-    expect(pointRightofLine(point(2, 1), l)).toBe(true);
-  });
+  //   expect(pointRightofLine(point(0, 1), l)).toBe(false);
+  //   expect(pointRightofLine(point(1, 1), l)).toBe(false);
+  //   expect(pointRightofLine(point(2, 1), l)).toBe(true);
+  // });
 
   const s: LineSegment<GlobalPoint> = lineSegment(point(1, 0), point(1, 2));
 
@@ -51,60 +34,6 @@ describe("point and line", () => {
     expect(pointOnLineSegment(point(0, 1), s)).toBe(false);
     expect(pointOnLineSegment(point(1, 1), s, 0)).toBe(true);
     expect(pointOnLineSegment(point(2, 1), s)).toBe(false);
-  });
-});
-
-describe("point and polylines", () => {
-  const polyline: Polyline<GlobalPoint> = [
-    lineSegment(point(1, 0), point(1, 2)),
-    lineSegment(point(1, 2), point(2, 2)),
-    lineSegment(point(2, 2), point(2, 1)),
-    lineSegment(point(2, 1), point(3, 1)),
-  ];
-
-  it("point on the line", () => {
-    expect(pointOnPolyline(point(1, 0), polyline)).toBe(true);
-    expect(pointOnPolyline(point(1, 2), polyline)).toBe(true);
-    expect(pointOnPolyline(point(2, 2), polyline)).toBe(true);
-    expect(pointOnPolyline(point(2, 1), polyline)).toBe(true);
-    expect(pointOnPolyline(point(3, 1), polyline)).toBe(true);
-
-    expect(pointOnPolyline(point(1, 1), polyline)).toBe(true);
-    expect(pointOnPolyline(point(2, 1.5), polyline)).toBe(true);
-    expect(pointOnPolyline(point(2.5, 1), polyline)).toBe(true);
-
-    expect(pointOnPolyline(point(0, 1), polyline)).toBe(false);
-    expect(pointOnPolyline(point(2.1, 1.5), polyline)).toBe(false);
-  });
-
-  it("point on the line with rotation", () => {
-    const truePoints = [
-      point(1, 0),
-      point(1, 2),
-      point(2, 2),
-      point(2, 1),
-      point(3, 1),
-    ];
-
-    truePoints.forEach((p) => {
-      const rotation = (Math.random() * 360) as Degrees;
-      const rotatedPoint = pointRotateDegs(p, point(0, 0), rotation);
-      const rotatedPolyline = polyline.map((line) =>
-        lineSegmentRotate(line, degreesToRadians(rotation), point(0, 0)),
-      );
-      expect(pointOnPolyline(rotatedPoint, rotatedPolyline)).toBe(true);
-    });
-
-    const falsePoints = [point(0, 1), point(2.1, 1.5)];
-
-    falsePoints.forEach((p) => {
-      const rotation = (Math.random() * 360) as Degrees;
-      const rotatedPoint = pointRotateDegs(p, point(0, 0), rotation);
-      const rotatedPolyline = polyline.map((line) =>
-        lineSegmentRotate(line, degreesToRadians(rotation), point(0, 0)),
-      );
-      expect(pointOnPolyline(rotatedPoint, rotatedPolyline)).toBe(false);
-    });
   });
 });
 
@@ -134,28 +63,6 @@ describe("point and polygon", () => {
     );
     expect(pointInPolygon(point(1, 1), poly)).toBe(true);
     expect(pointInPolygon(point(3, 3), poly)).toBe(false);
-  });
-});
-
-describe("point and curve", () => {
-  const c: Curve<GlobalPoint> = curve(
-    point(1.4, 1.65),
-    point(1.9, 7.9),
-    point(5.9, 1.65),
-    point(6.44, 4.84),
-  );
-
-  it("point on curve", () => {
-    expect(pointOnCurve(c[0], c)).toBe(true);
-    expect(pointOnCurve(c[3], c)).toBe(true);
-
-    expect(pointOnCurve(point(2, 4), c, 0.1)).toBe(true);
-    expect(pointOnCurve(point(4, 4.4), c, 0.1)).toBe(true);
-    expect(pointOnCurve(point(5.6, 3.85), c, 0.1)).toBe(true);
-
-    expect(pointOnCurve(point(5.6, 4), c, 0.1)).toBe(false);
-    expect(pointOnCurve(c[1], c, 0.1)).toBe(false);
-    expect(pointOnCurve(c[2], c, 0.1)).toBe(false);
   });
 });
 
@@ -210,11 +117,11 @@ describe("line and line", () => {
   const lineG: LineSegment<GlobalPoint> = lineSegment(point(0, 1), point(2, 3));
 
   it("intersection", () => {
-    expect(lineIntersectsLine(lineA, lineB)).toBe(true);
-    expect(lineIntersectsLine(lineA, lineC)).toBe(false);
-    expect(lineIntersectsLine(lineB, lineC)).toBe(false);
-    expect(lineIntersectsLine(lineC, lineD)).toBe(true);
-    expect(lineIntersectsLine(lineE, lineD)).toBe(false);
-    expect(lineIntersectsLine(lineF, lineG)).toBe(true);
+    expect(segmentsIntersectAt(lineA, lineB)).toEqual([2, 4]);
+    expect(segmentsIntersectAt(lineA, lineC)).toBe(null);
+    expect(segmentsIntersectAt(lineB, lineC)).toBe(null);
+    expect(segmentsIntersectAt(lineC, lineD)).toBe(null); // Line overlapping line is not intersection!
+    expect(segmentsIntersectAt(lineE, lineD)).toBe(null);
+    expect(segmentsIntersectAt(lineF, lineG)).toBe(null);
   });
 });

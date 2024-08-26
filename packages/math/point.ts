@@ -202,3 +202,66 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
   "inline";
   return Math.hypot(b[0] - a[0], b[1] - a[1]);
 }
+
+// const topPointFirst = <Point extends LocalPoint | GlobalPoint>(
+//   line: Line<Point>,
+// ) => {
+//   return line[1][1] > line[0][1] ? line : [line[1], line[0]];
+// };
+
+// export const pointLeftofLine = <Point extends LocalPoint | GlobalPoint>(
+//   point: Point,
+//   line: Line<Point>,
+// ) => {
+//   const t = topPointFirst(line);
+//   return (
+//     vectorCross(vectorFromPoint(point, t[0]), vectorFromPoint(t[1], t[0])) < 0
+//   );
+// };
+
+// export const pointRightofLine = <Point extends LocalPoint | GlobalPoint>(
+//   point: Point,
+//   line: Line<Point>,
+// ) => {
+//   const t = topPointFirst(line);
+//   return (
+//     vectorCross(vectorFromPoint(point, t[0]), vectorFromPoint(t[1], t[0])) > 0
+//   );
+// };
+
+// export const pointInBezierEquation = <Point extends LocalPoint | GlobalPoint>(
+//   p0: Point,
+//   p1: Point,
+//   p2: Point,
+//   p3: Point,
+//   [mx, my]: Point,
+//   lineThreshold: number,
+// ) => {
+//   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
+//   const equation = (t: number, idx: number) =>
+//     Math.pow(1 - t, 3) * p3[idx] +
+//     3 * t * Math.pow(1 - t, 2) * p2[idx] +
+//     3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
+//     p0[idx] * Math.pow(t, 3);
+
+//   const lineSegmentPoints: Point[] = [];
+//   let t = 0;
+//   while (t <= 1.0) {
+//     const tx = equation(t, 0);
+//     const ty = equation(t, 1);
+
+//     const diff = Math.sqrt(Math.pow(tx - mx, 2) + Math.pow(ty - my, 2));
+
+//     if (diff < lineThreshold) {
+//       return true;
+//     }
+
+//     lineSegmentPoints.push(point(tx, ty));
+
+//     t += 0.1;
+//   }
+
+//   // check the distance from line segments to the given point
+
+//   return false;
+// };
