@@ -168,6 +168,7 @@
     "exportImage": "Exporteer afbeelding...",
     "export": "Sla op...",
     "copyToClipboard": "Kopieer",
+    "copyLink": "",
     "save": "Opslaan naar huidige bestand",
     "saveAs": "Opslaan als",
     "load": "Open",
