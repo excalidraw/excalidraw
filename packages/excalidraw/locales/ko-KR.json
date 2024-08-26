@@ -168,6 +168,7 @@
     "exportImage": "이미지 내보내기",
     "export": "다른 이름으로 저장...",
     "copyToClipboard": "클립보드로 복사",
+    "copyLink": "",
     "save": "현재 파일에 저장",
     "saveAs": "다른 이름으로 저장",
     "load": "열기",
