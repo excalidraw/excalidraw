@@ -749,11 +749,10 @@ export const getCommonBounds = (
   let minY = Infinity;
   let maxY = -Infinity;
 
+  const _elementsMap = elementsMap || arrayToMap(elements);
+
   elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(
-      element,
-      elementsMap || arrayToMap(elements),
-    );
+    const [x1, y1, x2, y2] = getElementBounds(element, _elementsMap);
     minX = Math.min(minX, x1);
     minY = Math.min(minY, y1);
     maxX = Math.max(maxX, x2);
