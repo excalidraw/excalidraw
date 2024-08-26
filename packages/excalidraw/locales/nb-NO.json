@@ -168,6 +168,7 @@
     "exportImage": "Eksporter bilde...",
     "export": "Lagre som...",
     "copyToClipboard": "Kopier til utklippstavle",
+    "copyLink": "",
     "save": "Lagre til aktiv fil",
     "saveAs": "Lagre som",
     "load": "Åpne",
