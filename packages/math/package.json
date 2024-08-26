@@ -1,7 +1,19 @@
 {
   "name": "@excalidraw/math",
   "version": "1.0.0",
+  "main": "./dist/prod/index.js",
   "type": "module",
+  "module": "./dist/prod/index.js",
+  "exports": {
+    ".": {
+      "development": "./dist/dev/index.js",
+      "default": "./dist/prod/index.js"
+    }
+  },
+  "types": "./dist/utils/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
   "description": "Excalidraw math functions",
   "publishConfig": {
     "access": "public"
