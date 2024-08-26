@@ -168,6 +168,7 @@
     "exportImage": "Xuất file ảnh...",
     "export": "Lưu vào...",
     "copyToClipboard": "Sao chép vào bộ nhớ tạm",
+    "copyLink": "",
     "save": "Lưu vào tập tin hiện tại",
     "saveAs": "Lưu thành",
     "load": "Mở",
