@@ -168,6 +168,7 @@
     "exportImage": "匯出圖片",
     "export": "儲存至...",
     "copyToClipboard": "複製至剪貼簿",
+    "copyLink": "",
     "save": "儲存目前檔案",
     "saveAs": "儲存為",
     "load": "開啟",
