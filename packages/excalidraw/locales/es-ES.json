@@ -168,6 +168,7 @@
     "exportImage": "Exportar imagen...",
     "export": "Guardar en...",
     "copyToClipboard": "Copiar al portapapeles",
+    "copyLink": "",
     "save": "Guardar en archivo actual",
     "saveAs": "Guardar como",
     "load": "Abrir",
