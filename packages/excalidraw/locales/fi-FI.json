@@ -168,6 +168,7 @@
     "exportImage": "Vie kuva...",
     "export": "Tallenna nimellä...",
     "copyToClipboard": "Kopioi leikepöydälle",
+    "copyLink": "",
     "save": "Tallenna nykyiseen tiedostoon",
     "saveAs": "Tallenna nimellä",
     "load": "Avaa",
