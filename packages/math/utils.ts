@@ -3,6 +3,7 @@ import type {
   Degrees,
   GlobalPoint,
   LocalPoint,
+  PolarCoords,
   Polygon,
   Radians,
 } from "./types";
@@ -37,3 +38,13 @@ export const closePolygon = <Point extends LocalPoint | GlobalPoint>(
 ) => {
   return polygonIsClosed(polygon) ? polygon : [...polygon, polygon[0]];
 };
+
+/**
+ * Return the polar coordinates for the given carthesian point represented by
+ * (x, y) for the center point 0,0 where the first number returned is the radius,
+ * the second is the angle in radians.
+ */
+export const carthesian2Polar = <P extends GlobalPoint | LocalPoint>([
+  x,
+  y,
+]: P): PolarCoords => [Math.hypot(x, y), Math.atan2(y, x)];

@@ -1,3 +1,4 @@
+export * from "./arc";
 export * from "./angle";
 export * from "./curve";
 export * from "./line";

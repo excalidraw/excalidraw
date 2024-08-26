@@ -90,3 +90,18 @@ export type Curve<Point extends GlobalPoint | LocalPoint> = [
 ] & {
   _brand: "excalimath_curve";
 };
+
+/**
+ *
+ */
+export type PolarCoords = [number, number];
+
+/**
+ * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
+ * corresponds to (1, 0) carthesian coordinates (point), i.e. to the "right".
+ */
+export type SymmetricArc = {
+  radius: number;
+  startAngle: number;
+  endAngle: number;
+};

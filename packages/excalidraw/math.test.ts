@@ -1,10 +1,6 @@
 import type { Radians } from "../math";
-import { point, pointRotateRads } from "../math";
-import {
-  isPointOnSymmetricArc,
-  rangeIntersection,
-  rangesOverlap,
-} from "./math";
+import { isPointOnSymmetricArc, point, pointRotateRads } from "../math";
+import { rangeIntersection, rangesOverlap } from "./math";
 
 describe("rotate", () => {
   it("should rotate over (x2, y2) and return the rotated coordinates for (x1, y1)", () => {
