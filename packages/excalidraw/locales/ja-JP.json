@@ -168,6 +168,7 @@
     "exportImage": "画像のエクスポート...",
     "export": "名前を付けて保存...",
     "copyToClipboard": "クリップボードにコピー",
+    "copyLink": "",
     "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
     "load": "開く",
