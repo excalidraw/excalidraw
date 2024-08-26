@@ -168,6 +168,7 @@
     "exportImage": "Exporta la imatge...",
     "export": "Guardar a...",
     "copyToClipboard": "Copia al porta-retalls",
+    "copyLink": "",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
     "load": "Obrir",
