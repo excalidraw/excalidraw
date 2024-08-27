@@ -159,26 +159,42 @@ export const getDragOffsetXY = (
   return [x - x1, y - y1];
 };
 
-export const dragNewElement = (
-  newElement: NonDeletedExcalidrawElement,
-  elementType: AppState["activeTool"]["type"],
-  originX: number,
-  originY: number,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  shouldMaintainAspectRatio: boolean,
-  shouldResizeFromCenter: boolean,
-  zoom: NormalizedZoomValue,
+export const dragNewElement = ({
+  newElement,
+  elementType,
+  originX,
+  originY,
+  x,
+  y,
+  width,
+  height,
+  shouldMaintainAspectRatio,
+  shouldResizeFromCenter,
+  zoom,
+  widthAspectRatio = null,
+  originOffset = null,
+  informMutation = true,
+}: {
+  newElement: NonDeletedExcalidrawElement;
+  elementType: AppState["activeTool"]["type"];
+  originX: number;
+  originY: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  shouldMaintainAspectRatio: boolean;
+  shouldResizeFromCenter: boolean;
+  zoom: NormalizedZoomValue;
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
-  widthAspectRatio?: number | null,
-  originOffset: {
+  widthAspectRatio?: number | null;
+  originOffset?: {
     x: number;
     y: number;
-  } | null = null,
-) => {
+  } | null;
+  informMutation?: boolean;
+}) => {
   if (shouldMaintainAspectRatio && newElement.type !== "selection") {
     if (widthAspectRatio) {
       height = width / widthAspectRatio;
@@ -242,12 +258,16 @@ export const dragNewElement = (
   }
 
   if (width !== 0 && height !== 0) {
-    mutateElement(newElement, {
-      x: newX + (originOffset?.x ?? 0),
-      y: newY + (originOffset?.y ?? 0),
-      width,
-      height,
-      ...textAutoResize,
-    });
+    mutateElement(
+      newElement,
+      {
+        x: newX + (originOffset?.x ?? 0),
+        y: newY + (originOffset?.y ?? 0),
+        width,
+        height,
+        ...textAutoResize,
+      },
+      informMutation,
+    );
   }
 };

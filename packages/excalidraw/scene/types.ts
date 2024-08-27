@@ -92,6 +92,17 @@ export type InteractiveSceneRenderConfig = {
   callback: (data: RenderInteractiveSceneCallback) => void;
 };
 
+export type NewElementSceneRenderConfig = {
+  canvas: HTMLCanvasElement | null;
+  rc: RoughCanvas;
+  newElement: ExcalidrawElement | null;
+  elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
+  scale: number;
+  appState: AppState;
+  renderConfig: StaticCanvasRenderConfig;
+};
+
 export type SceneScroll = {
   scrollX: number;
   scrollY: number;
