@@ -2,10 +2,11 @@
 
 .excalidraw {
   .layer-ui__search {
-    max-height: 100vh;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 8px 0;
+    padding: 8px 0 0 0;
+    max-height: calc(100vh - 52px - 32px);
   }
 
   .layer-ui__search-header {
@@ -49,7 +50,6 @@
 
   .layer-ui__search-result-container {
     overflow-y: auto;
-    padding-bottom: 24px;
 
     ul {
       list-style: none;
@@ -61,7 +61,7 @@
   .layer-ui__result-item {
     display: flex;
     align-items: center;
-    // line-height: 24px;
+    line-height: 24px;
     height: 48px;
     padding: 4px 8px;
     overflow: hidden;
