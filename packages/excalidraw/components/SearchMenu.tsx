@@ -214,6 +214,13 @@ const ListItem = (props: {
         active: props.highlighted,
       })}
       onClick={props.onClick}
+      ref={(ref) => {
+        if (props.highlighted) {
+          ref?.scrollIntoView({
+            block: "nearest",
+          });
+        }
+      }}
     >
       <div className="text-icon">{TextIcon}</div>
       <div className="preview-text">{props.previewText}</div>
