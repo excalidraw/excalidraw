@@ -374,7 +374,10 @@ const getKeywordOffsetsInText = (
   }
 
   let startIndex = index;
-  let remainingKeyword = keyword;
+  let remainingKeyword = textElement.originalText.slice(
+    index,
+    index + keyword.length,
+  );
   const offsets: {
     offsetX: number;
     offsetY: number;
@@ -397,10 +400,7 @@ const getKeywordOffsetsInText = (
         startIndex - lineIndexRange.startIndex,
       );
 
-      const matchedWord = lineIndexRange.line.slice(
-        startIndex,
-        startIndex + remainingKeyword.slice(0, matchCapacity).length,
-      );
+      const matchedWord = remainingKeyword.slice(0, matchCapacity);
       remainingKeyword = remainingKeyword.slice(matchCapacity);
 
       const offset = measureText(
