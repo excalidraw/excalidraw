@@ -1,8 +1,8 @@
-import * as GA from "../ga";
-import * as GAPoint from "../gapoints";
-import * as GADirection from "../gadirections";
-import * as GALine from "../galines";
-import * as GATransform from "../gatransforms";
+import * as GA from "../../math/ga/ga";
+import * as GAPoint from "../../math/ga/gapoints";
+import * as GADirection from "../../math/ga/gadirections";
+import * as GALine from "../../math/ga/galines";
+import * as GATransform from "../../math/ga/gatransforms";
 
 import type {
   ExcalidrawBindableElement,

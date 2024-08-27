@@ -1,4 +1,10 @@
-import { point, pointRotateRads, type GlobalPoint } from "../math";
+import {
+  point,
+  pointRotateRads,
+  rangeIntersection,
+  rangesOverlap,
+  type GlobalPoint,
+} from "../math";
 import { TOOL_TYPE } from "./constants";
 import type { Bounds } from "./element/bounds";
 import {
@@ -15,7 +21,6 @@ import type {
 } from "./element/types";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
-import { rangeIntersection, rangesOverlap } from "./math";
 import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,

@@ -116,99 +116,6 @@ export const cubicBezierDistance = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   controlPoints: Curve<Point>,
 ) => {
-  const solveCubicEquation = (a: number, b: number, c: number, d: number) => {
-    // This function solves the cubic equation ax^3 + bx^2 + cx + d = 0
-    const roots: number[] = [];
-
-    const discriminant =
-      18 * a * b * c * d -
-      4 * Math.pow(b, 3) * d +
-      Math.pow(b, 2) * Math.pow(c, 2) -
-      4 * a * Math.pow(c, 3) -
-      27 * Math.pow(a, 2) * Math.pow(d, 2);
-
-    if (discriminant >= 0) {
-      const C = Math.cbrt((discriminant + Math.sqrt(discriminant)) / 2);
-      const D = Math.cbrt((discriminant - Math.sqrt(discriminant)) / 2);
-
-      const root1 = (-b - C - D) / (3 * a);
-      const root2 = (-b + (C + D) / 2) / (3 * a);
-      const root3 = (-b + (C + D) / 2) / (3 * a);
-
-      roots.push(root1, root2, root3);
-    } else {
-      const realPart = -b / (3 * a);
-
-      const root1 =
-        2 * Math.sqrt(-b / (3 * a)) * Math.cos(Math.acos(realPart) / 3);
-      const root2 =
-        2 *
-        Math.sqrt(-b / (3 * a)) *
-        Math.cos((Math.acos(realPart) + 2 * Math.PI) / 3);
-      const root3 =
-        2 *
-        Math.sqrt(-b / (3 * a)) *
-        Math.cos((Math.acos(realPart) + 4 * Math.PI) / 3);
-
-      roots.push(root1, root2, root3);
-    }
-
-    return roots;
-  };
-
-  const findClosestParameter = <Point extends LocalPoint | GlobalPoint>(
-    point: Point,
-    controlPoints: Curve<Point>,
-  ) => {
-    // This function finds the parameter t that minimizes the distance between the point
-    // and any point on the cubic Bezier curve.
-
-    const [p0, p1, p2, p3] = controlPoints;
-
-    // Use the direct formula to find the parameter t
-    const a = p3[0] - 3 * p2[0] + 3 * p1[0] - p0[0];
-    const b = 3 * p2[0] - 6 * p1[0] + 3 * p0[0];
-    const c = 3 * p1[0] - 3 * p0[0];
-    const d = p0[0] - point[0];
-
-    const rootsX = solveCubicEquation(a, b, c, d);
-
-    // Do the same for the y-coordinate
-    const e = p3[1] - 3 * p2[1] + 3 * p1[1] - p0[1];
-    const f = 3 * p2[1] - 6 * p1[1] + 3 * p0[1];
-    const g = 3 * p1[1] - 3 * p0[1];
-    const h = p0[1] - point[1];
-
-    const rootsY = solveCubicEquation(e, f, g, h);
-
-    // Select the real root that is between 0 and 1 (inclusive)
-    const validRootsX = rootsX.filter((root) => root >= 0 && root <= 1);
-    const validRootsY = rootsY.filter((root) => root >= 0 && root <= 1);
-
-    if (validRootsX.length === 0 || validRootsY.length === 0) {
-      // No valid roots found, use the midpoint as a fallback
-      return 0.5;
-    }
-
-    // Choose the parameter t that minimizes the distance
-    let minDistance = Infinity;
-    let closestT = 0;
-
-    for (const rootX of validRootsX) {
-      for (const rootY of validRootsY) {
-        const distance = Math.sqrt(
-          (rootX - point[0]) ** 2 + (rootY - point[1]) ** 2,
-        );
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestT = (rootX + rootY) / 2; // Use the average for a smoother result
-        }
-      }
-    }
-
-    return closestT;
-  };
-
   // Calculate the closest point on the Bezier curve to the given point
   const t = findClosestParameter(point, controlPoints);
 
@@ -221,4 +128,97 @@ export const cubicBezierDistance = <Point extends LocalPoint | GlobalPoint>(
   );
 
   return distance;
+};
+
+const solveCubic = (a: number, b: number, c: number, d: number) => {
+  // This function solves the cubic equation ax^3 + bx^2 + cx + d = 0
+  const roots: number[] = [];
+
+  const discriminant =
+    18 * a * b * c * d -
+    4 * Math.pow(b, 3) * d +
+    Math.pow(b, 2) * Math.pow(c, 2) -
+    4 * a * Math.pow(c, 3) -
+    27 * Math.pow(a, 2) * Math.pow(d, 2);
+
+  if (discriminant >= 0) {
+    const C = Math.cbrt((discriminant + Math.sqrt(discriminant)) / 2);
+    const D = Math.cbrt((discriminant - Math.sqrt(discriminant)) / 2);
+
+    const root1 = (-b - C - D) / (3 * a);
+    const root2 = (-b + (C + D) / 2) / (3 * a);
+    const root3 = (-b + (C + D) / 2) / (3 * a);
+
+    roots.push(root1, root2, root3);
+  } else {
+    const realPart = -b / (3 * a);
+
+    const root1 =
+      2 * Math.sqrt(-b / (3 * a)) * Math.cos(Math.acos(realPart) / 3);
+    const root2 =
+      2 *
+      Math.sqrt(-b / (3 * a)) *
+      Math.cos((Math.acos(realPart) + 2 * Math.PI) / 3);
+    const root3 =
+      2 *
+      Math.sqrt(-b / (3 * a)) *
+      Math.cos((Math.acos(realPart) + 4 * Math.PI) / 3);
+
+    roots.push(root1, root2, root3);
+  }
+
+  return roots;
+};
+
+const findClosestParameter = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  controlPoints: Curve<Point>,
+) => {
+  // This function finds the parameter t that minimizes the distance between the point
+  // and any point on the cubic Bezier curve.
+
+  const [p0, p1, p2, p3] = controlPoints;
+
+  // Use the direct formula to find the parameter t
+  const a = p3[0] - 3 * p2[0] + 3 * p1[0] - p0[0];
+  const b = 3 * p2[0] - 6 * p1[0] + 3 * p0[0];
+  const c = 3 * p1[0] - 3 * p0[0];
+  const d = p0[0] - point[0];
+
+  const rootsX = solveCubic(a, b, c, d);
+
+  // Do the same for the y-coordinate
+  const e = p3[1] - 3 * p2[1] + 3 * p1[1] - p0[1];
+  const f = 3 * p2[1] - 6 * p1[1] + 3 * p0[1];
+  const g = 3 * p1[1] - 3 * p0[1];
+  const h = p0[1] - point[1];
+
+  const rootsY = solveCubic(e, f, g, h);
+
+  // Select the real root that is between 0 and 1 (inclusive)
+  const validRootsX = rootsX.filter((root) => root >= 0 && root <= 1);
+  const validRootsY = rootsY.filter((root) => root >= 0 && root <= 1);
+
+  if (validRootsX.length === 0 || validRootsY.length === 0) {
+    // No valid roots found, use the midpoint as a fallback
+    return 0.5;
+  }
+
+  // Choose the parameter t that minimizes the distance
+  let minDistance = Infinity;
+  let closestT = 0;
+
+  for (const rootX of validRootsX) {
+    for (const rootY of validRootsY) {
+      const distance = Math.sqrt(
+        (rootX - point[0]) ** 2 + (rootY - point[1]) ** 2,
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestT = (rootX + rootY) / 2; // Use the average for a smoother result
+      }
+    }
+  }
+
+  return closestT;
 };

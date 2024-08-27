@@ -4,6 +4,7 @@ export * from "./curve";
 export * from "./line";
 export * from "./point";
 export * from "./polygon";
+export * from "./range";
 export * from "./segment";
 export * from "./triangle";
 export * from "./types";

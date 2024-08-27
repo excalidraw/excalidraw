@@ -13,7 +13,6 @@ import type {
 import type { Bounds } from "./element/bounds";
 import { getCurvePathOps } from "./element/bounds";
 import { ShapeCache } from "./scene/ShapeCache";
-import type { Vector } from "../math";
 import {
   type LocalPoint,
   type GlobalPoint,
@@ -26,7 +25,6 @@ import {
   pointsEqual,
   pointTranslate,
   pointDistance,
-  vector,
 } from "../math";
 import { invariant } from "./utils";
 
@@ -175,61 +173,6 @@ export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
     q[1] >= Math.min(p[1], r[1])
   );
 };
-
-// For the ordered points p, q, r, return
-// 0 if p, q, r are colinear
-// 1 if Clockwise
-// 2 if counterclickwise
-// const orderedColinearOrientation = <P extends GlobalPoint | LocalPoint>(
-//   p: P,
-//   q: P,
-//   r: P,
-// ) => {
-//   const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
-//   if (val === 0) {
-//     return 0;
-//   }
-//   return val > 0 ? 1 : 2;
-// };
-
-// // Check is p1q1 intersects with p2q2
-// const doSegmentsIntersect = <P extends GlobalPoint | LocalPoint>(
-//   p1: P,
-//   q1: P,
-//   p2: P,
-//   q2: P,
-// ) => {
-//   const o1 = orderedColinearOrientation(p1, q1, p2);
-//   const o2 = orderedColinearOrientation(p1, q1, q2);
-//   const o3 = orderedColinearOrientation(p2, q2, p1);
-//   const o4 = orderedColinearOrientation(p2, q2, q1);
-
-//   if (o1 !== o2 && o3 !== o4) {
-//     return true;
-//   }
-
-//   // p1, q1 and p2 are colinear and p2 lies on segment p1q1
-//   if (o1 === 0 && isPointWithinBounds(p1, p2, q1)) {
-//     return true;
-//   }
-
-//   // p1, q1 and p2 are colinear and q2 lies on segment p1q1
-//   if (o2 === 0 && isPointWithinBounds(p1, q2, q1)) {
-//     return true;
-//   }
-
-//   // p2, q2 and p1 are colinear and p1 lies on segment p2q2
-//   if (o3 === 0 && isPointWithinBounds(p2, p1, q2)) {
-//     return true;
-//   }
-
-//   // p2, q2 and q1 are colinear and q1 lies on segment p2q2
-//   if (o4 === 0 && isPointWithinBounds(p2, q1, q2)) {
-//     return true;
-//   }
-
-//   return false;
-// };
 
 // TODO: Rounding this point causes some shake when free drawing
 export const getGridPoint = (
@@ -425,70 +368,11 @@ export const mapIntervalToBezierT = <P extends GlobalPoint | LocalPoint>(
   );
 };
 
-export const isRightAngle = (angle: number) => {
-  // if our angles were mathematically accurate, we could just check
-  //
-  //    angle % (Math.PI / 2) === 0
-  //
-  // but since we're in floating point land, we need to round.
-  //
-  // Below, after dividing by Math.PI, a multiple of 0.5 indicates a right
-  // angle, which we can check with modulo after rounding.
-  return Math.round((angle / Math.PI) * 10000) % 5000 === 0;
-};
-
-// Given two ranges, return if the two ranges overlap with each other
-// e.g. [1, 3] overlaps with [2, 4] while [1, 3] does not overlap with [4, 5]
-export const rangesOverlap = (
-  [a0, a1]: [number, number],
-  [b0, b1]: [number, number],
-) => {
-  if (a0 <= b0) {
-    return a1 >= b0;
-  }
-
-  if (a0 >= b0) {
-    return b1 >= a0;
-  }
-
-  return false;
-};
-
-// Given two ranges,return ther intersection of the two ranges if any
-// e.g. the intersection of [1, 3] and [2, 4] is [2, 3]
-export const rangeIntersection = (
-  rangeA: [number, number],
-  rangeB: [number, number],
-): [number, number] | null => {
-  const rangeStart = Math.max(rangeA[0], rangeB[0]);
-  const rangeEnd = Math.min(rangeA[1], rangeB[1]);
-
-  if (rangeStart <= rangeEnd) {
-    return [rangeStart, rangeEnd];
-  }
-
-  return null;
-};
-
-export const isValueInRange = (value: number, min: number, max: number) => {
-  return value >= min && value <= max;
-};
-
 export const scalePointFromOrigin = <P extends GlobalPoint | LocalPoint>(
   p: P,
   mid: P,
   multiplier: number,
 ) => pointTranslate(mid, vectorScale(vectorFromPoint(p, mid), multiplier));
-
-export const magnitudeSq = (v: Vector) => v[0] * v[0] + v[1] * v[1];
-
-export const magnitude = (v: Vector) => Math.sqrt(magnitudeSq(v));
-
-export const normalize = (v: Vector): Vector => {
-  const m = magnitude(v);
-
-  return vector(v[0] / m, v[1] / m);
-};
 
 export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
   p: P,

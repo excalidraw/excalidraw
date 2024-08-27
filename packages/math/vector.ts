@@ -114,3 +114,28 @@ export function vectorScale(v: Vector, scalar: number): Vector {
   "inline";
   return vector(v[0] * scalar, v[1] * scalar);
 }
+
+/**
+ *
+ */
+export function vectorMagnitudeSq(v: Vector) {
+  "inline";
+  return v[0] * v[0] + v[1] * v[1];
+}
+
+/**
+ *
+ */
+export function vectorMagnitude(v: Vector) {
+  "inline";
+  return Math.sqrt(vectorMagnitudeSq(v));
+}
+
+/**
+ *
+ */
+export const vectorNormalize = (v: Vector): Vector => {
+  const m = vectorMagnitude(v);
+
+  return vector(v[0] / m, v[1] / m);
+};
