@@ -284,12 +284,12 @@
     "freedraw": "",
     "text": "Текст",
     "image": "Изображение",
-    "group": "",
+    "group": "Группа",
     "frame": "",
-    "magicframe": "",
-    "embeddable": "",
+    "magicframe": "Каркас для кода",
+    "embeddable": "Встроенная страница",
     "selection": "Выделение",
-    "iframe": ""
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Операции холста",
@@ -302,7 +302,7 @@
     "arrowTool": "",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
-    "embeddable": "",
+    "embeddable": "Перетащите для встраивания веб-сайта",
     "text_selected": "Дважды щелкните мышью или нажмите ENTER, чтобы редактировать текст",
     "text_editing": "Нажмите Escape либо Ctrl или Cmd + ENTER для завершения редактирования",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
@@ -316,11 +316,11 @@
     "placeImage": "Щелкните, чтобы разместить изображение, или нажмите и перетащите, чтобы установить его размер вручную",
     "publishLibrary": "Опубликовать свою собственную библиотеку",
     "bindTextToElement": "Нажмите Enter для добавления текста",
-    "createFlowchart": "",
+    "createFlowchart": "Удерживайте CtrlOrCmd и клавишу стрелки, чтобы создать диаграмму",
     "deepBoxSelect": "Удерживайте Ctrl или Cmd для глубокого выделения, чтобы предотвратить перетаскивание",
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "Удерживайте CtrlOrCmd, чтобы отключить привязку"
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -339,8 +339,8 @@
     "or": "Или"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Пригласить людей для участия в рисовании.",
+    "desc_privacy": "Не волнуйтесь, сеанс защищен сквозным шифрованием и полностью приватный. Даже наш сервер не сможет увидеть, что вы рисуете.",
     "button_startSession": "Начать сеанс",
     "button_stopSession": "Завершить сеанс",
     "desc_inProgressIntro": "Сеанс совместной работы запущен.",
@@ -367,8 +367,8 @@
     "click": "нажать",
     "deepSelect": "Глубокое выделение",
     "deepBoxSelect": "Глубокое выделение рамкой, и предотвращение перетаскивания",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Создать диаграмму из базового элемента",
+    "navigateFlowchart": "Навигация по диаграмме",
     "curvedArrow": "Изогнутая стрелка",
     "curvedLine": "Изогнутая линия",
     "documentation": "Документация",
@@ -451,8 +451,8 @@
       "copyPngToClipboard": "Скопировать PNG в буфер обмена"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Скопировать в буфер обмена"
     }
   },
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "Угол",
-    "shapes": "",
+    "shapes": "Фигуры",
     "height": "Высота",
     "scene": "Сцены",
     "selected": "Выбран",
     "storage": "Хранилище",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Свойства холста и фигуры",
+    "title": "Свойства",
+    "generalStats": "Общее",
+    "elementProperties": "Свойства формы",
     "total": "Всего",
     "version": "Версия",
     "versionCopy": "Копировать",
@@ -487,7 +487,7 @@
     "canvas": "холст",
     "selection": "выделение",
     "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор",
-    "unableToEmbed": "",
+    "unableToEmbed": "Встраивание этого url в данный момент не разрешено. Сделать запрос на GitHub для добавления url в белый список",
     "unrecognizedLinkFormat": ""
   },
   "colors": {
@@ -540,9 +540,9 @@
         "description": ""
       },
       "excalidrawPlus": {
-        "title": "",
+        "title": "Excalidraw+",
         "button": "Экспорт в Excalidraw+",
-        "description": ""
+        "description": "Сохраните сцену в ваше рабочее пространство Excalidraw+."
       }
     },
     "modal": {
@@ -553,17 +553,17 @@
       },
       "shareableLink": {
         "title": "Загрузить по ссылке",
-        "button": "",
+        "button": "Заменить содержимое",
         "description": ""
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
+    "title": "Из Mermaid в Excalidraw",
+    "button": "Вставить",
     "description": "",
-    "syntax": "",
-    "preview": ""
+    "syntax": "Синтаксис Mermaid",
+    "preview": "Предпросмотр"
   },
   "quickSearch": {
     "placeholder": "Быстрый поиск"
@@ -589,16 +589,16 @@
   "commandPalette": {
     "title": "Палитра команд",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
+      "select": "Выбрать",
+      "confirm": "Подтвердить",
       "close": "Закрыть"
     },
     "recents": "Недавно использованные",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Поиск меню, команд и скрытых сокровищ",
+      "noMatch": "Нет подходящих команд..."
     },
-    "itemNotAvailable": "",
+    "itemNotAvailable": "Команда недоступна...",
     "shortcutHint": "Используйте {{shortcut}} для командной палитры"
   }
 }
