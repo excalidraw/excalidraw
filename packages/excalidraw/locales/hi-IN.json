@@ -113,7 +113,7 @@
     "share": "साझा करें",
     "showStroke": "कूँची रंग चयक दिखायें",
     "showBackground": "पृष्ठभूमि रंग चयक दिखाये",
-    "showFonts": "",
+    "showFonts": "लिपि चुनक दिखायें",
     "toggleTheme": "अंधेरी/उजेलि संरचना पलटे",
     "theme": "संरचना पद्धति",
     "personalLib": "वैयक्तिक समूहकोष",
@@ -168,7 +168,7 @@
     "exportImage": "प्रतिमा निर्यात करे...",
     "export": "यंहा सुरक्षित करे...",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
-    "copyLink": "",
+    "copyLink": "लिंक कॉपी करें",
     "save": "वर्तमान फ़ाईल में सुरक्षित करें",
     "saveAs": "सेव करे इस तरह",
     "load": "खोलें",
@@ -316,7 +316,7 @@
     "placeImage": "प्रतिमा स्थापित करने के लिए क्लिक करें, अथवा प्रतिमा के आकार हस्तोंस्थापित करने के लिये क्लिक करके ड्रैग करें",
     "publishLibrary": "आपका अपना समूहकोष प्रकाशित करे",
     "bindTextToElement": "पाठ जोड़ने के लिए एंटर दबायें",
-    "createFlowchart": "",
+    "createFlowchart": "फ़्लोचार्ट बनाने के लिए कंट्रोलयाकमांड कुंजी के साथ बाण कुंजी दबायें रख़े",
     "deepBoxSelect": "गहरे चयन के लिये और ड्रेग रोकथाम के लिये कंट्रोल-या-कमांड दबायें रख़े",
     "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
@@ -367,8 +367,8 @@
     "click": "क्लिक करें",
     "deepSelect": "गहरा चयन",
     "deepBoxSelect": "बक्से के अंदर गहरा चयन करे और घसीटने की रोकथाम करे",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "सामान्य अवयव से फ़्लोचार्ट बनायें",
+    "navigateFlowchart": "फ़्लोचार्ट का अनुपालन करें",
     "curvedArrow": "वक्र तीर",
     "curvedLine": "वक्र रेखा",
     "documentation": "प्रलेखिकरण",
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "कोण",
-    "shapes": "",
+    "shapes": "आकृतियाँ",
     "height": "ऊंचाई",
     "scene": "दृश्य",
     "selected": "चयनित",
     "storage": "संग्रह",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "पटल और आकार के गुण",
+    "title": "गुण",
+    "generalStats": "साधारणत:",
+    "elementProperties": "आकृति के गुण",
     "total": "कुल",
     "version": "संस्करण",
     "versionCopy": "प्रतिलिपि के लिए क्लिक करें",
@@ -566,18 +566,18 @@
     "preview": "पूर्वावलोकन"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "त्वरित खोज"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "पुराना"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "इस दृश्य में",
+    "availableFonts": "उपलब्ध लिपियां",
+    "empty": "कोई लिपि नहीं मिली"
   },
   "userList": {
-    "empty": "",
+    "empty": "कोई उपयोक्ता नहीं मिला",
     "hint": {
       "text": "उपयोक्ता का अनुकरण करने के लिए उसपर क्लिक करें",
       "followStatus": "आप इस उपयोक्ता का अनुकरण कर रहें हैं.",
