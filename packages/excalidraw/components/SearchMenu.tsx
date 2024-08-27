@@ -448,6 +448,10 @@ const getKeywordOffsetsInText = (
   return offsets;
 };
 
+const sanitizeKeyword = (string: string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 const handleSearch = debounce(
   (
     keyword: string,
@@ -467,7 +471,8 @@ const handleSearch = debounce(
 
     const matches: SearchMatch[] = [];
 
-    const regex = new RegExp(keyword, "gi");
+    const safeKeyword = sanitizeKeyword(keyword);
+    const regex = new RegExp(safeKeyword, "gi");
 
     for (const textEl of textElements) {
       let match = null;
