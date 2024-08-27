@@ -8,9 +8,7 @@ import type { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
-// #if [DEV]
-import { saveDebugState } from "./DebugCanvas";
-// #endif
+import { isVisualDebuggerEnabled, saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -55,8 +53,7 @@ export const AppMainMenu: React.FC<{
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       </MainMenu.ItemLink>
-      {
-        // #if [DEV]
+      {isVisualDebuggerEnabled() && (
         <MainMenu.Item
           icon={eyeIcon}
           onClick={() => {
@@ -72,8 +69,7 @@ export const AppMainMenu: React.FC<{
         >
           Visual Debug
         </MainMenu.Item>
-        // #endif
-      }
+      )}
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme

@@ -6,7 +6,6 @@ import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import {
   APP_NAME,
-  ENV,
   EVENT,
   THEME,
   TITLE_TIMEOUT,
@@ -121,12 +120,11 @@ import {
 import { appThemeAtom, useHandleAppTheme } from "./useHandleAppTheme";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
-// #if [DEV]
 import DebugCanvas, {
   debugRenderer,
+  isVisualDebuggerEnabled,
   loadSavedDebugState,
 } from "./components/DebugCanvas";
-// #endif
 import { AIComponents } from "./components/AI";
 
 polyfill();
@@ -344,9 +342,7 @@ const ExcalidrawWrapper = () => {
       resolvablePromise<ExcalidrawInitialDataState | null>();
   }
 
-  // #if [DEV]
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
-  // #endif
 
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
@@ -376,7 +372,7 @@ const ExcalidrawWrapper = () => {
   const [, forceRefresh] = useState(false);
 
   useEffect(() => {
-    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    if (import.meta.env.DEV) {
       const debugState = loadSavedDebugState();
 
       if (debugState.enabled && !window.visualDebug) {
@@ -652,11 +648,9 @@ const ExcalidrawWrapper = () => {
     }
 
     // Render the debug scene if the debug canvas is available
-    // #if [DEV]
     if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(debugCanvasRef.current, appState, window.devicePixelRatio);
     }
-    // #endif
   };
 
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
@@ -1113,17 +1107,13 @@ const ExcalidrawWrapper = () => {
             },
           ]}
         />
-        {
-          // #if [DEV]
-          window.visualDebug && excalidrawAPI && (
-            <DebugCanvas
-              appState={excalidrawAPI.getAppState()}
-              scale={window.devicePixelRatio}
-              ref={debugCanvasRef}
-            />
-          )
-          // #endif
-        }
+        {isVisualDebuggerEnabled() && excalidrawAPI && (
+          <DebugCanvas
+            appState={excalidrawAPI.getAppState()}
+            scale={window.devicePixelRatio}
+            ref={debugCanvasRef}
+          />
+        )}
       </Excalidraw>
     </div>
   );
