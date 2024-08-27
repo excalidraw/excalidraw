@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/math",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "./dist/prod/index.js",
   "type": "module",
   "module": "./dist/prod/index.js",
