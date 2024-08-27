@@ -189,7 +189,8 @@ export const isRectangularElement = (
       element.type === "iframe" ||
       element.type === "embeddable" ||
       element.type === "frame" ||
-      element.type === "magicframe")
+      element.type === "magicframe" ||
+      element.type === "freedraw")
   );
 };
 

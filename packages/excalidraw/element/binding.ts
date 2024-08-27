@@ -10,7 +10,6 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawDiamondElement,
   ExcalidrawEllipseElement,
-  ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawIframeLikeElement,
@@ -26,6 +25,7 @@ import type {
   ExcalidrawElbowArrowElement,
   FixedPoint,
   SceneElementsMap,
+  ExcalidrawRectanguloidElement,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -1377,13 +1377,7 @@ export const distanceToBindableElement = (
 };
 
 const distanceToRectangle = (
-  element:
-    | ExcalidrawRectangleElement
-    | ExcalidrawTextElement
-    | ExcalidrawFreeDrawElement
-    | ExcalidrawImageElement
-    | ExcalidrawIframeLikeElement
-    | ExcalidrawFrameLikeElement,
+  element: ExcalidrawRectanguloidElement,
   p: GlobalPoint,
   elementsMap: ElementsMap,
 ): number => {

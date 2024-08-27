@@ -175,6 +175,15 @@ export type ExcalidrawFlowchartNodeElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
+export type ExcalidrawRectanguloidElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawImageElement
+  | ExcalidrawTextElement
+  | ExcalidrawFreeDrawElement
+  | ExcalidrawIframeLikeElement
+  | ExcalidrawFrameLikeElement
+  | ExcalidrawEmbeddableElement;
+
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
  * no computed data. The list of all ExcalidrawElements should be shareable
