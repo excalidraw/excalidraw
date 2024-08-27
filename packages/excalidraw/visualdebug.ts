@@ -1,6 +1,7 @@
 import type { LineSegment } from "../utils";
 import type { BoundingBox, Bounds } from "./element/bounds";
-import { isBounds, isLineSegment, type Point } from "./types";
+import { isBounds, isLineSegment } from "./element/typeChecks";
+import type { Point } from "./types";
 
 // The global data holder to collect the debug operations
 declare global {

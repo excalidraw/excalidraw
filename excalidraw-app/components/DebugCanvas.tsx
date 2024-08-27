@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
-import { isLineSegment, type AppState } from "../../packages/excalidraw/types";
+import { type AppState } from "../../packages/excalidraw/types";
 import { throttleRAF } from "../../packages/excalidraw/utils";
 import type { LineSegment } from "../../packages/utils";
 import {
@@ -13,6 +13,7 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
+import { isLineSegment } from "../../packages/excalidraw/element/typeChecks";
 
 const renderLine = (
   context: CanvasRenderingContext2D,
