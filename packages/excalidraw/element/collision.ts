@@ -1,4 +1,3 @@
-import { isPathALoop, isPointWithinBounds } from "../math";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -16,9 +15,9 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getBoundTextShape } from "../shapes";
+import { getBoundTextShape, isPathALoop } from "../shapes";
 import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
-import { point } from "../../math";
+import { isPointWithinBounds, point } from "../../math";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {

@@ -29,6 +29,7 @@ import type {
   AppClassProperties,
   AppState,
   KeyboardModifiersObject,
+  NullableGridSize,
 } from "./types";
 
 const SNAP_DISTANCE = 8;
@@ -1374,4 +1375,19 @@ export const isActiveToolNonLinearSnappable = (
     activeToolType === TOOL_TYPE.image ||
     activeToolType === TOOL_TYPE.text
   );
+};
+
+// TODO: Rounding this point causes some shake when free drawing
+export const getGridPoint = (
+  x: number,
+  y: number,
+  gridSize: NullableGridSize,
+): [number, number] => {
+  if (gridSize) {
+    return [
+      Math.round(x / gridSize) * gridSize,
+      Math.round(y / gridSize) * gridSize,
+    ];
+  }
+  return [x, y];
 };

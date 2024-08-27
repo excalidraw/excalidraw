@@ -29,6 +29,12 @@ import {
   SelectionIcon,
   TextIcon,
 } from "./components/icons";
+import {
+  DEFAULT_ADAPTIVE_RADIUS,
+  DEFAULT_PROPORTIONAL_RADIUS,
+  LINE_CONFIRM_THRESHOLD,
+  ROUNDNESS,
+} from "./constants";
 import { getElementAbsoluteCoords } from "./element";
 import type { Bounds } from "./element/bounds";
 import { shouldTestInside } from "./element/collision";
@@ -42,6 +48,7 @@ import type {
 } from "./element/types";
 import { KEYS } from "./keys";
 import { ShapeCache } from "./scene/ShapeCache";
+import type { NormalizedZoomValue, Zoom } from "./types";
 import { invariant } from "./utils";
 
 export const SHAPES = [
@@ -443,3 +450,44 @@ export const aabbsOverlapping = (a: Bounds, b: Bounds) =>
   pointInsideBounds(point(b[2], b[1]), a) ||
   pointInsideBounds(point(b[2], b[3]), a) ||
   pointInsideBounds(point(b[0], b[3]), a);
+
+export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
+  if (
+    element.roundness?.type === ROUNDNESS.PROPORTIONAL_RADIUS ||
+    element.roundness?.type === ROUNDNESS.LEGACY
+  ) {
+    return x * DEFAULT_PROPORTIONAL_RADIUS;
+  }
+
+  if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
+    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+
+    const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
+
+    if (x <= CUTOFF_SIZE) {
+      return x * DEFAULT_PROPORTIONAL_RADIUS;
+    }
+
+    return fixedRadiusSize;
+  }
+
+  return 0;
+};
+
+// Checks if the first and last point are close enough
+// to be considered a loop
+export const isPathALoop = (
+  points: ExcalidrawLinearElement["points"],
+  /** supply if you want the loop detection to account for current zoom */
+  zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
+): boolean => {
+  if (points.length >= 3) {
+    const [first, last] = [points[0], points[points.length - 1]];
+    const distance = pointDistance(first, last);
+
+    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
+    // really close we make the threshold smaller, and vice versa.
+    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
+  }
+  return false;
+};

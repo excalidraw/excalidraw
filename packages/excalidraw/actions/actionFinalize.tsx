@@ -6,7 +6,6 @@ import { done } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
-import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   maybeBindLinearElement,
@@ -17,6 +16,7 @@ import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
 import { point } from "../../math";
+import { isPathALoop } from "../shapes";
 
 export const actionFinalize = register({
   name: "finalize",

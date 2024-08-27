@@ -10,7 +10,6 @@ import type {
   ExcalidrawLinearElement,
   Arrowhead,
 } from "../element/types";
-import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
@@ -30,6 +29,7 @@ import {
   type GlobalPoint,
   type LocalPoint,
 } from "../../math";
+import { getCornerRadius, isPathALoop } from "../shapes";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 

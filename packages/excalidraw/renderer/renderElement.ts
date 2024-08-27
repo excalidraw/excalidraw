@@ -27,7 +27,6 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
-import { getCornerRadius } from "../math";
 import rough from "roughjs/bin/rough";
 import type {
   AppState,
@@ -61,6 +60,7 @@ import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
 import { PRECISION } from "../../math";
+import { getCornerRadius } from "../shapes";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original

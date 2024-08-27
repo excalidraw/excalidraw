@@ -52,7 +52,6 @@ import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
-import { getCenterForElement } from "../math";
 import {
   compareHeading,
   HEADING_DOWN,
@@ -697,14 +696,14 @@ const getSimultaneouslyUpdatedElementIds = (
 };
 
 export const getHeadingForElbowArrowSnap = (
-  point: Readonly<GlobalPoint>,
+  p: Readonly<GlobalPoint>,
   otherPoint: Readonly<GlobalPoint>,
   bindableElement: ExcalidrawBindableElement | undefined | null,
   aabb: Bounds | undefined | null,
   elementsMap: ElementsMap,
   origPoint: GlobalPoint,
 ): Heading => {
-  const otherPointHeading = vectorToHeading(vectorFromPoint(otherPoint, point));
+  const otherPointHeading = vectorToHeading(vectorFromPoint(otherPoint, p));
 
   if (!bindableElement || !aabb) {
     return otherPointHeading;
@@ -718,15 +717,17 @@ export const getHeadingForElbowArrowSnap = (
 
   if (!distance) {
     return vectorToHeading(
-      vectorFromPoint(point, getCenterForElement(bindableElement)),
+      vectorFromPoint(
+        p,
+        point<GlobalPoint>(
+          bindableElement.x + bindableElement.width / 2,
+          bindableElement.y + bindableElement.height / 2,
+        ),
+      ),
     );
   }
 
-  const pointHeading = headingForPointFromElement(
-    bindableElement,
-    aabb,
-    point as GlobalPoint,
-  );
+  const pointHeading = headingForPointFromElement(bindableElement, aabb, p);
 
   return pointHeading;
 };
@@ -842,7 +843,10 @@ export const avoidRectangularCorner = (
   element: ExcalidrawBindableElement,
   p: GlobalPoint,
 ): GlobalPoint => {
-  const center = getCenterForElement(element);
+  const center = point<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
   const nonRotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
   if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
@@ -2196,7 +2200,10 @@ export const getGlobalFixedPointForBindableElement = (
       element.x + element.width * fixedX,
       element.y + element.height * fixedY,
     ),
-    getCenterForElement(element),
+    point<GlobalPoint>(
+      element.x + element.width / 2,
+      element.y + element.height / 2,
+    ),
     element.angle,
   );
 };

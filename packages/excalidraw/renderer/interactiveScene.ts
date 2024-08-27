@@ -69,8 +69,8 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import { getCornerRadius } from "../math";
 import type { GlobalPoint, LocalPoint, Radians } from "../../math";
+import { getCornerRadius } from "../shapes";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,

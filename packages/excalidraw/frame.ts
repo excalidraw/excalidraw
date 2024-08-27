@@ -11,7 +11,6 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { isPointWithinBounds } from "./math";
 import {
   getBoundTextElement,
   getContainerElement,
@@ -30,7 +29,7 @@ import { getElementLineSegments } from "./element/bounds";
 import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
-import { point } from "../math";
+import { isPointWithinBounds, point } from "../math";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (

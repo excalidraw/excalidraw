@@ -11,7 +11,6 @@ import type {
   FixedPointBinding,
   SceneElementsMap,
 } from "./types";
-import { isPathALoop, getGridPoint } from "../math";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
 import {
@@ -62,8 +61,10 @@ import {
   getBezierCurveLength,
   getBezierXY,
   getControlPointsForBezierCurve,
+  isPathALoop,
   mapIntervalToBezierT,
 } from "../shapes";
+import { getGridPoint } from "../snapping";
 
 const editorMidPointsCache: {
   version: number | null;

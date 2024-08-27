@@ -176,6 +176,3 @@ export const flipHeading = (h: Heading): Heading =>
     h[0] === 0 ? 0 : h[0] > 0 ? -1 : 1,
     h[1] === 0 ? 0 : h[1] > 0 ? -1 : 1,
   ] as Heading;
-
-export const headingEqual = (a: Heading, b: Heading): boolean =>
-  a[0] === b[0] && a[1] === b[1];

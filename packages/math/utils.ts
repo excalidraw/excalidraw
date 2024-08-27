@@ -10,7 +10,7 @@ export function clamp(value: number, min: number, max: number) {
 export function round(value: number, precision: number) {
   const multiplier = Math.pow(10, precision);
 
-  return Math.round((value + PRECISION) * multiplier) / multiplier;
+  return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
 }
 
 export const closePolygon = <Point extends LocalPoint | GlobalPoint>(

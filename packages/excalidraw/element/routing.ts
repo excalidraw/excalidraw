@@ -28,12 +28,12 @@ import {
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
 import {
+  compareHeading,
   flipHeading,
   HEADING_DOWN,
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
-  headingEqual,
   vectorToHeading,
 } from "./heading";
 import { mutateElement } from "./mutateElement";
@@ -402,11 +402,11 @@ const astar = (
       // Do not allow going in reverse
       const reverseHeading = flipHeading(previousDirection);
       const neighborIsReverseRoute =
-        headingEqual(reverseHeading, neighborHeading) ||
+        compareHeading(reverseHeading, neighborHeading) ||
         (gridAddressesEqual(start.addr, neighbor.addr) &&
-          headingEqual(neighborHeading, startHeading)) ||
+          compareHeading(neighborHeading, startHeading)) ||
         (gridAddressesEqual(end.addr, neighbor.addr) &&
-          headingEqual(neighborHeading, endHeading));
+          compareHeading(neighborHeading, endHeading));
       if (neighborIsReverseRoute) {
         continue;
       }
@@ -935,7 +935,7 @@ const simplifyElbowArrowPoints = (points: GlobalPoint[]): GlobalPoint[] =>
     .slice(2)
     .reduce(
       (result, p) =>
-        headingEqual(
+        compareHeading(
           vectorToHeading(
             vectorFromPoint(
               result[result.length - 1],

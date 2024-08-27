@@ -210,7 +210,6 @@ import {
   isElementCompletelyInViewport,
   isElementInViewport,
 } from "../element/sizeHelpers";
-import { getCornerRadius, getGridPoint, isPathALoop } from "../math";
 import {
   calculateScrollCenter,
   getElementsWithinSelection,
@@ -225,7 +224,13 @@ import type {
   ScrollBars,
 } from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
-import { findShapeByKey, getBoundTextShape, getElementShape } from "../shapes";
+import {
+  findShapeByKey,
+  getBoundTextShape,
+  getCornerRadius,
+  getElementShape,
+  isPathALoop,
+} from "../shapes";
 import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
 import type {
@@ -381,6 +386,7 @@ import {
   getReferenceSnapPoints,
   SnapCache,
   isGridModeEnabled,
+  getGridPoint,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
