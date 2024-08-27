@@ -51,7 +51,6 @@ import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import {
   ARROW_TYPE,
   DEFAULT_SIDEBAR,
-  LIBRARY_SIDEBAR_TAB,
   SEARCH_SIDEBAR_TAB,
   type EXPORT_IMAGE_TYPES,
 } from "../constants";
@@ -4073,7 +4072,6 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           this.setState({
             openSidebar: null,
-            searchMatches: [],
           });
         } else {
           this.setState({

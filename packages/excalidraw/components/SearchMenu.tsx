@@ -4,12 +4,11 @@ import { TextField } from "./TextField";
 import { Button } from "./Button";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { debounce } from "lodash";
-import { AppClassProperties } from "../types";
+import type { AppClassProperties } from "../types";
 import { isTextElement } from "../element";
-import { ExcalidrawTextElement } from "../element/types";
+import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
 import { getFontString } from "../utils";
-import { EVENT } from "../constants";
 import { KEYS } from "../keys";
 
 import "./SearchMenu.scss";
@@ -65,7 +64,7 @@ export const SearchMenu = () => {
         })),
       });
     });
-  }, [keyWord, app, elementsMap]);
+  }, [keyWord, app, elementsMap, setAppState, setFocusIndex]);
 
   const goToNextItem = () => {
     if (matches.length > 0) {
@@ -122,23 +121,18 @@ export const SearchMenu = () => {
         });
       }
     }
-  }, [focusIndex, matches]);
+  }, [app, focusIndex, matches, setAppState]);
 
   useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if (matches.length) {
-        if (event.key === KEYS.ARROW_UP) {
-          goToPreviousItem();
-        } else if (event.key === KEYS.ARROW_DOWN) {
-          goToNextItem();
-        }
-      }
+    return () => {
+      setKeyWord("");
+      setFocusIndex(null);
+      setKeywordSearched(false);
+      setAppState({
+        searchMatches: [],
+      });
     };
-
-    window.addEventListener(EVENT.KEYDOWN, handler);
-
-    return () => window.removeEventListener(EVENT.KEYDOWN, handler);
-  }, [matches]);
+  }, [setAppState, setFocusIndex]);
 
   return (
     <div className="layer-ui__search">
@@ -152,8 +146,14 @@ export const SearchMenu = () => {
             }}
             selectOnRender
             onKeyDown={(event) => {
-              if (event.key === KEYS.ENTER) {
-                if (matches.length) {
+              if (matches.length) {
+                if (event.key === KEYS.ENTER) {
+                  goToNextItem();
+                }
+
+                if (event.key === KEYS.ARROW_UP) {
+                  goToPreviousItem();
+                } else if (event.key === KEYS.ARROW_DOWN) {
                   goToNextItem();
                 }
               }
@@ -232,8 +232,8 @@ const ListItem = (props: {
   const previewWords = props.preview.previewText.split(/\s+/);
 
   const preview = [
-    previewWords.slice(0, keywordStartIndex).join(" ") + " ",
-    previewWords.slice(keywordStartIndex, keywordStartIndex + 1) + " ",
+    `${previewWords.slice(0, keywordStartIndex).join(" ")} `,
+    `${previewWords.slice(keywordStartIndex, keywordStartIndex + 1)} `,
     previewWords.slice(keywordStartIndex + 1).join(" "),
   ];
 
@@ -357,14 +357,14 @@ const getKeywordOffsetsInText = (
   let currentIndex = 0;
   let lineNumber = 0;
 
-  for (let line of lines) {
-    let startIndex = currentIndex;
-    let endIndex = startIndex + line.length - 1;
+  for (const line of lines) {
+    const startIndex = currentIndex;
+    const endIndex = startIndex + line.length - 1;
 
     lineIndexRanges.push({
-      line: line,
-      startIndex: startIndex,
-      endIndex: endIndex,
+      line,
+      startIndex,
+      endIndex,
       lineNumber,
     });
 

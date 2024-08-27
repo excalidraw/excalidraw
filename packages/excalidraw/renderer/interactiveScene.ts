@@ -952,17 +952,19 @@ const _renderInteractiveScene = ({
     const element = elementsMap.get(id);
 
     if (element && isTextElement(element)) {
-      const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
-        getElementAbsoluteCoords(element, elementsMap, true);
+      const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
+        element,
+        elementsMap,
+        true,
+      );
 
       context.save();
       if (focus) {
         context.fillStyle = "rgba(255, 172, 28, 0.4)";
       } else {
-        context.fillStyle = "rgba(255, 255, 0, 0.4)"; // Yellow color with some transparency
+        context.fillStyle = "rgba(255, 255, 0, 0.4)";
       }
 
-      // Draw a rectangle to resemble the highlight marker
       context.translate(appState.scrollX, appState.scrollY);
       context.translate(cx, cy);
       context.rotate(element.angle);
@@ -982,7 +984,6 @@ const _renderInteractiveScene = ({
 
   renderSnaps(context, appState);
 
-  // Reset zoom
   context.restore();
 
   renderRemoteCursors({
