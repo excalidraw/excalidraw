@@ -18,8 +18,26 @@ import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 
 export const searchItemInFocusAtom = atom<number | null>(null);
+const SEARCH_DEBOUNCE = 250;
 
-const SEARCH_DEBOUNCE = 500;
+type SearchMatch = {
+  textElement: ExcalidrawTextElement;
+  keyword: string;
+  index: number;
+  preview: {
+    startIndex: number;
+    keywordIndex: number;
+    previewText: string;
+    moreBefore: boolean;
+    moreAfter: boolean;
+  };
+  matchedLines: {
+    offsetX: number;
+    offsetY: number;
+    width: number;
+    height: number;
+  }[];
+};
 
 export const SearchMenu = () => {
   const app = useApp();
@@ -189,9 +207,8 @@ export const SearchMenu = () => {
           {matches.map((searchMatch, index) => (
             <ListItem
               key={searchMatch.textElement.id + searchMatch.index}
-              textElement={searchMatch.textElement}
-              previewText={searchMatch.previewText}
-              index={searchMatch.index}
+              keyword={keyWord}
+              preview={searchMatch.preview}
               highlighted={index === focusIndex}
               onClick={() => {
                 setFocusIndex(index);
@@ -205,12 +222,21 @@ export const SearchMenu = () => {
 };
 
 const ListItem = (props: {
-  previewText: string;
-  textElement: ExcalidrawTextElement;
-  index: number;
+  preview: SearchMatch["preview"];
+  keyword: string;
   highlighted: boolean;
   onClick?: () => void;
 }) => {
+  const keywordStartIndex =
+    props.preview.keywordIndex - props.preview.startIndex;
+  const previewWords = props.preview.previewText.split(/\s+/);
+
+  const preview = [
+    previewWords.slice(0, keywordStartIndex).join(" ") + " ",
+    previewWords.slice(keywordStartIndex, keywordStartIndex + 1) + " ",
+    previewWords.slice(keywordStartIndex + 1).join(" "),
+  ];
+
   return (
     <li
       className={clsx("layer-ui__result-item", {
@@ -226,7 +252,25 @@ const ListItem = (props: {
       }}
     >
       <div className="text-icon">{TextIcon}</div>
-      <div className="preview-text">{props.previewText}</div>
+      <div className="preview-text">
+        {props.preview.moreBefore ? "..." : ""}
+        {preview.map((text, index) => (
+          <span key={index}>
+            {index === 1 ? (
+              <b
+                style={{
+                  fontWeight: 700,
+                }}
+              >
+                {text}
+              </b>
+            ) : (
+              text
+            )}
+          </span>
+        ))}
+        {props.preview.moreAfter ? "..." : ""}
+      </div>
     </li>
   );
 };
@@ -266,24 +310,9 @@ function normalizeWrappedText(
   return normalizedLines.join("\n");
 }
 
-type SearchMatch = {
-  textElement: ExcalidrawTextElement;
-  keyword: string;
-  index: number;
-  previewText: string;
-  matchedLines: {
-    offsetX: number;
-    offsetY: number;
-    width: number;
-    height: number;
-  }[];
-};
-
-const getSurroundingWords = (text: string, index: number): string => {
-  // Extracting words from the string
+const getPreviewText = (text: string, index: number) => {
   const words = text.split(/\s+/);
 
-  // Find the word corresponding to the given index
   let currentWordIndex = 0;
   let charCount = 0;
 
@@ -295,15 +324,21 @@ const getSurroundingWords = (text: string, index: number): string => {
     }
   }
 
-  // Determine the start and end indices of the surrounding words
-  const start = Math.max(0, currentWordIndex - 2);
-  const end = Math.min(words.length, currentWordIndex + 5 + 1); // +1 to include the current word
+  const WORDS_BEFORE = 2;
+  const WORDS_AFTER = 5;
 
-  // Extract the substring from the words array
+  const start = Math.max(0, currentWordIndex - WORDS_BEFORE);
+  const end = Math.min(words.length, currentWordIndex + WORDS_AFTER + 1); // +1 to include the current word
+
   const surroundingWords = words.slice(start, end);
 
-  // Join the words back into a single string
-  return surroundingWords.join(" ");
+  return {
+    startIndex: start,
+    keywordIndex: currentWordIndex,
+    previewText: surroundingWords.join(" "),
+    moreBefore: start !== 0,
+    moreAfter: end !== words.length,
+  };
 };
 
 const getKeywordOffsetsInText = (
@@ -318,7 +353,7 @@ const getKeywordOffsetsInText = (
 
   const lines = normalizedText.split("\n");
 
-  const indexRanges = [];
+  const lineIndexRanges = [];
   let currentIndex = 0;
   let lineNumber = 0;
 
@@ -326,8 +361,7 @@ const getKeywordOffsetsInText = (
     let startIndex = currentIndex;
     let endIndex = startIndex + line.length - 1;
 
-    // Store the line and its character index range
-    indexRanges.push({
+    lineIndexRanges.push({
       line: line,
       startIndex: startIndex,
       endIndex: endIndex,
@@ -339,9 +373,6 @@ const getKeywordOffsetsInText = (
     lineNumber++;
   }
 
-  // then find out which line the given keyword (index) is
-  // use the line and the line height to find out the correct offset
-
   let startIndex = index;
   let remainingKeyword = keyword;
   const offsets: {
@@ -351,25 +382,25 @@ const getKeywordOffsetsInText = (
     height: number;
   }[] = [];
 
-  for (const indexRange of indexRanges) {
+  for (const lineIndexRange of lineIndexRanges) {
     if (remainingKeyword === "") {
       break;
     }
 
     if (
-      startIndex >= indexRange.startIndex &&
-      startIndex <= indexRange.endIndex
+      startIndex >= lineIndexRange.startIndex &&
+      startIndex <= lineIndexRange.endIndex
     ) {
-      // how many characters can actually fit in this line?
-      const matchCapacity = indexRange.endIndex + 1 - startIndex;
-
-      const textToStart = indexRange.line.slice(
+      const matchCapacity = lineIndexRange.endIndex + 1 - startIndex;
+      const textToStart = lineIndexRange.line.slice(
         0,
-        startIndex - indexRange.startIndex,
+        startIndex - lineIndexRange.startIndex,
       );
 
-      const matchedWord = remainingKeyword.slice(0, matchCapacity);
-
+      const matchedWord = lineIndexRange.line.slice(
+        startIndex,
+        startIndex + remainingKeyword.slice(0, matchCapacity).length,
+      );
       remainingKeyword = remainingKeyword.slice(matchCapacity);
 
       const offset = measureText(
@@ -379,10 +410,9 @@ const getKeywordOffsetsInText = (
         true,
       );
 
-      // let's look the text alignment
       if (textElement.textAlign !== "left") {
         const lineLength = measureText(
-          indexRange.line,
+          lineIndexRange.line,
           getFontString(textElement),
           textElement.lineHeight,
           true,
@@ -401,9 +431,8 @@ const getKeywordOffsetsInText = (
         textElement.lineHeight,
       );
 
-      // const offsetX = textToStart === "" && textElement.textAlign ? 0 : offset.width;
       const offsetX = offset.width;
-      const offsetY = indexRange.lineNumber * offset.height;
+      const offsetY = lineIndexRange.lineNumber * offset.height;
 
       offsets.push({
         offsetX,
@@ -445,7 +474,7 @@ const handleSearch = debounce(
       const text = textEl.originalText;
 
       while ((match = regex.exec(text)) !== null) {
-        const previewText = getSurroundingWords(text, match.index);
+        const preview = getPreviewText(text, match.index);
 
         const matchedLines = getKeywordOffsetsInText(
           textEl,
@@ -457,7 +486,7 @@ const handleSearch = debounce(
           matches.push({
             textElement: textEl,
             keyword,
-            previewText,
+            preview,
             index: match.index,
             matchedLines,
           });
