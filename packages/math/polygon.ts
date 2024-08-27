@@ -5,14 +5,12 @@ import { closePolygon, PRECISION } from "./utils";
 export function polygon<Point extends GlobalPoint | LocalPoint>(
   ...points: Point[]
 ) {
-  "inline";
   return points as Polygon<Point>;
 }
 
 export function polygonFromPoints<Point extends GlobalPoint | LocalPoint>(
   points: Point[],
 ) {
-  "inline";
   return points as Polygon<Point>;
 }
 

@@ -15,7 +15,6 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   c: Point,
   d: Point,
 ) {
-  "inline";
   return [a, b, c, d] as Curve<Point>;
 }
 

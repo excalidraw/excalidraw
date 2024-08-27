@@ -13,7 +13,6 @@ export function vector(
   originX: number = 0,
   originY: number = 0,
 ): Vector {
-  "inline";
   return [x - originX, y - originY] as Vector;
 }
 
@@ -28,7 +27,6 @@ export function vectorFromPoint<Point extends GlobalPoint | LocalPoint>(
   p: Point,
   origin: Point = [0, 0] as Point,
 ): Vector {
-  "inline";
   return vector(p[0] - origin[0], p[1] - origin[1]);
 }
 
@@ -41,7 +39,6 @@ export function vectorFromPoint<Point extends GlobalPoint | LocalPoint>(
  * @returns The directed area value for the two vectos
  */
 export function vectorCross(a: Vector, b: Vector): number {
-  "inline";
   return a[0] * b[1] - b[0] * a[1];
 }
 
@@ -54,7 +51,6 @@ export function vectorCross(a: Vector, b: Vector): number {
  * @returns The sum of products of the two vectors
  */
 export function vectorDot(a: Vector, b: Vector) {
-  "inline";
   return a[0] * b[0] + a[1] * b[1];
 }
 
@@ -65,7 +61,6 @@ export function vectorDot(a: Vector, b: Vector) {
  * @returns TRUE if the value has the shape and components of a Vectors
  */
 export function isVector(v: unknown): v is Vector {
-  "inline";
   return (
     Array.isArray(v) &&
     v.length === 2 &&
@@ -84,7 +79,6 @@ export function isVector(v: unknown): v is Vector {
  * @returns The sum vector of the two provided vectors
  */
 export function vectorAdd(a: Readonly<Vector>, b: Readonly<Vector>): Vector {
-  "inline";
   return [a[0] + b[0], a[1] + b[1]] as Vector;
 }
 
@@ -99,7 +93,6 @@ export function vectorSubtract(
   start: Readonly<Vector>,
   end: Readonly<Vector>,
 ): Vector {
-  "inline";
   return [start[0] - end[0], start[1] - end[1]] as Vector;
 }
 
@@ -111,7 +104,6 @@ export function vectorSubtract(
  * @returns
  */
 export function vectorScale(v: Vector, scalar: number): Vector {
-  "inline";
   return vector(v[0] * scalar, v[1] * scalar);
 }
 
@@ -119,7 +111,6 @@ export function vectorScale(v: Vector, scalar: number): Vector {
  *
  */
 export function vectorMagnitudeSq(v: Vector) {
-  "inline";
   return v[0] * v[0] + v[1] * v[1];
 }
 
@@ -127,7 +118,6 @@ export function vectorMagnitudeSq(v: Vector) {
  *
  */
 export function vectorMagnitude(v: Vector) {
-  "inline";
   return Math.sqrt(vectorMagnitudeSq(v));
 }
 

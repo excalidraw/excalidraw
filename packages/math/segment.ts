@@ -19,14 +19,12 @@ export function lineSegment<P extends GlobalPoint | LocalPoint>(
   a: P,
   b: P,
 ): LineSegment<P> {
-  "inline";
   return [a, b] as LineSegment<P>;
 }
 
 export function lineSegmentFromPointArray<P extends GlobalPoint | LocalPoint>(
   pointArray: P[],
 ): LineSegment<P> | undefined {
-  "inline";
   return pointArray.length === 2
     ? lineSegment<P>(pointArray[0], pointArray[1])
     : undefined;

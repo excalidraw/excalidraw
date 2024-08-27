@@ -43,7 +43,5 @@ function _triangleSign<P extends GlobalPoint | LocalPoint>(
   p2: P,
   p3: P,
 ): number {
-  "inline";
-
   return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1]);
 }

@@ -1,6 +1,7 @@
 import type { Radians } from "../../math";
 import {
   point,
+  pointScaleFromOrigin,
   pointTranslate,
   vector,
   vectorCross,
@@ -11,12 +12,8 @@ import {
   type Vector,
 } from "../../math";
 import BinaryHeap from "../binaryheap";
-import {
-  aabbForElement,
-  pointInsideBounds,
-  scalePointFromOrigin,
-} from "../math";
 import { getSizeFromPoints } from "../points";
+import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
@@ -382,7 +379,7 @@ const astar = (
       }
 
       // Intersect
-      const neighborHalfPoint = scalePointFromOrigin(
+      const neighborHalfPoint = pointScaleFromOrigin(
         neighbor.pos,
         current.pos,
         0.5,

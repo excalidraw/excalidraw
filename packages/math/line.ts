@@ -8,7 +8,6 @@ import type { GlobalPoint, Line, LocalPoint, Radians } from "./types";
  * @returns The line on which the points lie
  */
 export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
-  "inline";
   return [a, b] as Line<P>;
 }
 
@@ -22,7 +21,6 @@ export function lineFromPointPair<P extends GlobalPoint | LocalPoint>([a, b]: [
   P,
   P,
 ]): Line<P> {
-  "inline";
   return line(a, b);
 }
 
@@ -35,7 +33,6 @@ export function lineFromPointPair<P extends GlobalPoint | LocalPoint>([a, b]: [
 export function lineFromPointArray<P extends GlobalPoint | LocalPoint>(
   pointArray: P[],
 ): Line<P> | undefined {
-  "inline";
   return pointArray.length === 2
     ? line<P>(pointArray[0], pointArray[1])
     : undefined;

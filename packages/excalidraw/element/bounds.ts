@@ -988,3 +988,9 @@ export const getVisibleSceneBounds = ({
     -scrollY + height / zoom.value,
   ];
 };
+
+export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
+  point(
+    bounds[0] + (bounds[2] - bounds[0]) / 2,
+    bounds[1] + (bounds[3] - bounds[1]) / 2,
+  );

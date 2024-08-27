@@ -10,7 +10,6 @@ import {
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement } from "../math";
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -31,6 +30,7 @@ import {
 } from "./typeChecks";
 import { invariant } from "../utils";
 import { point, type LocalPoint } from "../../math";
+import { aabbForElement } from "../shapes";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 

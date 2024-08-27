@@ -29,7 +29,7 @@ import type {
 } from "./types";
 
 import type { Bounds } from "./bounds";
-import { getElementAbsoluteCoords } from "./bounds";
+import { getCenterForBounds, getElementAbsoluteCoords } from "./bounds";
 import type { AppState } from "../types";
 import { isPointOnShape } from "../../utils/collision";
 import { getElementAtPosition } from "../scene";
@@ -51,13 +51,8 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { getElementShape } from "../shapes";
-import {
-  aabbForElement,
-  getCenterForBounds,
-  getCenterForElement,
-  pointInsideBounds,
-} from "../math";
+import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
+import { getCenterForElement } from "../math";
 import {
   compareHeading,
   HEADING_DOWN,

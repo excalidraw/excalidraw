@@ -1,5 +1,5 @@
+import { carthesian2Polar } from "./angle";
 import type { GlobalPoint, LocalPoint, SymmetricArc } from "./types";
-import { carthesian2Polar } from "./utils";
 
 /**
  * Determines if a carthesian point lies on a symmetric arc, i.e. an arc which

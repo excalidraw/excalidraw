@@ -1,4 +1,3 @@
-import { getCenterForBounds, scalePointFromOrigin } from "../math";
 import type {
   LocalPoint,
   GlobalPoint,
@@ -9,10 +8,11 @@ import type {
 import {
   point,
   pointRotateRads,
+  pointScaleFromOrigin,
   radiansToDegrees,
   triangleIncludesPoint,
 } from "../../math";
-import type { Bounds } from "./bounds";
+import { getCenterForBounds, type Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
 
 export const HEADING_RIGHT = [1, 0] as Heading;
@@ -81,7 +81,7 @@ export const headingForPointFromElement = <
     }
 
     const top = pointRotateRads(
-      scalePointFromOrigin(
+      pointScaleFromOrigin(
         point(element.x + element.width / 2, element.y),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
@@ -90,7 +90,7 @@ export const headingForPointFromElement = <
       element.angle,
     );
     const right = pointRotateRads(
-      scalePointFromOrigin(
+      pointScaleFromOrigin(
         point(element.x + element.width, element.y + element.height / 2),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
@@ -99,7 +99,7 @@ export const headingForPointFromElement = <
       element.angle,
     );
     const bottom = pointRotateRads(
-      scalePointFromOrigin(
+      pointScaleFromOrigin(
         point(element.x + element.width / 2, element.y + element.height),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
@@ -108,7 +108,7 @@ export const headingForPointFromElement = <
       element.angle,
     );
     const left = pointRotateRads(
-      scalePointFromOrigin(
+      pointScaleFromOrigin(
         point(element.x, element.y + element.height / 2),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
@@ -132,22 +132,22 @@ export const headingForPointFromElement = <
     return headingForDiamond(left, top);
   }
 
-  const topLeft = scalePointFromOrigin(
+  const topLeft = pointScaleFromOrigin(
     point(aabb[0], aabb[1]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
-  const topRight = scalePointFromOrigin(
+  const topRight = pointScaleFromOrigin(
     point(aabb[2], aabb[1]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
-  const bottomLeft = scalePointFromOrigin(
+  const bottomLeft = pointScaleFromOrigin(
     point(aabb[0], aabb[3]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
-  const bottomRight = scalePointFromOrigin(
+  const bottomRight = pointScaleFromOrigin(
     point(aabb[2], aabb[3]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,

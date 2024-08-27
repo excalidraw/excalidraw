@@ -60,6 +60,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
+import { PRECISION } from "../../math";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -908,7 +909,7 @@ export const renderElement = (
             // or check if angle is a right angle in which case we can still
             // disable smoothing without adversely affecting the result
             // We need less-than comparison because of FP artihmetic
-            Math.abs(Math.sin(2 * element.angle)) < 0.00001)
+            Math.abs(Math.sin(2 * element.angle)) < PRECISION)
         ) {
           // Disabling smoothing makes output much sharper, especially for
           // text. Unless for non-right angles, where the aliasing is really
