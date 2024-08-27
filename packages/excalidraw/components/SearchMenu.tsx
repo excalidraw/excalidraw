@@ -19,23 +19,26 @@ import { jotaiScope } from "../jotai";
 
 export const searchItemInFocusAtom = atom<number | null>(null);
 
+const SEARCH_DEBOUNCE = 500;
+
 export const SearchMenu = () => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
   const [keyWord, setKeyWord] = useState("");
   const [matches, setMatches] = useState<SearchMatch[]>([]);
+  const [keywordSearched, setKeywordSearched] = useState(false);
   const [focusIndex, setFocusIndex] = useAtom(
     searchItemInFocusAtom,
     jotaiScope,
   );
   const elementsMap = app.scene.getNonDeletedElementsMap();
 
-  console.log("focusIndex", focusIndex);
-
   useEffect(() => {
+    setKeywordSearched(false);
     handleSearch(keyWord, app, (matches) => {
       setMatches(matches);
       setFocusIndex(null);
+      setKeywordSearched(true);
       setAppState({
         searchMatches: matches.map((searchMatch) => ({
           id: searchMatch.textElement.id,
@@ -176,7 +179,7 @@ export const SearchMenu = () => {
           </>
         )}
 
-        {matches.length === 0 && keyWord && (
+        {matches.length === 0 && keyWord && keywordSearched && (
           <div>No results in this scene...</div>
         )}
       </div>
@@ -416,13 +419,10 @@ const getKeywordOffsetsInText = (
   return offsets;
 };
 
-// #region handleSearch
 const handleSearch = debounce(
   (
     keyword: string,
     app: AppClassProperties,
-    // string: preview
-    // number: index
     cb: (matches: SearchMatch[]) => void,
   ) => {
     if (!keyword || keyword === "") {
@@ -467,5 +467,5 @@ const handleSearch = debounce(
 
     cb(matches);
   },
-  0,
+  SEARCH_DEBOUNCE,
 );
