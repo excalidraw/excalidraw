@@ -1,7 +1,9 @@
+import type { LineSegment } from "../../utils";
 import { ROUNDNESS } from "../constants";
-import type { ElementOrToolType } from "../types";
+import type { ElementOrToolType, Point } from "../types";
 import type { MarkNonNullable } from "../utility-types";
 import { assertNever } from "../utils";
+import type { Bounds } from "./bounds";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -322,3 +324,23 @@ export const isFixedPointBinding = (
 ): binding is FixedPointBinding => {
   return binding.fixedPoint != null;
 };
+
+// TODO: Move this to @excalidraw/math
+export const isPoint = (point: unknown): point is Point =>
+  Array.isArray(point) && point.length === 2;
+
+// TODO: Move this to @excalidraw/math
+export const isBounds = (box: unknown): box is Bounds =>
+  Array.isArray(box) &&
+  box.length === 4 &&
+  typeof box[0] === "number" &&
+  typeof box[1] === "number" &&
+  typeof box[2] === "number" &&
+  typeof box[3] === "number";
+
+// TODO: Move this to @excalidraw/math
+export const isLineSegment = (segment: unknown): segment is LineSegment =>
+  Array.isArray(segment) &&
+  segment.length === 2 &&
+  isPoint(segment[0]) &&
+  isPoint(segment[0]);
