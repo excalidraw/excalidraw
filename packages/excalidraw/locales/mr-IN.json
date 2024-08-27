@@ -113,7 +113,7 @@
     "share": "सामायिक करा",
     "showStroke": "रेघ रंग निवड यंत्र दाखवा",
     "showBackground": "पार्श्वभूमि: रंग निवड यंत्र दाखवा",
-    "showFonts": "",
+    "showFonts": "लिपि निवड़क दाखवा",
     "toggleTheme": "उजेड़ाची किव्हा अंधाराची प्रणाली बदला",
     "theme": "संरचना पद्धति",
     "personalLib": "वैयक्तिक संग्रह",
@@ -168,7 +168,7 @@
     "exportImage": "प्रतिमा निर्यात करा...",
     "export": "येथे सुरक्षित करा...",
     "copyToClipboard": "फळी वर कॉपी करा",
-    "copyLink": "",
+    "copyLink": "कड़ी ची कॉपी करावी",
     "save": "वर्तमान फ़ाइल मधे जतन करा",
     "saveAs": "ह्या नावाने जतन करा",
     "load": "उघडा",
@@ -316,7 +316,7 @@
     "placeImage": "प्रतिमा ठेवण्यासाठी क्लिक करा, किंवा त्याचा आकार बदलण्या साठी क्लिक करा आणि ड्रॅग करा",
     "publishLibrary": "आपला खाजगी संग्रह प्रकाशित करा",
     "bindTextToElement": "मजकूर जोडण्यासाठी एंटर की दाबा",
-    "createFlowchart": "",
+    "createFlowchart": "प्रवाहचित्र बनवण्या साठी कंट्रोलयाकमांड कुंजी बरोबर बाण कुंजी दाबून ठेवां",
     "deepBoxSelect": "खोल निवड ह्या साठी कंट्रोल किव्हा कमांड दाबून ठेवा, आणि बाहेर खेचणे वाचवण्या साठी पण",
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे",
     "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा.",
@@ -367,8 +367,8 @@
     "click": "क्लिक करा",
     "deepSelect": "खोल निवड",
     "deepBoxSelect": "चौकट मधे खोल निवड करा आणि बाहेर ओढणे वाचवा",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "एका सामान्य अवयवा पासून प्रवाहचित्र बनवा",
+    "navigateFlowchart": "प्रवाहचित्रा चं अनुकरण करा",
     "curvedArrow": "वक्र बाण",
     "curvedLine": "वक्र रेघ",
     "documentation": "कागदपत्रे",
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "कोण",
-    "shapes": "",
+    "shapes": "आकार",
     "height": "उंची",
     "scene": "दृश्य",
     "selected": "निवडलेले",
     "storage": "साठवण",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "पटल आणि आकार गुण",
+    "title": "गुण",
+    "generalStats": "सर्वसामान्य",
+    "elementProperties": "अकाराचे गुण",
     "total": "योग",
     "version": "आवृत्ती",
     "versionCopy": "कॉपी करायला क्लिक करा",
@@ -566,18 +566,18 @@
     "preview": "पूर्वावलोकन"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "जलद शोध"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "ज़ुनं"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "ह्या दृश्या मधे",
+    "availableFonts": "उपलब्ध लीपीं",
+    "empty": "लिपि सपडली नाहीं"
   },
   "userList": {
-    "empty": "",
+    "empty": "वापरकर्ते सापडले नाहीत",
     "hint": {
       "text": "प्रयोक्ताचं अनुकरण करण्या साठी त्या वर क्लिक करा",
       "followStatus": "तुम्हीं सध्या ह्या उपयोक्ता चं अनुकरण करत आहेत",
