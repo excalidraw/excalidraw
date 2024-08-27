@@ -78,8 +78,6 @@
     "canvasColors": "Used on canvas",
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
-    "debugCanvas": "Debug canvas",
-    "visualDebug": "Visual debug",
     "clearCanvas": "Clear canvas",
     "layers": "Layers",
     "actions": "Actions",

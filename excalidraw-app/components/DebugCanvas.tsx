@@ -1,6 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { isLineSegment, type AppState } from "../../packages/excalidraw/types";
-import { t } from "../../packages/excalidraw/i18n";
 import { throttleRAF } from "../../packages/excalidraw/utils";
 import type { LineSegment } from "../../packages/utils";
 import {
@@ -284,7 +283,7 @@ const DebugCanvas = forwardRef<HTMLCanvasElement, DebugCanvasProps>(
         height={height * scale}
         ref={canvasRef}
       >
-        {t("labels.debugCanvas")}
+        Debug Canvas
       </canvas>
     );
   },

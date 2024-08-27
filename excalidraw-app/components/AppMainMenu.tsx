@@ -5,7 +5,7 @@ import {
   eyeIcon,
 } from "../../packages/excalidraw/components/icons";
 import type { Theme } from "../../packages/excalidraw/element/types";
-import { MainMenu, useI18n } from "../../packages/excalidraw/index";
+import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
 // #if [DEV]
@@ -20,7 +20,6 @@ export const AppMainMenu: React.FC<{
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
-  const { t } = useI18n();
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -71,7 +70,7 @@ export const AppMainMenu: React.FC<{
             props?.refresh();
           }}
         >
-          {t("labels.visualDebug")}
+          Visual Debug
         </MainMenu.Item>
         // #endif
       }
