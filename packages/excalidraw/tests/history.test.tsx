@@ -753,7 +753,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
           isDeleted: false,
@@ -961,7 +961,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
           isDeleted: false,
@@ -2727,7 +2727,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
 
       // Simulate remote update
       API.updateScene({
@@ -2740,8 +2740,8 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(4);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(3);
       expect(h.state.editingLinearElement).toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
 

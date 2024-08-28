@@ -35,6 +35,7 @@ import "./ImageExportDialog.scss";
 import { FilledButton } from "./FilledButton";
 import { cloneJSON } from "../utils";
 import { prepareElementsForExport } from "../data";
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -88,6 +89,8 @@ const ImageExportModal = ({
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
+
+  const { onCopy, copyStatus } = useCopyStatus();
 
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elementsSnapshot,
@@ -294,11 +297,17 @@ const ImageExportModal = ({
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
               label={t("imageExportDialog.title.copyPngToClipboard")}
-              onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements, {
-                  exportingFrame,
-                })
-              }
+              status={copyStatus}
+              onClick={async () => {
+                await onExportImage(
+                  EXPORT_IMAGE_TYPES.clipboard,
+                  exportedElements,
+                  {
+                    exportingFrame,
+                  },
+                );
+                onCopy();
+              }}
               icon={copyIcon}
             >
               {t("imageExportDialog.button.copyPngToClipboard")}
