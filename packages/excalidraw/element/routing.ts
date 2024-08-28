@@ -12,6 +12,7 @@ import {
 import { getSizeFromPoints } from "../points";
 import type { Point } from "../types";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -222,6 +223,8 @@ export const mutateElbowArrow = (
           BASE_PADDING,
         ),
     boundsOverlap,
+    hoveredStartElement && aabbForElement(hoveredStartElement),
+    hoveredEndElement && aabbForElement(hoveredEndElement),
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -233,6 +236,9 @@ export const mutateElbowArrow = (
     endHeading,
     endGlobalPoint,
   );
+
+  // debugDrawBounds(dynamicAABBs);
+  // debugDrawBounds(commonBounds, { color: "cyan" });
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -459,7 +465,11 @@ const generateDynamicAABBs = (
   startDifference?: [number, number, number, number],
   endDifference?: [number, number, number, number],
   disableSideHack?: boolean,
+  startElementBounds?: Bounds | null,
+  endElementBounds?: Bounds | null,
 ): Bounds[] => {
+  const startEl = startElementBounds ?? a;
+  const endEl = endElementBounds ?? b;
   const [startUp, startRight, startDown, startLeft] = startDifference ?? [
     0, 0, 0, 0,
   ];
@@ -468,29 +478,29 @@ const generateDynamicAABBs = (
   const first = [
     a[0] > b[2]
       ? a[1] > b[3] || a[3] < b[1]
-        ? Math.min((a[0] + b[2]) / 2, a[0] - startLeft)
-        : (a[0] + b[2]) / 2
+        ? Math.min((startEl[0] + endEl[2]) / 2, a[0] - startLeft)
+        : (startEl[0] + endEl[2]) / 2
       : a[0] > b[0]
       ? a[0] - startLeft
       : common[0] - startLeft,
     a[1] > b[3]
       ? a[0] > b[2] || a[2] < b[0]
-        ? Math.min((a[1] + b[3]) / 2, a[1] - startUp)
-        : (a[1] + b[3]) / 2
+        ? Math.min((startEl[1] + endEl[3]) / 2, a[1] - startUp)
+        : (startEl[1] + endEl[3]) / 2
       : a[1] > b[1]
       ? a[1] - startUp
       : common[1] - startUp,
     a[2] < b[0]
       ? a[1] > b[3] || a[3] < b[1]
-        ? Math.max((a[2] + b[0]) / 2, a[2] + startRight)
-        : (a[2] + b[0]) / 2
+        ? Math.max((startEl[2] + endEl[0]) / 2, a[2] + startRight)
+        : (startEl[2] + endEl[0]) / 2
       : a[2] < b[2]
       ? a[2] + startRight
       : common[2] + startRight,
     a[3] < b[1]
       ? a[0] > b[2] || a[2] < b[0]
-        ? Math.max((a[3] + b[1]) / 2, a[3] + startDown)
-        : (a[3] + b[1]) / 2
+        ? Math.max((startEl[3] + endEl[1]) / 2, a[3] + startDown)
+        : (startEl[3] + endEl[1]) / 2
       : a[3] < b[3]
       ? a[3] + startDown
       : common[3] + startDown,
@@ -498,33 +508,36 @@ const generateDynamicAABBs = (
   const second = [
     b[0] > a[2]
       ? b[1] > a[3] || b[3] < a[1]
-        ? Math.min((b[0] + a[2]) / 2, b[0] - endLeft)
-        : (b[0] + a[2]) / 2
+        ? Math.min((endEl[0] + startEl[2]) / 2, b[0] - endLeft)
+        : (endEl[0] + startEl[2]) / 2
       : b[0] > a[0]
       ? b[0] - endLeft
       : common[0] - endLeft,
     b[1] > a[3]
       ? b[0] > a[2] || b[2] < a[0]
-        ? Math.min((b[1] + a[3]) / 2, b[1] - endUp)
-        : (b[1] + a[3]) / 2
+        ? Math.min((endEl[1] + startEl[3]) / 2, b[1] - endUp)
+        : (endEl[1] + startEl[3]) / 2
       : b[1] > a[1]
       ? b[1] - endUp
       : common[1] - endUp,
     b[2] < a[0]
       ? b[1] > a[3] || b[3] < a[1]
-        ? Math.max((b[2] + a[0]) / 2, b[2] + endRight)
-        : (b[2] + a[0]) / 2
+        ? Math.max((endEl[2] + startEl[0]) / 2, b[2] + endRight)
+        : (endEl[2] + startEl[0]) / 2
       : b[2] < a[2]
       ? b[2] + endRight
       : common[2] + endRight,
     b[3] < a[1]
       ? b[0] > a[2] || b[2] < a[0]
-        ? Math.max((b[3] + a[1]) / 2, b[3] + endDown)
-        : (b[3] + a[1]) / 2
+        ? Math.max((endEl[3] + startEl[1]) / 2, b[3] + endDown)
+        : (endEl[3] + startEl[1]) / 2
       : b[3] < a[3]
       ? b[3] + endDown
       : common[3] + endDown,
   ] as Bounds;
+
+  debugDrawBounds(first, { color: "green" });
+  debugDrawBounds(second, { color: "green" });
 
   const c = commonAABB([first, second]);
   if (
