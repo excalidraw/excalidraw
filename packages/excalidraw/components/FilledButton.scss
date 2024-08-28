@@ -1,5 +1,19 @@
 @import "../css/variables.module.scss";
 
+@keyframes successStatusAnimation {
+  0% {
+    transform: scale(0.35);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 .excalidraw {
   .ExcButton {
     --text-color: transparent;
@@ -22,9 +36,10 @@
       visibility: visible;
       position: absolute;
 
-      width: 1rem;
-      height: 1rem;
-      font-size: 1rem;
+      width: 1.2rem;
+      height: 1.2rem;
+
+      animation: successStatusAnimation 0.5s cubic-bezier(0.3, 1, 0.6, 1);
     }
 
     &.ExcButton--status-loading,
