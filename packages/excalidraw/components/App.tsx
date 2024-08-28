@@ -9488,10 +9488,6 @@ class App extends React.Component<AppProps, AppState> {
       // -----------------------------------------------------------------------
     } else {
       this.interactiveCanvas?.removeEventListener(
-        EVENT.WHEEL,
-        this.handleWheel,
-      );
-      this.interactiveCanvas?.removeEventListener(
         EVENT.TOUCH_START,
         this.onTouchStart,
       );
@@ -10089,7 +10085,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !(
           event.target instanceof HTMLCanvasElement ||
-          event.target instanceof HTMLTextAreaElement
+          event.target instanceof HTMLTextAreaElement ||
+          event.target instanceof HTMLIFrameElement
         )
       ) {
         return;
