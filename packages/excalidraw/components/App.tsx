@@ -2580,6 +2580,11 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(window, EVENT.BLUR, this.onBlur, false),
       addEventListener(
         this.excalidrawContainerRef.current,
+        EVENT.WHEEL,
+        this.handleWheel,
+      ),
+      addEventListener(
+        this.excalidrawContainerRef.current,
         EVENT.DRAG_OVER,
         this.disableEvent,
         false,
@@ -6384,8 +6389,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // Returns whether the event is a panning
-  private handleCanvasPanUsingWheelOrSpaceDrag = (
-    event: React.PointerEvent<HTMLElement>,
+  public handleCanvasPanUsingWheelOrSpaceDrag = (
+    event: React.PointerEvent<HTMLElement> | MouseEvent,
   ): boolean => {
     if (
       !(
@@ -6394,13 +6399,18 @@ class App extends React.Component<AppProps, AppState> {
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
-      ) ||
-      this.state.editingTextElement
+      )
     ) {
       return false;
     }
     isPanning = true;
-    event.preventDefault();
+
+    if (!this.state.editingTextElement) {
+      // preventing defualt while text editing blur the cursor for some reason
+      // (I'm not even sure if we're solving something specific with this
+      // default preventing)
+      event.preventDefault();
+    }
 
     let nextPastePrevented = false;
     const isLinux =
@@ -9472,7 +9482,6 @@ class App extends React.Component<AppProps, AppState> {
       // NOTE wheel, touchstart, touchend events must be registered outside
       // of react because react binds them them passively (so we can't prevent
       // default on them)
-      this.interactiveCanvas.addEventListener(EVENT.WHEEL, this.handleWheel);
       this.interactiveCanvas.addEventListener(
         EVENT.TOUCH_START,
         this.onTouchStart,
