@@ -6406,9 +6406,7 @@ class App extends React.Component<AppProps, AppState> {
     isPanning = true;
 
     if (!this.state.editingTextElement) {
-      // preventing defualt while text editing blur the cursor for some reason
-      // (I'm not even sure if we're solving something specific with this
-      // default preventing)
+      // preventing defualt while text editing messes with cursor/focus
       event.preventDefault();
     }
 
@@ -10087,7 +10085,18 @@ class App extends React.Component<AppProps, AppState> {
     (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
+      // if not scrolling on canvas/wysiwyg, ignore
+      if (
+        !(
+          event.target instanceof HTMLCanvasElement ||
+          event.target instanceof HTMLTextAreaElement
+        )
+      ) {
+        return;
+      }
+
       event.preventDefault();
+
       if (isPanning) {
         return;
       }

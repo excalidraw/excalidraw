@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
+import { CLASSES, isSafari, POINTER_BUTTON } from "../constants";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -640,8 +640,8 @@ export const textWysiwyg = ({
   const onPointerDown = (event: MouseEvent) => {
     const target = event?.target;
 
-    // middle mouse (panning canvas)
-    if (event.button === 1) {
+    // panning canvas
+    if (event.button === POINTER_BUTTON.WHEEL) {
       // trying to pan by clicking inside text area itself -> handle here
       if (target instanceof HTMLTextAreaElement) {
         event.preventDefault();
