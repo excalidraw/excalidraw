@@ -15,6 +15,7 @@ import "./SearchMenu.scss";
 import clsx from "clsx";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
+import { t } from "../i18n";
 
 export const searchItemInFocusAtom = atom<number | null>(null);
 const SEARCH_DEBOUNCE = 250;
@@ -134,13 +135,18 @@ export const SearchMenu = () => {
     };
   }, [setAppState, setFocusIndex]);
 
+  const matchCount =
+    matches.length === 1
+      ? t("search.singleResult")
+      : `${matches.length} ${t("search.multipleResults")}`;
+
   return (
     <div className="layer-ui__search">
       <div className="layer-ui__search-header">
         <div className="search-input">
           <TextField
             value={keyWord}
-            placeholder="Find..."
+            placeholder={t("search.placeholder")}
             onChange={(value) => {
               setKeyWord(value);
             }}
@@ -173,9 +179,7 @@ export const SearchMenu = () => {
       <div className="layer-ui__search-count">
         {matches.length > 0 && (
           <>
-            <div>
-              {matches.length === 1 ? "1 result" : `${matches.length} results`}
-            </div>
+            <div>{matchCount}</div>
             <div className="result-nav">
               <Button
                 onSelect={() => {
@@ -198,7 +202,7 @@ export const SearchMenu = () => {
         )}
 
         {matches.length === 0 && keyWord && keywordSearched && (
-          <div>No results in this scene...</div>
+          <div>{t("search.noMatch")}</div>
         )}
       </div>
 
