@@ -49,6 +49,7 @@ import {
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
+import { CLASSES } from "../constants";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -426,7 +427,7 @@ export const ZoomActions = ({
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
 }) => (
-  <Stack.Col gap={1} className="zoom-actions">
+  <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
     <Stack.Row align="center">
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
