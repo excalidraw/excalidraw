@@ -279,42 +279,7 @@ const ListItem = (props: {
   );
 };
 
-function normalizeWrappedText(
-  wrappedText: string,
-  originalText: string,
-): string {
-  const wrappedLines = wrappedText.split("\n");
-  const normalizedLines: string[] = [];
-  let originalIndex = 0;
-
-  for (let i = 0; i < wrappedLines.length; i++) {
-    let currentLine = wrappedLines[i];
-    const nextLine = wrappedLines[i + 1];
-
-    if (nextLine) {
-      const nextLineIndexInOriginal = originalText.indexOf(
-        nextLine,
-        originalIndex,
-      );
-
-      if (nextLineIndexInOriginal > currentLine.length + originalIndex) {
-        let j = nextLineIndexInOriginal - (currentLine.length + originalIndex);
-
-        while (j > 0) {
-          currentLine += " ";
-          j--;
-        }
-      }
-    }
-
-    normalizedLines.push(currentLine);
-    originalIndex = originalIndex + currentLine.length;
-  }
-
-  return normalizedLines.join("\n");
-}
-
-const getPreviewText = (text: string, index: number) => {
+const getMatchPreview = (text: string, index: number) => {
   const words = text.split(/\s+/);
 
   let currentWordIndex = 0;
@@ -345,7 +310,42 @@ const getPreviewText = (text: string, index: number) => {
   };
 };
 
-const getKeywordOffsetsInText = (
+const normalizeWrappedText = (
+  wrappedText: string,
+  originalText: string,
+): string => {
+  const wrappedLines = wrappedText.split("\n");
+  const normalizedLines: string[] = [];
+  let originalIndex = 0;
+
+  for (let i = 0; i < wrappedLines.length; i++) {
+    let currentLine = wrappedLines[i];
+    const nextLine = wrappedLines[i + 1];
+
+    if (nextLine) {
+      const nextLineIndexInOriginal = originalText.indexOf(
+        nextLine,
+        originalIndex,
+      );
+
+      if (nextLineIndexInOriginal > currentLine.length + originalIndex) {
+        let j = nextLineIndexInOriginal - (currentLine.length + originalIndex);
+
+        while (j > 0) {
+          currentLine += " ";
+          j--;
+        }
+      }
+    }
+
+    normalizedLines.push(currentLine);
+    originalIndex = originalIndex + currentLine.length;
+  }
+
+  return normalizedLines.join("\n");
+};
+
+const getMatchedLines = (
   textElement: ExcalidrawTextElement,
   keyword: string,
   index: number,
@@ -382,7 +382,7 @@ const getKeywordOffsetsInText = (
     index,
     index + keyword.length,
   );
-  const offsets: {
+  const matchedLines: {
     offsetX: number;
     offsetY: number;
     width: number;
@@ -438,7 +438,7 @@ const getKeywordOffsetsInText = (
       const offsetX = offset.width;
       const offsetY = lineIndexRange.lineNumber * offset.height;
 
-      offsets.push({
+      matchedLines.push({
         offsetX,
         offsetY,
         width,
@@ -449,7 +449,7 @@ const getKeywordOffsetsInText = (
     }
   }
 
-  return offsets;
+  return matchedLines;
 };
 
 const sanitizeKeyword = (string: string) => {
@@ -483,13 +483,8 @@ const handleSearch = debounce(
       const text = textEl.originalText;
 
       while ((match = regex.exec(text)) !== null) {
-        const preview = getPreviewText(text, match.index);
-
-        const matchedLines = getKeywordOffsetsInText(
-          textEl,
-          keyword,
-          match.index,
-        );
+        const preview = getMatchPreview(text, match.index);
+        const matchedLines = getMatchedLines(textEl, keyword, match.index);
 
         if (matchedLines.length > 0) {
           matches.push({
