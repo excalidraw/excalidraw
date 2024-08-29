@@ -3794,7 +3794,7 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private getEditorUIOffsets = (): {
+  public getEditorUIOffsets = (): {
     top: number;
     right: number;
     bottom: number;

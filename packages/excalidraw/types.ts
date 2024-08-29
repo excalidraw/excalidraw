@@ -659,6 +659,7 @@ export type AppClassProperties = {
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
+  getEditorUIOffsets: App["getEditorUIOffsets"];
 };
 
 export type PointerDownState = Readonly<{

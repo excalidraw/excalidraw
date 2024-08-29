@@ -5,7 +5,7 @@ import { Button } from "./Button";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { debounce } from "lodash";
 import type { AppClassProperties } from "../types";
-import { isTextElement } from "../element";
+import { isTextElement, newTextElement } from "../element";
 import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
 import { getFontString } from "../utils";
@@ -16,8 +16,10 @@ import clsx from "clsx";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import { t } from "../i18n";
+import { isElementCompletelyInViewport } from "../element/sizeHelpers";
 
 export const searchItemInFocusAtom = atom<number | null>(null);
+
 const SEARCH_DEBOUNCE = 250;
 
 type SearchMatch = {
@@ -96,11 +98,36 @@ export const SearchMenu = () => {
       const match = matches[focusIndex];
 
       if (match) {
-        app.scrollToContent(match.textElement, {
-          fitToContent: true,
-          animate: true,
-          duration: 300,
+        const matchAsElement = newTextElement({
+          text: match.keyword,
+          x: match.textElement.x + match.matchedLines[0]?.offsetX ?? 0,
+          y: match.textElement.y + match.matchedLines[0]?.offsetY ?? 0,
+          width: match.matchedLines[0]?.width,
+          height: match.matchedLines[0]?.height,
         });
+
+        if (
+          !isElementCompletelyInViewport(
+            [matchAsElement],
+            app.canvas.width / window.devicePixelRatio,
+            app.canvas.height / window.devicePixelRatio,
+            {
+              offsetLeft: app.state.offsetLeft,
+              offsetTop: app.state.offsetTop,
+              scrollX: app.state.scrollX,
+              scrollY: app.state.scrollY,
+              zoom: app.state.zoom,
+            },
+            app.scene.getNonDeletedElementsMap(),
+            app.getEditorUIOffsets(),
+          )
+        ) {
+          app.scrollToContent(matchAsElement, {
+            fitToContent: true,
+            animate: true,
+            duration: 300,
+          });
+        }
 
         const nextMatches = matches.map((match, index) => {
           if (index === focusIndex) {
