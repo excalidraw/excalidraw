@@ -97,32 +97,42 @@ export function vectorSubtract(
 }
 
 /**
- * TODO
+ * Scale vector by a scalar.
  *
- * @param v
- * @param scalar
- * @returns
+ * @param v The vector to scale
+ * @param scalar The scalar to multiply the vector components with
+ * @returns The new scaled vector
  */
 export function vectorScale(v: Vector, scalar: number): Vector {
   return vector(v[0] * scalar, v[1] * scalar);
 }
 
 /**
+ * Calculates the sqare magnitude of a vector. Use this if you compare
+ * magnitudes as it saves you an SQRT.
  *
+ * @param v The vector to measure
+ * @returns The scalar squared magnitude of the vector
  */
 export function vectorMagnitudeSq(v: Vector) {
   return v[0] * v[0] + v[1] * v[1];
 }
 
 /**
+ * Calculates the magnitude of a vector.
  *
+ * @param v The vector to measure
+ * @returns The scalar magnitude of the vector
  */
 export function vectorMagnitude(v: Vector) {
   return Math.sqrt(vectorMagnitudeSq(v));
 }
 
 /**
+ * Normalize the vector (i.e. make the vector magnitue equal 1).
  *
+ * @param v The vector to normalize
+ * @returns The new normalized vector
  */
 export const vectorNormalize = (v: Vector): Vector => {
   const m = vectorMagnitude(v);

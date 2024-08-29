@@ -63,6 +63,19 @@ export type Vector = [u: number, v: number] & {
   _brand: "excalimath__vector";
 };
 
+// Triangles
+
+/**
+ * A triangle represented by 3 points
+ */
+export type Triangle<P extends GlobalPoint | LocalPoint> = [
+  a: P,
+  b: P,
+  c: P,
+] & {
+  _brand: "excalimath__triangle";
+};
+
 //
 // Polygon
 //

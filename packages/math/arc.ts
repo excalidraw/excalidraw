@@ -1,5 +1,6 @@
-import { carthesian2Polar } from "./angle";
+import { cartesian2Polar } from "./angle";
 import type { GlobalPoint, LocalPoint, SymmetricArc } from "./types";
+import { PRECISION } from "./utils";
 
 /**
  * Determines if a carthesian point lies on a symmetric arc, i.e. an arc which
@@ -9,10 +10,10 @@ export const isPointOnSymmetricArc = <P extends GlobalPoint | LocalPoint>(
   { radius: arcRadius, startAngle, endAngle }: SymmetricArc,
   point: P,
 ): boolean => {
-  const [radius, angle] = carthesian2Polar(point);
+  const [radius, angle] = cartesian2Polar(point);
 
   return startAngle < endAngle
-    ? Math.abs(radius - arcRadius) < 0.0000001 &&
+    ? Math.abs(radius - arcRadius) < PRECISION &&
         startAngle <= angle &&
         endAngle >= angle
     : startAngle <= angle || endAngle >= angle;

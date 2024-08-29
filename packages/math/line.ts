@@ -12,10 +12,10 @@ export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
 }
 
 /**
- * TODO
+ * Convenient point creation from an array of two points.
  *
- * @param param0
- * @returns
+ * @param param0 The array with the two points to convert to a line
+ * @returns The created line
  */
 export function lineFromPointPair<P extends GlobalPoint | LocalPoint>([a, b]: [
   P,

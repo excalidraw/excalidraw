@@ -130,15 +130,15 @@ export function pointRotateDegs<Point extends GlobalPoint | LocalPoint>(
 }
 
 /**
- * TODO
+ * Translate a point by a vector.
  *
  * WARNING: This is not for translating Excalidraw element points!
  *          You need to account for rotation on base coordinates
  *          on your own.
  *          CONSIDER USING AN APPROPRIATE ELEMENT-AWARE TRANSLATE!
  *
- * @param p
- * @param v
+ * @param p The point to apply the translation on
+ * @param v The vector to translate by
  * @returns
  */
 // TODO 99% of use is translating between global and local coords, which need to be formalized
@@ -150,21 +150,44 @@ export function pointTranslate<
 }
 
 /**
- * TODO
+ * Find the center point at equal distance from both points.
  *
- * @param a
- * @param b
- * @returns
+ * @param a One of the points to create the middle point for
+ * @param b The other point to create the middle point for
+ * @returns The middle point
  */
 export function pointCenter<P extends LocalPoint | GlobalPoint>(a: P, b: P): P {
   return point((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
 }
 
+/**
+ * Add together two points by their coordinates like you'd apply a translation
+ * to a point by a vector.
+ *
+ * @param a One point to act as a basis
+ * @param b The other point to act like the vector to translate by
+ * @returns
+ */
 export function pointAdd<Point extends LocalPoint | GlobalPoint>(
   a: Point,
   b: Point,
 ): Point {
   return point(a[0] + b[0], a[1] + b[1]);
+}
+
+/**
+ * Subtract a point from another point like you'd translate a point by an
+ * invese vector.
+ *
+ * @param a The point to translate
+ * @param b The point which will act like a vector
+ * @returns The resulting point
+ */
+export function pointSubtract<Point extends LocalPoint | GlobalPoint>(
+  a: Point,
+  b: Point,
+): Point {
+  return point(a[0] - b[0], a[1] - b[1]);
 }
 
 /**
@@ -198,10 +221,11 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
 }
 
 /**
+ * Scale a point from a given origin by the multiplier.
  *
- * @param p
- * @param mid
- * @param multiplier
+ * @param p The point to scale
+ * @param mid The origin to scale from
+ * @param multiplier The scaling factor
  * @returns
  */
 export const pointScaleFromOrigin = <P extends GlobalPoint | LocalPoint>(
@@ -210,8 +234,15 @@ export const pointScaleFromOrigin = <P extends GlobalPoint | LocalPoint>(
   multiplier: number,
 ) => pointTranslate(mid, vectorScale(vectorFromPoint(p, mid), multiplier));
 
-// Returns whether `q` lies inside the segment/rectangle defined by `p` and `r`.
-// This is an approximation to "does `q` lie on a segment `pr`" check.
+/**
+ * Returns whether `q` lies inside the segment/rectangle defined by `p` and `r`.
+ * This is an approximation to "does `q` lie on a segment `pr`" check.
+ *
+ * @param p The first point to compare against
+ * @param q The actual point this function checks whether is in between
+ * @param r The other point to compare against
+ * @returns TRUE if q is indeed between p and r
+ */
 export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
   p: P,
   q: P,

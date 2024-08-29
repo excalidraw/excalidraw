@@ -6,12 +6,12 @@ import {
 } from "./geometry/shape";
 import type { Curve } from "../math";
 import {
-  closePolygon,
   lineSegment,
   point,
   pointInPolygon,
   pointOnLineSegment,
   pointOnPolygon,
+  polygonFromPoints,
   type GlobalPoint,
   type LocalPoint,
   type Polygon,
@@ -58,9 +58,7 @@ export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
     case "ellipse":
       return pointInEllipse(point, shape.data);
     case "polyline": {
-      const polygon = closePolygon(
-        shape.data.flat() as Polygon<Point>,
-      ) as Polygon<Point>;
+      const polygon = polygonFromPoints(shape.data.flat());
       return pointInPolygon(point, polygon);
     }
     case "polycurve": {

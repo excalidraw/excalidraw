@@ -59,7 +59,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
-import { PRECISION } from "../../math";
+import { isRightAngleRads } from "../../math";
 import { getCornerRadius } from "../shapes";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
@@ -909,7 +909,7 @@ export const renderElement = (
             // or check if angle is a right angle in which case we can still
             // disable smoothing without adversely affecting the result
             // We need less-than comparison because of FP artihmetic
-            Math.abs(Math.sin(2 * element.angle)) < PRECISION)
+            isRightAngleRads(element.angle))
         ) {
           // Disabling smoothing makes output much sharper, especially for
           // text. Unless for non-right angles, where the aliasing is really

@@ -1,6 +1,3 @@
-import { polygonIsClosed } from "./polygon";
-import type { GlobalPoint, LocalPoint, Polygon } from "./types";
-
 export const PRECISION = 10e-5;
 
 export function clamp(value: number, min: number, max: number) {
@@ -12,9 +9,3 @@ export function round(value: number, precision: number) {
 
   return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
 }
-
-export const closePolygon = <Point extends LocalPoint | GlobalPoint>(
-  polygon: Polygon<Point>,
-) => {
-  return polygonIsClosed(polygon) ? polygon : [...polygon, polygon[0]];
-};

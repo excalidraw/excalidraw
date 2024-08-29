@@ -14,7 +14,6 @@
 
 import type { Curve, LineSegment, Polygon, Radians } from "../../math";
 import {
-  closePolygon,
   curve,
   lineSegment,
   point,
@@ -277,9 +276,7 @@ export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
     isClosed
       ? {
           type: "polygon",
-          data: closePolygon(
-            polyline.flat() as Polygon<Point>,
-          ) as Polygon<Point>,
+          data: polygonFromPoints(polyline.flat()),
         }
       : {
           type: "polyline",
@@ -305,9 +302,9 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   if (element.roundness === null) {
     return {
       type: "polygon",
-      data: closePolygon(
-        element.points.map((p) => transform(p as Point)) as Polygon<Point>,
-      ) as Polygon<Point>,
+      data: polygonFromPoints(
+        element.points.map((p) => transform(p as Point)) as Point[],
+      ),
     };
   }
 
