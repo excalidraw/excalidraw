@@ -60,11 +60,16 @@ const _debugRenderer = (
   canvas: HTMLCanvasElement,
   appState: AppState,
   scale: number,
+  refresh: () => void,
 ) => {
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
     scale,
   );
+
+  if (appState.height !== canvas.height || appState.width !== canvas.width) {
+    refresh();
+  }
 
   const context = bootstrapCanvas({
     canvas,
@@ -130,8 +135,13 @@ export const saveDebugState = (debug: { enabled: boolean }) => {
 };
 
 export const debugRenderer = throttleRAF(
-  (canvas: HTMLCanvasElement, appState: AppState, scale: number) => {
-    _debugRenderer(canvas, appState, scale);
+  (
+    canvas: HTMLCanvasElement,
+    appState: AppState,
+    scale: number,
+    refresh: () => void,
+  ) => {
+    _debugRenderer(canvas, appState, scale, refresh);
   },
   { trailing: true },
 );
