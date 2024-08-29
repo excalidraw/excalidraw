@@ -1,4 +1,9 @@
-import { pointCenter, pointFromVector, pointRotateRads } from "./point";
+import {
+  isPoint,
+  pointCenter,
+  pointFromVector,
+  pointRotateRads,
+} from "./point";
 import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
@@ -30,8 +35,28 @@ export function lineSegmentFromPointArray<P extends GlobalPoint | LocalPoint>(
     : undefined;
 }
 
-// return the coordinates resulting from rotating the given line about an origin by an angle in degrees
-// note that when the origin is not given, the midpoint of the given line is used as the origin
+/**
+ *
+ * @param segment
+ * @returns
+ */
+export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
+  segment: unknown,
+): segment is LineSegment<Point> =>
+  Array.isArray(segment) &&
+  segment.length === 2 &&
+  isPoint(segment[0]) &&
+  isPoint(segment[0]);
+
+/**
+ * Return the coordinates resulting from rotating the given line about an origin by an angle in radians
+ * note that when the origin is not given, the midpoint of the given line is used as the origin.
+ *
+ * @param l
+ * @param angle
+ * @param origin
+ * @returns
+ */
 export const lineSegmentRotate = <Point extends LocalPoint | GlobalPoint>(
   l: LineSegment<Point>,
   angle: Radians,
