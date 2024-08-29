@@ -90,7 +90,20 @@ const ImageExportModal = ({
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
 
-  const { onCopy, copyStatus } = useCopyStatus();
+  const { onCopy, copyStatus, resetCopyStatus } = useCopyStatus();
+
+  useEffect(() => {
+    // if user changes setting right after export to clipboard, reset the status
+    // so they don't have to wait for the timeout to click the button again
+    resetCopyStatus();
+  }, [
+    projectName,
+    exportWithBackground,
+    exportDarkMode,
+    exportScale,
+    embedScene,
+    resetCopyStatus,
+  ]);
 
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elementsSnapshot,
@@ -108,6 +121,7 @@ const ImageExportModal = ({
     if (!maxWidth) {
       return;
     }
+
     exportToCanvas({
       elements: exportedElements,
       appState: {
