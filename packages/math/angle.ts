@@ -8,7 +8,13 @@ import type {
 import { PRECISION } from "./utils";
 
 export const normalizeRadians = (angle: Radians): Radians => {
-  return (angle % (2 * Math.PI)) as Radians;
+  if (angle < 0) {
+    return (angle + 2 * Math.PI) as Radians;
+  }
+  if (angle >= 2 * Math.PI) {
+    return (angle - 2 * Math.PI) as Radians;
+  }
+  return angle;
 };
 
 /**
