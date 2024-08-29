@@ -12,7 +12,6 @@ import {
 import { getSizeFromPoints } from "../points";
 import type { Point } from "../types";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -236,9 +235,6 @@ export const mutateElbowArrow = (
     endHeading,
     endGlobalPoint,
   );
-
-  // debugDrawBounds(dynamicAABBs);
-  // debugDrawBounds(commonBounds, { color: "cyan" });
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -535,9 +531,6 @@ const generateDynamicAABBs = (
       ? b[3] + endDown
       : common[3] + endDown,
   ] as Bounds;
-
-  debugDrawBounds(first, { color: "green" });
-  debugDrawBounds(second, { color: "green" });
 
   const c = commonAABB([first, second]);
   if (
