@@ -664,10 +664,10 @@ export const textWysiwyg = ({
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        isShapeActionsPanel && //zsviczian
+        (isShapeActionsPanel || //zsviczian
         event.target.closest(
           `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-        ) &&
+        )) &&
         !isWritableElement(event.target)) ||
       isPropertiesTrigger
     ) {
