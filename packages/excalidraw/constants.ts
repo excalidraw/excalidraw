@@ -114,6 +114,7 @@ export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
   SHAPE_ACTIONS_MOBILE_MENU: "App-mobile-menu", //zsviczian
   MOBILE_TOOLBAR: "App-toolbar-content", //zsviczian
+  ZOOM_ACTIONS: "zoom-actions",
 };
 
 /**
