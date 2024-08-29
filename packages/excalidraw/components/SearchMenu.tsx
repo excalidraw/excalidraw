@@ -44,9 +44,9 @@ type SearchMatch = {
 export const SearchMenu = () => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
-  const [keyWord, setKeyWord] = useState("");
+  const [keyword, setKeyword] = useState("");
   const [matches, setMatches] = useState<SearchMatch[]>([]);
-  const [keywordSearched, setKeywordSearched] = useState(false);
+  const [searchedKeyword, setSearchedKeyword] = useState<string | null>("");
   const [focusIndex, setFocusIndex] = useAtom(
     searchItemInFocusAtom,
     jotaiScope,
@@ -54,20 +54,23 @@ export const SearchMenu = () => {
   const elementsMap = app.scene.getNonDeletedElementsMap();
 
   useEffect(() => {
-    setKeywordSearched(false);
-    handleSearch(keyWord, app, (matches) => {
-      setMatches(matches);
-      setFocusIndex(null);
-      setKeywordSearched(true);
-      setAppState({
-        searchMatches: matches.map((searchMatch) => ({
-          id: searchMatch.textElement.id,
-          focus: false,
-          matchedLines: searchMatch.matchedLines,
-        })),
+    const trimmedKeyword = keyword.trim();
+    if (trimmedKeyword !== searchedKeyword) {
+      setSearchedKeyword(null);
+      handleSearch(trimmedKeyword, app, (matches) => {
+        setMatches(matches);
+        setFocusIndex(null);
+        setSearchedKeyword(trimmedKeyword);
+        setAppState({
+          searchMatches: matches.map((searchMatch) => ({
+            id: searchMatch.textElement.id,
+            focus: false,
+            matchedLines: searchMatch.matchedLines,
+          })),
+        });
       });
-    });
-  }, [keyWord, app, elementsMap, setAppState, setFocusIndex]);
+    }
+  }, [keyword, searchedKeyword, app, elementsMap, setAppState, setFocusIndex]);
 
   const goToNextItem = () => {
     if (matches.length > 0) {
@@ -100,8 +103,8 @@ export const SearchMenu = () => {
       if (match) {
         const matchAsElement = newTextElement({
           text: match.keyword,
-          x: match.textElement.x + match.matchedLines[0]?.offsetX ?? 0,
-          y: match.textElement.y + match.matchedLines[0]?.offsetY ?? 0,
+          x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
+          y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
         });
@@ -153,9 +156,9 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     return () => {
-      setKeyWord("");
+      setKeyword("");
       setFocusIndex(null);
-      setKeywordSearched(false);
+      setSearchedKeyword(null);
       setAppState({
         searchMatches: [],
       });
@@ -172,10 +175,10 @@ export const SearchMenu = () => {
       <div className="layer-ui__search-header">
         <div className="search-input">
           <TextField
-            value={keyWord}
+            value={keyword}
             placeholder={t("search.placeholder")}
             onChange={(value) => {
-              setKeyWord(value);
+              setKeyword(value);
             }}
             selectOnRender
             onKeyDown={(event) => {
@@ -195,7 +198,7 @@ export const SearchMenu = () => {
         </div>
         <Button
           onSelect={() => {
-            setKeyWord("");
+            setKeyword("");
           }}
           className="clear-btn"
         >
@@ -228,7 +231,7 @@ export const SearchMenu = () => {
           </>
         )}
 
-        {matches.length === 0 && keyWord && keywordSearched && (
+        {matches.length === 0 && keyword && searchedKeyword && (
           <div>{t("search.noMatch")}</div>
         )}
       </div>
@@ -238,7 +241,7 @@ export const SearchMenu = () => {
           {matches.map((searchMatch, index) => (
             <ListItem
               key={searchMatch.textElement.id + searchMatch.index}
-              keyword={keyWord}
+              keyword={keyword}
               preview={searchMatch.preview}
               highlighted={index === focusIndex}
               onClick={() => {
