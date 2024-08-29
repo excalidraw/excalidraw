@@ -49,6 +49,7 @@ import {
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
+import { CLASSES } from "../constants";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -431,9 +432,9 @@ export const ZoomActions = ({
   zoom: Zoom;
   trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
-  <Stack.Col
+  <Stack.Col 
     gap={1}
-    className={clsx("zoom-actions", { "tray-zoom": trayMode })}
+    className={clsx(CLASSES.ZOOM_ACTIONS, { "tray-zoom": trayMode })} //zsviczian
   >
     <Stack.Row align="center">
       {renderAction("zoomOut")}
