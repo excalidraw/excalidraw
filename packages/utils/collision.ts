@@ -8,7 +8,7 @@ import type { Curve } from "../math";
 import {
   lineSegment,
   point,
-  pointInPolygon,
+  polygonIncludesPoint,
   pointOnLineSegment,
   pointOnPolygon,
   polygonFromPoints,
@@ -50,7 +50,7 @@ export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
 ) => {
   switch (shape.type) {
     case "polygon":
-      return pointInPolygon(point, shape.data);
+      return polygonIncludesPoint(point, shape.data);
     case "line":
       return false;
     case "curve":
@@ -59,7 +59,7 @@ export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
       return pointInEllipse(point, shape.data);
     case "polyline": {
       const polygon = polygonFromPoints(shape.data.flat());
-      return pointInPolygon(point, polygon);
+      return polygonIncludesPoint(point, polygon);
     }
     case "polycurve": {
       return false;
@@ -74,7 +74,7 @@ export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
   point: Point,
   bounds: Polygon<Point>,
 ) => {
-  return pointInPolygon(point, bounds);
+  return polygonIncludesPoint(point, bounds);
 };
 
 const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(

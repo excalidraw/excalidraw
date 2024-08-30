@@ -5,7 +5,7 @@ import {
   polygon,
   pointOnLineSegment,
   pointOnPolygon,
-  pointInPolygon,
+  polygonIncludesPoint,
   segmentsIntersectAt,
 } from "../../math";
 import { pointInEllipse, pointOnEllipse, type Ellipse } from "./shape";
@@ -56,8 +56,8 @@ describe("point and polygon", () => {
       point(2, 2),
       point(0, 2),
     );
-    expect(pointInPolygon(point(1, 1), poly)).toBe(true);
-    expect(pointInPolygon(point(3, 3), poly)).toBe(false);
+    expect(polygonIncludesPoint(point(1, 1), poly)).toBe(true);
+    expect(polygonIncludesPoint(point(3, 3), poly)).toBe(false);
   });
 });
 

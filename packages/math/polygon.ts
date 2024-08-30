@@ -15,7 +15,7 @@ export function polygonFromPoints<Point extends GlobalPoint | LocalPoint>(
   return polygonClose(points) as Polygon<Point>;
 }
 
-export const pointInPolygon = <Point extends LocalPoint | GlobalPoint>(
+export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   polygon: Polygon<Point>,
 ) => {
