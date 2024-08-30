@@ -113,6 +113,8 @@
     "esbuild-sass-plugin": "2.16.0",
     "eslint-plugin-react": "7.32.2",
     "fake-indexeddb": "3.1.7",
+    "fonteditor-core": "2.4.1",
+    "harfbuzzjs": "0.3.6",
     "import-meta-loader": "1.1.0",
     "mini-css-extract-plugin": "2.6.1",
     "postcss-loader": "7.0.1",

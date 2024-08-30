@@ -39,6 +39,7 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
+import type { Font } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -355,50 +356,14 @@ export const exportToSvg = async (
         </clipPath>`;
   }
 
-  const fontFamilies = elements.reduce((acc, element) => {
-    if (isTextElement(element)) {
-      acc.add(element.fontFamily);
-    }
-
-    return acc;
-  }, new Set<number>());
-
-  const fontFaces = opts?.skipInliningFonts
-    ? []
-    : await Promise.all(
-        Array.from(fontFamilies).map(async (x) => {
-          const { fonts, metadata } = Fonts.registered.get(x) ?? {};
-
-          if (!Array.isArray(fonts)) {
-            console.error(
-              `Couldn't find registered fonts for font-family "${x}"`,
-              Fonts.registered,
-            );
-            return;
-          }
-
-          if (metadata?.local) {
-            // don't inline local fonts
-            return;
-          }
-
-          return Promise.all(
-            fonts.map(
-              async (font) => `@font-face {
-        font-family: ${font.fontFace.family};
-        src: url(${await font.getContent()});
-          }`,
-            ),
-          );
-        }),
-      );
+  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
     <style class="style-fonts">
-      ${fontFaces.flat().filter(Boolean).join("\n")}
+      ${fontFaces.join("\n")}
     </style>
     ${exportingFrameClipPath}
   </defs>
@@ -468,4 +433,68 @@ export const getExportSize = (
   );
 
   return [width, height];
+};
+
+const getFontFaces = async (
+  elements: readonly ExcalidrawElement[],
+): Promise<string[]> => {
+  const fontFamilies = new Set<number>();
+  const codePoints = new Set<number>();
+
+  for (const element of elements) {
+    if (!isTextElement(element)) {
+      continue;
+    }
+
+    fontFamilies.add(element.fontFamily);
+
+    // gather unique codepoints only when inlining fonts
+    for (const codePoint of Array.from(element.originalText, (u) =>
+      u.codePointAt(0),
+    )) {
+      if (codePoint) {
+        codePoints.add(codePoint);
+      }
+    }
+  }
+
+  const getSource = (font: Font) => {
+    try {
+      // retrieve font source as dataurl based on the used codepoints
+      return font.getContent(codePoints);
+    } catch {
+      // fallback to font source as a url
+      return font.urls[0].toString();
+    }
+  };
+
+  const fontFaces = await Promise.all(
+    Array.from(fontFamilies).map(async (x) => {
+      const { fonts, metadata } = Fonts.registered.get(x) ?? {};
+
+      if (!Array.isArray(fonts)) {
+        console.error(
+          `Couldn't find registered fonts for font-family "${x}"`,
+          Fonts.registered,
+        );
+        return [];
+      }
+
+      if (metadata?.local) {
+        // don't inline local fonts
+        return [];
+      }
+
+      return Promise.all(
+        fonts.map(
+          async (font) => `@font-face {
+        font-family: ${font.fontFace.family};
+        src: url(${await getSource(font)});
+          }`,
+        ),
+      );
+    }),
+  );
+
+  return fontFaces.flat();
 };

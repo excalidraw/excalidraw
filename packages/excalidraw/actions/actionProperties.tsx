@@ -850,7 +850,7 @@ export const actionChangeFontFamily = register({
         ExcalidrawTextElement,
         ExcalidrawElement | null
       >();
-      let uniqueGlyphs = new Set<string>();
+      let uniqueChars = new Set<string>();
       let skipFontFaceCheck = false;
 
       const fontsCache = Array.from(Fonts.loadedFontsCache.values());
@@ -898,8 +898,8 @@ export const actionChangeFontFamily = register({
               }
 
               if (!skipFontFaceCheck) {
-                uniqueGlyphs = new Set([
-                  ...uniqueGlyphs,
+                uniqueChars = new Set([
+                  ...uniqueChars,
                   ...Array.from(newElement.originalText),
                 ]);
               }
@@ -919,12 +919,9 @@ export const actionChangeFontFamily = register({
       const fontString = `10px ${getFontFamilyString({
         fontFamily: nextFontFamily,
       })}`;
-      const glyphs = Array.from(uniqueGlyphs.values()).join();
+      const chars = Array.from(uniqueChars.values()).join();
 
-      if (
-        skipFontFaceCheck ||
-        window.document.fonts.check(fontString, glyphs)
-      ) {
+      if (skipFontFaceCheck || window.document.fonts.check(fontString, chars)) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
@@ -936,8 +933,8 @@ export const actionChangeFontFamily = register({
           );
         }
       } else {
-        // otherwise try to load all font faces for the given glyphs and redraw elements once our font faces loaded
-        window.document.fonts.load(fontString, glyphs).then((fontFaces) => {
+        // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
+        window.document.fonts.load(fontString, chars).then((fontFaces) => {
           for (const [element, container] of elementContainerMapping) {
             // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
             const latestElement = app.scene.getElement(element.id);

@@ -1,12 +1,14 @@
 import { stringToBase64, toByteString } from "../data/encode";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
+import loadWoff2 from "./wasm/woff2.loader";
+import loadHbSubset from "./wasm/hb-subset.loader";
 
 export interface Font {
   urls: URL[];
   fontFace: FontFace;
-  getContent(): Promise<string>;
+  getContent(codePoints: ReadonlySet<number>): Promise<string>;
 }
-export const UNPKG_PROD_URL = `https://unpkg.com/${
+export const UNPKG_FALLBACK_URL = `https://unpkg.com/${
   import.meta.env.VITE_PKG_NAME
     ? `${import.meta.env.VITE_PKG_NAME}@${import.meta.env.PKG_VERSION}` // should be provided by vite during package build
     : "@excalidraw/excalidraw" // fallback to latest package version (i.e. for app)
@@ -32,21 +34,32 @@ export class ExcalidrawFont implements Font {
   }
 
   /**
-   * Tries to fetch woff2 content, based on the registered urls.
-   * Returns last defined url in case of errors.
+   * Tries to fetch woff2 content, based on the registered urls (from first to last, treated as fallbacks).
    *
-   * Note: uses browser APIs for base64 encoding - use dataurl outside the browser environment.
+   * NOTE: assumes usage of `dataurl` outside the browser environment
+   *
+   * @returns base64 with subsetted glyphs based on the passed codepoint, last defined url otherwise
    */
-  public async getContent(): Promise<string> {
+  public async getContent(codePoints: ReadonlySet<number>): Promise<string> {
     let i = 0;
     const errorMessages = [];
 
     while (i < this.urls.length) {
       const url = this.urls[i];
 
+      // it's dataurl (server), the font is inlined as base64, no need to fetch
       if (url.protocol === "data:") {
-        // it's dataurl, the font is inlined as base64, no need to fetch
-        return url.toString();
+        const arrayBuffer = Buffer.from(
+          url.toString().split(",")[1],
+          "base64",
+        ).buffer;
+
+        const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
+          arrayBuffer,
+          codePoints,
+        );
+
+        return base64;
       }
 
       try {
@@ -57,13 +70,13 @@ export class ExcalidrawFont implements Font {
         });
 
         if (response.ok) {
-          const mimeType = await response.headers.get("Content-Type");
-          const buffer = await response.arrayBuffer();
+          const arrayBuffer = await response.arrayBuffer();
+          const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
+            arrayBuffer,
+            codePoints,
+          );
 
-          return `data:${mimeType};base64,${await stringToBase64(
-            await toByteString(buffer),
-            true,
-          )}`;
+          return base64;
         }
 
         // response not ok, try to continue
@@ -87,6 +100,48 @@ export class ExcalidrawFont implements Font {
     // in case of issues, at least return the last url as a content
     // defaults to unpkg for bundled fonts (so that we don't have to host them forever) and http url for others
     return this.urls.length ? this.urls[this.urls.length - 1].toString() : "";
+  }
+
+  /**
+   * Tries to subset glyphs in a font based on the used codepoints, returning the font as daturl.
+   *
+   * @param arrayBuffer font data buffer, preferrably in the woff2 format, though others should work as well
+   * @param codePoints codepoints used to subset the glyphs
+   *
+   * @returns font with subsetted glyphs (all glyphs in case of errors) converted into a dataurl
+   */
+  private static async subsetGlyphsByCodePoints(
+    arrayBuffer: ArrayBuffer,
+    codePoints: ReadonlySet<number>,
+  ): Promise<string> {
+    try {
+      // lazy loaded wasm modules to avoid multiple initializations in case of concurrent triggers
+      const { compress, decompress } = await loadWoff2();
+      const { subset } = await loadHbSubset();
+
+      const decompressedBinary = decompress(arrayBuffer).buffer;
+      const subsetSnft = subset(decompressedBinary, codePoints);
+      const compressedBinary = compress(subsetSnft.buffer);
+
+      return ExcalidrawFont.toBase64(compressedBinary.buffer);
+    } catch (e) {
+      console.error("Skipped glyph subsetting", e);
+      // Fallback to encoding whole font in case of errors
+      return ExcalidrawFont.toBase64(arrayBuffer);
+    }
+  }
+
+  private static async toBase64(arrayBuffer: ArrayBuffer) {
+    let base64: string;
+
+    if (typeof Buffer !== "undefined") {
+      // node + server-side
+      base64 = Buffer.from(arrayBuffer).toString("base64");
+    } else {
+      base64 = await stringToBase64(await toByteString(arrayBuffer), true);
+    }
+
+    return `data:font/woff2;base64,${base64}`;
   }
 
   private static createUrls(uri: string): URL[] {
@@ -118,15 +173,14 @@ export class ExcalidrawFont implements Font {
     }
 
     // fallback url for bundled fonts
-    urls.push(new URL(assetUrl, UNPKG_PROD_URL));
+    urls.push(new URL(assetUrl, UNPKG_FALLBACK_URL));
 
     return urls;
   }
 
   private static getFormat(url: URL) {
     try {
-      const pathname = new URL(url).pathname;
-      const parts = pathname.split(".");
+      const parts = new URL(url).pathname.split(".");
 
       if (parts.length === 1) {
         return "";
