@@ -73,8 +73,8 @@ export default defineConfig({
       },
 
       workbox: {
-        // Don't push fonts and locales to app precache
-        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js"],
+        // Don't push fonts, locales and wasm to app precache
+        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js", "**/*.wasm-*.js"],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -105,6 +105,17 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // <== 30 days
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp(".wasm-.+.js"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "wasm",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
               },
             },
           },
