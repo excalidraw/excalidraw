@@ -25,29 +25,33 @@ const load = (): Promise<{
             woff2Enc: (buffer: ArrayBuffer, byteLength: number) => Vector;
             woff2Dec: (buffer: ArrayBuffer, byteLength: number) => Vector;
           }) => {
-            // re-map from internal vector into byte array
-            function convertFromVecToUint8Array(vector: Vector): Uint8Array {
-              const arr = [];
-              for (let i = 0, l = vector.size(); i < l; i++) {
-                arr.push(vector.get(i));
+            try {
+              // re-map from internal vector into byte array
+              function convertFromVecToUint8Array(vector: Vector): Uint8Array {
+                const arr = [];
+                for (let i = 0, l = vector.size(); i < l; i++) {
+                  arr.push(vector.get(i));
+                }
+
+                return new Uint8Array(arr);
               }
 
-              return new Uint8Array(arr);
+              // re-exporting only compress and decompress functions (also avoids infinite loop inside emscripten bindings)
+              const woff2 = {
+                compress: (buffer: ArrayBuffer) =>
+                  convertFromVecToUint8Array(
+                    module.woff2Enc(buffer, buffer.byteLength),
+                  ),
+                decompress: (buffer: ArrayBuffer) =>
+                  convertFromVecToUint8Array(
+                    module.woff2Dec(buffer, buffer.byteLength),
+                  ),
+              };
+
+              resolve(woff2);
+            } catch (e) {
+              reject(e);
             }
-
-            // re-exporting only compress and decompress functions (also avoids infinite loop inside emscripten bindings)
-            const woff2 = {
-              compress: (buffer: ArrayBuffer) =>
-                convertFromVecToUint8Array(
-                  module.woff2Enc(buffer, buffer.byteLength),
-                ),
-              decompress: (buffer: ArrayBuffer) =>
-                convertFromVecToUint8Array(
-                  module.woff2Dec(buffer, buffer.byteLength),
-                ),
-            };
-
-            resolve(woff2);
           },
         );
     } catch (e) {
