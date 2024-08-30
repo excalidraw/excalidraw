@@ -46,9 +46,9 @@
     "arrowhead_triangle_outline": "Triangolo (contorno)",
     "arrowhead_diamond": "Diamante",
     "arrowhead_diamond_outline": "Diamante (contorno)",
-    "arrowtypes": "",
+    "arrowtypes": "Tipo di freccia",
     "arrowtype_sharp": "",
-    "arrowtype_round": "",
+    "arrowtype_round": "Freccia curva",
     "arrowtype_elbowed": "",
     "fontSize": "Dimensione carattere",
     "fontFamily": "Carattere",
@@ -113,7 +113,7 @@
     "share": "Condividi",
     "showStroke": "Mostra selettore colore del tratto",
     "showBackground": "Mostra selettore colore di sfondo",
-    "showFonts": "",
+    "showFonts": "Mostra selettore font",
     "toggleTheme": "Attiva/Disattiva tema chiaro/scuro",
     "theme": "Tema",
     "personalLib": "Libreria Personale",
@@ -168,7 +168,7 @@
     "exportImage": "Esporta immagine...",
     "export": "Salva in...",
     "copyToClipboard": "Copia negli appunti",
-    "copyLink": "",
+    "copyLink": "Copia link",
     "save": "Salva sul file corrente",
     "saveAs": "Salva con nome",
     "load": "Apri",
@@ -368,7 +368,7 @@
     "deepSelect": "Selezione profonda",
     "deepBoxSelect": "Seleziona in profondità all'interno della casella e previene il trascinamento",
     "createFlowchart": "",
-    "navigateFlowchart": "",
+    "navigateFlowchart": "Naviga un diagramma di flusso",
     "curvedArrow": "Freccia curva",
     "curvedLine": "Linea curva",
     "documentation": "Documentazione",
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "Angolo",
-    "shapes": "",
+    "shapes": "Forme",
     "height": "Altezza",
     "scene": "Scena",
     "selected": "Selezionato",
     "storage": "Memoria",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "title": "Proprietà",
+    "generalStats": "Generale",
+    "elementProperties": "Proprietà delle forme",
     "total": "Totale",
     "version": "Versione",
     "versionCopy": "Clicca per copiare",
@@ -566,15 +566,15 @@
     "preview": "Anteprima"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Ricerca rapida"
   },
   "fontList": {
     "badge": {
       "old": ""
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "In questa scena",
+    "availableFonts": "Font disponibili",
+    "empty": "Nessun font trovato"
   },
   "userList": {
     "empty": "",
