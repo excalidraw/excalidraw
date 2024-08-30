@@ -1,6 +1,8 @@
+import type { InclusiveRange } from "../math";
 import {
   point,
   pointRotateRads,
+  rangeInclusive,
   rangeIntersection,
   rangesOverlap,
   type GlobalPoint,
@@ -70,7 +72,7 @@ export type Gap = {
   endBounds: Bounds;
   startSide: [GlobalPoint, GlobalPoint];
   endSide: [GlobalPoint, GlobalPoint];
-  overlap: [number, number];
+  overlap: InclusiveRange;
   length: number;
 };
 
@@ -365,7 +367,10 @@ export const getVisibleGaps = (
 
       if (
         startMaxX < endMinX &&
-        rangesOverlap([startMinY, startMaxY], [endMinY, endMaxY])
+        rangesOverlap(
+          rangeInclusive(startMinY, startMaxY),
+          rangeInclusive(endMinY, endMaxY),
+        )
       ) {
         horizontalGaps.push({
           startBounds,
@@ -374,8 +379,8 @@ export const getVisibleGaps = (
           endSide: [point(endMinX, endMinY), point(endMinX, endMaxY)],
           length: endMinX - startMaxX,
           overlap: rangeIntersection(
-            [startMinY, startMaxY],
-            [endMinY, endMaxY],
+            rangeInclusive(startMinY, startMaxY),
+            rangeInclusive(endMinY, endMaxY),
           )!,
         });
       }
@@ -402,7 +407,10 @@ export const getVisibleGaps = (
 
       if (
         startMaxY < endMinY &&
-        rangesOverlap([startMinX, startMaxX], [endMinX, endMaxX])
+        rangesOverlap(
+          rangeInclusive(startMinX, startMaxX),
+          rangeInclusive(endMinX, endMaxX),
+        )
       ) {
         verticalGaps.push({
           startBounds,
@@ -411,8 +419,8 @@ export const getVisibleGaps = (
           endSide: [point(endMinX, endMinY), point(endMaxX, endMinY)],
           length: endMinY - startMaxY,
           overlap: rangeIntersection(
-            [startMinX, startMaxX],
-            [endMinX, endMaxX],
+            rangeInclusive(startMinX, startMaxX),
+            rangeInclusive(endMinX, endMaxX),
           )!,
         });
       }
@@ -455,7 +463,7 @@ const getGapSnaps = (
     const centerY = (minY + maxY) / 2;
 
     for (const gap of horizontalGaps) {
-      if (!rangesOverlap([minY, maxY], gap.overlap)) {
+      if (!rangesOverlap(rangeInclusive(minY, maxY), gap.overlap)) {
         continue;
       }
 
@@ -524,7 +532,7 @@ const getGapSnaps = (
       }
     }
     for (const gap of verticalGaps) {
-      if (!rangesOverlap([minX, maxX], gap.overlap)) {
+      if (!rangesOverlap(rangeInclusive(minX, maxX), gap.overlap)) {
         continue;
       }
 
@@ -912,12 +920,12 @@ const createGapSnapLines = (
     const [endMinX, endMinY, endMaxX, endMaxY] = gapSnap.gap.endBounds;
 
     const verticalIntersection = rangeIntersection(
-      [minY, maxY],
+      rangeInclusive(minY, maxY),
       gapSnap.gap.overlap,
     );
 
     const horizontalGapIntersection = rangeIntersection(
-      [minX, maxX],
+      rangeInclusive(minX, maxX),
       gapSnap.gap.overlap,
     );
 

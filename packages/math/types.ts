@@ -15,6 +15,15 @@ export type Radians = number & { _brand: "excalimath__radian" };
 export type Degrees = number & { _brand: "excalimath_degree" };
 
 //
+// Range
+//
+
+/**
+ * A number range which includes the start and end numbers in the range.
+ */
+export type InclusiveRange = [number, number] & { _brand: "excalimath_degree" };
+
+//
 // Point
 //
 

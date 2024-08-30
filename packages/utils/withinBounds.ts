@@ -15,7 +15,12 @@ import type { Bounds } from "../excalidraw/element/bounds";
 import { getElementBounds } from "../excalidraw/element/bounds";
 import { arrayToMap } from "../excalidraw/utils";
 import type { LocalPoint } from "../math";
-import { isValueInRange, point, pointRotateRads } from "../math";
+import {
+  rangeIncludesValue,
+  point,
+  pointRotateRads,
+  rangeInclusive,
+} from "../math";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
@@ -140,10 +145,16 @@ export const elementPartiallyOverlapsWithOrContainsBBox = (
   const elementBBox = getRotatedBBox(element);
 
   return (
-    (isValueInRange(elementBBox[0], bbox[0], bbox[2]) ||
-      isValueInRange(bbox[0], elementBBox[0], elementBBox[2])) &&
-    (isValueInRange(elementBBox[1], bbox[1], bbox[3]) ||
-      isValueInRange(bbox[1], elementBBox[1], elementBBox[3]))
+    (rangeIncludesValue(elementBBox[0], rangeInclusive(bbox[0], bbox[2])) ||
+      rangeIncludesValue(
+        bbox[0],
+        rangeInclusive(elementBBox[0], elementBBox[2]),
+      )) &&
+    (rangeIncludesValue(elementBBox[1], rangeInclusive(bbox[1], bbox[3])) ||
+      rangeIncludesValue(
+        bbox[1],
+        rangeInclusive(elementBBox[1], elementBBox[3]),
+      ))
   );
 };
 
