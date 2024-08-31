@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 const TIMEOUT = 2000;
 
@@ -15,8 +15,13 @@ export const useCopyStatus = () => {
     }, TIMEOUT);
   };
 
+  const resetCopyStatus = useCallback(() => {
+    setCopyStatus(null);
+  }, []);
+
   return {
     copyStatus,
+    resetCopyStatus,
     onCopy,
   };
 };
