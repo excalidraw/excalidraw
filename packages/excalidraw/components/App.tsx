@@ -10082,6 +10082,11 @@ class App extends React.Component<AppProps, AppState> {
           event.target instanceof HTMLIFrameElement
         )
       ) {
+        // prevent zooming the browser (but allow scrolling DOM)
+        if (event[KEYS.CTRL_OR_CMD]) {
+          event.preventDefault();
+        }
+
         return;
       }
 
