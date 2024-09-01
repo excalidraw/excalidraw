@@ -6455,6 +6455,11 @@ handle-thing@^2.0.0:
   resolved "https://registry.yarnpkg.com/handle-thing/-/handle-thing-2.0.1.tgz#857f79ce359580c340d43081cc648970d0bb234e"
   integrity sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==
 
+harfbuzzjs@0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/harfbuzzjs/-/harfbuzzjs-0.3.6.tgz#97865c861aa7734af5bd1904570712e9d753fda9"
+  integrity sha512-dzf7y6NS8fiAIvPAL/VKwY8wx2HCzUB0vUfOo6h1J5UilFEEf7iYqFsvgwjHwvM3whbjfOMadNvQekU3KuRnWQ==
+
 has-ansi@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/has-ansi/-/has-ansi-2.0.0.tgz#34f5049ce1ecdf2b0649af3ef24e45ed35416d91"
