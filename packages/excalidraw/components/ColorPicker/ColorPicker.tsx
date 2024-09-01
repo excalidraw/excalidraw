@@ -106,7 +106,7 @@ const ColorPickerPopupContent = ({
   return (
     <PropertiesPopover
       container={container}
-      style={{ maxWidth: "17em" }}
+      style={{ maxWidth: "13rem" }}
       onFocusOutside={(event) => {
         // refocus due to eye dropper
         focusPickerContent();
