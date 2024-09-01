@@ -4699,13 +4699,6 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private onWheel = withBatchedUpdates((event: WheelEvent) => {
-    // prevent browser pinch zoom on DOM elements
-    if (!(event.target instanceof HTMLCanvasElement) && event.ctrlKey) {
-      event.preventDefault();
-    }
-  });
-
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
       if (this.state.viewModeEnabled) {
