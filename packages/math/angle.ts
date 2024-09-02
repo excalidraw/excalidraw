@@ -19,7 +19,7 @@ export const normalizeRadians = (angle: Radians): Radians => {
 };
 
 /**
- * Return the polar coordinates for the given carthesian point represented by
+ * Return the polar coordinates for the given cartesian point represented by
  * (x, y) for the center point 0,0 where the first number returned is the radius,
  * the second is the angle in radians.
  */

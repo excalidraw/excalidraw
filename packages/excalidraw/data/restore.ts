@@ -40,11 +40,7 @@ import {
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { bumpVersion } from "../element/mutateElement";
-import {
-  getUpdatedTimestamp,
-  isFiniteNumber,
-  updateActiveTool,
-} from "../utils";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
 import { detectLineHeight, getContainerElement } from "../element/textElement";
@@ -59,7 +55,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 import type { LocalPoint, Radians } from "../../math";
-import { point } from "../../math";
+import { isFiniteNumber, point } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,

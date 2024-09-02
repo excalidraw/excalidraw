@@ -3,7 +3,7 @@ import type { GlobalPoint, LocalPoint, SymmetricArc } from "./types";
 import { PRECISION } from "./utils";
 
 /**
- * Determines if a carthesian point lies on a symmetric arc, i.e. an arc which
+ * Determines if a cartesian point lies on a symmetric arc, i.e. an arc which
  * is part of a circle contour centered on 0, 0.
  */
 export const isPointOnSymmetricArc = <P extends GlobalPoint | LocalPoint>(
