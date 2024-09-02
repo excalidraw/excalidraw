@@ -551,6 +551,7 @@ class App extends React.Component<AppProps, AppState> {
   public scene: Scene;
   public fonts: Fonts;
   public renderer: Renderer;
+  public visibleElements: readonly NonDeletedExcalidrawElement[];
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -685,6 +686,7 @@ class App extends React.Component<AppProps, AppState> {
     this.canvas = document.createElement("canvas");
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
+    this.visibleElements = [];
 
     this.store = new Store();
     this.history = new History();
@@ -1483,6 +1485,7 @@ class App extends React.Component<AppProps, AppState> {
         newElementId: this.state.newElement?.id,
         pendingImageElementId: this.state.pendingImageElementId,
       });
+    this.visibleElements = visibleElements;
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 

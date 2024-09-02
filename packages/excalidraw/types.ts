@@ -660,6 +660,7 @@ export type AppClassProperties = {
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
   getEditorUIOffsets: App["getEditorUIOffsets"];
+  visibleElements: App["visibleElements"];
 };
 
 export type PointerDownState = Readonly<{

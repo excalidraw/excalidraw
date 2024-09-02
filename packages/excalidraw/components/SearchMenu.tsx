@@ -61,9 +61,9 @@ export const SearchMenu = () => {
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
       searchedKeywordRef.current = null;
-      handleSearch(trimmedKeyword, app, (matches) => {
+      handleSearch(trimmedKeyword, app, (matches, index) => {
         setMatches(matches);
-        setFocusIndex(null);
+        setFocusIndex(index);
         searchedKeywordRef.current = trimmedKeyword;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
@@ -222,7 +222,13 @@ export const SearchMenu = () => {
       <div className="layer-ui__search-count">
         {matches.length > 0 && (
           <>
-            <div>{matchCount}</div>
+            {focusIndex !== null ? (
+              <div>
+                {focusIndex + 1} / {matchCount}
+              </div>
+            ) : (
+              <div>{matchCount}</div>
+            )}
             <div className="result-nav">
               <Button
                 onSelect={() => {
@@ -295,9 +301,7 @@ const ListItem = (props: {
       onClick={props.onClick}
       ref={(ref) => {
         if (props.highlighted) {
-          ref?.scrollIntoView({
-            block: "nearest",
-          });
+          ref?.scrollIntoView();
         }
       }}
     >
@@ -510,25 +514,26 @@ const handleSearch = debounce(
   (
     keyword: string,
     app: AppClassProperties,
-    cb: (matches: SearchMatch[]) => void,
+    cb: (matches: SearchMatch[], focusIndex: number | null) => void,
   ) => {
     if (!keyword || keyword === "") {
-      cb([]);
+      cb([], null);
       return;
     }
 
-    const scene = app.scene;
-    const elements = scene.getNonDeletedElements();
-    const textElements = elements.filter((e) =>
-      isTextElement(e),
+    const elements = app.scene.getNonDeletedElements();
+    const texts = elements.filter((el) =>
+      isTextElement(el),
     ) as ExcalidrawTextElement[];
+
+    texts.sort((a, b) => a.y - b.y);
 
     const matches: SearchMatch[] = [];
 
     const safeKeyword = sanitizeKeyword(keyword);
     const regex = new RegExp(safeKeyword, "gi");
 
-    for (const textEl of textElements) {
+    for (const textEl of texts) {
       let match = null;
       const text = textEl.originalText;
 
@@ -548,7 +553,12 @@ const handleSearch = debounce(
       }
     }
 
-    cb(matches);
+    const focusIndex =
+      matches.findIndex(
+        (match) => match.textElement.id === app.visibleElements[0]?.id,
+      ) ?? null;
+
+    cb(matches, focusIndex);
   },
   SEARCH_DEBOUNCE,
 );
