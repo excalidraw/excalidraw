@@ -27,8 +27,7 @@ type SearchMatch = {
   keyword: string;
   index: number;
   preview: {
-    startIndex: number;
-    keywordIndex: number;
+    indexInKeyword: number;
     previewText: string;
     moreBefore: boolean;
     moreAfter: boolean;
@@ -241,7 +240,7 @@ export const SearchMenu = () => {
           {matches.map((searchMatch, index) => (
             <ListItem
               key={searchMatch.textElement.id + searchMatch.index}
-              keyword={keyword}
+              trimmedKeyword={keyword.trim()}
               preview={searchMatch.preview}
               highlighted={index === focusIndex}
               onClick={() => {
@@ -257,18 +256,19 @@ export const SearchMenu = () => {
 
 const ListItem = (props: {
   preview: SearchMatch["preview"];
-  keyword: string;
+  trimmedKeyword: string;
   highlighted: boolean;
   onClick?: () => void;
 }) => {
-  const keywordStartIndex =
-    props.preview.keywordIndex - props.preview.startIndex;
-  const previewWords = props.preview.previewText.split(/\s+/);
-
   const preview = [
-    `${previewWords.slice(0, keywordStartIndex).join(" ")} `,
-    `${previewWords.slice(keywordStartIndex, keywordStartIndex + 1)} `,
-    previewWords.slice(keywordStartIndex + 1).join(" "),
+    props.preview.previewText.slice(0, props.preview.indexInKeyword),
+    props.preview.previewText.slice(
+      props.preview.indexInKeyword,
+      props.preview.indexInKeyword + props.trimmedKeyword.length,
+    ),
+    props.preview.previewText.slice(
+      props.preview.indexInKeyword + props.trimmedKeyword.length,
+    ),
   ];
 
   return (
@@ -288,55 +288,65 @@ const ListItem = (props: {
       <div className="text-icon">{TextIcon}</div>
       <div className="preview-text">
         {props.preview.moreBefore ? "..." : ""}
-        {preview.map((text, index) => (
-          <span key={index}>
-            {index === 1 ? (
-              <b
-                style={{
-                  fontWeight: 700,
-                }}
-              >
-                {text}
-              </b>
-            ) : (
-              text
-            )}
-          </span>
-        ))}
+        {preview.map((text, index) =>
+          index === 1 ? (
+            <b
+              style={{
+                fontWeight: 700,
+                overflow: "hidden",
+                lineClamp: 1,
+              }}
+            >
+              {text}
+            </b>
+          ) : (
+            text
+          ),
+        )}
         {props.preview.moreAfter ? "..." : ""}
       </div>
     </li>
   );
 };
 
-const getMatchPreview = (text: string, index: number) => {
-  const words = text.split(/\s+/);
-
-  let currentWordIndex = 0;
-  let charCount = 0;
-
-  for (let i = 0; i < words.length; i++) {
-    charCount += words[i].length + 1; // +1 for the space
-    if (charCount > index) {
-      currentWordIndex = i;
-      break;
-    }
-  }
-
+const getMatchPreview = (text: string, index: number, keyword: string) => {
   const WORDS_BEFORE = 2;
   const WORDS_AFTER = 5;
 
-  const start = Math.max(0, currentWordIndex - WORDS_BEFORE);
-  const end = Math.min(words.length, currentWordIndex + WORDS_AFTER + 1); // +1 to include the current word
+  let substrBeforeKeyword = text.slice(0, index);
+  const wordsBeforeKeyword = substrBeforeKeyword.split(/\s+/);
+  // text = "small", keyword = "mall", not complete before
+  // text = "small", keyword = "smal", complete before
+  const isKeywordCompleteBefore = substrBeforeKeyword.endsWith(" ");
+  const startWordIndex =
+    wordsBeforeKeyword.length -
+    WORDS_BEFORE -
+    1 -
+    (isKeywordCompleteBefore ? 1 : 0);
+  let wordsBeforeAsString =
+    wordsBeforeKeyword
+      .slice(startWordIndex < 0 ? 0 : startWordIndex)
+      .join(" ") + (isKeywordCompleteBefore ? " " : "");
 
-  const surroundingWords = words.slice(start, end);
+  wordsBeforeAsString = wordsBeforeAsString.slice(-10);
+
+  let substrAfterKeyword = text.slice(index + keyword.length);
+  const wordsAfter = substrAfterKeyword.split(/\s+/);
+  // text = "small", keyword = "mall", complete after
+  // text = "small", keyword = "smal", not complete after
+  const isKeywordCompleteAfter = !substrAfterKeyword.startsWith(" ");
+  const numberOfWordsToTake = isKeywordCompleteAfter
+    ? WORDS_AFTER + 1
+    : WORDS_AFTER;
+  const wordsAfterAsString =
+    (isKeywordCompleteAfter ? "" : " ") +
+    wordsAfter.slice(0, numberOfWordsToTake).join(" ");
 
   return {
-    startIndex: start,
-    keywordIndex: currentWordIndex,
-    previewText: surroundingWords.join(" "),
-    moreBefore: start !== 0,
-    moreAfter: end !== words.length,
+    indexInKeyword: wordsBeforeAsString.length,
+    previewText: wordsBeforeAsString + keyword + wordsAfterAsString,
+    moreBefore: startWordIndex > 0,
+    moreAfter: wordsAfter.length > numberOfWordsToTake,
   };
 };
 
@@ -513,7 +523,7 @@ const handleSearch = debounce(
       const text = textEl.originalText;
 
       while ((match = regex.exec(text)) !== null) {
-        const preview = getMatchPreview(text, match.index);
+        const preview = getMatchPreview(text, match.index, keyword);
         const matchedLines = getMatchedLines(textEl, keyword, match.index);
 
         if (matchedLines.length > 0) {

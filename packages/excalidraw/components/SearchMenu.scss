@@ -61,13 +61,8 @@
   .layer-ui__result-item {
     display: flex;
     align-items: center;
-    line-height: 24px;
     height: 48px;
     padding: 4px 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
 
     .text-icon {
       width: 20px;
@@ -77,6 +72,10 @@
 
     .preview-text {
       flex: 1;
+      max-height: 48px;
+      line-height: 24px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
