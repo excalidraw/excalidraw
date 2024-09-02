@@ -124,7 +124,7 @@ const findPartsForData = (data: any, parts: string[]) => {
 
 export const t = (
   path: NestedKeyOf<typeof fallbackLangData>,
-  replacement?: { [key: string]: string | number } | null,
+  replacement?: Record<string, string | number> | null,
   fallback?: string,
 ) => {
   if (currentLang.code.startsWith(TEST_LANG_CODE)) {
