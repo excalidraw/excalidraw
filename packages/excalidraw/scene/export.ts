@@ -466,7 +466,11 @@ const getFontFaces = async (
   const getSource = (font: Font) => {
     try {
       // retrieve font source as dataurl based on the used codepoints
-      return font.getContent(codePoints);
+      if(font.urls[0]?.href?.startsWith("data:font/woff2")) { //zsviczian
+        return font.getContent(codePoints);
+      } else { //zsviczian
+        return font.urls[0].toString(); //zsviczian
+      } //zsviczian
     } catch {
       // fallback to font source as a url
       return font.urls[0].toString();

@@ -7,6 +7,7 @@ export interface Font {
   urls: URL[];
   fontFace: FontFace;
   getContent(codePoints: ReadonlySet<number>): Promise<string>;
+  getContentLegacy(): Promise<string>; //zsviczian
 }
 export const UNPKG_FALLBACK_URL = `https://unpkg.com/${
   import.meta.env.VITE_PKG_NAME
@@ -209,5 +210,60 @@ export class ExcalidrawFont implements Font {
     result = `${result.replace(/\/+$/, "")}/`;
 
     return result;
+  }
+
+    /**
+   * zsviczian https://github.com/zsviczian/excalidraw/commit/b4cfaaa4b4f46ca01f94e27fb7bf651a9da99daa
+   */
+  public async getContentLegacy(): Promise<string> {
+    let i = 0;
+    const errorMessages = [];
+
+    while (i < this.urls.length) {
+      const url = this.urls[i];
+
+      if (url.protocol === "data:") {
+        // it's dataurl, the font is inlined as base64, no need to fetch
+        return url.toString();
+      }
+
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Accept: "font/woff2",
+          },
+        });
+
+        if (response.ok) {
+          const mimeType = await response.headers.get("Content-Type");
+          const buffer = await response.arrayBuffer();
+
+          return `data:${mimeType};base64,${await stringToBase64(
+            await toByteString(buffer),
+            true,
+          )}`;
+        }
+
+        // response not ok, try to continue
+        errorMessages.push(
+          `"${url.toString()}" returned status "${response.status}"`,
+        );
+      } catch (e) {
+        errorMessages.push(`"${url.toString()}" returned error "${e}"`);
+      }
+
+      i++;
+    }
+
+    console.error(
+      `Failed to fetch font "${
+        this.fontFace.family
+      }" from urls "${this.urls.toString()}`,
+      JSON.stringify(errorMessages, undefined, 2),
+    );
+
+    // in case of issues, at least return the last url as a content
+    // defaults to unpkg for bundled fonts (so that we don't have to host them forever) and http url for others
+    return this.urls.length ? this.urls[this.urls.length - 1].toString() : "";
   }
 }

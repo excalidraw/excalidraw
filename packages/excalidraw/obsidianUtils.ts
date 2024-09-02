@@ -1,6 +1,7 @@
 import { FreedrawIcon } from "./components/icons";
 import { FONT_FAMILY } from "./constants";
 import { Fonts, register } from "./fonts";
+import { Font } from "./fonts/ExcalidrawFont";
 import type { FontMetadata } from "./fonts/metadata";
 import { FONT_METADATA } from "./fonts/metadata";
 
@@ -102,7 +103,7 @@ export async function registerFontsInCSS() {
     }
     for (const font of fontFaces.fonts) {
       try {
-        const content = await font.getContent();
+        const content = await font.getContentLegacy();
         cssContent += `@font-face {font-family: ${font.fontFace.family}; src: url(${content});}\n`;
       } catch (e) {
         console.error(`Skipped inlining font "${font.toString()}"`, e);
@@ -121,6 +122,6 @@ export async function getCSSFontDefinition(fontFamily: number): Promise<string> 
   if (!fontFace) {
     return "";
   }
-  const content = await fontFace.getContent();
+  const content = await fontFace.getContentLegacy();
   return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`
 }
