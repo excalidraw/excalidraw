@@ -35,13 +35,13 @@
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "5.0.12",
-    "vite-plugin-checker": "0.6.1",
+    "vite": "5.4.2",
+    "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
-    "vite-plugin-pwa": "0.17.4",
-    "vite-plugin-svgr": "2.4.0",
-    "vitest": "1.6.0",
-    "vitest-canvas-mock": "0.3.2"
+    "vite-plugin-pwa": "0.20.2",
+    "vite-plugin-svgr": "4.2.0",
+    "vitest": "2.0.5",
+    "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
     "node": "18.0.0 - 20.x.x"

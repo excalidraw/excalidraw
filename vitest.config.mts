@@ -2,9 +2,12 @@ import { defineConfig } from "vitest/config";
 import { woff2BrowserPlugin } from "./scripts/woff2/woff2-vite-plugins";
 
 export default defineConfig({
-  // @ts-ignore
+  //@ts-ignore
   plugins: [woff2BrowserPlugin()],
   test: {
+    sequence: {
+      hooks: 'parallel',
+    },
     setupFiles: ["./setupTests.ts"],
     globals: true,
     environment: "jsdom",
