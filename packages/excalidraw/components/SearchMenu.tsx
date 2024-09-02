@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CloseIcon, TextIcon, collapseDownIcon, upIcon } from "./icons";
 import { TextField } from "./TextField";
 import { Button } from "./Button";
@@ -45,7 +45,9 @@ export const SearchMenu = () => {
   const setAppState = useExcalidrawSetAppState();
   const [keyword, setKeyword] = useState("");
   const [matches, setMatches] = useState<SearchMatch[]>([]);
-  const [searchedKeyword, setSearchedKeyword] = useState<string | null>("");
+  const searchedKeywordRef = useRef<string | null>();
+  const lastSceneNonceRef = useRef<number | undefined>();
+
   const [focusIndex, setFocusIndex] = useAtom(
     searchItemInFocusAtom,
     jotaiScope,
@@ -54,12 +56,16 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     const trimmedKeyword = keyword.trim();
-    if (trimmedKeyword !== searchedKeyword) {
-      setSearchedKeyword(null);
+    if (
+      trimmedKeyword !== searchedKeywordRef.current ||
+      app.scene.getSceneNonce() !== lastSceneNonceRef.current
+    ) {
+      searchedKeywordRef.current = null;
       handleSearch(trimmedKeyword, app, (matches) => {
         setMatches(matches);
         setFocusIndex(null);
-        setSearchedKeyword(trimmedKeyword);
+        searchedKeywordRef.current = trimmedKeyword;
+        lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
           searchMatches: matches.map((searchMatch) => ({
             id: searchMatch.textElement.id,
@@ -69,7 +75,14 @@ export const SearchMenu = () => {
         });
       });
     }
-  }, [keyword, searchedKeyword, app, elementsMap, setAppState, setFocusIndex]);
+  }, [
+    keyword,
+    elementsMap,
+    app,
+    setAppState,
+    setFocusIndex,
+    lastSceneNonceRef,
+  ]);
 
   const goToNextItem = () => {
     if (matches.length > 0) {
@@ -157,7 +170,8 @@ export const SearchMenu = () => {
     return () => {
       setKeyword("");
       setFocusIndex(null);
-      setSearchedKeyword(null);
+      searchedKeywordRef.current = null;
+      lastSceneNonceRef.current = undefined;
       setAppState({
         searchMatches: [],
       });
@@ -230,7 +244,7 @@ export const SearchMenu = () => {
           </>
         )}
 
-        {matches.length === 0 && keyword && searchedKeyword && (
+        {matches.length === 0 && keyword && searchedKeywordRef.current && (
           <div>{t("search.noMatch")}</div>
         )}
       </div>
