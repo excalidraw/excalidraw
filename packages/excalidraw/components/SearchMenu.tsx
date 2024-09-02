@@ -261,6 +261,7 @@ const ListItem = (props: {
   onClick?: () => void;
 }) => {
   const preview = [
+    props.preview.moreBefore ? "..." : "",
     props.preview.previewText.slice(0, props.preview.indexInKeyword),
     props.preview.previewText.slice(
       props.preview.indexInKeyword,
@@ -269,6 +270,7 @@ const ListItem = (props: {
     props.preview.previewText.slice(
       props.preview.indexInKeyword + props.trimmedKeyword.length,
     ),
+    props.preview.moreAfter ? "..." : "",
   ];
 
   return (
@@ -286,25 +288,14 @@ const ListItem = (props: {
       }}
     >
       <div className="text-icon">{TextIcon}</div>
-      <div className="preview-text">
-        {props.preview.moreBefore ? "..." : ""}
-        {preview.map((text, index) =>
-          index === 1 ? (
-            <b
-              style={{
-                fontWeight: 700,
-                overflow: "hidden",
-                lineClamp: 1,
-              }}
-            >
-              {text}
-            </b>
-          ) : (
-            text
-          ),
-        )}
-        {props.preview.moreAfter ? "..." : ""}
-      </div>
+      <div
+        className="preview-text"
+        dangerouslySetInnerHTML={{
+          __html: preview
+            .map((text, index) => (index === 2 ? `<b>${text}</b>` : text))
+            .join(""),
+        }}
+      ></div>
     </li>
   );
 };
@@ -313,7 +304,7 @@ const getMatchPreview = (text: string, index: number, keyword: string) => {
   const WORDS_BEFORE = 2;
   const WORDS_AFTER = 5;
 
-  let substrBeforeKeyword = text.slice(0, index);
+  const substrBeforeKeyword = text.slice(0, index);
   const wordsBeforeKeyword = substrBeforeKeyword.split(/\s+/);
   // text = "small", keyword = "mall", not complete before
   // text = "small", keyword = "smal", complete before
@@ -322,15 +313,20 @@ const getMatchPreview = (text: string, index: number, keyword: string) => {
     wordsBeforeKeyword.length -
     WORDS_BEFORE -
     1 -
-    (isKeywordCompleteBefore ? 1 : 0);
+    (isKeywordCompleteBefore ? 0 : 1);
   let wordsBeforeAsString =
     wordsBeforeKeyword
-      .slice(startWordIndex < 0 ? 0 : startWordIndex)
+      .slice(startWordIndex <= 0 ? 0 : startWordIndex)
       .join(" ") + (isKeywordCompleteBefore ? " " : "");
 
-  wordsBeforeAsString = wordsBeforeAsString.slice(-10);
+  const MAX_ALLOWED_CHARS = 20;
 
-  let substrAfterKeyword = text.slice(index + keyword.length);
+  wordsBeforeAsString =
+    wordsBeforeAsString.length > MAX_ALLOWED_CHARS
+      ? wordsBeforeAsString.slice(-MAX_ALLOWED_CHARS)
+      : wordsBeforeAsString;
+
+  const substrAfterKeyword = text.slice(index + keyword.length);
   const wordsAfter = substrAfterKeyword.split(/\s+/);
   // text = "small", keyword = "mall", complete after
   // text = "small", keyword = "smal", not complete after
