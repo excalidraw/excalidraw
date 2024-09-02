@@ -1,5 +1,5 @@
+import { clamp, round } from "../../math";
 import { MAX_ZOOM, MIN_ZOOM } from "../constants";
-import { clamp, round } from "../math";
 import type { NormalizedZoomValue } from "../types";
 
 export const getNormalizedZoom = (zoom: number): NormalizedZoomValue => {

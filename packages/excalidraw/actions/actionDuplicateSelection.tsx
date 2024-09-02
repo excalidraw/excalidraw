@@ -42,20 +42,21 @@ export const actionDuplicateSelection = register({
   perform: (elements, appState, formData, app) => {
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
-      const ret = LinearElementEditor.duplicateSelectedPoints(
-        appState,
-        app.scene.getNonDeletedElementsMap(),
-      );
+      // TODO: Invariants should be checked here instead of duplicateSelectedPoints()
+      try {
+        const newAppState = LinearElementEditor.duplicateSelectedPoints(
+          appState,
+          app.scene.getNonDeletedElementsMap(),
+        );
 
-      if (!ret) {
+        return {
+          elements,
+          appState: newAppState,
+          storeAction: StoreAction.CAPTURE,
+        };
+      } catch {
         return false;
       }
-
-      return {
-        elements,
-        appState: ret.appState,
-        storeAction: StoreAction.CAPTURE,
-      };
     }
 
     return {

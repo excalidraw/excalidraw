@@ -2,7 +2,6 @@ import type { ExcalidrawElement } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import type { Point } from "../types";
 import { getUpdatedTimestamp } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -59,8 +58,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           let didChangePoints = false;
           let index = prevPoints.length;
           while (--index) {
-            const prevPoint: Point = prevPoints[index];
-            const nextPoint: Point = nextPoints[index];
+            const prevPoint = prevPoints[index];
+            const nextPoint = nextPoints[index];
             if (
               prevPoint[0] !== nextPoint[0] ||
               prevPoint[1] !== nextPoint[1]

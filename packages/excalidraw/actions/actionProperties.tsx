@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppClassProperties, AppState, Point, Primitive } from "../types";
+import type { AppClassProperties, AppState, Primitive } from "../types";
 import type { StoreActionType } from "../store";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -115,6 +115,8 @@ import {
 } from "../element/binding";
 import { mutateElbowArrow } from "../element/routing";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import type { LocalPoint } from "../../math";
+import { point, vector } from "../../math";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -1648,10 +1650,10 @@ export const actionChangeArrowType = register({
             newElement,
             elementsMap,
             [finalStartPoint, finalEndPoint].map(
-              (point) =>
-                [point[0] - newElement.x, point[1] - newElement.y] as Point,
+              (p): LocalPoint =>
+                point(p[0] - newElement.x, p[1] - newElement.y),
             ),
-            [0, 0],
+            vector(0, 0),
             {
               ...(startElement && newElement.startBinding
                 ? {

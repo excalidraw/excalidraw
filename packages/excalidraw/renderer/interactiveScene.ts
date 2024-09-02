@@ -30,7 +30,7 @@ import {
   shouldShowBoundingBox,
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import type { InteractiveCanvasAppState, Point } from "../types";
+import type { InteractiveCanvasAppState } from "../types";
 import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
 
 import { renderSnaps } from "../renderer/renderSnaps";
@@ -69,7 +69,8 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import { getCornerRadius } from "../math";
+import type { GlobalPoint, LocalPoint, Radians } from "../../math";
+import { getCornerRadius } from "../shapes";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -101,7 +102,7 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-const highlightPoint = (
+const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -168,7 +169,7 @@ const strokeDiamondWithRotation = (
   context.restore();
 };
 
-const renderSingleLinearPoint = (
+const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: Point,
@@ -499,7 +500,7 @@ const renderLinearPointHandles = (
     element,
     elementsMap,
     appState,
-  ).filter((midPoint) => midPoint !== null) as Point[];
+  ).filter((midPoint): midPoint is GlobalPoint => midPoint !== null);
 
   midPoints.forEach((segmentMidPoint) => {
     if (
@@ -931,7 +932,7 @@ const _renderInteractiveScene = ({
       context.setLineDash(initialLineDash);
       const transformHandles = getTransformHandlesFromCoords(
         [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
-        0,
+        0 as Radians,
         appState.zoom,
         "mouse",
         isFrameSelected

@@ -30,13 +30,13 @@ import type {
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getContainingFrame } from "../frame";
-import { getCornerRadius, isPathALoop } from "../math";
 import { ShapeCache } from "../scene/ShapeCache";
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 import { getVerticalOffset } from "../fonts";
+import { getCornerRadius, isPathALoop } from "../shapes";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,

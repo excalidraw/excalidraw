@@ -17,6 +17,7 @@ import type {
   ExcalidrawElbowArrowElement,
 } from "./types";
 import { ARROW_TYPE } from "../constants";
+import { point } from "../../math";
 
 const { h } = window;
 
@@ -31,8 +32,8 @@ describe("elbow arrow routing", () => {
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
     mutateElbowArrow(arrow, scene.getNonDeletedElementsMap(), [
-      [-45 - arrow.x, -100.1 - arrow.y],
-      [45 - arrow.x, 99.9 - arrow.y],
+      point(-45 - arrow.x, -100.1 - arrow.y),
+      point(45 - arrow.x, 99.9 - arrow.y),
     ]);
     expect(arrow.points).toEqual([
       [0, 0],
@@ -68,10 +69,7 @@ describe("elbow arrow routing", () => {
       y: -100.1,
       width: 90,
       height: 200,
-      points: [
-        [0, 0],
-        [90, 200],
-      ],
+      points: [point(0, 0), point(90, 200)],
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(rectangle1);
     scene.insertElement(rectangle2);
@@ -83,10 +81,7 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    mutateElbowArrow(arrow, elementsMap, [
-      [0, 0],
-      [90, 200],
-    ]);
+    mutateElbowArrow(arrow, elementsMap, [point(0, 0), point(90, 200)]);
 
     expect(arrow.points).toEqual([
       [0, 0],

@@ -30,7 +30,6 @@ import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import type { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
-import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   measureText,
@@ -48,6 +47,7 @@ import {
 } from "../constants";
 import type { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getLineHeight } from "../fonts";
+import type { Radians } from "../../math";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -88,7 +88,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
-    angle = 0,
+    angle = 0 as Radians,
     groupIds = [],
     frameId = null,
     index = null,
@@ -346,6 +346,53 @@ const getAdjustedDimensions = (
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
   };
+};
+
+const adjustXYWithRotation = (
+  sides: {
+    n?: boolean;
+    e?: boolean;
+    s?: boolean;
+    w?: boolean;
+  },
+  x: number,
+  y: number,
+  angle: number,
+  deltaX1: number,
+  deltaY1: number,
+  deltaX2: number,
+  deltaY2: number,
+): [number, number] => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  if (sides.e && sides.w) {
+    x += deltaX1 + deltaX2;
+  } else if (sides.e) {
+    x += deltaX1 * (1 + cos);
+    y += deltaX1 * sin;
+    x += deltaX2 * (1 - cos);
+    y += deltaX2 * -sin;
+  } else if (sides.w) {
+    x += deltaX1 * (1 - cos);
+    y += deltaX1 * -sin;
+    x += deltaX2 * (1 + cos);
+    y += deltaX2 * sin;
+  }
+
+  if (sides.n && sides.s) {
+    y += deltaY1 + deltaY2;
+  } else if (sides.n) {
+    x += deltaY1 * sin;
+    y += deltaY1 * (1 - cos);
+    x += deltaY2 * -sin;
+    y += deltaY2 * (1 + cos);
+  } else if (sides.s) {
+    x += deltaY1 * -sin;
+    y += deltaY1 * (1 + cos);
+    x += deltaY2 * sin;
+    y += deltaY2 * (1 - cos);
+  }
+  return [x, y];
 };
 
 export const refreshTextDimensions = (

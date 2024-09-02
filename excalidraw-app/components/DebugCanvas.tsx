@@ -1,7 +1,6 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 import { type AppState } from "../../packages/excalidraw/types";
 import { throttleRAF } from "../../packages/excalidraw/utils";
-import type { LineSegment } from "../../packages/utils";
 import {
   bootstrapCanvas,
   getNormalizedCanvasDimensions,
@@ -13,12 +12,16 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import { isLineSegment } from "../../packages/excalidraw/element/typeChecks";
+import {
+  isLineSegment,
+  type GlobalPoint,
+  type LineSegment,
+} from "../../packages/math";
 
 const renderLine = (
   context: CanvasRenderingContext2D,
   zoom: number,
-  segment: LineSegment,
+  segment: LineSegment<GlobalPoint>,
   color: string,
 ) => {
   context.save();
@@ -47,10 +50,15 @@ const render = (
   context: CanvasRenderingContext2D,
   appState: AppState,
 ) => {
-  frame.forEach((el) => {
+  frame.forEach((el: DebugElement) => {
     switch (true) {
       case isLineSegment(el.data):
-        renderLine(context, appState.zoom.value, el.data, el.color);
+        renderLine(
+          context,
+          appState.zoom.value,
+          el.data as LineSegment<GlobalPoint>,
+          el.color,
+        );
         break;
     }
   });
