@@ -44,6 +44,8 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
+import type { LocalPoint, Radians } from "../../math";
+import { point } from "../../math";
 
 const { h } = window;
 
@@ -2038,9 +2040,9 @@ describe("history", () => {
             width: 178.9000000000001,
             height: 236.10000000000002,
             points: [
-              [0, 0],
-              [178.9000000000001, 0],
-              [178.9000000000001, 236.10000000000002],
+              point(0, 0),
+              point(178.9000000000001, 0),
+              point(178.9000000000001, 236.10000000000002),
             ],
             startBinding: {
               elementId: "KPrBI4g_v9qUB1XxYLgSz",
@@ -2156,12 +2158,12 @@ describe("history", () => {
         elements: [
           newElementWith(h.elements[0] as ExcalidrawLinearElement, {
             points: [
-              [0, 0],
-              [5, 5],
-              [10, 10],
-              [15, 15],
-              [20, 20],
-            ],
+              point(0, 0),
+              point(5, 5),
+              point(10, 10),
+              point(15, 15),
+              point(20, 20),
+            ] as LocalPoint[],
           }),
         ],
         storeAction: StoreAction.UPDATE,
@@ -4003,7 +4005,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 200,
               y: 200,
-              angle: 90,
+              angle: 90 as Radians,
             }),
           ],
           storeAction: StoreAction.CAPTURE,
@@ -4121,7 +4123,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 205,
               y: 205,
-              angle: 90,
+              angle: 90 as Radians,
             }),
           ],
           storeAction: StoreAction.CAPTURE,
