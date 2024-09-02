@@ -27,7 +27,7 @@ import {
   newImageElement,
   newMagicFrameElement,
 } from "../../element/newElement";
-import type { AppState, Point } from "../../types";
+import type { AppState } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import type { Mutable } from "../../utility-types";
@@ -36,6 +36,7 @@ import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
 import type { Action } from "../../actions/types";
 import { mutateElement } from "../../element/mutateElement";
+import { point, type LocalPoint, type Radians } from "../../../math";
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
@@ -171,7 +172,7 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
-    points?: T extends "arrow" | "line" ? readonly Point[] : never;
+    points?: T extends "arrow" | "line" ? readonly LocalPoint[] : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
@@ -218,7 +219,7 @@ export class API {
       y,
       frameId: rest.frameId ?? null,
       index: rest.index ?? null,
-      angle: rest.angle ?? 0,
+      angle: (rest.angle ?? 0) as Radians,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
@@ -293,8 +294,8 @@ export class API {
           height,
           type,
           points: rest.points ?? [
-            [0, 0],
-            [100, 100],
+            point<LocalPoint>(0, 0),
+            point<LocalPoint>(100, 100),
           ],
           elbowed: rest.elbowed ?? false,
         });
@@ -306,8 +307,8 @@ export class API {
           height,
           type,
           points: rest.points ?? [
-            [0, 0],
-            [100, 100],
+            point<LocalPoint>(0, 0),
+            point<LocalPoint>(100, 100),
           ],
         });
         break;

@@ -1,4 +1,4 @@
-import type { Point, ToolType } from "../../types";
+import type { ToolType } from "../../types";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -30,10 +30,11 @@ import {
   isFrameLikeElement,
 } from "../../element/typeChecks";
 import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
-import { rotatePoint } from "../../math";
 import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
+import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
+import { point, pointRotateRads } from "../../../math";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
@@ -131,27 +132,29 @@ export class Keyboard {
   };
 }
 
-const getElementPointForSelection = (element: ExcalidrawElement): Point => {
+const getElementPointForSelection = (
+  element: ExcalidrawElement,
+): GlobalPoint => {
   const { x, y, width, height, angle } = element;
-  const target: Point = [
+  const target = point<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
     y,
-  ];
-  let center: Point;
+  );
+  let center: GlobalPoint;
 
   if (isLinearElement(element)) {
     const bounds = getElementPointsCoords(element, element.points);
-    center = [(bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2];
+    center = point((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
   } else {
-    center = [x + width / 2, y + height / 2];
+    center = point(x + width / 2, y + height / 2);
   }
 
   if (isTextElement(element)) {
     return center;
   }
 
-  return rotatePoint(target, center, angle);
+  return pointRotateRads(target, center, angle);
 };
 
 export class Pointer {
@@ -328,7 +331,7 @@ const transform = (
     const isFrameSelected = elements.some(isFrameLikeElement);
     const transformHandles = getTransformHandlesFromCoords(
       [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
-      0,
+      0 as Radians,
       h.state.zoom,
       "mouse",
       isFrameSelected ? OMIT_SIDES_FOR_FRAME : OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
@@ -450,7 +453,7 @@ export class UI {
       width?: number;
       height?: number;
       angle?: number;
-      points?: T extends "line" | "arrow" | "freedraw" ? Point[] : never;
+      points?: T extends "line" | "arrow" | "freedraw" ? LocalPoint[] : never;
     } = {},
   ): Element<T> & {
     /** Returns the actual, current element from the elements array, instead
@@ -459,9 +462,9 @@ export class UI {
   } {
     const width = initialWidth ?? initialHeight ?? size;
     const height = initialHeight ?? size;
-    const points: Point[] = initialPoints ?? [
-      [0, 0],
-      [width, height],
+    const points: LocalPoint[] = initialPoints ?? [
+      point(0, 0),
+      point(width, height),
     ];
 
     UI.clickTool(type);
