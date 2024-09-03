@@ -43,7 +43,7 @@ import { excludeElementsInFramesFromSelection } from "../scene/selection"; //zsv
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { clamp } from "../math";
+import { clamp } from "../../math";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

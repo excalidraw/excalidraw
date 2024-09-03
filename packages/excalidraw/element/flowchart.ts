@@ -10,7 +10,6 @@ import {
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
-import { aabbForElement } from "../math";
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -20,7 +19,7 @@ import type {
   OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
-import type { AppState, PendingExcalidrawElements, Point } from "../types";
+import type { AppState, PendingExcalidrawElements } from "../types";
 import { mutateElement } from "./mutateElement";
 import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 import {
@@ -30,6 +29,8 @@ import {
   isFlowchartNodeElement,
 } from "./typeChecks";
 import { invariant } from "../utils";
+import { point, type LocalPoint } from "../../math";
+import { aabbForElement } from "../shapes";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -81,13 +82,14 @@ const getNodeRelatives = (
           "not an ExcalidrawBindableElement",
         );
 
-        const edgePoint: Point =
-          type === "predecessors" ? el.points[el.points.length - 1] : [0, 0];
+        const edgePoint = (
+          type === "predecessors" ? el.points[el.points.length - 1] : [0, 0]
+        ) as Readonly<LocalPoint>;
 
         const heading = headingForPointFromElement(node, aabbForElement(node), [
           edgePoint[0] + el.x,
           edgePoint[1] + el.y,
-        ]);
+        ] as Readonly<LocalPoint>);
 
         acc.push({
           relative,
@@ -419,10 +421,7 @@ const createBindingArrow = (
     strokeColor: appState.currentItemStrokeColor,
     strokeStyle: appState.currentItemStrokeStyle,
     strokeWidth: appState.currentItemStrokeWidth,
-    points: [
-      [0, 0],
-      [endX, endY],
-    ],
+    points: [point(0, 0), point(endX, endY)],
     elbowed: true,
   });
 

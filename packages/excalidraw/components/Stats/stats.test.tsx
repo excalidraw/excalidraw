@@ -19,12 +19,13 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
-import { degreeToRadian, rotate } from "../../math";
 import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
 import { getCommonBounds, isTextElement } from "../../element";
 import { API } from "../../tests/helpers/api";
 import { actionGroup } from "../../actions";
 import { isInGroup } from "../../groups";
+import type { Degrees } from "../../../math";
+import { degreesToRadians, point, pointRotateRads } from "../../../math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -46,7 +47,9 @@ const testInputProperty = (
   expect(input.value).toBe(initialValue.toString());
   UI.updateInput(input, String(nextValue));
   if (property === "angle") {
-    expect(element[property]).toBe(degreeToRadian(Number(nextValue)));
+    expect(element[property]).toBe(
+      degreesToRadians(Number(nextValue) as Degrees),
+    );
   } else if (property === "fontSize" && isTextElement(element)) {
     expect(element[property]).toBe(Number(nextValue));
   } else if (property !== "fontSize") {
@@ -260,11 +263,9 @@ describe("stats for a generic element", () => {
       rectangle.x + rectangle.width / 2,
       rectangle.y + rectangle.height / 2,
     ];
-    const [topLeftX, topLeftY] = rotate(
-      rectangle.x,
-      rectangle.y,
-      cx,
-      cy,
+    const [topLeftX, topLeftY] = pointRotateRads(
+      point(rectangle.x, rectangle.y),
+      point(cx, cy),
       rectangle.angle,
     );
 
@@ -281,11 +282,9 @@ describe("stats for a generic element", () => {
 
     testInputProperty(rectangle, "angle", "A", 0, 45);
 
-    let [newTopLeftX, newTopLeftY] = rotate(
-      rectangle.x,
-      rectangle.y,
-      cx,
-      cy,
+    let [newTopLeftX, newTopLeftY] = pointRotateRads(
+      point(rectangle.x, rectangle.y),
+      point(cx, cy),
       rectangle.angle,
     );
 
@@ -294,11 +293,9 @@ describe("stats for a generic element", () => {
 
     testInputProperty(rectangle, "angle", "A", 45, 66);
 
-    [newTopLeftX, newTopLeftY] = rotate(
-      rectangle.x,
-      rectangle.y,
-      cx,
-      cy,
+    [newTopLeftX, newTopLeftY] = pointRotateRads(
+      point(rectangle.x, rectangle.y),
+      point(cx, cy),
       rectangle.angle,
     );
     expect(newTopLeftX.toString()).not.toEqual(xInput.value);
@@ -313,11 +310,9 @@ describe("stats for a generic element", () => {
       rectangle.x + rectangle.width / 2,
       rectangle.y + rectangle.height / 2,
     ];
-    const [topLeftX, topLeftY] = rotate(
-      rectangle.x,
-      rectangle.y,
-      cx,
-      cy,
+    const [topLeftX, topLeftY] = pointRotateRads(
+      point(rectangle.x, rectangle.y),
+      point(cx, cy),
       rectangle.angle,
     );
     testInputProperty(rectangle, "width", "W", rectangle.width, 400);
@@ -325,11 +320,9 @@ describe("stats for a generic element", () => {
       rectangle.x + rectangle.width / 2,
       rectangle.y + rectangle.height / 2,
     ];
-    let [currentTopLeftX, currentTopLeftY] = rotate(
-      rectangle.x,
-      rectangle.y,
-      cx,
-      cy,
+    let [currentTopLeftX, currentTopLeftY] = pointRotateRads(
+      point(rectangle.x, rectangle.y),
+      point(cx, cy),
       rectangle.angle,
     );
     expect(currentTopLeftX).toBeCloseTo(topLeftX, 4);
@@ -340,11 +333,9 @@ describe("stats for a generic element", () => {
       rectangle.x + rectangle.width / 2,
       rectangle.y + rectangle.height / 2,
     ];
-    [currentTopLeftX, currentTopLeftY] = rotate(
-      rectangle.x,
-      rectangle.y,
-      cx,
-      cy,
+    [currentTopLeftX, currentTopLeftY] = pointRotateRads(
+      point(rectangle.x, rectangle.y),
+      point(cx, cy),
       rectangle.angle,
     );
 
@@ -642,7 +633,7 @@ describe("stats for multiple elements", () => {
 
     UI.updateInput(angle, "40");
 
-    const angleInRadian = degreeToRadian(40);
+    const angleInRadian = degreesToRadians(40 as Degrees);
     expect(rectangle?.angle).toBeCloseTo(angleInRadian, 4);
     expect(text?.angle).toBeCloseTo(angleInRadian, 4);
     expect(frame.angle).toBe(0);
