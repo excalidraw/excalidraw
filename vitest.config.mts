@@ -5,6 +5,8 @@ export default defineConfig({
   //@ts-ignore
   plugins: [woff2BrowserPlugin()],
   test: {
+    // Since hooks are running in stack in v2, which means all hooks run serially whereas
+    // we need to run them in parallel
     sequence: {
       hooks: 'parallel',
     },
@@ -19,6 +21,8 @@ export default defineConfig({
         functions: 68,
         statements: 70,
       },
+      // Since v2, it ignores empty lines by default and we need to disable it as it affects the coverage
+      ignoreEmptyLines: false
     },
   },
 });
