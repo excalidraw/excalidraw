@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "משולש (קו מתאר)",
     "arrowhead_diamond": "יהלום",
     "arrowhead_diamond_outline": "יהלום (קו מתאר)",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowtypes": "סוג החץ",
+    "arrowtype_sharp": "חץ מחודד",
+    "arrowtype_round": "חץ מעוקל",
+    "arrowtype_elbowed": "חץ זוויתי",
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
     "addWatermark": "הוספת „נוצר באמצעות Excalidraw”",
@@ -78,7 +78,7 @@
     "canvasColors": "בשימוש בקנבס",
     "canvasBackground": "רקע קנבס",
     "drawingCanvas": "קנבס ציור",
-    "clearCanvas": "",
+    "clearCanvas": "ניקוי הקנבס",
     "layers": "שכבות",
     "actions": "פעולות",
     "language": "שפה",
@@ -91,7 +91,7 @@
     "group": "קבץ",
     "ungroup": "פרק קבוצה",
     "collaborators": "שותפים",
-    "toggleGrid": "",
+    "toggleGrid": "הצגת רשת",
     "addToLibrary": "הוסף לספריה",
     "removeFromLibrary": "הסר מספריה",
     "libraryLoadingMessage": "טוען ספריה…",
@@ -113,7 +113,7 @@
     "share": "שתף",
     "showStroke": "הצג בוחר צבע מברשת",
     "showBackground": "הצג בוחר צבע רקע",
-    "showFonts": "",
+    "showFonts": "הצגת בוחר הפונטים",
     "toggleTheme": "החלפת מצב מואר/חשוך",
     "theme": "ערכת עיצוב",
     "personalLib": "ספריה פרטית",
@@ -134,7 +134,7 @@
     },
     "lineEditor": {
       "edit": "ערוך קו",
-      "editArrow": ""
+      "editArrow": "עריכת החץ"
     },
     "elementLock": {
       "lock": "נעילה",
@@ -146,16 +146,16 @@
     "sidebarLock": "שמור את סרגל הצד פתוח",
     "selectAllElementsInFrame": "בחר את כל האלמנטים במסגרת",
     "removeAllElementsFromFrame": "הסר את כל האלמנטים שבמסגרת",
-    "eyeDropper": "",
+    "eyeDropper": "בחירת צבע מתוך הקנבס",
     "textToDiagram": "טקסט לתרשים",
     "prompt": "בקשה",
-    "followUs": "",
+    "followUs": "לעקוב אחרינו",
     "discordChat": "צ׳אט ב־Discord",
-    "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
-    "installPWA": "",
-    "autoResize": ""
+    "zoomToFitViewport": "התאמת הזום לגודל המסך",
+    "zoomToFitSelection": "להתמקד בחלק הנבחר",
+    "zoomToFit": "להציג את כל האלמנטים",
+    "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
+    "autoResize": "לאפשר התאמה אוטומטית של גודל הטקסט"
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -168,7 +168,7 @@
     "exportImage": "ייצוא התמונה...",
     "export": "שמור ל...",
     "copyToClipboard": "העתק ללוח",
-    "copyLink": "",
+    "copyLink": "העתקת קישור",
     "save": "שמור לקובץ נוכחי",
     "saveAs": "שמירה בשם",
     "load": "פתח",
@@ -196,11 +196,11 @@
     "cancel": "ביטול",
     "clear": "ניקוי",
     "remove": "הסר",
-    "embed": "",
+    "embed": "להציג את ההטמעה",
     "publishLibrary": "פרסום",
     "submit": "שליחה",
     "confirm": "אשר",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "לחיצה לתפעול"
   },
   "alerts": {
     "clearReset": "פעולה זו תנקה את כל הקנבס. אתה בטוח?",
@@ -233,15 +233,15 @@
     "failedToFetchImage": "משיכת התמונה נכשלה.",
     "cannotResolveCollabServer": "לא הצלחתי להתחבר לשרת השיתוף. אנא רענן את הדף ונסה שוב.",
     "importLibraryError": "לא ניתן היה לטעון את הספריה",
-    "saveLibraryError": "",
+    "saveLibraryError": "שמירת הספריה בזיכרון לא הצליחה. יש לשמור את הספריה מקומית כקובץ כדי לוודא שהשינויים לא ילכו לאיבוד.",
     "collabSaveFailed": "לא הצלחתי להתחבר למסד הנתונים האחורי. אם הבעיה ממשיכה, כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
     "collabSaveFailed_sizeExceeded": "לא הצלחתי לשמור למסד הנתונים האחורי, נראה שהקנבס שלך גדול מדי. כדאי שתשמור את הקובץ מקומית כדי לוודא שלא תאבד את העבודה שלך.",
     "imageToolNotSupported": "תמונות מושבתות.",
     "brave_measure_text_error": {
-      "line1": "",
-      "line2": "",
-      "line3": "",
-      "line4": ""
+      "line1": "נראה שהנכם משתמשים בדפדפן Brave אשר מוגדר<bold>למנוע באופן אגרסיבי חתימה אלקטרונית</bold>.",
+      "line2": "ההגדרה הזאת יכולה לשבור את<bold>רכיבי הטקסט</bold> בעבודתך.",
+      "line3": "אנו ממליצים לבטל את ההגדרה הזו. תוכלו ללמוד <link>כאן</link> כיצד לעשות זאת.",
+      "line4": "אם ביטול ההגדרה אינו מתקן את הצגת רכיבי הטקסט אנא פתחו סוגיה בדף ה<issueLink>גיטהאב</issueLink> או כתבו לנו <discordLink>בדיסקורד</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "אי אפשר להוסיף רכיבי הטמעה לספרייה.",
@@ -276,20 +276,20 @@
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "rectangle": "מלבן",
+    "diamond": "יהלום",
+    "ellipse": "אליפסה",
+    "arrow": "חץ",
+    "line": "קו",
+    "freedraw": "ציור חופשי",
+    "text": "טקסט",
+    "image": "תמונה",
+    "group": "קבוצה",
+    "frame": "מסגרת",
+    "magicframe": "מתרשים קווי מתאר לקוד",
+    "embeddable": "הטמעה באתר",
+    "selection": "בחירה",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "פעולות קנבאס",
@@ -299,10 +299,10 @@
   "hints": {
     "canvasPanning": "כדי להזיז את הקנבס, החזק את גלגל העכבר לחוץ או את מקש הרווח לחוץ תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
-    "arrowTool": "",
+    "arrowTool": "לחצו כדי ליצור מספר נקודות, משכו כדי ליצור קו בודד. לחצו על {{arrowShortcut}} שוב כדי לשנות את סוג החץ.",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
-    "embeddable": "",
+    "embeddable": "הקליקו וגררו כדי ליצור הטמעת אתר",
     "text_selected": "לחץ לחיצה כפולה או הקש על אנטר לעריכת הטקסט",
     "text_editing": "כדי לסיים את העריכה לחץ על מקש Escape או על Ctrl (Cmd במחשבי אפל) ומקש Enter",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
@@ -316,11 +316,11 @@
     "placeImage": "הקלק להנחת התמונה, או הקלק וגרור להגדרת הגודל שלו ידנית",
     "publishLibrary": "פרסם ספריה משלך",
     "bindTextToElement": "הקש Enter כדי להוספת טקסט",
-    "createFlowchart": "",
+    "createFlowchart": "לחצו על CtrlOrCmd ומקש החץ כדי ליצור תרשים זרימה",
     "deepBoxSelect": "החזק Ctrl / Cmd לבחירה עמוקה ולמניעת גרירה",
     "eraserRevert": "החזק Alt להחזרת רכיבים מסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
-    "disableSnapping": ""
+    "disableSnapping": "החזיקו את מקש Ctrl או Cmd כדי להשבית את ההצמדה"
   },
   "canvasError": {
     "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
@@ -332,15 +332,15 @@
     "clearCanvasMessage": "אם טעינה מחדש לא עובדת, נסה ",
     "clearCanvasCaveat": " זה יגרום לאובדן העבודה ",
     "trackedToSentry": "השגיאה עם המזהה {{eventId}} במעקב במערכת שלך.",
-    "openIssueMessage": "",
+    "openIssueMessage": "אנו נזהרים מאוד לא להכניס מידע על הסצנה שלך בתוך דיווח התקלה. אם הסצנה אינה פרטית, אנא שקלו לשלוח אותה ל<button>מעקב השגיאות שלנו</button>. אנא הוסיפו בתחתית הבאג מידע על ידי העתקה והדבקה לתוך הסוגיה ב-GitHub.",
     "sceneContent": "תוכן הקנבאס:"
   },
   "shareDialog": {
     "or": "או"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "הזמנת משתתפים לעבודה משותפת.",
+    "desc_privacy": "אל דאגה, סשן העבודה מוצפן מקצה לקצה והוא פרטי לגמרי. אפילו השרתים שלנו לא יכולים לראות מה ציירתם.",
     "button_startSession": "התחל שיתוף",
     "button_stopSession": "הפסק שיתוף",
     "desc_inProgressIntro": "שיתוף חי פעיל כרגע.",
@@ -367,8 +367,8 @@
     "click": "קליק",
     "deepSelect": "בחירה עמוקה",
     "deepBoxSelect": "בחירה עמוקה בתוך קופסה ומניעת גרירה",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "יצירת תרשים זרימה מתוך רכיב רגיל",
+    "navigateFlowchart": "ניווט בתוך תרשים הזרימה",
     "curvedArrow": "חץ מעוגל",
     "curvedLine": "קו מעוגל",
     "documentation": "תיעוד",
@@ -417,9 +417,9 @@
       "required": "נדרש",
       "website": "הזינו כתובת URL תקינה"
     },
-    "noteDescription": "",
-    "noteGuidelines": "",
-    "noteLicense": "",
+    "noteDescription": "שלח את הספריה שלך כך שתצורף ל<link>מאגר הספריות הציבורי</link> כך שאנשים נוספים יוכלו להשתמש בה בעבודות שלהם.",
+    "noteGuidelines": "תחילה הספריה נדרשת לעבור אישור ידני. אנא קראו את <link>הנחיות</link> לפני שאתם לוחצים על שליחה. יש צורך בחשבון GitHub כדי לתקשר ולבצע שינויים אם נדרש, אך אין זה הכרחי לשיתוף הספריה.",
+    "noteLicense": "על ידי לחיצה על שליחה את/ה מסכימ/ה שהספריה תפורסם תחת <link>רישיון MIT</link>, אשר, בקצרה, מאפשר לכל אחד להשתמש בספריה ללא הגבלה.",
     "noteItems": "לכל פריט בסיפריה חייב להיות שם כדי שאפשר יהיה לסנן. הפריטי סיפריה הבאים יהיו כלולים:",
     "atleastOneLibItem": "אנא בחר לפחות פריט אחד מספריה כדי להתחיל",
     "republishWarning": "הערה: חלק מהפריטים שבחרת מסומנים ככאלו שכבר פורסמו/נשלחו. אתה צריך לשלוח פריטים מחדש כאשר אתה מעדכן ספריה או הגשה קיימים."
@@ -462,15 +462,15 @@
   },
   "stats": {
     "angle": "זווית",
-    "shapes": "",
+    "shapes": "צורות",
     "height": "גובה",
     "scene": "תצוגה",
     "selected": "נבחר",
     "storage": "אחסון",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "הגדרות הקנבס והצורות",
+    "title": "מאפיינים",
+    "generalStats": "כללי",
+    "elementProperties": "מאפייני צורה",
     "total": "סה״כ",
     "version": "גרסה",
     "versionCopy": "לחץ להעתקה",
@@ -487,8 +487,8 @@
     "canvas": "קנבאס",
     "selection": "בחירה",
     "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "הטמעת כתובת הרשת הזו אינה מותרת לעת עתה. העלו סוגיה ב-GitHub כדי לבקש שכתובת זו תכנס לרשימה המותרת",
+    "unrecognizedLinkFormat": "הקישור שהוטמע אינו בפורמט המצופה. אנא נסו להדביק מחדש את מחרוזת ההטמעה מהאתר המבוקש"
   },
   "colors": {
     "transparent": "שקוף",
@@ -549,35 +549,35 @@
       "loadFromFile": {
         "title": "טעינה מקובץ",
         "button": "טעינה מקובץ",
-        "description": ""
+        "description": "טעינת הקובץ <bold>תחליף את התוכן הקיים</bold>.<br></br>אתם יכולים לגבות את העבודה שלכם תחילה בעזרת האפשרויות שלהלן."
       },
       "shareableLink": {
         "title": "טעינה מקישור",
         "button": "החלפת התוכן שלי",
-        "description": ""
+        "description": "טעינת הקובץ <bold>תחליף את התוכן הקיים</bold>.<br></br>אתם יכולים לגבות את העבודה שלכם תחילה בעזרת האפשרויות שלהלן."
       }
     }
   },
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
-    "description": "",
+    "description": "לעת עתה נתמכים רק <flowchartLink>תרשימי זרימה</flowchartLink>, <sequenceLink>תהליכים</sequenceLink>, <classLink>ודיאגרמת מחלקה</classLink>. שאר הסוגים ייוצרו כתמונות ב-Excalidraw.",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "חיפוש מהיר"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "ישן"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "בסצינה הנוכחית",
+    "availableFonts": "הפונטים הקיימים",
+    "empty": "לא נמצאו פונטים"
   },
   "userList": {
-    "empty": "",
+    "empty": "לא נמצאו משתמשים",
     "hint": {
       "text": "יש ללחוץ על משתמש כדי לעקוב",
       "followStatus": "המשתמש ברשימת המעקב שלך",
@@ -595,7 +595,7 @@
     },
     "recents": "בשימוש לאחרונה",
     "search": {
-      "placeholder": "",
+      "placeholder": "תפריטי חיפוש, פקודות ואבני חן נעלמות",
       "noMatch": "אין פקודות תואמות…"
     },
     "itemNotAvailable": "הפקודה לא זמינה…",
