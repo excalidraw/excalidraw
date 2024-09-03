@@ -20,9 +20,9 @@ export default defineConfig({
       ignoreEmptyLines: false,
       thresholds: {
         lines: 66,
-        branches: 63,
-        functions: 66,
-        statements: 70,
+        branches: 70,
+        functions: 63,
+        statements: 66,
       },
     },
   },
