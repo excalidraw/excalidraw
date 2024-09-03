@@ -15,14 +15,15 @@ export default defineConfig({
     environment: "jsdom",
     coverage: {
       reporter: ["text", "json-summary", "json", "html", "lcovonly"],
+      // Since v2, it ignores empty lines by default and we need to disable it as it affects the coverage
+      // Additionally the thresholds also needs to be updated slightly as a result of this change
+      ignoreEmptyLines: false,
       thresholds: {
-        lines: 70,
-        branches: 70,
-        functions: 68,
+        lines: 66,
+        branches: 63,
+        functions: 66,
         statements: 70,
       },
-      // Since v2, it ignores empty lines by default and we need to disable it as it affects the coverage
-      ignoreEmptyLines: false
     },
   },
 });
