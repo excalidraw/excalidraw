@@ -38,7 +38,7 @@
     "vite": "5.4.2",
     "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
-    "vite-plugin-pwa": "0.20.2",
+    "vite-plugin-pwa": "0.17.4",
     "vite-plugin-svgr": "4.2.0",
     "vitest": "2.0.5",
     "vitest-canvas-mock": "0.3.3"
