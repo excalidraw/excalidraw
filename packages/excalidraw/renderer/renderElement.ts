@@ -28,7 +28,6 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
-import { getCornerRadius, isRightAngle } from "../math";
 import rough from "roughjs/bin/rough";
 import type {
   AppState,
@@ -62,6 +61,8 @@ import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getAreaLimit, getWidthHeightLimit } from "../obsidianUtils";
 import { getVerticalOffset } from "../fonts";
+import { isRightAngleRads } from "../../math";
+import { getCornerRadius } from "../shapes";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -926,7 +927,8 @@ export const renderElement = (
           (!element.angle ||
             // or check if angle is a right angle in which case we can still
             // disable smoothing without adversely affecting the result
-            isRightAngle(element.angle))
+            // We need less-than comparison because of FP artihmetic
+            isRightAngleRads(element.angle))
         ) {
           // Disabling smoothing makes output much sharper, especially for
           // text. Unless for non-right angles, where the aliasing is really
