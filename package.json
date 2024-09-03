@@ -83,8 +83,6 @@
   },
   "resolutions": {
     "@types/react": "18.2.0",
-    "strip-ansi": "6.0.1",
-    "string-width": "4.2.2",
-    "wrap-ansi": "7.0.0"
+    "strip-ansi": "6.0.1"
   }
 }
