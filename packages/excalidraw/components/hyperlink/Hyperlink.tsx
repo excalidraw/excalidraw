@@ -1,4 +1,4 @@
-import type { AppState, ExcalidrawProps, Point, UIAppState } from "../../types";
+import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -36,6 +36,7 @@ import { trackEvent } from "../../analytics";
 import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
+import { point, type GlobalPoint } from "../../../math";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -176,10 +177,12 @@ export const Hyperlink = ({
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-      const shouldHide = shouldHideLinkPopup(element, elementsMap, appState, [
-        event.clientX,
-        event.clientY,
-      ]) as boolean;
+      const shouldHide = shouldHideLinkPopup(
+        element,
+        elementsMap,
+        appState,
+        point(event.clientX, event.clientY),
+      ) as boolean;
       if (shouldHide) {
         timeoutId = window.setTimeout(() => {
           setAppState({ showHyperlinkPopup: false });
@@ -211,7 +214,7 @@ export const Hyperlink = ({
   const { x, y } = getCoordsForPopover(element, appState, elementsMap);
   if (
     appState.contextMenu ||
-    appState.draggingElement ||
+    appState.selectedElementsAreBeingDragged ||
     appState.resizingElement ||
     appState.isRotating ||
     appState.openMenu ||
@@ -416,7 +419,7 @@ const shouldHideLinkPopup = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
-  [clientX, clientY]: Point,
+  [clientX, clientY]: GlobalPoint,
 ): Boolean => {
   const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
     { clientX, clientY },

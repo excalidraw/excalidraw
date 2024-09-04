@@ -7,14 +7,19 @@ import type {
 
 import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
-import { rotate } from "../math";
 import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
-import { isFrameLikeElement, isLinearElement } from "./typeChecks";
+import {
+  isElbowArrow,
+  isFrameLikeElement,
+  isLinearElement,
+} from "./typeChecks";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   isAndroid,
   isIOS,
 } from "../constants";
+import type { Radians } from "../../math";
+import { point, pointRotateRads } from "../../math";
 
 export type TransformHandleDirection =
   | "n"
@@ -87,9 +92,13 @@ const generateTransformHandle = (
   height: number,
   cx: number,
   cy: number,
-  angle: number,
+  angle: Radians,
 ): TransformHandle => {
-  const [xx, yy] = rotate(x + width / 2, y + height / 2, cx, cy, angle);
+  const [xx, yy] = pointRotateRads(
+    point(x + width / 2, y + height / 2),
+    point(cx, cy),
+    angle,
+  );
   return [xx - width / 2, yy - height / 2, width, height];
 };
 
@@ -115,7 +124,7 @@ export const getOmitSidesForDevice = (device: Device) => {
 
 export const getTransformHandlesFromCoords = (
   [x1, y1, x2, y2, cx, cy]: [number, number, number, number, number, number],
-  angle: number,
+  angle: Radians,
   zoom: Zoom,
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
@@ -262,7 +271,11 @@ export const getTransformHandles = (
   // so that when locked element is selected (especially when you toggle lock
   // via keyboard) the locked element is visually distinct, indicating
   // you can't move/resize
-  if (element.locked) {
+  if (
+    element.locked ||
+    // Elbow arrows cannot be rotated
+    isElbowArrow(element)
+  ) {
     return {};
   }
 
@@ -312,6 +325,10 @@ export const shouldShowBoundingBox = (
     return true;
   }
   const element = elements[0];
+  if (isElbowArrow(element)) {
+    // Elbow arrows cannot be resized as single selected elements
+    return false;
+  }
   if (!isLinearElement(element)) {
     return true;
   }

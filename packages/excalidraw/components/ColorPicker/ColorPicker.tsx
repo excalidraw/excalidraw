@@ -1,22 +1,24 @@
-import { isInteractive, isTransparent, isWritableElement } from "../../utils";
+import { isTransparent } from "../../utils";
 import type { ExcalidrawElement } from "../../element/types";
 import type { AppState } from "../../types";
 import { TopPicks } from "./TopPicks";
+import { ButtonSeparator } from "../ButtonSeparator";
 import { Picker } from "./Picker";
 import * as Popover from "@radix-ui/react-popover";
 import { useAtom } from "jotai";
 import type { ColorPickerType } from "./colorPickerUtils";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
-import { useDevice, useExcalidrawContainer } from "../App";
+import { useExcalidrawContainer } from "../App";
 import type { ColorTuple, ColorPaletteCustom } from "../../colors";
 import { COLOR_PALETTE } from "../../colors";
 import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
 import clsx from "clsx";
+import { useRef } from "react";
 import { jotaiScope } from "../../jotai";
 import { ColorInput } from "./ColorInput";
-import { useRef } from "react";
 import { activeEyeDropperAtom } from "../EyeDropper";
+import { PropertiesPopover } from "../PropertiesPopover";
 
 import "./ColorPicker.scss";
 
@@ -71,15 +73,13 @@ const ColorPickerPopupContent = ({
   | "palette"
   | "updateData"
 >) => {
+  const { container } = useExcalidrawContainer();
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const [eyeDropperState, setEyeDropperState] = useAtom(
     activeEyeDropperAtom,
     jotaiScope,
   );
-
-  const { container } = useExcalidrawContainer();
-  const device = useDevice();
 
   const colorInputJSX = (
     <div>
@@ -94,6 +94,7 @@ const ColorPickerPopupContent = ({
       />
     </div>
   );
+
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const focusPickerContent = () => {
@@ -103,120 +104,73 @@ const ColorPickerPopupContent = ({
   };
 
   return (
-    <Popover.Portal container={container}>
-      <Popover.Content
-        ref={popoverRef}
-        className="focus-visible-none"
-        data-prevent-outside-click
-        onFocusOutside={(event) => {
-          focusPickerContent();
+    <PropertiesPopover
+      container={container}
+      style={{ maxWidth: "13rem" }}
+      onFocusOutside={(event) => {
+        // refocus due to eye dropper
+        focusPickerContent();
+        event.preventDefault();
+      }}
+      onPointerDownOutside={(event) => {
+        if (eyeDropperState) {
+          // prevent from closing if we click outside the popover
+          // while eyedropping (e.g. click when clicking the sidebar;
+          // the eye-dropper-backdrop is prevented downstream)
           event.preventDefault();
-        }}
-        onPointerDownOutside={(event) => {
-          if (eyeDropperState) {
-            // prevent from closing if we click outside the popover
-            // while eyedropping (e.g. click when clicking the sidebar;
-            // the eye-dropper-backdrop is prevented downstream)
-            event.preventDefault();
-          }
-        }}
-        onCloseAutoFocus={(e) => {
-          e.stopPropagation();
-          // prevents focusing the trigger
-          e.preventDefault();
-
-          // return focus to excalidraw container unless
-          // user focuses an interactive element, such as a button, or
-          // enters the text editor by clicking on canvas with the text tool
-          if (container && !isInteractive(document.activeElement)) {
-            container.focus();
-          }
-
-          updateData({ openPopup: null });
-          setActiveColorPickerSection(null);
-        }}
-        side={
-          device.editor.isMobile && !device.viewport.isLandscape
-            ? "bottom"
-            : "right"
         }
-        align={
-          device.editor.isMobile && !device.viewport.isLandscape
-            ? "center"
-            : "start"
-        }
-        alignOffset={-16}
-        sideOffset={20}
-        style={{
-          zIndex: "var(--zIndex-layerUI)",
-          backgroundColor: "var(--popup-bg-color)",
-          maxWidth: "208px",
-          maxHeight: window.innerHeight,
-          padding: "12px",
-          borderRadius: "8px",
-          boxSizing: "border-box",
-          overflowY: "auto",
-          boxShadow:
-            "0px 7px 14px rgba(0, 0, 0, 0.05), 0px 0px 3.12708px rgba(0, 0, 0, 0.0798), 0px 0px 0.931014px rgba(0, 0, 0, 0.1702)",
-        }}
-      >
-        {palette ? (
-          <Picker
-            palette={palette}
-            color={color}
-            onChange={(changedColor) => {
-              onChange(changedColor);
-            }}
-            onEyeDropperToggle={(force) => {
-              setEyeDropperState((state) => {
-                if (force) {
-                  state = state || {
-                    keepOpenOnAlt: true,
+      }}
+      onClose={() => {
+        updateData({ openPopup: null });
+        setActiveColorPickerSection(null);
+      }}
+    >
+      {palette ? (
+        <Picker
+          palette={palette}
+          color={color}
+          onChange={(changedColor) => {
+            onChange(changedColor);
+          }}
+          onEyeDropperToggle={(force) => {
+            setEyeDropperState((state) => {
+              if (force) {
+                state = state || {
+                  keepOpenOnAlt: true,
+                  onSelect: onChange,
+                  colorPickerType: type,
+                };
+                state.keepOpenOnAlt = true;
+                return state;
+              }
+
+              return force === false || state
+                ? null
+                : {
+                    keepOpenOnAlt: false,
                     onSelect: onChange,
                     colorPickerType: type,
                   };
-                  state.keepOpenOnAlt = true;
-                  return state;
-                }
-
-                return force === false || state
-                  ? null
-                  : {
-                      keepOpenOnAlt: false,
-                      onSelect: onChange,
-                      colorPickerType: type,
-                    };
-              });
-            }}
-            onEscape={(event) => {
-              if (eyeDropperState) {
-                setEyeDropperState(null);
-              } else if (isWritableElement(event.target)) {
-                focusPickerContent();
-              } else {
-                updateData({ openPopup: null });
-              }
-            }}
-            label={label}
-            type={type}
-            elements={elements}
-            updateData={updateData}
-          >
-            {colorInputJSX}
-          </Picker>
-        ) : (
-          colorInputJSX
-        )}
-        <Popover.Arrow
-          width={20}
-          height={10}
-          style={{
-            fill: "var(--popup-bg-color)",
-            filter: "drop-shadow(rgba(0, 0, 0, 0.05) 0px 3px 2px)",
+            });
           }}
-        />
-      </Popover.Content>
-    </Popover.Portal>
+          onEscape={(event) => {
+            if (eyeDropperState) {
+              setEyeDropperState(null);
+            } else {
+              updateData({ openPopup: null });
+            }
+          }}
+          label={label}
+          type={type}
+          elements={elements}
+          updateData={updateData}
+        >
+          {colorInputJSX}
+        </Picker>
+      ) : (
+        colorInputJSX
+      )}
+    </PropertiesPopover>
   );
 };
 
@@ -232,7 +186,7 @@ const ColorPickerTrigger = ({
   return (
     <Popover.Trigger
       type="button"
-      className={clsx("color-picker__button active-color", {
+      className={clsx("color-picker__button active-color properties-trigger", {
         "is-transparent": color === "transparent" || !color,
       })}
       aria-label={label}
@@ -268,14 +222,7 @@ export const ColorPicker = ({
           type={type}
           topPicks={topPicks}
         />
-        <div
-          style={{
-            width: 1,
-            height: "100%",
-            backgroundColor: "var(--default-border-color)",
-            margin: "0 auto",
-          }}
-        />
+        <ButtonSeparator />
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {

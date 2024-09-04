@@ -101,10 +101,12 @@ const getRelevantAppStateProps = (
   exportScale: appState.exportScale,
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,
+  gridStep: appState.gridStep,
   frameRendering: appState.frameRendering,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
+  currentHoveredFontFamily: appState.currentHoveredFontFamily,
 });
 
 const areEqual = (

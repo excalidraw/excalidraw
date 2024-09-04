@@ -1,19 +1,18 @@
+import React from "react";
 import { vi } from "vitest";
 import ReactDOM from "react-dom";
 import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
-import {
-  getDefaultLineHeight,
-  getLineHeightInPx,
-} from "../element/textElement";
+import { getLineHeightInPx } from "../element/textElement";
 import { getElementBounds } from "../element";
 import type { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 import { arrayToMap } from "../utils";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
+import { getLineHeight } from "../fonts";
 
 const { h } = window;
 
@@ -146,7 +145,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getDefaultLineHeight(h.state.currentItemFontFamily),
+        getLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -168,7 +167,7 @@ describe("paste text as single lines", () => {
     const lineHeightPx =
       getLineHeightInPx(
         h.app.state.currentItemFontSize,
-        getDefaultLineHeight(h.state.currentItemFontFamily),
+        getLineHeight(h.state.currentItemFontFamily),
       ) +
       10 / h.app.state.zoom.value;
     mouse.moveTo(100, 100);
@@ -281,7 +280,7 @@ describe("pasting & frames", () => {
     });
     const rect = API.createElement({ type: "rectangle" });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect],
@@ -320,7 +319,7 @@ describe("pasting & frames", () => {
       y: 100,
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2],
@@ -363,7 +362,7 @@ describe("pasting & frames", () => {
       groupIds: ["g1"],
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2],
@@ -414,7 +413,7 @@ describe("pasting & frames", () => {
       frameId: frame2.id,
     });
 
-    h.elements = [frame];
+    API.setElements([frame]);
 
     const clipboardJSON = await serializeAsClipboardJSON({
       elements: [rect, rect2, frame2],

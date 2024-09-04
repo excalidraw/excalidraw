@@ -1,5 +1,11 @@
+import throttle from "lodash.throttle";
+import { ENV } from "../constants";
 import type { OrderedExcalidrawElement } from "../element/types";
-import { orderByFractionalIndex, syncInvalidIndices } from "../fractionalIndex";
+import {
+  orderByFractionalIndex,
+  syncInvalidIndices,
+  validateFractionalIndices,
+} from "../fractionalIndex";
 import type { AppState } from "../types";
 import type { MakeBrand } from "../utility-types";
 import { arrayToMap } from "../utils";
@@ -18,9 +24,9 @@ const shouldDiscardRemoteElement = (
   if (
     local &&
     // local element is being edited
-    (local.id === localAppState.editingElement?.id ||
+    (local.id === localAppState.editingTextElement?.id ||
       local.id === localAppState.resizingElement?.id ||
-      local.id === localAppState.draggingElement?.id || // TODO: Is this still valid? As draggingElement is selection element, which is never part of the elements array
+      local.id === localAppState.newElement?.id || // TODO: Is this still valid? As newElement is selection element, which is never part of the elements array
       // local element is newer
       local.version > remote.version ||
       // resolve conflicting edits deterministically by taking the one with
@@ -32,6 +38,37 @@ const shouldDiscardRemoteElement = (
   }
   return false;
 };
+
+const validateIndicesThrottled = throttle(
+  (
+    orderedElements: readonly OrderedExcalidrawElement[],
+    localElements: readonly OrderedExcalidrawElement[],
+    remoteElements: readonly RemoteExcalidrawElement[],
+  ) => {
+    if (
+      import.meta.env.DEV ||
+      import.meta.env.MODE === ENV.TEST ||
+      window?.DEBUG_FRACTIONAL_INDICES
+    ) {
+      // create new instances due to the mutation
+      const elements = syncInvalidIndices(
+        orderedElements.map((x) => ({ ...x })),
+      );
+
+      validateFractionalIndices(elements, {
+        // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        includeBoundTextValidation: true,
+        reconciliationContext: {
+          localElements,
+          remoteElements,
+        },
+      });
+    }
+  },
+  1000 * 60,
+  { leading: true, trailing: false },
+);
 
 export const reconcileElements = (
   localElements: readonly OrderedExcalidrawElement[],
@@ -71,6 +108,8 @@ export const reconcileElements = (
   }
 
   const orderedElements = orderByFractionalIndex(reconciledElements);
+
+  validateIndicesThrottled(orderedElements, localElements, remoteElements);
 
   // de-duplicate indices
   syncInvalidIndices(orderedElements);

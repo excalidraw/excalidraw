@@ -5,6 +5,7 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
+import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
@@ -22,6 +23,14 @@ export default defineConfig({
     outDir: "build",
     rollupOptions: {
       output: {
+        assetFileNames(chunkInfo) {
+          if (chunkInfo?.name?.endsWith(".woff2")) {
+            // put on root so we are flexible about the CDN path
+            return "[name]-[hash][extname]";
+          }
+
+          return "assets/[name]-[hash][extname]";
+        },
         // Creating separate chunk for locales except for en and percentages.json so they
         // can be cached at runtime and not merged with
         // app precache. en.json and percentages.json are needed for first load
@@ -41,6 +50,7 @@ export default defineConfig({
     sourcemap: true,
   },
   plugins: [
+    woff2BrowserPlugin(),
     react(),
     checker({
       typescript: true,
@@ -63,8 +73,8 @@ export default defineConfig({
       },
 
       workbox: {
-        // Don't push fonts and locales to app precache
-        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js"],
+        // Don't push fonts, locales and wasm to app precache
+        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js", "**/*.wasm-*.js"],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -95,6 +105,17 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // <== 30 days
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp(".wasm-.+.js"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "wasm",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
               },
             },
           },

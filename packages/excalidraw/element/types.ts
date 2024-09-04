@@ -1,4 +1,4 @@
-import type { Point } from "../types";
+import type { LocalPoint, Radians } from "../../math";
 import type {
   FONT_FAMILY,
   ROUNDNESS,
@@ -6,8 +6,12 @@ import type {
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import type { MakeBrand, MarkNonNullable, ValueOf } from "../utility-types";
-import type { MagicCacheData } from "../data/magic";
+import type {
+  MakeBrand,
+  MarkNonNullable,
+  Merge,
+  ValueOf,
+} from "../utility-types";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -45,7 +49,7 @@ type _ExcalidrawElementBase = Readonly<{
   opacity: number;
   width: number;
   height: number;
-  angle: number;
+  angle: Radians;
   /** Random integer used to seed shape generation so that the roughjs shape
       doesn't differ across renders. */
   seed: number;
@@ -96,11 +100,22 @@ export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
     type: "embeddable";
   }>;
 
+export type MagicGenerationData =
+  | {
+      status: "pending";
+    }
+  | { status: "done"; html: string }
+  | {
+      status: "error";
+      message?: string;
+      code: "ERR_GENERATION_INTERRUPTED" | string;
+    };
+
 export type ExcalidrawIframeElement = _ExcalidrawElementBase &
   Readonly<{
     type: "iframe";
     // TODO move later to AI-specific frame
-    customData?: { generationData?: MagicCacheData };
+    customData?: { generationData?: MagicGenerationData };
   }>;
 
 export type ExcalidrawIframeLikeElement =
@@ -155,6 +170,20 @@ export type ExcalidrawGenericElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
+export type ExcalidrawFlowchartNodeElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement;
+
+export type ExcalidrawRectanguloidElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawImageElement
+  | ExcalidrawTextElement
+  | ExcalidrawFreeDrawElement
+  | ExcalidrawIframeLikeElement
+  | ExcalidrawFrameLikeElement
+  | ExcalidrawEmbeddableElement;
+
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
  * no computed data. The list of all ExcalidrawElements should be shareable
@@ -170,6 +199,11 @@ export type ExcalidrawElement =
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
+
+export type ExcalidrawNonSelectionElement = Exclude<
+  ExcalidrawElement,
+  ExcalidrawSelectionElement
+>;
 
 export type Ordered<TElement extends ExcalidrawElement> = TElement & {
   index: FractionalIndex;
@@ -228,11 +262,21 @@ export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
 } & ExcalidrawTextElement;
 
+export type FixedPoint = [number, number];
+
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;
   gap: number;
+  // Represents the fixed point binding information in form of a vertical and
+  // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
+  // gives the user selected fixed point by multiplying the bound element width
+  // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
+  // bound element-local point coordinate.
+  fixedPoint: FixedPoint | null;
 };
+
+export type FixedPointBinding = Merge<PointBinding, { fixedPoint: FixedPoint }>;
 
 export type Arrowhead =
   | "arrow"
@@ -248,8 +292,8 @@ export type Arrowhead =
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
-    points: readonly Point[];
-    lastCommittedPoint: Point | null;
+    points: readonly LocalPoint[];
+    lastCommittedPoint: LocalPoint | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
@@ -259,15 +303,25 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
+    elbowed: boolean;
   }>;
+
+export type ExcalidrawElbowArrowElement = Merge<
+  ExcalidrawArrowElement,
+  {
+    elbowed: true;
+    startBinding: FixedPointBinding | null;
+    endBinding: FixedPointBinding | null;
+  }
+>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
-    points: readonly Point[];
+    points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    lastCommittedPoint: Point | null;
+    lastCommittedPoint: LocalPoint | null;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

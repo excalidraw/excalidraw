@@ -1,7 +1,5 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
-
-import { rotate, centerPoint, rotatePoint } from "../math";
 import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -11,6 +9,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
   ElementsMap,
+  NonDeletedSceneElementsMap,
+  SceneElementsMap,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -24,6 +24,7 @@ import type { BoundingBox } from "./bounds";
 import {
   isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isFrameLikeElement,
   isFreeDrawElement,
   isImageElement,
@@ -32,12 +33,12 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
-import { updateBoundElements } from "./binding";
+import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
-import type { Point, PointerDownState } from "../types";
+import type { PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
@@ -53,23 +54,24 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
-
-export const normalizeAngle = (angle: number): number => {
-  if (angle < 0) {
-    return angle + 2 * Math.PI;
-  }
-  if (angle >= 2 * Math.PI) {
-    return angle - 2 * Math.PI;
-  }
-  return angle;
-};
+import { mutateElbowArrow } from "./routing";
+import type { GlobalPoint } from "../../math";
+import {
+  pointCenter,
+  normalizeRadians,
+  point,
+  pointFromPair,
+  pointRotateRads,
+  type Radians,
+  LocalPoint,
+} from "../../math";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
   originalElements: PointerDownState["originalElements"],
   transformHandleType: MaybeTransformHandleType,
   selectedElements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: SceneElementsMap,
   shouldRotateWithDiscreteAngle: boolean,
   shouldResizeFromCenter: boolean,
   shouldMaintainAspectRatio: boolean,
@@ -81,15 +83,16 @@ export const transformElements = (
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
-      rotateSingleElement(
-        element,
-        elementsMap,
-        pointerX,
-        pointerY,
-        shouldRotateWithDiscreteAngle,
-      );
-      updateBoundElements(element, elementsMap);
-      return true;
+      if (!isElbowArrow(element)) {
+        rotateSingleElement(
+          element,
+          elementsMap,
+          pointerX,
+          pointerY,
+          shouldRotateWithDiscreteAngle,
+        );
+        updateBoundElements(element, elementsMap);
+      }
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
         originalElements,
@@ -198,16 +201,17 @@ const rotateSingleElement = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  let angle: number;
+  let angle: Radians;
   if (isFrameLikeElement(element)) {
-    angle = 0;
+    angle = 0 as Radians;
   } else {
-    angle = (5 * Math.PI) / 2 + Math.atan2(pointerY - cy, pointerX - cx);
+    angle = ((5 * Math.PI) / 2 +
+      Math.atan2(pointerY - cy, pointerX - cx)) as Radians;
     if (shouldRotateWithDiscreteAngle) {
-      angle += SHIFT_LOCKING_ANGLE / 2;
-      angle -= angle % SHIFT_LOCKING_ANGLE;
+      angle = (angle + SHIFT_LOCKING_ANGLE / 2) as Radians;
+      angle = (angle - (angle % SHIFT_LOCKING_ANGLE)) as Radians;
     }
-    angle = normalizeAngle(angle);
+    angle = normalizeRadians(angle as Radians);
   }
   const boundTextElementId = getBoundTextElementId(element);
 
@@ -280,12 +284,10 @@ const resizeSingleTextElement = (
     elementsMap,
   );
   // rotation pointer with reverse angle
-  const [rotatedX, rotatedY] = rotate(
-    pointerX,
-    pointerY,
-    cx,
-    cy,
-    -element.angle,
+  const [rotatedX, rotatedY] = pointRotateRads(
+    point(pointerX, pointerY),
+    point(cx, cy),
+    -element.angle as Radians,
   );
   let scaleX = 0;
   let scaleY = 0;
@@ -319,20 +321,26 @@ const resizeSingleTextElement = (
     const startBottomRight = [x2, y2];
     const startCenter = [cx, cy];
 
-    let newTopLeft = [x1, y1] as [number, number];
+    let newTopLeft = point<GlobalPoint>(x1, y1);
     if (["n", "w", "nw"].includes(transformHandleType)) {
-      newTopLeft = [
+      newTopLeft = point<GlobalPoint>(
         startBottomRight[0] - Math.abs(nextWidth),
         startBottomRight[1] - Math.abs(nextHeight),
-      ];
+      );
     }
     if (transformHandleType === "ne") {
       const bottomLeft = [startTopLeft[0], startBottomRight[1]];
-      newTopLeft = [bottomLeft[0], bottomLeft[1] - Math.abs(nextHeight)];
+      newTopLeft = point<GlobalPoint>(
+        bottomLeft[0],
+        bottomLeft[1] - Math.abs(nextHeight),
+      );
     }
     if (transformHandleType === "sw") {
       const topRight = [startBottomRight[0], startTopLeft[1]];
-      newTopLeft = [topRight[0] - Math.abs(nextWidth), topRight[1]];
+      newTopLeft = point<GlobalPoint>(
+        topRight[0] - Math.abs(nextWidth),
+        topRight[1],
+      );
     }
 
     if (["s", "n"].includes(transformHandleType)) {
@@ -348,13 +356,17 @@ const resizeSingleTextElement = (
     }
 
     const angle = element.angle;
-    const rotatedTopLeft = rotatePoint(newTopLeft, [cx, cy], angle);
-    const newCenter: Point = [
+    const rotatedTopLeft = pointRotateRads(newTopLeft, point(cx, cy), angle);
+    const newCenter = point<GlobalPoint>(
       newTopLeft[0] + Math.abs(nextWidth) / 2,
       newTopLeft[1] + Math.abs(nextHeight) / 2,
-    ];
-    const rotatedNewCenter = rotatePoint(newCenter, [cx, cy], angle);
-    newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
+    );
+    const rotatedNewCenter = pointRotateRads(newCenter, point(cx, cy), angle);
+    newTopLeft = pointRotateRads(
+      rotatedTopLeft,
+      rotatedNewCenter,
+      -angle as Radians,
+    );
     const [nextX, nextY] = newTopLeft;
 
     mutateElement(element, {
@@ -374,14 +386,14 @@ const resizeSingleTextElement = (
       stateAtResizeStart.height,
       true,
     );
-    const startTopLeft: Point = [x1, y1];
-    const startBottomRight: Point = [x2, y2];
-    const startCenter: Point = centerPoint(startTopLeft, startBottomRight);
+    const startTopLeft = point<GlobalPoint>(x1, y1);
+    const startBottomRight = point<GlobalPoint>(x2, y2);
+    const startCenter = pointCenter(startTopLeft, startBottomRight);
 
-    const rotatedPointer = rotatePoint(
-      [pointerX, pointerY],
+    const rotatedPointer = pointRotateRads(
+      point(pointerX, pointerY),
       startCenter,
-      -stateAtResizeStart.angle,
+      -stateAtResizeStart.angle as Radians,
     );
 
     const [esx1, , esx2] = getResizedElementAbsoluteCoords(
@@ -447,13 +459,21 @@ const resizeSingleTextElement = (
 
     // adjust topLeft to new rotation point
     const angle = stateAtResizeStart.angle;
-    const rotatedTopLeft = rotatePoint(newTopLeft, startCenter, angle);
-    const newCenter: Point = [
+    const rotatedTopLeft = pointRotateRads(
+      pointFromPair(newTopLeft),
+      startCenter,
+      angle,
+    );
+    const newCenter = point(
       newTopLeft[0] + Math.abs(newBoundsWidth) / 2,
       newTopLeft[1] + Math.abs(newBoundsHeight) / 2,
-    ];
-    const rotatedNewCenter = rotatePoint(newCenter, startCenter, angle);
-    newTopLeft = rotatePoint(rotatedTopLeft, rotatedNewCenter, -angle);
+    );
+    const rotatedNewCenter = pointRotateRads(newCenter, startCenter, angle);
+    newTopLeft = pointRotateRads(
+      rotatedTopLeft,
+      rotatedNewCenter,
+      -angle as Radians,
+    );
 
     const resizedElement: Partial<ExcalidrawTextElement> = {
       width: Math.abs(newWidth),
@@ -471,7 +491,7 @@ const resizeSingleTextElement = (
 const rotateMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   elements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: ElementsMap,
+  elementsMap: SceneElementsMap,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -493,22 +513,27 @@ const rotateMultipleElements = (
       const cy = (y1 + y2) / 2;
       const origAngle =
         originalElements.get(element.id)?.angle ?? element.angle;
-      const [rotatedCX, rotatedCY] = rotate(
-        cx,
-        cy,
-        centerX,
-        centerY,
-        centerAngle + origAngle - element.angle,
+      const [rotatedCX, rotatedCY] = pointRotateRads(
+        point(cx, cy),
+        point(centerX, centerY),
+        (centerAngle + origAngle - element.angle) as Radians,
       );
-      mutateElement(
-        element,
-        {
-          x: element.x + (rotatedCX - cx),
-          y: element.y + (rotatedCY - cy),
-          angle: normalizeAngle(centerAngle + origAngle),
-        },
-        false,
-      );
+
+      if (isArrowElement(element) && isElbowArrow(element)) {
+        const points = getArrowLocalFixedPoints(element, elementsMap);
+        mutateElbowArrow(element, elementsMap, points);
+      } else {
+        mutateElement(
+          element,
+          {
+            x: element.x + (rotatedCX - cx),
+            y: element.y + (rotatedCY - cy),
+            angle: normalizeRadians((centerAngle + origAngle) as Radians),
+          },
+          false,
+        );
+      }
+
       updateBoundElements(element, elementsMap, {
         simultaneouslyUpdated: elements,
       });
@@ -520,7 +545,7 @@ const rotateMultipleElements = (
           {
             x: boundText.x + (rotatedCX - cx),
             y: boundText.y + (rotatedCY - cy),
-            angle: normalizeAngle(centerAngle + origAngle),
+            angle: normalizeRadians((centerAngle + origAngle) as Radians),
           },
           false,
         );
@@ -543,25 +568,43 @@ export const getResizeOffsetXY = (
       : getCommonBounds(selectedElements);
   const cx = (x1 + x2) / 2;
   const cy = (y1 + y2) / 2;
-  const angle = selectedElements.length === 1 ? selectedElements[0].angle : 0;
-  [x, y] = rotate(x, y, cx, cy, -angle);
+  const angle = (
+    selectedElements.length === 1 ? selectedElements[0].angle : 0
+  ) as Radians;
+  [x, y] = pointRotateRads(point(x, y), point(cx, cy), -angle as Radians);
   switch (transformHandleType) {
     case "n":
-      return rotate(x - (x1 + x2) / 2, y - y1, 0, 0, angle);
+      return pointRotateRads(
+        point(x - (x1 + x2) / 2, y - y1),
+        point(0, 0),
+        angle,
+      );
     case "s":
-      return rotate(x - (x1 + x2) / 2, y - y2, 0, 0, angle);
+      return pointRotateRads(
+        point(x - (x1 + x2) / 2, y - y2),
+        point(0, 0),
+        angle,
+      );
     case "w":
-      return rotate(x - x1, y - (y1 + y2) / 2, 0, 0, angle);
+      return pointRotateRads(
+        point(x - x1, y - (y1 + y2) / 2),
+        point(0, 0),
+        angle,
+      );
     case "e":
-      return rotate(x - x2, y - (y1 + y2) / 2, 0, 0, angle);
+      return pointRotateRads(
+        point(x - x2, y - (y1 + y2) / 2),
+        point(0, 0),
+        angle,
+      );
     case "nw":
-      return rotate(x - x1, y - y1, 0, 0, angle);
+      return pointRotateRads(point(x - x1, y - y1), point(0, 0), angle);
     case "ne":
-      return rotate(x - x2, y - y1, 0, 0, angle);
+      return pointRotateRads(point(x - x2, y - y1), point(0, 0), angle);
     case "sw":
-      return rotate(x - x1, y - y2, 0, 0, angle);
+      return pointRotateRads(point(x - x1, y - y2), point(0, 0), angle);
     case "se":
-      return rotate(x - x2, y - y2, 0, 0, angle);
+      return pointRotateRads(point(x - x2, y - y2), point(0, 0), angle);
     default:
       return [0, 0];
   }
@@ -633,7 +676,7 @@ const getResizeAnchor = (
 };
 
 const getResizedOrigin = (
-  prevOrigin: Point,
+  prevOrigin: GlobalPoint,
   prevWidth: number,
   prevHeight: number,
   newWidth: number,
@@ -809,11 +852,11 @@ export const resizeSingleElement = (
     true,
   );
 
-  let previousOrigin: Point = [origElement.x, origElement.y];
+  let previousOrigin = point<GlobalPoint>(origElement.x, origElement.y);
 
   if (isLinearElement(origElement)) {
     const [x1, y1] = getElementBounds(origElement, originalElementsMap);
-    previousOrigin = [x1, y1];
+    previousOrigin = point<GlobalPoint>(x1, y1);
   }
 
   const newOrigin: {
@@ -844,10 +887,9 @@ export const resizeSingleElement = (
     newOrigin.x += scaledX;
     newOrigin.y += scaledY;
 
-    rescaledPoints.points = rescaledPoints.points.map((p) => [
-      p[0] - scaledX,
-      p[1] - scaledY,
-    ]);
+    rescaledPoints.points = rescaledPoints.points.map((p) =>
+      point<LocalPoint>(p[0] - scaledX, p[1] - scaledY),
+    );
   }
 
   // flipping
@@ -896,8 +938,9 @@ export const resizeSingleElement = (
 
     mutateElement(latestElement, updates, shouldInformMutation);
 
-    updateBoundElements(latestElement, elementsMap, {
-      newSize: { width: nextWidth, height: nextHeight },
+    updateBoundElements(latestElement, elementsMap as SceneElementsMap, {
+      // TODO: confirm with MARK if this actually makes sense
+      oldSize: { width: nextWidth, height: nextHeight },
     });
 
     if (boundTextElement && boundTextFont != null) {
@@ -931,18 +974,18 @@ const getNextSingleWidthAndHeightFromPointer = (
 ) => {
   // Gets bounds corners
   const [x1, y1, x2, y2] = getElementBounds(origElement, originalElementsMap);
-  const startTopLeft: Point = [x1, y1];
-  const startBottomRight: Point = [x2, y2];
-  const startCenter: Point = [
+  const startTopLeft = point<GlobalPoint>(x1, y1);
+  const startBottomRight = point<GlobalPoint>(x2, y2);
+  const startCenter = point<GlobalPoint>(
     x1 + origElement.width / 2,
     y1 + origElement.height / 2,
-  ];
+  );
 
   // Calculate new dimensions based on cursor position
-  const rotatedPointer = rotatePoint(
-    [pointerX, pointerY],
+  const rotatedPointer = pointRotateRads(
+    point<GlobalPoint>(pointerX, pointerY),
     startCenter,
-    -origElement.angle,
+    -origElement.angle as Radians,
   );
 
   let scaleX = origElement.width / latestElement.width;
@@ -1046,7 +1089,7 @@ const getNextMultipleWidthAndHeightFromPointer = (
   const width = maxX - minX;
   const height = maxY - minY;
 
-  const anchorsMap: Record<TransformHandleDirection, Point> = {
+  const anchorsMap = {
     ne: [minX, maxY],
     se: [minX, minY],
     sw: [maxX, minY],
@@ -1055,7 +1098,7 @@ const getNextMultipleWidthAndHeightFromPointer = (
     w: [maxX, minY + height / 2],
     n: [minX + width / 2, maxY],
     s: [minX + width / 2, minY],
-  };
+  } as Record<TransformHandleDirection, GlobalPoint>;
 
   // anchor point must be on the opposite side of the dragged selection handle
   // or be the center of the selection if shouldResizeFromCenter
@@ -1257,7 +1300,7 @@ export const resizeMultipleElements = (
       );
     }
 
-    const anchorsMap: Record<TransformHandleDirection, Point> = {
+    const anchorsMap = {
       ne: [minX, maxY],
       se: [minX, minY],
       sw: [maxX, minY],
@@ -1266,7 +1309,7 @@ export const resizeMultipleElements = (
       w: [maxX, minY + height / 2],
       n: [minX + width / 2, maxY],
       s: [minX + width / 2, minY],
-    };
+    } as Record<TransformHandleDirection, GlobalPoint>;
 
     // anchor point must be on the opposite side of the dragged selection handle
     // or be the center of the selection if shouldResizeFromCenter
@@ -1318,7 +1361,9 @@ export const resizeMultipleElements = (
 
       const width = orig.width * scaleX;
       const height = orig.height * scaleY;
-      const angle = normalizeAngle(orig.angle * flipFactorX * flipFactorY);
+      const angle = normalizeRadians(
+        (orig.angle * flipFactorX * flipFactorY) as Radians,
+      );
 
       const isLinearOrFreeDraw =
         isLinearElement(orig) || isFreeDrawElement(orig);
@@ -1392,9 +1437,9 @@ export const resizeMultipleElements = (
 
       mutateElement(element, update, false);
 
-      updateBoundElements(element, elementsMap, {
+      updateBoundElements(element, elementsMap as SceneElementsMap, {
         simultaneouslyUpdated: elementsToUpdate,
-        newSize: { width, height },
+        oldSize: { width, height },
       });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);

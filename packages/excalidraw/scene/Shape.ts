@@ -1,3 +1,4 @@
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { RoughGenerator } from "roughjs/bin/generator";
 import { getDiamondPoints, getArrowheadPoints } from "../element";
@@ -9,12 +10,12 @@ import type {
   ExcalidrawLinearElement,
   Arrowhead,
 } from "../element/types";
-import { isPathALoop, getCornerRadius } from "../math";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
 import { ROUGHNESS } from "../constants";
 import {
+  isElbowArrow,
   isEmbeddableElement,
   isIframeElement,
   isIframeLikeElement,
@@ -22,6 +23,13 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
+import {
+  point,
+  pointDistance,
+  type GlobalPoint,
+  type LocalPoint,
+} from "../../math";
+import { getCornerRadius, isPathALoop } from "../shapes";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -398,18 +406,31 @@ export const _generateElementShape = (
 
       // points array can be empty in the beginning, so it is important to add
       // initial position to it
-      const points = element.points.length ? element.points : [[0, 0]];
+      const points = element.points.length
+        ? element.points
+        : [point<LocalPoint>(0, 0)];
 
-      // curve is always the first element
-      // this simplifies finding the curve for an element
-      if (!element.roundness) {
+      if (isElbowArrow(element)) {
+        shape = [
+          generator.path(
+            generateElbowArrowShape(points, 16),
+            generateRoughOptions(element, true),
+          ),
+        ];
+      } else if (!element.roundness) {
+        // curve is always the first element
+        // this simplifies finding the curve for an element
         if (options.fill) {
-          shape = [generator.polygon(points as [number, number][], options)];
+          shape = [
+            generator.polygon(points as unknown as RoughPoint[], options),
+          ];
         } else {
-          shape = [generator.linearPath(points as [number, number][], options)];
+          shape = [
+            generator.linearPath(points as unknown as RoughPoint[], options),
+          ];
         }
       } else {
-        shape = [generator.curve(points as [number, number][], options)];
+        shape = [generator.curve(points as unknown as RoughPoint[], options)];
       }
 
       // add lines only in arrow
@@ -481,4 +502,61 @@ export const _generateElementShape = (
       return null;
     }
   }
+};
+
+const generateElbowArrowShape = <Point extends GlobalPoint | LocalPoint>(
+  points: readonly Point[],
+  radius: number,
+) => {
+  const subpoints = [] as [number, number][];
+  for (let i = 1; i < points.length - 1; i += 1) {
+    const prev = points[i - 1];
+    const next = points[i + 1];
+    const corner = Math.min(
+      radius,
+      pointDistance(points[i], next) / 2,
+      pointDistance(points[i], prev) / 2,
+    );
+
+    if (prev[0] < points[i][0] && prev[1] === points[i][1]) {
+      // LEFT
+      subpoints.push([points[i][0] - corner, points[i][1]]);
+    } else if (prev[0] === points[i][0] && prev[1] < points[i][1]) {
+      // UP
+      subpoints.push([points[i][0], points[i][1] - corner]);
+    } else if (prev[0] > points[i][0] && prev[1] === points[i][1]) {
+      // RIGHT
+      subpoints.push([points[i][0] + corner, points[i][1]]);
+    } else {
+      subpoints.push([points[i][0], points[i][1] + corner]);
+    }
+
+    subpoints.push(points[i] as [number, number]);
+
+    if (next[0] < points[i][0] && next[1] === points[i][1]) {
+      // LEFT
+      subpoints.push([points[i][0] - corner, points[i][1]]);
+    } else if (next[0] === points[i][0] && next[1] < points[i][1]) {
+      // UP
+      subpoints.push([points[i][0], points[i][1] - corner]);
+    } else if (next[0] > points[i][0] && next[1] === points[i][1]) {
+      // RIGHT
+      subpoints.push([points[i][0] + corner, points[i][1]]);
+    } else {
+      subpoints.push([points[i][0], points[i][1] + corner]);
+    }
+  }
+
+  const d = [`M ${points[0][0]} ${points[0][1]}`];
+  for (let i = 0; i < subpoints.length; i += 3) {
+    d.push(`L ${subpoints[i][0]} ${subpoints[i][1]}`);
+    d.push(
+      `Q ${subpoints[i + 1][0]} ${subpoints[i + 1][1]}, ${
+        subpoints[i + 2][0]
+      } ${subpoints[i + 2][1]}`,
+    );
+  }
+  d.push(`L ${points[points.length - 1][0]} ${points[points.length - 1][1]}`);
+
+  return d.join(" ");
 };

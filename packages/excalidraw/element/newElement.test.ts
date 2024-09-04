@@ -4,6 +4,8 @@ import { API } from "../tests/helpers/api";
 import { FONT_FAMILY, ROUNDNESS } from "../constants";
 import { isPrimitive } from "../utils";
 import type { ExcalidrawLinearElement } from "./types";
+import type { LocalPoint } from "../../math";
+import { point } from "../../math";
 
 const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {
@@ -36,10 +38,7 @@ describe("duplicating single elements", () => {
     element.__proto__ = { hello: "world" };
 
     mutateElement(element, {
-      points: [
-        [1, 2],
-        [3, 4],
-      ],
+      points: [point<LocalPoint>(1, 2), point<LocalPoint>(3, 4)],
     });
 
     const copy = duplicateElement(null, new Map(), element);
@@ -121,6 +120,7 @@ describe("duplicating multiple elements", () => {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
     });
 
@@ -131,6 +131,7 @@ describe("duplicating multiple elements", () => {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       boundElements: [{ id: "text2", type: "text" }],
     });
@@ -247,6 +248,7 @@ describe("duplicating multiple elements", () => {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
     });
 
@@ -263,11 +265,13 @@ describe("duplicating multiple elements", () => {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       endBinding: {
         elementId: "rectangle-not-exists",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
     });
 
@@ -278,11 +282,13 @@ describe("duplicating multiple elements", () => {
         elementId: "rectangle-not-exists",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       endBinding: {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
     });
 

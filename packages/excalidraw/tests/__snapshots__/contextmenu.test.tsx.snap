@@ -795,10 +795,12 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "top": 40,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -810,11 +812,10 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -830,7 +831,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -839,6 +842,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -996,10 +1000,12 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1011,11 +1017,10 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1031,7 +1036,9 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1040,6 +1047,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -1193,7 +1201,7 @@ History {
 
 exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] appState 1`] = `
 {
@@ -1207,10 +1215,12 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1222,11 +1232,10 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1242,7 +1251,9 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1251,6 +1262,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -1519,7 +1531,7 @@ History {
 
 exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] appState 1`] = `
 {
@@ -1533,10 +1545,12 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1548,11 +1562,10 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1568,7 +1581,9 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1577,6 +1592,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -1845,7 +1861,7 @@ History {
 
 exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] appState 1`] = `
 {
@@ -1859,10 +1875,12 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -1874,11 +1892,10 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1894,7 +1911,9 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1903,6 +1922,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -2056,7 +2076,7 @@ History {
 
 exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] appState 1`] = `
 {
@@ -2070,10 +2090,12 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -2085,11 +2107,10 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2105,7 +2126,9 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2114,6 +2137,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -2291,7 +2315,7 @@ History {
 
 exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of renders 1`] = `7`;
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of renders 1`] = `6`;
 
 exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] appState 1`] = `
 {
@@ -2305,10 +2329,12 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -2320,11 +2346,10 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2340,7 +2365,9 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2349,6 +2376,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -2587,7 +2615,7 @@ History {
 
 exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of renders 1`] = `7`;
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of renders 1`] = `6`;
 
 exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] appState 1`] = `
 {
@@ -2601,10 +2629,12 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -2616,11 +2646,10 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2636,7 +2665,9 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2645,6 +2676,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -2951,7 +2983,7 @@ History {
 
 exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] appState 1`] = `
 {
@@ -2965,10 +2997,12 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "#a5d8ff",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "cross-hatch",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 60,
   "currentItemRoughness": 2,
@@ -2980,11 +3014,10 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3000,7 +3033,9 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3009,6 +3044,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -3421,7 +3457,7 @@ History {
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `16`;
 
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] appState 1`] = `
 {
@@ -3435,10 +3471,12 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -3450,11 +3488,10 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3470,7 +3507,9 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3479,6 +3518,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -3739,7 +3779,7 @@ History {
 
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of renders 1`] = `9`;
 
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] appState 1`] = `
 {
@@ -3753,10 +3793,12 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -3768,11 +3810,10 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3788,7 +3829,9 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3797,6 +3840,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -4057,7 +4101,7 @@ History {
 
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of renders 1`] = `9`;
 
 exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] appState 1`] = `
 {
@@ -4071,10 +4115,12 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "collaborators": Map {},
   "contextMenu": null,
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -4086,11 +4132,10 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4106,7 +4151,9 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -4115,6 +4162,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -4455,7 +4503,7 @@ History {
 
 exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of renders 1`] = `13`;
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of renders 1`] = `11`;
 
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] appState 1`] = `
 {
@@ -5252,10 +5300,12 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "top": -7,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -5267,11 +5317,10 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5287,7 +5336,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -5296,6 +5347,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -5577,7 +5629,7 @@ History {
 
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] appState 1`] = `
 {
@@ -6374,10 +6426,12 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "top": -7,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -6389,11 +6443,10 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -6409,7 +6462,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -6418,6 +6473,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -6745,7 +6801,7 @@ History {
 
 exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of renders 1`] = `13`;
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of renders 1`] = `11`;
 
 exports[`contextMenu element > shows context menu for canvas > [end of test] appState 1`] = `
 {
@@ -7304,10 +7360,12 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "top": -9,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -7319,11 +7377,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7339,7 +7396,9 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -7348,6 +7407,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -8211,10 +8271,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "top": -7,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -8226,11 +8288,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8246,7 +8307,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -8255,6 +8318,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -9100,10 +9164,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "top": 90,
   },
   "currentChartType": "bar",
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEndArrowhead": "arrow",
   "currentItemFillStyle": "solid",
-  "currentItemFontFamily": 1,
+  "currentItemFontFamily": 5,
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
@@ -9115,11 +9181,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "draggingElement": null,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9135,7 +9200,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 100,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -9144,6 +9211,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "Untitled-201933152653",
+  "newElement": null,
   "objectsSnapModeEnabled": false,
   "offsetLeft": 20,
   "offsetTop": 10,
@@ -9381,6 +9449,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] nu
 
 exports[`contextMenu element > shows context menu for element > [end of test] number of elements 2`] = `2`;
 
-exports[`contextMenu element > shows context menu for element > [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > shows context menu for element > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > shows context menu for element > [end of test] number of renders 2`] = `6`;

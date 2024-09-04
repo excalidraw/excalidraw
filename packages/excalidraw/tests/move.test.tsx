@@ -1,5 +1,6 @@
+import React from "react";
 import ReactDOM from "react-dom";
-import { render, fireEvent } from "./test-utils";
+import { render, fireEvent, act } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
@@ -13,6 +14,7 @@ import type {
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { vi } from "vitest";
+import type Scene from "../scene/Scene";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -46,9 +48,9 @@ describe("move element", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `6`,
+        `5`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -79,21 +81,24 @@ describe("move element", () => {
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
     const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
     const elementsMap = h.app.scene.getNonDeletedElementsMap();
-    // bind line to two rectangles
-    bindOrUnbindLinearElement(
-      arrow.get() as NonDeleted<ExcalidrawLinearElement>,
-      rectA.get() as ExcalidrawRectangleElement,
-      rectB.get() as ExcalidrawRectangleElement,
-      elementsMap,
-    );
+    act(() => {
+      // bind line to two rectangles
+      bindOrUnbindLinearElement(
+        arrow.get() as NonDeleted<ExcalidrawLinearElement>,
+        rectA.get() as ExcalidrawRectangleElement,
+        rectB.get() as ExcalidrawRectangleElement,
+        elementsMap,
+        {} as Scene,
+      );
+    });
 
     // select the second rectangle
     new Pointer("mouse").clickOn(rectB);
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `20`,
+      `17`,
     );
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`17`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`13`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
@@ -141,9 +146,9 @@ describe("duplicate element on move when ALT is clicked", () => {
       fireEvent.pointerUp(canvas);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `6`,
+        `5`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements.length).toEqual(1);
       expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
