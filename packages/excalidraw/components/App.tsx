@@ -50,8 +50,7 @@ import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import {
   ARROW_TYPE,
-  DEFAULT_SIDEBAR,
-  SEARCH_SIDEBAR_TAB,
+  SEARCH_SIDEBAR,
   type EXPORT_IMAGE_TYPES,
 } from "../constants";
 import {
@@ -3997,14 +3996,10 @@ class App extends React.Component<AppProps, AppState> {
       if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
         event.preventDefault();
 
-        if (
-          this.state.openSidebar?.name !== DEFAULT_SIDEBAR.name ||
-          this.state.openSidebar?.tab !== SEARCH_SIDEBAR_TAB
-        ) {
+        if (this.state.openSidebar?.name !== "search") {
           this.setState({
             openSidebar: {
-              name: DEFAULT_SIDEBAR.name,
-              tab: SEARCH_SIDEBAR_TAB,
+              name: SEARCH_SIDEBAR.name,
             },
           });
         }

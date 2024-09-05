@@ -1,9 +1,5 @@
 import clsx from "clsx";
-import {
-  DEFAULT_SIDEBAR,
-  LIBRARY_SIDEBAR_TAB,
-  SEARCH_SIDEBAR_TAB,
-} from "../constants";
+import { DEFAULT_SIDEBAR, LIBRARY_SIDEBAR_TAB } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
 import type { MarkOptional, Merge } from "../utility-types";
@@ -13,9 +9,8 @@ import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryMenu } from "./LibraryMenu";
 import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 import { Sidebar } from "./Sidebar/Sidebar";
-import { LibraryIcon, searchIcon } from "./icons";
 import "../components/dropdownMenu/DropdownMenu.scss";
-import { SearchMenu } from "./SearchMenu";
+import { t } from "../i18n";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
@@ -90,21 +85,25 @@ export const DefaultSidebar = Object.assign(
         >
           <Sidebar.Tabs>
             <Sidebar.Header>
-              <DefaultSidebar.TabTriggers>
-                <Sidebar.TabTrigger tab="library">
-                  {LibraryIcon}
-                </Sidebar.TabTrigger>
-                <Sidebar.TabTrigger tab="search">
-                  {searchIcon}
-                </Sidebar.TabTrigger>
-              </DefaultSidebar.TabTriggers>
-              {rest.__fallback && <DefaultSidebarTabTriggersTunnel.Out />}
+              {rest.__fallback && (
+                <div
+                  style={{
+                    color: "var(--color-primary)",
+                    fontSize: "1.2em",
+                    fontWeight: "bold",
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    paddingRight: "1em",
+                  }}
+                >
+                  {t("toolBar.library")}
+                </div>
+              )}
+              <DefaultSidebarTabTriggersTunnel.Out />
             </Sidebar.Header>
             <Sidebar.Tab tab={LIBRARY_SIDEBAR_TAB}>
               <LibraryMenu />
-            </Sidebar.Tab>
-            <Sidebar.Tab tab={SEARCH_SIDEBAR_TAB}>
-              <SearchMenu />
             </Sidebar.Tab>
             {children}
           </Sidebar.Tabs>

@@ -375,12 +375,15 @@ export const DEFAULT_ELEMENT_PROPS: {
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";
-export const SEARCH_SIDEBAR_TAB = "search";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
   defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;
+
+export const SEARCH_SIDEBAR = {
+  name: "search",
+};
 
 export const LIBRARY_DISABLED_TYPES = new Set([
   "iframe",
