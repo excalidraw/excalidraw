@@ -333,7 +333,7 @@ const ListItem = (props: {
       onClick={props.onClick}
       ref={(ref) => {
         if (props.highlighted) {
-          ref?.scrollIntoView();
+          ref?.scrollIntoView({ behavior: "auto", block: "nearest" });
         }
       }}
     >
