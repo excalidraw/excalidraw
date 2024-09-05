@@ -543,7 +543,13 @@ const getMatchedLines = (
         true,
       );
 
-      if (textElement.textAlign !== "left") {
+      // measureText returns a non-zero width for the empty string
+      // which is not what we're after here, hence the check and the correction
+      if (textToStart === "") {
+        offset.width = 0;
+      }
+
+      if (textElement.textAlign !== "left" && lineIndexRange.line.length > 0) {
         const lineLength = measureText(
           lineIndexRange.line,
           getFontString(textElement),

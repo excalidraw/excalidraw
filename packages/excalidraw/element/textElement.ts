@@ -294,12 +294,7 @@ export const measureText = (
     .join("\n");
   const fontSize = parseFloat(font);
   const height = getTextHeight(_text, fontSize, lineHeight);
-  let width = 0;
-  if (text === "") {
-    width = 0;
-  } else {
-    width = getTextWidth(_text, font, forceAdvanceWidth);
-  }
+  const width = getTextWidth(_text, font, forceAdvanceWidth);
   return { width, height };
 };
 
@@ -353,10 +348,6 @@ const getLineWidth = (
   font: FontString,
   forceAdvanceWidth?: true,
 ) => {
-  if (text === "") {
-    return 0;
-  }
-
   if (!canvas) {
     canvas = document.createElement("canvas");
   }
