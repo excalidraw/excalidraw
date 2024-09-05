@@ -6,6 +6,7 @@
     "excalidraw-app",
     "packages/excalidraw",
     "packages/utils",
+    "packages/math",
     "examples/excalidraw",
     "examples/excalidraw/*"
   ],

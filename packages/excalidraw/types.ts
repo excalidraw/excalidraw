@@ -24,7 +24,6 @@ import type {
   ExcalidrawNonSelectionElement,
 } from "./element/types";
 import type { Action } from "./actions/types";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { LinearElementEditor } from "./element/linearElementEditor";
 import type { SuggestedBinding } from "./element/binding";
 import type { ImportedDataState } from "./data/types";
@@ -42,8 +41,6 @@ import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type { StoreActionType } from "./store";
-
-export type Point = Readonly<RoughPoint>;
 
 export type SocketId = string & { _brand: "SocketId" };
 

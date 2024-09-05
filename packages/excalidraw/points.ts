@@ -1,6 +1,8 @@
-import type { Point } from "./types";
+import { pointFromPair, type GlobalPoint, type LocalPoint } from "../math";
 
-export const getSizeFromPoints = (points: readonly Point[]) => {
+export const getSizeFromPoints = (
+  points: readonly (GlobalPoint | LocalPoint)[],
+) => {
   const xs = points.map((point) => point[0]);
   const ys = points.map((point) => point[1]);
   return {
@@ -10,7 +12,7 @@ export const getSizeFromPoints = (points: readonly Point[]) => {
 };
 
 /** @arg dimension, 0 for rescaling only x, 1 for y */
-export const rescalePoints = (
+export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
   dimension: 0 | 1,
   newSize: number,
   points: readonly Point[],
@@ -31,7 +33,7 @@ export const rescalePoints = (
     if (newCoordinate < nextMinCoordinate) {
       nextMinCoordinate = newCoordinate;
     }
-    return newPoint as unknown as Point;
+    return newPoint as Point;
   });
 
   if (!normalize) {
@@ -45,11 +47,13 @@ export const rescalePoints = (
 
   const translation = minCoordinate - nextMinCoordinate;
 
-  const nextPoints = scaledPoints.map(
-    (scaledPoint) =>
+  const nextPoints = scaledPoints.map((scaledPoint) =>
+    pointFromPair<Point>(
       scaledPoint.map((value, currentDimension) => {
         return currentDimension === dimension ? value + translation : value;
       }) as [number, number],
+    ),
   );
+
   return nextPoints;
 };

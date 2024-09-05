@@ -1,8 +1,8 @@
-import * as GA from "../ga";
-import { point, toString, direction, offset } from "../ga";
-import * as GAPoint from "../gapoints";
-import * as GALine from "../galines";
-import * as GATransform from "../gatransforms";
+import * as GA from "./ga";
+import { point, toString, direction, offset } from "./ga";
+import * as GAPoint from "./gapoints";
+import * as GALine from "./galines";
+import * as GATransform from "./gatransforms";
 
 describe("geometric algebra", () => {
   describe("points", () => {

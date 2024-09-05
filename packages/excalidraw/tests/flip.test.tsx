@@ -28,6 +28,8 @@ import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
 import { arrayToMap, cloneJSON } from "../utils";
+import type { LocalPoint } from "../../math";
+import { point, type Radians } from "../../math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -131,7 +133,7 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     y: -2412.5069664197654,
     width: 1750.4888916015625,
     height: 410.51605224609375,
-    angle: 0,
+    angle: 0 as Radians,
     strokeColor: "#000000",
     backgroundColor: "#fa5252",
     fillStyle: "hachure",
@@ -145,9 +147,9 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     link: null,
     locked: false,
     points: [
-      [0, 0],
-      [-922.4761962890625, 300.3277587890625],
-      [828.0126953125, 410.51605224609375],
+      point<LocalPoint>(0, 0),
+      point<LocalPoint>(-922.4761962890625, 300.3277587890625),
+      point<LocalPoint>(828.0126953125, 410.51605224609375),
     ],
   });
 };
@@ -423,8 +425,8 @@ describe("arrow", () => {
   });
 
   it("flips a rotated arrow horizontally with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     API.setElements([line]);
     API.setAppState({
@@ -444,8 +446,8 @@ describe("arrow", () => {
   });
 
   it("flips a rotated arrow vertically with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
     API.setElements([line]);
     API.setAppState({
@@ -477,8 +479,8 @@ describe("arrow", () => {
 
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips a rotated arrow horizontally with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     API.updateElement(line, { angle: originalAngle });
     API.setElements([line]);
@@ -501,8 +503,8 @@ describe("arrow", () => {
 
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips a rotated arrow vertically with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
     API.updateElement(line, { angle: originalAngle });
     API.setElements([line]);
@@ -585,8 +587,8 @@ describe("line", () => {
 
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips a rotated line horizontally with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
     API.updateElement(line, { angle: originalAngle });
     API.setElements([line]);
@@ -600,8 +602,8 @@ describe("line", () => {
 
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips a rotated line vertically with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
     API.updateElement(line, { angle: originalAngle });
     API.setElements([line]);
@@ -619,8 +621,8 @@ describe("line", () => {
   });
 
   it("flips a rotated line horizontally with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
     API.setElements([line]);
     API.setAppState({
@@ -640,8 +642,8 @@ describe("line", () => {
   });
 
   it("flips a rotated line vertically with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
     API.setElements([line]);
     API.setAppState({
@@ -772,8 +774,8 @@ describe("image", () => {
   });
 
   it("flips an rotated image horizontally correctly", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     //paste image
     await createImage();
     await waitFor(() => {
@@ -790,8 +792,8 @@ describe("image", () => {
   });
 
   it("flips an rotated image vertically correctly", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     //paste image
     await createImage();
     await waitFor(() => {
