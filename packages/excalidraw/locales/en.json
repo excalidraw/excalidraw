@@ -164,7 +164,7 @@
   },
   "search": {
     "noMatch": "No matching items in this scene...",
-    "singleResult": "1 result",
+    "singleResult": "result",
     "multipleResults": "results",
     "placeholder": "Find text..."
   },

@@ -263,7 +263,7 @@ export const SearchMenu = () => {
       <div className="layer-ui__search-count">
         {searchMatches.items.length > 0 && (
           <>
-            {focusIndex !== null ? (
+            {focusIndex !== null && focusIndex > -1 ? (
               <div>
                 {focusIndex + 1} / {matchCount}
               </div>
