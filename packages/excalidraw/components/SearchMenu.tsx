@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { CloseIcon, TextIcon, collapseDownIcon, upIcon } from "./icons";
+import { memo, useEffect, useRef, useState } from "react";
+import { collapseDownIcon, upIcon, searchIcon } from "./icons";
 import { TextField } from "./TextField";
 import { Button } from "./Button";
 import { useApp, useExcalidrawSetAppState } from "./App";
@@ -17,7 +17,6 @@ import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import { t } from "../i18n";
 import { isElementCompletelyInViewport } from "../element/sizeHelpers";
-import React from "react";
 import { randomInteger } from "../random";
 
 const searchKeywordAtom = atom<string>("");
@@ -217,56 +216,48 @@ export const SearchMenu = () => {
     };
   }, []);
 
-  const matchCount =
+  const matchCount = `${searchMatches.items.length} ${
     searchMatches.items.length === 1
       ? t("search.singleResult")
-      : `${searchMatches.items.length} ${t("search.multipleResults")}`;
+      : t("search.multipleResults")
+  }`;
 
   return (
     <div className="layer-ui__search">
       <div className="layer-ui__search-header">
-        <div className="search-input">
-          <TextField
-            value={keyword}
-            ref={searchInputRef}
-            placeholder={t("search.placeholder")}
-            onChange={(value) => {
-              setKeyword(value);
-            }}
-            selectOnRender
-            onKeyDown={(event) => {
-              if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                setAppState({
-                  openSidebar: null,
-                });
-                return;
-              }
-
-              if (searchMatches.items.length) {
-                if (event.key === KEYS.ENTER) {
-                  goToNextItem();
-                }
-
-                if (event.key === KEYS.ARROW_UP) {
-                  goToPreviousItem();
-                } else if (event.key === KEYS.ARROW_DOWN) {
-                  goToNextItem();
-                }
-              }
-            }}
-          />
-        </div>
-        <Button
-          onSelect={() => {
-            setKeyword("");
+        <TextField
+          value={keyword}
+          ref={searchInputRef}
+          placeholder={t("search.placeholder")}
+          icon={searchIcon}
+          onChange={(value) => {
+            setKeyword(value);
           }}
-          className="clear-btn"
-        >
-          {CloseIcon}
-        </Button>
+          selectOnRender
+          onKeyDown={(event) => {
+            if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
+              event.preventDefault();
+              event.stopPropagation();
+
+              setAppState({
+                openSidebar: null,
+              });
+              return;
+            }
+
+            if (searchMatches.items.length) {
+              if (event.key === KEYS.ENTER) {
+                goToNextItem();
+              }
+
+              if (event.key === KEYS.ARROW_UP) {
+                goToPreviousItem();
+              } else if (event.key === KEYS.ARROW_DOWN) {
+                goToNextItem();
+              }
+            }
+          }}
+        />
       </div>
 
       <div className="layer-ui__search-count">
@@ -335,7 +326,7 @@ const ListItem = (props: {
   ];
 
   return (
-    <li
+    <div
       className={clsx("layer-ui__result-item", {
         active: props.highlighted,
       })}
@@ -346,7 +337,6 @@ const ListItem = (props: {
         }
       }}
     >
-      <div className="text-icon">{TextIcon}</div>
       <div
         className="preview-text"
         dangerouslySetInnerHTML={{
@@ -355,7 +345,7 @@ const ListItem = (props: {
             .join(""),
         }}
       ></div>
-    </li>
+    </div>
   );
 };
 
@@ -369,17 +359,15 @@ interface MatchListProps {
 const MatchListBase = (props: MatchListProps) => {
   return (
     <div className="layer-ui__search-result-container">
-      <ul>
-        {props.matches.items.map((searchMatch, index) => (
-          <ListItem
-            key={searchMatch.textElement.id + searchMatch.index}
-            trimmedKeyword={props.trimmedKeyword}
-            preview={searchMatch.preview}
-            highlighted={index === props.focusIndex}
-            onClick={() => props.onItemClick(index)}
-          />
-        ))}
-      </ul>
+      {props.matches.items.map((searchMatch, index) => (
+        <ListItem
+          key={searchMatch.textElement.id + searchMatch.index}
+          trimmedKeyword={props.trimmedKeyword}
+          preview={searchMatch.preview}
+          highlighted={index === props.focusIndex}
+          onClick={() => props.onItemClick(index)}
+        />
+      ))}
     </div>
   );
 };
@@ -391,7 +379,7 @@ const areEqual = (prevProps: MatchListProps, nextProps: MatchListProps) => {
   );
 };
 
-const MatchList = React.memo(MatchListBase, areEqual);
+const MatchList = memo(MatchListBase, areEqual);
 
 const getMatchPreview = (text: string, index: number, keyword: string) => {
   const WORDS_BEFORE = 2;

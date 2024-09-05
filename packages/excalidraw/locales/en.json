@@ -166,7 +166,7 @@
     "noMatch": "No matching items in this scene...",
     "singleResult": "1 result",
     "multipleResults": "results",
-    "placeholder": "Find..."
+    "placeholder": "Find text..."
   },
   "buttons": {
     "clearReset": "Reset the canvas",

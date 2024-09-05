@@ -31,7 +31,11 @@ import {
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
 import type { InteractiveCanvasAppState, Point } from "../types";
-import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  FRAME_STYLE,
+  THEME,
+} from "../constants";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
@@ -962,10 +966,16 @@ const _renderInteractiveScene = ({
       );
 
       context.save();
-      if (focus) {
-        context.fillStyle = "rgba(255, 172, 28, 0.4)";
+      if (appState.theme === THEME.LIGHT) {
+        if (focus) {
+          context.fillStyle = "rgba(255, 124, 0, 0.4)";
+        } else {
+          context.fillStyle = "rgba(255, 226, 0, 0.4)";
+        }
+      } else if (focus) {
+        context.fillStyle = "rgba(229, 82, 0, 0.4)";
       } else {
-        context.fillStyle = "rgba(255, 255, 0, 0.4)";
+        context.fillStyle = "rgba(99, 52, 0, 0.4)";
       }
 
       context.translate(appState.scrollX, appState.scrollY);
