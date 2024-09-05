@@ -3998,13 +3998,9 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
 
         if (
-          this.state.openSidebar?.name === DEFAULT_SIDEBAR.name &&
-          this.state.openSidebar.tab === SEARCH_SIDEBAR_TAB
+          this.state.openSidebar?.name !== DEFAULT_SIDEBAR.name ||
+          this.state.openSidebar?.tab !== SEARCH_SIDEBAR_TAB
         ) {
-          this.setState({
-            openSidebar: null,
-          });
-        } else {
           this.setState({
             openSidebar: {
               name: DEFAULT_SIDEBAR.name,
@@ -4012,6 +4008,7 @@ class App extends React.Component<AppProps, AppState> {
             },
           });
         }
+        return;
       }
 
       if (event[KEYS.CTRL_OR_CMD] && event.key.toLowerCase() === KEYS.V) {

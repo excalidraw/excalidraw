@@ -43,6 +43,9 @@ type SearchMatch = {
 export const SearchMenu = () => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   const [keyword, setKeyword] = useState("");
   const [matches, setMatches] = useState<SearchMatch[]>([]);
   const searchedKeywordRef = useRef<string | null>();
@@ -178,6 +181,27 @@ export const SearchMenu = () => {
     };
   }, [setAppState, setFocusIndex]);
 
+  useEffect(() => {
+    const eventHandler = (event: KeyboardEvent) => {
+      if (
+        event[KEYS.CTRL_OR_CMD] &&
+        event.key === KEYS.F &&
+        document.activeElement !== searchInputRef.current
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        searchInputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", eventHandler);
+
+    return () => {
+      window.removeEventListener("keydown", eventHandler);
+    };
+  }, []);
+
   const matchCount =
     matches.length === 1
       ? t("search.singleResult")
@@ -189,12 +213,23 @@ export const SearchMenu = () => {
         <div className="search-input">
           <TextField
             value={keyword}
+            ref={searchInputRef}
             placeholder={t("search.placeholder")}
             onChange={(value) => {
               setKeyword(value);
             }}
             selectOnRender
             onKeyDown={(event) => {
+              if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                setAppState({
+                  openSidebar: null,
+                });
+                return;
+              }
+
               if (matches.length) {
                 if (event.key === KEYS.ENTER) {
                   goToNextItem();
