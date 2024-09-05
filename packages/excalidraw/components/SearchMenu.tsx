@@ -18,6 +18,7 @@ import { jotaiScope } from "../jotai";
 import { t } from "../i18n";
 import { isElementCompletelyInViewport } from "../element/sizeHelpers";
 
+const searchKeywordAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
 
 const SEARCH_DEBOUNCE = 250;
@@ -46,7 +47,7 @@ export const SearchMenu = () => {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useAtom(searchKeywordAtom, jotaiScope);
   const [matches, setMatches] = useState<SearchMatch[]>([]);
   const searchedKeywordRef = useRef<string | null>();
   const lastSceneNonceRef = useRef<number | undefined>();
@@ -171,7 +172,6 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     return () => {
-      setKeyword("");
       setFocusIndex(null);
       searchedKeywordRef.current = null;
       lastSceneNonceRef.current = undefined;
