@@ -22,7 +22,7 @@ import { randomInteger } from "../random";
 const searchKeywordAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
 
-const SEARCH_DEBOUNCE = 250;
+const SEARCH_DEBOUNCE = 350;
 
 type SearchMatchItem = {
   textElement: ExcalidrawTextElement;
