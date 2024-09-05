@@ -634,9 +634,13 @@ const handleSearch = debounce(
       }
     }
 
+    const visibleIds = new Set(
+      app.visibleElements.map((visibleElement) => visibleElement.id),
+    );
+
     const focusIndex =
-      matchItems.findIndex(
-        (match) => match.textElement.id === app.visibleElements[0]?.id,
+      matchItems.findIndex((matchItem) =>
+        visibleIds.has(matchItem.textElement.id),
       ) ?? null;
 
     cb(matchItems, focusIndex);
