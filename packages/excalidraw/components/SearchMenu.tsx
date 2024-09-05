@@ -575,8 +575,8 @@ const getMatchedLines = (
   return matchedLines;
 };
 
-const sanitizeKeyword = (string: string) => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeSpecialCharacters = (string: string) => {
+  return string.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&");
 };
 
 const handleSearch = debounce(
@@ -599,8 +599,7 @@ const handleSearch = debounce(
 
     const matchItems: SearchMatchItem[] = [];
 
-    const safeKeyword = sanitizeKeyword(keyword);
-    const regex = new RegExp(safeKeyword, "gi");
+    const regex = new RegExp(escapeSpecialCharacters(keyword), "gi");
 
     for (const textEl of texts) {
       let match = null;
