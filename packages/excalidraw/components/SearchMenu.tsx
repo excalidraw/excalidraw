@@ -17,13 +17,15 @@ import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
 import { t } from "../i18n";
 import { isElementCompletelyInViewport } from "../element/sizeHelpers";
+import React from "react";
+import { randomInteger } from "../random";
 
 const searchKeywordAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
 
 const SEARCH_DEBOUNCE = 250;
 
-type SearchMatch = {
+type SearchMatchItem = {
   textElement: ExcalidrawTextElement;
   keyword: string;
   index: number;
@@ -41,6 +43,11 @@ type SearchMatch = {
   }[];
 };
 
+type SearchMatches = {
+  nonce: number | null;
+  items: SearchMatchItem[];
+};
+
 export const SearchMenu = () => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
@@ -48,7 +55,10 @@ export const SearchMenu = () => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [keyword, setKeyword] = useAtom(searchKeywordAtom, jotaiScope);
-  const [matches, setMatches] = useState<SearchMatch[]>([]);
+  const [searchMatches, setSearchMatches] = useState<SearchMatches>({
+    nonce: null,
+    items: [],
+  });
   const searchedKeywordRef = useRef<string | null>();
   const lastSceneNonceRef = useRef<number | undefined>();
 
@@ -65,13 +75,16 @@ export const SearchMenu = () => {
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
       searchedKeywordRef.current = null;
-      handleSearch(trimmedKeyword, app, (matches, index) => {
-        setMatches(matches);
+      handleSearch(trimmedKeyword, app, (matchItems, index) => {
+        setSearchMatches({
+          nonce: randomInteger(),
+          items: matchItems,
+        });
         setFocusIndex(index);
         searchedKeywordRef.current = trimmedKeyword;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
-          searchMatches: matches.map((searchMatch) => ({
+          searchMatches: matchItems.map((searchMatch) => ({
             id: searchMatch.textElement.id,
             focus: false,
             matchedLines: searchMatch.matchedLines,
@@ -89,32 +102,34 @@ export const SearchMenu = () => {
   ]);
 
   const goToNextItem = () => {
-    if (matches.length > 0) {
+    if (searchMatches.items.length > 0) {
       setFocusIndex((focusIndex) => {
         if (focusIndex === null) {
           return 0;
         }
 
-        return (focusIndex + 1) % matches.length;
+        return (focusIndex + 1) % searchMatches.items.length;
       });
     }
   };
 
   const goToPreviousItem = () => {
-    if (matches.length > 0) {
+    if (searchMatches.items.length > 0) {
       setFocusIndex((focusIndex) => {
         if (focusIndex === null) {
           return 0;
         }
 
-        return focusIndex - 1 < 0 ? matches.length - 1 : focusIndex - 1;
+        return focusIndex - 1 < 0
+          ? searchMatches.items.length - 1
+          : focusIndex - 1;
       });
     }
   };
 
   useEffect(() => {
-    if (matches.length > 0 && focusIndex !== null) {
-      const match = matches[focusIndex];
+    if (searchMatches.items.length > 0 && focusIndex !== null) {
+      const match = searchMatches.items[focusIndex];
 
       if (match) {
         const matchAsElement = newTextElement({
@@ -148,7 +163,7 @@ export const SearchMenu = () => {
           });
         }
 
-        const nextMatches = matches.map((match, index) => {
+        const nextMatches = searchMatches.items.map((match, index) => {
           if (index === focusIndex) {
             return {
               id: match.textElement.id,
@@ -168,7 +183,7 @@ export const SearchMenu = () => {
         });
       }
     }
-  }, [app, focusIndex, matches, setAppState]);
+  }, [app, focusIndex, searchMatches, setAppState]);
 
   useEffect(() => {
     return () => {
@@ -203,9 +218,9 @@ export const SearchMenu = () => {
   }, []);
 
   const matchCount =
-    matches.length === 1
+    searchMatches.items.length === 1
       ? t("search.singleResult")
-      : `${matches.length} ${t("search.multipleResults")}`;
+      : `${searchMatches.items.length} ${t("search.multipleResults")}`;
 
   return (
     <div className="layer-ui__search">
@@ -230,7 +245,7 @@ export const SearchMenu = () => {
                 return;
               }
 
-              if (matches.length) {
+              if (searchMatches.items.length) {
                 if (event.key === KEYS.ENTER) {
                   goToNextItem();
                 }
@@ -255,7 +270,7 @@ export const SearchMenu = () => {
       </div>
 
       <div className="layer-ui__search-count">
-        {matches.length > 0 && (
+        {searchMatches.items.length > 0 && (
           <>
             {focusIndex !== null ? (
               <div>
@@ -285,32 +300,23 @@ export const SearchMenu = () => {
           </>
         )}
 
-        {matches.length === 0 && keyword && searchedKeywordRef.current && (
-          <div>{t("search.noMatch")}</div>
-        )}
+        {searchMatches.items.length === 0 &&
+          keyword &&
+          searchedKeywordRef.current && <div>{t("search.noMatch")}</div>}
       </div>
 
-      <div className="layer-ui__search-result-container">
-        <ul>
-          {matches.map((searchMatch, index) => (
-            <ListItem
-              key={searchMatch.textElement.id + searchMatch.index}
-              trimmedKeyword={keyword.trim()}
-              preview={searchMatch.preview}
-              highlighted={index === focusIndex}
-              onClick={() => {
-                setFocusIndex(index);
-              }}
-            />
-          ))}
-        </ul>
-      </div>
+      <MatchList
+        matches={searchMatches}
+        onItemClick={setFocusIndex}
+        focusIndex={focusIndex}
+        trimmedKeyword={keyword.trim()}
+      />
     </div>
   );
 };
 
 const ListItem = (props: {
-  preview: SearchMatch["preview"];
+  preview: SearchMatchItem["preview"];
   trimmedKeyword: string;
   highlighted: boolean;
   onClick?: () => void;
@@ -352,6 +358,40 @@ const ListItem = (props: {
     </li>
   );
 };
+
+interface MatchListProps {
+  matches: SearchMatches;
+  onItemClick: (index: number) => void;
+  focusIndex: number | null;
+  trimmedKeyword: string;
+}
+
+const MatchListBase = (props: MatchListProps) => {
+  return (
+    <div className="layer-ui__search-result-container">
+      <ul>
+        {props.matches.items.map((searchMatch, index) => (
+          <ListItem
+            key={searchMatch.textElement.id + searchMatch.index}
+            trimmedKeyword={props.trimmedKeyword}
+            preview={searchMatch.preview}
+            highlighted={index === props.focusIndex}
+            onClick={() => props.onItemClick(index)}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const areEqual = (prevProps: MatchListProps, nextProps: MatchListProps) => {
+  return (
+    prevProps.matches.nonce === nextProps.matches.nonce &&
+    prevProps.focusIndex === nextProps.focusIndex
+  );
+};
+
+const MatchList = React.memo(MatchListBase, areEqual);
 
 const getMatchPreview = (text: string, index: number, keyword: string) => {
   const WORDS_BEFORE = 2;
@@ -549,7 +589,7 @@ const handleSearch = debounce(
   (
     keyword: string,
     app: AppClassProperties,
-    cb: (matches: SearchMatch[], focusIndex: number | null) => void,
+    cb: (matchItems: SearchMatchItem[], focusIndex: number | null) => void,
   ) => {
     if (!keyword || keyword === "") {
       cb([], null);
@@ -563,7 +603,7 @@ const handleSearch = debounce(
 
     texts.sort((a, b) => a.y - b.y);
 
-    const matches: SearchMatch[] = [];
+    const matchItems: SearchMatchItem[] = [];
 
     const safeKeyword = sanitizeKeyword(keyword);
     const regex = new RegExp(safeKeyword, "gi");
@@ -577,7 +617,7 @@ const handleSearch = debounce(
         const matchedLines = getMatchedLines(textEl, keyword, match.index);
 
         if (matchedLines.length > 0) {
-          matches.push({
+          matchItems.push({
             textElement: textEl,
             keyword,
             preview,
@@ -589,11 +629,11 @@ const handleSearch = debounce(
     }
 
     const focusIndex =
-      matches.findIndex(
+      matchItems.findIndex(
         (match) => match.textElement.id === app.visibleElements[0]?.id,
       ) ?? null;
 
-    cb(matches, focusIndex);
+    cb(matchItems, focusIndex);
   },
   SEARCH_DEBOUNCE,
 );
