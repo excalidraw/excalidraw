@@ -32,7 +32,6 @@ describe("exportToCanvas", async () => {
 
 describe("exportToBlob", async () => {
   describe("mime type", () => {
-    // afterEach(vi.restoreAllMocks);
     it("should change image/jpg to image/jpeg", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),
@@ -56,6 +55,7 @@ describe("exportToBlob", async () => {
       const consoleSpy = vi
         .spyOn(console, "warn")
         .mockImplementationOnce(() => void 0);
+
       await utils.exportToBlob({
         ...diagramFactory(),
         mimeType: MIME_TYPES.png,
