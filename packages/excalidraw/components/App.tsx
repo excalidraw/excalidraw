@@ -6411,8 +6411,16 @@ class App extends React.Component<AppProps, AppState> {
     }
     isPanning = true;
 
+    // due to event.preventDefault below, container wouldn't get focus
+    // automatically
+    this.focusContainer();
+
+    // preventing defualt while text editing messes with cursor/focus
     if (!this.state.editingTextElement) {
-      // preventing defualt while text editing messes with cursor/focus
+      // necessary to prevent browser from scrolling the page if excalidraw
+      // not full-page #4489
+      //
+      // as such, the above is broken when panning canvas while in wysiwyg
       event.preventDefault();
     }
 
