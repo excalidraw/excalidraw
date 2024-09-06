@@ -32,7 +32,6 @@ const handleDimensionChange: DragInputCallbackType<
   scene,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   const latestElement = elementsMap.get(origElement.id);
   if (origElement && latestElement) {

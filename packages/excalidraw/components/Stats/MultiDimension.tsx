@@ -154,7 +154,6 @@ const handleDimensionChange: DragInputCallbackType<
   property,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const atomicUnits = getAtomicUnits(originalElements, originalAppState);
   if (nextValue !== undefined) {
     for (const atomicUnit of atomicUnits) {

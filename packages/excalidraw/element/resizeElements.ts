@@ -9,7 +9,6 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
   ElementsMap,
-  NonDeletedSceneElementsMap,
   SceneElementsMap,
 } from "./types";
 import type { Mutable } from "../utility-types";
@@ -63,7 +62,7 @@ import {
   pointFromPair,
   pointRotateRads,
   type Radians,
-  LocalPoint,
+  type LocalPoint,
 } from "../../math";
 
 // Returns true when transform (resizing/rotation) happened
