@@ -23,7 +23,6 @@ import { Excalidraw } from "../index";
 import type { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
 import { vi } from "vitest";
-import * as blob from "../data/blob";
 import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
@@ -33,15 +32,15 @@ import { point, type Radians } from "../../math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
-// This needs to fixed in vitest mock, as when importActual used with mock
-// the tests hangs - https://github.com/vitest-dev/vitest/issues/546.
-// But fortunately spying and mocking the return value of spy works :p
 
-const resizeImageFileSpy = vi.spyOn(blob, "resizeImageFile");
-const generateIdFromFileSpy = vi.spyOn(blob, "generateIdFromFile");
-
-resizeImageFileSpy.mockImplementation(async (imageFile: File) => imageFile);
-generateIdFromFileSpy.mockImplementation(async () => "fileId" as FileId);
+vi.mock("../data/blob", async (actual) => {
+  const orig: Object = await actual();
+  return {
+    ...orig,
+    resizeImageFile: (imageFile: File) => imageFile,
+    generateIdFromFile: () => "fileId" as FileId,
+  };
+});
 
 beforeEach(async () => {
   // Unmount ReactDOM from root
