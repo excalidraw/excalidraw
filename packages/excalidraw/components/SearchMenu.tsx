@@ -366,14 +366,9 @@ const ListItem = (props: {
         }
       }}
     >
-      <div
-        className="preview-text"
-        dangerouslySetInnerHTML={{
-          __html: preview
-            .map((text, index) => (index === 2 ? `<b>${text}</b>` : text))
-            .join(""),
-        }}
-      ></div>
+      <div className="preview-text">
+        {preview.flatMap((text, idx) => (idx === 2 ? <b>{text}</b> : text))}
+      </div>
     </div>
   );
 };
