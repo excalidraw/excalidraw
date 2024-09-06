@@ -319,7 +319,9 @@ export const SearchMenu = () => {
 
         {searchMatches.items.length === 0 &&
           keyword &&
-          searchedKeywordRef.current && <div>{t("search.noMatch")}</div>}
+          searchedKeywordRef.current && (
+            <div style={{ margin: "1rem auto" }}>{t("search.noMatch")}</div>
+          )}
       </div>
 
       <MatchList
