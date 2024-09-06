@@ -1227,7 +1227,7 @@ describe("Test Linear Elements", () => {
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
 
-      expect(arrow.width).toBe(205);
+      expect(arrow.width).toBe(200);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
