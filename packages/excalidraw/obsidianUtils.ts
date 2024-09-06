@@ -125,3 +125,27 @@ export async function getCSSFontDefinition(fontFamily: number): Promise<string> 
   const content = await fontFace.getContentLegacy();
   return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`
 }
+
+function base64ToArrayBuffer(base64: string): ArrayBuffer {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes.buffer;
+}
+
+export function getArrayBufferFromBase64(url: string): ArrayBuffer {
+  const base64String = url.toString().split(",")[1];
+
+  if (typeof Buffer !== "undefined") {
+    // Node.js environment
+    return Buffer.from(base64String, "base64").buffer;
+  } else {
+    // Browser environment
+    return base64ToArrayBuffer(base64String);
+  }
+}
