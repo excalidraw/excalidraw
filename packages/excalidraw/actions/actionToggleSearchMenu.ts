@@ -35,7 +35,11 @@ export const actionToggleSearchMenu = register({
     }
 
     return {
-      appState: { ...appState, openSidebar: { name: SEARCH_SIDEBAR.name } },
+      appState: {
+        ...appState,
+        openSidebar: { name: SEARCH_SIDEBAR.name },
+        openDialog: null,
+      },
       storeAction: StoreAction.NONE,
     };
   },

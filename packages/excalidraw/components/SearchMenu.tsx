@@ -221,7 +221,13 @@ export const SearchMenu = () => {
       if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
         event.preventDefault();
         event.stopPropagation();
-        if (document.activeElement !== searchInputRef.current) {
+
+        if (!searchInputRef.current?.matches(":focus")) {
+          if (app.state.openDialog) {
+            setAppState({
+              openDialog: null,
+            });
+          }
           searchInputRef.current?.focus();
         } else {
           setAppState({
