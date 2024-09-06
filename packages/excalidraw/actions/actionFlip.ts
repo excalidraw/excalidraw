@@ -108,7 +108,7 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
-  resizeMultipleElements(selectedElements, elementsMap, "nw", {
+  resizeMultipleElements(selectedElements, elementsMap, "nw", app.scene, {
     flipByX: flipDirection === "horizontal",
     flipByY: flipDirection === "vertical",
     shouldResizeFromCenter: true,

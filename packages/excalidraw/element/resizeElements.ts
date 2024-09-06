@@ -71,6 +71,7 @@ export const transformElements = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: readonly NonDeletedExcalidrawElement[],
   elementsMap: SceneElementsMap,
+  scene: Scene,
   shouldRotateWithDiscreteAngle: boolean,
   shouldResizeFromCenter: boolean,
   shouldMaintainAspectRatio: boolean,
@@ -86,6 +87,7 @@ export const transformElements = (
         rotateSingleElement(
           element,
           elementsMap,
+          scene,
           pointerX,
           pointerY,
           shouldRotateWithDiscreteAngle,
@@ -172,6 +174,7 @@ export const transformElements = (
         selectedElements,
         elementsMap,
         transformHandleType,
+        scene,
         {
           shouldResizeFromCenter,
           shouldMaintainAspectRatio,
@@ -193,6 +196,7 @@ export const transformElements = (
 const rotateSingleElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
+  scene: Scene,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -217,9 +221,7 @@ const rotateSingleElement = (
   mutateElement(element, { angle });
   if (boundTextElementId) {
     const textElement =
-      Scene.getScene(element)?.getElement<ExcalidrawTextElementWithContainer>(
-        boundTextElementId,
-      );
+      scene.getElement<ExcalidrawTextElementWithContainer>(boundTextElementId);
 
     if (textElement && !isArrowElement(element)) {
       mutateElement(textElement, { angle });
@@ -1163,6 +1165,7 @@ export const resizeMultipleElements = (
   selectedElements: readonly NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   handleDirection: TransformHandleDirection,
+  scene: Scene,
   {
     shouldMaintainAspectRatio = false,
     shouldResizeFromCenter = false,
@@ -1455,6 +1458,6 @@ export const resizeMultipleElements = (
       }
     }
 
-    Scene.getScene(elementsAndUpdates[0].element)?.triggerUpdate();
+    scene.triggerUpdate();
   }
 };
