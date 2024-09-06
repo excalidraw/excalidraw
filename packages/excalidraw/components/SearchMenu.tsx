@@ -205,6 +205,19 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
+      if (
+        event.key === KEYS.ESCAPE &&
+        !app.state.openDialog &&
+        !app.state.openPopup
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        setAppState({
+          openSidebar: null,
+        });
+        return;
+      }
+
       if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
         event.preventDefault();
         event.stopPropagation();
@@ -243,7 +256,7 @@ export const SearchMenu = () => {
     return addEventListener(window, EVENT.KEYDOWN, eventHandler, {
       capture: true,
     });
-  }, [setAppState, stableState]);
+  }, [setAppState, stableState, app]);
 
   const matchCount = `${searchMatches.items.length} ${
     searchMatches.items.length === 1
