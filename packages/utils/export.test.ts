@@ -55,7 +55,6 @@ describe("exportToBlob", async () => {
       const consoleSpy = vi
         .spyOn(console, "warn")
         .mockImplementationOnce(() => void 0);
-
       await utils.exportToBlob({
         ...diagramFactory(),
         mimeType: MIME_TYPES.png,
