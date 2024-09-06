@@ -1170,3 +1170,26 @@ export const safelyParseJSON = (json: string): Record<string, any> | null => {
     return null;
   }
 };
+
+const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes.buffer;
+};
+
+export const getArrayBufferFromBase64 = (url: string): ArrayBuffer => {
+  const base64String = url.toString().split(",")[1];
+
+  if (typeof Buffer !== "undefined") {
+    // Node.js environment
+    return Buffer.from(base64String, "base64").buffer;
+  }
+  // Browser environment
+  return base64ToArrayBuffer(base64String);
+};
