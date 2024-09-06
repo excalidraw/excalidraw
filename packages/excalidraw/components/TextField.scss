@@ -57,8 +57,7 @@
       border: 1px solid var(--ExcTextField--border);
       border-radius: 0.5rem;
 
-      padding-left: 2.5rem;
-      padding-right: 0.75rem;
+      padding: 0 0.75rem;
 
       &:not(&--readonly) {
         &:hover {
@@ -115,6 +114,10 @@
           color: var(--ExcTextField--readonly--color);
         }
       }
+    }
+
+    &--hasIcon .ExcTextField__input {
+      padding-left: 2.5rem;
     }
   }
 }
