@@ -658,6 +658,7 @@ export type AppClassProperties = {
   plugins: App["plugins"];
   getEditorUIOffsets: App["getEditorUIOffsets"];
   visibleElements: App["visibleElements"];
+  excalidrawContainerValue: App["excalidrawContainerValue"];
 };
 
 export type PointerDownState = Readonly<{

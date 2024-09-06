@@ -1,4 +1,5 @@
 import { SEARCH_SIDEBAR } from "../constants";
+import { t } from "../i18n";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
 
@@ -18,7 +19,7 @@ export const SearchSidebar = () => {
               paddingRight: "1em",
             }}
           >
-            Find text
+            {t("search.title")}
           </div>
         </Sidebar.Header>
         <SearchMenu />

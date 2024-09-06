@@ -23,6 +23,7 @@ type TextFieldProps = {
 
   icon?: React.ReactNode;
   label?: string;
+  className?: string;
   placeholder?: string;
   isRedacted?: boolean;
 } & ({ value: string } | { defaultValue: string });
@@ -39,6 +40,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       onKeyDown,
       isRedacted = false,
       icon,
+      className,
       ...rest
     },
     ref,
@@ -58,7 +60,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     return (
       <div
-        className={clsx("ExcTextField", {
+        className={clsx("ExcTextField", className, {
           "ExcTextField--fullWidth": fullWidth,
           "ExcTextField--hasIcon": !!icon,
         })}

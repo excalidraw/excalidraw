@@ -48,11 +48,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import {
-  ARROW_TYPE,
-  SEARCH_SIDEBAR,
-  type EXPORT_IMAGE_TYPES,
-} from "../constants";
+import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -561,7 +557,7 @@ class App extends React.Component<AppProps, AppState> {
   public id: string;
   private store: Store;
   private history: History;
-  private excalidrawContainerValue: {
+  public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
   };
@@ -3998,19 +3994,6 @@ class App extends React.Component<AppProps, AppState> {
           }),
         });
         event.preventDefault();
-        return;
-      }
-
-      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
-        event.preventDefault();
-
-        if (this.state.openSidebar?.name !== SEARCH_SIDEBAR.name) {
-          this.setState({
-            openSidebar: {
-              name: SEARCH_SIDEBAR.name,
-            },
-          });
-        }
         return;
       }
 

@@ -18,7 +18,7 @@ import { jotaiScope } from "../jotai";
 import { t } from "../i18n";
 import { isElementCompletelyInViewport } from "../element/sizeHelpers";
 import { randomInteger } from "../random";
-import { EVENT } from "../constants";
+import { CLASSES, EVENT } from "../constants";
 import { useStable } from "../hooks/useStable";
 
 const searchKeywordAtom = atom<string>("");
@@ -255,6 +255,7 @@ export const SearchMenu = () => {
     <div className="layer-ui__search">
       <div className="layer-ui__search-header">
         <TextField
+          className={CLASSES.SEARCH_MENU_INPUT_WRAPPER}
           value={keyword}
           ref={searchInputRef}
           placeholder={t("search.placeholder")}

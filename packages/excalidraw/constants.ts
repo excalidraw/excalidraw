@@ -113,6 +113,7 @@ export const ENV = {
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
   ZOOM_ACTIONS: "zoom-actions",
+  SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
 };
 
 /**
