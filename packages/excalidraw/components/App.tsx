@@ -4004,7 +4004,7 @@ class App extends React.Component<AppProps, AppState> {
       if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
         event.preventDefault();
 
-        if (this.state.openSidebar?.name !== "search") {
+        if (this.state.openSidebar?.name !== SEARCH_SIDEBAR.name) {
           this.setState({
             openSidebar: {
               name: SEARCH_SIDEBAR.name,

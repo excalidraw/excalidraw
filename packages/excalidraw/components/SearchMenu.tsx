@@ -8,7 +8,7 @@ import type { AppClassProperties } from "../types";
 import { isTextElement, newTextElement } from "../element";
 import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
-import { getFontString } from "../utils";
+import { addEventListener, getFontString } from "../utils";
 import { KEYS } from "../keys";
 
 import "./SearchMenu.scss";
@@ -18,6 +18,8 @@ import { jotaiScope } from "../jotai";
 import { t } from "../i18n";
 import { isElementCompletelyInViewport } from "../element/sizeHelpers";
 import { randomInteger } from "../random";
+import { EVENT } from "../constants";
+import { useStable } from "../hooks/useStable";
 
 const searchKeywordAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
@@ -195,26 +197,53 @@ export const SearchMenu = () => {
     };
   }, [setAppState, setFocusIndex]);
 
+  const stableState = useStable({
+    goToNextItem,
+    goToPreviousItem,
+    searchMatches,
+  });
+
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
-      if (
-        event[KEYS.CTRL_OR_CMD] &&
-        event.key === KEYS.F &&
-        document.activeElement !== searchInputRef.current
-      ) {
+      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
         event.preventDefault();
         event.stopPropagation();
+        if (document.activeElement !== searchInputRef.current) {
+          searchInputRef.current?.focus();
+        } else {
+          setAppState({
+            openSidebar: null,
+          });
+        }
+      }
 
-        searchInputRef.current?.focus();
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.closest(".layer-ui__search")
+      ) {
+        if (stableState.searchMatches.items.length) {
+          if (event.key === KEYS.ENTER) {
+            event.stopPropagation();
+            stableState.goToNextItem();
+          }
+
+          if (event.key === KEYS.ARROW_UP) {
+            event.stopPropagation();
+            stableState.goToPreviousItem();
+          } else if (event.key === KEYS.ARROW_DOWN) {
+            event.stopPropagation();
+            stableState.goToNextItem();
+          }
+        }
       }
     };
 
-    window.addEventListener("keydown", eventHandler);
-
-    return () => {
-      window.removeEventListener("keydown", eventHandler);
-    };
-  }, []);
+    // `capture` needed to prevent firing on initial open from App.tsx,
+    // as well as to handle events before App ones
+    return addEventListener(window, EVENT.KEYDOWN, eventHandler, {
+      capture: true,
+    });
+  }, [setAppState, stableState]);
 
   const matchCount = `${searchMatches.items.length} ${
     searchMatches.items.length === 1
@@ -234,29 +263,6 @@ export const SearchMenu = () => {
             setKeyword(value);
           }}
           selectOnRender
-          onKeyDown={(event) => {
-            if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
-              event.preventDefault();
-              event.stopPropagation();
-
-              setAppState({
-                openSidebar: null,
-              });
-              return;
-            }
-
-            if (searchMatches.items.length) {
-              if (event.key === KEYS.ENTER) {
-                goToNextItem();
-              }
-
-              if (event.key === KEYS.ARROW_UP) {
-                goToPreviousItem();
-              } else if (event.key === KEYS.ARROW_DOWN) {
-                goToNextItem();
-              }
-            }
-          }}
         />
       </div>
 
@@ -327,6 +333,7 @@ const ListItem = (props: {
 
   return (
     <div
+      tabIndex={-1}
       className={clsx("layer-ui__result-item", {
         active: props.highlighted,
       })}
