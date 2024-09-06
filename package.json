@@ -21,8 +21,8 @@
     "@types/react-dom": "18.2.0",
     "@types/socket.io-client": "3.0.0",
     "@vitejs/plugin-react": "3.1.0",
-    "@vitest/coverage-v8": "0.33.0",
-    "@vitest/ui": "0.32.2",
+    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/ui": "2.0.5",
     "chai": "4.3.6",
     "dotenv": "16.0.1",
     "eslint-config-prettier": "8.5.0",
@@ -36,13 +36,13 @@
     "prettier": "2.6.2",
     "rewire": "6.0.0",
     "typescript": "4.9.4",
-    "vite": "5.0.12",
-    "vite-plugin-checker": "0.6.1",
+    "vite": "5.4.2",
+    "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",
-    "vite-plugin-svgr": "2.4.0",
-    "vitest": "1.6.0",
-    "vitest-canvas-mock": "0.3.2"
+    "vite-plugin-svgr": "4.2.0",
+    "vitest": "2.0.5",
+    "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
     "node": "18.0.0 - 20.x.x"
@@ -83,6 +83,7 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
-    "@types/react": "18.2.0"
+    "@types/react": "18.2.0",
+    "strip-ansi": "6.0.1"
   }
 }
