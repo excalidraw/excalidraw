@@ -247,7 +247,7 @@ export const textWysiwyg = ({
 
       // adding left and right padding buffer, so that browser does not cut the glyphs (does not work in Safari)
       const padding = !isSafari
-        ? Math.ceil(updatedTextElement.fontSize / 2)
+        ? Math.ceil(updatedTextElement.fontSize / appState.zoom.value / 2) //zsviczian
         : 0;
 
       // Make sure text editor height doesn't go beyond viewport
@@ -257,7 +257,7 @@ export const textWysiwyg = ({
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${Math.ceil(width)}px`, //zsviczian Obsidian app zoom !== 100% issue
+        width: `${Math.floor(width)}px`, //zsviczian Obsidian app zoom !== 100% issue, floor due to screen shift
         height: `${height}px`,
         left: `${viewportX - padding}px`,
         top: `${viewportY}px`,
@@ -356,7 +356,7 @@ export const textWysiwyg = ({
           getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font, true);
-        editable.style.width = `${Math.ceil(width)}px`; //zsviczian Obsidian app zoom !== 100% issue
+        editable.style.width = `${Math.floor(width)}px`; //zsviczian Obsidian app zoom !== 100% issue, floor due to horizontal shift
       }
     };
 

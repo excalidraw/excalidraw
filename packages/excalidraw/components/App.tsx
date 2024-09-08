@@ -1555,7 +1555,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const shouldBlockPointerEvents =
       this.state.selectionElement ||
-      this.state.newElement ||
+      (this.state.newElement && 
+        !["line","arrow"].includes(this.state.newElement.type) &&
+        (this.device.isTouchScreen || this.state.penDetected)) || //zsviczian can't exit line edit on phone
       this.state.selectedElementsAreBeingDragged ||
       this.state.resizingElement ||
       (this.state.activeTool.type === "laser" &&
