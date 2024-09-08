@@ -2295,6 +2295,9 @@ class App extends React.Component<AppProps, AppState> {
       storeAction: StoreAction.UPDATE,
     });
 
+    // clear the shape and image cache so that any images in initialData
+    // can be loaded fresh
+    this.clearImageShapeCache();
     // FontFaceSet loadingdone event we listen on may not always
     // fire (looking at you Safari), so on init we manually load all
     // fonts and rerender scene text elements once done. This also
@@ -2359,6 +2362,15 @@ class App extends React.Component<AppProps, AppState> {
     }
     return false;
   };
+
+  private clearImageShapeCache() {
+    this.scene.getNonDeletedElements().forEach((element) => {
+      if (isInitializedImageElement(element) && this.files[element.fileId]) {
+        this.imageCache.delete(element.fileId);
+        ShapeCache.delete(element);
+      }
+    });
+  }
 
   public async componentDidMount() {
     this.unmounted = false;
@@ -3674,15 +3686,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
-      this.scene.getNonDeletedElements().forEach((element) => {
-        if (
-          isInitializedImageElement(element) &&
-          filesMap.has(element.fileId)
-        ) {
-          this.imageCache.delete(element.fileId);
-          ShapeCache.delete(element);
-        }
-      });
+      this.clearImageShapeCache();
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
