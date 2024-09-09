@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "یک آیتم روی بوم را برای اضافه شده به اینجا انتخاب کنید، یا یک کتابخانه از مخزن عمومی در بخش پایین را نصب کنید.",
     "hint_emptyPrivateLibrary": "یک آیتم روی بوم را برای اضافه شدن به اینجا انتخاب کنید."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
     "exportJSON": "خروجی در فایل",
@@ -297,6 +304,7 @@
     "shapes": "شکل‌ها"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "برای حرکت دادن بوم، چرخ ماوس یا فاصله را در حین کشیدن نگه دارید یا از ابزار دستی استفاده کنید",
     "linearElement": "برای چند نقطه کلیک و برای یک خط بکشید",
     "arrowTool": "",
