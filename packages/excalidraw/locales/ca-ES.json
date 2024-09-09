@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Trieu un element o un llenç per a afegir-lo aquí, o instal·leu una biblioteca del repositori públic, més avall.",
     "hint_emptyPrivateLibrary": "Trieu un element o un llenç per a afegir-lo aquí."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Neteja el llenç",
     "exportJSON": "Exporta a un fitxer",
@@ -297,6 +304,7 @@
     "shapes": "Formes"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Per moure el llenç, manteniu premuda la roda del ratolí o la barra espaiadora mentre arrossegueu o utilitzeu l'eina manual",
     "linearElement": "Feu clic per a dibuixar múltiples punts; arrossegueu per a una sola línia",
     "arrowTool": "",
