@@ -6,7 +6,7 @@ import { Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { updateTextEditor } from "./queries/dom";
 import { API } from "./helpers/api";
-import { ExcalidrawTextElement } from "../element/types";
+import type { ExcalidrawTextElement } from "../element/types";
 
 const { h } = window;
 
