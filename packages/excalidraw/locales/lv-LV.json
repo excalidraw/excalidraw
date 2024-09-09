@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu, vai pievienojiet publisku bibliotēku zemāk.",
     "hint_emptyPrivateLibrary": "Atlasiet objektu tāfelē, lai to šeit pievienotu."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Atiestatīt tāfeli",
     "exportJSON": "Eksportēt kā failu",
@@ -297,6 +304,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Lai bīdītu tāfeli, turiet nospiestu ritināšanas vai atstarpes taustiņu, vai izmanto rokas rīku",
     "linearElement": "Klikšķiniet, lai sāktu zīmēt vairākus punktus; velciet, lai zīmētu līniju",
     "arrowTool": "",
