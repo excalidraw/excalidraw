@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "Selecione um item na área de desenho para adicioná-lo aqui."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "Pesquisar na área de desenho",
+    "noMatch": "Não foram encontrados resultados...",
+    "singleResult": "resultado",
+    "multipleResults": "resultados",
+    "placeholder": "Pesquisar texto..."
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho",
@@ -304,7 +304,7 @@
     "shapes": "Formas"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Escape para cancelar a pesquisa",
     "canvasPanning": "Para mover a área de desenho, carregue na roda do rato ou na barra de espaço enquanto arrasta, ou use a ferramenta da mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "arrowTool": "Clique para iniciar vários pontos, arraste para uma única linha. Prima {{arrowShortcut}} novamente para mudar o tipo de seta.",
