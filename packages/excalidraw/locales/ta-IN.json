@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "கித்தானிலுள்ள உருப்படியை இங்குச் சேர்க்க தேர்ந்தெடு, அல்லது கீழுள்ள பொது களஞ்சியத்திலிருந்து நூலகத்தை நிறுவு.",
     "hint_emptyPrivateLibrary": "கித்தானிலுள்ள உருப்படியை இங்குச் சேர்க்க தேர்ந்தெடு."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "கித்தானை அகரமாக்கு",
     "exportJSON": "கோப்புக்கு ஏற்றுமதிசெய்",
@@ -297,6 +304,7 @@
     "shapes": "வடிவங்கள்"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "பல புள்ளிகளைத் துவக்க சொடுக்கு, ஒற்றை வரிக்கு பிடித்திழு",
     "arrowTool": "",
