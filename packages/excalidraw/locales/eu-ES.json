@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko, edo instalatu liburutegi bat beheko biltegi publikotik.",
     "hint_emptyPrivateLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Garbitu oihala",
     "exportJSON": "Esportatu fitxategira",
@@ -297,6 +304,7 @@
     "shapes": "Formak"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Oihala mugitzeko, eutsi saguaren gurpila edo zuriune-barra arrastatzean, edo erabili esku tresna",
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
     "arrowTool": "",
