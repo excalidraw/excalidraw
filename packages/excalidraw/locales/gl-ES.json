@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Seleccione un elemento no lenzo para engadilo aquí, ou instale unha biblioteca dende o repositorio público, como se detalla a continuación.",
     "hint_emptyPrivateLibrary": "Seleccione un elemento do lenzo para engadilo aquí."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Limpar o lenzo",
     "exportJSON": "Exportar a arquivo",
@@ -297,6 +304,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Para mover o lenzo, manteña pulsada a roda do rato ou a barra de espazo mentres arrastra, ou utilice a ferramenta da man",
     "linearElement": "Faga clic para iniciar varios puntos, arrastre para unha sola liña",
     "arrowTool": "",
