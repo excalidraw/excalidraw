@@ -11,7 +11,7 @@ export const getTextEditor = async (selector: string, waitForEditor = true) => {
 };
 
 export const updateTextEditor = (
-  editor: HTMLTextAreaElement,
+  editor: HTMLTextAreaElement | HTMLInputElement,
   value: string,
 ) => {
   fireEvent.change(editor, { target: { value } });
