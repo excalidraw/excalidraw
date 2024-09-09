@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice alebo použite knižnicu z verejného zoznamu knižníc nižšie.",
     "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Obnoviť plátno",
     "exportJSON": "Exportovať do súboru",
@@ -297,6 +304,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania, alebo použite nástroj ruka",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "arrowTool": "Kliknite pre začatie pridávania viacerých bodov, potiahnite pre pridanie jednej čiary. Stlačte znovu {{arrowShortcut}} pre zmenu typu šípky.",
