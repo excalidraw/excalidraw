@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
     "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Återställ canvasen",
     "exportJSON": "Exportera till fil",
@@ -297,6 +304,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "För att flytta whiteboarden, håll mushjulet eller mellanslagstangenten medan du drar eller använd handverktyget",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "arrowTool": "Klicka för att påbörja multipla punkter, dra för en linje. Använd {{arrowShortcut}} igen för att ändra typ av pil.",
