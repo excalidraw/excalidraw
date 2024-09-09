@@ -135,6 +135,7 @@ export const SearchMenu = () => {
       if (match) {
         const matchAsElement = newTextElement({
           text: match.keyword,
+          rawText: match.keyword,
           x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
           y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
