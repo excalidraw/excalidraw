@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Chọn một món trên canvas để thêm nó vào đây, hoặc cài đặt thư viện từ kho lưu trữ công cộng, ở bên dưới.",
     "hint_emptyPrivateLibrary": "Chọn một món trên canvas để thêm nó vào đây."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Reset canvas",
     "exportJSON": "Xuất ra tập tin",
@@ -297,6 +304,7 @@
     "shapes": "Các hình khối"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Để di chuyển canvas, giữ con lăn chuột hoặc phím cách trong khi kéo, hoặc sử dụng công cụ cầm tay",
     "linearElement": "Ấn để bắt đầu nhiểm điểm vẽ, kéo để vẽ một đường thẳng",
     "arrowTool": "",
