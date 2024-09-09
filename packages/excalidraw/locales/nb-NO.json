@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Velg et objekt på lerretet for å legge det til her, eller installer et bibliotek fra den offentlige samlingen under.",
     "hint_emptyPrivateLibrary": "Velg et objekt på lerretet for å legge det til her."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Tøm lerretet og tilbakestill bakgrunnsfargen",
     "exportJSON": "Eksporter til fil",
@@ -297,6 +304,7 @@
     "shapes": "Former"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "For å flytte lerretet, hold musehjulet eller mellomromstasten mens du drar, eller bruk hånd-verktøyet",
     "linearElement": "Klikk for å starte linje med flere punkter, eller dra for en enkel linje",
     "arrowTool": "",
