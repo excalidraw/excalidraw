@@ -866,6 +866,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -1068,6 +1069,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1283,6 +1285,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1613,6 +1616,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1943,6 +1947,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -2158,6 +2163,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2397,6 +2403,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0_copy": true,
   },
@@ -2699,6 +2706,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -3065,6 +3073,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -3539,6 +3548,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -3861,6 +3871,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -4185,6 +4196,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -5370,6 +5382,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -6496,6 +6509,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -7431,6 +7445,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8339,6 +8354,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -9235,6 +9251,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },

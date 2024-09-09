@@ -51,7 +51,8 @@ export type ShortcutName =
     >
   | "saveScene"
   | "imageExport"
-  | "commandPalette";
+  | "commandPalette"
+  | "searchMenu";
 
 const shortcutMap: Record<ShortcutName, string[]> = {
   toggleTheme: [getShortcutKey("Shift+Alt+D")],
@@ -112,6 +113,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   saveFileToDisk: [getShortcutKey("CtrlOrCmd+S")],
   saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
   toggleShortcuts: [getShortcutKey("?")],
+  searchMenu: [getShortcutKey("CtrlOrCmd+F")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {

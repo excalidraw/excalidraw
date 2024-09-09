@@ -5,6 +5,7 @@ import {
   CLASSES,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_WIDTH,
+  SEARCH_SIDEBAR,
   TOOL_TYPE,
 } from "../constants";
 import { showSelectedShapeActions } from "../element";
@@ -63,6 +64,7 @@ import { LaserPointerButton } from "./LaserPointerButton";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import { SearchSidebar } from "./SearchSidebar";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -99,6 +101,7 @@ const DefaultMainMenu: React.FC<{
       {UIOptions.canvasActions.saveAsImage && (
         <MainMenu.DefaultItems.SaveAsImage />
       )}
+      <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
@@ -362,16 +365,21 @@ const LayerUI = ({
 
   const renderSidebars = () => {
     return (
-      <DefaultSidebar
-        __fallback
-        onDock={(docked) => {
-          trackEvent(
-            "sidebar",
-            `toggleDock (${docked ? "dock" : "undock"})`,
-            `(${device.editor.isMobile ? "mobile" : "desktop"})`,
-          );
-        }}
-      />
+      <>
+        {appState.openSidebar?.name === SEARCH_SIDEBAR.name && (
+          <SearchSidebar />
+        )}
+        <DefaultSidebar
+          __fallback
+          onDock={(docked) => {
+            trackEvent(
+              "sidebar",
+              `toggleDock (${docked ? "dock" : "undock"})`,
+              `(${device.editor.isMobile ? "mobile" : "desktop"})`,
+            );
+          }}
+        />
+      </>
     );
   };
 

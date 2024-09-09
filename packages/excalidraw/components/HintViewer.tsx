@@ -13,6 +13,7 @@ import { isEraserActive } from "../appState";
 import "./HintViewer.scss";
 import { isNodeInFlowchart } from "../element/flowchart";
 import { isGridModeEnabled } from "../snapping";
+import { SEARCH_SIDEBAR } from "../constants";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -29,6 +30,13 @@ const getHints = ({
 }: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
+
+  if (
+    appState.openSidebar?.name === SEARCH_SIDEBAR.name &&
+    appState.searchMatches?.length
+  ) {
+    return t("hints.dismissSearch");
+  }
 
   if (appState.openSidebar && !device.editor.canFitSidebar) {
     return null;
