@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Tilbakestill lerretet",
     "exportJSON": "Eksporter til fil",
@@ -297,6 +304,7 @@
     "shapes": "Formar"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "Klikk for å starte linje med fleire punkt, eller drag for ei enkel linje",
     "arrowTool": "",
