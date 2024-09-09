@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "Выберите объект на холсте, чтобы добавить его сюда."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "Найти на холсте",
+    "noMatch": "Совпадения не найдены...",
+    "singleResult": "результат",
+    "multipleResults": "результаты",
+    "placeholder": "Найти текст..."
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
@@ -304,7 +304,7 @@
     "shapes": "Фигуры"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Отменить поиск",
     "canvasPanning": "Чтобы двигать холст, удерживайте колесо мыши или пробел во время перетаскивания, или используйте инструмент \"Рука\"",
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "arrowTool": "",
