@@ -203,6 +203,7 @@ const getRelevantAppStateProps = (
   editingTextElement: appState.editingTextElement,
   gridColor: appState.gridColor, //zsviczian
   highlightSearchResult: appState.highlightSearchResult, //zsviczian
+  searchMatches: appState.searchMatches,
 });
 
 const areEqual = (

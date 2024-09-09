@@ -76,7 +76,7 @@ vi.mock(
           const url = this.urls[0];
 
           if (url.protocol !== "file:") {
-            return super.getContent();
+            return super.getContent(new Set());
           }
 
           // read local assets directly, without running a server

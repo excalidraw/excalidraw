@@ -115,6 +115,7 @@ export const CLASSES = {
   SHAPE_ACTIONS_MOBILE_MENU: "App-mobile-menu", //zsviczian
   MOBILE_TOOLBAR: "App-toolbar-content", //zsviczian
   ZOOM_ACTIONS: "zoom-actions",
+  SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
 };
 
 /**
@@ -533,6 +534,10 @@ export const DEFAULT_SIDEBAR = {
   name: "default",
   defaultTab: LIBRARY_SIDEBAR_TAB,
 } as const;
+
+export const SEARCH_SIDEBAR = {
+  name: "search",
+};
 
 export const LIBRARY_DISABLED_TYPES = new Set([
   "iframe",

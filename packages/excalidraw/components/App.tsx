@@ -460,6 +460,7 @@ import {
   FlowChartNavigator,
   getLinkDirectionFromKey,
 } from "../element/flowchart";
+import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { point, pointDistance, vector, pointRotateRads } from "../../math";
 
@@ -568,6 +569,7 @@ class App extends React.Component<AppProps, AppState> {
   public scene: Scene;
   public fonts: Fonts;
   public renderer: Renderer;
+  public visibleElements: readonly NonDeletedExcalidrawElement[];
   private resizeObserver: ResizeObserver | undefined;
   private nearestScrollableContainer: HTMLElement | Document | undefined;
   public library: AppClassProperties["library"];
@@ -575,7 +577,7 @@ class App extends React.Component<AppProps, AppState> {
   public id: string;
   private store: Store;
   private history: History;
-  private excalidrawContainerValue: {
+  public excalidrawContainerValue: {
     container: HTMLDivElement | null;
     id: string;
   };
@@ -707,6 +709,7 @@ class App extends React.Component<AppProps, AppState> {
     this.canvas = document.createElement("canvas");
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
+    this.visibleElements = [];
 
     this.store = new Store();
     this.history = new History();
@@ -1550,6 +1553,7 @@ class App extends React.Component<AppProps, AppState> {
         newElementId: this.state.newElement?.id,
         pendingImageElementId: this.state.pendingImageElementId,
       });
+    this.visibleElements = visibleElements;
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -2404,6 +2408,9 @@ class App extends React.Component<AppProps, AppState> {
       storeAction: StoreAction.UPDATE,
     });
 
+    // clear the shape and image cache so that any images in initialData
+    // can be loaded fresh
+    this.clearImageShapeCache();
     // FontFaceSet loadingdone event we listen on may not always
     // fire (looking at you Safari), so on init we manually load all
     // fonts and rerender scene text elements once done. This also
@@ -2470,6 +2477,15 @@ class App extends React.Component<AppProps, AppState> {
     }
     return false;
   };
+
+  private clearImageShapeCache() {
+    this.scene.getNonDeletedElements().forEach((element) => {
+      if (isInitializedImageElement(element) && this.files[element.fileId]) {
+        this.imageCache.delete(element.fileId);
+        ShapeCache.delete(element);
+      }
+    });
+  }
 
   public async componentDidMount() {
     this.unmounted = false;
@@ -3917,15 +3933,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
-      this.scene.getNonDeletedElements().forEach((element) => {
-        if (
-          isInitializedImageElement(element) &&
-          filesMap.has(element.fileId)
-        ) {
-          this.imageCache.delete(element.fileId);
-          ShapeCache.delete(element);
-        }
-      });
+      this.clearImageShapeCache();
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
@@ -4144,7 +4152,7 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private getEditorUIOffsets = (): {
+  public getEditorUIOffsets = (): {
     top: number;
     right: number;
     bottom: number;
@@ -6464,6 +6472,16 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
+    if (this.state.searchMatches) {
+      this.setState((state) => ({
+        searchMatches: state.searchMatches.map((searchMatch) => ({
+          ...searchMatch,
+          focus: false,
+        })),
+      }));
+      jotaiStore.set(searchItemInFocusAtom, null);
+    }
+
     // since contextMenu options are potentially evaluated on each render,
     // and an contextMenu action may depend on selection state, we must
     // close the contextMenu before we update the selection on pointerDown
@@ -6898,8 +6916,16 @@ class App extends React.Component<AppProps, AppState> {
     }
     isPanning = true;
 
+    // due to event.preventDefault below, container wouldn't get focus
+    // automatically
+    this.focusContainer();
+
+    // preventing defualt while text editing messes with cursor/focus
     if (!this.state.editingTextElement) {
-      // preventing defualt while text editing messes with cursor/focus
+      // necessary to prevent browser from scrolling the page if excalidraw
+      // not full-page #4489
+      //
+      // as such, the above is broken when panning canvas while in wysiwyg
       event.preventDefault();
     }
 

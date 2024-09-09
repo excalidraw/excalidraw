@@ -10,6 +10,8 @@ import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryMenu } from "./LibraryMenu";
 import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 import { Sidebar } from "./Sidebar/Sidebar";
+import "../components/dropdownMenu/DropdownMenu.scss";
+import { t } from "../i18n";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",
@@ -68,8 +70,7 @@ export const DefaultSidebar = Object.assign(
       return (
         <Sidebar
           {...rest}
-          name="default"
-          key="default"
+          name={"default"}
           className={clsx("default-sidebar", className)}
           docked={docked ?? appState.defaultSidebarDockedPreference}
           onDock={
