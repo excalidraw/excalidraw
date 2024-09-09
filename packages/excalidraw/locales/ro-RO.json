@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici sau instalează o bibliotecă din depozitul public, de mai jos.",
     "hint_emptyPrivateLibrary": "Selectează un element de pe pânză pentru a-l adăuga aici."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Resetare pânză",
     "exportJSON": "Exportare la fișiere",
@@ -297,6 +304,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Pentru a muta pânză, ține apăsată rotița mausului sau bara de spațiu sau folosește instrumentul în formă de mână",
     "linearElement": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie",
     "arrowTool": "Dă clic pentru a crea mai multe puncte, glisează pentru a forma o singură linie. Apasă {{arrowShortcut}} din nou pentru a schimba tipul săgeții.",
