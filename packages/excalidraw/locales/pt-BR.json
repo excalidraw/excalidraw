@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Selecione um item na tela para adicioná-lo aqui, ou instale uma biblioteca do repositório público, abaixo.",
     "hint_emptyPrivateLibrary": "Selecione um item na tela para adicioná-lo aqui."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Limpar o canvas e redefinir a cor de fundo",
     "exportJSON": "Exportar arquivo",
@@ -297,6 +304,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Para mover a tela, segure a roda do mouse ou a barra de espaço enquanto arrasta ou use a ferramenta de mão",
     "linearElement": "Clique para iniciar vários pontos, arraste para uma única linha",
     "arrowTool": "",
