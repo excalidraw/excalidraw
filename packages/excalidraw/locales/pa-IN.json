@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "ਇੱਥੇ ਆਈਟਮ ਜੋੜਨ ਲਈ ਉਸਨੂੰ ਕੈਨਵਸ ‘ਤੇ ਚੁਣੋ, ਜਾਂ ਹੇਠਾਂ ਪਬਲਿਕ ਰਿਪਾਜ਼ੀਟਰੀ ‘ਚੋਂ ਲਾਇਬ੍ਰੇਰੀ ਸਥਾਪਤ ਕਰੋ।",
     "hint_emptyPrivateLibrary": "ਇੱਥੇ ਆਈਟਮ ਜੋੜਨ ਲਈ ਉਸਨੂੰ ਕੈਨਵਸ ‘ਤੇ ਚੁਣੋ।"
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "ਕੈਨਵਸ ਰੀਸੈੱਟ ਕਰੋ",
     "exportJSON": "ਫਾਈਲ ਵਿੱਚ ਨਿਰਯਾਤ ਕਰੋ",
@@ -297,6 +304,7 @@
     "shapes": "ਆਕ੍ਰਿਤੀਆਂ"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "ਇੱਕ ਤੋਂ ਜ਼ਿਆਦਾ ਬਿੰਦੂਆਂ ਲਈ ਕਲਿੱਕ ਕਰਕੇ ਸ਼ੁਰੂਆਤ ਕਰੋ, ਇਕਹਿਰੀ ਲਕੀਰ ਲਈ ਘਸੀਟੋ",
     "arrowTool": "",
