@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Vyberte položku na plátně a přidejte ji sem nebo nainstalujte knihovnu z veřejného úložiště níže.",
     "hint_emptyPrivateLibrary": "Vyberte položku na plátně a přidejte ji sem."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Resetovat plátno",
     "exportJSON": "Exportovat do souboru",
@@ -297,6 +304,7 @@
     "shapes": "Tvary"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Chcete-li přesunout plátno, podržte kolečko nebo mezerník při tažení nebo použijte nástroj Ruka",
     "linearElement": "Kliknutím pro více bodů, táhnutím pro jednu čáru",
     "arrowTool": "",
