@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Seleccione un elemento en el lienzo para añadirlo aquí, o instale una biblioteca del repositorio público, a continuación.",
     "hint_emptyPrivateLibrary": "Seleccione un elemento del lienzo para añadirlo aquí."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Limpiar lienzo y reiniciar el color de fondo",
     "exportJSON": "Exportar a archivo",
@@ -297,6 +304,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Para mover el lienzo, mantenga la rueda del ratón o la barra espaciadora mientras arrastra o utilice la herramienta de mano",
     "linearElement": "Haz clic para dibujar múltiples puntos, arrastrar para solo una línea",
     "arrowTool": "",
