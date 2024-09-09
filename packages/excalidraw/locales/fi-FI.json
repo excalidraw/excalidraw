@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Valitse lisättävä kohde piirtoalueelta, tai asenna alta julkinen kirjasto.",
     "hint_emptyPrivateLibrary": "Valitse lisättävä kohde piirtoalueelta."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Tyhjennä piirtoalue",
     "exportJSON": "Vie tiedostoon",
@@ -297,6 +304,7 @@
     "shapes": "Muodot"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Piirtoalueen liikuttamiseksi pidä hiiren pyörää tai välilyöntiä pohjassa tai käytä käsityökalua",
     "linearElement": "Klikkaa piirtääksesi useampi piste, raahaa piirtääksesi yksittäinen viiva",
     "arrowTool": "",
