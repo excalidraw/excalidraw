@@ -76,11 +76,12 @@ export class API {
     });
   };
 
-  static updateElement = (
-    ...[element, updates]: Parameters<typeof mutateElement>
+  // eslint-disable-next-line prettier/prettier
+  static updateElement = <T extends ExcalidrawElement>(
+    ...args: Parameters<typeof mutateElement<T>>
   ) => {
     act(() => {
-      mutateElement(element, updates);
+      mutateElement<T>(...args);
     });
   };
 

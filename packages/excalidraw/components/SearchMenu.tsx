@@ -10,8 +10,6 @@ import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
 import { addEventListener, getFontString } from "../utils";
 import { KEYS } from "../keys";
-
-import "./SearchMenu.scss";
 import clsx from "clsx";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
@@ -20,6 +18,8 @@ import { isElementCompletelyInViewport } from "../element/sizeHelpers";
 import { randomInteger } from "../random";
 import { CLASSES, EVENT } from "../constants";
 import { useStable } from "../hooks/useStable";
+
+import "./SearchMenu.scss";
 
 const searchKeywordAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
@@ -229,6 +229,7 @@ export const SearchMenu = () => {
             });
           }
           searchInputRef.current?.focus();
+          searchInputRef.current?.select();
         } else {
           setAppState({
             openSidebar: null,
@@ -264,16 +265,6 @@ export const SearchMenu = () => {
     });
   }, [setAppState, stableState, app]);
 
-  /**
-   * NOTE:
-   *
-   * for testing purposes, we're manually focusing instead of
-   * setting `selectOnRender` on <TextField>
-   */
-  useEffect(() => {
-    searchInputRef.current?.focus();
-  }, []);
-
   const matchCount = `${searchMatches.items.length} ${
     searchMatches.items.length === 1
       ? t("search.singleResult")
@@ -292,6 +283,7 @@ export const SearchMenu = () => {
           onChange={(value) => {
             setKeyword(value);
           }}
+          selectOnRender
         />
       </div>
 
