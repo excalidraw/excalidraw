@@ -264,6 +264,16 @@ export const SearchMenu = () => {
     });
   }, [setAppState, stableState, app]);
 
+  /**
+   * NOTE:
+   *
+   * for testing purposes, we're manually focusing instead of
+   * setting `selectOnRender` on <TextField>
+   */
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, []);
+
   const matchCount = `${searchMatches.items.length} ${
     searchMatches.items.length === 1
       ? t("search.singleResult")
@@ -282,7 +292,6 @@ export const SearchMenu = () => {
           onChange={(value) => {
             setKeyword(value);
           }}
-          selectOnRender
         />
       </div>
 
