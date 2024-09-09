@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi, neɣ sbedd tamkarḍit seg usarsay azayez, ukessar-agi.",
     "hint_emptyPrivateLibrary": "Fren aferdis di teɣzut nusuneɣ akken at-ternuḍ dagi."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Ales awennez n teɣzut n usuneɣ",
     "exportJSON": "Sifeḍ afaylu",
@@ -297,6 +304,7 @@
     "shapes": "Talɣiwin"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Akken ad tesmuttiḍ taɣzut n usuneɣ, ṭṭef ṛṛuda n umumed, neɣ seqdec afecku Afus",
     "linearElement": "Ssit akken ad tebduḍ aṭas n tenqiḍin, zuɣer i yiwen n yizirig",
     "arrowTool": "",
