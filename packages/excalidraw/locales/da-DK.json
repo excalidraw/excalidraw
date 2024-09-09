@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "",
     "exportJSON": "",
@@ -297,6 +304,7 @@
     "shapes": ""
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "",
     "arrowTool": "",
