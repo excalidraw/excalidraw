@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   useApp,
   useAppProps,
@@ -30,7 +30,7 @@ import {
 } from "../icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../context/ui-appState";
-import type { AppProps, AppState, UIAppState } from "../../types";
+import type { AppProps, AppState, LibraryItem, UIAppState } from "../../types";
 import {
   capitalizeString,
   getShortcutKey,
@@ -44,14 +44,22 @@ import { SHAPES } from "../../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { actionClearCanvas, actionLink } from "../../actions";
-import { jotaiStore } from "../../jotai";
+import { jotaiScope, jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import type { CommandPaletteItem } from "./types";
 import * as defaultItems from "./defaultCommandPaletteItems";
 import { trackEvent } from "../../analytics";
 import { useStable } from "../../hooks/useStable";
+import {
+  distributeLibraryItemsOnSquareGrid,
+  libraryItemsAtom,
+} from "../../data/library";
 
 import "./CommandPalette.scss";
+import {
+  useLibraryCache,
+  useLibraryItemSvg,
+} from "../../hooks/useLibraryItemSvg";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 
@@ -62,6 +70,7 @@ export const DEFAULT_CATEGORIES = {
   editor: "Editor",
   elements: "Elements",
   links: "Links",
+  library: "Library",
 };
 
 const getCategoryOrder = (category: string) => {
@@ -188,6 +197,31 @@ function CommandPaletteInner({
     customCommandPaletteItems,
     appProps,
   });
+
+  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const libraryCommands: CommandPaletteItem[] = useMemo(
+    () =>
+      libraryItemsData.libraryItems
+        ?.filter((libraryItem) => !!libraryItem.name)
+        .map((libraryItem) => ({
+          label: libraryItem.name ?? "Unknown Library Item",
+          icon: (
+            <LibraryItemIcon
+              id={libraryItem.id}
+              elements={libraryItem.elements}
+            />
+          ),
+          category: "Library",
+          order: getCategoryOrder("Library"),
+          haystack: deburr(libraryItem.name ?? "Unknown Library Item"),
+          perform: () => {
+            app.onInsertElements(
+              distributeLibraryItemsOnSquareGrid([libraryItem]),
+            );
+          },
+        })) || [],
+    [app, libraryItemsData.libraryItems],
+  );
 
   useEffect(() => {
     // these props change often and we don't want them to re-run the effect
@@ -548,8 +582,9 @@ function CommandPaletteInner({
 
       setAllCommands(allCommands);
       setLastUsed(
-        allCommands.find((command) => command.label === lastUsed?.label) ??
-          null,
+        [...allCommands, ...libraryCommands].find(
+          (command) => command.label === lastUsed?.label,
+        ) ?? null,
       );
     }
   }, [
@@ -560,6 +595,7 @@ function CommandPaletteInner({
     lastUsed?.label,
     setLastUsed,
     setAppState,
+    libraryCommands,
   ]);
 
   const [commandSearch, setCommandSearch] = useState("");
@@ -756,9 +792,12 @@ function CommandPaletteInner({
       return nextCommandsByCategory;
     };
 
-    let matchingCommands = allCommands
-      .filter(isCommandAvailable)
-      .sort((a, b) => a.order - b.order);
+    let matchingCommands =
+      commandSearch?.length > 1
+        ? [...allCommands, ...libraryCommands]
+        : allCommands
+            .filter(isCommandAvailable)
+            .sort((a, b) => a.order - b.order);
 
     const showLastUsed =
       !commandSearch && lastUsed && isCommandAvailable(lastUsed);
@@ -782,14 +821,20 @@ function CommandPaletteInner({
     );
     matchingCommands = fuzzy
       .filter(_query, matchingCommands, {
-        extract: (command) => command.haystack,
+        extract: (command) => command.haystack ?? "",
       })
       .sort((a, b) => b.score - a.score)
       .map((item) => item.original);
 
     setCommandsByCategory(getNextCommandsByCategory(matchingCommands));
     setCurrentCommand(matchingCommands[0] ?? null);
-  }, [commandSearch, allCommands, isCommandAvailable, lastUsed]);
+  }, [
+    commandSearch,
+    allCommands,
+    isCommandAvailable,
+    lastUsed,
+    libraryCommands,
+  ]);
 
   return (
     <Dialog
@@ -880,6 +925,35 @@ function CommandPaletteInner({
   );
 }
 
+const LibraryItemIcon = ({
+  id,
+  elements,
+}: {
+  id: LibraryItem["id"] | null;
+  elements: LibraryItem["elements"] | undefined;
+}) => {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { svgCache } = useLibraryCache();
+  const svg = useLibraryItemSvg(id, elements, svgCache);
+
+  useEffect(() => {
+    const node = ref.current;
+
+    if (!node) {
+      return;
+    }
+
+    if (svg) {
+      node.innerHTML = svg.outerHTML;
+    }
+
+    return () => {
+      node.innerHTML = "";
+    };
+  }, [svg]);
+  return <div className="library-item-icon" ref={ref} />;
+};
+
 const CommandItem = ({
   command,
   isSelected,
@@ -919,6 +993,7 @@ const CommandItem = ({
       <div className="name">
         {command.icon && (
           <InlineIcon
+            className="icon"
             icon={
               typeof command.icon === "function"
                 ? command.icon(appState)
