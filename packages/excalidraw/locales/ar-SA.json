@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "حدد عنصر على القماش لإضافته هنا، أو تثبيت مكتبة من المستودع العام أدناه.",
     "hint_emptyPrivateLibrary": "حدد عنصر على القماش لإضافته هنا."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
     "exportJSON": "صدر الملف",
@@ -297,6 +304,7 @@
     "shapes": "الأشكال"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "لتحريك القماش، اضغط على عجلة الفأرة أو مفتاح المسافة أثناء السحب، أو استخدم أداة اليد",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
     "arrowTool": "",
