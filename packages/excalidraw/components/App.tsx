@@ -5073,6 +5073,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private startImageCropping = (image: ExcalidrawImageElement) => {
+    this.setState({
+      croppingElement: image,
+      isCropping: true,
+    });
+  };
+
+  private finishImageCropping = () => {
+    this.setState({
+      isCropping: false,
+      croppingElement: null,
+    });
+  };
+
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
@@ -5102,6 +5116,11 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
+    }
+
+    if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
+      this.startImageCropping(selectedElements[0]);
+      return;
     }
 
     resetCursor(this.interactiveCanvas);

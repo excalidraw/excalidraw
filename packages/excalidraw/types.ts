@@ -384,6 +384,10 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+
+  /** image cropping */
+  isCropping: boolean;
+  croppingElement: ExcalidrawImageElement | null;
 }
 
 export type UIAppState = Omit<
