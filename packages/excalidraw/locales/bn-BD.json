@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন, অথবা নীচে, প্রকাশ্য সংগ্রহশালা থেকে একটি সংগ্রহ ইনস্টল করুন৷",
     "hint_emptyPrivateLibrary": "এখানে যোগ করার জন্য ক্যানভাসে একটি বস্তু নির্বাচন করুন"
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "ক্যানভাস সাফ করুন",
     "exportJSON": "জেসন নিবদ্ধ করুন",
@@ -297,6 +304,7 @@
     "shapes": "আকার(গুলি)"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "একাধিক বিন্দু শুরু করতে ক্লিক করুন, একক লাইনের জন্য টেনে আনুন",
     "arrowTool": "",
