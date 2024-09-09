@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "ជ្រើសរើសធាតុនៅលើបាវដើម្បីបន្ថែមវានៅទីនេះ ឬដំឡើងបណ្ណាល័យពីឃ្លាំងសាធារណៈខាងក្រោម។",
     "hint_emptyPrivateLibrary": "ជ្រើសរើសធាតុនៅលើបាវដើម្បីបន្ថែមវានៅទីនេះ"
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "កំណត់បាវឡើងវិញ",
     "exportJSON": "នាំចេញជាឯកសារ",
@@ -297,6 +304,7 @@
     "shapes": "រាង"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "ដើម្បីផ្លាស់ទីបាវ សូមសង្កត់កង់កណ្ដុរឬគ្រាប់ចុចspacebarខណៈពេលកំពុងអូស ឬប្រើឧបករណ៍ដៃ។",
     "linearElement": "ចុចដើម្បីបង្កើតចំណុចច្រើន អូសដើម្បីបង្កើតបន្ទាត់មួយ",
     "arrowTool": "",
