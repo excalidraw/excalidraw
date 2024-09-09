@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
     "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "重置画布",
     "exportJSON": "导出为文件",
@@ -297,6 +304,7 @@
     "shapes": "形状"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键同时拖拽鼠标，或使用抓手工具。",
     "linearElement": "点击创建多个点 拖动创建直线",
     "arrowTool": "点击创建多个点，拖动创建直线。按 {{arrowShortcut}} 切换箭头类型。",
