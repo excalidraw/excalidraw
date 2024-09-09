@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useRef, useState } from "react";
 import { collapseDownIcon, upIcon, searchIcon } from "./icons";
 import { TextField } from "./TextField";
 import { Button } from "./Button";
@@ -376,7 +376,9 @@ const ListItem = (props: {
       }}
     >
       <div className="preview-text">
-        {preview.flatMap((text, idx) => (idx === 2 ? <b>{text}</b> : text))}
+        {preview.flatMap((text, idx) => (
+          <Fragment key={idx}>{idx === 2 ? <b>{text}</b> : text}</Fragment>
+        ))}
       </div>
     </div>
   );
