@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Selecteer een item op het canvas om het hier toe te voegen of installeer een bibliotheek uit de openbare repository, hieronder.",
     "hint_emptyPrivateLibrary": "Selecteer een item op het canvas om het hier toe te voegen."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Canvas opnieuw instellen",
     "exportJSON": "Exporteren naar bestand",
@@ -297,6 +304,7 @@
     "shapes": "Vormen"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Om de canvas te verplaatsen, houd muiswiel of spatiebalk ingedrukt tijdens slepen, of gebruik het handgereedschap",
     "linearElement": "Klik om meerdere punten te starten, sleep voor één lijn",
     "arrowTool": "",
