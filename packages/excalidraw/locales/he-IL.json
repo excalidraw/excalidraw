@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "בחר משהו בקנבס כדי להוסיף אותו לכאן, או שתתקין ספריה מהספריה הציבורית מטה.",
     "hint_emptyPrivateLibrary": "בחר משהו בקנבס כדי להוסיף אותו לכאן."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "אפס את הקנבאס",
     "exportJSON": "ייצא לקובץ",
@@ -297,6 +304,7 @@
     "shapes": "צורות"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "כדי להזיז את הקנבס, החזק את גלגל העכבר לחוץ או את מקש הרווח לחוץ תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
     "arrowTool": "לחצו כדי ליצור מספר נקודות, משכו כדי ליצור קו בודד. לחצו על {{arrowShortcut}} שוב כדי לשנות את סוג החץ.",
