@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "キャンバス上のアイテムを選択してここに追加するか、以下の公開リポジトリからライブラリをインストールしてください。",
     "hint_emptyPrivateLibrary": "キャンバス上のアイテムを選択すると、ここに追加されます。"
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "キャンバスのリセット",
     "exportJSON": "ファイルへエクスポート",
@@ -297,6 +304,7 @@
     "shapes": "図形"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "キャンバスを移動するには、マウスホイールまたはスペースバーを押しながらドラッグするか、手ツールを使用します",
     "linearElement": "クリックすると複数の頂点からなる曲線を開始、ドラッグすると直線",
     "arrowTool": "",
