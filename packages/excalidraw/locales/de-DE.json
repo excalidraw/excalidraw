@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
     "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
     "exportJSON": "In Datei exportieren",
@@ -297,6 +304,7 @@
     "shapes": "Formen"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens, oder verwende das Hand-Werkzeug",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "arrowTool": "Klicken, um mit mehreren Punkten zu starten, ziehen für eine einzelne Linie. Drücke {{arrowShortcut}} erneut, um den Pfeiltyp zu ändern.",
