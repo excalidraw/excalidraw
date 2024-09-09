@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "ကားချပ်ရှင်းလင်း",
     "exportJSON": "",
@@ -297,6 +304,7 @@
     "shapes": "ပုံသဏ္ဌာန်များ"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "အမှတ်များချမှတ်ရေးဆွဲရန်ကလစ်နှိပ်ပါ၊ မျဉ်းတစ်ကြောင်းတည်းအတွက် တရွတ်ဆွဲပါ။",
     "arrowTool": "",
