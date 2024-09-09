@@ -30,8 +30,12 @@ import {
   shouldShowBoundingBox,
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import type { InteractiveCanvasAppState } from "../types";
-import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  FRAME_STYLE,
+  THEME,
+} from "../constants";
+import { type InteractiveCanvasAppState } from "../types";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
@@ -952,9 +956,48 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
+  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+    const element = elementsMap.get(id);
+
+    if (element && isTextElement(element)) {
+      const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
+        element,
+        elementsMap,
+        true,
+      );
+
+      context.save();
+      if (appState.theme === THEME.LIGHT) {
+        if (focus) {
+          context.fillStyle = "rgba(255, 124, 0, 0.4)";
+        } else {
+          context.fillStyle = "rgba(255, 226, 0, 0.4)";
+        }
+      } else if (focus) {
+        context.fillStyle = "rgba(229, 82, 0, 0.4)";
+      } else {
+        context.fillStyle = "rgba(99, 52, 0, 0.4)";
+      }
+
+      context.translate(appState.scrollX, appState.scrollY);
+      context.translate(cx, cy);
+      context.rotate(element.angle);
+
+      matchedLines.forEach((matchedLine) => {
+        context.fillRect(
+          elementX1 + matchedLine.offsetX - cx,
+          elementY1 + matchedLine.offsetY - cy,
+          matchedLine.width,
+          matchedLine.height,
+        );
+      });
+
+      context.restore();
+    }
+  });
+
   renderSnaps(context, appState);
 
-  // Reset zoom
   context.restore();
 
   renderRemoteCursors({
