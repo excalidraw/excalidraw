@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "",
     "hint_emptyPrivateLibrary": ""
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "รีเซ็ทผืนผ้าใบ",
     "exportJSON": "ส่งออกไปยังไฟล์",
@@ -297,6 +304,7 @@
     "shapes": "รูปร่าง"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "",
     "arrowTool": "",
