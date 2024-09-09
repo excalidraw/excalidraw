@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Öğelerden birini eklemek için öğeyi seçiniz veya aşağıdaki genel kütüphaneden öğeleri ekleyin.",
     "hint_emptyPrivateLibrary": "Tuvalden bir eleman seçerek sayfaya ekleyin."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Tuvali sıfırla",
     "exportJSON": "Dosyaya aktar",
@@ -297,6 +304,7 @@
     "shapes": "Şekiller"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Tuvali taşımak için sürüklerken fare tekerleğine veya boşluk çubuğuna basılı tutun veya el aracını kullanın",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "arrowTool": "",
