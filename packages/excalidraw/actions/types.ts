@@ -138,7 +138,8 @@ export type ActionName =
   | "toggleLaserPointerTool" //zsviczian
   | "commandPalette"
   | "autoResize"
-  | "elementStats";
+  | "elementStats"
+  | "searchMenu";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -192,7 +193,8 @@ export interface Action {
           | "history"
           | "menu"
           | "collab"
-          | "hyperlink";
+          | "hyperlink"
+          | "search_menu";
         action?: string;
         predicate?: (
           appState: Readonly<AppState>,
