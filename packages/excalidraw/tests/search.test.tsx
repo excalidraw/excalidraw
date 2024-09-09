@@ -1,11 +1,12 @@
 import React from "react";
 import { render, waitFor } from "./test-utils";
-import { Excalidraw } from "../index";
+import { Excalidraw, mutateElement } from "../index";
 import { CLASSES, SEARCH_SIDEBAR } from "../constants";
 import { Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { updateTextEditor } from "./queries/dom";
 import { API } from "./helpers/api";
+import { ExcalidrawTextElement } from "../element/types";
 
 const { h } = window;
 
@@ -95,5 +96,48 @@ describe("search", () => {
     Keyboard.keyPress(KEYS.ENTER, searchInput);
     expect(h.app.state.searchMatches[0].focus).toBe(true);
     expect(h.app.state.searchMatches[1].focus).toBe(false);
+  });
+
+  it("should match text split across multiple lines", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    API.setElements([
+      API.createElement({
+        type: "text",
+        text: "",
+      }),
+    ]);
+
+    mutateElement(h.elements[0] as ExcalidrawTextElement, {
+      text: "t\ne\ns\nt \nt\ne\nx\nt \ns\np\nli\nt \ni\nn\nt\no\nm\nu\nlt\ni\np\nl\ne \nli\nn\ne\ns",
+      originalText: "test text split into multiple lines",
+    });
+
+    expect(h.app.state.openSidebar).toBeNull();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+    expect(h.app.state.openSidebar).not.toBeNull();
+    expect(h.app.state.openSidebar?.name).toBe(SEARCH_SIDEBAR.name);
+
+    const searchInput = await querySearchInput();
+
+    expect(searchInput.matches(":focus")).toBe(true);
+
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches.length).toBe(1);
+      expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(4);
+    });
+
+    updateTextEditor(searchInput, "ext spli");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches.length).toBe(1);
+      expect(h.app.state.searchMatches[0]?.matchedLines?.length).toBe(6);
+    });
   });
 });
