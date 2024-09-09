@@ -1,6 +1,6 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
-import { Excalidraw, mutateElement } from "../index";
+import { act, render, waitFor } from "./test-utils";
+import { Excalidraw } from "../index";
 import { CLASSES, SEARCH_SIDEBAR } from "../constants";
 import { Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
@@ -22,7 +22,7 @@ const querySearchInput = async () => {
 describe("search", () => {
   beforeEach(async () => {
     await render(<Excalidraw handleKeyboardGlobally />);
-    h.setState({
+    API.setAppState({
       openSidebar: null,
     });
   });
@@ -50,7 +50,9 @@ describe("search", () => {
         `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
       );
 
-    searchInput?.blur();
+    act(() => {
+      searchInput?.blur();
+    });
 
     expect(h.app.state.openSidebar).not.toBeNull();
     expect(searchInput?.matches(":focus")).toBe(false);
@@ -109,7 +111,7 @@ describe("search", () => {
       }),
     ]);
 
-    mutateElement(h.elements[0] as ExcalidrawTextElement, {
+    API.updateElement(h.elements[0] as ExcalidrawTextElement, {
       text: "t\ne\ns\nt \nt\ne\nx\nt \ns\np\nli\nt \ni\nn\nt\no\nm\nu\nlt\ni\np\nl\ne \nli\nn\ne\ns",
       originalText: "test text split into multiple lines",
     });
