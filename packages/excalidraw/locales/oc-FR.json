@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Seleccionatz un element d’apondre aquí, o installatz una bibliotèca del depaus public, çai-jos.",
     "hint_emptyPrivateLibrary": "Seleccionatz un element d’apondre aquí pel canabàs."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Reïnicializar lo canabàs",
     "exportJSON": "Exportar en fichièr",
@@ -297,6 +304,7 @@
     "shapes": "Formas"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "",
     "linearElement": "Clicatz per començar mantun punt, lisatz per una sola linha",
     "arrowTool": "",
