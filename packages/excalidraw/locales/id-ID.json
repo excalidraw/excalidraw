@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini, atau pasang pustaka dari gudang di bawah ini.",
     "hint_emptyPrivateLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
     "exportJSON": "Ekspor ke file",
@@ -297,6 +304,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "arrowTool": "",
