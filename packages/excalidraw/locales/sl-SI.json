@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Izberite element na platnu, da ga dodate sem, ali namestite knjižnico iz javnega skladišča spodaj.",
     "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Ponastavi platno",
     "exportJSON": "Izvozi v datoteko",
@@ -297,6 +304,7 @@
     "shapes": "Oblike"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "arrowTool": "Kliknite za začetek več točk, povlecite za eno črto. Ponovno pritisnite {{arrowShortcut}}, da spremenite vrsto puščice.",
