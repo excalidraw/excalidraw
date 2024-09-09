@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui, o installa una libreria dal repository pubblico qui sotto.",
     "hint_emptyPrivateLibrary": "Seleziona un elemento sulla tela per aggiungerlo qui."
   },
+  "search": {
+    "title": "",
+    "noMatch": "",
+    "singleResult": "",
+    "multipleResults": "",
+    "placeholder": ""
+  },
   "buttons": {
     "clearReset": "Svuota la tela",
     "exportJSON": "Esporta su file",
@@ -297,6 +304,7 @@
     "shapes": "Forme"
   },
   "hints": {
+    "dismissSearch": "",
     "canvasPanning": "Per spostare la tela, tieni premuta la rotellina del mouse o la barra spaziatrice mentre trascini oppure usa lo strumento mano",
     "linearElement": "Clicca per iniziare una linea in più punti, trascina per singola linea",
     "arrowTool": "",
