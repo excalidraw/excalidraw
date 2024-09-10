@@ -21,17 +21,17 @@ import { useStable } from "../hooks/useStable";
 
 import "./SearchMenu.scss";
 
-const searchKeywordAtom = atom<string>("");
+const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
 
 const SEARCH_DEBOUNCE = 350;
 
 type SearchMatchItem = {
   textElement: ExcalidrawTextElement;
-  keyword: string;
+  searchQuery: SearchQuery;
   index: number;
   preview: {
-    indexInKeyword: number;
+    indexInSearchQuery: number;
     previewText: string;
     moreBefore: boolean;
     moreAfter: boolean;
@@ -49,19 +49,25 @@ type SearchMatches = {
   items: SearchMatchItem[];
 };
 
+type SearchQuery = string & { _brand: "SearchQuery" };
+
 export const SearchMenu = () => {
   const app = useApp();
   const setAppState = useExcalidrawSetAppState();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const [keyword, setKeyword] = useAtom(searchKeywordAtom, jotaiScope);
+  const [inputValue, setInputValue] = useAtom(searchQueryAtom, jotaiScope);
+  const searchQuery = inputValue.trim() as SearchQuery;
+
+  const [isSearching, setIsSearching] = useState(false);
+
   const [searchMatches, setSearchMatches] = useState<SearchMatches>({
     nonce: null,
     items: [],
   });
-  const searchedKeywordRef = useRef<string | null>();
-  const lastSceneNonceRef = useRef<number | undefined>();
+  const searchedQueryRef = useRef<SearchQuery | null>(null);
+  const lastSceneNonceRef = useRef<number | undefined>(undefined);
 
   const [focusIndex, setFocusIndex] = useAtom(
     searchItemInFocusAtom,
@@ -70,19 +76,20 @@ export const SearchMenu = () => {
   const elementsMap = app.scene.getNonDeletedElementsMap();
 
   useEffect(() => {
-    const trimmedKeyword = keyword.trim();
+    if (isSearching) {
+      return;
+    }
     if (
-      trimmedKeyword !== searchedKeywordRef.current ||
+      searchQuery !== searchedQueryRef.current ||
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
-      searchedKeywordRef.current = null;
-      handleSearch(trimmedKeyword, app, (matchItems, index) => {
+      searchedQueryRef.current = null;
+      handleSearch(searchQuery, app, (matchItems, index) => {
         setSearchMatches({
           nonce: randomInteger(),
           items: matchItems,
         });
-        setFocusIndex(index);
-        searchedKeywordRef.current = trimmedKeyword;
+        searchedQueryRef.current = searchQuery;
         lastSceneNonceRef.current = app.scene.getSceneNonce();
         setAppState({
           searchMatches: matchItems.map((searchMatch) => ({
@@ -94,7 +101,8 @@ export const SearchMenu = () => {
       });
     }
   }, [
-    keyword,
+    isSearching,
+    searchQuery,
     elementsMap,
     app,
     setAppState,
@@ -129,17 +137,33 @@ export const SearchMenu = () => {
   };
 
   useEffect(() => {
+    setAppState((state) => {
+      return {
+        searchMatches: state.searchMatches.map((match, index) => {
+          if (index === focusIndex) {
+            return { ...match, focus: true };
+          }
+          return { ...match, focus: false };
+        }),
+      };
+    });
+  }, [focusIndex, setAppState]);
+
+  useEffect(() => {
     if (searchMatches.items.length > 0 && focusIndex !== null) {
       const match = searchMatches.items[focusIndex];
 
       if (match) {
         const matchAsElement = newTextElement({
-          text: match.keyword,
+          text: match.searchQuery,
           x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
           y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
         });
+
+        const isTextTiny =
+          match.textElement.fontSize * app.state.zoom.value < 12;
 
         if (
           !isElementCompletelyInViewport(
@@ -155,45 +179,36 @@ export const SearchMenu = () => {
             },
             app.scene.getNonDeletedElementsMap(),
             app.getEditorUIOffsets(),
-          )
+          ) ||
+          isTextTiny
         ) {
+          let zoomOptions: Parameters<AppClassProperties["scrollToContent"]>[1];
+
+          if (isTextTiny && app.state.zoom.value >= 1) {
+            zoomOptions = { fitToViewport: true };
+          } else if (isTextTiny || app.state.zoom.value > 1) {
+            zoomOptions = { fitToContent: true };
+          }
+
           app.scrollToContent(matchAsElement, {
-            fitToContent: true,
             animate: true,
             duration: 300,
+            ...zoomOptions,
           });
         }
-
-        const nextMatches = searchMatches.items.map((match, index) => {
-          if (index === focusIndex) {
-            return {
-              id: match.textElement.id,
-              focus: true,
-              matchedLines: match.matchedLines,
-            };
-          }
-          return {
-            id: match.textElement.id,
-            focus: false,
-            matchedLines: match.matchedLines,
-          };
-        });
-
-        setAppState({
-          searchMatches: nextMatches,
-        });
       }
     }
-  }, [app, focusIndex, searchMatches, setAppState]);
+  }, [focusIndex, searchMatches, app]);
 
   useEffect(() => {
     return () => {
       setFocusIndex(null);
-      searchedKeywordRef.current = null;
+      searchedQueryRef.current = null;
       lastSceneNonceRef.current = undefined;
       setAppState({
         searchMatches: [],
       });
+      setIsSearching(false);
     };
   }, [setAppState, setFocusIndex]);
 
@@ -276,12 +291,32 @@ export const SearchMenu = () => {
       <div className="layer-ui__search-header">
         <TextField
           className={CLASSES.SEARCH_MENU_INPUT_WRAPPER}
-          value={keyword}
+          value={inputValue}
           ref={searchInputRef}
           placeholder={t("search.placeholder")}
           icon={searchIcon}
           onChange={(value) => {
-            setKeyword(value);
+            setInputValue(value);
+            setIsSearching(true);
+            const searchQuery = value.trim() as SearchQuery;
+            handleSearch(searchQuery, app, (matchItems, index) => {
+              setSearchMatches({
+                nonce: randomInteger(),
+                items: matchItems,
+              });
+              setFocusIndex(index);
+              searchedQueryRef.current = searchQuery;
+              lastSceneNonceRef.current = app.scene.getSceneNonce();
+              setAppState({
+                searchMatches: matchItems.map((searchMatch) => ({
+                  id: searchMatch.textElement.id,
+                  focus: false,
+                  matchedLines: searchMatch.matchedLines,
+                })),
+              });
+
+              setIsSearching(false);
+            });
           }}
           selectOnRender
         />
@@ -319,8 +354,8 @@ export const SearchMenu = () => {
         )}
 
         {searchMatches.items.length === 0 &&
-          keyword &&
-          searchedKeywordRef.current && (
+          searchQuery &&
+          searchedQueryRef.current && (
             <div style={{ margin: "1rem auto" }}>{t("search.noMatch")}</div>
           )}
       </div>
@@ -329,7 +364,7 @@ export const SearchMenu = () => {
         matches={searchMatches}
         onItemClick={setFocusIndex}
         focusIndex={focusIndex}
-        trimmedKeyword={keyword.trim()}
+        searchQuery={searchQuery}
       />
     </div>
   );
@@ -337,19 +372,19 @@ export const SearchMenu = () => {
 
 const ListItem = (props: {
   preview: SearchMatchItem["preview"];
-  trimmedKeyword: string;
+  searchQuery: SearchQuery;
   highlighted: boolean;
   onClick?: () => void;
 }) => {
   const preview = [
     props.preview.moreBefore ? "..." : "",
-    props.preview.previewText.slice(0, props.preview.indexInKeyword),
+    props.preview.previewText.slice(0, props.preview.indexInSearchQuery),
     props.preview.previewText.slice(
-      props.preview.indexInKeyword,
-      props.preview.indexInKeyword + props.trimmedKeyword.length,
+      props.preview.indexInSearchQuery,
+      props.preview.indexInSearchQuery + props.searchQuery.length,
     ),
     props.preview.previewText.slice(
-      props.preview.indexInKeyword + props.trimmedKeyword.length,
+      props.preview.indexInSearchQuery + props.searchQuery.length,
     ),
     props.preview.moreAfter ? "..." : "",
   ];
@@ -380,7 +415,7 @@ interface MatchListProps {
   matches: SearchMatches;
   onItemClick: (index: number) => void;
   focusIndex: number | null;
-  trimmedKeyword: string;
+  searchQuery: SearchQuery;
 }
 
 const MatchListBase = (props: MatchListProps) => {
@@ -389,7 +424,7 @@ const MatchListBase = (props: MatchListProps) => {
       {props.matches.items.map((searchMatch, index) => (
         <ListItem
           key={searchMatch.textElement.id + searchMatch.index}
-          trimmedKeyword={props.trimmedKeyword}
+          searchQuery={props.searchQuery}
           preview={searchMatch.preview}
           highlighted={index === props.focusIndex}
           onClick={() => props.onItemClick(index)}
@@ -408,24 +443,27 @@ const areEqual = (prevProps: MatchListProps, nextProps: MatchListProps) => {
 
 const MatchList = memo(MatchListBase, areEqual);
 
-const getMatchPreview = (text: string, index: number, keyword: string) => {
+const getMatchPreview = (
+  text: string,
+  index: number,
+  searchQuery: SearchQuery,
+) => {
   const WORDS_BEFORE = 2;
   const WORDS_AFTER = 5;
 
-  const substrBeforeKeyword = text.slice(0, index);
-  const wordsBeforeKeyword = substrBeforeKeyword.split(/\s+/);
-  // text = "small", keyword = "mall", not complete before
-  // text = "small", keyword = "smal", complete before
-  const isKeywordCompleteBefore = substrBeforeKeyword.endsWith(" ");
+  const substrBeforeQuery = text.slice(0, index);
+  const wordsBeforeQuery = substrBeforeQuery.split(/\s+/);
+  // text = "small", query = "mall", not complete before
+  // text = "small", query = "smal", complete before
+  const isQueryCompleteBefore = substrBeforeQuery.endsWith(" ");
   const startWordIndex =
-    wordsBeforeKeyword.length -
+    wordsBeforeQuery.length -
     WORDS_BEFORE -
     1 -
-    (isKeywordCompleteBefore ? 0 : 1);
+    (isQueryCompleteBefore ? 0 : 1);
   let wordsBeforeAsString =
-    wordsBeforeKeyword
-      .slice(startWordIndex <= 0 ? 0 : startWordIndex)
-      .join(" ") + (isKeywordCompleteBefore ? " " : "");
+    wordsBeforeQuery.slice(startWordIndex <= 0 ? 0 : startWordIndex).join(" ") +
+    (isQueryCompleteBefore ? " " : "");
 
   const MAX_ALLOWED_CHARS = 20;
 
@@ -434,21 +472,21 @@ const getMatchPreview = (text: string, index: number, keyword: string) => {
       ? wordsBeforeAsString.slice(-MAX_ALLOWED_CHARS)
       : wordsBeforeAsString;
 
-  const substrAfterKeyword = text.slice(index + keyword.length);
-  const wordsAfter = substrAfterKeyword.split(/\s+/);
-  // text = "small", keyword = "mall", complete after
-  // text = "small", keyword = "smal", not complete after
-  const isKeywordCompleteAfter = !substrAfterKeyword.startsWith(" ");
-  const numberOfWordsToTake = isKeywordCompleteAfter
+  const substrAfterQuery = text.slice(index + searchQuery.length);
+  const wordsAfter = substrAfterQuery.split(/\s+/);
+  // text = "small", query = "mall", complete after
+  // text = "small", query = "smal", not complete after
+  const isQueryCompleteAfter = !substrAfterQuery.startsWith(" ");
+  const numberOfWordsToTake = isQueryCompleteAfter
     ? WORDS_AFTER + 1
     : WORDS_AFTER;
   const wordsAfterAsString =
-    (isKeywordCompleteAfter ? "" : " ") +
+    (isQueryCompleteAfter ? "" : " ") +
     wordsAfter.slice(0, numberOfWordsToTake).join(" ");
 
   return {
-    indexInKeyword: wordsBeforeAsString.length,
-    previewText: wordsBeforeAsString + keyword + wordsAfterAsString,
+    indexInSearchQuery: wordsBeforeAsString.length,
+    previewText: wordsBeforeAsString + searchQuery + wordsAfterAsString,
     moreBefore: startWordIndex > 0,
     moreAfter: wordsAfter.length > numberOfWordsToTake,
   };
@@ -491,7 +529,7 @@ const normalizeWrappedText = (
 
 const getMatchedLines = (
   textElement: ExcalidrawTextElement,
-  keyword: string,
+  searchQuery: SearchQuery,
   index: number,
 ) => {
   const normalizedText = normalizeWrappedText(
@@ -522,9 +560,9 @@ const getMatchedLines = (
   }
 
   let startIndex = index;
-  let remainingKeyword = textElement.originalText.slice(
+  let remainingQuery = textElement.originalText.slice(
     index,
-    index + keyword.length,
+    index + searchQuery.length,
   );
   const matchedLines: {
     offsetX: number;
@@ -534,7 +572,7 @@ const getMatchedLines = (
   }[] = [];
 
   for (const lineIndexRange of lineIndexRanges) {
-    if (remainingKeyword === "") {
+    if (remainingQuery === "") {
       break;
     }
 
@@ -548,8 +586,8 @@ const getMatchedLines = (
         startIndex - lineIndexRange.startIndex,
       );
 
-      const matchedWord = remainingKeyword.slice(0, matchCapacity);
-      remainingKeyword = remainingKeyword.slice(matchCapacity);
+      const matchedWord = remainingQuery.slice(0, matchCapacity);
+      remainingQuery = remainingQuery.slice(matchCapacity);
 
       const offset = measureText(
         textToStart,
@@ -608,11 +646,11 @@ const escapeSpecialCharacters = (string: string) => {
 
 const handleSearch = debounce(
   (
-    keyword: string,
+    searchQuery: SearchQuery,
     app: AppClassProperties,
     cb: (matchItems: SearchMatchItem[], focusIndex: number | null) => void,
   ) => {
-    if (!keyword || keyword === "") {
+    if (!searchQuery || searchQuery === "") {
       cb([], null);
       return;
     }
@@ -626,20 +664,20 @@ const handleSearch = debounce(
 
     const matchItems: SearchMatchItem[] = [];
 
-    const regex = new RegExp(escapeSpecialCharacters(keyword), "gi");
+    const regex = new RegExp(escapeSpecialCharacters(searchQuery), "gi");
 
     for (const textEl of texts) {
       let match = null;
       const text = textEl.originalText;
 
       while ((match = regex.exec(text)) !== null) {
-        const preview = getMatchPreview(text, match.index, keyword);
-        const matchedLines = getMatchedLines(textEl, keyword, match.index);
+        const preview = getMatchPreview(text, match.index, searchQuery);
+        const matchedLines = getMatchedLines(textEl, searchQuery, match.index);
 
         if (matchedLines.length > 0) {
           matchItems.push({
             textElement: textEl,
-            keyword,
+            searchQuery,
             preview,
             index: match.index,
             matchedLines,
