@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "Hitta på canvas",
+    "noMatch": "Inga träffar hittades...",
+    "singleResult": "resultat",
+    "multipleResults": "resultat",
+    "placeholder": "Sök text..."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -304,7 +304,7 @@
     "shapes": "Former"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "[Esc] för att avfärda sökning",
     "canvasPanning": "För att flytta whiteboarden, håll mushjulet eller mellanslagstangenten medan du drar eller använd handverktyget",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
     "arrowTool": "Klicka för att påbörja multipla punkter, dra för en linje. Använd {{arrowShortcut}} igen för att ändra typ av pil.",
