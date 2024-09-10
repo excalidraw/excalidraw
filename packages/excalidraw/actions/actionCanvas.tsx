@@ -270,6 +270,8 @@ export const zoomToFitBounds = ({
   appState,
   fitToViewport = false,
   viewportZoomFactor = 1,
+  minZoom = -Infinity,
+  maxZoom = Infinity,
 }: {
   bounds: SceneBounds;
   appState: Readonly<AppState>;
@@ -277,6 +279,8 @@ export const zoomToFitBounds = ({
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
 }) => {
   const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
@@ -290,11 +294,14 @@ export const zoomToFitBounds = ({
     const commonBoundsWidth = x2 - x1;
     const commonBoundsHeight = y2 - y1;
 
-    newZoomValue =
+    newZoomValue = clamp(
       Math.min(
         appState.width / commonBoundsWidth,
         appState.height / commonBoundsHeight,
-      ) * clamp(viewportZoomFactor, 0.1, 1);
+      ) * clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM),
+      minZoom,
+      maxZoom,
+    );
 
     newZoomValue = getNormalizedZoom(newZoomValue);
 
@@ -315,13 +322,19 @@ export const zoomToFitBounds = ({
     scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
     scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(
-      bounds,
-      {
-        width: appState.width,
-        height: appState.height,
-      },
-      viewportZoomFactor,
+    newZoomValue = getNormalizedZoom(
+      clamp(
+        zoomValueToFitBoundsOnViewport(
+          bounds,
+          {
+            width: appState.width,
+            height: appState.height,
+          },
+          viewportZoomFactor,
+        ),
+        minZoom,
+        maxZoom,
+      ),
     );
 
     const centerScroll = centerScrollOn({
@@ -353,6 +366,8 @@ export const zoomToFit = ({
   appState,
   fitToViewport,
   viewportZoomFactor,
+  minZoom,
+  maxZoom,
 }: {
   targetElements: readonly ExcalidrawElement[];
   appState: Readonly<AppState>;
@@ -360,6 +375,8 @@ export const zoomToFit = ({
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
 }) => {
   const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
 
@@ -368,6 +385,8 @@ export const zoomToFit = ({
     appState,
     fitToViewport,
     viewportZoomFactor,
+    minZoom,
+    maxZoom,
   });
 };
 

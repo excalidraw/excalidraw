@@ -3543,7 +3543,7 @@ class App extends React.Component<AppProps, AppState> {
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?:
+    opts?: (
       | {
           fitToContent?: boolean;
           fitToViewport?: never;
@@ -3560,7 +3560,11 @@ class App extends React.Component<AppProps, AppState> {
           viewportZoomFactor?: number;
           animate?: boolean;
           duration?: number;
-        },
+        }
+    ) & {
+      minZoom?: number;
+      maxZoom?: number;
+    },
   ) => {
     this.cancelInProgressAnimation?.();
 
@@ -3577,6 +3581,8 @@ class App extends React.Component<AppProps, AppState> {
         appState: this.state,
         fitToViewport: !!opts?.fitToViewport,
         viewportZoomFactor: opts?.viewportZoomFactor,
+        minZoom: opts?.minZoom,
+        maxZoom: opts?.maxZoom,
       });
       zoom = appState.zoom;
       scrollX = appState.scrollX;
