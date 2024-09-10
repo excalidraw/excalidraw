@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "選擇畫布上的物件以在此加入"
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "在畫布上尋找",
+    "noMatch": "未找到符合項目…",
+    "singleResult": "結果",
+    "multipleResults": "結果",
+    "placeholder": "尋找文字..."
   },
   "buttons": {
     "clearReset": "重置 canvas",
@@ -304,7 +304,7 @@
     "shapes": "形狀"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "按 Escape 鍵可停止搜尋",
     "canvasPanning": "若要移動畫布，請在拖曳時按住滑鼠滾輪或空白鍵，或使用手形工具",
     "linearElement": "點擊以繪製多點曲線；或拖曳以繪製直線",
     "arrowTool": "點擊以開始建立多點，拖曳可建立單一線段。再次按下 {{arrowShortcut}} 來變更箭頭類型。",
