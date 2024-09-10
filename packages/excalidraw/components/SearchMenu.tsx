@@ -167,7 +167,6 @@ export const SearchMenu = () => {
             fitToContent: true,
             animate: true,
             duration: 300,
-            ...(isTinyText ? { viewportZoomFactor: 1 } : {}),
           });
         }
 
