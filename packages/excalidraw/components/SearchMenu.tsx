@@ -6,7 +6,6 @@ import { useApp, useExcalidrawSetAppState } from "./App";
 import { debounce } from "lodash";
 import type { AppClassProperties } from "../types";
 import { isTextElement, newTextElement } from "../element";
-import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
 import { addEventListener, getFontString } from "../utils";
 import { KEYS } from "../keys";
@@ -135,7 +134,6 @@ export const SearchMenu = () => {
       if (match) {
         const matchAsElement = newTextElement({
           text: match.keyword,
-          rawText: match.keyword,
           x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
           y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
