@@ -20,6 +20,7 @@ import {
   get,
 } from "idb-keyval";
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
+import { SEARCH_SIDEBAR } from "../../packages/excalidraw/constants";
 import type { LibraryPersistedData } from "../../packages/excalidraw/data/library";
 import type { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
@@ -66,13 +67,19 @@ const saveDataStateToLocalStorage = (
   appState: AppState,
 ) => {
   try {
+    const _appState = clearAppStateForLocalStorage(appState);
+
+    if (_appState.openSidebar?.name === SEARCH_SIDEBAR.name) {
+      _appState.openSidebar = null;
+    }
+
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
       JSON.stringify(clearElementsForLocalStorage(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
+      JSON.stringify(_appState),
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
