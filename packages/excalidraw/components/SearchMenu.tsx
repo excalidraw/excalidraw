@@ -6,6 +6,7 @@ import { useApp, useExcalidrawSetAppState } from "./App";
 import { debounce } from "lodash";
 import type { AppClassProperties } from "../types";
 import { isTextElement, newTextElement } from "../element";
+import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
 import { addEventListener, getFontString } from "../utils";
 import { KEYS } from "../keys";
