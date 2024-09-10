@@ -135,12 +135,17 @@ export const SearchMenu = () => {
       if (match) {
         const matchAsElement = newTextElement({
           text: match.keyword,
+          rawText: match.keyword,
           x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
           y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
         });
 
+        const isTinyText =
+          app.state.zoom.value *
+            searchMatches.items[focusIndex].textElement.fontSize <
+          16;
         if (
           !isElementCompletelyInViewport(
             [matchAsElement],
@@ -155,12 +160,14 @@ export const SearchMenu = () => {
             },
             app.scene.getNonDeletedElementsMap(),
             app.getEditorUIOffsets(),
-          )
+          ) ||
+          isTinyText
         ) {
           app.scrollToContent(matchAsElement, {
             fitToContent: true,
             animate: true,
             duration: 300,
+            ...(isTinyText ? { viewportZoomFactor: 1 } : {}),
           });
         }
 
