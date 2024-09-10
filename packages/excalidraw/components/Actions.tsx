@@ -398,7 +398,9 @@ export const ShapesSwitcher = ({
           {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
           {renderMermaid && ( //zsviczian
             <DropdownMenu.Item
-              onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
+              onSelect={() =>
+                app.setOpenDialog({ name: "ttd", tab: "mermaid" })
+              }
               icon={mermaidLogoIcon}
               data-testid="toolbar-embeddable"
             >
@@ -432,7 +434,7 @@ export const ZoomActions = ({
   zoom: Zoom;
   trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
-  <Stack.Col 
+  <Stack.Col
     gap={1}
     className={clsx(CLASSES.ZOOM_ACTIONS, { "tray-zoom": trayMode })} //zsviczian
   >

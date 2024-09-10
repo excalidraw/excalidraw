@@ -808,7 +808,10 @@ export interface ExcalidrawImperativeAPI {
   addFiles: (data: BinaryFileData[]) => void;
   updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
   id: string;
-  selectElements: (elements: readonly ExcalidrawElement[], highlightSearchResult?: boolean) => void; //zsviczian
+  selectElements: (
+    elements: readonly ExcalidrawElement[],
+    highlightSearchResult?: boolean,
+  ) => void; //zsviczian
   sendBackward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian

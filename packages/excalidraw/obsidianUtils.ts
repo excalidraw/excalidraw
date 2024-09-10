@@ -113,7 +113,9 @@ export async function registerFontsInCSS() {
   styleElement.textContent = cssContent;
 }
 
-export async function getCSSFontDefinition(fontFamily: number): Promise<string> {
+export async function getCSSFontDefinition(
+  fontFamily: number,
+): Promise<string> {
   const fontFaces = Fonts.registered.get(fontFamily)?.fonts;
   if (!fontFaces) {
     return "";
@@ -123,7 +125,7 @@ export async function getCSSFontDefinition(fontFamily: number): Promise<string> 
     return "";
   }
   const content = await fontFace.getContentLegacy();
-  return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`
+  return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`;
 }
 
 function base64ToArrayBuffer(base64: string): ArrayBuffer {
@@ -144,8 +146,7 @@ export function getArrayBufferFromBase64(url: string): ArrayBuffer {
   if (typeof Buffer !== "undefined") {
     // Node.js environment
     return Buffer.from(base64String, "base64").buffer;
-  } else {
-    // Browser environment
-    return base64ToArrayBuffer(base64String);
   }
+  // Browser environment
+  return base64ToArrayBuffer(base64String);
 }

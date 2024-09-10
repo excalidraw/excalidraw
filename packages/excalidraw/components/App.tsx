@@ -1559,8 +1559,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const shouldBlockPointerEvents =
       this.state.selectionElement ||
-      (this.state.newElement && 
-        !["line","arrow"].includes(this.state.newElement.type) &&
+      (this.state.newElement &&
+        !["line", "arrow"].includes(this.state.newElement.type) &&
         (this.device.isTouchScreen || this.state.penDetected)) || //zsviczian can't exit line edit on phone
       this.state.selectedElementsAreBeingDragged ||
       this.state.resizingElement ||
@@ -1571,7 +1571,8 @@ class App extends React.Component<AppProps, AppState> {
     const firstSelectedElement = selectedElements[0];
 
     //zsviczian
-    const isHighlighter = this.state.newElement?.customData?.strokeOptions?.highlighter;
+    const isHighlighter =
+      this.state.newElement?.customData?.strokeOptions?.highlighter;
 
     return (
       <div
@@ -1759,28 +1760,29 @@ class App extends React.Component<AppProps, AppState> {
                             }}
                           />
                         )}
-                        {this.state.newElement && isHighlighter && ( //zsviczian
-                          <NewElementCanvas
-                            appState={this.state}
-                            scale={window.devicePixelRatio}
-                            rc={this.rc}
-                            elementsMap={elementsMap}
-                            allElementsMap={allElementsMap}
-                            renderConfig={{
-                              imageCache: this.imageCache,
-                              isExporting: false,
-                              renderGrid: false,
-                              canvasBackgroundColor:
-                                this.state.viewBackgroundColor,
-                              embedsValidationStatus:
-                                this.embedsValidationStatus,
-                              elementsPendingErasure:
-                                this.elementsPendingErasure,
-                              pendingFlowchartNodes: null,
-                              isHighlighterPenDrawing: isHighlighter, //zsviczian
-                            }}
-                          />
-                        )}                        
+                        {this.state.newElement &&
+                          isHighlighter && ( //zsviczian
+                            <NewElementCanvas
+                              appState={this.state}
+                              scale={window.devicePixelRatio}
+                              rc={this.rc}
+                              elementsMap={elementsMap}
+                              allElementsMap={allElementsMap}
+                              renderConfig={{
+                                imageCache: this.imageCache,
+                                isExporting: false,
+                                renderGrid: false,
+                                canvasBackgroundColor:
+                                  this.state.viewBackgroundColor,
+                                embedsValidationStatus:
+                                  this.embedsValidationStatus,
+                                elementsPendingErasure:
+                                  this.elementsPendingErasure,
+                                pendingFlowchartNodes: null,
+                                isHighlighterPenDrawing: isHighlighter, //zsviczian
+                              }}
+                            />
+                          )}
                         <StaticCanvas
                           canvas={this.canvas}
                           rc={this.rc}
@@ -1806,28 +1808,29 @@ class App extends React.Component<AppProps, AppState> {
                             isHighlighterPenDrawing: isHighlighter, //zsviczian
                           }}
                         />
-                        {this.state.newElement && !isHighlighter && ( //zsviczian
-                          <NewElementCanvas
-                            appState={this.state}
-                            scale={window.devicePixelRatio}
-                            rc={this.rc}
-                            elementsMap={elementsMap}
-                            allElementsMap={allElementsMap}
-                            renderConfig={{
-                              imageCache: this.imageCache,
-                              isExporting: false,
-                              renderGrid: false,
-                              canvasBackgroundColor:
-                                this.state.viewBackgroundColor,
-                              embedsValidationStatus:
-                                this.embedsValidationStatus,
-                              elementsPendingErasure:
-                                this.elementsPendingErasure,
-                              pendingFlowchartNodes: null,
-                              isHighlighterPenDrawing: isHighlighter, //zsviczian
-                            }}
-                          />
-                        )}
+                        {this.state.newElement &&
+                          !isHighlighter && ( //zsviczian
+                            <NewElementCanvas
+                              appState={this.state}
+                              scale={window.devicePixelRatio}
+                              rc={this.rc}
+                              elementsMap={elementsMap}
+                              allElementsMap={allElementsMap}
+                              renderConfig={{
+                                imageCache: this.imageCache,
+                                isExporting: false,
+                                renderGrid: false,
+                                canvasBackgroundColor:
+                                  this.state.viewBackgroundColor,
+                                embedsValidationStatus:
+                                  this.embedsValidationStatus,
+                                elementsPendingErasure:
+                                  this.elementsPendingErasure,
+                                pendingFlowchartNodes: null,
+                                isHighlighterPenDrawing: isHighlighter, //zsviczian
+                              }}
+                            />
+                          )}
                         <InteractiveCanvas
                           containerRef={this.excalidrawContainerRef}
                           canvas={this.interactiveCanvas}
@@ -3984,7 +3987,7 @@ class App extends React.Component<AppProps, AppState> {
           map[element.id] = true;
           return map;
         }, {} as any),
-        highlightSearchResult, //zsviczian 
+        highlightSearchResult, //zsviczian
       },
       storeAction: StoreAction.NONE,
       forceFlushSync: true,
@@ -7540,7 +7543,9 @@ class App extends React.Component<AppProps, AppState> {
         : {}),
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [point<LocalPoint>(0, 0)],
-      pressures: simulatePressure ? [] : [strokeOptions?.constantPressure ? 1 : event.pressure], //zsviczian
+      pressures: simulatePressure
+        ? []
+        : [strokeOptions?.constantPressure ? 1 : event.pressure], //zsviczian
     });
 
     //zsviczian

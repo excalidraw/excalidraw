@@ -206,7 +206,11 @@ const _renderStaticScene = ({
     return;
   }
 
-  const { renderGrid = true, isExporting, isHighlighterPenDrawing = false } = renderConfig; //zsviczian
+  const {
+    renderGrid = true,
+    isExporting,
+    isHighlighterPenDrawing = false,
+  } = renderConfig; //zsviczian
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -220,7 +224,9 @@ const _renderStaticScene = ({
     normalizedHeight,
     theme: appState.theme,
     isExporting,
-    viewBackgroundColor: isHighlighterPenDrawing ? "transparent" : appState.viewBackgroundColor, //zsviczian
+    viewBackgroundColor: isHighlighterPenDrawing
+      ? "transparent"
+      : appState.viewBackgroundColor, //zsviczian
   });
 
   // Apply zoom

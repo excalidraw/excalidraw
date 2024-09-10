@@ -26,7 +26,9 @@ const _renderNewElementScene = ({
       scale,
       normalizedWidth,
       normalizedHeight,
-      viewBackgroundColor: isHighlighterPenDrawing ?  appState.viewBackgroundColor : "transparent", //zsviczian
+      viewBackgroundColor: isHighlighterPenDrawing
+        ? appState.viewBackgroundColor
+        : "transparent", //zsviczian
     });
 
     // Apply zoom

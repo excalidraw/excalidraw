@@ -257,7 +257,7 @@ export const textWysiwyg = ({
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${Math.floor(width)}px`, //zsviczian Obsidian app zoom !== 100% issue, floor due to screen shift
+        width: `${Math.ceil(width)}px`, //zsviczian Obsidian app zoom !== 100% issue, floor due to screen shift
         height: `${height}px`,
         left: `${viewportX - padding}px`,
         top: `${viewportY}px`,
@@ -356,7 +356,7 @@ export const textWysiwyg = ({
           getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font, true);
-        editable.style.width = `${Math.floor(width)}px`; //zsviczian Obsidian app zoom !== 100% issue, floor due to horizontal shift
+        editable.style.width = `${Math.ceil(width)}px`; //zsviczian Obsidian app zoom !== 100% issue
       }
     };
 
@@ -665,9 +665,9 @@ export const textWysiwyg = ({
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
         (isShapeActionsPanel || //zsviczian
-        event.target.closest(
-          `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
-        )) &&
+          event.target.closest(
+            `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
+          )) &&
         !isWritableElement(event.target)) ||
       isPropertiesTrigger
     ) {

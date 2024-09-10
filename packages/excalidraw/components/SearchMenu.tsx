@@ -142,6 +142,10 @@ export const SearchMenu = () => {
           height: match.matchedLines[0]?.height,
         });
 
+        const isTinyText =
+          app.state.zoom.value *
+            searchMatches.items[focusIndex].textElement.fontSize <
+          16; //zsviczian
         if (
           !isElementCompletelyInViewport(
             [matchAsElement],
@@ -156,7 +160,8 @@ export const SearchMenu = () => {
             },
             app.scene.getNonDeletedElementsMap(),
             app.getEditorUIOffsets(),
-          )
+          ) ||
+          isTinyText //zsviczian
         ) {
           app.scrollToContent(matchAsElement, {
             fitToContent: true,

@@ -946,7 +946,7 @@ export const resizeMultipleElements = (
       ? orig.height
       : orig.height * scaleY; //zsviczian
     const angle = normalizeRadians(
-      (orig.angle * flipFactorX * flipFactorY) as Radians
+      (orig.angle * flipFactorX * flipFactorY) as Radians,
     );
 
     const isLinearOrFreeDraw = isLinearElement(orig) || isFreeDrawElement(orig);

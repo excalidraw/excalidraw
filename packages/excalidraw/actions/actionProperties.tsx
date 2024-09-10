@@ -829,9 +829,7 @@ export const actionChangeFontSize = register({
     ) as ExcalidrawTextElement[];
     if (selectedElements.length === 0) {
       selectedElements = (
-        appState.editingTextElement
-          ? [appState.editingTextElement]
-          : []
+        appState.editingTextElement ? [appState.editingTextElement] : []
       ) as ExcalidrawTextElement[];
     }
     const size = selectedElements[0]?.fontSize;
