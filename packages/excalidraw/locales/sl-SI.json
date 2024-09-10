@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "Poišči na platnu",
+    "noMatch": "Ni zadetkov ...",
+    "singleResult": "rezultat",
+    "multipleResults": "rezultata/i/ov",
+    "placeholder": "Poišči besedilo ..."
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
@@ -304,7 +304,7 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Pritisnite Escape, da opustite iskanje",
     "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
     "arrowTool": "Kliknite za začetek več točk, povlecite za eno črto. Ponovno pritisnite {{arrowShortcut}}, da spremenite vrsto puščice.",
