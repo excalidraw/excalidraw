@@ -1,4 +1,4 @@
-import type { Point } from "../types";
+import type { LocalPoint, Radians } from "../../math";
 import type {
   FONT_FAMILY,
   ROUNDNESS,
@@ -49,7 +49,7 @@ type _ExcalidrawElementBase = Readonly<{
   opacity: number;
   width: number;
   height: number;
-  angle: number;
+  angle: Radians;
   /** Random integer used to seed shape generation so that the roughjs shape
       doesn't differ across renders. */
   seed: number;
@@ -175,6 +175,15 @@ export type ExcalidrawFlowchartNodeElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
+export type ExcalidrawRectanguloidElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawImageElement
+  | ExcalidrawTextElement
+  | ExcalidrawFreeDrawElement
+  | ExcalidrawIframeLikeElement
+  | ExcalidrawFrameLikeElement
+  | ExcalidrawEmbeddableElement;
+
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
  * no computed data. The list of all ExcalidrawElements should be shareable
@@ -283,8 +292,8 @@ export type Arrowhead =
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
-    points: readonly Point[];
-    lastCommittedPoint: Point | null;
+    points: readonly LocalPoint[];
+    lastCommittedPoint: LocalPoint | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
@@ -309,10 +318,10 @@ export type ExcalidrawElbowArrowElement = Merge<
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
-    points: readonly Point[];
+    points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    lastCommittedPoint: Point | null;
+    lastCommittedPoint: LocalPoint | null;
   }>;
 
 export type FileId = string & { _brand: "FileId" };

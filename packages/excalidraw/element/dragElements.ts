@@ -11,7 +11,6 @@ import type {
   PointerDownState,
 } from "../types";
 import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
-import { getGridPoint } from "../math";
 import type Scene from "../scene/Scene";
 import {
   isArrowElement,
@@ -21,6 +20,7 @@ import {
 } from "./typeChecks";
 import { getFontString } from "../utils";
 import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
+import { getGridPoint } from "../snapping";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
