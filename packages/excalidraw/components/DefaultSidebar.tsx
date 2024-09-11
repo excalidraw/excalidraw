@@ -37,14 +37,11 @@ const DefaultSidebarTrigger = withInternalFallback(
 );
 DefaultSidebarTrigger.displayName = "DefaultSidebarTrigger";
 
-const DefaultTabTriggers = ({
-  children,
-  ...rest
-}: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
+const DefaultTabTriggers = ({ children }: { children: React.ReactNode }) => {
   const { DefaultSidebarTabTriggersTunnel } = useTunnels();
   return (
     <DefaultSidebarTabTriggersTunnel.In>
-      <Sidebar.TabTriggers {...rest}>{children}</Sidebar.TabTriggers>
+      {children}
     </DefaultSidebarTabTriggersTunnel.In>
   );
 };
@@ -76,7 +73,8 @@ export const DefaultSidebar = Object.assign(
       return (
         <Sidebar
           {...rest}
-          name={"default"}
+          name="default"
+          key="default"
           className={clsx("default-sidebar", className)}
           docked={
             isForceDocked || (docked ?? appState.defaultSidebarDockedPreference)
@@ -94,15 +92,15 @@ export const DefaultSidebar = Object.assign(
         >
           <Sidebar.Tabs>
             <Sidebar.Header>
-              <DefaultSidebar.TabTriggers>
+              <Sidebar.TabTriggers>
                 <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
                   {searchIcon}
                 </Sidebar.TabTrigger>
                 <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
                   {LibraryIcon}
                 </Sidebar.TabTrigger>
-              </DefaultSidebar.TabTriggers>
-              {rest.__fallback && <DefaultSidebarTabTriggersTunnel.Out />}
+                <DefaultSidebarTabTriggersTunnel.Out />
+              </Sidebar.TabTriggers>
             </Sidebar.Header>
             <Sidebar.Tab tab={LIBRARY_SIDEBAR_TAB}>
               <LibraryMenu />
