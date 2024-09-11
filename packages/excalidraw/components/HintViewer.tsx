@@ -13,7 +13,7 @@ import { isEraserActive } from "../appState";
 import "./HintViewer.scss";
 import { isNodeInFlowchart } from "../element/flowchart";
 import { isGridModeEnabled } from "../snapping";
-import { SEARCH_SIDEBAR } from "../constants";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -32,7 +32,8 @@ const getHints = ({
   const multiMode = appState.multiElement !== null;
 
   if (
-    appState.openSidebar?.name === SEARCH_SIDEBAR.name &&
+    appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+    appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
     appState.searchMatches?.length
   ) {
     return t("hints.dismissSearch");
