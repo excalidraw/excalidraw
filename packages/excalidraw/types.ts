@@ -926,3 +926,10 @@ export type GenerateDiagramToCode = (props: {
   frame: ExcalidrawMagicFrameElement;
   children: readonly ExcalidrawElement[];
 }) => MaybePromise<{ html: string }>;
+
+export type Offsets = Partial<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>;

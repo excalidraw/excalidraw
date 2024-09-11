@@ -261,6 +261,7 @@ import type {
   ElementsPendingErasure,
   GenerateDiagramToCode,
   NullableGridSize,
+  Offsets,
 } from "../types";
 import {
   debounce,
@@ -3415,6 +3416,7 @@ class App extends React.Component<AppProps, AppState> {
     if (opts.fitToContent) {
       this.scrollToContent(newElements, {
         fitToContent: true,
+        canvasOffsets: this.getEditorUIOffsets(),
       });
     }
   };
@@ -3733,7 +3735,7 @@ class App extends React.Component<AppProps, AppState> {
     target:
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?:
+    opts?: (
       | {
           fitToContent?: boolean;
           fitToViewport?: never;
@@ -3750,7 +3752,12 @@ class App extends React.Component<AppProps, AppState> {
           viewportZoomFactor?: number;
           animate?: boolean;
           duration?: number;
-        },
+        }
+    ) & {
+      minZoom?: number;
+      maxZoom?: number;
+      canvasOffsets?: Offsets;
+    },
   ) => {
     this.cancelInProgressAnimation?.();
 
@@ -3763,10 +3770,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (opts?.fitToContent || opts?.fitToViewport) {
       const { appState } = zoomToFit({
+        canvasOffsets: opts.canvasOffsets,
         targetElements,
         appState: this.state,
         fitToViewport: !!opts?.fitToViewport,
         viewportZoomFactor: opts?.viewportZoomFactor,
+        minZoom: opts?.minZoom,
+        maxZoom: opts?.maxZoom,
       });
       zoom = appState.zoom;
       scrollX = appState.scrollX;
@@ -4158,40 +4168,42 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  public getEditorUIOffsets = (): {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  } => {
+  public getEditorUIOffsets = (): Offsets => {
     const toolbarBottom =
       this.excalidrawContainerRef?.current
         ?.querySelector(".App-toolbar")
         ?.getBoundingClientRect()?.bottom ?? 0;
-    const sidebarWidth = Math.max(
-      this.excalidrawContainerRef?.current
-        ?.querySelector(".default-sidebar")
-        ?.getBoundingClientRect()?.width ?? 0,
-    );
-    const propertiesPanelWidth = Math.max(
-      this.excalidrawContainerRef?.current
-        ?.querySelector(".App-menu__left")
-        ?.getBoundingClientRect()?.width ?? 0,
-      0,
-    );
+    const sidebarRect = this.excalidrawContainerRef?.current
+      ?.querySelector(".sidebar")
+      ?.getBoundingClientRect();
+    const propertiesPanelRect = this.excalidrawContainerRef?.current
+      ?.querySelector(".App-menu__left")
+      ?.getBoundingClientRect();
+
+    const PADDING = 16;
 
     return getLanguage().rtl
       ? {
-          top: toolbarBottom,
-          right: propertiesPanelWidth,
-          bottom: 0,
-          left: sidebarWidth,
+          top: toolbarBottom + PADDING,
+          right:
+            Math.max(
+              this.state.width -
+                (propertiesPanelRect?.left ?? this.state.width),
+              0,
+            ) + PADDING,
+          bottom: PADDING,
+          left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
         }
       : {
-          top: toolbarBottom,
-          right: sidebarWidth,
-          bottom: 0,
-          left: propertiesPanelWidth,
+          top: toolbarBottom + PADDING,
+          right: Math.max(
+            this.state.width -
+              (sidebarRect?.left ?? this.state.width) +
+              PADDING,
+            0,
+          ),
+          bottom: PADDING,
+          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
         };
   };
 
@@ -4283,7 +4295,7 @@ class App extends React.Component<AppProps, AppState> {
               animate: true,
               duration: 300,
               fitToContent: true,
-              viewportZoomFactor: 0.8,
+              canvasOffsets: this.getEditorUIOffsets(),
             });
           }
 
@@ -4339,6 +4351,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.scrollToContent(nextNode, {
                   animate: true,
                   duration: 300,
+                  canvasOffsets: this.getEditorUIOffsets(),
                 });
               }
             }
@@ -4791,6 +4804,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scrollToContent(firstNode, {
               animate: true,
               duration: 300,
+              canvasOffsets: this.getEditorUIOffsets(),
             });
           }
         }
