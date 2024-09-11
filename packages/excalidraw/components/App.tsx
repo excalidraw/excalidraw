@@ -1489,7 +1489,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const isNewElementNotLinearOnTouchScreen =
       this.state.newElement &&
-      !["line", "arrow"].includes(this.state.newElement.type) &&
+      isLinearElement(this.state.newElement) &&
       (this.device.isTouchScreen || this.state.penDetected);
 
     const shouldBlockPointerEvents =
