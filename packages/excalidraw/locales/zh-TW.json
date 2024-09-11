@@ -167,7 +167,7 @@
     "noMatch": "未找到符合項目…",
     "singleResult": "結果",
     "multipleResults": "結果",
-    "placeholder": "尋找文字..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "重置 canvas",
