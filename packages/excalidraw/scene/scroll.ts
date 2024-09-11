@@ -1,4 +1,4 @@
-import type { AppState, PointerCoords, Zoom } from "../types";
+import type { AppState, Offsets, PointerCoords, Zoom } from "../types";
 import type { ExcalidrawElement } from "../element/types";
 import {
   getCommonBounds,
@@ -31,14 +31,28 @@ export const centerScrollOn = ({
   scenePoint,
   viewportDimensions,
   zoom,
+  offsets,
 }: {
   scenePoint: PointerCoords;
   viewportDimensions: { height: number; width: number };
   zoom: Zoom;
+  offsets?: Offsets;
 }) => {
+  let scrollX =
+    (viewportDimensions.width - (offsets?.right ?? 0)) / 2 / zoom.value -
+    scenePoint.x;
+
+  scrollX += (offsets?.left ?? 0) / 2 / zoom.value;
+
+  let scrollY =
+    (viewportDimensions.height - (offsets?.bottom ?? 0)) / 2 / zoom.value -
+    scenePoint.y;
+
+  scrollY += (offsets?.top ?? 0) / 2 / zoom.value;
+
   return {
-    scrollX: viewportDimensions.width / 2 / zoom.value - scenePoint.x,
-    scrollY: viewportDimensions.height / 2 / zoom.value - scenePoint.y,
+    scrollX,
+    scrollY,
   };
 };
 

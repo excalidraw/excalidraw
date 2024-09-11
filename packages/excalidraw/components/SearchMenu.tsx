@@ -20,6 +20,7 @@ import { CLASSES, EVENT } from "../constants";
 import { useStable } from "../hooks/useStable";
 
 import "./SearchMenu.scss";
+import { round } from "../../math";
 
 const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);
@@ -154,16 +155,23 @@ export const SearchMenu = () => {
       const match = searchMatches.items[focusIndex];
 
       if (match) {
+        const zoomValue = app.state.zoom.value;
+
         const matchAsElement = newTextElement({
           text: match.searchQuery,
           x: match.textElement.x + (match.matchedLines[0]?.offsetX ?? 0),
           y: match.textElement.y + (match.matchedLines[0]?.offsetY ?? 0),
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
+          fontSize: match.textElement.fontSize,
+          fontFamily: match.textElement.fontFamily,
         });
 
+        const FONT_SIZE_LEGIBILITY_THRESHOLD = 14;
+
+        const fontSize = match.textElement.fontSize;
         const isTextTiny =
-          match.textElement.fontSize * app.state.zoom.value < 12;
+          fontSize * zoomValue < FONT_SIZE_LEGIBILITY_THRESHOLD;
 
         if (
           !isElementCompletelyInViewport(
@@ -184,9 +192,17 @@ export const SearchMenu = () => {
         ) {
           let zoomOptions: Parameters<AppClassProperties["scrollToContent"]>[1];
 
-          if (isTextTiny && app.state.zoom.value >= 1) {
-            zoomOptions = { fitToViewport: true };
-          } else if (isTextTiny || app.state.zoom.value > 1) {
+          if (isTextTiny) {
+            if (fontSize >= FONT_SIZE_LEGIBILITY_THRESHOLD) {
+              zoomOptions = { fitToContent: true };
+            } else {
+              zoomOptions = {
+                fitToViewport: true,
+                // calculate zoom level to make the fontSize ~equal to FONT_SIZE_THRESHOLD, rounded to nearest 10%
+                maxZoom: round(FONT_SIZE_LEGIBILITY_THRESHOLD / fontSize, 1),
+              };
+            }
+          } else {
             zoomOptions = { fitToContent: true };
           }
 
@@ -194,6 +210,7 @@ export const SearchMenu = () => {
             animate: true,
             duration: 300,
             ...zoomOptions,
+            canvasOffsets: app.getEditorUIOffsets(),
           });
         }
       }
