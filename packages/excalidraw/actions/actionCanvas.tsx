@@ -645,14 +645,16 @@ export const zoomToFitElements = (
         );
 
   const newZoom = {
-    value: zoomValueToFitBoundsOnViewport(
-      commonBounds,
-      {
-        width: appState.width - appState.width * margin,
-        height: appState.height - appState.height * margin,
-      },
-      1,
-      maxZoom,
+    value: getNormalizedZoom(
+      zoomValueToFitBoundsOnViewport(
+        commonBounds,
+        {
+          width: appState.width - appState.width * margin,
+          height: appState.height - appState.height * margin,
+        },
+        1,
+        maxZoom,
+      )
     ),
   };
 
