@@ -1557,11 +1557,13 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
+    const isNewElementNotLinearOnTouchScreen = //zsviczian
+      this.state.newElement &&
+      (!isLinearElement(this.state.newElement) || !this.device.isTouchScreen);
+
     const shouldBlockPointerEvents =
       this.state.selectionElement ||
-      (this.state.newElement &&
-        !["line", "arrow"].includes(this.state.newElement.type) &&
-        (this.device.isTouchScreen || this.state.penDetected)) || //zsviczian can't exit line edit on phone
+      isNewElementNotLinearOnTouchScreen || //zsviczian
       this.state.selectedElementsAreBeingDragged ||
       this.state.resizingElement ||
       (this.state.activeTool.type === "laser" &&
