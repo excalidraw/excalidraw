@@ -392,9 +392,8 @@ const renderBindingHighlight = (
     context,
     suggestedBinding as any,
     elementsMap,
-    `${appState.gridColor.Regular}80`,
+    `${appState.gridColor.Bold}`,
   ); //zsviczian
-
   context.restore();
 };
 
