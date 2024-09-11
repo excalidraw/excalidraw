@@ -167,7 +167,7 @@
     "noMatch": "Nicio potrivire găsită...",
     "singleResult": "rezultat",
     "multipleResults": "rezultate",
-    "placeholder": ""
+    "placeholder": "Găsire text pe pânză..."
   },
   "buttons": {
     "clearReset": "Resetare pânză",
