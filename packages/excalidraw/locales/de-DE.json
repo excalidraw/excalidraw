@@ -167,7 +167,7 @@
     "noMatch": "Keine Treffer gefunden...",
     "singleResult": "Ergebnis",
     "multipleResults": "Ergebnisse",
-    "placeholder": "Text suchen..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
