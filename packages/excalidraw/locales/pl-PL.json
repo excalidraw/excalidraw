@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "Wybierz element, aby dodać go tutaj."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "Znajdź na płótnie",
+    "noMatch": "Nie znaleziono pasujących elementów...",
+    "singleResult": "wynik",
+    "multipleResults": "wyniki",
+    "placeholder": "Znajdź tekst..."
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
@@ -304,7 +304,7 @@
     "shapes": "Kształty"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Wyjdź, aby odrzucić wyszukiwanie",
     "canvasPanning": "Aby przesunąć płótno, przytrzymaj kółko myszy lub spację podczas przeciągania, albo użyj narzędzia ręki",
     "linearElement": "Naciśnij, aby zrobić punkt, przeciągnij, aby narysować linię",
     "arrowTool": "Kliknij, aby rozpocząć dodawanie wielu punktów, przeciągnij, aby narysować pojedynczą linię. Naciśnij przycisk {{arrowShortcut}} ponownie, aby zmienić typ strzałki.",
