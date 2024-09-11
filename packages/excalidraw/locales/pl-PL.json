@@ -167,7 +167,7 @@
     "noMatch": "Nie znaleziono pasujących elementów...",
     "singleResult": "wynik",
     "multipleResults": "wyniki",
-    "placeholder": "Znajdź tekst..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
