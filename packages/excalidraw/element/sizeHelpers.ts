@@ -2,7 +2,7 @@ import type { ElementsMap, ExcalidrawElement } from "./types";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import type { AppState, Zoom } from "../types";
+import type { AppState, Offsets, Zoom } from "../types";
 import { getCommonBounds, getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
 
@@ -67,12 +67,7 @@ export const isElementCompletelyInViewport = (
     scrollY: number;
   },
   elementsMap: ElementsMap,
-  padding?: Partial<{
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-  }>,
+  padding?: Offsets,
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
