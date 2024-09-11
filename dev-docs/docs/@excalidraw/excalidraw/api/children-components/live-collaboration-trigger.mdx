@@ -14,7 +14,7 @@ function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
   const [isCollaborating, setIsCollaborating] = useState(false);
   return (
-    <div style={{ height: "500px" }}>
+    <div>
       <p style={{ fontSize: "16px" }}>
         Selecting the checkbox to see the collaborator count
       </p>
@@ -44,18 +44,20 @@ function App() {
         />
         Show Collaborators
       </label>
-      <Excalidraw
-        ref={(api) => setExcalidrawAPI(api)}
-        renderTopRightUI={() => (
-          <LiveCollaborationTrigger
-            isCollaborating={isCollaborating}
-            onSelect={() => {
-              window.alert("You clicked on collab button");
-              setIsCollaborating(true);
-            }}
-          />
-        )}
-      ></Excalidraw>
+      <div style={{ height: "500px" }}>
+        <Excalidraw
+          ref={(api) => setExcalidrawAPI(api)}
+          renderTopRightUI={() => (
+            <LiveCollaborationTrigger
+              isCollaborating={isCollaborating}
+              onSelect={() => {
+                window.alert("You clicked on collab button");
+                setIsCollaborating(true);
+              }}
+            />
+          )}
+        />
+      </div>
     </div>
   );
 }
