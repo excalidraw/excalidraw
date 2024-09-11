@@ -209,6 +209,7 @@ export const SearchMenu = () => {
             animate: true,
             duration: 300,
             ...zoomOptions,
+            canvasOffsets: app.getEditorUIOffsets(),
           });
         }
       }
