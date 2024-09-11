@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "ईथे जोडण्या साठी पटल वरून एक वस्तु निवडा."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "पटल वर पहा",
+    "noMatch": "मिळते जुळते काहिही सापडले नाही...",
+    "singleResult": "निकाल",
+    "multipleResults": "निकाल",
+    "placeholder": "पाठ्य शोधा..."
   },
   "buttons": {
     "clearReset": "पटल पुसा",
@@ -304,7 +304,7 @@
     "shapes": "आकार"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "शोधणे थाम्बवण्या साठी एस्केप बटन दाबा",
     "canvasPanning": "कॅनव्हास सरकवण्या साठी, ड्रॅग करताना माउस व्हील धरा किंवा स्पेसबार दाबून ठेवा अथवा हात वालं उपकरण वापरा",
     "linearElement": "अनेक बिंदु साठी क्लिक करा, रेघे साठी ड्रैग करा",
     "arrowTool": "अनेक बिन्दु साठी क्लिक करावे, रेघ ओढ़ण्या साठी ड्रैग करावे. तीर प्रकार बदलण्या साठी {{arrowShortcut}} पुनः दाबावे.",
