@@ -5,7 +5,6 @@ import {
   CLASSES,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_WIDTH,
-  SEARCH_SIDEBAR,
   TOOL_TYPE,
 } from "../constants";
 import { showSelectedShapeActions } from "../element";
@@ -54,9 +53,6 @@ import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
@@ -64,7 +60,9 @@ import { LaserPointerButton } from "./LaserPointerButton";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
-import { SearchSidebar } from "./SearchSidebar";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -365,21 +363,16 @@ const LayerUI = ({
 
   const renderSidebars = () => {
     return (
-      <>
-        {appState.openSidebar?.name === SEARCH_SIDEBAR.name && (
-          <SearchSidebar />
-        )}
-        <DefaultSidebar
-          __fallback
-          onDock={(docked) => {
-            trackEvent(
-              "sidebar",
-              `toggleDock (${docked ? "dock" : "undock"})`,
-              `(${device.editor.isMobile ? "mobile" : "desktop"})`,
-            );
-          }}
-        />
-      </>
+      <DefaultSidebar
+        __fallback
+        onDock={(docked) => {
+          trackEvent(
+            "sidebar",
+            `toggleDock (${docked ? "dock" : "undock"})`,
+            `(${device.editor.isMobile ? "mobile" : "desktop"})`,
+          );
+        }}
+      />
     );
   };
 

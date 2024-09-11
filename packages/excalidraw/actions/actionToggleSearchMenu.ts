@@ -3,7 +3,7 @@ import { register } from "./register";
 import type { AppState } from "../types";
 import { searchIcon } from "../components/icons";
 import { StoreAction } from "../store";
-import { CLASSES, SEARCH_SIDEBAR } from "../constants";
+import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
 
 export const actionToggleSearchMenu = register({
   name: "searchMenu",
@@ -17,7 +17,10 @@ export const actionToggleSearchMenu = register({
     predicate: (appState) => appState.gridModeEnabled,
   },
   perform(elements, appState, _, app) {
-    if (appState.openSidebar?.name === SEARCH_SIDEBAR.name) {
+    if (
+      appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+      appState.openSidebar.tab === CANVAS_SEARCH_TAB
+    ) {
       const searchInput =
         app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
           `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
@@ -31,13 +34,14 @@ export const actionToggleSearchMenu = register({
       }
 
       searchInput?.focus();
+      searchInput?.select();
       return false;
     }
 
     return {
       appState: {
         ...appState,
-        openSidebar: { name: SEARCH_SIDEBAR.name },
+        openSidebar: { name: DEFAULT_SIDEBAR.name, tab: CANVAS_SEARCH_TAB },
         openDialog: null,
       },
       storeAction: StoreAction.NONE,

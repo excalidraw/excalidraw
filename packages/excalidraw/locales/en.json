@@ -167,7 +167,7 @@
     "noMatch": "No matches found...",
     "singleResult": "result",
     "multipleResults": "results",
-    "placeholder": "Find text..."
+    "placeholder": "Find text on canvas..."
   },
   "buttons": {
     "clearReset": "Reset the canvas",

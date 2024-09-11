@@ -1,7 +1,7 @@
 import React from "react";
 import { act, render, waitFor } from "./test-utils";
 import { Excalidraw } from "../index";
-import { CLASSES, SEARCH_SIDEBAR } from "../constants";
+import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
 import { Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
 import { updateTextEditor } from "./queries/dom";
@@ -34,7 +34,8 @@ describe("search", () => {
       Keyboard.keyPress(KEYS.F);
     });
     expect(h.app.state.openSidebar).not.toBeNull();
-    expect(h.app.state.openSidebar?.name).toBe(SEARCH_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
 
     const searchInput = await querySearchInput();
     expect(searchInput.matches(":focus")).toBe(true);
@@ -78,7 +79,8 @@ describe("search", () => {
       Keyboard.keyPress(KEYS.F);
     });
     expect(h.app.state.openSidebar).not.toBeNull();
-    expect(h.app.state.openSidebar?.name).toBe(SEARCH_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
 
     const searchInput = await querySearchInput();
 
@@ -122,7 +124,8 @@ describe("search", () => {
       Keyboard.keyPress(KEYS.F);
     });
     expect(h.app.state.openSidebar).not.toBeNull();
-    expect(h.app.state.openSidebar?.name).toBe(SEARCH_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+    expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
 
     const searchInput = await querySearchInput();
 
