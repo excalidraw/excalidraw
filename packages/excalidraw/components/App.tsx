@@ -2481,9 +2481,10 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  private clearImageShapeCache() {
+  private clearImageShapeCache(filesMap?: BinaryFiles) {
+    const files = filesMap ?? this.files;
     this.scene.getNonDeletedElements().forEach((element) => {
-      if (isInitializedImageElement(element) && this.files[element.fileId]) {
+      if (isInitializedImageElement(element) && files[element.fileId]) {
         this.imageCache.delete(element.fileId);
         ShapeCache.delete(element);
       }
@@ -3936,7 +3937,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
 
-      this.clearImageShapeCache();
+      this.clearImageShapeCache(Object.fromEntries(filesMap));
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
