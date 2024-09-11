@@ -20,7 +20,10 @@ import {
   get,
 } from "idb-keyval";
 import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
-import { SEARCH_SIDEBAR } from "../../packages/excalidraw/constants";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+} from "../../packages/excalidraw/constants";
 import type { LibraryPersistedData } from "../../packages/excalidraw/data/library";
 import type { ImportedDataState } from "../../packages/excalidraw/data/types";
 import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
@@ -69,7 +72,10 @@ const saveDataStateToLocalStorage = (
   try {
     const _appState = clearAppStateForLocalStorage(appState);
 
-    if (_appState.openSidebar?.name === SEARCH_SIDEBAR.name) {
+    if (
+      _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+      _appState.openSidebar.tab === CANVAS_SEARCH_TAB
+    ) {
       _appState.openSidebar = null;
     }
 
