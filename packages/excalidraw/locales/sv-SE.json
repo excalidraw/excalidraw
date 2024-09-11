@@ -167,7 +167,7 @@
     "noMatch": "Inga träffar hittades...",
     "singleResult": "resultat",
     "multipleResults": "resultat",
-    "placeholder": "Sök text..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
