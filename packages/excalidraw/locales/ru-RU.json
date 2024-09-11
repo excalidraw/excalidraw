@@ -167,7 +167,7 @@
     "noMatch": "Совпадения не найдены...",
     "singleResult": "результат",
     "multipleResults": "результаты",
-    "placeholder": ""
+    "placeholder": "Найти текст на холсте..."
   },
   "buttons": {
     "clearReset": "Очистить холст и сбросить цвет фона",
