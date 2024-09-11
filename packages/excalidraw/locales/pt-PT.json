@@ -167,7 +167,7 @@
     "noMatch": "Não foram encontrados resultados...",
     "singleResult": "resultado",
     "multipleResults": "resultados",
-    "placeholder": "Pesquisar texto..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho",
