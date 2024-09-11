@@ -164,6 +164,7 @@ export const SearchMenu = () => {
           width: match.matchedLines[0]?.width,
           height: match.matchedLines[0]?.height,
           fontSize: match.textElement.fontSize,
+          fontFamily: match.textElement.fontFamily,
         });
 
         const FONT_SIZE_LEGIBILITY_THRESHOLD = 14;
