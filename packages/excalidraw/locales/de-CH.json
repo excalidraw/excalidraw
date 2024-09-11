@@ -163,10 +163,10 @@
     "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
+    "title": "Auf Zeichenfläche suchen",
+    "noMatch": "Keine Treffer gefunden...",
+    "singleResult": "Ergebnis",
+    "multipleResults": "Ergebnisse",
     "placeholder": ""
   },
   "buttons": {
@@ -304,7 +304,7 @@
     "shapes": "Formen"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Escape zum Verwerfen der Suche",
     "canvasPanning": "Um die Zeichenfläche zu verschieben, halte das Mausrad oder die Leertaste während des Ziehens, oder verwende das Hand-Werkzeug",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
     "arrowTool": "Klicken, um mit mehreren Punkten zu starten, ziehen für eine einzelne Linie. Drücke {{arrowShortcut}} erneut, um den Pfeiltyp zu ändern.",
