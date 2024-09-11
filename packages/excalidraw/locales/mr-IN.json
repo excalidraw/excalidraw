@@ -167,7 +167,7 @@
     "noMatch": "मिळते जुळते काहिही सापडले नाही...",
     "singleResult": "निकाल",
     "multipleResults": "निकाल",
-    "placeholder": "पाठ्य शोधा..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "पटल पुसा",
