@@ -167,7 +167,7 @@
     "noMatch": "Ni zadetkov ...",
     "singleResult": "rezultat",
     "multipleResults": "rezultata/i/ov",
-    "placeholder": "Poišči besedilo ..."
+    "placeholder": ""
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
