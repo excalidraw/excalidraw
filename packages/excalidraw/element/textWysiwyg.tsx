@@ -247,7 +247,7 @@ export const textWysiwyg = ({
 
       // adding left and right padding buffer, so that browser does not cut the glyphs (does not work in Safari)
       const padding = !isSafari
-        ? Math.ceil(updatedTextElement.fontSize / 2)
+        ? Math.ceil(updatedTextElement.fontSize / appState.zoom.value / 2)
         : 0;
 
       // Make sure text editor height doesn't go beyond viewport
