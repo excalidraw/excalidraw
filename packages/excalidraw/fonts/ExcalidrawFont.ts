@@ -1,4 +1,8 @@
-import { stringToBase64, toByteString } from "../data/encode";
+import {
+  base64ToArrayBuffer,
+  stringToBase64,
+  toByteString,
+} from "../data/encode";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
 import loadWoff2 from "./wasm/woff2.loader";
 import loadHbSubset from "./wasm/hb-subset.loader";
@@ -49,10 +53,7 @@ export class ExcalidrawFont implements Font {
 
       // it's dataurl (server), the font is inlined as base64, no need to fetch
       if (url.protocol === "data:") {
-        const arrayBuffer = Buffer.from(
-          url.toString().split(",")[1],
-          "base64",
-        ).buffer;
+        const arrayBuffer = base64ToArrayBuffer(url.toString().split(",")[1]);
 
         const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
           arrayBuffer,
