@@ -8,7 +8,7 @@ export default defineConfig({
     // Since hooks are running in stack in v2, which means all hooks run serially whereas
     // we need to run them in parallel
     sequence: {
-      hooks: 'parallel',
+      hooks: "parallel",
     },
     setupFiles: ["./setupTests.ts"],
     globals: true,
