@@ -1487,13 +1487,9 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
-    const isNewElementNotLinearOnTouchScreen =
-      this.state.newElement &&
-      (!isLinearElement(this.state.newElement) || !this.device.isTouchScreen);
-
     const shouldBlockPointerEvents =
       this.state.selectionElement ||
-      isNewElementNotLinearOnTouchScreen ||
+      this.state.newElement ||
       this.state.selectedElementsAreBeingDragged ||
       this.state.resizingElement ||
       (this.state.activeTool.type === "laser" &&
