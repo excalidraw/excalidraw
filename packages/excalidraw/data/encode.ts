@@ -57,15 +57,13 @@ export const base64ToString = async (base64: string, isByteString = false) => {
     : byteStringToString(window.atob(base64));
 };
 
-export const base64ToArrayBuffer = (url: string): ArrayBuffer => {
-  const base64String = url.toString().split(",")[1];
-
+export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
   if (typeof Buffer !== "undefined") {
     // Node.js environment
-    return Buffer.from(base64String, "base64").buffer;
+    return Buffer.from(base64, "base64").buffer;
   }
   // Browser environment
-  return byteStringToArrayBuffer(atob(base64String));
+  return byteStringToArrayBuffer(atob(base64));
 };
 
 // -----------------------------------------------------------------------------

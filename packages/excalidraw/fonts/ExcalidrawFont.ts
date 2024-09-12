@@ -53,7 +53,7 @@ export class ExcalidrawFont implements Font {
 
       // it's dataurl (server), the font is inlined as base64, no need to fetch
       if (url.protocol === "data:") {
-        const arrayBuffer = base64ToArrayBuffer(url.toString());
+        const arrayBuffer = base64ToArrayBuffer(url.toString().split(",")[1]);
 
         const base64 = await ExcalidrawFont.subsetGlyphsByCodePoints(
           arrayBuffer,
