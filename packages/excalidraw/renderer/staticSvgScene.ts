@@ -440,7 +440,7 @@ const renderElementToSvg = (
           image.setAttribute("width", "100%");
           image.setAttribute("height", "100%");
           image.setAttribute("href", fileData.dataURL);
-          image.setAttribute("preserveAspectRatio", "none"); //zsviczian
+          image.setAttribute("preserveAspectRatio", "none");
 
           symbol.appendChild(image);
 
