@@ -167,7 +167,7 @@
     "noMatch": "Nie znaleziono pasujących elementów...",
     "singleResult": "wynik",
     "multipleResults": "wyniki",
-    "placeholder": ""
+    "placeholder": "Znajdź tekst na płótnie..."
   },
   "buttons": {
     "clearReset": "Wyczyść dokument i zresetuj kolor dokumentu",
