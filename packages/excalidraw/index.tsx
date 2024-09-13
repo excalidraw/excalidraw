@@ -8,7 +8,7 @@ import "./css/styles.scss";
 import "../../public/fonts/fonts.css";
 import polyfill from "./polyfill";
 
-import { AppProps, ExcalidrawProps } from "./types";
+import { AppComponentTypes, AppProps, ExcalidrawProps } from "./types";
 import { defaultLang } from "./i18n";
 import { DEFAULT_UI_OPTIONS } from "./constants";
 import { Provider } from "jotai";
@@ -19,6 +19,11 @@ import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 
 polyfill();
+
+const DefaultUIComponents: AppComponentTypes = {
+  Toolbar: null,
+  BurgerMenu: null,
+};
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
@@ -50,6 +55,10 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     validateEmbeddable,
     renderEmbeddable,
     aiEnabled,
+
+    // #region declare custom default values
+    components = DefaultUIComponents,
+    // #endregion
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -137,6 +146,9 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
           aiEnabled={aiEnabled !== false}
+          // #region custom components
+          components={components}
+          // #endregion
         >
           {children}
         </App>

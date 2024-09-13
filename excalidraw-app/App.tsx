@@ -699,6 +699,14 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        components={{
+          Toolbar: () => {
+            return <>Toolbar</>;
+          },
+          BurgerMenu: () => {
+            return <>Burger</>;
+          },
+        }}
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}

@@ -475,6 +475,10 @@ export interface ExcalidrawProps {
     appState: AppState,
   ) => JSX.Element | null;
   aiEnabled?: boolean;
+
+  // #region put custom components here
+  components?: AppComponentTypes;
+  // #enderegion
 }
 
 export type SceneData = {
@@ -529,6 +533,13 @@ export type UIOptions = Partial<{
   welcomeScreen?: boolean;
 }>;
 
+export type NullableFC = React.FC | null;
+
+export type AppComponentTypes = {
+  Toolbar: NullableFC;
+  BurgerMenu: NullableFC;
+};
+
 export type AppProps = Merge<
   ExcalidrawProps,
   {
@@ -543,6 +554,10 @@ export type AppProps = Merge<
     isCollaborating: boolean;
     children?: React.ReactNode;
     aiEnabled: boolean;
+
+    // #region extended options type here
+    components?: AppComponentTypes;
+    // #endregion
   }
 >;
 
