@@ -18,9 +18,9 @@
     }
 
     .ExcTextField__input {
-      background-color: var(--color-gray-90); //zsviczian
+      background-color: var(--color-gray-50); //zsviczian
       @at-root .excalidraw.theme--dark#{&} {
-        background-color: var(--color-gray-90); //zsviczian
+        background-color: var(--color-gray-50); //zsviczian
       }
 
       border-radius: var(--border-radius-md);
