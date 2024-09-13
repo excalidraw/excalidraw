@@ -240,24 +240,21 @@ const LayerUI = ({
       elements,
     );
 
-    const { Toolbar, BurgerMenu } = app.props.components!;
+    const { Toolbar, StylePanel, CanvasActions } = app.props.components!;
 
     return (
       <FixedSideContainer side="top">
         <div className="App-menu App-menu_top">
-          {/* Burger */}
+          {/* StylePanel */}
           <>
-            {BurgerMenu ? (
-              BurgerMenu({})
-            ) : (
-              <>
-                <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
-                  {renderCanvasActions()}
-                  {shouldRenderSelectedShapeActions &&
-                    renderSelectedShapeActions()}
-                </Stack.Col>
-              </>
-            )}
+            <Stack.Col gap={6} className={clsx("App-menu_top__left")}>
+              {CanvasActions ? CanvasActions({}) : renderCanvasActions()}
+
+              {StylePanel
+                ? StylePanel({})
+                : shouldRenderSelectedShapeActions &&
+                  renderSelectedShapeActions()}
+            </Stack.Col>
           </>
 
           {/* Toolbar */}

@@ -536,8 +536,9 @@ export type UIOptions = Partial<{
 export type NullableFC = React.FC | null;
 
 export type AppComponentTypes = {
-  Toolbar: NullableFC;
-  BurgerMenu: NullableFC;
+  Toolbar?: NullableFC;
+  StylePanel?: NullableFC;
+  CanvasActions?: NullableFC;
 };
 
 export type AppProps = Merge<

@@ -22,7 +22,8 @@ polyfill();
 
 const DefaultUIComponents: AppComponentTypes = {
   Toolbar: null,
-  BurgerMenu: null,
+  StylePanel: null,
+  CanvasActions: null,
 };
 
 const ExcalidrawBase = (props: ExcalidrawProps) => {
