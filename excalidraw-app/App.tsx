@@ -104,7 +104,7 @@ import { openConfirmModal } from "../packages/excalidraw/components/OverwriteCon
 import { OverwriteConfirmDialog } from "../packages/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
-import { Toolbar } from "./components/Toolbar";
+// import { Toolbar } from "./components/Toolbar";
 
 polyfill();
 
@@ -700,13 +700,15 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        components={{
-          Toolbar: () => <Toolbar />,
-          CanvasActions: () => <>Burger menu</>,
-          StylePanel: () => {
-            return <>Burger</>;
-          },
-        }}
+        components={
+          {
+            // Toolbar: () => <Toolbar />,
+            // CanvasActions: () => <>Burger menu</>,
+            // StylePanel: () => {
+            //   return <>Styles</>;
+            // },
+          }
+        }
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
