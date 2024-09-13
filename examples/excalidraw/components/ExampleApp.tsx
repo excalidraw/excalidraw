@@ -40,7 +40,7 @@ import type {
 } from "@excalidraw/excalidraw/dist/excalidraw/element/types";
 import type { ImportedLibraryData } from "@excalidraw/excalidraw/dist/excalidraw/data/types";
 
-import "./App.scss";
+import "./ExampleApp.scss";
 
 type Comment = {
   x: number;
@@ -73,7 +73,7 @@ export interface AppProps {
   excalidrawLib: typeof TExcalidraw;
 }
 
-export default function App({
+export default function ExampleApp({
   appTitle,
   useCustom,
   customArgs,
