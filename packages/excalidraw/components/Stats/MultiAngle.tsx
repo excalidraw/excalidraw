@@ -3,13 +3,14 @@ import { getBoundTextElement } from "../../element/textElement";
 import { isArrowElement } from "../../element/typeChecks";
 import type { ExcalidrawElement } from "../../element/types";
 import { isInGroup } from "../../groups";
-import { degreeToRadian, radianToDegree } from "../../math";
 import type Scene from "../../scene/Scene";
 import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 import type { AppState } from "../../types";
+import type { Degrees } from "../../../math";
+import { degreesToRadians, radiansToDegrees } from "../../../math";
 
 interface MultiAngleProps {
   elements: readonly ExcalidrawElement[];
@@ -39,7 +40,7 @@ const handleDegreeChange: DragInputCallbackType<
   );
 
   if (nextValue !== undefined) {
-    const nextAngle = degreeToRadian(nextValue);
+    const nextAngle = degreesToRadians(nextValue as Degrees);
 
     for (const element of editableLatestIndividualElements) {
       if (!element) {
@@ -71,7 +72,7 @@ const handleDegreeChange: DragInputCallbackType<
     }
     const originalElement = editableOriginalIndividualElements[i];
     const originalAngleInDegrees =
-      Math.round(radianToDegree(originalElement.angle) * 100) / 100;
+      Math.round(radiansToDegrees(originalElement.angle) * 100) / 100;
     const changeInDegrees = Math.round(accumulatedChange);
     let nextAngleInDegrees = (originalAngleInDegrees + changeInDegrees) % 360;
     if (shouldChangeByStepSize) {
@@ -81,7 +82,7 @@ const handleDegreeChange: DragInputCallbackType<
     nextAngleInDegrees =
       nextAngleInDegrees < 0 ? nextAngleInDegrees + 360 : nextAngleInDegrees;
 
-    const nextAngle = degreeToRadian(nextAngleInDegrees);
+    const nextAngle = degreesToRadians(nextAngleInDegrees as Degrees);
 
     mutateElement(
       latestElement,
@@ -109,7 +110,7 @@ const MultiAngle = ({
     (el) => !isInGroup(el) && isPropertyEditable(el, "angle"),
   );
   const angles = editableLatestIndividualElements.map(
-    (el) => Math.round((radianToDegree(el.angle) % 360) * 100) / 100,
+    (el) => Math.round((radiansToDegrees(el.angle) % 360) * 100) / 100,
   );
   const value = new Set(angles).size === 1 ? angles[0] : "Mixed";
 

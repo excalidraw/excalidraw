@@ -44,6 +44,8 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
+import type { LocalPoint, Radians } from "../../math";
+import { point } from "../../math";
 
 const { h } = window;
 
@@ -753,7 +755,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
           isDeleted: false,
@@ -961,7 +963,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
           isDeleted: false,
@@ -2038,9 +2040,9 @@ describe("history", () => {
             width: 178.9000000000001,
             height: 236.10000000000002,
             points: [
-              [0, 0],
-              [178.9000000000001, 0],
-              [178.9000000000001, 236.10000000000002],
+              point(0, 0),
+              point(178.9000000000001, 0),
+              point(178.9000000000001, 236.10000000000002),
             ],
             startBinding: {
               elementId: "KPrBI4g_v9qUB1XxYLgSz",
@@ -2156,12 +2158,12 @@ describe("history", () => {
         elements: [
           newElementWith(h.elements[0] as ExcalidrawLinearElement, {
             points: [
-              [0, 0],
-              [5, 5],
-              [10, 10],
-              [15, 15],
-              [20, 20],
-            ],
+              point(0, 0),
+              point(5, 5),
+              point(10, 10),
+              point(15, 15),
+              point(20, 20),
+            ] as LocalPoint[],
           }),
         ],
         storeAction: StoreAction.UPDATE,
@@ -2727,7 +2729,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
 
       // Simulate remote update
       API.updateScene({
@@ -2740,8 +2742,8 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(4);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(3);
       expect(h.state.editingLinearElement).toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
 
@@ -4003,7 +4005,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 200,
               y: 200,
-              angle: 90,
+              angle: 90 as Radians,
             }),
           ],
           storeAction: StoreAction.CAPTURE,
@@ -4121,7 +4123,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 205,
               y: 205,
-              angle: 90,
+              angle: 90 as Radians,
             }),
           ],
           storeAction: StoreAction.CAPTURE,

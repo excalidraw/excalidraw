@@ -162,12 +162,20 @@
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
     "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
   },
+  "search": {
+    "title": "Find on canvas",
+    "noMatch": "No matches found...",
+    "singleResult": "result",
+    "multipleResults": "results",
+    "placeholder": "Find text on canvas..."
+  },
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
     "export": "Save to...",
     "copyToClipboard": "Copy to clipboard",
+    "copyLink": "Copy link",
     "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Open",
@@ -272,8 +280,7 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "magicSettings": "AI settings"
+    "mermaidToExcalidraw": "Mermaid to Excalidraw"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -297,6 +304,7 @@
     "shapes": "Shapes"
   },
   "hints": {
+    "dismissSearch": "Escape to dismiss search",
     "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",

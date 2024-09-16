@@ -24,7 +24,6 @@ import type {
   ExcalidrawNonSelectionElement,
 } from "./element/types";
 import type { Action } from "./actions/types";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { LinearElementEditor } from "./element/linearElementEditor";
 import type { SuggestedBinding } from "./element/binding";
 import type { ImportedDataState } from "./data/types";
@@ -42,8 +41,6 @@ import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type { StoreActionType } from "./store";
-
-export type Point = Readonly<RoughPoint>;
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -200,7 +197,9 @@ export type InteractiveCanvasAppState = Readonly<
     // SnapLines
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
-    editingElement: AppState["editingElement"];
+    editingTextElement: AppState["editingTextElement"];
+    // Search matches
+    searchMatches: AppState["searchMatches"];
   }
 >;
 
@@ -268,13 +267,9 @@ export interface AppState {
   editingFrame: string | null;
   elementsToHighlight: NonDeleted<ExcalidrawElement>[] | null;
   /**
-   * currently set for:
-   * - text elements while in wysiwyg
-   * - newly created linear elements while in line editor (not set for existing
-   *   elements in line editor)
-   * - and new images while being placed on canvas
+   * set when a new text is created or when an existing text is being edited
    */
-  editingElement: NonDeletedExcalidrawElement | null;
+  editingTextElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
   activeTool: {
     /**
@@ -325,14 +320,6 @@ export interface AppState {
   openDialog:
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
-    | {
-        name: "settings";
-        source:
-          | "tool" // when magicframe tool is selected
-          | "generation" // when magicframe generate button is clicked
-          | "settings"; // when AI settings dialog is explicitly invoked
-        tab: "text-to-diagram" | "diagram-to-code";
-      }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" };
   /**
@@ -399,7 +386,19 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+  searchMatches: readonly SearchMatch[];
 }
+
+type SearchMatch = {
+  id: string;
+  focus: boolean;
+  matchedLines: {
+    offsetX: number;
+    offsetY: number;
+    width: number;
+    height: number;
+  }[];
+};
 
 export type UIAppState = Omit<
   AppState,
@@ -655,6 +654,11 @@ export type AppClassProperties = {
   dismissLinearEditor: App["dismissLinearEditor"];
   flowChartCreator: App["flowChartCreator"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
+  setPlugins: App["setPlugins"];
+  plugins: App["plugins"];
+  getEditorUIOffsets: App["getEditorUIOffsets"];
+  visibleElements: App["visibleElements"];
+  excalidrawContainerValue: App["excalidrawContainerValue"];
 };
 
 export type PointerDownState = Readonly<{
@@ -842,3 +846,15 @@ export type PendingExcalidrawElements = ExcalidrawElement[];
 export type NullableGridSize =
   | (AppState["gridSize"] & MakeBrand<"NullableGridSize">)
   | null;
+
+export type GenerateDiagramToCode = (props: {
+  frame: ExcalidrawMagicFrameElement;
+  children: readonly ExcalidrawElement[];
+}) => MaybePromise<{ html: string }>;
+
+export type Offsets = Partial<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>;

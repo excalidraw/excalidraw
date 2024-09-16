@@ -1,6 +1,7 @@
+import { point, type GlobalPoint, type LocalPoint } from "../../math";
 import { THEME } from "../constants";
 import type { PointSnapLine, PointerSnapLine } from "../snapping";
-import type { InteractiveCanvasAppState, Point } from "../types";
+import type { InteractiveCanvasAppState } from "../types";
 
 const SNAP_COLOR_LIGHT = "#ff6b6b";
 const SNAP_COLOR_DARK = "#ff0000";
@@ -85,7 +86,7 @@ const drawPointerSnapLine = (
   }
 };
 
-const drawCross = (
+const drawCross = <Point extends LocalPoint | GlobalPoint>(
   [x, y]: Point,
   appState: InteractiveCanvasAppState,
   context: CanvasRenderingContext2D,
@@ -106,18 +107,18 @@ const drawCross = (
   context.restore();
 };
 
-const drawLine = (
+const drawLine = <Point extends LocalPoint | GlobalPoint>(
   from: Point,
   to: Point,
   context: CanvasRenderingContext2D,
 ) => {
   context.beginPath();
-  context.lineTo(...from);
-  context.lineTo(...to);
+  context.lineTo(from[0], from[1]);
+  context.lineTo(to[0], to[1]);
   context.stroke();
 };
 
-const drawGapLine = (
+const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
   from: Point,
   to: Point,
   direction: "horizontal" | "vertical",
@@ -138,24 +139,28 @@ const drawGapLine = (
     const halfPoint = [(from[0] + to[0]) / 2, from[1]];
     // (1)
     if (!appState.zenModeEnabled) {
-      drawLine([from[0], from[1] - FULL], [from[0], from[1] + FULL], context);
+      drawLine(
+        point(from[0], from[1] - FULL),
+        point(from[0], from[1] + FULL),
+        context,
+      );
     }
 
     // (3)
     drawLine(
-      [halfPoint[0] - QUARTER, halfPoint[1] - HALF],
-      [halfPoint[0] - QUARTER, halfPoint[1] + HALF],
+      point(halfPoint[0] - QUARTER, halfPoint[1] - HALF),
+      point(halfPoint[0] - QUARTER, halfPoint[1] + HALF),
       context,
     );
     drawLine(
-      [halfPoint[0] + QUARTER, halfPoint[1] - HALF],
-      [halfPoint[0] + QUARTER, halfPoint[1] + HALF],
+      point(halfPoint[0] + QUARTER, halfPoint[1] - HALF),
+      point(halfPoint[0] + QUARTER, halfPoint[1] + HALF),
       context,
     );
 
     if (!appState.zenModeEnabled) {
       // (4)
-      drawLine([to[0], to[1] - FULL], [to[0], to[1] + FULL], context);
+      drawLine(point(to[0], to[1] - FULL), point(to[0], to[1] + FULL), context);
 
       // (2)
       drawLine(from, to, context);
@@ -164,24 +169,28 @@ const drawGapLine = (
     const halfPoint = [from[0], (from[1] + to[1]) / 2];
     // (1)
     if (!appState.zenModeEnabled) {
-      drawLine([from[0] - FULL, from[1]], [from[0] + FULL, from[1]], context);
+      drawLine(
+        point(from[0] - FULL, from[1]),
+        point(from[0] + FULL, from[1]),
+        context,
+      );
     }
 
     // (3)
     drawLine(
-      [halfPoint[0] - HALF, halfPoint[1] - QUARTER],
-      [halfPoint[0] + HALF, halfPoint[1] - QUARTER],
+      point(halfPoint[0] - HALF, halfPoint[1] - QUARTER),
+      point(halfPoint[0] + HALF, halfPoint[1] - QUARTER),
       context,
     );
     drawLine(
-      [halfPoint[0] - HALF, halfPoint[1] + QUARTER],
-      [halfPoint[0] + HALF, halfPoint[1] + QUARTER],
+      point(halfPoint[0] - HALF, halfPoint[1] + QUARTER),
+      point(halfPoint[0] + HALF, halfPoint[1] + QUARTER),
       context,
     );
 
     if (!appState.zenModeEnabled) {
       // (4)
-      drawLine([to[0] - FULL, to[1]], [to[0] + FULL, to[1]], context);
+      drawLine(point(to[0] - FULL, to[1]), point(to[0] + FULL, to[1]), context);
 
       // (2)
       drawLine(from, to, context);

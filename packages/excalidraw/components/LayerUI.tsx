@@ -53,17 +53,16 @@ import { LibraryIcon } from "./icons";
 import { UIAppStateContext } from "../context/ui-appState";
 import { DefaultSidebar } from "./DefaultSidebar";
 import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 import { mutateElement } from "../element/mutateElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { LaserPointerButton } from "./LaserPointerButton";
-import { MagicSettings } from "./MagicSettings";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -85,14 +84,6 @@ interface LayerUIProps {
   children?: React.ReactNode;
   app: AppClassProperties;
   isCollaborating: boolean;
-  openAIKey: string | null;
-  isOpenAIKeyPersisted: boolean;
-  onOpenAIAPIKeyChange: (apiKey: string, shouldPersist: boolean) => void;
-  onMagicSettingsConfirm: (
-    apiKey: string,
-    shouldPersist: boolean,
-    source: "tool" | "generation" | "settings",
-  ) => void;
 }
 
 const DefaultMainMenu: React.FC<{
@@ -108,6 +99,7 @@ const DefaultMainMenu: React.FC<{
       {UIOptions.canvasActions.saveAsImage && (
         <MainMenu.DefaultItems.SaveAsImage />
       )}
+      <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
@@ -149,10 +141,6 @@ const LayerUI = ({
   children,
   app,
   isCollaborating,
-  openAIKey,
-  isOpenAIKeyPersisted,
-  onOpenAIAPIKeyChange,
-  onMagicSettingsConfirm,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -477,25 +465,6 @@ const LayerUI = ({
       )}
       {appState.openDialog?.name === "help" && (
         <HelpDialog
-          onClose={() => {
-            setAppState({ openDialog: null });
-          }}
-        />
-      )}
-      {appState.openDialog?.name === "settings" && (
-        <MagicSettings
-          openAIKey={openAIKey}
-          isPersisted={isOpenAIKeyPersisted}
-          onChange={onOpenAIAPIKeyChange}
-          onConfirm={(apiKey, shouldPersist) => {
-            const source =
-              appState.openDialog?.name === "settings"
-                ? appState.openDialog?.source
-                : "settings";
-            setAppState({ openDialog: null }, () => {
-              onMagicSettingsConfirm(apiKey, shouldPersist, source);
-            });
-          }}
           onClose={() => {
             setAppState({ openDialog: null });
           }}

@@ -53,6 +53,7 @@ import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
 import { isArrowElement } from "../element/typeChecks";
+import { point, type LocalPoint } from "../../math";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -417,7 +418,7 @@ const bindLinearElementToElement = (
   const endPointIndex = linearElement.points.length - 1;
   const delta = 0.5;
 
-  const newPoints = cloneJSON(linearElement.points) as [number, number][];
+  const newPoints = cloneJSON<readonly LocalPoint[]>(linearElement.points);
 
   // left to right so shift the arrow towards right
   if (
@@ -535,10 +536,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newLinearElement({
           width,
           height,
-          points: [
-            [0, 0],
-            [width, height],
-          ],
+          points: [point(0, 0), point(width, height)],
           ...element,
         });
 
@@ -551,10 +549,7 @@ export const convertToExcalidrawElements = (
           width,
           height,
           endArrowhead: "arrow",
-          points: [
-            [0, 0],
-            [width, height],
-          ],
+          points: [point(0, 0), point(width, height)],
           ...element,
           type: "arrow",
         });

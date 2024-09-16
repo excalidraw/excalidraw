@@ -814,10 +814,10 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -868,6 +868,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -1019,10 +1020,10 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1070,6 +1071,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1203,7 +1205,7 @@ History {
 
 exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] appState 1`] = `
 {
@@ -1234,10 +1236,10 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1285,6 +1287,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1533,7 +1536,7 @@ History {
 
 exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] appState 1`] = `
 {
@@ -1564,10 +1567,10 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1615,6 +1618,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1863,7 +1867,7 @@ History {
 
 exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] appState 1`] = `
 {
@@ -1894,10 +1898,10 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1945,6 +1949,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -2078,7 +2083,7 @@ History {
 
 exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] appState 1`] = `
 {
@@ -2109,10 +2114,10 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2160,6 +2165,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2317,7 +2323,7 @@ History {
 
 exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of elements 1`] = `1`;
 
-exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of renders 1`] = `7`;
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of renders 1`] = `6`;
 
 exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] appState 1`] = `
 {
@@ -2348,10 +2354,10 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2399,6 +2405,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0_copy": true,
   },
@@ -2617,7 +2624,7 @@ History {
 
 exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of renders 1`] = `7`;
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of renders 1`] = `6`;
 
 exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] appState 1`] = `
 {
@@ -2648,10 +2655,10 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2701,6 +2708,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -2985,7 +2993,7 @@ History {
 
 exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] appState 1`] = `
 {
@@ -3016,10 +3024,10 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3067,6 +3075,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -3459,7 +3468,7 @@ History {
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `18`;
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `16`;
 
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] appState 1`] = `
 {
@@ -3490,10 +3499,10 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3541,6 +3550,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -3781,7 +3791,7 @@ History {
 
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of renders 1`] = `9`;
 
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] appState 1`] = `
 {
@@ -3812,10 +3822,10 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3863,6 +3873,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -4103,7 +4114,7 @@ History {
 
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of renders 1`] = `11`;
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of renders 1`] = `9`;
 
 exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] appState 1`] = `
 {
@@ -4134,10 +4145,10 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4187,6 +4198,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -4505,7 +4517,7 @@ History {
 
 exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of renders 1`] = `13`;
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of renders 1`] = `11`;
 
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] appState 1`] = `
 {
@@ -5321,10 +5333,10 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5374,6 +5386,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -5633,7 +5646,7 @@ History {
 
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of renders 1`] = `12`;
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of renders 1`] = `10`;
 
 exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] appState 1`] = `
 {
@@ -6449,10 +6462,10 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -6502,6 +6515,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -6807,7 +6821,7 @@ History {
 
 exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of elements 1`] = `2`;
 
-exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of renders 1`] = `13`;
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of renders 1`] = `11`;
 
 exports[`contextMenu element > shows context menu for canvas > [end of test] appState 1`] = `
 {
@@ -7383,10 +7397,10 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7437,6 +7451,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8296,10 +8311,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8347,6 +8362,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -9191,10 +9207,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9245,6 +9261,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -9459,6 +9476,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] nu
 
 exports[`contextMenu element > shows context menu for element > [end of test] number of elements 2`] = `2`;
 
-exports[`contextMenu element > shows context menu for element > [end of test] number of renders 1`] = `6`;
+exports[`contextMenu element > shows context menu for element > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > shows context menu for element > [end of test] number of renders 2`] = `6`;

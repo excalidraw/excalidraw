@@ -29,10 +29,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -80,6 +80,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id166": true,
   },
@@ -599,7 +600,7 @@ History {
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of elements 1`] = `4`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `22`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and the arrow got bound to a different element in the meantime > [end of test] number of renders 1`] = `21`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] appState 1`] = `
 {
@@ -630,10 +631,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -681,6 +682,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id161": true,
   },
@@ -1104,7 +1106,7 @@ History {
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `24`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind bindings when both are updated through the history and there are no conflicting updates in the meantime > [end of test] number of renders 1`] = `23`;
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should rebind remotely added arrow when it's bindable elements are added through the history > [end of test] appState 1`] = `
 {
@@ -1135,10 +1137,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1187,6 +1189,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -1502,10 +1505,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1554,6 +1557,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -1870,10 +1874,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1922,6 +1926,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2136,10 +2141,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2185,6 +2190,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id180": true,
   },
@@ -2544,7 +2550,7 @@ History {
 
 exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] number of renders 1`] = `10`;
+exports[`history > multiplayer undo/redo > conflicts in arrows and their bindable elements > should update bound element points when rectangle was remotely moved and arrow is added back through the history > [end of test] number of renders 1`] = `9`;
 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should preserve latest remotely added binding and unbind previous one when the container is added through the history > [end of test] appState 1`] = `
 {
@@ -2575,10 +2581,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2627,6 +2633,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2873,10 +2880,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2925,6 +2932,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3156,10 +3164,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3208,6 +3216,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3449,10 +3458,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3501,6 +3510,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3734,10 +3744,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3786,6 +3796,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3968,10 +3979,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4020,6 +4031,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4226,10 +4238,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4278,6 +4290,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4498,10 +4511,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4550,6 +4563,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4728,10 +4742,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4780,6 +4794,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4958,10 +4973,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5010,6 +5025,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5186,10 +5202,10 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5238,6 +5254,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5414,10 +5431,10 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5466,6 +5483,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5672,10 +5690,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5723,6 +5741,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -6002,10 +6021,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -6053,6 +6072,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -6395,7 +6415,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `20`;
+exports[`history > multiplayer undo/redo > should iterate through the history when element changes relate only to remotely deleted elements > [end of test] number of renders 1`] = `17`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when selected elements relate only to remotely deleted elements > [end of test] appState 1`] = `
 {
@@ -6426,10 +6446,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -6477,6 +6497,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id100": true,
     "id101": true,
@@ -6803,10 +6824,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -6855,6 +6876,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id105": true,
     "id106": true,
@@ -7121,10 +7143,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7170,7 +7192,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "selectedElementIds": {},
+  "searchMatches": [],
+  "selectedElementIds": {
+    "id113": true,
+  },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectionElement": null,
@@ -7241,7 +7266,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 8,
+  "version": 7,
   "width": 10,
   "x": -10,
   "y": -10,
@@ -7273,8 +7298,7 @@ History {
       },
       "elementsChange": ElementsChange {
         "added": Map {},
-        "removed": Map {},
-        "updated": Map {
+        "removed": Map {
           "id113" => Delta {
             "deleted": {
               "angle": 0,
@@ -7289,7 +7313,7 @@ History {
               "groupIds": [],
               "height": 10,
               "index": "a0",
-              "isDeleted": true,
+              "isDeleted": false,
               "lastCommittedPoint": [
                 10,
                 10,
@@ -7326,6 +7350,7 @@ History {
             },
           },
         },
+        "updated": Map {},
       },
     },
     HistoryEntry {
@@ -7367,11 +7392,9 @@ History {
         "delta": Delta {
           "deleted": {
             "editingLinearElementId": null,
-            "selectedLinearElementId": null,
           },
           "inserted": {
             "editingLinearElementId": "id113",
-            "selectedLinearElementId": "id113",
           },
         },
       },
@@ -7387,7 +7410,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of renders 1`] = `11`;
+exports[`history > multiplayer undo/redo > should iterate through the history when selected or editing linear element was remotely deleted > [end of test] number of renders 1`] = `10`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] appState 1`] = `
 {
@@ -7418,10 +7441,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7467,6 +7490,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -7615,7 +7639,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] number of renders 1`] = `10`;
+exports[`history > multiplayer undo/redo > should iterate through the history when when element change relates to remotely deleted element > [end of test] number of renders 1`] = `9`;
 
 exports[`history > multiplayer undo/redo > should iterate through the history when z-index changes do not produce visible change and we synced all indices > [end of test] appState 1`] = `
 {
@@ -7646,10 +7670,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7695,6 +7719,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8000,10 +8025,10 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8049,6 +8074,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8354,10 +8380,10 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8406,6 +8432,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id127": true,
     "id128": true,
@@ -8726,7 +8753,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] number of elements 1`] = `3`;
 
-exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] number of renders 1`] = `27`;
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress dragging > [end of test] number of renders 1`] = `25`;
 
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] appState 1`] = `
 {
@@ -8757,10 +8784,10 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8806,6 +8833,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8885,7 +8913,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 8,
+  "version": 7,
   "width": 50,
   "x": 10,
   "y": 10,
@@ -9012,7 +9040,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] number of elements 1`] = `2`;
 
-exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] number of renders 1`] = `10`;
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress freedraw > [end of test] number of renders 1`] = `8`;
 
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] appState 1`] = `
 {
@@ -9043,10 +9071,10 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9092,6 +9120,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id124": true,
   },
@@ -9276,7 +9305,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] number of elements 1`] = `2`;
 
-exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] number of renders 1`] = `14`;
+exports[`history > multiplayer undo/redo > should not let remote changes to interfere with in progress resizing > [end of test] number of renders 1`] = `13`;
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] appState 1`] = `
 {
@@ -9307,10 +9336,10 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9356,6 +9385,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id81": true,
   },
@@ -9539,7 +9569,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of elements 1`] = `2`;
 
-exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of renders 1`] = `11`;
+exports[`history > multiplayer undo/redo > should not override remote changes on different elements > [end of test] number of renders 1`] = `10`;
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] appState 1`] = `
 {
@@ -9570,10 +9600,10 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9619,6 +9649,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id83": true,
   },
@@ -9769,7 +9800,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of renders 1`] = `10`;
+exports[`history > multiplayer undo/redo > should not override remote changes on different properties > [end of test] number of renders 1`] = `9`;
 
 exports[`history > multiplayer undo/redo > should override remotely added groups on undo, but restore them on redo > [end of test] appState 1`] = `
 {
@@ -9800,10 +9831,10 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9852,6 +9883,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10100,10 +10132,10 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10149,6 +10181,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id92": true,
   },
@@ -10408,7 +10441,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `17`;
+exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `15`;
 
 exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] appState 1`] = `
 {
@@ -10439,10 +10472,10 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10488,6 +10521,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10642,7 +10676,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] number of renders 1`] = `12`;
+exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] number of renders 1`] = `11`;
 
 exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end of test] appState 1`] = `
 {
@@ -10673,10 +10707,10 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10725,6 +10759,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -11125,10 +11160,10 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11174,6 +11209,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id84": true,
   },
@@ -11347,7 +11383,7 @@ History {
 
 exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of renders 1`] = `16`;
+exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] number of renders 1`] = `15`;
 
 exports[`history > singleplayer undo/redo > remounting undo/redo buttons should initialize undo/redo state correctly > [end of test] appState 1`] = `
 {
@@ -11378,10 +11414,10 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11427,6 +11463,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -11585,7 +11622,7 @@ History {
 
 exports[`history > singleplayer undo/redo > remounting undo/redo buttons should initialize undo/redo state correctly > [end of test] number of elements 1`] = `2`;
 
-exports[`history > singleplayer undo/redo > remounting undo/redo buttons should initialize undo/redo state correctly > [end of test] number of renders 1`] = `12`;
+exports[`history > singleplayer undo/redo > remounting undo/redo buttons should initialize undo/redo state correctly > [end of test] number of renders 1`] = `11`;
 
 exports[`history > singleplayer undo/redo > should clear the redo stack on elements change > [end of test] appState 1`] = `
 {
@@ -11616,10 +11653,10 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11665,6 +11702,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id14": true,
   },
@@ -11825,7 +11863,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should clear the redo stack on elements change > [end of test] number of elements 1`] = `2`;
 
-exports[`history > singleplayer undo/redo > should clear the redo stack on elements change > [end of test] number of renders 1`] = `10`;
+exports[`history > singleplayer undo/redo > should clear the redo stack on elements change > [end of test] number of renders 1`] = `8`;
 
 exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] appState 1`] = `
 {
@@ -11856,10 +11894,10 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11905,6 +11943,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -12011,7 +12050,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 6,
+  "version": 5,
   "width": 50,
   "x": 60,
   "y": 0,
@@ -12065,7 +12104,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "strokeWidth": 2,
   "type": "freedraw",
   "updated": 1,
-  "version": 5,
+  "version": 4,
   "width": 50,
   "x": 150,
   "y": -10,
@@ -12225,7 +12264,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] number of elements 1`] = `3`;
 
-exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] number of renders 1`] = `15`;
+exports[`history > singleplayer undo/redo > should create entry when selecting freedraw > [end of test] number of renders 1`] = `12`;
 
 exports[`history > singleplayer undo/redo > should create new history entry on scene import via drag&drop > [end of test] appState 1`] = `
 {
@@ -12256,10 +12295,10 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -12308,6 +12347,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "resizingElement": null,
   "scrollX": -50,
   "scrollY": -50,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -12502,10 +12542,10 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -12551,6 +12591,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id78": true,
   },
@@ -12711,7 +12752,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should disable undo/redo buttons when stacks empty > [end of test] number of elements 1`] = `2`;
 
-exports[`history > singleplayer undo/redo > should disable undo/redo buttons when stacks empty > [end of test] number of renders 1`] = `8`;
+exports[`history > singleplayer undo/redo > should disable undo/redo buttons when stacks empty > [end of test] number of renders 1`] = `7`;
 
 exports[`history > singleplayer undo/redo > should end up with no history entry after initializing scene > [end of test] appState 1`] = `
 {
@@ -12742,10 +12783,10 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -12791,6 +12832,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id19": true,
   },
@@ -12951,7 +12993,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should end up with no history entry after initializing scene > [end of test] number of elements 1`] = `2`;
 
-exports[`history > singleplayer undo/redo > should end up with no history entry after initializing scene > [end of test] number of renders 1`] = `8`;
+exports[`history > singleplayer undo/redo > should end up with no history entry after initializing scene > [end of test] number of renders 1`] = `7`;
 
 exports[`history > singleplayer undo/redo > should iterate through the history when selection changes do not produce visible change > [end of test] appState 1`] = `
 {
@@ -12982,10 +13024,10 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13033,6 +13075,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -13197,7 +13240,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should iterate through the history when selection changes do not produce visible change > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should iterate through the history when selection changes do not produce visible change > [end of test] number of renders 1`] = `14`;
+exports[`history > singleplayer undo/redo > should iterate through the history when selection changes do not produce visible change > [end of test] number of renders 1`] = `13`;
 
 exports[`history > singleplayer undo/redo > should not clear the redo stack on standalone appstate change > [end of test] appState 1`] = `
 {
@@ -13228,10 +13271,10 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13277,6 +13320,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id8": true,
   },
@@ -13528,7 +13572,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should not clear the redo stack on standalone appstate change > [end of test] number of elements 1`] = `2`;
 
-exports[`history > singleplayer undo/redo > should not clear the redo stack on standalone appstate change > [end of test] number of renders 1`] = `14`;
+exports[`history > singleplayer undo/redo > should not clear the redo stack on standalone appstate change > [end of test] number of renders 1`] = `12`;
 
 exports[`history > singleplayer undo/redo > should not collapse when applying corrupted history entry > [end of test] appState 1`] = `
 {
@@ -13559,10 +13603,10 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13611,6 +13655,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -13730,10 +13775,10 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13779,6 +13824,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
     "id2": true,
@@ -14017,10 +14063,10 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -14069,6 +14115,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -14283,10 +14330,10 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -14334,6 +14381,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id11": true,
   },
@@ -14526,7 +14574,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] number of renders 1`] = `16`;
+exports[`history > singleplayer undo/redo > should not override appstate changes when redo stack is not cleared > [end of test] number of renders 1`] = `15`;
 
 exports[`history > singleplayer undo/redo > should support appstate name or viewBackgroundColor change > [end of test] appState 1`] = `
 {
@@ -14557,10 +14605,10 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -14609,6 +14657,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -14717,10 +14766,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -14768,6 +14817,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id55": true,
   },
@@ -15381,7 +15431,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] number of renders 1`] = `13`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on deletion and rebind on undo > [end of test] number of renders 1`] = `12`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] appState 1`] = `
 {
@@ -15412,10 +15462,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -15463,6 +15513,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id49": true,
   },
@@ -16000,7 +16051,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] number of renders 1`] = `13`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind arrow from non deleted bindable elements on undo and rebind on redo > [end of test] number of renders 1`] = `12`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] appState 1`] = `
 {
@@ -16031,10 +16082,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -16082,6 +16133,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id61": true,
   },
@@ -16619,7 +16671,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] number of renders 1`] = `21`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind everything from non deleted elements when iterating through the whole undo stack and vice versa rebind everything on redo > [end of test] number of renders 1`] = `20`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] appState 1`] = `
 {
@@ -16650,10 +16702,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -16699,6 +16751,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id62": true,
   },
@@ -17330,7 +17383,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `15`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangle from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `14`;
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] appState 1`] = `
 {
@@ -17361,10 +17414,10 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -17412,6 +17465,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id69": true,
     "id71": true,
@@ -18079,7 +18133,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] number of elements 1`] = `4`;
 
-exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `16`;
+exports[`history > singleplayer undo/redo > should support bidirectional bindings > should unbind rectangles from arrow on deletion and rebind on undo > [end of test] number of renders 1`] = `15`;
 
 exports[`history > singleplayer undo/redo > should support changes in elements' order > [end of test] appState 1`] = `
 {
@@ -18110,10 +18164,10 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -18161,6 +18215,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id39": true,
     "id41": true,
@@ -18552,7 +18607,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support changes in elements' order > [end of test] number of elements 1`] = `3`;
 
-exports[`history > singleplayer undo/redo > should support changes in elements' order > [end of test] number of renders 1`] = `23`;
+exports[`history > singleplayer undo/redo > should support changes in elements' order > [end of test] number of renders 1`] = `20`;
 
 exports[`history > singleplayer undo/redo > should support duplication of groups, appstate group selection and editing group > [end of test] appState 1`] = `
 {
@@ -18583,10 +18638,10 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -18634,6 +18689,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id35_copy_copy": true,
     "id36_copy_copy": true,
@@ -19104,10 +19160,10 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -19155,6 +19211,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -19528,7 +19585,7 @@ History {
 
 exports[`history > singleplayer undo/redo > should support element creation, deletion and appstate element selection change > [end of test] number of elements 1`] = `3`;
 
-exports[`history > singleplayer undo/redo > should support element creation, deletion and appstate element selection change > [end of test] number of renders 1`] = `30`;
+exports[`history > singleplayer undo/redo > should support element creation, deletion and appstate element selection change > [end of test] number of renders 1`] = `27`;
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] appState 1`] = `
 {
@@ -19559,10 +19616,10 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -19610,6 +19667,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
+  "searchMatches": [],
   "selectedElementIds": {
     "id27": true,
   },
@@ -19917,11 +19975,9 @@ History {
         "delta": Delta {
           "deleted": {
             "editingLinearElementId": null,
-            "selectedLinearElementId": null,
           },
           "inserted": {
             "editingLinearElementId": "id27",
-            "selectedLinearElementId": "id27",
           },
         },
       },
@@ -19937,4 +19993,4 @@ History {
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `23`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `21`;
