@@ -284,16 +284,17 @@ export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  forceAdvanceWidth?: true,
 ) => {
-  text = text
+  const _text = text
     .split("\n")
     // replace empty lines with single space because leading/trailing empty
     // lines would be stripped from computation
     .map((x) => x || " ")
     .join("\n");
   const fontSize = parseFloat(font);
-  const height = getTextHeight(text, fontSize, lineHeight);
-  const width = getTextWidth(text, font);
+  const height = getTextHeight(_text, fontSize, lineHeight);
+  const width = getTextWidth(_text, font, forceAdvanceWidth);
   return { width, height };
 };
 

@@ -133,6 +133,7 @@ const SingleLibraryItem = ({
           exportBackground: true,
         },
         files: null,
+        skipInliningFonts: true,
       });
       node.innerHTML = svg.outerHTML;
     })();
