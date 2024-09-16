@@ -5,6 +5,7 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
+  THEME,
 } from "../constants";
 import { normalizeLink, toValidURL } from "../data/url";
 import { getElementAbsoluteCoords } from "../element";
@@ -37,6 +38,7 @@ import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 import { getVerticalOffset } from "../fonts";
 import { getCornerRadius, isPathALoop } from "../shapes";
+import { applyDarkModeFilter } from "../colors";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -139,7 +141,7 @@ const renderElementToSvg = (
     case "rectangle":
     case "diamond":
     case "ellipse": {
-      const shape = ShapeCache.generateElementShape(element, null);
+      const shape = ShapeCache.generateElementShape(element, renderConfig);
       const node = roughSVGDrawWithPrecision(
         rsvg,
         shape,
@@ -389,7 +391,12 @@ const renderElementToSvg = (
       );
       node.setAttribute("stroke", "none");
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      path.setAttribute("fill", element.strokeColor);
+      path.setAttribute(
+        "fill",
+        renderConfig.theme === THEME.DARK
+          ? applyDarkModeFilter(element.strokeColor)
+          : element.strokeColor,
+      );
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
 
@@ -526,7 +533,12 @@ const renderElementToSvg = (
         rect.setAttribute("ry", FRAME_STYLE.radius.toString());
 
         rect.setAttribute("fill", "none");
-        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
+        rect.setAttribute(
+          "stroke",
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
+            : FRAME_STYLE.strokeColor,
+        );
         rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
 
         addToRoot(rect, element);
@@ -577,7 +589,12 @@ const renderElementToSvg = (
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute("fill", element.strokeColor);
+          text.setAttribute(
+            "fill",
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor,
+          );
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);

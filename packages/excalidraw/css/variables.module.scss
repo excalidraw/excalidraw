@@ -189,7 +189,11 @@
   }
 }
 
-$theme-filter: "invert(93%) hue-rotate(180deg)";
+$theme-filter: "invert(93%) hue-rotate(180deg)"; // prod
+// $theme-filter: "invert(93%)"; // prod
+// $theme-filter: "hue-rotate(180deg)"; // prod
+// $theme-filter: "hue-rotate(180deg) invert(93%)";
+
 $right-sidebar-width: "302px";
 
 :export {

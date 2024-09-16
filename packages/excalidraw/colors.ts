@@ -1,5 +1,90 @@
 import oc from "open-color";
 import type { Merge } from "./utility-types";
+import { clamp } from "../math/utils";
+import tinycolor from "tinycolor2";
+import { degreesToRadians } from "../math/angle";
+import type { Degrees } from "../math/types";
+
+function cssHueRotate(
+  red: number,
+  green: number,
+  blue: number,
+  degrees: Degrees,
+): { r: number; g: number; b: number } {
+  // normalize
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+
+  // Convert degrees to radians
+  const a = degreesToRadians(degrees);
+
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+
+  // rotation matrix
+  const matrix = [
+    0.213 + c * 0.787 - s * 0.213,
+    0.715 - c * 0.715 - s * 0.715,
+    0.072 - c * 0.072 + s * 0.928,
+    0.213 - c * 0.213 + s * 0.143,
+    0.715 + c * 0.285 + s * 0.14,
+    0.072 - c * 0.072 - s * 0.283,
+    0.213 - c * 0.213 - s * 0.787,
+    0.715 - c * 0.715 + s * 0.715,
+    0.072 + c * 0.928 + s * 0.072,
+  ];
+
+  // transform
+  const newR = r * matrix[0] + g * matrix[1] + b * matrix[2];
+  const newG = r * matrix[3] + g * matrix[4] + b * matrix[5];
+  const newB = r * matrix[6] + g * matrix[7] + b * matrix[8];
+
+  // clamp the values to [0, 1] range and convert back to [0, 255]
+  return {
+    r: Math.round(Math.max(0, Math.min(1, newR)) * 255),
+    g: Math.round(Math.max(0, Math.min(1, newG)) * 255),
+    b: Math.round(Math.max(0, Math.min(1, newB)) * 255),
+  };
+}
+
+const cssInvert = (
+  r: number,
+  g: number,
+  b: number,
+  percent: number,
+): { r: number; g: number; b: number } => {
+  const p = clamp(percent, 0, 100) / 100;
+
+  // Function to invert a single color component
+  const invertComponent = (color: number): number => {
+    // Apply the invert formula
+    const inverted = color * (1 - p) + (255 - color) * p;
+    // Round to the nearest integer and clamp to [0, 255]
+    return Math.round(clamp(inverted, 0, 255));
+  };
+
+  // Calculate the inverted RGB components
+  const invertedR = invertComponent(r);
+  const invertedG = invertComponent(g);
+  const invertedB = invertComponent(b);
+
+  return { r: invertedR, g: invertedG, b: invertedB };
+};
+
+export const applyDarkModeFilter = (color: string) => {
+  let tc = tinycolor(color);
+
+  const _alpha = tc._a;
+
+  // order of operations matters
+  // (corresponds to "filter: invert(invertPercent) hue-rotate(hueDegrees)" in css)
+  tc = tinycolor(cssInvert(tc._r, tc._g, tc._b, 93));
+  tc = tinycolor(cssHueRotate(tc._r, tc._g, tc._b, 180 as Degrees));
+  tc.setAlpha(_alpha);
+
+  return tc.toHex8String();
+};
 
 // FIXME can't put to utils.ts rn because of circular dependency
 const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(

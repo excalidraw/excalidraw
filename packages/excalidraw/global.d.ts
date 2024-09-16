@@ -104,3 +104,13 @@ declare namespace jest {
     toBeNonNaNNumber(): void;
   }
 }
+
+declare namespace tinycolor {
+  interface Instance {
+    _r: number;
+    _g: number;
+    _b: number;
+    _a: number;
+    _ok: boolean;
+  }
+}

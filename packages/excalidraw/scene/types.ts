@@ -35,6 +35,7 @@ export type StaticCanvasRenderConfig = {
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
+  theme: AppState["theme"];
 };
 
 export type SVGRenderConfig = {
@@ -46,6 +47,7 @@ export type SVGRenderConfig = {
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   embedsValidationStatus: EmbedsValidationStatus;
+  theme: AppState["theme"];
 };
 
 export type InteractiveCanvasRenderConfig = {

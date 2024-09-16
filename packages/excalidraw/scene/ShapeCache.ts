@@ -9,6 +9,7 @@ import { _generateElementShape } from "./Shape";
 import type { ElementShape, ElementShapes } from "./types";
 import { COLOR_PALETTE } from "../colors";
 import type { AppState, EmbedsValidationStatus } from "../types";
+import { THEME } from "..";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();
@@ -52,6 +53,7 @@ export class ShapeCache {
       isExporting: boolean;
       canvasBackgroundColor: AppState["viewBackgroundColor"];
       embedsValidationStatus: EmbedsValidationStatus;
+      theme: AppState["theme"];
     } | null,
   ) => {
     // when exporting, always regenerated to guarantee the latest shape
@@ -74,6 +76,7 @@ export class ShapeCache {
         isExporting: false,
         canvasBackgroundColor: COLOR_PALETTE.white,
         embedsValidationStatus: null,
+        theme: THEME.LIGHT,
       },
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]

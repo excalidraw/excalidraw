@@ -1700,6 +1700,7 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                             pendingFlowchartNodes:
                               this.flowChartCreator.pendingNodes,
+                            theme: this.state.theme,
                           }}
                         />
                         {this.state.newElement && (
@@ -1720,6 +1721,7 @@ class App extends React.Component<AppProps, AppState> {
                               elementsPendingErasure:
                                 this.elementsPendingErasure,
                               pendingFlowchartNodes: null,
+                              theme: this.state.theme,
                             }}
                           />
                         )}
@@ -2694,6 +2696,11 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         activeTool: updateActiveTool(this.state, { type: "selection" }),
       });
+    }
+    if (prevState.theme !== this.state.theme) {
+      this.scene
+        .getElementsIncludingDeleted()
+        .forEach((element) => ShapeCache.delete(element));
     }
     if (
       this.state.activeTool.type === "eraser" &&

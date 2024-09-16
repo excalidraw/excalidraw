@@ -40,6 +40,7 @@ import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
 import type { Font } from "../fonts/ExcalidrawFont";
+import { applyDarkModeFilter } from "../colors";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -214,6 +215,8 @@ export const exportToCanvas = async (
     files,
   });
 
+  const theme = appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT;
+
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
@@ -233,7 +236,7 @@ export const exportToCanvas = async (
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
-      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+      theme,
     },
     renderConfig: {
       canvasBackgroundColor: viewBackgroundColor,
@@ -244,6 +247,7 @@ export const exportToCanvas = async (
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
       pendingFlowchartNodes: null,
+      theme,
     },
   });
 
@@ -330,7 +334,7 @@ export const exportToSvg = async (
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
   if (exportWithDarkMode) {
-    svgRoot.setAttribute("filter", THEME_FILTER);
+    // svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
   const offsetX = -minX + exportPadding;
@@ -376,13 +380,20 @@ export const exportToSvg = async (
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${width}`);
     rect.setAttribute("height", `${height}`);
-    rect.setAttribute("fill", viewBackgroundColor);
+    rect.setAttribute(
+      "fill",
+      appState.exportWithDarkMode
+        ? applyDarkModeFilter(viewBackgroundColor)
+        : viewBackgroundColor,
+    );
     svgRoot.appendChild(rect);
   }
 
   const rsvg = rough.svg(svgRoot);
 
   const renderEmbeddables = opts?.renderEmbeddables ?? false;
+
+  const theme = appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT;
 
   renderSceneToSvg(
     elementsForRender,
@@ -405,6 +416,7 @@ export const exportToSvg = async (
               .map((element) => [element.id, true]),
           )
         : new Map(),
+      theme,
     },
   );
 

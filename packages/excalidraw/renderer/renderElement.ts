@@ -61,6 +61,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
 import { isRightAngleRads } from "../../math";
 import { getCornerRadius } from "../shapes";
+import { applyDarkModeFilter } from "../colors";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -247,9 +248,9 @@ const generateElementCanvas = (
   const rc = rough.canvas(canvas);
 
   // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig, appState)) {
-    context.filter = IMAGE_INVERT_FILTER;
-  }
+  // if (shouldResetImageFilter(element, renderConfig, appState)) {
+  //   context.filter = IMAGE_INVERT_FILTER;
+  // }
 
   drawElementOnCanvas(element, rc, context, renderConfig, appState);
 
@@ -403,7 +404,10 @@ const drawElementOnCanvas = (
     case "freedraw": {
       // Draw directly to canvas
       context.save();
-      context.fillStyle = element.strokeColor;
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? applyDarkModeFilter(element.strokeColor)
+          : element.strokeColor;
 
       const path = getFreeDrawPath2D(element) as Path2D;
       const fillShape = ShapeCache.get(element);
@@ -412,7 +416,10 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
 
-      context.fillStyle = element.strokeColor;
+      context.fillStyle =
+        appState.theme === THEME.DARK
+          ? applyDarkModeFilter(element.strokeColor)
+          : element.strokeColor;
       context.fill(path);
 
       context.restore();
@@ -458,7 +465,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.fillStyle = element.strokeColor;
+        context.fillStyle =
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
@@ -699,7 +709,10 @@ export const renderElement = (
         context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = FRAME_STYLE.strokeColor;
+        context.strokeStyle =
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : FRAME_STYLE.strokeColor;
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {

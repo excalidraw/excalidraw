@@ -3,6 +3,7 @@ import type { StaticCanvasAppState, AppState } from "../types";
 import type { StaticCanvasRenderConfig } from "../scene/types";
 
 import { THEME, THEME_FILTER } from "../constants";
+import { applyDarkModeFilter } from "../colors";
 
 export const fillCircle = (
   context: CanvasRenderingContext2D,
@@ -50,7 +51,7 @@ export const bootstrapCanvas = ({
   context.scale(scale, scale);
 
   if (isExporting && theme === THEME.DARK) {
-    context.filter = THEME_FILTER;
+    // context.filter = THEME_FILTER;
   }
 
   // Paint background
@@ -64,7 +65,10 @@ export const bootstrapCanvas = ({
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
     context.save();
-    context.fillStyle = viewBackgroundColor;
+    context.fillStyle =
+      theme === THEME.DARK
+        ? applyDarkModeFilter(viewBackgroundColor)
+        : viewBackgroundColor;
     context.fillRect(0, 0, normalizedWidth, normalizedHeight);
     context.restore();
   } else {

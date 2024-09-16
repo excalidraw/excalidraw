@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari, POINTER_BUTTON } from "../constants";
+import { CLASSES, isSafari, POINTER_BUTTON, THEME } from "../constants";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -50,6 +50,7 @@ import {
   originalContainerCache,
   updateOriginalContainerCache,
 } from "./containerCache";
+import { applyDarkModeFilter } from "../colors";
 
 const getTransform = (
   width: number,
@@ -273,10 +274,15 @@ export const textWysiwyg = ({
         textAlign,
         verticalAlign,
         color: updatedTextElement.strokeColor,
+        // color:
+        //   appState.theme === THEME.DARK
+        //     ? applyDarkModeFilter(updatedTextElement.strokeColor)
+        //     : updatedTextElement.strokeColor,
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
       });
+      // console.log("...", updatedTextElement.strokeColor);
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
