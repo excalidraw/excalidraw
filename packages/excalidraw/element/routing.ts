@@ -1,16 +1,19 @@
-import { cross } from "../../utils/geometry/geometry";
-import BinaryHeap from "../binaryheap";
+import type { Radians } from "../../math";
 import {
-  aabbForElement,
-  arePointsEqual,
-  pointInsideBounds,
-  pointToVector,
-  scalePointFromOrigin,
-  scaleVector,
-  translatePoint,
-} from "../math";
+  point,
+  pointScaleFromOrigin,
+  pointTranslate,
+  vector,
+  vectorCross,
+  vectorFromPoint,
+  vectorScale,
+  type GlobalPoint,
+  type LocalPoint,
+  type Vector,
+} from "../../math";
+import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
-import type { Point } from "../types";
+import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
@@ -25,6 +28,8 @@ import {
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
 import {
+  compareHeading,
+  flipHeading,
   HEADING_DOWN,
   HEADING_LEFT,
   HEADING_RIGHT,
@@ -41,6 +46,8 @@ import type {
 } from "./types";
 import type { ElementsMap, ExcalidrawBindableElement } from "./types";
 
+type GridAddress = [number, number] & { _brand: "gridaddress" };
+
 type Node = {
   f: number;
   g: number;
@@ -48,8 +55,8 @@ type Node = {
   closed: boolean;
   visited: boolean;
   parent: Node | null;
-  pos: Point;
-  addr: [number, number];
+  pos: GlobalPoint;
+  addr: GridAddress;
 };
 
 type Grid = {
@@ -63,8 +70,8 @@ const BASE_PADDING = 40;
 export const mutateElbowArrow = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  nextPoints: readonly Point[],
-  offset?: Point,
+  nextPoints: readonly LocalPoint[],
+  offset?: Vector,
   otherUpdates?: {
     startBinding?: FixedPointBinding | null;
     endBinding?: FixedPointBinding | null;
@@ -75,14 +82,20 @@ export const mutateElbowArrow = (
     informMutation?: boolean;
   },
 ) => {
-  const origStartGlobalPoint = translatePoint(nextPoints[0], [
-    arrow.x + (offset ? offset[0] : 0),
-    arrow.y + (offset ? offset[1] : 0),
-  ]);
-  const origEndGlobalPoint = translatePoint(nextPoints[nextPoints.length - 1], [
-    arrow.x + (offset ? offset[0] : 0),
-    arrow.y + (offset ? offset[1] : 0),
-  ]);
+  const origStartGlobalPoint: GlobalPoint = pointTranslate(
+    pointTranslate<LocalPoint, GlobalPoint>(
+      nextPoints[0],
+      vector(arrow.x, arrow.y),
+    ),
+    offset,
+  );
+  const origEndGlobalPoint: GlobalPoint = pointTranslate(
+    pointTranslate<LocalPoint, GlobalPoint>(
+      nextPoints[nextPoints.length - 1],
+      vector(arrow.x, arrow.y),
+    ),
+    offset,
+  );
 
   const startElement =
     arrow.startBinding &&
@@ -277,7 +290,10 @@ export const mutateElbowArrow = (
   );
 
   if (path) {
-    const points = path.map((node) => [node.pos[0], node.pos[1]]) as Point[];
+    const points = path.map((node) => [
+      node.pos[0],
+      node.pos[1],
+    ]) as GlobalPoint[];
     startDongle && points.unshift(startGlobalPoint);
     endDongle && points.push(endGlobalPoint);
 
@@ -286,7 +302,7 @@ export const mutateElbowArrow = (
       {
         ...otherUpdates,
         ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
-        angle: 0,
+        angle: 0 as Radians,
       },
       options?.informMutation,
     );
@@ -365,7 +381,7 @@ const astar = (
       }
 
       // Intersect
-      const neighborHalfPoint = scalePointFromOrigin(
+      const neighborHalfPoint = pointScaleFromOrigin(
         neighbor.pos,
         current.pos,
         0.5,
@@ -382,17 +398,17 @@ const astar = (
       // We need to check if the path we have arrived at this neighbor is the shortest one we have seen yet.
       const neighborHeading = neighborIndexToHeading(i as 0 | 1 | 2 | 3);
       const previousDirection = current.parent
-        ? vectorToHeading(pointToVector(current.pos, current.parent.pos))
+        ? vectorToHeading(vectorFromPoint(current.pos, current.parent.pos))
         : startHeading;
 
       // Do not allow going in reverse
-      const reverseHeading = scaleVector(previousDirection, -1);
+      const reverseHeading = flipHeading(previousDirection);
       const neighborIsReverseRoute =
-        arePointsEqual(reverseHeading, neighborHeading) ||
-        (arePointsEqual(start.addr, neighbor.addr) &&
-          arePointsEqual(neighborHeading, startHeading)) ||
-        (arePointsEqual(end.addr, neighbor.addr) &&
-          arePointsEqual(neighborHeading, endHeading));
+        compareHeading(reverseHeading, neighborHeading) ||
+        (gridAddressesEqual(start.addr, neighbor.addr) &&
+          compareHeading(neighborHeading, startHeading)) ||
+        (gridAddressesEqual(end.addr, neighbor.addr) &&
+          compareHeading(neighborHeading, endHeading));
       if (neighborIsReverseRoute) {
         continue;
       }
@@ -446,7 +462,7 @@ const pathTo = (start: Node, node: Node) => {
   return path;
 };
 
-const m_dist = (a: Point, b: Point) =>
+const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
 /**
@@ -547,7 +563,12 @@ const generateDynamicAABBs = (
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
-      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[2] - endCenterX, a[1] - endCenterY),
+          vector(a[0] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [first[0], first[1], cX, first[3]],
           [cX, second[1], second[2], second[3]],
@@ -563,7 +584,12 @@ const generateDynamicAABBs = (
       const cX = first[2] + (second[0] - first[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
-      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[0] - endCenterX, a[1] - endCenterY),
+          vector(a[2] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [first[0], first[1], first[2], cY],
           [second[0], cY, second[2], second[3]],
@@ -579,7 +605,12 @@ const generateDynamicAABBs = (
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = first[3] + (second[1] - first[3]) / 2;
 
-      if (cross([a[2], a[1]], [a[0], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[2] - endCenterX, a[1] - endCenterY),
+          vector(a[0] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [cX, first[1], first[2], first[3]],
           [second[0], second[1], cX, second[3]],
@@ -595,7 +626,12 @@ const generateDynamicAABBs = (
       const cX = second[2] + (first[0] - second[2]) / 2;
       const cY = second[3] + (first[1] - second[3]) / 2;
 
-      if (cross([a[0], a[1]], [a[2], a[3]], [endCenterX, endCenterY]) > 0) {
+      if (
+        vectorCross(
+          vector(a[0] - endCenterX, a[1] - endCenterY),
+          vector(a[2] - endCenterX, a[3] - endCenterY),
+        ) > 0
+      ) {
         return [
           [cX, first[1], first[2], first[3]],
           [second[0], second[1], cX, second[3]],
@@ -621,9 +657,9 @@ const generateDynamicAABBs = (
  */
 const calculateGrid = (
   aabbs: Bounds[],
-  start: Point,
+  start: GlobalPoint,
   startHeading: Heading,
-  end: Point,
+  end: GlobalPoint,
   endHeading: Heading,
   common: Bounds,
 ): Grid => {
@@ -668,8 +704,8 @@ const calculateGrid = (
           closed: false,
           visited: false,
           parent: null,
-          addr: [col, row] as [number, number],
-          pos: [x, y] as Point,
+          addr: [col, row] as GridAddress,
+          pos: [x, y] as GlobalPoint,
         }),
       ),
     ),
@@ -679,17 +715,17 @@ const calculateGrid = (
 const getDonglePosition = (
   bounds: Bounds,
   heading: Heading,
-  point: Point,
-): Point => {
+  p: GlobalPoint,
+): GlobalPoint => {
   switch (heading) {
     case HEADING_UP:
-      return [point[0], bounds[1]];
+      return point(p[0], bounds[1]);
     case HEADING_RIGHT:
-      return [bounds[2], point[1]];
+      return point(bounds[2], p[1]);
     case HEADING_DOWN:
-      return [point[0], bounds[3]];
+      return point(p[0], bounds[3]);
   }
-  return [bounds[0], point[1]];
+  return point(bounds[0], p[1]);
 };
 
 const estimateSegmentCount = (
@@ -832,7 +868,7 @@ const gridNodeFromAddr = (
 /**
  * Get node for global point on canvas (if exists)
  */
-const pointToGridNode = (point: Point, grid: Grid): Node | null => {
+const pointToGridNode = (point: GlobalPoint, grid: Grid): Node | null => {
   for (let col = 0; col < grid.col; col++) {
     for (let row = 0; row < grid.row; row++) {
       const candidate = gridNodeFromAddr([col, row], grid);
@@ -871,15 +907,24 @@ const getBindableElementForId = (
 };
 
 const normalizedArrowElementUpdate = (
-  global: Point[],
+  global: GlobalPoint[],
   externalOffsetX?: number,
   externalOffsetY?: number,
-) => {
+): {
+  points: LocalPoint[];
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
 
-  const points = global.map(
-    (point) => [point[0] - offsetX, point[1] - offsetY] as const,
+  const points = global.map((p) =>
+    pointTranslate<GlobalPoint, LocalPoint>(
+      p,
+      vectorScale(vectorFromPoint(global[0]), -1),
+    ),
   );
 
   return {
@@ -891,19 +936,22 @@ const normalizedArrowElementUpdate = (
 };
 
 /// If last and current segments have the same heading, skip the middle point
-const simplifyElbowArrowPoints = (points: Point[]): Point[] =>
+const simplifyElbowArrowPoints = (points: GlobalPoint[]): GlobalPoint[] =>
   points
     .slice(2)
     .reduce(
-      (result, point) =>
-        arePointsEqual(
+      (result, p) =>
+        compareHeading(
           vectorToHeading(
-            pointToVector(result[result.length - 1], result[result.length - 2]),
+            vectorFromPoint(
+              result[result.length - 1],
+              result[result.length - 2],
+            ),
           ),
-          vectorToHeading(pointToVector(point, result[result.length - 1])),
+          vectorToHeading(vectorFromPoint(p, result[result.length - 1])),
         )
-          ? [...result.slice(0, -1), point]
-          : [...result, point],
+          ? [...result.slice(0, -1), p]
+          : [...result, p],
       [points[0] ?? [0, 0], points[1] ?? [1, 0]],
     );
 
@@ -921,13 +969,13 @@ const neighborIndexToHeading = (idx: number): Heading => {
 
 const getGlobalPoint = (
   fixedPointRatio: [number, number] | undefined | null,
-  initialPoint: Point,
-  otherPoint: Point,
+  initialPoint: GlobalPoint,
+  otherPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   boundElement?: ExcalidrawBindableElement | null,
   hoveredElement?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
-): Point => {
+): GlobalPoint => {
   if (isDragging) {
     if (hoveredElement) {
       const snapPoint = getSnapPoint(
@@ -962,36 +1010,34 @@ const getGlobalPoint = (
 };
 
 const getSnapPoint = (
-  point: Point,
-  otherPoint: Point,
+  p: GlobalPoint,
+  otherPoint: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ) =>
   bindPointToSnapToElementOutline(
-    isRectanguloidElement(element)
-      ? avoidRectangularCorner(element, point)
-      : point,
+    isRectanguloidElement(element) ? avoidRectangularCorner(element, p) : p,
     otherPoint,
     element,
     elementsMap,
   );
 
 const getBindPointHeading = (
-  point: Point,
-  otherPoint: Point,
+  p: GlobalPoint,
+  otherPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
-  origPoint: Point,
+  origPoint: GlobalPoint,
 ) =>
   getHeadingForElbowArrowSnap(
-    point,
+    p,
     otherPoint,
     hoveredElement,
     hoveredElement &&
       aabbForElement(
         hoveredElement,
         Array(4).fill(
-          distanceToBindableElement(hoveredElement, point, elementsMap),
+          distanceToBindableElement(hoveredElement, p, elementsMap),
         ) as [number, number, number, number],
       ),
     elementsMap,
@@ -999,8 +1045,8 @@ const getBindPointHeading = (
   );
 
 const getHoveredElements = (
-  origStartGlobalPoint: Point,
-  origEndGlobalPoint: Point,
+  origStartGlobalPoint: GlobalPoint,
+  origEndGlobalPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
 ) => {
   // TODO: Might be a performance bottleneck and the Map type
@@ -1024,3 +1070,6 @@ const getHoveredElements = (
     ),
   ];
 };
+
+const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
+  a[0] === b[0] && a[1] === b[1];

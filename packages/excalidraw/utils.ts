@@ -1,3 +1,4 @@
+import { average } from "../math";
 import { COLOR_PALETTE } from "./colors";
 import type { EVENT } from "./constants";
 import {
@@ -992,10 +993,6 @@ export const isMemberOf = <T extends string>(
 
 export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
-export const isFiniteNumber = (value: any): value is number => {
-  return typeof value === "number" && Number.isFinite(value);
-};
-
 export const updateStable = <T extends any[] | Record<string, any>>(
   prevValue: T,
   nextValue: T,
@@ -1079,7 +1076,6 @@ export function addEventListener(
   };
 }
 
-const average = (a: number, b: number) => (a + b) / 2;
 export function getSvgPathFromStroke(points: number[][], closed = true) {
   const len = points.length;
 

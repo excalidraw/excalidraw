@@ -7,7 +7,6 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
-import type { Point } from "../types";
 import type { Bounds } from "../element/bounds";
 import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
@@ -16,6 +15,8 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
+import type { LocalPoint } from "../../math";
+import { point } from "../../math";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -217,18 +218,13 @@ describe("generic element", () => {
 });
 
 describe.each(["line", "freedraw"] as const)("%s element", (type) => {
-  const points: Record<typeof type, Point[]> = {
-    line: [
-      [0, 0],
-      [60, -20],
-      [20, 40],
-      [-40, 0],
-    ],
+  const points: Record<typeof type, LocalPoint[]> = {
+    line: [point(0, 0), point(60, -20), point(20, 40), point(-40, 0)],
     freedraw: [
-      [0, 0],
-      [-2.474600807561444, 41.021700699972],
-      [3.6627956000014024, 47.84174560617245],
-      [40.495224145598115, 47.15909710753482],
+      point(0, 0),
+      point(-2.474600807561444, 41.021700699972),
+      point(3.6627956000014024, 47.84174560617245),
+      point(40.495224145598115, 47.15909710753482),
     ],
   };
 
@@ -296,11 +292,11 @@ describe("arrow element", () => {
   it("resizes with a label", async () => {
     const arrow = UI.createElement("arrow", {
       points: [
-        [0, 0],
-        [40, 140],
-        [80, 60], // label's anchor
-        [180, 20],
-        [200, 120],
+        point(0, 0),
+        point(40, 140),
+        point(80, 60), // label's anchor
+        point(180, 20),
+        point(200, 120),
       ],
     });
     const label = await UI.editText(arrow, "Hello");
@@ -694,24 +690,24 @@ describe("multiple selection", () => {
       x: 60,
       y: 40,
       points: [
-        [0, 0],
-        [-40, 40],
-        [-60, 0],
-        [0, -40],
-        [40, 20],
-        [0, 40],
+        point(0, 0),
+        point(-40, 40),
+        point(-60, 0),
+        point(0, -40),
+        point(40, 20),
+        point(0, 40),
       ],
     });
     const freedraw = UI.createElement("freedraw", {
       x: 63.56072661326618,
       y: 100,
       points: [
-        [0, 0],
-        [-43.56072661326618, 18.15048126846341],
-        [-43.56072661326618, 29.041198460587566],
-        [-38.115368017204105, 42.652452795512204],
-        [-19.964886748740696, 66.24829266003775],
-        [19.056612930986716, 77.1390098521619],
+        point(0, 0),
+        point(-43.56072661326618, 18.15048126846341),
+        point(-43.56072661326618, 29.041198460587566),
+        point(-38.115368017204105, 42.652452795512204),
+        point(-19.964886748740696, 66.24829266003775),
+        point(19.056612930986716, 77.1390098521619),
       ],
     });
 
@@ -1050,13 +1046,13 @@ describe("multiple selection", () => {
       x: 60,
       y: 0,
       points: [
-        [0, 0],
-        [-40, 40],
-        [-20, 60],
-        [20, 20],
-        [40, 40],
-        [-20, 100],
-        [-60, 60],
+        point(0, 0),
+        point(-40, 40),
+        point(-20, 60),
+        point(20, 20),
+        point(40, 40),
+        point(-20, 100),
+        point(-60, 60),
       ],
     });
 

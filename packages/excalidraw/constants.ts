@@ -112,6 +112,8 @@ export const ENV = {
 
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
+  ZOOM_ACTIONS: "zoom-actions",
+  SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
 };
 
 /**
@@ -375,6 +377,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";
+export const CANVAS_SEARCH_TAB = "search";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
