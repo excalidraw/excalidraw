@@ -106,6 +106,40 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      if (event.origin !== "http://localhost:3000") {
+        // Ignore messages from React DevTools
+        if (event.data && event.data.source.startsWith("react-")) {
+          return;
+        }
+        console.warn("Message from unknown origin:", event.origin, event.data);
+        return;
+      }
+
+      console.info("Message received from Excalidraw+:", event.data);
+
+      const elements = localStorage.getItem("excalidraw");
+
+      // Respond to the message
+      console.info("Maybe sending message back to Excalidraw+");
+      // 50% chance for testing only
+      if (Math.random() < 0.5) {
+        console.info("Alright, actually sending message back to Excalidraw+");
+        event.source.postMessage(
+          { msg: "SURPRISE!", data: elements ? JSON.parse(elements) : "nope" },
+          event.origin,
+        );
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
   return (
     <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
       <InitializeApp langCode={langCode} theme={theme}>
