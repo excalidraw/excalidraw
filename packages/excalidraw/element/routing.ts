@@ -78,7 +78,6 @@ export const mutateElbowArrow = (
   },
   options?: {
     isDragging?: boolean;
-    disableBinding?: boolean;
     informMutation?: boolean;
   },
 ) => {
