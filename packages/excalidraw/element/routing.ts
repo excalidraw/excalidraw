@@ -36,6 +36,7 @@ import {
   HEADING_UP,
   vectorToHeading,
 } from "./heading";
+import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type {
@@ -82,6 +83,39 @@ export const mutateElbowArrow = (
     informMutation?: boolean;
   },
 ) => {
+  const update = updateElbowArrow(
+    arrow,
+    elementsMap,
+    nextPoints,
+    offset,
+    options,
+  );
+  if (update) {
+    mutateElement(
+      arrow,
+      {
+        ...otherUpdates,
+        ...update,
+        angle: 0 as Radians,
+      },
+      options?.informMutation,
+    );
+  } else {
+    console.error("Elbow arrow cannot find a route");
+  }
+};
+
+export const updateElbowArrow = (
+  arrow: ExcalidrawElbowArrowElement,
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  nextPoints: readonly LocalPoint[],
+  offset?: Vector,
+  options?: {
+    isDragging?: boolean;
+    disableBinding?: boolean;
+    informMutation?: boolean;
+  },
+): ElementUpdate<ExcalidrawElbowArrowElement> | null => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate(
     pointTranslate<LocalPoint, GlobalPoint>(
       nextPoints[0],
@@ -297,18 +331,10 @@ export const mutateElbowArrow = (
     startDongle && points.unshift(startGlobalPoint);
     endDongle && points.push(endGlobalPoint);
 
-    mutateElement(
-      arrow,
-      {
-        ...otherUpdates,
-        ...normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0),
-        angle: 0 as Radians,
-      },
-      options?.informMutation,
-    );
-  } else {
-    console.error("Elbow arrow cannot find a route");
+    return normalizedArrowElementUpdate(simplifyElbowArrowPoints(points), 0, 0);
   }
+
+  return null;
 };
 
 const offsetFromHeading = (
