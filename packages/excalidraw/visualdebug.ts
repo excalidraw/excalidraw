@@ -110,8 +110,8 @@ export const debugDrawBoundingBox = (
 export const debugDrawBounds = (
   box: Bounds | Bounds[],
   opts?: {
-    color: string;
-    permanent: boolean;
+    color?: string;
+    permanent?: boolean;
   },
 ) => {
   (isBounds(box) ? [box] : box).forEach((bbox) =>
@@ -136,7 +136,7 @@ export const debugDrawBounds = (
       ],
       {
         color: opts?.color ?? "green",
-        permanent: opts?.permanent,
+        permanent: !!opts?.permanent,
       },
     ),
   );

@@ -94,7 +94,16 @@ describe("elbow arrow routing", () => {
 
 describe("elbow arrow ui", () => {
   beforeEach(async () => {
+    localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
   });
 
   it("can follow bound shapes", async () => {
@@ -130,8 +139,8 @@ describe("elbow arrow ui", () => {
     expect(arrow.elbowed).toBe(true);
     expect(arrow.points).toEqual([
       [0, 0],
-      [35, 0],
-      [35, 200],
+      [45, 0],
+      [45, 200],
       [90, 200],
     ]);
   });
@@ -163,14 +172,6 @@ describe("elbow arrow ui", () => {
       h.state,
     )[0] as ExcalidrawArrowElement;
 
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: 1,
-      clientY: 1,
-    });
-    const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
-
     mouse.click(51, 51);
 
     const inputAngle = UI.queryStatsProperty("A")?.querySelector(
@@ -182,8 +183,8 @@ describe("elbow arrow ui", () => {
       [0, 0],
       [35, 0],
       [35, 90],
-      [25, 90],
-      [25, 165],
+      [35, 90], // Note that coordinates are rounded above!
+      [35, 165],
       [103, 165],
     ]);
   });
