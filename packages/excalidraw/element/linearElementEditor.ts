@@ -1479,7 +1479,9 @@ export class LinearElementEditor {
         nextPoints,
         vector(offsetX, offsetY),
         bindings,
-        options,
+        {
+          isDragging: options?.isDragging,
+        },
       );
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
