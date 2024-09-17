@@ -951,7 +951,7 @@ export const resizeMultipleElements = (
     }
 
     // Mirror fixed point binding if needed
-    const refreshedBindings = isArrowElement(orig)
+    const refreshedBindings = isElbowArrow(orig)
       ? getFlippedFixedPointBindingsForArrow(
           orig,
           elementsMap,
@@ -1102,7 +1102,7 @@ const rotateMultipleElements = (
         (centerAngle + origAngle - element.angle) as Radians,
       );
 
-      if (isArrowElement(element) && isElbowArrow(element)) {
+      if (isElbowArrow(element)) {
         const points = getArrowLocalFixedPoints(element, elementsMap);
         mutateElbowArrow(element, elementsMap, points);
       } else {

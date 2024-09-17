@@ -26,6 +26,7 @@ import type {
   FixedPoint,
   SceneElementsMap,
   ExcalidrawRectanguloidElement,
+  FixedPointBinding,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -39,6 +40,7 @@ import {
   isBindingElement,
   isBoundToContainer,
   isElbowArrow,
+  isFixedPointBinding,
   isFrameLikeElement,
   isLinearElement,
   isRectangularElement,
@@ -1013,7 +1015,7 @@ const updateBoundPoint = (
   const direction = startOrEnd === "startBinding" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
 
-  if (isElbowArrow(linearElement)) {
+  if (isElbowArrow(linearElement) && isFixedPointBinding(binding)) {
     const fixedPoint =
       normalizeFixedPoint(binding.fixedPoint) ??
       calculateFixedPointForElbowArrowBinding(
@@ -2290,7 +2292,7 @@ export const flipFixedPointBinding = (
 ) => {
   // Gather all bound arrow elements to the targeted bindable [element]
   boundElementsVisitor(elementsMap, element, (el) => {
-    if (isArrowElement(el)) {
+    if (isElbowArrow(el)) {
       mutateElement(el, {
         ...getFlippedFixedPointBindings(el, element, flipX, flipY),
       });
@@ -2310,45 +2312,41 @@ export const flipFixedPointBinding = (
  * @returns The PointBinding element updates you use for @see mutateElement
  */
 export const getFlippedFixedPointBindings = (
-  el: ExcalidrawArrowElement,
+  el: ExcalidrawElbowArrowElement,
   element: ExcalidrawBindableElement,
   flipX: boolean,
   flipY: boolean,
-): { startBinding?: PointBinding; endBinding?: PointBinding } => ({
+): { startBinding?: FixedPointBinding; endBinding?: FixedPointBinding } => ({
   // If [element] is the startBinding of this arrow...
   ...(element.id === el.startBinding?.elementId && {
-    startBinding: {
+    startBinding: el.startBinding && {
       ...el.startBinding,
-      fixedPoint: el.startBinding.fixedPoint
-        ? [
-            // Flip over the X direction if needed
-            flipX
-              ? -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5
-              : el.startBinding.fixedPoint[0],
-            // Flip over the Y direction if needed
-            flipY
-              ? -1 * (el.startBinding.fixedPoint[1] - 0.5) + 0.5
-              : el.startBinding.fixedPoint[1],
-          ]
-        : null,
+      fixedPoint: [
+        // Flip over the X direction if needed
+        flipX
+          ? -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5
+          : el.startBinding.fixedPoint[0],
+        // Flip over the Y direction if needed
+        flipY
+          ? -1 * (el.startBinding.fixedPoint[1] - 0.5) + 0.5
+          : el.startBinding.fixedPoint[1],
+      ],
     },
   }),
   // If [element] is the endBinding of this arrow...
   ...(element.id === el.endBinding?.elementId && {
-    endBinding: {
+    endBinding: el.endBinding && {
       ...el.endBinding,
-      fixedPoint: el.endBinding.fixedPoint
-        ? [
-            // Flip over the X direction if needed
-            flipX
-              ? -1 * (el.endBinding.fixedPoint[0] - 0.5) + 0.5
-              : el.endBinding.fixedPoint[0],
-            // Flip over the Y direction if needed
-            flipY
-              ? -1 * (el.endBinding.fixedPoint[1] - 0.5) + 0.5
-              : el.endBinding.fixedPoint[1],
-          ]
-        : null,
+      fixedPoint: [
+        // Flip over the X direction if needed
+        flipX
+          ? -1 * (el.endBinding.fixedPoint[0] - 0.5) + 0.5
+          : el.endBinding.fixedPoint[0],
+        // Flip over the Y direction if needed
+        flipY
+          ? -1 * (el.endBinding.fixedPoint[1] - 0.5) + 0.5
+          : el.endBinding.fixedPoint[1],
+      ],
     },
   }),
 });
@@ -2363,7 +2361,7 @@ export const getFlippedFixedPointBindings = (
  * @returns The PointBinding element updates you use for @see mutateElement
  */
 export const getFlippedFixedPointBindingsForArrow = (
-  arrow: ExcalidrawArrowElement,
+  arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
   flipX: boolean,
   flipY: boolean,

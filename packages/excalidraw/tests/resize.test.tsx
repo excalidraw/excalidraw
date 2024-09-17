@@ -1,9 +1,10 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
-  ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
@@ -351,7 +352,7 @@ describe("arrow element", () => {
 
     const arrow = h.scene.getSelectedElements(
       h.state,
-    )[0] as ExcalidrawArrowElement;
+    )[0] as ExcalidrawElbowArrowElement;
 
     expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
@@ -379,7 +380,7 @@ describe("arrow element", () => {
 
     const arrow = h.scene.getSelectedElements(
       h.state,
-    )[0] as ExcalidrawArrowElement;
+    )[0] as ExcalidrawElbowArrowElement;
 
     expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
@@ -884,7 +885,6 @@ describe("multiple selection", () => {
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );
-    expect(leftBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(leftBoundArrow.endBinding?.focus).toBe(leftArrowBinding.focus);
 
     expect(rightBoundArrow.x).toBeCloseTo(210);
@@ -899,7 +899,6 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );
-    expect(rightBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(rightBoundArrow.endBinding?.focus).toBe(rightArrowBinding.focus);
   });
 
