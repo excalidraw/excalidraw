@@ -797,7 +797,7 @@ export const bindPointToSnapToElementOutline = (
           isVertical
             ? Math.abs(p[1] - i[1]) < 0.1
             : Math.abs(p[0] - i[0]) < 0.1,
-        )[0] ?? point;
+        )[0] ?? p;
   }
 
   return p;
