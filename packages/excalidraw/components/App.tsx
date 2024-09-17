@@ -435,7 +435,7 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { mutateElbowArrow } from "../element/routing";
+import { mutateElbowArrow, updateElbowArrow } from "../element/routing";
 import {
   FlowChartCreator,
   FlowChartNavigator,
@@ -3109,7 +3109,23 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null, undefined);
+    let elements = opts.elements.map((el) =>
+      isElbowArrow(el)
+        ? {
+            ...el,
+            ...updateElbowArrow(
+              {
+                ...el,
+                startBinding: null,
+                endBinding: null,
+              },
+              this.scene.getNonDeletedElementsMap(),
+              [el.points[0], el.points[el.points.length - 1]],
+            ),
+          }
+        : el,
+    );
+    elements = restoreElements(elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
