@@ -2350,37 +2350,3 @@ export const getFlippedFixedPointBindings = (
     },
   }),
 });
-
-/**
- * Gets the flipped fixedPoint binding data from an arrow.
- *
- * @param arrow The arrow to get the binding data for
- * @param elementsMap The elementsMap to load the start and end bindings
- * @param flipX Whether to flip across the X axis
- * @param flipY Whether to flip across the Y axis
- * @returns The PointBinding element updates you use for @see mutateElement
- */
-export const getFlippedFixedPointBindingsForArrow = (
-  arrow: ExcalidrawElbowArrowElement,
-  elementsMap: ElementsMap,
-  flipX: boolean,
-  flipY: boolean,
-): { startBinding?: PointBinding; endBinding?: PointBinding } => {
-  const startElement =
-    arrow.startBinding &&
-    (elementsMap.get(arrow.startBinding.elementId) as
-      | undefined
-      | ExcalidrawBindableElement);
-  const endElement =
-    arrow.endBinding &&
-    (elementsMap.get(arrow.endBinding.elementId) as
-      | undefined
-      | ExcalidrawBindableElement);
-
-  return {
-    ...(startElement &&
-      getFlippedFixedPointBindings(arrow, startElement, flipX, flipY)),
-    ...(endElement &&
-      getFlippedFixedPointBindings(arrow, endElement, flipX, flipY)),
-  };
-};

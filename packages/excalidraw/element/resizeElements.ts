@@ -36,7 +36,6 @@ import { getFontString } from "../utils";
 import {
   flipFixedPointBinding,
   getArrowLocalFixedPoints,
-  getFlippedFixedPointBindingsForArrow,
   updateBoundElements,
 } from "./binding";
 import type {
@@ -950,16 +949,6 @@ export const resizeMultipleElements = (
       continue;
     }
 
-    // Mirror fixed point binding if needed
-    const refreshedBindings = isElbowArrow(orig)
-      ? getFlippedFixedPointBindingsForArrow(
-          orig,
-          elementsMap,
-          isFlippedByX,
-          isFlippedByY,
-        )
-      : {};
-
     const width = orig.width * scaleX;
     const height = orig.height * scaleY;
     const angle = normalizeRadians(
@@ -988,7 +977,6 @@ export const resizeMultipleElements = (
       height,
       angle,
       ...rescaledPoints,
-      ...refreshedBindings,
     };
 
     if (isImageElement(orig)) {
@@ -1035,19 +1023,6 @@ export const resizeMultipleElements = (
     const { width: oldWidth, height: oldHeight } = element;
 
     mutateElement(element, update, false);
-
-    if (isArrowElement(element) && isElbowArrow(element)) {
-      mutateElbowArrow(
-        element,
-        elementsMap,
-        element.points,
-        undefined,
-        undefined,
-        {
-          informMutation: false,
-        },
-      );
-    }
 
     updateBoundElements(element, elementsMap, {
       simultaneouslyUpdated: elementsToUpdate,

@@ -18,7 +18,8 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
-import { isLinearElement } from "../element/typeChecks";
+import { isElbowArrow, isLinearElement } from "../element/typeChecks";
+import { mutateElbowArrow } from "../element/routing";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -43,14 +44,6 @@ export const actionFlipHorizontal = register({
     };
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
-  predicate: (_, appState) => {
-    if (appState.selectedLinearElement) {
-      // No flippin' single selected elbow arrows!
-      return !appState.selectedLinearElement?.elbowed;
-    }
-
-    return true;
-  },
 });
 
 export const actionFlipVertical = register({
@@ -77,14 +70,6 @@ export const actionFlipVertical = register({
   },
   keyTest: (event) =>
     event.shiftKey && event.code === CODES.V && !event[KEYS.CTRL_OR_CMD],
-  predicate: (_, appState) => {
-    if (appState.selectedLinearElement) {
-      // No flippin' single selected elbow arrows!
-      return !appState.selectedLinearElement?.elbowed;
-    }
-
-    return true;
-  },
 });
 
 const flipSelectedElements = (
@@ -146,6 +131,21 @@ const flipElements = (
     isBindingEnabled(appState),
     [],
   );
+
+  selectedElements.forEach((element) => {
+    if (isElbowArrow(element)) {
+      mutateElbowArrow(
+        element,
+        elementsMap,
+        element.points,
+        undefined,
+        undefined,
+        {
+          informMutation: false,
+        },
+      );
+    }
+  });
 
   return selectedElements;
 };
