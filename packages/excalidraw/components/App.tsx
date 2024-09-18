@@ -185,6 +185,7 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -287,6 +288,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  toBrandedType,
 } from "../utils";
 import {
   createSrcDoc,
@@ -3111,16 +3113,14 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     let elements = opts.elements.map((el, _, elements) => {
       if (isElbowArrow(el)) {
-        const startBinding =
+        const startEndElements = [
           el.startBinding &&
-          elements.find((l) => l.id === el.startBinding?.elementId)
-            ? el.startBinding
-            : null;
-        const endBinding =
+            elements.find((l) => l.id === el.startBinding?.elementId),
           el.endBinding &&
-          elements.find((l) => l.id === el.endBinding?.elementId)
-            ? el.endBinding
-            : null;
+            elements.find((l) => l.id === el.endBinding?.elementId),
+        ];
+        const startBinding = startEndElements[0] ? el.startBinding : null;
+        const endBinding = startEndElements[1] ? el.endBinding : null;
         return {
           ...el,
           ...updateElbowArrow(
@@ -3129,7 +3129,19 @@ class App extends React.Component<AppProps, AppState> {
               startBinding,
               endBinding,
             },
-            this.scene.getNonDeletedElementsMap(),
+            toBrandedType<NonDeletedSceneElementsMap>(
+              new Map(
+                startEndElements
+                  .filter((x) => x != null)
+                  .map(
+                    (el) =>
+                      [el.id!, el] as [
+                        string,
+                        Ordered<NonDeletedExcalidrawElement>,
+                      ],
+                  ),
+              ),
+            ),
             [el.points[0], el.points[el.points.length - 1]],
           ),
         };
