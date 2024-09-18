@@ -110,11 +110,18 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
-  const { minX, minY, maxX, maxY } = getCommonBoundingBox(selectedElements);
+  // Elbow arrow flipping make the selection group "move" across the canvas
+  // because of how elbow arrows can bump against the "wall" of the selection
+  const selectionWithoutElbowArrows = selectedElements.filter(
+    (el) => !isElbowArrow(el),
+  );
+  const { minX, minY, maxX, maxY } = getCommonBoundingBox(
+    selectionWithoutElbowArrows,
+  );
 
   resizeMultipleElements(
     elementsMap,
-    selectedElements,
+    selectionWithoutElbowArrows,
     elementsMap,
     "nw",
     true,
