@@ -3135,7 +3135,7 @@ class App extends React.Component<AppProps, AppState> {
                   .filter((x) => x != null)
                   .map(
                     (el) =>
-                      [el.id!, el] as [
+                      [el!.id, el] as [
                         string,
                         Ordered<NonDeletedExcalidrawElement>,
                       ],
