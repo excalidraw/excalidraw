@@ -22,7 +22,6 @@ import {
 } from "./bounds";
 import {
   isArrowElement,
-  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
@@ -33,11 +32,7 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
-import {
-  flipFixedPointBinding,
-  getArrowLocalFixedPoints,
-  updateBoundElements,
-} from "./binding";
+import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
@@ -68,9 +63,6 @@ import {
   pointRotateRads,
   type Radians,
 } from "../../math";
-
-let alreadyFlippedX = false;
-let alreadyFlippedY = false;
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
@@ -623,26 +615,6 @@ export const resizeSingleElement = (
 
   const flipX = eleNewWidth < 0;
   const flipY = eleNewHeight < 0;
-
-  // Mirror fixed point binding if needed
-  const doFixedPointFlipX =
-    (flipX && !alreadyFlippedX) || (!flipX && alreadyFlippedX);
-  const doFixedPointFlipY =
-    (flipY && !alreadyFlippedY) || (!flipY && alreadyFlippedY);
-  if (doFixedPointFlipX) {
-    alreadyFlippedX = !alreadyFlippedX;
-  }
-  if (doFixedPointFlipY) {
-    alreadyFlippedY = !alreadyFlippedY;
-  }
-  if ((doFixedPointFlipX || doFixedPointFlipY) && isBindableElement(element)) {
-    flipFixedPointBinding(
-      element,
-      elementsMap,
-      doFixedPointFlipX,
-      doFixedPointFlipY,
-    );
-  }
 
   // Flip horizontally
   if (flipX) {

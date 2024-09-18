@@ -26,7 +26,6 @@ import type {
   FixedPoint,
   SceneElementsMap,
   ExcalidrawRectanguloidElement,
-  FixedPointBinding,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -2272,81 +2271,3 @@ export const normalizeFixedPoint = <T extends FixedPoint | null>(
   }
   return fixedPoint as any as T extends null ? null : FixedPoint;
 };
-
-/**
- * During flipping, mirroring and resizing when sides change relation to each
- * other the `fixedPoint` in ExcalidrawArrowElement bindings associated with the
- * bindable element (if any) must be mirrored to have a consistent behavor,
- * which is accomplished by this function.
- *
- * @param element The flipped, mirrored or resized bindable element
- * @param elementsMap
- * @param flipX
- * @param flipY
- */
-export const flipFixedPointBinding = (
-  element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-  flipX: boolean,
-  flipY: boolean,
-) => {
-  // Gather all bound arrow elements to the targeted bindable [element]
-  boundElementsVisitor(elementsMap, element, (el) => {
-    if (isElbowArrow(el)) {
-      mutateElement(el, {
-        ...getFlippedFixedPointBindings(el, element, flipX, flipY),
-      });
-    }
-  });
-};
-
-/**
- * Generates the startBinding and endBinding for fixedPoint flipping.
- *
- * @see flipFixedPointBinding for the main reasn this function exists
- *
- * @param el The arrow element for which the binding updates are generated for
- * @param element The binding to derive fixedPoint from. @see FixedPointBinding
- * @param flipX Whether to flip across the X axis
- * @param flipY Whether to flip across the Y axis
- * @returns The PointBinding element updates you use for @see mutateElement
- */
-export const getFlippedFixedPointBindings = (
-  el: ExcalidrawElbowArrowElement,
-  element: ExcalidrawBindableElement,
-  flipX: boolean,
-  flipY: boolean,
-): { startBinding?: FixedPointBinding; endBinding?: FixedPointBinding } => ({
-  // If [element] is the startBinding of this arrow...
-  ...(element.id === el.startBinding?.elementId && {
-    startBinding: el.startBinding && {
-      ...el.startBinding,
-      fixedPoint: [
-        // Flip over the X direction if needed
-        flipX
-          ? -1 * (el.startBinding.fixedPoint[0] - 0.5) + 0.5
-          : el.startBinding.fixedPoint[0],
-        // Flip over the Y direction if needed
-        flipY
-          ? -1 * (el.startBinding.fixedPoint[1] - 0.5) + 0.5
-          : el.startBinding.fixedPoint[1],
-      ],
-    },
-  }),
-  // If [element] is the endBinding of this arrow...
-  ...(element.id === el.endBinding?.elementId && {
-    endBinding: el.endBinding && {
-      ...el.endBinding,
-      fixedPoint: [
-        // Flip over the X direction if needed
-        flipX
-          ? -1 * (el.endBinding.fixedPoint[0] - 0.5) + 0.5
-          : el.endBinding.fixedPoint[0],
-        // Flip over the Y direction if needed
-        flipY
-          ? -1 * (el.endBinding.fixedPoint[1] - 0.5) + 0.5
-          : el.endBinding.fixedPoint[1],
-      ],
-    },
-  }),
-});
