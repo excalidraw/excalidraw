@@ -359,8 +359,8 @@ describe("arrow element", () => {
 
     UI.resize(rectangle, "se", [-200, -150]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.05);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
   });
 
   it("flips the fixed point binding on negative resize for group selection", () => {
