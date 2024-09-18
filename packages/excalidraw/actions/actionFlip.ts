@@ -2,6 +2,7 @@ import { register } from "./register";
 import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -20,6 +21,7 @@ import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
 import { isElbowArrow, isLinearElement } from "../element/typeChecks";
 import { mutateElbowArrow } from "../element/routing";
+import { mutateElement } from "../element/mutateElement";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -110,18 +112,12 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
-  // Elbow arrow flipping make the selection group "move" across the canvas
-  // because of how elbow arrows can bump against the "wall" of the selection
-  const selectionWithoutElbowArrows = selectedElements.filter(
-    (el) => !isElbowArrow(el),
-  );
-  const { minX, minY, maxX, maxY } = getCommonBoundingBox(
-    selectionWithoutElbowArrows,
-  );
+  const { minX, minY, maxX, maxY, midX, midY } =
+    getCommonBoundingBox(selectedElements);
 
   resizeMultipleElements(
     elementsMap,
-    selectionWithoutElbowArrows,
+    selectedElements,
     elementsMap,
     "nw",
     true,
@@ -139,8 +135,30 @@ const flipElements = (
     [],
   );
 
-  selectedElements.forEach((element) => {
-    if (isElbowArrow(element)) {
+  const [elbowArrows, rest] = selectedElements.reduce(
+    (grouping, element) =>
+      isElbowArrow(element)
+        ? [[...grouping[0], element], grouping[1]]
+        : [grouping[0], [...grouping[1], element]],
+    [[], []] as [
+      NonDeleted<ExcalidrawElbowArrowElement>[],
+      NonDeleted<ExcalidrawElement>[],
+    ],
+  );
+
+  // Elbow arrow flipping make the selection group "move" across the canvas
+  // because of how elbow arrows can bump against the "wall" of the selection
+  if (elbowArrows.length > 0) {
+    const { midX: newMidX, midY: newMidY } =
+      getCommonBoundingBox(selectedElements);
+    const [diffX, diffY] = [midX - newMidX, midY - newMidY];
+    rest.forEach((element) =>
+      mutateElement(element, {
+        x: element.x + diffX,
+        y: element.y + diffY,
+      }),
+    );
+    elbowArrows.forEach((element) =>
       mutateElbowArrow(
         element,
         elementsMap,
@@ -150,9 +168,9 @@ const flipElements = (
         {
           informMutation: false,
         },
-      );
-    }
-  });
+      ),
+    );
+  }
 
   return selectedElements;
 };
