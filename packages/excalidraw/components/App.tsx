@@ -3109,22 +3109,34 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    let elements = opts.elements.map((el) =>
-      isElbowArrow(el)
-        ? {
-            ...el,
-            ...updateElbowArrow(
-              {
-                ...el,
-                startBinding: null,
-                endBinding: null,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              [el.points[0], el.points[el.points.length - 1]],
-            ),
-          }
-        : el,
-    );
+    let elements = opts.elements.map((el, _, elements) => {
+      if (isElbowArrow(el)) {
+        const startBinding =
+          el.startBinding &&
+          elements.find((l) => l.id === el.startBinding?.elementId)
+            ? el.startBinding
+            : null;
+        const endBinding =
+          el.endBinding &&
+          elements.find((l) => l.id === el.endBinding?.elementId)
+            ? el.endBinding
+            : null;
+        return {
+          ...el,
+          ...updateElbowArrow(
+            {
+              ...el,
+              startBinding,
+              endBinding,
+            },
+            this.scene.getNonDeletedElementsMap(),
+            [el.points[0], el.points[el.points.length - 1]],
+          ),
+        };
+      }
+
+      return el;
+    });
     elements = restoreElements(elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
