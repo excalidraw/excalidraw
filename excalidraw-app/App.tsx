@@ -1119,7 +1119,69 @@ const ExcalidrawWrapper = () => {
   );
 };
 
+const CloudExport = () => {
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      console.info("Message received from Excalidraw+:", event);
+      if (event.origin !== "http://localhost:3000") {
+        // Ignore messages from React DevTools
+        if (event.data && event.data.source.startsWith("react-")) {
+          return;
+        }
+        console.warn("Message from unknown origin:", event.origin, event.data);
+        return;
+      }
+
+      console.info("Message received from Excalidraw+:", event.data);
+
+      // TODO: maybe validate the data and code more defensively
+      const _elements = localStorage.getItem("excalidraw");
+      const _appState = localStorage.getItem("excalidraw-state");
+      const viewBackgroundColor = _appState
+        ? (JSON.parse(_appState)?.viewBackgroundColor as string)
+        : "#ffffff";
+
+      // Respond to the message
+      console.info("Maybe sending message back to Excalidraw+");
+      // 50% chance for testing only
+      // if (Math.random() < 0.5) {
+      console.info("Alright, actually sending message back to Excalidraw+");
+      event.source.postMessage(
+        {
+          msg: "SURPRISE!",
+          data: _elements
+            ? {
+                elements: JSON.parse(_elements),
+                appState: { viewBackgroundColor },
+              }
+            : "nope",
+        },
+        event.origin,
+      );
+      // }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  return (
+    <div>
+      <h1>Cloud Export</h1>
+      <div>Now exporting your scene to Excalidraw+...</div>
+    </div>
+  );
+};
+
 const ExcalidrawApp = () => {
+  const isCloudExportWindow = window.location.pathname === "/cloud-export";
+  if (isCloudExportWindow) {
+    return <CloudExport />;
+  }
+
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
