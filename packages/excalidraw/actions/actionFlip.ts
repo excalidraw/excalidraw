@@ -135,42 +135,48 @@ const flipElements = (
     [],
   );
 
-  const [elbowArrows, rest] = selectedElements.reduce(
-    (grouping, element) =>
+  // ---------------------------------------------------------------------------
+  // flipping arrow elements (and potentially other) makes the selection group
+  // "move" across the canvas because of how arrows can bump against the "wall"
+  // of the selection, so we need to center the group back to the original
+  // position so that repeated flips don't accumulate the offset
+
+  const { elbowArrows, otherElements } = selectedElements.reduce(
+    (
+      acc: {
+        elbowArrows: ExcalidrawElbowArrowElement[];
+        otherElements: ExcalidrawElement[];
+      },
+      element,
+    ) =>
       isElbowArrow(element)
-        ? [[...grouping[0], element], grouping[1]]
-        : [grouping[0], [...grouping[1], element]],
-    [[], []] as [
-      NonDeleted<ExcalidrawElbowArrowElement>[],
-      NonDeleted<ExcalidrawElement>[],
-    ],
+        ? { ...acc, elbowArrows: acc.elbowArrows.concat(element) }
+        : { ...acc, otherElements: acc.otherElements.concat(element) },
+    { elbowArrows: [], otherElements: [] },
   );
 
-  // Elbow arrow flipping make the selection group "move" across the canvas
-  // because of how elbow arrows can bump against the "wall" of the selection
-  if (elbowArrows.length > 0) {
-    const { midX: newMidX, midY: newMidY } =
-      getCommonBoundingBox(selectedElements);
-    const [diffX, diffY] = [midX - newMidX, midY - newMidY];
-    rest.forEach((element) =>
-      mutateElement(element, {
-        x: element.x + diffX,
-        y: element.y + diffY,
-      }),
-    );
-    elbowArrows.forEach((element) =>
-      mutateElbowArrow(
-        element,
-        elementsMap,
-        element.points,
-        undefined,
-        undefined,
-        {
-          informMutation: false,
-        },
-      ),
-    );
-  }
+  const { midX: newMidX, midY: newMidY } =
+    getCommonBoundingBox(selectedElements);
+  const [diffX, diffY] = [midX - newMidX, midY - newMidY];
+  otherElements.forEach((element) =>
+    mutateElement(element, {
+      x: element.x + diffX,
+      y: element.y + diffY,
+    }),
+  );
+  elbowArrows.forEach((element) =>
+    mutateElbowArrow(
+      element,
+      elementsMap,
+      element.points,
+      undefined,
+      undefined,
+      {
+        informMutation: false,
+      },
+    ),
+  );
+  // ---------------------------------------------------------------------------
 
   return selectedElements;
 };
