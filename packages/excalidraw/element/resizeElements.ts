@@ -9,6 +9,7 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
   ElementsMap,
+  ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
   SceneElementsMap,
 } from "./types";
@@ -909,6 +910,8 @@ export const resizeMultipleElements = (
       fontSize?: ExcalidrawTextElement["fontSize"];
       scale?: ExcalidrawImageElement["scale"];
       boundTextFontSize?: ExcalidrawTextElement["fontSize"];
+      startBinding?: ExcalidrawArrowElement["startBinding"];
+      endBinding?: ExcalidrawArrowElement["endBinding"];
     };
   }[] = [];
 
@@ -993,19 +996,6 @@ export const resizeMultipleElements = (
 
     mutateElement(element, update, false);
 
-    if (isArrowElement(element) && isElbowArrow(element)) {
-      mutateElbowArrow(
-        element,
-        elementsMap,
-        element.points,
-        undefined,
-        undefined,
-        {
-          informMutation: false,
-        },
-      );
-    }
-
     updateBoundElements(element, elementsMap, {
       simultaneouslyUpdated: elementsToUpdate,
       oldSize: { width: oldWidth, height: oldHeight },
@@ -1059,7 +1049,7 @@ const rotateMultipleElements = (
         (centerAngle + origAngle - element.angle) as Radians,
       );
 
-      if (isArrowElement(element) && isElbowArrow(element)) {
+      if (isElbowArrow(element)) {
         const points = getArrowLocalFixedPoints(element, elementsMap);
         mutateElbowArrow(element, elementsMap, points);
       } else {

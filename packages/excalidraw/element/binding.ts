@@ -39,6 +39,7 @@ import {
   isBindingElement,
   isBoundToContainer,
   isElbowArrow,
+  isFixedPointBinding,
   isFrameLikeElement,
   isLinearElement,
   isRectangularElement,
@@ -797,7 +798,7 @@ export const bindPointToSnapToElementOutline = (
           isVertical
             ? Math.abs(p[1] - i[1]) < 0.1
             : Math.abs(p[0] - i[0]) < 0.1,
-        )[0] ?? point;
+        )[0] ?? p;
   }
 
   return p;
@@ -1013,7 +1014,7 @@ const updateBoundPoint = (
   const direction = startOrEnd === "startBinding" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
 
-  if (isElbowArrow(linearElement)) {
+  if (isElbowArrow(linearElement) && isFixedPointBinding(binding)) {
     const fixedPoint =
       normalizeFixedPoint(binding.fixedPoint) ??
       calculateFixedPointForElbowArrowBinding(

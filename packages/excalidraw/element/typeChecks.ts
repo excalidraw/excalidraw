@@ -320,9 +320,12 @@ export const getDefaultRoundnessTypeForElement = (
 };
 
 export const isFixedPointBinding = (
-  binding: PointBinding,
+  binding: PointBinding | FixedPointBinding,
 ): binding is FixedPointBinding => {
-  return binding.fixedPoint != null;
+  return (
+    Object.hasOwn(binding, "fixedPoint") &&
+    (binding as FixedPointBinding).fixedPoint != null
+  );
 };
 
 // TODO: Move this to @excalidraw/math

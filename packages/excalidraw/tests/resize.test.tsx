@@ -4,6 +4,7 @@ import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
+  ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
@@ -332,6 +333,62 @@ describe("arrow element", () => {
     );
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
+  });
+
+  it("flips the fixed point binding on negative resize for single bindable", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize(rectangle, "se", [-200, -150]);
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+  });
+
+  it("flips the fixed point binding on negative resize for group selection", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize([rectangle, arrow], "nw", [300, 350]);
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.144, 2);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
 
@@ -828,7 +885,6 @@ describe("multiple selection", () => {
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );
-    expect(leftBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(leftBoundArrow.endBinding?.focus).toBe(leftArrowBinding.focus);
 
     expect(rightBoundArrow.x).toBeCloseTo(210);
@@ -843,7 +899,6 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );
-    expect(rightBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(rightBoundArrow.endBinding?.focus).toBe(rightArrowBinding.focus);
   });
 
