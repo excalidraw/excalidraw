@@ -5,6 +5,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPointBinding,
   FontFamilyValues,
   OrderedExcalidrawElement,
   PointBinding,
@@ -21,6 +22,7 @@ import {
 import {
   isArrowElement,
   isElbowArrow,
+  isFixedPointBinding,
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -101,8 +103,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const repairBinding = (
   element: ExcalidrawLinearElement,
-  binding: PointBinding | null,
-): PointBinding | null => {
+  binding: PointBinding | FixedPointBinding | null,
+): PointBinding | FixedPointBinding | null => {
   if (!binding) {
     return null;
   }
@@ -110,9 +112,11 @@ const repairBinding = (
   return {
     ...binding,
     focus: binding.focus || 0,
-    fixedPoint: isElbowArrow(element)
-      ? normalizeFixedPoint(binding.fixedPoint ?? [0, 0])
-      : null,
+    ...(isElbowArrow(element) && isFixedPointBinding(binding)
+      ? {
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+        }
+      : {}),
   };
 };
 

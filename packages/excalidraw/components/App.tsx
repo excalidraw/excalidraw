@@ -185,6 +185,7 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -287,6 +288,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  toBrandedType,
 } from "../utils";
 import {
   createSrcDoc,
@@ -3109,22 +3111,44 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    let elements = opts.elements.map((el) =>
-      isElbowArrow(el)
-        ? {
-            ...el,
-            ...updateElbowArrow(
-              {
-                ...el,
-                startBinding: null,
-                endBinding: null,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              [el.points[0], el.points[el.points.length - 1]],
+    let elements = opts.elements.map((el, _, elements) => {
+      if (isElbowArrow(el)) {
+        const startEndElements = [
+          el.startBinding &&
+            elements.find((l) => l.id === el.startBinding?.elementId),
+          el.endBinding &&
+            elements.find((l) => l.id === el.endBinding?.elementId),
+        ];
+        const startBinding = startEndElements[0] ? el.startBinding : null;
+        const endBinding = startEndElements[1] ? el.endBinding : null;
+        return {
+          ...el,
+          ...updateElbowArrow(
+            {
+              ...el,
+              startBinding,
+              endBinding,
+            },
+            toBrandedType<NonDeletedSceneElementsMap>(
+              new Map(
+                startEndElements
+                  .filter((x) => x != null)
+                  .map(
+                    (el) =>
+                      [el!.id, el] as [
+                        string,
+                        Ordered<NonDeletedExcalidrawElement>,
+                      ],
+                  ),
+              ),
             ),
-          }
-        : el,
-    );
+            [el.points[0], el.points[el.points.length - 1]],
+          ),
+        };
+      }
+
+      return el;
+    });
     elements = restoreElements(elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 

@@ -102,6 +102,7 @@ export class LinearElementEditor {
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
   public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
+  public readonly elbowed: boolean;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
     this.elementId = element.id as string & {
@@ -131,6 +132,7 @@ export class LinearElementEditor {
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
+    this.elbowed = isElbowArrow(element) && element.elbowed;
   }
 
   // ---------------------------------------------------------------------------
@@ -1477,7 +1479,9 @@ export class LinearElementEditor {
         nextPoints,
         vector(offsetX, offsetY),
         bindings,
-        options,
+        {
+          isDragging: options?.isDragging,
+        },
       );
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
