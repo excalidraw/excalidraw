@@ -129,6 +129,10 @@ export class API {
     expect(API.getSelectedElements().length).toBe(0);
   };
 
+  static getElement = <T extends ExcalidrawElement>(element: T): T => {
+    return h.app.scene.getElementsMapIncludingDeleted().get(element.id) as T || element;
+  }
+
   static createElement = <
     T extends Exclude<ExcalidrawElementType, "selection"> = "rectangle",
   >({
@@ -185,6 +189,12 @@ export class API {
       : never;
     endBinding?: T extends "arrow"
       ? ExcalidrawArrowElement["endBinding"] | ExcalidrawElbowArrowElement["endBinding"]
+      : never;
+    startArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["startArrowhead"] | ExcalidrawElbowArrowElement["startArrowhead"]
+      : never;
+    endArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["endArrowhead"] | ExcalidrawElbowArrowElement["endArrowhead"]
       : never;
     elbowed?: boolean;
   }): T extends "arrow" | "line"
@@ -342,6 +352,8 @@ export class API {
     if (element.type === "arrow") {
       element.startBinding = rest.startBinding ?? null;
       element.endBinding = rest.endBinding ?? null;
+      element.startArrowhead = rest.startArrowhead ?? null;
+      element.endArrowhead = rest.endArrowhead ?? null;
     }
     if (id) {
       element.id = id;
