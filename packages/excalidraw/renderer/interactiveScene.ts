@@ -52,7 +52,6 @@ import {
 } from "./helpers";
 import oc from "open-color";
 import {
-  isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
   isLinearElement,
@@ -807,7 +806,6 @@ const _renderInteractiveScene = ({
             // Elbow arrow elements cannot be selected when bound on either end
             (
               isSingleLinearElementSelected &&
-              isArrowElement(element) &&
               isElbowArrow(element) &&
               (element.startBinding || element.endBinding)
             )
