@@ -193,6 +193,7 @@ export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
+  | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
