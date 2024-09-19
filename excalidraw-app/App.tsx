@@ -1121,7 +1121,7 @@ const ExcalidrawWrapper = () => {
 
 const CloudExport = () => {
   useEffect(() => {
-    const handleMessage = (event: any) => {
+    const handleMessage = async (event: any) => {
       console.info("Message received from Excalidraw+:", event);
       if (event.origin !== "http://localhost:3000") {
         // Ignore messages from React DevTools
@@ -1141,6 +1141,14 @@ const CloudExport = () => {
         ? (JSON.parse(_appState)?.viewBackgroundColor as string)
         : "#ffffff";
 
+      const els = _elements ? JSON.parse(_elements) : [];
+      const _files = els.filter((el: any) => el.fileId !== undefined);
+      console.info({ _files });
+
+      const fileIds = _files.map((el: any) => el.fileId);
+      const files = await LocalData.fileStorage.getFiles(fileIds);
+      console.info({ files });
+
       // Respond to the message
       console.info("Maybe sending message back to Excalidraw+");
       // 50% chance for testing only
@@ -1153,6 +1161,7 @@ const CloudExport = () => {
             ? {
                 elements: JSON.parse(_elements),
                 appState: { viewBackgroundColor },
+                files: files.loadedFiles,
               }
             : "nope",
         },
