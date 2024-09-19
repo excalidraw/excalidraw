@@ -2,6 +2,8 @@ import { register } from "./register";
 import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
+  ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -18,7 +20,13 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
-import { isLinearElement } from "../element/typeChecks";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isLinearElement,
+} from "../element/typeChecks";
+import { mutateElbowArrow } from "../element/routing";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -109,7 +117,23 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
-  const { minX, minY, maxX, maxY } = getCommonBoundingBox(selectedElements);
+  if (
+    selectedElements.every(
+      (element) =>
+        isArrowElement(element) && (element.startBinding || element.endBinding),
+    )
+  ) {
+    return selectedElements.map((element) => {
+      const _element = element as ExcalidrawArrowElement;
+      return newElementWith(_element, {
+        startArrowhead: _element.endArrowhead,
+        endArrowhead: _element.startArrowhead,
+      });
+    });
+  }
+
+  const { minX, minY, maxX, maxY, midX, midY } =
+    getCommonBoundingBox(selectedElements);
 
   resizeMultipleElements(
     elementsMap,
@@ -130,6 +154,49 @@ const flipElements = (
     isBindingEnabled(appState),
     [],
   );
+
+  // ---------------------------------------------------------------------------
+  // flipping arrow elements (and potentially other) makes the selection group
+  // "move" across the canvas because of how arrows can bump against the "wall"
+  // of the selection, so we need to center the group back to the original
+  // position so that repeated flips don't accumulate the offset
+
+  const { elbowArrows, otherElements } = selectedElements.reduce(
+    (
+      acc: {
+        elbowArrows: ExcalidrawElbowArrowElement[];
+        otherElements: ExcalidrawElement[];
+      },
+      element,
+    ) =>
+      isElbowArrow(element)
+        ? { ...acc, elbowArrows: acc.elbowArrows.concat(element) }
+        : { ...acc, otherElements: acc.otherElements.concat(element) },
+    { elbowArrows: [], otherElements: [] },
+  );
+
+  const { midX: newMidX, midY: newMidY } =
+    getCommonBoundingBox(selectedElements);
+  const [diffX, diffY] = [midX - newMidX, midY - newMidY];
+  otherElements.forEach((element) =>
+    mutateElement(element, {
+      x: element.x + diffX,
+      y: element.y + diffY,
+    }),
+  );
+  elbowArrows.forEach((element) =>
+    mutateElbowArrow(
+      element,
+      elementsMap,
+      element.points,
+      undefined,
+      undefined,
+      {
+        informMutation: false,
+      },
+    ),
+  );
+  // ---------------------------------------------------------------------------
 
   return selectedElements;
 };

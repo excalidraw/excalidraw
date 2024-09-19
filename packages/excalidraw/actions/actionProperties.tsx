@@ -1907,19 +1907,6 @@ export const actionChangeArrowType = register({
                 : {}),
             },
           );
-        } else {
-          mutateElement(
-            newElement,
-            {
-              startBinding: newElement.startBinding
-                ? { ...newElement.startBinding, fixedPoint: null }
-                : null,
-              endBinding: newElement.endBinding
-                ? { ...newElement.endBinding, fixedPoint: null }
-                : null,
-            },
-            false,
-          );
         }
 
         return newElement;

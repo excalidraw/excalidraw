@@ -41,7 +41,6 @@ import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type {
   ExcalidrawElbowArrowElement,
-  FixedPointBinding,
   NonDeletedSceneElementsMap,
   SceneElementsMap,
 } from "./types";
@@ -73,13 +72,12 @@ export const mutateElbowArrow = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   nextPoints: readonly LocalPoint[],
   offset?: Vector,
-  otherUpdates?: {
-    startBinding?: FixedPointBinding | null;
-    endBinding?: FixedPointBinding | null;
-  },
+  otherUpdates?: Omit<
+    ElementUpdate<ExcalidrawElbowArrowElement>,
+    "angle" | "x" | "y" | "width" | "height" | "elbowed" | "points"
+  >,
   options?: {
     isDragging?: boolean;
-    disableBinding?: boolean;
     informMutation?: boolean;
   },
 ) => {
