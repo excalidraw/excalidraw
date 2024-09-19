@@ -2,6 +2,7 @@ import { register } from "./register";
 import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeleted,
@@ -19,9 +20,13 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
-import { isElbowArrow, isLinearElement } from "../element/typeChecks";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isLinearElement,
+} from "../element/typeChecks";
 import { mutateElbowArrow } from "../element/routing";
-import { mutateElement } from "../element/mutateElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -112,6 +117,21 @@ const flipElements = (
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
+  if (
+    selectedElements.every(
+      (element) =>
+        isArrowElement(element) && (element.startBinding || element.endBinding),
+    )
+  ) {
+    return selectedElements.map((element) => {
+      const _element = element as ExcalidrawArrowElement;
+      return newElementWith(_element, {
+        startArrowhead: _element.endArrowhead,
+        endArrowhead: _element.startArrowhead,
+      });
+    });
+  }
+
   const { minX, minY, maxX, maxY, midX, midY } =
     getCommonBoundingBox(selectedElements);
 
