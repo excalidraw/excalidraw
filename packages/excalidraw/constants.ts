@@ -116,6 +116,9 @@ export const CLASSES = {
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
 };
 
+export const CHINESE_HANDWRITTEN_FALLBACK_FONT = "Xiaolai";
+export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
+
 /**
  * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
  *
@@ -135,6 +138,19 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
 };
+
+/** Separated fallback families, not the mix them main ones  */
+export const FONT_FAMILY_FALLBACKS = {
+  [CHINESE_HANDWRITTEN_FALLBACK_FONT]: 1000,
+  [WINDOWS_EMOJI_FALLBACK_FONT]: 10000,
+};
+
+// both of these could be in theory computed, though for such a small list it's just better to hardcode these
+export const FONT_FAMILY_FALLBACKS_STRING = `${CHINESE_HANDWRITTEN_FALLBACK_FONT}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
+export const FONT_FAMILY_FALLBACKS_ORDERED = [
+  FONT_FAMILY_FALLBACKS[CHINESE_HANDWRITTEN_FALLBACK_FONT],
+  FONT_FAMILY_FALLBACKS[WINDOWS_EMOJI_FALLBACK_FONT],
+];
 
 export const THEME = {
   LIGHT: "light",
@@ -156,8 +172,6 @@ export const FRAME_STYLE = {
   nameFontSize: 14,
   nameLineHeight: 1.25,
 };
-
-export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;

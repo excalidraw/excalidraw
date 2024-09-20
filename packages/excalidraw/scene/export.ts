@@ -9,7 +9,14 @@ import type {
 import type { Bounds } from "../element/bounds";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
-import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
+import {
+  arrayToMap,
+  distance,
+  getFontString,
+  PromisePool,
+  promiseTry,
+  toBrandedType,
+} from "../utils";
 import type { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -18,6 +25,8 @@ import {
   SVG_NS,
   THEME,
   THEME_FILTER,
+  FONT_FAMILY_FALLBACKS,
+  FONT_FAMILY_FALLBACKS_ORDERED,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -39,7 +48,7 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
-import type { Font } from "../fonts/ExcalidrawFont";
+import { containsChinese } from "../element/textElement";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -367,13 +376,13 @@ export const exportToSvg = async (
   }
 
   const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
+  const delimiter = "\n      "; // 6 spaces
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
-    <style class="style-fonts">
-      ${fontFaces.join("\n")}
+    <style class="style-fonts">${delimiter}${fontFaces.join(delimiter)}
     </style>
     ${exportingFrameClipPath}
   </defs>
@@ -449,6 +458,7 @@ const getFontFaces = async (
   elements: readonly ExcalidrawElement[],
 ): Promise<string[]> => {
   const fontFamilies = new Set<number>();
+  const characters = new Set<string>();
   const codePoints = new Set<number>();
 
   for (const element of elements) {
@@ -459,52 +469,100 @@ const getFontFaces = async (
     fontFamilies.add(element.fontFamily);
 
     // gather unique codepoints only when inlining fonts
-    for (const codePoint of Array.from(element.originalText, (u) =>
-      u.codePointAt(0),
-    )) {
-      if (codePoint) {
-        codePoints.add(codePoint);
+    for (const char of element.originalText) {
+      if (!characters.has(char)) {
+        characters.add(char);
+        codePoints.add(char.codePointAt(0)!);
       }
     }
   }
 
-  const getSource = (font: Font) => {
-    try {
-      // retrieve font source as dataurl based on the used codepoints
-      return font.getContent(codePoints);
-    } catch {
-      // fallback to font source as a url
-      return font.urls[0].toString();
-    }
-  };
+  const uniqueChars = Array.from(characters).join("");
+  const uniqueCodePoints = Array.from(codePoints);
 
-  const fontFaces = await Promise.all(
-    Array.from(fontFamilies).map(async (x) => {
-      const { fonts, metadata } = Fonts.registered.get(x) ?? {};
+  // quick check for Han, might match a bit more, which is fine
+  if (containsChinese(uniqueChars)) {
+    fontFamilies.add(FONT_FAMILY_FALLBACKS.Xiaolai);
+  }
 
-      if (!Array.isArray(fonts)) {
-        console.error(
-          `Couldn't find registered fonts for font-family "${x}"`,
-          Fonts.registered,
-        );
-        return [];
-      }
-
-      if (metadata?.local) {
-        // don't inline local fonts
-        return [];
-      }
-
-      return Promise.all(
-        fonts.map(
-          async (font) => `@font-face {
-        font-family: ${font.fontFace.family};
-        src: url(${await getSource(font)});
-          }`,
-        ),
-      );
-    }),
+  const iterator = fontFacesIterator(
+    fontFamilies,
+    uniqueChars,
+    uniqueCodePoints,
   );
 
-  return fontFaces.flat();
+  // don't trigger hundreds of concurrent requests (each performing fetch, creating a worker, etc.),
+  // instead go three requests at a time, in a controlled manner, without completely blocking the main thread
+  // and avoiding potential issues such as rate limits
+  const concurrency = 3;
+  const fontFaces = await new PromisePool(iterator, concurrency).all();
+
+  // dedup just in case (i.e. could be the same font faces with 0 glyphs)
+  return Array.from(new Set(fontFaces));
 };
+
+function* fontFacesIterator(
+  families: Set<number>,
+  characters: string,
+  codePoints: Array<number>,
+): Generator<Promise<void | readonly [number, string]>> {
+  // the order between the families is important, as fallbacks need to be defined first and in the reversed order
+  // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
+  const reversedFallbacks = Array.from(FONT_FAMILY_FALLBACKS_ORDERED).reverse();
+
+  for (const [familyIndex, family] of Array.from(families).entries()) {
+    const { fontFaces, metadata } = Fonts.registered.get(family) ?? {};
+
+    if (!Array.isArray(fontFaces)) {
+      console.error(
+        `Couldn't find registered fonts for font-family "${family}"`,
+        Fonts.registered,
+      );
+      continue;
+    }
+
+    if (metadata?.local) {
+      // don't inline local fonts
+      continue;
+    }
+
+    const fallbackIndex = reversedFallbacks.findIndex(
+      (fallback) => fallback === family,
+    );
+
+    let fontFamilyOrder: number;
+
+    if (fallbackIndex !== -1) {
+      // making sure the fallback fonts are defined first, so that they don't override default fonts
+      fontFamilyOrder = fallbackIndex;
+    } else {
+      // making sure the built-in font faces are always defined after fallback fonts
+      fontFamilyOrder = FONT_FAMILY_FALLBACKS_ORDERED.length + familyIndex;
+    }
+
+    // making a safe buffer in between the families, assuming there won't be more than 10k font faces per family
+    fontFamilyOrder *= 10_000;
+
+    for (const [fontFaceIndex, fontFace] of fontFaces.entries()) {
+      yield promiseTry(async () => {
+        try {
+          const fontFaceCSS = await fontFace.toCSS(characters, codePoints);
+
+          if (!fontFaceCSS) {
+            return;
+          }
+
+          const fontFaceOrder = fontFamilyOrder + fontFaceIndex;
+          const fontFaceTuple = [fontFaceOrder, fontFaceCSS] as const;
+
+          return fontFaceTuple;
+        } catch (error) {
+          console.error(
+            `Couldn't transform font-face to css for family "${fontFace.fontFace.family}"`,
+            error,
+          );
+        }
+      });
+    }
+  }
+}

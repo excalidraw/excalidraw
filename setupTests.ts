@@ -34,12 +34,14 @@ Object.defineProperty(window, "FontFace", {
     private source: string;
     private descriptors: any;
     private status: string;
+    private unicodeRange: string;
 
     constructor(family, source, descriptors) {
       this.family = family;
       this.source = source;
       this.descriptors = descriptors;
       this.status = "unloaded";
+      this.unicodeRange = "U+0000-00FF";
     }
 
     load() {
@@ -57,26 +59,30 @@ Object.defineProperty(document, "fonts", {
   },
 });
 
+Object.defineProperty(window, "Worker", {
+  value: class {},
+});
+
 Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {
   value: `file://${__dirname}/`,
 });
 
 vi.mock(
-  "./packages/excalidraw/fonts/ExcalidrawFont",
+  "./packages/excalidraw/fonts/ExcalidrawFontFace",
   async (importOriginal) => {
     const mod = await importOriginal<
-      typeof import("./packages/excalidraw/fonts/ExcalidrawFont")
+      typeof import("./packages/excalidraw/fonts/ExcalidrawFontFace")
     >();
-    const ExcalidrawFontImpl = mod.ExcalidrawFont;
+    const ExcalidrawFontFaceImpl = mod.ExcalidrawFontFace;
 
     return {
       ...mod,
-      ExcalidrawFont: class extends ExcalidrawFontImpl {
+      ExcalidrawFontFace: class extends ExcalidrawFontFaceImpl {
         public async getContent(): Promise<string> {
           const url = this.urls[0];
 
           if (url.protocol !== "file:") {
-            return super.getContent(new Set());
+            return super.getContent([]);
           }
 
           // read local assets directly, without running a server
