@@ -38,7 +38,7 @@ import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { clamp, roundToStep } from "../../math";
+import { clamp, point, roundToStep } from "../../math";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -324,7 +324,7 @@ export const zoomToFitBounds = ({
   );
 
   const centerScroll = centerScrollOn({
-    scenePoint: { x: centerX, y: centerY },
+    scenePoint: point(centerX, centerY),
     viewportDimensions: {
       width: appState.width,
       height: appState.height,

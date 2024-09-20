@@ -127,7 +127,7 @@ export const actionFinalize = register({
         !isLoop &&
         multiPointElement.points.length > 1
       ) {
-        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           multiPointElement,
           -1,
           arrayToMap(elements),
@@ -135,7 +135,7 @@ export const actionFinalize = register({
         maybeBindLinearElement(
           multiPointElement,
           appState,
-          { x, y },
+          p,
           elementsMap,
           elements,
         );

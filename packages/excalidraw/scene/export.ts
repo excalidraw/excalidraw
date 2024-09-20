@@ -9,7 +9,7 @@ import type {
 import type { Bounds } from "../element/bounds";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
-import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
+import { arrayToMap, getFontString, toBrandedType } from "../utils";
 import type { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -40,6 +40,7 @@ import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
 import type { Font } from "../fonts/ExcalidrawFont";
+import { rangeExtent, rangeInclusive } from "../../math";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -427,8 +428,8 @@ const getCanvasSize = (
   exportPadding: number,
 ): Bounds => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  const width = distance(minX, maxX) + exportPadding * 2;
-  const height = distance(minY, maxY) + exportPadding * 2;
+  const width = rangeExtent(rangeInclusive(minX, maxX)) + exportPadding * 2;
+  const height = rangeExtent(rangeInclusive(minY, maxY)) + exportPadding * 2;
 
   return [minX, minY, width, height];
 };

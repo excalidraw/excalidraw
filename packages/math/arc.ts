@@ -1,12 +1,19 @@
 import { cartesian2Polar } from "./angle";
-import type { GlobalPoint, LocalPoint, SymmetricArc } from "./types";
+import type {
+  GlobalPoint,
+  LocalPoint,
+  SymmetricArc,
+  ViewportPoint,
+} from "./types";
 import { PRECISION } from "./utils";
 
 /**
  * Determines if a cartesian point lies on a symmetric arc, i.e. an arc which
  * is part of a circle contour centered on 0, 0.
  */
-export const isPointOnSymmetricArc = <P extends GlobalPoint | LocalPoint>(
+export const isPointOnSymmetricArc = <
+  P extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   { radius: arcRadius, startAngle, endAngle }: SymmetricArc,
   point: P,
 ): boolean => {

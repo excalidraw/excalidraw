@@ -4,6 +4,7 @@ import type {
   Triangle,
   Vector,
   Radians,
+  ViewportPoint,
 } from "../../math";
 import {
   point,
@@ -21,7 +22,9 @@ export const HEADING_LEFT = [-1, 0] as Heading;
 export const HEADING_UP = [0, -1] as Heading;
 export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
 
-export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
+export const headingForDiamond = <
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   a: Point,
   b: Point,
 ) => {

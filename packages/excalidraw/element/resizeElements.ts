@@ -1089,8 +1089,7 @@ export const getResizeOffsetXY = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
-  x: number,
-  y: number,
+  [x, y]: GlobalPoint,
 ): [number, number] => {
   const [x1, y1, x2, y2] =
     selectedElements.length === 1

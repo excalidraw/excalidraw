@@ -81,7 +81,7 @@ export const isPointHittingLink = (
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    hitElementBoundingBox(x, y, element, elementsMap)
+    hitElementBoundingBox(point(x, y), element, elementsMap)
   ) {
     return true;
   }

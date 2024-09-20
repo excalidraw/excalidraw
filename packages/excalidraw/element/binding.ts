@@ -49,7 +49,7 @@ import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
 import type Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
-import { arrayToMap, tupleToCoors } from "../utils";
+import { arrayToMap } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
@@ -389,7 +389,7 @@ export const getSuggestedBindingsForArrows = (
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
-  pointerCoords: { x: number; y: number },
+  pointerCoords: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
 ): void => {
@@ -508,10 +508,7 @@ const unbindLinearElement = (
 };
 
 export const getHoveredElementForBinding = (
-  pointerCoords: {
-    x: number;
-    y: number;
-  },
+  pointer: GlobalPoint,
   elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   fullShape?: boolean,
@@ -522,7 +519,7 @@ export const getHoveredElementForBinding = (
       isBindableElement(element, false) &&
       bindingBorderTest(
         element,
-        pointerCoords,
+        pointer,
         elementsMap,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
@@ -1177,14 +1174,12 @@ const getLinearElementEdgeCoors = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
-): { x: number; y: number } => {
+): GlobalPoint => {
   const index = startOrEnd === "start" ? 0 : -1;
-  return tupleToCoors(
-    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      linearElement,
-      index,
-      elementsMap,
-    ),
+  return LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    index,
+    elementsMap,
   );
 };
 
@@ -1330,7 +1325,7 @@ const newBoundElements = (
 
 export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
-  { x, y }: { x: number; y: number },
+  [x, y]: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   fullShape?: boolean,
 ): boolean => {

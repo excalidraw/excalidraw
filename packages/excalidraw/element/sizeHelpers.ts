@@ -5,6 +5,7 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import type { AppState, Offsets, Zoom } from "../types";
 import { getCommonBounds, getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
+import { point } from "../../math";
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
@@ -33,25 +34,22 @@ export const isElementInViewport = (
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft,
-      clientY: viewTransformations.offsetTop,
-    },
+    point(viewTransformations.offsetLeft, viewTransformations.offsetTop),
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + width,
-      clientY: viewTransformations.offsetTop + height,
-    },
+    point(
+      viewTransformations.offsetLeft + width,
+      viewTransformations.offsetTop + height,
+    ),
     viewTransformations,
   );
 
   return (
-    topLeftSceneCoords.x <= x2 &&
-    topLeftSceneCoords.y <= y2 &&
-    bottomRightSceneCoords.x >= x1 &&
-    bottomRightSceneCoords.y >= y1
+    topLeftSceneCoords[0] <= x2 &&
+    topLeftSceneCoords[1] <= y2 &&
+    bottomRightSceneCoords[0] >= x1 &&
+    bottomRightSceneCoords[1] >= y1
   );
 };
 
@@ -71,25 +69,25 @@ export const isElementCompletelyInViewport = (
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + (padding?.left || 0),
-      clientY: viewTransformations.offsetTop + (padding?.top || 0),
-    },
+    point(
+      viewTransformations.offsetLeft + (padding?.left || 0),
+      viewTransformations.offsetTop + (padding?.top || 0),
+    ),
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    {
-      clientX: viewTransformations.offsetLeft + width - (padding?.right || 0),
-      clientY: viewTransformations.offsetTop + height - (padding?.bottom || 0),
-    },
+    point(
+      viewTransformations.offsetLeft + width - (padding?.right || 0),
+      viewTransformations.offsetTop + height - (padding?.bottom || 0),
+    ),
     viewTransformations,
   );
 
   return (
-    x1 >= topLeftSceneCoords.x &&
-    y1 >= topLeftSceneCoords.y &&
-    x2 <= bottomRightSceneCoords.x &&
-    y2 <= bottomRightSceneCoords.y
+    x1 >= topLeftSceneCoords[0] &&
+    y1 >= topLeftSceneCoords[1] &&
+    x2 <= bottomRightSceneCoords[0] &&
+    y2 <= bottomRightSceneCoords[1]
   );
 };
 

@@ -1,6 +1,6 @@
 import { pointsEqual } from "./point";
 import { lineSegment, pointOnLineSegment } from "./segment";
-import type { GlobalPoint, LocalPoint, Polygon } from "./types";
+import type { GlobalPoint, LocalPoint, Polygon, ViewportPoint } from "./types";
 import { PRECISION } from "./utils";
 
 export function polygon<Point extends GlobalPoint | LocalPoint>(
@@ -9,13 +9,15 @@ export function polygon<Point extends GlobalPoint | LocalPoint>(
   return polygonClose(points) as Polygon<Point>;
 }
 
-export function polygonFromPoints<Point extends GlobalPoint | LocalPoint>(
-  points: Point[],
-) {
+export function polygonFromPoints<
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+>(points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
+export const polygonIncludesPoint = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   point: Point,
   polygon: Polygon<Point>,
 ) => {
@@ -40,7 +42,9 @@ export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
   return inside;
 };
 
-export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnPolygon = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   p: Point,
   poly: Polygon<Point>,
   threshold = PRECISION,
@@ -57,7 +61,7 @@ export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
   return on;
 };
 
-function polygonClose<Point extends LocalPoint | GlobalPoint>(
+function polygonClose<Point extends LocalPoint | GlobalPoint | ViewportPoint>(
   polygon: Point[],
 ) {
   return polygonIsClosed(polygon)
@@ -65,8 +69,8 @@ function polygonClose<Point extends LocalPoint | GlobalPoint>(
     : ([...polygon, polygon[0]] as Polygon<Point>);
 }
 
-function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
-  polygon: Point[],
-) {
+function polygonIsClosed<
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(polygon: Point[]) {
   return pointsEqual(polygon[0], polygon[polygon.length - 1]);
 }

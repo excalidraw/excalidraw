@@ -11,18 +11,6 @@ import {
 import { pointInEllipse, pointOnEllipse, type Ellipse } from "./shape";
 
 describe("point and line", () => {
-  // const l: Line<GlobalPoint> = line(point(1, 0), point(1, 2));
-
-  // it("point on left or right of line", () => {
-  //   expect(pointLeftofLine(point(0, 1), l)).toBe(true);
-  //   expect(pointLeftofLine(point(1, 1), l)).toBe(false);
-  //   expect(pointLeftofLine(point(2, 1), l)).toBe(false);
-
-  //   expect(pointRightofLine(point(0, 1), l)).toBe(false);
-  //   expect(pointRightofLine(point(1, 1), l)).toBe(false);
-  //   expect(pointRightofLine(point(2, 1), l)).toBe(true);
-  // });
-
   const s: LineSegment<GlobalPoint> = lineSegment(point(1, 0), point(1, 2));
 
   it("point on the line", () => {

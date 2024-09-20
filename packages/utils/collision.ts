@@ -4,7 +4,7 @@ import {
   pointOnEllipse,
   type GeometricShape,
 } from "./geometry/shape";
-import type { Curve } from "../math";
+import type { Curve, ViewportPoint } from "../math";
 import {
   lineSegment,
   point,
@@ -18,7 +18,9 @@ import {
 } from "../math";
 
 // check if the given point is considered on the given shape's border
-export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
+export const isPointOnShape = <
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   point: Point,
   shape: GeometricShape<Point>,
   tolerance = 0,
@@ -45,21 +47,21 @@ export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
 
 // check if the given point is considered inside the element's border
 export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
-  point: Point,
+  p: Point,
   shape: GeometricShape<Point>,
 ) => {
   switch (shape.type) {
     case "polygon":
-      return polygonIncludesPoint(point, shape.data);
+      return polygonIncludesPoint(p, shape.data);
     case "line":
       return false;
     case "curve":
       return false;
     case "ellipse":
-      return pointInEllipse(point, shape.data);
+      return pointInEllipse(p, shape.data);
     case "polyline": {
       const polygon = polygonFromPoints(shape.data.flat());
-      return polygonIncludesPoint(point, polygon);
+      return polygonIncludesPoint(p, polygon);
     }
     case "polycurve": {
       return false;
@@ -77,7 +79,9 @@ export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
   return polygonIncludesPoint(point, bounds);
 };
 
-const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
+const pointOnPolycurve = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   point: Point,
   polycurve: Polycurve<Point>,
   tolerance: number,
@@ -85,7 +89,9 @@ const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
   return polycurve.some((curve) => pointOnCurve(point, curve, tolerance));
 };
 
-const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(
+const cubicBezierEquation = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   curve: Curve<Point>,
 ) => {
   const [p0, p1, p2, p3] = curve;
@@ -97,7 +103,9 @@ const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(
     p0[idx] * Math.pow(t, 3);
 };
 
-const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
+const polyLineFromCurve = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   curve: Curve<Point>,
   segments = 10,
 ): Polyline<Point> => {
@@ -119,7 +127,9 @@ const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
   return lineSegments;
 };
 
-export const pointOnCurve = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnCurve = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   point: Point,
   curve: Curve<Point>,
   threshold: number,
@@ -127,7 +137,9 @@ export const pointOnCurve = <Point extends LocalPoint | GlobalPoint>(
   return pointOnPolyline(point, polyLineFromCurve(curve), threshold);
 };
 
-export const pointOnPolyline = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnPolyline = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   point: Point,
   polyline: Polyline<Point>,
   threshold = 10e-5,

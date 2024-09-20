@@ -71,8 +71,8 @@ export const rangeIntersection = (
  * Determine if a value is inside a range.
  *
  * @param value The value to check
- * @param range The range
- * @returns
+ * @param range The range to check
+ * @returns TRUE if the value is in range
  */
 export const rangeIncludesValue = (
   value: number,
@@ -80,3 +80,13 @@ export const rangeIncludesValue = (
 ): boolean => {
   return value >= min && value <= max;
 };
+
+/**
+ * Determine the distance between the start and end of the range.
+ *
+ * @param range The range of which to measure the extent of
+ * @returns The scalar distance or extent of the start and end of the range
+ */
+export function rangeExtent([a, b]: InclusiveRange) {
+  return Math.abs(a - b);
+}

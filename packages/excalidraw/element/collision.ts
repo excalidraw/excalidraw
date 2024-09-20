@@ -42,35 +42,33 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
 };
 
 export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
-  x: number;
-  y: number;
+  sceneCoords: Point;
   element: ExcalidrawElement;
   shape: GeometricShape<Point>;
   threshold?: number;
   frameNameBound?: FrameNameBounds | null;
 };
 
-export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
-  x,
-  y,
+export const hitElementItself = ({
+  sceneCoords,
   element,
   shape,
   threshold = 10,
   frameNameBound = null,
-}: HitTestArgs<Point>) => {
+}: HitTestArgs<GlobalPoint>) => {
   let hit = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
-      isPointInShape(point(x, y), shape) ||
-      isPointOnShape(point(x, y), shape, threshold)
-    : isPointOnShape(point(x, y), shape, threshold);
+      isPointInShape(sceneCoords, shape) ||
+      isPointOnShape(sceneCoords, shape, threshold)
+    : isPointOnShape(sceneCoords, shape, threshold);
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
-    hit = isPointInShape(point(x, y), {
+    hit = isPointInShape(sceneCoords, {
       type: "polygon",
       data: getPolygonShape(frameNameBound as ExcalidrawRectangleElement)
-        .data as Polygon<Point>,
+        .data as Polygon<GlobalPoint>,
     });
   }
 
@@ -78,8 +76,7 @@ export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
 };
 
 export const hitElementBoundingBox = (
-  x: number,
-  y: number,
+  scenePointer: GlobalPoint,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   tolerance = 0,
@@ -89,31 +86,27 @@ export const hitElementBoundingBox = (
   y1 -= tolerance;
   x2 += tolerance;
   y2 += tolerance;
-  return isPointWithinBounds(point(x1, y1), point(x, y), point(x2, y2));
+  return isPointWithinBounds(point(x1, y1), scenePointer, point(x2, y2));
 };
 
-export const hitElementBoundingBoxOnly = <
-  Point extends GlobalPoint | LocalPoint,
->(
-  hitArgs: HitTestArgs<Point>,
+export const hitElementBoundingBoxOnly = (
+  hitArgs: HitTestArgs<GlobalPoint>,
   elementsMap: ElementsMap,
 ) => {
   return (
     !hitElementItself(hitArgs) &&
     // bound text is considered part of the element (even if it's outside the bounding box)
     !hitElementBoundText(
-      hitArgs.x,
-      hitArgs.y,
+      hitArgs.sceneCoords,
       getBoundTextShape(hitArgs.element, elementsMap),
     ) &&
-    hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element, elementsMap)
+    hitElementBoundingBox(hitArgs.sceneCoords, hitArgs.element, elementsMap)
   );
 };
 
-export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
-  x: number,
-  y: number,
-  textShape: GeometricShape<Point> | null,
+export const hitElementBoundText = (
+  scenePointer: GlobalPoint,
+  textShape: GeometricShape<GlobalPoint> | null,
 ): boolean => {
-  return !!textShape && isPointInShape(point(x, y), textShape);
+  return !!textShape && isPointInShape(scenePointer, textShape);
 };

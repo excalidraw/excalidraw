@@ -43,6 +43,13 @@ export type LocalPoint = [x: number, y: number] & {
   _brand: "excalimath__localpoint";
 };
 
+/**
+ * Represents a 2D position on the browser viewport.
+ */
+export type ViewportPoint = [x: number, y: number] & {
+  _brand: "excalimath_viewportpoint";
+};
+
 // Line
 
 /**
@@ -57,7 +64,10 @@ export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
  * line that is bounded by two distinct end points, and
  * contains every point on the line that is between its endpoints.
  */
-export type LineSegment<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
+export type LineSegment<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
+  a: P,
+  b: P,
+] & {
   _brand: "excalimath_linesegment";
 };
 
@@ -93,9 +103,10 @@ export type Triangle<P extends GlobalPoint | LocalPoint> = [
  * A polygon is a closed shape by connecting the given points
  * rectangles and diamonds are modelled by polygons
  */
-export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[] & {
-  _brand: "excalimath_polygon";
-};
+export type Polygon<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
+  Point[] & {
+    _brand: "excalimath_polygon";
+  };
 
 //
 // Curve
@@ -104,7 +115,7 @@ export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[] & {
 /**
  * Cubic bezier curve with four control points
  */
-export type Curve<Point extends GlobalPoint | LocalPoint> = [
+export type Curve<Point extends GlobalPoint | LocalPoint | ViewportPoint> = [
   Point,
   Point,
   Point,

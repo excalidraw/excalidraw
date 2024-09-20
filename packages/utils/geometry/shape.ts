@@ -12,7 +12,13 @@
  * to pure shapes
  */
 
-import type { Curve, LineSegment, Polygon, Radians } from "../../math";
+import type {
+  Curve,
+  LineSegment,
+  Polygon,
+  Radians,
+  ViewportPoint,
+} from "../../math";
 import {
   curve,
   lineSegment,
@@ -56,24 +62,27 @@ import { invariant } from "../../excalidraw/utils";
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
 // be used to model other elements
-export type Polyline<Point extends GlobalPoint | LocalPoint> =
+export type Polyline<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
   LineSegment<Point>[];
 
 // a polycurve is a curve consisting of ther curves, this corresponds to a complex
 // curve on the canvas
-export type Polycurve<Point extends GlobalPoint | LocalPoint> = Curve<Point>[];
+export type Polycurve<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
+  Curve<Point>[];
 
 // an ellipse is specified by its center, angle, and its major and minor axes
 // but for the sake of simplicity, we've used halfWidth and halfHeight instead
 // in replace of semi major and semi minor axes
-export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
+export type Ellipse<Point extends GlobalPoint | LocalPoint | ViewportPoint> = {
   center: Point;
   angle: Radians;
   halfWidth: number;
   halfHeight: number;
 };
 
-export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
+export type GeometricShape<
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+> =
   | {
       type: "line";
       data: LineSegment<Point>;
@@ -239,7 +248,9 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
-const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
+const polylineFromPoints = <
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   points: Point[],
 ): Polyline<Point> => {
   let previousPoint: Point = points[0];
@@ -254,13 +265,15 @@ const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
   return polyline;
 };
 
-export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
+export const getFreedrawShape = <
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   element: ExcalidrawFreeDrawElement,
   center: Point,
   isClosed: boolean = false,
 ): GeometricShape<Point> => {
-  const transform = (p: Point) =>
-    pointRotateRads(
+  const transform = (p: Point): Point =>
+    pointRotateRads<Point>(
       pointFromVector(
         vectorAdd(vectorFromPoint(p), vector(element.x, element.y)),
       ),
@@ -391,7 +404,9 @@ export const segmentIntersectRectangleElement = <
     .filter((i): i is Point => !!i);
 };
 
-const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
+const distanceToEllipse = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {
@@ -445,7 +460,9 @@ const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
   return pointDistance(point(rotatedPointX, rotatedPointY), point(minX, minY));
 };
 
-export const pointOnEllipse = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnEllipse = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   point: Point,
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
@@ -453,7 +470,9 @@ export const pointOnEllipse = <Point extends LocalPoint | GlobalPoint>(
   return distanceToEllipse(point, ellipse) <= threshold;
 };
 
-export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
+export const pointInEllipse = <
+  Point extends LocalPoint | GlobalPoint | ViewportPoint,
+>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {

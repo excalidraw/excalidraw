@@ -15,6 +15,7 @@ import type {
 } from "../../element/types";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
+import { point } from "../../../math";
 
 type InteractiveCanvasProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -103,10 +104,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       remotePointerViewportCoords.set(
         socketId,
         sceneCoordsToViewportCoords(
-          {
-            sceneX: user.pointer.x,
-            sceneY: user.pointer.y,
-          },
+          point(user.pointer.x, user.pointer.y),
           props.appState,
         ),
       );

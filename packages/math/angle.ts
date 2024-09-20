@@ -4,6 +4,7 @@ import type {
   LocalPoint,
   PolarCoords,
   Radians,
+  ViewportPoint,
 } from "./types";
 import { PRECISION } from "./utils";
 
@@ -23,10 +24,9 @@ export const normalizeRadians = (angle: Radians): Radians => {
  * (x, y) for the center point 0,0 where the first number returned is the radius,
  * the second is the angle in radians.
  */
-export const cartesian2Polar = <P extends GlobalPoint | LocalPoint>([
-  x,
-  y,
-]: P): PolarCoords => [Math.hypot(x, y), Math.atan2(y, x)];
+export const cartesian2Polar = <
+  P extends GlobalPoint | LocalPoint | ViewportPoint,
+>([x, y]: P): PolarCoords => [Math.hypot(x, y), Math.atan2(y, x)];
 
 export function degreesToRadians(degrees: Degrees): Radians {
   return ((degrees * Math.PI) / 180) as Radians;

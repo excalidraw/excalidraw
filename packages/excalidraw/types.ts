@@ -41,6 +41,7 @@ import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type { StoreActionType } from "./store";
+import type { GlobalPoint } from "../math";
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -415,14 +416,9 @@ export type Zoom = Readonly<{
   value: NormalizedZoomValue;
 }>;
 
-export type PointerCoords = Readonly<{
-  x: number;
-  y: number;
-}>;
-
 export type Gesture = {
-  pointers: Map<number, PointerCoords>;
-  lastCenter: { x: number; y: number } | null;
+  pointers: Map<number, GlobalPoint>;
+  lastCenter: GlobalPoint | null;
   initialDistance: number | null;
   initialScale: number | null;
 };
@@ -661,17 +657,17 @@ export type AppClassProperties = {
   excalidrawContainerValue: App["excalidrawContainerValue"];
 };
 
-export type PointerDownState = Readonly<{
+export type PointerDownState = {
   // The first position at which pointerDown happened
-  origin: Readonly<{ x: number; y: number }>;
+  origin: Readonly<GlobalPoint>;
   // Same as "origin" but snapped to the grid, if grid is on
   originInGrid: Readonly<{ x: number; y: number }>;
   // Scrollbar checks
-  scrollbars: ReturnType<typeof isOverScrollBars>;
+  scrollbars: Readonly<ReturnType<typeof isOverScrollBars>>;
   // The previous pointer position
-  lastCoords: { x: number; y: number };
+  lastCoords: GlobalPoint;
   // map of original elements data
-  originalElements: Map<string, NonDeleted<ExcalidrawElement>>;
+  originalElements: Readonly<Map<string, NonDeleted<ExcalidrawElement>>>;
   resize: {
     // Handle when resizing, might change during the pointer interaction
     handleType: MaybeTransformHandleType;
@@ -698,12 +694,12 @@ export type PointerDownState = Readonly<{
     hasBeenDuplicated: boolean;
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
   };
-  withCmdOrCtrl: boolean;
+  withCmdOrCtrl: Readonly<boolean>;
   drag: {
     // Might change during the pointer interaction
     hasOccurred: boolean;
     // Might change during the pointer interaction
-    offset: { x: number; y: number } | null;
+    offset: Readonly<{ x: number; y: number }> | null;
   };
   // We need to have these in the state so that we can unsubscribe them
   eventListeners: {
@@ -719,7 +715,7 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     hasOccurred: boolean;
   };
-}>;
+};
 
 export type UnsubscribeCallback = () => void;
 

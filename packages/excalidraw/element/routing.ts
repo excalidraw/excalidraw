@@ -14,7 +14,7 @@ import {
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
-import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { isAnyTrue, toBrandedType } from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -1081,13 +1081,13 @@ const getHoveredElements = (
   const elements = Array.from(elementsMap.values());
   return [
     getHoveredElementForBinding(
-      tupleToCoors(origStartGlobalPoint),
+      origStartGlobalPoint,
       elements,
       nonDeletedSceneElementsMap,
       true,
     ),
     getHoveredElementForBinding(
-      tupleToCoors(origEndGlobalPoint),
+      origEndGlobalPoint,
       elements,
       nonDeletedSceneElementsMap,
       true,

@@ -1,3 +1,4 @@
+import type { ViewportPoint } from "../math";
 import {
   isPoint,
   point,
@@ -435,7 +436,9 @@ export const aabbForElement = (
   return bounds;
 };
 
-export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+export const pointInsideBounds = <
+  P extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   p: P,
   bounds: Bounds,
 ): boolean =>

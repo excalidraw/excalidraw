@@ -1,3 +1,4 @@
+import type { ViewportPoint } from "../../math";
 import { point, type GlobalPoint, type LocalPoint } from "../../math";
 import { THEME } from "../constants";
 import type { PointSnapLine, PointerSnapLine } from "../snapping";
@@ -107,7 +108,7 @@ const drawCross = <Point extends LocalPoint | GlobalPoint>(
   context.restore();
 };
 
-const drawLine = <Point extends LocalPoint | GlobalPoint>(
+const drawLine = <Point extends LocalPoint | GlobalPoint | ViewportPoint>(
   from: Point,
   to: Point,
   context: CanvasRenderingContext2D,
@@ -118,7 +119,7 @@ const drawLine = <Point extends LocalPoint | GlobalPoint>(
   context.stroke();
 };
 
-const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
+const drawGapLine = <Point extends LocalPoint | GlobalPoint | ViewportPoint>(
   from: Point,
   to: Point,
   direction: "horizontal" | "vertical",

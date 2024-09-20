@@ -29,6 +29,7 @@ import { getElementLineSegments } from "./element/bounds";
 import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
+import type { GlobalPoint } from "../math";
 import { isPointWithinBounds, point } from "../math";
 
 // --------------------------- Frame State ------------------------------------
@@ -149,20 +150,13 @@ export const elementOverlapsWithFrame = (
 };
 
 export const isCursorInFrame = (
-  cursorCoords: {
-    x: number;
-    y: number;
-  },
+  cursorCoords: GlobalPoint,
   frame: NonDeleted<ExcalidrawFrameLikeElement>,
   elementsMap: ElementsMap,
 ) => {
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
 
-  return isPointWithinBounds(
-    point(fx1, fy1),
-    point(cursorCoords.x, cursorCoords.y),
-    point(fx2, fy2),
-  );
+  return isPointWithinBounds(point(fx1, fy1), cursorCoords, point(fx2, fy2));
 };
 
 export const groupsAreAtLeastIntersectingTheFrame = (

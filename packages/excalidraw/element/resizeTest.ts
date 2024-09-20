@@ -92,7 +92,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     if (!(isLinearElement(element) && element.points.length <= 2)) {
       const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
-        point(x1 - SPACING, y1 - SPACING),
+        point<Point>(x1 - SPACING, y1 - SPACING),
         point(x2 + SPACING, y2 + SPACING),
         point(cx, cy),
         element.angle,
@@ -101,7 +101,11 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       for (const [dir, side] of Object.entries(sides)) {
         // test to see if x, y are on the line segment
         if (
-          pointOnLineSegment(point(x, y), side as LineSegment<Point>, SPACING)
+          pointOnLineSegment(
+            point<Point>(x, y),
+            side as LineSegment<Point>,
+            SPACING,
+          )
         ) {
           return dir as TransformHandleType;
         }
@@ -115,8 +119,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
 export const getElementWithTransformHandleType = (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
-  scenePointerX: number,
-  scenePointerY: number,
+  scenePointer: GlobalPoint,
   zoom: Zoom,
   pointerType: PointerType,
   elementsMap: ElementsMap,
@@ -130,8 +133,8 @@ export const getElementWithTransformHandleType = (
       element,
       elementsMap,
       appState,
-      scenePointerX,
-      scenePointerY,
+      scenePointer[0],
+      scenePointer[1],
       zoom,
       pointerType,
       device,
@@ -140,12 +143,9 @@ export const getElementWithTransformHandleType = (
   }, null as { element: NonDeletedExcalidrawElement; transformHandleType: MaybeTransformHandleType } | null);
 };
 
-export const getTransformHandleTypeFromCoords = <
-  Point extends GlobalPoint | LocalPoint,
->(
+export const getTransformHandleTypeFromCoords = (
   [x1, y1, x2, y2]: Bounds,
-  scenePointerX: number,
-  scenePointerY: number,
+  scenePointer: GlobalPoint,
   zoom: Zoom,
   pointerType: PointerType,
   device: Device,
@@ -163,7 +163,7 @@ export const getTransformHandleTypeFromCoords = <
       transformHandles[key as Exclude<TransformHandleType, "rotation">]!;
     return (
       transformHandle &&
-      isInsideTransformHandle(transformHandle, scenePointerX, scenePointerY)
+      isInsideTransformHandle(transformHandle, scenePointer[0], scenePointer[1])
     );
   });
 
@@ -178,7 +178,7 @@ export const getTransformHandleTypeFromCoords = <
     const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
 
     const sides = getSelectionBorders(
-      point(x1 - SPACING, y1 - SPACING),
+      point<GlobalPoint>(x1 - SPACING, y1 - SPACING),
       point(x2 + SPACING, y2 + SPACING),
       point(cx, cy),
       0 as Radians,
@@ -188,8 +188,8 @@ export const getTransformHandleTypeFromCoords = <
       // test to see if x, y are on the line segment
       if (
         pointOnLineSegment(
-          point(scenePointerX, scenePointerY),
-          side as LineSegment<Point>,
+          scenePointer,
+          side as LineSegment<GlobalPoint>,
           SPACING,
         )
       ) {
