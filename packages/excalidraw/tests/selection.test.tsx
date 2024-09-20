@@ -126,7 +126,7 @@ describe("deselect when pressing escape", () => {
       height: 50,
     });
 
-    h.elements = [rect1, rect2];
+    API.setElements([rect1, rect2]);
 
     mouse.clickAt(0, 0);
 
@@ -170,7 +170,7 @@ describe("deselect when pressing escape", () => {
       height: 50,
     });
 
-    h.elements = [rect1, rect2, rect3];
+    API.setElements([rect1, rect2, rect3]);
 
     mouse.downAt(-10, -10);
     mouse.moveTo(160, 60);
