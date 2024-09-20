@@ -1,22 +1,45 @@
-import { NonDeletedExcalidrawElement } from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
   ellipseFixture,
   rectangleWithLinkFixture,
+  textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
 import { exportToCanvas, exportToSvg } from "../../../utils";
-import { FRAME_STYLE } from "../../constants";
+import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 
 describe("exportToSvg", () => {
-  window.EXCALIDRAW_ASSET_PATH = "/";
   const ELEMENT_HEIGHT = 100;
   const ELEMENT_WIDTH = 100;
   const ELEMENTS = [
-    { ...diamondFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
-    { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
+    {
+      ...diamondFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a0",
+    },
+    {
+      ...ellipseFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a1",
+    },
+    {
+      ...textFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a2",
+    },
+    {
+      ...textFixture,
+      fontFamily: FONT_FAMILY.Nunito, // test embedding external font
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a3",
+    },
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_OPTIONS = {
@@ -65,7 +88,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      '"_themeFilter_1883f3"',
+      `"_themeFilter_1883f3"`,
     );
   });
 

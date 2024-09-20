@@ -20,7 +20,7 @@ exportToCanvas(&#123;<br/>&nbsp;
   getDimensions,<br/>&nbsp;
   files,<br/>&nbsp;
   exportPadding?: number;<br/>
-&#125;: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/utils.ts#L21">ExportOpts</a>
+&#125;: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/utils/export.ts#L24">ExportOpts</a>
 </pre>
 
 | Name | Type | Default | Description |
@@ -90,7 +90,7 @@ function App() {
         <img src={canvasUrl} alt="" />
       </div>
       <div style={{ height: "400px" }}>
-        <Excalidraw ref={(api) => setExcalidrawAPI(api)}
+        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}
 />
       </div>
     </>

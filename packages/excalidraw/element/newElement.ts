@@ -1,4 +1,4 @@
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElement,
@@ -17,6 +17,7 @@ import {
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeElement,
   ElementsMap,
+  ExcalidrawArrowElement,
 } from "./types";
 import {
   arrayToMap,
@@ -27,16 +28,14 @@ import {
 import { randomInteger, randomId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
-import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   measureText,
   normalizeText,
   wrapText,
   getBoundTextMaxWidth,
-  getDefaultLineHeight,
 } from "./textElement";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -46,7 +45,9 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkOptional, Merge, Mutable } from "../utility-types";
+import type { MarkOptional, Merge, Mutable } from "../utility-types";
+import { getLineHeight } from "../fonts";
+import type { Radians } from "../../math";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -55,6 +56,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "angle"
   | "groupIds"
   | "frameId"
+  | "index"
   | "boundElements"
   | "seed"
   | "version"
@@ -86,9 +88,10 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
-    angle = 0,
+    angle = 0 as Radians,
     groupIds = [],
     frameId = null,
+    index = null,
     roundness = null,
     boundElements = null,
     link = null,
@@ -114,6 +117,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     opacity,
     groupIds,
     frameId,
+    index,
     roundness,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
@@ -212,18 +216,19 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
-    strokeWidth?: ExcalidrawTextElement["strokeWidth"];
+    autoResize?: ExcalidrawTextElement["autoResize"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
-  const lineHeight = opts.lineHeight || getDefaultLineHeight(fontFamily);
+  const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
   const metrics = measureText(
     text,
@@ -237,24 +242,28 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElement = newElementWith(
-    {
-      ..._newElementBase<ExcalidrawTextElement>("text", opts),
-      text,
-      fontSize,
-      fontFamily,
-      textAlign,
-      verticalAlign,
-      x: opts.x - offsets.x,
-      y: opts.y - offsets.y,
-      width: metrics.width,
-      height: metrics.height,
-      containerId: opts.containerId || null,
-      originalText: text,
-      lineHeight,
-    },
+  const textElementProps: ExcalidrawTextElement = {
+    ..._newElementBase<ExcalidrawTextElement>("text", opts),
+    text,
+    fontSize,
+    fontFamily,
+    textAlign,
+    verticalAlign,
+    x: opts.x - offsets.x,
+    y: opts.y - offsets.y,
+    width: metrics.width,
+    height: metrics.height,
+    containerId: opts.containerId || null,
+    originalText: opts.originalText ?? text,
+    autoResize: opts.autoResize ?? true,
+    lineHeight,
+  };
+
+  const textElement: ExcalidrawTextElement = newElementWith(
+    textElementProps,
     {},
   );
+
   return textElement;
 };
 
@@ -268,18 +277,25 @@ const getAdjustedDimensions = (
   width: number;
   height: number;
 } => {
-  const { width: nextWidth, height: nextHeight } = measureText(
+  let { width: nextWidth, height: nextHeight } = measureText(
     nextText,
     getFontString(element),
     element.lineHeight,
   );
+
+  // wrapped text
+  if (!element.autoResize) {
+    nextWidth = element.width;
+  }
+
   const { textAlign, verticalAlign } = element;
   let x: number;
   let y: number;
   if (
     textAlign === "center" &&
     verticalAlign === VERTICAL_ALIGN.MIDDLE &&
-    !element.containerId
+    !element.containerId &&
+    element.autoResize
   ) {
     const prevMetrics = measureText(
       element.text,
@@ -331,6 +347,53 @@ const getAdjustedDimensions = (
   };
 };
 
+const adjustXYWithRotation = (
+  sides: {
+    n?: boolean;
+    e?: boolean;
+    s?: boolean;
+    w?: boolean;
+  },
+  x: number,
+  y: number,
+  angle: number,
+  deltaX1: number,
+  deltaY1: number,
+  deltaX2: number,
+  deltaY2: number,
+): [number, number] => {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  if (sides.e && sides.w) {
+    x += deltaX1 + deltaX2;
+  } else if (sides.e) {
+    x += deltaX1 * (1 + cos);
+    y += deltaX1 * sin;
+    x += deltaX2 * (1 - cos);
+    y += deltaX2 * -sin;
+  } else if (sides.w) {
+    x += deltaX1 * (1 - cos);
+    y += deltaX1 * -sin;
+    x += deltaX2 * (1 + cos);
+    y += deltaX2 * sin;
+  }
+
+  if (sides.n && sides.s) {
+    y += deltaY1 + deltaY2;
+  } else if (sides.n) {
+    x += deltaY1 * sin;
+    y += deltaY1 * (1 - cos);
+    x += deltaY2 * -sin;
+    y += deltaY2 * (1 + cos);
+  } else if (sides.s) {
+    x += deltaY1 * -sin;
+    y += deltaY1 * (1 + cos);
+    x += deltaY2 * sin;
+    y += deltaY2 * (1 - cos);
+  }
+  return [x, y];
+};
+
 export const refreshTextDimensions = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
@@ -340,36 +403,17 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (container) {
+  if (container || !textElement.autoResize) {
     text = wrapText(
       text,
       getFontString(textElement),
-      getBoundTextMaxWidth(container, textElement),
+      container
+        ? getBoundTextMaxWidth(container, textElement)
+        : textElement.width,
     );
   }
   const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
   return { text, ...dimensions };
-};
-
-export const updateTextElement = (
-  textElement: ExcalidrawTextElement,
-  container: ExcalidrawTextContainer | null,
-  elementsMap: ElementsMap,
-  {
-    text,
-    isDeleted,
-    originalText,
-  }: {
-    text: string;
-    isDeleted?: boolean;
-    originalText: string;
-  },
-): ExcalidrawTextElement => {
-  return newElementWith(textElement, {
-    originalText,
-    isDeleted: isDeleted ?? textElement.isDeleted,
-    ...refreshTextDimensions(textElement, container, elementsMap, originalText),
-  });
 };
 
 export const newFreeDrawElement = (
@@ -377,12 +421,13 @@ export const newFreeDrawElement = (
     type: "freedraw";
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
+    pressures?: ExcalidrawFreeDrawElement["pressures"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
   return {
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
     points: opts.points || [],
-    pressures: [],
+    pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
     lastCommittedPoint: null,
   };
@@ -391,8 +436,6 @@ export const newFreeDrawElement = (
 export const newLinearElement = (
   opts: {
     type: ExcalidrawLinearElement["type"];
-    startArrowhead?: Arrowhead | null;
-    endArrowhead?: Arrowhead | null;
     points?: ExcalidrawLinearElement["points"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
@@ -402,8 +445,29 @@ export const newLinearElement = (
     lastCommittedPoint: null,
     startBinding: null,
     endBinding: null,
+    startArrowhead: null,
+    endArrowhead: null,
+  };
+};
+
+export const newArrowElement = (
+  opts: {
+    type: ExcalidrawArrowElement["type"];
+    startArrowhead?: Arrowhead | null;
+    endArrowhead?: Arrowhead | null;
+    points?: ExcalidrawArrowElement["points"];
+    elbowed?: boolean;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawArrowElement> => {
+  return {
+    ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
+    points: opts.points || [],
+    lastCommittedPoint: null,
+    startBinding: null,
+    endBinding: null,
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
+    elbowed: opts.elbowed || false,
   };
 };
 
@@ -517,7 +581,7 @@ export const regenerateId = (
     if (
       window.h?.app
         ?.getSceneElementsIncludingDeleted()
-        .find((el) => el.id === nextId)
+        .find((el: ExcalidrawElement) => el.id === nextId)
     ) {
       nextId += "_copy";
     }

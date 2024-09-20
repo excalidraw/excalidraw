@@ -1,11 +1,12 @@
 import "./ToolIcon.scss";
 
-import React, { CSSProperties, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
 import Spinner from "./Spinner";
-import { PointerType } from "../element/types";
+import type { PointerType } from "../element/types";
 import { isPromiseLike } from "../utils";
 
 export type ToolButtonSize = "small" | "medium";
@@ -25,6 +26,7 @@ type ToolButtonBaseProps = {
   hidden?: boolean;
   visible?: boolean;
   selected?: boolean;
+  disabled?: boolean;
   className?: string;
   style?: CSSProperties;
   isLoading?: boolean;
@@ -124,10 +126,14 @@ export const ToolButton = React.forwardRef((props: ToolButtonProps, ref) => {
         type={type}
         onClick={onClick}
         ref={innerRef}
-        disabled={isLoading || props.isLoading}
+        disabled={isLoading || props.isLoading || !!props.disabled}
       >
         {(props.icon || props.label) && (
-          <div className="ToolIcon__icon" aria-hidden="true">
+          <div
+            className="ToolIcon__icon"
+            aria-hidden="true"
+            aria-disabled={!!props.disabled}
+          >
             {props.icon || props.label}
             {props.keyBindingLabel && (
               <span className="ToolIcon__keybinding">

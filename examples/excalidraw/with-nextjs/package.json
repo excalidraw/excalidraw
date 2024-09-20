@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm",
+    "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm && yarn copy:assets",
+    "copy:assets": "cp ../../../packages/excalidraw/dist/browser/prod/excalidraw-assets/*.woff2 ./public",
     "dev": "yarn build:workspace && next dev -p 3005",
     "build": "yarn build:workspace && next build",
     "start": "next start -p 3006",
@@ -12,13 +13,13 @@
   "dependencies": {
     "@excalidraw/excalidraw": "*",
     "next": "14.1",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.0",
     "path2d-polyfill": "2.0.1",
     "typescript": "^5"
   }

@@ -1,0 +1,137 @@
+@import "../../css/variables.module.scss";
+
+$verticalBreakpoint: 861px;
+
+.excalidraw {
+  .command-palette-dialog {
+    user-select: none;
+
+    .Modal__content {
+      height: auto;
+      max-height: 100%;
+
+      @media screen and (min-width: $verticalBreakpoint) {
+        max-height: 750px;
+        height: 100%;
+      }
+
+      .Island {
+        height: 100%;
+        padding: 1.5rem;
+      }
+
+      .Dialog__content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .shortcuts-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 12px;
+      gap: 1.5rem;
+    }
+
+    .shortcut {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 16px;
+      font-size: 10px;
+      gap: 0.25rem;
+
+      .shortcut-wrapper {
+        display: flex;
+      }
+
+      .shortcut-plus {
+        margin: 0px 4px;
+      }
+
+      .shortcut-key {
+        padding: 0px 4px;
+        height: 16px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--color-primary-light);
+      }
+
+      .shortcut-desc {
+        margin-left: 4px;
+        color: var(--color-gray-50);
+      }
+    }
+
+    .commands {
+      overflow-y: auto;
+      box-sizing: border-box;
+      margin-top: 12px;
+      color: var(--popup-text-color);
+      user-select: none;
+
+      .command-category {
+        display: flex;
+        flex-direction: column;
+        padding: 12px 0px;
+        margin-right: 0.25rem;
+      }
+
+      .command-category-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+      }
+
+      .command-item {
+        color: var(--popup-text-color);
+        height: 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+        padding: 0 0.5rem;
+        border-radius: var(--border-radius-lg);
+        cursor: pointer;
+
+        &:active {
+          background-color: var(--color-surface-low);
+        }
+
+        .name {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+        }
+      }
+
+      .item-selected {
+        background-color: var(--color-surface-mid);
+      }
+
+      .item-disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .no-match {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 36px;
+      }
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+    }
+  }
+}

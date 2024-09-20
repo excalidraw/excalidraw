@@ -17,8 +17,12 @@ import {
 import { getNonDeletedElements } from "../element";
 import { randomId } from "../random";
 import { ToolButton } from "../components/ToolButton";
-import { ExcalidrawElement, ExcalidrawTextElement } from "../element/types";
-import { AppClassProperties, AppState } from "../types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
+import type { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
   getElementsInResizingFrame,
@@ -27,6 +31,8 @@ import {
   removeElementsFromFrame,
   replaceAllElementsInFrame,
 } from "../frame";
+import { syncMovedIndices } from "../fractionalIndex";
+import { StoreAction } from "../store";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -61,6 +67,8 @@ const enableActionGroup = (
 
 export const actionGroup = register({
   name: "group",
+  label: "labels.group",
+  icon: (appState) => <GroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements({
@@ -69,7 +77,7 @@ export const actionGroup = register({
     });
     if (selectedElements.length < 2) {
       // nothing to group
-      return { appState, elements, commitToHistory: false };
+      return { appState, elements, storeAction: StoreAction.NONE };
     }
     // if everything is already grouped into 1 group, there is nothing to do
     const selectedGroupIds = getSelectedGroupIds(appState);
@@ -89,7 +97,7 @@ export const actionGroup = register({
       ]);
       if (combinedSet.size === elementIdsInGroup.size) {
         // no incremental ids in the selected ids
-        return { appState, elements, commitToHistory: false };
+        return { appState, elements, storeAction: StoreAction.NONE };
       }
     }
 
@@ -131,18 +139,19 @@ export const actionGroup = register({
     // to the z order of the highest element in the layer stack
     const elementsInGroup = getElementsInGroup(nextElements, newGroupId);
     const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
-    const lastGroupElementIndex = nextElements.lastIndexOf(lastElementInGroup);
+    const lastGroupElementIndex = nextElements.lastIndexOf(
+      lastElementInGroup as OrderedExcalidrawElement,
+    );
     const elementsAfterGroup = nextElements.slice(lastGroupElementIndex + 1);
     const elementsBeforeGroup = nextElements
       .slice(0, lastGroupElementIndex)
       .filter(
         (updatedElement) => !isElementInGroup(updatedElement, newGroupId),
       );
-    nextElements = [
-      ...elementsBeforeGroup,
-      ...elementsInGroup,
-      ...elementsAfterGroup,
-    ];
+    const reorderedElements = syncMovedIndices(
+      [...elementsBeforeGroup, ...elementsInGroup, ...elementsAfterGroup],
+      arrayToMap(elementsInGroup),
+    );
 
     return {
       appState: {
@@ -153,11 +162,10 @@ export const actionGroup = register({
           getNonDeletedElements(nextElements),
         ),
       },
-      elements: nextElements,
-      commitToHistory: true,
+      elements: reorderedElements,
+      storeAction: StoreAction.CAPTURE,
     };
   },
-  contextItemLabel: "labels.group",
   predicate: (elements, appState, _, app) =>
     enableActionGroup(elements, appState, app),
   keyTest: (event) =>
@@ -177,13 +185,15 @@ export const actionGroup = register({
 
 export const actionUngroup = register({
   name: "ungroup",
+  label: "labels.ungroup",
+  icon: (appState) => <UngroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const groupIds = getSelectedGroupIds(appState);
     const elementsMap = arrayToMap(elements);
 
     if (groupIds.length === 0) {
-      return { appState, elements, commitToHistory: false };
+      return { appState, elements, storeAction: StoreAction.NONE };
     }
 
     let nextElements = [...elements];
@@ -256,14 +266,13 @@ export const actionUngroup = register({
     return {
       appState: { ...appState, ...updateAppState },
       elements: nextElements,
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
     event.shiftKey &&
     event[KEYS.CTRL_OR_CMD] &&
     event.key === KEYS.G.toUpperCase(),
-  contextItemLabel: "labels.ungroup",
   predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (

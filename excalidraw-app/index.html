@@ -20,7 +20,7 @@
       name="description"
       content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <meta name="image" content="https://excalidraw.com/og-image-2.png" />
+    <meta name="image" content="https://excalidraw.com/og-image-3.png" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:site_name" content="Excalidraw" />
@@ -35,7 +35,7 @@
       property="og:description"
       content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
     />
-    <meta property="og:image" content="https://excalidraw.com/og-image-2.png" />
+    <meta property="og:image" content="https://excalidraw.com/og-image-3.png" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
@@ -51,7 +51,7 @@
     />
     <meta
       property="twitter:image"
-      content="https://excalidraw.com/og-twitter-v2.png"
+      content="https://excalidraw.com/og-image-3.png"
     />
 
     <!-- General tags -->
@@ -64,12 +64,30 @@
     <!--   to minimize white flash on load when user has dark mode enabled   -->
     <script>
       try {
-        //
-        const theme = window.localStorage.getItem("excalidraw-theme");
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
+        function setTheme(theme) {
+          if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
         }
-      } catch {}
+
+        function getTheme() {
+          const theme = window.localStorage.getItem("excalidraw-theme");
+
+          if (theme && theme === "system") {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+          } else {
+            return theme || "light";
+          }
+        }
+
+        setTheme(getTheme());
+      } catch (e) {
+        console.error("Error setting dark mode", e);
+      }
     </script>
     <style>
       html.dark {
@@ -77,8 +95,13 @@
         color: #fff;
       }
     </style>
+
+    <!-- Warmup the connection for Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <!------------------------------------------------------------------------->
-    <% if ("%PROD%" === "true") { %>
+    <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <script>
       // Redirect Excalidraw+ users which have auto-redirect enabled.
       //
@@ -97,7 +120,31 @@
         window.location.href = "https://app.excalidraw.com";
       }
     </script>
+
+    <!-- Following placeholder is replaced during the build step -->
+    <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
+
+    <% } else { %>
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
     <% } %>
+
+    <!-- For Nunito only preload the latin range, which should be good enough for now -->
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <!-- Register Assistant as the UI font, before the scene inits -->
+    <link
+      rel="stylesheet"
+      href="../packages/excalidraw/fonts/assets/fonts.css"
+      type="text/css"
+    />
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -106,23 +153,8 @@
     <!-- Excalidraw version -->
     <meta name="version" content="{version}" />
 
-    <link
-      rel="preload"
-      href="/Virgil.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="/Cascadia.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-
-    <link rel="stylesheet" href="/fonts/fonts.css" type="text/css" />
-    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%"==="true" ) { %>
+    <% if (typeof VITE_APP_DEV_DISABLE_LIVE_RELOAD != 'undefined' &&
+    VITE_APP_DEV_DISABLE_LIVE_RELOAD == true) { %>
     <script>
       {
         const _WebSocket = window.WebSocket;
@@ -139,7 +171,6 @@
     </script>
     <% } %>
     <script>
-      window.EXCALIDRAW_ASSET_PATH = "/";
       // setting this so that libraries installation reuses this window tab.
       window.name = "_excalidraw";
     </script>
@@ -196,7 +227,6 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
-    <% if ("%VITE_APP_DEV_DISABLE_LIVE_RELOAD%" !== 'true') { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking
@@ -229,6 +259,5 @@
       }
     </script>
     <!-- end LEGACY GOOGLE ANALYTICS -->
-    <% } %>
   </body>
 </html>

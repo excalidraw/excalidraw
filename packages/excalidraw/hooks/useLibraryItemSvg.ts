@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { COLOR_PALETTE } from "../colors";
 import { jotaiScope } from "../jotai";
 import { exportToSvg } from "../../utils/export";
-import { LibraryItem } from "../types";
+import type { LibraryItem } from "../types";
 
 export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 
@@ -18,6 +18,7 @@ const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
     },
     files: null,
     renderEmbeddables: false,
+    skipInliningFonts: true,
   });
 };
 
@@ -40,6 +41,7 @@ export const useLibraryItemSvg = (
           // When there is no svg in cache export it and save to cache
           (async () => {
             const exportedSvg = await exportLibraryItemToSvg(elements);
+            // TODO: should likely be removed for custom fonts
             exportedSvg.querySelector(".style-fonts")?.remove();
 
             if (exportedSvg) {

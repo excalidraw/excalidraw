@@ -1,4 +1,6 @@
-import { AppClassProperties, AppState, Primitive } from "../types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { AppClassProperties, AppState, Primitive } from "../types";
+import type { StoreActionType } from "../store";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -9,6 +11,7 @@ import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconPicker } from "../components/IconPicker";
+import { FontPicker } from "../components/FontPicker/FontPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
@@ -38,9 +41,6 @@ import {
   FontSizeExtraLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
-  FreedrawIcon,
-  FontFamilyNormalIcon,
-  FontFamilyCodeIcon,
   TextAlignLeftIcon,
   TextAlignCenterIcon,
   TextAlignRightIcon,
@@ -49,8 +49,13 @@ import {
   ArrowheadCircleOutlineIcon,
   ArrowheadDiamondIcon,
   ArrowheadDiamondOutlineIcon,
+  fontSizeIcon,
+  sharpArrowIcon,
+  roundArrowIcon,
+  elbowArrowIcon,
 } from "../components/icons";
 import {
+  ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
@@ -64,17 +69,17 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { getBoundTextElement } from "../element/textElement";
 import {
-  getBoundTextElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
-import {
+  isArrowElement,
   isBoundToContainer,
+  isElbowArrow,
   isLinearElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import {
+import type {
   Arrowhead,
+  ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -93,8 +98,25 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
-import { arrayToMap, getShortcutKey } from "../utils";
+import {
+  arrayToMap,
+  getFontFamilyString,
+  getShortcutKey,
+  tupleToCoors,
+} from "../utils";
 import { register } from "./register";
+import { StoreAction } from "../store";
+import { Fonts, getLineHeight } from "../fonts";
+import {
+  bindLinearElement,
+  bindPointToSnapToElementOutline,
+  calculateFixedPointForElbowArrowBinding,
+  getHoveredElementForBinding,
+} from "../element/binding";
+import { mutateElbowArrow } from "../element/routing";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import type { LocalPoint } from "../../math";
+import { point, vector } from "../../math";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -113,7 +135,7 @@ export const changeProperty = (
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
-      element.id === appState.editingElement?.id
+      element.id === appState.editingTextElement?.id
     ) {
       return callback(element);
     }
@@ -128,13 +150,13 @@ export const getFormValue = function <T extends Primitive>(
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
-  const editingElement = appState.editingElement;
+  const editingTextElement = appState.editingTextElement;
   const nonDeletedElements = getNonDeletedElements(elements);
 
   let ret: T | null = null;
 
-  if (editingElement) {
-    ret = getAttribute(editingElement);
+  if (editingTextElement) {
+    ret = getAttribute(editingTextElement);
   }
 
   if (!ret) {
@@ -165,7 +187,7 @@ const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
   nextElement: ExcalidrawTextElement,
 ) => {
-  if (isBoundToContainer(nextElement)) {
+  if (isBoundToContainer(nextElement) || !nextElement.autoResize) {
     return nextElement;
   }
   return mutateElement(
@@ -230,7 +252,7 @@ const changeFontSize = (
           ? [...newFontSizes][0]
           : fallbackValue ?? appState.currentItemFontSize,
     },
-    commitToHistory: true,
+    storeAction: StoreAction.CAPTURE,
   };
 };
 
@@ -238,6 +260,7 @@ const changeFontSize = (
 
 export const actionChangeStrokeColor = register({
   name: "changeStrokeColor",
+  label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -259,7 +282,9 @@ export const actionChangeStrokeColor = register({
         ...appState,
         ...value,
       },
-      commitToHistory: !!value.currentItemStrokeColor,
+      storeAction: !!value.currentItemStrokeColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -288,6 +313,7 @@ export const actionChangeStrokeColor = register({
 
 export const actionChangeBackgroundColor = register({
   name: "changeBackgroundColor",
+  label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -302,7 +328,9 @@ export const actionChangeBackgroundColor = register({
         ...appState,
         ...value,
       },
-      commitToHistory: !!value.currentItemBackgroundColor,
+      storeAction: !!value.currentItemBackgroundColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -331,6 +359,7 @@ export const actionChangeBackgroundColor = register({
 
 export const actionChangeFillStyle = register({
   name: "changeFillStyle",
+  label: "labels.fill",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     trackEvent(
@@ -345,7 +374,7 @@ export const actionChangeFillStyle = register({
         }),
       ),
       appState: { ...appState, currentItemFillStyle: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -408,6 +437,7 @@ export const actionChangeFillStyle = register({
 
 export const actionChangeStrokeWidth = register({
   name: "changeStrokeWidth",
+  label: "labels.strokeWidth",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -417,7 +447,7 @@ export const actionChangeStrokeWidth = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -461,6 +491,7 @@ export const actionChangeStrokeWidth = register({
 
 export const actionChangeSloppiness = register({
   name: "changeSloppiness",
+  label: "labels.sloppiness",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -471,7 +502,7 @@ export const actionChangeSloppiness = register({
         }),
       ),
       appState: { ...appState, currentItemRoughness: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -512,6 +543,7 @@ export const actionChangeSloppiness = register({
 
 export const actionChangeStrokeStyle = register({
   name: "changeStrokeStyle",
+  label: "labels.strokeStyle",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -521,7 +553,7 @@ export const actionChangeStrokeStyle = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeStyle: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -562,6 +594,7 @@ export const actionChangeStrokeStyle = register({
 
 export const actionChangeOpacity = register({
   name: "changeOpacity",
+  label: "labels.opacity",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
@@ -575,7 +608,7 @@ export const actionChangeOpacity = register({
         true,
       ),
       appState: { ...appState, currentItemOpacity: value },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -603,6 +636,7 @@ export const actionChangeOpacity = register({
 
 export const actionChangeFontSize = register({
   name: "changeFontSize",
+  label: "labels.fontSize",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, () => value, value);
@@ -673,6 +707,8 @@ export const actionChangeFontSize = register({
 
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
+  label: "labels.decreaseFontSize",
+  icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
@@ -695,6 +731,8 @@ export const actionDecreaseFontSize = register({
 
 export const actionIncreaseFontSize = register({
   name: "increaseFontSize",
+  label: "labels.increaseFontSize",
+  icon: fontSizeIcon,
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
@@ -711,103 +749,389 @@ export const actionIncreaseFontSize = register({
   },
 });
 
+type ChangeFontFamilyData = Partial<
+  Pick<
+    AppState,
+    "openPopup" | "currentItemFontFamily" | "currentHoveredFontFamily"
+  >
+> & {
+  /** cache of selected & editing elements populated on opened popup */
+  cachedElements?: Map<string, ExcalidrawElement>;
+  /** flag to reset all elements to their cached versions  */
+  resetAll?: true;
+  /** flag to reset all containers to their cached versions */
+  resetContainers?: true;
+};
+
 export const actionChangeFontFamily = register({
   name: "changeFontFamily",
+  label: "labels.fontFamily",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return {
-      elements: changeProperty(
+    const { cachedElements, resetAll, resetContainers, ...nextAppState } =
+      value as ChangeFontFamilyData;
+
+    if (resetAll) {
+      const nextElements = changeProperty(
         elements,
         appState,
-        (oldElement) => {
-          if (isTextElement(oldElement)) {
-            const newElement: ExcalidrawTextElement = newElementWith(
-              oldElement,
-              {
-                fontFamily: value,
-                lineHeight: getDefaultLineHeight(value),
-              },
-            );
-            redrawTextBoundingBox(
-              newElement,
-              app.scene.getContainerElement(oldElement),
-              app.scene.getNonDeletedElementsMap(),
-            );
+        (element) => {
+          const cachedElement = cachedElements?.get(element.id);
+          if (cachedElement) {
+            const newElement = newElementWith(element, {
+              ...cachedElement,
+            });
+
             return newElement;
           }
 
-          return oldElement;
+          return element;
         },
         true,
-      ),
+      );
+
+      return {
+        elements: nextElements,
+        appState: {
+          ...appState,
+          ...nextAppState,
+        },
+        storeAction: StoreAction.UPDATE,
+      };
+    }
+
+    const { currentItemFontFamily, currentHoveredFontFamily } = value;
+
+    let nexStoreAction: StoreActionType = StoreAction.NONE;
+    let nextFontFamily: FontFamilyValues | undefined;
+    let skipOnHoverRender = false;
+
+    if (currentItemFontFamily) {
+      nextFontFamily = currentItemFontFamily;
+      nexStoreAction = StoreAction.CAPTURE;
+    } else if (currentHoveredFontFamily) {
+      nextFontFamily = currentHoveredFontFamily;
+      nexStoreAction = StoreAction.NONE;
+
+      const selectedTextElements = getSelectedElements(elements, appState, {
+        includeBoundTextElement: true,
+      }).filter((element) => isTextElement(element));
+
+      // skip on hover re-render for more than 200 text elements or for text element with more than 5000 chars combined
+      if (selectedTextElements.length > 200) {
+        skipOnHoverRender = true;
+      } else {
+        let i = 0;
+        let textLengthAccumulator = 0;
+
+        while (
+          i < selectedTextElements.length &&
+          textLengthAccumulator < 5000
+        ) {
+          const textElement = selectedTextElements[i] as ExcalidrawTextElement;
+          textLengthAccumulator += textElement?.originalText.length || 0;
+          i++;
+        }
+
+        if (textLengthAccumulator > 5000) {
+          skipOnHoverRender = true;
+        }
+      }
+    }
+
+    const result = {
       appState: {
         ...appState,
-        currentItemFontFamily: value,
+        ...nextAppState,
       },
-      commitToHistory: true,
+      storeAction: nexStoreAction,
     };
+
+    if (nextFontFamily && !skipOnHoverRender) {
+      const elementContainerMapping = new Map<
+        ExcalidrawTextElement,
+        ExcalidrawElement | null
+      >();
+      let uniqueChars = new Set<string>();
+      let skipFontFaceCheck = false;
+
+      const fontsCache = Array.from(Fonts.loadedFontsCache.values());
+      const fontFamily = Object.entries(FONT_FAMILY).find(
+        ([_, value]) => value === nextFontFamily,
+      )?.[0];
+
+      // skip `document.font.check` check on hover, if at least one font family has loaded as it's super slow (could result in slightly different bbox, which is fine)
+      if (
+        currentHoveredFontFamily &&
+        fontFamily &&
+        fontsCache.some((sig) => sig.startsWith(fontFamily))
+      ) {
+        skipFontFaceCheck = true;
+      }
+
+      // following causes re-render so make sure we changed the family
+      // otherwise it could cause unexpected issues, such as preventing opening the popover when in wysiwyg
+      Object.assign(result, {
+        elements: changeProperty(
+          elements,
+          appState,
+          (oldElement) => {
+            if (
+              isTextElement(oldElement) &&
+              (oldElement.fontFamily !== nextFontFamily ||
+                currentItemFontFamily) // force update on selection
+            ) {
+              const newElement: ExcalidrawTextElement = newElementWith(
+                oldElement,
+                {
+                  fontFamily: nextFontFamily,
+                  lineHeight: getLineHeight(nextFontFamily!),
+                },
+              );
+
+              const cachedContainer =
+                cachedElements?.get(oldElement.containerId || "") || {};
+
+              const container = app.scene.getContainerElement(oldElement);
+
+              if (resetContainers && container && cachedContainer) {
+                // reset the container back to it's cached version
+                mutateElement(container, { ...cachedContainer }, false);
+              }
+
+              if (!skipFontFaceCheck) {
+                uniqueChars = new Set([
+                  ...uniqueChars,
+                  ...Array.from(newElement.originalText),
+                ]);
+              }
+
+              elementContainerMapping.set(newElement, container);
+
+              return newElement;
+            }
+
+            return oldElement;
+          },
+          true,
+        ),
+      });
+
+      // size is irrelevant, but necessary
+      const fontString = `10px ${getFontFamilyString({
+        fontFamily: nextFontFamily,
+      })}`;
+      const chars = Array.from(uniqueChars.values()).join();
+
+      if (skipFontFaceCheck || window.document.fonts.check(fontString, chars)) {
+        // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
+        for (const [element, container] of elementContainerMapping) {
+          // trigger synchronous redraw
+          redrawTextBoundingBox(
+            element,
+            container,
+            app.scene.getNonDeletedElementsMap(),
+            false,
+          );
+        }
+      } else {
+        // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
+        window.document.fonts.load(fontString, chars).then((fontFaces) => {
+          for (const [element, container] of elementContainerMapping) {
+            // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
+            const latestElement = app.scene.getElement(element.id);
+            const latestContainer = container
+              ? app.scene.getElement(container.id)
+              : null;
+
+            if (latestElement) {
+              // trigger async redraw
+              redrawTextBoundingBox(
+                latestElement as ExcalidrawTextElement,
+                latestContainer,
+                app.scene.getNonDeletedElementsMap(),
+                false,
+              );
+            }
+          }
+
+          // trigger update once we've mutated all the elements, which also updates our cache
+          app.fonts.onLoaded(fontFaces);
+        });
+      }
+    }
+
+    return result;
   },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
-    const options: {
-      value: FontFamilyValues;
-      text: string;
-      icon: JSX.Element;
-      testId: string;
-    }[] = [
-      {
-        value: FONT_FAMILY.Virgil,
-        text: t("labels.handDrawn"),
-        icon: FreedrawIcon,
-        testId: "font-family-virgil",
-      },
-      {
-        value: FONT_FAMILY.Helvetica,
-        text: t("labels.normal"),
-        icon: FontFamilyNormalIcon,
-        testId: "font-family-normal",
-      },
-      {
-        value: FONT_FAMILY.Cascadia,
-        text: t("labels.code"),
-        icon: FontFamilyCodeIcon,
-        testId: "font-family-code",
-      },
-    ];
+  PanelComponent: ({ elements, appState, app, updateData }) => {
+    const cachedElementsRef = useRef<Map<string, ExcalidrawElement>>(new Map());
+    const prevSelectedFontFamilyRef = useRef<number | null>(null);
+    // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
+    const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
+    const isUnmounted = useRef(true);
+
+    const selectedFontFamily = useMemo(() => {
+      const getFontFamily = (
+        elementsArray: readonly ExcalidrawElement[],
+        elementsMap: Map<string, ExcalidrawElement>,
+      ) =>
+        getFormValue(
+          elementsArray,
+          appState,
+          (element) => {
+            if (isTextElement(element)) {
+              return element.fontFamily;
+            }
+            const boundTextElement = getBoundTextElement(element, elementsMap);
+            if (boundTextElement) {
+              return boundTextElement.fontFamily;
+            }
+            return null;
+          },
+          (element) =>
+            isTextElement(element) ||
+            getBoundTextElement(element, elementsMap) !== null,
+          (hasSelection) =>
+            hasSelection
+              ? null
+              : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
+        );
+
+      // popup opened, use cached elements
+      if (
+        batchedData.openPopup === "fontFamily" &&
+        appState.openPopup === "fontFamily"
+      ) {
+        return getFontFamily(
+          Array.from(cachedElementsRef.current?.values() ?? []),
+          cachedElementsRef.current,
+        );
+      }
+
+      // popup closed, use all elements
+      if (!batchedData.openPopup && appState.openPopup !== "fontFamily") {
+        return getFontFamily(elements, app.scene.getNonDeletedElementsMap());
+      }
+
+      // popup props are not in sync, hence we are in the middle of an update, so keeping the previous value we've had
+      return prevSelectedFontFamilyRef.current;
+    }, [batchedData.openPopup, appState, elements, app.scene]);
+
+    useEffect(() => {
+      prevSelectedFontFamilyRef.current = selectedFontFamily;
+    }, [selectedFontFamily]);
+
+    useEffect(() => {
+      if (Object.keys(batchedData).length) {
+        updateData(batchedData);
+        // reset the data after we've used the data
+        setBatchedData({});
+      }
+      // call update only on internal state changes
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [batchedData]);
+
+    useEffect(() => {
+      isUnmounted.current = false;
+
+      return () => {
+        isUnmounted.current = true;
+      };
+    }, []);
 
     return (
       <fieldset>
         <legend>{t("labels.fontFamily")}</legend>
-        <ButtonIconSelect<FontFamilyValues | false>
-          group="font-family"
-          options={options}
-          value={getFormValue(
-            elements,
-            appState,
-            (element) => {
-              if (isTextElement(element)) {
-                return element.fontFamily;
+        <FontPicker
+          isOpened={appState.openPopup === "fontFamily"}
+          selectedFontFamily={selectedFontFamily}
+          hoveredFontFamily={appState.currentHoveredFontFamily}
+          onSelect={(fontFamily) => {
+            setBatchedData({
+              openPopup: null,
+              currentHoveredFontFamily: null,
+              currentItemFontFamily: fontFamily,
+            });
+
+            // defensive clear so immediate close won't abuse the cached elements
+            cachedElementsRef.current.clear();
+          }}
+          onHover={(fontFamily) => {
+            setBatchedData({
+              currentHoveredFontFamily: fontFamily,
+              cachedElements: new Map(cachedElementsRef.current),
+              resetContainers: true,
+            });
+          }}
+          onLeave={() => {
+            setBatchedData({
+              currentHoveredFontFamily: null,
+              cachedElements: new Map(cachedElementsRef.current),
+              resetAll: true,
+            });
+          }}
+          onPopupChange={(open) => {
+            if (open) {
+              // open, populate the cache from scratch
+              cachedElementsRef.current.clear();
+
+              const { editingTextElement } = appState;
+
+              // still check type to be safe
+              if (editingTextElement?.type === "text") {
+                // retrieve the latest version from the scene, as `editingTextElement` isn't mutated
+                const latesteditingTextElement = app.scene.getElement(
+                  editingTextElement.id,
+                );
+
+                // inside the wysiwyg editor
+                cachedElementsRef.current.set(
+                  editingTextElement.id,
+                  newElementWith(
+                    latesteditingTextElement || editingTextElement,
+                    {},
+                    true,
+                  ),
+                );
+              } else {
+                const selectedElements = getSelectedElements(
+                  elements,
+                  appState,
+                  {
+                    includeBoundTextElement: true,
+                  },
+                );
+
+                for (const element of selectedElements) {
+                  cachedElementsRef.current.set(
+                    element.id,
+                    newElementWith(element, {}, true),
+                  );
+                }
               }
-              const boundTextElement = getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              );
-              if (boundTextElement) {
-                return boundTextElement.fontFamily;
+
+              setBatchedData({
+                openPopup: "fontFamily",
+              });
+            } else {
+              // close, use the cache and clear it afterwards
+              const data = {
+                openPopup: null,
+                currentHoveredFontFamily: null,
+                cachedElements: new Map(cachedElementsRef.current),
+                resetAll: true,
+              } as ChangeFontFamilyData;
+
+              if (isUnmounted.current) {
+                // in case the component was unmounted by the parent, trigger the update directly
+                updateData({ ...batchedData, ...data });
+              } else {
+                setBatchedData(data);
               }
-              return null;
-            },
-            (element) =>
-              isTextElement(element) ||
-              getBoundTextElement(
-                element,
-                app.scene.getNonDeletedElementsMap(),
-              ) !== null,
-            (hasSelection) =>
-              hasSelection
-                ? null
-                : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
-          )}
-          onChange={(value) => updateData(value)}
+
+              cachedElementsRef.current.clear();
+            }
+          }}
         />
       </fieldset>
     );
@@ -816,6 +1140,7 @@ export const actionChangeFontFamily = register({
 
 export const actionChangeTextAlign = register({
   name: "changeTextAlign",
+  label: "Change text alignment",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return {
@@ -844,7 +1169,7 @@ export const actionChangeTextAlign = register({
         ...appState,
         currentItemTextAlign: value,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -905,6 +1230,7 @@ export const actionChangeTextAlign = register({
 
 export const actionChangeVerticalAlign = register({
   name: "changeVerticalAlign",
+  label: "Change vertical alignment",
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     return {
@@ -933,7 +1259,7 @@ export const actionChangeVerticalAlign = register({
       appState: {
         ...appState,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -994,11 +1320,16 @@ export const actionChangeVerticalAlign = register({
 
 export const actionChangeRoundness = register({
   name: "changeRoundness",
+  label: "Change edge roundness",
   trackEvent: false,
   perform: (elements, appState, value) => {
     return {
-      elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
+      elements: changeProperty(elements, appState, (el) => {
+        if (isElbowArrow(el)) {
+          return el;
+        }
+
+        return newElementWith(el, {
           roundness:
             value === "round"
               ? {
@@ -1007,13 +1338,13 @@ export const actionChangeRoundness = register({
                     : ROUNDNESS.PROPORTIONAL_RADIUS,
                 }
               : null,
-        }),
-      ),
+        });
+      }),
       appState: {
         ...appState,
         currentItemRoundness: value,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1048,7 +1379,8 @@ export const actionChangeRoundness = register({
             appState,
             (element) =>
               hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
-            (element) => element.hasOwnProperty("roundness"),
+            (element) =>
+              !isArrowElement(element) && element.hasOwnProperty("roundness"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemRoundness,
           )}
@@ -1132,6 +1464,7 @@ const getArrowheadOptions = (flip: boolean) => {
 
 export const actionChangeArrowhead = register({
   name: "changeArrowhead",
+  label: "Change arrowheads",
   trackEvent: false,
   perform: (
     elements,
@@ -1164,7 +1497,7 @@ export const actionChangeArrowhead = register({
           ? "currentItemStartArrowhead"
           : "currentItemEndArrowhead"]: value.type,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1206,6 +1539,209 @@ export const actionChangeArrowhead = register({
             onChange={(value) => updateData({ position: "end", type: value })}
           />
         </div>
+      </fieldset>
+    );
+  },
+});
+
+export const actionChangeArrowType = register({
+  name: "changeArrowType",
+  label: "Change arrow types",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (!isArrowElement(el)) {
+          return el;
+        }
+        const newElement = newElementWith(el, {
+          roundness:
+            value === ARROW_TYPE.round
+              ? {
+                  type: ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : null,
+          elbowed: value === ARROW_TYPE.elbow,
+          points:
+            value === ARROW_TYPE.elbow || el.elbowed
+              ? [el.points[0], el.points[el.points.length - 1]]
+              : el.points,
+        });
+
+        if (isElbowArrow(newElement)) {
+          const elementsMap = app.scene.getNonDeletedElementsMap();
+
+          app.dismissLinearEditor();
+
+          const startGlobalPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              newElement,
+              0,
+              elementsMap,
+            );
+          const endGlobalPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              newElement,
+              -1,
+              elementsMap,
+            );
+          const startHoveredElement =
+            !newElement.startBinding &&
+            getHoveredElementForBinding(
+              tupleToCoors(startGlobalPoint),
+              elements,
+              elementsMap,
+              true,
+            );
+          const endHoveredElement =
+            !newElement.endBinding &&
+            getHoveredElementForBinding(
+              tupleToCoors(endGlobalPoint),
+              elements,
+              elementsMap,
+              true,
+            );
+          const startElement = startHoveredElement
+            ? startHoveredElement
+            : newElement.startBinding &&
+              (elementsMap.get(
+                newElement.startBinding.elementId,
+              ) as ExcalidrawBindableElement);
+          const endElement = endHoveredElement
+            ? endHoveredElement
+            : newElement.endBinding &&
+              (elementsMap.get(
+                newElement.endBinding.elementId,
+              ) as ExcalidrawBindableElement);
+
+          const finalStartPoint = startHoveredElement
+            ? bindPointToSnapToElementOutline(
+                startGlobalPoint,
+                endGlobalPoint,
+                startHoveredElement,
+                elementsMap,
+              )
+            : startGlobalPoint;
+          const finalEndPoint = endHoveredElement
+            ? bindPointToSnapToElementOutline(
+                endGlobalPoint,
+                startGlobalPoint,
+                endHoveredElement,
+                elementsMap,
+              )
+            : endGlobalPoint;
+
+          startHoveredElement &&
+            bindLinearElement(
+              newElement,
+              startHoveredElement,
+              "start",
+              elementsMap,
+            );
+          endHoveredElement &&
+            bindLinearElement(
+              newElement,
+              endHoveredElement,
+              "end",
+              elementsMap,
+            );
+
+          mutateElbowArrow(
+            newElement,
+            elementsMap,
+            [finalStartPoint, finalEndPoint].map(
+              (p): LocalPoint =>
+                point(p[0] - newElement.x, p[1] - newElement.y),
+            ),
+            vector(0, 0),
+            {
+              ...(startElement && newElement.startBinding
+                ? {
+                    startBinding: {
+                      // @ts-ignore TS cannot discern check above
+                      ...newElement.startBinding!,
+                      ...calculateFixedPointForElbowArrowBinding(
+                        newElement,
+                        startElement,
+                        "start",
+                        elementsMap,
+                      ),
+                    },
+                  }
+                : {}),
+              ...(endElement && newElement.endBinding
+                ? {
+                    endBinding: {
+                      // @ts-ignore TS cannot discern check above
+                      ...newElement.endBinding,
+                      ...calculateFixedPointForElbowArrowBinding(
+                        newElement,
+                        endElement,
+                        "end",
+                        elementsMap,
+                      ),
+                    },
+                  }
+                : {}),
+            },
+          );
+        }
+
+        return newElement;
+      }),
+      appState: {
+        ...appState,
+        currentItemArrowType: value,
+      },
+      storeAction: StoreAction.CAPTURE,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    return (
+      <fieldset>
+        <legend>{t("labels.arrowtypes")}</legend>
+        <ButtonIconSelect
+          group="arrowtypes"
+          options={[
+            {
+              value: ARROW_TYPE.sharp,
+              text: t("labels.arrowtype_sharp"),
+              icon: sharpArrowIcon,
+              testId: "sharp-arrow",
+            },
+            {
+              value: ARROW_TYPE.round,
+              text: t("labels.arrowtype_round"),
+              icon: roundArrowIcon,
+              testId: "round-arrow",
+            },
+            {
+              value: ARROW_TYPE.elbow,
+              text: t("labels.arrowtype_elbowed"),
+              icon: elbowArrowIcon,
+              testId: "elbow-arrow",
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isArrowElement(element)) {
+                return element.elbowed
+                  ? ARROW_TYPE.elbow
+                  : element.roundness
+                  ? ARROW_TYPE.round
+                  : ARROW_TYPE.sharp;
+              }
+
+              return null;
+            },
+            (element) => isArrowElement(element),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemArrowType,
+          )}
+          onChange={(value) => updateData(value)}
+        />
       </fieldset>
     );
   },

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ActionManager } from "../actions/manager";
-import {
+import type { ActionManager } from "../actions/manager";
+import type {
+  ExcalidrawElement,
   ExcalidrawElementType,
   NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
@@ -16,13 +17,18 @@ import {
   hasStrokeWidth,
 } from "../scene";
 import { SHAPES } from "../shapes";
-import { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
 import Stack from "./Stack";
 import { ToolButton } from "./ToolButton";
-import { hasStrokeColor } from "../scene/comparisons";
+import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
-import { hasBoundTextElement, isTextElement } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  isElbowArrow,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
@@ -39,11 +45,45 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
-  OpenAIIcon,
   MagicIcon,
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
+import { CLASSES } from "../constants";
+
+export const canChangeStrokeColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  let commonSelectedType: ExcalidrawElementType | null =
+    targetElements[0]?.type || null;
+
+  for (const element of targetElements) {
+    if (element.type !== commonSelectedType) {
+      commonSelectedType = null;
+      break;
+    }
+  }
+
+  return (
+    (hasStrokeColor(appState.activeTool.type) &&
+      appState.activeTool.type !== "image" &&
+      commonSelectedType !== "image" &&
+      commonSelectedType !== "frame" &&
+      commonSelectedType !== "magicframe") ||
+    targetElements.some((element) => hasStrokeColor(element.type))
+  );
+};
+
+export const canChangeBackgroundColor = (
+  appState: UIAppState,
+  targetElements: ExcalidrawElement[],
+) => {
+  return (
+    hasBackground(appState.activeTool.type) ||
+    targetElements.some((element) => hasBackground(element.type))
+  );
+};
 
 export const SelectedShapeActions = ({
   appState,
@@ -64,7 +104,9 @@ export const SelectedShapeActions = ({
   ) {
     isSingleElementBoundContainer = true;
   }
-  const isEditing = Boolean(appState.editingElement);
+  const isEditingTextOrNewElement = Boolean(
+    appState.editingTextElement || appState.newElement,
+  );
   const device = useDevice();
   const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
@@ -75,35 +117,23 @@ export const SelectedShapeActions = ({
       (element) =>
         hasBackground(element.type) && !isTransparent(element.backgroundColor),
     );
-  const showChangeBackgroundIcons =
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type));
 
   const showLinkIcon =
     targetElements.length === 1 || isSingleElementBoundContainer;
 
-  let commonSelectedType: ExcalidrawElementType | null =
-    targetElements[0]?.type || null;
-
-  for (const element of targetElements) {
-    if (element.type !== commonSelectedType) {
-      commonSelectedType = null;
-      break;
-    }
-  }
+  const showLineEditorAction =
+    !appState.editingLinearElement &&
+    targetElements.length === 1 &&
+    isLinearElement(targetElements[0]) &&
+    !isElbowArrow(targetElements[0]);
 
   return (
     <div className="panelColumn">
       <div>
-        {((hasStrokeColor(appState.activeTool.type) &&
-          appState.activeTool.type !== "image" &&
-          commonSelectedType !== "image" &&
-          commonSelectedType !== "frame" &&
-          commonSelectedType !== "magicframe") ||
-          targetElements.some((element) => hasStrokeColor(element.type))) &&
+        {canChangeStrokeColor(appState, targetElements) &&
           renderAction("changeStrokeColor")}
       </div>
-      {showChangeBackgroundIcons && (
+      {canChangeBackgroundColor(appState, targetElements) && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {showFillIcons && renderAction("changeFillStyle")}
@@ -129,13 +159,16 @@ export const SelectedShapeActions = ({
         <>{renderAction("changeRoundness")}</>
       )}
 
+      {(toolIsArrow(appState.activeTool.type) ||
+        targetElements.some((element) => toolIsArrow(element.type))) && (
+        <>{renderAction("changeArrowType")}</>
+      )}
+
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
-          {renderAction("changeFontSize")}
-
           {renderAction("changeFontFamily")}
-
+          {renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&
             renderAction("changeTextAlign")}
@@ -156,8 +189,8 @@ export const SelectedShapeActions = ({
         <div className="buttonList">
           {renderAction("sendToBack")}
           {renderAction("sendBackward")}
-          {renderAction("bringToFront")}
           {renderAction("bringForward")}
+          {renderAction("bringToFront")}
         </div>
       </fieldset>
 
@@ -203,7 +236,7 @@ export const SelectedShapeActions = ({
           </div>
         </fieldset>
       )}
-      {!isEditing && targetElements.length > 0 && (
+      {!isEditingTextOrNewElement && targetElements.length > 0 && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
@@ -212,6 +245,7 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {showLinkIcon && renderAction("hyperlink")}
+            {showLineEditorAction && renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
       )}
@@ -316,8 +350,8 @@ export const ShapesSwitcher = ({
                 fontSize: 8,
                 fontFamily: "Cascadia, monospace",
                 position: "absolute",
-                background: "pink",
-                color: "black",
+                background: "var(--color-promo)",
+                color: "var(--color-surface-lowest)",
                 bottom: 3,
                 right: 4,
               }}
@@ -368,7 +402,7 @@ export const ShapesSwitcher = ({
           >
             {t("toolBar.mermaidToExcalidraw")}
           </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && (
+          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
             <>
               <DropdownMenu.Item
                 onSelect={() => app.onMagicframeToolSelect()}
@@ -377,20 +411,6 @@ export const ShapesSwitcher = ({
               >
                 {t("toolBar.magicframe")}
                 <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onSelect={() => {
-                  trackEvent("ai", "open-settings", "d2c");
-                  app.setOpenDialog({
-                    name: "settings",
-                    source: "settings",
-                    tab: "diagram-to-code",
-                  });
-                }}
-                icon={OpenAIIcon}
-                data-testid="toolbar-magicSettings"
-              >
-                {t("toolBar.magicSettings")}
               </DropdownMenu.Item>
             </>
           )}
@@ -407,7 +427,7 @@ export const ZoomActions = ({
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
 }) => (
-  <Stack.Col gap={1} className="zoom-actions">
+  <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
     <Stack.Row align="center">
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
@@ -441,6 +461,7 @@ export const ExitZenModeAction = ({
   showExitZenModeBtn: boolean;
 }) => (
   <button
+    type="button"
     className={clsx("disable-zen-mode", {
       "disable-zen-mode--visible": showExitZenModeBtn,
     })}

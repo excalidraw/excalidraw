@@ -1,9 +1,11 @@
+import React from "react";
 import { vi } from "vitest";
-import { Excalidraw } from "../../index";
-import { ExcalidrawImperativeAPI } from "../../types";
+import { Excalidraw, StoreAction } from "../../index";
+import type { ExcalidrawImperativeAPI } from "../../types";
 import { resolvablePromise } from "../../utils";
 import { render } from "../test-utils";
 import { Pointer } from "../helpers/ui";
+import { API } from "../helpers/api";
 
 describe("event callbacks", () => {
   const h = window.h;
@@ -27,7 +29,10 @@ describe("event callbacks", () => {
 
     const origBackgroundColor = h.state.viewBackgroundColor;
     excalidrawAPI.onChange(onChange);
-    excalidrawAPI.updateScene({ appState: { viewBackgroundColor: "red" } });
+    API.updateScene({
+      appState: { viewBackgroundColor: "red" },
+      storeAction: StoreAction.CAPTURE,
+    });
     expect(onChange).toHaveBeenCalledWith(
       // elements
       [],
@@ -38,7 +43,7 @@ describe("event callbacks", () => {
       // files
       {},
     );
-    expect(onChange.mock.lastCall[1].viewBackgroundColor).not.toBe(
+    expect(onChange.mock?.lastCall?.[1].viewBackgroundColor).not.toBe(
       origBackgroundColor,
     );
   });

@@ -1,11 +1,11 @@
-import {
+import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { AppState, InteractiveCanvasAppState } from "../types";
+import type { AppState, InteractiveCanvasAppState } from "../types";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -218,10 +218,15 @@ export const getSelectedElements = (
 
 export const getTargetElements = (
   elements: ElementsMapOrArray,
-  appState: Pick<AppState, "selectedElementIds" | "editingElement">,
+  appState: Pick<
+    AppState,
+    "selectedElementIds" | "editingTextElement" | "newElement"
+  >,
 ) =>
-  appState.editingElement
-    ? [appState.editingElement]
+  appState.editingTextElement
+    ? [appState.editingTextElement]
+    : appState.newElement
+    ? [appState.newElement]
     : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
       });

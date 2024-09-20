@@ -4,20 +4,28 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { register } from "./register";
 import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
-import { newElementWith } from "../element/mutateElement";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppClassProperties, AppState } from "../types";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import { getElementsInGroup } from "../groups";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
+import {
+  isBoundToContainer,
+  isElbowArrow,
+  isFrameLikeElement,
+} from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
+import { StoreAction } from "../store";
+import { mutateElbowArrow } from "../element/routing";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
+  app: AppClassProperties,
 ) => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
   const framesToBeDeleted = new Set(
     getSelectedElements(
       elements.filter((el) => isFrameLikeElement(el)),
@@ -28,6 +36,26 @@ const deleteSelectedElements = (
   return {
     elements: elements.map((el) => {
       if (appState.selectedElementIds[el.id]) {
+        if (el.boundElements) {
+          el.boundElements.forEach((candidate) => {
+            const bound = app.scene
+              .getNonDeletedElementsMap()
+              .get(candidate.id);
+            if (bound && isElbowArrow(bound)) {
+              mutateElement(bound, {
+                startBinding:
+                  el.id === bound.startBinding?.elementId
+                    ? null
+                    : bound.startBinding,
+                endBinding:
+                  el.id === bound.endBinding?.elementId
+                    ? null
+                    : bound.endBinding,
+              });
+              mutateElbowArrow(bound, elementsMap, bound.points);
+            }
+          });
+        }
         return newElementWith(el, { isDeleted: true });
       }
 
@@ -72,6 +100,8 @@ const handleGroupEditingState = (
 
 export const actionDeleteSelected = register({
   name: "deleteSelectedElements",
+  label: "labels.delete",
+  icon: TrashIcon,
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
     if (appState.editingLinearElement) {
@@ -110,7 +140,7 @@ export const actionDeleteSelected = register({
             ...nextAppState,
             editingLinearElement: null,
           },
-          commitToHistory: false,
+          storeAction: StoreAction.CAPTURE,
         };
       }
 
@@ -127,7 +157,11 @@ export const actionDeleteSelected = register({
           : endBindingElement,
       };
 
-      LinearElementEditor.deletePoints(element, selectedPointsIndices);
+      LinearElementEditor.deletePoints(
+        element,
+        selectedPointsIndices,
+        elementsMap,
+      );
 
       return {
         elements,
@@ -142,11 +176,11 @@ export const actionDeleteSelected = register({
                 : [0],
           },
         },
-        commitToHistory: true,
+        storeAction: StoreAction.CAPTURE,
       };
     }
     let { elements: nextElements, appState: nextAppState } =
-      deleteSelectedElements(elements, appState);
+      deleteSelectedElements(elements, appState, app);
     fixBindingsAfterDeletion(
       nextElements,
       elements.filter(({ id }) => appState.selectedElementIds[id]),
@@ -162,13 +196,14 @@ export const actionDeleteSelected = register({
         multiElement: null,
         activeEmbeddable: null,
       },
-      commitToHistory: isSomeElementSelected(
+      storeAction: isSomeElementSelected(
         getNonDeletedElements(elements),
         appState,
-      ),
+      )
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.delete",
   keyTest: (event, appState, elements) =>
     (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE) &&
     !event[KEYS.CTRL_OR_CMD],

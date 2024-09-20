@@ -13,7 +13,7 @@ Once the callback is triggered, you will need to store the api in state to acces
 ```jsx showLineNumbers
 export default function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
-  return <Excalidraw excalidrawAPI={{(api)=> setExcalidrawAPI(api)}} />;
+  return <Excalidraw excalidrawAPI={(api)=> setExcalidrawAPI(api)} />;
 }
 ```
 
@@ -22,7 +22,7 @@ You can use this prop when you want to access some [Excalidraw APIs](https://git
 | API | Signature | Usage |
 | --- | --- | --- |
 | [updateScene](#updatescene) | `function` | updates the scene with the sceneData |
-| [updateLibrary](#updatelibrary) | `function` | updates the scene with the sceneData |
+| [updateLibrary](#updatelibrary) | `function` | updates the library |
 | [addFiles](#addfiles) | `function` | add files data to the appState |
 | [resetScene](#resetscene) | `function` | Resets the scene. If `resetLoadingState` is passed as true then it will also force set the loading state to false. |
 | [getSceneElementsIncludingDeleted](#getsceneelementsincludingdeleted) | `function` | Returns all the elements including the deleted in the scene |
@@ -65,7 +65,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
 | `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
-| `commitToHistory` | `boolean` | Implies if the `history (undo/redo)` should be recorded. Defaults to `false`. |
+| `commitToStore` | `boolean` | Implies if the change should be captured and commited to the `store`. Commited changes are emmitted and listened to by other components, such as `History` for undo / redo purposes. Defaults to `false`. |
 
 ```jsx live
 function App() {
@@ -115,7 +115,7 @@ function App() {
       <button className="custom-button" onClick={updateScene}>
         Update Scene
       </button>
-      <Excalidraw ref={(api) => setExcalidrawAPI(api)} />
+      <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)} />
     </div>
   );
 }
@@ -188,7 +188,7 @@ function App() {
         Update Library
       </button>
       <Excalidraw
-        ref={(api) => setExcalidrawAPI(api)}
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
         // initial data retrieved from https://github.com/excalidraw/excalidraw/blob/master/dev-docs/packages/excalidraw/initialData.js
         initialData={{
           libraryItems: initialData.libraryItems,

@@ -1,16 +1,17 @@
 import { isElementInViewport } from "../element/sizeHelpers";
 import { isImageElement } from "../element/typeChecks";
-import {
+import type {
+  ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
 import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { memoize, toBrandedType } from "../utils";
-import Scene from "./Scene";
-import { RenderableElementsMap } from "./types";
+import type Scene from "./Scene";
+import type { RenderableElementsMap } from "./types";
 
 export class Renderer {
   private scene: Scene;
@@ -64,11 +65,13 @@ export class Renderer {
 
     const getRenderableElements = ({
       elements,
-      editingElement,
+      editingTextElement,
+      newElementId,
       pendingImageElementId,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
-      editingElement: AppState["editingElement"];
+      editingTextElement: AppState["editingTextElement"];
+      newElementId: ExcalidrawElement["id"] | undefined;
       pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
       const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
@@ -83,12 +86,16 @@ export class Renderer {
           }
         }
 
+        if (newElementId === element.id) {
+          continue;
+        }
+
         // we don't want to render text element that's being currently edited
         // (it's rendered on remote only)
         if (
-          !editingElement ||
-          editingElement.type !== "text" ||
-          element.id !== editingElement.id
+          !editingTextElement ||
+          editingTextElement.type !== "text" ||
+          element.id !== editingTextElement.id
         ) {
           elementsMap.set(element.id, element);
         }
@@ -105,11 +112,11 @@ export class Renderer {
         scrollY,
         height,
         width,
-        editingElement,
+        editingTextElement,
+        newElementId,
         pendingImageElementId,
-        // unused but serves we cache on it to invalidate elements if they
-        // get mutated
-        versionNonce: _versionNonce,
+        // cache-invalidation nonce
+        sceneNonce: _sceneNonce,
       }: {
         zoom: AppState["zoom"];
         offsetLeft: AppState["offsetLeft"];
@@ -118,15 +125,19 @@ export class Renderer {
         scrollY: AppState["scrollY"];
         height: AppState["height"];
         width: AppState["width"];
-        editingElement: AppState["editingElement"];
+        editingTextElement: AppState["editingTextElement"];
+        /** note: first render of newElement will always bust the cache
+         * (we'd have to prefilter elements outside of this function) */
+        newElementId: ExcalidrawElement["id"] | undefined;
         pendingImageElementId: AppState["pendingImageElementId"];
-        versionNonce: ReturnType<InstanceType<typeof Scene>["getVersionNonce"]>;
+        sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
 
         const elementsMap = getRenderableElements({
           elements,
-          editingElement,
+          editingTextElement,
+          newElementId,
           pendingImageElementId,
         });
 

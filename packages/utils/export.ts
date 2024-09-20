@@ -3,8 +3,8 @@ import {
   exportToSvg as _exportToSvg,
 } from "../excalidraw/scene/export";
 import { getDefaultAppState } from "../excalidraw/appState";
-import { AppState, BinaryFiles } from "../excalidraw/types";
-import {
+import type { AppState, BinaryFiles } from "../excalidraw/types";
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -166,9 +166,11 @@ export const exportToSvg = async ({
   exportPadding,
   renderEmbeddables,
   exportingFrame,
+  skipInliningFonts,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
+  skipInliningFonts?: true;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
@@ -184,6 +186,7 @@ export const exportToSvg = async ({
   return _exportToSvg(restoredElements, exportAppState, files, {
     exportingFrame,
     renderEmbeddables,
+    skipInliningFonts,
   });
 };
 

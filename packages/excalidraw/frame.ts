@@ -3,7 +3,7 @@ import {
   getElementAbsoluteCoords,
   isTextElement,
 } from "./element";
-import {
+import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
@@ -11,25 +11,29 @@ import {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { isPointWithinBounds } from "./math";
 import {
   getBoundTextElement,
   getContainerElement,
 } from "./element/textElement";
 import { arrayToMap } from "./utils";
 import { mutateElement } from "./element/mutateElement";
-import { AppClassProperties, AppState, StaticCanvasAppState } from "./types";
+import type {
+  AppClassProperties,
+  AppState,
+  StaticCanvasAppState,
+} from "./types";
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
 import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
-import { ReadonlySetLike } from "./utility-types";
+import type { ReadonlySetLike } from "./utility-types";
+import { isPointWithinBounds, point } from "../math";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
-  nextElements: ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
   oldElements: readonly ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
 ) => {
@@ -155,9 +159,9 @@ export const isCursorInFrame = (
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
 
   return isPointWithinBounds(
-    [fx1, fy1],
-    [cursorCoords.x, cursorCoords.y],
-    [fx2, fy2],
+    point(fx1, fy1),
+    point(cursorCoords.x, cursorCoords.y),
+    point(fx2, fy2),
   );
 };
 
@@ -751,15 +755,12 @@ export const isElementInFrame = (
   return false;
 };
 
-export const getFrameLikeTitle = (
-  element: ExcalidrawFrameLikeElement,
-  frameIdx: number,
-) => {
+export const getFrameLikeTitle = (element: ExcalidrawFrameLikeElement) => {
   // TODO name frames "AI" only if specific to AI frames
   return element.name === null
     ? isFrameElement(element)
-      ? `Frame ${frameIdx}`
-      : `AI Frame $${frameIdx}`
+      ? "Frame"
+      : "AI Frame"
     : element.name;
 };
 

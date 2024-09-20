@@ -20,7 +20,7 @@ import {
 
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import type { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { exportToCanvas } from "../../utils/export";
@@ -35,6 +35,7 @@ import "./ImageExportDialog.scss";
 import { FilledButton } from "./FilledButton";
 import { cloneJSON } from "../utils";
 import { prepareElementsForExport } from "../data";
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -89,6 +90,21 @@ const ImageExportModal = ({
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
 
+  const { onCopy, copyStatus, resetCopyStatus } = useCopyStatus();
+
+  useEffect(() => {
+    // if user changes setting right after export to clipboard, reset the status
+    // so they don't have to wait for the timeout to click the button again
+    resetCopyStatus();
+  }, [
+    projectName,
+    exportWithBackground,
+    exportDarkMode,
+    exportScale,
+    embedScene,
+    resetCopyStatus,
+  ]);
+
   const { exportedElements, exportingFrame } = prepareElementsForExport(
     elementsSnapshot,
     appStateSnapshot,
@@ -105,6 +121,7 @@ const ImageExportModal = ({
     if (!maxWidth) {
       return;
     }
+
     exportToCanvas({
       elements: exportedElements,
       appState: {
@@ -294,11 +311,17 @@ const ImageExportModal = ({
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
               label={t("imageExportDialog.title.copyPngToClipboard")}
-              onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.clipboard, exportedElements, {
-                  exportingFrame,
-                })
-              }
+              status={copyStatus}
+              onClick={async () => {
+                await onExportImage(
+                  EXPORT_IMAGE_TYPES.clipboard,
+                  exportedElements,
+                  {
+                    exportingFrame,
+                  },
+                );
+                onCopy();
+              }}
               icon={copyIcon}
             >
               {t("imageExportDialog.button.copyPngToClipboard")}

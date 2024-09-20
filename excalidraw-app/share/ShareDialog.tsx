@@ -1,5 +1,4 @@
-import { useRef, useState } from "react";
-import * as Popover from "@radix-ui/react-popover";
+import { useEffect, useRef, useState } from "react";
 import { copyTextToSystemClipboard } from "../../packages/excalidraw/clipboard";
 import { trackEvent } from "../../packages/excalidraw/analytics";
 import { getFrame } from "../../packages/excalidraw/utils";
@@ -14,14 +13,16 @@ import {
   share,
   shareIOS,
   shareWindows,
-  tablerCheckIcon,
 } from "../../packages/excalidraw/components/icons";
 import { TextField } from "../../packages/excalidraw/components/TextField";
 import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
-import { activeRoomLinkAtom, CollabAPI } from "../collab/Collab";
+import type { CollabAPI } from "../collab/Collab";
+import { activeRoomLinkAtom } from "../collab/Collab";
 import { atom, useAtom, useAtomValue } from "jotai";
 
 import "./ShareDialog.scss";
+import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
+import { useCopyStatus } from "../../packages/excalidraw/hooks/useCopiedIndicator";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
@@ -61,10 +62,11 @@ const ActiveRoomDialog = ({
   handleClose: () => void;
 }) => {
   const { t } = useI18n();
-  const [justCopied, setJustCopied] = useState(false);
+  const [, setJustCopied] = useState(false);
   const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
+  const { onCopy, copyStatus } = useCopyStatus();
 
   const copyRoomLink = async () => {
     try {
@@ -128,26 +130,16 @@ const ActiveRoomDialog = ({
             onClick={shareRoomLink}
           />
         )}
-        <Popover.Root open={justCopied}>
-          <Popover.Trigger asChild>
-            <FilledButton
-              size="large"
-              label="Copy link"
-              icon={copyIcon}
-              onClick={copyRoomLink}
-            />
-          </Popover.Trigger>
-          <Popover.Content
-            onOpenAutoFocus={(event) => event.preventDefault()}
-            onCloseAutoFocus={(event) => event.preventDefault()}
-            className="ShareDialog__popover"
-            side="top"
-            align="end"
-            sideOffset={5.5}
-          >
-            {tablerCheckIcon} copied
-          </Popover.Content>
-        </Popover.Root>
+        <FilledButton
+          size="large"
+          label={t("buttons.copyLink")}
+          icon={copyIcon}
+          status={copyStatus}
+          onClick={() => {
+            copyRoomLink();
+            onCopy();
+          }}
+        />
       </div>
       <div className="ShareDialog__active__description">
         <p>
@@ -275,6 +267,14 @@ export const ShareDialog = (props: {
 }) => {
   const [shareDialogState, setShareDialogState] = useAtom(shareDialogStateAtom);
 
+  const { openDialog } = useUIAppState();
+
+  useEffect(() => {
+    if (openDialog) {
+      setShareDialogState({ isOpen: false });
+    }
+  }, [openDialog, setShareDialogState]);
+
   if (!shareDialogState.isOpen) {
     return null;
   }
@@ -285,6 +285,6 @@ export const ShareDialog = (props: {
       collabAPI={props.collabAPI}
       onExportToBackend={props.onExportToBackend}
       type={shareDialogState.type}
-    ></ShareDialogInner>
+    />
   );
 };

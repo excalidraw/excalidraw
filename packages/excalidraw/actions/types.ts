@@ -1,14 +1,24 @@
-import React from "react";
-import { ExcalidrawElement } from "../element/types";
-import {
+import type React from "react";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
+import type {
   AppClassProperties,
   AppState,
   ExcalidrawProps,
   BinaryFiles,
+  UIAppState,
 } from "../types";
-import { MarkOptional } from "../utility-types";
+import type { MarkOptional } from "../utility-types";
+import type { StoreActionType } from "../store";
 
-export type ActionSource = "ui" | "keyboard" | "contextMenu" | "api";
+export type ActionSource =
+  | "ui"
+  | "keyboard"
+  | "contextMenu"
+  | "api"
+  | "commandPalette";
 
 /** if false, the action should be prevented */
 export type ActionResult =
@@ -19,14 +29,13 @@ export type ActionResult =
         "offsetTop" | "offsetLeft" | "width" | "height"
       > | null;
       files?: BinaryFiles | null;
-      commitToHistory: boolean;
-      syncHistory?: boolean;
+      storeAction: StoreActionType;
       replaceFiles?: boolean;
     }
   | false;
 
 type ActionFn = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly OrderedExcalidrawElement[],
   appState: Readonly<AppState>,
   formData: any,
   app: AppClassProperties,
@@ -61,6 +70,7 @@ export type ActionName =
   | "changeSloppiness"
   | "changeStrokeStyle"
   | "changeArrowhead"
+  | "changeArrowType"
   | "changeOpacity"
   | "changeFontSize"
   | "toggleCanvasMenu"
@@ -124,7 +134,11 @@ export type ActionName =
   | "setFrameAsActiveTool"
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
-  | "wrapTextInContainer";
+  | "wrapTextInContainer"
+  | "commandPalette"
+  | "autoResize"
+  | "elementStats"
+  | "searchMenu";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -137,6 +151,20 @@ export type PanelComponentProps = {
 
 export interface Action {
   name: ActionName;
+  label:
+    | string
+    | ((
+        elements: readonly ExcalidrawElement[],
+        appState: Readonly<AppState>,
+        app: AppClassProperties,
+      ) => string);
+  keywords?: string[];
+  icon?:
+    | React.ReactNode
+    | ((
+        appState: UIAppState,
+        elements: readonly ExcalidrawElement[],
+      ) => React.ReactNode);
   PanelComponent?: React.FC<PanelComponentProps>;
   perform: ActionFn;
   keyPriority?: number;
@@ -146,13 +174,6 @@ export interface Action {
     elements: readonly ExcalidrawElement[],
     app: AppClassProperties,
   ) => boolean;
-  contextItemLabel?:
-    | string
-    | ((
-        elements: readonly ExcalidrawElement[],
-        appState: Readonly<AppState>,
-        app: AppClassProperties,
-      ) => string);
   predicate?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
@@ -171,7 +192,8 @@ export interface Action {
           | "history"
           | "menu"
           | "collab"
-          | "hyperlink";
+          | "hyperlink"
+          | "search_menu";
         action?: string;
         predicate?: (
           appState: Readonly<AppState>,

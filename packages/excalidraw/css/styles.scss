@@ -4,6 +4,7 @@
 :root {
   --zIndex-canvas: 1;
   --zIndex-interactiveCanvas: 2;
+  --zIndex-svgLayer: 3;
   --zIndex-wysiwyg: 3;
   --zIndex-canvasButtons: 3;
   --zIndex-layerUI: 4;
@@ -19,6 +20,12 @@
   --sal: env(safe-area-inset-left);
   --sar: env(safe-area-inset-right);
   --sat: env(safe-area-inset-top);
+}
+
+body.excalidraw-cursor-resize,
+body.excalidraw-cursor-resize a:hover,
+body.excalidraw-cursor-resize * {
+  cursor: ew-resize;
 }
 
 .excalidraw {
@@ -145,7 +152,7 @@
       margin-bottom: 0.25rem;
       font-size: 0.75rem;
       color: var(--text-primary-color);
-      font-weight: normal;
+      font-weight: 400;
       display: block;
     }
 
@@ -220,14 +227,7 @@
     label,
     button,
     .zIndexButton {
-      @include outlineButtonStyles;
-
-      padding: 0;
-
-      svg {
-        width: var(--default-icon-size);
-        height: var(--default-icon-size);
-      }
+      @include outlineButtonIconStyles;
     }
   }
 
@@ -387,7 +387,7 @@
   .App-menu__left {
     overflow-y: auto;
     padding: 0.75rem;
-    width: 202px;
+    width: 12.5rem;
     box-sizing: border-box;
     position: absolute;
   }
@@ -578,7 +578,7 @@
   // use custom, minimalistic scrollbar
   // (doesn't work in Firefox)
   ::-webkit-scrollbar {
-    width: 3px;
+    width: 4px;
     height: 3px;
   }
 
@@ -656,6 +656,10 @@
     @at-root .excalidraw.theme--dark#{&} {
       --button-hover-bg: #363541;
       --button-bg: var(--color-surface-high);
+    }
+
+    .buttonList {
+      padding: 0.25rem 0;
     }
   }
 
@@ -750,7 +754,7 @@
     padding: 1rem 1.6rem;
     border-radius: 12px;
     color: #fff;
-    font-weight: bold;
+    font-weight: 700;
     letter-spacing: 0.6px;
     font-family: "Assistant";
   }

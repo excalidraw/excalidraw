@@ -1,0 +1,61 @@
+{
+  "name": "@excalidraw/math",
+  "version": "0.1.0",
+  "main": "./dist/prod/index.js",
+  "type": "module",
+  "module": "./dist/prod/index.js",
+  "exports": {
+    ".": {
+      "development": "./dist/dev/index.js",
+      "default": "./dist/prod/index.js"
+    }
+  },
+  "types": "./dist/utils/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "description": "Excalidraw math functions",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-math",
+    "math",
+    "vector",
+    "algebra",
+    "2d"
+  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "dependencies": {
+    "@excalidraw/utils": "*"
+  },
+  "scripts": {
+    "gen:types": "rm -rf types && tsc",
+    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
+    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
+    "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
+    "pack": "yarn build:umd && yarn pack"
+  }
+}

@@ -3,7 +3,7 @@ import "./ToolIcon.scss";
 import { t } from "../i18n";
 import { ToolButton } from "./ToolButton";
 import { THEME } from "../constants";
-import { Theme } from "../element/types";
+import type { Theme } from "../element/types";
 
 // We chose to use only explicit toggle and not a third option for system value,
 // but this could be added in the future.
@@ -14,7 +14,9 @@ export const DarkModeToggle = (props: {
 }) => {
   const title =
     props.title ||
-    (props.value === "dark" ? t("buttons.lightMode") : t("buttons.darkMode"));
+    (props.value === THEME.DARK
+      ? t("buttons.lightMode")
+      : t("buttons.darkMode"));
 
   return (
     <ToolButton

@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import {
   render,
@@ -16,7 +17,7 @@ import * as StaticScene from "../renderer/staticScene";
 import { reseed } from "../random";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
-import { ShortcutName } from "../actions/shortcuts";
+import type { ShortcutName } from "../actions/shortcuts";
 import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
@@ -27,7 +28,7 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history.getSnapshotForTest()).toMatchSnapshot(`[${name}] history`);
+  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
@@ -108,8 +109,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
@@ -159,7 +160,7 @@ describe("contextMenu element", () => {
       width: 200,
       backgroundColor: "red",
     });
-    h.elements = [rect1, rect2];
+    API.setElements([rect1, rect2]);
     API.setSelectedElements([rect1]);
 
     // lower z-index
@@ -188,19 +189,19 @@ describe("contextMenu element", () => {
     mouse.up(10, 10);
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -10);
     mouse.up(10, 10);
 
     mouse.reset();
     mouse.click(10, 10);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.click(20, 0);
+      mouse.click(22, 0);
     });
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
 
     const contextMenu = UI.queryContextMenu();
@@ -240,13 +241,13 @@ describe("contextMenu element", () => {
     mouse.up(10, 10);
 
     UI.clickTool("rectangle");
-    mouse.down(10, -10);
+    mouse.down(12, -10);
     mouse.up(10, 10);
 
     mouse.reset();
     mouse.click(10, 10);
     Keyboard.withModifierKeys({ shift: true }, () => {
-      mouse.click(20, 0);
+      mouse.click(22, 0);
     });
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -255,8 +256,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
 
     const contextMenu = UI.queryContextMenu();
@@ -297,8 +298,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     expect(copiedStyles).toBe("{}");
@@ -382,8 +383,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryAllByText(contextMenu!, "Delete")[0]);
@@ -398,8 +399,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Add to library")!);
@@ -417,14 +418,32 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Duplicate")!);
     expect(h.elements).toHaveLength(2);
-    const { id: _id0, seed: _seed0, x: _x0, y: _y0, ...rect1 } = h.elements[0];
-    const { id: _id1, seed: _seed1, x: _x1, y: _y1, ...rect2 } = h.elements[1];
+    const {
+      id: _id0,
+      seed: _seed0,
+      x: _x0,
+      y: _y0,
+      index: _fractionalIndex0,
+      version: _version0,
+      versionNonce: _versionNonce0,
+      ...rect1
+    } = h.elements[0];
+    const {
+      id: _id1,
+      seed: _seed1,
+      x: _x1,
+      y: _y1,
+      index: _fractionalIndex1,
+      version: _version1,
+      versionNonce: _versionNonce1,
+      ...rect2
+    } = h.elements[1];
     expect(rect1).toEqual(rect2);
   });
 
@@ -530,8 +549,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
     const contextMenu = UI.queryContextMenu();
     fireEvent.click(queryByText(contextMenu!, "Group selection")!);
@@ -560,8 +579,8 @@ describe("contextMenu element", () => {
 
     fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
       button: 2,
-      clientX: 1,
-      clientY: 1,
+      clientX: 3,
+      clientY: 3,
     });
 
     const contextMenu = UI.queryContextMenu();
@@ -589,7 +608,7 @@ describe("contextMenu element", () => {
       fillStyle: "solid",
       groupIds: ["g1"],
     });
-    h.elements = [rectangle1, rectangle2];
+    API.setElements([rectangle1, rectangle2]);
 
     mouse.rightClickAt(50, 50);
     expect(API.getSelectedElements().length).toBe(2);

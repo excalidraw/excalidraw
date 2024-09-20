@@ -1,11 +1,12 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { trackEvent } from "../analytics";
-import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
-import { ChartType } from "../element/types";
+import type { ChartElements, Spreadsheet } from "../charts";
+import { renderSpreadsheet } from "../charts";
+import type { ChartType } from "../element/types";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
-import { UIAppState } from "../types";
+import type { UIAppState } from "../types";
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
 
@@ -64,6 +65,7 @@ const ChartPreviewBtn = (props: {
 
   return (
     <button
+      type="button"
       className="ChartPreview"
       onClick={() => {
         if (chartElements) {

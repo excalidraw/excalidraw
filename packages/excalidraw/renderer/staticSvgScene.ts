@@ -1,5 +1,5 @@
-import { Drawable } from "roughjs/bin/core";
-import { RoughSVG } from "roughjs/bin/svg";
+import type { Drawable } from "roughjs/bin/core";
+import type { RoughSVG } from "roughjs/bin/svg";
 import {
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
@@ -17,7 +17,6 @@ import {
   getBoundTextElement,
   getContainerElement,
   getLineHeightInPx,
-  getVerticalOffset,
 } from "../element/textElement";
 import {
   isArrowElement,
@@ -25,18 +24,19 @@ import {
   isInitializedImageElement,
   isTextElement,
 } from "../element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getContainingFrame } from "../frame";
-import { getCornerRadius, isPathALoop } from "../math";
 import { ShapeCache } from "../scene/ShapeCache";
-import { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
-import { AppState, BinaryFiles } from "../types";
+import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
+import type { AppState, BinaryFiles } from "../types";
 import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
+import { getVerticalOffset } from "../fonts";
+import { getCornerRadius, isPathALoop } from "../shapes";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -421,6 +421,7 @@ const renderElementToSvg = (
           image.setAttribute("width", "100%");
           image.setAttribute("height", "100%");
           image.setAttribute("href", fileData.dataURL);
+          image.setAttribute("preserveAspectRatio", "none");
 
           symbol.appendChild(image);
 
@@ -618,6 +619,15 @@ export const renderSceneToSvg = (
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       if (!element.isDeleted) {
+        if (
+          isTextElement(element) &&
+          element.containerId &&
+          elementsMap.has(element.containerId)
+        ) {
+          // will be rendered with the container
+          return;
+        }
+
         try {
           renderElementToSvg(
             element,
@@ -629,6 +639,20 @@ export const renderSceneToSvg = (
             element.y + renderConfig.offsetY,
             renderConfig,
           );
+
+          const boundTextElement = getBoundTextElement(element, elementsMap);
+          if (boundTextElement) {
+            renderElementToSvg(
+              boundTextElement,
+              elementsMap,
+              rsvg,
+              svgRoot,
+              files,
+              boundTextElement.x + renderConfig.offsetX,
+              boundTextElement.y + renderConfig.offsetY,
+              renderConfig,
+            );
+          }
         } catch (error: any) {
           console.error(error);
         }

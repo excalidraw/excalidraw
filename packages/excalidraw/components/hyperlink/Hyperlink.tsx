@@ -1,4 +1,4 @@
-import { AppState, ExcalidrawProps, Point } from "../../types";
+import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
@@ -6,7 +6,7 @@ import {
 } from "../../utils";
 import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
 import { mutateElement } from "../../element/mutateElement";
-import {
+import type {
   ElementsMap,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
@@ -26,9 +26,9 @@ import clsx from "clsx";
 import { KEYS } from "../../keys";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
 import { getElementAbsoluteCoords } from "../../element/bounds";
-import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
+import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 import { getSelectedElements } from "../../scene";
-import { isPointHittingElementBoundingBox } from "../../element/collision";
+import { hitElementBoundingBox } from "../../element/collision";
 import { isLocalLink, normalizeLink } from "../../data/url";
 
 import "./Hyperlink.scss";
@@ -36,6 +36,7 @@ import { trackEvent } from "../../analytics";
 import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
+import { point, type GlobalPoint } from "../../../math";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -176,10 +177,12 @@ export const Hyperlink = ({
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
-      const shouldHide = shouldHideLinkPopup(element, elementsMap, appState, [
-        event.clientX,
-        event.clientY,
-      ]) as boolean;
+      const shouldHide = shouldHideLinkPopup(
+        element,
+        elementsMap,
+        appState,
+        point(event.clientX, event.clientY),
+      ) as boolean;
       if (shouldHide) {
         timeoutId = window.setTimeout(() => {
           setAppState({ showHyperlinkPopup: false });
@@ -211,7 +214,7 @@ export const Hyperlink = ({
   const { x, y } = getCoordsForPopover(element, appState, elementsMap);
   if (
     appState.contextMenu ||
-    appState.draggingElement ||
+    appState.selectedElementsAreBeingDragged ||
     appState.resizingElement ||
     appState.isRotating ||
     appState.openMenu ||
@@ -332,10 +335,10 @@ const getCoordsForPopover = (
 
 export const getContextMenuLabel = (
   elements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
+  appState: UIAppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
-  const label = selectedElements[0]!.link
+  const label = selectedElements[0]?.link
     ? isEmbeddableElement(selectedElements[0])
       ? "labels.link.editEmbed"
       : "labels.link.edit"
@@ -416,7 +419,7 @@ const shouldHideLinkPopup = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
-  [clientX, clientY]: Point,
+  [clientX, clientY]: GlobalPoint,
 ): Boolean => {
   const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
     { clientX, clientY },
@@ -425,15 +428,7 @@ const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (
-    isPointHittingElementBoundingBox(
-      element,
-      elementsMap,
-      [sceneX, sceneY],
-      threshold,
-      null,
-    )
-  ) {
+  if (hitElementBoundingBox(sceneX, sceneY, element, elementsMap)) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element, elementsMap);

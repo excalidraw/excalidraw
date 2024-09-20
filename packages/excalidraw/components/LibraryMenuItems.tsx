@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { serializeLibraryAsJSON } from "../data/json";
 import { t } from "../i18n";
-import {
+import type {
   ExcalidrawProps,
   LibraryItem,
   LibraryItems,
