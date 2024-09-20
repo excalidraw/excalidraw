@@ -8,10 +8,11 @@ import type {
 import type { AppState, BinaryFileData } from "../packages/excalidraw/types";
 
 const REQUEST_SCENE = "REQUEST_SCENE";
+const E_PLUS_DEV_URL = "http://localhost:3000";
 
 const EXCALIDRAW_PLUS_ORIGIN = import.meta.env.PROD
   ? import.meta.env.VITE_APP_PLUS_APP
-  : "http://localhost:3000";
+  : E_PLUS_DEV_URL;
 
 type ParsedSceneData =
   | {
@@ -107,10 +108,9 @@ export const CloudExport = () => {
     };
   }, []);
 
-  return (
-    <div>
-      <h1>Cloud Export</h1>
-      <div>Now exporting your scene to Excalidraw+...</div>
-    </div>
-  );
+  // Since this component is expected to run in a hidden iframe on Excaildraw+,
+  // it doesn't need to render anything. All the data we need is available in
+  // LocalStorage and IndexedDB. It only needs to handle the messaging between
+  // the parent window and the iframe with the relevant data.
+  return null;
 };
