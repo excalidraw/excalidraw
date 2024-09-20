@@ -1,6 +1,6 @@
 {
   "name": "excalidraw_karat",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "main": "main.js",
   "types": "types/packages/excalidraw/index.d.ts",
   "files": [
