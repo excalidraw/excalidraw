@@ -165,9 +165,9 @@
   "search": {
     "title": "איתור בלוח הציור",
     "noMatch": "לא נמצאו תוצאות…",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "singleResult": "תוצאה",
+    "multipleResults": "תוצאות",
+    "placeholder": "איתור טקסט בלוח הציור…"
   },
   "buttons": {
     "clearReset": "אפס את הקנבאס",
@@ -304,7 +304,7 @@
     "shapes": "צורות"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Escape לסילוק החיפוש",
     "canvasPanning": "כדי להזיז את הקנבס, החזק את גלגל העכבר לחוץ או את מקש הרווח לחוץ תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
     "arrowTool": "לחצו כדי ליצור מספר נקודות, משכו כדי ליצור קו בודד. לחצו על {{arrowShortcut}} שוב כדי לשנות את סוג החץ.",
