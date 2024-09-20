@@ -67,7 +67,7 @@ export const renderRemoteCursors = ({
 }) => {
   // Paint remote pointers
   for (const [socketId, pointer] of renderConfig.remotePointerViewportCoords) {
-    let { x, y } = pointer;
+    let [x, y] = pointer;
 
     const collaborator = appState.collaborators.get(socketId);
 
