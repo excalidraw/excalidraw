@@ -4071,9 +4071,10 @@ class App extends React.Component<AppProps, AppState> {
         event.key === KEYS.ESCAPE &&
         // unless we're dragging or finalizing an action
         !(
-          this.state.draggingElement ||
+          this.state.newElement ||
           isWritableElement(event.target) ||
-          this.state.editingElement ||
+          this.state.editingTextElement ||
+          this.state.editingLinearElement ||
           ["freedraw", "eraser"].includes(this.state.activeTool.type)
         )
       ) {
