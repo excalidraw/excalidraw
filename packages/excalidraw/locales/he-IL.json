@@ -163,8 +163,8 @@
     "hint_emptyPrivateLibrary": "בחר משהו בקנבס כדי להוסיף אותו לכאן."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
+    "title": "איתור בלוח הציור",
+    "noMatch": "לא נמצאו תוצאות…",
     "singleResult": "",
     "multipleResults": "",
     "placeholder": ""
