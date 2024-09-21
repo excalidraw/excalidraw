@@ -696,6 +696,13 @@ export const resizeSingleElement = (
     points: rescaledPoints,
   };
 
+  // TODO: this is not the best approach
+  updateInternalScale(
+    element,
+    eleNewWidth / element.width,
+    eleNewHeight / element.height,
+  );
+
   if ("scale" in element && "scale" in stateAtResizeStart) {
     mutateElement(element, {
       scale: [
@@ -748,6 +755,36 @@ export const resizeSingleElement = (
       shouldMaintainAspectRatio,
     );
   }
+};
+
+const updateInternalScale = (
+  element: NonDeletedExcalidrawElement,
+  scaleX: number,
+  scaleY: number,
+) => {
+  if ("type" in element && element.type === "image") {
+    element = element as ExcalidrawImageElement;
+  } else {
+    return;
+  }
+
+  // if the scales happen to be 0 (which is insanely unlikely), it will
+  // zero out the rolling multiplier and cause weird bugs with cropping.
+  // if zero is detected, just set the scales to an obnoxiously small number
+  if (scaleX === 0) {
+    scaleX = Number.EPSILON;
+  }
+  if (scaleY === 0) {
+    scaleY = Number.EPSILON;
+  }
+
+  scaleX = Math.abs(scaleX);
+  scaleY = Math.abs(scaleY);
+
+  mutateElement(element, {
+    resizedFactorX: element.resizedFactorX * scaleX,
+    resizedFactorY: element.resizedFactorY * scaleY,
+  });
 };
 
 export const resizeMultipleElements = (

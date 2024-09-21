@@ -441,7 +441,14 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import type { LocalPoint, Radians } from "../../math";
-import { point, pointDistance, vector } from "../../math";
+import {
+  clamp,
+  point,
+  pointDistance,
+  pointRotateRads,
+  vector,
+} from "../../math";
+import { cropElement } from "../element/cropElement";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -584,6 +591,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
+  lastPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
   animationFrameHandler = new AnimationFrameHandler();
@@ -3863,6 +3871,28 @@ class App extends React.Component<AppProps, AppState> {
 
       if (!isInputLike(event.target)) {
         if (
+          (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+          this.state.croppingElement
+        ) {
+          this.finishImageCropping();
+          return;
+        }
+
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (
+          selectedElements.length === 1 &&
+          isImageElement(selectedElements[0]) &&
+          event.key === KEYS.ENTER
+        ) {
+          this.startImageCropping(selectedElements[0]);
+          return;
+        }
+
+        if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
         ) {
@@ -6560,6 +6590,12 @@ class App extends React.Component<AppProps, AppState> {
         arrowDirection: "origin",
         center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
       },
+      crop: {
+        handleType: false,
+        isCropping: false,
+        offset: { x: 0, y: 0 },
+        complete: false,
+      },
       hit: {
         element: null,
         allHitElements: [],
@@ -6671,11 +6707,28 @@ class App extends React.Component<AppProps, AppState> {
             this.device,
           );
         if (elementWithTransformHandleType != null) {
-          this.setState({
-            resizingElement: elementWithTransformHandleType.element,
-          });
-          pointerDownState.resize.handleType =
-            elementWithTransformHandleType.transformHandleType;
+          if (
+            elementWithTransformHandleType.transformHandleType === "rotation"
+          ) {
+            this.setState({
+              resizingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          } else if (this.state.croppingElement) {
+            this.setState({
+              croppingElement:
+                elementWithTransformHandleType.element as ExcalidrawImageElement,
+            });
+            pointerDownState.crop.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          } else {
+            this.setState({
+              resizingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          }
         }
       } else if (selectedElements.length > 1) {
         pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
@@ -6708,6 +6761,17 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0],
           );
         }
+      } else if (pointerDownState.crop.handleType) {
+        pointerDownState.crop.isCropping = true;
+        pointerDownState.crop.offset = tupleToCoors(
+          getResizeOffsetXY(
+            pointerDownState.crop.handleType,
+            selectedElements,
+            this.scene.getNonDeletedElementsMap(),
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+          ),
+        );
       } else {
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
@@ -7604,6 +7668,13 @@ class App extends React.Component<AppProps, AppState> {
           return true;
         }
       }
+      if (pointerDownState.crop.isCropping) {
+        pointerDownState.lastCoords.x = pointerCoords.x;
+        pointerDownState.lastCoords.y = pointerCoords.y;
+        if (this.maybeHandleCrop(pointerDownState, event)) {
+          return true;
+        }
+      }
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
       if (this.state.selectedLinearElement) {
@@ -7773,6 +7844,65 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
+          // #region drag
+          if (
+            selectedElements.length === 1 &&
+            isImageElement(selectedElements[0]) &&
+            this.state.croppingElement?.id === selectedElements[0].id &&
+            selectedElements[0].crop !== null
+          ) {
+            const crop = selectedElements[0].crop;
+            const image = selectedElements[0];
+
+            const lastPointerCoords =
+              this.lastPointerMoveCoords ?? pointerDownState.origin;
+
+            const instantDragOffset = {
+              x: pointerCoords.x - lastPointerCoords.x,
+              y: pointerCoords.y - lastPointerCoords.y,
+            };
+
+            // current offset is based on the element's width and height
+            const uncroppedWidth = image.widthAtCreation * image.resizedFactorX;
+            const uncroppedHeight =
+              image.heightAtCreation * image.resizedFactorY;
+
+            const SENSITIVITY_FACTOR = 3;
+
+            const adjustedOffset = {
+              x:
+                instantDragOffset.x *
+                (uncroppedWidth / image.naturalWidth) *
+                SENSITIVITY_FACTOR,
+              y:
+                instantDragOffset.y *
+                (uncroppedHeight / image.naturalHeight) *
+                SENSITIVITY_FACTOR,
+            };
+
+            const nextCrop = {
+              ...crop,
+              x: clamp(
+                crop.x - adjustedOffset.x,
+                0,
+                image.naturalWidth - crop.width,
+              ),
+              y: clamp(
+                crop.y - adjustedOffset.y,
+                0,
+                image.naturalHeight - crop.height,
+              ),
+            };
+
+            mutateElement(image, {
+              crop: nextCrop,
+            });
+
+            this.lastPointerMoveCoords = pointerCoords;
+
+            return;
+          }
+
           // Snap cache *must* be synchronously popuplated before initial drag,
           // otherwise the first drag even will not snap, causing a jump before
           // it snaps to its position if previously snapped already.
@@ -7906,6 +8036,8 @@ class App extends React.Component<AppProps, AppState> {
             this.maybeCacheVisibleGaps(event, selectedElements, true);
             this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
+
+          this.lastPointerMoveCoords = pointerCoords;
           return;
         }
       }
@@ -8158,6 +8290,7 @@ class App extends React.Component<AppProps, AppState> {
         activeTool,
         isResizing,
         isRotating,
+        isCropping,
       } = this.state;
 
       this.setState((prevState) => ({
@@ -8171,6 +8304,8 @@ class App extends React.Component<AppProps, AppState> {
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
       }));
+
+      this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);
@@ -8654,6 +8789,15 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (
+        isCropping &&
+        !isResizing &&
+        ((!hitElement && !pointerDownState.crop.isCropping) ||
+          (hitElement && hitElement !== this.state.croppingElement))
+      ) {
+        this.finishImageCropping();
+      }
+
       const pointerStart = this.lastPointerDownEvent;
       const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
 
@@ -8909,7 +9053,12 @@ class App extends React.Component<AppProps, AppState> {
         this.store.shouldCaptureIncrement();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
+      if (
+        pointerDownState.drag.hasOccurred ||
+        isResizing ||
+        isRotating ||
+        isCropping
+      ) {
         // We only allow binding via linear elements, specifically via dragging
         // the endpoints ("start" or "end").
         const linearElements = this.scene
@@ -9324,7 +9473,18 @@ class App extends React.Component<AppProps, AppState> {
       const x = imageElement.x + imageElement.width / 2 - width / 2;
       const y = imageElement.y + imageElement.height / 2 - height / 2;
 
-      mutateElement(imageElement, { x, y, width, height });
+      mutateElement(imageElement, {
+        x,
+        y,
+        width,
+        height,
+        widthAtCreation: width,
+        heightAtCreation: height,
+        naturalWidth: image.naturalWidth,
+        naturalHeight: image.naturalHeight,
+        resizedFactorX: 1,
+        resizedFactorY: 1,
+      });
     }
   };
 
@@ -9861,6 +10021,46 @@ class App extends React.Component<AppProps, AppState> {
         ),
       });
     }
+  };
+
+  private maybeHandleCrop = (
+    pointerDownState: PointerDownState,
+    event: MouseEvent | KeyboardEvent,
+  ): boolean => {
+    if (pointerDownState.crop.complete) {
+      return true;
+    }
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElements(),
+      this.state,
+    );
+
+    if (selectedElements.length > 1) {
+      // don't see much sense in allowing multi-crop, that would be weird
+      return false;
+    }
+
+    const transformHandleType = pointerDownState.crop.handleType;
+    const pointerCoords = pointerDownState.lastCoords;
+    const [x, y] = getGridPoint(
+      pointerCoords.x - pointerDownState.crop.offset.x,
+      pointerCoords.y - pointerDownState.crop.offset.y,
+      this.getEffectiveGridSize(),
+    );
+
+    const elementToCrop = selectedElements[0] as ExcalidrawImageElement;
+    if (transformHandleType) {
+      cropElement(
+        elementToCrop,
+        this.scene.getNonDeletedElementsMap(),
+        transformHandleType,
+        x,
+        y,
+      );
+      return true;
+    }
+
+    return false;
   };
 
   private maybeHandleResize = (
