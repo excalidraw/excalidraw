@@ -478,6 +478,7 @@ export const newImageElement = (
     status?: ExcalidrawImageElement["status"];
     fileId?: ExcalidrawImageElement["fileId"];
     scale?: ExcalidrawImageElement["scale"];
+    crop?: ExcalidrawImageElement["crop"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
   return {
@@ -488,6 +489,13 @@ export const newImageElement = (
     status: opts.status ?? "pending",
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
+    widthAtCreation: 0,
+    heightAtCreation: 0,
+    naturalWidth: 0,
+    naturalHeight: 0,
+    crop: opts.crop ?? null,
+    resizedFactorX: 1,
+    resizedFactorY: 1,
   };
 };
 

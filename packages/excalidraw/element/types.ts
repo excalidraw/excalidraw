@@ -140,6 +140,23 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
+
+    /** the image's dimension after adjustment at creation */
+    widthAtCreation: number;
+    heightAtCreation: number;
+    /** how much the image has been resized with respect the dimension at creation */
+    resizedFactorX: number;
+    resizedFactorY: number;
+
+    naturalWidth: number;
+    naturalHeight: number;
+
+    crop: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    } | null;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
