@@ -59,6 +59,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   GroupId,
@@ -591,6 +592,96 @@ const renderTransformHandles = (
   });
 };
 
+const renderCropHandles = (
+  context: CanvasRenderingContext2D,
+  renderConfig: InteractiveCanvasRenderConfig,
+  appState: InteractiveCanvasAppState,
+  croppingElement: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
+): void => {
+  const lineWidth = 3 / appState.zoom.value;
+  const length = 15 / appState.zoom.value;
+
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    croppingElement,
+    elementsMap,
+  );
+  const halfWidth =
+    cx - x1 + (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+  const halfHeight =
+    cy - y1 + (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+
+  context.save();
+  context.fillStyle = renderConfig.selectionColor;
+  context.strokeStyle = renderConfig.selectionColor;
+  context.lineWidth = lineWidth;
+
+  const halfLineWidth = lineWidth / 2;
+
+  const handles: Array<
+    [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ]
+  > = [
+    [
+      // x, y
+      [-halfWidth, -halfHeight],
+      // first start and t0
+      [0, halfLineWidth],
+      [length, halfLineWidth],
+      // second  start and to
+      [halfLineWidth, 0],
+      [halfLineWidth, length - halfLineWidth],
+    ],
+    [
+      [halfWidth - halfLineWidth, -halfHeight + halfLineWidth],
+      [halfLineWidth, 0],
+      [-length + halfLineWidth, 0],
+      [0, -halfLineWidth],
+      [0, length - lineWidth],
+    ],
+    [
+      [-halfWidth, halfHeight],
+      [0, -halfLineWidth],
+      [length, -halfLineWidth],
+      [halfLineWidth, 0],
+      [halfLineWidth, -length + halfLineWidth],
+    ],
+    [
+      [halfWidth - halfLineWidth, halfHeight - halfLineWidth],
+      [halfLineWidth, 0],
+      [-length + halfLineWidth, 0],
+      [0, halfLineWidth],
+      [0, -length + lineWidth],
+    ],
+  ];
+
+  handles.forEach((handle) => {
+    const [[x, y], [x1s, y1s], [x1t, y1t], [x2s, y2s], [x2t, y2t]] = handle;
+
+    context.save();
+    context.translate(cx, cy);
+    context.rotate(croppingElement.angle);
+
+    context.beginPath();
+    context.moveTo(x + x1s, y + y1s);
+    context.lineTo(x + x1t, y + y1t);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(x + x2s, y + y2s);
+    context.lineTo(x + x2t, y + y2t);
+    context.stroke();
+    context.restore();
+  });
+
+  context.restore();
+};
+
 const renderTextBox = (
   text: NonDeleted<ExcalidrawTextElement>,
   context: CanvasRenderingContext2D,
@@ -898,7 +989,9 @@ const _renderInteractiveScene = ({
         !appState.viewModeEnabled &&
         showBoundingBox &&
         // do not show transform handles when text is being edited
-        !isTextElement(appState.editingTextElement)
+        !isTextElement(appState.editingTextElement) &&
+        // do not show transform handles when image is being cropped
+        !appState.croppingElement
       ) {
         renderTransformHandles(
           context,
@@ -906,6 +999,16 @@ const _renderInteractiveScene = ({
           appState,
           transformHandles,
           selectedElements[0].angle,
+        );
+      }
+
+      if (appState.isCropping && appState.croppingElement) {
+        renderCropHandles(
+          context,
+          renderConfig,
+          appState,
+          appState.croppingElement,
+          elementsMap,
         );
       }
     } else if (selectedElements.length > 1 && !appState.isRotating) {

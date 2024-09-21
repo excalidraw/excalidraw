@@ -17,6 +17,7 @@ import {
   isArrowElement,
   hasBoundTextElement,
   isMagicFrameElement,
+  isImageElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -61,6 +62,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
 import { isRightAngleRads } from "../../math";
 import { getCornerRadius } from "../shapes";
+import { getUncroppedImageElement } from "../element/cropElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -434,8 +436,26 @@ const drawElementOnCanvas = (
           );
           context.clip();
         }
+
+        // TODO: check why only croppingElement has the latest update
+        const { x, y, width, height } = element.crop
+          ? element.crop
+          : element === appState.croppingElement &&
+            appState.croppingElement.crop
+          ? appState.croppingElement.crop
+          : {
+              x: 0,
+              y: 0,
+              width: element.naturalWidth,
+              height: element.naturalHeight,
+            };
+
         context.drawImage(
           img,
+          x,
+          y,
+          width,
+          height,
           0 /* hardcoded for the selection box*/,
           0,
           element.width,
@@ -921,13 +941,52 @@ export const renderElement = (
           context.imageSmoothingEnabled = false;
         }
 
-        drawElementFromCanvas(
-          elementWithCanvas,
-          context,
+        if (
+          element.id === appState.croppingElement?.id &&
+          isImageElement(elementWithCanvas.element) &&
+          elementWithCanvas.element.crop !== null
+        ) {
+          context.save();
+          context.globalAlpha = 0.1;
+
+          const uncroppedElementCanvas = generateElementCanvas(
+            getUncroppedImageElement(elementWithCanvas.element, elementsMap),
+            allElementsMap,
+            appState.zoom,
+            renderConfig,
+            appState,
+          );
+
+          if (uncroppedElementCanvas) {
+            drawElementFromCanvas(
+              uncroppedElementCanvas,
+              context,
+              renderConfig,
+              appState,
+              allElementsMap,
+            );
+          }
+
+          context.restore();
+        }
+
+        const _elementWithCanvas = generateElementCanvas(
+          elementWithCanvas.element,
+          allElementsMap,
+          appState.zoom,
           renderConfig,
           appState,
-          allElementsMap,
         );
+
+        if (_elementWithCanvas) {
+          drawElementFromCanvas(
+            _elementWithCanvas,
+            context,
+            renderConfig,
+            appState,
+            allElementsMap,
+          );
+        }
 
         // reset
         context.imageSmoothingEnabled = currentImageSmoothingStatus;
