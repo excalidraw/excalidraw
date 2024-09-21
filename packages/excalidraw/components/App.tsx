@@ -2918,7 +2918,6 @@ class App extends React.Component<AppProps, AppState> {
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
       const isPlainPaste = !!IS_PLAIN_PASTE;
-
       // #686
       const target = document.activeElement;
       const isExcalidrawActive =
@@ -3931,7 +3930,6 @@ class App extends React.Component<AppProps, AppState> {
           this.triggerRender(true);
           return;
         }
-
         const arrowKeyPressed = isArrowKey(event.key);
 
         if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
@@ -4265,7 +4263,37 @@ class App extends React.Component<AppProps, AppState> {
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key);
+        let shape = findShapeByKey(event.key);
+        //if shapes are selected and waht to change ao of them togather
+        const selectedShape = this.scene.getSelectedElements({
+          selectedElementIds: this.state.selectedElementIds,
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        });
+        if (selectedShape.length > 0 && shape) {
+          const newShapeArr = [];
+          for (let i = 0; i < selectedShape.length; i++) {
+            const found_shape = selectedShape[i];
+            if (
+              found_shape.type !== shape &&
+              (shape === "ellipse" ||
+                shape === "diamond" ||
+                shape === "rectangle") &&
+              ["ellipse", "diamond", "rectangle"].includes(found_shape.type)
+            ) {
+              const newShape = newElement({ ...found_shape, type: shape });
+              newShapeArr.push(newShape);
+            } else {
+              newShapeArr.push(found_shape);
+            }
+          }
+          const allshapes = this.scene.getNonDeletedElements();
+          const leftOverShapes = allshapes.filter((shape) => {
+            return !selectedShape.some((selected) => selected.id === shape.id);
+          });
+          this.scene.replaceAllElements([...newShapeArr, ...leftOverShapes]);
+          shape = "selection";
+        }
         if (shape) {
           if (this.state.activeTool.type !== shape) {
             trackEvent(
