@@ -113,7 +113,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   saveFileToDisk: [getShortcutKey("CtrlOrCmd+S")],
   saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
   toggleShortcuts: [getShortcutKey("?")],
-  searchMenu: [getShortcutKey("CtrlOrCmd+F")],
+  searchMenu: [getShortcutKey("CtrlOrCmd+Alt+F")],
 };
 
 export const getShortcutFromShortcutName = (name: ShortcutName, idx = 0) => {
