@@ -9684,6 +9684,8 @@ class App extends React.Component<AppProps, AppState> {
               dataURL,
               created: Date.now(),
               lastRetrieved: Date.now(),
+              //@ts-ignore
+              name: imageFile?.name, // zsviczian
             },
           };
           const cachedImageData = this.imageCache.get(fileId);
