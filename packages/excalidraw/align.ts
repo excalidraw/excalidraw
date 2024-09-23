@@ -19,7 +19,13 @@ export const alignElements = (
     elementsMap,
   );
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
-  const unpackedGroups = unpackGroups(groups);
+
+  // #8522 Allow grouped elements to align within group
+  // --------------------------------------------------
+  const unpackedGroups =
+    groups.length > 1
+      ? groups
+      : groups.flatMap((group) => group.map((elements) => [elements]));
 
   return unpackedGroups.flatMap((group) => {
     const translation = calculateTranslation(
@@ -64,12 +70,4 @@ const calculateTranslation = (
       (selectionBoundingBox[min] + selectionBoundingBox[max]) / 2 -
       (groupBoundingBox[min] + groupBoundingBox[max]) / 2,
   };
-};
-
-const unpackGroups = (groups: ExcalidrawElement[][]): ExcalidrawElement[][] => {
-  if (groups.length > 1) {
-    return groups;
-  }
-
-  return groups.flatMap((group) => group.map((elements) => [elements]));
 };
