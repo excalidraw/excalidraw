@@ -1,3 +1,4 @@
+import type { LineSegment } from "../math";
 import {
   vectorCross,
   vectorFromPoint,
@@ -5,8 +6,6 @@ import {
   type LocalPoint,
 } from "../math";
 import type { Bounds } from "../excalidraw/element/bounds";
-
-export type LineSegment<P extends LocalPoint | GlobalPoint> = [P, P];
 
 export function getBBox<P extends LocalPoint | GlobalPoint>(
   line: LineSegment<P>,

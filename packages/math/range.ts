@@ -87,6 +87,6 @@ export const rangeIncludesValue = (
  * @param range The range of which to measure the extent of
  * @returns The scalar distance or extent of the start and end of the range
  */
-export function rangeExtent([a, b]: InclusiveRange) {
+export function rangeExtent([a, b]: InclusiveRange): number {
   return Math.abs(a - b);
 }

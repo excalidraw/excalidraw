@@ -1,5 +1,6 @@
 import type { Radians } from "../../math";
 import {
+  pointExtent,
   point,
   pointScaleFromOrigin,
   pointTranslate,
@@ -12,7 +13,6 @@ import {
   type Vector,
 } from "../../math";
 import BinaryHeap from "../binaryheap";
-import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType } from "../utils";
 import {
@@ -955,7 +955,7 @@ const normalizedArrowElementUpdate = (
     points,
     x: offsetX + (externalOffsetX ?? 0),
     y: offsetY + (externalOffsetY ?? 0),
-    ...getSizeFromPoints(points),
+    ...pointExtent(points),
   };
 };
 

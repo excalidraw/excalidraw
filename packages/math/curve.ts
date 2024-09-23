@@ -1,5 +1,5 @@
 import { point, pointRotateRads } from "./point";
-import type { Curve, GlobalPoint, LocalPoint, Radians } from "./types";
+import type { Curve, GenericPoint, Radians } from "./types";
 
 /**
  *
@@ -9,7 +9,7 @@ import type { Curve, GlobalPoint, LocalPoint, Radians } from "./types";
  * @param d
  * @returns
  */
-export function curve<Point extends GlobalPoint | LocalPoint>(
+export function curve<Point extends GenericPoint>(
   a: Point,
   b: Point,
   c: Point,
@@ -18,7 +18,7 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   return [a, b, c, d] as Curve<Point>;
 }
 
-export const curveRotate = <Point extends LocalPoint | GlobalPoint>(
+export const curveRotate = <Point extends GenericPoint>(
   curve: Curve<Point>,
   angle: Radians,
   origin: Point,
@@ -32,7 +32,7 @@ export const curveRotate = <Point extends LocalPoint | GlobalPoint>(
  * @param curveTightness
  * @returns
  */
-export function curveToBezier<Point extends LocalPoint | GlobalPoint>(
+export function curveToBezier<Point extends GenericPoint>(
   pointsIn: readonly Point[],
   curveTightness = 0,
 ): Point[] {
@@ -84,7 +84,7 @@ export function curveToBezier<Point extends LocalPoint | GlobalPoint>(
  * @param controlPoints
  * @returns
  */
-export const cubicBezierPoint = <Point extends LocalPoint | GlobalPoint>(
+export const cubicBezierPoint = <Point extends GenericPoint>(
   t: number,
   controlPoints: Curve<Point>,
 ): Point => {
@@ -111,7 +111,7 @@ export const cubicBezierPoint = <Point extends LocalPoint | GlobalPoint>(
  * @param controlPoints
  * @returns
  */
-export const cubicBezierDistance = <Point extends LocalPoint | GlobalPoint>(
+export const cubicBezierDistance = <Point extends GenericPoint>(
   point: Point,
   controlPoints: Curve<Point>,
 ) => {
@@ -169,7 +169,7 @@ const solveCubic = (a: number, b: number, c: number, d: number) => {
   return roots;
 };
 
-const findClosestParameter = <Point extends LocalPoint | GlobalPoint>(
+const findClosestParameter = <Point extends GenericPoint>(
   point: Point,
   controlPoints: Curve<Point>,
 ) => {

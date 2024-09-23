@@ -1,5 +1,4 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
-import { rescalePoints } from "../points";
 import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -62,6 +61,7 @@ import {
   pointFromPair,
   pointRotateRads,
   type Radians,
+  pointRescaleFromTopLeft,
 } from "../../math";
 
 // Returns true when transform (resizing/rotation) happened
@@ -191,10 +191,10 @@ export const rescalePointsInElement = (
 ) =>
   isLinearElement(element) || isFreeDrawElement(element)
     ? {
-        points: rescalePoints(
+        points: pointRescaleFromTopLeft(
           0,
           width,
-          rescalePoints(1, height, element.points, normalizePoints),
+          pointRescaleFromTopLeft(1, height, element.points, normalizePoints),
           normalizePoints,
         ),
       }
@@ -674,14 +674,14 @@ export const resizeSingleElement = (
   let rescaledElementPointsY;
   let rescaledPoints;
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    rescaledElementPointsY = rescalePoints(
+    rescaledElementPointsY = pointRescaleFromTopLeft(
       1,
       eleNewHeight,
       (stateAtResizeStart as ExcalidrawLinearElement).points,
       true,
     );
 
-    rescaledPoints = rescalePoints(
+    rescaledPoints = pointRescaleFromTopLeft(
       0,
       eleNewWidth,
       rescaledElementPointsY,

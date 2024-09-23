@@ -19,7 +19,6 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -38,6 +37,7 @@ import {
   pointDistance,
   pointFromArray,
   pointRotateRads,
+  pointRescaleFromTopLeft,
 } from "../../math";
 import type { Mutable } from "../utility-types";
 
@@ -859,10 +859,10 @@ export const getResizedElementAbsoluteCoords = (
     ];
   }
 
-  const points = rescalePoints(
+  const points = pointRescaleFromTopLeft(
     0,
     nextWidth,
-    rescalePoints(1, nextHeight, element.points, normalizePoints),
+    pointRescaleFromTopLeft(1, nextHeight, element.points, normalizePoints),
     normalizePoints,
   );
 

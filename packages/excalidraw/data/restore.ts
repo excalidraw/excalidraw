@@ -48,7 +48,6 @@ import type { MarkOptional, Mutable } from "../utility-types";
 import { detectLineHeight, getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
 import { normalizeFixedPoint } from "../element/binding";
 import {
@@ -57,7 +56,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 import type { LocalPoint, Radians } from "../../math";
-import { isFiniteNumber, point } from "../../math";
+import { pointExtent, isFiniteNumber, point } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -288,7 +287,7 @@ const restoreElement = (
         points,
         x,
         y,
-        ...getSizeFromPoints(points),
+        ...pointExtent(points),
       });
     case "arrow": {
       const { startArrowhead = null, endArrowhead = "arrow" } = element;
@@ -315,7 +314,7 @@ const restoreElement = (
         x,
         y,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
-        ...getSizeFromPoints(points),
+        ...pointExtent(points),
       });
     }
 

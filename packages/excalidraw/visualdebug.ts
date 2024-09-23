@@ -1,5 +1,5 @@
+import type { LineSegment } from "../math";
 import { isLineSegment, lineSegment, point, type GlobalPoint } from "../math";
-import type { LineSegment } from "../utils";
 import type { BoundingBox, Bounds } from "./element/bounds";
 import { isBounds } from "./element/typeChecks";
 

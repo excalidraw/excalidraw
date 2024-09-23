@@ -1,15 +1,12 @@
-import { isPointOnSymmetricArc } from "./arc";
+import { radians } from "./angle";
+import { arc, isPointOnSymmetricArc } from "./arc";
 import { point } from "./point";
 
 describe("point on arc", () => {
   it("should detect point on simple arc", () => {
     expect(
       isPointOnSymmetricArc(
-        {
-          radius: 1,
-          startAngle: -Math.PI / 4,
-          endAngle: Math.PI / 4,
-        },
+        arc(1, radians(-Math.PI / 4), radians(Math.PI / 4)),
         point(0.92291667, 0.385),
       ),
     ).toBe(true);
@@ -17,11 +14,7 @@ describe("point on arc", () => {
   it("should not detect point outside of a simple arc", () => {
     expect(
       isPointOnSymmetricArc(
-        {
-          radius: 1,
-          startAngle: -Math.PI / 4,
-          endAngle: Math.PI / 4,
-        },
+        arc(1, radians(-Math.PI / 4), radians(Math.PI / 4)),
         point(-0.92291667, 0.385),
       ),
     ).toBe(false);
@@ -29,11 +22,7 @@ describe("point on arc", () => {
   it("should not detect point with good angle but incorrect radius", () => {
     expect(
       isPointOnSymmetricArc(
-        {
-          radius: 1,
-          startAngle: -Math.PI / 4,
-          endAngle: Math.PI / 4,
-        },
+        arc(1, radians(-Math.PI / 4), radians(Math.PI / 4)),
         point(-0.5, 0.5),
       ),
     ).toBe(false);

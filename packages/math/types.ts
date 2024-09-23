@@ -14,18 +14,10 @@ export type Radians = number & { _brand: "excalimath__radian" };
  */
 export type Degrees = number & { _brand: "excalimath_degree" };
 
-//
-// Range
-//
-
 /**
  * A number range which includes the start and end numbers in the range.
  */
 export type InclusiveRange = [number, number] & { _brand: "excalimath_degree" };
-
-//
-// Point
-//
 
 /**
  * Represents a 2D position in world or canvas space. A
@@ -50,7 +42,18 @@ export type ViewportPoint = [x: number, y: number] & {
   _brand: "excalimath_viewportpoint";
 };
 
-// Line
+/**
+ * A coordinate system useful for circular path calculations
+ */
+export type PolarCoords = [radius: number, angle: Radians] & {
+  _brand: "excalimath_polarCoords";
+};
+
+/**
+ * Aggregate type of all the point types when a function
+ * is point type agnostic
+ */
+export type GenericPoint = GlobalPoint | LocalPoint | ViewportPoint;
 
 /**
  * A line is an infinitely long object with no width, depth, or curvature.
@@ -71,10 +74,6 @@ export type LineSegment<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
   _brand: "excalimath_linesegment";
 };
 
-//
-// Vector
-//
-
 /**
  * Represents a 2D vector
  */
@@ -82,12 +81,10 @@ export type Vector = [u: number, v: number] & {
   _brand: "excalimath__vector";
 };
 
-// Triangles
-
 /**
  * A triangle represented by 3 points
  */
-export type Triangle<P extends GlobalPoint | LocalPoint> = [
+export type Triangle<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
   a: P,
   b: P,
   c: P,
@@ -95,9 +92,17 @@ export type Triangle<P extends GlobalPoint | LocalPoint> = [
   _brand: "excalimath__triangle";
 };
 
-//
-// Polygon
-//
+/**
+ * A rectangular shape represented by 4 points at its corners
+ */
+export type Rectangle<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
+  a: P,
+  b: P,
+  c: P,
+  d: P,
+] & {
+  _brand: "excalimath__rectangle";
+};
 
 /**
  * A polygon is a closed shape by connecting the given points
@@ -107,10 +112,6 @@ export type Polygon<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
   Point[] & {
     _brand: "excalimath_polygon";
   };
-
-//
-// Curve
-//
 
 /**
  * Cubic bezier curve with four control points
@@ -124,18 +125,24 @@ export type Curve<Point extends GlobalPoint | LocalPoint | ViewportPoint> = [
   _brand: "excalimath_curve";
 };
 
-export type PolarCoords = [
-  radius: number,
-  /** angle in radians */
-  angle: number,
-];
-
 /**
  * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
- * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right".
+ * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right"
  */
 export type SymmetricArc = {
   radius: number;
-  startAngle: number;
-  endAngle: number;
+  startAngle: Radians;
+  endAngle: Radians;
+} & {
+  _brand: "excalimath_symmetricarc";
+};
+
+/**
+ * The width and height represented as a type
+ */
+export type Extent = {
+  width: number;
+  height: number;
+} & {
+  _brand: "excalimath_extent";
 };
