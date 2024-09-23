@@ -553,10 +553,7 @@ export const convertToExcalidrawElements = (
           type: "arrow",
         });
 
-        Object.assign(
-          excalidrawElement,
-          pointExtent(excalidrawElement.points),
-        );
+        Object.assign(excalidrawElement, pointExtent(excalidrawElement.points));
         break;
       }
       case "text": {

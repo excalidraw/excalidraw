@@ -6,7 +6,6 @@ import {
   pointOnLineSegment,
   pointOnPolygon,
   polygonIncludesPoint,
-  segmentsIntersectAt,
 } from "../../math";
 import { pointInEllipse, pointOnEllipse, type Ellipse } from "./shape";
 
