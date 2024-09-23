@@ -1,13 +1,3 @@
-@mixin animate($animation,$duration,$method,$times){
-  animation: $animation $duration $method $times;
-}
-
-@mixin keyframes($name){
-  @keyframes #{$name}{
-      @content;
-  }
-}
-
 .excalidraw {
   --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
 
