@@ -12,7 +12,7 @@ import {
   type LocalPoint,
   type Vector,
 } from "../../math";
-import BinaryHeap from "../binaryheap";
+import BinaryHeap from "../../utils/binaryheap";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType } from "../utils";
 import {
