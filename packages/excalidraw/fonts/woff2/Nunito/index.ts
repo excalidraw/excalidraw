@@ -7,6 +7,7 @@ import Vietnamese from "https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiO
 import { GOOGLE_FONTS_RANGES } from "../../metadata";
 import { type ExcalidrawFontFaceDescriptor } from "../..";
 
+// TODO_CHINESE: replace https with the local font files
 export const NunitoFontFaces: ExcalidrawFontFaceDescriptor[] = [
   {
     uri: CyrilicExt,
