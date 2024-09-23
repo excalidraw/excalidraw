@@ -2,7 +2,7 @@ import {
   WorkerInTheMainChunkError,
   WorkerUrlNotDefinedError,
 } from "../../errors";
-import { promiseTry } from "../../utils";
+import { isServerEnv, promiseTry } from "../../utils";
 import { WorkerPool } from "../../workers";
 import type { Commands } from "./subset-shared.chunk";
 
@@ -51,7 +51,7 @@ export const subsetWoff2GlyphsByCodepoints = async (
       if (
         // don't log the expected errors server-side
         !(
-          process.env.NODE_ENV &&
+          isServerEnv() &&
           (e instanceof WorkerUrlNotDefinedError ||
             e instanceof WorkerInTheMainChunkError)
         )

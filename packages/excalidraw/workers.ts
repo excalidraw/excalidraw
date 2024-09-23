@@ -5,9 +5,11 @@ import { debounce } from "./utils";
 
 type InitializeWorker = (worker: Worker) => void;
 
-class IdleWorker extends Worker {
+class IdleWorker {
+  public instance: Worker;
+
   constructor(workerUrl: URL) {
-    super(workerUrl, { type: "module" });
+    this.instance = new Worker(workerUrl, { type: "module" });
   }
 
   /**
@@ -87,10 +89,10 @@ export class WorkerPool<T, R> {
     }
 
     return new Promise((resolve, reject) => {
-      worker.onmessage = this.onMessageHandler(worker, resolve);
-      worker.onerror = this.onErrorHandler(worker, reject);
+      worker.instance.onmessage = this.onMessageHandler(worker, resolve);
+      worker.instance.onerror = this.onErrorHandler(worker, reject);
 
-      worker.postMessage(data, options);
+      worker.instance.postMessage(data, options);
       worker.debounceTerminate(() =>
         reject(
           new Error(`Active worker did not respond for ${this.workerTTL}ms!`),
@@ -105,7 +107,7 @@ export class WorkerPool<T, R> {
   public async clear() {
     for (const worker of this.idleWorkers) {
       worker.debounceTerminate.cancel();
-      worker.terminate();
+      worker.instance.terminate();
     }
 
     this.idleWorkers.clear();
@@ -118,7 +120,7 @@ export class WorkerPool<T, R> {
     const worker = new IdleWorker(this.workerUrl);
 
     worker.debounceTerminate = debounce((reject?: () => void) => {
-      worker.terminate();
+      worker.instance.terminate();
 
       if (this.idleWorkers.has(worker)) {
         this.idleWorkers.delete(worker);
@@ -132,7 +134,7 @@ export class WorkerPool<T, R> {
       }
     }, this.workerTTL);
 
-    this.initWorker(worker);
+    this.initWorker(worker.instance);
 
     return worker;
   }

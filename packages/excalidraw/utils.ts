@@ -723,6 +723,9 @@ export const isTestEnv = () => import.meta.env.MODE === "test";
 
 export const isDevEnv = () => import.meta.env.MODE === "development";
 
+export const isServerEnv = () =>
+  typeof process !== "undefined" && !!process?.env?.NODE_ENV;
+
 export const wrapEvent = <T extends Event>(name: EVENT, nativeEvent: T) => {
   return new CustomEvent(name, {
     detail: {

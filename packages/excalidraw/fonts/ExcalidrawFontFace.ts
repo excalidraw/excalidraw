@@ -1,8 +1,11 @@
+import { isServerEnv } from "../utils";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
 import { subsetWoff2GlyphsByCodepoints } from "./subset/subset-main";
 
+type DataURL = string;
+
 export interface IExcalidrawFontFace {
-  urls: URL[];
+  urls: URL[] | DataURL[];
   fontFace: FontFace;
   toCSS(
     characters: string,
@@ -11,7 +14,7 @@ export interface IExcalidrawFontFace {
 }
 
 export class ExcalidrawFontFace implements IExcalidrawFontFace {
-  public readonly urls: URL[];
+  public readonly urls: URL[] | DataURL[];
   public readonly fontFace: FontFace;
 
   private static readonly UNPKG_FALLBACK_URL = `https://unpkg.com/${
@@ -23,9 +26,13 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
     this.urls = ExcalidrawFontFace.createUrls(uri);
 
-    const sources = this.urls
-      .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
-      .join(", ");
+    let sources = "";
+    // sources are irrelevant on the server
+    if (!isServerEnv()) {
+      sources = this.urls
+        .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
+        .join(", ");
+    }
 
     this.fontFace = new FontFace(family, sources, {
       display: "swap",
@@ -86,7 +93,9 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
 
         // response not ok, try to continue
         errorMessages.push(
-          `"${url.toString()}" returned status "${response.status}"`,
+          `"${
+            url instanceof URL ? url.toString() : "dataurl"
+          }" returned status "${response.status}"`,
         );
       } catch (e) {
         errorMessages.push(`"${url.toString()}" returned error "${e}"`);
@@ -96,9 +105,7 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
     }
 
     console.error(
-      `Failed to fetch font "${
-        this.fontFace.family
-      }" from urls "${this.urls.toString()}`,
+      `Failed to fetch font family "${this.fontFace.family}"`,
       JSON.stringify(errorMessages, undefined, 2),
     );
 
@@ -110,7 +117,7 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   private getUnicodeRangeRegex() {
     // TODO: consider having actual unicode ranges for all the fonts or even splitting the exiting fonts based on the ranges
     const ranges = this.fontFace.unicodeRange
-      .split(", ")
+      .split(/,\s*/)
       .map((range) => {
         const [start, end] = range.replace("U+", "").split("-");
         if (end) {
@@ -123,13 +130,18 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
     return new RegExp(`[${ranges}]`);
   }
 
-  private static createUrls(uri: string): URL[] {
+  private static createUrls(uri: string): URL[] | DataURL[] {
+    if (uri.startsWith("data")) {
+      // don't create the URL as it's expensive
+      return [uri];
+    }
+
     if (uri.startsWith(LOCAL_FONT_PROTOCOL)) {
       // no url for local fonts
       return [];
     }
 
-    if (uri.startsWith("http") || uri.startsWith("data")) {
+    if (uri.startsWith("http")) {
       // one url for http imports or data url
       return [new URL(uri)];
     }
@@ -157,7 +169,12 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
     return urls;
   }
 
-  private static getFormat(url: URL) {
+  private static getFormat(url: URL | DataURL) {
+    if (!(url instanceof URL)) {
+      // format is irrelevant for data url
+      return "";
+    }
+
     try {
       const parts = new URL(url).pathname.split(".");
 

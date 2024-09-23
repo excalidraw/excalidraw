@@ -59,10 +59,6 @@ Object.defineProperty(document, "fonts", {
   },
 });
 
-Object.defineProperty(window, "Worker", {
-  value: class {},
-});
-
 Object.defineProperty(window, "EXCALIDRAW_ASSET_PATH", {
   value: `file://${__dirname}/`,
 });
