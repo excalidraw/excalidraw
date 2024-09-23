@@ -1,3 +1,13 @@
+@mixin animate($animation,$duration,$method,$times){
+  animation: $animation $duration $method $times;
+}
+
+@mixin keyframes($name){
+  @keyframes #{$name}{
+      @content;
+  }
+}
+
 .excalidraw {
   --color-primary-contrast-offset: #625ee0; // to offset Chubb illusion
 
@@ -16,6 +26,43 @@
     margin-top: auto;
     margin-bottom: auto;
     margin-inline-start: auto;
+  }
+
+  .alert-save {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    bottom: 10vh;
+    margin-inline: auto;
+    width: fit-content;
+
+    opacity: 0;
+    transition: all 0s;
+
+    &.animate {
+      opacity: 1;
+      transition: all 0.2s ease-in;
+    }
+
+    .dialog {
+      margin-inline: 10px;
+      padding: 1rem;
+      padding-inline: 1.25rem;
+
+      resize: none;
+      white-space: pre-wrap;
+      box-sizing: border-box;
+
+      background-color: var(--color-warning);
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--dialog-border-color);
+
+      font-size: 0.875rem;
+      text-align: center;
+      line-height: 1.5;
+      color: var(--color-text-warning);
+    }
   }
 
   .encrypted-icon {

@@ -230,7 +230,8 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
-    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
+    "saveYourContent": "Don't forget to save your content ({{shortcut}})!"
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
