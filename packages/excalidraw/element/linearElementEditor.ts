@@ -39,7 +39,7 @@ import {
 } from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { DRAGGING_THRESHOLD } from "../constants";
+import { DRAGGING_THRESHOLD, LINE_CONFIRM_THRESHOLD } from "../constants";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
@@ -57,12 +57,12 @@ import {
   pointDistance,
   pointSubtract,
   pointFromPair,
+  pathIsALoop,
 } from "../../math";
 import {
   getBezierCurveLength,
   getBezierXY,
   getControlPointsForBezierCurve,
-  isPathALoop,
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
@@ -418,7 +418,12 @@ export class LinearElementEditor {
           selectedPoint === 0 ||
           selectedPoint === element.points.length - 1
         ) {
-          if (isPathALoop(element.points, appState.zoom.value)) {
+          if (
+            pathIsALoop(
+              element.points,
+              LINE_CONFIRM_THRESHOLD / appState.zoom.value,
+            )
+          ) {
             LinearElementEditor.movePoints(
               element,
               [

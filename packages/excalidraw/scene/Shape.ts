@@ -13,7 +13,7 @@ import type {
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
 import { simplify } from "points-on-curve";
-import { ROUGHNESS } from "../constants";
+import { LINE_CONFIRM_THRESHOLD, ROUGHNESS } from "../constants";
 import {
   isElbowArrow,
   isEmbeddableElement,
@@ -24,12 +24,13 @@ import {
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
 import {
+  pathIsALoop,
   point,
   pointDistance,
   type GlobalPoint,
   type LocalPoint,
 } from "../../math";
-import { getCornerRadius, isPathALoop } from "../shapes";
+import { getCornerRadius } from "../shapes";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -107,7 +108,7 @@ export const generateRoughOptions = (
     }
     case "line":
     case "freedraw": {
-      if (isPathALoop(element.points)) {
+      if (pathIsALoop(element.points, LINE_CONFIRM_THRESHOLD)) {
         options.fillStyle = element.fillStyle;
         options.fill =
           element.backgroundColor === "transparent"
@@ -473,7 +474,7 @@ export const _generateElementShape = (
       let shape: ElementShapes[typeof element.type];
       generateFreeDrawShape(element);
 
-      if (isPathALoop(element.points)) {
+      if (pathIsALoop(element.points, LINE_CONFIRM_THRESHOLD)) {
         // generate rough polygon to fill freedraw shape
         const simplifiedPoints = simplify(element.points, 0.75);
         shape = generator.curve(simplifiedPoints as [number, number][], {

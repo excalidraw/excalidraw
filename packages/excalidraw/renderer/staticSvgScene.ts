@@ -2,6 +2,7 @@ import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 import {
   FRAME_STYLE,
+  LINE_CONFIRM_THRESHOLD,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
@@ -36,7 +37,8 @@ import type { AppState, BinaryFiles } from "../types";
 import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 import { getVerticalOffset } from "../fonts";
-import { getCornerRadius, isPathALoop } from "../shapes";
+import { getCornerRadius } from "../shapes";
+import { pathIsALoop } from "../../math";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -341,7 +343,7 @@ const renderElementToSvg = (
         );
         if (
           element.type === "line" &&
-          isPathALoop(element.points) &&
+          pathIsALoop(element.points, LINE_CONFIRM_THRESHOLD) &&
           element.backgroundColor !== "transparent"
         ) {
           node.setAttribute("fill-rule", "evenodd");

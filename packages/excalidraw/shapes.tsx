@@ -1,4 +1,4 @@
-import type { ViewportPoint } from "../math";
+import type { GenericPoint, ViewportPoint } from "../math";
 import {
   isPoint,
   point,
@@ -33,7 +33,6 @@ import {
 import {
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
-  LINE_CONFIRM_THRESHOLD,
   ROUNDNESS,
 } from "./constants";
 import { getElementAbsoluteCoords } from "./element";
@@ -49,7 +48,6 @@ import type {
 } from "./element/types";
 import { KEYS } from "./keys";
 import { ShapeCache } from "./scene/ShapeCache";
-import type { NormalizedZoomValue, Zoom } from "./types";
 import { invariant } from "./utils";
 
 export const SHAPES = [
@@ -222,9 +220,7 @@ export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
   return null;
 };
 
-export const getControlPointsForBezierCurve = <
-  P extends GlobalPoint | LocalPoint,
->(
+export const getControlPointsForBezierCurve = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -266,7 +262,7 @@ export const getControlPointsForBezierCurve = <
   return controlPoints;
 };
 
-export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
+export const getBezierXY = <P extends GenericPoint>(
   p0: P,
   p1: P,
   p2: P,
@@ -283,7 +279,7 @@ export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
   return point(tx, ty);
 };
 
-const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
+const getPointsInBezierCurve = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -313,7 +309,7 @@ const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
   return pointsOnCurve;
 };
 
-const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
+const getBezierCurveArcLengths = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -475,22 +471,4 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   }
 
   return 0;
-};
-
-// Checks if the first and last point are close enough
-// to be considered a loop
-export const isPathALoop = (
-  points: ExcalidrawLinearElement["points"],
-  /** supply if you want the loop detection to account for current zoom */
-  zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
-): boolean => {
-  if (points.length >= 3) {
-    const [first, last] = [points[0], points[points.length - 1]];
-    const distance = pointDistance(first, last);
-
-    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
-    // really close we make the threshold smaller, and vice versa.
-    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
-  }
-  return false;
 };

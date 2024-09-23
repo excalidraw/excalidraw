@@ -15,9 +15,10 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getBoundTextShape, isPathALoop } from "../shapes";
+import { getBoundTextShape } from "../shapes";
 import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
-import { isPointWithinBounds, point } from "../../math";
+import { pathIsALoop, isPointWithinBounds, point } from "../../math";
+import { LINE_CONFIRM_THRESHOLD } from "../constants";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -31,11 +32,17 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
     isTextElement(element);
 
   if (element.type === "line") {
-    return isDraggableFromInside && isPathALoop(element.points);
+    return (
+      isDraggableFromInside &&
+      pathIsALoop(element.points, LINE_CONFIRM_THRESHOLD)
+    );
   }
 
   if (element.type === "freedraw") {
-    return isDraggableFromInside && isPathALoop(element.points);
+    return (
+      isDraggableFromInside &&
+      pathIsALoop(element.points, LINE_CONFIRM_THRESHOLD)
+    );
   }
 
   return isDraggableFromInside || isImageElement(element);

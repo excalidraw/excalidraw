@@ -229,7 +229,6 @@ import {
   getBoundTextShape,
   getCornerRadius,
   getElementShape,
-  isPathALoop,
 } from "../shapes";
 import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
@@ -449,6 +448,7 @@ import type {
   ViewportPoint,
 } from "../../math";
 import {
+  pathIsALoop,
   point,
   pointCenter,
   pointDistance,
@@ -5605,7 +5605,9 @@ class App extends React.Component<AppProps, AppState> {
             ));
         }
 
-        if (isPathALoop(points, this.state.zoom.value)) {
+        if (
+          pathIsALoop(points, LINE_CONFIRM_THRESHOLD / this.state.zoom.value)
+        ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isElbowArrow(multiElement)) {
@@ -7206,7 +7208,10 @@ class App extends React.Component<AppProps, AppState> {
       // finalize if completing a loop
       if (
         multiElement.type === "line" &&
-        isPathALoop(multiElement.points, this.state.zoom.value)
+        pathIsALoop(
+          multiElement.points,
+          LINE_CONFIRM_THRESHOLD / this.state.zoom.value,
+        )
       ) {
         mutateElement(multiElement, {
           lastCommittedPoint:

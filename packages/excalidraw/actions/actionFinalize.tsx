@@ -15,8 +15,7 @@ import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { point } from "../../math";
-import { isPathALoop } from "../shapes";
+import { pathIsALoop, point } from "../../math";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -104,7 +103,7 @@ export const actionFinalize = register({
       // If the multi point line closes the loop,
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
-      const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
+      const isLoop = pathIsALoop(multiPointElement.points, appState.zoom.value);
       if (
         multiPointElement.type === "line" ||
         multiPointElement.type === "freedraw"
