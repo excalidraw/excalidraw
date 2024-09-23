@@ -13,11 +13,7 @@ import type {
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
-import {
-  getCurvePathOps,
-  getElementPointsCoords,
-  getMinMaxXYFromCurvePathOps,
-} from "./bounds";
+import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
 import type {
   AppState,
   InteractiveCanvasAppState,
@@ -66,6 +62,7 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
+import { getCurvePathOps } from "../../utils/geometry/shape";
 
 const editorMidPointsCache: {
   version: number | null;

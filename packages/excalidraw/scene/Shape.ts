@@ -1,7 +1,7 @@
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { RoughGenerator } from "roughjs/bin/generator";
-import { getDiamondPoints, getArrowheadPoints } from "../element";
+import { getArrowheadPoints, getDiamondPoints } from "../element";
 import type { ElementShapes } from "./types";
 import type {
   ExcalidrawElement,

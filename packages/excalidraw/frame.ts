@@ -25,12 +25,22 @@ import type {
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
-import { getElementLineSegments } from "./element/bounds";
-import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
-import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
+import { elementsOverlappingBBox } from "../utils/";
+import {
+  isFrameElement,
+  isFrameLikeElement,
+  isFreeDrawElement,
+  isLinearElement,
+} from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
-import type { GlobalPoint } from "../math";
-import { isPointWithinBounds, point } from "../math";
+import type { GlobalPoint, LineSegment } from "../math";
+import {
+  isPointWithinBounds,
+  lineSegment,
+  point,
+  pointRotateRads,
+  segmentsIntersectAt,
+} from "../math";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -64,6 +74,101 @@ export const bindElementsToFramesAfterDuplication = (
   }
 };
 
+/*
+ * for a given element, `getElementLineSegments` returns line segments
+ * that can be used for visual collision detection (useful for frames)
+ * as opposed to bounding box collision detection
+ */
+const getElementLineSegments = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): LineSegment<GlobalPoint>[] => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+  );
+
+  const center: GlobalPoint = point(cx, cy);
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const segments: LineSegment<GlobalPoint>[] = [];
+
+    let i = 0;
+
+    while (i < element.points.length - 1) {
+      segments.push(
+        lineSegment(
+          pointRotateRads(
+            point(
+              element.points[i][0] + element.x,
+              element.points[i][1] + element.y,
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            point(
+              element.points[i + 1][0] + element.x,
+              element.points[i + 1][1] + element.y,
+            ),
+            center,
+            element.angle,
+          ),
+        ),
+      );
+      i++;
+    }
+
+    return segments;
+  }
+
+  const [nw, ne, sw, se, n, s, w, e] = (
+    [
+      [x1, y1],
+      [x2, y1],
+      [x1, y2],
+      [x2, y2],
+      [cx, y1],
+      [cx, y2],
+      [x1, cy],
+      [x2, cy],
+    ] as GlobalPoint[]
+  ).map((point) => pointRotateRads(point, center, element.angle));
+
+  if (element.type === "diamond") {
+    return [
+      lineSegment(n, w),
+      lineSegment(n, e),
+      lineSegment(s, w),
+      lineSegment(s, e),
+    ];
+  }
+
+  if (element.type === "ellipse") {
+    return [
+      lineSegment(n, w),
+      lineSegment(n, e),
+      lineSegment(s, w),
+      lineSegment(s, e),
+      lineSegment(n, w),
+      lineSegment(n, e),
+      lineSegment(s, w),
+      lineSegment(s, e),
+    ];
+  }
+
+  return [
+    lineSegment(nw, ne),
+    lineSegment(sw, se),
+    lineSegment(nw, sw),
+    lineSegment(ne, se),
+    lineSegment(nw, e),
+    lineSegment(sw, e),
+    lineSegment(ne, w),
+    lineSegment(se, w),
+  ];
+};
+
 export function isElementIntersectingFrame(
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
@@ -75,7 +180,7 @@ export function isElementIntersectingFrame(
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>
-      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+      segmentsIntersectAt(frameLineSegment, elementLineSegment),
     ),
   );
 
