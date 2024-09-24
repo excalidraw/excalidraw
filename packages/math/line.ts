@@ -1,5 +1,5 @@
 import { pointCenter, pointRotateRads } from "./point";
-import type { GlobalPoint, Line, LocalPoint, Radians } from "./types";
+import type { GenericPoint, Line, Radians } from "./types";
 
 /**
  * Create a line from two points.
@@ -7,7 +7,7 @@ import type { GlobalPoint, Line, LocalPoint, Radians } from "./types";
  * @param points The two points lying on the line
  * @returns The line on which the points lie
  */
-export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
+export function line<P extends GenericPoint>(a: P, b: P): Line<P> {
   return [a, b] as Line<P>;
 }
 
@@ -17,7 +17,7 @@ export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
  * @param param0 The array with the two points to convert to a line
  * @returns The created line
  */
-export function lineFromPointPair<P extends GlobalPoint | LocalPoint>([a, b]: [
+export function lineFromPointPair<P extends GenericPoint>([a, b]: [
   P,
   P,
 ]): Line<P> {
@@ -30,7 +30,7 @@ export function lineFromPointPair<P extends GlobalPoint | LocalPoint>([a, b]: [
  * @param pointArray
  * @returns
  */
-export function lineFromPointArray<P extends GlobalPoint | LocalPoint>(
+export function lineFromPointArray<P extends GenericPoint>(
   pointArray: P[],
 ): Line<P> | undefined {
   return pointArray.length === 2
@@ -40,7 +40,7 @@ export function lineFromPointArray<P extends GlobalPoint | LocalPoint>(
 
 // return the coordinates resulting from rotating the given line about an origin by an angle in degrees
 // note that when the origin is not given, the midpoint of the given line is used as the origin
-export const lineRotate = <Point extends LocalPoint | GlobalPoint>(
+export const lineRotate = <Point extends GenericPoint>(
   l: Line<Point>,
   angle: Radians,
   origin?: Point,

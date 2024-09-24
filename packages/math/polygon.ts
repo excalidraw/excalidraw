@@ -1,23 +1,17 @@
 import { pointsEqual } from "./point";
 import { lineSegment, pointOnLineSegment } from "./segment";
-import type { GlobalPoint, LocalPoint, Polygon, ViewportPoint } from "./types";
+import type { GenericPoint, Polygon } from "./types";
 import { PRECISION } from "./utils";
 
-export function polygon<Point extends GlobalPoint | LocalPoint>(
-  ...points: Point[]
-) {
+export function polygon<Point extends GenericPoint>(...points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export function polygonFromPoints<
-  Point extends GlobalPoint | LocalPoint | ViewportPoint,
->(points: Point[]) {
+export function polygonFromPoints<Point extends GenericPoint>(points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export const polygonIncludesPoint = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const polygonIncludesPoint = <Point extends GenericPoint>(
   point: Point,
   polygon: Polygon<Point>,
 ) => {
@@ -42,9 +36,7 @@ export const polygonIncludesPoint = <
   return inside;
 };
 
-export const pointOnPolygon = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const pointOnPolygon = <Point extends GenericPoint>(
   p: Point,
   poly: Polygon<Point>,
   threshold = PRECISION,
@@ -61,16 +53,12 @@ export const pointOnPolygon = <
   return on;
 };
 
-function polygonClose<Point extends LocalPoint | GlobalPoint | ViewportPoint>(
-  polygon: Point[],
-) {
+function polygonClose<Point extends GenericPoint>(polygon: Point[]) {
   return polygonIsClosed(polygon)
     ? polygon
     : ([...polygon, polygon[0]] as Polygon<Point>);
 }
 
-function polygonIsClosed<
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(polygon: Point[]) {
+function polygonIsClosed<Point extends GenericPoint>(polygon: Point[]) {
   return pointsEqual(polygon[0], polygon[polygon.length - 1]);
 }

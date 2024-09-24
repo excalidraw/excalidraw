@@ -58,7 +58,7 @@ export type GenericPoint = GlobalPoint | LocalPoint | ViewportPoint;
 /**
  * A line is an infinitely long object with no width, depth, or curvature.
  */
-export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
+export type Line<P extends GenericPoint> = [p: P, q: P] & {
   _brand: "excalimath_line";
 };
 
@@ -67,10 +67,7 @@ export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
  * line that is bounded by two distinct end points, and
  * contains every point on the line that is between its endpoints.
  */
-export type LineSegment<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
-  a: P,
-  b: P,
-] & {
+export type LineSegment<P extends GenericPoint> = [a: P, b: P] & {
   _brand: "excalimath_linesegment";
 };
 

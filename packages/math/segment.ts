@@ -4,13 +4,7 @@ import {
   pointFromVector,
   pointRotateRads,
 } from "./point";
-import type {
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Radians,
-  ViewportPoint,
-} from "./types";
+import type { GenericPoint, LineSegment, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
   vectorAdd,
@@ -26,14 +20,14 @@ import {
  * @param points The two points delimiting the line segment on each end
  * @returns The line segment delineated by the points
  */
-export function lineSegment<P extends GlobalPoint | LocalPoint | ViewportPoint>(
+export function lineSegment<P extends GenericPoint>(
   a: P,
   b: P,
 ): LineSegment<P> {
   return [a, b] as LineSegment<P>;
 }
 
-export function lineSegmentFromPointArray<P extends GlobalPoint | LocalPoint>(
+export function lineSegmentFromPointArray<P extends GenericPoint>(
   pointArray: P[],
 ): LineSegment<P> | undefined {
   return pointArray.length === 2
@@ -46,7 +40,7 @@ export function lineSegmentFromPointArray<P extends GlobalPoint | LocalPoint>(
  * @param segment
  * @returns
  */
-export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
+export const isLineSegment = <Point extends GenericPoint>(
   segment: unknown,
 ): segment is LineSegment<Point> =>
   Array.isArray(segment) &&
@@ -63,9 +57,7 @@ export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
  * @param origin
  * @returns
  */
-export const lineSegmentRotate = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const lineSegmentRotate = <Point extends GenericPoint>(
   l: LineSegment<Point>,
   angle: Radians,
   origin?: Point,
@@ -80,9 +72,7 @@ export const lineSegmentRotate = <
  * Calculates the point two line segments with a definite start and end point
  * intersect at.
  */
-export const segmentsIntersectAt = <
-  Point extends GlobalPoint | LocalPoint | ViewportPoint,
->(
+export const segmentsIntersectAt = <Point extends GenericPoint>(
   a: Readonly<LineSegment<Point>>,
   b: Readonly<LineSegment<Point>>,
 ): Point | null => {
@@ -115,9 +105,7 @@ export const segmentsIntersectAt = <
   return null;
 };
 
-export const pointOnLineSegment = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const pointOnLineSegment = <Point extends GenericPoint>(
   point: Point,
   line: LineSegment<Point>,
   threshold = PRECISION,
@@ -131,9 +119,7 @@ export const pointOnLineSegment = <
   return distance < threshold;
 };
 
-export const distanceToLineSegment = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const distanceToLineSegment = <Point extends GenericPoint>(
   point: Point,
   line: LineSegment<Point>,
 ) => {
