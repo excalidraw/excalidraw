@@ -450,9 +450,8 @@ export const parseTokens = (text: string) => {
   // ['non-', 'profit org'] =>,'non- proft org' => ['non-','profit','org']
   const words = segments.join(" ").split(" ");
 
-  // TODO_CHINESE: naive wrapping, might not cover all the possible cases, add test cases & check with native speaker
   let tokens = words;
-  // quick check for the whole text
+  // CJK / Emoji "naive" wrapping
   if (containsCJK(text) || containsEmoji(text)) {
     tokens = words.flatMap((word) => {
       // quick check for the word

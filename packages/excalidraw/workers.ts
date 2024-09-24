@@ -1,8 +1,6 @@
 import { WorkerInTheMainChunkError, WorkerUrlNotDefinedError } from "./errors";
 import { debounce } from "./utils";
 
-// TODO_CHINESE: consider at least unit testing the worker pool
-
 type InitializeWorker = (worker: Worker) => void;
 
 class IdleWorker {

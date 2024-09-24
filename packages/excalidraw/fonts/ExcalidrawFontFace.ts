@@ -1,4 +1,4 @@
-import { isServerEnv } from "../utils";
+import { isServerEnv, promiseTry } from "../utils";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
 import { subsetWoff2GlyphsByCodepoints } from "./subset/subset-main";
 
@@ -75,28 +75,13 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
       const url = this.urls[i];
 
       try {
-        const response = await fetch(url, {
-          headers: {
-            Accept: "font/woff2",
-          },
-        });
-
-        if (response.ok) {
-          const arrayBuffer = await response.arrayBuffer();
-          const base64 = await subsetWoff2GlyphsByCodepoints(
-            arrayBuffer,
-            codePoints,
-          );
-
-          return base64;
-        }
-
-        // response not ok, try to continue
-        errorMessages.push(
-          `"${
-            url instanceof URL ? url.toString() : "dataurl"
-          }" returned status "${response.status}"`,
+        const arrayBuffer = await this.fetchFont(url);
+        const base64 = await subsetWoff2GlyphsByCodepoints(
+          arrayBuffer,
+          codePoints,
         );
+
+        return base64;
       } catch (e) {
         errorMessages.push(`"${url.toString()}" returned error "${e}"`);
       }
@@ -112,6 +97,26 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
     // in case of issues, at least return the last url as a content
     // defaults to unpkg for bundled fonts (so that we don't have to host them forever) and http url for others
     return this.urls.length ? this.urls[this.urls.length - 1].toString() : "";
+  }
+
+  public fetchFont(url: URL | DataURL): Promise<ArrayBuffer> {
+    return promiseTry(async () => {
+      const response = await fetch(url, {
+        headers: {
+          Accept: "font/woff2",
+        },
+      });
+
+      if (!response.ok) {
+        const urlString = url instanceof URL ? url.toString() : "dataurl";
+        throw new Error(
+          `Failed to fetch "${urlString}": ${response.statusText}`,
+        );
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      return arrayBuffer;
+    });
   }
 
   private getUnicodeRangeRegex() {

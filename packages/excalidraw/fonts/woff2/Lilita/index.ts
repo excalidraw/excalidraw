@@ -4,7 +4,6 @@ import LilitaLatinExt from "https://fonts.gstatic.com/s/lilitaone/v15/i7dPIFZ9Zz
 import { GOOGLE_FONTS_RANGES } from "../../metadata";
 import { type ExcalidrawFontFaceDescriptor } from "../..";
 
-// TODO_CHINESE: replace https with the local font files
 export const LilitaFontFaces: ExcalidrawFontFaceDescriptor[] = [
   {
     uri: LilitaLatinExt,

@@ -64,7 +64,6 @@ export const subsetWoff2GlyphsByCodepoints = async (
       }
 
       // fallback to the main thread
-      // TODO_CHINESE: consider adding test cases for the fallback (and also in case the fallback fails as well)
       return subsetToBase64(arrayBuffer, codePoints);
     }
   });

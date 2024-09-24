@@ -581,7 +581,6 @@ const renderElementToSvg = (
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
-          // TODO_CHINESE: double-check that we can use "alphabetic" for the current Chinese font or any CJK in the future
           text.setAttribute("dominant-baseline", "alphabetic");
           node.appendChild(text);
         }

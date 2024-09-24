@@ -74,13 +74,14 @@ vi.mock(
     return {
       ...mod,
       ExcalidrawFontFace: class extends ExcalidrawFontFaceImpl {
-        public async getContent(): Promise<string> {
-          const url = this.urls[0];
+        public async fetchFont(url: URL): Promise<ArrayBuffer> {
+          if (!url.toString().startsWith("file://")) {
+            return super.fetchFont(url);
+          }
 
-          // TODO_CHINESE: mock only the fetch, so that these tests could execute the subsetting
           // read local assets directly, without running a server
           const content = await fs.promises.readFile(url);
-          return `data:font/woff2;base64,${content.toString("base64")}`;
+          return content.buffer;
         }
       },
     };
