@@ -68,7 +68,6 @@
     "css-loader": "6.7.1",
     "file-loader": "6.2.0",
     "fonteditor-core": "2.4.0",
-    "node-fetch": "3.3.2",
     "sass-loader": "13.0.2",
     "ts-loader": "9.3.1",
     "typescript": "4.9.4",

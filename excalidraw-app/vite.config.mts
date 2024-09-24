@@ -48,6 +48,8 @@ export default defineConfig({
       },
     },
     sourcemap: true,
+    // don't auto-inline small assets (i.e. fonts hosted on CDN)
+    assetsInlineLimit: 0,
   },
   plugins: [
     woff2BrowserPlugin(),
