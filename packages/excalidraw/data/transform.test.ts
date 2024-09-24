@@ -309,28 +309,32 @@ describe("Test Transform", () => {
   });
 
   describe("Test Frames", () => {
+    const elements: ExcalidrawElementSkeleton[] = [
+      {
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        strokeWidth: 2,
+        id: "1",
+      },
+      {
+        type: "diamond",
+        x: 120,
+        y: 20,
+        backgroundColor: "#fff3bf",
+        strokeWidth: 2,
+        label: {
+          text: "HELLO EXCALIDRAW",
+          strokeColor: "#099268",
+          fontSize: 30,
+        },
+        id: "2",
+      },
+    ];
+
     it("should transform frames and update frame ids when regenerated", () => {
       const elementsSkeleton: ExcalidrawElementSkeleton[] = [
-        {
-          type: "rectangle",
-          x: 10,
-          y: 10,
-          strokeWidth: 2,
-          id: "1",
-        },
-        {
-          type: "diamond",
-          x: 120,
-          y: 20,
-          backgroundColor: "#fff3bf",
-          strokeWidth: 2,
-          label: {
-            text: "HELLO EXCALIDRAW",
-            strokeColor: "#099268",
-            fontSize: 30,
-          },
-          id: "2",
-        },
+        ...elements,
         {
           type: "frame",
           children: ["1", "2"],
@@ -352,28 +356,9 @@ describe("Test Transform", () => {
       });
     });
 
-    it("should consider max of calculated and frame dimensions when provided", () => {
+    it("should consider user defined frame dimensions over calculated when provided", () => {
       const elementsSkeleton: ExcalidrawElementSkeleton[] = [
-        {
-          type: "rectangle",
-          x: 10,
-          y: 10,
-          strokeWidth: 2,
-          id: "1",
-        },
-        {
-          type: "diamond",
-          x: 120,
-          y: 20,
-          backgroundColor: "#fff3bf",
-          strokeWidth: 2,
-          label: {
-            text: "HELLO EXCALIDRAW",
-            strokeColor: "#099268",
-            fontSize: 30,
-          },
-          id: "2",
-        },
+        ...elements,
         {
           type: "frame",
           children: ["1", "2"],
@@ -388,7 +373,27 @@ describe("Test Transform", () => {
       );
       const frame = excalidrawElements.find((ele) => ele.type === "frame")!;
       expect(frame.width).toBe(800);
-      expect(frame.height).toBe(126);
+      expect(frame.height).toBe(100);
+    });
+
+    it("should consider user defined frame coordinates calculated when provided", () => {
+      const elementsSkeleton: ExcalidrawElementSkeleton[] = [
+        ...elements,
+        {
+          type: "frame",
+          children: ["1", "2"],
+          name: "My frame",
+          x: 100,
+          y: 300,
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elementsSkeleton,
+        opts,
+      );
+      const frame = excalidrawElements.find((ele) => ele.type === "frame")!;
+      expect(frame.x).toBe(100);
+      expect(frame.y).toBe(300);
     });
   });
 
