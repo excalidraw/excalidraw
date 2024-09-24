@@ -143,3 +143,13 @@ export type Extent = {
 } & {
   _brand: "excalimath_extent";
 };
+
+// an ellipse is specified by its center, angle, and its major and minor axes
+// but for the sake of simplicity, we've used halfWidth and halfHeight instead
+// in replace of semi major and semi minor axes
+export type Ellipse<Point extends GenericPoint> = {
+  center: Point;
+  angle: Radians;
+  halfWidth: number;
+  halfHeight: number;
+};

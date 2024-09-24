@@ -1,5 +1,5 @@
 import type { Radians } from "../math";
-import { point } from "../math";
+import { point, radians } from "../math";
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
@@ -205,7 +205,7 @@ const chartXLabels = (
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
-        angle: 5.87 as Radians,
+        angle: radians(5.87),
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",

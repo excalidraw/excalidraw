@@ -73,6 +73,7 @@ import {
   pointFromPair,
   pointDistanceSq,
   clamp,
+  radians,
 } from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
 
@@ -845,7 +846,7 @@ export const avoidRectangularCorner = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
-  const nonRotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
+  const nonRotatedPoint = pointRotateRads(p, center, radians(-element.angle));
 
   if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
     // Top left

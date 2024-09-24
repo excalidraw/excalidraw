@@ -55,8 +55,8 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import type { LocalPoint, Radians } from "../../math";
-import { pointExtent, isFiniteNumber, point } from "../../math";
+import type { LocalPoint } from "../../math";
+import { pointExtent, isFiniteNumber, point, radians } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -153,7 +153,7 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
-    angle: element.angle || (0 as Radians),
+    angle: element.angle || radians(0),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,

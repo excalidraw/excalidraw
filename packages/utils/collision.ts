@@ -1,9 +1,5 @@
 import type { Polycurve, Polyline } from "./geometry/shape";
-import {
-  pointInEllipse,
-  pointOnEllipse,
-  type GeometricShape,
-} from "./geometry/shape";
+import { type GeometricShape } from "./geometry/shape";
 import type { Curve, ViewportPoint } from "../math";
 import {
   lineSegment,
@@ -15,6 +11,8 @@ import {
   type GlobalPoint,
   type LocalPoint,
   type Polygon,
+  pointOnEllipse,
+  pointInEllipse,
 } from "../math";
 
 // check if the given point is considered on the given shape's border
