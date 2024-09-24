@@ -17,7 +17,6 @@ import {
   getElementAbsoluteCoords,
   getCommonBounds,
   getResizedElementAbsoluteCoords,
-  getCommonBoundingBox,
 } from "./bounds";
 import {
   isArrowElement,
@@ -808,9 +807,11 @@ export const resizeMultipleElements = (
     return [...acc, { ...text, ...xy }];
   }, [] as ExcalidrawTextElementWithContainer[]);
 
-  const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
+  const [minX, minY, maxX, maxY] = getCommonBounds(
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
+  const midX = (minX + maxX) / 2;
+  const midY = (minY + maxY) / 2;
   const width = maxX - minX;
   const height = maxY - minY;
 

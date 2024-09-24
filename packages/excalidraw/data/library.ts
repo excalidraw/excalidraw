@@ -11,7 +11,6 @@ import type App from "../components/App";
 import { atom } from "jotai";
 import { jotaiStore } from "../jotai";
 import type { ExcalidrawElement } from "../element/types";
-import { getCommonBoundingBox } from "../element/bounds";
 import { AbortError } from "../errors";
 import { t } from "../i18n";
 import { useEffect, useRef } from "react";
@@ -34,7 +33,7 @@ import {
 import type { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 import { Queue } from "../queue";
-import { hashElementsVersion, hashString } from "../element";
+import { getCommonBounds, hashElementsVersion, hashString } from "../element";
 
 type LibraryUpdate = {
   /** deleted library items since last onLibraryChange event */
@@ -387,7 +386,8 @@ export const distributeLibraryItemsOnSquareGrid = (
     const maxHeight = libraryItems
       .slice(row * ITEMS_PER_ROW, row * ITEMS_PER_ROW + ITEMS_PER_ROW)
       .reduce((acc, item) => {
-        const { height } = getCommonBoundingBox(item.elements);
+        const bounds = getCommonBounds(item.elements);
+        const height = bounds[3] - bounds[1];
         return Math.max(acc, height);
       }, 0);
     return maxHeight;
@@ -402,7 +402,9 @@ export const distributeLibraryItemsOnSquareGrid = (
         currCol = 0;
       }
       if (currCol === targetCol) {
-        const { width } = getCommonBoundingBox(item.elements);
+        const bounds = getCommonBounds(item.elements);
+        const width = bounds[2] - bounds[0];
+
         maxWidth = Math.max(maxWidth, width);
       }
       index++;
@@ -434,7 +436,10 @@ export const distributeLibraryItemsOnSquareGrid = (
     }
     maxWidthCurrCol = getMaxWidthPerCol(col);
 
-    const { minX, minY, width, height } = getCommonBoundingBox(item.elements);
+    const bounds = getCommonBounds(item.elements);
+    const [minX, minY, maxX, maxY] = bounds;
+    const width = maxX - minX;
+    const height = maxY - minY;
     const offsetCenterX = (maxWidthCurrCol - width) / 2;
     const offsetCenterY = (maxHeightCurrRow - height) / 2;
     resElements.push(

@@ -3,7 +3,7 @@ import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
 import { act, queryByTestId } from "@testing-library/react";
 
-import { Excalidraw } from "../index";
+import { Excalidraw, getCommonBounds } from "../index";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
 import type { LibraryItem, LibraryItems } from "../types";
@@ -11,7 +11,6 @@ import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import type { ExcalidrawGenericElement } from "../element/types";
-import { getCommonBoundingBox } from "../element/bounds";
 import { parseLibraryJSON } from "../data/blob";
 
 const { h } = window;
@@ -294,6 +293,7 @@ describe("distributeLibraryItemsOnSquareGrid()", () => {
     expect(distributed.length).toEqual(
       libraryItems.map((x) => x.elements).flat().length,
     );
+    const el4_el5_bounds = getCommonBounds([el4, el5]);
     expect(distributed).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -306,7 +306,7 @@ describe("distributeLibraryItemsOnSquareGrid()", () => {
           x:
             el1.width +
             PADDING +
-            (getCommonBoundingBox([el4, el5]).width - el2.width) / 2,
+            (el4_el5_bounds[2] - el4_el5_bounds[0] - el2.width) / 2,
           y: Math.abs(el1.height - el2.height) / 2,
         }),
         expect.objectContaining({

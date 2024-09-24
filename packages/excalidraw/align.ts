@@ -1,7 +1,6 @@
 import type { ElementsMap, ExcalidrawElement } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
-import type { BoundingBox } from "./element/bounds";
-import { getCommonBoundingBox } from "./element/bounds";
+import { getCommonBounds, type Bounds } from "./element/bounds";
 import { getMaximumGroups } from "./groups";
 
 export interface Alignment {
@@ -18,14 +17,10 @@ export const alignElements = (
     selectedElements,
     elementsMap,
   );
-  const selectionBoundingBox = getCommonBoundingBox(selectedElements);
+  const selectionBounds = getCommonBounds(selectedElements);
 
   return groups.flatMap((group) => {
-    const translation = calculateTranslation(
-      group,
-      selectionBoundingBox,
-      alignment,
-    );
+    const translation = calculateTranslation(group, selectionBounds, alignment);
     return group.map((element) =>
       newElementWith(element, {
         x: element.x + translation.x,
@@ -37,10 +32,30 @@ export const alignElements = (
 
 const calculateTranslation = (
   group: ExcalidrawElement[],
-  selectionBoundingBox: BoundingBox,
+  selectionBounds: Bounds,
   { axis, position }: Alignment,
 ): { x: number; y: number } => {
-  const groupBoundingBox = getCommonBoundingBox(group);
+  const selectionBoundingBox = {
+    minX: selectionBounds[0],
+    minY: selectionBounds[1],
+    maxX: selectionBounds[2],
+    maxY: selectionBounds[3],
+    midX: (selectionBounds[0] + selectionBounds[2]) / 2,
+    midY: (selectionBounds[1] + selectionBounds[3]) / 2,
+    width: selectionBounds[2] - selectionBounds[0],
+    height: selectionBounds[3] - selectionBounds[1],
+  };
+  const groupBounds = getCommonBounds(group);
+  const groupBoundingBox = {
+    minX: groupBounds[0],
+    minY: groupBounds[1],
+    maxX: groupBounds[2],
+    maxY: groupBounds[3],
+    midX: (groupBounds[0] + groupBounds[2]) / 2,
+    midY: (groupBounds[1] + groupBounds[3]) / 2,
+    width: groupBounds[2] - groupBounds[0],
+    height: groupBounds[3] - groupBounds[1],
+  };
 
   const [min, max]: ["minX" | "minY", "maxX" | "maxY"] =
     axis === "x" ? ["minX", "maxX"] : ["minY", "maxY"];

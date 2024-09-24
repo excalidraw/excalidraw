@@ -1,6 +1,6 @@
 import type { LineSegment } from "../math";
 import { isLineSegment, lineSegment, point, type GlobalPoint } from "../math";
-import type { BoundingBox, Bounds } from "./element/bounds";
+import type { Bounds } from "./element/bounds";
 import { isBounds } from "./element/typeChecks";
 
 // The global data holder to collect the debug operations
@@ -69,41 +69,6 @@ export const debugDrawPoint = (
       color: opts?.color ?? "cyan",
       permanent: opts?.permanent,
     },
-  );
-};
-
-export const debugDrawBoundingBox = (
-  box: BoundingBox | BoundingBox[],
-  opts?: {
-    color?: string;
-    permanent?: boolean;
-  },
-) => {
-  (Array.isArray(box) ? box : [box]).forEach((bbox) =>
-    debugDrawLine(
-      [
-        lineSegment(
-          point<GlobalPoint>(bbox.minX, bbox.minY),
-          point<GlobalPoint>(bbox.maxX, bbox.minY),
-        ),
-        lineSegment(
-          point<GlobalPoint>(bbox.maxX, bbox.minY),
-          point<GlobalPoint>(bbox.maxX, bbox.maxY),
-        ),
-        lineSegment(
-          point<GlobalPoint>(bbox.maxX, bbox.maxY),
-          point<GlobalPoint>(bbox.minX, bbox.maxY),
-        ),
-        lineSegment(
-          point<GlobalPoint>(bbox.minX, bbox.maxY),
-          point<GlobalPoint>(bbox.minX, bbox.minY),
-        ),
-      ],
-      {
-        color: opts?.color ?? "cyan",
-        permanent: opts?.permanent,
-      },
-    ),
   );
 };
 
