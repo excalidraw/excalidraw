@@ -7604,6 +7604,11 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ) {
     return withBatchedUpdatesThrottled((event: PointerEvent) => {
+      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+      const lastPointerCoords =
+        this.lastPointerMoveCoords ?? pointerDownState.origin;
+      this.lastPointerMoveCoords = pointerCoords;
+
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -7625,8 +7630,6 @@ class App extends React.Component<AppProps, AppState> {
       if (this.handlePointerMoveOverScrollbars(event, pointerDownState)) {
         return;
       }
-
-      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
       if (isEraserActive(this.state)) {
         this.handleEraser(event, pointerDownState, pointerCoords);
@@ -7852,53 +7855,55 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0].crop !== null
           ) {
             const crop = selectedElements[0].crop;
-            const image = selectedElements[0];
+            const image =
+              isInitializedImageElement(selectedElements[0]) &&
+              this.imageCache.get(selectedElements[0].fileId)?.image;
 
-            const lastPointerCoords =
-              this.lastPointerMoveCoords ?? pointerDownState.origin;
+            if (image && !(image instanceof Promise)) {
+              const instantDragOffset = {
+                x: pointerCoords.x - lastPointerCoords.x,
+                y: pointerCoords.y - lastPointerCoords.y,
+              };
 
-            const instantDragOffset = {
-              x: pointerCoords.x - lastPointerCoords.x,
-              y: pointerCoords.y - lastPointerCoords.y,
-            };
+              // current offset is based on the element's width and height
+              const uncroppedWidth =
+                selectedElements[0].initialWidth *
+                selectedElements[0].resizeFactors[0];
+              const uncroppedHeight =
+                selectedElements[0].initialHeight *
+                selectedElements[0].resizeFactors[1];
 
-            // current offset is based on the element's width and height
-            const uncroppedWidth = image.widthAtCreation * image.resizedFactorX;
-            const uncroppedHeight =
-              image.heightAtCreation * image.resizedFactorY;
+              const SENSITIVITY_FACTOR = 3;
 
-            const SENSITIVITY_FACTOR = 3;
+              const adjustedOffset = {
+                x:
+                  instantDragOffset.x *
+                  (uncroppedWidth / image.naturalWidth) *
+                  SENSITIVITY_FACTOR,
+                y:
+                  instantDragOffset.y *
+                  (uncroppedHeight / image.naturalHeight) *
+                  SENSITIVITY_FACTOR,
+              };
 
-            const adjustedOffset = {
-              x:
-                instantDragOffset.x *
-                (uncroppedWidth / image.naturalWidth) *
-                SENSITIVITY_FACTOR,
-              y:
-                instantDragOffset.y *
-                (uncroppedHeight / image.naturalHeight) *
-                SENSITIVITY_FACTOR,
-            };
+              const nextCrop = {
+                ...crop,
+                x: clamp(
+                  crop.x - adjustedOffset.x,
+                  0,
+                  image.naturalWidth - crop.width,
+                ),
+                y: clamp(
+                  crop.y - adjustedOffset.y,
+                  0,
+                  image.naturalHeight - crop.height,
+                ),
+              };
 
-            const nextCrop = {
-              ...crop,
-              x: clamp(
-                crop.x - adjustedOffset.x,
-                0,
-                image.naturalWidth - crop.width,
-              ),
-              y: clamp(
-                crop.y - adjustedOffset.y,
-                0,
-                image.naturalHeight - crop.height,
-              ),
-            };
-
-            mutateElement(image, {
-              crop: nextCrop,
-            });
-
-            this.lastPointerMoveCoords = pointerCoords;
+              mutateElement(selectedElements[0], {
+                crop: nextCrop,
+              });
+            }
 
             return;
           }
@@ -8037,7 +8042,6 @@ class App extends React.Component<AppProps, AppState> {
             this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
 
-          this.lastPointerMoveCoords = pointerCoords;
           return;
         }
       }
@@ -9478,12 +9482,14 @@ class App extends React.Component<AppProps, AppState> {
         y,
         width,
         height,
-        widthAtCreation: width,
-        heightAtCreation: height,
-        naturalWidth: image.naturalWidth,
-        naturalHeight: image.naturalHeight,
-        resizedFactorX: 1,
-        resizedFactorY: 1,
+        initialWidth: width,
+        initialHeight: height,
+        crop: {
+          x: 0,
+          y: 0,
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        },
       });
     }
   };
@@ -10053,6 +10059,7 @@ class App extends React.Component<AppProps, AppState> {
       cropElement(
         elementToCrop,
         this.scene.getNonDeletedElementsMap(),
+        this.imageCache,
         transformHandleType,
         x,
         y,

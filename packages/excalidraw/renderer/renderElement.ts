@@ -446,8 +446,8 @@ const drawElementOnCanvas = (
           : {
               x: 0,
               y: 0,
-              width: element.naturalWidth,
-              height: element.naturalHeight,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
             };
 
         context.drawImage(
@@ -950,7 +950,11 @@ export const renderElement = (
           context.globalAlpha = 0.1;
 
           const uncroppedElementCanvas = generateElementCanvas(
-            getUncroppedImageElement(elementWithCanvas.element, elementsMap),
+            getUncroppedImageElement(
+              elementWithCanvas.element,
+              elementsMap,
+              renderConfig.imageCache,
+            ),
             allElementsMap,
             appState.zoom,
             renderConfig,

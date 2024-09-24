@@ -782,8 +782,10 @@ const updateInternalScale = (
   scaleY = Math.abs(scaleY);
 
   mutateElement(element, {
-    resizedFactorX: element.resizedFactorX * scaleX,
-    resizedFactorY: element.resizedFactorY * scaleY,
+    resizeFactors: [
+      element.resizeFactors[0] * scaleX,
+      element.resizeFactors[1] * scaleY,
+    ],
   });
 };
 

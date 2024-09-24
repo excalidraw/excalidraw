@@ -489,13 +489,10 @@ export const newImageElement = (
     status: opts.status ?? "pending",
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
-    widthAtCreation: 0,
-    heightAtCreation: 0,
-    naturalWidth: 0,
-    naturalHeight: 0,
+    initialWidth: opts.width ?? 0,
+    initialHeight: opts.height ?? 0,
+    resizeFactors: [1, 1],
     crop: opts.crop ?? null,
-    resizedFactorX: 1,
-    resizedFactorY: 1,
   };
 };
 

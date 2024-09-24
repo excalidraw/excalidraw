@@ -255,13 +255,9 @@ const restoreElement = (
         fileId: element.fileId,
         scale: element.scale || [1, 1],
         crop: element.crop ?? null,
-        // TODO: restore properly
-        widthAtCreation: element.widthAtCreation,
-        heightAtCreation: element.heightAtCreation,
-        naturalWidth: element.naturalWidth,
-        naturalHeight: element.naturalHeight,
-        resizedFactorX: element.resizedFactorX,
-        resizedFactorY: element.resizedFactorY,
+        initialWidth: element.initialWidth ?? element.width,
+        initialHeight: element.initialHeight ?? element.height,
+        resizeFactors: element.resizeFactors ?? [1, 1],
       });
     case "line":
     // @ts-ignore LEGACY type

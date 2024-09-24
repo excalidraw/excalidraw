@@ -26,19 +26,22 @@ import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
+import { AppClassProperties } from "../types";
+import { isInitializedImageElement } from "./typeChecks";
 
-// i split out these 'internal' functions so that this functionality can be easily unit tested
-const cropElementInternal = (
+const _cropElement = (
   element: ExcalidrawImageElement,
   transformHandle: TransformHandleType,
+  naturalWidth: number,
+  naturalHeight: number,
   pointerX: number,
   pointerY: number,
 ) => {
-  const uncroppedWidth = element.widthAtCreation * element.resizedFactorX;
-  const uncroppedHeight = element.heightAtCreation * element.resizedFactorY;
+  const uncroppedWidth = element.initialWidth * element.resizeFactors[0];
+  const uncroppedHeight = element.initialHeight * element.resizeFactors[1];
 
-  const naturalWidthToUncropped = element.naturalWidth / uncroppedWidth;
-  const naturalHeightToUncropped = element.naturalHeight / uncroppedHeight;
+  const naturalWidthToUncropped = naturalWidth / uncroppedWidth;
+  const naturalHeightToUncropped = naturalHeight / uncroppedHeight;
 
   const croppedLeft = (element.crop?.x ?? 0) / naturalWidthToUncropped;
   const croppedTop = (element.crop?.y ?? 0) / naturalHeightToUncropped;
@@ -71,8 +74,8 @@ const cropElementInternal = (
   const crop = element.crop ?? {
     x: 0,
     y: 0,
-    width: element.naturalWidth,
-    height: element.naturalHeight,
+    width: naturalWidth,
+    height: naturalHeight,
   };
 
   if (transformHandle.includes("n")) {
@@ -84,9 +87,8 @@ const cropElementInternal = (
     const pointerDeltaY = pointerY - element.y;
     nextHeight = element.height - pointerDeltaY;
 
-    crop.y =
-      ((pointerDeltaY + croppedTop) / uncroppedHeight) * element.naturalHeight;
-    crop.height = (nextHeight / uncroppedHeight) * element.naturalHeight;
+    crop.y = ((pointerDeltaY + croppedTop) / uncroppedHeight) * naturalHeight;
+    crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
   }
 
   if (transformHandle.includes("s")) {
@@ -96,7 +98,7 @@ const cropElementInternal = (
     pointerY = clamp(pointerY, northBound, southBound);
 
     nextHeight = pointerY - element.y;
-    crop.height = (nextHeight / uncroppedHeight) * element.naturalHeight;
+    crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
   }
 
   if (transformHandle.includes("w")) {
@@ -108,9 +110,8 @@ const cropElementInternal = (
     const pointerDeltaX = pointerX - element.x;
     nextWidth = element.width - pointerDeltaX;
 
-    crop.x =
-      ((pointerDeltaX + croppedLeft) / uncroppedWidth) * element.naturalWidth;
-    crop.width = (nextWidth / uncroppedWidth) * element.naturalWidth;
+    crop.x = ((pointerDeltaX + croppedLeft) / uncroppedWidth) * naturalWidth;
+    crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
   }
 
   if (transformHandle.includes("e")) {
@@ -120,7 +121,7 @@ const cropElementInternal = (
     pointerX = clamp(pointerX, westBound, eastBound);
 
     nextWidth = pointerX - element.x;
-    crop.width = (nextWidth / uncroppedWidth) * element.naturalWidth;
+    crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
   }
 
   const newOrigin = recomputeOrigin(
@@ -142,22 +143,30 @@ const cropElementInternal = (
 export const cropElement = (
   element: ExcalidrawImageElement,
   elementsMap: NonDeletedSceneElementsMap,
+  imageCache: AppClassProperties["imageCache"],
   transformHandle: TransformHandleType,
   pointerX: number,
   pointerY: number,
 ) => {
-  const mutation = cropElementInternal(
-    element,
-    transformHandle,
-    pointerX,
-    pointerY,
-  );
+  const image =
+    isInitializedImageElement(element) && imageCache.get(element.fileId)?.image;
 
-  mutateElement(element, mutation);
+  if (image && !(image instanceof Promise)) {
+    const mutation = _cropElement(
+      element,
+      transformHandle,
+      image.naturalWidth,
+      image.naturalHeight,
+      pointerX,
+      pointerY,
+    );
 
-  updateBoundElements(element, elementsMap, {
-    oldSize: { width: element.width, height: element.height },
-  });
+    mutateElement(element, mutation);
+
+    updateBoundElements(element, elementsMap, {
+      oldSize: { width: element.width, height: element.height },
+    });
+  }
 };
 
 // TODO: replace with the refactored resizeSingleElement
@@ -222,71 +231,77 @@ const recomputeOrigin = (
 };
 
 export const getUncroppedImageElement = (
-  image: ExcalidrawImageElement,
+  element: ExcalidrawImageElement,
   elementsMap: ElementsMap,
+  imageCache: AppClassProperties["imageCache"],
 ) => {
-  if (image.crop) {
-    const width = image.widthAtCreation * image.resizedFactorX;
-    const height = image.heightAtCreation * image.resizedFactorY;
+  const image =
+    isInitializedImageElement(element) && imageCache.get(element.fileId)?.image;
 
-    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-      image,
-      elementsMap,
-    );
+  if (image && !(image instanceof Promise)) {
+    if (element.crop) {
+      const width = element.initialWidth * element.resizeFactors[0];
+      const height = element.initialHeight * element.resizeFactors[1];
 
-    const topLeftVector = vectorFromPoint(
-      pointRotateRads(point(x1, y1), point(cx, cy), image.angle),
-    );
-    const topRightVector = vectorFromPoint(
-      pointRotateRads(point(x2, y1), point(cx, cy), image.angle),
-    );
-    const topEdgeNormalized = vectorNormalize(
-      vectorSubtract(topRightVector, topLeftVector),
-    );
-    const bottomLeftVector = vectorFromPoint(
-      pointRotateRads(point(x1, y2), point(cx, cy), image.angle),
-    );
-    const leftEdgeVector = vectorSubtract(bottomLeftVector, topLeftVector);
-    const leftEdgeNormalized = vectorNormalize(leftEdgeVector);
+      const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+        element,
+        elementsMap,
+      );
 
-    const rotatedTopLeft = vectorAdd(
-      vectorAdd(
-        topLeftVector,
-        vectorScale(
-          topEdgeNormalized,
-          (-image.crop.x * width) / image.naturalWidth,
+      const topLeftVector = vectorFromPoint(
+        pointRotateRads(point(x1, y1), point(cx, cy), element.angle),
+      );
+      const topRightVector = vectorFromPoint(
+        pointRotateRads(point(x2, y1), point(cx, cy), element.angle),
+      );
+      const topEdgeNormalized = vectorNormalize(
+        vectorSubtract(topRightVector, topLeftVector),
+      );
+      const bottomLeftVector = vectorFromPoint(
+        pointRotateRads(point(x1, y2), point(cx, cy), element.angle),
+      );
+      const leftEdgeVector = vectorSubtract(bottomLeftVector, topLeftVector);
+      const leftEdgeNormalized = vectorNormalize(leftEdgeVector);
+
+      const rotatedTopLeft = vectorAdd(
+        vectorAdd(
+          topLeftVector,
+          vectorScale(
+            topEdgeNormalized,
+            (-element.crop.x * width) / image.naturalWidth,
+          ),
         ),
-      ),
-      vectorScale(
-        leftEdgeNormalized,
-        (-image.crop.y * height) / image.naturalHeight,
-      ),
-    );
+        vectorScale(
+          leftEdgeNormalized,
+          (-element.crop.y * height) / image.naturalHeight,
+        ),
+      );
 
-    const center = pointFromVector(
-      vectorAdd(
-        vectorAdd(rotatedTopLeft, vectorScale(topEdgeNormalized, width / 2)),
-        vectorScale(leftEdgeNormalized, height / 2),
-      ),
-    );
+      const center = pointFromVector(
+        vectorAdd(
+          vectorAdd(rotatedTopLeft, vectorScale(topEdgeNormalized, width / 2)),
+          vectorScale(leftEdgeNormalized, height / 2),
+        ),
+      );
 
-    const unrotatedTopLeft = pointRotateRads(
-      pointFromVector(rotatedTopLeft),
-      center,
-      -image.angle as Radians,
-    );
+      const unrotatedTopLeft = pointRotateRads(
+        pointFromVector(rotatedTopLeft),
+        center,
+        -element.angle as Radians,
+      );
 
-    const uncroppedElement: ExcalidrawImageElement = {
-      ...image,
-      x: unrotatedTopLeft[0],
-      y: unrotatedTopLeft[1],
-      width,
-      height,
-      crop: null,
-    };
+      const uncroppedElement: ExcalidrawImageElement = {
+        ...element,
+        x: unrotatedTopLeft[0],
+        y: unrotatedTopLeft[1],
+        width,
+        height,
+        crop: null,
+      };
 
-    return uncroppedElement;
+      return uncroppedElement;
+    }
   }
 
-  return image;
+  return element;
 };
