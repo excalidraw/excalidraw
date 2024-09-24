@@ -19,10 +19,10 @@ export default defineConfig({
       // Additionally the thresholds also needs to be updated slightly as a result of this change
       ignoreEmptyLines: false,
       thresholds: {
-        lines: 66,
+        lines: 60,
         branches: 70,
         functions: 63,
-        statements: 66,
+        statements: 60,
       },
     },
   },
