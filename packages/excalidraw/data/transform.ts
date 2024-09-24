@@ -46,6 +46,7 @@ import {
   assertNever,
   cloneJSON,
   getFontString,
+  isDevEnv,
   toBrandedType,
 } from "../utils";
 import { getSizeFromPoints } from "../points";
@@ -775,7 +776,11 @@ export const convertToExcalidrawElements = (
       width: frameWidth,
       height: frameHeight,
     });
-    if (frame?.x || frame?.y || frame?.width || frame?.height) {
+    if (
+      isDevEnv() &&
+      element.children.length &&
+      (frame?.x || frame?.y || frame?.width || frame?.height)
+    ) {
       console.info(
         "User provided frame attributes are being considered, if you find this inaccurate, please remove any of the attributes - x, y, width and height so frame coordinates and dimensions are calculated automatically",
       );
