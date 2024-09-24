@@ -1,9 +1,7 @@
 import { defineConfig } from "vitest/config";
-import { woff2BrowserPlugin } from "./scripts/woff2/woff2-vite-plugins";
 
 export default defineConfig({
   //@ts-ignore
-  plugins: [woff2BrowserPlugin()],
   test: {
     // Since hooks are running in stack in v2, which means all hooks run serially whereas
     // we need to run them in parallel
