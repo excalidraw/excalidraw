@@ -193,6 +193,7 @@ export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
+  | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
@@ -268,15 +269,19 @@ export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;
   gap: number;
-  // Represents the fixed point binding information in form of a vertical and
-  // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
-  // gives the user selected fixed point by multiplying the bound element width
-  // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
-  // bound element-local point coordinate.
-  fixedPoint: FixedPoint | null;
 };
 
-export type FixedPointBinding = Merge<PointBinding, { fixedPoint: FixedPoint }>;
+export type FixedPointBinding = Merge<
+  PointBinding,
+  {
+    // Represents the fixed point binding information in form of a vertical and
+    // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
+    // gives the user selected fixed point by multiplying the bound element width
+    // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
+    // bound element-local point coordinate.
+    fixedPoint: FixedPoint;
+  }
+>;
 
 export type Arrowhead =
   | "arrow"

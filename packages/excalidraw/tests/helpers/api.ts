@@ -9,6 +9,8 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawElementType,
   ExcalidrawMagicFrameElement,
+  ExcalidrawElbowArrowElement,
+  ExcalidrawArrowElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
@@ -127,6 +129,10 @@ export class API {
     expect(API.getSelectedElements().length).toBe(0);
   };
 
+  static getElement = <T extends ExcalidrawElement>(element: T): T => {
+    return h.app.scene.getElementsMapIncludingDeleted().get(element.id) as T || element;
+  }
+
   static createElement = <
     T extends Exclude<ExcalidrawElementType, "selection"> = "rectangle",
   >({
@@ -179,10 +185,16 @@ export class API {
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
     startBinding?: T extends "arrow"
-      ? ExcalidrawLinearElement["startBinding"]
+      ? ExcalidrawArrowElement["startBinding"] | ExcalidrawElbowArrowElement["startBinding"]
       : never;
     endBinding?: T extends "arrow"
-      ? ExcalidrawLinearElement["endBinding"]
+      ? ExcalidrawArrowElement["endBinding"] | ExcalidrawElbowArrowElement["endBinding"]
+      : never;
+    startArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["startArrowhead"] | ExcalidrawElbowArrowElement["startArrowhead"]
+      : never;
+    endArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["endArrowhead"] | ExcalidrawElbowArrowElement["endArrowhead"]
       : never;
     elbowed?: boolean;
   }): T extends "arrow" | "line"
@@ -340,6 +352,8 @@ export class API {
     if (element.type === "arrow") {
       element.startBinding = rest.startBinding ?? null;
       element.endBinding = rest.endBinding ?? null;
+      element.startArrowhead = rest.startArrowhead ?? null;
+      element.endArrowhead = rest.endArrowhead ?? null;
     }
     if (id) {
       element.id = id;

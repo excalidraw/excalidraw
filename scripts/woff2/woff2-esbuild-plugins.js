@@ -2,44 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 const which = require("which");
-const fetch = require("node-fetch");
 const wawoff = require("wawoff2");
 const { Font } = require("fonteditor-core");
-
-/**
- * Custom esbuild plugin to convert url woff2 imports into a text.
- * Other woff2 imports are handled by a "file" loader.
- *
- * @returns {import("esbuild").Plugin}
- */
-module.exports.woff2BrowserPlugin = () => {
-  return {
-    name: "woff2BrowserPlugin",
-    setup(build) {
-      build.initialOptions.loader = {
-        ".woff2": "file",
-        ...build.initialOptions.loader,
-      };
-
-      build.onResolve({ filter: /^https:\/\/.+?\.woff2$/ }, (args) => {
-        return {
-          path: args.path,
-          namespace: "woff2BrowserPlugin",
-        };
-      });
-
-      build.onLoad(
-        { filter: /.*/, namespace: "woff2BrowserPlugin" },
-        async (args) => {
-          return {
-            contents: args.path,
-            loader: "text",
-          };
-        },
-      );
-    },
-  };
-};
 
 /**
  * Custom esbuild plugin to:
@@ -53,27 +17,6 @@ module.exports.woff2BrowserPlugin = () => {
  * @returns {import("esbuild").Plugin}
  */
 module.exports.woff2ServerPlugin = (options = {}) => {
-  // google CDN fails time to time, so let's retry
-  async function fetchRetry(url, options = {}, retries = 0, delay = 1000) {
-    try {
-      const response = await fetch(url, options);
-
-      if (!response.ok) {
-        throw new Error(`Status: ${response.status}, ${await response.json()}`);
-      }
-
-      return response;
-    } catch (e) {
-      if (retries > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        return fetchRetry(url, options, retries - 1, delay * 2);
-      }
-
-      console.error(`Couldn't fetch: ${url}, error: ${e.message}`);
-      throw e;
-    }
-  }
-
   return {
     name: "woff2ServerPlugin",
     setup(build) {
@@ -82,9 +25,7 @@ module.exports.woff2ServerPlugin = (options = {}) => {
       const fonts = new Map();
 
       build.onResolve({ filter: /\.woff2$/ }, (args) => {
-        const resolvedPath = args.path.startsWith("http")
-          ? args.path // url
-          : path.resolve(args.resolveDir, args.path); // absolute path
+        const resolvedPath = path.resolve(args.resolveDir, args.path);
 
         return {
           path: resolvedPath,
@@ -101,9 +42,7 @@ module.exports.woff2ServerPlugin = (options = {}) => {
             // read local woff2 as a buffer (WARN: `readFileSync` does not work!)
             woff2Buffer = await fs.promises.readFile(args.path);
           } else {
-            // fetch remote woff2 as a buffer (i.e. from a cdn)
-            const response = await fetchRetry(args.path, {}, 3);
-            woff2Buffer = await response.buffer();
+            throw new Error(`Font path has to be absolute! "${args.path}"`);
           }
 
           // google's brotli decompression into snft

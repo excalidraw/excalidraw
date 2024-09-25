@@ -649,7 +649,12 @@ const ExcalidrawWrapper = () => {
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
-      debugRenderer(debugCanvasRef.current, appState, window.devicePixelRatio);
+      debugRenderer(
+        debugCanvasRef.current,
+        appState,
+        window.devicePixelRatio,
+        () => forceRefresh((prev) => !prev),
+      );
     }
   };
 
