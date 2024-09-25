@@ -82,13 +82,21 @@ export const ellipseTouchesPoint = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
 ) => {
-  return ellipseDistance(point, ellipse) <= threshold;
+  return ellipseDistanceFromPoint(point, ellipse) <= threshold;
 };
 
-export const ellipseDistance = <Point extends GenericPoint>(
+/**
+ * Determine the shortest euclidean distance from a point to the
+ * outline of the ellipse
+ *
+ * @param p The point to consider
+ * @param ellipse The ellipse to calculate the distance to
+ * @returns The eucledian distance
+ */
+export const ellipseDistanceFromPoint = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
-) => {
+): number => {
   const { angle, halfWidth, halfHeight, center } = ellipse;
   const a = halfWidth;
   const b = halfHeight;
