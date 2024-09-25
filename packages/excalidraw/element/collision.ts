@@ -16,7 +16,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { getBoundTextShape } from "../shapes";
-import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
+import type { GlobalPoint, Polygon } from "../../math";
 import { pathIsALoop, isPointWithinBounds, point } from "../../math";
 import { LINE_CONFIRM_THRESHOLD } from "../constants";
 
@@ -48,10 +48,10 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   return isDraggableFromInside || isImageElement(element);
 };
 
-export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
-  sceneCoords: Point;
+export type HitTestArgs = {
+  sceneCoords: GlobalPoint;
   element: ExcalidrawElement;
-  shape: GeometricShape<Point>;
+  shape: GeometricShape<GlobalPoint>;
   threshold?: number;
   frameNameBound?: FrameNameBounds | null;
 };
@@ -62,7 +62,7 @@ export const hitElementItself = ({
   shape,
   threshold = 10,
   frameNameBound = null,
-}: HitTestArgs<GlobalPoint>) => {
+}: HitTestArgs) => {
   let hit = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
@@ -97,7 +97,7 @@ export const hitElementBoundingBox = (
 };
 
 export const hitElementBoundingBoxOnly = (
-  hitArgs: HitTestArgs<GlobalPoint>,
+  hitArgs: HitTestArgs,
   elementsMap: ElementsMap,
 ) => {
   return (

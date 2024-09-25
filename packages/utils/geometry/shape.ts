@@ -23,6 +23,7 @@ import type {
 } from "../../math";
 import {
   curve,
+  ellipse,
   lineSegment,
   point,
   pointFromArray,
@@ -178,12 +179,12 @@ export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
 
   return {
     type: "ellipse",
-    data: {
-      center: point(x + width / 2, y + height / 2),
+    data: ellipse(
+      point(x + width / 2, y + height / 2),
       angle,
-      halfWidth: width / 2,
-      halfHeight: height / 2,
-    },
+      width / 2,
+      height / 2,
+    ),
   };
 };
 

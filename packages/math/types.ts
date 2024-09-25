@@ -126,7 +126,8 @@ export type Curve<Point extends GlobalPoint | LocalPoint | ViewportPoint> = [
  * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
  * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right"
  */
-export type SymmetricArc = {
+export type SymmetricArc<Point extends GenericPoint> = {
+  center: Point;
   radius: number;
   startAngle: Radians;
   endAngle: Radians;
@@ -152,4 +153,6 @@ export type Ellipse<Point extends GenericPoint> = {
   angle: Radians;
   halfWidth: number;
   halfHeight: number;
+} & {
+  _brand: "excalimath_ellipse";
 };

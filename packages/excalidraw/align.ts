@@ -42,8 +42,6 @@ const calculateTranslation = (
     maxY: selectionBounds[3],
     midX: (selectionBounds[0] + selectionBounds[2]) / 2,
     midY: (selectionBounds[1] + selectionBounds[3]) / 2,
-    width: selectionBounds[2] - selectionBounds[0],
-    height: selectionBounds[3] - selectionBounds[1],
   };
   const groupBounds = getCommonBounds(group);
   const groupBoundingBox = {
@@ -53,8 +51,6 @@ const calculateTranslation = (
     maxY: groupBounds[3],
     midX: (groupBounds[0] + groupBounds[2]) / 2,
     midY: (groupBounds[1] + groupBounds[3]) / 2,
-    width: groupBounds[2] - groupBounds[0],
-    height: groupBounds[3] - groupBounds[1],
   };
 
   const [min, max]: ["minX" | "minY", "maxX" | "maxY"] =

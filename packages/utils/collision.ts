@@ -1,6 +1,6 @@
 import type { Polycurve, Polyline } from "./geometry/shape";
 import { type GeometricShape } from "./geometry/shape";
-import type { Curve, ViewportPoint } from "../math";
+import type { Curve, GenericPoint } from "../math";
 import {
   lineSegment,
   point,
@@ -8,23 +8,16 @@ import {
   pointOnLineSegment,
   pointOnPolygon,
   polygonFromPoints,
-  type GlobalPoint,
-  type LocalPoint,
-  type Polygon,
   pointOnEllipse,
   pointInEllipse,
 } from "../math";
 
 // check if the given point is considered on the given shape's border
-export const isPointOnShape = <
-  Point extends GlobalPoint | LocalPoint | ViewportPoint,
->(
+export const isPointOnShape = <Point extends GenericPoint>(
   point: Point,
   shape: GeometricShape<Point>,
   tolerance = 0,
-) => {
-  // get the distance from the given point to the given element
-  // check if the distance is within the given epsilon range
+): boolean => {
   switch (shape.type) {
     case "polygon":
       return pointOnPolygon(point, shape.data, tolerance);
@@ -39,12 +32,12 @@ export const isPointOnShape = <
     case "polycurve":
       return pointOnPolycurve(point, shape.data, tolerance);
     default:
-      throw Error(`shape ${shape} is not implemented`);
+      throw Error(`Shape ${shape} is not implemented`);
   }
 };
 
 // check if the given point is considered inside the element's border
-export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
+export const isPointInShape = <Point extends GenericPoint>(
   p: Point,
   shape: GeometricShape<Point>,
 ) => {
@@ -69,17 +62,7 @@ export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
   }
 };
 
-// check if the given element is in the given bounds
-export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
-  point: Point,
-  bounds: Polygon<Point>,
-) => {
-  return polygonIncludesPoint(point, bounds);
-};
-
-const pointOnPolycurve = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+const pointOnPolycurve = <Point extends GenericPoint>(
   point: Point,
   polycurve: Polycurve<Point>,
   tolerance: number,
@@ -87,9 +70,7 @@ const pointOnPolycurve = <
   return polycurve.some((curve) => pointOnCurve(point, curve, tolerance));
 };
 
-const cubicBezierEquation = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+const cubicBezierEquation = <Point extends GenericPoint>(
   curve: Curve<Point>,
 ) => {
   const [p0, p1, p2, p3] = curve;
@@ -101,9 +82,7 @@ const cubicBezierEquation = <
     p0[idx] * Math.pow(t, 3);
 };
 
-const polyLineFromCurve = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+const polyLineFromCurve = <Point extends GenericPoint>(
   curve: Curve<Point>,
   segments = 10,
 ): Polyline<Point> => {
@@ -125,9 +104,7 @@ const polyLineFromCurve = <
   return lineSegments;
 };
 
-export const pointOnCurve = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const pointOnCurve = <Point extends GenericPoint>(
   point: Point,
   curve: Curve<Point>,
   threshold: number,
@@ -135,9 +112,7 @@ export const pointOnCurve = <
   return pointOnPolyline(point, polyLineFromCurve(curve), threshold);
 };
 
-export const pointOnPolyline = <
-  Point extends LocalPoint | GlobalPoint | ViewportPoint,
->(
+export const pointOnPolyline = <Point extends GenericPoint>(
   point: Point,
   polyline: Polyline<Point>,
   threshold = 10e-5,

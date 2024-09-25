@@ -6,7 +6,7 @@ import {
   pointFromVector,
   pointRotateRads,
 } from "./point";
-import type { Ellipse, GenericPoint, Line } from "./types";
+import type { Ellipse, GenericPoint, LineSegment, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
   vector,
@@ -15,6 +15,20 @@ import {
   vectorFromPoint,
   vectorScale,
 } from "./vector";
+
+export function ellipse<Point extends GenericPoint>(
+  center: Point,
+  angle: Radians,
+  halfWidth: number,
+  halfHeight: number,
+): Ellipse<Point> {
+  return {
+    center,
+    angle,
+    halfWidth,
+    halfHeight,
+  } as Ellipse<Point>;
+}
 
 export const pointInEllipse = <Point extends GenericPoint>(
   p: Point,
@@ -162,19 +176,19 @@ const distanceToEllipse = <Point extends GenericPoint>(
  * ellipse.
  */
 export function interceptPointsOfLineAndEllipse<Point extends GenericPoint>(
-  ellipse: Readonly<Ellipse<Point>>,
-  l: Readonly<Line<Point>>,
+  e: Readonly<Ellipse<Point>>,
+  l: Readonly<LineSegment<Point>>,
 ): Point[] {
-  const rx = ellipse.halfWidth;
-  const ry = ellipse.halfHeight;
+  const rx = e.halfWidth;
+  const ry = e.halfHeight;
   const nonRotatedLine = line(
-    pointRotateRads(l[0], ellipse.center, radians(-ellipse.angle)),
-    pointRotateRads(l[1], ellipse.center, radians(-ellipse.angle)),
+    pointRotateRads(l[0], e.center, radians(-e.angle)),
+    pointRotateRads(l[1], e.center, radians(-e.angle)),
   );
   const dir = vectorFromPoint(nonRotatedLine[1], nonRotatedLine[0]);
   const diff = vector(
-    nonRotatedLine[0][0] - ellipse.center[0],
-    nonRotatedLine[0][1] - ellipse.center[1],
+    nonRotatedLine[0][0] - e.center[0],
+    nonRotatedLine[0][1] - e.center[1],
   );
   const mDir = vector(dir[0] / (rx * rx), dir[1] / (ry * ry));
   const mDiff = vector(diff[0] / (rx * rx), diff[1] / (ry * ry));
@@ -226,6 +240,6 @@ export function interceptPointsOfLineAndEllipse<Point extends GenericPoint>(
   }
 
   return intersections.map((point) =>
-    pointRotateRads(point, ellipse.center, ellipse.angle),
+    pointRotateRads(point, e.center, e.angle),
   );
 }
