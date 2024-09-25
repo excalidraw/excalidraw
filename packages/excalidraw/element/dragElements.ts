@@ -16,6 +16,7 @@ import {
   isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
+  isImageElement,
   isTextElement,
 } from "./typeChecks";
 import { getFontString } from "../utils";
@@ -258,6 +259,14 @@ export const dragNewElement = ({
   }
 
   if (width !== 0 && height !== 0) {
+    let imageInitialDimension = null;
+    if (isImageElement(newElement)) {
+      imageInitialDimension = {
+        initialWidth: width,
+        initialHeight: height,
+      };
+    }
+
     mutateElement(
       newElement,
       {
@@ -266,6 +275,7 @@ export const dragNewElement = ({
         width,
         height,
         ...textAutoResize,
+        ...imageInitialDimension,
       },
       informMutation,
     );
