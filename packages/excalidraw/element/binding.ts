@@ -65,7 +65,7 @@ import {
 } from "./heading";
 import type { LocalPoint, Radians } from "../../math";
 import {
-  lineSegment,
+  segment,
   point,
   pointRotateRads,
   type GlobalPoint,
@@ -1615,7 +1615,7 @@ const intersectElementWithLine = (
   elementsMap: ElementsMap,
 ): GlobalPoint[] | undefined => {
   if (isRectangularElement(element)) {
-    return segmentIntersectRectangleElement(element, lineSegment(a, b), gap);
+    return segmentIntersectRectangleElement(element, segment(a, b), gap);
   }
 
   const relateToCenter = relativizationToElementCenter(element, elementsMap);

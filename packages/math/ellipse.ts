@@ -6,7 +6,7 @@ import {
   pointFromVector,
   pointRotateRads,
 } from "./point";
-import type { Ellipse, GenericPoint, LineSegment, Radians } from "./types";
+import type { Ellipse, GenericPoint, Segment, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
   vector,
@@ -16,6 +16,15 @@ import {
   vectorScale,
 } from "./vector";
 
+/**
+ * Construct an Ellipse object from the parameters
+ *
+ * @param center The center of the ellipse
+ * @param angle The slanting of the ellipse in radians
+ * @param halfWidth Half of the width of a non-slanted version of the ellipse
+ * @param halfHeight Half of the height of a non-slanted version of the ellipse
+ * @returns The constructed Ellipse object
+ */
 export function ellipse<Point extends GenericPoint>(
   center: Point,
   angle: Radians,
@@ -30,7 +39,14 @@ export function ellipse<Point extends GenericPoint>(
   } as Ellipse<Point>;
 }
 
-export const pointInEllipse = <Point extends GenericPoint>(
+/**
+ * Determines if a point is inside or on the ellipse outline
+ *
+ * @param p The point to test
+ * @param ellipse The ellipse to compare against
+ * @returns TRUE if the point is inside or on the outline of the ellipse
+ */
+export const ellipseIncludesPoint = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {
@@ -52,7 +68,16 @@ export const pointInEllipse = <Point extends GenericPoint>(
   );
 };
 
-export const pointOnEllipse = <Point extends GenericPoint>(
+/**
+ * Tests whether a point lies on the outline of the ellipse within a given
+ * tolerance
+ *
+ * @param point The point to test
+ * @param ellipse The ellipse to compare against
+ * @param threshold The distance to consider a point close enough to be "on" the outline
+ * @returns TRUE if the point is on the ellise outline
+ */
+export const ellipseTouchesPoint = <Point extends GenericPoint>(
   point: Point,
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
@@ -60,7 +85,7 @@ export const pointOnEllipse = <Point extends GenericPoint>(
   return distanceToEllipse(point, ellipse) <= threshold;
 };
 
-export const ellipseAxes = <Point extends GenericPoint>(
+export const ellipseFocusToCenter = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
@@ -72,17 +97,6 @@ export const ellipseAxes = <Point extends GenericPoint>(
     ? ellipse.halfHeight * 2
     : ellipse.halfWidth * 2;
 
-  return {
-    majorAxis,
-    minorAxis,
-  };
-};
-
-export const ellipseFocusToCenter = <Point extends GenericPoint>(
-  ellipse: Ellipse<Point>,
-) => {
-  const { majorAxis, minorAxis } = ellipseAxes(ellipse);
-
   return Math.sqrt(majorAxis ** 2 - minorAxis ** 2);
 };
 
@@ -90,7 +104,14 @@ export const ellipseExtremes = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const { center, angle } = ellipse;
-  const { majorAxis, minorAxis } = ellipseAxes(ellipse);
+  const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
+
+  const majorAxis = widthGreaterThanHeight
+    ? ellipse.halfWidth * 2
+    : ellipse.halfHeight * 2;
+  const minorAxis = widthGreaterThanHeight
+    ? ellipse.halfHeight * 2
+    : ellipse.halfWidth * 2;
 
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
@@ -175,9 +196,9 @@ const distanceToEllipse = <Point extends GenericPoint>(
  * Calculate a maximum of two intercept points for a line going throug an
  * ellipse.
  */
-export function interceptPointsOfLineAndEllipse<Point extends GenericPoint>(
+export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
   e: Readonly<Ellipse<Point>>,
-  l: Readonly<LineSegment<Point>>,
+  l: Readonly<Segment<Point>>,
 ): Point[] {
   const rx = e.halfWidth;
   const ry = e.halfHeight;

@@ -2,14 +2,14 @@ import type { Polycurve, Polyline } from "./geometry/shape";
 import { type GeometricShape } from "./geometry/shape";
 import type { Curve, GenericPoint } from "../math";
 import {
-  lineSegment,
+  segment,
   point,
   polygonIncludesPoint,
-  pointOnLineSegment,
+  segmentIncludesPoint,
   pointOnPolygon,
   polygonFromPoints,
-  pointOnEllipse,
-  pointInEllipse,
+  ellipseTouchesPoint,
+  ellipseIncludesPoint,
 } from "../math";
 
 // check if the given point is considered on the given shape's border
@@ -22,9 +22,9 @@ export const isPointOnShape = <Point extends GenericPoint>(
     case "polygon":
       return pointOnPolygon(point, shape.data, tolerance);
     case "ellipse":
-      return pointOnEllipse(point, shape.data, tolerance);
+      return ellipseTouchesPoint(point, shape.data, tolerance);
     case "line":
-      return pointOnLineSegment(point, shape.data, tolerance);
+      return segmentIncludesPoint(point, shape.data, tolerance);
     case "polyline":
       return pointOnPolyline(point, shape.data, tolerance);
     case "curve":
@@ -49,7 +49,7 @@ export const isPointInShape = <Point extends GenericPoint>(
     case "curve":
       return false;
     case "ellipse":
-      return pointInEllipse(p, shape.data);
+      return ellipseIncludesPoint(p, shape.data);
     case "polyline": {
       const polygon = polygonFromPoints(shape.data.flat());
       return polygonIncludesPoint(p, polygon);
@@ -96,7 +96,7 @@ const polyLineFromCurve = <Point extends GenericPoint>(
     t += increment;
     if (t <= 1) {
       const nextPoint: Point = point(equation(t, 0), equation(t, 1));
-      lineSegments.push(lineSegment(startingPoint, nextPoint));
+      lineSegments.push(segment(startingPoint, nextPoint));
       startingPoint = nextPoint;
     }
   }
@@ -117,5 +117,5 @@ export const pointOnPolyline = <Point extends GenericPoint>(
   polyline: Polyline<Point>,
   threshold = 10e-5,
 ) => {
-  return polyline.some((line) => pointOnLineSegment(point, line, threshold));
+  return polyline.some((line) => segmentIncludesPoint(point, line, threshold));
 };

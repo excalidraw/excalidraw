@@ -1,7 +1,7 @@
 import { cartesian2Polar, radians } from "./angle";
-import { ellipse, interceptPointsOfLineAndEllipse } from "./ellipse";
+import { ellipse, ellipseSegmentInterceptPoints } from "./ellipse";
 import { point } from "./point";
-import type { GenericPoint, LineSegment, Radians, SymmetricArc } from "./types";
+import type { GenericPoint, Segment, Radians, Arc } from "./types";
 import { PRECISION } from "./utils";
 
 /**
@@ -20,15 +20,15 @@ export function arc<Point extends GenericPoint>(
   startAngle: Radians,
   endAngle: Radians,
 ) {
-  return { center, radius, startAngle, endAngle } as SymmetricArc<Point>;
+  return { center, radius, startAngle, endAngle } as Arc<Point>;
 }
 
 /**
  * Determines if a cartesian point lies on a symmetric arc, i.e. an arc which
  * is part of a circle contour centered on 0, 0.
  */
-export function isPointOnSymmetricArc<P extends GenericPoint>(
-  { center, radius: arcRadius, startAngle, endAngle }: SymmetricArc<P>,
+export function arcIncludesPoint<P extends GenericPoint>(
+  { center, radius: arcRadius, startAngle, endAngle }: Arc<P>,
   p: P,
 ): boolean {
   const [radius, angle] = cartesian2Polar(
@@ -47,10 +47,10 @@ export function isPointOnSymmetricArc<P extends GenericPoint>(
  * point and end point and a symmetric arc.
  */
 export function interceptOfSymmetricArcAndSegment<Point extends GenericPoint>(
-  a: Readonly<SymmetricArc<Point>>,
-  l: Readonly<LineSegment<Point>>,
+  a: Readonly<Arc<Point>>,
+  l: Readonly<Segment<Point>>,
 ): Point[] {
-  return interceptPointsOfLineAndEllipse(
+  return ellipseSegmentInterceptPoints(
     ellipse(a.center, radians(0), a.radius, a.radius),
     l,
   ).filter((candidate) => {

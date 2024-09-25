@@ -33,10 +33,10 @@ import {
   isLinearElement,
 } from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
-import type { GlobalPoint, LineSegment } from "../math";
+import type { GlobalPoint, Segment } from "../math";
 import {
   isPointWithinBounds,
-  lineSegment,
+  segment,
   point,
   pointRotateRads,
   segmentsIntersectAt,
@@ -82,7 +82,7 @@ export const bindElementsToFramesAfterDuplication = (
 const getElementLineSegments = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): LineSegment<GlobalPoint>[] => {
+): Segment<GlobalPoint>[] => {
   const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
     element,
     elementsMap,
@@ -91,13 +91,13 @@ const getElementLineSegments = (
   const center: GlobalPoint = point(cx, cy);
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const segments: LineSegment<GlobalPoint>[] = [];
+    const segments: Segment<GlobalPoint>[] = [];
 
     let i = 0;
 
     while (i < element.points.length - 1) {
       segments.push(
-        lineSegment(
+        segment(
           pointRotateRads(
             point(
               element.points[i][0] + element.x,
@@ -137,35 +137,35 @@ const getElementLineSegments = (
 
   if (element.type === "diamond") {
     return [
-      lineSegment(n, w),
-      lineSegment(n, e),
-      lineSegment(s, w),
-      lineSegment(s, e),
+      segment(n, w),
+      segment(n, e),
+      segment(s, w),
+      segment(s, e),
     ];
   }
 
   if (element.type === "ellipse") {
     return [
-      lineSegment(n, w),
-      lineSegment(n, e),
-      lineSegment(s, w),
-      lineSegment(s, e),
-      lineSegment(n, w),
-      lineSegment(n, e),
-      lineSegment(s, w),
-      lineSegment(s, e),
+      segment(n, w),
+      segment(n, e),
+      segment(s, w),
+      segment(s, e),
+      segment(n, w),
+      segment(n, e),
+      segment(s, w),
+      segment(s, e),
     ];
   }
 
   return [
-    lineSegment(nw, ne),
-    lineSegment(sw, se),
-    lineSegment(nw, sw),
-    lineSegment(ne, se),
-    lineSegment(nw, e),
-    lineSegment(sw, e),
-    lineSegment(ne, w),
-    lineSegment(se, w),
+    segment(nw, ne),
+    segment(sw, se),
+    segment(nw, sw),
+    segment(ne, se),
+    segment(nw, e),
+    segment(sw, e),
+    segment(ne, w),
+    segment(se, w),
   ];
 };
 

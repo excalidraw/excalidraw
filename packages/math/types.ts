@@ -67,8 +67,8 @@ export type Line<P extends GenericPoint> = [p: P, q: P] & {
  * line that is bounded by two distinct end points, and
  * contains every point on the line that is between its endpoints.
  */
-export type LineSegment<P extends GenericPoint> = [a: P, b: P] & {
-  _brand: "excalimath_linesegment";
+export type Segment<P extends GenericPoint> = [a: P, b: P] & {
+  _brand: "excalimath_segment";
 };
 
 /**
@@ -81,23 +81,14 @@ export type Vector = [u: number, v: number] & {
 /**
  * A triangle represented by 3 points
  */
-export type Triangle<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
-  a: P,
-  b: P,
-  c: P,
-] & {
+export type Triangle<P extends GenericPoint> = [a: P, b: P, c: P] & {
   _brand: "excalimath__triangle";
 };
 
 /**
  * A rectangular shape represented by 4 points at its corners
  */
-export type Rectangle<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
-  a: P,
-  b: P,
-  c: P,
-  d: P,
-] & {
+export type Rectangle<P extends GenericPoint> = [a: P, b: P, c: P, d: P] & {
   _brand: "excalimath__rectangle";
 };
 
@@ -105,28 +96,24 @@ export type Rectangle<P extends GlobalPoint | LocalPoint | ViewportPoint> = [
  * A polygon is a closed shape by connecting the given points
  * rectangles and diamonds are modelled by polygons
  */
-export type Polygon<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
-  Point[] & {
-    _brand: "excalimath_polygon";
-  };
+export type Polygon<Point extends GenericPoint> = Point[] & {
+  _brand: "excalimath_polygon";
+};
 
 /**
  * Cubic bezier curve with four control points
  */
-export type Curve<Point extends GlobalPoint | LocalPoint | ViewportPoint> = [
-  Point,
-  Point,
-  Point,
-  Point,
-] & {
+export type Curve<Point extends GenericPoint> = [Point, Point, Point, Point] & {
   _brand: "excalimath_curve";
 };
 
 /**
+ * Represents a symmetric arc, a segment of a circular path
+ *
  * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
  * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right"
  */
-export type SymmetricArc<Point extends GenericPoint> = {
+export type Arc<Point extends GenericPoint> = {
   center: Point;
   radius: number;
   startAngle: Radians;

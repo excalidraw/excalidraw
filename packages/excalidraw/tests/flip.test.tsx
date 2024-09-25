@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import {
   fireEvent,
@@ -27,8 +26,8 @@ import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
 import { arrayToMap, cloneJSON } from "../utils";
-import type { LocalPoint } from "../../math";
-import { point, type Radians } from "../../math";
+import type { LocalPoint, Radians } from "../../math";
+import { point, radians } from "../../math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -132,7 +131,7 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     y: -2412.5069664197654,
     width: 1750.4888916015625,
     height: 410.51605224609375,
-    angle: 0 as Radians,
+    angle: radians(0),
     strokeColor: "#000000",
     backgroundColor: "#fa5252",
     fillStyle: "hachure",

@@ -4,7 +4,7 @@ import {
   pointFromVector,
   pointRotateRads,
 } from "./point";
-import type { GenericPoint, LineSegment, Radians } from "./types";
+import type { GenericPoint, Segment, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
   vectorAdd,
@@ -20,18 +20,15 @@ import {
  * @param points The two points delimiting the line segment on each end
  * @returns The line segment delineated by the points
  */
-export function lineSegment<P extends GenericPoint>(
-  a: P,
-  b: P,
-): LineSegment<P> {
-  return [a, b] as LineSegment<P>;
+export function segment<P extends GenericPoint>(a: P, b: P): Segment<P> {
+  return [a, b] as Segment<P>;
 }
 
-export function lineSegmentFromPointArray<P extends GenericPoint>(
+export function segmentFromPointArray<P extends GenericPoint>(
   pointArray: P[],
-): LineSegment<P> | undefined {
+): Segment<P> | undefined {
   return pointArray.length === 2
-    ? lineSegment<P>(pointArray[0], pointArray[1])
+    ? segment<P>(pointArray[0], pointArray[1])
     : undefined;
 }
 
@@ -40,9 +37,9 @@ export function lineSegmentFromPointArray<P extends GenericPoint>(
  * @param segment
  * @returns
  */
-export const isLineSegment = <Point extends GenericPoint>(
+export const isSegment = <Point extends GenericPoint>(
   segment: unknown,
-): segment is LineSegment<Point> =>
+): segment is Segment<Point> =>
   Array.isArray(segment) &&
   segment.length === 2 &&
   isPoint(segment[0]) &&
@@ -57,12 +54,12 @@ export const isLineSegment = <Point extends GenericPoint>(
  * @param origin
  * @returns
  */
-export const lineSegmentRotate = <Point extends GenericPoint>(
-  l: LineSegment<Point>,
+export const segmentRotate = <Point extends GenericPoint>(
+  l: Segment<Point>,
   angle: Radians,
   origin?: Point,
-): LineSegment<Point> => {
-  return lineSegment(
+): Segment<Point> => {
+  return segment(
     pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
     pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
   );
@@ -73,8 +70,8 @@ export const lineSegmentRotate = <Point extends GenericPoint>(
  * intersect at.
  */
 export const segmentsIntersectAt = <Point extends GenericPoint>(
-  a: Readonly<LineSegment<Point>>,
-  b: Readonly<LineSegment<Point>>,
+  a: Readonly<Segment<Point>>,
+  b: Readonly<Segment<Point>>,
 ): Point | null => {
   const a0 = vectorFromPoint(a[0]);
   const a1 = vectorFromPoint(a[1]);
@@ -105,12 +102,12 @@ export const segmentsIntersectAt = <Point extends GenericPoint>(
   return null;
 };
 
-export const pointOnLineSegment = <Point extends GenericPoint>(
+export const segmentIncludesPoint = <Point extends GenericPoint>(
   point: Point,
-  line: LineSegment<Point>,
+  line: Segment<Point>,
   threshold = PRECISION,
 ) => {
-  const distance = distanceToLineSegment(point, line);
+  const distance = segmentDistanceToPoint(point, line);
 
   if (distance === 0) {
     return true;
@@ -119,9 +116,9 @@ export const pointOnLineSegment = <Point extends GenericPoint>(
   return distance < threshold;
 };
 
-export const distanceToLineSegment = <Point extends GenericPoint>(
+export const segmentDistanceToPoint = <Point extends GenericPoint>(
   point: Point,
-  line: LineSegment<Point>,
+  line: Segment<Point>,
 ) => {
   const [x, y] = point;
   const [[x1, y1], [x2, y2]] = line;

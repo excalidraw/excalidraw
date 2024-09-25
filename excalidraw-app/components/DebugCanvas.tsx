@@ -13,15 +13,15 @@ import {
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
 import {
-  isLineSegment,
+  isSegment,
   type GlobalPoint,
-  type LineSegment,
+  type Segment,
 } from "../../packages/math";
 
 const renderLine = (
   context: CanvasRenderingContext2D,
   zoom: number,
-  segment: LineSegment<GlobalPoint>,
+  segment: Segment<GlobalPoint>,
   color: string,
 ) => {
   context.save();
@@ -52,11 +52,11 @@ const render = (
 ) => {
   frame.forEach((el: DebugElement) => {
     switch (true) {
-      case isLineSegment(el.data):
+      case isSegment(el.data):
         renderLine(
           context,
           appState.zoom.value,
-          el.data as LineSegment<GlobalPoint>,
+          el.data as Segment<GlobalPoint>,
           el.color,
         );
         break;

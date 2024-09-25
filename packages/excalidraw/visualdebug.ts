@@ -1,5 +1,5 @@
-import type { LineSegment } from "../math";
-import { isLineSegment, lineSegment, point, type GlobalPoint } from "../math";
+import type { Segment } from "../math";
+import { isSegment, segment, point, type GlobalPoint } from "../math";
 import type { Bounds } from "./element/bounds";
 import { isBounds } from "./element/typeChecks";
 
@@ -15,20 +15,20 @@ declare global {
 
 export type DebugElement = {
   color: string;
-  data: LineSegment<GlobalPoint>;
+  data: Segment<GlobalPoint>;
   permanent: boolean;
 };
 
 export const debugDrawLine = (
-  segment: LineSegment<GlobalPoint> | LineSegment<GlobalPoint>[],
+  segment: Segment<GlobalPoint> | Segment<GlobalPoint>[],
   opts?: {
     color?: string;
     permanent?: boolean;
   },
 ) => {
   const segments = (
-    isLineSegment(segment) ? [segment] : segment
-  ) as LineSegment<GlobalPoint>[];
+    isSegment(segment) ? [segment] : segment
+  ) as Segment<GlobalPoint>[];
 
   segments.forEach((data) =>
     addToCurrentFrame({
@@ -51,7 +51,7 @@ export const debugDrawPoint = (
   const yOffset = opts?.fuzzy ? Math.random() * 3 : 0;
 
   debugDrawLine(
-    lineSegment(
+    segment(
       point<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset - 10),
       point<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset + 10),
     ),
@@ -61,7 +61,7 @@ export const debugDrawPoint = (
     },
   );
   debugDrawLine(
-    lineSegment(
+    segment(
       point<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset + 10),
       point<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset - 10),
     ),
@@ -82,19 +82,19 @@ export const debugDrawBounds = (
   (isBounds(box) ? [box] : box).forEach((bbox) =>
     debugDrawLine(
       [
-        lineSegment(
+        segment(
           point<GlobalPoint>(bbox[0], bbox[1]),
           point<GlobalPoint>(bbox[2], bbox[1]),
         ),
-        lineSegment(
+        segment(
           point<GlobalPoint>(bbox[2], bbox[1]),
           point<GlobalPoint>(bbox[2], bbox[3]),
         ),
-        lineSegment(
+        segment(
           point<GlobalPoint>(bbox[2], bbox[3]),
           point<GlobalPoint>(bbox[0], bbox[3]),
         ),
-        lineSegment(
+        segment(
           point<GlobalPoint>(bbox[0], bbox[3]),
           point<GlobalPoint>(bbox[0], bbox[1]),
         ),

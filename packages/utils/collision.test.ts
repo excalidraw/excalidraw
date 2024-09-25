@@ -2,8 +2,8 @@ import type { Curve, Degrees, GlobalPoint } from "../math";
 import {
   curve,
   degreesToRadians,
-  lineSegment,
-  lineSegmentRotate,
+  segment,
+  segmentRotate,
   point,
   pointRotateDegs,
 } from "../math";
@@ -34,10 +34,10 @@ describe("point and curve", () => {
 
 describe("point and polylines", () => {
   const polyline: Polyline<GlobalPoint> = [
-    lineSegment(point(1, 0), point(1, 2)),
-    lineSegment(point(1, 2), point(2, 2)),
-    lineSegment(point(2, 2), point(2, 1)),
-    lineSegment(point(2, 1), point(3, 1)),
+    segment(point(1, 0), point(1, 2)),
+    segment(point(1, 2), point(2, 2)),
+    segment(point(2, 2), point(2, 1)),
+    segment(point(2, 1), point(3, 1)),
   ];
 
   it("point on the line", () => {
@@ -68,7 +68,7 @@ describe("point and polylines", () => {
       const rotation = (Math.random() * 360) as Degrees;
       const rotatedPoint = pointRotateDegs(p, point(0, 0), rotation);
       const rotatedPolyline = polyline.map((line) =>
-        lineSegmentRotate(line, degreesToRadians(rotation), point(0, 0)),
+        segmentRotate(line, degreesToRadians(rotation), point(0, 0)),
       );
       expect(pointOnPolyline(rotatedPoint, rotatedPolyline)).toBe(true);
     });
@@ -79,7 +79,7 @@ describe("point and polylines", () => {
       const rotation = (Math.random() * 360) as Degrees;
       const rotatedPoint = pointRotateDegs(p, point(0, 0), rotation);
       const rotatedPolyline = polyline.map((line) =>
-        lineSegmentRotate(line, degreesToRadians(rotation), point(0, 0)),
+        segmentRotate(line, degreesToRadians(rotation), point(0, 0)),
       );
       expect(pointOnPolyline(rotatedPoint, rotatedPolyline)).toBe(false);
     });

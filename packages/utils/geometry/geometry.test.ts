@@ -1,20 +1,20 @@
-import type { GlobalPoint, LineSegment, Polygon } from "../../math";
+import type { GlobalPoint, Segment, Polygon } from "../../math";
 import {
   point,
-  lineSegment,
+  segment,
   polygon,
-  pointOnLineSegment,
+  segmentIncludesPoint,
   pointOnPolygon,
   polygonIncludesPoint,
 } from "../../math";
 
 describe("point and line", () => {
-  const s: LineSegment<GlobalPoint> = lineSegment(point(1, 0), point(1, 2));
+  const s: Segment<GlobalPoint> = segment(point(1, 0), point(1, 2));
 
   it("point on the line", () => {
-    expect(pointOnLineSegment(point(0, 1), s)).toBe(false);
-    expect(pointOnLineSegment(point(1, 1), s, 0)).toBe(true);
-    expect(pointOnLineSegment(point(2, 1), s)).toBe(false);
+    expect(segmentIncludesPoint(point(0, 1), s)).toBe(false);
+    expect(segmentIncludesPoint(point(1, 1), s, 0)).toBe(true);
+    expect(segmentIncludesPoint(point(2, 1), s)).toBe(false);
   });
 });
 

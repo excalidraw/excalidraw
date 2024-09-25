@@ -1,5 +1,5 @@
 import { pointsEqual } from "./point";
-import { lineSegment, pointOnLineSegment } from "./segment";
+import { segment, segmentIncludesPoint } from "./segment";
 import type { GenericPoint, Polygon } from "./types";
 import { PRECISION } from "./utils";
 
@@ -44,7 +44,7 @@ export const pointOnPolygon = <Point extends GenericPoint>(
   let on = false;
 
   for (let i = 0, l = poly.length - 1; i < l; i++) {
-    if (pointOnLineSegment(p, lineSegment(poly[i], poly[i + 1]), threshold)) {
+    if (segmentIncludesPoint(p, segment(poly[i], poly[i + 1]), threshold)) {
       on = true;
       break;
     }
