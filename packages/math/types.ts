@@ -88,7 +88,7 @@ export type Triangle<P extends GenericPoint> = [a: P, b: P, c: P] & {
 /**
  * A rectangular shape represented by 4 points at its corners
  */
-export type Rectangle<P extends GenericPoint> = [a: P, b: P, c: P, d: P] & {
+export type Rectangle<P extends GenericPoint> = [a: P, b: P] & {
   _brand: "excalimath__rectangle";
 };
 

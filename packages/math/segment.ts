@@ -1,4 +1,3 @@
-import { invariant } from "../excalidraw/utils";
 import {
   isPoint,
   pointCenter,
@@ -23,10 +22,9 @@ import {
  * @returns The line segment delineated by the points
  */
 export function segment<P extends GenericPoint>(a: P, b: P): Segment<P> {
-  invariant(
-    !pointsEqual(a, b),
-    "The start and end points of the segment cannot match",
-  );
+  if (pointsEqual(a, b)) {
+    console.warn("The start and end points of the segment cannot match");
+  }
 
   return [a, b] as Segment<P>;
 }

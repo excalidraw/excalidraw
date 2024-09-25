@@ -253,15 +253,13 @@ const polylineFromPoints = <
   return polyline;
 };
 
-export const getFreedrawShape = <
-  Point extends GlobalPoint | LocalPoint | ViewportPoint,
->(
+export const getFreedrawShape = (
   element: ExcalidrawFreeDrawElement,
-  center: Point,
+  center: GlobalPoint,
   isClosed: boolean = false,
-): GeometricShape<Point> => {
-  const transform = (p: Point): Point =>
-    pointRotateRads<Point>(
+): GeometricShape<GlobalPoint> => {
+  const transform = (p: Readonly<LocalPoint>): GlobalPoint =>
+    pointRotateRads(
       pointFromVector(
         vectorAdd(vectorFromPoint(p), vector(element.x, element.y)),
       ),
@@ -269,9 +267,7 @@ export const getFreedrawShape = <
       element.angle,
     );
 
-  const polyline = polylineFromPoints(
-    element.points.map((p) => transform(p as Point)),
-  );
+  const polyline = polylineFromPoints(element.points.map((p) => transform(p)));
 
   return (
     isClosed
@@ -283,7 +279,7 @@ export const getFreedrawShape = <
           type: "polyline",
           data: polyline,
         }
-  ) as GeometricShape<Point>;
+  ) as GeometricShape<GlobalPoint>;
 };
 
 export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
