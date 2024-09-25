@@ -1,4 +1,4 @@
-import { isServerEnv, promiseTry } from "../utils";
+import { promiseTry } from "../utils";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
 import { subsetWoff2GlyphsByCodepoints } from "./subset/subset-main";
 
@@ -26,13 +26,9 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
     this.urls = ExcalidrawFontFace.createUrls(uri);
 
-    let sources = "";
-    // sources are irrelevant on the server
-    if (!isServerEnv()) {
-      sources = this.urls
-        .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
-        .join(", ");
-    }
+    const sources = this.urls
+      .map((url) => `url(${url}) ${ExcalidrawFontFace.getFormat(url)}`)
+      .join(", ");
 
     this.fontFace = new FontFace(family, sources, {
       display: "swap",
