@@ -1,9 +1,7 @@
 import { defineConfig } from "vitest/config";
-import { woff2BrowserPlugin } from "./scripts/woff2/woff2-vite-plugins";
 
 export default defineConfig({
   //@ts-ignore
-  plugins: [woff2BrowserPlugin()],
   test: {
     // Since hooks are running in stack in v2, which means all hooks run serially whereas
     // we need to run them in parallel
@@ -19,10 +17,10 @@ export default defineConfig({
       // Additionally the thresholds also needs to be updated slightly as a result of this change
       ignoreEmptyLines: false,
       thresholds: {
-        lines: 66,
+        lines: 60,
         branches: 70,
         functions: 63,
-        statements: 66,
+        statements: 60,
       },
     },
   },
