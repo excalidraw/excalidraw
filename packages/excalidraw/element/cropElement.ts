@@ -85,7 +85,7 @@ const _cropElement = (
     pointerY = clamp(pointerY, northBound, southBound);
 
     const pointerDeltaY = pointerY - element.y;
-    nextHeight = element.height - pointerDeltaY;
+    nextHeight = Math.max(element.height - pointerDeltaY, 1);
 
     crop.y = ((pointerDeltaY + croppedTop) / uncroppedHeight) * naturalHeight;
     crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
@@ -97,7 +97,7 @@ const _cropElement = (
 
     pointerY = clamp(pointerY, northBound, southBound);
 
-    nextHeight = pointerY - element.y;
+    nextHeight = Math.max(pointerY - element.y, 1);
     crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
   }
 
@@ -108,7 +108,7 @@ const _cropElement = (
     pointerX = clamp(pointerX, westBound, eastBound);
 
     const pointerDeltaX = pointerX - element.x;
-    nextWidth = element.width - pointerDeltaX;
+    nextWidth = Math.max(element.width - pointerDeltaX, 1);
 
     crop.x = ((pointerDeltaX + croppedLeft) / uncroppedWidth) * naturalWidth;
     crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
@@ -120,7 +120,7 @@ const _cropElement = (
 
     pointerX = clamp(pointerX, westBound, eastBound);
 
-    nextWidth = pointerX - element.x;
+    nextWidth = Math.max(pointerX - element.x, 1);
     crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
   }
 
