@@ -1,4 +1,4 @@
-import { Point } from "points-on-curve";
+import { type Point } from "points-on-curve";
 import {
   type Radians,
   point,
@@ -15,7 +15,7 @@ import {
 import { updateBoundElements } from "./binding";
 import { mutateElement } from "./mutateElement";
 import { TransformHandleType } from "./transformHandles";
-import {
+import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawImageElement,

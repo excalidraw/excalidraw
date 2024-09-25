@@ -5106,13 +5106,11 @@ class App extends React.Component<AppProps, AppState> {
   private startImageCropping = (image: ExcalidrawImageElement) => {
     this.setState({
       croppingElement: image,
-      isCropping: true,
     });
   };
 
   private finishImageCropping = () => {
     this.setState({
-      isCropping: false,
       croppingElement: null,
     });
   };
@@ -6590,12 +6588,6 @@ class App extends React.Component<AppProps, AppState> {
         arrowDirection: "origin",
         center: { x: (maxX + minX) / 2, y: (maxY + minY) / 2 },
       },
-      crop: {
-        handleType: false,
-        isCropping: false,
-        offset: { x: 0, y: 0 },
-        complete: false,
-      },
       hit: {
         element: null,
         allHitElements: [],
@@ -6716,11 +6708,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
           } else if (this.state.croppingElement) {
-            this.setState({
-              croppingElement:
-                elementWithTransformHandleType.element as ExcalidrawImageElement,
-            });
-            pointerDownState.crop.handleType =
+            pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
           } else {
             this.setState({
@@ -6761,17 +6749,6 @@ class App extends React.Component<AppProps, AppState> {
             selectedElements[0],
           );
         }
-      } else if (pointerDownState.crop.handleType) {
-        pointerDownState.crop.isCropping = true;
-        pointerDownState.crop.offset = tupleToCoors(
-          getResizeOffsetXY(
-            pointerDownState.crop.handleType,
-            selectedElements,
-            this.scene.getNonDeletedElementsMap(),
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          ),
-        );
       } else {
         if (this.state.selectedLinearElement) {
           const linearElementEditor =
@@ -6805,6 +6782,13 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
+
+        if (
+          this.state.croppingElement &&
+          pointerDownState.hit.element !== this.state.croppingElement
+        ) {
+          this.finishImageCropping();
+        }
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
@@ -7667,14 +7651,10 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        if (this.maybeHandleResize(pointerDownState, event)) {
+        if (this.maybeHandleCrop(pointerDownState, event)) {
           return true;
         }
-      }
-      if (pointerDownState.crop.isCropping) {
-        pointerDownState.lastCoords.x = pointerCoords.x;
-        pointerDownState.lastCoords.y = pointerCoords.y;
-        if (this.maybeHandleCrop(pointerDownState, event)) {
+        if (this.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
       }
@@ -7847,17 +7827,17 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
-          // #region drag
+          // #region move crop region
+          const croppingElement = this.state.croppingElement;
           if (
-            selectedElements.length === 1 &&
-            isImageElement(selectedElements[0]) &&
-            this.state.croppingElement?.id === selectedElements[0].id &&
-            selectedElements[0].crop !== null
+            croppingElement &&
+            croppingElement.crop !== null &&
+            pointerDownState.hit.element === croppingElement
           ) {
-            const crop = selectedElements[0].crop;
+            const crop = croppingElement.crop;
             const image =
-              isInitializedImageElement(selectedElements[0]) &&
-              this.imageCache.get(selectedElements[0].fileId)?.image;
+              isInitializedImageElement(croppingElement) &&
+              this.imageCache.get(croppingElement.fileId)?.image;
 
             if (image && !(image instanceof Promise)) {
               const instantDragOffset = {
@@ -7865,42 +7845,21 @@ class App extends React.Component<AppProps, AppState> {
                 y: pointerCoords.y - lastPointerCoords.y,
               };
 
-              // current offset is based on the element's width and height
-              const uncroppedWidth =
-                selectedElements[0].initialWidth *
-                selectedElements[0].resizeFactors[0];
-              const uncroppedHeight =
-                selectedElements[0].initialHeight *
-                selectedElements[0].resizeFactors[1];
-
-              const SENSITIVITY_FACTOR = 3;
-
-              const adjustedOffset = {
-                x:
-                  instantDragOffset.x *
-                  (uncroppedWidth / image.naturalWidth) *
-                  SENSITIVITY_FACTOR,
-                y:
-                  instantDragOffset.y *
-                  (uncroppedHeight / image.naturalHeight) *
-                  SENSITIVITY_FACTOR,
-              };
-
               const nextCrop = {
                 ...crop,
                 x: clamp(
-                  crop.x - adjustedOffset.x,
+                  crop.x - instantDragOffset.x,
                   0,
                   image.naturalWidth - crop.width,
                 ),
                 y: clamp(
-                  crop.y - adjustedOffset.y,
+                  crop.y - instantDragOffset.y,
                   0,
                   image.naturalHeight - crop.height,
                 ),
               };
 
-              mutateElement(selectedElements[0], {
+              mutateElement(croppingElement, {
                 crop: nextCrop,
               });
             }
@@ -8290,6 +8249,7 @@ class App extends React.Component<AppProps, AppState> {
       const {
         newElement,
         resizingElement,
+        croppingElement,
         multiElement,
         activeTool,
         isResizing,
@@ -8300,6 +8260,7 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
+        isCropping: false,
         resizingElement: null,
         selectionElement: null,
         frameToHighlight: null,
@@ -8793,11 +8754,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // click outside the cropping region to exit o0ol
       if (
-        isCropping &&
-        !isResizing &&
-        ((!hitElement && !pointerDownState.crop.isCropping) ||
-          (hitElement && hitElement !== this.state.croppingElement))
+        // not in the cropping mode at all
+        !croppingElement ||
+        // in the cropping mode
+        (croppingElement &&
+          // not cropping and no hit element
+          ((!hitElement && !isCropping) ||
+            // hitting something else
+            (hitElement && hitElement !== croppingElement)))
       ) {
         this.finishImageCropping();
       }
@@ -10033,37 +9999,33 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
-    if (pointerDownState.crop.complete) {
-      return true;
-    }
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElements(),
-      this.state,
-    );
-
-    if (selectedElements.length > 1) {
-      // don't see much sense in allowing multi-crop, that would be weird
+    // to crop, we must already be in the cropping mode, where croppingElement has been set
+    if (!this.state.croppingElement) {
       return false;
     }
 
-    const transformHandleType = pointerDownState.crop.handleType;
+    const transformHandleType = pointerDownState.resize.handleType;
     const pointerCoords = pointerDownState.lastCoords;
     const [x, y] = getGridPoint(
-      pointerCoords.x - pointerDownState.crop.offset.x,
-      pointerCoords.y - pointerDownState.crop.offset.y,
+      pointerCoords.x - pointerDownState.resize.offset.x,
+      pointerCoords.y - pointerDownState.resize.offset.y,
       this.getEffectiveGridSize(),
     );
 
-    const elementToCrop = selectedElements[0] as ExcalidrawImageElement;
     if (transformHandleType) {
       cropElement(
-        elementToCrop,
+        this.state.croppingElement,
         this.scene.getNonDeletedElementsMap(),
         this.imageCache,
         transformHandleType,
         x,
         y,
       );
+
+      this.setState({
+        isCropping: transformHandleType && transformHandleType !== "rotation",
+      });
+
       return true;
     }
 

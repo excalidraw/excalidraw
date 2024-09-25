@@ -602,7 +602,7 @@ const renderCropHandles = (
   const lineWidth = 3 / appState.zoom.value;
   const length = 15 / appState.zoom.value;
 
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+  const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
     croppingElement,
     elementsMap,
   );
@@ -1002,7 +1002,7 @@ const _renderInteractiveScene = ({
         );
       }
 
-      if (appState.isCropping && appState.croppingElement) {
+      if (appState.croppingElement && !appState.isCropping) {
         renderCropHandles(
           context,
           renderConfig,

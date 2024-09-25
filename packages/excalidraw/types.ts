@@ -177,7 +177,6 @@ export type StaticCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     // Cropping
-    isCropping: AppState["isCropping"];
     croppingElement: AppState["croppingElement"];
   }
 >;
@@ -676,12 +675,6 @@ export type PointerDownState = Readonly<{
     arrowDirection: "origin" | "end";
     // This is a center point of selected elements determined on the initial pointer down event (for rotation only)
     center: { x: number; y: number };
-  };
-  crop: {
-    handleType: MaybeTransformHandleType;
-    isCropping: boolean;
-    offset: { x: number; y: number };
-    complete: boolean;
   };
   hit: {
     // The element the pointer is "hitting", is determined on the initial
