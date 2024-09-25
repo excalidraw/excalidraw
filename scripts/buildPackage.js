@@ -1,7 +1,6 @@
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
-const { woff2BrowserPlugin } = require("./woff2/woff2-esbuild-plugins");
 
 // Will be used later for treeshaking
 //const fs = require("fs");
@@ -45,13 +44,15 @@ const browserConfig = {
   format: "esm",
   plugins: [
     sassPlugin(),
-    woff2BrowserPlugin(),
     externalGlobalPlugin({
       react: "React",
       "react-dom": "ReactDOM",
     }),
   ],
   splitting: true,
+  loader: {
+    ".woff2": "file",
+  },
 };
 const createESMBrowserBuild = async () => {
   // Development unminified build with source maps
@@ -100,9 +101,10 @@ const rawConfig = {
   entryPoints: ["index.tsx"],
   bundle: true,
   format: "esm",
-  plugins: [sassPlugin(), woff2BrowserPlugin()],
+  plugins: [sassPlugin()],
   loader: {
     ".json": "copy",
+    ".woff2": "file",
   },
   packages: "external",
 };
