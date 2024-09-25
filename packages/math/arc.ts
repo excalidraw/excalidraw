@@ -1,6 +1,8 @@
+import { invariant } from "../excalidraw/utils";
 import { cartesian2Polar, radians } from "./angle";
 import { ellipse, ellipseSegmentInterceptPoints } from "./ellipse";
-import { point } from "./point";
+import { point, pointDistance } from "./point";
+import { segment } from "./segment";
 import type { GenericPoint, Segment, Radians, Arc } from "./types";
 import { PRECISION } from "./utils";
 
@@ -40,6 +42,25 @@ export function arcIncludesPoint<P extends GenericPoint>(
         startAngle <= angle &&
         endAngle >= angle
     : startAngle <= angle || endAngle >= angle;
+}
+
+/**
+ *
+ * @param a
+ * @param p
+ */
+export function arcDistanceFromPoint<Point extends GenericPoint>(
+  a: Arc<Point>,
+  p: Point,
+) {
+  const intersectPoint = arcSegmentInterceptPoint(a, segment(p, a.center));
+
+  invariant(
+    intersectPoint.length !== 1,
+    "Arc distance intersector cannot have multiple intersections",
+  );
+
+  return pointDistance(intersectPoint[0], p);
 }
 
 /**

@@ -25,7 +25,6 @@ import type {
   ExcalidrawElbowArrowElement,
   FixedPoint,
   SceneElementsMap,
-  ExcalidrawRectanguloidElement,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -63,7 +62,7 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import type { LocalPoint, Radians } from "../../math";
+import type { LocalPoint } from "../../math";
 import {
   segment,
   point,
@@ -76,6 +75,7 @@ import {
   radians,
 } from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
+import { distanceToBindableElement } from "./distance";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -557,10 +557,7 @@ const calculateFocusAndGap = (
       edgePoint,
       elementsMap,
     ),
-    gap: Math.max(
-      1,
-      distanceToBindableElement(hoveredElement, edgePoint, elementsMap),
-    ),
+    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
   };
 };
 
@@ -736,11 +733,7 @@ const getDistanceForBinding = (
   bindableElement: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
 ) => {
-  const distance = distanceToBindableElement(
-    bindableElement,
-    point,
-    elementsMap,
-  );
+  const distance = distanceToBindableElement(bindableElement, point);
   const bindDistance = maxBindingGap(
     bindableElement,
     bindableElement.width,
@@ -781,9 +774,7 @@ export const bindPointToSnapToElementOutline = (
     const isVertical =
       compareHeading(heading, HEADING_LEFT) ||
       compareHeading(heading, HEADING_RIGHT);
-    const dist = Math.abs(
-      distanceToBindableElement(bindableElement, p, elementsMap),
-    );
+    const dist = Math.abs(distanceToBindableElement(bindableElement, p));
     const isInner = isVertical
       ? dist < bindableElement.width * -0.1
       : dist < bindableElement.height * -0.1;
@@ -937,7 +928,7 @@ export const snapToMid = (
 ): GlobalPoint => {
   const { x, y, width, height, angle } = element;
   const center = point<GlobalPoint>(x + width / 2 - 0.1, y + height / 2 - 0.1);
-  const nonRotated = pointRotateRads(p, center, -angle as Radians);
+  const nonRotated = pointRotateRads(p, center, radians(-angle));
 
   // snap-to-center point is adaptive to element size, but we don't want to go
   // above and below certain px distance
@@ -1123,7 +1114,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   const nonRotatedSnappedGlobalPoint = pointRotateRads(
     snappedPoint,
     globalMidPoint,
-    -hoveredElement.angle as Radians,
+    radians(-hoveredElement.angle),
   );
 
   return {
@@ -1349,148 +1340,6 @@ export const maxBindingGap = (
   const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
   // We make the bindable boundary bigger for bigger elements
   return Math.max(16, Math.min(0.25 * smallerDimension, 32));
-};
-
-export const distanceToBindableElement = (
-  element: ExcalidrawBindableElement,
-  point: GlobalPoint,
-  elementsMap: ElementsMap,
-): number => {
-  switch (element.type) {
-    case "rectangle":
-    case "image":
-    case "text":
-    case "iframe":
-    case "embeddable":
-    case "frame":
-    case "magicframe":
-      return distanceToRectangle(element, point, elementsMap);
-    case "diamond":
-      return distanceToDiamond(element, point, elementsMap);
-    case "ellipse":
-      return distanceToEllipse(element, point, elementsMap);
-  }
-};
-
-const distanceToRectangle = (
-  element: ExcalidrawRectanguloidElement,
-  p: GlobalPoint,
-  elementsMap: ElementsMap,
-): number => {
-  const [, pointRel, hwidth, hheight] = pointRelativeToElement(
-    element,
-    p,
-    elementsMap,
-  );
-  return Math.max(
-    GAPoint.distanceToLine(pointRel, GALine.equation(0, 1, -hheight)),
-    GAPoint.distanceToLine(pointRel, GALine.equation(1, 0, -hwidth)),
-  );
-};
-
-const distanceToDiamond = (
-  element: ExcalidrawDiamondElement,
-  point: GlobalPoint,
-  elementsMap: ElementsMap,
-): number => {
-  const [, pointRel, hwidth, hheight] = pointRelativeToElement(
-    element,
-    point,
-    elementsMap,
-  );
-  const side = GALine.equation(hheight, hwidth, -hheight * hwidth);
-  return GAPoint.distanceToLine(pointRel, side);
-};
-
-const distanceToEllipse = (
-  element: ExcalidrawEllipseElement,
-  point: GlobalPoint,
-  elementsMap: ElementsMap,
-): number => {
-  const [pointRel, tangent] = ellipseParamsForTest(element, point, elementsMap);
-  return -GALine.sign(tangent) * GAPoint.distanceToLine(pointRel, tangent);
-};
-
-const ellipseParamsForTest = (
-  element: ExcalidrawEllipseElement,
-  point: GlobalPoint,
-  elementsMap: ElementsMap,
-): [GA.Point, GA.Line] => {
-  const [, pointRel, hwidth, hheight] = pointRelativeToElement(
-    element,
-    point,
-    elementsMap,
-  );
-  const [px, py] = GAPoint.toTuple(pointRel);
-
-  // We're working in positive quadrant, so start with `t = 45deg`, `tx=cos(t)`
-  let tx = 0.707;
-  let ty = 0.707;
-
-  const a = hwidth;
-  const b = hheight;
-
-  // This is a numerical method to find the params tx, ty at which
-  // the ellipse has the closest point to the given point
-  [0, 1, 2, 3].forEach((_) => {
-    const xx = a * tx;
-    const yy = b * ty;
-
-    const ex = ((a * a - b * b) * tx ** 3) / a;
-    const ey = ((b * b - a * a) * ty ** 3) / b;
-
-    const rx = xx - ex;
-    const ry = yy - ey;
-
-    const qx = px - ex;
-    const qy = py - ey;
-
-    const r = Math.hypot(ry, rx);
-    const q = Math.hypot(qy, qx);
-
-    tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
-    ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
-    const t = Math.hypot(ty, tx);
-    tx /= t;
-    ty /= t;
-  });
-
-  const closestPoint = GA.point(a * tx, b * ty);
-
-  const tangent = GALine.orthogonalThrough(pointRel, closestPoint);
-  return [pointRel, tangent];
-};
-
-// Returns:
-//   1. the point relative to the elements (x, y) position
-//   2. the point relative to the element's center with positive (x, y)
-//   3. half element width
-//   4. half element height
-//
-// Note that for linear elements the (x, y) position is not at the
-// top right corner of their boundary.
-//
-// Rectangles, diamonds and ellipses are symmetrical over axes,
-// and other elements have a rectangular boundary,
-// so we only need to perform hit tests for the positive quadrant.
-const pointRelativeToElement = (
-  element: ExcalidrawElement,
-  pointTuple: GlobalPoint,
-  elementsMap: ElementsMap,
-): [GA.Point, GA.Point, number, number] => {
-  const point = GAPoint.from(pointTuple);
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-  const center = coordsCenter(x1, y1, x2, y2);
-  // GA has angle orientation opposite to `rotate`
-  const rotate = GATransform.rotation(center, element.angle);
-  const pointRotated = GATransform.apply(rotate, point);
-  const pointRelToCenter = GA.sub(pointRotated, GADirection.from(center));
-  const pointRelToCenterAbs = GAPoint.abs(pointRelToCenter);
-  const elementPos = GA.offset(element.x, element.y);
-  const pointRelToPos = GA.sub(pointRotated, elementPos);
-  const halfWidth = (x2 - x1) / 2;
-  const halfHeight = (y2 - y1) / 2;
-  return [pointRelToPos, pointRelToCenterAbs, halfWidth, halfHeight];
 };
 
 const relativizationToElementCenter = (

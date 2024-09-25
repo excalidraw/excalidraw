@@ -122,11 +122,11 @@ export const segmentIncludesPoint = <Point extends GenericPoint>(
 };
 
 export const segmentDistanceToPoint = <Point extends GenericPoint>(
-  point: Point,
-  line: Segment<Point>,
+  p: Point,
+  s: Segment<Point>,
 ) => {
-  const [x, y] = point;
-  const [[x1, y1], [x2, y2]] = line;
+  const [x, y] = p;
+  const [[x1, y1], [x2, y2]] = s;
 
   const A = x - x1;
   const B = y - y1;

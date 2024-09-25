@@ -140,10 +140,10 @@ export const findShapeByKey = (key: string) => {
  * get the pure geometric shape of an excalidraw element
  * which is then used for hit detection
  */
-export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
+export const getElementShape = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape<Point> => {
+): GeometricShape<GlobalPoint> => {
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -163,16 +163,16 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
-        ? getClosedCurveShape<Point>(
+        ? getClosedCurveShape<GlobalPoint>(
             element,
             roughShape,
-            point<Point>(element.x, element.y),
+            point<GlobalPoint>(element.x, element.y),
             element.angle,
             point(cx, cy),
           )
-        : getCurveShape<Point>(
+        : getCurveShape<GlobalPoint>(
             roughShape,
-            point<Point>(element.x, element.y),
+            point<GlobalPoint>(element.x, element.y),
             element.angle,
             point(cx, cy),
           );
@@ -192,10 +192,10 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   }
 };
 
-export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
+export const getBoundTextShape = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape<Point> | null => {
+): GeometricShape<GlobalPoint> | null => {
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (boundTextElement) {
