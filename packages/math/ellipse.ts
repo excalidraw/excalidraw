@@ -82,63 +82,10 @@ export const ellipseTouchesPoint = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
 ) => {
-  return distanceToEllipse(point, ellipse) <= threshold;
+  return ellipseDistance(point, ellipse) <= threshold;
 };
 
-export const ellipseFocusToCenter = <Point extends GenericPoint>(
-  ellipse: Ellipse<Point>,
-) => {
-  const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
-
-  const majorAxis = widthGreaterThanHeight
-    ? ellipse.halfWidth * 2
-    : ellipse.halfHeight * 2;
-  const minorAxis = widthGreaterThanHeight
-    ? ellipse.halfHeight * 2
-    : ellipse.halfWidth * 2;
-
-  return Math.sqrt(majorAxis ** 2 - minorAxis ** 2);
-};
-
-export const ellipseExtremes = <Point extends GenericPoint>(
-  ellipse: Ellipse<Point>,
-) => {
-  const { center, angle } = ellipse;
-  const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
-
-  const majorAxis = widthGreaterThanHeight
-    ? ellipse.halfWidth * 2
-    : ellipse.halfHeight * 2;
-  const minorAxis = widthGreaterThanHeight
-    ? ellipse.halfHeight * 2
-    : ellipse.halfWidth * 2;
-
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-
-  const sqSum = majorAxis ** 2 + minorAxis ** 2;
-  const sqDiff = (majorAxis ** 2 - minorAxis ** 2) * Math.cos(2 * angle);
-
-  const yMax = Math.sqrt((sqSum - sqDiff) / 2);
-  const xAtYMax =
-    (yMax * sqSum * sin * cos) /
-    (majorAxis ** 2 * sin ** 2 + minorAxis ** 2 * cos ** 2);
-
-  const xMax = Math.sqrt((sqSum + sqDiff) / 2);
-  const yAtXMax =
-    (xMax * sqSum * sin * cos) /
-    (majorAxis ** 2 * cos ** 2 + minorAxis ** 2 * sin ** 2);
-  const centerVector = vectorFromPoint(center);
-
-  return [
-    vectorAdd(vector(xAtYMax, yMax), centerVector),
-    vectorAdd(vectorScale(vector(xAtYMax, yMax), -1), centerVector),
-    vectorAdd(vector(xMax, yAtXMax), centerVector),
-    vectorAdd(vector(xMax, yAtXMax), centerVector),
-  ];
-};
-
-const distanceToEllipse = <Point extends GenericPoint>(
+export const ellipseDistance = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {

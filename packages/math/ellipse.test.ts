@@ -50,8 +50,31 @@ describe("point and ellipse", () => {
 
 describe("line and ellipse", () => {
   it("detects outside segment", () => {
-    const l = segment<GlobalPoint>(point(-100, 0), point(-10, 0));
     const e = ellipse(point(0, 0), radians(0), 2, 2);
-    expect(ellipseSegmentInterceptPoints(e, l).length).toBe(0);
+
+    expect(
+      ellipseSegmentInterceptPoints(
+        e,
+        segment<GlobalPoint>(point(-100, 0), point(-10, 0)),
+      ),
+    ).toEqual([]);
+    expect(
+      ellipseSegmentInterceptPoints(
+        e,
+        segment<GlobalPoint>(point(-10, 0), point(10, 0)),
+      ),
+    ).toEqual([point(-2, 0), point(2, 0)]);
+    expect(
+      ellipseSegmentInterceptPoints(
+        e,
+        segment<GlobalPoint>(point(-10, -2), point(10, -2)),
+      ),
+    ).toEqual([point(0, -2)]);
+    expect(
+      ellipseSegmentInterceptPoints(
+        e,
+        segment<GlobalPoint>(point(0, -1), point(0, 1)),
+      ),
+    ).toEqual([]);
   });
 });

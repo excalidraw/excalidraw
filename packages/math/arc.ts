@@ -6,11 +6,11 @@ import { PRECISION } from "./utils";
 
 /**
  * Constructs a symmetric arc defined by the originating circle radius
- * the start angle and end angle with 0 radians being the "northest" point
+ * the start angle and end angle with 0 radians being the most "eastward" point
  * of the circle.
  *
  * @param radius The radius of the circle this arc lies on
- * @param startAngle The start angle with 0 radians being the "northest" point
+ * @param startAngle The start angle with 0 radians being the most "eastward" point
  * @param endAngle The end angle with 0 radians being the "northest" point
  * @returns The constructed symmetric arc
  */
@@ -46,20 +46,20 @@ export function arcIncludesPoint<P extends GenericPoint>(
  * Returns the intersection point(s) of a line segment represented by a start
  * point and end point and a symmetric arc.
  */
-export function interceptOfSymmetricArcAndSegment<Point extends GenericPoint>(
+export function arcSegmentInterceptPoint<Point extends GenericPoint>(
   a: Readonly<Arc<Point>>,
-  l: Readonly<Segment<Point>>,
+  s: Readonly<Segment<Point>>,
 ): Point[] {
   return ellipseSegmentInterceptPoints(
     ellipse(a.center, radians(0), a.radius, a.radius),
-    l,
+    s,
   ).filter((candidate) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(
       point(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
 
     return a.startAngle < a.endAngle
-      ? Math.abs(a.radius - candidateRadius) < 0.0000001 &&
+      ? Math.abs(a.radius - candidateRadius) < PRECISION &&
           a.startAngle <= candidateAngle &&
           a.endAngle >= candidateAngle
       : a.startAngle <= candidateAngle || a.endAngle >= candidateAngle;

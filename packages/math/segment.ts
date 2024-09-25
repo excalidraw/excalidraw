@@ -1,8 +1,10 @@
+import { invariant } from "../excalidraw/utils";
 import {
   isPoint,
   pointCenter,
   pointFromVector,
   pointRotateRads,
+  pointsEqual,
 } from "./point";
 import type { GenericPoint, Segment, Radians } from "./types";
 import { PRECISION } from "./utils";
@@ -21,6 +23,11 @@ import {
  * @returns The line segment delineated by the points
  */
 export function segment<P extends GenericPoint>(a: P, b: P): Segment<P> {
+  invariant(
+    !pointsEqual(a, b),
+    "The start and end points of the segment cannot match",
+  );
+
   return [a, b] as Segment<P>;
 }
 

@@ -12,11 +12,7 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import {
-  isSegment,
-  type GlobalPoint,
-  type Segment,
-} from "../../packages/math";
+import { isSegment, type GlobalPoint, type Segment } from "../../packages/math";
 
 const renderLine = (
   context: CanvasRenderingContext2D,

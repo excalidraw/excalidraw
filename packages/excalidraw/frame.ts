@@ -136,12 +136,7 @@ const getElementLineSegments = (
   ).map((point) => pointRotateRads(point, center, element.angle));
 
   if (element.type === "diamond") {
-    return [
-      segment(n, w),
-      segment(n, e),
-      segment(s, w),
-      segment(s, e),
-    ];
+    return [segment(n, w), segment(n, e), segment(s, w), segment(s, e)];
   }
 
   if (element.type === "ellipse") {

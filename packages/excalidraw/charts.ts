@@ -1,4 +1,3 @@
-import type { Radians } from "../math";
 import { point, radians } from "../math";
 import {
   COLOR_PALETTE,
