@@ -139,18 +139,21 @@ export const FONT_FAMILY = {
   "Liberation Sans": 9,
 };
 
-/** Separated fallback families, not the mix them main ones  */
 export const FONT_FAMILY_FALLBACKS = {
-  [CHINESE_HANDWRITTEN_FALLBACK_FONT]: 1000,
-  [WINDOWS_EMOJI_FALLBACK_FONT]: 10000,
+  [CHINESE_HANDWRITTEN_FALLBACK_FONT]: 100,
+  [WINDOWS_EMOJI_FALLBACK_FONT]: 1000,
 };
 
-// both of these could be in theory computed, though for such a small list it's just better to hardcode these
-export const FONT_FAMILY_FALLBACKS_STRING = `${CHINESE_HANDWRITTEN_FALLBACK_FONT}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
-export const FONT_FAMILY_FALLBACKS_ORDERED = [
-  FONT_FAMILY_FALLBACKS[CHINESE_HANDWRITTEN_FALLBACK_FONT],
-  FONT_FAMILY_FALLBACKS[WINDOWS_EMOJI_FALLBACK_FONT],
-];
+export const getFontFamilyFallbacks = (
+  fontFamily: number,
+): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
+  switch (fontFamily) {
+    case FONT_FAMILY.Excalifont:
+      return [CHINESE_HANDWRITTEN_FALLBACK_FONT, WINDOWS_EMOJI_FALLBACK_FONT];
+    default:
+      return [WINDOWS_EMOJI_FALLBACK_FONT];
+  }
+};
 
 export const THEME = {
   LIGHT: "light",

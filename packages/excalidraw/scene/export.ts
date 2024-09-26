@@ -26,7 +26,8 @@ import {
   THEME,
   THEME_FILTER,
   FONT_FAMILY_FALLBACKS,
-  FONT_FAMILY_FALLBACKS_ORDERED,
+  getFontFamilyFallbacks,
+  CHINESE_HANDWRITTEN_FALLBACK_FONT,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -477,16 +478,25 @@ const getFontFaces = async (
     }
   }
 
+  const orderedFamilies = Array.from(fontFamilies);
   const uniqueChars = Array.from(characters).join("");
   const uniqueCodePoints = Array.from(codePoints);
 
-  // quick check for Han, might match a bit more, which is fine
-  if (containsChinese(uniqueChars)) {
-    fontFamilies.add(FONT_FAMILY_FALLBACKS.Xiaolai);
+  const containsChineseFallback = orderedFamilies.find((x) =>
+    getFontFamilyFallbacks(x).includes(CHINESE_HANDWRITTEN_FALLBACK_FONT),
+  );
+
+  // quick check for Han might match a bit more, which is fine
+  if (containsChineseFallback && containsChinese(uniqueChars)) {
+    // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
+    // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
+    orderedFamilies.unshift(
+      FONT_FAMILY_FALLBACKS[CHINESE_HANDWRITTEN_FALLBACK_FONT],
+    );
   }
 
   const iterator = fontFacesIterator(
-    fontFamilies,
+    orderedFamilies,
     uniqueChars,
     uniqueCodePoints,
   );
@@ -502,15 +512,11 @@ const getFontFaces = async (
 };
 
 function* fontFacesIterator(
-  families: Set<number>,
+  families: Array<number>,
   characters: string,
   codePoints: Array<number>,
 ): Generator<Promise<void | readonly [number, string]>> {
-  // the order between the families is important, as fallbacks need to be defined first and in the reversed order
-  // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
-  const reversedFallbacks = Array.from(FONT_FAMILY_FALLBACKS_ORDERED).reverse();
-
-  for (const [familyIndex, family] of Array.from(families).entries()) {
+  for (const [familyIndex, family] of families.entries()) {
     const { fontFaces, metadata } = Fonts.registered.get(family) ?? {};
 
     if (!Array.isArray(fontFaces)) {
@@ -526,23 +532,6 @@ function* fontFacesIterator(
       continue;
     }
 
-    const fallbackIndex = reversedFallbacks.findIndex(
-      (fallback) => fallback === family,
-    );
-
-    let fontFamilyOrder: number;
-
-    if (fallbackIndex !== -1) {
-      // making sure the fallback fonts are defined first, so that they don't override default fonts
-      fontFamilyOrder = fallbackIndex;
-    } else {
-      // making sure the built-in font faces are always defined after fallback fonts
-      fontFamilyOrder = FONT_FAMILY_FALLBACKS_ORDERED.length + familyIndex;
-    }
-
-    // making a safe buffer in between the families, assuming there won't be more than 10k font faces per family
-    fontFamilyOrder *= 10_000;
-
     for (const [fontFaceIndex, fontFace] of fontFaces.entries()) {
       yield promiseTry(async () => {
         try {
@@ -552,7 +541,7 @@ function* fontFacesIterator(
             return;
           }
 
-          const fontFaceOrder = fontFamilyOrder + fontFaceIndex;
+          const fontFaceOrder = familyIndex + fontFaceIndex;
           const fontFaceTuple = [fontFaceOrder, fontFaceCSS] as const;
 
           return fontFaceTuple;

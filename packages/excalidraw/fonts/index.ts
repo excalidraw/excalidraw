@@ -8,7 +8,12 @@ import type {
 import { ShapeCache } from "../scene/ShapeCache";
 import { isTextElement } from "../element";
 import { getFontString } from "../utils";
-import { FONT_FAMILY, FONT_FAMILY_FALLBACKS } from "../constants";
+import {
+  FONT_FAMILY,
+  FONT_FAMILY_FALLBACKS,
+  WINDOWS_EMOJI_FALLBACK_FONT,
+  CHINESE_HANDWRITTEN_FALLBACK_FONT,
+} from "../constants";
 import { FONT_METADATA, type FontMetadata } from "./metadata";
 import { getContainerElement } from "../element/textElement";
 import {
@@ -211,7 +216,9 @@ export class Fonts {
         FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
         FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
 
-      const metadata = FONT_METADATA[fontFamily];
+      // default to Excalifont metrics
+      const metadata =
+        FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
 
       register.call(fonts, family, metadata, ...fontFacesDescriptors);
     };
@@ -228,8 +235,8 @@ export class Fonts {
     init("Virgil", ...VirgilFontFaces);
 
     // fallback font faces
-    init("Xiaolai", ...XiaolaiFontFaces);
-    init("Segoe UI Emoji", ...EmojiFontFaces);
+    init(CHINESE_HANDWRITTEN_FALLBACK_FONT, ...XiaolaiFontFaces);
+    init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
 
     Fonts._initialized = true;
 
