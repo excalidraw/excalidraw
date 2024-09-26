@@ -47,7 +47,7 @@
     "arrowhead_diamond": "ひし形",
     "arrowhead_diamond_outline": "ひし形 (中抜き)",
     "arrowtypes": "",
-    "arrowtype_sharp": "",
+    "arrowtype_sharp": "鋭い矢印",
     "arrowtype_round": "",
     "arrowtype_elbowed": "",
     "fontSize": "フォントの大きさ",
@@ -78,7 +78,7 @@
     "canvasColors": "キャンバス上で使用",
     "canvasBackground": "キャンバスの背景",
     "drawingCanvas": "キャンバスの描画",
-    "clearCanvas": "",
+    "clearCanvas": "キャンバスを片付ける",
     "layers": "レイヤー",
     "actions": "操作",
     "language": "言語",
@@ -114,8 +114,8 @@
     "showStroke": "ストロークカラーピッカーを表示",
     "showBackground": "背景色ピッカーを表示",
     "showFonts": "",
-    "toggleTheme": "",
-    "theme": "",
+    "toggleTheme": "ライト/ダークテーマに変更",
+    "theme": "テーマ",
     "personalLib": "個人ライブラリ",
     "excalidrawLib": "Excalidrawライブラリ",
     "decreaseFontSize": "フォントサイズを縮小",
@@ -134,7 +134,7 @@
     },
     "lineEditor": {
       "edit": "行を編集",
-      "editArrow": ""
+      "editArrow": "矢印を編集"
     },
     "elementLock": {
       "lock": "ロック",
@@ -163,7 +163,7 @@
     "hint_emptyPrivateLibrary": "キャンバス上のアイテムを選択すると、ここに追加されます。"
   },
   "search": {
-    "title": "",
+    "title": "キャンバスで検索",
     "noMatch": "",
     "singleResult": "",
     "multipleResults": "",
@@ -175,7 +175,7 @@
     "exportImage": "画像のエクスポート...",
     "export": "名前を付けて保存...",
     "copyToClipboard": "クリップボードにコピー",
-    "copyLink": "",
+    "copyLink": "リンクをコピー",
     "save": "現在のファイルに保存",
     "saveAs": "名前を付けて保存",
     "load": "開く",
@@ -285,18 +285,18 @@
   "element": {
     "rectangle": "",
     "diamond": "",
-    "ellipse": "",
+    "ellipse": "楕円",
     "arrow": "",
     "line": "",
     "freedraw": "",
-    "text": "",
-    "image": "",
+    "text": "文字",
+    "image": "画像",
     "group": "",
     "frame": "",
-    "magicframe": "",
+    "magicframe": "ワイヤーフレームからコードを生成",
     "embeddable": "",
     "selection": "",
-    "iframe": ""
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "キャンバス操作",
@@ -476,7 +476,7 @@
     "selected": "選択済み",
     "storage": "ストレージ",
     "fullTitle": "",
-    "title": "",
+    "title": "プロパティ",
     "generalStats": "",
     "elementProperties": "",
     "total": "合計",
