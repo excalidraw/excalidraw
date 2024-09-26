@@ -155,7 +155,10 @@
     "zoomToFitSelection": "Zoom to fit selection",
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
-    "autoResize": "Enable text auto-resizing"
+    "autoResize": "Enable text auto-resizing",
+    "changeToRectangle": "Change shape type to rectangle",
+    "changeToDiamond": "Change shape type to diamond",
+    "changeToEllipse": "Change shape type to ellipse"
   },
   "library": {
     "noItems": "No items added yet...",

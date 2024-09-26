@@ -89,4 +89,8 @@ export { actionToggleLinearEditor } from "./actionLinearEditor";
 
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";
 
-export { actionGroupChange } from "./actionGroupChange";
+export {
+  actionChangeToRectangle,
+  actionChangeToDiamond,
+  actionChangeToEllipse,
+} from "./actionTypeChange";
