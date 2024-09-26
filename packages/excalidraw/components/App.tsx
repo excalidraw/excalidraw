@@ -2918,6 +2918,7 @@ class App extends React.Component<AppProps, AppState> {
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
       const isPlainPaste = !!IS_PLAIN_PASTE;
+
       // #686
       const target = document.activeElement;
       const isExcalidrawActive =
@@ -3930,6 +3931,7 @@ class App extends React.Component<AppProps, AppState> {
           this.triggerRender(true);
           return;
         }
+
         const arrowKeyPressed = isArrowKey(event.key);
 
         if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
