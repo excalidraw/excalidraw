@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。"
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "title": "在画布上查找",
+    "noMatch": "无匹配项…",
+    "singleResult": "结果",
+    "multipleResults": "结果",
+    "placeholder": "在画布上查找文本…"
   },
   "buttons": {
     "clearReset": "重置画布",
