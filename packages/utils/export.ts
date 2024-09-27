@@ -208,3 +208,12 @@ export const exportToClipboard = async (
     throw new Error("Invalid export type");
   }
 };
+
+export { getCommonBoundingBox } from "../excalidraw/element/bounds"; //zsviczian
+export { getMaximumGroups } from "../excalidraw/groups"; //zsviczian
+export { intersectElementWithLine } from "../excalidraw/element/binding"; //zsviczian
+export { determineFocusDistance } from "../excalidraw/element/binding"; //zsviczian
+export { measureText, wrapText } from "../excalidraw/element/textElement"; //zsviczian
+export { getLineHeight } from "../excalidraw/fonts/index"; //zsviczian
+export { getFontString, getFontFamilyString } from "../excalidraw/utils"; //zsviczian
+export { getBoundTextMaxWidth } from "../excalidraw/element/textElement"; //zsviczian
