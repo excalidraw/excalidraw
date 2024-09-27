@@ -1,5 +1,5 @@
 import { radians } from "./angle";
-import { arc, arcIncludesPoint, arcSegmentInterceptPoint } from "./arc";
+import { arc, arcIncludesPoint, arcSegmentInterceptPoints } from "./arc";
 import { point } from "./point";
 import { segment } from "./segment";
 
@@ -33,7 +33,7 @@ describe("point on arc", () => {
 describe("intersection", () => {
   it("should report correct interception point", () => {
     expect(
-      arcSegmentInterceptPoint(
+      arcSegmentInterceptPoints(
         arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
         segment(point(2, 1), point(0, 0)),
       ),
@@ -42,7 +42,7 @@ describe("intersection", () => {
 
   it("should report both interception points when present", () => {
     expect(
-      arcSegmentInterceptPoint(
+      arcSegmentInterceptPoints(
         arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
         segment(point(0.9, -2), point(0.9, 2)),
       ),

@@ -705,11 +705,7 @@ export const getHeadingForElbowArrowSnap = (
     return otherPointHeading;
   }
 
-  const distance = getDistanceForBinding(
-    origPoint,
-    bindableElement,
-    elementsMap,
-  );
+  const distance = getDistanceForBinding(origPoint, bindableElement);
 
   if (!distance) {
     return vectorToHeading(
@@ -731,7 +727,6 @@ export const getHeadingForElbowArrowSnap = (
 const getDistanceForBinding = (
   point: Readonly<GlobalPoint>,
   bindableElement: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
 ) => {
   const distance = distanceToBindableElement(bindableElement, point);
   const bindDistance = maxBindingGap(

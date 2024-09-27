@@ -137,7 +137,6 @@ export type Extent = {
 // in replace of semi major and semi minor axes
 export type Ellipse<Point extends GenericPoint> = {
   center: Point;
-  angle: Radians;
   halfWidth: number;
   halfHeight: number;
 } & {

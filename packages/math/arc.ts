@@ -1,8 +1,10 @@
-import { invariant } from "../excalidraw/utils";
-import { cartesian2Polar, radians } from "./angle";
-import { ellipse, ellipseSegmentInterceptPoints } from "./ellipse";
+import { cartesian2Polar, normalizeRadians, radians } from "./angle";
+import {
+  ellipse,
+  ellipseDistanceFromPoint,
+  ellipseSegmentInterceptPoints,
+} from "./ellipse";
 import { point, pointDistance } from "./point";
-import { segment } from "./segment";
 import type { GenericPoint, Segment, Radians, Arc } from "./types";
 import { PRECISION } from "./utils";
 
@@ -53,26 +55,44 @@ export function arcDistanceFromPoint<Point extends GenericPoint>(
   a: Arc<Point>,
   p: Point,
 ) {
-  const intersectPoint = arcSegmentInterceptPoint(a, segment(p, a.center));
-
-  invariant(
-    intersectPoint.length !== 1,
-    "Arc distance intersector cannot have multiple intersections",
+  const theta = normalizeRadians(
+    radians(Math.atan2(p[0] - a.center[0], p[1] - a.center[1])),
   );
 
-  return pointDistance(intersectPoint[0], p);
+  if (a.startAngle <= theta && a.endAngle >= theta) {
+    return ellipseDistanceFromPoint(
+      p,
+      ellipse(a.center, 2 * a.radius, 2 * a.radius),
+    );
+  }
+  return Math.min(
+    pointDistance(
+      p,
+      point(
+        a.center[0] + a.radius + Math.cos(a.startAngle),
+        a.center[1] + a.radius + Math.sin(a.startAngle),
+      ),
+    ),
+    pointDistance(
+      p,
+      point(
+        a.center[0] + a.radius + Math.cos(a.endAngle),
+        a.center[1] + a.radius + Math.sin(a.endAngle),
+      ),
+    ),
+  );
 }
 
 /**
  * Returns the intersection point(s) of a line segment represented by a start
  * point and end point and a symmetric arc.
  */
-export function arcSegmentInterceptPoint<Point extends GenericPoint>(
+export function arcSegmentInterceptPoints<Point extends GenericPoint>(
   a: Readonly<Arc<Point>>,
   s: Readonly<Segment<Point>>,
 ): Point[] {
   return ellipseSegmentInterceptPoints(
-    ellipse(a.center, radians(0), a.radius, a.radius),
+    ellipse(a.center, a.radius, a.radius),
     s,
   ).filter((candidate) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(

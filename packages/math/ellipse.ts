@@ -1,12 +1,5 @@
-import { radians } from "./angle";
-import { line } from "./line";
-import {
-  point,
-  pointDistance,
-  pointFromVector,
-  pointRotateRads,
-} from "./point";
-import type { Ellipse, GenericPoint, Segment, Radians } from "./types";
+import { point, pointDistance, pointFromVector } from "./point";
+import type { Ellipse, GenericPoint, Segment } from "./types";
 import { PRECISION } from "./utils";
 import {
   vector,
@@ -27,13 +20,11 @@ import {
  */
 export function ellipse<Point extends GenericPoint>(
   center: Point,
-  angle: Radians,
   halfWidth: number,
   halfHeight: number,
 ): Ellipse<Point> {
   return {
     center,
-    angle,
     halfWidth,
     halfHeight,
   } as Ellipse<Point>;
@@ -50,22 +41,11 @@ export const ellipseIncludesPoint = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {
-  const { center, angle, halfWidth, halfHeight } = ellipse;
-  const translatedPoint = vectorAdd(
-    vectorFromPoint(p),
-    vectorScale(vectorFromPoint(center), -1),
-  );
-  const [rotatedPointX, rotatedPointY] = pointRotateRads(
-    pointFromVector(translatedPoint),
-    point(0, 0),
-    radians(-angle),
-  );
+  const { center, halfWidth, halfHeight } = ellipse;
+  const normalizedX = (p[0] - center[0]) / halfWidth;
+  const normalizedY = (p[1] - center[1]) / halfHeight;
 
-  return (
-    (rotatedPointX / halfWidth) * (rotatedPointX / halfWidth) +
-      (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
-    1
-  );
+  return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
 };
 
 /**
@@ -97,21 +77,16 @@ export const ellipseDistanceFromPoint = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ): number => {
-  const { angle, halfWidth, halfHeight, center } = ellipse;
+  const { halfWidth, halfHeight, center } = ellipse;
   const a = halfWidth;
   const b = halfHeight;
   const translatedPoint = vectorAdd(
     vectorFromPoint(p),
     vectorScale(vectorFromPoint(center), -1),
   );
-  const [rotatedPointX, rotatedPointY] = pointRotateRads(
-    pointFromVector(translatedPoint),
-    point(0, 0),
-    radians(-angle),
-  );
 
-  const px = Math.abs(rotatedPointX);
-  const py = Math.abs(rotatedPointY);
+  const px = Math.abs(translatedPoint[0]);
+  const py = Math.abs(translatedPoint[1]);
 
   let tx = 0.707;
   let ty = 0.707;
@@ -140,11 +115,11 @@ export const ellipseDistanceFromPoint = <Point extends GenericPoint>(
   }
 
   const [minX, minY] = [
-    a * tx * Math.sign(rotatedPointX),
-    b * ty * Math.sign(rotatedPointY),
+    a * tx * Math.sign(translatedPoint[0]),
+    b * ty * Math.sign(translatedPoint[1]),
   ];
 
-  return pointDistance(point(rotatedPointX, rotatedPointY), point(minX, minY));
+  return pointDistance(pointFromVector(translatedPoint), point(minX, minY));
 };
 
 /**
@@ -153,19 +128,13 @@ export const ellipseDistanceFromPoint = <Point extends GenericPoint>(
  */
 export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
   e: Readonly<Ellipse<Point>>,
-  l: Readonly<Segment<Point>>,
+  s: Readonly<Segment<Point>>,
 ): Point[] {
   const rx = e.halfWidth;
   const ry = e.halfHeight;
-  const nonRotatedLine = line(
-    pointRotateRads(l[0], e.center, radians(-e.angle)),
-    pointRotateRads(l[1], e.center, radians(-e.angle)),
-  );
-  const dir = vectorFromPoint(nonRotatedLine[1], nonRotatedLine[0]);
-  const diff = vector(
-    nonRotatedLine[0][0] - e.center[0],
-    nonRotatedLine[0][1] - e.center[1],
-  );
+
+  const dir = vectorFromPoint(s[1], s[0]);
+  const diff = vector(s[0][0] - e.center[0], s[0][1] - e.center[1]);
   const mDir = vector(dir[0] / (rx * rx), dir[1] / (ry * ry));
   const mDiff = vector(diff[0] / (rx * rx), diff[1] / (ry * ry));
 
@@ -183,10 +152,8 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
     if (0 <= t_a && t_a <= 1) {
       intersections.push(
         point(
-          nonRotatedLine[0][0] +
-            (nonRotatedLine[1][0] - nonRotatedLine[0][0]) * t_a,
-          nonRotatedLine[0][1] +
-            (nonRotatedLine[1][1] - nonRotatedLine[0][1]) * t_a,
+          s[0][0] + (s[1][0] - s[0][0]) * t_a,
+          s[0][1] + (s[1][1] - s[0][1]) * t_a,
         ),
       );
     }
@@ -194,10 +161,8 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
     if (0 <= t_b && t_b <= 1) {
       intersections.push(
         point(
-          nonRotatedLine[0][0] +
-            (nonRotatedLine[1][0] - nonRotatedLine[0][0]) * t_b,
-          nonRotatedLine[0][1] +
-            (nonRotatedLine[1][1] - nonRotatedLine[0][1]) * t_b,
+          s[0][0] + (s[1][0] - s[0][0]) * t_b,
+          s[0][1] + (s[1][1] - s[0][1]) * t_b,
         ),
       );
     }
@@ -206,16 +171,12 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
     if (0 <= t && t <= 1) {
       intersections.push(
         point(
-          nonRotatedLine[0][0] +
-            (nonRotatedLine[1][0] - nonRotatedLine[0][0]) * t,
-          nonRotatedLine[0][1] +
-            (nonRotatedLine[1][1] - nonRotatedLine[0][1]) * t,
+          s[0][0] + (s[1][0] - s[0][0]) * t,
+          s[0][1] + (s[1][1] - s[0][1]) * t,
         ),
       );
     }
   }
 
-  return intersections.map((point) =>
-    pointRotateRads(point, e.center, e.angle),
-  );
+  return intersections;
 }

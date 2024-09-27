@@ -175,16 +175,11 @@ export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
 export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawEllipseElement,
 ): GeometricShape<Point> => {
-  const { width, height, angle, x, y } = element;
+  const { width, height, x, y } = element;
 
   return {
     type: "ellipse",
-    data: ellipse(
-      point(x + width / 2, y + height / 2),
-      angle,
-      width / 2,
-      height / 2,
-    ),
+    data: ellipse(point(x + width / 2, y + height / 2), width / 2, height / 2),
   };
 };
 

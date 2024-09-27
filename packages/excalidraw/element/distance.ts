@@ -123,8 +123,8 @@ const roundedCutoffSegment = (
   const t = (4 * r) / Math.sqrt(2);
 
   return segment(
-    ellipseSegmentInterceptPoints(ellipse(s[0], radians(0), t, t), s)[0],
-    ellipseSegmentInterceptPoints(ellipse(s[1], radians(0), t, t), s)[0],
+    ellipseSegmentInterceptPoints(ellipse(s[0], t, t), s)[0],
+    ellipseSegmentInterceptPoints(ellipse(s[1], t, t), s)[0],
   );
 };
 
@@ -198,13 +198,12 @@ export const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
   p: GlobalPoint,
 ): number => {
+  const center = point(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
   return ellipseDistanceFromPoint(
-    p,
-    ellipse(
-      point(element.x + element.width / 2, element.y + element.height / 2),
-      element.angle,
-      element.width / 2,
-      element.height / 2,
-    ),
+    pointRotateRads(p, center, radians(-element.angle)),
+    ellipse(center, element.width / 2, element.height / 2),
   );
 };

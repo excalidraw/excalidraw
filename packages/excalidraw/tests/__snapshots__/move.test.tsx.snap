@@ -225,7 +225,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
     "elementId": "id0",
     "fixedPoint": null,
     "focus": "-0.60000",
-    "gap": 10,
+    "gap": 9,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
