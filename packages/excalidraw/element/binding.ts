@@ -73,6 +73,11 @@ import {
   pointDistanceSq,
   clamp,
   radians,
+  vectorScale,
+  pointFromVector,
+  vectorRotate,
+  vectorNormalize,
+  pointDistance,
 } from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
 import { distanceToBindableElement } from "./distance";
@@ -1425,7 +1430,7 @@ const determineFocusPoint = (
     GAPoint.from(adjecentPoint),
   );
   const reverseRelateToCenter = GA.reverse(relateToCenter);
-  let point;
+  let p: GA.Point;
   switch (element.type) {
     case "rectangle":
     case "image":
@@ -1435,14 +1440,18 @@ const determineFocusPoint = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      point = findFocusPointForRectangulars(element, focus, adjecentPointRel);
+      p = findFocusPointForRectanguloidElement(
+        element,
+        focus,
+        adjecentPointRel,
+      );
       break;
     case "ellipse":
-      point = findFocusPointForEllipse(element, focus, adjecentPointRel);
+      p = findFocusPointForEllipse(element, focus, adjecentPointRel);
       break;
   }
   return pointFromPair(
-    GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, point)),
+    GAPoint.toTuple(GATransform.apply(reverseRelateToCenter, p)),
   );
 };
 
@@ -1692,7 +1701,7 @@ const findFocusPointForEllipse = (
   return GA.point(x, (-m * x - 1) / n);
 };
 
-const findFocusPointForRectangulars = (
+const findFocusPointForRectanguloidElement = (
   element:
     | ExcalidrawRectangleElement
     | ExcalidrawImageElement
@@ -1705,23 +1714,34 @@ const findFocusPointForRectangulars = (
   relativeDistance: number,
   // The point for which we're trying to find the focus point, relative
   // to the element center.
-  point: GA.Point,
+  gaPoint: GA.Point,
 ): GA.Point => {
-  const relativeDistanceAbs = Math.abs(relativeDistance);
-  const orientation = Math.sign(relativeDistance);
-  const corners = getCorners(element, relativeDistanceAbs);
+  const relP = pointFromPair<GlobalPoint>(GAPoint.toTuple(gaPoint));
+  const center = point<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
+  const p = point<GlobalPoint>(center[0] + relP[0], center[1] + relP[1]);
+  const ret = pointFromVector(
+    vectorScale(
+      vectorRotate(
+        vectorNormalize(vectorFromPoint(p, center)),
+        radians(Math.PI / 2),
+      ),
+      Math.sign(relativeDistance) *
+        Math.min(
+          pointDistance(point<GlobalPoint>(element.x, element.y), center) *
+            Math.abs(relativeDistance),
+          element.width / 2,
+          element.height / 2,
+        ),
+    ),
+    center,
+  );
 
-  let maxDistance = 0;
-  let tangentPoint: null | GA.Point = null;
-  corners.forEach((corner) => {
-    const distance = orientation * GALine.through(point, corner)[1];
-    if (distance > maxDistance) {
-      maxDistance = distance;
-      tangentPoint = corner;
-    }
-  });
-  return tangentPoint!;
+  return GA.point(ret[0] - center[0], ret[1] - center[1]);
 };
+
 export const bindingProperties: Set<BindableProp | BindingProp> = new Set([
   "boundElements",
   "frameId",

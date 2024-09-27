@@ -46,8 +46,11 @@ export function pointFromPair<Point extends GenericPoint>(
  * @param v The vector to convert
  * @returns The point the vector points at with origin 0,0
  */
-export function pointFromVector<P extends GenericPoint>(v: Vector): P {
-  return v as unknown as P;
+export function pointFromVector<P extends GenericPoint>(
+  v: Vector,
+  offset: P = point(0, 0),
+): P {
+  return point<P>(offset[0] + v[0], offset[1] + v[1]);
 }
 
 /**
@@ -96,9 +99,12 @@ export function pointRotateRads<Point extends GenericPoint>(
   [cx, cy]: Point,
   angle: Radians,
 ): Point {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
   return point(
-    (x - cx) * Math.cos(angle) - (y - cy) * Math.sin(angle) + cx,
-    (x - cx) * Math.sin(angle) + (y - cy) * Math.cos(angle) + cy,
+    (x - cx) * cos - (y - cy) * sin + cx,
+    (x - cx) * sin + (y - cy) * cos + cy,
   );
 }
 
