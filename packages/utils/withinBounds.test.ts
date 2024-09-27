@@ -1,8 +1,8 @@
-import type { Bounds } from "../excalidraw/element/bounds";
+import type { Bounds } from "../excalidraw/element/types";
 import { API } from "../excalidraw/tests/helpers/api";
 import {
-  elementPartiallyOverlapsWithOrContainsBBox,
-  elementsOverlappingBBox,
+  elementPartiallyOverlapsWithOrContainsBounds,
+  elementsOverlappingBounds,
   isElementInsideBBox,
 } from "./withinBounds";
 
@@ -99,13 +99,13 @@ describe("elementPartiallyOverlapsWithOrContainsBBox()", () => {
 
     // bbox contains element
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(0, 0, 100, 100),
         bbox,
       ),
     ).toBe(true);
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(10, 10, 90, 90),
         bbox,
       ),
@@ -113,7 +113,7 @@ describe("elementPartiallyOverlapsWithOrContainsBBox()", () => {
 
     // element contains bbox
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(-10, -10, 110, 110),
         bbox,
       ),
@@ -121,28 +121,28 @@ describe("elementPartiallyOverlapsWithOrContainsBBox()", () => {
 
     // element overlaps bbox from top-left
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(-10, -10, 100, 100),
         bbox,
       ),
     ).toBe(true);
     // element overlaps bbox from top-right
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(90, -10, 100, 100),
         bbox,
       ),
     ).toBe(true);
     // element overlaps bbox from bottom-left
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(-10, 90, 100, 100),
         bbox,
       ),
     ).toBe(true);
     // element overlaps bbox from bottom-right
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(90, 90, 100, 100),
         bbox,
       ),
@@ -154,7 +154,7 @@ describe("elementPartiallyOverlapsWithOrContainsBBox()", () => {
 
     // outside diagonally
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(110, 110, 100, 100),
         bbox,
       ),
@@ -162,28 +162,28 @@ describe("elementPartiallyOverlapsWithOrContainsBBox()", () => {
 
     // outside on the left
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(-110, 10, 50, 50),
         bbox,
       ),
     ).toBe(false);
     // outside on the right
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(110, 10, 50, 50),
         bbox,
       ),
     ).toBe(false);
     // outside on the top
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(10, -110, 50, 50),
         bbox,
       ),
     ).toBe(false);
     // outside on the bottom
     expect(
-      elementPartiallyOverlapsWithOrContainsBBox(
+      elementPartiallyOverlapsWithOrContainsBounds(
         makeElement(10, 110, 50, 50),
         bbox,
       ),
@@ -201,7 +201,7 @@ describe("elementsOverlappingBBox()", () => {
     const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
 
     expect(
-      elementsOverlappingBBox({
+      elementsOverlappingBounds({
         bounds: bbox,
         type: "overlap",
         elements: [
@@ -223,7 +223,7 @@ describe("elementsOverlappingBBox()", () => {
     const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
 
     expect(
-      elementsOverlappingBBox({
+      elementsOverlappingBounds({
         bounds: bbox,
         type: "contain",
         elements: [
@@ -245,7 +245,7 @@ describe("elementsOverlappingBBox()", () => {
     const rectOverlappingTopLeft = makeElement(-10, -10, 50, 50);
 
     expect(
-      elementsOverlappingBBox({
+      elementsOverlappingBounds({
         bounds: bbox,
         type: "inside",
         elements: [

@@ -103,6 +103,22 @@ export function pointRotateRads<Point extends GenericPoint>(
 }
 
 /**
+ * Rotate multiple points around a common center via the same angle in radians
+ *
+ * @param p The point array to rotate
+ * @param c The common center point
+ * @param angle The common angle to rotate by
+ * @returns The array of rotated points
+ */
+function pointsRotateRads<Point extends GenericPoint>(
+  p: Point[],
+  c: Point,
+  angle: Radians,
+): Point[] {
+  return p.map((x, idx) => pointRotateRads(x, c, angle));
+}
+
+/**
  * Roate a point by [angle] degree.
  *
  * @param point The point to rotate

@@ -25,7 +25,7 @@ import type {
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
-import { elementsOverlappingBBox } from "../utils/";
+import { elementsOverlappingBounds } from "../utils/";
 import {
   isFrameElement,
   isFrameLikeElement,
@@ -863,7 +863,7 @@ export const getElementsOverlappingFrame = (
   frame: ExcalidrawFrameLikeElement,
 ) => {
   return (
-    elementsOverlappingBBox({
+    elementsOverlappingBounds({
       elements,
       bounds: frame,
       type: "overlap",

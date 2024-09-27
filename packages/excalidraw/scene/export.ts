@@ -1,12 +1,12 @@
 import rough from "roughjs/bin/rough";
 import type {
+  Bounds,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "../element/types";
-import type { Bounds } from "../element/bounds";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
 import { arrayToMap, getFontString, toBrandedType } from "../utils";

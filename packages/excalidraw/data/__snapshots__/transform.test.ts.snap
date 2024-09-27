@@ -1,5 +1,236 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "#d8f5a2",
+  "boundElements": [
+    {
+      "id": "id45",
+      "type": "arrow",
+    },
+    {
+      "id": "id46",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 300,
+  "id": Any<String>,
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#66a80f",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "ellipse",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": Any<Number>,
+  "width": 300,
+  "x": 630,
+  "y": 316,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 2`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id46",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 100,
+  "id": Any<String>,
+  "index": "a1",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#9c36b5",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "diamond",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": Any<Number>,
+  "width": 140,
+  "x": 96,
+  "y": 400,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 3`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": "arrow",
+  "endBinding": {
+    "elementId": "ellipse-1",
+    "fixedPoint": null,
+    "focus": -0.008153707962747813,
+    "gap": 11.562288374879595,
+  },
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 35,
+  "id": Any<String>,
+  "index": "a2",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0.5,
+      0.5,
+    ],
+    [
+      394.5,
+      34.5,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "startArrowhead": null,
+  "startBinding": {
+    "elementId": "id47",
+    "fixedPoint": null,
+    "focus": -0.08139534883720931,
+    "gap": 1,
+  },
+  "strokeColor": "#1864ab",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": Any<Number>,
+  "width": 395,
+  "x": 247,
+  "y": 420,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": "arrow",
+  "endBinding": {
+    "elementId": "ellipse-1",
+    "fixedPoint": null,
+    "focus": 0.10666666666666667,
+    "gap": 3.8343264684446097,
+  },
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 0,
+  "id": Any<String>,
+  "index": "a3",
+  "isDeleted": false,
+  "lastCommittedPoint": null,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0.5,
+      0,
+    ],
+    [
+      399.5,
+      0,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "startArrowhead": null,
+  "startBinding": {
+    "elementId": "diamond-1",
+    "fixedPoint": null,
+    "focus": 0,
+    "gap": 5.2311437434718675,
+  },
+  "strokeColor": "#e67700",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 4,
+  "versionNonce": Any<Number>,
+  "width": 400,
+  "x": 227,
+  "y": 450,
+}
+`;
+
+exports[`Test Transform > Test arrow bindings > should bind arrows to existing shapes when start / end provided with ids 5`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": [
+    {
+      "id": "id45",
+      "type": "arrow",
+    },
+  ],
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 300,
+  "id": Any<String>,
+  "index": "a4",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": Any<Number>,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "rectangle",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": Any<Number>,
+  "width": 300,
+  "x": -53,
+  "y": 270,
+}
+`;
+
 exports[`Test Transform > Test arrow bindings > should bind arrows to existing text elements when start / end provided with ids 1`] = `
 {
   "angle": 0,

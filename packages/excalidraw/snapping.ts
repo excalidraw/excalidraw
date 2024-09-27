@@ -8,7 +8,6 @@ import {
   type GlobalPoint,
 } from "../math";
 import { TOOL_TYPE } from "./constants";
-import type { Bounds } from "./element/bounds";
 import {
   getCommonBounds,
   getDraggedElementsBounds,
@@ -17,6 +16,7 @@ import {
 import type { MaybeTransformHandleType } from "./element/transformHandles";
 import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
 import type {
+  Bounds,
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,

@@ -1,7 +1,7 @@
 import type { Segment } from "../math";
 import { isSegment, segment, point, type GlobalPoint } from "../math";
-import type { Bounds } from "./element/bounds";
 import { isBounds } from "./element/typeChecks";
+import type { Bounds } from "./element/types";
 
 // The global data holder to collect the debug operations
 declare global {

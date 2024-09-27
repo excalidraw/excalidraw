@@ -4,11 +4,11 @@ import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
+  Bounds,
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
-import type { Bounds } from "../element/bounds";
 import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
@@ -895,7 +895,7 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.height).toBeCloseTo(0);
     expect(rightBoundArrow.angle).toEqual(0);
     expect(rightBoundArrow.startBinding).toBeNull();
-    expect(rightBoundArrow.endBinding?.gap).toBeCloseTo(8.0952);
+    expect(rightBoundArrow.endBinding?.gap).toBeCloseTo(7.0952);
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );

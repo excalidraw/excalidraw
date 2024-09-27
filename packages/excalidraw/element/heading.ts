@@ -13,8 +13,8 @@ import {
   radiansToDegrees,
   triangleIncludesPoint,
 } from "../../math";
-import { getCenterForBounds, type Bounds } from "./bounds";
-import type { ExcalidrawBindableElement } from "./types";
+import { getCenterForBounds } from "./bounds";
+import type { Bounds, ExcalidrawBindableElement } from "./types";
 
 export const HEADING_RIGHT = [1, 0] as Heading;
 export const HEADING_DOWN = [0, 1] as Heading;

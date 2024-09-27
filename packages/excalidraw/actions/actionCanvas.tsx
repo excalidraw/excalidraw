@@ -35,7 +35,7 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import type { SceneBounds } from "../element/bounds";
+import type { ViewportBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
 import { clamp, point, roundToStep } from "../../math";
@@ -245,7 +245,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: SceneBounds,
+  bounds: ViewportBounds,
   viewportDimensions: { width: number; height: number },
   viewportZoomFactor: number = 1, // default to 1 if not provided
 ) => {
@@ -271,7 +271,7 @@ export const zoomToFitBounds = ({
   minZoom = -Infinity,
   maxZoom = Infinity,
 }: {
-  bounds: SceneBounds;
+  bounds: ViewportBounds;
   canvasOffsets?: Offsets;
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */

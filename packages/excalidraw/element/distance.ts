@@ -40,31 +40,33 @@ export const distanceToBindableElement = (
   }
 };
 
+/**
+ * Returns the distance of a point and the provided rectangular-shaped element,
+ * accounting for roundness and rotation
+ *
+ * @param element The rectanguloid element
+ * @param p The point to consider
+ * @returns The eucledian distance to the outline of the rectanguloid element
+ */
 export const distanceToRectangleElement = (
   element: ExcalidrawRectanguloidElement,
   p: GlobalPoint,
 ) => {
-  const center = point(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
   const r = rectangle(
-    pointRotateRads(
-      point(element.x, element.y),
-      center,
-      radians(element.angle),
-    ),
-    pointRotateRads(
-      point(element.x + element.width, element.y + element.height),
-      center,
-      radians(element.angle),
-    ),
+    point(element.x, element.y),
+    point(element.x + element.width, element.y + element.height),
+  );
+  // To emulate a rotated rectangle we rotate the point in the inverse angle
+  // instead. It's all the same distance-wise.
+  const rotatedPoint = pointRotateRads(
+    p,
+    point(element.x + element.width / 2, element.y + element.height / 2),
+    radians(-element.angle),
   );
   const roundness = getCornerRadius(
     Math.min(element.width, element.height),
     element,
   );
-  const rotatedPoint = pointRotateRads(p, center, element.angle);
   const sideDistances = [
     segment(
       point(r[0][0] + roundness, r[0][1]),
@@ -116,10 +118,22 @@ export const distanceToRectangleElement = (
   return Math.min(...[...sideDistances, ...cornerDistances]);
 };
 
-const roundedCutoffSegment = (
+/**
+ * Shortens a segment on both ends to accomodate the arc in the rounded
+ * diamond shape
+ *
+ * @param s The segment to shorten
+ * @param r The radius to shorten by
+ * @returns The segment shortened on both ends by the same radius
+ */
+const createDiamondSide = (
   s: Segment<GlobalPoint>,
   r: number,
 ): Segment<GlobalPoint> => {
+  if (r === 0) {
+    return s;
+  }
+
   const t = (4 * r) / Math.sqrt(2);
 
   return segment(
@@ -128,17 +142,36 @@ const roundedCutoffSegment = (
   );
 };
 
-const diamondArc = (left: GlobalPoint, right: GlobalPoint, r: number) => {
-  const c = point((left[0] + right[0]) / 2, left[1]);
+/**
+ * Creates an arc for the given roundness and position by taking the start
+ * and end positions and determining the angle points on the hypotethical
+ * circle with center point between start and end and raidus equals provided
+ * roundness. I.e. the created arc is gobal point-aware, or "rotated" in-place.
+ *
+ * @param start
+ * @param end
+ * @param r
+ * @returns
+ */
+const createDiamondArc = (start: GlobalPoint, end: GlobalPoint, r: number) => {
+  const c = point((start[0] + end[0]) / 2, start[1]);
 
   return arc(
     c,
     r,
-    radians(Math.asin((left[1] - c[1]) / r)),
-    radians(Math.asin((right[1] - c[1]) / r)),
+    radians(Math.asin((start[1] - c[1]) / r)),
+    radians(Math.asin((end[1] - c[1]) / r)),
   );
 };
 
+/**
+ * Returns the distance of a point and the provided diamond element, accounting
+ * for roundness and rotation
+ *
+ * @param element The diamond element
+ * @param p The point to consider
+ * @returns The eucledian distance to the outline of the diamond
+ */
 export const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
   p: GlobalPoint,
@@ -151,31 +184,19 @@ export const distanceToDiamondElement = (
     Math.min(element.width, element.height),
     element,
   );
-  const rotatedPoint = pointRotateRads(p, center, element.angle);
-  const top = pointRotateRads<GlobalPoint>(
+  // Rotate the point to the inverse direction to simulate the rotated diamond
+  // points. It's all the same distance-wise.
+  const rotatedPoint = pointRotateRads(p, center, radians(-element.angle));
+  const [top, right, bottom, left]: GlobalPoint[] = [
     point(element.x + element.width / 2, element.y),
-    center,
-    element.angle,
-  );
-  const right = pointRotateRads<GlobalPoint>(
     point(element.x + element.width, element.y + element.height / 2),
-    center,
-    element.angle,
-  );
-  const bottom = pointRotateRads<GlobalPoint>(
     point(element.x + element.width / 2, element.y + element.height),
-    center,
-    element.angle,
-  );
-  const left = pointRotateRads<GlobalPoint>(
     point(element.x, element.y + element.height / 2),
-    center,
-    element.angle,
-  );
-  const topRight = roundedCutoffSegment(segment(top, right), roundness);
-  const bottomRight = roundedCutoffSegment(segment(right, bottom), roundness);
-  const bottomLeft = roundedCutoffSegment(segment(bottom, left), roundness);
-  const topLeft = roundedCutoffSegment(segment(left, top), roundness);
+  ];
+  const topRight = createDiamondSide(segment(top, right), roundness);
+  const bottomRight = createDiamondSide(segment(right, bottom), roundness);
+  const bottomLeft = createDiamondSide(segment(bottom, left), roundness);
+  const topLeft = createDiamondSide(segment(left, top), roundness);
 
   return Math.min(
     ...[
@@ -184,16 +205,24 @@ export const distanceToDiamondElement = (
       ),
       ...(roundness > 0
         ? [
-            diamondArc(topLeft[1], topRight[0], roundness),
-            diamondArc(topRight[1], bottomRight[0], roundness),
-            diamondArc(bottomRight[1], bottomLeft[0], roundness),
-            diamondArc(bottomLeft[1], topLeft[0], roundness),
+            createDiamondArc(topLeft[1], topRight[0], roundness),
+            createDiamondArc(topRight[1], bottomRight[0], roundness),
+            createDiamondArc(bottomRight[1], bottomLeft[0], roundness),
+            createDiamondArc(bottomLeft[1], topLeft[0], roundness),
           ].map((a) => arcDistanceFromPoint(a, rotatedPoint))
         : []),
     ],
   );
 };
 
+/**
+ * Returns the distance of a point and the provided ellipse element, accounting
+ * for roundness and rotation
+ *
+ * @param element The ellipse element
+ * @param p The point to consider
+ * @returns The eucledian distance to the outline of the ellipse
+ */
 export const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
   p: GlobalPoint,
@@ -203,6 +232,7 @@ export const distanceToEllipseElement = (
     element.y + element.height / 2,
   );
   return ellipseDistanceFromPoint(
+    // Instead of rotating the ellipse, rotate the point to the inverse angle
     pointRotateRads(p, center, radians(-element.angle)),
     ellipse(center, element.width / 2, element.height / 2),
   );

@@ -25,9 +25,9 @@ import type {
   ExcalidrawElbowArrowElement,
   FixedPoint,
   SceneElementsMap,
+  Bounds,
 } from "./types";
 
-import type { Bounds } from "./bounds";
 import { getCenterForBounds, getElementAbsoluteCoords } from "./bounds";
 import type { AppState } from "../types";
 import { isPointOnShape } from "../../utils/collision";

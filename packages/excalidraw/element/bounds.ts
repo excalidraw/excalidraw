@@ -4,6 +4,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
+  Bounds,
 } from "./types";
 import rough from "roughjs/bin/rough";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -34,17 +35,7 @@ import { getCurvePathOps } from "../../utils/geometry/shape";
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
-/**
- * x and y position of top left corner, x and y position of bottom right corner
- */
-export type Bounds = readonly [
-  minX: number,
-  minY: number,
-  maxX: number,
-  maxY: number,
-];
-
-export type SceneBounds = readonly [
+export type ViewportBounds = readonly [
   sceneX: number,
   sceneY: number,
   sceneX2: number,
@@ -57,6 +48,7 @@ class ElementBounds {
     {
       bounds: Bounds;
       version: ExcalidrawElement["version"];
+      versionNonce: ExcalidrawElement["versionNonce"];
     }
   >();
 
@@ -66,6 +58,7 @@ class ElementBounds {
     if (
       cachedBounds?.version &&
       cachedBounds.version === element.version &&
+      cachedBounds?.versionNonce === element.versionNonce &&
       // we don't invalidate cache when we update containers and not labels,
       // which is causing problems down the line. Fix TBA.
       !isBoundToContainer(element)
@@ -76,6 +69,7 @@ class ElementBounds {
 
     ElementBounds.boundsCache.set(element, {
       version: element.version,
+      versionNonce: element.versionNonce,
       bounds,
     });
 
@@ -93,7 +87,7 @@ class ElementBounds {
       elementsMap,
     );
     if (isFreeDrawElement(element)) {
-      const [minX, minY, maxX, maxY] = getBoundsFromPoints(
+      const [minX, minY, maxX, maxY] = getBoundsFromFreeDrawPoints(
         element.points.map(([x, y]) =>
           pointRotateRads(
             point(x, y),
@@ -177,6 +171,20 @@ class ElementBounds {
   }
 }
 
+/**
+ * Get the axis-aligned bounds of the given element in global / scene coordinates
+ *
+ * @param element The element to determine the bounding box for
+ * @param elementsMap The elements map to retrieve attached elements (notably text label)
+ * @returns The axis-aligned bounding box in scene (global coordinates)
+ */
+export const getElementBounds = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): Bounds => {
+  return ElementBounds.getBounds(element, elementsMap);
+};
+
 // Scene -> Scene coords, but in x1,x2,y1,y2 format.
 //
 // If the element is created from right to left, the width is going to be negative
@@ -222,21 +230,6 @@ export const getElementAbsoluteCoords = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   ];
-};
-
-export const getDiamondPoints = (element: ExcalidrawElement) => {
-  // Here we add +1 to avoid these numbers to be 0
-  // otherwise rough.js will throw an error complaining about it
-  const topX = Math.floor(element.width / 2) + 1;
-  const topY = 0;
-  const rightX = element.width;
-  const rightY = Math.floor(element.height / 2) + 1;
-  const bottomX = topX;
-  const bottomY = element.height;
-  const leftX = 0;
-  const leftY = rightY;
-
-  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 };
 
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
@@ -382,7 +375,7 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getBoundsFromPoints = (
+const getBoundsFromFreeDrawPoints = (
   points: ExcalidrawFreeDrawElement["points"],
 ): Bounds => {
   let minX = Infinity;
@@ -403,7 +396,7 @@ export const getBoundsFromPoints = (
 const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number, number, number, number, number] => {
-  const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
+  const [minX, minY, maxX, maxY] = getBoundsFromFreeDrawPoints(element.points);
   const x1 = minX + element.x;
   const y1 = minY + element.y;
   const x2 = maxX + element.x;
@@ -496,13 +489,6 @@ const getLinearElementRotatedBounds = (
   return coords;
 };
 
-export const getElementBounds = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-): Bounds => {
-  return ElementBounds.getBounds(element, elementsMap);
-};
-
 export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
   elementsMap?: ElementsMap,
@@ -568,7 +554,7 @@ export const getResizedElementAbsoluteCoords = (
 
   if (isFreeDrawElement(element)) {
     // Free Draw
-    bounds = getBoundsFromPoints(points);
+    bounds = getBoundsFromFreeDrawPoints(points);
   } else {
     // Line
     const gen = rough.generator();
@@ -651,7 +637,7 @@ export const getVisibleSceneBounds = ({
   width,
   height,
   zoom,
-}: AppState): SceneBounds => {
+}: AppState): ViewportBounds => {
   return [
     -scrollX,
     -scrollY,

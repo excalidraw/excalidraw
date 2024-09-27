@@ -1,4 +1,5 @@
 import type {
+  Bounds,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -11,7 +12,6 @@ import {
   isLinearElement,
   isTextElement,
 } from "../excalidraw/element/typeChecks";
-import type { Bounds } from "../excalidraw/element/bounds";
 import { getElementBounds } from "../excalidraw/element/bounds";
 import { arrayToMap } from "../excalidraw/utils";
 import type { LocalPoint } from "../math";
@@ -22,15 +22,10 @@ import {
   rangeInclusive,
 } from "../math";
 
-type Element = NonDeletedExcalidrawElement;
-type Elements = readonly NonDeletedExcalidrawElement[];
-
-type Points = readonly LocalPoint[];
-
 /** @returns vertices relative to element's top-left [0,0] position  */
 const getNonLinearElementRelativePoints = (
   element: Exclude<
-    Element,
+    NonDeletedExcalidrawElement,
     ExcalidrawLinearElement | ExcalidrawFreeDrawElement
   >,
 ): [
@@ -56,14 +51,16 @@ const getNonLinearElementRelativePoints = (
 };
 
 /** @returns vertices relative to element's top-left [0,0] position  */
-const getElementRelativePoints = (element: ExcalidrawElement): Points => {
+const getElementRelativePoints = (
+  element: ExcalidrawElement,
+): readonly LocalPoint[] => {
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     return element.points;
   }
   return getNonLinearElementRelativePoints(element);
 };
 
-const getMinMaxPoints = (points: Points) => {
+const getMinMaxPoints = (points: readonly LocalPoint[]) => {
   const ret = points.reduce(
     (limits, [x, y]) => {
       limits.minY = Math.min(limits.minY, y);
@@ -90,7 +87,7 @@ const getMinMaxPoints = (points: Points) => {
   return ret;
 };
 
-const getRotatedBBox = (element: Element): Bounds => {
+const getRotatedBBox = (element: NonDeletedExcalidrawElement): Bounds => {
   const points = getElementRelativePoints(element);
 
   const { cx, cy } = getMinMaxPoints(points);
@@ -110,7 +107,7 @@ const getRotatedBBox = (element: Element): Bounds => {
 };
 
 export const isElementInsideBBox = (
-  element: Element,
+  element: NonDeletedExcalidrawElement,
   bbox: Bounds,
   eitherDirection = false,
 ): boolean => {
@@ -138,8 +135,8 @@ export const isElementInsideBBox = (
   );
 };
 
-export const elementPartiallyOverlapsWithOrContainsBBox = (
-  element: Element,
+export const elementPartiallyOverlapsWithOrContainsBounds = (
+  element: NonDeletedExcalidrawElement,
   bbox: Bounds,
 ): boolean => {
   const elementBBox = getRotatedBBox(element);
@@ -158,13 +155,13 @@ export const elementPartiallyOverlapsWithOrContainsBBox = (
   );
 };
 
-export const elementsOverlappingBBox = ({
+export const elementsOverlappingBounds = ({
   elements,
   bounds,
   type,
   errorMargin = 0,
 }: {
-  elements: Elements;
+  elements: readonly NonDeletedExcalidrawElement[];
   bounds: Bounds | ExcalidrawElement;
   /** safety offset. Defaults to 0. */
   errorMargin?: number;
@@ -194,7 +191,7 @@ export const elementsOverlappingBBox = ({
 
     const isOverlaping =
       type === "overlap"
-        ? elementPartiallyOverlapsWithOrContainsBBox(element, adjustedBBox)
+        ? elementPartiallyOverlapsWithOrContainsBounds(element, adjustedBBox)
         : type === "inside"
         ? isElementInsideBBox(element, adjustedBBox)
         : isElementInsideBBox(element, adjustedBBox, true);

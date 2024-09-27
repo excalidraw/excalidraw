@@ -10,9 +10,9 @@ import type {
   OrderedExcalidrawElement,
   FixedPointBinding,
   SceneElementsMap,
+  Bounds,
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
-import type { Bounds } from "./bounds";
 import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
 import type {
   AppState,

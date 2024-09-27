@@ -24,7 +24,6 @@ import {
   getGlobalFixedPointForBindableElement,
   snapToMid,
 } from "./binding";
-import type { Bounds } from "./bounds";
 import { distanceToBindableElement } from "./distance";
 import type { Heading } from "./heading";
 import {
@@ -40,6 +39,7 @@ import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import type {
+  Bounds,
   ExcalidrawElbowArrowElement,
   NonDeletedSceneElementsMap,
   SceneElementsMap,

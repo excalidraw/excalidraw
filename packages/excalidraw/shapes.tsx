@@ -36,11 +36,11 @@ import {
   ROUNDNESS,
 } from "./constants";
 import { getElementAbsoluteCoords } from "./element";
-import type { Bounds } from "./element/bounds";
 import { shouldTestInside } from "./element/collision";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { getBoundTextElement } from "./element/textElement";
 import type {
+  Bounds,
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawLinearElement,

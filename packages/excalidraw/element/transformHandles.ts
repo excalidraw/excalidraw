@@ -1,11 +1,11 @@
 import type {
+  Bounds,
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   PointerType,
 } from "./types";
 
-import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import {

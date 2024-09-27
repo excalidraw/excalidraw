@@ -2,7 +2,6 @@ import { ROUNDNESS } from "../constants";
 import type { ElementOrToolType } from "../types";
 import type { MarkNonNullable } from "../utility-types";
 import { assertNever } from "../utils";
-import type { Bounds } from "./bounds";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -26,6 +25,7 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
+  Bounds,
 } from "./types";
 
 export const isInitializedImageElement = (

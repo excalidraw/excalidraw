@@ -3,6 +3,7 @@ import type {
   PointerType,
   NonDeletedExcalidrawElement,
   ElementsMap,
+  Bounds,
 } from "./types";
 
 import type {
@@ -17,7 +18,6 @@ import {
   canResizeFromSides,
 } from "./transformHandles";
 import type { AppState, Device, Zoom } from "../types";
-import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
 import { isLinearElement } from "./typeChecks";
