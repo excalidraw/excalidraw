@@ -40,14 +40,14 @@
     position: relative;
 
     & > div {
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
+      padding-left: 12px; //zsviczian Obsidian Zoom 0.75rem;
+      padding-right: 12px; //zsviczian Obsidian Zoom 0.75rem;
     }
 
     &__row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      gap: 16px; //zsviczian Obsidian Zoom 1rem;
     }
 
     &__items {
