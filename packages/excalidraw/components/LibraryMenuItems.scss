@@ -47,7 +47,7 @@
     &__row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px; //zsviczian Obsidian Zoom 1rem;
+      gap: 1rem;
     }
 
     &__items {
@@ -76,7 +76,7 @@
     &__grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
-      grid-gap: 1rem;
+      grid-gap: 16px; //zsviczian Obsidian Zoom 1rem;
     }
 
     .separator {
