@@ -21,7 +21,6 @@ export {
   getCommonBounds,
   getClosestElementBounds,
 } from "./bounds";
-export { getDiamondPoints } from "../scene/Shape";
 
 export {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,

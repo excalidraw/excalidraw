@@ -12,7 +12,7 @@ import {
   segment,
   segmentDistanceToPoint,
 } from "../../math";
-import { getCornerRadius } from "../shapes";
+import { getCornerRadius, getDiamondPoints } from "../shapes";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
@@ -128,18 +128,19 @@ export const distanceToRectangleElement = (
  */
 const createDiamondSide = (
   s: Segment<GlobalPoint>,
-  r: number,
+  startRadius: number,
+  endRadius: number,
 ): Segment<GlobalPoint> => {
-  if (r === 0) {
-    return s;
-  }
+  const a = ellipseSegmentInterceptPoints(
+    ellipse(s[0], startRadius, startRadius),
+    s,
+  )[0];
+  const b = ellipseSegmentInterceptPoints(
+    ellipse(s[1], endRadius, endRadius),
+    s,
+  )[0];
 
-  const t = (4 * r) / Math.sqrt(2);
-
-  return segment(
-    ellipseSegmentInterceptPoints(ellipse(s[0], t, t), s)[0],
-    ellipseSegmentInterceptPoints(ellipse(s[1], t, t), s)[0],
-  );
+  return segment(a, b);
 };
 
 /**
@@ -154,7 +155,10 @@ const createDiamondSide = (
  * @returns
  */
 const createDiamondArc = (start: GlobalPoint, end: GlobalPoint, r: number) => {
-  const c = point((start[0] + end[0]) / 2, start[1]);
+  const c = point<GlobalPoint>(
+    (start[0] + end[0]) / 2,
+    (start[1] + end[1]) / 2,
+  );
 
   return arc(
     c,
@@ -176,41 +180,58 @@ export const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
   p: GlobalPoint,
 ): number => {
-  const center = point<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
-  const roundness = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
+  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+    getDiamondPoints(element);
+  const center = point<GlobalPoint>((topX + bottomX) / 2, (topY + bottomY) / 2);
+  const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
+  const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
+
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, radians(-element.angle));
   const [top, right, bottom, left]: GlobalPoint[] = [
-    point(element.x + element.width / 2, element.y),
-    point(element.x + element.width, element.y + element.height / 2),
-    point(element.x + element.width / 2, element.y + element.height),
-    point(element.x, element.y + element.height / 2),
+    point(element.x + topX, element.y + topY),
+    point(element.x + rightX, element.y + rightY),
+    point(element.x + bottomX, element.y + bottomY),
+    point(element.x + leftX, element.y + leftY),
   ];
-  const topRight = createDiamondSide(segment(top, right), roundness);
-  const bottomRight = createDiamondSide(segment(right, bottom), roundness);
-  const bottomLeft = createDiamondSide(segment(bottom, left), roundness);
-  const topLeft = createDiamondSide(segment(left, top), roundness);
+
+  const topRight = createDiamondSide(
+    segment(top, right),
+    verticalRadius,
+    horizontalRadius,
+  );
+  const bottomRight = createDiamondSide(
+    segment(bottom, right),
+    verticalRadius,
+    horizontalRadius,
+  );
+  const bottomLeft = createDiamondSide(
+    segment(bottom, left),
+    verticalRadius,
+    horizontalRadius,
+  );
+  const topLeft = createDiamondSide(
+    segment(top, left),
+    verticalRadius,
+    horizontalRadius,
+  );
+
+  const arcs = element.roundness
+    ? [
+        createDiamondArc(topLeft[0], topRight[0], verticalRadius), // TOP
+        createDiamondArc(topRight[1], bottomRight[1], horizontalRadius), // RIGHT
+        createDiamondArc(bottomRight[0], bottomLeft[0], verticalRadius), // BOTTOM
+        createDiamondArc(bottomLeft[1], topLeft[1], horizontalRadius), // LEFT
+      ]
+    : [];
 
   return Math.min(
     ...[
       ...[topRight, bottomRight, bottomLeft, topLeft].map((s) =>
         segmentDistanceToPoint(rotatedPoint, s),
       ),
-      ...(roundness > 0
-        ? [
-            createDiamondArc(topLeft[1], topRight[0], roundness),
-            createDiamondArc(topRight[1], bottomRight[0], roundness),
-            createDiamondArc(bottomRight[1], bottomLeft[0], roundness),
-            createDiamondArc(bottomLeft[1], topLeft[0], roundness),
-          ].map((a) => arcDistanceFromPoint(a, rotatedPoint))
-        : []),
+      ...arcs.map((a) => arcDistanceFromPoint(a, rotatedPoint)),
     ],
   );
 };
