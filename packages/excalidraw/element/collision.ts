@@ -1,14 +1,11 @@
-import { isPathALoop, isPointWithinBounds } from "../math";
-
 import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawRectangleElement,
 } from "./types";
-
 import { getElementBounds } from "./bounds";
 import type { FrameNameBounds } from "../types";
-import type { Polygon, GeometricShape } from "../../utils/geometry/shape";
+import type { GeometricShape } from "../../utils/geometry/shape";
 import { getPolygonShape } from "../../utils/geometry/shape";
 import { isPointInShape, isPointOnShape } from "../../utils/collision";
 import { isTransparent } from "../utils";
@@ -18,6 +15,9 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
+import { getBoundTextShape, isPathALoop } from "../shapes";
+import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
+import { isPointWithinBounds, point } from "../../math";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -41,35 +41,36 @@ export const shouldTestInside = (element: ExcalidrawElement) => {
   return isDraggableFromInside || isImageElement(element);
 };
 
-export type HitTestArgs = {
+export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
   x: number;
   y: number;
   element: ExcalidrawElement;
-  shape: GeometricShape;
+  shape: GeometricShape<Point>;
   threshold?: number;
   frameNameBound?: FrameNameBounds | null;
 };
 
-export const hitElementItself = ({
+export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
   x,
   y,
   element,
   shape,
   threshold = 10,
   frameNameBound = null,
-}: HitTestArgs) => {
+}: HitTestArgs<Point>) => {
   let hit = shouldTestInside(element)
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
-      isPointInShape([x, y], shape) || isPointOnShape([x, y], shape, threshold)
-    : isPointOnShape([x, y], shape, threshold);
+      isPointInShape(point(x, y), shape) ||
+      isPointOnShape(point(x, y), shape, threshold)
+    : isPointOnShape(point(x, y), shape, threshold);
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
-    hit = isPointInShape([x, y], {
+    hit = isPointInShape(point(x, y), {
       type: "polygon",
       data: getPolygonShape(frameNameBound as ExcalidrawRectangleElement)
-        .data as Polygon,
+        .data as Polygon<Point>,
     });
   }
 
@@ -88,23 +89,31 @@ export const hitElementBoundingBox = (
   y1 -= tolerance;
   x2 += tolerance;
   y2 += tolerance;
-  return isPointWithinBounds([x1, y1], [x, y], [x2, y2]);
+  return isPointWithinBounds(point(x1, y1), point(x, y), point(x2, y2));
 };
 
-export const hitElementBoundingBoxOnly = (
-  hitArgs: HitTestArgs,
+export const hitElementBoundingBoxOnly = <
+  Point extends GlobalPoint | LocalPoint,
+>(
+  hitArgs: HitTestArgs<Point>,
   elementsMap: ElementsMap,
 ) => {
   return (
     !hitElementItself(hitArgs) &&
+    // bound text is considered part of the element (even if it's outside the bounding box)
+    !hitElementBoundText(
+      hitArgs.x,
+      hitArgs.y,
+      getBoundTextShape(hitArgs.element, elementsMap),
+    ) &&
     hitElementBoundingBox(hitArgs.x, hitArgs.y, hitArgs.element, elementsMap)
   );
 };
 
-export const hitElementBoundText = (
+export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
   x: number,
   y: number,
-  textShape: GeometricShape | null,
-) => {
-  return textShape && isPointInShape([x, y], textShape);
+  textShape: GeometricShape<Point> | null,
+): boolean => {
+  return !!textShape && isPointInShape(point(x, y), textShape);
 };

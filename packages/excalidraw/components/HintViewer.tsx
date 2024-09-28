@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import type { AppClassProperties, Device, UIAppState } from "../types";
 import {
+  isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
@@ -10,6 +11,9 @@ import { getShortcutKey } from "../utils";
 import { isEraserActive } from "../appState";
 
 import "./HintViewer.scss";
+import { isNodeInFlowchart } from "../element/flowchart";
+import { isGridModeEnabled } from "../snapping";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -18,9 +22,22 @@ interface HintViewerProps {
   app: AppClassProperties;
 }
 
-const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
+const getHints = ({
+  appState,
+  isMobile,
+  device,
+  app,
+}: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
+
+  if (
+    appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+    appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
+    appState.searchMatches?.length
+  ) {
+    return t("hints.dismissSearch");
+  }
 
   if (appState.openSidebar && !device.editor.canFitSidebar) {
     return null;
@@ -30,10 +47,13 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.eraserRevert");
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
-    if (!multiMode) {
-      return t("hints.linearElement");
+    if (multiMode) {
+      return t("hints.linearElementMulti");
     }
-    return t("hints.linearElementMulti");
+    if (activeTool.type === "arrow") {
+      return t("hints.arrowTool", { arrowShortcut: getShortcutKey("A") });
+    }
+    return t("hints.linearElement");
   }
 
   if (activeTool.type === "freedraw") {
@@ -76,21 +96,21 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.text_selected");
   }
 
-  if (appState.editingElement && isTextElement(appState.editingElement)) {
+  if (appState.editingTextElement) {
     return t("hints.text_editing");
   }
 
   if (activeTool.type === "selection") {
     if (
-      appState.draggingElement?.type === "selection" &&
+      appState.selectionElement &&
       !selectedElements.length &&
-      !appState.editingElement &&
+      !appState.editingTextElement &&
       !appState.editingLinearElement
     ) {
       return t("hints.deepBoxSelect");
     }
 
-    if (appState.gridSize && appState.draggingElement) {
+    if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping");
     }
 
@@ -108,9 +128,23 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
         return t("hints.lineEditor_info");
       }
       if (
-        !appState.draggingElement &&
+        !appState.newElement &&
+        !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
+        if (isFlowchartNodeElement(selectedElements[0])) {
+          if (
+            isNodeInFlowchart(
+              selectedElements[0],
+              app.scene.getNonDeletedElementsMap(),
+            )
+          ) {
+            return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+          }
+
+          return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+        }
+
         return t("hints.bindTextToElement");
       }
     }
@@ -125,17 +159,24 @@ export const HintViewer = ({
   device,
   app,
 }: HintViewerProps) => {
-  let hint = getHints({
+  const hints = getHints({
     appState,
     isMobile,
     device,
     app,
   });
-  if (!hint) {
+
+  if (!hints) {
     return null;
   }
 
-  hint = getShortcutKey(hint);
+  const hint = Array.isArray(hints)
+    ? hints
+        .map((hint) => {
+          return getShortcutKey(hint).replace(/\. ?$/, "");
+        })
+        .join(". ")
+    : getShortcutKey(hints);
 
   return (
     <div className="HintViewer">

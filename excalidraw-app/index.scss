@@ -25,6 +25,7 @@
     margin-bottom: auto;
     margin-inline-start: auto;
     margin-inline-end: 0.6em;
+    z-index: var(--zIndex-layerUI);
 
     svg {
       width: 1.2rem;

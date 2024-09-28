@@ -13,16 +13,13 @@ import {
 import { bindLinearElement } from "../element/binding";
 import type { ElementConstructorOpts } from "../element/newElement";
 import {
+  newArrowElement,
   newFrameElement,
   newImageElement,
   newMagicFrameElement,
   newTextElement,
 } from "../element/newElement";
-import {
-  getDefaultLineHeight,
-  measureText,
-  normalizeText,
-} from "../element/textElement";
+import { measureText, normalizeText } from "../element/textElement";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -49,11 +46,15 @@ import {
   assertNever,
   cloneJSON,
   getFontString,
+  isDevEnv,
   toBrandedType,
 } from "../utils";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
+import { getLineHeight } from "../fonts";
+import { isArrowElement } from "../element/typeChecks";
+import { point, type LocalPoint } from "../../math";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -418,7 +419,7 @@ const bindLinearElementToElement = (
   const endPointIndex = linearElement.points.length - 1;
   const delta = 0.5;
 
-  const newPoints = cloneJSON(linearElement.points) as [number, number][];
+  const newPoints = cloneJSON<readonly LocalPoint[]>(linearElement.points);
 
   // left to right so shift the arrow towards right
   if (
@@ -536,10 +537,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newLinearElement({
           width,
           height,
-          points: [
-            [0, 0],
-            [width, height],
-          ],
+          points: [point(0, 0), point(width, height)],
           ...element,
         });
 
@@ -548,15 +546,13 @@ export const convertToExcalidrawElements = (
       case "arrow": {
         const width = element.width || DEFAULT_LINEAR_ELEMENT_PROPS.width;
         const height = element.height || DEFAULT_LINEAR_ELEMENT_PROPS.height;
-        excalidrawElement = newLinearElement({
+        excalidrawElement = newArrowElement({
           width,
           height,
           endArrowhead: "arrow",
-          points: [
-            [0, 0],
-            [width, height],
-          ],
+          points: [point(0, 0), point(width, height)],
           ...element,
+          type: "arrow",
         });
 
         Object.assign(
@@ -568,8 +564,7 @@ export const convertToExcalidrawElements = (
       case "text": {
         const fontFamily = element?.fontFamily || DEFAULT_FONT_FAMILY;
         const fontSize = element?.fontSize || DEFAULT_FONT_SIZE;
-        const lineHeight =
-          element?.lineHeight || getDefaultLineHeight(fontFamily);
+        const lineHeight = element?.lineHeight || getLineHeight(fontFamily);
         const text = element.text ?? "";
         const normalizedText = normalizeText(text);
         const metrics = measureText(
@@ -659,7 +654,7 @@ export const convertToExcalidrawElements = (
           elementStore.add(container);
           elementStore.add(text);
 
-          if (container.type === "arrow") {
+          if (isArrowElement(container)) {
             const originalStart =
               element.type === "arrow" ? element?.start : undefined;
             const originalEnd =
@@ -678,7 +673,7 @@ export const convertToExcalidrawElements = (
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
-                container as ExcalidrawArrowElement,
+                container,
                 originalStart,
                 originalEnd,
                 elementStore,
@@ -723,7 +718,7 @@ export const convertToExcalidrawElements = (
   }
 
   // Once all the excalidraw elements are created, we can add frames since we
-  // need to calculate coordinates and dimensions of frame which is possibe after all
+  // need to calculate coordinates and dimensions of frame which is possible after all
   // frame children are processed.
   for (const [id, element] of elementsWithIds) {
     if (element.type !== "frame" && element.type !== "magicframe") {
@@ -770,10 +765,26 @@ export const convertToExcalidrawElements = (
     maxX = maxX + PADDING;
     maxY = maxY + PADDING;
 
-    // Take the max of calculated and provided frame dimensions, whichever is higher
-    const width = Math.max(frame?.width, maxX - minX);
-    const height = Math.max(frame?.height, maxY - minY);
-    Object.assign(frame, { x: minX, y: minY, width, height });
+    const frameX = frame?.x || minX;
+    const frameY = frame?.y || minY;
+    const frameWidth = frame?.width || maxX - minX;
+    const frameHeight = frame?.height || maxY - minY;
+
+    Object.assign(frame, {
+      x: frameX,
+      y: frameY,
+      width: frameWidth,
+      height: frameHeight,
+    });
+    if (
+      isDevEnv() &&
+      element.children.length &&
+      (frame?.x || frame?.y || frame?.width || frame?.height)
+    ) {
+      console.info(
+        "User provided frame attributes are being considered, if you find this inaccurate, please remove any of the attributes - x, y, width and height so frame coordinates and dimensions are calculated automatically",
+      );
+    }
   }
 
   return elementStore.getElements();

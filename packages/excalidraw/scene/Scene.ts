@@ -1,3 +1,4 @@
+import throttle from "lodash.throttle";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -49,6 +50,24 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   }
   return { elementsMap, elements };
 };
+
+const validateIndicesThrottled = throttle(
+  (elements: readonly ExcalidrawElement[]) => {
+    if (
+      import.meta.env.DEV ||
+      import.meta.env.MODE === ENV.TEST ||
+      window?.DEBUG_FRACTIONAL_INDICES
+    ) {
+      validateFractionalIndices(elements, {
+        // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        includeBoundTextValidation: true,
+      });
+    }
+  },
+  1000 * 60,
+  { leading: true, trailing: false },
+);
 
 const hashSelectionOpts = (
   opts: Parameters<InstanceType<typeof Scene>["getSelectedElements"]>[0],
@@ -105,6 +124,9 @@ class Scene {
     }
   }
 
+  /**
+   * @deprecated pass down `app.scene` and use it directly
+   */
   static getScene(elementKey: ElementKey): Scene | null {
     if (isIdKey(elementKey)) {
       return this.sceneMapById.get(elementKey) || null;
@@ -271,10 +293,7 @@ class Scene {
         : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
-      // throw on invalid indices in test / dev to potentially detect cases were we forgot to sync moved elements
-      validateFractionalIndices(_nextElements.map((x) => x.index));
-    }
+    validateIndicesThrottled(_nextElements);
 
     this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
@@ -358,6 +377,10 @@ class Scene {
   }
 
   insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+    if (!elements.length) {
+      return;
+    }
+
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
@@ -384,7 +407,11 @@ class Scene {
   };
 
   insertElements = (elements: ExcalidrawElement[]) => {
-    const index = elements[0].frameId
+    if (!elements.length) {
+      return;
+    }
+
+    const index = elements[0]?.frameId
       ? this.getElementIndex(elements[0].frameId)
       : this.elements.length;
 

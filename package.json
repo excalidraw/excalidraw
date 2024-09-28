@@ -6,22 +6,12 @@
     "excalidraw-app",
     "packages/excalidraw",
     "packages/utils",
+    "packages/math",
     "examples/excalidraw",
     "examples/excalidraw/*"
   ],
-  "dependencies": {
-    "@excalidraw/random-username": "1.0.0",
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
-    "firebase": "8.3.3",
-    "i18next-browser-languagedetector": "6.1.4",
-    "idb-keyval": "6.0.3",
-    "jotai": "1.13.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "socket.io-client": "4.7.2"
-  },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.3.0",
@@ -31,8 +21,8 @@
     "@types/react-dom": "18.2.0",
     "@types/socket.io-client": "3.0.0",
     "@vitejs/plugin-react": "3.1.0",
-    "@vitest/coverage-v8": "0.33.0",
-    "@vitest/ui": "0.32.2",
+    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/ui": "2.0.5",
     "chai": "4.3.6",
     "dotenv": "16.0.1",
     "eslint-config-prettier": "8.5.0",
@@ -47,12 +37,12 @@
     "rewire": "6.0.0",
     "typescript": "4.9.4",
     "vite": "5.0.12",
-    "vite-plugin-checker": "0.6.1",
+    "vite-plugin-checker": "0.7.2",
     "vite-plugin-ejs": "1.7.0",
     "vite-plugin-pwa": "0.17.4",
-    "vite-plugin-svgr": "2.4.0",
-    "vitest": "1.5.3",
-    "vitest-canvas-mock": "0.3.2"
+    "vite-plugin-svgr": "4.2.0",
+    "vitest": "2.0.5",
+    "vitest-canvas-mock": "0.3.3"
   },
   "engines": {
     "node": "18.0.0 - 20.x.x"
@@ -87,6 +77,13 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease:excalidraw": "node scripts/prerelease.js",
     "build:preview": "yarn build && vite preview --port 5000",
-    "release:excalidraw": "node scripts/release.js"
+    "release:excalidraw": "node scripts/release.js",
+    "rm:build": "rm -rf excalidraw-app/{build,dist,dev-dist} && rm -rf packages/*/{dist,build} && rm -rf examples/*/*/{build,dist}",
+    "rm:node_modules": "rm -rf node_modules && rm -rf excalidraw-app/node_modules && rm -rf packages/*/node_modules",
+    "clean-install": "yarn rm:node_modules && yarn install"
+  },
+  "resolutions": {
+    "@types/react": "18.2.0",
+    "strip-ansi": "6.0.1"
   }
 }

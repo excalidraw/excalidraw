@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES } from "../constants";
+import { CLASSES, isSafari, POINTER_BUTTON } from "../constants";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -38,7 +38,11 @@ import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
-import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
+import {
+  actionResetZoom,
+  actionZoomIn,
+  actionZoomOut,
+} from "../actions/actionCanvas";
 import type App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
@@ -132,10 +136,15 @@ export const textWysiwyg = ({
         updatedTextElement,
         app.scene.getNonDeletedElementsMap(),
       );
+
+      let width = updatedTextElement.width;
+
+      // set to element height by default since that's
+      // what is going to be used for unbounded text
+      let height = updatedTextElement.height;
+
       let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
-      let textElementWidth = updatedTextElement.width;
-      const textElementHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
         if (isArrowElement(container)) {
@@ -177,9 +186,9 @@ export const textWysiwyg = ({
         );
 
         // autogrow container height if text exceeds
-        if (!isArrowElement(container) && textElementHeight > maxHeight) {
+        if (!isArrowElement(container) && height > maxHeight) {
           const targetContainerHeight = computeContainerDimensionForBoundText(
-            textElementHeight,
+            height,
             container.type,
           );
 
@@ -190,10 +199,10 @@ export const textWysiwyg = ({
           // is reached when text is removed
           !isArrowElement(container) &&
           container.height > originalContainerData.height &&
-          textElementHeight < maxHeight
+          height < maxHeight
         ) {
           const targetContainerHeight = computeContainerDimensionForBoundText(
-            textElementHeight,
+            height,
             container.type,
           );
           mutateElement(container, { height: targetContainerHeight });
@@ -226,30 +235,41 @@ export const textWysiwyg = ({
 
       if (!container) {
         maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-        textElementWidth = Math.min(textElementWidth, maxWidth);
+        width = Math.min(width, maxWidth);
       } else {
-        textElementWidth += 0.5;
+        width += 0.5;
       }
+
+      // add 5% buffer otherwise it causes wysiwyg to jump
+      height *= 1.05;
+
+      const font = getFontString(updatedTextElement);
+
+      // adding left and right padding buffer, so that browser does not cut the glyphs (does not work in Safari)
+      const padding = !isSafari
+        ? Math.ceil(updatedTextElement.fontSize / appState.zoom.value / 2)
+        : 0;
 
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
       Object.assign(editable.style, {
-        font: getFontString(updatedTextElement),
+        font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${textElementWidth}px`,
-        height: `${textElementHeight}px`,
-        left: `${viewportX}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        left: `${viewportX - padding}px`,
         top: `${viewportY}px`,
         transform: getTransform(
-          textElementWidth,
-          textElementHeight,
+          width,
+          height,
           getTextElementAngle(updatedTextElement, container),
           appState,
           maxWidth,
           editorMaxHeight,
         ),
+        padding: `0 ${padding}px`,
         textAlign,
         verticalAlign,
         color: updatedTextElement.strokeColor,
@@ -290,7 +310,6 @@ export const textWysiwyg = ({
     minHeight: "1em",
     backfaceVisibility: "hidden",
     margin: 0,
-    padding: 0,
     border: 0,
     outline: 0,
     resize: "none",
@@ -336,13 +355,22 @@ export const textWysiwyg = ({
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );
-        const width = getTextWidth(wrappedText, font);
+        const width = getTextWidth(wrappedText, font, true);
         editable.style.width = `${width}px`;
       }
     };
 
     editable.oninput = () => {
-      onChange(normalizeText(editable.value));
+      const normalized = normalizeText(editable.value);
+      if (editable.value !== normalized) {
+        const selectionStart = editable.selectionStart;
+        editable.value = normalized;
+        // put the cursor at some position close to where it was before
+        // normalization (otherwise it'll end up at the end of the text)
+        editable.selectionStart = selectionStart;
+        editable.selectionEnd = selectionStart;
+      }
+      onChange(editable.value);
     };
   }
 
@@ -354,6 +382,10 @@ export const textWysiwyg = ({
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionResetZoom);
       updateWysiwygStyle();
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
@@ -485,8 +517,10 @@ export const textWysiwyg = ({
   };
 
   const stopEvent = (event: Event) => {
-    event.preventDefault();
-    event.stopPropagation();
+    if (event.target instanceof HTMLCanvasElement) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   };
 
   // using a state variable instead of passing it to the handleSubmit callback
@@ -567,6 +601,7 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
+    unbindOnScroll();
 
     editable.remove();
   };
@@ -579,72 +614,59 @@ export const textWysiwyg = ({
     // in that same tick.
     const target = event?.target;
 
-    const isTargetPickerTrigger =
+    const isPropertiesTrigger =
       target instanceof HTMLElement &&
-      target.classList.contains("active-color");
+      target.classList.contains("properties-trigger");
 
     setTimeout(() => {
       editable.onblur = handleSubmit;
 
-      if (isTargetPickerTrigger) {
-        const callback = (
-          mutationList: MutationRecord[],
-          observer: MutationObserver,
-        ) => {
-          const radixIsRemoved = mutationList.find(
-            (mutation) =>
-              mutation.removedNodes.length > 0 &&
-              (mutation.removedNodes[0] as HTMLElement).dataset
-                ?.radixPopperContentWrapper !== undefined,
-          );
-
-          if (radixIsRemoved) {
-            // should work without this in theory
-            // and i think it does actually but radix probably somewhere,
-            // somehow sets the focus elsewhere
-            setTimeout(() => {
-              editable.focus();
-            });
-
-            observer.disconnect();
-          }
-        };
-
-        const observer = new MutationObserver(callback);
-
-        observer.observe(document.querySelector(".excalidraw-container")!, {
-          childList: true,
-        });
-      }
-
       // case: clicking on the same property → no change → no update → no focus
-      if (!isTargetPickerTrigger) {
+      if (!isPropertiesTrigger) {
         editable.focus();
       }
     });
   };
 
+  const temporarilyDisableSubmit = () => {
+    editable.onblur = null;
+    window.addEventListener("pointerup", bindBlurEvent);
+    // handle edge-case where pointerup doesn't fire e.g. due to user
+    // alt-tabbing away
+    window.addEventListener("blur", handleSubmit);
+  };
+
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
-    const isTargetPickerTrigger =
-      event.target instanceof HTMLElement &&
-      event.target.classList.contains("active-color");
+    const target = event?.target;
+
+    // panning canvas
+    if (event.button === POINTER_BUTTON.WHEEL) {
+      // trying to pan by clicking inside text area itself -> handle here
+      if (target instanceof HTMLTextAreaElement) {
+        event.preventDefault();
+        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
+      }
+      temporarilyDisableSubmit();
+      return;
+    }
+
+    const isPropertiesTrigger =
+      target instanceof HTMLElement &&
+      target.classList.contains("properties-trigger");
 
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        event.target.closest(
+          `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
+        ) &&
         !isWritableElement(event.target)) ||
-      isTargetPickerTrigger
+      isPropertiesTrigger
     ) {
-      editable.onblur = null;
-      window.addEventListener("pointerup", bindBlurEvent);
-      // handle edge-case where pointerup doesn't fire e.g. due to user
-      // alt-tabbing away
-      window.addEventListener("blur", handleSubmit);
+      temporarilyDisableSubmit();
     } else if (
-      event.target instanceof HTMLElement &&
-      !event.target.contains(editable) &&
+      event.target instanceof HTMLCanvasElement &&
       // Vitest simply ignores stopPropagation, capture-mode, or rAF
       // so without introducing crazier hacks, nothing we can do
       !isTestEnv()
@@ -662,14 +684,18 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = Scene.getScene(element)!.onUpdate(() => {
+  const unbindUpdate = app.scene.onUpdate(() => {
     updateWysiwygStyle();
-    const isColorPickerActive = !!document.activeElement?.closest(
-      ".color-picker-content",
+    const isPopupOpened = !!document.activeElement?.closest(
+      ".properties-content",
     );
-    if (!isColorPickerActive) {
+    if (!isPopupOpened) {
       editable.focus();
     }
+  });
+
+  const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
+    updateWysiwygStyle();
   });
 
   // ---------------------------------------------------------------------------
@@ -701,10 +727,6 @@ export const textWysiwyg = ({
   // triggered the wysiwyg
   requestAnimationFrame(() => {
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
-  });
-  window.addEventListener("wheel", stopEvent, {
-    passive: false,
-    capture: true,
   });
   window.addEventListener("beforeunload", handleSubmit);
   excalidrawContainer

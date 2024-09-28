@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (outline)",
     "arrowhead_diamond": "Diamond",
     "arrowhead_diamond_outline": "Diamond (outline)",
+    "arrowtypes": "Arrow type",
+    "arrowtype_sharp": "Sharp arrow",
+    "arrowtype_round": "Curved arrow",
+    "arrowtype_elbowed": "Elbow arrow",
     "fontSize": "Font size",
     "fontFamily": "Font family",
     "addWatermark": "Add \"Made with Excalidraw\"",
@@ -109,6 +113,7 @@
     "share": "Share",
     "showStroke": "Show stroke color picker",
     "showBackground": "Show background color picker",
+    "showFonts": "Show font picker",
     "toggleTheme": "Toggle light/dark theme",
     "theme": "Theme",
     "personalLib": "Personal Library",
@@ -157,12 +162,20 @@
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
     "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
   },
+  "search": {
+    "title": "Find on canvas",
+    "noMatch": "No matches found...",
+    "singleResult": "result",
+    "multipleResults": "results",
+    "placeholder": "Find text on canvas..."
+  },
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
     "exportImage": "Export image...",
     "export": "Save to...",
     "copyToClipboard": "Copy to clipboard",
+    "copyLink": "Copy link",
     "save": "Save to current file",
     "saveAs": "Save as",
     "load": "Open",
@@ -267,8 +280,23 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "magicSettings": "AI settings"
+    "mermaidToExcalidraw": "Mermaid to Excalidraw"
+  },
+  "element": {
+    "rectangle": "Rectangle",
+    "diamond": "Diamond",
+    "ellipse": "Ellipse",
+    "arrow": "Arrow",
+    "line": "Line",
+    "freedraw": "Freedraw",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group",
+    "frame": "Frame",
+    "magicframe": "Wireframe to code",
+    "embeddable": "Web Embed",
+    "selection": "Selection",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Canvas actions",
@@ -276,8 +304,10 @@
     "shapes": "Shapes"
   },
   "hints": {
+    "dismissSearch": "Escape to dismiss search",
     "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
+    "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
@@ -294,6 +324,7 @@
     "placeImage": "Click to place the image, or click and drag to set its size manually",
     "publishLibrary": "Publish your own library",
     "bindTextToElement": "Press enter to add text",
+    "createFlowchart": "Hold CtrlOrCmd and Arrow key to create a flowchart",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
@@ -344,6 +375,8 @@
     "click": "click",
     "deepSelect": "Deep select",
     "deepBoxSelect": "Deep select within box, and prevent dragging",
+    "createFlowchart": "Create a flowchart from a generic element",
+    "navigateFlowchart": "Navigate a flowchart",
     "curvedArrow": "Curved arrow",
     "curvedLine": "Curved line",
     "documentation": "Documentation",
@@ -437,13 +470,15 @@
   },
   "stats": {
     "angle": "Angle",
-    "element": "Element",
-    "elements": "Elements",
+    "shapes": "Shapes",
     "height": "Height",
     "scene": "Scene",
     "selected": "Selected",
     "storage": "Storage",
-    "title": "Stats for nerds",
+    "fullTitle": "Canvas & Shape properties",
+    "title": "Properties",
+    "generalStats": "General",
+    "elementProperties": "Shape properties",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Click to copy",
@@ -538,11 +573,19 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   },
-  "userList": {
-    "search": {
-      "placeholder": "Quick search",
-      "empty": "No users found"
+  "quickSearch": {
+    "placeholder": "Quick search"
+  },
+  "fontList": {
+    "badge": {
+      "old": "old"
     },
+    "sceneFonts": "In this scene",
+    "availableFonts": "Available fonts",
+    "empty": "No fonts found"
+  },
+  "userList": {
+    "empty": "No users found",
     "hint": {
       "text": "Click on user to follow",
       "followStatus": "You're currently following this user",

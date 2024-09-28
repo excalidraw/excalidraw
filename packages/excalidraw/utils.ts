@@ -1,3 +1,4 @@
+import { average } from "../math";
 import { COLOR_PALETTE } from "./colors";
 import type { EVENT } from "./constants";
 import {
@@ -88,6 +89,7 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
+      // TODO: we should fallback first to generic family names first, rather than directly to the emoji font
       return `${fontFamilyString}, ${WINDOWS_EMOJI_FALLBACK_FONT}`;
     }
   }
@@ -676,12 +678,44 @@ export const arrayToMapWithIndex = <T extends { id: string }>(
  */
 export const arrayToObject = <T>(
   array: readonly T[],
-  groupBy?: (value: T) => string,
+  groupBy?: (value: T) => string | number,
 ) =>
   array.reduce((acc, value) => {
     acc[groupBy ? groupBy(value) : String(value)] = value;
     return acc;
   }, {} as { [key: string]: T });
+
+/** Doubly linked node */
+export type Node<T> = T & {
+  prev: Node<T> | null;
+  next: Node<T> | null;
+};
+
+/**
+ * Creates a circular doubly linked list by adding `prev` and `next` props to the existing array nodes.
+ */
+export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
+  array.reduce((acc, curr, index) => {
+    const node: Node<T> = { ...curr, prev: null, next: null };
+
+    // no-op for first item, we don't want circular references on a single item
+    if (index !== 0) {
+      const prevNode = acc[index - 1];
+      node.prev = prevNode;
+      prevNode.next = node;
+
+      if (index === array.length - 1) {
+        // make the references circular and connect head & tail
+        const firstNode = acc[0];
+        node.next = firstNode;
+        firstNode.prev = node;
+      }
+    }
+
+    acc.push(node);
+
+    return acc;
+  }, [] as Node<T>[]);
 
 export const isTestEnv = () => import.meta.env.MODE === "test";
 
@@ -896,6 +930,12 @@ export const assertNever = (
   throw new Error(message);
 };
 
+export function invariant(condition: any, message: string): asserts condition {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
 /**
  * Memoizes on values of `opts` object (strict equality).
  */
@@ -952,10 +992,6 @@ export const isMemberOf = <T extends string>(
 };
 
 export const cloneJSON = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
-
-export const isFiniteNumber = (value: any): value is number => {
-  return typeof value === "number" && Number.isFinite(value);
-};
 
 export const updateStable = <T extends any[] | Record<string, any>>(
   prevValue: T,
@@ -1040,7 +1076,6 @@ export function addEventListener(
   };
 }
 
-const average = (a: number, b: number) => (a + b) / 2;
 export function getSvgPathFromStroke(points: number[][], closed = true) {
   const len = points.length;
 
@@ -1123,4 +1158,15 @@ export const promiseTry = async <TValue, TArgs extends unknown[]>(
   return new Promise((resolve) => {
     resolve(fn(...args));
   });
+};
+
+export const isAnyTrue = (...args: boolean[]): boolean =>
+  Math.max(...args.map((arg) => (arg ? 1 : 0))) > 0;
+
+export const safelyParseJSON = (json: string): Record<string, any> | null => {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
 };

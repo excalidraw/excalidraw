@@ -2,7 +2,6 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 import type {
   ExcalidrawElement,
-  ExcalidrawTextElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -17,6 +16,7 @@ import type {
   SocketId,
   UserIdleState,
   Device,
+  PendingExcalidrawElements,
 } from "../types";
 import type { MakeBrand } from "../utility-types";
 
@@ -34,6 +34,7 @@ export type StaticCanvasRenderConfig = {
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
+  pendingFlowchartNodes: PendingExcalidrawElements | null;
 };
 
 export type SVGRenderConfig = {
@@ -91,14 +92,21 @@ export type InteractiveSceneRenderConfig = {
   callback: (data: RenderInteractiveSceneCallback) => void;
 };
 
+export type NewElementSceneRenderConfig = {
+  canvas: HTMLCanvasElement | null;
+  rc: RoughCanvas;
+  newElement: ExcalidrawElement | null;
+  elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
+  scale: number;
+  appState: AppState;
+  renderConfig: StaticCanvasRenderConfig;
+};
+
 export type SceneScroll = {
   scrollX: number;
   scrollY: number;
 };
-
-export interface Scene {
-  elements: ExcalidrawTextElement[];
-}
 
 export type ExportType =
   | "png"

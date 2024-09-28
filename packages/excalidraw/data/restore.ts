@@ -1,19 +1,17 @@
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawElementType,
+  ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPointBinding,
   FontFamilyValues,
   OrderedExcalidrawElement,
   PointBinding,
   StrokeRoundness,
 } from "../element/types";
-import type {
-  AppState,
-  BinaryFiles,
-  LibraryItem,
-  NormalizedZoomValue,
-} from "../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
@@ -21,7 +19,14 @@ import {
   isInvisiblySmallElement,
   refreshTextDimensions,
 } from "../element";
-import { isTextElement, isUsingAdaptiveRadius } from "../element/typeChecks";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isFixedPointBinding,
+  isLinearElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
 import { randomId } from "../random";
 import {
   DEFAULT_FONT_FAMILY,
@@ -31,6 +36,8 @@ import {
   ROUNDNESS,
   DEFAULT_SIDEBAR,
   DEFAULT_ELEMENT_PROPS,
+  DEFAULT_GRID_SIZE,
+  DEFAULT_GRID_STEP,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -38,14 +45,19 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
-import {
-  detectLineHeight,
-  getContainerElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+import { detectLineHeight, getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
+import { getLineHeight } from "../fonts";
+import { normalizeFixedPoint } from "../element/binding";
+import {
+  getNormalizedGridSize,
+  getNormalizedGridStep,
+  getNormalizedZoom,
+} from "../scene";
+import type { LocalPoint, Radians } from "../../math";
+import { isFiniteNumber, point } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -89,11 +101,23 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (binding: PointBinding | null) => {
+const repairBinding = (
+  element: ExcalidrawLinearElement,
+  binding: PointBinding | FixedPointBinding | null,
+): PointBinding | FixedPointBinding | null => {
   if (!binding) {
     return null;
   }
-  return { ...binding, focus: binding.focus || 0 };
+
+  return {
+    ...binding,
+    focus: binding.focus || 0,
+    ...(isElbowArrow(element) && isFixedPointBinding(binding)
+      ? {
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+        }
+      : {}),
+  };
 };
 
 const restoreElementWithProperties = <
@@ -130,7 +154,7 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
-    angle: element.angle || 0,
+    angle: element.angle || (0 as Radians),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
@@ -200,7 +224,7 @@ const restoreElement = (
             detectLineHeight(element)
           : // no element height likely means programmatic use, so default
             // to a fixed line height
-            getDefaultLineHeight(element.fontFamily));
+            getLineHeight(element.fontFamily));
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -239,19 +263,12 @@ const restoreElement = (
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-    case "arrow": {
-      const {
-        startArrowhead = null,
-        endArrowhead = element.type === "arrow" ? "arrow" : null,
-      } = element;
+      const { startArrowhead = null, endArrowhead = null } = element;
       let x = element.x;
       let y = element.y;
       let points = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [
-              [0, 0],
-              [element.width, element.height],
-            ]
+          ? [point(0, 0), point(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
@@ -263,14 +280,41 @@ const restoreElement = (
           (element.type as ExcalidrawElementType | "draw") === "draw"
             ? "line"
             : element.type,
-        startBinding: repairBinding(element.startBinding),
-        endBinding: repairBinding(element.endBinding),
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
         lastCommittedPoint: null,
         startArrowhead,
         endArrowhead,
         points,
         x,
         y,
+        ...getSizeFromPoints(points),
+      });
+    case "arrow": {
+      const { startArrowhead = null, endArrowhead = "arrow" } = element;
+      let x: number | undefined = element.x;
+      let y: number | undefined = element.y;
+      let points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
+        !Array.isArray(element.points) || element.points.length < 2
+          ? [point(0, 0), point(element.width, element.height)]
+          : element.points;
+
+      if (points[0][0] !== 0 || points[0][1] !== 0) {
+        ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
+      }
+
+      // TODO: Separate arrow from linear element
+      return restoreElementWithProperties(element as ExcalidrawArrowElement, {
+        type: element.type,
+        startBinding: repairBinding(element, element.startBinding),
+        endBinding: repairBinding(element, element.endBinding),
+        lastCommittedPoint: null,
+        startArrowhead,
+        endArrowhead,
+        points,
+        x,
+        y,
+        elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
       });
     }
@@ -460,6 +504,23 @@ export const restoreElements = (
         ),
       );
     }
+
+    if (isLinearElement(element)) {
+      if (
+        element.startBinding &&
+        (!restoredElementsMap.has(element.startBinding.elementId) ||
+          !isArrowElement(element))
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).startBinding = null;
+      }
+      if (
+        element.endBinding &&
+        (!restoredElementsMap.has(element.endBinding.elementId) ||
+          !isArrowElement(element))
+      ) {
+        (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
+      }
+    }
   }
 
   return restoredElements;
@@ -555,19 +616,24 @@ export const restoreAppState = (
       locked: nextAppState.activeTool.locked ?? false,
     },
     // Migrates from previous version where appState.zoom was a number
-    zoom:
-      typeof appState.zoom === "number"
-        ? {
-            value: appState.zoom as NormalizedZoomValue,
-          }
-        : appState.zoom?.value
-        ? appState.zoom
-        : defaultAppState.zoom,
+    zoom: {
+      value: getNormalizedZoom(
+        isFiniteNumber(appState.zoom)
+          ? appState.zoom
+          : appState.zoom?.value ?? defaultAppState.zoom.value,
+      ),
+    },
     openSidebar:
       // string (legacy)
       typeof (appState.openSidebar as any as string) === "string"
         ? { name: DEFAULT_SIDEBAR.name }
         : nextAppState.openSidebar,
+    gridSize: getNormalizedGridSize(
+      isFiniteNumber(appState.gridSize) ? appState.gridSize : DEFAULT_GRID_SIZE,
+    ),
+    gridStep: getNormalizedGridStep(
+      isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
+    ),
   };
 };
 

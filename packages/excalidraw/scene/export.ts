@@ -13,8 +13,8 @@ import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import type { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
-  FONT_FAMILY,
   FRAME_STYLE,
+  FONT_FAMILY,
   SVG_NS,
   THEME,
   THEME_FILTER,
@@ -32,12 +32,14 @@ import {
   getRootElements,
 } from "../frame";
 import { newTextElement } from "../element";
-import type { Mutable } from "../utility-types";
+import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
+import { isFrameLikeElement, isTextElement } from "../element/typeChecks";
 import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
+import { Fonts } from "../fonts";
+import type { Font } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -83,29 +85,19 @@ const addFrameLabelsAsTextElements = (
   opts: Pick<AppState, "exportWithDarkMode">,
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
-  let frameIndex = 0;
-  let magicFrameIndex = 0;
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      if (isFrameElement(element)) {
-        frameIndex++;
-      } else {
-        magicFrameIndex++;
-      }
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: FONT_FAMILY.Assistant,
+        fontFamily: FONT_FAMILY.Helvetica,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
         strokeColor: opts.exportWithDarkMode
           ? FRAME_STYLE.nameColorDarkTheme
           : FRAME_STYLE.nameColorLightTheme,
-        text: getFrameLikeTitle(
-          element,
-          isFrameElement(element) ? frameIndex : magicFrameIndex,
-        ),
+        text: getFrameLikeTitle(element),
       });
       textElement.y -= textElement.height;
 
@@ -182,11 +174,22 @@ export const exportToCanvas = async (
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
   },
+  loadFonts: () => Promise<void> = async () => {
+    await Fonts.loadFontsForElements(elements);
+  },
 ) => {
+  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
+  await loadFonts();
+
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
     appState.frameRendering ?? null,
   );
+  // for canvas export, don't clip if exporting a specific frame as it would
+  // clip the corners of the content
+  if (exportingFrame) {
+    frameRendering.clip = false;
+  }
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -245,6 +248,7 @@ export const exportToCanvas = async (
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
+      pendingFlowchartNodes: null,
     },
   });
 
@@ -269,6 +273,7 @@ export const exportToSvg = async (
      */
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
+    skipInliningFonts?: true;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -333,21 +338,6 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  let assetPath = "https://excalidraw.com/";
-  // Asset path needs to be determined only when using package
-  if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
-    assetPath =
-      window.EXCALIDRAW_ASSET_PATH ||
-      `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-        import.meta.env.VITE_PKG_VERSION
-      }`;
-
-    if (assetPath?.startsWith("/")) {
-      assetPath = assetPath.replace("/", `${window.location.origin}/`);
-    }
-    assetPath = `${assetPath}/dist/excalidraw-assets/`;
-  }
-
   const offsetX = -minX + exportPadding;
   const offsetY = -minY + exportPadding;
 
@@ -366,28 +356,24 @@ export const exportToSvg = async (
     }) rotate(${frame.angle} ${cx} ${cy})"
           width="${frame.width}"
           height="${frame.height}"
+          ${
+            exportingFrame
+              ? ""
+              : `rx=${FRAME_STYLE.radius} ry=${FRAME_STYLE.radius}`
+          }
           >
           </rect>
         </clipPath>`;
   }
+
+  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
     <style class="style-fonts">
-      @font-face {
-        font-family: "Virgil";
-        src: url("${assetPath}Virgil.woff2");
-      }
-      @font-face {
-        font-family: "Cascadia";
-        src: url("${assetPath}Cascadia.woff2");
-      }
-      @font-face {
-        font-family: "Assistant";
-        src: url("${assetPath}Assistant-Regular.woff2");
-      }
+      ${fontFaces.join("\n")}
     </style>
     ${exportingFrameClipPath}
   </defs>
@@ -457,4 +443,68 @@ export const getExportSize = (
   );
 
   return [width, height];
+};
+
+const getFontFaces = async (
+  elements: readonly ExcalidrawElement[],
+): Promise<string[]> => {
+  const fontFamilies = new Set<number>();
+  const codePoints = new Set<number>();
+
+  for (const element of elements) {
+    if (!isTextElement(element)) {
+      continue;
+    }
+
+    fontFamilies.add(element.fontFamily);
+
+    // gather unique codepoints only when inlining fonts
+    for (const codePoint of Array.from(element.originalText, (u) =>
+      u.codePointAt(0),
+    )) {
+      if (codePoint) {
+        codePoints.add(codePoint);
+      }
+    }
+  }
+
+  const getSource = (font: Font) => {
+    try {
+      // retrieve font source as dataurl based on the used codepoints
+      return font.getContent(codePoints);
+    } catch {
+      // fallback to font source as a url
+      return font.urls[0].toString();
+    }
+  };
+
+  const fontFaces = await Promise.all(
+    Array.from(fontFamilies).map(async (x) => {
+      const { fonts, metadata } = Fonts.registered.get(x) ?? {};
+
+      if (!Array.isArray(fonts)) {
+        console.error(
+          `Couldn't find registered fonts for font-family "${x}"`,
+          Fonts.registered,
+        );
+        return [];
+      }
+
+      if (metadata?.local) {
+        // don't inline local fonts
+        return [];
+      }
+
+      return Promise.all(
+        fonts.map(
+          async (font) => `@font-face {
+        font-family: ${font.fontFace.family};
+        src: url(${await getSource(font)});
+          }`,
+        ),
+      );
+    }),
+  );
+
+  return fontFaces.flat();
 };
