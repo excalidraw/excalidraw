@@ -44,6 +44,7 @@ import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
 import { clamp, roundToStep } from "../../math";
+import { getMaxZoom } from "../obsidianUtils";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -267,8 +268,12 @@ const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
   viewportZoomFactor: number = 1, // default to 1 if not provided
-  maxZoom: number = 1, //zsviczian
+  maxZoom?: number, //zsviczian
 ) => {
+  if (typeof maxZoom === "undefined") {
+    //zsviczian
+    maxZoom = getMaxZoom();
+  }
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
   const zoomValueForWidth = viewportDimensions.width / commonBoundsWidth;
@@ -631,9 +636,13 @@ export const zoomToFitElements = (
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
   app: AppClassProperties, //zsviczian
-  maxZoom: number = 1, //zsviczian
+  maxZoom?: number, //zsviczian
   margin: number = 0, //zsviczian
 ) => {
+  if (typeof maxZoom === "undefined") {
+    //zsviczian
+    maxZoom = getMaxZoom();
+  }
   const nonDeletedElements = getNonDeletedElements(elements);
   const selectedElements = app.scene.getSelectedElements(appState);
 
@@ -654,7 +663,7 @@ export const zoomToFitElements = (
         },
         1,
         maxZoom,
-      )
+      ),
     ),
   };
 

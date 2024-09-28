@@ -434,8 +434,8 @@ import { getRenderOpacity } from "../renderer/renderElement";
 import {
   allowDoubleTapEraser,
   getExcalidrawContentEl,
+  getMaxZoom,
   hideFreedrawPenmodeCursor,
-  hostPlugin,
   initializeObsidianUtils,
 } from "../obsidianUtils";
 import {
@@ -3892,9 +3892,13 @@ class App extends React.Component<AppProps, AppState> {
   //zsviczian
   zoomToFit = (
     target: readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    maxZoom: number = 1, //null will zoom to max based on viewport
+    maxZoom?: number, //null will zoom to max based on viewport
     margin: number = 0.03, //percentage of viewport width&height
   ) => {
+    if (typeof maxZoom === "undefined") {
+      //zsviczian
+      maxZoom = getMaxZoom();
+    }
     if (!target) {
       target = this.scene.getNonDeletedElements();
     }
@@ -4206,17 +4210,21 @@ class App extends React.Component<AppProps, AppState> {
 
   public getEditorUIOffsets = (): Offsets => {
     const toolbarBottom =
-      this.excalidrawContainerRef?.current
+      (this.excalidrawContainerRef?.current
         ?.querySelector(".App-toolbar")
-        ?.getBoundingClientRect()?.bottom ?? 0;
+        ?.getBoundingClientRect()?.bottom ?? 0) - this.state.offsetTop;
     const sidebarRect = this.excalidrawContainerRef?.current
       ?.querySelector(".sidebar")
       ?.getBoundingClientRect();
     const propertiesPanelRect = this.excalidrawContainerRef?.current
       ?.querySelector(".App-menu__left")
       ?.getBoundingClientRect();
-
     const PADDING = 16;
+
+    const adjustRectValueForOffset = ( //zsviczian https://github.com/excalidraw/excalidraw/issues/8561
+      value: number | undefined,
+      fallback: number,
+    ) => (value ?? fallback + this.state.offsetLeft) - this.state.offsetLeft;
 
     return getLanguage().rtl
       ? {
@@ -4224,22 +4232,31 @@ class App extends React.Component<AppProps, AppState> {
           right:
             Math.max(
               this.state.width -
-                (propertiesPanelRect?.left ?? this.state.width),
+                adjustRectValueForOffset( //zsivczian
+                  propertiesPanelRect?.left,
+                  this.state.width,
+                ),
               0,
             ) + PADDING,
           bottom: PADDING,
-          left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
+          left: //zsivczian
+            Math.max(adjustRectValueForOffset(sidebarRect?.right, 0), 0) +
+            PADDING,
         }
       : {
           top: toolbarBottom + PADDING,
           right: Math.max(
             this.state.width -
-              (sidebarRect?.left ?? this.state.width) +
+              adjustRectValueForOffset(sidebarRect?.left, this.state.width) + //zsivczian
               PADDING,
             0,
           ),
           bottom: PADDING,
-          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
+          left: //zsivczian
+            Math.max(
+              adjustRectValueForOffset(propertiesPanelRect?.right, 0),
+              0,
+            ) + PADDING,
         };
   };
 
@@ -5186,6 +5203,20 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           newElement: null,
           editingTextElement: null,
+        });
+
+        //zsviczian
+        //when closing the color palette color picker popup while editing a text element
+        //sometimes even though setState was executed here successfully, there is a race condition
+        //resulting in editingTexElement not being set to null
+        //if this happens, this workaround will force it to null
+        setTimeout(() => {
+          if (this.state.editingTextElement) {
+            this.setState({
+              newElement: null,
+              editingTextElement: null,
+            });
+          }
         });
         if (this.state.activeTool.locked) {
           setCursorForShape(this.interactiveCanvas, this.state);

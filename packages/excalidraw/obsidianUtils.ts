@@ -28,6 +28,10 @@ export function allowDoubleTapEraser() {
   return hostPlugin.settings.penModeDoubleTapEraser;
 }
 
+export function getMaxZoom(): number {
+  return hostPlugin.settings.zoomToFitMaxLevel ?? 1;
+}
+
 export function isExcaliBrainView() {
   const excalidrawView = hostPlugin.activeExcalidrawView;
   if (!excalidrawView) {
