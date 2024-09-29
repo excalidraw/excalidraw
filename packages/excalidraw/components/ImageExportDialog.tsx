@@ -171,14 +171,6 @@ const ImageExportModal = ({
     embedScene,
   ]);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     console.log(imageTitle);
-  //   }, 5000);
-
-  //   return () => clearInterval(intervalId);
-  // }, []);
-
   useEffect(() => {
     imageTitle = imageTitleState;
   }, [imageTitleState]);
