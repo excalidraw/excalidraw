@@ -1,4 +1,5 @@
 import rough from "roughjs/bin/rough";
+import { imageTitle } from "../components/ImageExportDialog";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -59,10 +60,6 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   const metrics = ctx.measureText(text);
 
   if (metrics.width > maxWidth) {
-    // we iterate from the right, removing characters one by one instead
-    // of bulding the string up. This assumes that it's more likely
-    // your frame names will overflow by not that many characters
-    // (if ever), so it sohuld be faster this way.
     for (let i = text.length; i > 0; i--) {
       const newText = `${text.slice(0, i)}...`;
       if (ctx.measureText(newText).width <= maxWidth) {
@@ -74,12 +71,6 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   return newElementWith(element, { text, width: maxWidth });
 };
 
-/**
- * When exporting frames, we need to render frame labels which are currently
- * being rendered in DOM when editing. Adding the labels as regular text
- * elements seems like a simple hack. In the future we'll want to move to
- * proper canvas rendering, even within editor (instead of DOM).
- */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
   opts: Pick<AppState, "exportWithDarkMode">,
@@ -178,15 +169,12 @@ export const exportToCanvas = async (
     await Fonts.loadFontsForElements(elements);
   },
 ) => {
-  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
   await loadFonts();
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
     appState.frameRendering ?? null,
   );
-  // for canvas export, don't clip if exporting a specific frame as it would
-  // clip the corners of the content
   if (exportingFrame) {
     frameRendering.clip = false;
   }
@@ -245,7 +233,6 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
-      // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
       pendingFlowchartNodes: null,
@@ -268,12 +255,10 @@ export const exportToSvg = async (
   },
   files: BinaryFiles | null,
   opts?: {
-    /**
-     * if true, all embeddables passed in will be rendered when possible.
-     */
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
+    title?: string;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -289,7 +274,7 @@ export const exportToSvg = async (
     exportEmbedScene,
   } = appState;
 
-  const { exportingFrame = null } = opts || {};
+  const { exportingFrame = null, title = imageTitle=="" ? "excalidraw" : imageTitle } = opts || {};
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -304,17 +289,11 @@ export const exportToSvg = async (
 
   let metadata = "";
 
-  // we need to serialize the "original" elements before we put them through
-  // the tempScene hack which duplicates and regenerates ids
   if (exportEmbedScene) {
     try {
       metadata = await (
         await import("../data/image")
       ).encodeSvgMetadata({
-        // when embedding scene, we want to embed the origionally supplied
-        // elements which don't contain the temp frame labels.
-        // But it also requires that the exportToSvg is being supplied with
-        // only the elements that we're exporting, and no extra.
         text: serializeAsJSON(elements, appState, files || {}, "local"),
       });
     } catch (error: any) {
@@ -327,7 +306,6 @@ export const exportToSvg = async (
     exportPadding,
   );
 
-  // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
@@ -377,9 +355,9 @@ export const exportToSvg = async (
     </style>
     ${exportingFrameClipPath}
   </defs>
+  <title>${title}</title> <!-- Add title tag -->
   `;
 
-  // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
@@ -421,7 +399,6 @@ export const exportToSvg = async (
   return svgRoot;
 };
 
-// calculate smallest area to fit the contents in
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
@@ -458,7 +435,6 @@ const getFontFaces = async (
 
     fontFamilies.add(element.fontFamily);
 
-    // gather unique codepoints only when inlining fonts
     for (const codePoint of Array.from(element.originalText, (u) =>
       u.codePointAt(0),
     )) {
@@ -470,10 +446,8 @@ const getFontFaces = async (
 
   const getSource = (font: Font) => {
     try {
-      // retrieve font source as dataurl based on the used codepoints
       return font.getContent(codePoints);
     } catch {
-      // fallback to font source as a url
       return font.urls[0].toString();
     }
   };
@@ -491,7 +465,6 @@ const getFontFaces = async (
       }
 
       if (metadata?.local) {
-        // don't inline local fonts
         return [];
       }
 
