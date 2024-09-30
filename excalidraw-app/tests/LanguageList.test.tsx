@@ -12,15 +12,7 @@ import ExcalidrawApp from "../App";
 describe("Test LanguageList", () => {
   it("rerenders UI on language change", async () => {
     await render(
-      <ExcalidrawApp
-        firebaseConfig={{
-          apiKey: "",
-          authDomain: "",
-          databaseURL: "",
-          projectId: "",
-          storageBucket: "",
-        }}
-      />)
+      <ExcalidrawApp collabServerUrl="https://test.com"  />)
 
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");

@@ -1,5 +1,5 @@
 import polyfill from "../packages/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
@@ -1132,11 +1132,12 @@ type FirebaseConfig = {
   projectId: string;
   storageBucket: string;
 };
-let firebaseConfig: FirebaseConfig;
+let collabServerUrl: string;
 const ExcalidrawApp: React.FC<{
-  firebaseConfig: FirebaseConfig;
-}> = React.memo((props) => {
-  firebaseConfig = props.firebaseConfig;  return (
+  collabServerUrl: string;
+}> = memo((props) => {
+  collabServerUrl = props.collabServerUrl;
+  return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
         <ExcalidrawWrapper />
@@ -1145,5 +1146,6 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { firebaseConfig };
+export { collabServerUrl };
+
 export default ExcalidrawApp;
