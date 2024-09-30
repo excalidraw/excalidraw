@@ -24,6 +24,8 @@ describe("Test LanguageList", () => {
           roomLinkData={null}
           username={""}
           theme="dark"
+          excalidrawAPIRefCallback={() => {}}
+          onChange={() => {}}
         />,
       );
     // select rectangle tool to show properties menu

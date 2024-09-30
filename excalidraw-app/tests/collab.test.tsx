@@ -82,7 +82,8 @@ describe("collaboration", () => {
         roomLinkData={null}
         username={""}
         theme="dark"
-
+        excalidrawAPIRefCallback={() => {}}
+        onChange={() => {}}
       />,
     );
     const rect1Props = {

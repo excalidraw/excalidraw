@@ -13,6 +13,7 @@ import {
 } from "../packages/excalidraw/constants";
 import { loadFromBlob } from "../packages/excalidraw/data/blob";
 import type {
+  ExcalidrawElement,
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
@@ -358,6 +359,11 @@ const ExcalidrawWrapper = () => {
   const [excalidrawAPI, excalidrawRefCallback] =
     useCallbackRefState<ExcalidrawImperativeAPI>();
 
+  const setExcalidrawAPI: SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => {
+    excalidrawRefCallback(api);
+    externalExcalidrawRefCallback(api);
+  };
+
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
@@ -649,6 +655,8 @@ const ExcalidrawWrapper = () => {
         }
       });
     }
+
+    externalOnChange(elements, appState, files);
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
@@ -1138,11 +1146,19 @@ let firebaseConfig: FirebaseConfig;
 let collabServerUrl: string;
 
 type RoomLinkData = { roomId: string; roomKey: string } | null;
+type SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => void;
+type OnChange = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  files: BinaryFiles,
+) => void;
 let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
+let externalExcalidrawRefCallback: SetExcalidrawAPI;
+let externalOnChange: OnChange;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
@@ -1150,6 +1166,8 @@ const ExcalidrawApp: React.FC<{
   roomLinkData: RoomLinkData;
   username: string;
   theme: Theme;
+  excalidrawAPIRefCallback: SetExcalidrawAPI;
+  onChange: OnChange;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
@@ -1157,6 +1175,8 @@ const ExcalidrawApp: React.FC<{
   customUsername = props.username;
   collabServerUrl = props.collabServerUrl;
   customTheme = props.theme;
+  externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
+  externalOnChange = props.onChange;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>

@@ -29,6 +29,8 @@ describe("Test MobileMenu", () => {
         roomLinkData={null}
         username={""}
         theme="dark"
+        excalidrawAPIRefCallback={() => {}}
+        onChange={() => {}}
       />,
     ); // @ts-ignore
     h.app.refreshViewportBreakpoints();
