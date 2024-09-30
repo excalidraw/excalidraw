@@ -6,7 +6,7 @@ import {
   pointRotateRads,
   pointsEqual,
 } from "./point";
-import type { GenericPoint, Segment, Radians, Line } from "./types";
+import type { GenericPoint, Segment, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
   vectorAdd,
@@ -180,15 +180,10 @@ export function segmentDistanceToPoint<Point extends GenericPoint>(
 }
 
 /**
- * Returns the intersection point between a segment and a line, if any
+ * Returns the intersection point of a segment and a line
  *
- * @param s
  * @param l
+ * @param s
  * @returns
  */
-export function segmentIntersectsLine<Point extends GenericPoint>(
-  s: Segment<Point>,
-  l: Line<Point>,
-): Point | null {
-  return lineIntersectsSegment(l, s);
-}
+export const segmentIntersectsLine = lineIntersectsSegment;

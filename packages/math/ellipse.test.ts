@@ -3,7 +3,9 @@ import {
   ellipseSegmentInterceptPoints,
   ellipseIncludesPoint,
   ellipseTouchesPoint,
+  ellipseIntersectsLine,
 } from "./ellipse";
+import { line } from "./line";
 import { point } from "./point";
 import { segment } from "./segment";
 import type { Ellipse, GlobalPoint } from "./types";
@@ -47,7 +49,7 @@ describe("point and ellipse", () => {
   });
 });
 
-describe("line and ellipse", () => {
+describe("segment and ellipse", () => {
   it("detects outside segment", () => {
     const e = ellipse(point(0, 0), 2, 2);
 
@@ -75,5 +77,34 @@ describe("line and ellipse", () => {
         segment<GlobalPoint>(point(0, -1), point(0, 1)),
       ),
     ).toEqual([]);
+  });
+});
+
+describe("line and ellipse", () => {
+  const e = ellipse(point(0, 0), 2, 2);
+
+  it("detects outside line", () => {
+    expect(
+      ellipseIntersectsLine(
+        e,
+        line<GlobalPoint>(point(-10, -10), point(10, -10)),
+      ),
+    ).toEqual([]);
+  });
+  it("detects line intersecting ellipse", () => {
+    expect(
+      ellipseIntersectsLine(e, line<GlobalPoint>(point(0, -1), point(0, 1))),
+    ).toEqual([point(0, 2), point(0, -2)]);
+    expect(
+      ellipseIntersectsLine(
+        e,
+        line<GlobalPoint>(point(-100, 0), point(-10, 0)),
+      ).map(([x, y]) => point(Math.round(x), Math.round(y))),
+    ).toEqual([point(2, 0), point(-2, 0)]);
+  });
+  it("detects line touching ellipse", () => {
+    expect(
+      ellipseIntersectsLine(e, line<GlobalPoint>(point(-2, -2), point(2, -2))),
+    ).toEqual([point(0, -2)]);
   });
 });

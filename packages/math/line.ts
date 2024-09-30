@@ -1,3 +1,4 @@
+import { ellipseIntersectsLine } from "./ellipse";
 import { point, pointCenter, pointRotateRads } from "./point";
 import { segmentIncludesPoint } from "./segment";
 import type { GenericPoint, Line, Radians, Segment } from "./types";
@@ -93,3 +94,5 @@ export function lineIntersectsSegment<Point extends GenericPoint>(
 
   return candidate;
 }
+
+export const lineInterceptsEllipse = ellipseIntersectsLine;

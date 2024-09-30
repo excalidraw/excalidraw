@@ -1,5 +1,5 @@
-import { point, pointDistance, pointFromVector } from "./point";
-import type { Ellipse, GenericPoint, Segment } from "./types";
+import { point, pointDistance, pointFromVector, pointsEqual } from "./point";
+import type { Ellipse, GenericPoint, Line, Segment } from "./types";
 import { PRECISION } from "./utils";
 import {
   vector,
@@ -179,4 +179,38 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
   }
 
   return intersections;
+}
+
+export function ellipseIntersectsLine<Point extends GenericPoint>(
+  { center, halfWidth, halfHeight }: Ellipse<Point>,
+  [g, h]: Line<Point>,
+): Point[] {
+  const [cx, cy] = center;
+  const x1 = g[0] - cx;
+  const y1 = g[1] - cy;
+  const x2 = h[0] - cx;
+  const y2 = h[1] - cy;
+  const a =
+    Math.pow(x2 - x1, 2) / Math.pow(halfWidth, 2) +
+    Math.pow(y2 - y1, 2) / Math.pow(halfHeight, 2);
+  const b =
+    2 *
+    ((x1 * (x2 - x1)) / Math.pow(halfWidth, 2) +
+      (y1 * (y2 - y1)) / Math.pow(halfHeight, 2));
+  const c =
+    Math.pow(x1, 2) / Math.pow(halfWidth, 2) +
+    Math.pow(y1, 2) / Math.pow(halfHeight, 2) -
+    1;
+  const t1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+  const t2 = (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+  const candidates = [
+    point<Point>(x1 + t1 * (x2 - x1) + cx, y1 + t1 * (y2 - y1) + cy),
+    point<Point>(x1 + t2 * (x2 - x1) + cx, y1 + t2 * (y2 - y1) + cy),
+  ].filter((p) => !isNaN(p[0]) && !isNaN(p[1]));
+
+  if (candidates.length === 2 && pointsEqual(candidates[0], candidates[1])) {
+    return [candidates[0]];
+  }
+
+  return candidates;
 }
