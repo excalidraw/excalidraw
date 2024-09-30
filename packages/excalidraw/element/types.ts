@@ -141,12 +141,6 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
 
-    /** the image's dimension after initialization */
-    initialWidth: number;
-    initialHeight: number;
-    /** how much the image has been resized with respect the dimension at creation */
-    resizeFactors: [number, number];
-
     crop: {
       x: number;
       y: number;

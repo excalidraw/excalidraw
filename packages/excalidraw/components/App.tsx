@@ -441,13 +441,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import type { LocalPoint, Radians } from "../../math";
-import {
-  clamp,
-  point,
-  pointDistance,
-  pointRotateRads,
-  vector,
-} from "../../math";
+import { clamp, point, pointDistance, vector } from "../../math";
 import { cropElement } from "../element/cropElement";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -9448,8 +9442,6 @@ class App extends React.Component<AppProps, AppState> {
         y,
         width,
         height,
-        initialWidth: width,
-        initialHeight: height,
         crop: {
           x: 0,
           y: 0,

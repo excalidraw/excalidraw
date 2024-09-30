@@ -14,7 +14,7 @@ import {
 } from "../../math";
 import { updateBoundElements } from "./binding";
 import { mutateElement } from "./mutateElement";
-import { TransformHandleType } from "./transformHandles";
+import type { TransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -26,19 +26,24 @@ import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import { AppClassProperties } from "../types";
+import type { AppClassProperties } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 
 const _cropElement = (
   element: ExcalidrawImageElement,
+  image: HTMLImageElement,
   transformHandle: TransformHandleType,
   naturalWidth: number,
   naturalHeight: number,
   pointerX: number,
   pointerY: number,
 ) => {
-  const uncroppedWidth = element.initialWidth * element.resizeFactors[0];
-  const uncroppedHeight = element.initialHeight * element.resizeFactors[1];
+  const uncroppedWidth =
+    element.width /
+    (element.crop ? element.crop.width / image.naturalWidth : 1);
+  const uncroppedHeight =
+    element.height /
+    (element.crop ? element.crop.height / image.naturalHeight : 1);
 
   const naturalWidthToUncropped = naturalWidth / uncroppedWidth;
   const naturalHeightToUncropped = naturalHeight / uncroppedHeight;
@@ -154,6 +159,7 @@ export const cropElement = (
   if (image && !(image instanceof Promise)) {
     const mutation = _cropElement(
       element,
+      image,
       transformHandle,
       image.naturalWidth,
       image.naturalHeight,
@@ -240,8 +246,9 @@ export const getUncroppedImageElement = (
 
   if (image && !(image instanceof Promise)) {
     if (element.crop) {
-      const width = element.initialWidth * element.resizeFactors[0];
-      const height = element.initialHeight * element.resizeFactors[1];
+      const width = element.width / (element.crop.width / image.naturalWidth);
+      const height =
+        element.height / (element.crop.height / image.naturalHeight);
 
       const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
         element,
