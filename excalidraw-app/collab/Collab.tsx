@@ -87,7 +87,7 @@ import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
 } from "../../packages/excalidraw/data/reconcile";
-import { collabServerUrl } from "..";
+import { collabServerUrl } from "../App";
 
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
