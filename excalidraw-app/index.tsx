@@ -1,7 +1,7 @@
 import { StrictMode, useCallback, useState } from "react";
 import { createRoot } from "react-dom/client";
 import ExcalidrawApp from "./App";
-import { registerSW } from "virtual:pwa-register";
+// import { registerSW } from "virtual:pwa-register";
 
 import "../excalidraw-app/sentry";
 import type {
@@ -9,12 +9,11 @@ import type {
   BinaryFiles,
   ExcalidrawImperativeAPI,
 } from "../packages/excalidraw/types";
-import type { ExcalidrawElement } from "../packages/excalidraw/element/types";
-import { SyncableExcalidrawElement } from "./data";
+import type { SyncableExcalidrawElement } from "./data";
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
-registerSW();
+// registerSW();
 
 function App() {
   const [excalidrawAPI, setExcalidrawAPI] =
@@ -32,6 +31,9 @@ function App() {
     },
     [],
   );
+
+  console.log(`firebase_config ${import.meta.env.VITE_APP_FIREBASE_CONFIG}`);
+  console.log(`collabServerUrl: ${import.meta.env.VITE_APP_WS_SERVER_URL}`);
   return (
     <StrictMode>
       <ExcalidrawApp

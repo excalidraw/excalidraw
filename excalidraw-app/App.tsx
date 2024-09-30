@@ -59,11 +59,10 @@ import Collab, {
 } from "./collab/Collab";
 import {
   exportToBackend,
-  getCollaborationLinkData,
   isCollaborationLink,
   loadScene,
-  SyncableExcalidrawElement,
 } from "./data";
+import type { SyncableExcalidrawElement } from "./data";
 import {
   importFromLocalStorage,
   importUsernameFromLocalStorage,

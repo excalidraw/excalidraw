@@ -1,9 +1,6 @@
 {
-  "name": "@excalidraw/excalidraw",
-  "version": "0.17.1",
-  "main": "./dist/prod/index.js",
-  "type": "module",
-  "module": "./dist/prod/index.js",
+  "name": "excalidraw_karat",
+  "version": "0.0.27",
   "exports": {
     ".": {
       "development": "./dist/dev/index.js",

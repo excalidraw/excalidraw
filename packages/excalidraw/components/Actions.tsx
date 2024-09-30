@@ -340,7 +340,7 @@ export const ShapesSwitcher = ({
           title={t("toolBar.extraTools")}
         >
           {extraToolsIcon}
-          {app.props.aiEnabled !== false && (
+          {/* {app.props.aiEnabled !== false && (
             <div
               style={{
                 display: "inline-flex",
@@ -358,7 +358,7 @@ export const ShapesSwitcher = ({
             >
               AI
             </div>
-          )}
+          )} */}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}
