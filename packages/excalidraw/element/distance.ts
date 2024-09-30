@@ -131,16 +131,14 @@ const createDiamondSide = (
   startRadius: number,
   endRadius: number,
 ): Segment<GlobalPoint> => {
-  const a = ellipseSegmentInterceptPoints(
-    ellipse(s[0], startRadius, startRadius),
-    s,
-  )[0];
-  const b = ellipseSegmentInterceptPoints(
-    ellipse(s[1], endRadius, endRadius),
-    s,
-  )[0];
-
-  return segment(a, b);
+  return segment(
+    ellipseSegmentInterceptPoints(
+      ellipse(s[0], startRadius, startRadius),
+      s,
+    )[0] ?? s[0],
+    ellipseSegmentInterceptPoints(ellipse(s[1], endRadius, endRadius), s)[0] ??
+      s[1],
+  );
 };
 
 /**
