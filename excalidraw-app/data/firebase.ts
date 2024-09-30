@@ -25,7 +25,7 @@ import { getSyncableElements } from ".";
 import type { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
 import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
-import { customFirebaseConfig } from "../App";
+import { customFirebaseConfig, customToken } from "../App";
 
 // private
 // -----------------------------------------------------------------------------
@@ -41,10 +41,19 @@ const _loadFirebase = async () => {
   const firebase = (
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
+  await import(/* webpackChunkName: "firebase" */ "firebase/auth");
+
 
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);
+      try {
+        await firebase.auth().signInWithCustomToken(customToken);
+        console.log("User signed in with custom token");
+      } catch (error) {
+        console.error("Error signing in with custom token: ", error);
+        throw error;
+      }
     } catch (error: any) {
       // trying initialize again throws. Usually this is harmless, and happens
       // mainly in dev (HMR)
