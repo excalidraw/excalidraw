@@ -43,6 +43,7 @@ import type {
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
+  getCollabServer,
   getSyncableElements,
 } from "../data";
 import {
