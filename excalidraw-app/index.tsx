@@ -10,6 +10,6 @@ const root = createRoot(rootElement);
 registerSW();
 root.render(
   <StrictMode>
-    <ExcalidrawApp />
-  </StrictMode>,
+      <ExcalidrawApp firebaseConfig={JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG)} />
+  </StrictMode>
 );

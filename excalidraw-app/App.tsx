@@ -126,6 +126,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import React from "react";
 
 polyfill();
 
@@ -1124,14 +1125,25 @@ const ExcalidrawWrapper = () => {
   );
 };
 
-const ExcalidrawApp = () => {
-  return (
+type FirebaseConfig = {
+  apiKey: string;
+  authDomain: string;
+  databaseURL: string;
+  projectId: string;
+  storageBucket: string;
+};
+let firebaseConfig: FirebaseConfig;
+const ExcalidrawApp: React.FC<{
+  firebaseConfig: FirebaseConfig;
+}> = React.memo((props) => {
+  firebaseConfig = props.firebaseConfig;  return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
         <ExcalidrawWrapper />
       </Provider>
     </TopErrorBoundary>
   );
-};
+});
 
+export { firebaseConfig };
 export default ExcalidrawApp;
