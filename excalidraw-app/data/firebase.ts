@@ -19,7 +19,7 @@ import {
   encryptData,
   decryptData,
 } from "../../packages/excalidraw/data/encryption";
-import { MIME_TYPES } from "../../packages/excalidraw/constants";
+import { ENV, MIME_TYPES } from "../../packages/excalidraw/constants";
 import type { SyncableExcalidrawElement } from ".";
 import { getSyncableElements } from ".";
 import type { ResolutionType } from "../../packages/excalidraw/utility-types";
@@ -42,14 +42,21 @@ const _loadFirebase = async () => {
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
   await import(/* webpackChunkName: "firebase" */ "firebase/auth");
-
+  console.log('heloooo custom branch')
 
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);
+      let token;
       try {
-        await firebase.auth().signInWithCustomToken(customToken);
-        console.log("User signed in with custom token");
+        if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+          const res = await fetch("https://localhost:8080/devFirebaseToken");
+          const data = await res.json();
+          token = data.token;
+        } else {
+          token = customToken;
+        }
+        await firebase.auth().signInWithCustomToken(token);
       } catch (error) {
         console.error("Error signing in with custom token: ", error);
         throw error;

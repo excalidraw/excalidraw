@@ -25,6 +25,7 @@ describe("Test LanguageList", () => {
           username={""}
           theme="dark"
           excalidrawAPIRefCallback={() => {}}
+          token=""
         />,
       );
     // select rectangle tool to show properties menu

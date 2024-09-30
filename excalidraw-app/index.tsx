@@ -35,7 +35,7 @@ function App() {
         username={"Karat Engineer"}
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
-        token="aflkasjlfja"
+        token="placeholder"
       />
     </StrictMode>
   );

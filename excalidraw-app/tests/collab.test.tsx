@@ -83,6 +83,7 @@ describe("collaboration", () => {
         username={""}
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
+        token=""
       />,
     );
     const rect1Props = {
