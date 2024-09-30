@@ -275,6 +275,282 @@ const addNewNode = (
   };
 };
 
+const resolveOverlap = (
+  nodeA: ExcalidrawBindableElement,
+  nodeB: ExcalidrawBindableElement,
+  direction: LinkDirection,
+) => {
+  const margin = 5;
+
+  if (direction === "left" || direction === "right") {
+    const overlapY = Math.min(
+      nodeA.y + nodeA.height - nodeB.y,
+      nodeB.y + nodeB.height - nodeA.y,
+    );
+
+    if (overlapY > 0) {
+      const shiftAmount = overlapY + margin;
+
+      if (nodeA.y < nodeB.y) {
+        const newAY = nodeA.y - shiftAmount;
+        const newBY = nodeB.y + shiftAmount;
+        mutateElement(nodeA, { y: newAY });
+        mutateElement(nodeB, { y: newBY });
+      } else {
+        const newAY = nodeA.y + shiftAmount;
+        const newBY = nodeB.y - shiftAmount;
+        mutateElement(nodeA, { y: newAY });
+        mutateElement(nodeB, { y: newBY });
+      }
+    }
+  } else {
+    const overlapX = Math.min(
+      nodeA.x + nodeA.width - nodeB.x,
+      nodeB.x + nodeB.width - nodeA.x,
+    );
+
+    if (overlapX > 0) {
+      const shiftAmount = overlapX + margin;
+
+      if (nodeA.x < nodeB.x) {
+        const newAX = nodeA.y - shiftAmount;
+        const newBX = nodeB.y + shiftAmount;
+        mutateElement(nodeA, { y: newAX });
+        mutateElement(nodeB, { y: newBX });
+      } else {
+        const newAX = nodeA.y + shiftAmount;
+        const newBX = nodeB.y - shiftAmount;
+        mutateElement(nodeA, { y: newAX });
+        mutateElement(nodeB, { y: newBX });
+      }
+    }
+  }
+};
+
+const nodesOverlap = (
+  nodeA: ExcalidrawBindableElement,
+  nodeB: ExcalidrawBindableElement,
+): boolean => {
+  const horizontallyOverlapping =
+    nodeA.x < nodeB.x + nodeB.width && nodeA.x + nodeA.width > nodeB.x;
+  const verticallyOverlapping =
+    nodeA.y < nodeB.y + nodeB.height && nodeA.y + nodeA.height > nodeB.y;
+
+  return horizontallyOverlapping && verticallyOverlapping;
+};
+
+// export const addNewNodes = (
+//   startNode: ExcalidrawFlowchartNodeElement,
+//   elementsMap: ElementsMap,
+//   appState: AppState,
+//   direction: LinkDirection,
+//   numberOfNodes: number,
+// ) => {
+//   // always start from 0 and distribute evenly
+//   const newNodes: ExcalidrawElement[] = [];
+//   const nextNodelist: ExcalidrawElement[] = [];
+//   const nextbindigArrawlist: ExcalidrawElement[] = [];
+
+//   const successors = getSuccessors(startNode, elementsMap, direction);
+//   const predeccessors = getPredecessors(startNode, elementsMap, direction);
+
+//   for (let i = 0; i < numberOfNodes; i++) {
+//     let nextX: number;
+//     let nextY: number;
+//     if (direction === "left" || direction === "right") {
+//       const totalHeight =
+//         VERTICAL_OFFSET * (numberOfNodes - 1) +
+//         numberOfNodes * startNode.height;
+
+//       const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
+
+//       let offsetX = HORIZONTAL_OFFSET + startNode.width;
+//       if (direction === "left") {
+//         offsetX *= -1;
+//       }
+//       nextX = startNode.x + offsetX;
+//       const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
+//       nextY = startY + offsetY;
+//     } else {
+//       const totalWidth =
+//         HORIZONTAL_OFFSET * (numberOfNodes - 1) +
+//         numberOfNodes * startNode.width;
+//       const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
+//       let offsetY = VERTICAL_OFFSET + startNode.height;
+
+//       if (direction === "up") {
+//         offsetY *= -1;
+//       }
+//       nextY = startNode.y + offsetY;
+//       const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
+//       nextX = startX + offsetX;
+//     }
+
+//     const nextNode = newElement({
+//       type: startNode.type,
+//       x: nextX,
+//       y: nextY,
+//       // TODO: extract this to a util
+//       width: startNode.width,
+//       height: startNode.height,
+//       roundness: startNode.roundness,
+//       roughness: startNode.roughness,
+//       backgroundColor: startNode.backgroundColor,
+//       strokeColor: startNode.strokeColor,
+//       strokeWidth: startNode.strokeWidth,
+//     });
+
+//     invariant(
+//       isFlowchartNodeElement(nextNode),
+//       "not an ExcalidrawFlowchartNodeElement",
+//     );
+
+//     const bindingArrow = createBindingArrow(
+//       startNode,
+//       nextNode,
+//       elementsMap,
+//       direction,
+//       appState,
+//     );
+//     nextNodelist.push(nextNode);
+//     nextbindigArrawlist.push(bindingArrow);
+//   }
+
+//   let allNodes = [];
+//   if (direction === "right" || direction === "down") {
+//     allNodes = [...successors, ...nextNodelist];
+//   } else {
+//     allNodes = [...predeccessors, ...nextNodelist];
+//   }
+
+//   for (let i = 0; i < allNodes.length; i++) {
+//     for (let j = i + 1; j < allNodes.length; j++) {
+//       const nodeA = allNodes[i] as ExcalidrawFlowchartNodeElement;
+//       const nodeB = allNodes[j] as ExcalidrawFlowchartNodeElement;
+//       if (nodesOverlap(nodeA, nodeB)) {
+//         resolveOverlap(nodeA, nodeB, direction);
+//       }
+//     }
+//   }
+//   for (let i = 0; i < nextNodelist.length; i++) {
+//     newNodes.push(nextNodelist[i]);
+//     newNodes.push(nextbindigArrawlist[i]);
+//   }
+//   return newNodes;
+// };
+
+// export const addNewNodes = (
+//   startNode: ExcalidrawFlowchartNodeElement,
+//   elementsMap: ElementsMap,
+//   appState: AppState,
+//   direction: LinkDirection,
+//   numberOfNodes: number,
+// ) => {
+//   const newNodes: ExcalidrawElement[] = [];
+
+//   const successors = getSuccessors(startNode, elementsMap, direction);
+//   const predeccessors = getPredecessors(startNode, elementsMap, direction);
+
+//   let existingNodes: ExcalidrawElement[] = [];
+
+//   if (direction === "right" || direction === "down") {
+//     existingNodes = successors;
+//   } else {
+//     existingNodes = predeccessors;
+//   }
+
+//   const totalNodes = existingNodes.length + numberOfNodes;
+
+//   for (let i = 0; i < totalNodes; i++) {
+//     let nextX: number;
+//     let nextY: number;
+
+//     if (direction === "left" || direction === "right") {
+//       const totalHeight =
+//         (VERTICAL_OFFSET + startNode.height) * (totalNodes - 1);
+
+//       const middleOffset =
+//         totalNodes % 2 === 0
+//           ? totalHeight / 2
+//           : Math.floor(totalNodes / 2) * (VERTICAL_OFFSET + startNode.height);
+
+//       const startY = startNode.y + startNode.height / 2 - middleOffset;
+
+//       let offsetX = HORIZONTAL_OFFSET + startNode.width;
+//       if (direction === "left") {
+//         offsetX *= -1;
+//       }
+//       nextX = startNode.x + offsetX;
+
+//       const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
+//       nextY = startY + offsetY;
+//     } else {
+//       const totalWidth =
+//         (HORIZONTAL_OFFSET + startNode.width) * (totalNodes - 1);
+
+//       const middleOffset =
+//         totalNodes % 2 === 0
+//           ? totalWidth / 2
+//           : Math.floor(totalNodes / 2) * (HORIZONTAL_OFFSET + startNode.width);
+
+//       const startX = startNode.x + startNode.width / 2 - middleOffset;
+
+//       let offsetY = VERTICAL_OFFSET + startNode.height;
+//       if (direction === "up") {
+//         offsetY *= -1;
+//       }
+//       nextY = startNode.y + offsetY;
+
+//       const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
+//       nextX = startX + offsetX;
+//     }
+
+//     let nextNode: ExcalidrawElement;
+//     if (i < existingNodes.length) {
+//       nextNode = existingNodes[i];
+//       mutateElement(nextNode, { x: nextX, y: nextY });
+//     } else {
+//       nextNode = newElement({
+//         type: startNode.type,
+//         x: nextX,
+//         y: nextY,
+//         width: startNode.width,
+//         height: startNode.height,
+//         roundness: startNode.roundness,
+//         roughness: startNode.roughness,
+//         backgroundColor: startNode.backgroundColor,
+//         strokeColor: startNode.strokeColor,
+//         strokeWidth: startNode.strokeWidth,
+//       });
+
+//       invariant(
+//         isFlowchartNodeElement(nextNode),
+//         "not an ExcalidrawFlowchartNodeElement",
+//       );
+//     }
+
+//     if (
+//       i >= existingNodes.length &&
+//       (nextNode.type === "rectangle" ||
+//         nextNode.type === "diamond" ||
+//         nextNode.type === "ellipse")
+//     ) {
+//       const bindingArrow = createBindingArrow(
+//         startNode,
+//         nextNode,
+//         elementsMap,
+//         direction,
+//         appState,
+//       );
+
+//       newNodes.push(nextNode);
+//       newNodes.push(bindingArrow);
+//     }
+//   }
+
+//   return newNodes;
+// };
+
 export const addNewNodes = (
   startNode: ExcalidrawFlowchartNodeElement,
   elementsMap: ElementsMap,
