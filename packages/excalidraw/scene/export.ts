@@ -27,7 +27,7 @@ import {
   THEME_FILTER,
   FONT_FAMILY_FALLBACKS,
   getFontFamilyFallbacks,
-  CHINESE_HANDWRITTEN_FALLBACK_FONT,
+  CJK_HANDWRITTEN_FALLBACK_FONT,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -49,7 +49,7 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
-import { containsChinese } from "../element/textElement";
+import { containsCJK } from "../element/textElement";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -482,16 +482,16 @@ const getFontFaces = async (
   const uniqueChars = Array.from(characters).join("");
   const uniqueCodePoints = Array.from(codePoints);
 
-  const containsChineseFallback = orderedFamilies.find((x) =>
-    getFontFamilyFallbacks(x).includes(CHINESE_HANDWRITTEN_FALLBACK_FONT),
+  const containsCJKFallback = orderedFamilies.find((x) =>
+    getFontFamilyFallbacks(x).includes(CJK_HANDWRITTEN_FALLBACK_FONT),
   );
 
   // quick check for Han might match a bit more, which is fine
-  if (containsChineseFallback && containsChinese(uniqueChars)) {
+  if (containsCJKFallback && containsCJK(uniqueChars)) {
     // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
     // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
     orderedFamilies.unshift(
-      FONT_FAMILY_FALLBACKS[CHINESE_HANDWRITTEN_FALLBACK_FONT],
+      FONT_FAMILY_FALLBACKS[CJK_HANDWRITTEN_FALLBACK_FONT],
     );
   }
 

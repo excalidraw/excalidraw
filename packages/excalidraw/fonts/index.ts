@@ -12,7 +12,7 @@ import {
   FONT_FAMILY,
   FONT_FAMILY_FALLBACKS,
   WINDOWS_EMOJI_FALLBACK_FONT,
-  CHINESE_HANDWRITTEN_FALLBACK_FONT,
+  CJK_HANDWRITTEN_FALLBACK_FONT,
 } from "../constants";
 import { FONT_METADATA, type FontMetadata } from "./metadata";
 import { getContainerElement } from "../element/textElement";
@@ -235,7 +235,7 @@ export class Fonts {
     init("Virgil", ...VirgilFontFaces);
 
     // fallback font faces
-    init(CHINESE_HANDWRITTEN_FALLBACK_FONT, ...XiaolaiFontFaces);
+    init(CJK_HANDWRITTEN_FALLBACK_FONT, ...XiaolaiFontFaces);
     init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
 
     Fonts._initialized = true;

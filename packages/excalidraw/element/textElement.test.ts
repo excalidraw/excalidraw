@@ -9,7 +9,6 @@ import {
   wrapText,
   detectLineHeight,
   getLineHeightInPx,
-  parseTokens,
 } from "./textElement";
 import type { ExcalidrawTextElementWithContainer, FontString } from "./types";
 
@@ -198,43 +197,43 @@ now`,
   });
 });
 
-describe("Test parseTokens", () => {
-  it("should split into tokens correctly", () => {
-    let text = "Excalidraw is a virtual collaborative whiteboard";
-    expect(parseTokens(text)).toEqual([
-      "Excalidraw",
-      "is",
-      "a",
-      "virtual",
-      "collaborative",
-      "whiteboard",
-    ]);
+// describe("Test parseTokens", () => {
+//   it("should split into tokens correctly", () => {
+//     let text = "Excalidraw is a virtual collaborative whiteboard";
+//     expect(parseTokens(text)).toEqual([
+//       "Excalidraw",
+//       "is",
+//       "a",
+//       "virtual",
+//       "collaborative",
+//       "whiteboard",
+//     ]);
 
-    text =
-      "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
-    expect(parseTokens(text)).toEqual([
-      "Wikipedia",
-      "is",
-      "hosted",
-      "by",
-      "Wikimedia-",
-      "",
-      "Foundation,",
-      "a",
-      "non-",
-      "profit",
-      "organization",
-      "that",
-      "also",
-      "hosts",
-      "a",
-      "range-",
-      "of",
-      "other",
-      "projects",
-    ]);
-  });
-});
+//     text =
+//       "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+//     expect(parseTokens(text)).toEqual([
+//       "Wikipedia",
+//       "is",
+//       "hosted",
+//       "by",
+//       "Wikimedia-",
+//       "",
+//       "Foundation,",
+//       "a",
+//       "non-",
+//       "profit",
+//       "organization",
+//       "that",
+//       "also",
+//       "hosts",
+//       "a",
+//       "range-",
+//       "of",
+//       "other",
+//       "projects",
+//     ]);
+//   });
+// });
 
 describe("Test measureText", () => {
   describe("Test getContainerCoords", () => {

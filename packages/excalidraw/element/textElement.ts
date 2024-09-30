@@ -30,29 +30,81 @@ import {
 } from "./containerCache";
 import type { ExtractSetType } from "../utility-types";
 
+const CJK_CHAR =
+  /\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}/u;
+
+// should cover most emojis, including skin tone, gender variations, pictographic chars and etc.
+const EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
+
+// matches common full width punctuation marks as some expressions are not meant to be broken down, i.e.: "た。"
+const CJK_NON_BREAKING_POINTS = /。，、．：；？！/u;
+
+// matches full width characters as parantheses are not part of the `CJK` check above, thus need to be broken individually
+const CJK_LOOKAHEAD_BREAKING_POINTS = /（［｛〈《「『【〖〔〘〚〝〃ー/u;
+const CJK_LOOKBEHIND_BREAKING_POINTS = /）］｝〉》」』】〗〕〙〛〞〟〃・/u;
+
+// Hello た。
+//        ↑ DON'T BREAK → ["Hello た。"]
+const NON_BREAKING_POINTS = new RegExp(
+  `(?![${CJK_NON_BREAKING_POINTS.source}])`,
+  "u",
+);
+
+// Hello World
+//      ↑ BREAK BEFORE " " → ["Hello", " World"]
+// HelloたWorld
+//      ↑ BREAK BEFORE "た" → ["Hello", "たWorld"]
+// Hello「World」
+//      ↑ BREAK BEFORE "「" → ["Hello", "「World」"]
+const LOOK_AHEAD_BREAKING_POINTS = new RegExp(
+  `(?=[\\s${CJK_CHAR.source}${CJK_LOOKAHEAD_BREAKING_POINTS.source}${EMOJI_CHAR.source}])`,
+  "u",
+);
+
+// Hello World
+//       ↑ BREAK AFTER " " → ["Hello ", "World"]
+// Hello-World
+//       ↑ BREAK AFTER "-" → ["Hello-", "World"]
+// HelloたWorld
+//       ↑ BREAK AFTER "た" → ["Helloた", "World"]
+//「Hello」World
+//       ↑ BREAK AFTER "」" → ["「Hello」", "World"]
+const LOOK_BEHIND_BREAKING_POINTS = new RegExp(
+  `(?<=[-\\s${CJK_CHAR.source}${CJK_LOOKBEHIND_BREAKING_POINTS.source}${EMOJI_CHAR.source}])`,
+  "u",
+);
+
+// combines all breaking points above
+const LINE_BREAKING_POINTS = new RegExp(
+  `${NON_BREAKING_POINTS.source}(${LOOK_AHEAD_BREAKING_POINTS.source}|${LOOK_BEHIND_BREAKING_POINTS.source})`,
+  "u",
+);
+
+/**
+ * Break a line based on the whitespaces, CJK / emoji chars and language specific breaking points,
+ * like hyphen for Latin and various full-width codepoints for CJK - especially Japanese, e.g.:
+ *
+ *  "Hello 世界。🌎🗺" → ["Hello", " ", "世", "界。", "🌎", "🗺"]
+ *  "Hello-world" → ["Hello-", "world"]
+ *  "「Hello World」" → ["「Hello", " ", "World」"]
+ *
+ * // TODO_CJK: keeps all the whitespaces => should improve wrapping => test
+ *
+ * Browser support as of 10/2024:
+ * - 91% Lookbehind assertion https://caniuse.com/mdn-javascript_regular_expressions_lookbehind_assertion
+ * - 94% Unicode character class escape https://caniuse.com/mdn-javascript_regular_expressions_unicode_character_class_escape
+ */
+const parseTokens = (line: string) => {
+  // filtering due to multi-codepoint chars like 🗺
+  return line.split(LINE_BREAKING_POINTS).filter(Boolean);
+};
+
 export const containsCJK = (text: string) => {
-  return /\p{Script=Han}|\p{Script=Hiragana}|\p{Script=Katakana}|\p{Script=Hangul}/u.test(
-    text,
-  );
-};
-
-export const containsChinese = (text: string) => {
-  return /\p{Script=Han}/u.test(text);
-};
-
-export const containsJapanese = (text: string) => {
-  // Kanji (Han) should be checked by `containsChinese`
-  return /\p{Script=Hiragana}|\p{Script=Katakana}/u.test(text);
-};
-
-export const containsKorean = (text: string) => {
-  return /\p{Script=Hangul}/u.test(text);
+  return CJK_CHAR.test(text);
 };
 
 export const containsEmoji = (text: string) => {
-  // should cover most emojis, including skin tone, gender variations, pictographic chars and etc.
-  const emojiRegex = /\p{Emoji_Presentation}|\p{Extended_Pictographic}/u;
-  return emojiRegex.test(text);
+  return EMOJI_CHAR.test(text);
 };
 
 export const normalizeText = (text: string) => {
@@ -433,48 +485,88 @@ export const getTextHeight = (
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
-export const parseTokens = (text: string) => {
-  // Splitting words containing "-" as those are treated as separate words
-  // by css wrapping algorithm eg non-profit => non-, profit
-  const segments = text.split("-");
-  if (segments.length > 1) {
-    // non-proft org => ['non-', 'profit org']
-    segments.forEach((word, index) => {
-      if (index !== segments.length - 1) {
-        segments[index] = word += "-";
-      }
-    });
-  }
-  // Joining the words with space and splitting them again with space to get the
-  // final list of tokens
-  // ['non-', 'profit org'] =>,'non- proft org' => ['non-','profit','org']
-  const words = segments.join(" ").split(" ");
+const wrapWord = (
+  word: string,
+  font: FontString,
+  maxWidth: number,
+): Array<string> => {
+  const lines: Array<string> = [];
+  const chars = Array.from(word);
 
-  let tokens = words;
-  // CJK / Emoji "naive" wrapping
-  if (containsCJK(text) || containsEmoji(text)) {
-    tokens = words.flatMap((word) => {
-      // quick check for the word
-      if (containsCJK(word) || containsEmoji(word)) {
-        // using Array.from to accomodate for multi-byte characters
-        return Array.from(word).reduce((tokens, char) => {
-          if (tokens.length === 0 || containsCJK(char) || containsEmoji(char)) {
-            // treat CJK and emoji characters as individual tokens due to wrapping
-            tokens.push(char);
-          } else {
-            // keep joining chars until we encounter a CJK or emoji char
-            tokens[tokens.length - 1] += char;
-          }
+  let currentLine = "";
+  let currentLineWidth = 0;
 
-          return tokens;
-        }, [] as string[]);
-      }
+  for (const char of chars) {
+    const _charWidth = charWidth.calculate(char, font);
+    const testLineWidth = currentLineWidth + _charWidth;
 
-      return word;
-    });
+    if (testLineWidth <= maxWidth) {
+      currentLine = currentLine + char;
+      currentLineWidth = testLineWidth;
+      continue;
+    }
+
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+
+    currentLine = char;
+    currentLineWidth = _charWidth;
   }
 
-  return tokens;
+  // TODO_CJK: expects no whitespaces => consider adding invariant
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+};
+
+const wrapLine = (
+  line: string,
+  font: FontString,
+  maxWidth: number,
+): string[] => {
+  const lines: Array<string> = [];
+  const tokens = parseTokens(line);
+  const tokenIterator = tokens[Symbol.iterator]();
+
+  let currentLine = "";
+  let iterator = tokenIterator.next();
+
+  while (!iterator.done) {
+    const token = iterator.value;
+    const testLine = currentLine + token;
+
+    // build up the current line (skip expensive `getLineWidth` for whitespaces alone)
+    if (/\s/.test(token) || getLineWidth(testLine, font, true) <= maxWidth) {
+      currentLine = testLine;
+      iterator = tokenIterator.next();
+      continue;
+    }
+
+    // TODO_CJK: we can do this simple check due to custom iteration => test
+    // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
+    if (!currentLine) {
+      const wrappedWord = wrapWord(token, font, maxWidth);
+      lines.push(...wrappedWord.slice(0, -1));
+
+      // last line of the wrapped word might still be joined with next token/s => TODO_CJK: test
+      currentLine = wrappedWord[wrappedWord.length - 1] ?? "";
+      iterator = tokenIterator.next();
+    } else {
+      lines.push(currentLine.trimEnd());
+      // reset current line, but don't iterate on the next token, as we didn't use it yet!
+      currentLine = "";
+    }
+  }
+
+  // iterator done, push the trailing line if exists
+  if (currentLine) {
+    lines.push(currentLine.trimEnd());
+  }
+
+  return lines;
 };
 
 export const wrapText = (
@@ -491,137 +583,17 @@ export const wrapText = (
 
   const lines: Array<string> = [];
   const originalLines = text.split("\n");
-  const spaceAdvanceWidth = getLineWidth(" ", font, true);
-
-  let currentLine = "";
-  let currentLineWidthTillNow = 0;
-
-  const push = (str: string) => {
-    if (str.trim()) {
-      lines.push(str);
-    }
-  };
-
-  const resetParams = () => {
-    currentLine = "";
-    currentLineWidthTillNow = 0;
-  };
 
   for (const originalLine of originalLines) {
     const currentLineWidth = getLineWidth(originalLine, font, true);
 
-    // Push the line if its <= maxWidth
     if (currentLineWidth <= maxWidth) {
       lines.push(originalLine);
       continue;
     }
 
-    const words = parseTokens(originalLine);
-    resetParams();
-
-    let index = 0;
-
-    while (index < words.length) {
-      const currentWordWidth = getLineWidth(words[index], font, true);
-
-      // This will only happen when single word takes entire width
-      if (currentWordWidth === maxWidth) {
-        push(words[index]);
-        index++;
-      }
-
-      // Start breaking longer words exceeding max width
-      else if (currentWordWidth > maxWidth) {
-        // push current line since the current word exceeds the max width
-        // so will be appended in next line
-        push(currentLine);
-
-        resetParams();
-
-        while (words[index].length > 0) {
-          const currentChar = String.fromCodePoint(
-            words[index].codePointAt(0)!,
-          );
-
-          const line = currentLine + currentChar;
-          // use advance width instead of the actual width as it's closest to the browser wapping algo
-          // use width of the whole line instead of calculating individual chars to accomodate for kerning
-          const lineAdvanceWidth = getLineWidth(line, font, true);
-          const charAdvanceWidth = charWidth.calculate(currentChar, font);
-
-          currentLineWidthTillNow = lineAdvanceWidth;
-          words[index] = words[index].slice(currentChar.length);
-
-          if (currentLineWidthTillNow >= maxWidth) {
-            push(currentLine);
-            currentLine = currentChar;
-            currentLineWidthTillNow = charAdvanceWidth;
-          } else {
-            currentLine = line;
-          }
-        }
-        // push current line if appending space exceeds max width
-        if (currentLineWidthTillNow + spaceAdvanceWidth >= maxWidth) {
-          push(currentLine);
-          resetParams();
-          // space needs to be appended before next word
-          // as currentLine contains chars which couldn't be appended
-          // to previous line unless the line ends with hyphen to sync
-          // with css word-wrap
-        } else if (!currentLine.endsWith("-")) {
-          currentLine += " ";
-          currentLineWidthTillNow += spaceAdvanceWidth;
-        }
-        index++;
-      } else {
-        // Start appending words in a line till max width reached
-        while (currentLineWidthTillNow < maxWidth && index < words.length) {
-          const word = words[index];
-          currentLineWidthTillNow = getLineWidth(
-            currentLine + word,
-            font,
-            true,
-          );
-
-          if (currentLineWidthTillNow > maxWidth) {
-            push(currentLine);
-            resetParams();
-
-            break;
-          }
-          index++;
-
-          // if word ends with "-" then we don't need to add space
-          // to sync with css word-wrap
-          const shouldAppendSpace =
-            !word.endsWith("-") && !containsCJK(word) && !containsEmoji(word);
-
-          currentLine += word;
-
-          if (shouldAppendSpace) {
-            currentLine += " ";
-          }
-
-          // Push the word if appending space exceeds max width
-          if (currentLineWidthTillNow + spaceAdvanceWidth >= maxWidth) {
-            if (shouldAppendSpace) {
-              lines.push(currentLine.slice(0, -1));
-            } else {
-              lines.push(currentLine);
-            }
-            resetParams();
-            break;
-          }
-        }
-      }
-    }
-
-    if (currentLine.slice(-1) === " ") {
-      // only remove last trailing space which we have added when joining words
-      currentLine = currentLine.slice(0, -1);
-    }
-
-    push(currentLine);
+    const wrappedLine = wrapLine(originalLine, font, maxWidth);
+    lines.push(...wrappedLine);
   }
 
   return lines.join("\n");
