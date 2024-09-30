@@ -1132,8 +1132,10 @@ type FirebaseConfig = {
   projectId: string;
   storageBucket: string;
 };
+let firebaseConfig: FirebaseConfig;
 let collabServerUrl: string;
 const ExcalidrawApp: React.FC<{
+  firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
 }> = memo((props) => {
   collabServerUrl = props.collabServerUrl;
@@ -1147,5 +1149,6 @@ const ExcalidrawApp: React.FC<{
 });
 
 export { collabServerUrl };
+export { firebaseConfig };
 
 export default ExcalidrawApp;

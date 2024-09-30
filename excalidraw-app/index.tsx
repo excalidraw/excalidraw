@@ -10,6 +10,9 @@ const root = createRoot(rootElement);
 registerSW();
 root.render(
   <StrictMode>
-      <ExcalidrawApp collabServerUrl="https://test.com" />
-  </StrictMode>
+    <ExcalidrawApp
+      firebaseConfig={JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG)}
+      collabServerUrl={import.meta.env.VITE_APP_WS_SERVER_URL}
+    />
+  </StrictMode>,
 );

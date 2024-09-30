@@ -71,9 +71,16 @@ describe("collaboration", () => {
   it("should allow to undo / redo even on force-deleted elements", async () => {
     await render(
       <ExcalidrawApp
-      collabServerUrl="https://test.com" 
-      />
-    );    
+        firebaseConfig={{
+          apiKey: "",
+          authDomain: "",
+          databaseURL: "",
+          projectId: "",
+          storageBucket: "",
+        }}
+        collabServerUrl="https://test.com"
+      />,
+    );
     const rect1Props = {
       type: "rectangle",
       id: "A",

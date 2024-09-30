@@ -11,9 +11,18 @@ import ExcalidrawApp from "../App";
 
 describe("Test LanguageList", () => {
   it("rerenders UI on language change", async () => {
-    await render(
-      <ExcalidrawApp collabServerUrl="https://test.com"  />)
-
+      await render(
+        <ExcalidrawApp
+          firebaseConfig={{
+            apiKey: "",
+            authDomain: "",
+            databaseURL: "",
+            projectId: "",
+            storageBucket: "",
+          }}
+          collabServerUrl="https://test.com"
+        />,
+      );
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");
     // english lang should display `thin` label
