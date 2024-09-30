@@ -81,6 +81,8 @@ describe("collaboration", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+        theme="dark"
+
       />,
     );
     const rect1Props = {

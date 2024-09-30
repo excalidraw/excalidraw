@@ -13,7 +13,7 @@ export const AppWelcomeScreen: React.FC<{
   let headingContent;
 
   if (isExcalidrawPlusSignedUser) {
-    headingContent = t("welcomeScreen.app.center_heading_plus")
+    headingContent = t("welcomeScreen.defaults.center_heading")
       .split(/(Excalidraw\+)/)
       .map((bit, idx) => {
         if (bit === "Excalidraw+") {
@@ -32,13 +32,13 @@ export const AppWelcomeScreen: React.FC<{
         return bit;
       });
   } else {
-    headingContent = t("welcomeScreen.app.center_heading");
+    headingContent = t("welcomeScreen.defaults.center_heading");
   }
 
   return (
     <WelcomeScreen>
       <WelcomeScreen.Hints.MenuHint>
-        {t("welcomeScreen.app.menuHint")}
+        {t("welcomeScreen.defaults.menuHint")}
       </WelcomeScreen.Hints.MenuHint>
       <WelcomeScreen.Hints.ToolbarHint />
       <WelcomeScreen.Hints.HelpHint />
@@ -50,12 +50,12 @@ export const AppWelcomeScreen: React.FC<{
         <WelcomeScreen.Center.Menu>
           <WelcomeScreen.Center.MenuItemLoadScene />
           <WelcomeScreen.Center.MenuItemHelp />
-          {props.isCollabEnabled && (
+          {/* {props.isCollabEnabled && (
             <WelcomeScreen.Center.MenuItemLiveCollaborationTrigger
               onSelect={() => props.onCollabDialogOpen()}
             />
-          )}
-          {!isExcalidrawPlusSignedUser && (
+          )} */}
+          {/* {!isExcalidrawPlusSignedUser && (
             <WelcomeScreen.Center.MenuItemLink
               href={`${
                 import.meta.env.VITE_APP_PLUS_LP
@@ -65,7 +65,7 @@ export const AppWelcomeScreen: React.FC<{
             >
               Sign up
             </WelcomeScreen.Center.MenuItemLink>
-          )}
+          )} */}
         </WelcomeScreen.Center.Menu>
       </WelcomeScreen.Center>
     </WelcomeScreen>

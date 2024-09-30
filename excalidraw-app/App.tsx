@@ -16,6 +16,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
+  Theme,
 } from "../packages/excalidraw/element/types";
 import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
 import { t } from "../packages/excalidraw/i18n";
@@ -1141,17 +1142,21 @@ let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
+let customTheme: Theme;
+
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
   roomLinkData: RoomLinkData;
   username: string;
+  theme: Theme;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
   collabServerUrl = props.collabServerUrl;
+  customTheme = props.theme;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>

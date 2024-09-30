@@ -28,6 +28,7 @@ describe("Test MobileMenu", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+        theme="dark"
       />,
     ); // @ts-ignore
     h.app.refreshViewportBreakpoints();

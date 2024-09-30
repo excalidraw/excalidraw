@@ -23,6 +23,7 @@ describe("Test LanguageList", () => {
           collabServerUrl="https://test.com"
           roomLinkData={null}
           username={""}
+          theme="dark"
         />,
       );
     // select rectangle tool to show properties menu
