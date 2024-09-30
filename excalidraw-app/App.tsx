@@ -497,11 +497,6 @@ const ExcalidrawWrapper = () => {
       }
     };
 
-    const titleTimeout = setTimeout(
-      () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
-    );
-
     const syncData = debounce(() => {
       if (isTestEnv()) {
         return;
@@ -592,7 +587,6 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
-      clearTimeout(titleTimeout);
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode]);
 
@@ -655,8 +649,6 @@ const ExcalidrawWrapper = () => {
         }
       });
     }
-
-    externalOnChange(elements, appState, files);
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
@@ -1147,18 +1139,12 @@ let collabServerUrl: string;
 
 type RoomLinkData = { roomId: string; roomKey: string } | null;
 type SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => void;
-type OnChange = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-  files: BinaryFiles,
-) => void;
 let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
 let externalExcalidrawRefCallback: SetExcalidrawAPI;
-let externalOnChange: OnChange;
 let customToken: string;
 
 const ExcalidrawApp: React.FC<{
@@ -1168,7 +1154,6 @@ const ExcalidrawApp: React.FC<{
   username: string;
   theme: Theme;
   excalidrawAPIRefCallback: SetExcalidrawAPI;
-  onChange: OnChange;
   token: string;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
@@ -1179,7 +1164,6 @@ const ExcalidrawApp: React.FC<{
   customTheme = props.theme;
   customToken = props.token;
   externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
-  externalOnChange = props.onChange;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>

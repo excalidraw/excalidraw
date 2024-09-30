@@ -30,7 +30,6 @@ describe("Test MobileMenu", () => {
         username={""}
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
-        onChange={() => {}}
       />,
     ); // @ts-ignore
     h.app.refreshViewportBreakpoints();

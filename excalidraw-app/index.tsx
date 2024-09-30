@@ -22,14 +22,7 @@ function App() {
     (value: ExcalidrawImperativeAPI) => setExcalidrawAPI(value),
     [],
   );
-  const onChange = (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    // eslint-disable-next-line no-console
-    console.log({ excalidrawAPI, elements, appState, files });
-  };
+ 
   return (
     <StrictMode>
       <ExcalidrawApp
@@ -42,7 +35,6 @@ function App() {
         username={"Karat Engineer"}
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
-        onChange={onChange}
         token="aflkasjlfja"
       />
     </StrictMode>
