@@ -88,7 +88,7 @@ import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
 } from "../../packages/excalidraw/data/reconcile";
-import { customCollabServerUrl } from "../App";
+import { customCollabServerUrl, onCollabRoomSave } from "../App";
 
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -317,6 +317,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       console.error(error);
     }
+    await onCollabRoomSave(syncableElements, this.excalidrawAPI.getAppState());
   };
 
   stopCollaboration = (keepRemoteState = true) => {

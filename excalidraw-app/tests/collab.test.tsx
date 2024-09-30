@@ -83,7 +83,8 @@ describe("collaboration", () => {
         username={""}
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
-        token=""
+        firebaseToken=""
+        onCollabRoomSave={() => Promise.resolve()}
       />,
     );
     const rect1Props = {

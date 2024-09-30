@@ -10,6 +10,7 @@ import type {
   ExcalidrawImperativeAPI,
 } from "../packages/excalidraw/types";
 import type { ExcalidrawElement } from "../packages/excalidraw/element/types";
+import { SyncableExcalidrawElement } from "./data";
 window.__EXCALIDRAW_SHA__ = import.meta.env.VITE_APP_GIT_SHA;
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
@@ -22,7 +23,15 @@ function App() {
     (value: ExcalidrawImperativeAPI) => setExcalidrawAPI(value),
     [],
   );
- 
+  const onCollabRoomSave = useCallback(
+    async (
+      elements: readonly SyncableExcalidrawElement[],
+      appState: AppState,
+    ) => {
+      console.log("collab room save");
+    },
+    [],
+  );
   return (
     <StrictMode>
       <ExcalidrawApp
@@ -35,7 +44,8 @@ function App() {
         username={"Karat Engineer"}
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
-        token="placeholder"
+        firebaseToken="placeholder"
+        onCollabRoomSave={onCollabRoomSave}
       />
     </StrictMode>
   );

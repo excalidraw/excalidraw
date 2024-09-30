@@ -62,6 +62,7 @@ import {
   getCollaborationLinkData,
   isCollaborationLink,
   loadScene,
+  SyncableExcalidrawElement,
 } from "./data";
 import {
   importFromLocalStorage,
@@ -1118,8 +1119,11 @@ let customRoomLinkData: RoomLinkData;
 let customUsername: string;
 let customTheme: Theme;
 let externalExcalidrawRefCallback: SetExcalidrawAPI;
-let customToken: string;
-
+let onCollabRoomSave: (
+  elements: readonly SyncableExcalidrawElement[],
+  appState: AppState,
+) => Promise<void>;
+let customFirebaseToken: string;
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
   collabServerUrl: string;
@@ -1127,7 +1131,11 @@ const ExcalidrawApp: React.FC<{
   username: string;
   theme: Theme;
   excalidrawAPIRefCallback: SetExcalidrawAPI;
-  token: string;
+  firebaseToken: string;
+  onCollabRoomSave: (
+    elements: readonly SyncableExcalidrawElement[],
+    appState: AppState,
+  ) => Promise<void>;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
@@ -1135,7 +1143,8 @@ const ExcalidrawApp: React.FC<{
   customUsername = props.username;
   collabServerUrl = props.collabServerUrl;
   customTheme = props.theme;
-  customToken = props.token;
+  customFirebaseToken= props.firebaseToken;
+  onCollabRoomSave = props.onCollabRoomSave;
   externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
   return (
     <TopErrorBoundary>
@@ -1146,7 +1155,11 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { customCollabServerUrl, customFirebaseConfig, customToken };
-
+export {
+  customCollabServerUrl,
+  customFirebaseConfig,
+  customFirebaseToken,
+  onCollabRoomSave,
+};
 
 export default ExcalidrawApp;

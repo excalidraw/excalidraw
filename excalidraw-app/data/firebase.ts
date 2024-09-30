@@ -25,7 +25,7 @@ import { getSyncableElements } from ".";
 import type { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
 import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
-import { customFirebaseConfig, customToken } from "../App";
+import { customFirebaseConfig, customFirebaseToken} from "../App";
 
 // private
 // -----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ const _loadFirebase = async () => {
       firebase.initializeApp(customFirebaseConfig);
       try {
         try {
-          await firebase.auth().signInWithCustomToken(customToken);
+          await firebase.auth().signInWithCustomToken(customFirebaseToken);
         } catch (tokenError) {
           try {
             await firebase

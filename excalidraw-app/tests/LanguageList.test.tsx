@@ -25,7 +25,8 @@ describe("Test LanguageList", () => {
           username={""}
           theme="dark"
           excalidrawAPIRefCallback={() => {}}
-          token=""
+          firebaseToken=""
+          onCollabRoomSave={() => Promise.resolve()}
         />,
       );
     // select rectangle tool to show properties menu

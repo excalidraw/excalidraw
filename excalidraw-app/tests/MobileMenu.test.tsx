@@ -30,8 +30,8 @@ describe("Test MobileMenu", () => {
         username={""}
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
-        token=""
-
+        firebaseToken=""
+        onCollabRoomSave={() => Promise.resolve()}
       />,
     ); // @ts-ignore
     h.app.refreshViewportBreakpoints();
