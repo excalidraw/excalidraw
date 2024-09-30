@@ -1159,6 +1159,7 @@ let customUsername: string;
 let customTheme: Theme;
 let externalExcalidrawRefCallback: SetExcalidrawAPI;
 let externalOnChange: OnChange;
+let customToken: string;
 
 const ExcalidrawApp: React.FC<{
   firebaseConfig: FirebaseConfig;
@@ -1168,6 +1169,7 @@ const ExcalidrawApp: React.FC<{
   theme: Theme;
   excalidrawAPIRefCallback: SetExcalidrawAPI;
   onChange: OnChange;
+  token: string;
 }> = memo((props) => {
   customFirebaseConfig = props.firebaseConfig;
   customCollabServerUrl = props.collabServerUrl;
@@ -1175,6 +1177,7 @@ const ExcalidrawApp: React.FC<{
   customUsername = props.username;
   collabServerUrl = props.collabServerUrl;
   customTheme = props.theme;
+  customToken = props.token;
   externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
   externalOnChange = props.onChange;
   return (
@@ -1186,7 +1189,7 @@ const ExcalidrawApp: React.FC<{
   );
 });
 
-export { customCollabServerUrl, customFirebaseConfig };
+export { customCollabServerUrl, customFirebaseConfig, customToken };
 
 
 export default ExcalidrawApp;

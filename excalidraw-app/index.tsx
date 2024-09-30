@@ -43,6 +43,7 @@ function App() {
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
         onChange={onChange}
+        token="aflkasjlfja"
       />
     </StrictMode>
   );
