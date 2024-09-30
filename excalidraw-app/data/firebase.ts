@@ -47,19 +47,13 @@ const _loadFirebase = async () => {
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);
-      let token;
       try {
-        try {
-          if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
-            await firebase
-              .auth()
-              .signInWithEmailAndPassword("test@test.com", "karat123");
-          } else {
-            await firebase.auth().signInWithCustomToken(customToken);
-          }
-        } catch (error) {
-          console.error("Error signing in with custom token: ", error);
-          throw error;
+        if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
+          await firebase
+            .auth()
+            .signInWithEmailAndPassword("test@test.com", "karat123");
+        } else {
+          await firebase.auth().signInWithCustomToken(customToken);
         }
       } catch (error) {
         console.error("Error signing in with custom token: ", error);
