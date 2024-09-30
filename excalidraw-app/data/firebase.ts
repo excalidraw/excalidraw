@@ -42,7 +42,7 @@ const _loadFirebase = async () => {
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
   await import(/* webpackChunkName: "firebase" */ "firebase/auth");
-  console.log('heloooo custom branch')
+  console.log("heloooo custom branch");
 
   if (!isFirebaseInitialized) {
     try {
@@ -50,13 +50,12 @@ const _loadFirebase = async () => {
       let token;
       try {
         if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
-          const res = await fetch("https://localhost:8080/devFirebaseToken");
-          const data = await res.json();
-          token = data.token;
+          await firebase
+            .auth()
+            .signInWithEmailAndPassword("test@test.com", "karat123");
         } else {
-          token = customToken;
+          await firebase.auth().signInWithCustomToken(customToken);
         }
-        await firebase.auth().signInWithCustomToken(token);
       } catch (error) {
         console.error("Error signing in with custom token: ", error);
         throw error;
