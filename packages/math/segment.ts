@@ -1,3 +1,4 @@
+import { lineIntersectsSegment } from "./line";
 import {
   isPoint,
   pointCenter,
@@ -5,7 +6,7 @@ import {
   pointRotateRads,
   pointsEqual,
 } from "./point";
-import type { GenericPoint, Segment, Radians } from "./types";
+import type { GenericPoint, Segment, Radians, Line } from "./types";
 import { PRECISION } from "./utils";
 import {
   vectorAdd,
@@ -38,17 +39,21 @@ export function segmentFromPointArray<P extends GenericPoint>(
 }
 
 /**
+ * Determines if the provided value is a segment
  *
- * @param segment
- * @returns
+ * @param value The candidate
+ * @returns Returns TRUE if the provided value is a segment
  */
-export const isSegment = <Point extends GenericPoint>(
-  segment: unknown,
-): segment is Segment<Point> =>
-  Array.isArray(segment) &&
-  segment.length === 2 &&
-  isPoint(segment[0]) &&
-  isPoint(segment[0]);
+export function isSegment<Point extends GenericPoint>(
+  value: unknown,
+): value is Segment<Point> {
+  return (
+    Array.isArray(value) &&
+    segment.length === 2 &&
+    isPoint(value[0]) &&
+    isPoint(value[0])
+  );
+}
 
 /**
  * Return the coordinates resulting from rotating the given line about an origin by an angle in radians
@@ -59,25 +64,25 @@ export const isSegment = <Point extends GenericPoint>(
  * @param origin
  * @returns
  */
-export const segmentRotate = <Point extends GenericPoint>(
+export function segmentRotate<Point extends GenericPoint>(
   l: Segment<Point>,
   angle: Radians,
   origin?: Point,
-): Segment<Point> => {
+): Segment<Point> {
   return segment(
     pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
     pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
   );
-};
+}
 
 /**
  * Calculates the point two line segments with a definite start and end point
  * intersect at.
  */
-export const segmentsIntersectAt = <Point extends GenericPoint>(
+export function segmentsIntersectAt<Point extends GenericPoint>(
   a: Readonly<Segment<Point>>,
   b: Readonly<Segment<Point>>,
-): Point | null => {
+): Point | null {
   const a0 = vectorFromPoint(a[0]);
   const a1 = vectorFromPoint(a[1]);
   const b0 = vectorFromPoint(b[0]);
@@ -105,26 +110,41 @@ export const segmentsIntersectAt = <Point extends GenericPoint>(
   }
 
   return null;
-};
+}
 
-export const segmentIncludesPoint = <Point extends GenericPoint>(
+/**
+ * Determnines if a point lies on a segment
+ *
+ * @param point
+ * @param s
+ * @param threshold
+ * @returns
+ */
+export function segmentIncludesPoint<Point extends GenericPoint>(
   point: Point,
-  line: Segment<Point>,
+  s: Segment<Point>,
   threshold = PRECISION,
-) => {
-  const distance = segmentDistanceToPoint(point, line);
+) {
+  const distance = segmentDistanceToPoint(point, s);
 
   if (distance === 0) {
     return true;
   }
 
   return distance < threshold;
-};
+}
 
-export const segmentDistanceToPoint = <Point extends GenericPoint>(
+/**
+ * Returns the shortest distance from a point to a segment.
+ *
+ * @param p
+ * @param s
+ * @returns
+ */
+export function segmentDistanceToPoint<Point extends GenericPoint>(
   p: Point,
   s: Segment<Point>,
-) => {
+): number {
   const [x, y] = p;
   const [[x1, y1], [x2, y2]] = s;
 
@@ -157,4 +177,18 @@ export const segmentDistanceToPoint = <Point extends GenericPoint>(
   const dx = x - xx;
   const dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
-};
+}
+
+/**
+ * Returns the intersection point between a segment and a line, if any
+ *
+ * @param s
+ * @param l
+ * @returns
+ */
+export function segmentIntersectsLine<Point extends GenericPoint>(
+  s: Segment<Point>,
+  l: Line<Point>,
+): Point | null {
+  return lineIntersectsSegment(l, s);
+}
