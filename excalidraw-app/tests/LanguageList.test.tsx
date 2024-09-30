@@ -21,6 +21,8 @@ describe("Test LanguageList", () => {
             storageBucket: "",
           }}
           collabServerUrl="https://test.com"
+          roomLinkData={null}
+          username={""}
         />,
       );
     // select rectangle tool to show properties menu

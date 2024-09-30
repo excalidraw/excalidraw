@@ -88,7 +88,7 @@ import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
 } from "../../packages/excalidraw/data/reconcile";
-import { collabServerUrl } from "../App";
+import { customCollabServerUrl } from "../App";
 
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -485,7 +485,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.fallbackInitializationHandler = fallbackInitializationHandler;
 
     try {
-      const socketServerData = await getCollabServer(collabServerUrl);
+      const socketServerData = await getCollabServer(customCollabServerUrl);
       this.portal.socket = this.portal.open(
         socketIOClient(import.meta.env.VITE_APP_WS_SERVER_URL, {
           transports: ["websocket", "polling"],

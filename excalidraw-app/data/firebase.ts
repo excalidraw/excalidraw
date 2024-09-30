@@ -25,7 +25,7 @@ import { getSyncableElements } from ".";
 import type { ResolutionType } from "../../packages/excalidraw/utility-types";
 import type { Socket } from "socket.io-client";
 import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
-import { firebaseConfig } from "../App";
+import { customFirebaseConfig } from "../App";
 
 // private
 // -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ const _loadFirebase = async () => {
 
   if (!isFirebaseInitialized) {
     try {
-      firebase.initializeApp(firebaseConfig);
+      firebase.initializeApp(customFirebaseConfig);
     } catch (error: any) {
       // trying initialize again throws. Usually this is harmless, and happens
       // mainly in dev (HMR)
@@ -315,7 +315,7 @@ export const loadFilesFromFirebase = async (
     [...new Set(filesIds)].map(async (id) => {
       try {
         const url = `https://firebasestorage.googleapis.com/v0/b/${
-          firebaseConfig.storageBucket
+          customFirebaseConfig.storageBucket
         }/o/${encodeURIComponent(prefix.replace(/^\//, ""))}%2F${id}`;
         const response = await fetch(`${url}?alt=media`);
         if (response.status < 400) {

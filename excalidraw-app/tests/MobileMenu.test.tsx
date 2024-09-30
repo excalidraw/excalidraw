@@ -26,6 +26,8 @@ describe("Test MobileMenu", () => {
           storageBucket: "",
         }}
         collabServerUrl="https://test.com"
+        roomLinkData={null}
+        username={""}
       />,
     ); // @ts-ignore
     h.app.refreshViewportBreakpoints();
