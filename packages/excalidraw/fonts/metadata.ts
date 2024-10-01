@@ -59,6 +59,15 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     icon: FontFamilyHeadingIcon,
   },
+  [FONT_FAMILY["Gamja Flower"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 886,
+      descender: -374,
+      lineHeight: 1.25,
+    },
+    icon: FreedrawIcon,
+  },
   [FONT_FAMILY["Comic Shanns"]]: {
     metrics: {
       unitsPerEm: 1000,
