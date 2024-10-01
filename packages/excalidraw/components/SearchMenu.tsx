@@ -250,7 +250,7 @@ export const SearchMenu = () => {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
+      if (event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.F) {
         event.preventDefault();
         event.stopPropagation();
 

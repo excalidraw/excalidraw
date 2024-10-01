@@ -51,5 +51,6 @@ export const actionToggleSearchMenu = register({
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F,
+  keyTest: (event) =>
+    event[KEYS.CTRL_OR_CMD] && event.altKey && event.key === KEYS.F,
 });
