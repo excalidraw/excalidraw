@@ -13,7 +13,7 @@ import { useMemo } from "react";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 import type { AtomicUnit } from "./utils";
 import type { AppState } from "../../types";
-import { point, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
 
 interface MultiPositionProps {
   property: "x" | "y";
@@ -44,8 +44,8 @@ const moveElements = (
       origElement.y + origElement.height / 2,
     ];
     const [topLeftX, topLeftY] = pointRotateRads(
-      point(origElement.x, origElement.y),
-      point(cx, cy),
+      pointFrom(origElement.x, origElement.y),
+      pointFrom(cx, cy),
       origElement.angle,
     );
 
@@ -97,8 +97,8 @@ const moveGroupTo = (
       ];
 
       const [topLeftX, topLeftY] = pointRotateRads(
-        point(latestElement.x, latestElement.y),
-        point(cx, cy),
+        pointFrom(latestElement.x, latestElement.y),
+        pointFrom(cx, cy),
         latestElement.angle,
       );
 
@@ -171,8 +171,8 @@ const handlePositionChange: DragInputCallbackType<
             origElement.y + origElement.height / 2,
           ];
           const [topLeftX, topLeftY] = pointRotateRads(
-            point(origElement.x, origElement.y),
-            point(cx, cy),
+            pointFrom(origElement.x, origElement.y),
+            pointFrom(cx, cy),
             origElement.angle,
           );
 
@@ -241,8 +241,8 @@ const MultiPosition = ({
         const [cx, cy] = [el.x + el.width / 2, el.y + el.height / 2];
 
         const [topLeftX, topLeftY] = pointRotateRads(
-          point(el.x, el.y),
-          point(cx, cy),
+          pointFrom(el.x, el.y),
+          pointFrom(cx, cy),
           el.angle,
         );
 
