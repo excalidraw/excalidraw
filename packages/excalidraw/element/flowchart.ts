@@ -275,69 +275,69 @@ const addNewNode = (
   };
 };
 
-const resolveOverlap = (
-  nodeA: ExcalidrawBindableElement,
-  nodeB: ExcalidrawBindableElement,
-  direction: LinkDirection,
-) => {
-  const margin = 5;
+// const resolveOverlap = (
+//   nodeA: ExcalidrawBindableElement,
+//   nodeB: ExcalidrawBindableElement,
+//   direction: LinkDirection,
+// ) => {
+//   const margin = 5;
 
-  if (direction === "left" || direction === "right") {
-    const overlapY = Math.min(
-      nodeA.y + nodeA.height - nodeB.y,
-      nodeB.y + nodeB.height - nodeA.y,
-    );
+//   if (direction === "left" || direction === "right") {
+//     const overlapY = Math.min(
+//       nodeA.y + nodeA.height - nodeB.y,
+//       nodeB.y + nodeB.height - nodeA.y,
+//     );
 
-    if (overlapY > 0) {
-      const shiftAmount = overlapY + margin;
+//     if (overlapY > 0) {
+//       const shiftAmount = overlapY + margin;
 
-      if (nodeA.y < nodeB.y) {
-        const newAY = nodeA.y - shiftAmount;
-        const newBY = nodeB.y + shiftAmount;
-        mutateElement(nodeA, { y: newAY });
-        mutateElement(nodeB, { y: newBY });
-      } else {
-        const newAY = nodeA.y + shiftAmount;
-        const newBY = nodeB.y - shiftAmount;
-        mutateElement(nodeA, { y: newAY });
-        mutateElement(nodeB, { y: newBY });
-      }
-    }
-  } else {
-    const overlapX = Math.min(
-      nodeA.x + nodeA.width - nodeB.x,
-      nodeB.x + nodeB.width - nodeA.x,
-    );
+//       if (nodeA.y < nodeB.y) {
+//         const newAY = nodeA.y - shiftAmount;
+//         const newBY = nodeB.y + shiftAmount;
+//         mutateElement(nodeA, { y: newAY });
+//         mutateElement(nodeB, { y: newBY });
+//       } else {
+//         const newAY = nodeA.y + shiftAmount;
+//         const newBY = nodeB.y - shiftAmount;
+//         mutateElement(nodeA, { y: newAY });
+//         mutateElement(nodeB, { y: newBY });
+//       }
+//     }
+//   } else {
+//     const overlapX = Math.min(
+//       nodeA.x + nodeA.width - nodeB.x,
+//       nodeB.x + nodeB.width - nodeA.x,
+//     );
 
-    if (overlapX > 0) {
-      const shiftAmount = overlapX + margin;
+//     if (overlapX > 0) {
+//       const shiftAmount = overlapX + margin;
 
-      if (nodeA.x < nodeB.x) {
-        const newAX = nodeA.y - shiftAmount;
-        const newBX = nodeB.y + shiftAmount;
-        mutateElement(nodeA, { y: newAX });
-        mutateElement(nodeB, { y: newBX });
-      } else {
-        const newAX = nodeA.y + shiftAmount;
-        const newBX = nodeB.y - shiftAmount;
-        mutateElement(nodeA, { y: newAX });
-        mutateElement(nodeB, { y: newBX });
-      }
-    }
-  }
-};
+//       if (nodeA.x < nodeB.x) {
+//         const newAX = nodeA.y - shiftAmount;
+//         const newBX = nodeB.y + shiftAmount;
+//         mutateElement(nodeA, { y: newAX });
+//         mutateElement(nodeB, { y: newBX });
+//       } else {
+//         const newAX = nodeA.y + shiftAmount;
+//         const newBX = nodeB.y - shiftAmount;
+//         mutateElement(nodeA, { y: newAX });
+//         mutateElement(nodeB, { y: newBX });
+//       }
+//     }
+//   }
+// };
 
-const nodesOverlap = (
-  nodeA: ExcalidrawBindableElement,
-  nodeB: ExcalidrawBindableElement,
-): boolean => {
-  const horizontallyOverlapping =
-    nodeA.x < nodeB.x + nodeB.width && nodeA.x + nodeA.width > nodeB.x;
-  const verticallyOverlapping =
-    nodeA.y < nodeB.y + nodeB.height && nodeA.y + nodeA.height > nodeB.y;
+// const nodesOverlap = (
+//   nodeA: ExcalidrawBindableElement,
+//   nodeB: ExcalidrawBindableElement,
+// ): boolean => {
+//   const horizontallyOverlapping =
+//     nodeA.x < nodeB.x + nodeB.width && nodeA.x + nodeA.width > nodeB.x;
+//   const verticallyOverlapping =
+//     nodeA.y < nodeB.y + nodeB.height && nodeA.y + nodeA.height > nodeB.y;
 
-  return horizontallyOverlapping && verticallyOverlapping;
-};
+//   return horizontallyOverlapping && verticallyOverlapping;
+// };
 
 // export const addNewNodes = (
 //   startNode: ExcalidrawFlowchartNodeElement,
@@ -508,6 +508,8 @@ const nodesOverlap = (
 //     let nextNode: ExcalidrawElement;
 //     if (i < existingNodes.length) {
 //       nextNode = existingNodes[i];
+//       const arrow = existingNodes[i+1];
+//       console.log(arrow)
 //       mutateElement(nextNode, { x: nextX, y: nextY });
 //     } else {
 //       nextNode = newElement({
@@ -551,53 +553,132 @@ const nodesOverlap = (
 //   return newNodes;
 // };
 
-export const addNewNodes = (
+// export const addNewNodes = (
+//   startNode: ExcalidrawFlowchartNodeElement,
+//   elementsMap: ElementsMap,
+//   appState: AppState,
+//   direction: LinkDirection,
+//   numberOfNodes: number,
+// ) => {
+//   // always start from 0 and distribute evenly
+//   const newNodes: ExcalidrawElement[] = [];
+
+//   for (let i = 0; i < numberOfNodes; i++) {
+//     let nextX: number;
+//     let nextY: number;
+//     if (direction === "left" || direction === "right") {
+//       const totalHeight =
+//         VERTICAL_OFFSET * (numberOfNodes - 1) +
+//         numberOfNodes * startNode.height;
+
+//       const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
+
+//       let offsetX = HORIZONTAL_OFFSET + startNode.width;
+//       if (direction === "left") {
+//         offsetX *= -1;
+//       }
+//       nextX = startNode.x + offsetX;
+//       const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
+//       nextY = startY + offsetY;
+//     } else {
+//       const totalWidth =
+//         HORIZONTAL_OFFSET * (numberOfNodes - 1) +
+//         numberOfNodes * startNode.width;
+//       const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
+//       let offsetY = VERTICAL_OFFSET + startNode.height;
+
+//       if (direction === "up") {
+//         offsetY *= -1;
+//       }
+//       nextY = startNode.y + offsetY;
+//       const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
+//       nextX = startX + offsetX;
+//     }
+
+//     const nextNode = newElement({
+//       type: startNode.type,
+//       x: nextX,
+//       y: nextY,
+//       // TODO: extract this to a util
+//       width: startNode.width,
+//       height: startNode.height,
+//       roundness: startNode.roundness,
+//       roughness: startNode.roughness,
+//       backgroundColor: startNode.backgroundColor,
+//       strokeColor: startNode.strokeColor,
+//       strokeWidth: startNode.strokeWidth,
+//     });
+
+//     invariant(
+//       isFlowchartNodeElement(nextNode),
+//       "not an ExcalidrawFlowchartNodeElement",
+//     );
+
+//     const bindingArrow = createBindingArrow(
+//       startNode,
+//       nextNode,
+//       elementsMap,
+//       direction,
+//       appState,
+//     );
+
+//     newNodes.push(nextNode);
+//     newNodes.push(bindingArrow);
+//   }
+
+//   return newNodes;
+// };
+
+// export const addNewNodes = (
+//   startNode: ExcalidrawFlowchartNodeElement,
+//   elementsMap: ElementsMap,
+//   appState: AppState,
+//   direction: LinkDirection,
+//   numberOfNodes: number,
+// ) => {
+//   const newNodes: ExcalidrawElement[] = [];
+//   let newElementMap = elementsMap; // Initialize with existing elements map
+
+//   for (let i = 0; i < numberOfNodes; i++) {
+//     const { nextNode, bindingArrow } = addNewNode(
+//       startNode,
+//       newElementMap,
+//       appState,
+//       direction,
+//     );
+//     newNodes.push(nextNode);
+//     newNodes.push(bindingArrow);
+
+//     // Update newElementMap to include new nodes
+//     newElementMap = {
+//       ...newElementMap,
+//       ...newNodes.reduce((acc, node) => ({ ...acc, [node.id]: node }), {}),
+//     };
+//   }
+
+//   return newNodes;
+// };
+
+const addNewNodes = (
   startNode: ExcalidrawFlowchartNodeElement,
   elementsMap: ElementsMap,
   appState: AppState,
   direction: LinkDirection,
   numberOfNodes: number,
 ) => {
-  // always start from 0 and distribute evenly
   const newNodes: ExcalidrawElement[] = [];
 
+  const successors = getSuccessors(startNode, elementsMap, direction);
+  const predeccessors = getPredecessors(startNode, elementsMap, direction);
+  const linkedNodes = [...successors, ...predeccessors];
+
   for (let i = 0; i < numberOfNodes; i++) {
-    let nextX: number;
-    let nextY: number;
-    if (direction === "left" || direction === "right") {
-      const totalHeight =
-        VERTICAL_OFFSET * (numberOfNodes - 1) +
-        numberOfNodes * startNode.height;
-
-      const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
-
-      let offsetX = HORIZONTAL_OFFSET + startNode.width;
-      if (direction === "left") {
-        offsetX *= -1;
-      }
-      nextX = startNode.x + offsetX;
-      const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
-      nextY = startY + offsetY;
-    } else {
-      const totalWidth =
-        HORIZONTAL_OFFSET * (numberOfNodes - 1) +
-        numberOfNodes * startNode.width;
-      const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
-      let offsetY = VERTICAL_OFFSET + startNode.height;
-
-      if (direction === "up") {
-        offsetY *= -1;
-      }
-      nextY = startNode.y + offsetY;
-      const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
-      nextX = startX + offsetX;
-    }
+    const offsets = getOffsets(startNode, linkedNodes, direction);
 
     const nextNode = newElement({
       type: startNode.type,
-      x: nextX,
-      y: nextY,
-      // TODO: extract this to a util
+      x: startNode.x + offsets.x,
+      y: startNode.y + offsets.y,
       width: startNode.width,
       height: startNode.height,
       roundness: startNode.roundness,
@@ -607,11 +688,13 @@ export const addNewNodes = (
       strokeWidth: startNode.strokeWidth,
     });
 
+    // Invariant check for node type (optional)
     invariant(
       isFlowchartNodeElement(nextNode),
       "not an ExcalidrawFlowchartNodeElement",
     );
 
+    // Create the binding arrow to connect nodes
     const bindingArrow = createBindingArrow(
       startNode,
       nextNode,
@@ -622,6 +705,8 @@ export const addNewNodes = (
 
     newNodes.push(nextNode);
     newNodes.push(bindingArrow);
+
+    linkedNodes.push(nextNode);
   }
 
   return newNodes;
