@@ -37,7 +37,7 @@ import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
 import type { ViewportPoint } from "../../../math";
-import { point } from "../../../math";
+import { pointFrom } from "../../../math";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -182,7 +182,7 @@ export const Hyperlink = ({
         element,
         elementsMap,
         appState,
-        point(event.clientX, event.clientY),
+        pointFrom(event.clientX, event.clientY),
       ) as boolean;
       if (shouldHide) {
         timeoutId = window.setTimeout(() => {
@@ -326,7 +326,7 @@ const getCoordsForPopover = (
 ) => {
   const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
   const [viewportX, viewportY] = sceneCoordsToViewportCoords(
-    point(x1 + element.width / 2, y1),
+    pointFrom(x1 + element.width / 2, y1),
     appState,
   );
   const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
@@ -388,7 +388,7 @@ const renderTooltip = (
   );
 
   const linkViewportCoords = sceneCoordsToViewportCoords(
-    point(linkX, linkY),
+    pointFrom(linkX, linkY),
     appState,
   );
 

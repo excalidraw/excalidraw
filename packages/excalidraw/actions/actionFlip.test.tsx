@@ -9,7 +9,7 @@ import {
 } from "../tests/test-utils";
 import { API } from "../tests/helpers/api";
 import type { LocalPoint } from "../../math";
-import { point, radians } from "../../math";
+import { pointFrom, radians } from "../../math";
 import { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { vi } from "vitest";
@@ -144,9 +144,9 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     link: null,
     locked: false,
     points: [
-      point<LocalPoint>(0, 0),
-      point<LocalPoint>(-922.4761962890625, 300.3277587890625),
-      point<LocalPoint>(828.0126953125, 410.51605224609375),
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(-922.4761962890625, 300.3277587890625),
+      pointFrom<LocalPoint>(828.0126953125, 410.51605224609375),
     ],
   });
 };
@@ -936,11 +936,11 @@ describe("flipping re-centers selection", () => {
         startArrowhead: null,
         endArrowhead: "arrow",
         points: [
-          point(0, 0),
-          point(0, -35),
-          point(-90.9, -35),
-          point(-90.9, 204.9),
-          point(65.1, 204.9),
+          pointFrom(0, 0),
+          pointFrom(0, -35),
+          pointFrom(-90.9, -35),
+          pointFrom(-90.9, 204.9),
+          pointFrom(65.1, 204.9),
         ],
         elbowed: true,
       }),

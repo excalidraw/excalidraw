@@ -25,7 +25,7 @@ import {
   curve,
   ellipse,
   segment,
-  point,
+  pointFrom,
   pointFromArray,
   pointFromVector,
   pointRotateRads,
@@ -115,23 +115,23 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
   const cx = x + width / 2;
   const cy = y + height / 2;
 
-  const center: Point = point(cx, cy);
+  const center: Point = pointFrom(cx, cy);
 
   let data: Polygon<Point>;
 
   if (element.type === "diamond") {
     data = polygon(
-      pointRotateRads(point(cx, y), center, angle),
-      pointRotateRads(point(x + width, cy), center, angle),
-      pointRotateRads(point(cx, y + height), center, angle),
-      pointRotateRads(point(x, cy), center, angle),
+      pointRotateRads(pointFrom(cx, y), center, angle),
+      pointRotateRads(pointFrom(x + width, cy), center, angle),
+      pointRotateRads(pointFrom(cx, y + height), center, angle),
+      pointRotateRads(pointFrom(x, cy), center, angle),
     );
   } else {
     data = polygon(
-      pointRotateRads(point(x, y), center, angle),
-      pointRotateRads(point(x + width, y), center, angle),
-      pointRotateRads(point(x + width, y + height), center, angle),
-      pointRotateRads(point(x, y + height), center, angle),
+      pointRotateRads(pointFrom(x, y), center, angle),
+      pointRotateRads(pointFrom(x + width, y), center, angle),
+      pointRotateRads(pointFrom(x + width, y + height), center, angle),
+      pointRotateRads(pointFrom(x, y + height), center, angle),
     );
   }
 
@@ -159,11 +159,11 @@ export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
   y2 += padding;
 
   //const angleInDegrees = angleToDegrees(element.angle);
-  const center = point(cx, cy);
-  const topLeft = pointRotateRads(point(x1, y1), center, element.angle);
-  const topRight = pointRotateRads(point(x2, y1), center, element.angle);
-  const bottomLeft = pointRotateRads(point(x1, y2), center, element.angle);
-  const bottomRight = pointRotateRads(point(x2, y2), center, element.angle);
+  const center = pointFrom(cx, cy);
+  const topLeft = pointRotateRads(pointFrom(x1, y1), center, element.angle);
+  const topRight = pointRotateRads(pointFrom(x2, y1), center, element.angle);
+  const bottomLeft = pointRotateRads(pointFrom(x1, y2), center, element.angle);
+  const bottomRight = pointRotateRads(pointFrom(x2, y2), center, element.angle);
 
   return {
     type: "polygon",
@@ -179,7 +179,11 @@ export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
 
   return {
     type: "ellipse",
-    data: ellipse(point(x + width / 2, y + height / 2), width / 2, height / 2),
+    data: ellipse(
+      pointFrom(x + width / 2, y + height / 2),
+      width / 2,
+      height / 2,
+    ),
   };
 };
 
@@ -195,20 +199,20 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 // linear
 export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   roughShape: Drawable,
-  startingPoint: Point = point(0, 0),
+  startingPoint: Point = pointFrom(0, 0),
   angleInRadian: Radians,
   center: Point,
 ): GeometricShape<Point> => {
   const transform = (p: Point): Point =>
     pointRotateRads(
-      point(p[0] + startingPoint[0], p[1] + startingPoint[1]),
+      pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
       angleInRadian,
     );
 
   const ops = getCurvePathOps(roughShape);
   const polycurve: Polycurve<Point> = [];
-  let p0 = point<Point>(0, 0);
+  let p0 = pointFrom<Point>(0, 0);
 
   for (const op of ops) {
     if (op.op === "move") {
@@ -217,9 +221,9 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
       p0 = transform(p);
     }
     if (op.op === "bcurveTo") {
-      const p1 = transform(point<Point>(op.data[0], op.data[1]));
-      const p2 = transform(point<Point>(op.data[2], op.data[3]));
-      const p3 = transform(point<Point>(op.data[4], op.data[5]));
+      const p1 = transform(pointFrom<Point>(op.data[0], op.data[1]));
+      const p2 = transform(pointFrom<Point>(op.data[2], op.data[3]));
+      const p3 = transform(pointFrom<Point>(op.data[4], op.data[5]));
       polycurve.push(curve<Point>(p0, p1, p2, p3));
       p0 = p3;
     }
@@ -280,13 +284,13 @@ export const getFreedrawShape = (
 export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawLinearElement,
   roughShape: Drawable,
-  startingPoint: Point = point<Point>(0, 0),
+  startingPoint: Point = pointFrom<Point>(0, 0),
   angleInRadian: Radians,
   center: Point,
 ): GeometricShape<Point> => {
   const transform = (p: Point) =>
     pointRotateRads(
-      point(p[0] + startingPoint[0], p[1] + startingPoint[1]),
+      pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
       angleInRadian,
     );
@@ -308,17 +312,17 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
     if (operation.op === "move") {
       odd = !odd;
       if (odd) {
-        points.push(point(operation.data[0], operation.data[1]));
+        points.push(pointFrom(operation.data[0], operation.data[1]));
       }
     } else if (operation.op === "bcurveTo") {
       if (odd) {
-        points.push(point(operation.data[0], operation.data[1]));
-        points.push(point(operation.data[2], operation.data[3]));
-        points.push(point(operation.data[4], operation.data[5]));
+        points.push(pointFrom(operation.data[0], operation.data[1]));
+        points.push(pointFrom(operation.data[2], operation.data[3]));
+        points.push(pointFrom(operation.data[4], operation.data[5]));
       }
     } else if (operation.op === "lineTo") {
       if (odd) {
-        points.push(point(operation.data[0], operation.data[1]));
+        points.push(pointFrom(operation.data[0], operation.data[1]));
       }
     }
   }
@@ -356,27 +360,27 @@ export const segmentIntersectRectangleElement = <
     element.x + element.width + gap,
     element.y + element.height + gap,
   ];
-  const center = point(
+  const center = pointFrom(
     (bounds[0] + bounds[2]) / 2,
     (bounds[1] + bounds[3]) / 2,
   );
 
   return [
     segment(
-      pointRotateRads(point(bounds[0], bounds[1]), center, element.angle),
-      pointRotateRads(point(bounds[2], bounds[1]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[0], bounds[1]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[2], bounds[1]), center, element.angle),
     ),
     segment(
-      pointRotateRads(point(bounds[2], bounds[1]), center, element.angle),
-      pointRotateRads(point(bounds[2], bounds[3]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[2], bounds[1]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[2], bounds[3]), center, element.angle),
     ),
     segment(
-      pointRotateRads(point(bounds[2], bounds[3]), center, element.angle),
-      pointRotateRads(point(bounds[0], bounds[3]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[2], bounds[3]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[0], bounds[3]), center, element.angle),
     ),
     segment(
-      pointRotateRads(point(bounds[0], bounds[3]), center, element.angle),
-      pointRotateRads(point(bounds[0], bounds[1]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[0], bounds[3]), center, element.angle),
+      pointRotateRads(pointFrom(bounds[0], bounds[1]), center, element.angle),
     ),
   ]
     .map((l) => segmentsIntersectAt(s, l))

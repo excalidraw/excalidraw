@@ -449,7 +449,7 @@ import type {
 } from "../../math";
 import {
   pathIsALoop,
-  point,
+  pointFrom,
   pointCenter,
   pointDistance,
   pointSubtract,
@@ -600,7 +600,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
-  lastViewportPosition = point<ViewportPoint>(0, 0);
+  lastViewportPosition = pointFrom<ViewportPoint>(0, 0);
 
   animationFrameHandler = new AnimationFrameHandler();
 
@@ -1008,7 +1008,7 @@ class App extends React.Component<AppProps, AppState> {
       <>
         {embeddableElements.map((el) => {
           const [x, y] = sceneCoordsToViewportCoords(
-            point(el.x, el.y),
+            pointFrom(el.x, el.y),
             this.state,
           );
 
@@ -1294,11 +1294,11 @@ class App extends React.Component<AppProps, AppState> {
         if (frameNameDiv) {
           const box = frameNameDiv.getBoundingClientRect();
           const boxSceneTopLeft = viewportCoordsToSceneCoords(
-            point(box.x, box.y),
+            pointFrom(box.x, box.y),
             this.state,
           );
           const boxSceneBottomRight = viewportCoordsToSceneCoords(
-            point(box.right, box.bottom),
+            pointFrom(box.right, box.bottom),
             this.state,
           );
 
@@ -1354,7 +1354,10 @@ class App extends React.Component<AppProps, AppState> {
         return null;
       }
 
-      const [x1, y1] = sceneCoordsToViewportCoords(point(f.x, f.y), this.state);
+      const [x1, y1] = sceneCoordsToViewportCoords(
+        pointFrom(f.x, f.y),
+        this.state,
+      );
 
       const FRAME_NAME_EDIT_PADDING = 6;
 
@@ -3171,7 +3174,7 @@ class App extends React.Component<AppProps, AppState> {
         : this.state.height / 2 + this.state.offsetTop;
 
     const [x, y] = viewportCoordsToSceneCoords(
-      point(clientX, clientY),
+      pointFrom(clientX, clientY),
       this.state,
     );
 
@@ -3197,7 +3200,7 @@ class App extends React.Component<AppProps, AppState> {
 
     syncMovedIndices(nextElements, arrayToMap(newElements));
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(point(x, y));
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointFrom(x, y));
 
     if (topLayerFrame) {
       const eligibleElements = filterElementsEligibleAsFrameChildren(
@@ -3407,7 +3410,7 @@ class App extends React.Component<AppProps, AppState> {
         const originalText = normalizeText(line).trim();
         if (originalText.length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
-            point(x, currentY),
+            pointFrom(x, currentY),
           );
 
           let metrics = measureText(originalText, fontString, lineHeight);
@@ -3848,7 +3851,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      this.lastViewportPosition = point(event.clientX, event.clientY);
+      this.lastViewportPosition = pointFrom(event.clientX, event.clientY);
     },
   );
 
@@ -4679,7 +4682,7 @@ class App extends React.Component<AppProps, AppState> {
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const [viewportX, viewportY] = sceneCoordsToViewportCoords(
-          point(x, y),
+          pointFrom(x, y),
           this.state,
         );
         return [
@@ -5039,7 +5042,7 @@ class App extends React.Component<AppProps, AppState> {
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
       mutateElement(container, { height: newHeight, width: newWidth });
-      sceneCoords = point(
+      sceneCoords = pointFrom(
         container.x + newWidth / 2,
         container.y + newHeight / 2,
       );
@@ -5151,7 +5154,7 @@ class App extends React.Component<AppProps, AppState> {
     resetCursor(this.interactiveCanvas);
 
     let sceneCoords = viewportCoordsToSceneCoords(
-      point(event.clientX, event.clientY),
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
 
@@ -5259,11 +5262,14 @@ class App extends React.Component<AppProps, AppState> {
     isTouchScreen: boolean,
   ) => {
     const draggedDistance = pointDistance(
-      point(
+      pointFrom(
         this.lastPointerDownEvent!.clientX,
         this.lastPointerDownEvent!.clientY,
       ),
-      point(this.lastPointerUpEvent!.clientX, this.lastPointerUpEvent!.clientY),
+      pointFrom(
+        this.lastPointerUpEvent!.clientX,
+        this.lastPointerUpEvent!.clientY,
+      ),
     );
     if (
       !this.hitLinkElement ||
@@ -5274,7 +5280,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
-      point(
+      pointFrom(
         this.lastPointerDownEvent!.clientX,
         this.lastPointerDownEvent!.clientY,
       ),
@@ -5289,7 +5295,10 @@ class App extends React.Component<AppProps, AppState> {
       this.device.editor.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
-      point(this.lastPointerUpEvent!.clientX, this.lastPointerUpEvent!.clientY),
+      pointFrom(
+        this.lastPointerUpEvent!.clientX,
+        this.lastPointerUpEvent!.clientY,
+      ),
       this.state,
     );
     const lastPointerUpHittingLinkIcon = isPointHittingLink(
@@ -5347,7 +5356,7 @@ class App extends React.Component<AppProps, AppState> {
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(
         event.pointerId,
-        point(event.clientX, event.clientY),
+        pointFrom(event.clientX, event.clientY),
       );
     }
 
@@ -5429,7 +5438,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const scenePointer = viewportCoordsToSceneCoords(
-      point(event.clientX, event.clientY),
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
 
@@ -5543,7 +5552,7 @@ class App extends React.Component<AppProps, AppState> {
         // threshold, add a point
         if (
           pointDistance(
-            point(scenePointer[0] - rx, scenePointer[1] - ry),
+            pointFrom(scenePointer[0] - rx, scenePointer[1] - ry),
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
@@ -5552,7 +5561,10 @@ class App extends React.Component<AppProps, AppState> {
             {
               points: [
                 ...points,
-                point<LocalPoint>(scenePointer[0] - rx, scenePointer[1] - ry),
+                pointFrom<LocalPoint>(
+                  scenePointer[0] - rx,
+                  scenePointer[1] - ry,
+                ),
               ],
             },
             false,
@@ -5566,7 +5578,7 @@ class App extends React.Component<AppProps, AppState> {
         points.length > 2 &&
         lastCommittedPoint &&
         pointDistance(
-          point(scenePointer[0] - rx, scenePointer[1] - ry),
+          pointFrom(scenePointer[0] - rx, scenePointer[1] - ry),
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
@@ -5616,7 +5628,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
             [
               ...points.slice(0, -1),
-              point<LocalPoint>(
+              pointFrom<LocalPoint>(
                 lastCommittedX + dxFromLastCommitted,
                 lastCommittedY + dyFromLastCommitted,
               ),
@@ -5635,7 +5647,7 @@ class App extends React.Component<AppProps, AppState> {
             {
               points: [
                 ...points.slice(0, -1),
-                point<LocalPoint>(
+                pointFrom<LocalPoint>(
                   lastCommittedX + dxFromLastCommitted,
                   lastCommittedY + dyFromLastCommitted,
                 ),
@@ -5872,10 +5884,10 @@ class App extends React.Component<AppProps, AppState> {
         (1 - distanceRatio) * p[0] + distanceRatio * scenePointer[0];
       const nextY =
         (1 - distanceRatio) * p[1] + distanceRatio * scenePointer[1];
-      p = point(nextX, nextY);
+      p = pointFrom(nextX, nextY);
     }
 
-    pointerDownState.lastCoords = point(scenePointer[0], scenePointer[1]);
+    pointerDownState.lastCoords = pointFrom(scenePointer[0], scenePointer[1]);
 
     if (didChange) {
       for (const element of this.scene.getNonDeletedElements()) {
@@ -6227,7 +6239,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       const sceneCoords = viewportCoordsToSceneCoords(
-        point(event.clientX, event.clientY),
+        pointFrom(event.clientX, event.clientY),
         this.state,
       );
 
@@ -6315,7 +6327,7 @@ class App extends React.Component<AppProps, AppState> {
     this.lastPointerUpEvent = event;
 
     const scenePointer = viewportCoordsToSceneCoords(
-      point(event.clientX, event.clientY),
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
     const clicklength =
@@ -6522,7 +6534,10 @@ class App extends React.Component<AppProps, AppState> {
   private updateGestureOnPointerDown(
     event: React.PointerEvent<HTMLElement>,
   ): void {
-    gesture.pointers.set(event.pointerId, point(event.clientX, event.clientY));
+    gesture.pointers.set(
+      event.pointerId,
+      pointFrom(event.clientX, event.clientY),
+    );
 
     if (gesture.pointers.size === 2) {
       const [pointer1, pointer2] = Array.from(gesture.pointers.values());
@@ -6536,7 +6551,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
   ): PointerDownState {
     const origin = viewportCoordsToSceneCoords(
-      point(event.clientX, event.clientY),
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -6613,7 +6628,7 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
     isDraggingScrollBar = true;
-    pointerDownState.lastCoords = point(event.clientX, event.clientY);
+    pointerDownState.lastCoords = pointFrom(event.clientX, event.clientY);
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
@@ -6977,7 +6992,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (hasBoundTextElement(element)) {
       container = element as ExcalidrawTextContainer;
-      sceneCoords = point(
+      sceneCoords = pointFrom(
         element.x + element.width / 2,
         element.y + element.height / 2,
       );
@@ -7010,7 +7025,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
-      point(gridX, gridY),
+      pointFrom(gridX, gridY),
     );
 
     const simulatePressure = event.pressure === 0.5;
@@ -7030,7 +7045,7 @@ class App extends React.Component<AppProps, AppState> {
       simulatePressure,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
-      points: [point<LocalPoint>(0, 0)],
+      points: [pointFrom<LocalPoint>(0, 0)],
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
@@ -7175,7 +7190,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const topLayerFrame = addToFrameUnderCursor
-      ? this.getTopLayerFrameAtSceneCoords(point(gridX, gridY))
+      ? this.getTopLayerFrameAtSceneCoords(pointFrom(gridX, gridY))
       : null;
 
     const element = newImageElement({
@@ -7239,7 +7254,7 @@ class App extends React.Component<AppProps, AppState> {
         multiElement.points.length > 1 &&
         lastCommittedPoint &&
         pointDistance(
-          point(
+          pointFrom(
             pointerDownState.origin[0] - rx,
             pointerDownState.origin[1] - ry,
           ),
@@ -7273,7 +7288,7 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
-        point(gridX, gridY),
+        pointFrom(gridX, gridY),
       );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
@@ -7343,7 +7358,7 @@ class App extends React.Component<AppProps, AppState> {
         };
       });
       mutateElement(element, {
-        points: [...element.points, point<LocalPoint>(0, 0)],
+        points: [...element.points, pointFrom<LocalPoint>(0, 0)],
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
@@ -7392,7 +7407,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
-      point(gridX, gridY),
+      pointFrom(gridX, gridY),
     );
 
     const baseElementAttributes = {
@@ -7568,7 +7583,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const pointerCoords = viewportCoordsToSceneCoords(
-        point(event.clientX, event.clientY),
+        pointFrom(event.clientX, event.clientY),
         this.state,
       );
 
@@ -7942,7 +7957,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points, point<LocalPoint>(dx, dy)],
+                points: [...points, pointFrom<LocalPoint>(dx, dy)],
                 pressures,
               },
               false,
@@ -7971,7 +7986,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points, point<LocalPoint>(dx, dy)],
+                points: [...points, pointFrom<LocalPoint>(dx, dy)],
               },
               false,
             );
@@ -7979,7 +7994,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElbowArrow(
               newElement,
               elementsMap,
-              [...points.slice(0, -1), point<LocalPoint>(dx, dy)],
+              [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               vector(0, 0),
               undefined,
               {
@@ -7991,7 +8006,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points.slice(0, -1), point<LocalPoint>(dx, dy)],
+                points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
               false,
             );
@@ -8128,7 +8143,10 @@ class App extends React.Component<AppProps, AppState> {
       this.translateCanvas({
         scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
-      pointerDownState.lastCoords = point(x, pointerDownState.lastCoords[1]);
+      pointerDownState.lastCoords = pointFrom(
+        x,
+        pointerDownState.lastCoords[1],
+      );
       return true;
     }
 
@@ -8138,7 +8156,10 @@ class App extends React.Component<AppProps, AppState> {
       this.translateCanvas({
         scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
-      pointerDownState.lastCoords = point(pointerDownState.lastCoords[0], y);
+      pointerDownState.lastCoords = pointFrom(
+        pointerDownState.lastCoords[0],
+        y,
+      );
       return true;
     }
     return false;
@@ -8280,7 +8301,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (newElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
-          point(childEvent.clientX, childEvent.clientY),
+          pointFrom(childEvent.clientX, childEvent.clientY),
           this.state,
         );
 
@@ -8299,9 +8320,9 @@ class App extends React.Component<AppProps, AppState> {
           : [...newElement.pressures, childEvent.pressure];
 
         mutateElement(newElement, {
-          points: [...points, point<LocalPoint>(dx, dy)],
+          points: [...points, pointFrom<LocalPoint>(dx, dy)],
           pressures,
-          lastCommittedPoint: point<LocalPoint>(dx, dy),
+          lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
 
         this.actionManager.executeAction(actionFinalize);
@@ -8340,7 +8361,7 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
         }
         const pointerCoords = viewportCoordsToSceneCoords(
-          point(childEvent.clientX, childEvent.clientY),
+          pointFrom(childEvent.clientX, childEvent.clientY),
           this.state,
         );
 
@@ -8348,7 +8369,7 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(newElement, {
             points: [
               ...newElement.points,
-              point<LocalPoint>(
+              pointFrom<LocalPoint>(
                 pointerCoords[0] - newElement.x,
                 pointerCoords[1] - newElement.y,
               ),
@@ -8465,7 +8486,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (pointerDownState.drag.hasOccurred) {
         const sceneCoords = viewportCoordsToSceneCoords(
-          point(childEvent.clientX, childEvent.clientY),
+          pointFrom(childEvent.clientX, childEvent.clientY),
           this.state,
         );
 
@@ -8665,13 +8686,13 @@ class App extends React.Component<AppProps, AppState> {
         this.eraserTrail.endPath();
 
         const draggedDistance = pointDistance(
-          point(pointerStart.clientX, pointerStart.clientY),
-          point(pointerEnd.clientX, pointerEnd.clientY),
+          pointFrom(pointerStart.clientX, pointerStart.clientY),
+          pointFrom(pointerEnd.clientX, pointerEnd.clientY),
         );
 
         if (draggedDistance === 0) {
           const scenePointer = viewportCoordsToSceneCoords(
-            point(pointerEnd.clientX, pointerEnd.clientY),
+            pointFrom(pointerEnd.clientX, pointerEnd.clientY),
             this.state,
           );
           const hitElements = this.getElementsAtPosition(scenePointer);
@@ -9208,7 +9229,7 @@ class App extends React.Component<AppProps, AppState> {
       const clientY = this.state.height / 2 + this.state.offsetTop;
 
       const [x, y] = viewportCoordsToSceneCoords(
-        point(clientX, clientY),
+        pointFrom(clientX, clientY),
         this.state,
       );
 
@@ -9500,7 +9521,7 @@ class App extends React.Component<AppProps, AppState> {
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
     const [sceneX, sceneY] = viewportCoordsToSceneCoords(
-      point(event.clientX, event.clientY),
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
 
@@ -9693,7 +9714,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const position = viewportCoordsToSceneCoords(
-      point(event.clientX, event.clientY),
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
     const element = this.getElementAtPosition(position, {
@@ -10168,7 +10189,7 @@ class App extends React.Component<AppProps, AppState> {
     container?: ExcalidrawTextContainer | null,
   ) {
     if (container) {
-      let elementCenter = point<GlobalPoint>(
+      let elementCenter = pointFrom<GlobalPoint>(
         container.x + container.width / 2,
         container.y + container.height / 2,
       );
@@ -10203,7 +10224,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     const [sceneX, sceneY] = viewportCoordsToSceneCoords(
-      point(x, y),
+      pointFrom(x, y),
       this.state,
     );
 

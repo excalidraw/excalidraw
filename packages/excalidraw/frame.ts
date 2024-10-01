@@ -37,9 +37,9 @@ import type { GlobalPoint, Segment } from "../math";
 import {
   isPointWithinBounds,
   segment,
-  point,
   pointRotateRads,
   segmentsIntersectAt,
+  pointFrom,
 } from "../math";
 
 // --------------------------- Frame State ------------------------------------
@@ -88,7 +88,7 @@ const getElementLineSegments = (
     elementsMap,
   );
 
-  const center: GlobalPoint = point(cx, cy);
+  const center: GlobalPoint = pointFrom(cx, cy);
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
     const segments: Segment<GlobalPoint>[] = [];
@@ -99,7 +99,7 @@ const getElementLineSegments = (
       segments.push(
         segment(
           pointRotateRads(
-            point(
+            pointFrom(
               element.points[i][0] + element.x,
               element.points[i][1] + element.y,
             ),
@@ -107,7 +107,7 @@ const getElementLineSegments = (
             element.angle,
           ),
           pointRotateRads(
-            point(
+            pointFrom(
               element.points[i + 1][0] + element.x,
               element.points[i + 1][1] + element.y,
             ),
@@ -256,7 +256,11 @@ export const isCursorInFrame = (
 ) => {
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
 
-  return isPointWithinBounds(point(fx1, fy1), cursorCoords, point(fx2, fy2));
+  return isPointWithinBounds(
+    pointFrom(fx1, fy1),
+    cursorCoords,
+    pointFrom(fx2, fy2),
+  );
 };
 
 export const groupsAreAtLeastIntersectingTheFrame = (

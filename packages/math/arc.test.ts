@@ -6,31 +6,31 @@ import {
   arcSegmentInterceptPoints,
 } from "./arc";
 import { line } from "./line";
-import { point } from "./point";
+import { pointFrom } from "./point";
 import { segment } from "./segment";
 
 describe("point on arc", () => {
   it("should detect point on simple arc", () => {
     expect(
       arcIncludesPoint(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        point(0.92291667, 0.385),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        pointFrom(0.92291667, 0.385),
       ),
     ).toBe(true);
   });
   it("should not detect point outside of a simple arc", () => {
     expect(
       arcIncludesPoint(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        point(-0.92291667, 0.385),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        pointFrom(-0.92291667, 0.385),
       ),
     ).toBe(false);
   });
   it("should not detect point with good angle but incorrect radius", () => {
     expect(
       arcIncludesPoint(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        point(-0.5, 0.5),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        pointFrom(-0.5, 0.5),
       ),
     ).toBe(false);
   });
@@ -40,42 +40,42 @@ describe("intersection", () => {
   it("should report correct interception point for segment", () => {
     expect(
       arcSegmentInterceptPoints(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        segment(point(2, 1), point(0, 0)),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        segment(pointFrom(2, 1), pointFrom(0, 0)),
       ),
-    ).toEqual([point(0.894427190999916, 0.447213595499958)]);
+    ).toEqual([pointFrom(0.894427190999916, 0.447213595499958)]);
   });
 
   it("should report both interception points when present for segment", () => {
     expect(
       arcSegmentInterceptPoints(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        segment(point(0.9, -2), point(0.9, 2)),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        segment(pointFrom(0.9, -2), pointFrom(0.9, 2)),
       ),
     ).toEqual([
-      point(0.9, -0.4358898943540668),
-      point(0.9, 0.4358898943540668),
+      pointFrom(0.9, -0.4358898943540668),
+      pointFrom(0.9, 0.4358898943540668),
     ]);
   });
 
   it("should report correct interception point for line", () => {
     expect(
       arcLineInterceptPoints(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        line(point(2, 1), point(0, 0)),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        line(pointFrom(2, 1), pointFrom(0, 0)),
       ),
-    ).toEqual([point(0.894427190999916, 0.447213595499958)]);
+    ).toEqual([pointFrom(0.894427190999916, 0.447213595499958)]);
   });
 
   it("should report both interception points when present for line", () => {
     expect(
       arcLineInterceptPoints(
-        arc(point(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
-        line(point(0.9, -2), point(0.9, 2)),
+        arc(pointFrom(0, 0), 1, radians(-Math.PI / 4), radians(Math.PI / 4)),
+        line(pointFrom(0.9, -2), pointFrom(0.9, 2)),
       ),
     ).toEqual([
-      point(0.9, 0.4358898943540668),
-      point(0.9, -0.4358898943540668),
+      pointFrom(0.9, 0.4358898943540668),
+      pointFrom(0.9, -0.4358898943540668),
     ]);
   });
 });

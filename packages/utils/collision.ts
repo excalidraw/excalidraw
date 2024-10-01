@@ -3,7 +3,7 @@ import { type GeometricShape } from "./geometry/shape";
 import type { Curve, GenericPoint } from "../math";
 import {
   segment,
-  point,
+  pointFrom,
   polygonIncludesPoint,
   segmentIncludesPoint,
   pointOnPolygon,
@@ -95,7 +95,7 @@ const polyLineFromCurve = <Point extends GenericPoint>(
   for (let i = 0; i < segments; i++) {
     t += increment;
     if (t <= 1) {
-      const nextPoint: Point = point(equation(t, 0), equation(t, 1));
+      const nextPoint: Point = pointFrom(equation(t, 0), equation(t, 1));
       lineSegments.push(segment(startingPoint, nextPoint));
       startingPoint = nextPoint;
     }

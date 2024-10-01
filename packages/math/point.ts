@@ -10,7 +10,10 @@ import { vectorFromPoint, vectorScale } from "./vector";
  * @param y The Y coordinate
  * @returns The branded and created point
  */
-export function point<Point extends GenericPoint>(x: number, y: number): Point {
+export function pointFrom<Point extends GenericPoint>(
+  x: number,
+  y: number,
+): Point {
   return [x, y] as Point;
 }
 
@@ -24,7 +27,7 @@ export function pointFromArray<Point extends GenericPoint>(
   numberArray: number[],
 ): Point | undefined {
   return numberArray.length === 2
-    ? point<Point>(numberArray[0], numberArray[1])
+    ? pointFrom<Point>(numberArray[0], numberArray[1])
     : undefined;
 }
 
@@ -48,9 +51,9 @@ export function pointFromPair<Point extends GenericPoint>(
  */
 export function pointFromVector<P extends GenericPoint>(
   v: Vector,
-  offset: P = point(0, 0),
+  offset: P = pointFrom(0, 0),
 ): P {
-  return point<P>(offset[0] + v[0], offset[1] + v[1]);
+  return pointFrom<P>(offset[0] + v[0], offset[1] + v[1]);
 }
 
 /**
@@ -102,7 +105,7 @@ export function pointRotateRads<Point extends GenericPoint>(
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
 
-  return point(
+  return pointFrom(
     (x - cx) * cos - (y - cy) * sin + cx,
     (x - cx) * sin + (y - cy) * cos + cy,
   );
@@ -141,7 +144,7 @@ export function pointTranslate<
   From extends GenericPoint,
   To extends GenericPoint,
 >(p: From, v: Vector = [0, 0] as Vector): To {
-  return point(p[0] + v[0], p[1] + v[1]);
+  return pointFrom(p[0] + v[0], p[1] + v[1]);
 }
 
 /**
@@ -171,7 +174,7 @@ export function pointAdd<Point extends GenericPoint>(
   a: Point,
   b: Point,
 ): Point {
-  return point(a[0] + b[0], a[1] + b[1]);
+  return pointFrom(a[0] + b[0], a[1] + b[1]);
 }
 
 /**
@@ -186,7 +189,7 @@ export function pointSubtract<Point extends GenericPoint>(
   a: Point,
   b: Point,
 ): Point {
-  return point(a[0] - b[0], a[1] - b[1]);
+  return pointFrom(a[0] - b[0], a[1] - b[1]);
 }
 
 /**

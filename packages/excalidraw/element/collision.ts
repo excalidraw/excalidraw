@@ -31,7 +31,7 @@ import type { Arc, GlobalPoint, Polygon } from "../../math";
 import {
   pathIsALoop,
   isPointWithinBounds,
-  point,
+  pointFrom,
   rectangle,
   pointRotateRads,
   radians,
@@ -119,7 +119,11 @@ export const hitElementBoundingBox = (
   y1 -= tolerance;
   x2 += tolerance;
   y2 += tolerance;
-  return isPointWithinBounds(point(x1, y1), scenePointer, point(x2, y2));
+  return isPointWithinBounds(
+    pointFrom(x1, y1),
+    scenePointer,
+    pointFrom(x2, y2),
+  );
 };
 
 export const hitElementBoundingBoxOnly = (
@@ -175,13 +179,13 @@ export const intersectRectanguloidWithLine = (
   offset: number,
 ): GlobalPoint[] => {
   const r = rectangle(
-    point(element.x - offset, element.y - offset),
-    point(
+    pointFrom(element.x - offset, element.y - offset),
+    pointFrom(
       element.x + element.width + offset,
       element.y + element.height + offset,
     ),
   );
-  const center = point<GlobalPoint>(
+  const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
@@ -203,20 +207,20 @@ export const intersectRectanguloidWithLine = (
   );
   const sideIntersections: GlobalPoint[] = [
     segment<GlobalPoint>(
-      point<GlobalPoint>(r[0][0] + roundness, r[0][1]),
-      point<GlobalPoint>(r[1][0] - roundness, r[0][1]),
+      pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
+      pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
     ),
     segment<GlobalPoint>(
-      point<GlobalPoint>(r[1][0], r[0][1] + roundness),
-      point<GlobalPoint>(r[1][0], r[1][1] - roundness),
+      pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
+      pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
     ),
     segment<GlobalPoint>(
-      point<GlobalPoint>(r[1][0] - roundness, r[1][1]),
-      point<GlobalPoint>(r[0][0] + roundness, r[1][1]),
+      pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
+      pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
     ),
     segment<GlobalPoint>(
-      point<GlobalPoint>(r[0][0], r[1][1] - roundness),
-      point<GlobalPoint>(r[0][0], r[0][1] + roundness),
+      pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
+      pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
     ),
   ]
     .map((s) =>
@@ -228,25 +232,25 @@ export const intersectRectanguloidWithLine = (
     roundness > 0
       ? [
           arc<GlobalPoint>(
-            point(r[0][0] + roundness, r[0][1] + roundness),
+            pointFrom(r[0][0] + roundness, r[0][1] + roundness),
             roundness,
             radians(Math.PI),
             radians((3 / 4) * Math.PI),
           ),
           arc<GlobalPoint>(
-            point(r[1][0] - roundness, r[0][1] + roundness),
+            pointFrom(r[1][0] - roundness, r[0][1] + roundness),
             roundness,
             radians((3 / 4) * Math.PI),
             radians(0),
           ),
           arc<GlobalPoint>(
-            point(r[1][0] - roundness, r[1][1] - roundness),
+            pointFrom(r[1][0] - roundness, r[1][1] - roundness),
             roundness,
             radians(0),
             radians((1 / 2) * Math.PI),
           ),
           arc<GlobalPoint>(
-            point(r[0][0] + roundness, r[1][1] - roundness),
+            pointFrom(r[0][0] + roundness, r[1][1] - roundness),
             roundness,
             radians((1 / 2) * Math.PI),
             radians(Math.PI),
@@ -277,7 +281,10 @@ export const intersectDiamondWithLine = (
 ): GlobalPoint[] => {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element, offset);
-  const center = point<GlobalPoint>((topX + bottomX) / 2, (topY + bottomY) / 2);
+  const center = pointFrom<GlobalPoint>(
+    (topX + bottomX) / 2,
+    (topY + bottomY) / 2,
+  );
   const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
   const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
 
@@ -286,10 +293,10 @@ export const intersectDiamondWithLine = (
   const rotatedA = pointRotateRads(a, center, radians(-element.angle));
   const rotatedB = pointRotateRads(b, center, radians(-element.angle));
   const [top, right, bottom, left]: GlobalPoint[] = [
-    point(element.x + topX, element.y + topY),
-    point(element.x + rightX, element.y + rightY),
-    point(element.x + bottomX, element.y + bottomY),
-    point(element.x + leftX, element.y + leftY),
+    pointFrom(element.x + topX, element.y + topY),
+    pointFrom(element.x + rightX, element.y + rightY),
+    pointFrom(element.x + bottomX, element.y + bottomY),
+    pointFrom(element.x + leftX, element.y + leftY),
   ];
 
   const topRight = createDiamondSide(
@@ -353,7 +360,7 @@ export const intersectEllipseWithLine = (
   b: GlobalPoint,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const center = point<GlobalPoint>(
+  const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
     element.y + element.height / 2,
   );

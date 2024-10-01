@@ -52,7 +52,7 @@ import {
 import type { LocalPoint } from "../../math";
 import {
   segment,
-  point,
+  pointFrom,
   pointRotateRads,
   type GlobalPoint,
   vectorFromPoint,
@@ -701,7 +701,7 @@ export const getHeadingForElbowArrowSnap = (
     return vectorToHeading(
       vectorFromPoint(
         p,
-        point<GlobalPoint>(
+        pointFrom<GlobalPoint>(
           bindableElement.x + bindableElement.width / 2,
           bindableElement.y + bindableElement.height / 2,
         ),
@@ -741,14 +741,14 @@ export const bindPointToSnapToElementOutline = (
     const intersections: GlobalPoint[] = [
       ...(intersectElementWithLine(
         bindableElement,
-        point(p[0], p[1] - 2 * bindableElement.height),
-        point(p[0], p[1] + 2 * bindableElement.height),
+        pointFrom(p[0], p[1] - 2 * bindableElement.height),
+        pointFrom(p[0], p[1] + 2 * bindableElement.height),
         FIXED_BINDING_DISTANCE,
       ) ?? []),
       ...(intersectElementWithLine(
         bindableElement,
-        point(p[0] - 2 * bindableElement.width, p[1]),
-        point(p[0] + 2 * bindableElement.width, p[1]),
+        pointFrom(p[0] - 2 * bindableElement.width, p[1]),
+        pointFrom(p[0] + 2 * bindableElement.width, p[1]),
         FIXED_BINDING_DISTANCE,
       ) ?? []),
     ].filter((p) => p != null);
@@ -786,25 +786,25 @@ const headingToMidBindPoint = (
   switch (true) {
     case compareHeading(heading, HEADING_UP):
       return pointRotateRads(
-        point((aabb[0] + aabb[2]) / 2 + 0.1, aabb[1]),
+        pointFrom((aabb[0] + aabb[2]) / 2 + 0.1, aabb[1]),
         center,
         bindableElement.angle,
       );
     case compareHeading(heading, HEADING_RIGHT):
       return pointRotateRads(
-        point(aabb[2], (aabb[1] + aabb[3]) / 2 + 0.1),
+        pointFrom(aabb[2], (aabb[1] + aabb[3]) / 2 + 0.1),
         center,
         bindableElement.angle,
       );
     case compareHeading(heading, HEADING_DOWN):
       return pointRotateRads(
-        point((aabb[0] + aabb[2]) / 2 - 0.1, aabb[3]),
+        pointFrom((aabb[0] + aabb[2]) / 2 - 0.1, aabb[3]),
         center,
         bindableElement.angle,
       );
     default:
       return pointRotateRads(
-        point(aabb[0], (aabb[1] + aabb[3]) / 2 - 0.1),
+        pointFrom(aabb[0], (aabb[1] + aabb[3]) / 2 - 0.1),
         center,
         bindableElement.angle,
       );
@@ -815,7 +815,7 @@ export const avoidRectangularCorner = (
   element: ExcalidrawBindableElement,
   p: GlobalPoint,
 ): GlobalPoint => {
-  const center = point<GlobalPoint>(
+  const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
@@ -825,13 +825,13 @@ export const avoidRectangularCorner = (
     // Top left
     if (nonRotatedPoint[1] - element.y > -FIXED_BINDING_DISTANCE) {
       return pointRotateRads<GlobalPoint>(
-        point(element.x - FIXED_BINDING_DISTANCE, element.y),
+        pointFrom(element.x - FIXED_BINDING_DISTANCE, element.y),
         center,
         element.angle,
       );
     }
     return pointRotateRads(
-      point(element.x, element.y - FIXED_BINDING_DISTANCE),
+      pointFrom(element.x, element.y - FIXED_BINDING_DISTANCE),
       center,
       element.angle,
     );
@@ -842,13 +842,16 @@ export const avoidRectangularCorner = (
     // Bottom left
     if (nonRotatedPoint[0] - element.x > -FIXED_BINDING_DISTANCE) {
       return pointRotateRads(
-        point(element.x, element.y + element.height + FIXED_BINDING_DISTANCE),
+        pointFrom(
+          element.x,
+          element.y + element.height + FIXED_BINDING_DISTANCE,
+        ),
         center,
         element.angle,
       );
     }
     return pointRotateRads(
-      point(element.x - FIXED_BINDING_DISTANCE, element.y + element.height),
+      pointFrom(element.x - FIXED_BINDING_DISTANCE, element.y + element.height),
       center,
       element.angle,
     );
@@ -862,7 +865,7 @@ export const avoidRectangularCorner = (
       element.width + FIXED_BINDING_DISTANCE
     ) {
       return pointRotateRads(
-        point(
+        pointFrom(
           element.x + element.width,
           element.y + element.height + FIXED_BINDING_DISTANCE,
         ),
@@ -871,7 +874,7 @@ export const avoidRectangularCorner = (
       );
     }
     return pointRotateRads(
-      point(
+      pointFrom(
         element.x + element.width + FIXED_BINDING_DISTANCE,
         element.y + element.height,
       ),
@@ -888,13 +891,16 @@ export const avoidRectangularCorner = (
       element.width + FIXED_BINDING_DISTANCE
     ) {
       return pointRotateRads(
-        point(element.x + element.width, element.y - FIXED_BINDING_DISTANCE),
+        pointFrom(
+          element.x + element.width,
+          element.y - FIXED_BINDING_DISTANCE,
+        ),
         center,
         element.angle,
       );
     }
     return pointRotateRads(
-      point(element.x + element.width + FIXED_BINDING_DISTANCE, element.y),
+      pointFrom(element.x + element.width + FIXED_BINDING_DISTANCE, element.y),
       center,
       element.angle,
     );
@@ -909,7 +915,10 @@ export const snapToMid = (
   tolerance: number = 0.05,
 ): GlobalPoint => {
   const { x, y, width, height, angle } = element;
-  const center = point<GlobalPoint>(x + width / 2 - 0.1, y + height / 2 - 0.1);
+  const center = pointFrom<GlobalPoint>(
+    x + width / 2 - 0.1,
+    y + height / 2 - 0.1,
+  );
   const nonRotated = pointRotateRads(p, center, radians(-angle));
 
   // snap-to-center point is adaptive to element size, but we don't want to go
@@ -924,7 +933,7 @@ export const snapToMid = (
   ) {
     // LEFT
     return pointRotateRads(
-      point(x - FIXED_BINDING_DISTANCE, center[1]),
+      pointFrom(x - FIXED_BINDING_DISTANCE, center[1]),
       center,
       angle,
     );
@@ -935,7 +944,7 @@ export const snapToMid = (
   ) {
     // TOP
     return pointRotateRads(
-      point(center[0], y - FIXED_BINDING_DISTANCE),
+      pointFrom(center[0], y - FIXED_BINDING_DISTANCE),
       center,
       angle,
     );
@@ -946,7 +955,7 @@ export const snapToMid = (
   ) {
     // RIGHT
     return pointRotateRads(
-      point(x + width + FIXED_BINDING_DISTANCE, center[1]),
+      pointFrom(x + width + FIXED_BINDING_DISTANCE, center[1]),
       center,
       angle,
     );
@@ -957,7 +966,7 @@ export const snapToMid = (
   ) {
     // DOWN
     return pointRotateRads(
-      point(center[0], y + height + FIXED_BINDING_DISTANCE),
+      pointFrom(center[0], y + height + FIXED_BINDING_DISTANCE),
       center,
       angle,
     );
@@ -994,11 +1003,11 @@ const updateBoundPoint = (
         startOrEnd === "startBinding" ? "start" : "end",
         elementsMap,
       ).fixedPoint;
-    const globalMidPoint = point<GlobalPoint>(
+    const globalMidPoint = pointFrom<GlobalPoint>(
       bindableElement.x + bindableElement.width / 2,
       bindableElement.y + bindableElement.height / 2,
     );
-    const global = point<GlobalPoint>(
+    const global = pointFrom<GlobalPoint>(
       bindableElement.x + fixedPoint[0] * bindableElement.width,
       bindableElement.y + fixedPoint[1] * bindableElement.height,
     );
@@ -1086,7 +1095,7 @@ export const calculateFixedPointForElbowArrowBinding = (
     otherGlobalPoint,
     hoveredElement,
   );
-  const globalMidPoint = point(
+  const globalMidPoint = pointFrom(
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   );
@@ -1303,9 +1312,9 @@ export const bindingBorderTest = (
   const threshold = maxBindingGap(element, element.width, element.height);
   const shape = getElementShape(element, elementsMap);
   return (
-    isPointOnShape(point(x, y), shape, threshold) ||
+    isPointOnShape(pointFrom(x, y), shape, threshold) ||
     (fullShape === true &&
-      pointInsideBounds(point(x, y), aabbForElement(element)))
+      pointInsideBounds(pointFrom(x, y), aabbForElement(element)))
   );
 };
 
@@ -1333,7 +1342,7 @@ const determineFocusDistance = (
   // Another point on the line, in absolute coordinates (closer to element)
   b: GlobalPoint,
 ): number => {
-  const center = point<GlobalPoint>(
+  const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
@@ -1357,7 +1366,7 @@ const determineFocusPoint = (
   focus: number,
   adjacentPoint: GlobalPoint,
 ): GlobalPoint => {
-  const center = point<GlobalPoint>(
+  const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
@@ -1373,7 +1382,7 @@ const determineFocusPoint = (
       ),
       Math.sign(focus) *
         Math.min(
-          pointDistance(point<GlobalPoint>(element.x, element.y), center) *
+          pointDistance(pointFrom<GlobalPoint>(element.x, element.y), center) *
             Math.abs(focus),
           element.width / 2,
           element.height / 2,
@@ -1698,11 +1707,11 @@ export const getGlobalFixedPointForBindableElement = (
   const [fixedX, fixedY] = normalizeFixedPoint(fixedPointRatio);
 
   return pointRotateRads(
-    point(
+    pointFrom(
       element.x + element.width * fixedX,
       element.y + element.height * fixedY,
     ),
-    point<GlobalPoint>(
+    pointFrom<GlobalPoint>(
       element.x + element.width / 2,
       element.y + element.height / 2,
     ),
@@ -1730,7 +1739,7 @@ const getGlobalFixedPoints = (
           arrow.startBinding.fixedPoint,
           startElement as ExcalidrawBindableElement,
         )
-      : point<GlobalPoint>(
+      : pointFrom<GlobalPoint>(
           arrow.x + arrow.points[0][0],
           arrow.y + arrow.points[0][1],
         );
@@ -1740,7 +1749,7 @@ const getGlobalFixedPoints = (
           arrow.endBinding.fixedPoint,
           endElement as ExcalidrawBindableElement,
         )
-      : point<GlobalPoint>(
+      : pointFrom<GlobalPoint>(
           arrow.x + arrow.points[arrow.points.length - 1][0],
           arrow.y + arrow.points[arrow.points.length - 1][1],
         );

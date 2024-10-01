@@ -1,5 +1,5 @@
 import type { Segment } from "../math";
-import { isSegment, segment, point, type GlobalPoint } from "../math";
+import { isSegment, segment, pointFrom, type GlobalPoint } from "../math";
 import { isBounds } from "./element/typeChecks";
 import type { Bounds } from "./element/types";
 
@@ -52,8 +52,8 @@ export const debugDrawPoint = (
 
   debugDrawLine(
     segment(
-      point<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset - 10),
-      point<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset + 10),
+      pointFrom<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset - 10),
+      pointFrom<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset + 10),
     ),
     {
       color: opts?.color ?? "cyan",
@@ -62,8 +62,8 @@ export const debugDrawPoint = (
   );
   debugDrawLine(
     segment(
-      point<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset + 10),
-      point<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset - 10),
+      pointFrom<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset + 10),
+      pointFrom<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset - 10),
     ),
     {
       color: opts?.color ?? "cyan",
@@ -83,20 +83,20 @@ export const debugDrawBounds = (
     debugDrawLine(
       [
         segment(
-          point<GlobalPoint>(bbox[0], bbox[1]),
-          point<GlobalPoint>(bbox[2], bbox[1]),
+          pointFrom<GlobalPoint>(bbox[0], bbox[1]),
+          pointFrom<GlobalPoint>(bbox[2], bbox[1]),
         ),
         segment(
-          point<GlobalPoint>(bbox[2], bbox[1]),
-          point<GlobalPoint>(bbox[2], bbox[3]),
+          pointFrom<GlobalPoint>(bbox[2], bbox[1]),
+          pointFrom<GlobalPoint>(bbox[2], bbox[3]),
         ),
         segment(
-          point<GlobalPoint>(bbox[2], bbox[3]),
-          point<GlobalPoint>(bbox[0], bbox[3]),
+          pointFrom<GlobalPoint>(bbox[2], bbox[3]),
+          pointFrom<GlobalPoint>(bbox[0], bbox[3]),
         ),
         segment(
-          point<GlobalPoint>(bbox[0], bbox[3]),
-          point<GlobalPoint>(bbox[0], bbox[1]),
+          pointFrom<GlobalPoint>(bbox[0], bbox[3]),
+          pointFrom<GlobalPoint>(bbox[0], bbox[1]),
         ),
       ],
       {
