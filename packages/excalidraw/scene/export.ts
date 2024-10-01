@@ -1,4 +1,5 @@
 import rough from "roughjs/bin/rough";
+import { imageTitle } from "../components/ImageExportDialog";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -73,7 +74,6 @@ const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   }
   return newElementWith(element, { text, width: maxWidth });
 };
-
 /**
  * When exporting frames, we need to render frame labels which are currently
  * being rendered in DOM when editing. Adding the labels as regular text
@@ -274,6 +274,7 @@ export const exportToSvg = async (
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
+    title?: string;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -289,7 +290,10 @@ export const exportToSvg = async (
     exportEmbedScene,
   } = appState;
 
-  const { exportingFrame = null } = opts || {};
+  const {
+    exportingFrame = null,
+    title = imageTitle == "" ? "excalidraw" : imageTitle,
+  } = opts || {};
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -377,8 +381,8 @@ export const exportToSvg = async (
     </style>
     ${exportingFrameClipPath}
   </defs>
+  <title>${title}</title> <!-- Add title tag -->
   `;
-
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
@@ -474,6 +478,7 @@ const getFontFaces = async (
       return font.getContent(codePoints);
     } catch {
       // fallback to font source as a url
+
       return font.urls[0].toString();
     }
   };

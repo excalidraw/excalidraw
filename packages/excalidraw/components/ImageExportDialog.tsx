@@ -40,6 +40,8 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
 
+export let imageTitle = "";
+
 export const ErrorCanvasPreview = () => {
   return (
     <div>
@@ -86,6 +88,7 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [imageTitleState, setImageTitleState] = useState(imageTitle);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
@@ -167,6 +170,10 @@ const ImageExportModal = ({
     exportScale,
     embedScene,
   ]);
+
+  useEffect(() => {
+    imageTitle = imageTitleState;
+  }, [imageTitleState]);
 
   return (
     <div className="ImageExportModal">
@@ -279,6 +286,16 @@ const ImageExportModal = ({
               value: scale,
               label: `${scale}\u00d7`,
             }))}
+          />
+        </ExportSetting>
+        <ExportSetting
+          label="SVG Title"
+          name="imageTitle"
+        >
+          <input
+            type="text"
+            value={imageTitleState}
+            onChange={(event) => setImageTitleState(event.target.value)}
           />
         </ExportSetting>
 
