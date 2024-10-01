@@ -54,7 +54,7 @@ import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
 import { isArrowElement } from "../element/typeChecks";
-import { point, type LocalPoint } from "../../math";
+import { pointFrom, type LocalPoint } from "../../math";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -537,7 +537,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newLinearElement({
           width,
           height,
-          points: [point(0, 0), point(width, height)],
+          points: [pointFrom(0, 0), pointFrom(width, height)],
           ...element,
         });
 
@@ -550,7 +550,7 @@ export const convertToExcalidrawElements = (
           width,
           height,
           endArrowhead: "arrow",
-          points: [point(0, 0), point(width, height)],
+          points: [pointFrom(0, 0), pointFrom(width, height)],
           ...element,
           type: "arrow",
         });

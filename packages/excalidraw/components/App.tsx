@@ -445,7 +445,7 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { point, pointDistance, vector } from "../../math";
+import { pointFrom, pointDistance, vector } from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -4910,7 +4910,7 @@ class App extends React.Component<AppProps, AppState> {
         this.getElementHitThreshold(),
       );
 
-      return isPointInShape(point(x, y), selectionShape);
+      return isPointInShape(pointFrom(x, y), selectionShape);
     }
 
     // take bound text element into consideration for hit collision as well
@@ -5269,7 +5269,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.scene.getNonDeletedElementsMap(),
           this.state,
-          point(scenePointer.x, scenePointer.y),
+          pointFrom(scenePointer.x, scenePointer.y),
           this.device.editor.isMobile,
         )
       );
@@ -5281,11 +5281,14 @@ class App extends React.Component<AppProps, AppState> {
     isTouchScreen: boolean,
   ) => {
     const draggedDistance = pointDistance(
-      point(
+      pointFrom(
         this.lastPointerDownEvent!.clientX,
         this.lastPointerDownEvent!.clientY,
       ),
-      point(this.lastPointerUpEvent!.clientX, this.lastPointerUpEvent!.clientY),
+      pointFrom(
+        this.lastPointerUpEvent!.clientX,
+        this.lastPointerUpEvent!.clientY,
+      ),
     );
     if (
       !this.hitLinkElement ||
@@ -5304,7 +5307,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       elementsMap,
       this.state,
-      point(lastPointerDownCoords.x, lastPointerDownCoords.y),
+      pointFrom(lastPointerDownCoords.x, lastPointerDownCoords.y),
       this.device.editor.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
@@ -5315,7 +5318,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       elementsMap,
       this.state,
-      point(lastPointerUpCoords.x, lastPointerUpCoords.y),
+      pointFrom(lastPointerUpCoords.x, lastPointerUpCoords.y),
       this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
@@ -5565,7 +5568,7 @@ class App extends React.Component<AppProps, AppState> {
         // threshold, add a point
         if (
           pointDistance(
-            point(scenePointerX - rx, scenePointerY - ry),
+            pointFrom(scenePointerX - rx, scenePointerY - ry),
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
@@ -5574,7 +5577,7 @@ class App extends React.Component<AppProps, AppState> {
             {
               points: [
                 ...points,
-                point<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
+                pointFrom<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
               ],
             },
             false,
@@ -5588,7 +5591,7 @@ class App extends React.Component<AppProps, AppState> {
         points.length > 2 &&
         lastCommittedPoint &&
         pointDistance(
-          point(scenePointerX - rx, scenePointerY - ry),
+          pointFrom(scenePointerX - rx, scenePointerY - ry),
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
@@ -5636,7 +5639,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
             [
               ...points.slice(0, -1),
-              point<LocalPoint>(
+              pointFrom<LocalPoint>(
                 lastCommittedX + dxFromLastCommitted,
                 lastCommittedY + dyFromLastCommitted,
               ),
@@ -5655,7 +5658,7 @@ class App extends React.Component<AppProps, AppState> {
             {
               points: [
                 ...points.slice(0, -1),
-                point<LocalPoint>(
+                pointFrom<LocalPoint>(
                   lastCommittedX + dxFromLastCommitted,
                   lastCommittedY + dyFromLastCommitted,
                 ),
@@ -5884,8 +5887,8 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     const distance = pointDistance(
-      point(pointerDownState.lastCoords.x, pointerDownState.lastCoords.y),
-      point(scenePointer.x, scenePointer.y),
+      pointFrom(pointerDownState.lastCoords.x, pointerDownState.lastCoords.y),
+      pointFrom(scenePointer.x, scenePointer.y),
     );
     const threshold = this.getElementHitThreshold();
     const p = { ...pointerDownState.lastCoords };
@@ -6397,7 +6400,7 @@ class App extends React.Component<AppProps, AppState> {
           this.hitLinkElement,
           this.scene.getNonDeletedElementsMap(),
           this.state,
-          point(scenePointer.x, scenePointer.y),
+          pointFrom(scenePointer.x, scenePointer.y),
         )
       ) {
         this.handleEmbeddableCenterClick(this.hitLinkElement);
@@ -7088,7 +7091,7 @@ class App extends React.Component<AppProps, AppState> {
       simulatePressure,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
-      points: [point<LocalPoint>(0, 0)],
+      points: [pointFrom<LocalPoint>(0, 0)],
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
@@ -7297,7 +7300,10 @@ class App extends React.Component<AppProps, AppState> {
         multiElement.points.length > 1 &&
         lastCommittedPoint &&
         pointDistance(
-          point(pointerDownState.origin.x - rx, pointerDownState.origin.y - ry),
+          pointFrom(
+            pointerDownState.origin.x - rx,
+            pointerDownState.origin.y - ry,
+          ),
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
@@ -7399,7 +7405,7 @@ class App extends React.Component<AppProps, AppState> {
         };
       });
       mutateElement(element, {
-        points: [...element.points, point<LocalPoint>(0, 0)],
+        points: [...element.points, pointFrom<LocalPoint>(0, 0)],
       });
       const boundElement = getHoveredElementForBinding(
         pointerDownState.origin,
@@ -7652,8 +7658,8 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         if (
           pointDistance(
-            point(pointerCoords.x, pointerCoords.y),
-            point(pointerDownState.origin.x, pointerDownState.origin.y),
+            pointFrom(pointerCoords.x, pointerCoords.y),
+            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
           ) < DRAGGING_THRESHOLD
         ) {
           return;
@@ -8002,7 +8008,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points, point<LocalPoint>(dx, dy)],
+                points: [...points, pointFrom<LocalPoint>(dx, dy)],
                 pressures,
               },
               false,
@@ -8031,7 +8037,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points, point<LocalPoint>(dx, dy)],
+                points: [...points, pointFrom<LocalPoint>(dx, dy)],
               },
               false,
             );
@@ -8039,7 +8045,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElbowArrow(
               newElement,
               elementsMap,
-              [...points.slice(0, -1), point<LocalPoint>(dx, dy)],
+              [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               vector(0, 0),
               undefined,
               {
@@ -8051,7 +8057,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points.slice(0, -1), point<LocalPoint>(dx, dy)],
+                points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
               false,
             );
@@ -8360,9 +8366,9 @@ class App extends React.Component<AppProps, AppState> {
           : [...newElement.pressures, childEvent.pressure];
 
         mutateElement(newElement, {
-          points: [...points, point<LocalPoint>(dx, dy)],
+          points: [...points, pointFrom<LocalPoint>(dx, dy)],
           pressures,
-          lastCommittedPoint: point<LocalPoint>(dx, dy),
+          lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
 
         this.actionManager.executeAction(actionFinalize);
@@ -8409,7 +8415,7 @@ class App extends React.Component<AppProps, AppState> {
           mutateElement(newElement, {
             points: [
               ...newElement.points,
-              point<LocalPoint>(
+              pointFrom<LocalPoint>(
                 pointerCoords.x - newElement.x,
                 pointerCoords.y - newElement.y,
               ),
@@ -8723,8 +8729,8 @@ class App extends React.Component<AppProps, AppState> {
         this.eraserTrail.endPath();
 
         const draggedDistance = pointDistance(
-          point(pointerStart.clientX, pointerStart.clientY),
-          point(pointerEnd.clientX, pointerEnd.clientY),
+          pointFrom(pointerStart.clientX, pointerStart.clientY),
+          pointFrom(pointerEnd.clientX, pointerEnd.clientY),
         );
 
         if (draggedDistance === 0) {

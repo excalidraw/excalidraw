@@ -38,7 +38,7 @@ import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
 import type { Action } from "../../actions/types";
 import { mutateElement } from "../../element/mutateElement";
-import { point, type LocalPoint, type Radians } from "../../../math";
+import { pointFrom, type LocalPoint, type Radians } from "../../../math";
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
@@ -307,8 +307,8 @@ export class API {
           height,
           type,
           points: rest.points ?? [
-            point<LocalPoint>(0, 0),
-            point<LocalPoint>(100, 100),
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
           ],
           elbowed: rest.elbowed ?? false,
         });
@@ -320,8 +320,8 @@ export class API {
           height,
           type,
           points: rest.points ?? [
-            point<LocalPoint>(0, 0),
-            point<LocalPoint>(100, 100),
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
           ],
         });
         break;
