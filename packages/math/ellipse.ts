@@ -181,7 +181,7 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
   return intersections;
 }
 
-export function ellipseIntersectsLine<Point extends GenericPoint>(
+export function ellipseLineIntersectionPoints<Point extends GenericPoint>(
   { center, halfWidth, halfHeight }: Ellipse<Point>,
   [g, h]: Line<Point>,
 ): Point[] {

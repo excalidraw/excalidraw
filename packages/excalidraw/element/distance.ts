@@ -1,10 +1,9 @@
-import type { GlobalPoint, Segment } from "../../math";
+import type { GlobalPoint } from "../../math";
 import {
   arc,
   arcDistanceFromPoint,
   ellipse,
   ellipseDistanceFromPoint,
-  ellipseSegmentInterceptPoints,
   point,
   pointRotateRads,
   radians,
@@ -13,6 +12,7 @@ import {
   segmentDistanceToPoint,
 } from "../../math";
 import { getCornerRadius, getDiamondPoints } from "../shapes";
+import { createDiamondArc, createDiamondSide } from "./bounds";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
@@ -22,7 +22,7 @@ import type {
 
 export const distanceToBindableElement = (
   element: ExcalidrawBindableElement,
-  point: GlobalPoint,
+  p: GlobalPoint,
 ): number => {
   switch (element.type) {
     case "rectangle":
@@ -32,11 +32,11 @@ export const distanceToBindableElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      return distanceToRectangleElement(element, point);
+      return distanceToRectangleElement(element, p);
     case "diamond":
-      return distanceToDiamondElement(element, point);
+      return distanceToDiamondElement(element, p);
     case "ellipse":
-      return distanceToEllipseElement(element, point);
+      return distanceToEllipseElement(element, p);
   }
 };
 
@@ -116,54 +116,6 @@ export const distanceToRectangleElement = (
       : [];
 
   return Math.min(...[...sideDistances, ...cornerDistances]);
-};
-
-/**
- * Shortens a segment on both ends to accomodate the arc in the rounded
- * diamond shape
- *
- * @param s The segment to shorten
- * @param r The radius to shorten by
- * @returns The segment shortened on both ends by the same radius
- */
-const createDiamondSide = (
-  s: Segment<GlobalPoint>,
-  startRadius: number,
-  endRadius: number,
-): Segment<GlobalPoint> => {
-  return segment(
-    ellipseSegmentInterceptPoints(
-      ellipse(s[0], startRadius, startRadius),
-      s,
-    )[0] ?? s[0],
-    ellipseSegmentInterceptPoints(ellipse(s[1], endRadius, endRadius), s)[0] ??
-      s[1],
-  );
-};
-
-/**
- * Creates an arc for the given roundness and position by taking the start
- * and end positions and determining the angle points on the hypotethical
- * circle with center point between start and end and raidus equals provided
- * roundness. I.e. the created arc is gobal point-aware, or "rotated" in-place.
- *
- * @param start
- * @param end
- * @param r
- * @returns
- */
-const createDiamondArc = (start: GlobalPoint, end: GlobalPoint, r: number) => {
-  const c = point<GlobalPoint>(
-    (start[0] + end[0]) / 2,
-    (start[1] + end[1]) / 2,
-  );
-
-  return arc(
-    c,
-    r,
-    radians(Math.asin((start[1] - c[1]) / r)),
-    radians(Math.asin((end[1] - c[1]) / r)),
-  );
 };
 
 /**

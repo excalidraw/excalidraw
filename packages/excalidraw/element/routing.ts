@@ -1043,7 +1043,6 @@ const getSnapPoint = (
     isRectanguloidElement(element) ? avoidRectangularCorner(element, p) : p,
     otherPoint,
     element,
-    elementsMap,
   );
 
 const getBindPointHeading = (

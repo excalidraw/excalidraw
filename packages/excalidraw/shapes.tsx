@@ -474,7 +474,10 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   return 0;
 };
 
-export const getDiamondPoints = (element: ExcalidrawDiamondElement) => {
+export const getDiamondPoints = (
+  element: ExcalidrawDiamondElement,
+  offset: number = 0,
+) => {
   // Here we add +1 to avoid these numbers to be 0
   // otherwise rough.js will throw an error complaining about it
   const topX = Math.floor(element.width / 2) + 1;
@@ -486,5 +489,14 @@ export const getDiamondPoints = (element: ExcalidrawDiamondElement) => {
   const leftX = 0;
   const leftY = rightY;
 
-  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
+  return [
+    topX - offset,
+    topY - offset,
+    rightX + offset,
+    rightY + offset,
+    bottomX + offset,
+    bottomY + offset,
+    leftX - offset,
+    leftY - offset,
+  ];
 };

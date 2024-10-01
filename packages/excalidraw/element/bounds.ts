@@ -22,13 +22,18 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { ShapeCache } from "../scene/ShapeCache";
 import { arrayToMap, invariant } from "../utils";
-import type { GlobalPoint, LocalPoint } from "../../math";
+import type { GlobalPoint, LocalPoint, Segment } from "../../math";
 import {
   point,
   pointDistance,
   pointFromArray,
   pointRotateRads,
   pointRescaleFromTopLeft,
+  segment,
+  ellipseSegmentInterceptPoints,
+  ellipse,
+  arc,
+  radians,
 } from "../../math";
 import type { Mutable } from "../utility-types";
 import { getCurvePathOps } from "../../utils/geometry/shape";
@@ -651,3 +656,55 @@ export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   );
+
+/**
+ * Shortens a segment on both ends to accomodate the arc in the rounded
+ * diamond shape
+ *
+ * @param s The segment to shorten
+ * @param r The radius to shorten by
+ * @returns The segment shortened on both ends by the same radius
+ */
+export const createDiamondSide = (
+  s: Segment<GlobalPoint>,
+  startRadius: number,
+  endRadius: number,
+): Segment<GlobalPoint> => {
+  return segment(
+    ellipseSegmentInterceptPoints(
+      ellipse(s[0], startRadius, startRadius),
+      s,
+    )[0] ?? s[0],
+    ellipseSegmentInterceptPoints(ellipse(s[1], endRadius, endRadius), s)[0] ??
+      s[1],
+  );
+};
+
+/**
+ * Creates an arc for the given roundness and position by taking the start
+ * and end positions and determining the angle points on the hypotethical
+ * circle with center point between start and end and raidus equals provided
+ * roundness. I.e. the created arc is gobal point-aware, or "rotated" in-place.
+ *
+ * @param start
+ * @param end
+ * @param r
+ * @returns
+ */
+export const createDiamondArc = (
+  start: GlobalPoint,
+  end: GlobalPoint,
+  r: number,
+) => {
+  const c = point<GlobalPoint>(
+    (start[0] + end[0]) / 2,
+    (start[1] + end[1]) / 2,
+  );
+
+  return arc(
+    c,
+    r,
+    radians(Math.asin((start[1] - c[1]) / r)),
+    radians(Math.asin((end[1] - c[1]) / r)),
+  );
+};

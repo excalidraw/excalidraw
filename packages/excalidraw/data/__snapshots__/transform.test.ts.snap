@@ -89,7 +89,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endBinding": {
     "elementId": "ellipse-1",
     "fixedPoint": null,
-    "focus": -0.008153707962747813,
+    "focus": -0.008835048729392623,
     "gap": 11.562288374879595,
   },
   "fillStyle": "solid",
@@ -120,7 +120,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startBinding": {
     "elementId": "id49",
     "fixedPoint": null,
-    "focus": -0.08139534883720931,
+    "focus": -0.08860759493670874,
     "gap": 1,
   },
   "strokeColor": "#1864ab",
@@ -147,7 +147,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endBinding": {
     "elementId": "ellipse-1",
     "fixedPoint": null,
-    "focus": 0.10666666666666667,
+    "focus": 0.1045751633986928,
     "gap": 3.8343264684446097,
   },
   "fillStyle": "solid",
@@ -1485,7 +1485,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endBinding": {
     "elementId": "Alice",
     "fixedPoint": null,
-    "focus": 0,
+    "focus": 1.7573472843231123e-16,
     "gap": 5.299874999999986,
   },
   "fillStyle": "solid",

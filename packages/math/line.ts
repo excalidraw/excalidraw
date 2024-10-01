@@ -1,4 +1,4 @@
-import { ellipseIntersectsLine } from "./ellipse";
+import { ellipseLineIntersectionPoints } from "./ellipse";
 import { point, pointCenter, pointRotateRads } from "./point";
 import { segmentIncludesPoint } from "./segment";
 import type { GenericPoint, Line, Radians, Segment } from "./types";
@@ -60,7 +60,7 @@ export function lineRotate<Point extends GenericPoint>(
  * @param b Another line to intersect
  * @returns The intersection point
  */
-export function lineIntersectsLine<Point extends GenericPoint>(
+export function lineLineIntersectionPoint<Point extends GenericPoint>(
   [[x1, y1], [x2, y2]]: Line<Point>,
   [[x3, y3], [x4, y4]]: Line<Point>,
 ): Point | null {
@@ -83,11 +83,11 @@ export function lineIntersectsLine<Point extends GenericPoint>(
  * @param s
  * @returns
  */
-export function lineIntersectsSegment<Point extends GenericPoint>(
+export function lineSegmentIntersectionPoints<Point extends GenericPoint>(
   l: Line<Point>,
   s: Segment<Point>,
 ): Point | null {
-  const candidate = lineIntersectsLine(l, line(s[0], s[1]));
+  const candidate = lineLineIntersectionPoint(l, line(s[0], s[1]));
   if (!candidate || !segmentIncludesPoint(candidate, s)) {
     return null;
   }
@@ -95,4 +95,4 @@ export function lineIntersectsSegment<Point extends GenericPoint>(
   return candidate;
 }
 
-export const lineInterceptsEllipse = ellipseIntersectsLine;
+export const lineInterceptsEllipse = ellipseLineIntersectionPoints;

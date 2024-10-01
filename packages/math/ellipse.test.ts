@@ -3,7 +3,7 @@ import {
   ellipseSegmentInterceptPoints,
   ellipseIncludesPoint,
   ellipseTouchesPoint,
-  ellipseIntersectsLine,
+  ellipseLineIntersectionPoints,
 } from "./ellipse";
 import { line } from "./line";
 import { point } from "./point";
@@ -85,7 +85,7 @@ describe("line and ellipse", () => {
 
   it("detects outside line", () => {
     expect(
-      ellipseIntersectsLine(
+      ellipseLineIntersectionPoints(
         e,
         line<GlobalPoint>(point(-10, -10), point(10, -10)),
       ),
@@ -93,10 +93,10 @@ describe("line and ellipse", () => {
   });
   it("detects line intersecting ellipse", () => {
     expect(
-      ellipseIntersectsLine(e, line<GlobalPoint>(point(0, -1), point(0, 1))),
+      ellipseLineIntersectionPoints(e, line<GlobalPoint>(point(0, -1), point(0, 1))),
     ).toEqual([point(0, 2), point(0, -2)]);
     expect(
-      ellipseIntersectsLine(
+      ellipseLineIntersectionPoints(
         e,
         line<GlobalPoint>(point(-100, 0), point(-10, 0)),
       ).map(([x, y]) => point(Math.round(x), Math.round(y))),
@@ -104,7 +104,7 @@ describe("line and ellipse", () => {
   });
   it("detects line touching ellipse", () => {
     expect(
-      ellipseIntersectsLine(e, line<GlobalPoint>(point(-2, -2), point(2, -2))),
+      ellipseLineIntersectionPoints(e, line<GlobalPoint>(point(-2, -2), point(2, -2))),
     ).toEqual([point(0, -2)]);
   });
 });

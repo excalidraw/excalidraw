@@ -2,10 +2,11 @@ import { cartesian2Polar, normalizeRadians, radians } from "./angle";
 import {
   ellipse,
   ellipseDistanceFromPoint,
+  ellipseLineIntersectionPoints,
   ellipseSegmentInterceptPoints,
 } from "./ellipse";
 import { point, pointDistance } from "./point";
-import type { GenericPoint, Segment, Radians, Arc } from "./types";
+import type { GenericPoint, Segment, Radians, Arc, Line } from "./types";
 import { PRECISION } from "./utils";
 
 /**
@@ -85,7 +86,7 @@ export function arcDistanceFromPoint<Point extends GenericPoint>(
 
 /**
  * Returns the intersection point(s) of a line segment represented by a start
- * point and end point and a symmetric arc.
+ * point and end point and a symmetric arc
  */
 export function arcSegmentInterceptPoints<Point extends GenericPoint>(
   a: Readonly<Arc<Point>>,
@@ -94,6 +95,34 @@ export function arcSegmentInterceptPoints<Point extends GenericPoint>(
   return ellipseSegmentInterceptPoints(
     ellipse(a.center, a.radius, a.radius),
     s,
+  ).filter((candidate) => {
+    const [candidateRadius, candidateAngle] = cartesian2Polar(
+      point(candidate[0] - a.center[0], candidate[1] - a.center[1]),
+    );
+
+    return a.startAngle < a.endAngle
+      ? Math.abs(a.radius - candidateRadius) < PRECISION &&
+          a.startAngle <= candidateAngle &&
+          a.endAngle >= candidateAngle
+      : a.startAngle <= candidateAngle || a.endAngle >= candidateAngle;
+  });
+}
+
+/**
+ * Returns the intersection point(s) of a line segment represented by a start
+ * point and end point and a symmetric arc
+ *
+ * @param a
+ * @param l
+ * @returns
+ */
+export function arcLineInterceptPoints<Point extends GenericPoint>(
+  a: Readonly<Arc<Point>>,
+  l: Readonly<Line<Point>>,
+): Point[] {
+  return ellipseLineIntersectionPoints(
+    ellipse(a.center, a.radius, a.radius),
+    l,
   ).filter((candidate) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(
       point(candidate[0] - a.center[0], candidate[1] - a.center[1]),

@@ -1,4 +1,4 @@
-import { lineIntersectsSegment } from "./line";
+import { lineSegmentIntersectionPoints } from "./line";
 import {
   isPoint,
   pointCenter,
@@ -186,4 +186,4 @@ export function segmentDistanceToPoint<Point extends GenericPoint>(
  * @param s
  * @returns
  */
-export const segmentIntersectsLine = lineIntersectsSegment;
+export const segmentLineIntersectionPoints = lineSegmentIntersectionPoints;
