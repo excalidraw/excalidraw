@@ -1,4 +1,4 @@
-import { point, type GlobalPoint, type LocalPoint } from "../../math";
+import { pointFrom, type GlobalPoint, type LocalPoint } from "../../math";
 import { THEME } from "../constants";
 import type { PointSnapLine, PointerSnapLine } from "../snapping";
 import type { InteractiveCanvasAppState } from "../types";
@@ -140,27 +140,31 @@ const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
     // (1)
     if (!appState.zenModeEnabled) {
       drawLine(
-        point(from[0], from[1] - FULL),
-        point(from[0], from[1] + FULL),
+        pointFrom(from[0], from[1] - FULL),
+        pointFrom(from[0], from[1] + FULL),
         context,
       );
     }
 
     // (3)
     drawLine(
-      point(halfPoint[0] - QUARTER, halfPoint[1] - HALF),
-      point(halfPoint[0] - QUARTER, halfPoint[1] + HALF),
+      pointFrom(halfPoint[0] - QUARTER, halfPoint[1] - HALF),
+      pointFrom(halfPoint[0] - QUARTER, halfPoint[1] + HALF),
       context,
     );
     drawLine(
-      point(halfPoint[0] + QUARTER, halfPoint[1] - HALF),
-      point(halfPoint[0] + QUARTER, halfPoint[1] + HALF),
+      pointFrom(halfPoint[0] + QUARTER, halfPoint[1] - HALF),
+      pointFrom(halfPoint[0] + QUARTER, halfPoint[1] + HALF),
       context,
     );
 
     if (!appState.zenModeEnabled) {
       // (4)
-      drawLine(point(to[0], to[1] - FULL), point(to[0], to[1] + FULL), context);
+      drawLine(
+        pointFrom(to[0], to[1] - FULL),
+        pointFrom(to[0], to[1] + FULL),
+        context,
+      );
 
       // (2)
       drawLine(from, to, context);
@@ -170,27 +174,31 @@ const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
     // (1)
     if (!appState.zenModeEnabled) {
       drawLine(
-        point(from[0] - FULL, from[1]),
-        point(from[0] + FULL, from[1]),
+        pointFrom(from[0] - FULL, from[1]),
+        pointFrom(from[0] + FULL, from[1]),
         context,
       );
     }
 
     // (3)
     drawLine(
-      point(halfPoint[0] - HALF, halfPoint[1] - QUARTER),
-      point(halfPoint[0] + HALF, halfPoint[1] - QUARTER),
+      pointFrom(halfPoint[0] - HALF, halfPoint[1] - QUARTER),
+      pointFrom(halfPoint[0] + HALF, halfPoint[1] - QUARTER),
       context,
     );
     drawLine(
-      point(halfPoint[0] - HALF, halfPoint[1] + QUARTER),
-      point(halfPoint[0] + HALF, halfPoint[1] + QUARTER),
+      pointFrom(halfPoint[0] - HALF, halfPoint[1] + QUARTER),
+      pointFrom(halfPoint[0] + HALF, halfPoint[1] + QUARTER),
       context,
     );
 
     if (!appState.zenModeEnabled) {
       // (4)
-      drawLine(point(to[0] - FULL, to[1]), point(to[0] + FULL, to[1]), context);
+      drawLine(
+        pointFrom(to[0] - FULL, to[1]),
+        pointFrom(to[0] + FULL, to[1]),
+        context,
+      );
 
       // (2)
       drawLine(from, to, context);

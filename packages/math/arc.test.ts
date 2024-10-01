@@ -1,5 +1,5 @@
 import { isPointOnSymmetricArc } from "./arc";
-import { point } from "./point";
+import { pointFrom } from "./point";
 
 describe("point on arc", () => {
   it("should detect point on simple arc", () => {
@@ -10,7 +10,7 @@ describe("point on arc", () => {
           startAngle: -Math.PI / 4,
           endAngle: Math.PI / 4,
         },
-        point(0.92291667, 0.385),
+        pointFrom(0.92291667, 0.385),
       ),
     ).toBe(true);
   });
@@ -22,7 +22,7 @@ describe("point on arc", () => {
           startAngle: -Math.PI / 4,
           endAngle: Math.PI / 4,
         },
-        point(-0.92291667, 0.385),
+        pointFrom(-0.92291667, 0.385),
       ),
     ).toBe(false);
   });
@@ -34,7 +34,7 @@ describe("point on arc", () => {
           startAngle: -Math.PI / 4,
           endAngle: Math.PI / 4,
         },
-        point(-0.5, 0.5),
+        pointFrom(-0.5, 0.5),
       ),
     ).toBe(false);
   });

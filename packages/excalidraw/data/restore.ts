@@ -57,7 +57,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 import type { LocalPoint, Radians } from "../../math";
-import { isFiniteNumber, point } from "../../math";
+import { isFiniteNumber, pointFrom } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -268,7 +268,7 @@ const restoreElement = (
       let y = element.y;
       let points = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [point(0, 0), point(element.width, element.height)]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
@@ -296,7 +296,7 @@ const restoreElement = (
       let y: number | undefined = element.y;
       let points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [point(0, 0), point(element.width, element.height)]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {

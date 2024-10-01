@@ -6,7 +6,7 @@ import type {
   Radians,
 } from "../../math";
 import {
-  point,
+  pointFrom,
   pointRotateRads,
   pointScaleFromOrigin,
   radiansToDegrees,
@@ -82,7 +82,7 @@ export const headingForPointFromElement = <
 
     const top = pointRotateRads(
       pointScaleFromOrigin(
-        point(element.x + element.width / 2, element.y),
+        pointFrom(element.x + element.width / 2, element.y),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
@@ -91,7 +91,7 @@ export const headingForPointFromElement = <
     );
     const right = pointRotateRads(
       pointScaleFromOrigin(
-        point(element.x + element.width, element.y + element.height / 2),
+        pointFrom(element.x + element.width, element.y + element.height / 2),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
@@ -100,7 +100,7 @@ export const headingForPointFromElement = <
     );
     const bottom = pointRotateRads(
       pointScaleFromOrigin(
-        point(element.x + element.width / 2, element.y + element.height),
+        pointFrom(element.x + element.width / 2, element.y + element.height),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
@@ -109,7 +109,7 @@ export const headingForPointFromElement = <
     );
     const left = pointRotateRads(
       pointScaleFromOrigin(
-        point(element.x, element.y + element.height / 2),
+        pointFrom(element.x, element.y + element.height / 2),
         midPoint,
         SEARCH_CONE_MULTIPLIER,
       ),
@@ -133,22 +133,22 @@ export const headingForPointFromElement = <
   }
 
   const topLeft = pointScaleFromOrigin(
-    point(aabb[0], aabb[1]),
+    pointFrom(aabb[0], aabb[1]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
   const topRight = pointScaleFromOrigin(
-    point(aabb[2], aabb[1]),
+    pointFrom(aabb[2], aabb[1]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
   const bottomLeft = pointScaleFromOrigin(
-    point(aabb[0], aabb[3]),
+    pointFrom(aabb[0], aabb[3]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
   const bottomRight = pointScaleFromOrigin(
-    point(aabb[2], aabb[3]),
+    pointFrom(aabb[2], aabb[3]),
     midPoint,
     SEARCH_CONE_MULTIPLIER,
   ) as Point;

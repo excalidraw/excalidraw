@@ -19,7 +19,7 @@ import {
   isIOS,
 } from "../constants";
 import type { Radians } from "../../math";
-import { point, pointRotateRads } from "../../math";
+import { pointFrom, pointRotateRads } from "../../math";
 
 export type TransformHandleDirection =
   | "n"
@@ -95,8 +95,8 @@ const generateTransformHandle = (
   angle: Radians,
 ): TransformHandle => {
   const [xx, yy] = pointRotateRads(
-    point(x + width / 2, y + height / 2),
-    point(cx, cy),
+    pointFrom(x + width / 2, y + height / 2),
+    pointFrom(cx, cy),
     angle,
   );
   return [xx - width / 2, yy - height / 2, width, height];

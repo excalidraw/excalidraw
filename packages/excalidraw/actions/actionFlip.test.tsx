@@ -2,7 +2,7 @@ import React from "react";
 import { Excalidraw } from "../index";
 import { render } from "../tests/test-utils";
 import { API } from "../tests/helpers/api";
-import { point } from "../../math";
+import { pointFrom } from "../../math";
 import { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
 
 const { h } = window;
@@ -50,11 +50,11 @@ describe("flipping re-centers selection", () => {
         startArrowhead: null,
         endArrowhead: "arrow",
         points: [
-          point(0, 0),
-          point(0, -35),
-          point(-90.9, -35),
-          point(-90.9, 204.9),
-          point(65.1, 204.9),
+          pointFrom(0, 0),
+          pointFrom(0, -35),
+          pointFrom(-90.9, -35),
+          pointFrom(-90.9, 204.9),
+          pointFrom(65.1, 204.9),
         ],
         elbowed: true,
       }),

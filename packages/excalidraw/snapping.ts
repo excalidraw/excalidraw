@@ -1,6 +1,6 @@
 import type { InclusiveRange } from "../math";
 import {
-  point,
+  pointFrom,
   pointRotateRads,
   rangeInclusive,
   rangeIntersection,
@@ -228,52 +228,52 @@ export const getElementsCorners = (
       !boundingBoxCorners
     ) {
       const leftMid = pointRotateRads<GlobalPoint>(
-        point(x1, y1 + halfHeight),
-        point(cx, cy),
+        pointFrom(x1, y1 + halfHeight),
+        pointFrom(cx, cy),
         element.angle,
       );
       const topMid = pointRotateRads<GlobalPoint>(
-        point(x1 + halfWidth, y1),
-        point(cx, cy),
+        pointFrom(x1 + halfWidth, y1),
+        pointFrom(cx, cy),
         element.angle,
       );
       const rightMid = pointRotateRads<GlobalPoint>(
-        point(x2, y1 + halfHeight),
-        point(cx, cy),
+        pointFrom(x2, y1 + halfHeight),
+        pointFrom(cx, cy),
         element.angle,
       );
       const bottomMid = pointRotateRads<GlobalPoint>(
-        point(x1 + halfWidth, y2),
-        point(cx, cy),
+        pointFrom(x1 + halfWidth, y2),
+        pointFrom(cx, cy),
         element.angle,
       );
-      const center = point<GlobalPoint>(cx, cy);
+      const center = pointFrom<GlobalPoint>(cx, cy);
 
       result = omitCenter
         ? [leftMid, topMid, rightMid, bottomMid]
         : [leftMid, topMid, rightMid, bottomMid, center];
     } else {
       const topLeft = pointRotateRads<GlobalPoint>(
-        point(x1, y1),
-        point(cx, cy),
+        pointFrom(x1, y1),
+        pointFrom(cx, cy),
         element.angle,
       );
       const topRight = pointRotateRads<GlobalPoint>(
-        point(x2, y1),
-        point(cx, cy),
+        pointFrom(x2, y1),
+        pointFrom(cx, cy),
         element.angle,
       );
       const bottomLeft = pointRotateRads<GlobalPoint>(
-        point(x1, y2),
-        point(cx, cy),
+        pointFrom(x1, y2),
+        pointFrom(cx, cy),
         element.angle,
       );
       const bottomRight = pointRotateRads<GlobalPoint>(
-        point(x2, y2),
-        point(cx, cy),
+        pointFrom(x2, y2),
+        pointFrom(cx, cy),
         element.angle,
       );
-      const center = point<GlobalPoint>(cx, cy);
+      const center = pointFrom<GlobalPoint>(cx, cy);
 
       result = omitCenter
         ? [topLeft, topRight, bottomLeft, bottomRight]
@@ -287,18 +287,18 @@ export const getElementsCorners = (
     const width = maxX - minX;
     const height = maxY - minY;
 
-    const topLeft = point<GlobalPoint>(minX, minY);
-    const topRight = point<GlobalPoint>(maxX, minY);
-    const bottomLeft = point<GlobalPoint>(minX, maxY);
-    const bottomRight = point<GlobalPoint>(maxX, maxY);
-    const center = point<GlobalPoint>(minX + width / 2, minY + height / 2);
+    const topLeft = pointFrom<GlobalPoint>(minX, minY);
+    const topRight = pointFrom<GlobalPoint>(maxX, minY);
+    const bottomLeft = pointFrom<GlobalPoint>(minX, maxY);
+    const bottomRight = pointFrom<GlobalPoint>(maxX, maxY);
+    const center = pointFrom<GlobalPoint>(minX + width / 2, minY + height / 2);
 
     result = omitCenter
       ? [topLeft, topRight, bottomLeft, bottomRight]
       : [topLeft, topRight, bottomLeft, bottomRight, center];
   }
 
-  return result.map((p) => point(round(p[0]), round(p[1])));
+  return result.map((p) => pointFrom(round(p[0]), round(p[1])));
 };
 
 const getReferenceElements = (
@@ -375,8 +375,11 @@ export const getVisibleGaps = (
         horizontalGaps.push({
           startBounds,
           endBounds,
-          startSide: [point(startMaxX, startMinY), point(startMaxX, startMaxY)],
-          endSide: [point(endMinX, endMinY), point(endMinX, endMaxY)],
+          startSide: [
+            pointFrom(startMaxX, startMinY),
+            pointFrom(startMaxX, startMaxY),
+          ],
+          endSide: [pointFrom(endMinX, endMinY), pointFrom(endMinX, endMaxY)],
           length: endMinX - startMaxX,
           overlap: rangeIntersection(
             rangeInclusive(startMinY, startMaxY),
@@ -415,8 +418,11 @@ export const getVisibleGaps = (
         verticalGaps.push({
           startBounds,
           endBounds,
-          startSide: [point(startMinX, startMaxY), point(startMaxX, startMaxY)],
-          endSide: [point(endMinX, endMinY), point(endMaxX, endMinY)],
+          startSide: [
+            pointFrom(startMinX, startMaxY),
+            pointFrom(startMaxX, startMaxY),
+          ],
+          endSide: [pointFrom(endMinX, endMinY), pointFrom(endMaxX, endMinY)],
           length: endMinY - startMaxY,
           overlap: rangeIntersection(
             rangeInclusive(startMinX, startMaxX),
@@ -832,7 +838,7 @@ const createPointSnapLines = (
         }
         snapsX[key].push(
           ...snap.points.map((p) =>
-            point<GlobalPoint>(round(p[0]), round(p[1])),
+            pointFrom<GlobalPoint>(round(p[0]), round(p[1])),
           ),
         );
       }
@@ -849,7 +855,7 @@ const createPointSnapLines = (
         }
         snapsY[key].push(
           ...snap.points.map((p) =>
-            point<GlobalPoint>(round(p[0]), round(p[1])),
+            pointFrom<GlobalPoint>(round(p[0]), round(p[1])),
           ),
         );
       }
@@ -863,7 +869,7 @@ const createPointSnapLines = (
         points: dedupePoints(
           points
             .map((p) => {
-              return point<GlobalPoint>(Number(key), p[1]);
+              return pointFrom<GlobalPoint>(Number(key), p[1]);
             })
             .sort((a, b) => a[1] - b[1]),
         ),
@@ -876,7 +882,7 @@ const createPointSnapLines = (
           points: dedupePoints(
             points
               .map((p) => {
-                return point<GlobalPoint>(p[0], Number(key));
+                return pointFrom<GlobalPoint>(p[0], Number(key));
               })
               .sort((a, b) => a[0] - b[0]),
           ),
@@ -940,16 +946,16 @@ const createGapSnapLines = (
               type: "gap",
               direction: "horizontal",
               points: [
-                point(gapSnap.gap.startSide[0][0], gapLineY),
-                point(minX, gapLineY),
+                pointFrom(gapSnap.gap.startSide[0][0], gapLineY),
+                pointFrom(minX, gapLineY),
               ],
             },
             {
               type: "gap",
               direction: "horizontal",
               points: [
-                point(maxX, gapLineY),
-                point(gapSnap.gap.endSide[0][0], gapLineY),
+                pointFrom(maxX, gapLineY),
+                pointFrom(gapSnap.gap.endSide[0][0], gapLineY),
               ],
             },
           );
@@ -966,16 +972,16 @@ const createGapSnapLines = (
               type: "gap",
               direction: "vertical",
               points: [
-                point(gapLineX, gapSnap.gap.startSide[0][1]),
-                point(gapLineX, minY),
+                pointFrom(gapLineX, gapSnap.gap.startSide[0][1]),
+                pointFrom(gapLineX, minY),
               ],
             },
             {
               type: "gap",
               direction: "vertical",
               points: [
-                point(gapLineX, maxY),
-                point(gapLineX, gapSnap.gap.endSide[0][1]),
+                pointFrom(gapLineX, maxY),
+                pointFrom(gapLineX, gapSnap.gap.endSide[0][1]),
               ],
             },
           );
@@ -991,12 +997,15 @@ const createGapSnapLines = (
             {
               type: "gap",
               direction: "horizontal",
-              points: [point(startMaxX, gapLineY), point(endMinX, gapLineY)],
+              points: [
+                pointFrom(startMaxX, gapLineY),
+                pointFrom(endMinX, gapLineY),
+              ],
             },
             {
               type: "gap",
               direction: "horizontal",
-              points: [point(endMaxX, gapLineY), point(minX, gapLineY)],
+              points: [pointFrom(endMaxX, gapLineY), pointFrom(minX, gapLineY)],
             },
           );
         }
@@ -1011,12 +1020,18 @@ const createGapSnapLines = (
             {
               type: "gap",
               direction: "horizontal",
-              points: [point(maxX, gapLineY), point(startMinX, gapLineY)],
+              points: [
+                pointFrom(maxX, gapLineY),
+                pointFrom(startMinX, gapLineY),
+              ],
             },
             {
               type: "gap",
               direction: "horizontal",
-              points: [point(startMaxX, gapLineY), point(endMinX, gapLineY)],
+              points: [
+                pointFrom(startMaxX, gapLineY),
+                pointFrom(endMinX, gapLineY),
+              ],
             },
           );
         }
@@ -1031,12 +1046,18 @@ const createGapSnapLines = (
             {
               type: "gap",
               direction: "vertical",
-              points: [point(gapLineX, maxY), point(gapLineX, startMinY)],
+              points: [
+                pointFrom(gapLineX, maxY),
+                pointFrom(gapLineX, startMinY),
+              ],
             },
             {
               type: "gap",
               direction: "vertical",
-              points: [point(gapLineX, startMaxY), point(gapLineX, endMinY)],
+              points: [
+                pointFrom(gapLineX, startMaxY),
+                pointFrom(gapLineX, endMinY),
+              ],
             },
           );
         }
@@ -1051,12 +1072,15 @@ const createGapSnapLines = (
             {
               type: "gap",
               direction: "vertical",
-              points: [point(gapLineX, startMaxY), point(gapLineX, endMinY)],
+              points: [
+                pointFrom(gapLineX, startMaxY),
+                pointFrom(gapLineX, endMinY),
+              ],
             },
             {
               type: "gap",
               direction: "vertical",
-              points: [point(gapLineX, endMaxY), point(gapLineX, minY)],
+              points: [pointFrom(gapLineX, endMaxY), pointFrom(gapLineX, minY)],
             },
           );
         }
@@ -1070,7 +1094,7 @@ const createGapSnapLines = (
       return {
         ...gapSnapLine,
         points: gapSnapLine.points.map((p) =>
-          point(round(p[0]), round(p[1])),
+          pointFrom(round(p[0]), round(p[1])),
         ) as PointPair,
       };
     }),
@@ -1120,35 +1144,35 @@ export const snapResizingElements = (
   if (transformHandle) {
     switch (transformHandle) {
       case "e": {
-        selectionSnapPoints.push(point(maxX, minY), point(maxX, maxY));
+        selectionSnapPoints.push(pointFrom(maxX, minY), pointFrom(maxX, maxY));
         break;
       }
       case "w": {
-        selectionSnapPoints.push(point(minX, minY), point(minX, maxY));
+        selectionSnapPoints.push(pointFrom(minX, minY), pointFrom(minX, maxY));
         break;
       }
       case "n": {
-        selectionSnapPoints.push(point(minX, minY), point(maxX, minY));
+        selectionSnapPoints.push(pointFrom(minX, minY), pointFrom(maxX, minY));
         break;
       }
       case "s": {
-        selectionSnapPoints.push(point(minX, maxY), point(maxX, maxY));
+        selectionSnapPoints.push(pointFrom(minX, maxY), pointFrom(maxX, maxY));
         break;
       }
       case "ne": {
-        selectionSnapPoints.push(point(maxX, minY));
+        selectionSnapPoints.push(pointFrom(maxX, minY));
         break;
       }
       case "nw": {
-        selectionSnapPoints.push(point(minX, minY));
+        selectionSnapPoints.push(pointFrom(minX, minY));
         break;
       }
       case "se": {
-        selectionSnapPoints.push(point(maxX, maxY));
+        selectionSnapPoints.push(pointFrom(maxX, maxY));
         break;
       }
       case "sw": {
-        selectionSnapPoints.push(point(minX, maxY));
+        selectionSnapPoints.push(pointFrom(minX, maxY));
         break;
       }
     }
@@ -1191,10 +1215,10 @@ export const snapResizingElements = (
   );
 
   const corners: GlobalPoint[] = [
-    point(x1, y1),
-    point(x1, y2),
-    point(x2, y1),
-    point(x2, y2),
+    pointFrom(x1, y1),
+    pointFrom(x1, y2),
+    pointFrom(x2, y1),
+    pointFrom(x2, y2),
   ];
 
   getPointSnaps(
@@ -1231,7 +1255,7 @@ export const snapNewElement = (
   }
 
   const selectionSnapPoints: GlobalPoint[] = [
-    point(origin.x + dragOffset.x, origin.y + dragOffset.y),
+    pointFrom(origin.x + dragOffset.x, origin.y + dragOffset.y),
   ];
 
   const snapDistance = getSnapDistance(app.state.zoom.value);
@@ -1331,7 +1355,7 @@ export const getSnapLinesAtPointer = (
 
         verticalSnapLines.push({
           type: "pointer",
-          points: [corner, point(corner[0], pointer.y)],
+          points: [corner, pointFrom(corner[0], pointer.y)],
           direction: "vertical",
         });
 
@@ -1347,7 +1371,7 @@ export const getSnapLinesAtPointer = (
 
         horizontalSnapLines.push({
           type: "pointer",
-          points: [corner, point(pointer.x, corner[1])],
+          points: [corner, pointFrom(pointer.x, corner[1])],
           direction: "horizontal",
         });
 

@@ -20,7 +20,7 @@ import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit, resizeElement } from "./utils";
 import type { AtomicUnit } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { point, type GlobalPoint } from "../../../math";
+import { pointFrom, type GlobalPoint } from "../../../math";
 
 interface MultiDimensionProps {
   property: "width" | "height";
@@ -182,7 +182,7 @@ const handleDimensionChange: DragInputCallbackType<
           nextHeight,
           initialHeight,
           aspectRatio,
-          point(x1, y1),
+          pointFrom(x1, y1),
           property,
           latestElements,
           originalElements,
@@ -287,7 +287,7 @@ const handleDimensionChange: DragInputCallbackType<
         nextHeight,
         initialHeight,
         aspectRatio,
-        point(x1, y1),
+        pointFrom(x1, y1),
         property,
         latestElements,
         originalElements,

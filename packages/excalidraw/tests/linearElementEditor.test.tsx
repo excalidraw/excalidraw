@@ -28,7 +28,7 @@ import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 import type { GlobalPoint } from "../../math";
-import { pointCenter, point } from "../../math";
+import { pointCenter, pointFrom } from "../../math";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -57,8 +57,8 @@ describe("Test Linear Elements", () => {
     interactiveCanvas = container.querySelector("canvas.interactive")!;
   });
 
-  const p1 = point<GlobalPoint>(20, 20);
-  const p2 = point<GlobalPoint>(60, 20);
+  const p1 = pointFrom<GlobalPoint>(20, 20);
+  const p2 = pointFrom<GlobalPoint>(60, 20);
   const midpoint = pointCenter<GlobalPoint>(p1, p2);
   const delta = 50;
   const mouse = new Pointer("mouse");
@@ -75,7 +75,7 @@ describe("Test Linear Elements", () => {
       height: 0,
       type,
       roughness,
-      points: [point(0, 0), point(p2[0] - p1[0], p2[1] - p1[1])],
+      points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], p2[1] - p1[1])],
       roundness,
     });
     API.setElements([line]);
@@ -99,9 +99,9 @@ describe("Test Linear Elements", () => {
       type,
       roughness,
       points: [
-        point(0, 0),
-        point(p3[0], p3[1]),
-        point(p2[0] - p1[0], p2[1] - p1[1]),
+        pointFrom(0, 0),
+        pointFrom(p3[0], p3[1]),
+        pointFrom(p2[0] - p1[0], p2[1] - p1[1]),
       ],
       roundness,
     });
@@ -161,7 +161,7 @@ describe("Test Linear Elements", () => {
     expect(line.points.length).toEqual(2);
 
     mouse.clickAt(midpoint[0], midpoint[1]);
-    drag(midpoint, point(midpoint[0] + 1, midpoint[1] + 1));
+    drag(midpoint, pointFrom(midpoint[0] + 1, midpoint[1] + 1));
 
     expect(line.points.length).toEqual(2);
 
@@ -169,7 +169,7 @@ describe("Test Linear Elements", () => {
     expect(line.y).toBe(originalY);
     expect(line.points.length).toEqual(2);
 
-    drag(midpoint, point(midpoint[0] + delta, midpoint[1] + delta));
+    drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
     expect(line.x).toBe(originalX);
     expect(line.y).toBe(originalY);
     expect(line.points.length).toEqual(3);
@@ -184,7 +184,7 @@ describe("Test Linear Elements", () => {
     expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
 
     // drag line from midpoint
-    drag(midpoint, point(midpoint[0] + delta, midpoint[1] + delta));
+    drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`9`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(line.points.length).toEqual(3);
@@ -248,7 +248,7 @@ describe("Test Linear Elements", () => {
       mouse.clickAt(midpoint[0], midpoint[1]);
       expect(line.points.length).toEqual(2);
 
-      drag(midpoint, point(midpoint[0] + 1, midpoint[1] + 1));
+      drag(midpoint, pointFrom(midpoint[0] + 1, midpoint[1] + 1));
       expect(line.x).toBe(originalX);
       expect(line.y).toBe(originalY);
       expect(line.points.length).toEqual(3);
@@ -261,7 +261,7 @@ describe("Test Linear Elements", () => {
       enterLineEditingMode(line);
 
       // drag line from midpoint
-      drag(midpoint, point(midpoint[0] + delta, midpoint[1] + delta));
+      drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
         `12`,
       );
@@ -356,7 +356,7 @@ describe("Test Linear Elements", () => {
       const startPoint = pointCenter(points[0], midPoints[0]!);
       const deltaX = 50;
       const deltaY = 20;
-      const endPoint = point<GlobalPoint>(
+      const endPoint = pointFrom<GlobalPoint>(
         startPoint[0] + deltaX,
         startPoint[1] + deltaY,
       );
@@ -399,8 +399,8 @@ describe("Test Linear Elements", () => {
       // This is the expected midpoint for line with round edge
       // hence hardcoding it so if later some bug is introduced
       // this will fail and we can fix it
-      const firstSegmentMidpoint = point<GlobalPoint>(55, 45);
-      const lastSegmentMidpoint = point<GlobalPoint>(75, 40);
+      const firstSegmentMidpoint = pointFrom<GlobalPoint>(55, 45);
+      const lastSegmentMidpoint = pointFrom<GlobalPoint>(75, 40);
 
       let line: ExcalidrawLinearElement;
 
@@ -416,7 +416,7 @@ describe("Test Linear Elements", () => {
         // drag line via first segment midpoint
         drag(
           firstSegmentMidpoint,
-          point(
+          pointFrom(
             firstSegmentMidpoint[0] + delta,
             firstSegmentMidpoint[1] + delta,
           ),
@@ -426,7 +426,10 @@ describe("Test Linear Elements", () => {
         // drag line from last segment midpoint
         drag(
           lastSegmentMidpoint,
-          point(lastSegmentMidpoint[0] + delta, lastSegmentMidpoint[1] + delta),
+          pointFrom(
+            lastSegmentMidpoint[0] + delta,
+            lastSegmentMidpoint[1] + delta,
+          ),
         );
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
@@ -475,10 +478,10 @@ describe("Test Linear Elements", () => {
           h.state,
         );
 
-        const hitCoords = point<GlobalPoint>(points[0][0], points[0][1]);
+        const hitCoords = pointFrom<GlobalPoint>(points[0][0], points[0][1]);
 
         // Drag from first point
-        drag(hitCoords, point(hitCoords[0] - delta, hitCoords[1] - delta));
+        drag(hitCoords, pointFrom(hitCoords[0] - delta, hitCoords[1] - delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `12`,
@@ -516,10 +519,10 @@ describe("Test Linear Elements", () => {
           h.state,
         );
 
-        const hitCoords = point<GlobalPoint>(points[0][0], points[0][1]);
+        const hitCoords = pointFrom<GlobalPoint>(points[0][0], points[0][1]);
 
         // Drag from first point
-        drag(hitCoords, point(hitCoords[0] + delta, hitCoords[1] + delta));
+        drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `12`,
@@ -556,7 +559,7 @@ describe("Test Linear Elements", () => {
         // dragging line from last segment midpoint
         drag(
           lastSegmentMidpoint,
-          point(lastSegmentMidpoint[0] + 50, lastSegmentMidpoint[1] + 50),
+          pointFrom(lastSegmentMidpoint[0] + 50, lastSegmentMidpoint[1] + 50),
         );
         expect(line.points.length).toEqual(4);
 
@@ -589,11 +592,11 @@ describe("Test Linear Elements", () => {
       // This is the expected midpoint for line with round edge
       // hence hardcoding it so if later some bug is introduced
       // this will fail and we can fix it
-      const firstSegmentMidpoint = point<GlobalPoint>(
+      const firstSegmentMidpoint = pointFrom<GlobalPoint>(
         55.9697848965255,
         47.442326230998205,
       );
-      const lastSegmentMidpoint = point<GlobalPoint>(
+      const lastSegmentMidpoint = pointFrom<GlobalPoint>(
         76.08587175006699,
         43.294165939653226,
       );
@@ -612,7 +615,7 @@ describe("Test Linear Elements", () => {
         // drag line from first segment midpoint
         drag(
           firstSegmentMidpoint,
-          point(
+          pointFrom(
             firstSegmentMidpoint[0] + delta,
             firstSegmentMidpoint[1] + delta,
           ),
@@ -622,7 +625,10 @@ describe("Test Linear Elements", () => {
         // drag line from last segment midpoint
         drag(
           lastSegmentMidpoint,
-          point(lastSegmentMidpoint[0] + delta, lastSegmentMidpoint[1] + delta),
+          pointFrom(
+            lastSegmentMidpoint[0] + delta,
+            lastSegmentMidpoint[1] + delta,
+          ),
         );
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `16`,
@@ -669,10 +675,10 @@ describe("Test Linear Elements", () => {
           h.state,
         );
 
-        const hitCoords = point<GlobalPoint>(points[0][0], points[0][1]);
+        const hitCoords = pointFrom<GlobalPoint>(points[0][0], points[0][1]);
 
         // Drag from first point
-        drag(hitCoords, point(hitCoords[0] - delta, hitCoords[1] - delta));
+        drag(hitCoords, pointFrom(hitCoords[0] - delta, hitCoords[1] - delta));
 
         const newPoints = LinearElementEditor.getPointsGlobalCoordinates(
           line,
@@ -717,10 +723,10 @@ describe("Test Linear Elements", () => {
           h.state,
         );
 
-        const hitCoords = point<GlobalPoint>(points[0][0], points[0][1]);
+        const hitCoords = pointFrom<GlobalPoint>(points[0][0], points[0][1]);
 
         // Drag from first point
-        drag(hitCoords, point(hitCoords[0] + delta, hitCoords[1] + delta));
+        drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
           `12`,
@@ -751,7 +757,10 @@ describe("Test Linear Elements", () => {
 
         drag(
           lastSegmentMidpoint,
-          point(lastSegmentMidpoint[0] + delta, lastSegmentMidpoint[1] + delta),
+          pointFrom(
+            lastSegmentMidpoint[0] + delta,
+            lastSegmentMidpoint[1] + delta,
+          ),
         );
         expect(line.points.length).toEqual(4);
 
@@ -811,8 +820,8 @@ describe("Test Linear Elements", () => {
       API.setSelectedElements([line]);
       enterLineEditingMode(line, true);
       drag(
-        point(line.points[0][0] + line.x, line.points[0][1] + line.y),
-        point(
+        pointFrom(line.points[0][0] + line.x, line.points[0][1] + line.y),
+        pointFrom(
           dragEndPositionOffset[0] + line.x,
           dragEndPositionOffset[1] + line.y,
         ),
@@ -927,14 +936,14 @@ describe("Test Linear Elements", () => {
         // This is the expected midpoint for line with round edge
         // hence hardcoding it so if later some bug is introduced
         // this will fail and we can fix it
-        const firstSegmentMidpoint = point<GlobalPoint>(
+        const firstSegmentMidpoint = pointFrom<GlobalPoint>(
           55.9697848965255,
           47.442326230998205,
         );
         // drag line from first segment midpoint
         drag(
           firstSegmentMidpoint,
-          point(
+          pointFrom(
             firstSegmentMidpoint[0] + delta,
             firstSegmentMidpoint[1] + delta,
           ),
@@ -1151,7 +1160,7 @@ describe("Test Linear Elements", () => {
       );
 
       // Drag from last point
-      drag(points[1], point(points[1][0] + 300, points[1][1]));
+      drag(points[1], pointFrom(points[1][0] + 300, points[1][1]));
 
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
@@ -1350,11 +1359,11 @@ describe("Test Linear Elements", () => {
           [
             {
               index: 0,
-              point: point(line.points[0][0] + 10, line.points[0][1] + 10),
+              point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),
             },
             {
               index: line.points.length - 1,
-              point: point(
+              point: pointFrom(
                 line.points[line.points.length - 1][0] - 10,
                 line.points[line.points.length - 1][1] - 10,
               ),

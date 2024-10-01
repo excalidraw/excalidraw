@@ -4,7 +4,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import { point, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
 
 interface PositionProps {
   property: "x" | "y";
@@ -33,8 +33,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     origElement.y + origElement.height / 2,
   ];
   const [topLeftX, topLeftY] = pointRotateRads(
-    point(origElement.x, origElement.y),
-    point(cx, cy),
+    pointFrom(origElement.x, origElement.y),
+    pointFrom(cx, cy),
     origElement.angle,
   );
 
@@ -93,8 +93,8 @@ const Position = ({
   appState,
 }: PositionProps) => {
   const [topLeftX, topLeftY] = pointRotateRads(
-    point(element.x, element.y),
-    point(element.x + element.width / 2, element.y + element.height / 2),
+    pointFrom(element.x, element.y),
+    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     element.angle,
   );
   const value =
