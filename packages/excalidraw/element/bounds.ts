@@ -34,6 +34,9 @@ import {
   ellipse,
   arc,
   radians,
+  cartesian2Polar,
+  normalizeRadians,
+  radiansToDegrees,
 } from "../../math";
 import type { Mutable } from "../utility-types";
 import { getCurvePathOps } from "../../utils/geometry/shape";
@@ -694,17 +697,18 @@ export const createDiamondSide = (
 export const createDiamondArc = (
   start: GlobalPoint,
   end: GlobalPoint,
+  c: GlobalPoint,
   r: number,
 ) => {
-  const c = pointFrom<GlobalPoint>(
-    (start[0] + end[0]) / 2,
-    (start[1] + end[1]) / 2,
+  const [, startAngle] = cartesian2Polar(
+    pointFrom(start[0] - c[0], start[1] - c[1]),
   );
+  const [, endAngle] = cartesian2Polar(pointFrom(end[0] - c[0], end[1] - c[1]));
 
   return arc(
     c,
     r,
-    radians(Math.asin((start[1] - c[1]) / r)),
-    radians(Math.asin((end[1] - c[1]) / r)),
+    normalizeRadians(startAngle), // normalizeRadians(radians(startAngle - Math.PI / 2)),
+    normalizeRadians(endAngle), // normalizeRadians(radians(endAngle - Math.PI / 2)),
   );
 };

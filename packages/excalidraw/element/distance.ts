@@ -172,10 +172,30 @@ export const distanceToDiamondElement = (
 
   const arcs = element.roundness
     ? [
-        createDiamondArc(topLeft[0], topRight[0], verticalRadius), // TOP
-        createDiamondArc(topRight[1], bottomRight[1], horizontalRadius), // RIGHT
-        createDiamondArc(bottomRight[0], bottomLeft[0], verticalRadius), // BOTTOM
-        createDiamondArc(bottomLeft[1], topLeft[1], horizontalRadius), // LEFT
+        createDiamondArc(
+          topLeft[0],
+          topRight[0],
+          pointFrom(top[0], top[1] + verticalRadius),
+          verticalRadius,
+        ), // TOP
+        createDiamondArc(
+          topRight[1],
+          bottomRight[1],
+          pointFrom(right[0] - horizontalRadius, right[1]),
+          horizontalRadius,
+        ), // RIGHT
+        createDiamondArc(
+          bottomRight[0],
+          bottomLeft[0],
+          pointFrom(bottom[0], bottom[1] - verticalRadius),
+          verticalRadius,
+        ), // BOTTOM
+        createDiamondArc(
+          bottomLeft[1],
+          topLeft[1],
+          pointFrom(right[0] + horizontalRadius, right[1]),
+          horizontalRadius,
+        ), // LEFT
       ]
     : [];
 

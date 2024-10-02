@@ -22,11 +22,7 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import {
-  getBoundTextShape,
-  getCornerRadius,
-  getDiamondPoints,
-} from "../shapes";
+import { getBoundTextShape, getCornerRadius } from "../shapes";
 import type { Arc, GlobalPoint, Polygon } from "../../math";
 import {
   pathIsALoop,
@@ -43,6 +39,7 @@ import {
   pointDistanceSq,
   ellipse,
   ellipseLineIntersectionPoints,
+  pointsEqual,
 } from "../../math";
 import { LINE_CONFIRM_THRESHOLD } from "../constants";
 
@@ -152,7 +149,7 @@ export const intersectElementWithLine = (
   element: ExcalidrawElement,
   a: GlobalPoint,
   b: GlobalPoint,
-  offset: number,
+  offset: number = 0,
 ): GlobalPoint[] => {
   switch (element.type) {
     case "rectangle":
@@ -172,7 +169,7 @@ export const intersectElementWithLine = (
   }
 };
 
-export const intersectRectanguloidWithLine = (
+const intersectRectanguloidWithLine = (
   element: ExcalidrawRectanguloidElement,
   a: GlobalPoint,
   b: GlobalPoint,
@@ -234,8 +231,8 @@ export const intersectRectanguloidWithLine = (
           arc<GlobalPoint>(
             pointFrom(r[0][0] + roundness, r[0][1] + roundness),
             roundness,
-            radians(Math.PI),
             radians((3 / 4) * Math.PI),
+            radians(0),
           ),
           arc<GlobalPoint>(
             pointFrom(r[1][0] - roundness, r[0][1] + roundness),
@@ -261,8 +258,13 @@ export const intersectRectanguloidWithLine = (
           .map((j) => pointRotateRads(j, center, element.angle))
       : [];
 
-  return [...sideIntersections, ...cornerIntersections].sort(
-    (g, h) => pointDistanceSq(g!, b) - pointDistanceSq(h!, b),
+  return (
+    [...sideIntersections, ...cornerIntersections]
+      // Remove duplicates
+      .filter(
+        (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
+      )
+      .sort((g, h) => pointDistanceSq(g!, b) - pointDistanceSq(h!, b))
   );
 };
 
@@ -273,31 +275,39 @@ export const intersectRectanguloidWithLine = (
  * @param b
  * @returns
  */
-export const intersectDiamondWithLine = (
+const intersectDiamondWithLine = (
   element: ExcalidrawDiamondElement,
   a: GlobalPoint,
   b: GlobalPoint,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-    getDiamondPoints(element, offset);
-  const center = pointFrom<GlobalPoint>(
-    (topX + bottomX) / 2,
-    (topY + bottomY) / 2,
+  const top = pointFrom<GlobalPoint>(element.x + element.width / 2, element.y);
+  const right = pointFrom<GlobalPoint>(
+    element.x + element.width,
+    element.y + element.height / 2,
   );
-  const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-  const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
+  const bottom = pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height,
+  );
+  const left = pointFrom<GlobalPoint>(
+    element.x,
+    element.y + element.height / 2,
+  );
+  const center = pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
+  const verticalRadius = getCornerRadius(Math.abs(top[0] - left[0]), element);
+  const horizontalRadius = getCornerRadius(
+    Math.abs(right[1] - top[1]),
+    element,
+  );
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
   const rotatedA = pointRotateRads(a, center, radians(-element.angle));
   const rotatedB = pointRotateRads(b, center, radians(-element.angle));
-  const [top, right, bottom, left]: GlobalPoint[] = [
-    pointFrom(element.x + topX, element.y + topY),
-    pointFrom(element.x + rightX, element.y + rightY),
-    pointFrom(element.x + bottomX, element.y + bottomY),
-    pointFrom(element.x + leftX, element.y + leftY),
-  ];
 
   const topRight = createDiamondSide(
     segment<GlobalPoint>(top, right),
@@ -322,10 +332,42 @@ export const intersectDiamondWithLine = (
 
   const arcs: Arc<GlobalPoint>[] = element.roundness
     ? [
-        createDiamondArc(topLeft[0], topRight[0], verticalRadius), // TOP
-        createDiamondArc(topRight[1], bottomRight[1], horizontalRadius), // RIGHT
-        createDiamondArc(bottomRight[0], bottomLeft[0], verticalRadius), // BOTTOM
-        createDiamondArc(bottomLeft[1], topLeft[1], horizontalRadius), // LEFT
+        createDiamondArc(
+          topLeft[0],
+          topRight[0],
+          pointFrom(
+            top[0],
+            top[1] + Math.sqrt(2 * Math.pow(verticalRadius, 2)),
+          ),
+          verticalRadius,
+        ), // TOP
+        createDiamondArc(
+          topRight[1],
+          bottomRight[1],
+          pointFrom(
+            right[0] - Math.sqrt(2 * Math.pow(horizontalRadius, 2)),
+            right[1],
+          ),
+          horizontalRadius,
+        ), // RIGHT
+        createDiamondArc(
+          bottomRight[0],
+          bottomLeft[0],
+          pointFrom(
+            bottom[0],
+            bottom[1] - Math.sqrt(2 * Math.pow(verticalRadius, 2)),
+          ),
+          verticalRadius,
+        ), // BOTTOM
+        createDiamondArc(
+          bottomLeft[1],
+          topLeft[1],
+          pointFrom(
+            left[0] + Math.sqrt(2 * Math.pow(horizontalRadius, 2)),
+            left[1],
+          ),
+          horizontalRadius,
+        ), // LEFT
       ]
     : [];
 
@@ -342,8 +384,13 @@ export const intersectDiamondWithLine = (
     // Rotate back intersection points
     .map((p) => pointRotateRads(p, center, element.angle));
 
-  return [...sides, ...corners].sort(
-    (g, h) => pointDistanceSq(g!, b) - pointDistanceSq(h!, b),
+  return (
+    [...sides, ...corners]
+      // Remove duplicates
+      .filter(
+        (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
+      )
+      .sort((g, h) => pointDistanceSq(g!, b) - pointDistanceSq(h!, b))
   );
 };
 
@@ -354,7 +401,7 @@ export const intersectDiamondWithLine = (
  * @param b
  * @returns
  */
-export const intersectEllipseWithLine = (
+const intersectEllipseWithLine = (
   element: ExcalidrawEllipseElement,
   a: GlobalPoint,
   b: GlobalPoint,

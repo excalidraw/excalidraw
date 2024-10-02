@@ -60,7 +60,8 @@ export const normalizeRadians = (angle: Radians): Radians => {
 export const cartesian2Polar = <P extends GenericPoint>([
   x,
   y,
-]: P): PolarCoords => polar(Math.hypot(x, y), radians(Math.atan2(y, x)));
+]: P): PolarCoords =>
+  polar(Math.hypot(x, y), normalizeRadians(radians(Math.atan2(y, x))));
 
 /**
  * Convert an angle in degrees into randians
