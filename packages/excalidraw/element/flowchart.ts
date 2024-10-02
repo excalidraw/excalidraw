@@ -191,11 +191,39 @@ export const getPredecessors = (
   return getNodeRelatives("predecessors", node, elementsMap, direction);
 };
 
+function getIndividualYOffset(nodes: ExcalidrawElement[]): number[] {
+  const offsets = [];
+
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const nodeA = nodes[i];
+    const nodeB = nodes[i + 1];
+
+    const offset = nodeB.y - (nodeA.y + nodeA.height);
+    offsets.push(offset);
+  }
+
+  return offsets;
+}
+function getIndividualXOffset(nodes: ExcalidrawElement[]): number[] {
+  const offsets = [];
+
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const nodeA = nodes[i];
+    const nodeB = nodes[i + 1];
+
+    const offset = nodeB.y - (nodeA.y + nodeA.height);
+    offsets.push(offset);
+  }
+
+  return offsets;
+}
+
 const getOffsets = (
   element: ExcalidrawFlowchartNodeElement,
   linkedNodes: ExcalidrawElement[],
   direction: LinkDirection,
 ) => {
+  console.log("code0")
   if (direction === "up" || direction === "down") {
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     // check vertical space
@@ -215,6 +243,7 @@ const getOffsets = (
       };
     }
   } else if (direction === "right" || direction === "left") {
+    console.log("code1")
     const minY = element.y;
     const maxY = element.y + element.height;
 
@@ -231,7 +260,7 @@ const getOffsets = (
       };
     }
   }
-
+  console.log("code2")
   const { minX, maxX } = getMinMaxX(linkedNodes);
   if (direction === "up" || direction === "down") {
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
@@ -256,8 +285,11 @@ const getOffsets = (
       y,
     };
   }
-
+  console.log("code3")
   const { minY, maxY } = getMinMaxY(linkedNodes);
+  const offsets = getIndividualYOffset(linkedNodes);
+  const absoluteOffsets = offsets.map((offset) => Math.abs(offset));
+  const minAbsoluteOffset = Math.min(...absoluteOffsets, 0); // it's because the nodes can be offseted away from each outher with a large number which we dont want
 
   const x =
     (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
@@ -267,9 +299,9 @@ const getOffsets = (
     linkedNodes.length === 0
       ? 0
       : (linkedNodes.length + 1) % 2 === 0
-      ? Math.abs(maxY - minY) / 2 + element.height
-      : (Math.abs(maxY - minY) / 2 + element.height) * -1;
-
+      ? Math.abs(maxY - minY) / 2 + element.height + minAbsoluteOffset
+      : (Math.abs(maxY - minY) / 2 + element.height + minAbsoluteOffset) * -1;
+    
   if (direction === "left") {
     return {
       x: x * -1,
@@ -287,54 +319,53 @@ const getOffsets = (
 //   linkedNodes: ExcalidrawElement[],
 //   direction: LinkDirection,
 // ) => {
-//   const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
+//   if (direction === "up" || direction === "down") {
+//     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+//     // check vertical space
+//     const minX = element.x;
+//     const maxX = element.x + element.width;
 
-//   if (direction === "right" || direction === "left") {
+//     // vertical space is available
+//     if (
+//       linkedNodes.every(
+//         (linkedNode) =>
+//           linkedNode.x + linkedNode.width < minX || linkedNode.x > maxX,
+//       )
+//     ) {
+//       return {
+//         x: 0,
+//         y: _VERTICAL_OFFSET * (direction === "up" ? -1 : 1),
+//       };
+//     }
+//   } else if (direction === "right" || direction === "left") {
 //     const minY = element.y;
 //     const maxY = element.y + element.height;
 
-//     // Check for vertical overlap with any linked nodes
 //     if (
 //       linkedNodes.every(
 //         (linkedNode) =>
 //           linkedNode.y + linkedNode.height < minY || linkedNode.y > maxY,
 //       )
 //     ) {
-//       // If no vertical overlap, place node as usual
 //       return {
 //         x:
 //           (HORIZONTAL_OFFSET + element.width) * (direction === "left" ? -1 : 1),
 //         y: 0,
 //       };
-//     } else {
-//       // If there is vertical overlap, adjust the y-position
-//       // Find the closest node above or below and place the new node with enough space
-//       let maxLinkedY = Math.max(
-//         ...linkedNodes.map((node) => node.y + node.height),
-//       );
-//       let minLinkedY = Math.min(...linkedNodes.map((node) => node.y));
-
-//       // Choose whether to place the node above or below the closest linked node
-//       const newY = maxLinkedY + VERTICAL_OFFSET;
-
-//       return {
-//         x:
-//           (HORIZONTAL_OFFSET + element.width) * (direction === "left" ? -1 : 1),
-//         y: newY,
-//       };
 //     }
 //   }
 
-// Handle vertical placement (same as before)
+//   const { minX, maxX } = getMinMaxX(linkedNodes);
 //   if (direction === "up" || direction === "down") {
 //     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
 //     const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
+
 //     const x =
 //       linkedNodes.length === 0
 //         ? 0
 //         : (linkedNodes.length + 1) % 2 === 0
-//         ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
-//         : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+//         ? Math.abs(maxX - minX) / 2 + element.width
+//         : (Math.abs(maxX - minX) / 2 + element.width) * -1;
 
 //     if (direction === "up") {
 //       return {
@@ -348,6 +379,30 @@ const getOffsets = (
 //       y,
 //     };
 //   }
+
+//   const { minY, maxY } = getMinMaxY(linkedNodes);
+
+//   const x =
+//     (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
+//     element.width;
+
+//   const y =
+//     linkedNodes.length === 0
+//       ? 0
+//       : (linkedNodes.length + 1) % 2 === 0
+//       ? Math.abs(maxY - minY) / 2 + element.height
+//       : (Math.abs(maxY - minY) / 2 + element.height) * -1;
+
+//   if (direction === "left") {
+//     return {
+//       x: x * -1,
+//       y,
+//     };
+//   }
+//   return {
+//     x,
+//     y,
+//   };
 // };
 
 const addNewNode = (
