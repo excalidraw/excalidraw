@@ -57,6 +57,34 @@ const alignTextElements = (
   };
 };
 
+const isSelected = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  app: AppClassProperties,
+  alignment: TextAlign,
+): boolean => {
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const selectedTextAlign = getFormValue(
+    elements,
+    appState,
+    (element) => {
+      if (isTextElement(element)) {
+        return element.textAlign;
+      }
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+      if (boundTextElement) {
+        return boundTextElement.textAlign;
+      }
+      return null;
+    },
+    (element) =>
+      isTextElement(element) ||
+      getBoundTextElement(element, elementsMap) !== null,
+    (hasSelection) => (hasSelection ? null : appState.currentItemTextAlign),
+  );
+  return selectedTextAlign === alignment;
+};
+
 export const actionChangeTextAlignLeft = register({
   name: "changeTextAlignLeft",
   label: t("labels.alignTextLeft"),
@@ -66,36 +94,19 @@ export const actionChangeTextAlignLeft = register({
   perform: (elements, appState, _, app) =>
     alignTextElements(elements, appState, app, "left"),
   PanelComponent: ({ elements, appState, updateData, app }) => {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
-    const selectedTextAlign = getFormValue(
-      elements,
-      appState,
-      (element) => {
-        if (isTextElement(element)) {
-          return element.textAlign;
-        }
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          return boundTextElement.textAlign;
-        }
-        return null;
-      },
-      (element) =>
-        isTextElement(element) ||
-        getBoundTextElement(element, elementsMap) !== null,
-      (hasSelection) => (hasSelection ? null : appState.currentItemTextAlign),
-    );
     return (
       <label
         key={t("labels.left")}
-        className={clsx({ active: selectedTextAlign === "left" })}
+        className={clsx({
+          active: isSelected(elements, appState, app, "left"),
+        })}
         title={t("labels.left")}
       >
         <input
           type="radio"
           name="text-align"
           onChange={() => updateData("left")}
-          checked={selectedTextAlign === "left"}
+          checked={isSelected(elements, appState, app, "left")}
           data-testid="align-left"
         />
         {TextAlignLeftIcon}
@@ -113,36 +124,19 @@ export const actionChangeTextAlignRight = register({
   perform: (elements, appState, _, app) =>
     alignTextElements(elements, appState, app, "right"),
   PanelComponent: ({ elements, appState, updateData, app }) => {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
-    const selectedTextAlign = getFormValue(
-      elements,
-      appState,
-      (element) => {
-        if (isTextElement(element)) {
-          return element.textAlign;
-        }
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          return boundTextElement.textAlign;
-        }
-        return null;
-      },
-      (element) =>
-        isTextElement(element) ||
-        getBoundTextElement(element, elementsMap) !== null,
-      (hasSelection) => (hasSelection ? null : appState.currentItemTextAlign),
-    );
     return (
       <label
         key={t("labels.right")}
-        className={clsx({ active: selectedTextAlign === "right" })}
+        className={clsx({
+          active: isSelected(elements, appState, app, "right"),
+        })}
         title={t("labels.right")}
       >
         <input
           type="radio"
           name="text-align"
           onChange={() => updateData("right")}
-          checked={selectedTextAlign === "right"}
+          checked={isSelected(elements, appState, app, "right")}
           data-testid="align-right"
         />
         {TextAlignRightIcon}
@@ -160,36 +154,19 @@ export const actionChangeTextAlignCenter = register({
   perform: (elements, appState, _, app) =>
     alignTextElements(elements, appState, app, "center"),
   PanelComponent: ({ elements, appState, updateData, app }) => {
-    const elementsMap = app.scene.getNonDeletedElementsMap();
-    const selectedTextAlign = getFormValue(
-      elements,
-      appState,
-      (element) => {
-        if (isTextElement(element)) {
-          return element.textAlign;
-        }
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement) {
-          return boundTextElement.textAlign;
-        }
-        return null;
-      },
-      (element) =>
-        isTextElement(element) ||
-        getBoundTextElement(element, elementsMap) !== null,
-      (hasSelection) => (hasSelection ? null : appState.currentItemTextAlign),
-    );
     return (
       <label
         key={t("labels.center")}
-        className={clsx({ active: selectedTextAlign === "center" })}
+        className={clsx({
+          active: isSelected(elements, appState, app, "center"),
+        })}
         title={t("labels.center")}
       >
         <input
           type="radio"
           name="text-align"
           onChange={() => updateData("center")}
-          checked={selectedTextAlign === "center"}
+          checked={isSelected(elements, appState, app, "center")}
           data-testid="align-horizontal-center"
         />
         {TextAlignCenterIcon}

@@ -16,7 +16,6 @@ export {
   actionChangeOpacity,
   actionChangeFontSize,
   actionChangeFontFamily,
-  actionChangeTextAlign,
   actionChangeVerticalAlign,
 } from "./actionProperties";
 
