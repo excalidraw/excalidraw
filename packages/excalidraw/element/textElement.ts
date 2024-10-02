@@ -30,7 +30,7 @@ import {
 } from "./containerCache";
 import type { ExtractSetType } from "../utility-types";
 import type { GlobalPoint } from "../../math";
-import { point } from "../../math";
+import { pointFrom } from "../../math";
 
 export const normalizeText = (text: string) => {
   return (
@@ -678,7 +678,7 @@ export const getContainerCenter = (
   elementsMap: ElementsMap,
 ): GlobalPoint => {
   if (!isArrowElement(container)) {
-    return point(
+    return pointFrom(
       container.x + container.width / 2,
       container.y + container.height / 2,
     );
@@ -694,7 +694,7 @@ export const getContainerCenter = (
       container.points[index],
       elementsMap,
     );
-    return point(midPoint[0], midPoint[1]);
+    return pointFrom(midPoint[0], midPoint[1]);
   }
   const index = container.points.length / 2 - 1;
   let midSegmentMidpoint = LinearElementEditor.getEditorMidPoints(
@@ -711,7 +711,7 @@ export const getContainerCenter = (
       elementsMap,
     );
   }
-  return point(midSegmentMidpoint[0], midSegmentMidpoint[1]);
+  return pointFrom(midSegmentMidpoint[0], midSegmentMidpoint[1]);
 };
 
 export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {

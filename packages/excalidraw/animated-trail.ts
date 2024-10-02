@@ -5,7 +5,7 @@ import type { AppState } from "./types";
 import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
 import type App from "./components/App";
 import { SVG_NS } from "./constants";
-import { point } from "../math";
+import { pointFrom } from "../math";
 
 export interface Trail {
   start(container: SVGSVGElement): void;
@@ -136,7 +136,7 @@ export class AnimatedTrail implements Trail {
   private drawTrail(trail: LaserPointer, state: AppState): string {
     const stroke = trail
       .getStrokeOutline(trail.options.size / state.zoom.value)
-      .map((p) => sceneCoordsToViewportCoords(point(p[0], p[1]), state));
+      .map((p) => sceneCoordsToViewportCoords(pointFrom(p[0], p[1]), state));
 
     return getSvgPathFromStroke(stroke, true);
   }

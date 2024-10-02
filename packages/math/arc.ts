@@ -5,7 +5,7 @@ import {
   ellipseLineIntersectionPoints,
   ellipseSegmentInterceptPoints,
 } from "./ellipse";
-import { point, pointDistance } from "./point";
+import { pointFrom, pointDistance } from "./point";
 import type { GenericPoint, Segment, Radians, Arc, Line } from "./types";
 import { PRECISION } from "./utils";
 
@@ -37,7 +37,7 @@ export function arcIncludesPoint<P extends GenericPoint>(
   p: P,
 ): boolean {
   const [radius, angle] = cartesian2Polar(
-    point(p[0] - center[0], p[1] - center[1]),
+    pointFrom(p[0] - center[0], p[1] - center[1]),
   );
 
   return startAngle < endAngle
@@ -69,14 +69,14 @@ export function arcDistanceFromPoint<Point extends GenericPoint>(
   return Math.min(
     pointDistance(
       p,
-      point(
+      pointFrom(
         a.center[0] + a.radius + Math.cos(a.startAngle),
         a.center[1] + a.radius + Math.sin(a.startAngle),
       ),
     ),
     pointDistance(
       p,
-      point(
+      pointFrom(
         a.center[0] + a.radius + Math.cos(a.endAngle),
         a.center[1] + a.radius + Math.sin(a.endAngle),
       ),
@@ -97,7 +97,7 @@ export function arcSegmentInterceptPoints<Point extends GenericPoint>(
     s,
   ).filter((candidate) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(
-      point(candidate[0] - a.center[0], candidate[1] - a.center[1]),
+      pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
 
     return a.startAngle < a.endAngle
@@ -125,7 +125,7 @@ export function arcLineInterceptPoints<Point extends GenericPoint>(
     l,
   ).filter((candidate) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(
-      point(candidate[0] - a.center[0], candidate[1] - a.center[1]),
+      pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
 
     return a.startAngle < a.endAngle

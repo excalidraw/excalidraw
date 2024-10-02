@@ -5,7 +5,7 @@ import { getElementAbsoluteCoords } from ".";
 import { useExcalidrawAppState } from "../components/App";
 
 import "./ElementCanvasButtons.scss";
-import { point } from "../../math";
+import { pointFrom } from "../../math";
 
 const CONTAINER_PADDING = 5;
 
@@ -16,7 +16,7 @@ const getContainerCoords = (
 ) => {
   const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
   const [viewportX, viewportY] = sceneCoordsToViewportCoords(
-    point(x1 + element.width, y1),
+    pointFrom(x1 + element.width, y1),
     appState,
   );
   const x = viewportX - appState.offsetLeft + 10;

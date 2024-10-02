@@ -1,5 +1,5 @@
 import { ellipseLineIntersectionPoints } from "./ellipse";
-import { point, pointCenter, pointRotateRads } from "./point";
+import { pointFrom, pointCenter, pointRotateRads } from "./point";
 import { segmentIncludesPoint } from "./segment";
 import type { GenericPoint, Line, Radians, Segment } from "./types";
 
@@ -73,7 +73,7 @@ export function lineLineIntersectionPoint<Point extends GenericPoint>(
   const xnum = a * (x3 - x4) - (x1 - x2) * c;
   const ynum = a * (y3 - y4) - (y1 - y2) * c;
 
-  return point<Point>(xnum / den, ynum / den);
+  return pointFrom<Point>(xnum / den, ynum / den);
 }
 
 /**

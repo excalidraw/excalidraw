@@ -11,16 +11,16 @@ import {
   tupleToCoors,
   viewportCoordsToSceneCoords,
 } from "../utils";
-import { point, type GlobalPoint } from "../../math";
+import { pointFrom, type GlobalPoint } from "../../math";
 
 const isOutsideViewPort = (appState: AppState, cords: Array<number>) => {
   const [x1, y1, x2, y2] = cords;
   const [viewportX1, viewportY1] = sceneCoordsToViewportCoords(
-    point(x1, y1),
+    pointFrom(x1, y1),
     appState,
   );
   const [viewportX2, viewportY2] = sceneCoordsToViewportCoords(
-    point(x2, y2),
+    pointFrom(x2, y2),
     appState,
   );
   return (
@@ -77,7 +77,7 @@ export const calculateScrollCenter = (
       elements,
       tupleToCoors(
         viewportCoordsToSceneCoords(
-          point(appState.scrollX, appState.scrollY),
+          pointFrom(appState.scrollX, appState.scrollY),
           appState,
         ),
       ),
@@ -88,7 +88,7 @@ export const calculateScrollCenter = (
   const centerY = (y1 + y2) / 2;
 
   return centerScrollOn({
-    scenePoint: point(centerX, centerY),
+    scenePoint: pointFrom(centerX, centerY),
     viewportDimensions: { width: appState.width, height: appState.height },
     zoom: appState.zoom,
   });

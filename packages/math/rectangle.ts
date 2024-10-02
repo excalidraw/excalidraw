@@ -1,5 +1,5 @@
 import { invariant } from "../excalidraw/utils";
-import { point } from "./point";
+import { pointFrom } from "./point";
 import { segment, segmentDistanceToPoint } from "./segment";
 import type { GenericPoint, Rectangle } from "./types";
 
@@ -32,10 +32,10 @@ export function rectangleDistanceFromPoint<Point extends GenericPoint>(
   p: Point,
 ): number {
   const sides = [
-    segment(point(r[0][0], r[0][1]), point(r[1][0], r[0][1])),
-    segment(point(r[1][0], r[0][1]), point(r[1][0], r[1][1])),
-    segment(point(r[1][0], r[1][1]), point(r[0][0], r[1][1])),
-    segment(point(r[0][0], r[1][1]), point(r[0][0], r[0][1])),
+    segment(pointFrom(r[0][0], r[0][1]), pointFrom(r[1][0], r[0][1])),
+    segment(pointFrom(r[1][0], r[0][1]), pointFrom(r[1][0], r[1][1])),
+    segment(pointFrom(r[1][0], r[1][1]), pointFrom(r[0][0], r[1][1])),
+    segment(pointFrom(r[0][0], r[1][1]), pointFrom(r[0][0], r[0][1])),
   ];
 
   return Math.min(...sides.map((side) => segmentDistanceToPoint(p, side)));

@@ -4,7 +4,7 @@ import {
   arcDistanceFromPoint,
   ellipse,
   ellipseDistanceFromPoint,
-  point,
+  pointFrom,
   pointRotateRads,
   radians,
   rectangle,
@@ -53,14 +53,14 @@ export const distanceToRectangleElement = (
   p: GlobalPoint,
 ) => {
   const r = rectangle(
-    point(element.x, element.y),
-    point(element.x + element.width, element.y + element.height),
+    pointFrom(element.x, element.y),
+    pointFrom(element.x + element.width, element.y + element.height),
   );
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(
     p,
-    point(element.x + element.width / 2, element.y + element.height / 2),
+    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     radians(-element.angle),
   );
   const roundness = getCornerRadius(
@@ -69,45 +69,45 @@ export const distanceToRectangleElement = (
   );
   const sideDistances = [
     segment(
-      point(r[0][0] + roundness, r[0][1]),
-      point(r[1][0] - roundness, r[0][1]),
+      pointFrom(r[0][0] + roundness, r[0][1]),
+      pointFrom(r[1][0] - roundness, r[0][1]),
     ),
     segment(
-      point(r[1][0], r[0][1] + roundness),
-      point(r[1][0], r[1][1] - roundness),
+      pointFrom(r[1][0], r[0][1] + roundness),
+      pointFrom(r[1][0], r[1][1] - roundness),
     ),
     segment(
-      point(r[1][0] - roundness, r[1][1]),
-      point(r[0][0] + roundness, r[1][1]),
+      pointFrom(r[1][0] - roundness, r[1][1]),
+      pointFrom(r[0][0] + roundness, r[1][1]),
     ),
     segment(
-      point(r[0][0], r[1][1] - roundness),
-      point(r[0][0], r[0][1] + roundness),
+      pointFrom(r[0][0], r[1][1] - roundness),
+      pointFrom(r[0][0], r[0][1] + roundness),
     ),
   ].map((s) => segmentDistanceToPoint(rotatedPoint, s));
   const cornerDistances =
     roundness > 0
       ? [
           arc(
-            point(r[0][0] + roundness, r[0][1] + roundness),
+            pointFrom(r[0][0] + roundness, r[0][1] + roundness),
             roundness,
             radians(Math.PI),
             radians((3 / 4) * Math.PI),
           ),
           arc(
-            point(r[1][0] - roundness, r[0][1] + roundness),
+            pointFrom(r[1][0] - roundness, r[0][1] + roundness),
             roundness,
             radians((3 / 4) * Math.PI),
             radians(0),
           ),
           arc(
-            point(r[1][0] - roundness, r[1][1] - roundness),
+            pointFrom(r[1][0] - roundness, r[1][1] - roundness),
             roundness,
             radians(0),
             radians((1 / 2) * Math.PI),
           ),
           arc(
-            point(r[0][0] + roundness, r[1][1] - roundness),
+            pointFrom(r[0][0] + roundness, r[1][1] - roundness),
             roundness,
             radians((1 / 2) * Math.PI),
             radians(Math.PI),
@@ -132,7 +132,10 @@ export const distanceToDiamondElement = (
 ): number => {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
     getDiamondPoints(element);
-  const center = point<GlobalPoint>((topX + bottomX) / 2, (topY + bottomY) / 2);
+  const center = pointFrom<GlobalPoint>(
+    (topX + bottomX) / 2,
+    (topY + bottomY) / 2,
+  );
   const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
   const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
 
@@ -140,10 +143,10 @@ export const distanceToDiamondElement = (
   // points. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, radians(-element.angle));
   const [top, right, bottom, left]: GlobalPoint[] = [
-    point(element.x + topX, element.y + topY),
-    point(element.x + rightX, element.y + rightY),
-    point(element.x + bottomX, element.y + bottomY),
-    point(element.x + leftX, element.y + leftY),
+    pointFrom(element.x + topX, element.y + topY),
+    pointFrom(element.x + rightX, element.y + rightY),
+    pointFrom(element.x + bottomX, element.y + bottomY),
+    pointFrom(element.x + leftX, element.y + leftY),
   ];
 
   const topRight = createDiamondSide(
@@ -198,7 +201,7 @@ export const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
   p: GlobalPoint,
 ): number => {
-  const center = point(
+  const center = pointFrom(
     element.x + element.width / 2,
     element.y + element.height / 2,
   );

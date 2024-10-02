@@ -1,4 +1,9 @@
-import { point, pointDistance, pointFromVector, pointsEqual } from "./point";
+import {
+  pointFrom,
+  pointDistance,
+  pointFromVector,
+  pointsEqual,
+} from "./point";
 import type { Ellipse, GenericPoint, Line, Segment } from "./types";
 import { PRECISION } from "./utils";
 import {
@@ -119,7 +124,7 @@ export const ellipseDistanceFromPoint = <Point extends GenericPoint>(
     b * ty * Math.sign(translatedPoint[1]),
   ];
 
-  return pointDistance(pointFromVector(translatedPoint), point(minX, minY));
+  return pointDistance(pointFromVector(translatedPoint), pointFrom(minX, minY));
 };
 
 /**
@@ -151,7 +156,7 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
 
     if (0 <= t_a && t_a <= 1) {
       intersections.push(
-        point(
+        pointFrom(
           s[0][0] + (s[1][0] - s[0][0]) * t_a,
           s[0][1] + (s[1][1] - s[0][1]) * t_a,
         ),
@@ -160,7 +165,7 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
 
     if (0 <= t_b && t_b <= 1) {
       intersections.push(
-        point(
+        pointFrom(
           s[0][0] + (s[1][0] - s[0][0]) * t_b,
           s[0][1] + (s[1][1] - s[0][1]) * t_b,
         ),
@@ -170,7 +175,7 @@ export function ellipseSegmentInterceptPoints<Point extends GenericPoint>(
     const t = -b / a;
     if (0 <= t && t <= 1) {
       intersections.push(
-        point(
+        pointFrom(
           s[0][0] + (s[1][0] - s[0][0]) * t,
           s[0][1] + (s[1][1] - s[0][1]) * t,
         ),
@@ -204,8 +209,8 @@ export function ellipseLineIntersectionPoints<Point extends GenericPoint>(
   const t1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
   const t2 = (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
   const candidates = [
-    point<Point>(x1 + t1 * (x2 - x1) + cx, y1 + t1 * (y2 - y1) + cy),
-    point<Point>(x1 + t2 * (x2 - x1) + cx, y1 + t2 * (y2 - y1) + cy),
+    pointFrom<Point>(x1 + t1 * (x2 - x1) + cx, y1 + t1 * (y2 - y1) + cy),
+    pointFrom<Point>(x1 + t2 * (x2 - x1) + cx, y1 + t2 * (y2 - y1) + cy),
   ].filter((p) => !isNaN(p[0]) && !isNaN(p[1]));
 
   if (candidates.length === 2 && pointsEqual(candidates[0], candidates[1])) {

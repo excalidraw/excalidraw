@@ -5,7 +5,7 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import type { AppState, Offsets, Zoom } from "../types";
 import { getCommonBounds, getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
-import { point } from "../../math";
+import { pointFrom } from "../../math";
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
@@ -34,11 +34,11 @@ export const isElementInViewport = (
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    point(viewTransformations.offsetLeft, viewTransformations.offsetTop),
+    pointFrom(viewTransformations.offsetLeft, viewTransformations.offsetTop),
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    point(
+    pointFrom(
       viewTransformations.offsetLeft + width,
       viewTransformations.offsetTop + height,
     ),
@@ -69,14 +69,14 @@ export const isElementCompletelyInViewport = (
 ) => {
   const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
-    point(
+    pointFrom(
       viewTransformations.offsetLeft + (padding?.left || 0),
       viewTransformations.offsetTop + (padding?.top || 0),
     ),
     viewTransformations,
   );
   const bottomRightSceneCoords = viewportCoordsToSceneCoords(
-    point(
+    pointFrom(
       viewTransformations.offsetLeft + width - (padding?.right || 0),
       viewTransformations.offsetTop + height - (padding?.bottom || 0),
     ),

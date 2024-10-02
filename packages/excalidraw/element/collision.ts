@@ -227,7 +227,9 @@ export const intersectRectanguloidWithLine = (
       lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
     )
     .filter((x) => x != null)
-    .map((j) => pointRotateRads<GlobalPoint>(j, center, element.angle));
+    .map((j: GlobalPoint) =>
+      pointRotateRads<GlobalPoint>(j, center, element.angle),
+    );
   const cornerIntersections: GlobalPoint[] =
     roundness > 0
       ? [
@@ -335,7 +337,9 @@ export const intersectDiamondWithLine = (
     )
     .filter((x) => x != null)
     // Rotate back intersection points
-    .map((p) => pointRotateRads<GlobalPoint>(p, center, element.angle));
+    .map((p: GlobalPoint) =>
+      pointRotateRads<GlobalPoint>(p, center, element.angle),
+    );
   const corners = arcs
     .flatMap((x) => arcLineInterceptPoints(x, line(rotatedA, rotatedB)))
     .filter((x) => x != null)

@@ -1,5 +1,5 @@
 import type { GlobalPoint, ViewportPoint } from "../math";
-import { average, point } from "../math";
+import { average, pointFrom } from "../math";
 import { COLOR_PALETTE } from "./colors";
 import type { EVENT } from "./constants";
 import {
@@ -436,7 +436,7 @@ export const viewportCoordsToSceneCoords = (
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return point<GlobalPoint>(x, y);
+  return pointFrom<GlobalPoint>(x, y);
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -457,7 +457,7 @@ export const sceneCoordsToViewportCoords = (
 ): ViewportPoint => {
   const x = (sceneX + scrollX) * zoom.value + offsetLeft;
   const y = (sceneY + scrollY) * zoom.value + offsetTop;
-  return point(x, y);
+  return pointFrom(x, y);
 };
 
 export const getGlobalCSSVariable = (name: string) =>
