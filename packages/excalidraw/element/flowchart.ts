@@ -418,9 +418,9 @@ const createBindingArrow = (
     y: startY,
     startArrowhead: null,
     endArrowhead: appState.currentItemEndArrowhead,
-    strokeColor: appState.currentItemStrokeColor,
-    strokeStyle: appState.currentItemStrokeStyle,
-    strokeWidth: appState.currentItemStrokeWidth,
+    strokeColor: startBindingElement.strokeColor,
+    strokeStyle: startBindingElement.strokeStyle,
+    strokeWidth: startBindingElement.strokeWidth,
     points: [pointFrom(0, 0), pointFrom(endX, endY)],
     elbowed: true,
   });
