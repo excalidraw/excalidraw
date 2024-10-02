@@ -130,41 +130,57 @@ const getSuccessors = (
   return getNodeRelatives("successors", node, elementsMap, direction);
 };
 
-function getIndividualYOffset(nodes: ExcalidrawElement[]): number[] {
-  const offsets = [];
-
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const nodeA = nodes[i];
-    const nodeB = nodes[i + 1];
-
-    // Calculate the vertical offset between nodeA and nodeB
-    const offset = nodeB.y - (nodeA.y + nodeA.height);
-    offsets.push(offset);
-  }
-  return offsets; // Returns an array of individual y-offsets
-}
-
-function getMinMaxY(nodes: ExcalidrawElement[]): { minY: number; maxY: number } {
+function getMinMaxY(nodes: ExcalidrawElement[]): {
+  minY: number;
+  maxY: number;
+} {
   if (nodes.length === 0) {
-    return { minY: 0, maxY: 0 }; // Return 0 if there are no nodes
+    return { minY: 0, maxY: 0 };
   }
 
-  let minY = Infinity; // Start with Infinity to find the minimum
-  let maxY = -Infinity; // Start with -Infinity to find the maximum
+  let minY = Infinity;
+  let maxY = -Infinity;
 
   for (const node of nodes) {
-    // Update the minY if the current node's top position is lower
     if (node.y < minY) {
-      minY = node.y; // Update minY to the top of the current node
+      minY = node.y;
     }
-    // Update the maxY if the current node's bottom position is higher
-    const bottomY = node.y + node.height; // Calculate the bottom position of the node
+
+    const bottomY = node.y + node.height;
     if (bottomY > maxY) {
-      maxY = bottomY; // Update maxY to the bottom of the current node
+      maxY = bottomY;
     }
   }
 
-  return { minY, maxY }; // Return the min and max y values
+  return { minY, maxY };
+}
+
+function getMinMaxX(nodes: ExcalidrawElement[]): {
+  minX: number;
+  maxX: number;
+} {
+  if (nodes.length === 0) {
+    return { minX: 0, maxX: 0 };
+  }
+
+  let minX = Infinity;
+  let maxX = -Infinity;
+
+  for (const node of nodes) {
+    // Update minX if the current node's left position is smaller
+    if (node.x < minX) {
+      minX = node.x;
+    }
+
+    // Calculate the right edge of the current node
+    const rightX = node.x + node.width;
+    // Update maxX if the right edge is larger than current maxX
+    if (rightX > maxX) {
+      maxX = rightX;
+    }
+  }
+
+  return { minX, maxX };
 }
 
 export const getPredecessors = (
@@ -180,10 +196,6 @@ const getOffsets = (
   linkedNodes: ExcalidrawElement[],
   direction: LinkDirection,
 ) => {
-  const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
-
-  // check if vertical space or horizontal space is available first
-  console.log("code 1");
   if (direction === "up" || direction === "down") {
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     // check vertical space
@@ -219,16 +231,18 @@ const getOffsets = (
       };
     }
   }
-  console.log("code 2");
+
+  const { minX, maxX } = getMinMaxX(linkedNodes);
   if (direction === "up" || direction === "down") {
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
+
     const x =
       linkedNodes.length === 0
         ? 0
         : (linkedNodes.length + 1) % 2 === 0
-        ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
-        : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+        ? Math.abs(maxX - minX) / 2 + element.width
+        : (Math.abs(maxX - minX) / 2 + element.width) * -1;
 
     if (direction === "up") {
       return {
@@ -242,31 +256,20 @@ const getOffsets = (
       y,
     };
   }
-  console.log("code 3");
-  const offsets = getIndividualYOffset(linkedNodes);
-  const {minY,maxY}=getMinMaxY(linkedNodes);
-  // const boundes=getCommonBounds(linkedNodes)
-  const absoluteOffsets = offsets.map((offset) => Math.abs(offset));
-  const minAbsoluteOffset = Math.min(...absoluteOffsets, 0);
-  // const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
-  
-  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height + minAbsoluteOffset;
+
+  const { minY, maxY } = getMinMaxY(linkedNodes);
+
   const x =
     (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
     element.width;
-  // const y =
-  //   linkedNodes.length === 0
-  //     ? 0
-  //     : (linkedNodes.length + 1) % 2 === 0
-  //     ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
-  //     : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
+
   const y =
     linkedNodes.length === 0
       ? 0
       : (linkedNodes.length + 1) % 2 === 0
-      ? (Math.abs(maxY)+minAbsoluteOffset)
-      : (Math.abs(minY)+minAbsoluteOffset) * -1;
-      console.log({x,y})
+      ? Math.abs(maxY - minY) / 2 + element.height
+      : (Math.abs(maxY - minY) / 2 + element.height) * -1;
+
   if (direction === "left") {
     return {
       x: x * -1,
@@ -322,7 +325,7 @@ const getOffsets = (
 //     }
 //   }
 
-//   // Handle vertical placement (same as before)
+// Handle vertical placement (same as before)
 //   if (direction === "up" || direction === "down") {
 //     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
 //     const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
