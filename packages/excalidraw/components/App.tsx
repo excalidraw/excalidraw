@@ -1954,7 +1954,6 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         selectedElementIds: { [frameElement.id]: true },
       });
-
     } catch (error: any) {
       trackEvent("ai", "generate (failed)", "d2c");
       this.updateMagicGeneration({
