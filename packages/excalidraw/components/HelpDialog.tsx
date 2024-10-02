@@ -484,6 +484,18 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("labels.increaseFontSize")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Shift+>")]}
             />
+            <Shortcut
+              label={t("labels.alignTextLeft")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Alt+L")]}
+            />
+            <Shortcut
+              label={t("labels.alignTextCenter")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Alt+T")]}
+            />
+            <Shortcut
+              label={t("labels.alignTextRight")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+Alt+R")]}
+            />
           </ShortcutIsland>
         </Section>
       </Dialog>

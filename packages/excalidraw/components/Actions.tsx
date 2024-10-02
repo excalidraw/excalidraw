@@ -169,9 +169,10 @@ export const SelectedShapeActions = ({
         <>
           {renderAction("changeFontFamily")}
           {renderAction("changeFontSize")}
-          {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements, elementsMap)) &&
-            renderAction("changeTextAlign")}
+          {appState.activeTool.type === "text" ||
+          suppportsHorizontalAlign(targetElements, elementsMap) ? (
+            <TextAlignActions renderAction={renderAction} />
+          ) : null}
         </>
       )}
 
@@ -481,4 +482,19 @@ export const FinalizeAction = ({
   <div className={`finalize-button ${className}`}>
     {renderAction("finalize", { size: "small" })}
   </div>
+);
+
+const TextAlignActions = ({
+  renderAction,
+}: {
+  renderAction: ActionManager["renderAction"];
+}) => (
+  <fieldset>
+    <legend>{t("labels.textAlign")}</legend>
+    <div className="buttonList">
+      {renderAction("changeTextAlignLeft")}
+      {renderAction("changeTextAlignCenter")}
+      {renderAction("changeTextAlignRight")}
+    </div>
+  </fieldset>
 );
