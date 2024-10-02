@@ -2980,7 +2980,7 @@ class App extends React.Component<AppProps, AppState> {
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
 
-        this.store.shouldCaptureIncrement(); 
+        this.store.shouldCaptureIncrement();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds(
             {
