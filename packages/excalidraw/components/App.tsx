@@ -7761,6 +7761,7 @@ class App extends React.Component<AppProps, AppState> {
               },
             });
           }
+          
           return;
         }
       }
@@ -7792,6 +7793,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           frameToHighlight:
             topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null,
+            
         });
 
         // Marking that click was used for dragging to check
@@ -7818,6 +7820,7 @@ class App extends React.Component<AppProps, AppState> {
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
+          // const a=event[KEYS.TAB];
 
           if (lockDirection) {
             const distanceX = Math.abs(dragOffset.x);
@@ -7869,7 +7872,8 @@ class App extends React.Component<AppProps, AppState> {
             // should be removed
             selectionElement: null,
           });
-
+          
+          
           if (
             selectedElements.length !== 1 ||
             !isElbowArrow(selectedElements[0])
@@ -7878,98 +7882,108 @@ class App extends React.Component<AppProps, AppState> {
               suggestedBindings: getSuggestedBindingsForArrows(
                 selectedElements,
                 this.scene.getNonDeletedElementsMap(),
-              ),
+              )
             });
           }
-
+          // keyTest:(event)=>
+          window.addEventListener('keydown', (event) => {
+            if (event.key === 'Tab' && event.altKey) {
+              pointerDownState.hit.hasBeenDuplicated = false; // Reset duplication state
+            }
+          });
+          
           // We duplicate the selected element if alt is pressed on pointer move
-          // if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
-          //   // Move the currently selected elements to the top of the z index stack, and
-          //   // put the duplicates where the selected elements used to be.
-          //   // (the origin point where the dragging started)
+          if (event.altKey&& !pointerDownState.hit.hasBeenDuplicated) {
+            // Move the currently selected elements to the top of the z index stack, and
+            // put the duplicates where the selected elements used to be.
+            // (the origin point where the dragging started)
+            // onKeyDown={(event) => {
+            
 
-          //   pointerDownState.hit.hasBeenDuplicated = true;
+           
+            pointerDownState.hit.hasBeenDuplicated = true;
 
-          //   const nextElements = [];
-          //   const elementsToAppend = [];
-          //   const groupIdMap = new Map();
-          //   const oldIdToDuplicatedId = new Map();
-          //   const hitElement = pointerDownState.hit.element;
-          //   const selectedElementIds = new Set(
-          //     this.scene
-          //       .getSelectedElements({
-          //         selectedElementIds: this.state.selectedElementIds,
-          //         includeBoundTextElement: true,
-          //         includeElementsInFrames: true,
-          //       })
-          //       .map((element) => element.id),
-          //   );
+            const nextElements = [];
+            const elementsToAppend = [];
+            const groupIdMap = new Map();
+            const oldIdToDuplicatedId = new Map();
+            const hitElement = pointerDownState.hit.element;
+            const selectedElementIds = new Set(
+              this.scene
+                .getSelectedElements({
+                  selectedElementIds: this.state.selectedElementIds,
+                  includeBoundTextElement: true,
+                  includeElementsInFrames: true,
+                })
+                .map((element) => element.id),
+            );
 
-          //   const elements = this.scene.getElementsIncludingDeleted();
+            const elements = this.scene.getElementsIncludingDeleted();
 
-          //   for (const element of elements) {
-          //     if (
-          //       selectedElementIds.has(element.id) ||
-          //       // case: the state.selectedElementIds might not have been
-          //       // updated yet by the time this mousemove event is fired
-          //       (element.id === hitElement?.id &&
-          //         pointerDownState.hit.wasAddedToSelection)
-          //     ) {
-          //       const duplicatedElement = duplicateElement(
-          //         this.state.editingGroupId,
-          //         groupIdMap,
-          //         element,
-          //       );
-          //       const origElement = pointerDownState.originalElements.get(
-          //         element.id,
-          //       )!;
-          //       mutateElement(duplicatedElement, {
-          //         x: origElement.x,
-          //         y: origElement.y,
-          //       });
+            for (const element of elements) {
+              if (
+                selectedElementIds.has(element.id) ||
+                // case: the state.selectedElementIds might not have been
+                // updated yet by the time this mousemove event is fired
+                (element.id === hitElement?.id &&
+                  pointerDownState.hit.wasAddedToSelection)
+              ) {
+                const duplicatedElement = duplicateElement(
+                  this.state.editingGroupId,
+                  groupIdMap,
+                  element,
+                );
+                const origElement = pointerDownState.originalElements.get(
+                  element.id,
+                )!;
+                mutateElement(duplicatedElement, {
+                  x: origElement.x,
+                  y: origElement.y,
+                });
 
-          //       // put duplicated element to pointerDownState.originalElements
-          //       // so that we can snap to the duplicated element without releasing
-          //       pointerDownState.originalElements.set(
-          //         duplicatedElement.id,
-          //         duplicatedElement,
-          //       );
+                // put duplicated element to pointerDownState.originalElements
+                // so that we can snap to the duplicated element without releasing
+                pointerDownState.originalElements.set(
+                  duplicatedElement.id,
+                  duplicatedElement,
+                );
 
-          //       nextElements.push(duplicatedElement);
-          //       elementsToAppend.push(element);
-          //       oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
-          //     } else {
-          //       nextElements.push(element);
-          //     }
-          //   }
+                nextElements.push(duplicatedElement);
+                elementsToAppend.push(element);
+                oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
+              } else {
+                nextElements.push(element);
+              }
+            }
 
-          //   const nextSceneElements = [...nextElements, ...elementsToAppend];
+            const nextSceneElements = [...nextElements, ...elementsToAppend];
 
-          //   syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
+            syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
 
-          //   bindTextToShapeAfterDuplication(
-          //     nextElements,
-          //     elementsToAppend,
-          //     oldIdToDuplicatedId,
-          //   );
-          //   fixBindingsAfterDuplication(
-          //     nextSceneElements,
-          //     elementsToAppend,
-          //     oldIdToDuplicatedId,
-          //     "duplicatesServeAsOld",
-          //   );
-          //   bindElementsToFramesAfterDuplication(
-          //     nextSceneElements,
-          //     elementsToAppend,
-          //     oldIdToDuplicatedId,
-          //   );
+            bindTextToShapeAfterDuplication(
+              nextElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
+            fixBindingsAfterDuplication(
+              nextSceneElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+              "duplicatesServeAsOld",
+            );
+            bindElementsToFramesAfterDuplication(
+              nextSceneElements,
+              elementsToAppend,
+              oldIdToDuplicatedId,
+            );
 
-          //   this.scene.replaceAllElements(nextSceneElements);
-          //   this.maybeCacheVisibleGaps(event, selectedElements, true);
-          //   this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
-          // }
+            this.scene.replaceAllElements(nextSceneElements);
+            this.maybeCacheVisibleGaps(event, selectedElements, true);
+            this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
+          }
           return;
         }
+       
       }
 
       if (this.state.selectionElement) {
