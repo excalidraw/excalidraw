@@ -43,7 +43,7 @@ describe("Test wrapText", () => {
       {
         desc: "break all words when width of each word is less than container width",
         width: 80,
-        res: `Hello \nwhats \nup`,
+        res: `Hello\nwhats\nup`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
@@ -65,7 +65,7 @@ p`,
         desc: "break words as per the width",
 
         width: 140,
-        res: `Hello whats \nup`,
+        res: `Hello whats\nup`,
       },
       {
         desc: "fit the container",
@@ -95,7 +95,7 @@ whats up`;
       {
         desc: "break all words when width of each word is less than container width",
         width: 80,
-        res: `Hello\nwhats \nup`,
+        res: `Hello\nwhats\nup`,
       },
       {
         desc: "break all characters when width of each character is less than container width",
@@ -141,26 +141,24 @@ whats up`,
       {
         desc: "fit characters of long string as per container width",
         width: 170,
-        res: `hellolongtextth\nisiswhatsupwith\nyouIamtypingggg\ngandtypinggg \nbreak it now`,
+        res: `hellolongtextthi\nsiswhatsupwithyo\nuIamtypingggggan\ndtypinggg break\nit now`,
       },
-
       {
         desc: "fit characters of long string as per container width and break words as per the width",
 
         width: 130,
-        res: `hellolongte
-xtthisiswha
-tsupwithyou
-Iamtypinggg
-ggandtyping
-gg break it
-now`,
+        res: `hellolongtex
+tthisiswhats
+upwithyouIam
+typingggggan
+dtypinggg
+break it now`,
       },
       {
         desc: "fit the long text when container width is greater than text length and move the rest to next line",
 
         width: 600,
-        res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg \nbreak it now`,
+        res: `hellolongtextthisiswhatsupwithyouIamtypingggggandtypinggg\nbreak it now`,
       },
     ].forEach((data) => {
       it(`should ${data.desc}`, () => {
@@ -174,7 +172,7 @@ now`,
     const text = "Hello Excalidraw";
     // Length of "Excalidraw" is 100 and exacty equal to max width
     const res = wrapText(text, font, 100);
-    expect(res).toEqual(`Hello \nExcalidraw`);
+    expect(res).toEqual(`Hello\nExcalidraw`);
   });
 
   it("should return the text as is if max width is invalid", () => {
@@ -189,11 +187,11 @@ now`,
       "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
     const res = wrapText(text, font, 110);
     expect(res).toBe(
-      `Wikipedia \nis hosted \nby \nWikimedia-\nFoundation,\na non-\nprofit \norganizati\non that \nalso hosts\na range-of\nother \nprojects`,
+      `Wikipedia\nis hosted\nby\nWikimedia-\nFoundation,\na non-\nprofit\norganizatio\nn that also\nhosts a\nrange-of\nother\nprojects`,
     );
 
     text = "Hello thereusing-now";
-    expect(wrapText(text, font, 100)).toEqual("Hello \nthereusin\ng-now");
+    expect(wrapText(text, font, 100)).toEqual("Hello\nthereusing\n-now");
   });
 });
 

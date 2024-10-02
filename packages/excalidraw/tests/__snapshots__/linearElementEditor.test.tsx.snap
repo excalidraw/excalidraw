@@ -1,14 +1,14 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Test Linear Elements > Test bound text element > should bind text to arrow when clicked on arrow and enter pressed 1`] = `
-"Online whiteboard 
-collaboration made 
+"Online whiteboard
+collaboration made
 easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should bind text to arrow when double clicked 1`] = `
-"Online whiteboard 
-collaboration made 
+"Online whiteboard
+collaboration made
 easy"
 `;
 
@@ -24,34 +24,34 @@ exports[`Test Linear Elements > Test bound text element > should match styles fo
 `;
 
 exports[`Test Linear Elements > Test bound text element > should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized 2`] = `
-"Online whiteboard 
-collaboration made 
+"Online whiteboard
+collaboration made
 easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should resize and position the bound text and bounding box correctly when 3 pointer arrow element resized 6`] = `
-"Online whiteboard 
+"Online whiteboard
 collaboration made easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should resize and position the bound text correctly when 2 pointer linear element resized 2`] = `
-"Online whiteboard 
-collaboration made 
+"Online whiteboard
+collaboration made
 easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should resize and position the bound text correctly when 2 pointer linear element resized 5`] = `
-"Online whiteboard 
+"Online whiteboard
 collaboration made easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should wrap the bound text when arrow bound container moves 1`] = `
-"Online whiteboard 
+"Online whiteboard
 collaboration made easy"
 `;
 
 exports[`Test Linear Elements > Test bound text element > should wrap the bound text when arrow bound container moves 2`] = `
-"Online whiteboard 
-collaboration made 
+"Online whiteboard
+collaboration made
 easy"
 `;

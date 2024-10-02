@@ -30,25 +30,35 @@ import {
 } from "./containerCache";
 import type { ExtractSetType } from "../utility-types";
 
-const CJK_CHAR =
+// should be enough to detect CJK, though does not include every possible char,
+// such symbols and punctuations covered by `_CJK_BREAK_BEFORE_NOT_AFTER`, `_CJK_BREAK_AFTER_NOT_BEFORE` or _CJK_BREAK_BEFORE_AND_AFTER
+const _CJK_CHAR =
   /\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}/u;
 
 // should cover most emojis, including skin tone, gender variations, pictographic chars and etc.
-const EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
+const _EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
 
-// matches common full width punctuation marks as some expressions are not meant to be broken down, i.e.: "た。"
-const CJK_NON_BREAKING_POINTS = /。，、．：；？！/u;
-
-// matches full width characters as parantheses are not part of the `CJK` check above, thus need to be broken individually
-const CJK_LOOKAHEAD_BREAKING_POINTS = /（［｛〈《「『【〖〔〘〚〝〃ー/u;
-const CJK_LOOKBEHIND_BREAKING_POINTS = /）］｝〉》」』】〗〕〙〛〞〟〃・/u;
-
+// full width CJK characters which are natural breaking points
+// ~ expect a break before (lookahead), but not after (negative lookbehind),  i.e. "（"
+// ~ expect a break after (lookbehind), but not before (negative lookahead), i.e. "）"
+// ~ expect a break always (lookahead and lookbehind), i.e. "〃"
 // Hello た。
-//        ↑ DON'T BREAK → ["Hello た。"]
-const NON_BREAKING_POINTS = new RegExp(
-  `(?![${CJK_NON_BREAKING_POINTS.source}])`,
-  "u",
-);
+//        ↑ DON'T BREAK "た。" (negative lookahead)
+// Hello「た」 World
+//       ↑ DON'T BREAK "「た" (negative lookbehind)
+//        ↑ DON'T BREAK "た」"(negative lookahead)
+//      ↑ BREAK BEFORE "「" (lookahead)
+//         ↑ BREAK AFTER "」" (lookbehind)
+// → ["Hello", "「た」", "World"]
+const _CJK_BREAK_BEFORE_NOT_AFTER =
+  /（［｛〈《「『【〖〔〘〚＜＠＾〝￠￡￥￦＄±/u;
+const _CJK_BREAK_AFTER_NOT_BEFORE =
+  /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．：；？！％‥…ー/u;
+const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u;
+
+// breaking points for latin
+const _LATIN_BREAK_AFTER = /-/u;
+const _LATIN_BREAK_ALWAYS = /\s/u;
 
 // Hello World
 //      ↑ BREAK BEFORE " " → ["Hello", " World"]
@@ -56,8 +66,8 @@ const NON_BREAKING_POINTS = new RegExp(
 //      ↑ BREAK BEFORE "た" → ["Hello", "たWorld"]
 // Hello「World」
 //      ↑ BREAK BEFORE "「" → ["Hello", "「World」"]
-const LOOK_AHEAD_BREAKING_POINTS = new RegExp(
-  `(?=[\\s${CJK_CHAR.source}${CJK_LOOKAHEAD_BREAKING_POINTS.source}${EMOJI_CHAR.source}])`,
+const _LOOK_AHEAD_BREAKING_POINTS = new RegExp(
+  `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}])(?=[${_LATIN_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_EMOJI_CHAR.source}])`,
   "u",
 );
 
@@ -69,16 +79,25 @@ const LOOK_AHEAD_BREAKING_POINTS = new RegExp(
 //       ↑ BREAK AFTER "た" → ["Helloた", "World"]
 //「Hello」World
 //       ↑ BREAK AFTER "」" → ["「Hello」", "World"]
-const LOOK_BEHIND_BREAKING_POINTS = new RegExp(
-  `(?<=[-\\s${CJK_CHAR.source}${CJK_LOOKBEHIND_BREAKING_POINTS.source}${EMOJI_CHAR.source}])`,
+const _LOOK_BEHIND_BREAKING_POINTS = new RegExp(
+  `(?![${_CJK_BREAK_AFTER_NOT_BEFORE.source}])(?<=[${_LATIN_BREAK_AFTER.source}${_LATIN_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}${_CJK_BREAK_AFTER_NOT_BEFORE.source}${_EMOJI_CHAR.source}])`,
   "u",
 );
 
-// combines all breaking points above
-const LINE_BREAKING_POINTS = new RegExp(
-  `${NON_BREAKING_POINTS.source}(${LOOK_AHEAD_BREAKING_POINTS.source}|${LOOK_BEHIND_BREAKING_POINTS.source})`,
+const CJK_REGEX = new RegExp(`[${_CJK_CHAR.source}]`, "u");
+const EMOJI_REGEX = new RegExp(`[${_EMOJI_CHAR.source}]`, "u");
+const BREAK_LINE_REGEX = new RegExp(
+  `${_LOOK_AHEAD_BREAKING_POINTS.source}|${_LOOK_BEHIND_BREAKING_POINTS.source}`,
   "u",
 );
+
+export const containsCJK = (text: string) => {
+  return CJK_REGEX.test(text);
+};
+
+export const containsEmoji = (text: string) => {
+  return EMOJI_REGEX.test(text);
+};
 
 /**
  * Break a line based on the whitespaces, CJK / emoji chars and language specific breaking points,
@@ -88,23 +107,13 @@ const LINE_BREAKING_POINTS = new RegExp(
  *  "Hello-world" → ["Hello-", "world"]
  *  "「Hello World」" → ["「Hello", " ", "World」"]
  *
- * // TODO_CJK: keeps all the whitespaces => should improve wrapping => test
- *
  * Browser support as of 10/2024:
  * - 91% Lookbehind assertion https://caniuse.com/mdn-javascript_regular_expressions_lookbehind_assertion
  * - 94% Unicode character class escape https://caniuse.com/mdn-javascript_regular_expressions_unicode_character_class_escape
  */
 const parseTokens = (line: string) => {
   // filtering due to multi-codepoint chars like 🗺
-  return line.split(LINE_BREAKING_POINTS).filter(Boolean);
-};
-
-export const containsCJK = (text: string) => {
-  return CJK_CHAR.test(text);
-};
-
-export const containsEmoji = (text: string) => {
-  return EMOJI_CHAR.test(text);
+  return line.split(BREAK_LINE_REGEX).filter(Boolean);
 };
 
 export const normalizeText = (text: string) => {
@@ -485,6 +494,13 @@ export const getTextHeight = (
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
+const isSingleCharacter = (maybeSingleCharacter: string) => {
+  return (
+    maybeSingleCharacter.codePointAt(0) !== undefined &&
+    maybeSingleCharacter.codePointAt(1) === undefined
+  );
+};
+
 const wrapWord = (
   word: string,
   font: FontString,
@@ -532,32 +548,46 @@ const wrapLine = (
   const tokenIterator = tokens[Symbol.iterator]();
 
   let currentLine = "";
+  let currentLineWidth = 0;
+
   let iterator = tokenIterator.next();
 
   while (!iterator.done) {
     const token = iterator.value;
     const testLine = currentLine + token;
 
-    // build up the current line (skip expensive `getLineWidth` for whitespaces alone)
-    if (/\s/.test(token) || getLineWidth(testLine, font, true) <= maxWidth) {
+    // cache single codepoint whitespace / CJK / emoji width calc. as kerning should not apply here
+    const testLineWidth = isSingleCharacter(token)
+      ? currentLineWidth + charWidth.calculate(token, font)
+      : getLineWidth(testLine, font, true);
+
+    // build up the current line, skipping length check for possibly trailing whitespaces
+    if (/\s/.test(token) || testLineWidth <= maxWidth) {
       currentLine = testLine;
+      currentLineWidth = testLineWidth;
       iterator = tokenIterator.next();
       continue;
     }
 
-    // TODO_CJK: we can do this simple check due to custom iteration => test
     // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
+    // TODO_CJK: we can do this simple check due to custom iteration => test
     if (!currentLine) {
       const wrappedWord = wrapWord(token, font, maxWidth);
-      lines.push(...wrappedWord.slice(0, -1));
+      const precedingLines = wrappedWord.slice(0, -1);
+      const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
 
-      // last line of the wrapped word might still be joined with next token/s => TODO_CJK: test
-      currentLine = wrappedWord[wrappedWord.length - 1] ?? "";
+      lines.push(...precedingLines);
+
+      // trailing line of the wrapped word might still be joined with next token/s => TODO_CJK: test
+      currentLine = trailingLine;
+      currentLineWidth = getLineWidth(trailingLine, font, true);
       iterator = tokenIterator.next();
     } else {
+      // push & reset, but don't iterate on the next token, as we didn't use it yet!
       lines.push(currentLine.trimEnd());
-      // reset current line, but don't iterate on the next token, as we didn't use it yet!
+
       currentLine = "";
+      currentLineWidth = 0;
     }
   }
 
@@ -603,16 +633,16 @@ export const charWidth = (() => {
   const cachedCharWidth: { [key: FontString]: Array<number> } = {};
 
   const calculate = (char: string, font: FontString) => {
-    const ascii = char.charCodeAt(0);
+    const unicode = char.charCodeAt(0);
     if (!cachedCharWidth[font]) {
       cachedCharWidth[font] = [];
     }
-    if (!cachedCharWidth[font][ascii]) {
+    if (!cachedCharWidth[font][unicode]) {
       const width = getLineWidth(char, font, true);
-      cachedCharWidth[font][ascii] = width;
+      cachedCharWidth[font][unicode] = width;
     }
 
-    return cachedCharWidth[font][ascii];
+    return cachedCharWidth[font][unicode];
   };
 
   const getCache = (font: FontString) => {
