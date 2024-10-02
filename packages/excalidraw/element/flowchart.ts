@@ -31,6 +31,7 @@ import {
 import { invariant } from "../utils";
 import { point, type LocalPoint } from "../../math";
 import { aabbForElement } from "../shapes";
+import { getCommonBounds } from "./bounds";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -129,6 +130,43 @@ const getSuccessors = (
   return getNodeRelatives("successors", node, elementsMap, direction);
 };
 
+function getIndividualYOffset(nodes: ExcalidrawElement[]): number[] {
+  const offsets = [];
+
+  for (let i = 0; i < nodes.length - 1; i++) {
+    const nodeA = nodes[i];
+    const nodeB = nodes[i + 1];
+
+    // Calculate the vertical offset between nodeA and nodeB
+    const offset = nodeB.y - (nodeA.y + nodeA.height);
+    offsets.push(offset);
+  }
+  return offsets; // Returns an array of individual y-offsets
+}
+
+function getMinMaxY(nodes: ExcalidrawElement[]): { minY: number; maxY: number } {
+  if (nodes.length === 0) {
+    return { minY: 0, maxY: 0 }; // Return 0 if there are no nodes
+  }
+
+  let minY = Infinity; // Start with Infinity to find the minimum
+  let maxY = -Infinity; // Start with -Infinity to find the maximum
+
+  for (const node of nodes) {
+    // Update the minY if the current node's top position is lower
+    if (node.y < minY) {
+      minY = node.y; // Update minY to the top of the current node
+    }
+    // Update the maxY if the current node's bottom position is higher
+    const bottomY = node.y + node.height; // Calculate the bottom position of the node
+    if (bottomY > maxY) {
+      maxY = bottomY; // Update maxY to the bottom of the current node
+    }
+  }
+
+  return { minY, maxY }; // Return the min and max y values
+}
+
 export const getPredecessors = (
   node: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
@@ -145,6 +183,7 @@ const getOffsets = (
   const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
 
   // check if vertical space or horizontal space is available first
+  console.log("code 1");
   if (direction === "up" || direction === "down") {
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     // check vertical space
@@ -180,7 +219,7 @@ const getOffsets = (
       };
     }
   }
-
+  console.log("code 2");
   if (direction === "up" || direction === "down") {
     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
@@ -203,18 +242,31 @@ const getOffsets = (
       y,
     };
   }
-
-  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+  console.log("code 3");
+  const offsets = getIndividualYOffset(linkedNodes);
+  const {minY,maxY}=getMinMaxY(linkedNodes);
+  // const boundes=getCommonBounds(linkedNodes)
+  const absoluteOffsets = offsets.map((offset) => Math.abs(offset));
+  const minAbsoluteOffset = Math.min(...absoluteOffsets, 0);
+  // const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+  
+  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height + minAbsoluteOffset;
   const x =
     (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
     element.width;
+  // const y =
+  //   linkedNodes.length === 0
+  //     ? 0
+  //     : (linkedNodes.length + 1) % 2 === 0
+  //     ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
+  //     : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
   const y =
     linkedNodes.length === 0
       ? 0
       : (linkedNodes.length + 1) % 2 === 0
-      ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
-      : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
-
+      ? (Math.abs(maxY)+minAbsoluteOffset)
+      : (Math.abs(minY)+minAbsoluteOffset) * -1;
+      console.log({x,y})
   if (direction === "left") {
     return {
       x: x * -1,
@@ -226,6 +278,74 @@ const getOffsets = (
     y,
   };
 };
+
+// const getOffsets = (
+//   element: ExcalidrawFlowchartNodeElement,
+//   linkedNodes: ExcalidrawElement[],
+//   direction: LinkDirection,
+// ) => {
+//   const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
+
+//   if (direction === "right" || direction === "left") {
+//     const minY = element.y;
+//     const maxY = element.y + element.height;
+
+//     // Check for vertical overlap with any linked nodes
+//     if (
+//       linkedNodes.every(
+//         (linkedNode) =>
+//           linkedNode.y + linkedNode.height < minY || linkedNode.y > maxY,
+//       )
+//     ) {
+//       // If no vertical overlap, place node as usual
+//       return {
+//         x:
+//           (HORIZONTAL_OFFSET + element.width) * (direction === "left" ? -1 : 1),
+//         y: 0,
+//       };
+//     } else {
+//       // If there is vertical overlap, adjust the y-position
+//       // Find the closest node above or below and place the new node with enough space
+//       let maxLinkedY = Math.max(
+//         ...linkedNodes.map((node) => node.y + node.height),
+//       );
+//       let minLinkedY = Math.min(...linkedNodes.map((node) => node.y));
+
+//       // Choose whether to place the node above or below the closest linked node
+//       const newY = maxLinkedY + VERTICAL_OFFSET;
+
+//       return {
+//         x:
+//           (HORIZONTAL_OFFSET + element.width) * (direction === "left" ? -1 : 1),
+//         y: newY,
+//       };
+//     }
+//   }
+
+//   // Handle vertical placement (same as before)
+//   if (direction === "up" || direction === "down") {
+//     const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+//     const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
+//     const x =
+//       linkedNodes.length === 0
+//         ? 0
+//         : (linkedNodes.length + 1) % 2 === 0
+//         ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
+//         : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+
+//     if (direction === "up") {
+//       return {
+//         x,
+//         y: y * -1,
+//       };
+//     }
+
+//     return {
+//       x,
+//       y,
+//     };
+//   }
+// };
 
 const addNewNode = (
   element: ExcalidrawFlowchartNodeElement,
@@ -553,81 +673,81 @@ const addNewNode = (
 //   return newNodes;
 // };
 
-// export const addNewNodes = (
-//   startNode: ExcalidrawFlowchartNodeElement,
-//   elementsMap: ElementsMap,
-//   appState: AppState,
-//   direction: LinkDirection,
-//   numberOfNodes: number,
-// ) => {
-//   // always start from 0 and distribute evenly
-//   const newNodes: ExcalidrawElement[] = [];
+export const addNewNodes = (
+  startNode: ExcalidrawFlowchartNodeElement,
+  elementsMap: ElementsMap,
+  appState: AppState,
+  direction: LinkDirection,
+  numberOfNodes: number,
+) => {
+  // always start from 0 and distribute evenly
+  const newNodes: ExcalidrawElement[] = [];
 
-//   for (let i = 0; i < numberOfNodes; i++) {
-//     let nextX: number;
-//     let nextY: number;
-//     if (direction === "left" || direction === "right") {
-//       const totalHeight =
-//         VERTICAL_OFFSET * (numberOfNodes - 1) +
-//         numberOfNodes * startNode.height;
+  for (let i = 0; i < numberOfNodes; i++) {
+    let nextX: number;
+    let nextY: number;
+    if (direction === "left" || direction === "right") {
+      const totalHeight =
+        VERTICAL_OFFSET * (numberOfNodes - 1) +
+        numberOfNodes * startNode.height;
 
-//       const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
+      const startY = startNode.y + startNode.height / 2 - totalHeight / 2;
 
-//       let offsetX = HORIZONTAL_OFFSET + startNode.width;
-//       if (direction === "left") {
-//         offsetX *= -1;
-//       }
-//       nextX = startNode.x + offsetX;
-//       const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
-//       nextY = startY + offsetY;
-//     } else {
-//       const totalWidth =
-//         HORIZONTAL_OFFSET * (numberOfNodes - 1) +
-//         numberOfNodes * startNode.width;
-//       const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
-//       let offsetY = VERTICAL_OFFSET + startNode.height;
+      let offsetX = HORIZONTAL_OFFSET + startNode.width;
+      if (direction === "left") {
+        offsetX *= -1;
+      }
+      nextX = startNode.x + offsetX;
+      const offsetY = (VERTICAL_OFFSET + startNode.height) * i;
+      nextY = startY + offsetY;
+    } else {
+      const totalWidth =
+        HORIZONTAL_OFFSET * (numberOfNodes - 1) +
+        numberOfNodes * startNode.width;
+      const startX = startNode.x + startNode.width / 2 - totalWidth / 2;
+      let offsetY = VERTICAL_OFFSET + startNode.height;
 
-//       if (direction === "up") {
-//         offsetY *= -1;
-//       }
-//       nextY = startNode.y + offsetY;
-//       const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
-//       nextX = startX + offsetX;
-//     }
+      if (direction === "up") {
+        offsetY *= -1;
+      }
+      nextY = startNode.y + offsetY;
+      const offsetX = (HORIZONTAL_OFFSET + startNode.width) * i;
+      nextX = startX + offsetX;
+    }
 
-//     const nextNode = newElement({
-//       type: startNode.type,
-//       x: nextX,
-//       y: nextY,
-//       // TODO: extract this to a util
-//       width: startNode.width,
-//       height: startNode.height,
-//       roundness: startNode.roundness,
-//       roughness: startNode.roughness,
-//       backgroundColor: startNode.backgroundColor,
-//       strokeColor: startNode.strokeColor,
-//       strokeWidth: startNode.strokeWidth,
-//     });
+    const nextNode = newElement({
+      type: startNode.type,
+      x: nextX,
+      y: nextY,
+      // TODO: extract this to a util
+      width: startNode.width,
+      height: startNode.height,
+      roundness: startNode.roundness,
+      roughness: startNode.roughness,
+      backgroundColor: startNode.backgroundColor,
+      strokeColor: startNode.strokeColor,
+      strokeWidth: startNode.strokeWidth,
+    });
 
-//     invariant(
-//       isFlowchartNodeElement(nextNode),
-//       "not an ExcalidrawFlowchartNodeElement",
-//     );
+    invariant(
+      isFlowchartNodeElement(nextNode),
+      "not an ExcalidrawFlowchartNodeElement",
+    );
 
-//     const bindingArrow = createBindingArrow(
-//       startNode,
-//       nextNode,
-//       elementsMap,
-//       direction,
-//       appState,
-//     );
+    const bindingArrow = createBindingArrow(
+      startNode,
+      nextNode,
+      elementsMap,
+      direction,
+      appState,
+    );
 
-//     newNodes.push(nextNode);
-//     newNodes.push(bindingArrow);
-//   }
+    newNodes.push(nextNode);
+    newNodes.push(bindingArrow);
+  }
 
-//   return newNodes;
-// };
+  return newNodes;
+};
 
 // export const addNewNodes = (
 //   startNode: ExcalidrawFlowchartNodeElement,
@@ -659,58 +779,58 @@ const addNewNode = (
 //   return newNodes;
 // };
 
-const addNewNodes = (
-  startNode: ExcalidrawFlowchartNodeElement,
-  elementsMap: ElementsMap,
-  appState: AppState,
-  direction: LinkDirection,
-  numberOfNodes: number,
-) => {
-  const newNodes: ExcalidrawElement[] = [];
+// const addNewNodes = (
+//   startNode: ExcalidrawFlowchartNodeElement,
+//   elementsMap: ElementsMap,
+//   appState: AppState,
+//   direction: LinkDirection,
+//   numberOfNodes: number,
+// ) => {
+//   const newNodes: ExcalidrawElement[] = [];
 
-  const successors = getSuccessors(startNode, elementsMap, direction);
-  const predeccessors = getPredecessors(startNode, elementsMap, direction);
-  const linkedNodes = [...successors, ...predeccessors];
+//   const successors = getSuccessors(startNode, elementsMap, direction);
+//   const predeccessors = getPredecessors(startNode, elementsMap, direction);
+//   const linkedNodes = [...successors, ...predeccessors];
 
-  for (let i = 0; i < numberOfNodes; i++) {
-    const offsets = getOffsets(startNode, linkedNodes, direction);
+//   for (let i = 0; i < numberOfNodes; i++) {
+//     const offsets = getOffsets(startNode, linkedNodes, direction);
 
-    const nextNode = newElement({
-      type: startNode.type,
-      x: startNode.x + offsets.x,
-      y: startNode.y + offsets.y,
-      width: startNode.width,
-      height: startNode.height,
-      roundness: startNode.roundness,
-      roughness: startNode.roughness,
-      backgroundColor: startNode.backgroundColor,
-      strokeColor: startNode.strokeColor,
-      strokeWidth: startNode.strokeWidth,
-    });
+//     const nextNode = newElement({
+//       type: startNode.type,
+//       x: startNode.x + offsets.x,
+//       y: startNode.y + offsets.y,
+//       width: startNode.width,
+//       height: startNode.height,
+//       roundness: startNode.roundness,
+//       roughness: startNode.roughness,
+//       backgroundColor: startNode.backgroundColor,
+//       strokeColor: startNode.strokeColor,
+//       strokeWidth: startNode.strokeWidth,
+//     });
 
-    // Invariant check for node type (optional)
-    invariant(
-      isFlowchartNodeElement(nextNode),
-      "not an ExcalidrawFlowchartNodeElement",
-    );
+//     // Invariant check for node type (optional)
+//     invariant(
+//       isFlowchartNodeElement(nextNode),
+//       "not an ExcalidrawFlowchartNodeElement",
+//     );
 
-    // Create the binding arrow to connect nodes
-    const bindingArrow = createBindingArrow(
-      startNode,
-      nextNode,
-      elementsMap,
-      direction,
-      appState,
-    );
+//     // Create the binding arrow to connect nodes
+//     const bindingArrow = createBindingArrow(
+//       startNode,
+//       nextNode,
+//       elementsMap,
+//       direction,
+//       appState,
+//     );
 
-    newNodes.push(nextNode);
-    newNodes.push(bindingArrow);
+//     newNodes.push(nextNode);
+//     newNodes.push(bindingArrow);
 
-    linkedNodes.push(nextNode);
-  }
+//     linkedNodes.push(nextNode);
+//   }
 
-  return newNodes;
-};
+//   return newNodes;
+// };
 
 const createBindingArrow = (
   startBindingElement: ExcalidrawFlowchartNodeElement,
