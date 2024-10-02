@@ -1950,6 +1950,11 @@ class App extends React.Component<AppProps, AppState> {
         frameElement,
         data: { status: "done", html: parsedHtml },
       });
+
+      this.setState({
+        selectedElementIds: { [frameElement.id]: true },
+      });
+
     } catch (error: any) {
       trackEvent("ai", "generate (failed)", "d2c");
       this.updateMagicGeneration({
@@ -2990,8 +2995,6 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         });
-
-        this.actionManager.executeAction(actionFinalize);
 
         return;
       }
