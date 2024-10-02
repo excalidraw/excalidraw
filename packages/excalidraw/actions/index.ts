@@ -16,7 +16,6 @@ export {
   actionChangeOpacity,
   actionChangeFontSize,
   actionChangeFontFamily,
-  actionChangeTextAlign,
   actionChangeVerticalAlign,
 } from "./actionProperties";
 
@@ -88,3 +87,9 @@ export { actionToggleElementLock } from "./actionElementLock";
 export { actionToggleLinearEditor } from "./actionLinearEditor";
 
 export { actionToggleSearchMenu } from "./actionToggleSearchMenu";
+
+export {
+  actionChangeTextAlignLeft,
+  actionChangeTextAlignRight,
+  actionChangeTextAlignCenter,
+} from "./actionTextAlign";
