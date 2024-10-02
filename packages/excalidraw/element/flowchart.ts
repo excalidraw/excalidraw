@@ -416,7 +416,7 @@ const createBindingArrow = (
     type: "arrow",
     x: startX,
     y: startY,
-    startArrowhead: appState.currentItemStartArrowhead,
+    startArrowhead: null,
     endArrowhead: appState.currentItemEndArrowhead,
     strokeColor: appState.currentItemStrokeColor,
     strokeStyle: appState.currentItemStrokeStyle,
