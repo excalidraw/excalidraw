@@ -374,7 +374,11 @@ import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import {
+  actionToggleEraserTool,
+  actionToggleHandTool,
+  zoomToFit,
+} from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { ImageSceneDataError } from "../errors";
@@ -5136,6 +5140,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private debounceDoubleClickTimestamp: number = 0;
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
@@ -5144,6 +5149,23 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.multiElement) {
       return;
     }
+
+    if (
+      this.state.penMode &&
+      this.lastPointerDownEvent?.pointerType === "touch" &&
+      this.state.activeTool.type !== "selection"
+    ) {
+      const now = Date.now();
+      if (now - this.debounceDoubleClickTimestamp < 200) {
+        //handleCanvasDoubleClick click fires twice in case of touch.
+        //Once from the onTouchStart event handler, once from the double click event handler
+        return;
+      }
+      this.debounceDoubleClickTimestamp = now;
+      this.updateScene(actionToggleEraserTool.perform([] as any, this.state));
+      return;
+    }
+
     // we should only be able to double click when mode is selection
     if (this.state.activeTool.type !== "selection") {
       return;
