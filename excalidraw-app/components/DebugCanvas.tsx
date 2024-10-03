@@ -12,7 +12,13 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import { isSegment, type GlobalPoint, type Segment } from "../../packages/math";
+import type { Arc } from "../../packages/math";
+import {
+  isArc,
+  isSegment,
+  type GlobalPoint,
+  type Segment,
+} from "../../packages/math";
 
 const renderLine = (
   context: CanvasRenderingContext2D,
@@ -25,6 +31,26 @@ const renderLine = (
   context.beginPath();
   context.moveTo(segment[0][0] * zoom, segment[0][1] * zoom);
   context.lineTo(segment[1][0] * zoom, segment[1][1] * zoom);
+  context.stroke();
+  context.restore();
+};
+
+const renderArc = (
+  context: CanvasRenderingContext2D,
+  zoom: number,
+  a: Arc<GlobalPoint>,
+  color: string,
+) => {
+  context.save();
+  context.strokeStyle = color;
+  context.beginPath();
+  context.arc(
+    a.center[0] * zoom,
+    a.center[1] * zoom,
+    a.radius * zoom,
+    a.startAngle,
+    a.endAngle,
+  );
   context.stroke();
   context.restore();
 };
@@ -53,6 +79,14 @@ const render = (
           context,
           appState.zoom.value,
           el.data as Segment<GlobalPoint>,
+          el.color,
+        );
+        break;
+      case isArc(el.data):
+        renderArc(
+          context,
+          appState.zoom.value,
+          el.data as Arc<GlobalPoint>,
           el.color,
         );
         break;

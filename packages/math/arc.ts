@@ -5,7 +5,7 @@ import {
   ellipseLineIntersectionPoints,
   ellipseSegmentInterceptPoints,
 } from "./ellipse";
-import { pointFrom, pointDistance } from "./point";
+import { pointFrom, pointDistance, isPoint } from "./point";
 import type { GenericPoint, Segment, Radians, Arc, Line } from "./types";
 import { PRECISION } from "./utils";
 
@@ -134,4 +134,19 @@ export function arcLineInterceptPoints<Point extends GenericPoint>(
           a.endAngle >= candidateAngle
       : a.startAngle <= candidateAngle || a.endAngle >= candidateAngle;
   });
+}
+
+export function isArc<Point extends GenericPoint>(v: unknown): v is Arc<Point> {
+  return (
+    v != null &&
+    typeof v === "object" &&
+    Object.hasOwn(v, "center") &&
+    Object.hasOwn(v, "radius") &&
+    Object.hasOwn(v, "startAngle") &&
+    Object.hasOwn(v, "endAngle") &&
+    isPoint((v as Arc<Point>).center) &&
+    typeof (v as Arc<Point>).radius === "number" &&
+    typeof (v as Arc<Point>).startAngle === "number" &&
+    typeof (v as Arc<Point>).endAngle === "number"
+  );
 }
