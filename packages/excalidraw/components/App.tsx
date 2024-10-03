@@ -7993,8 +7993,19 @@ class App extends React.Component<AppProps, AppState> {
 
         if (newElement.type === "freedraw") {
           const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          let dx = pointerCoords.x - newElement.x;
+          let dy = pointerCoords.y - newElement.y;
+
+          if(event.shiftKey) {
+            const angle = Math.atan2(dy, dx);
+
+            const step = Math.PI / 4;
+            const snappedAngle = Math.round(angle / step) * step;
+
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            dx = Math.cos(snappedAngle) * distance;
+            dy = Math.sin(snappedAngle) * distance;
+          }
 
           const lastPoint = points.length > 0 && points[points.length - 1];
           const discardPoint =
