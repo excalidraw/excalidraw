@@ -331,16 +331,18 @@ export const removeFromSelectedGroups = (
 export const getMaximumGroups = (
   elements: ExcalidrawElement[],
   elementsMap: ElementsMap,
+  groupOffset: number = 0,
 ): ExcalidrawElement[][] => {
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
   >();
   elements.forEach((element: ExcalidrawElement) => {
+    const groupIdIndex = Math.max(element.groupIds.length - 1 - groupOffset, 0);
     const groupId =
       element.groupIds.length === 0
         ? element.id
-        : element.groupIds[element.groupIds.length - 1];
+        : element.groupIds[groupIdIndex];
 
     const currentGroupMembers = groups.get(groupId) || [];
 

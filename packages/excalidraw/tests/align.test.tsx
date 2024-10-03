@@ -186,6 +186,166 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].y).toEqual(110);
   });
 
+  const createAndGroupTwoRectangles = () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    UI.clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(100, 100);
+
+    // Select the first element.
+    // The second rectangle is already reselected because it was the last element created
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+  };
+
+  const createAndGroupTwoRectanglesWithDifferentSizes = () => {
+    UI.clickTool("rectangle");
+    mouse.down();
+    mouse.up(100, 100);
+
+    UI.clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(110, 110);
+
+    // Select the first element.
+    // The second rectangle is already reselected because it was the last element created
+    mouse.reset();
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.click();
+    });
+
+    API.executeAction(actionGroup);
+  };
+
+  it("aligns two objects in group correctly to the top", () => {
+    createAndGroupTwoRectangles();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_UP);
+    });
+
+    // Check if x position did not change
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(0);
+  });
+
+  it("aligns two objects in group correctly to the bottom", () => {
+    createAndGroupTwoRectangles();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_DOWN);
+    });
+
+    // Check if x position did not change
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(110);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+  });
+
+  it("aligns two objects in group correctly to the left", () => {
+    createAndGroupTwoRectangles();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_LEFT);
+    });
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(0);
+
+    // Check if y position did not change
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+  });
+
+  it("aligns two objects in group correctly to the right", () => {
+    createAndGroupTwoRectangles();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+
+    Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
+      Keyboard.keyPress(KEYS.ARROW_RIGHT);
+    });
+
+    expect(API.getSelectedElements()[0].x).toEqual(110);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    // Check if y position did not change
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+  });
+
+  it("centers two objects in group with different sizes correctly vertically", () => {
+    createAndGroupTwoRectanglesWithDifferentSizes();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+
+    API.executeAction(actionAlignVerticallyCentered);
+
+    // Check if x position did not change
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(60);
+    expect(API.getSelectedElements()[1].y).toEqual(55);
+  });
+
+  it("centers two objects in group with different sizes correctly horizontally", () => {
+    createAndGroupTwoRectanglesWithDifferentSizes();
+
+    expect(API.getSelectedElements()[0].x).toEqual(0);
+    expect(API.getSelectedElements()[1].x).toEqual(110);
+
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+
+    API.executeAction(actionAlignHorizontallyCentered);
+
+    expect(API.getSelectedElements()[0].x).toEqual(60);
+    expect(API.getSelectedElements()[1].x).toEqual(55);
+
+    // Check if y position did not change
+    expect(API.getSelectedElements()[0].y).toEqual(0);
+    expect(API.getSelectedElements()[1].y).toEqual(110);
+  });
+
   const createAndSelectGroupAndRectangle = () => {
     UI.clickTool("rectangle");
     mouse.down();
