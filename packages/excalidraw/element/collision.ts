@@ -264,7 +264,7 @@ const intersectRectanguloidWithLine = (
       .filter(
         (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
       )
-      .sort((g, h) => pointDistanceSq(g!, b) - pointDistanceSq(h!, b))
+      .sort((g, h) => pointDistanceSq(g!, a) - pointDistanceSq(h!, a))
   );
 };
 
@@ -390,7 +390,7 @@ const intersectDiamondWithLine = (
       .filter(
         (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
       )
-      .sort((g, h) => pointDistanceSq(g!, b) - pointDistanceSq(h!, b))
+      .sort((g, h) => pointDistanceSq(g!, a) - pointDistanceSq(h!, a))
   );
 };
 
@@ -418,5 +418,7 @@ const intersectEllipseWithLine = (
   return ellipseLineIntersectionPoints(
     ellipse(center, element.width / 2 + offset, element.height / 2 + offset),
     line(rotatedA, rotatedB),
-  ).map((p) => pointRotateRads(p, center, element.angle));
+  )
+    .map((p) => pointRotateRads(p, center, element.angle))
+    .sort((g, h) => pointDistanceSq(g!, a) - pointDistanceSq(h!, a));
 };
