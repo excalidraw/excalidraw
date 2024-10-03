@@ -33,7 +33,7 @@
     "react-dom": "18.2.0",
     "vite-plugin-html": "3.2.2",
     "@excalidraw/random-username": "1.0.0",
-    "@sentry/browser": "6.2.5",
+    "@sentry/browser": "8.33.0",
     "@sentry/integrations": "6.2.5",
     "i18next-browser-languagedetector": "6.1.4",
     "socket.io-client": "4.7.2"
