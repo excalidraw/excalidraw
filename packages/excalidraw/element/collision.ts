@@ -42,6 +42,7 @@ import {
   pointsEqual,
 } from "../../math";
 import { LINE_CONFIRM_THRESHOLD } from "../constants";
+import { debugDrawArc, debugDrawLine } from "../visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -281,17 +282,20 @@ const intersectDiamondWithLine = (
   b: GlobalPoint,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const top = pointFrom<GlobalPoint>(element.x + element.width / 2, element.y);
+  const top = pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y - offset,
+  );
   const right = pointFrom<GlobalPoint>(
-    element.x + element.width,
+    element.x + element.width + offset,
     element.y + element.height / 2,
   );
   const bottom = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
-    element.y + element.height,
+    element.y + element.height + offset,
   );
   const left = pointFrom<GlobalPoint>(
-    element.x,
+    element.x - offset,
     element.y + element.height / 2,
   );
   const center = pointFrom<GlobalPoint>(
@@ -309,25 +313,21 @@ const intersectDiamondWithLine = (
   const rotatedA = pointRotateRads(a, center, radians(-element.angle));
   const rotatedB = pointRotateRads(b, center, radians(-element.angle));
 
-  const topRight = createDiamondSide(
-    segment<GlobalPoint>(top, right),
-    verticalRadius,
-    horizontalRadius,
+  const topRight = segment<GlobalPoint>(
+    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
+    pointFrom(right[0] - verticalRadius, right[1] - horizontalRadius),
   );
-  const bottomRight = createDiamondSide(
-    segment<GlobalPoint>(bottom, right),
-    verticalRadius,
-    horizontalRadius,
+  const bottomRight = segment<GlobalPoint>(
+    pointFrom(bottom[0] + verticalRadius, bottom[1] - horizontalRadius),
+    pointFrom(right[0] - verticalRadius, right[1] + horizontalRadius),
   );
-  const bottomLeft = createDiamondSide(
-    segment<GlobalPoint>(bottom, left),
-    verticalRadius,
-    horizontalRadius,
+  const bottomLeft = segment<GlobalPoint>(
+    pointFrom(bottom[0] - verticalRadius, bottom[1] - horizontalRadius),
+    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
   );
-  const topLeft = createDiamondSide(
-    segment<GlobalPoint>(top, left),
-    verticalRadius,
-    horizontalRadius,
+  const topLeft = segment<GlobalPoint>(
+    pointFrom(top[0] - verticalRadius, top[1] + horizontalRadius),
+    pointFrom(left[0] + verticalRadius, left[1] - horizontalRadius),
   );
 
   const arcs: Arc<GlobalPoint>[] = element.roundness
@@ -337,7 +337,7 @@ const intersectDiamondWithLine = (
           topRight[0],
           pointFrom(
             top[0],
-            top[1] + Math.sqrt(2 * Math.pow(verticalRadius, 2)),
+            top[1] + Math.sqrt(2 * Math.pow(verticalRadius, 2)) - offset,
           ),
           verticalRadius,
         ), // TOP
@@ -345,7 +345,7 @@ const intersectDiamondWithLine = (
           topRight[1],
           bottomRight[1],
           pointFrom(
-            right[0] - Math.sqrt(2 * Math.pow(horizontalRadius, 2)),
+            right[0] - Math.sqrt(2 * Math.pow(horizontalRadius, 2)) + offset,
             right[1],
           ),
           horizontalRadius,
@@ -355,7 +355,7 @@ const intersectDiamondWithLine = (
           bottomLeft[0],
           pointFrom(
             bottom[0],
-            bottom[1] - Math.sqrt(2 * Math.pow(verticalRadius, 2)),
+            bottom[1] - Math.sqrt(2 * Math.pow(verticalRadius, 2)) + offset,
           ),
           verticalRadius,
         ), // BOTTOM
@@ -363,13 +363,16 @@ const intersectDiamondWithLine = (
           bottomLeft[1],
           topLeft[1],
           pointFrom(
-            left[0] + Math.sqrt(2 * Math.pow(horizontalRadius, 2)),
+            left[0] + Math.sqrt(2 * Math.pow(horizontalRadius, 2)) - offset,
             left[1],
           ),
           horizontalRadius,
         ), // LEFT
       ]
     : [];
+
+  arcs.forEach((a) => debugDrawArc(a, { color: "red" }));
+  debugDrawLine([topRight, bottomRight, bottomLeft, topLeft], {});
 
   const sides: GlobalPoint[] = [topRight, bottomRight, bottomLeft, topLeft]
     .map((s) =>

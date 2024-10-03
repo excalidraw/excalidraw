@@ -71,6 +71,7 @@ import {
 import { distanceToBindableElement } from "./distance";
 
 import { intersectElementWithLine } from "./collision";
+import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
