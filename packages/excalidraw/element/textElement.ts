@@ -54,12 +54,30 @@ const _EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
 const _CJK_BREAK_BEFORE_NOT_AFTER =
   /（［｛〈《「『【〖〔〘〚＜＠＾〝￠￡￥￦＄±/u;
 const _CJK_BREAK_AFTER_NOT_BEFORE =
-  /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．.,：；？！％‥…ー/u;
+  /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．：；？！％‥…ー/u;
 const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u;
 
 // breaking points for latin
 const _LATIN_BREAK_AFTER = /-/u;
 const _LATIN_BREAK_ALWAYS = /\s/u;
+const _ALL_BREAK_ALWAYS = new RegExp(
+  `${_LATIN_BREAK_ALWAYS.source}${_CJK_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_EMOJI_CHAR.source}`,
+  "u",
+);
+
+/**
+ * Core breaking regex and fallback for browsers (mainly Safari < 16.4) that don't support "Lookbehind assertion".
+ *
+ * Browser support as of 10/2024:
+ * - 91% Lookbehind assertion https://caniuse.com/mdn-javascript_regular_expressions_lookbehind_assertion
+ * - 94% Unicode character class escape https://caniuse.com/mdn-javascript_regular_expressions_unicode_character_class_escape
+ *
+ * Does not include advanced CJK breaking rules, but covers most of the core cases, especially for latin.
+ */
+const BREAK_LINE_REGEX_CORE = new RegExp(
+  `([${_LATIN_BREAK_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
+  "u",
+);
 
 // Hello World
 //      ↑ BREAK BEFORE " " → ["Hello", " World"]
@@ -67,10 +85,11 @@ const _LATIN_BREAK_ALWAYS = /\s/u;
 //      ↑ BREAK BEFORE "た" → ["Hello", "たWorld"]
 // Hello「World」
 //      ↑ BREAK BEFORE "「" → ["Hello", "「World」"]
-const _LOOK_AHEAD_BREAKING_POINTS = new RegExp(
-  `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}])(?=[${_LATIN_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_EMOJI_CHAR.source}])`,
-  "u",
-);
+const getLookaheadBreakingPoints = () =>
+  new RegExp(
+    `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}])(?=[${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
+    "u",
+  );
 
 // Hello World
 //       ↑ BREAK AFTER " " → ["Hello ", "World"]
@@ -80,10 +99,11 @@ const _LOOK_AHEAD_BREAKING_POINTS = new RegExp(
 //       ↑ BREAK AFTER "た" → ["Helloた", "World"]
 //「Hello」World
 //       ↑ BREAK AFTER "」" → ["「Hello」", "World"]
-const _LOOK_BEHIND_BREAKING_POINTS = new RegExp(
-  `(?![${_CJK_BREAK_AFTER_NOT_BEFORE.source}])(?<=[${_LATIN_BREAK_AFTER.source}${_LATIN_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}${_CJK_BREAK_AFTER_NOT_BEFORE.source}${_EMOJI_CHAR.source}])`,
-  "u",
-);
+const getLookbehindBreakingPoints = () =>
+  new RegExp(
+    `(?![${_CJK_BREAK_AFTER_NOT_BEFORE.source}])(?<=[${_LATIN_BREAK_AFTER.source}${_CJK_BREAK_AFTER_NOT_BEFORE.source}${_ALL_BREAK_ALWAYS.source}])`,
+    "u",
+  );
 
 /**
  * Break a line based on the whitespaces, CJK / emoji chars and language specific breaking points,
@@ -92,15 +112,29 @@ const _LOOK_BEHIND_BREAKING_POINTS = new RegExp(
  *  "Hello 世界。🌎🗺" → ["Hello", " ", "世", "界。", "🌎", "🗺"]
  *  "Hello-world" → ["Hello-", "world"]
  *  "「Hello World」" → ["「Hello", " ", "World」"]
- *
- * Browser support as of 10/2024:
- * - 91% Lookbehind assertion https://caniuse.com/mdn-javascript_regular_expressions_lookbehind_assertion
- * - 94% Unicode character class escape https://caniuse.com/mdn-javascript_regular_expressions_unicode_character_class_escape
  */
-const BREAK_LINE_REGEX = new RegExp(
-  `${_LOOK_AHEAD_BREAKING_POINTS.source}|${_LOOK_BEHIND_BREAKING_POINTS.source}`,
-  "u",
-);
+const getBreakLineRegexAdvanced = () =>
+  new RegExp(
+    `${getLookaheadBreakingPoints().source}|${
+      getLookbehindBreakingPoints().source
+    }`,
+    "u",
+  );
+
+let cachedBreakLineRegex: RegExp | undefined;
+
+// Lazy-load for browsers that don't support "Lookbehind assertion"
+const getBreakLineRegex = () => {
+  if (!cachedBreakLineRegex) {
+    try {
+      cachedBreakLineRegex = getBreakLineRegexAdvanced();
+    } catch {
+      cachedBreakLineRegex = BREAK_LINE_REGEX_CORE;
+    }
+  }
+
+  return cachedBreakLineRegex;
+};
 
 const CJK_REGEX = new RegExp(`[${_CJK_CHAR.source}]`, "u");
 const EMOJI_REGEX = new RegExp(`[${_EMOJI_CHAR.source}]`, "u");
@@ -491,6 +525,14 @@ export const getTextHeight = (
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
+// TODO: consider unit testing this!
+export const parseTokens = (line: string) => {
+  const breakLineRegex = getBreakLineRegex();
+
+  // filtering due to multi-codepoint chars like 🗺
+  return line.split(breakLineRegex).filter(Boolean);
+};
+
 const isSingleCharacter = (maybeSingleCharacter: string) => {
   return (
     maybeSingleCharacter.codePointAt(0) !== undefined &&
@@ -550,8 +592,7 @@ const wrapLine = (
   maxWidth: number,
 ): string[] => {
   const lines: Array<string> = [];
-  // filtering due to multi-codepoint chars like 🗺
-  const tokens = line.split(BREAK_LINE_REGEX).filter(Boolean);
+  const tokens = parseTokens(line);
   const tokenIterator = tokens[Symbol.iterator]();
 
   let currentLine = "";

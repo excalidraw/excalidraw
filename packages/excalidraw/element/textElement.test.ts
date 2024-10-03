@@ -39,6 +39,13 @@ describe("Test wrapText", () => {
     expect(res).toBe("H\ne\nl\nl\no\n😀");
   });
 
+  it("should not wrap number when wrapping line", () => {
+    const text = "don't wrap this number 99,100.99";
+    const maxWidth = 300;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("don't wrap this number\n99,100.99");
+  });
+
   it("should support multiple (multi-codepoint) emojis", () => {
     const text = "😀🗺🔥";
     const maxWidth = 1;
@@ -70,11 +77,6 @@ describe("Test wrapText", () => {
     expect(res2).toBe(`\tA)\none\ntab\n- two\ntabs\n- 8\nspace\ns`);
   });
 
-  // everything else is up to the splitter
-  // - multiple CJK, latin and emojis
-  // - break always (common)
-  // - break after not before
-  // - break before not after (pairs)
   describe("When text is CJK", () => {
     it("should break each CJK character when width is very small", () => {
       // "안녕하세요" (Hangul) + "こんにちは世界" (Hiragana, Kanji) + "ｺﾝﾆﾁハ" (Katakana) + "你好" (Han) = "Hello Hello World Hello Hi"
