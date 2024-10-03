@@ -16,6 +16,7 @@ import {
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
+  ENV,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
@@ -53,7 +54,7 @@ const _EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
 const _CJK_BREAK_BEFORE_NOT_AFTER =
   /（［｛〈《「『【〖〔〘〚＜＠＾〝￠￡￥￦＄±/u;
 const _CJK_BREAK_AFTER_NOT_BEFORE =
-  /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．：；？！％‥…ー/u;
+  /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．.,：；？！％‥…ー/u;
 const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u;
 
 // breaking points for latin
@@ -84,21 +85,6 @@ const _LOOK_BEHIND_BREAKING_POINTS = new RegExp(
   "u",
 );
 
-const CJK_REGEX = new RegExp(`[${_CJK_CHAR.source}]`, "u");
-const EMOJI_REGEX = new RegExp(`[${_EMOJI_CHAR.source}]`, "u");
-const BREAK_LINE_REGEX = new RegExp(
-  `${_LOOK_AHEAD_BREAKING_POINTS.source}|${_LOOK_BEHIND_BREAKING_POINTS.source}`,
-  "u",
-);
-
-export const containsCJK = (text: string) => {
-  return CJK_REGEX.test(text);
-};
-
-export const containsEmoji = (text: string) => {
-  return EMOJI_REGEX.test(text);
-};
-
 /**
  * Break a line based on the whitespaces, CJK / emoji chars and language specific breaking points,
  * like hyphen for Latin and various full-width codepoints for CJK - especially Japanese, e.g.:
@@ -111,9 +97,20 @@ export const containsEmoji = (text: string) => {
  * - 91% Lookbehind assertion https://caniuse.com/mdn-javascript_regular_expressions_lookbehind_assertion
  * - 94% Unicode character class escape https://caniuse.com/mdn-javascript_regular_expressions_unicode_character_class_escape
  */
-const parseTokens = (line: string) => {
-  // filtering due to multi-codepoint chars like 🗺
-  return line.split(BREAK_LINE_REGEX).filter(Boolean);
+const BREAK_LINE_REGEX = new RegExp(
+  `${_LOOK_AHEAD_BREAKING_POINTS.source}|${_LOOK_BEHIND_BREAKING_POINTS.source}`,
+  "u",
+);
+
+const CJK_REGEX = new RegExp(`[${_CJK_CHAR.source}]`, "u");
+const EMOJI_REGEX = new RegExp(`[${_EMOJI_CHAR.source}]`, "u");
+
+export const containsCJK = (text: string) => {
+  return CJK_REGEX.test(text);
+};
+
+export const containsEmoji = (text: string) => {
+  return EMOJI_REGEX.test(text);
 };
 
 export const normalizeText = (text: string) => {
@@ -501,11 +498,21 @@ const isSingleCharacter = (maybeSingleCharacter: string) => {
   );
 };
 
+const satisfiesWordInvariant = (word: string) => {
+  if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    if (/\s/.test(word)) {
+      throw new Error("Word should not contain any whitespaces!");
+    }
+  }
+};
+
 const wrapWord = (
   word: string,
   font: FontString,
   maxWidth: number,
 ): Array<string> => {
+  satisfiesWordInvariant(word);
+
   const lines: Array<string> = [];
   const chars = Array.from(word);
 
@@ -530,7 +537,6 @@ const wrapWord = (
     currentLineWidth = _charWidth;
   }
 
-  // TODO_CJK: expects no whitespaces => consider adding invariant
   if (currentLine) {
     lines.push(currentLine);
   }
@@ -544,7 +550,8 @@ const wrapLine = (
   maxWidth: number,
 ): string[] => {
   const lines: Array<string> = [];
-  const tokens = parseTokens(line);
+  // filtering due to multi-codepoint chars like 🗺
+  const tokens = line.split(BREAK_LINE_REGEX).filter(Boolean);
   const tokenIterator = tokens[Symbol.iterator]();
 
   let currentLine = "";
@@ -556,7 +563,7 @@ const wrapLine = (
     const token = iterator.value;
     const testLine = currentLine + token;
 
-    // cache single codepoint whitespace / CJK / emoji width calc. as kerning should not apply here
+    // cache single codepoint whitespace, CJK or emoji width calc. as kerning should not apply here
     const testLineWidth = isSingleCharacter(token)
       ? currentLineWidth + charWidth.calculate(token, font)
       : getLineWidth(testLine, font, true);
@@ -570,15 +577,14 @@ const wrapLine = (
     }
 
     // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
-    // TODO_CJK: we can do this simple check due to custom iteration => test
     if (!currentLine) {
       const wrappedWord = wrapWord(token, font, maxWidth);
-      const precedingLines = wrappedWord.slice(0, -1);
       const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
+      const precedingLines = wrappedWord.slice(0, -1);
 
       lines.push(...precedingLines);
 
-      // trailing line of the wrapped word might still be joined with next token/s => TODO_CJK: test
+      // trailing line of the wrapped word might still be joined with next token/s
       currentLine = trailingLine;
       currentLineWidth = getLineWidth(trailingLine, font, true);
       iterator = tokenIterator.next();
@@ -586,6 +592,7 @@ const wrapLine = (
       // push & reset, but don't iterate on the next token, as we didn't use it yet!
       lines.push(currentLine.trimEnd());
 
+      // purposefully not iterating and not setting `currentLine` to `token`, so that we could use a simple !currentLine check above
       currentLine = "";
       currentLineWidth = 0;
     }

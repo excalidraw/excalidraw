@@ -126,26 +126,27 @@ export class Fonts {
    * Load font faces for a given scene and trigger scene update.
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
-    const sceneFamilies = this.getSceneFontFamilies();
+    const sceneFamilies = this.getSceneFamilies();
     const loaded = await Fonts.loadFontFaces(sceneFamilies);
     this.onLoaded(loaded);
     return loaded;
   };
 
   /**
-   * Gets all the font families for the given scene.
+   * Load all registered font faces.
    */
-  public getSceneFontFamilies = () => {
-    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
+  public static loadAllFonts = async (): Promise<FontFace[]> => {
+    const allFamilies = Fonts.getAllFamilies();
+    return Fonts.loadFontFaces(allFamilies);
   };
 
   /**
    * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
    */
-  public static loadFontsForElements = async (
+  public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
-    const fontFamilies = Fonts.getFontFamilies(elements);
+    const fontFamilies = Fonts.getElementsFamilies(elements);
     return await Fonts.loadFontFaces(fontFamilies);
   };
 
@@ -243,7 +244,18 @@ export class Fonts {
     return fonts.registered;
   }
 
-  private static getFontFamilies(
+  /**
+   * Gets all the font families for the given scene.
+   */
+  public getSceneFamilies = () => {
+    return Fonts.getElementsFamilies(this.scene.getNonDeletedElements());
+  };
+
+  private static getAllFamilies() {
+    return Array.from(Fonts.registered.keys());
+  }
+
+  private static getElementsFamilies(
     elements: ReadonlyArray<ExcalidrawElement>,
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
