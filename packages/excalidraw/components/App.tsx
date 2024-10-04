@@ -7842,12 +7842,14 @@ class App extends React.Component<AppProps, AppState> {
               const nextCrop = {
                 ...crop,
                 x: clamp(
-                  crop.x - instantDragOffset.x,
+                  crop.x -
+                    instantDragOffset.x * Math.sign(croppingElement.scale[0]),
                   0,
                   image.naturalWidth - crop.width,
                 ),
                 y: clamp(
-                  crop.y - instantDragOffset.y,
+                  crop.y -
+                    instantDragOffset.y * Math.sign(croppingElement.scale[1]),
                   0,
                   image.naturalHeight - crop.height,
                 ),

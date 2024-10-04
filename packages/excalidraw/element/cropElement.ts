@@ -19,6 +19,7 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawImageElement,
+  ImageCrop,
   NonDeleted,
   NonDeletedSceneElementsMap,
 } from "./types";
@@ -62,9 +63,6 @@ const _cropElement = (
    * *––––––––––––––––––––––––*
    */
 
-  const availableTopCropSpace = croppedTop;
-  const availableLeftCropSpace = croppedLeft;
-
   const rotatedPointer = pointRotateRads(
     point(pointerX, pointerY),
     point(element.x + element.width / 2, element.y + element.height / 2),
@@ -83,50 +81,63 @@ const _cropElement = (
     height: naturalHeight,
   };
 
+  const previousCropHeight = crop.height;
+  const previousCropWidth = crop.width;
+
+  const isFlippedByX = element.scale[0] === -1;
+  const isFlippedByY = element.scale[1] === -1;
+
   if (transformHandle.includes("n")) {
-    const northBound = element.y - availableTopCropSpace;
-    const southBound = element.y + element.height;
-
-    pointerY = clamp(pointerY, northBound, southBound);
-
     const pointerDeltaY = pointerY - element.y;
-    nextHeight = Math.max(element.height - pointerDeltaY, 1);
-
-    crop.y = ((pointerDeltaY + croppedTop) / uncroppedHeight) * naturalHeight;
+    nextHeight = clamp(
+      element.height - pointerDeltaY,
+      1,
+      isFlippedByY ? uncroppedHeight - croppedTop : element.height + croppedTop,
+    );
     crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
-  }
 
-  if (transformHandle.includes("s")) {
-    const northBound = element.y;
-    const southBound = element.y + (uncroppedHeight - croppedTop);
-
-    pointerY = clamp(pointerY, northBound, southBound);
-
-    nextHeight = Math.max(pointerY - element.y, 1);
+    if (!isFlippedByY) {
+      crop.y = crop.y + (previousCropHeight - crop.height);
+    }
+  } else if (transformHandle.includes("s")) {
+    nextHeight = clamp(
+      pointerY - element.y,
+      1,
+      isFlippedByY ? element.height + croppedTop : uncroppedHeight - croppedTop,
+    );
     crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
+
+    if (isFlippedByY) {
+      const changeInCropHeight = previousCropHeight - crop.height;
+      crop.y += changeInCropHeight;
+    }
   }
 
   if (transformHandle.includes("w")) {
-    const eastBound = element.x + element.width;
-    const westBound = element.x - availableLeftCropSpace;
-
-    pointerX = clamp(pointerX, westBound, eastBound);
-
     const pointerDeltaX = pointerX - element.x;
-    nextWidth = Math.max(element.width - pointerDeltaX, 1);
 
-    crop.x = ((pointerDeltaX + croppedLeft) / uncroppedWidth) * naturalWidth;
+    nextWidth = clamp(
+      element.width - pointerDeltaX,
+      1,
+      isFlippedByX ? uncroppedWidth - croppedLeft : element.width + croppedLeft,
+    );
+
     crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
-  }
 
-  if (transformHandle.includes("e")) {
-    const eastBound = element.x + (uncroppedWidth - croppedLeft);
-    const westBound = element.x;
-
-    pointerX = clamp(pointerX, westBound, eastBound);
-
-    nextWidth = Math.max(pointerX - element.x, 1);
-    crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
+    if (!isFlippedByX) {
+      crop.x += previousCropWidth - crop.width;
+    }
+  } else if (transformHandle.includes("e")) {
+    nextWidth = clamp(
+      pointerX - element.x,
+      1,
+      isFlippedByX ? element.width + croppedLeft : uncroppedWidth - croppedLeft,
+    );
+    crop.width = nextWidth * naturalWidthToUncropped;
+    if (isFlippedByX) {
+      const changeInCropWidth = previousCropWidth - crop.width;
+      crop.x += changeInCropWidth;
+    }
   }
 
   const newOrigin = recomputeOrigin(
@@ -270,17 +281,20 @@ export const getUncroppedImageElement = (
       const leftEdgeVector = vectorSubtract(bottomLeftVector, topLeftVector);
       const leftEdgeNormalized = vectorNormalize(leftEdgeVector);
 
+      const { cropX, cropY } = adjustCropPosition(
+        element.crop,
+        element.scale,
+        image,
+      );
+
       const rotatedTopLeft = vectorAdd(
         vectorAdd(
           topLeftVector,
-          vectorScale(
-            topEdgeNormalized,
-            (-element.crop.x * width) / image.naturalWidth,
-          ),
+          vectorScale(topEdgeNormalized, (-cropX * width) / image.naturalWidth),
         ),
         vectorScale(
           leftEdgeNormalized,
-          (-element.crop.y * height) / image.naturalHeight,
+          (-cropY * height) / image.naturalHeight,
         ),
       );
 
@@ -311,4 +325,29 @@ export const getUncroppedImageElement = (
   }
 
   return element;
+};
+
+const adjustCropPosition = (
+  crop: ImageCrop,
+  scale: ExcalidrawImageElement["scale"],
+  image: HTMLImageElement,
+) => {
+  let cropX = crop.x;
+  let cropY = crop.y;
+
+  const flipX = scale[0] === -1;
+  const flipY = scale[1] === -1;
+
+  if (flipX) {
+    cropX = image.naturalWidth - Math.abs(cropX) - crop.width;
+  }
+
+  if (flipY) {
+    cropY = image.naturalHeight - Math.abs(cropY) - crop.height;
+  }
+
+  return {
+    cropX,
+    cropY,
+  };
 };

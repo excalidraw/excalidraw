@@ -132,6 +132,13 @@ export type IframeData =
       | { type: "document"; srcdoc: (theme: Theme) => string }
     );
 
+export type ImageCrop = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
@@ -141,12 +148,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
 
-    crop: {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    } | null;
+    crop: ImageCrop | null;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
