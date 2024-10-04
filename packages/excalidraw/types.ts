@@ -203,6 +203,8 @@ export type InteractiveCanvasAppState = Readonly<
     // Cropping
     isCropping: AppState["isCropping"];
     croppingElement: AppState["croppingElement"];
+    // Search matches
+    searchMatches: AppState["searchMatches"];
   }
 >;
 
@@ -393,7 +395,20 @@ export interface AppState {
   /** image cropping */
   isCropping: boolean;
   croppingElement: ExcalidrawImageElement | null;
+
+  searchMatches: readonly SearchMatch[];
 }
+
+type SearchMatch = {
+  id: string;
+  focus: boolean;
+  matchedLines: {
+    offsetX: number;
+    offsetY: number;
+    width: number;
+    height: number;
+  }[];
+};
 
 export type UIAppState = Omit<
   AppState,
@@ -651,6 +666,9 @@ export type AppClassProperties = {
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
+  getEditorUIOffsets: App["getEditorUIOffsets"];
+  visibleElements: App["visibleElements"];
+  excalidrawContainerValue: App["excalidrawContainerValue"];
 };
 
 export type PointerDownState = Readonly<{
@@ -843,3 +861,10 @@ export type GenerateDiagramToCode = (props: {
   frame: ExcalidrawMagicFrameElement;
   children: readonly ExcalidrawElement[];
 }) => MaybePromise<{ html: string }>;
+
+export type Offsets = Partial<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>;

@@ -223,7 +223,6 @@ export const newTextElement = (
     verticalAlign?: VerticalAlign;
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
-    strokeWidth?: ExcalidrawTextElement["strokeWidth"];
     autoResize?: ExcalidrawTextElement["autoResize"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {

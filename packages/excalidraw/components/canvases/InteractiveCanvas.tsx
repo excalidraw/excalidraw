@@ -205,6 +205,7 @@ const getRelevantAppStateProps = (
   editingTextElement: appState.editingTextElement,
   isCropping: appState.isCropping,
   croppingElement: appState.croppingElement,
+  searchMatches: appState.searchMatches,
 });
 
 const areEqual = (

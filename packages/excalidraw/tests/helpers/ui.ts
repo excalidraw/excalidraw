@@ -34,7 +34,7 @@ import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
 import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
-import { point, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
@@ -69,8 +69,11 @@ export class Keyboard {
     }
   };
 
-  static keyDown = (key: string) => {
-    fireEvent.keyDown(document, {
+  static keyDown = (
+    key: string,
+    target: HTMLElement | Document | Window = document,
+  ) => {
+    fireEvent.keyDown(target, {
       key,
       ctrlKey,
       shiftKey,
@@ -78,8 +81,11 @@ export class Keyboard {
     });
   };
 
-  static keyUp = (key: string) => {
-    fireEvent.keyUp(document, {
+  static keyUp = (
+    key: string,
+    target: HTMLElement | Document | Window = document,
+  ) => {
+    fireEvent.keyUp(target, {
       key,
       ctrlKey,
       shiftKey,
@@ -87,9 +93,9 @@ export class Keyboard {
     });
   };
 
-  static keyPress = (key: string) => {
-    Keyboard.keyDown(key);
-    Keyboard.keyUp(key);
+  static keyPress = (key: string, target?: HTMLElement | Document | Window) => {
+    Keyboard.keyDown(key, target);
+    Keyboard.keyUp(key, target);
   };
 
   static codeDown = (code: string) => {
@@ -136,7 +142,7 @@ const getElementPointForSelection = (
   element: ExcalidrawElement,
 ): GlobalPoint => {
   const { x, y, width, height, angle } = element;
-  const target = point<GlobalPoint>(
+  const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
     y,
@@ -145,9 +151,12 @@ const getElementPointForSelection = (
 
   if (isLinearElement(element)) {
     const bounds = getElementPointsCoords(element, element.points);
-    center = point((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
+    center = pointFrom(
+      (bounds[0] + bounds[2]) / 2,
+      (bounds[1] + bounds[3]) / 2,
+    );
   } else {
-    center = point(x + width / 2, y + height / 2);
+    center = pointFrom(x + width / 2, y + height / 2);
   }
 
   if (isTextElement(element)) {
@@ -463,8 +472,8 @@ export class UI {
     const width = initialWidth ?? initialHeight ?? size;
     const height = initialHeight ?? size;
     const points: LocalPoint[] = initialPoints ?? [
-      point(0, 0),
-      point(width, height),
+      pointFrom(0, 0),
+      pointFrom(width, height),
     ];
 
     UI.clickTool(type);

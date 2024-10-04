@@ -1,7 +1,7 @@
 import { type Point } from "points-on-curve";
 import {
   type Radians,
-  point,
+  pointFrom,
   pointCenter,
   pointRotateRads,
   vectorFromPoint,
@@ -64,8 +64,8 @@ const _cropElement = (
    */
 
   const rotatedPointer = pointRotateRads(
-    point(pointerX, pointerY),
-    point(element.x + element.width / 2, element.y + element.height / 2),
+    pointFrom(pointerX, pointerY),
+    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     -element.angle as Radians,
   );
 
@@ -199,8 +199,8 @@ const recomputeOrigin = (
     stateAtCropStart.height,
     true,
   );
-  const startTopLeft = point(x1, y1);
-  const startBottomRight = point(x2, y2);
+  const startTopLeft = pointFrom(x1, y1);
+  const startBottomRight = pointFrom(x2, y2);
   const startCenter: any = pointCenter(startTopLeft, startBottomRight);
 
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
@@ -267,16 +267,16 @@ export const getUncroppedImageElement = (
       );
 
       const topLeftVector = vectorFromPoint(
-        pointRotateRads(point(x1, y1), point(cx, cy), element.angle),
+        pointRotateRads(pointFrom(x1, y1), pointFrom(cx, cy), element.angle),
       );
       const topRightVector = vectorFromPoint(
-        pointRotateRads(point(x2, y1), point(cx, cy), element.angle),
+        pointRotateRads(pointFrom(x2, y1), pointFrom(cx, cy), element.angle),
       );
       const topEdgeNormalized = vectorNormalize(
         vectorSubtract(topRightVector, topLeftVector),
       );
       const bottomLeftVector = vectorFromPoint(
-        pointRotateRads(point(x1, y2), point(cx, cy), element.angle),
+        pointRotateRads(pointFrom(x1, y2), pointFrom(cx, cy), element.angle),
       );
       const leftEdgeVector = vectorSubtract(bottomLeftVector, topLeftVector);
       const leftEdgeNormalized = vectorNormalize(leftEdgeVector);

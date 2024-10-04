@@ -46,6 +46,7 @@ import {
   assertNever,
   cloneJSON,
   getFontString,
+  isDevEnv,
   toBrandedType,
 } from "../utils";
 import { getSizeFromPoints } from "../points";
@@ -53,7 +54,7 @@ import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
 import { isArrowElement } from "../element/typeChecks";
-import { point, type LocalPoint } from "../../math";
+import { pointFrom, type LocalPoint } from "../../math";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -536,7 +537,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newLinearElement({
           width,
           height,
-          points: [point(0, 0), point(width, height)],
+          points: [pointFrom(0, 0), pointFrom(width, height)],
           ...element,
         });
 
@@ -549,7 +550,7 @@ export const convertToExcalidrawElements = (
           width,
           height,
           endArrowhead: "arrow",
-          points: [point(0, 0), point(width, height)],
+          points: [pointFrom(0, 0), pointFrom(width, height)],
           ...element,
           type: "arrow",
         });
@@ -717,7 +718,7 @@ export const convertToExcalidrawElements = (
   }
 
   // Once all the excalidraw elements are created, we can add frames since we
-  // need to calculate coordinates and dimensions of frame which is possibe after all
+  // need to calculate coordinates and dimensions of frame which is possible after all
   // frame children are processed.
   for (const [id, element] of elementsWithIds) {
     if (element.type !== "frame" && element.type !== "magicframe") {
@@ -764,10 +765,26 @@ export const convertToExcalidrawElements = (
     maxX = maxX + PADDING;
     maxY = maxY + PADDING;
 
-    // Take the max of calculated and provided frame dimensions, whichever is higher
-    const width = Math.max(frame?.width, maxX - minX);
-    const height = Math.max(frame?.height, maxY - minY);
-    Object.assign(frame, { x: minX, y: minY, width, height });
+    const frameX = frame?.x || minX;
+    const frameY = frame?.y || minY;
+    const frameWidth = frame?.width || maxX - minX;
+    const frameHeight = frame?.height || maxY - minY;
+
+    Object.assign(frame, {
+      x: frameX,
+      y: frameY,
+      width: frameWidth,
+      height: frameHeight,
+    });
+    if (
+      isDevEnv() &&
+      element.children.length &&
+      (frame?.x || frame?.y || frame?.width || frame?.height)
+    ) {
+      console.info(
+        "User provided frame attributes are being considered, if you find this inaccurate, please remove any of the attributes - x, y, width and height so frame coordinates and dimensions are calculated automatically",
+      );
+    }
   }
 
   return elementStore.getElements();
