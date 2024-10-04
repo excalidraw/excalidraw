@@ -305,38 +305,42 @@ const renderBindingHighlightForSuggestedPointBinding = (
   });
 };
 
+type ElementSelectionBorder = {
+  angle: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  selectionColors: string[];
+  dashed?: boolean;
+  cx: number;
+  cy: number;
+  activeEmbeddable: boolean;
+  padding?: number;
+};
+
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  elementProperties: {
-    angle: number;
-    elementX1: number;
-    elementY1: number;
-    elementX2: number;
-    elementY2: number;
-    selectionColors: string[];
-    dashed?: boolean;
-    cx: number;
-    cy: number;
-    activeEmbeddable: boolean;
-  },
+  elementProperties: ElementSelectionBorder,
 ) => {
   const {
     angle,
-    elementX1,
-    elementY1,
-    elementX2,
-    elementY2,
+    x1,
+    y1,
+    x2,
+    y2,
     selectionColors,
     cx,
     cy,
     dashed,
     activeEmbeddable,
   } = elementProperties;
-  const elementWidth = elementX2 - elementX1;
-  const elementHeight = elementY2 - elementY1;
+  const elementWidth = x2 - x1;
+  const elementHeight = y2 - y1;
 
-  const padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
+  const padding =
+    elementProperties.padding ?? DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
   const linePadding = padding / appState.zoom.value;
   const lineWidth = 8 / appState.zoom.value;
@@ -358,8 +362,8 @@ const renderSelectionBorder = (
     context.lineDashOffset = (lineWidth + spaceWidth) * index;
     strokeRectWithRotation(
       context,
-      elementX1 - linePadding,
-      elementY1 - linePadding,
+      x1 - linePadding,
+      y1 - linePadding,
       elementWidth + linePadding * 2,
       elementHeight + linePadding * 2,
       cx,
@@ -431,18 +435,17 @@ const renderElementsBoxHighlight = (
   );
 
   const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
-    const [elementX1, elementY1, elementX2, elementY2] =
-      getCommonBounds(elements);
+    const [x1, y1, x2, y2] = getCommonBounds(elements);
     return {
       angle: 0,
-      elementX1,
-      elementX2,
-      elementY1,
-      elementY2,
+      x1,
+      x2,
+      y1,
+      y2,
       selectionColors: ["rgb(0,118,255)"],
       dashed: false,
-      cx: elementX1 + (elementX2 - elementX1) / 2,
-      cy: elementY1 + (elementY2 - elementY1) / 2,
+      cx: x1 + (x2 - x1) / 2,
+      cy: y1 + (y2 - y1) / 2,
       activeEmbeddable: false,
     };
   };
@@ -599,24 +602,33 @@ const renderCropHandles = (
   croppingElement: ExcalidrawImageElement,
   elementsMap: ElementsMap,
 ): void => {
-  const lineWidth = 3 / appState.zoom.value;
-  const length = 15 / appState.zoom.value;
-
   const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
     croppingElement,
     elementsMap,
   );
-  const halfWidth =
-    cx - x1 + (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
-  const halfHeight =
-    cy - y1 + (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
+
+  const LINE_WIDTH = 3;
+  const LINE_LENGTH = 20;
+
+  const ZOOMED_LINE_WIDTH = LINE_WIDTH / appState.zoom.value;
+  const ZOOMED_HALF_LINE_WIDTH = ZOOMED_LINE_WIDTH / 2;
+
+  const HALF_WIDTH = cx - x1 + ZOOMED_LINE_WIDTH;
+  const HALF_HEIGHT = cy - y1 + ZOOMED_LINE_WIDTH;
+
+  const HORIZONTAL_LINE_LENGTH = Math.min(
+    LINE_LENGTH / appState.zoom.value,
+    HALF_WIDTH,
+  );
+  const VERTICAL_LINE_LENGTH = Math.min(
+    LINE_LENGTH / appState.zoom.value,
+    HALF_HEIGHT,
+  );
 
   context.save();
   context.fillStyle = renderConfig.selectionColor;
   context.strokeStyle = renderConfig.selectionColor;
-  context.lineWidth = lineWidth;
-
-  const halfLineWidth = lineWidth / 2;
+  context.lineWidth = ZOOMED_LINE_WIDTH;
 
   const handles: Array<
     [
@@ -629,34 +641,40 @@ const renderCropHandles = (
   > = [
     [
       // x, y
-      [-halfWidth, -halfHeight],
-      // first start and t0
-      [0, halfLineWidth],
-      [length, halfLineWidth],
-      // second  start and to
-      [halfLineWidth, 0],
-      [halfLineWidth, length - halfLineWidth],
+      [-HALF_WIDTH, -HALF_HEIGHT],
+      // horizontal line: first start and to
+      [0, ZOOMED_HALF_LINE_WIDTH],
+      [HORIZONTAL_LINE_LENGTH, ZOOMED_HALF_LINE_WIDTH],
+      // vertical line: second  start and to
+      [ZOOMED_HALF_LINE_WIDTH, 0],
+      [ZOOMED_HALF_LINE_WIDTH, VERTICAL_LINE_LENGTH],
     ],
     [
-      [halfWidth - halfLineWidth, -halfHeight + halfLineWidth],
-      [halfLineWidth, 0],
-      [-length + halfLineWidth, 0],
-      [0, -halfLineWidth],
-      [0, length - lineWidth],
+      [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, -HALF_HEIGHT],
+      [ZOOMED_HALF_LINE_WIDTH, ZOOMED_HALF_LINE_WIDTH],
+      [
+        -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
+        ZOOMED_HALF_LINE_WIDTH,
+      ],
+      [0, 0],
+      [0, VERTICAL_LINE_LENGTH],
     ],
     [
-      [-halfWidth, halfHeight],
-      [0, -halfLineWidth],
-      [length, -halfLineWidth],
-      [halfLineWidth, 0],
-      [halfLineWidth, -length + halfLineWidth],
+      [-HALF_WIDTH, HALF_HEIGHT],
+      [0, -ZOOMED_HALF_LINE_WIDTH],
+      [HORIZONTAL_LINE_LENGTH, -ZOOMED_HALF_LINE_WIDTH],
+      [ZOOMED_HALF_LINE_WIDTH, 0],
+      [ZOOMED_HALF_LINE_WIDTH, -VERTICAL_LINE_LENGTH],
     ],
     [
-      [halfWidth - halfLineWidth, halfHeight - halfLineWidth],
-      [halfLineWidth, 0],
-      [-length + halfLineWidth, 0],
-      [0, halfLineWidth],
-      [0, -length + lineWidth],
+      [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, HALF_HEIGHT],
+      [ZOOMED_HALF_LINE_WIDTH, -ZOOMED_HALF_LINE_WIDTH],
+      [
+        -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
+        -ZOOMED_HALF_LINE_WIDTH,
+      ],
+      [0, 0],
+      [0, -VERTICAL_LINE_LENGTH],
     ],
   ];
 
@@ -871,18 +889,7 @@ const _renderInteractiveScene = ({
       // Optimisation for finding quickly relevant element ids
       const locallySelectedIds = arrayToMap(selectedElements);
 
-      const selections: {
-        angle: number;
-        elementX1: number;
-        elementY1: number;
-        elementX2: number;
-        elementY2: number;
-        selectionColors: string[];
-        dashed?: boolean;
-        cx: number;
-        cy: number;
-        activeEmbeddable: boolean;
-      }[] = [];
+      const selections: ElementSelectionBorder[] = [];
 
       for (const element of elementsMap.values()) {
         const selectionColors = [];
@@ -922,14 +929,17 @@ const _renderInteractiveScene = ({
         }
 
         if (selectionColors.length) {
-          const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
-            getElementAbsoluteCoords(element, elementsMap, true);
+          const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+            element,
+            elementsMap,
+            true,
+          );
           selections.push({
             angle: element.angle,
-            elementX1,
-            elementY1,
-            elementX2,
-            elementY2,
+            x1,
+            y1,
+            x2,
+            y2,
             selectionColors,
             dashed: !!remoteClients,
             cx,
@@ -937,24 +947,25 @@ const _renderInteractiveScene = ({
             activeEmbeddable:
               appState.activeEmbeddable?.element === element &&
               appState.activeEmbeddable.state === "active",
+            padding:
+              element.id === appState.croppingElement?.id ? 0 : undefined,
           });
         }
       }
 
       const addSelectionForGroupId = (groupId: GroupId) => {
         const groupElements = getElementsInGroup(elementsMap, groupId);
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getCommonBounds(groupElements);
+        const [x1, y1, x2, y2] = getCommonBounds(groupElements);
         selections.push({
           angle: 0,
-          elementX1,
-          elementX2,
-          elementY1,
-          elementY2,
+          x1,
+          x2,
+          y1,
+          y2,
           selectionColors: [oc.black],
           dashed: true,
-          cx: elementX1 + (elementX2 - elementX1) / 2,
-          cy: elementY1 + (elementY2 - elementY1) / 2,
+          cx: x1 + (x2 - x1) / 2,
+          cy: y1 + (y2 - y1) / 2,
           activeEmbeddable: false,
         });
       };
