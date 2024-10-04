@@ -7997,20 +7997,31 @@ class App extends React.Component<AppProps, AppState> {
           let dy = pointerCoords.y - newElement.y;
 
           if(event.shiftKey) {
+
             const angle = Math.atan2(dy, dx);
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            const snappingInterval = Math.PI / 4;
+            const snappingAngles = [
+              0, Math.PI / 6, Math.PI / 4, Math.PI / 3, Math.PI / 2,
+              (2 * Math.PI) / 3, (3 * Math.PI) / 4, (5 * Math.PI) / 6,
+              Math.PI, (7 * Math.PI) / 6, (5 * Math.PI) / 4, (4 * Math.PI) / 3,
+              (3 * Math.PI) / 2, (5 * Math.PI) / 3, (7 * Math.PI) / 4, (11 * Math.PI) / 6
+            ];
+            
+            const closestAngle = snappingAngles.reduce((prev, curr) =>
+              Math.abs(curr - angle) < Math.abs(prev - angle) ? curr : prev
+            );
 
-            const snappedAngle = Math.round(angle / snappingInterval) * snappingInterval;
-
-            dx = Math.cos(snappedAngle) * distance;
-            dy = Math.sin(snappedAngle) * distance;
+            dx = Math.cos(closestAngle) * distance;
+            dy = Math.sin(closestAngle) * distance;
           }
-
           const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+
+          const minDistance = 15;
+          const maxDistance = 200;
+          const distanceFromLastPoint = lastPoint ? Math.sqrt(Math.pow(lastPoint[0] - dx, 2) + Math.pow(lastPoint[1] - dy, 2)) : Infinity;
+
+          const discardPoint = lastPoint && (distanceFromLastPoint < minDistance || distanceFromLastPoint > maxDistance);
 
           if (!discardPoint) {
             const pressures = newElement.simulatePressure
