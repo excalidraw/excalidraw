@@ -2,7 +2,8 @@ import { ButtonIconSelect } from "../components/ButtonIconSelect";
 
 import { DiamondIcon, EllipseIcon, RectangleIcon } from "../components/icons";
 
-import { newElement } from "../element";
+import { newElement, redrawTextBoundingBox } from "../element";
+
 import { isFlowchartNodeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
@@ -23,17 +24,36 @@ export const actionChangeShapeType = register({
     value: "rectangle" | "diamond" | "ellipse",
     app: AppClassProperties,
   ) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (el.type !== value && isFlowchartNodeElement(el)) {
-          return newElement({
-            ...el,
-            type: value,
-            versionNonce: randomInteger(),
-          });
+    const newElements = changeProperty(elements, appState, (el) => {
+      if (el.type !== value && isFlowchartNodeElement(el)) {
+        const side = el.width > el.height ? el.width : el.height;
+        const newShape = newElement({
+          ...el,
+          width: side,
+          height: side,
+          type: value,
+          versionNonce: randomInteger(),
+        });
+        return newShape;
+      }
+      return el;
+    });
+    newElements.forEach((ele) => {
+      if (ele.type === "text" && ele.containerId) {
+        const container = newElements.find((e) => e.id === ele.containerId);
+        if (container === undefined) {
+          return;
         }
-        return el;
-      }),
+        redrawTextBoundingBox(
+          ele,
+          container,
+          app.scene.getNonDeletedElementsMap(),
+        );
+      }
+    });
+
+    return {
+      elements: newElements,
       storeAction: StoreAction.CAPTURE,
     };
   },
