@@ -24,7 +24,7 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Excalidraw depends on assets such as localization files (if you opt to use them), fonts, and others.
 
-By default these assets are loaded from a public CDN [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist), so you don't need to do anything on your end.
+By default these assets are loaded from a public CDN [`https://unpkg.com/@excalidraw/excalidraw/dist/prod/`](https://unpkg.com/@excalidraw/excalidraw/dist/prod/), so you don't need to do anything on your end.
 
 However, if you want to host these files yourself, you can find them in your `node_modules/@excalidraw/excalidraw/dist` directory, in folders `excalidraw-assets` (for production) and `excalidraw-assets-dev` (for development).
 
@@ -32,6 +32,26 @@ Copy these folders to your static assets directory, and add a `window.EXCALIDRAW
 
 ```js
 window.EXCALIDRAW_ASSET_PATH = "/";
+```
+
+or, if you serve your assets from the root of your CDN, you would do:
+
+```js
+// Vanilla
+<head>
+    <script>
+        window.EXCALIDRAW_ASSET_PATH = "https://my.cdn.com/assets/";
+    </script>    
+</head>
+```
+
+or, if you prefer the path to be dynamicly set based on the `location.origin`, you could do the following:
+
+```jsx
+// Next.js
+<Script id="load-env-variables" strategy="beforeInteractive" >
+    { `window["EXCALIDRAW_ASSET_PATH"] = location.origin;` } // or use just "/"!
+</Script>
 ```
 
 ### Dimensions of Excalidraw
