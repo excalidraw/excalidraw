@@ -175,7 +175,7 @@
     "exportImage": "Exportera bild...",
     "export": "Spara till...",
     "copyToClipboard": "Kopiera till urklipp",
-    "copyLink": "",
+    "copyLink": "Kopiera länk",
     "save": "Spara till aktuell fil",
     "saveAs": "Spara som",
     "load": "Öppna",
@@ -574,18 +574,18 @@
     "preview": "Förhandsgranska"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Snabbsök"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "gammal"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "I den här scenen",
+    "availableFonts": "Tillgängliga typsnitt",
+    "empty": "Inga typsnitt hittades"
   },
   "userList": {
-    "empty": "",
+    "empty": "Inga användare hittades",
     "hint": {
       "text": "Klicka på användaren för att följa",
       "followStatus": "Du följer den här användaren",
