@@ -213,6 +213,7 @@ const LayerUI = ({
           // approximate height of hamburgerMenu + footer
           maxHeight: `${appState.height - 166}px`,
         }}
+        collapsable
       >
         <SelectedShapeActions
           appState={appState}
