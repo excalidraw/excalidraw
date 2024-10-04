@@ -113,7 +113,7 @@
     "share": "Dela",
     "showStroke": "Visa färgväljare för linjefärg",
     "showBackground": "Visa färgväljare för bakgrundsfärg",
-    "showFonts": "",
+    "showFonts": "Visa typsnittsväljare",
     "toggleTheme": "Växla ljus/mörkt tema",
     "theme": "Tema",
     "personalLib": "Personligt bibliotek",
@@ -167,7 +167,7 @@
     "noMatch": "Inga träffar hittades...",
     "singleResult": "resultat",
     "multipleResults": "resultat",
-    "placeholder": ""
+    "placeholder": "Hitta text på canvas..."
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
