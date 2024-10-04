@@ -7998,11 +7998,12 @@ class App extends React.Component<AppProps, AppState> {
 
           if(event.shiftKey) {
             const angle = Math.atan2(dy, dx);
-
-            const step = Math.PI / 4;
-            const snappedAngle = Math.round(angle / step) * step;
-
             const distance = Math.sqrt(dx * dx + dy * dy);
+
+            const snappingInterval = Math.PI / 4;
+
+            const snappedAngle = Math.round(angle / snappingInterval) * snappingInterval;
+
             dx = Math.cos(snappedAngle) * distance;
             dy = Math.sin(snappedAngle) * distance;
           }
