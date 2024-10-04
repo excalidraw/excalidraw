@@ -38,6 +38,7 @@ const _CJK_CHAR =
 
 // should cover most emojis, including skin tone, gender variations, pictographic chars and etc.
 const _EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
+const _MULTI_CODEPOINT_EMOJI_SEPARATOR = /\u200D\uFE0F\u20E3/u;
 
 // full width CJK characters which are natural breaking points
 // ~ expect a break before (lookahead), but not after (negative lookbehind),  i.e. "（"
@@ -52,7 +53,7 @@ const _EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
 //         ↑ BREAK AFTER "」" (lookbehind)
 // → ["Hello", "「た」", "World"]
 const _CJK_BREAK_BEFORE_NOT_AFTER =
-  /（［｛〈《「『【〖〔〘〚＜＠＾〝￠￡￥￦＄±/u;
+  /（［｛〈《「『【〖〔〘〚＜＠＾〝￠￡＄￥￦±/u;
 const _CJK_BREAK_AFTER_NOT_BEFORE =
   /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．：；？！％‥…ー/u;
 const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u;
@@ -66,7 +67,7 @@ const _ALL_BREAK_ALWAYS = new RegExp(
 );
 
 /**
- * Core breaking regex and fallback for browsers (mainly Safari < 16.4) that don't support "Lookbehind assertion".
+ * Simple fallback for browsers (mainly Safari < 16.4) that don't support "Lookbehind assertion".
  *
  * Browser support as of 10/2024:
  * - 91% Lookbehind assertion https://caniuse.com/mdn-javascript_regular_expressions_lookbehind_assertion
@@ -74,7 +75,7 @@ const _ALL_BREAK_ALWAYS = new RegExp(
  *
  * Does not include advanced CJK breaking rules, but covers most of the core cases, especially for latin.
  */
-const BREAK_LINE_REGEX_CORE = new RegExp(
+const BREAK_LINE_REGEX_SIMPLE = new RegExp(
   `([${_LATIN_BREAK_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
   "u",
 );
@@ -87,7 +88,7 @@ const BREAK_LINE_REGEX_CORE = new RegExp(
 //      ↑ BREAK BEFORE "「" → ["Hello", "「World」"]
 const getLookaheadBreakingPoints = () =>
   new RegExp(
-    `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}])(?=[${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
+    `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_MULTI_CODEPOINT_EMOJI_SEPARATOR.source}])(?=[${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
     "u",
   );
 
@@ -129,7 +130,7 @@ const getBreakLineRegex = () => {
     try {
       cachedBreakLineRegex = getBreakLineRegexAdvanced();
     } catch {
-      cachedBreakLineRegex = BREAK_LINE_REGEX_CORE;
+      cachedBreakLineRegex = BREAK_LINE_REGEX_SIMPLE;
     }
   }
 
@@ -525,7 +526,6 @@ export const getTextHeight = (
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
-// TODO: consider unit testing this!
 export const parseTokens = (line: string) => {
   const breakLineRegex = getBreakLineRegex();
 

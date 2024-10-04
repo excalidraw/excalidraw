@@ -24,14 +24,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames(chunkInfo) {
+          // TODO: consider splitting all fonts similar to Xiaolai
+          // fonts don't change often, so hash is not necessary
+          // put on root so we are flexible about the CDN path
           if (chunkInfo?.name?.endsWith(".woff2")) {
-            // TODO: consider splitting also other fonts and thus skipping hash altogether
-            if (chunkInfo.name.includes("Xiaolai")) {
-              return "[name][extname]";
-            } else {
-              // put on root so we are flexible about the CDN path
-              return "[name]-[hash][extname]";
-            }
+            return "[name]-[extname]";
           }
 
           return "assets/[name]-[hash][extname]";

@@ -115,8 +115,8 @@ module.exports.woff2ServerPlugin = (options = {}) => {
 
         // for now we are interested in the regular families only
         for (const [family, { Regular }] of sortedFonts) {
-          if (family === "Xiaolai SC") {
-            // don't generate ttf for Xiaolai SC, as we have it hardcoded
+          if (family.includes("Xiaolai")) {
+            // don't generate ttf for Xiaolai, as we have it hardcoded
             continue;
           }
 

@@ -9,6 +9,7 @@ import {
   wrapText,
   detectLineHeight,
   getLineHeightInPx,
+  parseTokens,
 } from "./textElement";
 import type { ExcalidrawTextElementWithContainer, FontString } from "./types";
 
@@ -157,7 +158,7 @@ describe("Test wrapText", () => {
       expect(res).toBe("「Hello\nた」World");
     });
 
-    it("should break regular Chinese sentences", () => {
+    it("should break Chinese sentences", () => {
       const text = `中国你好！这是一个测试。
 我们来看看：人民币¥1234「很贵」
 （括号）、逗号，句号。空格 换行　全角符号…—`;
@@ -176,7 +177,7 @@ describe("Test wrapText", () => {
     });
   });
 
-  it("should break regular Japanese sentences", () => {
+  it("should break Japanese sentences", () => {
     const text = `日本こんにちは！これはテストです。
   見てみましょう：円￥1234「高い」
   （括弧）、読点、句点。
@@ -197,7 +198,7 @@ describe("Test wrapText", () => {
   空白\n改行　全角\n記号…ー`);
   });
 
-  it("should break regular Korean sentences", () => {
+  it("should break Korean sentences", () => {
     const text = `한국 안녕하세요! 이것은 테스트입니다.
 우리 보자: 원화₩1234「비싸다」
 (괄호), 쉼표, 마침표.
@@ -392,6 +393,184 @@ break it now`,
         const res = wrapText(text, font, data.width - BOUND_TEXT_PADDING * 2);
         expect(res).toEqual(data.res);
       });
+    });
+  });
+
+  describe("Test parseTokens", () => {
+    it("should tokenize latin", () => {
+      let text = "Excalidraw is a virtual collaborative whiteboard";
+
+      expect(parseTokens(text)).toEqual([
+        "Excalidraw",
+        " ",
+        "is",
+        " ",
+        "a",
+        " ",
+        "virtual",
+        " ",
+        "collaborative",
+        " ",
+        "whiteboard",
+      ]);
+
+      text =
+        "Wikipedia is hosted by Wikimedia- Foundation, a non-profit organization that also hosts a range-of other projects";
+      expect(parseTokens(text)).toEqual([
+        "Wikipedia",
+        " ",
+        "is",
+        " ",
+        "hosted",
+        " ",
+        "by",
+        " ",
+        "Wikimedia-",
+        " ",
+        "Foundation,",
+        " ",
+        "a",
+        " ",
+        "non-",
+        "profit",
+        " ",
+        "organization",
+        " ",
+        "that",
+        " ",
+        "also",
+        " ",
+        "hosts",
+        " ",
+        "a",
+        " ",
+        "range-",
+        "of",
+        " ",
+        "other",
+        " ",
+        "projects",
+      ]);
+    });
+
+    it("should tokenize emojis", () => {
+      const text = `👩🏽‍🦰👨‍👩‍👧‍👦👩🏾‍🔬🏳️‍🌈🧔‍♀️🧑‍🤝‍🧑🙅🏽‍♂️🇺🇸🦅`;
+      const tokens = parseTokens(text);
+
+      // for now it's enough to multicode-emojis split as individual codepoints as the editor will take care of joining them together
+      expect(tokens).toEqual([
+        "👩",
+        "🏽",
+        "‍🦰",
+        "👨",
+        "‍👩",
+        "‍👧",
+        "‍👦",
+        "👩",
+        "🏾",
+        "‍🔬",
+        "🏳",
+        "️‍🌈",
+        "🧔",
+        "‍♀",
+        "️🧑",
+        "‍🤝",
+        "‍🧑",
+        "🙅",
+        "🏽",
+        "‍♂",
+        "️🇺",
+        "🇸",
+        "🦅",
+      ]);
+    });
+
+    it("should tokenize CJK", () => {
+      const text = `《道德經》こんにちは世界！안녕하세요세계；Hello World？・ニューヨーク・た…￥3700.55す。090-1234-5678￥1,000〜＄5,000「素晴らしい！」〔重要〕＃１：Taro君30％は、（たなばた）〰￥110±￥570で20℃〜9:30〜10:00【一番】`;
+      // [
+      //   '《道',  '德',   '經》',      'こ',    'ん',
+      //   'に',    'ち',   'は',        '世',    '界！',
+      //   '안',    '녕',   '하',        '세',    '요',
+      //   '세',    '계；', 'Hello',     ' ',     'World？',
+      //   '・',    'ニ',   'ュー',      'ヨー',  'ク',
+      //   '・',    'た…',  '￥3700.55', 'す。',  '090-',
+      //   '1234-', '5678', '￥1,000',   '〜',    '＄5,000',
+      //   '「素',  '晴',   'ら',        'し',    'い！」',
+      //   '〔重',  '要〕', '＃',        '１：',  'Taro',
+      //   '君',    '30％', 'は、',      '（た',  'な',
+      //   'ば',    'た）', '〰',        '￥110', '±￥570',
+      //   'で',    '20℃',  '〜',        '9:30',  '〜',
+      //   '10:00', '【一', '番】'
+      // ]
+      const tokens = parseTokens(text);
+
+      // Latin
+      expect(tokens).toContain("Hello");
+      expect(tokens).toContain("World？");
+      expect(tokens).toContain("Taro");
+
+      // Chinese
+      expect(tokens).toContain("《道");
+      expect(tokens).toContain("德");
+      expect(tokens).toContain("經》");
+
+      // Japanese
+      expect(tokens).toContain("こ");
+      expect(tokens).toContain("ん");
+      expect(tokens).toContain("に");
+      expect(tokens).toContain("ち");
+      expect(tokens).toContain("は");
+      expect(tokens).toContain("世");
+      expect(tokens).toContain("ニ");
+      expect(tokens).toContain("ク");
+      expect(tokens).toContain("界！");
+      expect(tokens).toContain("す。");
+      expect(tokens).toContain("ュー");
+      expect(tokens).toContain("た…");
+      expect(tokens).toContain("「素");
+      expect(tokens).toContain("晴");
+      expect(tokens).toContain("ら");
+      expect(tokens).toContain("し");
+      expect(tokens).toContain("い！」");
+      expect(tokens).toContain("君");
+      expect(tokens).toContain("は、");
+      expect(tokens).toContain("（た");
+      expect(tokens).toContain("な");
+      expect(tokens).toContain("ば");
+      expect(tokens).toContain("た）");
+      expect(tokens).toContain("で");
+      expect(tokens).toContain("【一");
+      expect(tokens).toContain("番】");
+
+      // Check for Korean
+      expect(tokens).toContain("안");
+      expect(tokens).toContain("녕");
+      expect(tokens).toContain("하");
+      expect(tokens).toContain("세");
+      expect(tokens).toContain("요");
+      expect(tokens).toContain("세");
+      expect(tokens).toContain("계；");
+
+      // Numbers and units
+      expect(tokens).toContain("￥3700.55");
+      expect(tokens).toContain("090-");
+      expect(tokens).toContain("1234-");
+      expect(tokens).toContain("5678");
+      expect(tokens).toContain("￥1,000");
+      expect(tokens).toContain("＄5,000");
+      expect(tokens).toContain("１：");
+      expect(tokens).toContain("30％");
+      expect(tokens).toContain("￥110");
+      expect(tokens).toContain("±￥570");
+      expect(tokens).toContain("20℃");
+      expect(tokens).toContain("9:30");
+      expect(tokens).toContain("10:00");
+
+      // Punctuation and symbols
+      expect(tokens).toContain("・");
+      expect(tokens).toContain("〜");
+      expect(tokens).toContain("〰");
+      expect(tokens).toContain("＃");
     });
   });
 });
