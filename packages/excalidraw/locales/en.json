@@ -158,7 +158,8 @@
     "autoResize": "Enable text auto-resizing",
     "changeToRectangle": "Change shape type to rectangle",
     "changeToDiamond": "Change shape type to diamond",
-    "changeToEllipse": "Change shape type to ellipse"
+    "changeToEllipse": "Change shape type to ellipse",
+    "changeShapesTypes": "Shapes types"
   },
   "library": {
     "noItems": "No items added yet...",

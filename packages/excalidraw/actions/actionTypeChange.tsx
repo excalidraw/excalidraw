@@ -1,63 +1,83 @@
-import { cutIcon } from "../components/icons";
+import { ButtonIconSelect } from "../components/ButtonIconSelect";
+
+import { DiamondIcon, EllipseIcon, RectangleIcon } from "../components/icons";
+
 import { newElement } from "../element";
+import { isFlowchartNodeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
-import { KEYS } from "../keys";
+import { t } from "../i18n";
+
 import { randomInteger } from "../random";
 import { StoreAction } from "../store";
 import type { AppClassProperties, AppState } from "../types";
+import { changeProperty, getFormValue } from "./actionProperties";
 import { register } from "./register";
 
-const changeShapeForAllSelected =
-  (newType: "rectangle" | "diamond" | "ellipse") =>
-  (
+export const actionChangeShapeType = register({
+  name: "changeShapeType",
+  label: "labels.shapeType",
+  trackEvent: { category: "element", action: "changeShapeForAllSelected" },
+  perform: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    value: null,
+    value: "rectangle" | "diamond" | "ellipse",
     app: AppClassProperties,
   ) => {
-    const selectedElements = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeElementsInFrames: true,
-    });
-
     return {
-      elements: [
-        ...elements,
-        ...selectedElements.map((el) =>
-          newElement({
+      elements: changeProperty(elements, appState, (el) => {
+        if (el.type !== value && isFlowchartNodeElement(el)) {
+          return newElement({
             ...el,
-            type: newType,
-            versionNonce: randomInteger(), // Force state update
-          }),
-        ),
-      ],
+            type: value,
+            versionNonce: randomInteger(),
+          });
+        }
+        return el;
+      }),
       storeAction: StoreAction.CAPTURE,
     };
-  };
-
-export const actionChangeToRectangle = register({
-  name: "changeToRectangle",
-  label: "labels.changeToRectangle",
-  icon: cutIcon,
-  trackEvent: { category: "element", action: "changeToRectangle" },
-  perform: changeShapeForAllSelected("rectangle"),
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS[2],
-});
-
-export const actionChangeToDiamond = register({
-  name: "changeToDiamond",
-  label: "labels.changeToDiamond",
-  icon: cutIcon,
-  trackEvent: { category: "element", action: "changeToRectangle" },
-  perform: changeShapeForAllSelected("diamond"),
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS[3],
-});
-
-export const actionChangeToEllipse = register({
-  name: "changeToEllipse",
-  label: "labels.changeToEllipse",
-  icon: cutIcon,
-  trackEvent: { category: "element", action: "changeToEllipse" },
-  perform: changeShapeForAllSelected("ellipse"),
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS[4],
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => (
+    <fieldset>
+      <legend>{t("labels.changeShapesTypes")}</legend>
+      <ButtonIconSelect
+        group="shapeType"
+        options={[
+          {
+            value: "rectangle",
+            text: t("labels.changeToRectangle"),
+            icon: RectangleIcon,
+            testId: "sharp-rectangle",
+          },
+          {
+            value: "diamond",
+            text: t("labels.changeToDiamond"),
+            icon: DiamondIcon,
+            testId: "sharp-rectangle",
+          },
+          {
+            value: "ellipse",
+            text: t("labels.changeToEllipse"),
+            icon: EllipseIcon,
+            testId: "elbow-arrow",
+          },
+        ]}
+        aria-label={t("labels.changeToRectangle")}
+        value={getFormValue(
+          elements,
+          appState,
+          (element) => {
+            if (isFlowchartNodeElement(element)) {
+              return element.type;
+            }
+            return null;
+          },
+          (element) => isFlowchartNodeElement(element),
+          (hasSelection) =>
+            hasSelection ? null : appState.currentItemArrowType,
+        )}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
 });
