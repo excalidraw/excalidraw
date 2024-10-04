@@ -581,6 +581,7 @@ export const regenerateId = (
     if (
       window.h?.app
         ?.getSceneElementsIncludingDeleted()
+        // @ts-ignore
         .find((el: ExcalidrawElement) => el.id === nextId)
     ) {
       nextId += "_copy";

@@ -2,6 +2,7 @@
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"],
   "compilerOptions": {
     "target": "ESNext",
+    "noEmitOnError": true,
     "strict": true,
     "outDir": "dist",
     "skipLibCheck": true,
