@@ -6010,20 +6010,6 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       }
-
-      if (
-        !LinearElementEditor.arePointsEqual(
-          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
-          segmentMidPointHoveredCoords,
-        )
-      ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
-            segmentMidPointHoveredCoords,
-          },
-        });
-      }
     } else {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
     }

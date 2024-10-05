@@ -101,7 +101,6 @@ export class LinearElementEditor {
     | "keep";
   public readonly endBindingElement: ExcalidrawBindableElement | null | "keep";
   public readonly hoverPointIndex: number;
-  public readonly segmentMidPointHoveredCoords: GlobalPoint | null;
   public readonly elbowed: boolean;
 
   constructor(element: NonDeleted<ExcalidrawLinearElement>) {
@@ -131,7 +130,6 @@ export class LinearElementEditor {
       },
     };
     this.hoverPointIndex = -1;
-    this.segmentMidPointHoveredCoords = null;
     this.elbowed = isElbowArrow(element) && element.elbowed;
   }
 
@@ -586,20 +584,6 @@ export class LinearElementEditor {
     const threshold =
       LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
 
-    const existingSegmentMidpointHitCoords =
-      linearElementEditor.segmentMidPointHoveredCoords;
-    if (existingSegmentMidpointHitCoords) {
-      const distance = pointDistance(
-        pointFrom(
-          existingSegmentMidpointHitCoords[0],
-          existingSegmentMidpointHitCoords[1],
-        ),
-        pointFrom(scenePointer.x, scenePointer.y),
-      );
-      if (distance <= threshold) {
-        return existingSegmentMidpointHitCoords;
-      }
-    }
     let index = 0;
     const midPoints: typeof editorMidPointsCache["points"] =
       LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
