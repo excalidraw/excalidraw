@@ -7665,6 +7665,8 @@ class App extends React.Component<AppProps, AppState> {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
 
+        let didDrag = false;
+
         if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
@@ -7716,29 +7718,59 @@ class App extends React.Component<AppProps, AppState> {
               this.state.selectedLinearElement.elementId,
               elementsMap,
             )!,
-          )
+          ) &&
+          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+            .index
         ) {
-          // pointerCoords
           const arrow = LinearElementEditor.getElement(
             this.state.selectedLinearElement.elementId,
             elementsMap,
           ) as ExcalidrawElbowArrowElement;
           const { index: segmentIdx } =
             this.state.selectedLinearElement.pointerDownState.segmentMidpoint;
-          const startPoint = arrow.points[segmentIdx! - 1];
-          const endPoint = arrow.points[segmentIdx!];
-          const nextPoints = Array.from(arrow.points);
-          if (startPoint[0] === endPoint[0]) {
-            // HORIZONTAL
-            nextPoints[segmentIdx! - 1][0] = pointerCoords.x;
-            nextPoints[segmentIdx!][0] = pointerCoords.x;
-          } else {
-            // VERTICAL
-            nextPoints[segmentIdx! - 1][1] = pointerCoords.x;
-            nextPoints[segmentIdx!][1] = pointerCoords.x;
-          }
-          console.log("???");
-          mutateElbowArrow(arrow, elementsMap, nextPoints);
+          const startPoint =
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
+              arrow,
+              segmentIdx! - 1,
+              elementsMap,
+            );
+          const endPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            segmentIdx!,
+            elementsMap,
+          );
+          const isHorizontal = startPoint[0] === endPoint[0];
+          LinearElementEditor.movePoints(
+            arrow,
+            [
+              {
+                index: segmentIdx! - 1,
+                point: LinearElementEditor.pointFromAbsoluteCoords(
+                  arrow,
+                  pointFrom(
+                    isHorizontal ? pointerCoords.x : startPoint[0],
+                    !isHorizontal ? pointerCoords.y : startPoint[1],
+                  ),
+                  elementsMap,
+                ),
+                isDragging: true,
+              },
+              {
+                index: segmentIdx!,
+                point: LinearElementEditor.pointFromAbsoluteCoords(
+                  arrow,
+                  pointFrom(
+                    isHorizontal ? pointerCoords.x : endPoint[0],
+                    !isHorizontal ? pointerCoords.y : endPoint[1],
+                  ),
+                  elementsMap,
+                ),
+                isDragging: true,
+              },
+            ],
+            elementsMap,
+          );
+          didDrag = true;
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
           !linearElementEditor.pointerDownState.segmentMidpoint.added
@@ -7746,20 +7778,21 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const didDrag = LinearElementEditor.handlePointDragging(
-          event,
-          this,
-          pointerCoords.x,
-          pointerCoords.y,
-          (element, pointsSceneCoords) => {
-            this.maybeSuggestBindingsForLinearElementAtCoords(
-              element,
-              pointsSceneCoords,
-            );
-          },
-          linearElementEditor,
-          this.scene,
-        );
+        didDrag =
+          LinearElementEditor.handlePointDragging(
+            event,
+            this,
+            pointerCoords.x,
+            pointerCoords.y,
+            (element, pointsSceneCoords) => {
+              this.maybeSuggestBindingsForLinearElementAtCoords(
+                element,
+                pointsSceneCoords,
+              );
+            },
+            linearElementEditor,
+            this.scene,
+          ) || didDrag;
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
@@ -7775,6 +7808,7 @@ class App extends React.Component<AppProps, AppState> {
               },
             });
           }
+
           if (!this.state.selectedLinearElement.isDragging) {
             this.setState({
               selectedLinearElement: {

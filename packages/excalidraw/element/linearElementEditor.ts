@@ -1266,10 +1266,10 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
+      fixedSegments?: number[] | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
-      isDragging?: boolean;
     },
   ) {
     const { points } = element;
@@ -1432,6 +1432,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
+      fixedSegments?: number[] | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1439,23 +1440,27 @@ export class LinearElementEditor {
     },
   ) {
     if (isElbowArrow(element)) {
-      const bindings: {
+      const updates: {
         startBinding?: FixedPointBinding | null;
         endBinding?: FixedPointBinding | null;
+        fixedSegments?: number[] | null;
       } = {};
       if (otherUpdates?.startBinding !== undefined) {
-        bindings.startBinding =
+        updates.startBinding =
           otherUpdates.startBinding !== null &&
           isFixedPointBinding(otherUpdates.startBinding)
             ? otherUpdates.startBinding
             : null;
       }
       if (otherUpdates?.endBinding !== undefined) {
-        bindings.endBinding =
+        updates.endBinding =
           otherUpdates.endBinding !== null &&
           isFixedPointBinding(otherUpdates.endBinding)
             ? otherUpdates.endBinding
             : null;
+      }
+      if (otherUpdates?.fixedSegments) {
+        updates.fixedSegments = otherUpdates.fixedSegments.toSorted();
       }
 
       const mergedElementsMap = options?.changedElements
@@ -1469,7 +1474,7 @@ export class LinearElementEditor {
         mergedElementsMap,
         nextPoints,
         vector(offsetX, offsetY),
-        bindings,
+        updates,
         {
           isDragging: options?.isDragging,
         },

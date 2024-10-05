@@ -86,14 +86,17 @@ export const mutateElbowArrow = (
     elementsMap,
     nextPoints,
     offset,
+    otherUpdates?.fixedSegments,
     options,
   );
+
   if (update) {
     mutateElement(
       arrow,
       {
         ...otherUpdates,
         ...update,
+        //points: nextPoints,
         angle: 0 as Radians,
       },
       options?.informMutation,
@@ -107,13 +110,16 @@ export const updateElbowArrow = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   nextPoints: readonly LocalPoint[],
-  offset?: Vector,
+  offset?: Readonly<Vector>,
+  fixSegments?: number[] | null,
   options?: {
     isDragging?: boolean;
     disableBinding?: boolean;
-    informMutation?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> | null => {
+  const nextFixedSegments = Array.from(
+    new Set(arrow.fixedSegments).union(new Set(fixSegments ?? [])),
+  ).toSorted();
   const origStartGlobalPoint: GlobalPoint = pointTranslate(
     pointTranslate<LocalPoint, GlobalPoint>(
       nextPoints[0],
