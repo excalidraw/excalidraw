@@ -186,6 +186,7 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
+  ExcalidrawElbowArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -7709,6 +7710,35 @@ class App extends React.Component<AppProps, AppState> {
           });
 
           return;
+        } else if (
+          isElbowArrow(
+            LinearElementEditor.getElement(
+              this.state.selectedLinearElement.elementId,
+              elementsMap,
+            )!,
+          )
+        ) {
+          // pointerCoords
+          const arrow = LinearElementEditor.getElement(
+            this.state.selectedLinearElement.elementId,
+            elementsMap,
+          ) as ExcalidrawElbowArrowElement;
+          const { index: segmentIdx } =
+            this.state.selectedLinearElement.pointerDownState.segmentMidpoint;
+          const startPoint = arrow.points[segmentIdx! - 1];
+          const endPoint = arrow.points[segmentIdx!];
+          const nextPoints = Array.from(arrow.points);
+          if (startPoint[0] === endPoint[0]) {
+            // HORIZONTAL
+            nextPoints[segmentIdx! - 1][0] = pointerCoords.x;
+            nextPoints[segmentIdx!][0] = pointerCoords.x;
+          } else {
+            // VERTICAL
+            nextPoints[segmentIdx! - 1][1] = pointerCoords.x;
+            nextPoints[segmentIdx!][1] = pointerCoords.x;
+          }
+          console.log("???");
+          mutateElbowArrow(arrow, elementsMap, nextPoints);
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
           !linearElementEditor.pointerDownState.segmentMidpoint.added

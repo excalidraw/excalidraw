@@ -492,6 +492,7 @@ export class LinearElementEditor {
 
     // Since its not needed outside editor unless 2 pointer lines or bound text
     if (
+      !isElbowArrow(element) &&
       !appState.editingLinearElement &&
       element.points.length > 2 &&
       !boundText
@@ -577,7 +578,11 @@ export class LinearElementEditor {
       element,
       elementsMap,
     );
-    if (points.length >= 3 && !appState.editingLinearElement) {
+    if (
+      points.length >= 3 &&
+      !appState.editingLinearElement &&
+      !isElbowArrow(element)
+    ) {
       return null;
     }
 
@@ -590,7 +595,7 @@ export class LinearElementEditor {
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
         const distance = pointDistance(
-          pointFrom(midPoints[index]![0], midPoints[index]![1]),
+          midPoints[index]!,
           pointFrom(scenePointer.x, scenePointer.y),
         );
         if (distance <= threshold) {
@@ -731,12 +736,8 @@ export class LinearElementEditor {
         segmentMidpoint,
         elementsMap,
       );
-    }
-    if (event.altKey && appState.editingLinearElement) {
-      if (
-        linearElementEditor.lastUncommittedPoint == null &&
-        !isElbowArrow(element)
-      ) {
+    } else if (event.altKey && appState.editingLinearElement) {
+      if (linearElementEditor.lastUncommittedPoint == null) {
         mutateElement(element, {
           points: [
             ...element.points,
