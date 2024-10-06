@@ -211,7 +211,7 @@ export const updateElbowArrow = (
                   gap: 0,
                 },
           endBinding:
-            endIdx === 0
+            endIdx === nextPoints.length - 1
               ? arrow.endBinding
               : {
                   elementId: `temp-end-${id}`,

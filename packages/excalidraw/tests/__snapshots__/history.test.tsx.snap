@@ -10879,6 +10879,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
     "gap": "3.53708",
   },
   "fillStyle": "solid",
+  "fixedSegments": null,
   "frameId": null,
   "groupIds": [],
   "height": "448.10100",
