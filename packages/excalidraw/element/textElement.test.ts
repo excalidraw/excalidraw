@@ -48,10 +48,10 @@ describe("Test wrapText", () => {
   });
 
   it("should support multiple (multi-codepoint) emojis", () => {
-    const text = "😀🗺🔥";
+    const text = "😀🗺🔥👩🏽‍🦰👨‍👩‍👧‍👦🇨🇿";
     const maxWidth = 1;
     const res = wrapText(text, font, maxWidth);
-    expect(res).toBe("😀\n🗺\n🔥");
+    expect(res).toBe("😀\n🗺\n🔥\n👩🏽‍🦰\n👨‍👩‍👧‍👦\n🇨🇿");
   });
 
   it("should wrap the text correctly when text contains hyphen", () => {
@@ -453,35 +453,71 @@ break it now`,
       ]);
     });
 
-    it("should tokenize emojis", () => {
-      const text = `👩🏽‍🦰👨‍👩‍👧‍👦👩🏾‍🔬🏳️‍🌈🧔‍♀️🧑‍🤝‍🧑🙅🏽‍♂️🇺🇸🦅`;
+    it("should not tokenize number", () => {
+      const text = "99,100.99";
+      const tokens = parseTokens(text);
+      expect(tokens).toEqual(["99,100.99"]);
+    });
+
+    it("should tokenize joined emojis", () => {
+      const text = `😬🌍🗺🔥☂️👩🏽‍🦰👨‍👩‍👧‍👦👩🏾‍🔬🏳️‍🌈🧔‍♀️🧑‍🤝‍🧑🙅🏽‍♂️✅0️⃣🇨🇿🦅`;
       const tokens = parseTokens(text);
 
-      // for now it's enough to multicode-emojis split as individual codepoints as the editor will take care of joining them together
       expect(tokens).toEqual([
-        "👩",
-        "🏽",
-        "‍🦰",
-        "👨",
-        "‍👩",
-        "‍👧",
-        "‍👦",
-        "👩",
-        "🏾",
-        "‍🔬",
-        "🏳",
-        "️‍🌈",
-        "🧔",
-        "‍♀",
-        "️🧑",
-        "‍🤝",
-        "‍🧑",
-        "🙅",
-        "🏽",
-        "‍♂",
-        "️🇺",
-        "🇸",
+        "😬",
+        "🌍",
+        "🗺",
+        "🔥",
+        "☂️",
+        "👩🏽‍🦰",
+        "👨‍👩‍👧‍👦",
+        "👩🏾‍🔬",
+        "🏳️‍🌈",
+        "🧔‍♀️",
+        "🧑‍🤝‍🧑",
+        "🙅🏽‍♂️",
+        "✅",
+        "0️⃣",
+        "🇨🇿",
         "🦅",
+      ]);
+    });
+
+    it("should tokenize emojis mixed with mixed text", () => {
+      const text = `😬a🌍b🗺c🔥d☂️《👩🏽‍🦰》👨‍👩‍👧‍👦德👩🏾‍🔬こ🏳️‍🌈안🧔‍♀️g🧑‍🤝‍🧑h🙅🏽‍♂️e✅f0️⃣g🇨🇿10🦅#hash`;
+      const tokens = parseTokens(text);
+
+      expect(tokens).toEqual([
+        "😬",
+        "a",
+        "🌍",
+        "b",
+        "🗺",
+        "c",
+        "🔥",
+        "d",
+        "☂️",
+        "《",
+        "👩🏽‍🦰",
+        "》",
+        "👨‍👩‍👧‍👦",
+        "德",
+        "👩🏾‍🔬",
+        "こ",
+        "🏳️‍🌈",
+        "안",
+        "🧔‍♀️",
+        "g",
+        "🧑‍🤝‍🧑",
+        "h",
+        "🙅🏽‍♂️",
+        "e",
+        "✅",
+        "f0️⃣g", // bummer, but ok, as we traded kecaps not breaking (less common) for hash and numbers not breaking (more common)
+        "🇨🇿",
+        "10", // nice! do not break the number, as it's by default matched by \p{Emoji}
+        "🦅",
+        "#hash", // nice! do not break the hash, as it's by default matched by \p{Emoji}
       ]);
     });
 

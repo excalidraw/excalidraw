@@ -36,9 +36,31 @@ import type { ExtractSetType } from "../utility-types";
 const _CJK_CHAR =
   /\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}/u;
 
-// should cover most emojis, including skin tone, gender variations, pictographic chars and etc.
-const _EMOJI_CHAR = /\p{Emoji_Presentation}\p{Extended_Pictographic}/u;
-const _MULTI_CODEPOINT_EMOJI_SEPARATOR = /\u200D\uFE0F\u20E3/u;
+/**
+ * Matches various emoji types.
+ *
+ * 1. basic emojis (😀, 🌍)
+ * 2. flags (🇨🇿)
+ * 3. multi-codepoint emojis:
+ *    - skin tones (👍🏽)
+ *    - variation selectors (☂️)
+ *    - keycaps (1️⃣)
+ *    - tag sequences (🏴󠁧󠁢󠁥󠁮󠁧󠁿)
+ *    - emoji sequences (👨‍👩‍👧‍👦, 👩‍🚀, 🏳️‍🌈)
+ *
+ * Unicode points:
+ * - \uFE0F: presentation selector
+ * - \u20E3: enclosing keycap
+ * - \u200D: ZWJ (zero width joiner)
+ * - \u{E0020}-\u{E007E}: tags
+ * - \u{E007F}: cancel tag
+ *
+ * Adapated version from https://unicode.org/reports/tr51/#EBNF_and_Regex, with changes:
+ * - replaced \p{Emoji} with [\p{Extended_Pictographic}\p{Emoji_Presentation}] as \p{Emoji},
+ *   see more in `should tokenize emojis mixed with mixed text` test
+ */
+const _EMOJI_CHAR =
+  /(\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}](?:\p{EMod}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u200D(?:\p{RI}\p{RI}|[\p{Emoji}](?:\p{EMod}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?))*)/u;
 
 // full width CJK characters which are natural breaking points
 // ~ expect a break before (lookahead), but not after (negative lookbehind),  i.e. "（"
@@ -62,7 +84,7 @@ const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u
 const _LATIN_BREAK_AFTER = /-/u;
 const _LATIN_BREAK_ALWAYS = /\s/u;
 const _ALL_BREAK_ALWAYS = new RegExp(
-  `${_LATIN_BREAK_ALWAYS.source}${_CJK_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_EMOJI_CHAR.source}`,
+  `${_LATIN_BREAK_ALWAYS.source}${_CJK_BREAK_ALWAYS.source}${_CJK_CHAR.source}`,
   "u",
 );
 
@@ -88,7 +110,7 @@ const BREAK_LINE_REGEX_SIMPLE = new RegExp(
 //      ↑ BREAK BEFORE "「" → ["Hello", "「World」"]
 const getLookaheadBreakingPoints = () =>
   new RegExp(
-    `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_MULTI_CODEPOINT_EMOJI_SEPARATOR.source}])(?=[${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
+    `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}])(?=[${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
     "u",
   );
 
@@ -116,9 +138,9 @@ const getLookbehindBreakingPoints = () =>
  */
 const getBreakLineRegexAdvanced = () =>
   new RegExp(
-    `${getLookaheadBreakingPoints().source}|${
+    `${_EMOJI_CHAR.source}|(${getLookaheadBreakingPoints().source}|${
       getLookbehindBreakingPoints().source
-    }`,
+    })`,
     "u",
   );
 
@@ -138,7 +160,7 @@ const getBreakLineRegex = () => {
 };
 
 const CJK_REGEX = new RegExp(`[${_CJK_CHAR.source}]`, "u");
-const EMOJI_REGEX = new RegExp(`[${_EMOJI_CHAR.source}]`, "u");
+const EMOJI_REGEX = new RegExp(`${_EMOJI_CHAR.source}`, "u");
 
 export const containsCJK = (text: string) => {
   return CJK_REGEX.test(text);
@@ -533,6 +555,7 @@ export const parseTokens = (line: string) => {
   return line.split(breakLineRegex).filter(Boolean);
 };
 
+// handles multi-byte chars (é, 中) and purposefully does not handle multi-codepoint char (🌍, 👩🏽‍🦰)
 const isSingleCharacter = (maybeSingleCharacter: string) => {
   return (
     maybeSingleCharacter.codePointAt(0) !== undefined &&
@@ -553,6 +576,11 @@ const wrapWord = (
   font: FontString,
   maxWidth: number,
 ): Array<string> => {
+  // multi-codepoint emojis are already broken apart and shouldn't be broken further
+  if (EMOJI_REGEX.test(word)) {
+    return [word];
+  }
+
   satisfiesWordInvariant(word);
 
   const lines: Array<string> = [];
