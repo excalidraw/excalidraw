@@ -1460,7 +1460,7 @@ export class LinearElementEditor {
             : null;
       }
       if (otherUpdates?.fixedSegments) {
-        updates.fixedSegments = otherUpdates.fixedSegments.toSorted();
+        updates.fixedSegments = otherUpdates.fixedSegments.sort();
       }
 
       const mergedElementsMap = options?.changedElements

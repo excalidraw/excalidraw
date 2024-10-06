@@ -2259,7 +2259,7 @@ const getGlobalFixedPoints = (
 export const getArrowLocalFixedPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
-) => {
+): [LocalPoint, LocalPoint] => {
   const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
 
   return [
