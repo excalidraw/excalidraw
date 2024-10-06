@@ -51,7 +51,7 @@ export default function App() {
 
 However the above component only works for named component exports. If you want to import some util / constant or something else apart from Excalidraw, then this approach will not work. Instead you can write a wrapper over Excalidraw and import the wrapper dynamically.
 
-If you are using `pages router` then importing the wrapper dynamically would work, where as if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper as shown :point_down:
+If you are using `pages router` then importing the wrapper dynamically would work, whereas if you are using `app router` then you will have to also add `useClient` directive on top of the file in addition to dynamically importing the wrapper as shown :point_down:
 
 <Tabs>
   <TabItem value="Excalidraw Wrapper" label="Excalidraw Wrapper" >
@@ -85,7 +85,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
   ```jsx showLineNumbers
   import dynamic from "next/dynamic";
   
-  // Since client components get prerenderd on server as well hence importing 
+  // Since client components get prerendered on server as well hence importing 
   // the excalidraw stuff dynamically with ssr false
 
   const ExcalidrawWrapper = dynamic(
@@ -108,7 +108,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
   ```jsx showLineNumbers
   import dynamic from "next/dynamic";
 
-  // Since client components get prerenderd on server as well hence importing 
+  // Since client components get prerendered on server as well hence importing 
   // the excalidraw stuff dynamically with ssr false
 
   const ExcalidrawWrapper = dynamic(
@@ -138,7 +138,7 @@ The `types` are available at `@excalidraw/excalidraw/types`, you can view [examp
 
 Since we support `umd` build ships with `react/jsx-runtime` and `react-dom/client` inlined with the package. This conflicts with `Preact` and hence the build doesn't work directly with `Preact`.
 
-However we have shipped a separate build for `Preact` so if you are using `Preact` you need to set `process.env.IS_PREACT` to `true` to use the `Preact` build.
+However, we have shipped a separate build for `Preact` so if you are using `Preact` you need to set `process.env.IS_PREACT` to `true` to use the `Preact` build.
 
 Once the above `env` variable is set, you will be able to use the package in `Preact` as well.
 
