@@ -1,16 +1,16 @@
 {
   "name": "excalidraw_karat",
-  "version": "0.0.27-alpha-4",
+  "version": "0.0.27-alpha-5",
   "type": "module",
   "exports": {
     ".": {
       "development": "./dist/dev/index.js",
       "types": "./dist/excalidraw/index.d.ts",
-      "default": "./dist/dev/index.js"
+      "default": "./dist/prod/index.js"
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
-      "default": "./dist/dev/index.css"
+      "default": "./dist/prod/index.css"
     }
   },
   "types": "./dist/excalidraw/index.d.ts",
