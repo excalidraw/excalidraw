@@ -56,8 +56,7 @@ const _CJK_CHAR =
  * - \u{E007F}: cancel tag
  *
  * Adapated version from https://unicode.org/reports/tr51/#EBNF_and_Regex, with changes:
- * - replaced \p{Emoji} with [\p{Extended_Pictographic}\p{Emoji_Presentation}] as \p{Emoji},
- *   see more in `should tokenize emojis mixed with mixed text` test
+ * - replaced \p{Emoji} with [\p{Extended_Pictographic}\p{Emoji_Presentation}], see more in `should tokenize emojis mixed with mixed text` test
  */
 const _EMOJI_CHAR =
   /(\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}](?:\p{EMod}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u200D(?:\p{RI}\p{RI}|[\p{Emoji}](?:\p{EMod}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?))*)/u;
