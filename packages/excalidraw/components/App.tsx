@@ -9531,12 +9531,7 @@ class App extends React.Component<AppProps, AppState> {
         y,
         width,
         height,
-        crop: {
-          x: 0,
-          y: 0,
-          width: image.naturalWidth,
-          height: image.naturalHeight,
-        },
+        crop: null,
       });
     }
   };

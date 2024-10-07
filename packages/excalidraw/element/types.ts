@@ -137,6 +137,7 @@ export type ImageCrop = {
   y: number;
   width: number;
   height: number;
+  naturalDimension: [number, number];
 };
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
@@ -147,7 +148,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
-
+    /** whether an element is cropped */
     crop: ImageCrop | null;
   }>;
 

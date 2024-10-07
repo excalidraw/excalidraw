@@ -950,11 +950,7 @@ export const renderElement = (
           context.globalAlpha = 0.1;
 
           const uncroppedElementCanvas = generateElementCanvas(
-            getUncroppedImageElement(
-              elementWithCanvas.element,
-              elementsMap,
-              renderConfig.imageCache,
-            ),
+            getUncroppedImageElement(elementWithCanvas.element, elementsMap),
             allElementsMap,
             appState.zoom,
             renderConfig,

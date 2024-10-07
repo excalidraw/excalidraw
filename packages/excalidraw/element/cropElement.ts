@@ -32,19 +32,14 @@ import { isInitializedImageElement } from "./typeChecks";
 
 const _cropElement = (
   element: ExcalidrawImageElement,
-  image: HTMLImageElement,
   transformHandle: TransformHandleType,
   naturalWidth: number,
   naturalHeight: number,
   pointerX: number,
   pointerY: number,
 ) => {
-  const uncroppedWidth =
-    element.width /
-    (element.crop ? element.crop.width / image.naturalWidth : 1);
-  const uncroppedHeight =
-    element.height /
-    (element.crop ? element.crop.height / image.naturalHeight : 1);
+  const { width: uncroppedWidth, height: uncroppedHeight } =
+    getUncroppedWidthAndHeight(element);
 
   const naturalWidthToUncropped = naturalWidth / uncroppedWidth;
   const naturalHeightToUncropped = naturalHeight / uncroppedHeight;
@@ -53,7 +48,7 @@ const _cropElement = (
   const croppedTop = (element.crop?.y ?? 0) / naturalHeightToUncropped;
 
   /**
-   * uncropped width
+   *      uncropped width
    * *––––––––––––––––––––––––*
    * |     (x,y) (natural)    |
    * |       *–––––––*        |
@@ -79,6 +74,7 @@ const _cropElement = (
     y: 0,
     width: naturalWidth,
     height: naturalHeight,
+    naturalDimension: [naturalWidth, naturalHeight],
   };
 
   const previousCropHeight = crop.height;
@@ -168,17 +164,17 @@ export const cropElement = (
     isInitializedImageElement(element) && imageCache.get(element.fileId)?.image;
 
   if (image && !(image instanceof Promise)) {
-    const mutation = _cropElement(
+    mutateElement(
       element,
-      image,
-      transformHandle,
-      image.naturalWidth,
-      image.naturalHeight,
-      pointerX,
-      pointerY,
+      _cropElement(
+        element,
+        transformHandle,
+        image.naturalWidth,
+        image.naturalHeight,
+        pointerX,
+        pointerY,
+      ),
     );
-
-    mutateElement(element, mutation);
 
     updateBoundElements(element, elementsMap, {
       oldSize: { width: element.width, height: element.height },
@@ -186,7 +182,6 @@ export const cropElement = (
   }
 };
 
-// TODO: replace with the refactored resizeSingleElement
 const recomputeOrigin = (
   stateAtCropStart: NonDeleted<ExcalidrawElement>,
   transformHandle: TransformHandleType,
@@ -250,87 +245,96 @@ const recomputeOrigin = (
 export const getUncroppedImageElement = (
   element: ExcalidrawImageElement,
   elementsMap: ElementsMap,
-  imageCache: AppClassProperties["imageCache"],
 ) => {
-  const image =
-    isInitializedImageElement(element) && imageCache.get(element.fileId)?.image;
+  if (element.crop) {
+    const { width, height } = getUncroppedWidthAndHeight(element);
 
-  if (image && !(image instanceof Promise)) {
-    if (element.crop) {
-      const width = element.width / (element.crop.width / image.naturalWidth);
-      const height =
-        element.height / (element.crop.height / image.naturalHeight);
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+      element,
+      elementsMap,
+    );
 
-      const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-        element,
-        elementsMap,
-      );
+    const topLeftVector = vectorFromPoint(
+      pointRotateRads(pointFrom(x1, y1), pointFrom(cx, cy), element.angle),
+    );
+    const topRightVector = vectorFromPoint(
+      pointRotateRads(pointFrom(x2, y1), pointFrom(cx, cy), element.angle),
+    );
+    const topEdgeNormalized = vectorNormalize(
+      vectorSubtract(topRightVector, topLeftVector),
+    );
+    const bottomLeftVector = vectorFromPoint(
+      pointRotateRads(pointFrom(x1, y2), pointFrom(cx, cy), element.angle),
+    );
+    const leftEdgeVector = vectorSubtract(bottomLeftVector, topLeftVector);
+    const leftEdgeNormalized = vectorNormalize(leftEdgeVector);
 
-      const topLeftVector = vectorFromPoint(
-        pointRotateRads(pointFrom(x1, y1), pointFrom(cx, cy), element.angle),
-      );
-      const topRightVector = vectorFromPoint(
-        pointRotateRads(pointFrom(x2, y1), pointFrom(cx, cy), element.angle),
-      );
-      const topEdgeNormalized = vectorNormalize(
-        vectorSubtract(topRightVector, topLeftVector),
-      );
-      const bottomLeftVector = vectorFromPoint(
-        pointRotateRads(pointFrom(x1, y2), pointFrom(cx, cy), element.angle),
-      );
-      const leftEdgeVector = vectorSubtract(bottomLeftVector, topLeftVector);
-      const leftEdgeNormalized = vectorNormalize(leftEdgeVector);
+    const { cropX, cropY } = adjustCropPosition(element.crop, element.scale);
 
-      const { cropX, cropY } = adjustCropPosition(
-        element.crop,
-        element.scale,
-        image,
-      );
-
-      const rotatedTopLeft = vectorAdd(
-        vectorAdd(
-          topLeftVector,
-          vectorScale(topEdgeNormalized, (-cropX * width) / image.naturalWidth),
-        ),
+    const rotatedTopLeft = vectorAdd(
+      vectorAdd(
+        topLeftVector,
         vectorScale(
-          leftEdgeNormalized,
-          (-cropY * height) / image.naturalHeight,
+          topEdgeNormalized,
+          (-cropX * width) / element.crop.naturalDimension[0],
         ),
-      );
+      ),
+      vectorScale(
+        leftEdgeNormalized,
+        (-cropY * height) / element.crop.naturalDimension[1],
+      ),
+    );
 
-      const center = pointFromVector(
-        vectorAdd(
-          vectorAdd(rotatedTopLeft, vectorScale(topEdgeNormalized, width / 2)),
-          vectorScale(leftEdgeNormalized, height / 2),
-        ),
-      );
+    const center = pointFromVector(
+      vectorAdd(
+        vectorAdd(rotatedTopLeft, vectorScale(topEdgeNormalized, width / 2)),
+        vectorScale(leftEdgeNormalized, height / 2),
+      ),
+    );
 
-      const unrotatedTopLeft = pointRotateRads(
-        pointFromVector(rotatedTopLeft),
-        center,
-        -element.angle as Radians,
-      );
+    const unrotatedTopLeft = pointRotateRads(
+      pointFromVector(rotatedTopLeft),
+      center,
+      -element.angle as Radians,
+    );
 
-      const uncroppedElement: ExcalidrawImageElement = {
-        ...element,
-        x: unrotatedTopLeft[0],
-        y: unrotatedTopLeft[1],
-        width,
-        height,
-        crop: null,
-      };
+    const uncroppedElement: ExcalidrawImageElement = {
+      ...element,
+      x: unrotatedTopLeft[0],
+      y: unrotatedTopLeft[1],
+      width,
+      height,
+      crop: null,
+    };
 
-      return uncroppedElement;
-    }
+    return uncroppedElement;
   }
 
   return element;
 };
 
+export const getUncroppedWidthAndHeight = (element: ExcalidrawImageElement) => {
+  if (element.crop) {
+    const width =
+      element.width / (element.crop.width / element.crop.naturalDimension[0]);
+    const height =
+      element.height / (element.crop.height / element.crop.naturalDimension[1]);
+
+    return {
+      width,
+      height,
+    };
+  }
+
+  return {
+    width: element.width,
+    height: element.height,
+  };
+};
+
 const adjustCropPosition = (
   crop: ImageCrop,
   scale: ExcalidrawImageElement["scale"],
-  image: HTMLImageElement,
 ) => {
   let cropX = crop.x;
   let cropY = crop.y;
@@ -339,11 +343,11 @@ const adjustCropPosition = (
   const flipY = scale[1] === -1;
 
   if (flipX) {
-    cropX = image.naturalWidth - Math.abs(cropX) - crop.width;
+    cropX = crop.naturalDimension[0] - Math.abs(cropX) - crop.width;
   }
 
   if (flipY) {
-    cropY = image.naturalHeight - Math.abs(cropY) - crop.height;
+    cropY = crop.naturalDimension[1] - Math.abs(cropY) - crop.height;
   }
 
   return {
