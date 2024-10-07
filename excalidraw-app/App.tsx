@@ -1106,11 +1106,11 @@ type FirebaseConfig = {
   projectId: string;
   storageBucket: string;
 };
-let firebaseConfig: FirebaseConfig;
-let collabServerUrl: string;
 
 type RoomLinkData = { roomId: string; roomKey: string } | null;
+
 type SetExcalidrawAPI = (api: ExcalidrawImperativeAPI) => void;
+
 let customCollabServerUrl: string;
 let customFirebaseConfig: FirebaseConfig;
 let customRoomLinkData: RoomLinkData;
@@ -1139,7 +1139,6 @@ const ExcalidrawApp: React.FC<{
   customCollabServerUrl = props.collabServerUrl;
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
-  collabServerUrl = props.collabServerUrl;
   customTheme = props.theme;
   customFirebaseToken= props.firebaseToken;
   onCollabRoomSave = props.onCollabRoomSave;
