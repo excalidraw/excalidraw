@@ -1,6 +1,6 @@
 {
   "name": "excalidraw_karat",
-  "version": "0.0.27-alpha-2",
+  "version": "0.0.27-alpha-4",
   "type": "module",
   "exports": {
     ".": {

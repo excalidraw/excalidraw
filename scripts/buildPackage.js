@@ -131,5 +131,31 @@ const createESMRawBuild = async () => {
   });
 };
 
+const cjsConfig = {
+  entryPoints: ["index.tsx"],
+  bundle: true,
+  format: "cjs", // Set format to CommonJS
+  plugins: [sassPlugin()],
+  loader: {
+    ".json": "copy",
+    ".woff2": "file",
+  },
+};
+
+// Function to create CJS build
+const createCJSBuild = async () => {
+  // Development unminified build with source maps
+  await build({
+    ...cjsConfig,
+    sourcemap: true,
+    outdir: "dist/cjs/dev", // Output directory for CJS dev build
+    define: {
+      "import.meta.env": JSON.stringify({ DEV: true }),
+    },
+  });
+};
+
+// Call the function to create the CJS build
+createCJSBuild();
 createESMRawBuild();
 // createESMBrowserBuild();
