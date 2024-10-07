@@ -4,7 +4,7 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import type { History } from "../history";
 import { HistoryChangedEvent } from "../history";
-import type { AppState } from "../types";
+import type { AppClassProperties, AppState } from "../types";
 import { KEYS } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
@@ -13,15 +13,19 @@ import type { Store } from "../store";
 import { StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
-const writeData = (
+const executeHistoryAction = (
+  app: AppClassProperties,
   appState: Readonly<AppState>,
   updater: () => [SceneElementsMap, AppState] | void,
 ): ActionResult => {
   if (
     !appState.multiElement &&
     !appState.resizingElement &&
-    !appState.editingElement &&
-    !appState.draggingElement
+    !appState.editingTextElement &&
+    !appState.newElement &&
+    !appState.selectedElementsAreBeingDragged &&
+    !appState.selectionElement &&
+    !app.flowChartCreator.isCreatingChart
   ) {
     const result = updater();
 
@@ -50,8 +54,8 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   icon: UndoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState) =>
-    writeData(appState, () =>
+  perform: (elements, appState, value, app) =>
+    executeHistoryAction(app, appState, () =>
       history.undo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,
@@ -91,8 +95,8 @@ export const createRedoAction: ActionCreator = (history, store) => ({
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState) =>
-    writeData(appState, () =>
+  perform: (elements, appState, _, app) =>
+    executeHistoryAction(app, appState, () =>
       history.redo(
         arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
         appState,

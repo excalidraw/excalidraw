@@ -289,6 +289,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("Alt+/")]}
             />
             <Shortcut
+              label={t("search.title")}
+              shortcuts={[getShortcutFromShortcutName("searchMenu")]}
+            />
+            <Shortcut
               label={t("commandPalette.title")}
               shortcuts={
                 isFirefox
@@ -304,6 +308,16 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             className="HelpDialog__island--editor"
             caption={t("helpDialog.editor")}
           >
+            <Shortcut
+              label={t("helpDialog.createFlowchart")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+Arrow Key`)]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.navigateFlowchart")}
+              shortcuts={[getShortcutKey(`Alt+Arrow Key`)]}
+              isOr={true}
+            />
             <Shortcut
               label={t("labels.moveCanvas")}
               shortcuts={[

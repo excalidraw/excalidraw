@@ -15,6 +15,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Prefer user defined coordinates and dimensions when creating a frame using [`convertToExcalidrawElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/excalidraw-element-skeleton#converttoexcalidrawelements) [#8517](https://github.com/excalidraw/excalidraw/pull/8517)
+
 - `props.initialData` can now be a function that returns `ExcalidrawInitialDataState` or `Promise<ExcalidrawInitialDataState>`. [#8107](https://github.com/excalidraw/excalidraw/pull/8135)
 
 - Added support for multiplayer undo/redo, by calculating invertible increments and storing them inside the local-only undo/redo stacks. [#7348](https://github.com/excalidraw/excalidraw/pull/7348)
@@ -38,6 +40,8 @@ Please add the latest change on the top under the correct section.
 - Keep customData when converting to ExcalidrawElement. [#7656](https://github.com/excalidraw/excalidraw/pull/7656)
 
 ### Breaking Changes
+
+- Stats container CSS changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout.
 
 - `updateScene` API has changed due to the added `Store` component as part of the multiplayer undo / redo initiative. Specifically, `sceneData` property `commitToHistory: boolean` was replaced with `storeAction: StoreActionType`. Make sure to update all instances of `updateScene` according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
 

@@ -856,8 +856,8 @@ const getSelectedMathElements = (
     getNonDeletedElements(elements),
     appState,
   );
-  if (appState.editingElement) {
-    selectedElements.push(appState.editingElement);
+  if (appState.editingTextElement) {
+    selectedElements.push(appState.editingTextElement);
   }
   const eligibleElements = selectedElements.filter(
     (element, index, eligibleElements) =>

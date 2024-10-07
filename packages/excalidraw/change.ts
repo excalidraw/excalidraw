@@ -1100,7 +1100,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
     try {
       // TODO: #7348 refactor away mutations below, so that we couldn't end up in an incosistent state
       ElementsChange.redrawTextBoundingBoxes(nextElements, changedElements);
-      ElementsChange.redrawBoundArrows(nextElements, changedElements);
 
       // the following reorder performs also mutations, but only on new instances of changed elements
       // (unless something goes really bad and it fallbacks to fixing all invalid indices)
@@ -1109,6 +1108,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
         changedElements,
         flags,
       );
+
+      // Need ordered nextElements to avoid z-index binding issues
+      ElementsChange.redrawBoundArrows(nextElements, changedElements);
     } catch (e) {
       console.error(
         `Couldn't mutate elements after applying elements change`,
@@ -1460,7 +1462,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
-        updateBoundElements(element, elements);
+        updateBoundElements(element, elements, {
+          changedElements: changed,
+        });
       }
     }
   }

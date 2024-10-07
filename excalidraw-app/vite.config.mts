@@ -26,10 +26,10 @@ export default defineConfig({
         assetFileNames(chunkInfo) {
           if (chunkInfo?.name?.endsWith(".woff2")) {
             // put on root so we are flexible about the CDN path
-            return '[name]-[hash][extname]';
+            return "[name]-[hash][extname]";
           }
 
-          return 'assets/[name]-[hash][extname]';
+          return "assets/[name]-[hash][extname]";
         },
         // Creating separate chunk for locales except for en and percentages.json so they
         // can be cached at runtime and not merged with
@@ -44,10 +44,12 @@ export default defineConfig({
             // Taking the substring after "locales/"
             return `locales/${id.substring(index + 8)}`;
           }
-        }
+        },
       },
     },
     sourcemap: true,
+    // don't auto-inline small assets (i.e. fonts hosted on CDN)
+    assetsInlineLimit: 0,
   },
   plugins: [
     woff2BrowserPlugin(),
@@ -73,8 +75,8 @@ export default defineConfig({
       },
 
       workbox: {
-        // Don't push fonts and locales to app precache
-        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js"],
+        // Don't push fonts, locales and wasm to app precache
+        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js", "**/*.wasm-*.js"],
         runtimeCaching: [
           {
             urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
@@ -105,6 +107,17 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // <== 30 days
+              },
+            },
+          },
+          {
+            urlPattern: new RegExp(".wasm-.+.js"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "wasm",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
               },
             },
           },

@@ -11,7 +11,7 @@ import {
   isBoundToContainer,
   isTextElement,
 } from "./typeChecks";
-import { CLASSES, isSafari } from "../constants";
+import { CLASSES, isSafari, POINTER_BUTTON } from "../constants";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -39,7 +39,11 @@ import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
 } from "../actions/actionProperties";
-import { actionZoomIn, actionZoomOut } from "../actions/actionCanvas";
+import {
+  actionResetZoom,
+  actionZoomIn,
+  actionZoomOut,
+} from "../actions/actionCanvas";
 import type App from "../components/App";
 import { LinearElementEditor } from "./linearElementEditor";
 import { parseClipboard } from "../clipboard";
@@ -292,7 +296,7 @@ export const textWysiwyg = ({
 
       // adding left and right padding buffer, so that browser does not cut the glyphs (does not work in Safari)
       const padding = !isSafari
-        ? Math.ceil(updatedTextElement.fontSize / 2)
+        ? Math.ceil(updatedTextElement.fontSize / appState.zoom.value / 2)
         : 0;
 
       // Make sure text editor height doesn't go beyond viewport
@@ -409,7 +413,16 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
-      onChange(normalizeText(editable.value));
+      const normalized = normalizeText(editable.value);
+      if (editable.value !== normalized) {
+        const selectionStart = editable.selectionStart;
+        editable.value = normalized;
+        // put the cursor at some position close to where it was before
+        // normalization (otherwise it'll end up at the end of the text)
+        editable.selectionStart = selectionStart;
+        editable.selectionEnd = selectionStart;
+      }
+      onChange(editable.value);
     };
   }
 
@@ -421,6 +434,10 @@ export const textWysiwyg = ({
     } else if (!event.shiftKey && actionZoomOut.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomOut);
+      updateWysiwygStyle();
+    } else if (!event.shiftKey && actionResetZoom.keyTest(event)) {
+      event.preventDefault();
+      app.actionManager.executeAction(actionResetZoom);
       updateWysiwygStyle();
     } else if (actionDecreaseFontSize.keyTest(event)) {
       app.actionManager.executeAction(actionDecreaseFontSize);
@@ -636,6 +653,7 @@ export const textWysiwyg = ({
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
+    unbindOnScroll();
 
     editable.remove();
   };
@@ -662,9 +680,28 @@ export const textWysiwyg = ({
     });
   };
 
+  const temporarilyDisableSubmit = () => {
+    editable.onblur = null;
+    window.addEventListener("pointerup", bindBlurEvent);
+    // handle edge-case where pointerup doesn't fire e.g. due to user
+    // alt-tabbing away
+    window.addEventListener("blur", handleSubmit);
+  };
+
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
     const target = event?.target;
+
+    // panning canvas
+    if (event.button === POINTER_BUTTON.WHEEL) {
+      // trying to pan by clicking inside text area itself -> handle here
+      if (target instanceof HTMLTextAreaElement) {
+        event.preventDefault();
+        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
+      }
+      temporarilyDisableSubmit();
+      return;
+    }
 
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
@@ -673,17 +710,14 @@ export const textWysiwyg = ({
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        event.target.closest(
+          `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
+        ) &&
         !isWritableElement(event.target)) ||
       isPropertiesTrigger
     ) {
-      editable.onblur = null;
-      window.addEventListener("pointerup", bindBlurEvent);
-      // handle edge-case where pointerup doesn't fire e.g. due to user
-      // alt-tabbing away
-      window.addEventListener("blur", handleSubmit);
+      temporarilyDisableSubmit();
     } else if (
-      event.target instanceof HTMLElement &&
       event.target instanceof HTMLCanvasElement &&
       // Vitest simply ignores stopPropagation, capture-mode, or rAF
       // so without introducing crazier hacks, nothing we can do
@@ -702,7 +736,7 @@ export const textWysiwyg = ({
   };
 
   // handle updates of textElement properties of editing element
-  const unbindUpdate = Scene.getScene(element)!.onUpdate(() => {
+  const unbindUpdate = app.scene.onUpdate(() => {
     updateWysiwygStyle();
     const isPopupOpened = !!document.activeElement?.closest(
       ".properties-content",
@@ -710,6 +744,10 @@ export const textWysiwyg = ({
     if (!isPopupOpened) {
       editable.focus();
     }
+  });
+
+  const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
+    updateWysiwygStyle();
   });
 
   // ---------------------------------------------------------------------------
@@ -741,10 +779,6 @@ export const textWysiwyg = ({
   // triggered the wysiwyg
   requestAnimationFrame(() => {
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
-  });
-  window.addEventListener("wheel", stopEvent, {
-    passive: false,
-    capture: true,
   });
   window.addEventListener("beforeunload", handleSubmit);
   excalidrawContainer

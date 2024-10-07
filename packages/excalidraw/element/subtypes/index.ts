@@ -133,8 +133,8 @@ export const subtypeActionPredicate: ActionPredicateFn = function (
     getNonDeletedElements(elements),
     appState,
   );
-  const chosen = appState.editingElement
-    ? [appState.editingElement, ...selectedElements]
+  const chosen = appState.editingTextElement
+    ? [appState.editingTextElement, ...selectedElements]
     : selectedElements;
   // Now handle actions added by subtypes
   if (isSubtypeActionName(action.name)) {

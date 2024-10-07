@@ -27,6 +27,8 @@ export interface FontMetadata {
   deprecated?: true;
   /** flag to indicate a server-side only font */
   serverSide?: true;
+  /** flag to indiccate a local-only font */
+  local?: true;
 }
 
 export const FONT_METADATA: Record<number, FontMetadata> = {
@@ -85,6 +87,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     icon: FontFamilyNormalIcon,
     deprecated: true,
+    local: true,
   },
   [FONT_FAMILY.Cascadia]: {
     metrics: {

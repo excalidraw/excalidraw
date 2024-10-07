@@ -7,10 +7,10 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
 } from "./types";
-import { distance2d, rotate, rotatePoint } from "../math";
 import rough from "roughjs/bin/rough";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { AppState, Point } from "../types";
+import type { AppState } from "../types";
 import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
@@ -22,9 +22,24 @@ import {
 import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
-import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
-import { arrayToMap } from "../utils";
+import { arrayToMap, invariant } from "../utils";
+import type {
+  Degrees,
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+  Radians,
+} from "../../math";
+import {
+  degreesToRadians,
+  lineSegment,
+  pointFrom,
+  pointDistance,
+  pointFromArray,
+  pointRotateRads,
+} from "../../math";
+import type { Mutable } from "../utility-types";
 
 export type RectangleBox = {
   x: number;
@@ -97,7 +112,11 @@ export class ElementBounds {
     if (isFreeDrawElement(element)) {
       const [minX, minY, maxX, maxY] = getBoundsFromPoints(
         element.points.map(([x, y]) =>
-          rotate(x, y, cx - element.x, cy - element.y, element.angle),
+          pointRotateRads(
+            pointFrom(x, y),
+            pointFrom(cx - element.x, cy - element.y),
+            element.angle,
+          ),
         ),
       );
 
@@ -110,10 +129,26 @@ export class ElementBounds {
     } else if (isLinearElement(element)) {
       bounds = getLinearElementRotatedBounds(element, cx, cy, elementsMap);
     } else if (element.type === "diamond") {
-      const [x11, y11] = rotate(cx, y1, cx, cy, element.angle);
-      const [x12, y12] = rotate(cx, y2, cx, cy, element.angle);
-      const [x22, y22] = rotate(x1, cy, cx, cy, element.angle);
-      const [x21, y21] = rotate(x2, cy, cx, cy, element.angle);
+      const [x11, y11] = pointRotateRads(
+        pointFrom(cx, y1),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [x12, y12] = pointRotateRads(
+        pointFrom(cx, y2),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [x22, y22] = pointRotateRads(
+        pointFrom(x1, cy),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [x21, y21] = pointRotateRads(
+        pointFrom(x2, cy),
+        pointFrom(cx, cy),
+        element.angle,
+      );
       const minX = Math.min(x11, x12, x22, x21);
       const minY = Math.min(y11, y12, y22, y21);
       const maxX = Math.max(x11, x12, x22, x21);
@@ -128,10 +163,26 @@ export class ElementBounds {
       const hh = Math.hypot(h * cos, w * sin);
       bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
     } else {
-      const [x11, y11] = rotate(x1, y1, cx, cy, element.angle);
-      const [x12, y12] = rotate(x1, y2, cx, cy, element.angle);
-      const [x22, y22] = rotate(x2, y2, cx, cy, element.angle);
-      const [x21, y21] = rotate(x2, y1, cx, cy, element.angle);
+      const [x11, y11] = pointRotateRads(
+        pointFrom(x1, y1),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [x12, y12] = pointRotateRads(
+        pointFrom(x1, y2),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [x22, y22] = pointRotateRads(
+        pointFrom(x2, y2),
+        pointFrom(cx, cy),
+        element.angle,
+      );
+      const [x21, y21] = pointRotateRads(
+        pointFrom(x2, y1),
+        pointFrom(cx, cy),
+        element.angle,
+      );
       const minX = Math.min(x11, x12, x22, x21);
       const minY = Math.min(y11, y12, y22, y21);
       const maxX = Math.max(x11, x12, x22, x21);
@@ -165,18 +216,18 @@ export const getElementAbsoluteCoords = (
       ? getContainerElement(element, elementsMap)
       : null;
     if (isArrowElement(container)) {
-      const coords = LinearElementEditor.getBoundTextElementPosition(
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
         container,
         element as ExcalidrawTextElementWithContainer,
         elementsMap,
       );
       return [
-        coords.x,
-        coords.y,
-        coords.x + element.width,
-        coords.y + element.height,
-        coords.x + element.width / 2,
-        coords.y + element.height / 2,
+        x,
+        y,
+        x + element.width,
+        y + element.height,
+        x + element.width / 2,
+        y + element.height / 2,
       ];
     }
   }
@@ -198,38 +249,40 @@ export const getElementAbsoluteCoords = (
 export const getElementLineSegments = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): [Point, Point][] => {
+): LineSegment<GlobalPoint>[] => {
   const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
     element,
     elementsMap,
   );
 
-  const center: Point = [cx, cy];
+  const center: GlobalPoint = pointFrom(cx, cy);
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const segments: [Point, Point][] = [];
+    const segments: LineSegment<GlobalPoint>[] = [];
 
     let i = 0;
 
     while (i < element.points.length - 1) {
-      segments.push([
-        rotatePoint(
-          [
-            element.points[i][0] + element.x,
-            element.points[i][1] + element.y,
-          ] as Point,
-          center,
-          element.angle,
+      segments.push(
+        lineSegment(
+          pointRotateRads(
+            pointFrom(
+              element.points[i][0] + element.x,
+              element.points[i][1] + element.y,
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom(
+              element.points[i + 1][0] + element.x,
+              element.points[i + 1][1] + element.y,
+            ),
+            center,
+            element.angle,
+          ),
         ),
-        rotatePoint(
-          [
-            element.points[i + 1][0] + element.x,
-            element.points[i + 1][1] + element.y,
-          ] as Point,
-          center,
-          element.angle,
-        ),
-      ]);
+      );
       i++;
     }
 
@@ -246,40 +299,40 @@ export const getElementLineSegments = (
       [cx, y2],
       [x1, cy],
       [x2, cy],
-    ] as Point[]
-  ).map((point) => rotatePoint(point, center, element.angle));
+    ] as GlobalPoint[]
+  ).map((point) => pointRotateRads(point, center, element.angle));
 
   if (element.type === "diamond") {
     return [
-      [n, w],
-      [n, e],
-      [s, w],
-      [s, e],
+      lineSegment(n, w),
+      lineSegment(n, e),
+      lineSegment(s, w),
+      lineSegment(s, e),
     ];
   }
 
   if (element.type === "ellipse") {
     return [
-      [n, w],
-      [n, e],
-      [s, w],
-      [s, e],
-      [n, w],
-      [n, e],
-      [s, w],
-      [s, e],
+      lineSegment(n, w),
+      lineSegment(n, e),
+      lineSegment(s, w),
+      lineSegment(s, e),
+      lineSegment(n, w),
+      lineSegment(n, e),
+      lineSegment(s, w),
+      lineSegment(s, e),
     ];
   }
 
   return [
-    [nw, ne],
-    [sw, se],
-    [nw, sw],
-    [ne, se],
-    [nw, e],
-    [sw, e],
-    [ne, w],
-    [se, w],
+    lineSegment(nw, ne),
+    lineSegment(sw, se),
+    lineSegment(nw, sw),
+    lineSegment(ne, se),
+    lineSegment(nw, e),
+    lineSegment(sw, e),
+    lineSegment(ne, w),
+    lineSegment(se, w),
   ];
 };
 
@@ -386,10 +439,10 @@ const solveQuadratic = (
 };
 
 const getCubicBezierCurveBound = (
-  p0: Point,
-  p1: Point,
-  p2: Point,
-  p3: Point,
+  p0: GlobalPoint,
+  p1: GlobalPoint,
+  p2: GlobalPoint,
+  p3: GlobalPoint,
 ): Bounds => {
   const solX = solveQuadratic(p0[0], p1[0], p2[0], p3[0]);
   const solY = solveQuadratic(p0[1], p1[1], p2[1], p3[1]);
@@ -415,9 +468,9 @@ const getCubicBezierCurveBound = (
 
 export const getMinMaxXYFromCurvePathOps = (
   ops: Op[],
-  transformXY?: (x: number, y: number) => [number, number],
+  transformXY?: (p: GlobalPoint) => GlobalPoint,
 ): Bounds => {
-  let currentP: Point = [0, 0];
+  let currentP: GlobalPoint = pointFrom(0, 0);
 
   const { minX, minY, maxX, maxY } = ops.reduce(
     (limits, { op, data }) => {
@@ -425,19 +478,21 @@ export const getMinMaxXYFromCurvePathOps = (
       // move, bcurveTo, lineTo, and curveTo
       if (op === "move") {
         // change starting point
-        currentP = data as unknown as Point;
+        const p: GlobalPoint | undefined = pointFromArray(data);
+        invariant(p != null, "Op data is not a point");
+        currentP = p;
         // move operation does not draw anything; so, it always
         // returns false
       } else if (op === "bcurveTo") {
-        const _p1 = [data[0], data[1]] as Point;
-        const _p2 = [data[2], data[3]] as Point;
-        const _p3 = [data[4], data[5]] as Point;
+        const _p1 = pointFrom<GlobalPoint>(data[0], data[1]);
+        const _p2 = pointFrom<GlobalPoint>(data[2], data[3]);
+        const _p3 = pointFrom<GlobalPoint>(data[4], data[5]);
 
-        const p1 = transformXY ? transformXY(..._p1) : _p1;
-        const p2 = transformXY ? transformXY(..._p2) : _p2;
-        const p3 = transformXY ? transformXY(..._p3) : _p3;
+        const p1 = transformXY ? transformXY(_p1) : _p1;
+        const p2 = transformXY ? transformXY(_p2) : _p2;
+        const p3 = transformXY ? transformXY(_p3) : _p3;
 
-        const p0 = transformXY ? transformXY(...currentP) : currentP;
+        const p0 = transformXY ? transformXY(currentP) : currentP;
         currentP = _p3;
 
         const [minX, minY, maxX, maxY] = getCubicBezierCurveBound(
@@ -507,14 +562,14 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
 };
 
 /** @returns number in degrees */
-export const getArrowheadAngle = (arrowhead: Arrowhead): number => {
+export const getArrowheadAngle = (arrowhead: Arrowhead): Degrees => {
   switch (arrowhead) {
     case "bar":
-      return 90;
+      return 90 as Degrees;
     case "arrow":
-      return 20;
+      return 20 as Degrees;
     default:
-      return 25;
+      return 25 as Degrees;
   }
 };
 
@@ -533,19 +588,24 @@ export const getArrowheadPoints = (
   const index = position === "start" ? 1 : ops.length - 1;
 
   const data = ops[index].data;
-  const p3 = [data[4], data[5]] as Point;
-  const p2 = [data[2], data[3]] as Point;
-  const p1 = [data[0], data[1]] as Point;
+
+  invariant(data.length === 6, "Op data length is not 6");
+
+  const p3 = pointFrom(data[4], data[5]);
+  const p2 = pointFrom(data[2], data[3]);
+  const p1 = pointFrom(data[0], data[1]);
 
   // We need to find p0 of the bezier curve.
   // It is typically the last point of the previous
   // curve; it can also be the position of moveTo operation.
   const prevOp = ops[index - 1];
-  let p0: Point = [0, 0];
+  let p0 = pointFrom(0, 0);
   if (prevOp.op === "move") {
-    p0 = prevOp.data as unknown as Point;
+    const p = pointFromArray(prevOp.data);
+    invariant(p != null, "Op data is not a point");
+    p0 = p;
   } else if (prevOp.op === "bcurveTo") {
-    p0 = [prevOp.data[4], prevOp.data[5]];
+    p0 = pointFrom(prevOp.data[4], prevOp.data[5]);
   }
 
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
@@ -610,8 +670,16 @@ export const getArrowheadPoints = (
   const angle = getArrowheadAngle(arrowhead);
 
   // Return points
-  const [x3, y3] = rotate(xs, ys, x2, y2, (-angle * Math.PI) / 180);
-  const [x4, y4] = rotate(xs, ys, x2, y2, (angle * Math.PI) / 180);
+  const [x3, y3] = pointRotateRads(
+    pointFrom(xs, ys),
+    pointFrom(x2, y2),
+    ((-angle * Math.PI) / 180) as Radians,
+  );
+  const [x4, y4] = pointRotateRads(
+    pointFrom(xs, ys),
+    pointFrom(x2, y2),
+    degreesToRadians(angle),
+  );
 
   if (arrowhead === "diamond" || arrowhead === "diamond_outline") {
     // point opposite to the arrowhead point
@@ -621,12 +689,10 @@ export const getArrowheadPoints = (
     if (position === "start") {
       const [px, py] = element.points.length > 1 ? element.points[1] : [0, 0];
 
-      [ox, oy] = rotate(
-        x2 + minSize * 2,
-        y2,
-        x2,
-        y2,
-        Math.atan2(py - y2, px - x2),
+      [ox, oy] = pointRotateRads(
+        pointFrom(x2 + minSize * 2, y2),
+        pointFrom(x2, y2),
+        Math.atan2(py - y2, px - x2) as Radians,
       );
     } else {
       const [px, py] =
@@ -634,12 +700,10 @@ export const getArrowheadPoints = (
           ? element.points[element.points.length - 2]
           : [0, 0];
 
-      [ox, oy] = rotate(
-        x2 - minSize * 2,
-        y2,
-        x2,
-        y2,
-        Math.atan2(y2 - py, x2 - px),
+      [ox, oy] = pointRotateRads(
+        pointFrom(x2 - minSize * 2, y2),
+        pointFrom(x2, y2),
+        Math.atan2(y2 - py, x2 - px) as Radians,
       );
     }
 
@@ -665,7 +729,10 @@ const generateLinearElementShape = (
     return "linearPath";
   })();
 
-  return generator[method](element.points as Mutable<Point>[], options);
+  return generator[method](
+    element.points as Mutable<LocalPoint>[] as RoughPoint[],
+    options,
+  );
 };
 
 const getLinearElementRotatedBounds = (
@@ -678,11 +745,9 @@ const getLinearElementRotatedBounds = (
 
   if (element.points.length < 2) {
     const [pointX, pointY] = element.points[0];
-    const [x, y] = rotate(
-      element.x + pointX,
-      element.y + pointY,
-      cx,
-      cy,
+    const [x, y] = pointRotateRads(
+      pointFrom(element.x + pointX, element.y + pointY),
+      pointFrom(cx, cy),
       element.angle,
     );
 
@@ -708,8 +773,12 @@ const getLinearElementRotatedBounds = (
   const cachedShape = ShapeCache.get(element)?.[0];
   const shape = cachedShape ?? generateLinearElementShape(element);
   const ops = getCurvePathOps(shape);
-  const transformXY = (x: number, y: number) =>
-    rotate(element.x + x, element.y + y, cx, cy, element.angle);
+  const transformXY = ([x, y]: GlobalPoint) =>
+    pointRotateRads<GlobalPoint>(
+      pointFrom(element.x + x, element.y + y),
+      pointFrom(cx, cy),
+      element.angle,
+    );
   const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
   let coords: Bounds = [res[0], res[1], res[2], res[3]];
   if (boundTextElement) {
@@ -738,6 +807,7 @@ export const getElementBounds = (
 
 export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
+  elementsMap?: ElementsMap,
 ): Bounds => {
   if (!elements.length) {
     return [0, 0, 0, 0];
@@ -748,10 +818,10 @@ export const getCommonBounds = (
   let minY = Infinity;
   let maxY = -Infinity;
 
-  const elementsMap = arrayToMap(elements);
+  const _elementsMap = elementsMap || arrayToMap(elements);
 
   elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+    const [x1, y1, x2, y2] = getElementBounds(element, _elementsMap);
     minX = Math.min(minX, x1);
     minY = Math.min(minY, y1);
     maxX = Math.max(maxX, x2);
@@ -860,7 +930,10 @@ export const getClosestElementBounds = (
   const elementsMap = arrayToMap(elements);
   elements.forEach((element) => {
     const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-    const distance = distance2d((x1 + x2) / 2, (y1 + y2) / 2, from.x, from.y);
+    const distance = pointDistance(
+      pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
+      pointFrom(from.x, from.y),
+    );
 
     if (distance < minDistance) {
       minDistance = distance;
@@ -915,3 +988,9 @@ export const getVisibleSceneBounds = ({
     -scrollY + height / zoom.value,
   ];
 };
+
+export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
+  pointFrom(
+    bounds[0] + (bounds[2] - bounds[0]) / 2,
+    bounds[1] + (bounds[3] - bounds[1]) / 2,
+  );

@@ -34,16 +34,12 @@ import {
 import { newTextElement } from "../element";
 import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import {
-  isFrameElement,
-  isFrameLikeElement,
-  isTextElement,
-} from "../element/typeChecks";
+import { isFrameLikeElement, isTextElement } from "../element/typeChecks";
 import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
-import { LOCAL_FONT_PROTOCOL } from "../fonts/metadata";
+import type { Font } from "../fonts/ExcalidrawFont";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -89,15 +85,8 @@ const addFrameLabelsAsTextElements = (
   opts: Pick<AppState, "exportWithDarkMode">,
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
-  let frameIndex = 0;
-  let magicFrameIndex = 0;
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      if (isFrameElement(element)) {
-        frameIndex++;
-      } else {
-        magicFrameIndex++;
-      }
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
@@ -108,10 +97,7 @@ const addFrameLabelsAsTextElements = (
         strokeColor: opts.exportWithDarkMode
           ? FRAME_STYLE.nameColorDarkTheme
           : FRAME_STYLE.nameColorLightTheme,
-        text: getFrameLikeTitle(
-          element,
-          isFrameElement(element) ? frameIndex : magicFrameIndex,
-        ),
+        text: getFrameLikeTitle(element),
       });
       textElement.y -= textElement.height;
 
@@ -188,11 +174,22 @@ export const exportToCanvas = async (
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
   },
+  loadFonts: () => Promise<void> = async () => {
+    await Fonts.loadFontsForElements(elements);
+  },
 ) => {
+  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
+  await loadFonts();
+
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
     appState.frameRendering ?? null,
   );
+  // for canvas export, don't clip if exporting a specific frame as it would
+  // clip the corners of the content
+  if (exportingFrame) {
+    frameRendering.clip = false;
+  }
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -251,6 +248,7 @@ export const exportToCanvas = async (
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
+      pendingFlowchartNodes: null,
     },
   });
 
@@ -358,62 +356,24 @@ export const exportToSvg = async (
     }) rotate(${frame.angle} ${cx} ${cy})"
           width="${frame.width}"
           height="${frame.height}"
+          ${
+            exportingFrame
+              ? ""
+              : `rx=${FRAME_STYLE.radius} ry=${FRAME_STYLE.radius}`
+          }
           >
           </rect>
         </clipPath>`;
   }
 
-  const fontFamilies = elements.reduce((acc, element) => {
-    if (isTextElement(element)) {
-      acc.add(element.fontFamily);
-    }
-
-    return acc;
-  }, new Set<number>());
-
-  const fontFaces = opts?.skipInliningFonts
-    ? []
-    : await Promise.all(
-        Array.from(fontFamilies).map(async (x) => {
-          const { fontFaces } = Fonts.registered.get(x) ?? {};
-
-          if (!Array.isArray(fontFaces)) {
-            console.error(
-              `Couldn't find registered font-faces for font-family "${x}"`,
-              Fonts.registered,
-            );
-            return;
-          }
-
-          return Promise.all(
-            fontFaces
-              .filter((font) => font.url.protocol !== LOCAL_FONT_PROTOCOL)
-              .map(async (font) => {
-                try {
-                  const content = await font.getContent();
-
-                  return `@font-face {
-        font-family: ${font.fontFace.family};
-        src: url(${content});
-          }`;
-                } catch (e) {
-                  console.error(
-                    `Skipped inlining font with URL "${font.url.toString()}"`,
-                    e,
-                  );
-                  return "";
-                }
-              }),
-          );
-        }),
-      );
+  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
 
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
     <style class="style-fonts">
-      ${fontFaces.flat().filter(Boolean).join("\n")}
+      ${fontFaces.join("\n")}
     </style>
     ${exportingFrameClipPath}
   </defs>
@@ -483,4 +443,68 @@ export const getExportSize = (
   );
 
   return [width, height];
+};
+
+const getFontFaces = async (
+  elements: readonly ExcalidrawElement[],
+): Promise<string[]> => {
+  const fontFamilies = new Set<number>();
+  const codePoints = new Set<number>();
+
+  for (const element of elements) {
+    if (!isTextElement(element)) {
+      continue;
+    }
+
+    fontFamilies.add(element.fontFamily);
+
+    // gather unique codepoints only when inlining fonts
+    for (const codePoint of Array.from(element.originalText, (u) =>
+      u.codePointAt(0),
+    )) {
+      if (codePoint) {
+        codePoints.add(codePoint);
+      }
+    }
+  }
+
+  const getSource = (font: Font) => {
+    try {
+      // retrieve font source as dataurl based on the used codepoints
+      return font.getContent(codePoints);
+    } catch {
+      // fallback to font source as a url
+      return font.urls[0].toString();
+    }
+  };
+
+  const fontFaces = await Promise.all(
+    Array.from(fontFamilies).map(async (x) => {
+      const { fonts, metadata } = Fonts.registered.get(x) ?? {};
+
+      if (!Array.isArray(fonts)) {
+        console.error(
+          `Couldn't find registered fonts for font-family "${x}"`,
+          Fonts.registered,
+        );
+        return [];
+      }
+
+      if (metadata?.local) {
+        // don't inline local fonts
+        return [];
+      }
+
+      return Promise.all(
+        fonts.map(
+          async (font) => `@font-face {
+        font-family: ${font.fontFace.family};
+        src: url(${await getSource(font)});
+          }`,
+        ),
+      );
+    }),
+  );
+
+  return fontFaces.flat();
 };

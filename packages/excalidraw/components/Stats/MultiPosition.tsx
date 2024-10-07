@@ -1,9 +1,9 @@
 import type {
   ElementsMap,
   ExcalidrawElement,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "../../element/types";
-import { rotate } from "../../math";
 import type Scene from "../../scene/Scene";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
@@ -13,6 +13,7 @@ import { useMemo } from "react";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 import type { AtomicUnit } from "./utils";
 import type { AppState } from "../../types";
+import { pointFrom, pointRotateRads } from "../../../math";
 
 interface MultiPositionProps {
   property: "x" | "y";
@@ -33,6 +34,7 @@ const moveElements = (
   originalElements: readonly ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   for (let i = 0; i < elements.length; i++) {
     const origElement = originalElements[i];
@@ -41,11 +43,9 @@ const moveElements = (
       origElement.x + origElement.width / 2,
       origElement.y + origElement.height / 2,
     ];
-    const [topLeftX, topLeftY] = rotate(
-      origElement.x,
-      origElement.y,
-      cx,
-      cy,
+    const [topLeftX, topLeftY] = pointRotateRads(
+      pointFrom(origElement.x, origElement.y),
+      pointFrom(cx, cy),
       origElement.angle,
     );
 
@@ -60,6 +60,8 @@ const moveElements = (
       newTopLeftY,
       origElement,
       elementsMap,
+      elements,
+      scene,
       originalElementsMap,
       false,
     );
@@ -71,6 +73,7 @@ const moveGroupTo = (
   nextY: number,
   originalElements: ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
@@ -93,11 +96,9 @@ const moveGroupTo = (
         latestElement.y + latestElement.height / 2,
       ];
 
-      const [topLeftX, topLeftY] = rotate(
-        latestElement.x,
-        latestElement.y,
-        cx,
-        cy,
+      const [topLeftX, topLeftY] = pointRotateRads(
+        pointFrom(latestElement.x, latestElement.y),
+        pointFrom(cx, cy),
         latestElement.angle,
       );
 
@@ -106,6 +107,8 @@ const moveGroupTo = (
         topLeftY + offsetY,
         origElement,
         elementsMap,
+        elements,
+        scene,
         originalElementsMap,
         false,
       );
@@ -126,6 +129,7 @@ const handlePositionChange: DragInputCallbackType<
   originalAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+  const elements = scene.getNonDeletedElements();
 
   if (nextValue !== undefined) {
     for (const atomicUnit of getAtomicUnits(
@@ -150,6 +154,7 @@ const handlePositionChange: DragInputCallbackType<
           newTopLeftY,
           elementsInUnit.map((el) => el.original),
           elementsMap,
+          elements,
           originalElementsMap,
           scene,
         );
@@ -165,11 +170,9 @@ const handlePositionChange: DragInputCallbackType<
             origElement.x + origElement.width / 2,
             origElement.y + origElement.height / 2,
           ];
-          const [topLeftX, topLeftY] = rotate(
-            origElement.x,
-            origElement.y,
-            cx,
-            cy,
+          const [topLeftX, topLeftY] = pointRotateRads(
+            pointFrom(origElement.x, origElement.y),
+            pointFrom(cx, cy),
             origElement.angle,
           );
 
@@ -180,6 +183,8 @@ const handlePositionChange: DragInputCallbackType<
             newTopLeftY,
             origElement,
             elementsMap,
+            elements,
+            scene,
             originalElementsMap,
             false,
           );
@@ -206,6 +211,7 @@ const handlePositionChange: DragInputCallbackType<
     originalElements,
     elementsMap,
     originalElementsMap,
+    scene,
   );
 
   scene.triggerUpdate();
@@ -234,7 +240,11 @@ const MultiPosition = ({
         const [el] = elementsInUnit;
         const [cx, cy] = [el.x + el.width / 2, el.y + el.height / 2];
 
-        const [topLeftX, topLeftY] = rotate(el.x, el.y, cx, cy, el.angle);
+        const [topLeftX, topLeftY] = pointRotateRads(
+          pointFrom(el.x, el.y),
+          pointFrom(cx, cy),
+          el.angle,
+        );
 
         return Math.round((property === "x" ? topLeftX : topLeftY) * 100) / 100;
       }),

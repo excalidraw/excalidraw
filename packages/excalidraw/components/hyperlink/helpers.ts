@@ -1,3 +1,5 @@
+import type { GlobalPoint, Radians } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
 import { MIME_TYPES } from "../../constants";
 import type { Bounds } from "../../element/bounds";
 import { getElementAbsoluteCoords } from "../../element/bounds";
@@ -6,9 +8,8 @@ import type {
   ElementsMap,
   NonDeletedExcalidrawElement,
 } from "../../element/types";
-import { rotate } from "../../math";
 import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
-import type { AppState, Point, UIAppState } from "../../types";
+import type { AppState, UIAppState } from "../../types";
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
@@ -17,7 +18,7 @@ EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,
-  angle: number,
+  angle: Radians,
   appState: Pick<UIAppState, "zoom">,
 ): Bounds => {
   const size = DEFAULT_LINK_SIZE;
@@ -33,11 +34,9 @@ export const getLinkHandleFromCoords = (
   const x = x2 + dashedLineMargin - centeringOffset;
   const y = y1 - dashedLineMargin - linkMarginY + centeringOffset;
 
-  const [rotatedX, rotatedY] = rotate(
-    x + linkWidth / 2,
-    y + linkHeight / 2,
-    centerX,
-    centerY,
+  const [rotatedX, rotatedY] = pointRotateRads(
+    pointFrom(x + linkWidth / 2, y + linkHeight / 2),
+    pointFrom(centerX, centerY),
     angle,
   );
   return [
@@ -52,7 +51,7 @@ export const isPointHittingLinkIcon = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
-  [x, y]: Point,
+  [x, y]: GlobalPoint,
 ) => {
   const threshold = 4 / appState.zoom.value;
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -73,7 +72,7 @@ export const isPointHittingLink = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: AppState,
-  [x, y]: Point,
+  [x, y]: GlobalPoint,
   isMobile: boolean,
 ) => {
   if (!element.link || appState.selectedElementIds[element.id]) {
@@ -86,5 +85,10 @@ export const isPointHittingLink = (
   ) {
     return true;
   }
-  return isPointHittingLinkIcon(element, elementsMap, appState, [x, y]);
+  return isPointHittingLinkIcon(
+    element,
+    elementsMap,
+    appState,
+    pointFrom(x, y),
+  );
 };

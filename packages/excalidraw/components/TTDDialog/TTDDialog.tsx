@@ -25,11 +25,11 @@ import type { BinaryFiles } from "../../types";
 import { ArrowRightIcon } from "../icons";
 
 import "./TTDDialog.scss";
-import { isFiniteNumber } from "../../utils";
 import { atom, useAtom } from "jotai";
 import { trackEvent } from "../../analytics";
 import { InlineIcon } from "../InlineIcon";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
+import { isFiniteNumber } from "../../../math";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;

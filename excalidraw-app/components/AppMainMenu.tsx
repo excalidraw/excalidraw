@@ -2,11 +2,13 @@ import React from "react";
 import {
   loginIcon,
   ExcalLogo,
+  eyeIcon,
 } from "../../packages/excalidraw/components/icons";
 import type { Theme } from "../../packages/excalidraw/element/types";
 import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
+import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -14,6 +16,7 @@ export const AppMainMenu: React.FC<{
   isCollabEnabled: boolean;
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
+  refresh: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -28,6 +31,7 @@ export const AppMainMenu: React.FC<{
         />
       )}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
+      <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
@@ -50,6 +54,23 @@ export const AppMainMenu: React.FC<{
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       </MainMenu.ItemLink>
+      {import.meta.env.DEV && (
+        <MainMenu.Item
+          icon={eyeIcon}
+          onClick={() => {
+            if (window.visualDebug) {
+              delete window.visualDebug;
+              saveDebugState({ enabled: false });
+            } else {
+              window.visualDebug = { data: [] };
+              saveDebugState({ enabled: true });
+            }
+            props?.refresh();
+          }}
+        >
+          Visual Debug
+        </MainMenu.Item>
+      )}
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme

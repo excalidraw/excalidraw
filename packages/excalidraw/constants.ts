@@ -1,5 +1,5 @@
 import cssVariables from "./css/variables.module.scss";
-import type { AppProps } from "./types";
+import type { AppProps, AppState } from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
@@ -112,6 +112,8 @@ export const ENV = {
 
 export const CLASSES = {
   SHAPE_ACTIONS_MENU: "App-menu__left",
+  ZOOM_ACTIONS: "zoom-actions",
+  SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
 };
 
 /**
@@ -179,7 +181,8 @@ export const COLOR_VOICE_CALL = "#a2f1a6";
 
 export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 
-export const GRID_SIZE = 20; // TODO make it configurable?
+export const DEFAULT_GRID_SIZE = 20;
+export const DEFAULT_GRID_STEP = 5;
 
 export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",
@@ -234,7 +237,7 @@ export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
-export const MAX_ZOOM = 30.0;
+export const MAX_ZOOM = 30;
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds
@@ -374,6 +377,7 @@ export const DEFAULT_ELEMENT_PROPS: {
 };
 
 export const LIBRARY_SIDEBAR_TAB = "library";
+export const CANVAS_SEARCH_TAB = "search";
 
 export const DEFAULT_SIDEBAR = {
   name: "default",
@@ -421,3 +425,9 @@ export const DEFAULT_FILENAME = "Untitled";
 export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 
 export const MIN_WIDTH_OR_HEIGHT = 1;
+
+export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
+  sharp: "sharp",
+  round: "round",
+  elbow: "elbow",
+};
