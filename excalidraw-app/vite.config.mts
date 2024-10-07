@@ -28,7 +28,7 @@ export default defineConfig({
           // fonts don't change often, so hash is not necessary
           // put on root so we are flexible about the CDN path
           if (chunkInfo?.name?.endsWith(".woff2")) {
-            return "[name]-[extname]";
+            return "[name][extname]";
           }
 
           return "assets/[name]-[hash][extname]";
