@@ -305,6 +305,7 @@ define: {
 
 ## 0.16.0 (2023-09-19)
 
+- Add a `subtype` attribute to `ExcalidrawElement` to allow self-contained extensions of any `ExcalidrawElement` type. Implement MathJax support on stem.excalidraw.com as a `math` subtype of `ExcalidrawTextElement`. Both standard Latex input and simplified AsciiMath input are supported. [#6037](https://github.com/excalidraw/excalidraw/pull/6037).
 - Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
 - Introducing Web-Embeds (alias iframe element)[#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
