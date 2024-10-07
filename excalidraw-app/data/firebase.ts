@@ -42,7 +42,6 @@ const _loadFirebase = async () => {
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
   await import(/* webpackChunkName: "firebase" */ "firebase/auth");
-  console.log("heloooo custom branch");
 
   if (!isFirebaseInitialized) {
     try {

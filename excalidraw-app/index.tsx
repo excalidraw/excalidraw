@@ -27,13 +27,11 @@ function App() {
       elements: readonly SyncableExcalidrawElement[],
       appState: AppState,
     ) => {
-      console.log("collab room save");
+      console.log("Collab room save");
     },
     [],
   );
 
-  console.log(`firebase_config ${import.meta.env.VITE_APP_FIREBASE_CONFIG}`);
-  console.log(`collabServerUrl: ${import.meta.env.VITE_APP_WS_SERVER_URL}`);
   return (
     <StrictMode>
       <ExcalidrawApp
