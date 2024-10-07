@@ -6,7 +6,7 @@
     ".": {
       "development": "./dist/dev/index.js",
       "types": "./dist/excalidraw/index.d.ts",
-      "default": "./dist/prod/index.js"
+      "default": "./dist/dev/index.js"
     },
     "./index.css": {
       "development": "./dist/dev/index.css",

@@ -44,9 +44,9 @@ function App() {
           roomKey: "yx8WgrzkcceYyZFXAo4_9g", // arbitrary constant key
         }}
         username={"Karat Engineer"}
+        firebaseToken="placeholder"
         theme="dark"
         excalidrawAPIRefCallback={excalidrawAPIRefCallback}
-        firebaseToken="placeholder"
         onCollabRoomSave={onCollabRoomSave}
       />
     </StrictMode>

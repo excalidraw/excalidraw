@@ -790,7 +790,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        excalidrawAPI={excalidrawRefCallback}
+        excalidrawAPI={setExcalidrawAPI}
         onChange={onChange}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
@@ -1140,9 +1140,9 @@ const ExcalidrawApp: React.FC<{
   customRoomLinkData = props.roomLinkData;
   customUsername = props.username;
   customTheme = props.theme;
+  externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
   customFirebaseToken= props.firebaseToken;
   onCollabRoomSave = props.onCollabRoomSave;
-  externalExcalidrawRefCallback = props.excalidrawAPIRefCallback;
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
