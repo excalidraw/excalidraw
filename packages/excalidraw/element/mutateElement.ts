@@ -50,7 +50,11 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
         ...updates,
         angle: 0 as Radians,
         ...updateElbowArrowPoints(
-          element,
+          {
+            ...element,
+            x: updates.x || element.x,
+            y: updates.y || element.y,
+          },
           mergedElementsMap,
           // @ts-ignore
           updates,

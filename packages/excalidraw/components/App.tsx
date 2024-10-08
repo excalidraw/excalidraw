@@ -6182,6 +6182,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({
       selectedElementsAreBeingDragged: false,
+      flippedFixedPointBindings: false,
     });
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
@@ -10049,23 +10050,26 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (
-      transformElements(
-        pointerDownState.originalElements,
-        transformHandleType,
-        selectedElements,
-        this.scene.getElementsMapIncludingDeleted(),
-        shouldRotateWithDiscreteAngle(event),
-        shouldResizeFromCenter(event),
-        selectedElements.some((element) => isImageElement(element))
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
-        resizeX,
-        resizeY,
-        pointerDownState.resize.center.x,
-        pointerDownState.resize.center.y,
-      )
-    ) {
+    const transformed = transformElements(
+      pointerDownState.originalElements,
+      transformHandleType,
+      selectedElements,
+      this.scene.getElementsMapIncludingDeleted(),
+      shouldRotateWithDiscreteAngle(event),
+      shouldResizeFromCenter(event),
+      selectedElements.some((element) => isImageElement(element))
+        ? !shouldMaintainAspectRatio(event)
+        : shouldMaintainAspectRatio(event),
+      resizeX,
+      resizeY,
+      pointerDownState.resize.center.x,
+      pointerDownState.resize.center.y,
+      this.state.flippedFixedPointBindings,
+      (flippedFixedPointBindings) =>
+        this.setState({ flippedFixedPointBindings }),
+    );
+
+    if (transformed) {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
         this.scene.getNonDeletedElementsMap(),

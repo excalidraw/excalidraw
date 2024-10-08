@@ -143,6 +143,7 @@ const flipElements = (
     true,
     flipDirection === "horizontal" ? maxX : minX,
     flipDirection === "horizontal" ? minY : maxY,
+    true,
   );
 
   bindOrUnbindLinearElements(

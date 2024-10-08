@@ -387,6 +387,7 @@ export interface AppState {
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
   searchMatches: readonly SearchMatch[];
+  flippedFixedPointBindings: boolean;
 }
 
 type SearchMatch = {
