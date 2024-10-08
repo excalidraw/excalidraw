@@ -1406,6 +1406,12 @@ const getArrowheadOptions = (flip: boolean) => {
       icon: <ArrowheadArrowIcon flip={flip} />,
     },
     {
+      value: "triangle",
+      text: t("labels.arrowhead_triangle"),
+      icon: <ArrowheadTriangleIcon flip={flip} />,
+      keyBinding: "t",
+    },
+    {
       value: "bar",
       text: t("labels.arrowhead_bar"),
       keyBinding: "e",
@@ -1413,51 +1419,40 @@ const getArrowheadOptions = (flip: boolean) => {
     },
     {
       value: "dot",
-      text: t("labels.arrowhead_circle"),
+      text: t("labels.arrowhead_dot"),
       keyBinding: null,
       icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: false,
     },
     {
       value: "circle",
       text: t("labels.arrowhead_circle"),
       keyBinding: "r",
       icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: false,
     },
     {
       value: "circle_outline",
       text: t("labels.arrowhead_circle_outline"),
       keyBinding: null,
       icon: <ArrowheadCircleOutlineIcon flip={flip} />,
-      showInPicker: false,
     },
-    {
-      value: "triangle",
-      text: t("labels.arrowhead_triangle"),
-      icon: <ArrowheadTriangleIcon flip={flip} />,
-      keyBinding: "t",
-    },
+
     {
       value: "triangle_outline",
       text: t("labels.arrowhead_triangle_outline"),
       icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
       keyBinding: null,
-      showInPicker: false,
     },
     {
       value: "diamond",
       text: t("labels.arrowhead_diamond"),
       icon: <ArrowheadDiamondIcon flip={flip} />,
       keyBinding: null,
-      showInPicker: false,
     },
     {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
       keyBinding: null,
-      showInPicker: false,
     },
   ] as const;
 };
