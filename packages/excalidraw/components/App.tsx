@@ -438,7 +438,7 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { mutateElbowArrow, updateElbowArrow } from "../element/routing";
+import { updateElbowArrowPoints } from "../element/routing";
 import {
   FlowChartCreator,
   FlowChartNavigator,
@@ -446,7 +446,7 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { pointFrom, pointDistance, vector } from "../../math";
+import { pointFrom, pointDistance } from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2606,6 +2606,7 @@ class App extends React.Component<AppProps, AppState> {
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
         this.handleWheel,
+        { passive: false },
       ),
       addEventListener(
         this.excalidrawContainerRef.current,
@@ -3124,7 +3125,7 @@ class App extends React.Component<AppProps, AppState> {
         const endBinding = startEndElements[1] ? el.endBinding : null;
         return {
           ...el,
-          ...updateElbowArrow(
+          ...updateElbowArrowPoints(
             {
               ...el,
               startBinding,
@@ -3143,7 +3144,7 @@ class App extends React.Component<AppProps, AppState> {
                   ),
               ),
             ),
-            [el.points[0], el.points[el.points.length - 1]],
+            { points: el.points },
           ),
         };
       }
@@ -5634,40 +5635,21 @@ class App extends React.Component<AppProps, AppState> {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
-        if (isElbowArrow(multiElement)) {
-          mutateElbowArrow(
-            multiElement,
-            this.scene.getNonDeletedElementsMap(),
-            [
+        // update last uncommitted point
+        mutateElement(
+          multiElement,
+          {
+            points: [
               ...points.slice(0, -1),
               pointFrom<LocalPoint>(
                 lastCommittedX + dxFromLastCommitted,
                 lastCommittedY + dyFromLastCommitted,
               ),
             ],
-            undefined,
-            undefined,
-            {
-              isDragging: true,
-              informMutation: false,
-            },
-          );
-        } else {
-          // update last uncommitted point
-          mutateElement(
-            multiElement,
-            {
-              points: [
-                ...points.slice(0, -1),
-                pointFrom<LocalPoint>(
-                  lastCommittedX + dxFromLastCommitted,
-                  lastCommittedY + dyFromLastCommitted,
-                ),
-              ],
-            },
-            false,
-          );
-        }
+          },
+          false,
+          true,
+        );
 
         // in this path, we're mutating multiElement to reflect
         // how it will be after adding pointer position as the next point
@@ -8091,25 +8073,17 @@ class App extends React.Component<AppProps, AppState> {
               },
               false,
             );
-          } else if (points.length > 1 && isElbowArrow(newElement)) {
-            mutateElbowArrow(
-              newElement,
-              elementsMap,
-              [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
-              vector(0, 0),
-              undefined,
-              {
-                isDragging: true,
-                informMutation: false,
-              },
-            );
-          } else if (points.length === 2) {
+          } else if (
+            points.length === 2 ||
+            (points.length > 1 && isElbowArrow(newElement))
+          ) {
             mutateElement(
               newElement,
               {
                 points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
               false,
+              true,
             );
           }
 
@@ -9609,6 +9583,7 @@ class App extends React.Component<AppProps, AppState> {
       this.interactiveCanvas.addEventListener(
         EVENT.TOUCH_START,
         this.onTouchStart,
+        { passive: false },
       );
       this.interactiveCanvas.addEventListener(EVENT.TOUCH_END, this.onTouchEnd);
       // -----------------------------------------------------------------------

@@ -1,4 +1,3 @@
-import type { Radians } from "../../math";
 import {
   pointFrom,
   pointScaleFromOrigin,
@@ -9,7 +8,6 @@ import {
   vectorScale,
   type GlobalPoint,
   type LocalPoint,
-  type Vector,
 } from "../../math";
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
@@ -37,7 +35,6 @@ import {
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
-import { mutateElement } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
@@ -73,67 +70,23 @@ type Grid = {
 
 const BASE_PADDING = 40;
 
-export const mutateElbowArrow = (
+export const updateElbowArrowPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  nextPoints: readonly LocalPoint[],
-  offset?: Vector,
-  otherUpdates?: Omit<
-    ElementUpdate<ExcalidrawElbowArrowElement>,
-    "angle" | "x" | "y" | "width" | "height" | "elbowed" | "points"
-  >,
-  options?: {
-    isDragging?: boolean;
-    informMutation?: boolean;
+  updates: {
+    points: readonly LocalPoint[];
+    fixedSegments?: number[];
   },
-) => {
-  const update = updateElbowArrow(
-    arrow,
-    elementsMap,
-    [nextPoints[0], nextPoints[nextPoints.length - 1]],
-    otherUpdates?.fixedSegments,
-    offset,
-    options,
-  );
-
-  if (update) {
-    mutateElement(
-      arrow,
-      {
-        ...otherUpdates,
-        ...update,
-        //points: nextPoints,
-        angle: 0 as Radians,
-      },
-      options?.informMutation,
-    );
-  } else {
-    console.error("Elbow arrow cannot find a route");
-  }
-};
-
-export const updateElbowArrow = (
-  arrow: ExcalidrawElbowArrowElement,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  targetPoints: readonly [LocalPoint, LocalPoint],
-  fixSegments?: number[] | null,
-  offset?: Readonly<Vector>,
   options?: {
     isDragging?: boolean;
     disableBinding?: boolean;
   },
-): ElementUpdate<ExcalidrawElbowArrowElement> | null => {
-  // Merge a set of arrow points with offet, new points overriding any old points
-  const nextPoints = Array.from(arrow.points);
-  nextPoints[0] = pointTranslate(targetPoints[0], offset);
-  nextPoints[nextPoints.length - 1] = pointTranslate(
-    targetPoints[targetPoints.length - 1],
-    offset,
-  );
-
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
   // Segment index
-  const nextFixedSegments: number[] = Array.from<number>(
-    new Set([...(arrow.fixedSegments ?? []), ...(fixSegments ?? [])]),
+  const nextFixedSegments = (
+    updates.fixedSegments ??
+    arrow.fixedSegments ??
+    []
   ).sort();
 
   // Determine the arrow parts based on fixed segments
@@ -143,14 +96,14 @@ export const updateElbowArrow = (
     prevIdx = segmentIdx - 1;
     return ret;
   });
-  parts.push([prevIdx, nextPoints.length - 1]);
+  parts.push([prevIdx, updates.points.length - 1]);
 
   // Generate the part ends
   const temporaryElementsMap = new Map<string, Partial<ExcalidrawElement>>(
     elementsMap,
   );
   const points = parts.flatMap(([startIdx, endIdx], id) => {
-    const partGlobalPoints = nextPoints.map((p) =>
+    const partGlobalPoints = updates.points.map((p) =>
       pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
     );
     const startGlobalCoords = partGlobalPoints[startIdx];
@@ -171,7 +124,7 @@ export const updateElbowArrow = (
         height: 10,
       });
     }
-    if (endIdx !== nextPoints.length - 1) {
+    if (endIdx !== updates.points.length - 1) {
       temporaryElementsMap.set(`temp-end-${id}`, {
         id: `temp-end-${id}`,
         type: "rectangle",
@@ -189,7 +142,7 @@ export const updateElbowArrow = (
           y: partGlobalPoints[startIdx][1],
           startArrowhead: startIdx === 0 ? arrow.startArrowhead : null,
           endArrowhead:
-            endIdx === nextPoints.length - 1 ? arrow.endArrowhead : null,
+            endIdx === updates.points.length - 1 ? arrow.endArrowhead : null,
           startBinding:
             startIdx === 0
               ? arrow.startBinding
@@ -211,7 +164,7 @@ export const updateElbowArrow = (
                   gap: 0,
                 },
           endBinding:
-            endIdx === nextPoints.length - 1
+            endIdx === updates.points.length - 1
               ? arrow.endBinding
               : {
                   elementId: `temp-end-${id}`,
@@ -244,9 +197,7 @@ export const updateElbowArrow = (
     );
   });
 
-  return points
-    ? normalizedArrowElementUpdate(points, 0, 0, nextFixedSegments)
-    : null;
+  return normalizedArrowElementUpdate(points, nextFixedSegments);
 };
 
 /**
@@ -1086,8 +1037,6 @@ const getBindableElementForId = (
 
 const normalizedArrowElementUpdate = (
   global: GlobalPoint[],
-  externalOffsetX: number,
-  externalOffsetY: number,
   nextFixedSegments: number[],
 ): {
   points: LocalPoint[];
@@ -1109,8 +1058,8 @@ const normalizedArrowElementUpdate = (
 
   return {
     points,
-    x: offsetX + (externalOffsetX ?? 0),
-    y: offsetY + (externalOffsetY ?? 0),
+    x: offsetX,
+    y: offsetY,
     fixedSegments: nextFixedSegments.length ? nextFixedSegments : null,
     ...getSizeFromPoints(points),
   };

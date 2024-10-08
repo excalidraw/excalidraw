@@ -32,7 +32,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { invariant, toBrandedType, tupleToCoors } from "../utils";
+import { invariant, tupleToCoors } from "../utils";
 import {
   isBindingElement,
   isElbowArrow,
@@ -44,7 +44,6 @@ import { DRAGGING_THRESHOLD } from "../constants";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
-import { mutateElbowArrow } from "./routing";
 import type Scene from "../scene/Scene";
 import type { Radians } from "../../math";
 import {
@@ -56,6 +55,7 @@ import {
   type GlobalPoint,
   type LocalPoint,
   pointDistance,
+  pointTranslate,
 } from "../../math";
 import {
   getBezierCurveLength,
@@ -1444,6 +1444,7 @@ export class LinearElementEditor {
         startBinding?: FixedPointBinding | null;
         endBinding?: FixedPointBinding | null;
         fixedSegments?: number[] | null;
+        points?: LocalPoint[];
       } = {};
       if (otherUpdates?.startBinding !== undefined) {
         updates.startBinding =
@@ -1463,21 +1464,23 @@ export class LinearElementEditor {
         updates.fixedSegments = otherUpdates.fixedSegments.sort();
       }
 
-      const mergedElementsMap = options?.changedElements
-        ? toBrandedType<SceneElementsMap>(
-            new Map([...elementsMap, ...options.changedElements]),
-          )
-        : elementsMap;
-
-      mutateElbowArrow(
-        element,
-        mergedElementsMap,
-        nextPoints,
+      updates.points = Array.from(nextPoints);
+      updates.points[0] = pointTranslate(
+        updates.points[0],
         vector(offsetX, offsetY),
+      );
+      updates.points[updates.points.length - 1] = pointTranslate(
+        updates.points[updates.points.length - 1],
+        vector(offsetX, offsetY),
+      );
+
+      mutateElement(
+        element,
         updates,
-        {
-          isDragging: options?.isDragging,
-        },
+        true,
+        options?.isDragging,
+        false,
+        options?.changedElements,
       );
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);

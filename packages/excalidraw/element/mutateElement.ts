@@ -1,10 +1,17 @@
-import type { ExcalidrawElement } from "./types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { isElbowArrow } from "./typeChecks";
+import { updateElbowArrowPoints } from "./routing";
+import type { Radians } from "../../math";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -19,15 +26,43 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
+  isDragging = false,
+  disableBinding = false,
+  changedElements?: Map<string, OrderedExcalidrawElement>,
 ): TElement => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fileId } = updates as any;
+  const { fileId } = updates as any;
+  const { points } = updates as any;
 
   if (typeof points !== "undefined") {
-    updates = { ...getSizeFromPoints(points), ...updates };
+    if (isElbowArrow(element)) {
+      const mergedElementsMap = toBrandedType<SceneElementsMap>(
+        new Map([
+          ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
+          ...(changedElements ?? []),
+        ]),
+      );
+
+      updates = {
+        ...updates,
+        angle: 0 as Radians,
+        ...updateElbowArrowPoints(
+          element,
+          mergedElementsMap,
+          // @ts-ignore
+          updates,
+          {
+            isDragging,
+            disableBinding,
+          },
+        ),
+      };
+    } else {
+      updates = { ...getSizeFromPoints(points), ...updates };
+    }
   }
 
   for (const key in updates) {

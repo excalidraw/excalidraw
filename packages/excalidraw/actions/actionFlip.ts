@@ -25,7 +25,6 @@ import {
   isElbowArrow,
   isLinearElement,
 } from "../element/typeChecks";
-import { mutateElbowArrow } from "../element/routing";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 
 export const actionFlipHorizontal = register({
@@ -185,16 +184,7 @@ const flipElements = (
     }),
   );
   elbowArrows.forEach((element) =>
-    mutateElbowArrow(
-      element,
-      elementsMap,
-      element.points,
-      undefined,
-      undefined,
-      {
-        informMutation: false,
-      },
-    ),
+    mutateElement(element, { points: element.points }, false),
   );
   // ---------------------------------------------------------------------------
 

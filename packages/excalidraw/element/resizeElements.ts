@@ -12,6 +12,7 @@ import type {
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
   SceneElementsMap,
+  ExcalidrawElbowArrowElement,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -53,7 +54,6 @@ import {
 } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
-import { mutateElbowArrow } from "./routing";
 import type { GlobalPoint } from "../../math";
 import {
   pointCenter,
@@ -1002,6 +1002,13 @@ export const resizeMultipleElements = (
     const { angle } = update;
     const { width: oldWidth, height: oldHeight } = element;
 
+    if (isElbowArrow(element)) {
+      update.points = getArrowLocalFixedPoints(
+        { ...element, ...update } as ExcalidrawElbowArrowElement,
+        elementsMap,
+      );
+    }
+
     mutateElement(element, update, false);
 
     updateBoundElements(element, elementsMap, {
@@ -1058,8 +1065,9 @@ const rotateMultipleElements = (
       );
 
       if (isElbowArrow(element)) {
-        const points = getArrowLocalFixedPoints(element, elementsMap);
-        mutateElbowArrow(element, elementsMap, points);
+        mutateElement(element, {
+          points: getArrowLocalFixedPoints(element, elementsMap),
+        });
       } else {
         mutateElement(
           element,
