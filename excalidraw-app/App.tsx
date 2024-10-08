@@ -278,6 +278,7 @@ const initializeScene = async (opts: {
     }
   }
 
+  console.log('roomlinkdata', roomLinkData, opts.collabAPI);
   if (roomLinkData && opts.collabAPI) {
     const { excalidrawAPI } = opts;
     opts.collabAPI.setUsername(customUsername);
@@ -327,7 +328,8 @@ const initializeScene = async (opts: {
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const isCollabDisabled = isRunningInIframe();
+  const isCollabDisabled = false;
+  console.log('Collab disabled', isCollabDisabled);
 
   const [appTheme, setAppTheme] = useAtom(appThemeAtom);
   const { editorTheme } = useHandleAppTheme();
