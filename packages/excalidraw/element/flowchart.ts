@@ -137,16 +137,19 @@ export const getPredecessors = (
   return getNodeRelatives("predecessors", node, elementsMap, direction);
 };
 
+let isFirstCall = true;
+let isInitialOdd = false;
+
 const getOffsets = (
   element: ExcalidrawFlowchartNodeElement,
   linkedNodes: ExcalidrawElement[],
   direction: LinkDirection,
 ) => {
   const _HORIZONTAL_OFFSET = HORIZONTAL_OFFSET + element.width;
+  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
 
   // check if vertical space or horizontal space is available first
   if (direction === "up" || direction === "down") {
-    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
     // check vertical space
     const minX = element.x;
     const maxX = element.x + element.width;
@@ -182,14 +185,29 @@ const getOffsets = (
   }
 
   if (direction === "up" || direction === "down") {
-    const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+    if (isFirstCall) {
+      isInitialOdd = linkedNodes.length % 2 !== 0;
+      isFirstCall = false;
+    }
+
+    let x: number;
     const y = linkedNodes.length === 0 ? _VERTICAL_OFFSET : _VERTICAL_OFFSET;
-    const x =
-      linkedNodes.length === 0
-        ? 0
-        : (linkedNodes.length + 1) % 2 === 0
-        ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
-        : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+
+    if (isInitialOdd) {
+      x =
+        linkedNodes.length === 0
+          ? 0
+          : (linkedNodes.length + 1) % 2 === 0
+          ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
+          : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+    } else {
+      x =
+        linkedNodes.length === 0
+          ? 0
+          : linkedNodes.length % 2 === 0
+          ? ((linkedNodes.length + 1) / 2) * _HORIZONTAL_OFFSET
+          : (linkedNodes.length / 2) * _HORIZONTAL_OFFSET * -1;
+    }
 
     if (direction === "up") {
       return {
@@ -204,16 +222,30 @@ const getOffsets = (
     };
   }
 
-  const _VERTICAL_OFFSET = VERTICAL_OFFSET + element.height;
+  if (isFirstCall) {
+    isInitialOdd = linkedNodes.length % 2 !== 0;
+    isFirstCall = false;
+  }
+  let y: number;
+
+  if (isInitialOdd) {
+    y =
+      linkedNodes.length === 0
+        ? 0
+        : (linkedNodes.length + 1) % 2 === 0
+        ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
+        : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
+  } else {
+    y =
+      linkedNodes.length === 0
+        ? 0
+        : linkedNodes.length % 2 === 0
+        ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
+        : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
+  }
   const x =
     (linkedNodes.length === 0 ? HORIZONTAL_OFFSET : HORIZONTAL_OFFSET) +
     element.width;
-  const y =
-    linkedNodes.length === 0
-      ? 0
-      : (linkedNodes.length + 1) % 2 === 0
-      ? ((linkedNodes.length + 1) / 2) * _VERTICAL_OFFSET
-      : (linkedNodes.length / 2) * _VERTICAL_OFFSET * -1;
 
   if (direction === "left") {
     return {
