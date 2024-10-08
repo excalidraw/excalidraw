@@ -1,5 +1,5 @@
 import type { Radians } from "../math";
-import { point } from "../math";
+import { pointFrom } from "../math";
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
@@ -263,7 +263,7 @@ const chartLines = (
     x,
     y,
     width: chartWidth,
-    points: [point(0, 0), point(chartWidth, 0)],
+    points: [pointFrom(0, 0), pointFrom(chartWidth, 0)],
   });
 
   const yLine = newLinearElement({
@@ -274,7 +274,7 @@ const chartLines = (
     x,
     y,
     height: chartHeight,
-    points: [point(0, 0), point(0, -chartHeight)],
+    points: [pointFrom(0, 0), pointFrom(0, -chartHeight)],
   });
 
   const maxLine = newLinearElement({
@@ -287,7 +287,7 @@ const chartLines = (
     strokeStyle: "dotted",
     width: chartWidth,
     opacity: GRID_OPACITY,
-    points: [point(0, 0), point(chartWidth, 0)],
+    points: [pointFrom(0, 0), pointFrom(chartWidth, 0)],
   });
 
   return [xLine, yLine, maxLine];
@@ -445,7 +445,7 @@ const chartTypeLine = (
       height: cy,
       strokeStyle: "dotted",
       opacity: GRID_OPACITY,
-      points: [point(0, 0), point(0, cy)],
+      points: [pointFrom(0, 0), pointFrom(0, cy)],
     });
   });
 

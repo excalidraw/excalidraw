@@ -23,7 +23,7 @@ import { SIDE_RESIZING_THRESHOLD } from "../constants";
 import { isLinearElement } from "./typeChecks";
 import type { GlobalPoint, LineSegment, LocalPoint } from "../../math";
 import {
-  point,
+  pointFrom,
   pointOnLineSegment,
   pointRotateRads,
   type Radians,
@@ -92,16 +92,20 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     if (!(isLinearElement(element) && element.points.length <= 2)) {
       const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
-        point(x1 - SPACING, y1 - SPACING),
-        point(x2 + SPACING, y2 + SPACING),
-        point(cx, cy),
+        pointFrom(x1 - SPACING, y1 - SPACING),
+        pointFrom(x2 + SPACING, y2 + SPACING),
+        pointFrom(cx, cy),
         element.angle,
       );
 
       for (const [dir, side] of Object.entries(sides)) {
         // test to see if x, y are on the line segment
         if (
-          pointOnLineSegment(point(x, y), side as LineSegment<Point>, SPACING)
+          pointOnLineSegment(
+            pointFrom(x, y),
+            side as LineSegment<Point>,
+            SPACING,
+          )
         ) {
           return dir as TransformHandleType;
         }
@@ -178,9 +182,9 @@ export const getTransformHandleTypeFromCoords = <
     const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
 
     const sides = getSelectionBorders(
-      point(x1 - SPACING, y1 - SPACING),
-      point(x2 + SPACING, y2 + SPACING),
-      point(cx, cy),
+      pointFrom(x1 - SPACING, y1 - SPACING),
+      pointFrom(x2 + SPACING, y2 + SPACING),
+      pointFrom(cx, cy),
       0 as Radians,
     );
 
@@ -188,7 +192,7 @@ export const getTransformHandleTypeFromCoords = <
       // test to see if x, y are on the line segment
       if (
         pointOnLineSegment(
-          point(scenePointerX, scenePointerY),
+          pointFrom(scenePointerX, scenePointerY),
           side as LineSegment<Point>,
           SPACING,
         )
@@ -265,10 +269,10 @@ const getSelectionBorders = <Point extends LocalPoint | GlobalPoint>(
   center: Point,
   angle: Radians,
 ) => {
-  const topLeft = pointRotateRads(point(x1, y1), center, angle);
-  const topRight = pointRotateRads(point(x2, y1), center, angle);
-  const bottomLeft = pointRotateRads(point(x1, y2), center, angle);
-  const bottomRight = pointRotateRads(point(x2, y2), center, angle);
+  const topLeft = pointRotateRads(pointFrom(x1, y1), center, angle);
+  const topRight = pointRotateRads(pointFrom(x2, y1), center, angle);
+  const bottomLeft = pointRotateRads(pointFrom(x1, y2), center, angle);
+  const bottomRight = pointRotateRads(pointFrom(x2, y2), center, angle);
 
   return {
     n: [topLeft, topRight],
