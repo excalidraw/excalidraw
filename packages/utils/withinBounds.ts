@@ -17,7 +17,7 @@ import { arrayToMap } from "../excalidraw/utils";
 import type { LocalPoint } from "../math";
 import {
   rangeIncludesValue,
-  point,
+  pointFrom,
   pointRotateRads,
   rangeInclusive,
 } from "../math";
@@ -41,17 +41,17 @@ const getNonLinearElementRelativePoints = (
 ] => {
   if (element.type === "diamond") {
     return [
-      point(element.width / 2, 0),
-      point(element.width, element.height / 2),
-      point(element.width / 2, element.height),
-      point(0, element.height / 2),
+      pointFrom(element.width / 2, 0),
+      pointFrom(element.width, element.height / 2),
+      pointFrom(element.width / 2, element.height),
+      pointFrom(0, element.height / 2),
     ];
   }
   return [
-    point(0, 0),
-    point(0 + element.width, 0),
-    point(0 + element.width, element.height),
-    point(0, element.height),
+    pointFrom(0, 0),
+    pointFrom(0 + element.width, 0),
+    pointFrom(0 + element.width, element.height),
+    pointFrom(0, element.height),
   ];
 };
 
@@ -94,7 +94,7 @@ const getRotatedBBox = (element: Element): Bounds => {
   const points = getElementRelativePoints(element);
 
   const { cx, cy } = getMinMaxPoints(points);
-  const centerPoint = point<LocalPoint>(cx, cy);
+  const centerPoint = pointFrom<LocalPoint>(cx, cy);
 
   const rotatedPoints = points.map((p) =>
     pointRotateRads(p, centerPoint, element.angle),

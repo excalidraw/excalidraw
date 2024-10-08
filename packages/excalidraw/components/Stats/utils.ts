@@ -1,5 +1,5 @@
 import type { Radians } from "../../../math";
-import { point, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
 import {
   bindOrUnbindLinearElements,
   updateBoundElements,
@@ -232,8 +232,8 @@ export const moveElement = (
     originalElement.y + originalElement.height / 2,
   ];
   const [topLeftX, topLeftY] = pointRotateRads(
-    point(originalElement.x, originalElement.y),
-    point(cx, cy),
+    pointFrom(originalElement.x, originalElement.y),
+    pointFrom(cx, cy),
     originalElement.angle,
   );
 
@@ -241,8 +241,8 @@ export const moveElement = (
   const changeInY = newTopLeftY - topLeftY;
 
   const [x, y] = pointRotateRads(
-    point(newTopLeftX, newTopLeftY),
-    point(cx + changeInX, cy + changeInY),
+    pointFrom(newTopLeftX, newTopLeftY),
+    pointFrom(cx + changeInX, cy + changeInY),
     -originalElement.angle as Radians,
   );
 
