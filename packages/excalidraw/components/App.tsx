@@ -445,7 +445,18 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { clamp, pointFrom, pointDistance, vector } from "../../math";
+import {
+  clamp,
+  pointFrom,
+  pointDistance,
+  vector,
+  pointRotateRads,
+  vectorScale,
+  vectorFromPoint,
+  vectorSubtract,
+  vectorDot,
+  vectorMagnitude,
+} from "../../math";
 import { cropElement } from "../element/cropElement";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -7921,22 +7932,84 @@ class App extends React.Component<AppProps, AppState> {
               this.imageCache.get(croppingElement.fileId)?.image;
 
             if (image && !(image instanceof Promise)) {
-              const instantDragOffset = {
-                x: pointerCoords.x - lastPointerCoords.x,
-                y: pointerCoords.y - lastPointerCoords.y,
-              };
+              // scale the offset by at least a factor of 2 to improve ux
+              let instantDragOffset = vectorScale(
+                vector(
+                  pointerCoords.x - lastPointerCoords.x,
+                  pointerCoords.y - lastPointerCoords.y,
+                ),
+                Math.max(this.state.zoom.value, 2),
+              );
+
+              if (croppingElement.angle !== 0) {
+                const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+                  croppingElement,
+                  elementsMap,
+                );
+
+                const topLeft = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x1, y1),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const topRight = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x2, y1),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const bottomLeft = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x1, y2),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const topEdge = vectorSubtract(topRight, topLeft);
+                const leftEdge = vectorSubtract(bottomLeft, topLeft);
+
+                /**
+                 * project instantDrafOffset onto leftEdge to find out the y scalar
+                 *                                 topEdge to find out the x scalar
+                 */
+
+                const scaleY =
+                  vectorDot(instantDragOffset, leftEdge) /
+                  vectorDot(leftEdge, leftEdge);
+                const scaleX =
+                  vectorDot(instantDragOffset, topEdge) /
+                  vectorDot(topEdge, topEdge);
+
+                instantDragOffset = vectorScale(
+                  vector(scaleX, scaleY),
+                  /**
+                   * projection results in small x and y scalars
+                   * scale to account for this
+                   */
+                  Math.min(
+                    Math.max(
+                      vectorMagnitude(topEdge),
+                      vectorMagnitude(leftEdge),
+                    ),
+                    100,
+                  ),
+                );
+              }
 
               const nextCrop = {
                 ...crop,
                 x: clamp(
                   crop.x -
-                    instantDragOffset.x * Math.sign(croppingElement.scale[0]),
+                    instantDragOffset[0] * Math.sign(croppingElement.scale[0]),
                   0,
                   image.naturalWidth - crop.width,
                 ),
                 y: clamp(
                   crop.y -
-                    instantDragOffset.y * Math.sign(croppingElement.scale[1]),
+                    instantDragOffset[1] * Math.sign(croppingElement.scale[1]),
                   0,
                   image.naturalHeight - crop.height,
                 ),
