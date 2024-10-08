@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Popover } from "./Popover";
 
 import "./IconPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
 import { getLanguage } from "../i18n";
 import clsx from "clsx";
+
+type TOption<T> = {
+  value: T;
+  text: string;
+  icon: JSX.Element;
+  keyBinding: string | null;
+  showInPicker?: boolean;
+};
 
 function Picker<T>({
   options,
@@ -15,18 +23,26 @@ function Picker<T>({
 }: {
   label: string;
   value: T;
-  options: {
-    value: T;
-    text: string;
-    icon: JSX.Element;
-    keyBinding: string | null;
-  }[];
+  options: Omit<TOption<T>, "showInPicker">[];
   onChange: (value: T) => void;
   onClose: () => void;
 }) {
   const rFirstItem = React.useRef<HTMLButtonElement>();
   const rActiveItem = React.useRef<HTMLButtonElement>();
   const rGallery = React.useRef<HTMLDivElement>(null);
+  const [isCollapsed, setIscollapsed] = React.useState<boolean>(true);
+  const visibleOptions = useMemo(() => {
+    if (!isCollapsed) {
+      return options;
+    }
+
+    const selectedOptionIndex = options.findIndex((opt) => opt.value === value);
+    if (selectedOptionIndex < 3) {
+      return options.slice(0, 3);
+    }
+
+    return [options[selectedOptionIndex], ...options.slice(1, 3)];
+  }, [options, isCollapsed, value]);
 
   React.useEffect(() => {
     // After the component is first mounted focus on first input
@@ -106,7 +122,7 @@ function Picker<T>({
       onKeyDown={handleKeyDown}
     >
       <div className="picker-content" ref={rGallery}>
-        {options.map((option, i) => (
+        {visibleOptions.map((option, i) => (
           <button
             type="button"
             className={clsx("picker-option", {
@@ -141,6 +157,18 @@ function Picker<T>({
           </button>
         ))}
       </div>
+      {options.length > 3 && (
+        <div className="picker-footer">
+          <span
+            className="picker-footer-link"
+            onClick={() => {
+              setIscollapsed((state) => !state);
+            }}
+          >
+            {isCollapsed ? <>More +</> : <>Less -</>}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -154,13 +182,7 @@ export function IconPicker<T>({
 }: {
   label: string;
   value: T;
-  options: readonly {
-    value: T;
-    text: string;
-    icon: JSX.Element;
-    keyBinding: string | null;
-    showInPicker?: boolean;
-  }[];
+  options: readonly TOption<T>[];
   onChange: (value: T) => void;
   group?: string;
 }) {
