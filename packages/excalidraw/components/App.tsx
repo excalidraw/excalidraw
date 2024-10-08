@@ -210,6 +210,7 @@ import {
 import {
   isElementCompletelyInViewport,
   isElementInViewport,
+  getSnappedCoordinates,
 } from "../element/sizeHelpers";
 import {
   calculateScrollCenter,
@@ -445,7 +446,7 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { pointFrom, pointDistance, vector } from "../../math";
+import { pointFrom, pointDistance, vector, pointDistanceSq } from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -7993,35 +7994,44 @@ class App extends React.Component<AppProps, AppState> {
 
         if (newElement.type === "freedraw") {
           const points = newElement.points;
-          let dx = pointerCoords.x - newElement.x;
-          let dy = pointerCoords.y - newElement.y;
+          let dx, dy;
+
+          if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
+            // If rotation with a discrete angle is needed
+            ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
+              newElement.x,
+              newElement.y,
+              pointerCoords.x,
+              pointerCoords.y
+            ));
+          } else {
+            // Default calculation for dx and dy
+            dx = pointerCoords.x - newElement.x;
+            dy = pointerCoords.y - newElement.y;
+          }
 
           if(event.shiftKey) {
-
-            const angle = Math.atan2(dy, dx);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            const snappingAngles = [
-              0, Math.PI / 6, Math.PI / 4, Math.PI / 3, Math.PI / 2,
-              (2 * Math.PI) / 3, (3 * Math.PI) / 4, (5 * Math.PI) / 6,
-              Math.PI, (7 * Math.PI) / 6, (5 * Math.PI) / 4, (4 * Math.PI) / 3,
-              (3 * Math.PI) / 2, (5 * Math.PI) / 3, (7 * Math.PI) / 4, (11 * Math.PI) / 6
-            ];
-            
-            const closestAngle = snappingAngles.reduce((prev, curr) =>
-              Math.abs(curr - angle) < Math.abs(prev - angle) ? curr : prev
-            );
-
-            dx = Math.cos(closestAngle) * distance;
-            dy = Math.sin(closestAngle) * distance;
+            const { dx: snappedDx, dy: snappedDy } = getSnappedCoordinates(dx, dy);
+            dx = snappedDx;
+            dy = snappedDy;
           }
-          const lastPoint = points.length > 0 && points[points.length - 1];
 
+          const lastPoint = points.length > 0 && points[points.length - 1];
+          
+          // Ensure that points are discarded if they are either too close (less than minDistance) or too far (greater than maxDistance) from the last point
           const minDistance = 15;
           const maxDistance = 200;
-          const distanceFromLastPoint = lastPoint ? Math.sqrt(Math.pow(lastPoint[0] - dx, 2) + Math.pow(lastPoint[1] - dy, 2)) : Infinity;
 
-          const discardPoint = lastPoint && (distanceFromLastPoint < minDistance || distanceFromLastPoint > maxDistance);
+          const minDistanceSq = Math.pow(minDistance, 2);
+          const maxDistanceSq = Math.pow(maxDistance, 2);
+
+          const currentPoint: LocalPoint = [dx, dy] as LocalPoint;
+
+          const distanceFromLastPointSq = lastPoint 
+          ? pointDistanceSq(lastPoint, currentPoint) 
+          : Infinity;
+
+          const discardPoint = lastPoint && (distanceFromLastPointSq < minDistanceSq || distanceFromLastPointSq > maxDistanceSq);
 
           if (!discardPoint) {
             const pressures = newElement.simulatePressure
