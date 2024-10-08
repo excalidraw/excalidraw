@@ -31,11 +31,6 @@ import {
 } from "./containerCache";
 import type { ExtractSetType } from "../utility-types";
 
-// should be enough to detect CJK, though does not include every possible char,
-// such symbols and punctuations covered by `_CJK_BREAK_BEFORE_NOT_AFTER`, `_CJK_BREAK_AFTER_NOT_BEFORE` or _CJK_BREAK_BEFORE_AND_AFTER
-const _CJK_CHAR =
-  /\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}/u;
-
 /**
  * Matches various emoji types.
  *
@@ -55,37 +50,64 @@ const _CJK_CHAR =
  * - \u{E0020}-\u{E007E}: tags
  * - \u{E007F}: cancel tag
  *
- * Adapated version from https://unicode.org/reports/tr51/#EBNF_and_Regex, with changes:
+ * @see https://unicode.org/reports/tr51/#EBNF_and_Regex, with changes:
  * - replaced \p{Emoji} with [\p{Extended_Pictographic}\p{Emoji_Presentation}], see more in `should tokenize emojis mixed with mixed text` test
+ * - replaced \p{Emod} with \p{Emoji_Modifier} as some do not understand the shortcut (i.e. https://devina.io/redos-checker)
  */
 const _EMOJI_CHAR =
-  /(\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}](?:\p{EMod}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u200D(?:\p{RI}\p{RI}|[\p{Emoji}](?:\p{EMod}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?))*)/u;
+  /(\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}](?:\p{Emoji_Modifier}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u200D(?:\p{RI}\p{RI}|[\p{Emoji}](?:\p{Emoji_Modifier}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?))*)/u;
 
-// full width CJK characters which are natural breaking points
-// ~ expect a break before (lookahead), but not after (negative lookbehind),  i.e. "（"
-// ~ expect a break after (lookbehind), but not before (negative lookahead), i.e. "）"
-// ~ expect a break always (lookahead and lookbehind), i.e. "〃"
-// Hello た。
-//        ↑ DON'T BREAK "た。" (negative lookahead)
-// Hello「た」 World
-//       ↑ DON'T BREAK "「た" (negative lookbehind)
-//        ↑ DON'T BREAK "た」"(negative lookahead)
-//      ↑ BREAK BEFORE "「" (lookahead)
-//         ↑ BREAK AFTER "」" (lookbehind)
-// → ["Hello", "「た」", "World"]
-const _CJK_BREAK_BEFORE_NOT_AFTER =
-  /（［｛〈《「『【〖〔〘〚＜＠＾〝￠￡＄￥￦±/u;
-const _CJK_BREAK_AFTER_NOT_BEFORE =
-  /）］｝〉》」』】〗〕〙〛＞〞＇〟・。，、．：；？！％‥…ー/u;
+/**
+ * Detect a CJK char, though does not include every possible char used in CJK texts,
+ * such as symbols and punctuations.
+ *
+ * By default every CJK is a breaking point, though CJK has additional breaking points,
+ * including full width punctuations or symbols (Chinese and Japanese) and western punctuations (Korean).
+ *
+ * Additional CJK breaking point rules:
+ * - expect a break before (lookahead), but not after (negative lookbehind),  i.e. "(" or "("
+ * - expect a break after (lookbehind), but not before (negative lookahead), i.e. "）" or ")"
+ * - expect a break always (lookahead and lookbehind), i.e. "〃"
+ */
+const _CJK_CHAR =
+  /\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}/u;
+
+/**
+ * Following characters break only with CJK, not with alphabetic characters.
+ * This is essential for Korean, as it uses alphabetic punctuation, but expects CJK-like breaking points.
+ *
+ * Hello((た)) → ["Hello", "((た))"]
+ * Hello((World)) → ["Hello((World))"]
+ */
+const _CJK_BREAK_BEFORE_CJK_NOT_AFTER = /<\(\[\{/u;
+const _CJK_BREAK_AFTER_CJK_NOT_BEFORE = />\)\]\}.,:;\?!/u;
+
+/**
+ * Following characters break with any character, even though are mostly used with CJK.
+ *
+ * Hello た。→ ["Hello", "た。"]
+ *        ↑ DON'T BREAK "た。" (negative lookahead)
+ * Hello「た」 World → ["Hello", "「た」", "World"]
+ *       ↑ DON'T BREAK "「た" (negative lookbehind)
+ *        ↑ DON'T BREAK "た」"(negative lookahead)
+ *      ↑ BREAK BEFORE "「" (lookahead)
+ *         ↑ BREAK AFTER "」" (lookbehind)
+ */
+const _CJK_BREAK_BEFORE_ANY_NOT_AFTER = /（［｛〈《｟｢「『【〖〔〘〚＜〝/u;
+const _CJK_BREAK_AFTER_ANY_NOT_BEFORE =
+  /）］｝〉》｠｣」』】〗〕〙〛＞〞＇〟・。ﾟﾞ，、．：；？！％ー±‥…\//u;
 const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u;
 
-// breaking points for latin
-const _LATIN_BREAK_AFTER = /-/u;
-const _LATIN_BREAK_ALWAYS = /\s/u;
-const _ALL_BREAK_ALWAYS = new RegExp(
-  `${_LATIN_BREAK_ALWAYS.source}${_CJK_BREAK_ALWAYS.source}${_CJK_CHAR.source}`,
-  "u",
-);
+/**
+ * Natural breaking points for alphabetic-based grammars are whitespace and hyphen.
+ *
+ * Hello-world
+ *       ↑ BREAK AFTER "-" → ["Hello-", "world"]
+ * Hello world
+ *      ↑ BREAK ALWAYS " " → ["Hello", " ", "world"]
+ */
+const _ALPHABETIC_BREAK_AFTER = /-/u;
+const _ALPHABETIC_BREAK_ALWAYS = /\s/u;
 
 /**
  * Simple fallback for browsers (mainly Safari < 16.4) that don't support "Lookbehind assertion".
@@ -97,39 +119,39 @@ const _ALL_BREAK_ALWAYS = new RegExp(
  * Does not include advanced CJK breaking rules, but covers most of the core cases, especially for latin.
  */
 const BREAK_LINE_REGEX_SIMPLE = new RegExp(
-  `([${_LATIN_BREAK_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
+  `${_EMOJI_CHAR.source}|([${_ALPHABETIC_BREAK_AFTER.source}${_ALPHABETIC_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`,
   "u",
 );
 
-// Hello World
-//      ↑ BREAK BEFORE " " → ["Hello", " World"]
-// HelloたWorld
-//      ↑ BREAK BEFORE "た" → ["Hello", "たWorld"]
-// Hello「World」
-//      ↑ BREAK BEFORE "「" → ["Hello", "「World」"]
-const getLookaheadBreakingPoints = () =>
-  new RegExp(
-    `(?<![${_CJK_BREAK_BEFORE_NOT_AFTER.source}])(?=[${_CJK_BREAK_BEFORE_NOT_AFTER.source}${_ALL_BREAK_ALWAYS.source}])`,
-    "u",
-  );
+// Hello World → ["Hello", " World"]
+//      ↑ BREAK BEFORE " "
+// HelloたWorld → ["Hello", "たWorld"]
+//      ↑ BREAK BEFORE "た"
+// Hello「World」→ ["Hello", "「World」"]
+//      ↑ BREAK BEFORE "「"
+const getLookaheadBreakingPoints = () => {
+  const ANY_BREAKING_POINT = `(?<![${_CJK_BREAK_BEFORE_ANY_NOT_AFTER.source}])(?=[${_ALPHABETIC_BREAK_ALWAYS.source}${_CJK_BREAK_BEFORE_ANY_NOT_AFTER.source}])`;
+  const CJK_BREAKING_POINT = `(?<![${_CJK_BREAK_BEFORE_ANY_NOT_AFTER.source}${_CJK_BREAK_BEFORE_CJK_NOT_AFTER.source}])(?=[${_CJK_BREAK_BEFORE_CJK_NOT_AFTER.source}]*[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`;
+  return new RegExp(`(?:${ANY_BREAKING_POINT}|${CJK_BREAKING_POINT})`, "u");
+};
 
-// Hello World
-//       ↑ BREAK AFTER " " → ["Hello ", "World"]
-// Hello-World
-//       ↑ BREAK AFTER "-" → ["Hello-", "World"]
-// HelloたWorld
-//       ↑ BREAK AFTER "た" → ["Helloた", "World"]
-//「Hello」World
-//       ↑ BREAK AFTER "」" → ["「Hello」", "World"]
-const getLookbehindBreakingPoints = () =>
-  new RegExp(
-    `(?![${_CJK_BREAK_AFTER_NOT_BEFORE.source}])(?<=[${_LATIN_BREAK_AFTER.source}${_CJK_BREAK_AFTER_NOT_BEFORE.source}${_ALL_BREAK_ALWAYS.source}])`,
-    "u",
-  );
+// Hello World → ["Hello ", "World"]
+//       ↑ BREAK AFTER " "
+// Hello-World → ["Hello-", "World"]
+//       ↑ BREAK AFTER "-"
+// HelloたWorld → ["Helloた", "World"]
+//       ↑ BREAK AFTER "た"
+//「Hello」World → ["「Hello」", "World"]
+//       ↑ BREAK AFTER "」"
+const getLookbehindBreakingPoints = () => {
+  const ANY_BREAKING_POINT = `(?![${_CJK_BREAK_AFTER_ANY_NOT_BEFORE.source}])(?<=[${_ALPHABETIC_BREAK_AFTER.source}${_ALPHABETIC_BREAK_ALWAYS.source}${_CJK_BREAK_AFTER_ANY_NOT_BEFORE.source}])`;
+  const CJK_BREAKING_POINT = `(?![${_CJK_BREAK_AFTER_ANY_NOT_BEFORE.source}${_CJK_BREAK_AFTER_CJK_NOT_BEFORE.source}])(?<=[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}][${_CJK_BREAK_AFTER_CJK_NOT_BEFORE.source}]*)`;
+  return new RegExp(`(?:${ANY_BREAKING_POINT}|${CJK_BREAKING_POINT})`, "u");
+};
 
 /**
  * Break a line based on the whitespaces, CJK / emoji chars and language specific breaking points,
- * like hyphen for Latin and various full-width codepoints for CJK - especially Japanese, e.g.:
+ * like hyphen for alphabetic and various full-width codepoints for CJK - especially Japanese, e.g.:
  *
  *  "Hello 世界。🌎🗺" → ["Hello", " ", "世", "界。", "🌎", "🗺"]
  *  "Hello-world" → ["Hello-", "world"]
@@ -137,9 +159,9 @@ const getLookbehindBreakingPoints = () =>
  */
 const getBreakLineRegexAdvanced = () =>
   new RegExp(
-    `${_EMOJI_CHAR.source}|(${getLookaheadBreakingPoints().source}|${
+    `${_EMOJI_CHAR.source}|${getLookaheadBreakingPoints().source}|${
       getLookbehindBreakingPoints().source
-    })`,
+    }`,
     "u",
   );
 

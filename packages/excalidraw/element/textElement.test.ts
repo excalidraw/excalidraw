@@ -204,9 +204,16 @@ describe("Test wrapText", () => {
 (괄호), 쉼표, 마침표.
 공백 줄바꿈　전각기호…—`;
 
-    const maxWidth = 60;
-    const res = wrapText(text, font, maxWidth);
-    expect(res).toBe(`한국 안녕하\n세요! 이것\n은 테스트입\n니다.
+    const maxWidth1 = 80;
+    const res1 = wrapText(text, font, maxWidth1);
+    expect(res1).toBe(`한국 안녕하세\n요! 이것은 테\n스트입니다.
+우리 보자: 원\n화₩1234「비\n싸다」
+(괄호), 쉼\n표, 마침표.
+공백 줄바꿈　전\n각기호…—`);
+
+    const maxWidth2 = 60;
+    const res2 = wrapText(text, font, maxWidth2);
+    expect(res2).toBe(`한국 안녕하\n세요! 이것\n은 테스트입\n니다.
 우리 보자:\n원화\n₩1234\n「비싸다」
 (괄호),\n쉼표, 마침\n표.
 공백 줄바꿈\n전각기호…—`);
@@ -521,27 +528,34 @@ break it now`,
       ]);
     });
 
-    it("should tokenize CJK", () => {
-      const text = `《道德經》こんにちは世界！안녕하세요세계；Hello World？・ニューヨーク・た…￥3700.55す。090-1234-5678￥1,000〜＄5,000「素晴らしい！」〔重要〕＃１：Taro君30％は、（たなばた）〰￥110±￥570で20℃〜9:30〜10:00【一番】`;
+    it("should tokenize artificial CJK", () => {
+      const text = `《道德經》こんにちは世界！안녕하세요세계；다.다...원/달(((다)))[[1]]〚({((한))>)〛た…[Hello] World？・ニューヨーク・￥3700.55す。090-1234-5678￥1,000〜＄5,000「素晴らしい！」〔重要〕＃１：Taro君30％は、（たなばた）〰￥110±￥570で20℃〜9:30〜10:00【一番】`;
+
       // [
-      //   '《道',  '德',   '經》',      'こ',    'ん',
-      //   'に',    'ち',   'は',        '世',    '界！',
-      //   '안',    '녕',   '하',        '세',    '요',
-      //   '세',    '계；', 'Hello',     ' ',     'World？',
-      //   '・',    'ニ',   'ュー',      'ヨー',  'ク',
-      //   '・',    'た…',  '￥3700.55', 'す。',  '090-',
-      //   '1234-', '5678', '￥1,000',   '〜',    '＄5,000',
-      //   '「素',  '晴',   'ら',        'し',    'い！」',
-      //   '〔重',  '要〕', '＃',        '１：',  'Taro',
-      //   '君',    '30％', 'は、',      '（た',  'な',
-      //   'ば',    'た）', '〰',        '￥110', '±￥570',
-      //   'で',    '20℃',  '〜',        '9:30',  '〜',
-      //   '10:00', '【一', '番】'
+      //   '《道',    '德',       '經》',        'こ',
+      //   'ん',      'に',       'ち',          'は',
+      //   '世',      '界！',     '안',          '녕',
+      //   '하',      '세',       '요',          '세',
+      //   '계；',    '다.',      '다...',       '원/',
+      //   '달',      '(((다)))', '[[1]]',       '〚({((한))>)〛',
+      //   'た…',     '[Hello]',  ' ',           'World？',
+      //   '・',      'ニ',       'ュー',        'ヨー',
+      //   'ク',      '・',       '￥3700.55',   'す。',
+      //   '090-',    '1234-',    '5678￥1,000', '〜',
+      //   '＄5,000', '「素',     '晴',          'ら',
+      //   'し',      'い！」',   '〔重',        '要〕',
+      //   '＃',      '１：',     'Taro',        '君',
+      //   '30％',    'は、',     '（た',        'な',
+      //   'ば',      'た）',     '〰',          '￥110±',
+      //   '￥570',   'で',       '20℃',         '〜',
+      //   '9:30',    '〜',       '10:00',       '【一',
+      //   '番】'
       // ]
       const tokens = parseTokens(text);
 
       // Latin
-      expect(tokens).toContain("Hello");
+      expect(tokens).toContain("[[1]]");
+      expect(tokens).toContain("[Hello]");
       expect(tokens).toContain("World？");
       expect(tokens).toContain("Taro");
 
@@ -549,6 +563,7 @@ break it now`,
       expect(tokens).toContain("《道");
       expect(tokens).toContain("德");
       expect(tokens).toContain("經》");
+      expect(tokens).toContain("た…");
 
       // Japanese
       expect(tokens).toContain("こ");
@@ -562,7 +577,6 @@ break it now`,
       expect(tokens).toContain("界！");
       expect(tokens).toContain("す。");
       expect(tokens).toContain("ュー");
-      expect(tokens).toContain("た…");
       expect(tokens).toContain("「素");
       expect(tokens).toContain("晴");
       expect(tokens).toContain("ら");
@@ -586,18 +600,23 @@ break it now`,
       expect(tokens).toContain("요");
       expect(tokens).toContain("세");
       expect(tokens).toContain("계；");
+      expect(tokens).toContain("다.");
+      expect(tokens).toContain("다...");
+      expect(tokens).toContain("원/");
+      expect(tokens).toContain("달");
+      expect(tokens).toContain("(((다)))");
+      expect(tokens).toContain("〚({((한))>)〛");
 
       // Numbers and units
       expect(tokens).toContain("￥3700.55");
       expect(tokens).toContain("090-");
       expect(tokens).toContain("1234-");
-      expect(tokens).toContain("5678");
-      expect(tokens).toContain("￥1,000");
+      expect(tokens).toContain("5678￥1,000");
       expect(tokens).toContain("＄5,000");
       expect(tokens).toContain("１：");
       expect(tokens).toContain("30％");
-      expect(tokens).toContain("￥110");
-      expect(tokens).toContain("±￥570");
+      expect(tokens).toContain("￥110±");
+      expect(tokens).toContain("￥570");
       expect(tokens).toContain("20℃");
       expect(tokens).toContain("9:30");
       expect(tokens).toContain("10:00");
