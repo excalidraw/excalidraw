@@ -15,7 +15,7 @@ import {
   CJK_HANDWRITTEN_FALLBACK_FONT,
 } from "../constants";
 import { FONT_METADATA, type FontMetadata } from "./metadata";
-import { getContainerElement } from "../element/textElement";
+import { charWidth, getContainerElement } from "../element/textElement";
 import {
   ExcalidrawFontFace,
   type IExcalidrawFontFace,
@@ -110,6 +110,10 @@ export class Fonts {
       if (isTextElement(element)) {
         didUpdate = true;
         ShapeCache.delete(element);
+
+        // clear the width cache, so that we don't perform subsuequnt wrapping based on the stale fallback font metrics
+        charWidth.clearCache(getFontString(element));
+
         const container = getContainerElement(element, elementsMap);
         if (container) {
           ShapeCache.delete(container);

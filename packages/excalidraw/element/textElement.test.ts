@@ -127,14 +127,14 @@ describe("Test wrapText", () => {
     });
 
     it("should break before and after certain CJK symbols", () => {
-      const text = "こんにちは・世界";
+      const text = "こんにちは〃世界";
       const maxWidth1 = 50;
       const res1 = wrapText(text, font, maxWidth1);
-      expect(res1).toBe("こんにちは\n・世界");
+      expect(res1).toBe("こんにちは\n〃世界");
 
       const maxWidth2 = 60;
       const res2 = wrapText(text, font, maxWidth2);
-      expect(res2).toBe("こんにちは・\n世界");
+      expect(res2).toBe("こんにちは〃\n世界");
     });
 
     it("should break after, not before for certain CJK pairs", () => {
@@ -529,29 +529,30 @@ break it now`,
     });
 
     it("should tokenize artificial CJK", () => {
-      const text = `《道德經》こんにちは世界！안녕하세요세계；다.다...원/달(((다)))[[1]]〚({((한))>)〛た…[Hello] World？・ニューヨーク・￥3700.55す。090-1234-5678￥1,000〜＄5,000「素晴らしい！」〔重要〕＃１：Taro君30％は、（たなばた）〰￥110±￥570で20℃〜9:30〜10:00【一番】`;
+      const text = `《道德經》醫-醫こんにちは世界！안녕하세요세계；다.다...원/달(((다)))[[1]]〚({((한))>)〛た…[Hello] World？ニューヨーク・￥3700.55す。090-1234-5678￥1,000〜＄5,000「素晴らしい！」〔重要〕＃１：Taro君30％は、（たなばた）〰￥110±￥570で20℃〜9:30〜10:00【一番】`;
+      const tokens = parseTokens(text);
 
+      // console.log(tokens);
       // [
-      //   '《道',    '德',       '經》',        'こ',
-      //   'ん',      'に',       'ち',          'は',
-      //   '世',      '界！',     '안',          '녕',
-      //   '하',      '세',       '요',          '세',
-      //   '계；',    '다.',      '다...',       '원/',
-      //   '달',      '(((다)))', '[[1]]',       '〚({((한))>)〛',
-      //   'た…',     '[Hello]',  ' ',           'World？',
-      //   '・',      'ニ',       'ュー',        'ヨー',
-      //   'ク',      '・',       '￥3700.55',   'す。',
-      //   '090-',    '1234-',    '5678￥1,000', '〜',
-      //   '＄5,000', '「素',     '晴',          'ら',
-      //   'し',      'い！」',   '〔重',        '要〕',
-      //   '＃',      '１：',     'Taro',        '君',
-      //   '30％',    'は、',     '（た',        'な',
-      //   'ば',      'た）',     '〰',          '￥110±',
-      //   '￥570',   'で',       '20℃',         '〜',
-      //   '9:30',    '〜',       '10:00',       '【一',
+      //   '《道',    '德',             '經》',        '醫-',
+      //   '醫',      'こ',             'ん',          'に',
+      //   'ち',      'は',             '世',          '界！',
+      //   '안',      '녕',             '하',          '세',
+      //   '요',      '세',             '계；',        '다.',
+      //   '다...',   '원/',            '달',          '(((다)))',
+      //   '[[1]]',   '〚({((한))>)〛', 'た…',         '[Hello]',
+      //   ' ',       'World？',        'ニ',          'ュー',
+      //   'ヨー',    'ク・',           '￥3700.55',   'す。',
+      //   '090-',    '1234-',          '5678￥1,000', '〜',
+      //   '＄5,000', '「素',           '晴',          'ら',
+      //   'し',      'い！」',         '〔重',        '要〕',
+      //   '＃',      '１：',           'Taro',        '君',
+      //   '30％',    'は、',           '（た',        'な',
+      //   'ば',      'た）',           '〰',          '￥110±',
+      //   '￥570',   'で',             '20℃',         '〜',
+      //   '9:30',    '〜',             '10:00',       '【一',
       //   '番】'
       // ]
-      const tokens = parseTokens(text);
 
       // Latin
       expect(tokens).toContain("[[1]]");
@@ -563,7 +564,8 @@ break it now`,
       expect(tokens).toContain("《道");
       expect(tokens).toContain("德");
       expect(tokens).toContain("經》");
-      expect(tokens).toContain("た…");
+      expect(tokens).toContain("醫-");
+      expect(tokens).toContain("醫");
 
       // Japanese
       expect(tokens).toContain("こ");
@@ -573,8 +575,9 @@ break it now`,
       expect(tokens).toContain("は");
       expect(tokens).toContain("世");
       expect(tokens).toContain("ニ");
-      expect(tokens).toContain("ク");
+      expect(tokens).toContain("ク・");
       expect(tokens).toContain("界！");
+      expect(tokens).toContain("た…");
       expect(tokens).toContain("す。");
       expect(tokens).toContain("ュー");
       expect(tokens).toContain("「素");
@@ -622,7 +625,6 @@ break it now`,
       expect(tokens).toContain("10:00");
 
       // Punctuation and symbols
-      expect(tokens).toContain("・");
       expect(tokens).toContain("〜");
       expect(tokens).toContain("〰");
       expect(tokens).toContain("＃");

@@ -52,7 +52,7 @@ import type { ExtractSetType } from "../utility-types";
  *
  * @see https://unicode.org/reports/tr51/#EBNF_and_Regex, with changes:
  * - replaced \p{Emoji} with [\p{Extended_Pictographic}\p{Emoji_Presentation}], see more in `should tokenize emojis mixed with mixed text` test
- * - replaced \p{Emod} with \p{Emoji_Modifier} as some do not understand the shortcut (i.e. https://devina.io/redos-checker)
+ * - replaced \p{Emod} with \p{Emoji_Modifier} as some do not understand the abbreviation (i.e. https://devina.io/redos-checker)
  */
 const _EMOJI_CHAR =
   /(\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}](?:\p{Emoji_Modifier}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u200D(?:\p{RI}\p{RI}|[\p{Emoji}](?:\p{Emoji_Modifier}|\uFE0F\u20E3?|[\u{E0020}-\u{E007E}]+\u{E007F})?))*)/u;
@@ -79,8 +79,9 @@ const _CJK_CHAR =
  * Hello((た)) → ["Hello", "((た))"]
  * Hello((World)) → ["Hello((World))"]
  */
-const _CJK_BREAK_BEFORE_CJK_NOT_AFTER = /<\(\[\{/u;
-const _CJK_BREAK_AFTER_CJK_NOT_BEFORE = />\)\]\}.,:;\?!/u;
+const _CJK_BREAK_NOT_AFTER_BUT_BEFORE = /<\(\[\{/u;
+const _CJK_BREAK_NOT_BEFORE_BUT_AFTER = />\)\]\}.,:;\?!/u;
+const _CJK_BREAK_ALWAYS = /　〃〜～〰＃＆＊＋－／＝｜￢￣￤/u;
 
 /**
  * Following characters break with any character, even though are mostly used with CJK.
@@ -93,21 +94,20 @@ const _CJK_BREAK_AFTER_CJK_NOT_BEFORE = />\)\]\}.,:;\?!/u;
  *      ↑ BREAK BEFORE "「" (lookahead)
  *         ↑ BREAK AFTER "」" (lookbehind)
  */
-const _CJK_BREAK_BEFORE_ANY_NOT_AFTER = /（［｛〈《｟｢「『【〖〔〘〚＜〝/u;
-const _CJK_BREAK_AFTER_ANY_NOT_BEFORE =
+const _ANY_BREAK_NOT_AFTER_BUT_BEFORE = /（［｛〈《｟｢「『【〖〔〘〚＜〝/u;
+const _ANY_BREAK_NOT_BEFORE_BUT_AFTER =
   /）］｝〉》｠｣」』】〗〕〙〛＞〞＇〟・。ﾟﾞ，、．：；？！％ー±‥…\//u;
-const _CJK_BREAK_ALWAYS = /　〃〜～〰・＃＆＊＋－／＝｜￢￣￤/u;
 
 /**
- * Natural breaking points for alphabetic-based grammars are whitespace and hyphen.
+ * Natural breaking points for any grammars.
  *
  * Hello-world
  *       ↑ BREAK AFTER "-" → ["Hello-", "world"]
  * Hello world
  *      ↑ BREAK ALWAYS " " → ["Hello", " ", "world"]
  */
-const _ALPHABETIC_BREAK_AFTER = /-/u;
-const _ALPHABETIC_BREAK_ALWAYS = /\s/u;
+const _ANY_BREAK_AFTER = /-/u;
+const _ANY_BREAK_ALWAYS = /\s/u;
 
 /**
  * Simple fallback for browsers (mainly Safari < 16.4) that don't support "Lookbehind assertion".
@@ -119,7 +119,7 @@ const _ALPHABETIC_BREAK_ALWAYS = /\s/u;
  * Does not include advanced CJK breaking rules, but covers most of the core cases, especially for latin.
  */
 const BREAK_LINE_REGEX_SIMPLE = new RegExp(
-  `${_EMOJI_CHAR.source}|([${_ALPHABETIC_BREAK_AFTER.source}${_ALPHABETIC_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`,
+  `${_EMOJI_CHAR.source}|([${_ANY_BREAK_ALWAYS.source}${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}${_ANY_BREAK_AFTER.source}])`,
   "u",
 );
 
@@ -130,8 +130,8 @@ const BREAK_LINE_REGEX_SIMPLE = new RegExp(
 // Hello「World」→ ["Hello", "「World」"]
 //      ↑ BREAK BEFORE "「"
 const getLookaheadBreakingPoints = () => {
-  const ANY_BREAKING_POINT = `(?<![${_CJK_BREAK_BEFORE_ANY_NOT_AFTER.source}])(?=[${_ALPHABETIC_BREAK_ALWAYS.source}${_CJK_BREAK_BEFORE_ANY_NOT_AFTER.source}])`;
-  const CJK_BREAKING_POINT = `(?<![${_CJK_BREAK_BEFORE_ANY_NOT_AFTER.source}${_CJK_BREAK_BEFORE_CJK_NOT_AFTER.source}])(?=[${_CJK_BREAK_BEFORE_CJK_NOT_AFTER.source}]*[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`;
+  const ANY_BREAKING_POINT = `(?<![${_ANY_BREAK_NOT_AFTER_BUT_BEFORE.source}])(?=[${_ANY_BREAK_NOT_AFTER_BUT_BEFORE.source}${_ANY_BREAK_ALWAYS.source}])`;
+  const CJK_BREAKING_POINT = `(?<![${_ANY_BREAK_NOT_AFTER_BUT_BEFORE.source}${_CJK_BREAK_NOT_AFTER_BUT_BEFORE.source}])(?=[${_CJK_BREAK_NOT_AFTER_BUT_BEFORE.source}]*[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`;
   return new RegExp(`(?:${ANY_BREAKING_POINT}|${CJK_BREAKING_POINT})`, "u");
 };
 
@@ -144,8 +144,8 @@ const getLookaheadBreakingPoints = () => {
 //「Hello」World → ["「Hello」", "World"]
 //       ↑ BREAK AFTER "」"
 const getLookbehindBreakingPoints = () => {
-  const ANY_BREAKING_POINT = `(?![${_CJK_BREAK_AFTER_ANY_NOT_BEFORE.source}])(?<=[${_ALPHABETIC_BREAK_AFTER.source}${_ALPHABETIC_BREAK_ALWAYS.source}${_CJK_BREAK_AFTER_ANY_NOT_BEFORE.source}])`;
-  const CJK_BREAKING_POINT = `(?![${_CJK_BREAK_AFTER_ANY_NOT_BEFORE.source}${_CJK_BREAK_AFTER_CJK_NOT_BEFORE.source}])(?<=[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}][${_CJK_BREAK_AFTER_CJK_NOT_BEFORE.source}]*)`;
+  const ANY_BREAKING_POINT = `(?![${_ANY_BREAK_NOT_BEFORE_BUT_AFTER.source}])(?<=[${_ANY_BREAK_NOT_BEFORE_BUT_AFTER.source}${_ANY_BREAK_ALWAYS.source}${_ANY_BREAK_AFTER.source}])`;
+  const CJK_BREAKING_POINT = `(?![${_ANY_BREAK_NOT_BEFORE_BUT_AFTER.source}${_CJK_BREAK_NOT_BEFORE_BUT_AFTER.source}${_ANY_BREAK_AFTER.source}])(?<=[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}][${_CJK_BREAK_NOT_BEFORE_BUT_AFTER.source}]*)`;
   return new RegExp(`(?:${ANY_BREAKING_POINT}|${CJK_BREAKING_POINT})`, "u");
 };
 
@@ -572,6 +572,7 @@ export const getTextHeight = (
 export const parseTokens = (line: string) => {
   const breakLineRegex = getBreakLineRegex();
 
+  // TODO: consider using a debounced-cache for the tokens (i.e. based on the line hash, as can be done only once during a resize)
   // filtering due to multi-codepoint chars like 🗺
   return line.split(breakLineRegex).filter(Boolean);
 };
@@ -745,9 +746,15 @@ export const charWidth = (() => {
   const getCache = (font: FontString) => {
     return cachedCharWidth[font];
   };
+
+  const clearCache = (font: FontString) => {
+    cachedCharWidth[font] = [];
+  };
+
   return {
     calculate,
     getCache,
+    clearCache,
   };
 })();
 
