@@ -12,23 +12,29 @@
  * to pure shapes
  */
 
-import type { Curve, LineSegment, Polygon, Radians } from "../../math";
+import type {
+  Curve,
+  Ellipse,
+  GenericPoint,
+  Segment,
+  Polygon,
+  Radians,
+  ViewportPoint,
+} from "../../math";
 import {
   curve,
-  lineSegment,
+  ellipse,
+  segment,
   pointFrom,
-  pointDistance,
   pointFromArray,
   pointFromVector,
   pointRotateRads,
   polygon,
   polygonFromPoints,
-  PRECISION,
   segmentsIntersectAt,
   vector,
   vectorAdd,
   vectorFromPoint,
-  vectorScale,
   type GlobalPoint,
   type LocalPoint,
 } from "../../math";
@@ -56,27 +62,18 @@ import { invariant } from "../../excalidraw/utils";
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
 // be used to model other elements
-export type Polyline<Point extends GlobalPoint | LocalPoint> =
-  LineSegment<Point>[];
+export type Polyline<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
+  Segment<Point>[];
 
 // a polycurve is a curve consisting of ther curves, this corresponds to a complex
 // curve on the canvas
-export type Polycurve<Point extends GlobalPoint | LocalPoint> = Curve<Point>[];
+export type Polycurve<Point extends GlobalPoint | LocalPoint | ViewportPoint> =
+  Curve<Point>[];
 
-// an ellipse is specified by its center, angle, and its major and minor axes
-// but for the sake of simplicity, we've used halfWidth and halfHeight instead
-// in replace of semi major and semi minor axes
-export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
-  center: Point;
-  angle: Radians;
-  halfWidth: number;
-  halfHeight: number;
-};
-
-export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
+export type GeometricShape<Point extends GenericPoint> =
   | {
       type: "line";
-      data: LineSegment<Point>;
+      data: Segment<Point>;
     }
   | {
       type: "polygon";
@@ -178,16 +175,15 @@ export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
 export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawEllipseElement,
 ): GeometricShape<Point> => {
-  const { width, height, angle, x, y } = element;
+  const { width, height, x, y } = element;
 
   return {
     type: "ellipse",
-    data: {
-      center: pointFrom(x + width / 2, y + height / 2),
-      angle,
-      halfWidth: width / 2,
-      halfHeight: height / 2,
-    },
+    data: ellipse(
+      pointFrom(x + width / 2, y + height / 2),
+      width / 2,
+      height / 2,
+    ),
   };
 };
 
@@ -239,27 +235,29 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
-const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
+const polylineFromPoints = <
+  Point extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   points: Point[],
 ): Polyline<Point> => {
   let previousPoint: Point = points[0];
-  const polyline: LineSegment<Point>[] = [];
+  const polyline: Segment<Point>[] = [];
 
   for (let i = 1; i < points.length; i++) {
     const nextPoint = points[i];
-    polyline.push(lineSegment<Point>(previousPoint, nextPoint));
+    polyline.push(segment<Point>(previousPoint, nextPoint));
     previousPoint = nextPoint;
   }
 
   return polyline;
 };
 
-export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
+export const getFreedrawShape = (
   element: ExcalidrawFreeDrawElement,
-  center: Point,
+  center: GlobalPoint,
   isClosed: boolean = false,
-): GeometricShape<Point> => {
-  const transform = (p: Point) =>
+): GeometricShape<GlobalPoint> => {
+  const transform = (p: Readonly<LocalPoint>): GlobalPoint =>
     pointRotateRads(
       pointFromVector(
         vectorAdd(vectorFromPoint(p), vector(element.x, element.y)),
@@ -268,9 +266,7 @@ export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
       element.angle,
     );
 
-  const polyline = polylineFromPoints(
-    element.points.map((p) => transform(p as Point)),
-  );
+  const polyline = polylineFromPoints(element.points.map((p) => transform(p)));
 
   return (
     isClosed
@@ -282,7 +278,7 @@ export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
           type: "polyline",
           data: polyline,
         }
-  ) as GeometricShape<Point>;
+  ) as GeometricShape<GlobalPoint>;
 };
 
 export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
@@ -355,7 +351,7 @@ export const segmentIntersectRectangleElement = <
   Point extends LocalPoint | GlobalPoint,
 >(
   element: ExcalidrawBindableElement,
-  segment: LineSegment<Point>,
+  s: Segment<Point>,
   gap: number = 0,
 ): Point[] => {
   const bounds = [
@@ -370,167 +366,23 @@ export const segmentIntersectRectangleElement = <
   );
 
   return [
-    lineSegment(
+    segment(
       pointRotateRads(pointFrom(bounds[0], bounds[1]), center, element.angle),
       pointRotateRads(pointFrom(bounds[2], bounds[1]), center, element.angle),
     ),
-    lineSegment(
+    segment(
       pointRotateRads(pointFrom(bounds[2], bounds[1]), center, element.angle),
       pointRotateRads(pointFrom(bounds[2], bounds[3]), center, element.angle),
     ),
-    lineSegment(
+    segment(
       pointRotateRads(pointFrom(bounds[2], bounds[3]), center, element.angle),
       pointRotateRads(pointFrom(bounds[0], bounds[3]), center, element.angle),
     ),
-    lineSegment(
+    segment(
       pointRotateRads(pointFrom(bounds[0], bounds[3]), center, element.angle),
       pointRotateRads(pointFrom(bounds[0], bounds[1]), center, element.angle),
     ),
   ]
-    .map((s) => segmentsIntersectAt(segment, s))
+    .map((l) => segmentsIntersectAt(s, l))
     .filter((i): i is Point => !!i);
-};
-
-const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
-  p: Point,
-  ellipse: Ellipse<Point>,
-) => {
-  const { angle, halfWidth, halfHeight, center } = ellipse;
-  const a = halfWidth;
-  const b = halfHeight;
-  const translatedPoint = vectorAdd(
-    vectorFromPoint(p),
-    vectorScale(vectorFromPoint(center), -1),
-  );
-  const [rotatedPointX, rotatedPointY] = pointRotateRads(
-    pointFromVector(translatedPoint),
-    pointFrom(0, 0),
-    -angle as Radians,
-  );
-
-  const px = Math.abs(rotatedPointX);
-  const py = Math.abs(rotatedPointY);
-
-  let tx = 0.707;
-  let ty = 0.707;
-
-  for (let i = 0; i < 3; i++) {
-    const x = a * tx;
-    const y = b * ty;
-
-    const ex = ((a * a - b * b) * tx ** 3) / a;
-    const ey = ((b * b - a * a) * ty ** 3) / b;
-
-    const rx = x - ex;
-    const ry = y - ey;
-
-    const qx = px - ex;
-    const qy = py - ey;
-
-    const r = Math.hypot(ry, rx);
-    const q = Math.hypot(qy, qx);
-
-    tx = Math.min(1, Math.max(0, ((qx * r) / q + ex) / a));
-    ty = Math.min(1, Math.max(0, ((qy * r) / q + ey) / b));
-    const t = Math.hypot(ty, tx);
-    tx /= t;
-    ty /= t;
-  }
-
-  const [minX, minY] = [
-    a * tx * Math.sign(rotatedPointX),
-    b * ty * Math.sign(rotatedPointY),
-  ];
-
-  return pointDistance(
-    pointFrom(rotatedPointX, rotatedPointY),
-    pointFrom(minX, minY),
-  );
-};
-
-export const pointOnEllipse = <Point extends LocalPoint | GlobalPoint>(
-  point: Point,
-  ellipse: Ellipse<Point>,
-  threshold = PRECISION,
-) => {
-  return distanceToEllipse(point, ellipse) <= threshold;
-};
-
-export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
-  p: Point,
-  ellipse: Ellipse<Point>,
-) => {
-  const { center, angle, halfWidth, halfHeight } = ellipse;
-  const translatedPoint = vectorAdd(
-    vectorFromPoint(p),
-    vectorScale(vectorFromPoint(center), -1),
-  );
-  const [rotatedPointX, rotatedPointY] = pointRotateRads(
-    pointFromVector(translatedPoint),
-    pointFrom(0, 0),
-    -angle as Radians,
-  );
-
-  return (
-    (rotatedPointX / halfWidth) * (rotatedPointX / halfWidth) +
-      (rotatedPointY / halfHeight) * (rotatedPointY / halfHeight) <=
-    1
-  );
-};
-
-export const ellipseAxes = <Point extends LocalPoint | GlobalPoint>(
-  ellipse: Ellipse<Point>,
-) => {
-  const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
-
-  const majorAxis = widthGreaterThanHeight
-    ? ellipse.halfWidth * 2
-    : ellipse.halfHeight * 2;
-  const minorAxis = widthGreaterThanHeight
-    ? ellipse.halfHeight * 2
-    : ellipse.halfWidth * 2;
-
-  return {
-    majorAxis,
-    minorAxis,
-  };
-};
-
-export const ellipseFocusToCenter = <Point extends LocalPoint | GlobalPoint>(
-  ellipse: Ellipse<Point>,
-) => {
-  const { majorAxis, minorAxis } = ellipseAxes(ellipse);
-
-  return Math.sqrt(majorAxis ** 2 - minorAxis ** 2);
-};
-
-export const ellipseExtremes = <Point extends LocalPoint | GlobalPoint>(
-  ellipse: Ellipse<Point>,
-) => {
-  const { center, angle } = ellipse;
-  const { majorAxis, minorAxis } = ellipseAxes(ellipse);
-
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-
-  const sqSum = majorAxis ** 2 + minorAxis ** 2;
-  const sqDiff = (majorAxis ** 2 - minorAxis ** 2) * Math.cos(2 * angle);
-
-  const yMax = Math.sqrt((sqSum - sqDiff) / 2);
-  const xAtYMax =
-    (yMax * sqSum * sin * cos) /
-    (majorAxis ** 2 * sin ** 2 + minorAxis ** 2 * cos ** 2);
-
-  const xMax = Math.sqrt((sqSum + sqDiff) / 2);
-  const yAtXMax =
-    (xMax * sqSum * sin * cos) /
-    (majorAxis ** 2 * cos ** 2 + minorAxis ** 2 * sin ** 2);
-  const centerVector = vectorFromPoint(center);
-
-  return [
-    vectorAdd(vector(xAtYMax, yMax), centerVector),
-    vectorAdd(vectorScale(vector(xAtYMax, yMax), -1), centerVector),
-    vectorAdd(vector(xMax, yAtXMax), centerVector),
-    vectorAdd(vector(xMax, yAtXMax), centerVector),
-  ];
 };

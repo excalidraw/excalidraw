@@ -1,5 +1,4 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
-import { rescalePoints } from "../points";
 import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -18,7 +17,6 @@ import {
   getElementAbsoluteCoords,
   getCommonBounds,
   getResizedElementAbsoluteCoords,
-  getCommonBoundingBox,
 } from "./bounds";
 import {
   isArrowElement,
@@ -62,6 +60,7 @@ import {
   pointFromPair,
   pointRotateRads,
   type Radians,
+  pointRescaleFromTopLeft,
 } from "../../math";
 
 // Returns true when transform (resizing/rotation) happened
@@ -191,10 +190,10 @@ export const rescalePointsInElement = (
 ) =>
   isLinearElement(element) || isFreeDrawElement(element)
     ? {
-        points: rescalePoints(
+        points: pointRescaleFromTopLeft(
           0,
           width,
-          rescalePoints(1, height, element.points, normalizePoints),
+          pointRescaleFromTopLeft(1, height, element.points, normalizePoints),
           normalizePoints,
         ),
       }
@@ -682,14 +681,14 @@ export const resizeSingleElement = (
   let rescaledElementPointsY;
   let rescaledPoints;
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    rescaledElementPointsY = rescalePoints(
+    rescaledElementPointsY = pointRescaleFromTopLeft(
       1,
       eleNewHeight,
       (stateAtResizeStart as ExcalidrawLinearElement).points,
       true,
     );
 
-    rescaledPoints = rescalePoints(
+    rescaledPoints = pointRescaleFromTopLeft(
       0,
       eleNewWidth,
       rescaledElementPointsY,
@@ -816,9 +815,11 @@ export const resizeMultipleElements = (
     return [...acc, { ...text, ...xy }];
   }, [] as ExcalidrawTextElementWithContainer[]);
 
-  const { minX, minY, maxX, maxY, midX, midY } = getCommonBoundingBox(
+  const [minX, minY, maxX, maxY] = getCommonBounds(
     targetElements.map(({ orig }) => orig).concat(boundTextElements),
   );
+  const midX = (minX + maxX) / 2;
+  const midY = (minY + maxY) / 2;
   const width = maxX - minX;
   const height = maxY - minY;
 
@@ -1097,8 +1098,7 @@ export const getResizeOffsetXY = (
   transformHandleType: MaybeTransformHandleType,
   selectedElements: NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
-  x: number,
-  y: number,
+  [x, y]: GlobalPoint,
 ): [number, number] => {
   const [x1, y1, x2, y2] =
     selectedElements.length === 1

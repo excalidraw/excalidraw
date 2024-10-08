@@ -35,10 +35,10 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import type { SceneBounds } from "../element/bounds";
+import type { ViewportBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { clamp, roundToStep } from "../../math";
+import { clamp, pointFrom, roundToStep } from "../../math";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -245,7 +245,7 @@ export const actionResetZoom = register({
 });
 
 const zoomValueToFitBoundsOnViewport = (
-  bounds: SceneBounds,
+  bounds: ViewportBounds,
   viewportDimensions: { width: number; height: number },
   viewportZoomFactor: number = 1, // default to 1 if not provided
 ) => {
@@ -271,7 +271,7 @@ export const zoomToFitBounds = ({
   minZoom = -Infinity,
   maxZoom = Infinity,
 }: {
-  bounds: SceneBounds;
+  bounds: ViewportBounds;
   canvasOffsets?: Offsets;
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
@@ -324,7 +324,7 @@ export const zoomToFitBounds = ({
   );
 
   const centerScroll = centerScrollOn({
-    scenePoint: { x: centerX, y: centerY },
+    scenePoint: pointFrom(centerX, centerY),
     viewportDimensions: {
       width: appState.width,
       height: appState.height,

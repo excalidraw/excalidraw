@@ -164,8 +164,8 @@ export const EyeDropper: React.FC<{
 
     // init color preview else it would show only after the first mouse move
     mouseMoveListener({
-      clientX: stableProps.app.lastViewportPosition.x,
-      clientY: stableProps.app.lastViewportPosition.y,
+      clientX: stableProps.app.lastViewportPosition[0],
+      clientY: stableProps.app.lastViewportPosition[1],
       altKey: false,
     });
 

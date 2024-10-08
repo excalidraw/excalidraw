@@ -284,9 +284,9 @@ export { convertToExcalidrawElements } from "./data/transform";
 export { getCommonBounds, getVisibleSceneBounds } from "./element/bounds";
 
 export {
-  elementsOverlappingBBox,
+  elementsOverlappingBounds as elementsOverlappingBBox,
   isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
+  elementPartiallyOverlapsWithOrContainsBounds as elementPartiallyOverlapsWithOrContainsBBox,
 } from "../utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";

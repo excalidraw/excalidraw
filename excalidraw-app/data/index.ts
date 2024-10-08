@@ -10,7 +10,7 @@ import {
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
 import type { ImportedDataState } from "../../packages/excalidraw/data/types";
-import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
+import type { ViewportBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
 import type {
@@ -104,7 +104,7 @@ export type SocketUpdateDataSource = {
     payload: {
       socketId: SocketId;
       username: string;
-      sceneBounds: SceneBounds;
+      sceneBounds: ViewportBounds;
     };
   };
   IDLE_STATUS: {

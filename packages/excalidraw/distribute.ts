@@ -1,7 +1,7 @@
 import { newElementWith } from "./element/mutateElement";
 import { getMaximumGroups } from "./groups";
-import { getCommonBoundingBox } from "./element/bounds";
 import type { ElementsMap, ExcalidrawElement } from "./element/types";
+import { getCommonBounds } from "./element/bounds";
 
 export interface Distribution {
   space: "between";
@@ -18,9 +18,35 @@ export const distributeElements = (
       ? (["minX", "midX", "maxX", "width"] as const)
       : (["minY", "midY", "maxY", "height"] as const);
 
-  const bounds = getCommonBoundingBox(selectedElements);
+  const bb = getCommonBounds(selectedElements);
+  const bounds = {
+    minX: bb[0],
+    minY: bb[1],
+    maxX: bb[2],
+    maxY: bb[3],
+    midX: (bb[0] + bb[2]) / 2,
+    midY: (bb[1] + bb[3]) / 2,
+    width: bb[2] - bb[0],
+    height: bb[3] - bb[1],
+  };
   const groups = getMaximumGroups(selectedElements, elementsMap)
-    .map((group) => [group, getCommonBoundingBox(group)] as const)
+    .map((group) => {
+      const bounds = getCommonBounds(group);
+
+      return [
+        group,
+        {
+          minX: bounds[0],
+          minY: bounds[1],
+          maxX: bounds[2],
+          maxY: bounds[3],
+          midX: (bounds[0] + bounds[2]) / 2,
+          midY: (bounds[1] + bounds[3]) / 2,
+          width: bounds[2] - bounds[0],
+          height: bounds[3] - bounds[1],
+        },
+      ] as const;
+    })
     .sort((a, b) => a[1][mid] - b[1][mid]);
 
   let span = 0;

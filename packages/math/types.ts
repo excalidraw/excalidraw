@@ -14,18 +14,10 @@ export type Radians = number & { _brand: "excalimath__radian" };
  */
 export type Degrees = number & { _brand: "excalimath_degree" };
 
-//
-// Range
-//
-
 /**
  * A number range which includes the start and end numbers in the range.
  */
 export type InclusiveRange = [number, number] & { _brand: "excalimath_degree" };
-
-//
-// Point
-//
 
 /**
  * Represents a 2D position in world or canvas space. A
@@ -43,12 +35,30 @@ export type LocalPoint = [x: number, y: number] & {
   _brand: "excalimath__localpoint";
 };
 
-// Line
+/**
+ * Represents a 2D position on the browser viewport.
+ */
+export type ViewportPoint = [x: number, y: number] & {
+  _brand: "excalimath_viewportpoint";
+};
+
+/**
+ * A coordinate system useful for circular path calculations
+ */
+export type PolarCoords = [radius: number, angle: Radians] & {
+  _brand: "excalimath_polarCoords";
+};
+
+/**
+ * Aggregate type of all the point types when a function
+ * is point type agnostic
+ */
+export type GenericPoint = GlobalPoint | LocalPoint | ViewportPoint;
 
 /**
  * A line is an infinitely long object with no width, depth, or curvature.
  */
-export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
+export type Line<P extends GenericPoint> = [p: P, q: P] & {
   _brand: "excalimath_line";
 };
 
@@ -57,13 +67,9 @@ export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
  * line that is bounded by two distinct end points, and
  * contains every point on the line that is between its endpoints.
  */
-export type LineSegment<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
-  _brand: "excalimath_linesegment";
+export type Segment<P extends GenericPoint> = [a: P, b: P] & {
+  _brand: "excalimath_segment";
 };
-
-//
-// Vector
-//
 
 /**
  * Represents a 2D vector
@@ -72,59 +78,67 @@ export type Vector = [u: number, v: number] & {
   _brand: "excalimath__vector";
 };
 
-// Triangles
-
 /**
  * A triangle represented by 3 points
  */
-export type Triangle<P extends GlobalPoint | LocalPoint> = [
-  a: P,
-  b: P,
-  c: P,
-] & {
+export type Triangle<P extends GenericPoint> = [a: P, b: P, c: P] & {
   _brand: "excalimath__triangle";
 };
 
-//
-// Polygon
-//
+/**
+ * A rectangular shape represented by 4 points at its corners
+ */
+export type Rectangle<P extends GenericPoint> = [a: P, b: P] & {
+  _brand: "excalimath__rectangle";
+};
 
 /**
  * A polygon is a closed shape by connecting the given points
  * rectangles and diamonds are modelled by polygons
  */
-export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[] & {
+export type Polygon<Point extends GenericPoint> = Point[] & {
   _brand: "excalimath_polygon";
 };
-
-//
-// Curve
-//
 
 /**
  * Cubic bezier curve with four control points
  */
-export type Curve<Point extends GlobalPoint | LocalPoint> = [
-  Point,
-  Point,
-  Point,
-  Point,
-] & {
+export type Curve<Point extends GenericPoint> = [Point, Point, Point, Point] & {
   _brand: "excalimath_curve";
 };
 
-export type PolarCoords = [
-  radius: number,
-  /** angle in radians */
-  angle: number,
-];
+/**
+ * Represents a symmetric arc, a segment of a circular path
+ *
+ * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
+ * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right"
+ */
+export type Arc<Point extends GenericPoint> = {
+  center: Point;
+  radius: number;
+  startAngle: Radians;
+  endAngle: Radians;
+} & {
+  _brand: "excalimath_symmetricarc";
+};
 
 /**
- * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
- * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right".
+ * The width and height represented as a type
  */
-export type SymmetricArc = {
-  radius: number;
-  startAngle: number;
-  endAngle: number;
+export type Extent = {
+  width: number;
+  height: number;
+} & {
+  _brand: "excalimath_extent";
+};
+
+// an ellipse is specified by its center, angle, and its major and minor axes
+// but for the sake of simplicity, we've used halfWidth and halfHeight instead
+// in replace of semi major and semi minor axes
+export type Ellipse<Point extends GenericPoint> = {
+  center: Point;
+  halfWidth: number;
+  halfHeight: number;
+} & {
+  _brand: "excalimath_ellipse";
 };

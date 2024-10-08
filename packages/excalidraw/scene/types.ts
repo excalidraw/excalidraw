@@ -19,6 +19,7 @@ import type {
   PendingExcalidrawElements,
 } from "../types";
 import type { MakeBrand } from "../utility-types";
+import type { ViewportPoint } from "../../math";
 
 export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;
@@ -52,7 +53,7 @@ export type InteractiveCanvasRenderConfig = {
   // collab-related state
   // ---------------------------------------------------------------------------
   remoteSelectedElementIds: Map<ExcalidrawElement["id"], SocketId[]>;
-  remotePointerViewportCoords: Map<SocketId, { x: number; y: number }>;
+  remotePointerViewportCoords: Map<SocketId, ViewportPoint>;
   remotePointerUserStates: Map<SocketId, UserIdleState>;
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;

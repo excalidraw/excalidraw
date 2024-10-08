@@ -19,8 +19,6 @@ export {
   getElementAbsoluteCoords,
   getElementBounds,
   getCommonBounds,
-  getDiamondPoints,
-  getArrowheadPoints,
   getClosestElementBounds,
 } from "./bounds";
 
@@ -55,6 +53,7 @@ export {
   getNormalizedDimensions,
 } from "./sizeHelpers";
 export { showSelectedShapeActions } from "./showSelectedShapeActions";
+export { getArrowheadPoints } from "./arrow";
 
 /**
  * @deprecated unsafe, use hashElementsVersion instead

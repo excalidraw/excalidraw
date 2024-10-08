@@ -1,10 +1,10 @@
 import type { GlobalPoint, Radians } from "../../../math";
 import { pointFrom, pointRotateRads } from "../../../math";
 import { MIME_TYPES } from "../../constants";
-import type { Bounds } from "../../element/bounds";
 import { getElementAbsoluteCoords } from "../../element/bounds";
 import { hitElementBoundingBox } from "../../element/collision";
 import type {
+  Bounds,
   ElementsMap,
   NonDeletedExcalidrawElement,
 } from "../../element/types";
@@ -81,7 +81,7 @@ export const isPointHittingLink = (
   if (
     !isMobile &&
     appState.viewModeEnabled &&
-    hitElementBoundingBox(x, y, element, elementsMap)
+    hitElementBoundingBox(pointFrom(x, y), element, elementsMap)
   ) {
     return true;
   }

@@ -373,3 +373,13 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+/**
+ * Axis-aligned bounding box (i.e. no rotation)
+ */
+export type Bounds = readonly [
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+];

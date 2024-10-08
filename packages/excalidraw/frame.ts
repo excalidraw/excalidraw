@@ -25,11 +25,22 @@ import type {
 import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
-import { getElementLineSegments } from "./element/bounds";
-import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
-import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
+import { elementsOverlappingBounds } from "../utils/";
+import {
+  isFrameElement,
+  isFrameLikeElement,
+  isFreeDrawElement,
+  isLinearElement,
+} from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
-import { isPointWithinBounds, pointFrom } from "../math";
+import type { GlobalPoint, Segment } from "../math";
+import {
+  isPointWithinBounds,
+  segment,
+  pointRotateRads,
+  segmentsIntersectAt,
+  pointFrom,
+} from "../math";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -63,6 +74,96 @@ export const bindElementsToFramesAfterDuplication = (
   }
 };
 
+/*
+ * for a given element, `getElementLineSegments` returns line segments
+ * that can be used for visual collision detection (useful for frames)
+ * as opposed to bounding box collision detection
+ */
+const getElementLineSegments = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): Segment<GlobalPoint>[] => {
+  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    element,
+    elementsMap,
+  );
+
+  const center: GlobalPoint = pointFrom(cx, cy);
+
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
+    const segments: Segment<GlobalPoint>[] = [];
+
+    let i = 0;
+
+    while (i < element.points.length - 1) {
+      segments.push(
+        segment(
+          pointRotateRads(
+            pointFrom(
+              element.points[i][0] + element.x,
+              element.points[i][1] + element.y,
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom(
+              element.points[i + 1][0] + element.x,
+              element.points[i + 1][1] + element.y,
+            ),
+            center,
+            element.angle,
+          ),
+        ),
+      );
+      i++;
+    }
+
+    return segments;
+  }
+
+  const [nw, ne, sw, se, n, s, w, e] = (
+    [
+      [x1, y1],
+      [x2, y1],
+      [x1, y2],
+      [x2, y2],
+      [cx, y1],
+      [cx, y2],
+      [x1, cy],
+      [x2, cy],
+    ] as GlobalPoint[]
+  ).map((point) => pointRotateRads(point, center, element.angle));
+
+  if (element.type === "diamond") {
+    return [segment(n, w), segment(n, e), segment(s, w), segment(s, e)];
+  }
+
+  if (element.type === "ellipse") {
+    return [
+      segment(n, w),
+      segment(n, e),
+      segment(s, w),
+      segment(s, e),
+      segment(n, w),
+      segment(n, e),
+      segment(s, w),
+      segment(s, e),
+    ];
+  }
+
+  return [
+    segment(nw, ne),
+    segment(sw, se),
+    segment(nw, sw),
+    segment(ne, se),
+    segment(nw, e),
+    segment(sw, e),
+    segment(ne, w),
+    segment(se, w),
+  ];
+};
+
 export function isElementIntersectingFrame(
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
@@ -74,7 +175,7 @@ export function isElementIntersectingFrame(
 
   const intersecting = frameLineSegments.some((frameLineSegment) =>
     elementLineSegments.some((elementLineSegment) =>
-      doLineSegmentsIntersect(frameLineSegment, elementLineSegment),
+      segmentsIntersectAt(frameLineSegment, elementLineSegment),
     ),
   );
 
@@ -149,10 +250,7 @@ export const elementOverlapsWithFrame = (
 };
 
 export const isCursorInFrame = (
-  cursorCoords: {
-    x: number;
-    y: number;
-  },
+  cursorCoords: GlobalPoint,
   frame: NonDeleted<ExcalidrawFrameLikeElement>,
   elementsMap: ElementsMap,
 ) => {
@@ -160,7 +258,7 @@ export const isCursorInFrame = (
 
   return isPointWithinBounds(
     pointFrom(fx1, fy1),
-    pointFrom(cursorCoords.x, cursorCoords.y),
+    cursorCoords,
     pointFrom(fx2, fy2),
   );
 };
@@ -769,7 +867,7 @@ export const getElementsOverlappingFrame = (
   frame: ExcalidrawFrameLikeElement,
 ) => {
   return (
-    elementsOverlappingBBox({
+    elementsOverlappingBounds({
       elements,
       bounds: frame,
       type: "overlap",

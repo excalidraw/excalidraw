@@ -1,37 +1,30 @@
 import type { Polycurve, Polyline } from "./geometry/shape";
+import { type GeometricShape } from "./geometry/shape";
+import type { Curve, GenericPoint } from "../math";
 import {
-  pointInEllipse,
-  pointOnEllipse,
-  type GeometricShape,
-} from "./geometry/shape";
-import type { Curve } from "../math";
-import {
-  lineSegment,
+  segment,
   pointFrom,
   polygonIncludesPoint,
-  pointOnLineSegment,
+  segmentIncludesPoint,
   pointOnPolygon,
   polygonFromPoints,
-  type GlobalPoint,
-  type LocalPoint,
-  type Polygon,
+  ellipseTouchesPoint,
+  ellipseIncludesPoint,
 } from "../math";
 
 // check if the given point is considered on the given shape's border
-export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
+export const isPointOnShape = <Point extends GenericPoint>(
   point: Point,
   shape: GeometricShape<Point>,
   tolerance = 0,
-) => {
-  // get the distance from the given point to the given element
-  // check if the distance is within the given epsilon range
+): boolean => {
   switch (shape.type) {
     case "polygon":
       return pointOnPolygon(point, shape.data, tolerance);
     case "ellipse":
-      return pointOnEllipse(point, shape.data, tolerance);
+      return ellipseTouchesPoint(point, shape.data, tolerance);
     case "line":
-      return pointOnLineSegment(point, shape.data, tolerance);
+      return segmentIncludesPoint(point, shape.data, tolerance);
     case "polyline":
       return pointOnPolyline(point, shape.data, tolerance);
     case "curve":
@@ -39,27 +32,27 @@ export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(
     case "polycurve":
       return pointOnPolycurve(point, shape.data, tolerance);
     default:
-      throw Error(`shape ${shape} is not implemented`);
+      throw Error(`Shape ${shape} is not implemented`);
   }
 };
 
 // check if the given point is considered inside the element's border
-export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
-  point: Point,
+export const isPointInShape = <Point extends GenericPoint>(
+  p: Point,
   shape: GeometricShape<Point>,
 ) => {
   switch (shape.type) {
     case "polygon":
-      return polygonIncludesPoint(point, shape.data);
+      return polygonIncludesPoint(p, shape.data);
     case "line":
       return false;
     case "curve":
       return false;
     case "ellipse":
-      return pointInEllipse(point, shape.data);
+      return ellipseIncludesPoint(p, shape.data);
     case "polyline": {
       const polygon = polygonFromPoints(shape.data.flat());
-      return polygonIncludesPoint(point, polygon);
+      return polygonIncludesPoint(p, polygon);
     }
     case "polycurve": {
       return false;
@@ -69,15 +62,7 @@ export const isPointInShape = <Point extends GlobalPoint | LocalPoint>(
   }
 };
 
-// check if the given element is in the given bounds
-export const isPointInBounds = <Point extends GlobalPoint | LocalPoint>(
-  point: Point,
-  bounds: Polygon<Point>,
-) => {
-  return polygonIncludesPoint(point, bounds);
-};
-
-const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
+const pointOnPolycurve = <Point extends GenericPoint>(
   point: Point,
   polycurve: Polycurve<Point>,
   tolerance: number,
@@ -85,7 +70,7 @@ const pointOnPolycurve = <Point extends LocalPoint | GlobalPoint>(
   return polycurve.some((curve) => pointOnCurve(point, curve, tolerance));
 };
 
-const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(
+const cubicBezierEquation = <Point extends GenericPoint>(
   curve: Curve<Point>,
 ) => {
   const [p0, p1, p2, p3] = curve;
@@ -97,7 +82,7 @@ const cubicBezierEquation = <Point extends LocalPoint | GlobalPoint>(
     p0[idx] * Math.pow(t, 3);
 };
 
-const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
+const polyLineFromCurve = <Point extends GenericPoint>(
   curve: Curve<Point>,
   segments = 10,
 ): Polyline<Point> => {
@@ -111,7 +96,7 @@ const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
     t += increment;
     if (t <= 1) {
       const nextPoint: Point = pointFrom(equation(t, 0), equation(t, 1));
-      lineSegments.push(lineSegment(startingPoint, nextPoint));
+      lineSegments.push(segment(startingPoint, nextPoint));
       startingPoint = nextPoint;
     }
   }
@@ -119,7 +104,7 @@ const polyLineFromCurve = <Point extends LocalPoint | GlobalPoint>(
   return lineSegments;
 };
 
-export const pointOnCurve = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnCurve = <Point extends GenericPoint>(
   point: Point,
   curve: Curve<Point>,
   threshold: number,
@@ -127,10 +112,10 @@ export const pointOnCurve = <Point extends LocalPoint | GlobalPoint>(
   return pointOnPolyline(point, polyLineFromCurve(curve), threshold);
 };
 
-export const pointOnPolyline = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnPolyline = <Point extends GenericPoint>(
   point: Point,
   polyline: Polyline<Point>,
   threshold = 10e-5,
 ) => {
-  return polyline.some((line) => pointOnLineSegment(point, line, threshold));
+  return polyline.some((line) => segmentIncludesPoint(point, line, threshold));
 };

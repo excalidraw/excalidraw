@@ -1,9 +1,8 @@
 import { updateBoundElements } from "./binding";
-import type { Bounds } from "./bounds";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import type { NonDeletedExcalidrawElement } from "./types";
+import type { Bounds, NonDeletedExcalidrawElement } from "./types";
 import type {
   AppState,
   NormalizedZoomValue,

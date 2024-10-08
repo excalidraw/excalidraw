@@ -26,7 +26,7 @@ import type {
   RenderableElementsMap,
   InteractiveCanvasRenderConfig,
 } from "../scene/types";
-import { distance, getFontString, isRTL } from "../utils";
+import { getFontString, isRTL } from "../utils";
 import rough from "roughjs/bin/rough";
 import type {
   AppState,
@@ -59,7 +59,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
-import { isRightAngleRads } from "../../math";
+import { isRightAngleRads, rangeExtent, rangeInclusive } from "../../math";
 import { getCornerRadius } from "../shapes";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
@@ -163,11 +163,11 @@ const cappedElementCanvasSize = (
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const elementWidth =
     isLinearElement(element) || isFreeDrawElement(element)
-      ? distance(x1, x2)
+      ? rangeExtent(rangeInclusive(x1, x2))
       : element.width;
   const elementHeight =
     isLinearElement(element) || isFreeDrawElement(element)
-      ? distance(y1, y2)
+      ? rangeExtent(rangeInclusive(y1, y2))
       : element.height;
 
   let width = elementWidth * window.devicePixelRatio + padding * 2;
@@ -226,12 +226,16 @@ const generateElementCanvas = (
 
     canvasOffsetX =
       element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * scale
+        ? rangeExtent(rangeInclusive(element.x, x1)) *
+          window.devicePixelRatio *
+          scale
         : 0;
 
     canvasOffsetY =
       element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * scale
+        ? rangeExtent(rangeInclusive(element.y, y1)) *
+          window.devicePixelRatio *
+          scale
         : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
@@ -263,7 +267,10 @@ const generateElementCanvas = (
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     // Take max dimensions of arrow canvas so that when canvas is rotated
     // the arrow doesn't get clipped
-    const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
+    const maxDim = Math.max(
+      rangeExtent(rangeInclusive(x1, x2)),
+      rangeExtent(rangeInclusive(y1, y2)),
+    );
     boundTextCanvas.width =
       maxDim * window.devicePixelRatio * scale + padding * scale * 10;
     boundTextCanvas.height =
@@ -813,7 +820,10 @@ export const renderElement = (
 
           // Take max dimensions of arrow canvas so that when canvas is rotated
           // the arrow doesn't get clipped
-          const maxDim = Math.max(distance(x1, x2), distance(y1, y2));
+          const maxDim = Math.max(
+            rangeExtent(rangeInclusive(x1, x2)),
+            rangeExtent(rangeInclusive(y1, y2)),
+          );
           const padding = getCanvasPadding(element);
           tempCanvas.width =
             maxDim * appState.exportScale + padding * 10 * appState.exportScale;

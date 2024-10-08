@@ -1,11 +1,10 @@
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
-  Arrowhead,
   ExcalidrawFreeDrawElement,
-  NonDeleted,
   ExcalidrawTextElementWithContainer,
   ElementsMap,
+  Bounds,
 } from "./types";
 import rough from "roughjs/bin/rough";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -19,61 +18,45 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
-import { rescalePoints } from "../points";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { ShapeCache } from "../scene/ShapeCache";
 import { arrayToMap, invariant } from "../utils";
-import type {
-  Degrees,
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Radians,
-} from "../../math";
+import type { GlobalPoint, LocalPoint, Segment } from "../../math";
 import {
-  degreesToRadians,
-  lineSegment,
   pointFrom,
   pointDistance,
   pointFromArray,
   pointRotateRads,
+  pointRescaleFromTopLeft,
+  segment,
+  ellipseSegmentInterceptPoints,
+  ellipse,
+  arc,
+  radians,
+  cartesian2Polar,
+  normalizeRadians,
+  radiansToDegrees,
 } from "../../math";
 import type { Mutable } from "../utility-types";
-
-export type RectangleBox = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  angle: number;
-};
+import { getCurvePathOps } from "../../utils/geometry/shape";
 
 type MaybeQuadraticSolution = [number | null, number | null] | false;
 
-/**
- * x and y position of top left corner, x and y position of bottom right corner
- */
-export type Bounds = readonly [
-  minX: number,
-  minY: number,
-  maxX: number,
-  maxY: number,
-];
-
-export type SceneBounds = readonly [
+export type ViewportBounds = readonly [
   sceneX: number,
   sceneY: number,
   sceneX2: number,
   sceneY2: number,
 ];
 
-export class ElementBounds {
+class ElementBounds {
   private static boundsCache = new WeakMap<
     ExcalidrawElement,
     {
       bounds: Bounds;
       version: ExcalidrawElement["version"];
+      versionNonce: ExcalidrawElement["versionNonce"];
     }
   >();
 
@@ -83,6 +66,7 @@ export class ElementBounds {
     if (
       cachedBounds?.version &&
       cachedBounds.version === element.version &&
+      cachedBounds?.versionNonce === element.versionNonce &&
       // we don't invalidate cache when we update containers and not labels,
       // which is causing problems down the line. Fix TBA.
       !isBoundToContainer(element)
@@ -93,6 +77,7 @@ export class ElementBounds {
 
     ElementBounds.boundsCache.set(element, {
       version: element.version,
+      versionNonce: element.versionNonce,
       bounds,
     });
 
@@ -110,7 +95,7 @@ export class ElementBounds {
       elementsMap,
     );
     if (isFreeDrawElement(element)) {
-      const [minX, minY, maxX, maxY] = getBoundsFromPoints(
+      const [minX, minY, maxX, maxY] = getBoundsFromFreeDrawPoints(
         element.points.map(([x, y]) =>
           pointRotateRads(
             pointFrom(x, y),
@@ -194,6 +179,20 @@ export class ElementBounds {
   }
 }
 
+/**
+ * Get the axis-aligned bounds of the given element in global / scene coordinates
+ *
+ * @param element The element to determine the bounding box for
+ * @param elementsMap The elements map to retrieve attached elements (notably text label)
+ * @returns The axis-aligned bounding box in scene (global coordinates)
+ */
+export const getElementBounds = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): Bounds => {
+  return ElementBounds.getBounds(element, elementsMap);
+};
+
 // Scene -> Scene coords, but in x1,x2,y1,y2 format.
 //
 // If the element is created from right to left, the width is going to be negative
@@ -239,141 +238,6 @@ export const getElementAbsoluteCoords = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   ];
-};
-
-/*
- * for a given element, `getElementLineSegments` returns line segments
- * that can be used for visual collision detection (useful for frames)
- * as opposed to bounding box collision detection
- */
-export const getElementLineSegments = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-): LineSegment<GlobalPoint>[] => {
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    elementsMap,
-  );
-
-  const center: GlobalPoint = pointFrom(cx, cy);
-
-  if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const segments: LineSegment<GlobalPoint>[] = [];
-
-    let i = 0;
-
-    while (i < element.points.length - 1) {
-      segments.push(
-        lineSegment(
-          pointRotateRads(
-            pointFrom(
-              element.points[i][0] + element.x,
-              element.points[i][1] + element.y,
-            ),
-            center,
-            element.angle,
-          ),
-          pointRotateRads(
-            pointFrom(
-              element.points[i + 1][0] + element.x,
-              element.points[i + 1][1] + element.y,
-            ),
-            center,
-            element.angle,
-          ),
-        ),
-      );
-      i++;
-    }
-
-    return segments;
-  }
-
-  const [nw, ne, sw, se, n, s, w, e] = (
-    [
-      [x1, y1],
-      [x2, y1],
-      [x1, y2],
-      [x2, y2],
-      [cx, y1],
-      [cx, y2],
-      [x1, cy],
-      [x2, cy],
-    ] as GlobalPoint[]
-  ).map((point) => pointRotateRads(point, center, element.angle));
-
-  if (element.type === "diamond") {
-    return [
-      lineSegment(n, w),
-      lineSegment(n, e),
-      lineSegment(s, w),
-      lineSegment(s, e),
-    ];
-  }
-
-  if (element.type === "ellipse") {
-    return [
-      lineSegment(n, w),
-      lineSegment(n, e),
-      lineSegment(s, w),
-      lineSegment(s, e),
-      lineSegment(n, w),
-      lineSegment(n, e),
-      lineSegment(s, w),
-      lineSegment(s, e),
-    ];
-  }
-
-  return [
-    lineSegment(nw, ne),
-    lineSegment(sw, se),
-    lineSegment(nw, sw),
-    lineSegment(ne, se),
-    lineSegment(nw, e),
-    lineSegment(sw, e),
-    lineSegment(ne, w),
-    lineSegment(se, w),
-  ];
-};
-
-/**
- * Scene -> Scene coords, but in x1,x2,y1,y2 format.
- *
- * Rectangle here means any rectangular frame, not an excalidraw element.
- */
-export const getRectangleBoxAbsoluteCoords = (boxSceneCoords: RectangleBox) => {
-  return [
-    boxSceneCoords.x,
-    boxSceneCoords.y,
-    boxSceneCoords.x + boxSceneCoords.width,
-    boxSceneCoords.y + boxSceneCoords.height,
-    boxSceneCoords.x + boxSceneCoords.width / 2,
-    boxSceneCoords.y + boxSceneCoords.height / 2,
-  ];
-};
-
-export const getDiamondPoints = (element: ExcalidrawElement) => {
-  // Here we add +1 to avoid these numbers to be 0
-  // otherwise rough.js will throw an error complaining about it
-  const topX = Math.floor(element.width / 2) + 1;
-  const topY = 0;
-  const rightX = element.width;
-  const rightY = Math.floor(element.height / 2) + 1;
-  const bottomX = topX;
-  const bottomY = element.height;
-  const leftX = 0;
-  const leftY = rightY;
-
-  return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
-};
-
-export const getCurvePathOps = (shape: Drawable): Op[] => {
-  for (const set of shape.sets) {
-    if (set.type === "path") {
-      return set.ops;
-    }
-  }
-  return shape.sets[0].ops;
 };
 
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
@@ -519,7 +383,7 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getBoundsFromPoints = (
+const getBoundsFromFreeDrawPoints = (
   points: ExcalidrawFreeDrawElement["points"],
 ): Bounds => {
   let minX = Infinity;
@@ -540,177 +404,12 @@ export const getBoundsFromPoints = (
 const getFreeDrawElementAbsoluteCoords = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number, number, number, number, number] => {
-  const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
+  const [minX, minY, maxX, maxY] = getBoundsFromFreeDrawPoints(element.points);
   const x1 = minX + element.x;
   const y1 = minY + element.y;
   const x2 = maxX + element.x;
   const y2 = maxY + element.y;
   return [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2];
-};
-
-/** @returns number in pixels */
-export const getArrowheadSize = (arrowhead: Arrowhead): number => {
-  switch (arrowhead) {
-    case "arrow":
-      return 25;
-    case "diamond":
-    case "diamond_outline":
-      return 12;
-    default:
-      return 15;
-  }
-};
-
-/** @returns number in degrees */
-export const getArrowheadAngle = (arrowhead: Arrowhead): Degrees => {
-  switch (arrowhead) {
-    case "bar":
-      return 90 as Degrees;
-    case "arrow":
-      return 20 as Degrees;
-    default:
-      return 25 as Degrees;
-  }
-};
-
-export const getArrowheadPoints = (
-  element: ExcalidrawLinearElement,
-  shape: Drawable[],
-  position: "start" | "end",
-  arrowhead: Arrowhead,
-) => {
-  const ops = getCurvePathOps(shape[0]);
-  if (ops.length < 1) {
-    return null;
-  }
-
-  // The index of the bCurve operation to examine.
-  const index = position === "start" ? 1 : ops.length - 1;
-
-  const data = ops[index].data;
-
-  invariant(data.length === 6, "Op data length is not 6");
-
-  const p3 = pointFrom(data[4], data[5]);
-  const p2 = pointFrom(data[2], data[3]);
-  const p1 = pointFrom(data[0], data[1]);
-
-  // We need to find p0 of the bezier curve.
-  // It is typically the last point of the previous
-  // curve; it can also be the position of moveTo operation.
-  const prevOp = ops[index - 1];
-  let p0 = pointFrom(0, 0);
-  if (prevOp.op === "move") {
-    const p = pointFromArray(prevOp.data);
-    invariant(p != null, "Op data is not a point");
-    p0 = p;
-  } else if (prevOp.op === "bcurveTo") {
-    p0 = pointFrom(prevOp.data[4], prevOp.data[5]);
-  }
-
-  // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
-  const equation = (t: number, idx: number) =>
-    Math.pow(1 - t, 3) * p3[idx] +
-    3 * t * Math.pow(1 - t, 2) * p2[idx] +
-    3 * Math.pow(t, 2) * (1 - t) * p1[idx] +
-    p0[idx] * Math.pow(t, 3);
-
-  // Ee know the last point of the arrow (or the first, if start arrowhead).
-  const [x2, y2] = position === "start" ? p0 : p3;
-
-  // By using cubic bezier equation (B(t)) and the given parameters,
-  // we calculate a point that is closer to the last point.
-  // The value 0.3 is chosen arbitrarily and it works best for all
-  // the tested cases.
-  const [x1, y1] = [equation(0.3, 0), equation(0.3, 1)];
-
-  // Find the normalized direction vector based on the
-  // previously calculated points.
-  const distance = Math.hypot(x2 - x1, y2 - y1);
-  const nx = (x2 - x1) / distance;
-  const ny = (y2 - y1) / distance;
-
-  const size = getArrowheadSize(arrowhead);
-
-  let length = 0;
-
-  {
-    // Length for -> arrows is based on the length of the last section
-    const [cx, cy] =
-      position === "end"
-        ? element.points[element.points.length - 1]
-        : element.points[0];
-    const [px, py] =
-      element.points.length > 1
-        ? position === "end"
-          ? element.points[element.points.length - 2]
-          : element.points[1]
-        : [0, 0];
-
-    length = Math.hypot(cx - px, cy - py);
-  }
-
-  // Scale down the arrowhead until we hit a certain size so that it doesn't look weird.
-  // This value is selected by minimizing a minimum size with the last segment of the arrowhead
-  const lengthMultiplier =
-    arrowhead === "diamond" || arrowhead === "diamond_outline" ? 0.25 : 0.5;
-  const minSize = Math.min(size, length * lengthMultiplier);
-  const xs = x2 - nx * minSize;
-  const ys = y2 - ny * minSize;
-
-  if (
-    arrowhead === "dot" ||
-    arrowhead === "circle" ||
-    arrowhead === "circle_outline"
-  ) {
-    const diameter = Math.hypot(ys - y2, xs - x2) + element.strokeWidth - 2;
-    return [x2, y2, diameter];
-  }
-
-  const angle = getArrowheadAngle(arrowhead);
-
-  // Return points
-  const [x3, y3] = pointRotateRads(
-    pointFrom(xs, ys),
-    pointFrom(x2, y2),
-    ((-angle * Math.PI) / 180) as Radians,
-  );
-  const [x4, y4] = pointRotateRads(
-    pointFrom(xs, ys),
-    pointFrom(x2, y2),
-    degreesToRadians(angle),
-  );
-
-  if (arrowhead === "diamond" || arrowhead === "diamond_outline") {
-    // point opposite to the arrowhead point
-    let ox;
-    let oy;
-
-    if (position === "start") {
-      const [px, py] = element.points.length > 1 ? element.points[1] : [0, 0];
-
-      [ox, oy] = pointRotateRads(
-        pointFrom(x2 + minSize * 2, y2),
-        pointFrom(x2, y2),
-        Math.atan2(py - y2, px - x2) as Radians,
-      );
-    } else {
-      const [px, py] =
-        element.points.length > 1
-          ? element.points[element.points.length - 2]
-          : [0, 0];
-
-      [ox, oy] = pointRotateRads(
-        pointFrom(x2 - minSize * 2, y2),
-        pointFrom(x2, y2),
-        Math.atan2(y2 - py, x2 - px) as Radians,
-      );
-    }
-
-    return [x2, y2, x3, y3, ox, oy, x4, y4];
-  }
-
-  return [x2, y2, x3, y3, x4, y4];
 };
 
 const generateLinearElementShape = (
@@ -798,13 +497,6 @@ const getLinearElementRotatedBounds = (
   return coords;
 };
 
-export const getElementBounds = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-): Bounds => {
-  return ElementBounds.getBounds(element, elementsMap);
-};
-
 export const getCommonBounds = (
   elements: readonly ExcalidrawElement[],
   elementsMap?: ElementsMap,
@@ -859,10 +551,10 @@ export const getResizedElementAbsoluteCoords = (
     ];
   }
 
-  const points = rescalePoints(
+  const points = pointRescaleFromTopLeft(
     0,
     nextWidth,
-    rescalePoints(1, nextHeight, element.points, normalizePoints),
+    pointRescaleFromTopLeft(1, nextHeight, element.points, normalizePoints),
     normalizePoints,
   );
 
@@ -870,7 +562,7 @@ export const getResizedElementAbsoluteCoords = (
 
   if (isFreeDrawElement(element)) {
     // Free Draw
-    bounds = getBoundsFromPoints(points);
+    bounds = getBoundsFromFreeDrawPoints(points);
   } else {
     // Line
     const gen = rough.generator();
@@ -944,33 +636,6 @@ export const getClosestElementBounds = (
   return getElementBounds(closestElement, elementsMap);
 };
 
-export interface BoundingBox {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-  midX: number;
-  midY: number;
-  width: number;
-  height: number;
-}
-
-export const getCommonBoundingBox = (
-  elements: ExcalidrawElement[] | readonly NonDeleted<ExcalidrawElement>[],
-): BoundingBox => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  return {
-    minX,
-    minY,
-    maxX,
-    maxY,
-    width: maxX - minX,
-    height: maxY - minY,
-    midX: (minX + maxX) / 2,
-    midY: (minY + maxY) / 2,
-  };
-};
-
 /**
  * returns scene coords of user's editor viewport (visible canvas area) bounds
  */
@@ -980,7 +645,7 @@ export const getVisibleSceneBounds = ({
   width,
   height,
   zoom,
-}: AppState): SceneBounds => {
+}: AppState): ViewportBounds => {
   return [
     -scrollX,
     -scrollY,
@@ -994,3 +659,56 @@ export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   );
+
+/**
+ * Shortens a segment on both ends to accomodate the arc in the rounded
+ * diamond shape
+ *
+ * @param s The segment to shorten
+ * @param r The radius to shorten by
+ * @returns The segment shortened on both ends by the same radius
+ */
+export const createDiamondSide = (
+  s: Segment<GlobalPoint>,
+  startRadius: number,
+  endRadius: number,
+): Segment<GlobalPoint> => {
+  return segment(
+    ellipseSegmentInterceptPoints(
+      ellipse(s[0], startRadius, startRadius),
+      s,
+    )[0] ?? s[0],
+    ellipseSegmentInterceptPoints(ellipse(s[1], endRadius, endRadius), s)[0] ??
+      s[1],
+  );
+};
+
+/**
+ * Creates an arc for the given roundness and position by taking the start
+ * and end positions and determining the angle points on the hypotethical
+ * circle with center point between start and end and raidus equals provided
+ * roundness. I.e. the created arc is gobal point-aware, or "rotated" in-place.
+ *
+ * @param start
+ * @param end
+ * @param r
+ * @returns
+ */
+export const createDiamondArc = (
+  start: GlobalPoint,
+  end: GlobalPoint,
+  c: GlobalPoint,
+  r: number,
+) => {
+  const [, startAngle] = cartesian2Polar(
+    pointFrom(start[0] - c[0], start[1] - c[1]),
+  );
+  const [, endAngle] = cartesian2Polar(pointFrom(end[0] - c[0], end[1] - c[1]));
+
+  return arc(
+    c,
+    r,
+    normalizeRadians(startAngle), // normalizeRadians(radians(startAngle - Math.PI / 2)),
+    normalizeRadians(endAngle), // normalizeRadians(radians(endAngle - Math.PI / 2)),
+  );
+};

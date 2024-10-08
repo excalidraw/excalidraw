@@ -48,7 +48,6 @@ import type { MarkOptional, Mutable } from "../utility-types";
 import { detectLineHeight, getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
 import { normalizeFixedPoint } from "../element/binding";
 import {
@@ -56,8 +55,8 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import type { LocalPoint, Radians } from "../../math";
-import { isFiniteNumber, pointFrom } from "../../math";
+import type { LocalPoint } from "../../math";
+import { pointExtent, isFiniteNumber, pointFrom, radians } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -154,7 +153,7 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
-    angle: element.angle || (0 as Radians),
+    angle: element.angle || radians(0),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
@@ -288,7 +287,7 @@ const restoreElement = (
         points,
         x,
         y,
-        ...getSizeFromPoints(points),
+        ...pointExtent(points),
       });
     case "arrow": {
       const { startArrowhead = null, endArrowhead = "arrow" } = element;
@@ -315,7 +314,7 @@ const restoreElement = (
         x,
         y,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
-        ...getSizeFromPoints(points),
+        ...pointExtent(points),
       });
     }
 

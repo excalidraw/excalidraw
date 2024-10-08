@@ -1,12 +1,7 @@
-import {
-  isLineSegment,
-  lineSegment,
-  pointFrom,
-  type GlobalPoint,
-} from "../math";
-import type { LineSegment } from "../utils";
-import type { BoundingBox, Bounds } from "./element/bounds";
+import type { Arc, Segment } from "../math";
+import { isSegment, segment, pointFrom, type GlobalPoint } from "../math";
 import { isBounds } from "./element/typeChecks";
+import type { Bounds } from "./element/types";
 
 // The global data holder to collect the debug operations
 declare global {
@@ -20,20 +15,34 @@ declare global {
 
 export type DebugElement = {
   color: string;
-  data: LineSegment<GlobalPoint>;
+  data: Segment<GlobalPoint> | Arc<GlobalPoint>;
   permanent: boolean;
 };
 
+export const debugDrawArc = (
+  a: Arc<GlobalPoint>,
+  opts?: {
+    color?: string;
+    permanent?: boolean;
+  },
+) => {
+  addToCurrentFrame({
+    color: opts?.color ?? "blue",
+    permanent: !!opts?.permanent,
+    data: a,
+  });
+};
+
 export const debugDrawLine = (
-  segment: LineSegment<GlobalPoint> | LineSegment<GlobalPoint>[],
+  segment: Segment<GlobalPoint> | Segment<GlobalPoint>[],
   opts?: {
     color?: string;
     permanent?: boolean;
   },
 ) => {
   const segments = (
-    isLineSegment(segment) ? [segment] : segment
-  ) as LineSegment<GlobalPoint>[];
+    isSegment(segment) ? [segment] : segment
+  ) as Segment<GlobalPoint>[];
 
   segments.forEach((data) =>
     addToCurrentFrame({
@@ -56,7 +65,7 @@ export const debugDrawPoint = (
   const yOffset = opts?.fuzzy ? Math.random() * 3 : 0;
 
   debugDrawLine(
-    lineSegment(
+    segment(
       pointFrom<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset - 10),
       pointFrom<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset + 10),
     ),
@@ -66,7 +75,7 @@ export const debugDrawPoint = (
     },
   );
   debugDrawLine(
-    lineSegment(
+    segment(
       pointFrom<GlobalPoint>(p[0] + xOffset - 10, p[1] + yOffset + 10),
       pointFrom<GlobalPoint>(p[0] + xOffset + 10, p[1] + yOffset - 10),
     ),
@@ -74,41 +83,6 @@ export const debugDrawPoint = (
       color: opts?.color ?? "cyan",
       permanent: opts?.permanent,
     },
-  );
-};
-
-export const debugDrawBoundingBox = (
-  box: BoundingBox | BoundingBox[],
-  opts?: {
-    color?: string;
-    permanent?: boolean;
-  },
-) => {
-  (Array.isArray(box) ? box : [box]).forEach((bbox) =>
-    debugDrawLine(
-      [
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.minX, bbox.minY),
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.minY),
-        ),
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.minY),
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.maxY),
-        ),
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.maxY),
-          pointFrom<GlobalPoint>(bbox.minX, bbox.maxY),
-        ),
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.minX, bbox.maxY),
-          pointFrom<GlobalPoint>(bbox.minX, bbox.minY),
-        ),
-      ],
-      {
-        color: opts?.color ?? "cyan",
-        permanent: opts?.permanent,
-      },
-    ),
   );
 };
 
@@ -122,19 +96,19 @@ export const debugDrawBounds = (
   (isBounds(box) ? [box] : box).forEach((bbox) =>
     debugDrawLine(
       [
-        lineSegment(
+        segment(
           pointFrom<GlobalPoint>(bbox[0], bbox[1]),
           pointFrom<GlobalPoint>(bbox[2], bbox[1]),
         ),
-        lineSegment(
+        segment(
           pointFrom<GlobalPoint>(bbox[2], bbox[1]),
           pointFrom<GlobalPoint>(bbox[2], bbox[3]),
         ),
-        lineSegment(
+        segment(
           pointFrom<GlobalPoint>(bbox[2], bbox[3]),
           pointFrom<GlobalPoint>(bbox[0], bbox[3]),
         ),
-        lineSegment(
+        segment(
           pointFrom<GlobalPoint>(bbox[0], bbox[3]),
           pointFrom<GlobalPoint>(bbox[0], bbox[1]),
         ),

@@ -49,12 +49,11 @@ import {
   isDevEnv,
   toBrandedType,
 } from "../utils";
-import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
 import { isArrowElement } from "../element/typeChecks";
-import { pointFrom, type LocalPoint } from "../../math";
+import { pointExtent, pointFrom, type LocalPoint } from "../../math";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -555,10 +554,7 @@ export const convertToExcalidrawElements = (
           type: "arrow",
         });
 
-        Object.assign(
-          excalidrawElement,
-          getSizeFromPoints(excalidrawElement.points),
-        );
+        Object.assign(excalidrawElement, pointExtent(excalidrawElement.points));
         break;
       }
       case "text": {

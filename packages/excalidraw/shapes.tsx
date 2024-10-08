@@ -1,3 +1,4 @@
+import type { GenericPoint, ViewportPoint } from "../math";
 import {
   isPoint,
   pointFrom,
@@ -32,23 +33,22 @@ import {
 import {
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
-  LINE_CONFIRM_THRESHOLD,
   ROUNDNESS,
 } from "./constants";
 import { getElementAbsoluteCoords } from "./element";
-import type { Bounds } from "./element/bounds";
 import { shouldTestInside } from "./element/collision";
 import { LinearElementEditor } from "./element/linearElementEditor";
 import { getBoundTextElement } from "./element/textElement";
 import type {
+  Bounds,
   ElementsMap,
+  ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
 } from "./element/types";
 import { KEYS } from "./keys";
 import { ShapeCache } from "./scene/ShapeCache";
-import type { NormalizedZoomValue, Zoom } from "./types";
 import { invariant } from "./utils";
 
 export const SHAPES = [
@@ -141,10 +141,10 @@ export const findShapeByKey = (key: string) => {
  * get the pure geometric shape of an excalidraw element
  * which is then used for hit detection
  */
-export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
+export const getElementShape = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape<Point> => {
+): GeometricShape<GlobalPoint> => {
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -164,16 +164,16 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
-        ? getClosedCurveShape<Point>(
+        ? getClosedCurveShape<GlobalPoint>(
             element,
             roughShape,
-            pointFrom<Point>(element.x, element.y),
+            pointFrom<GlobalPoint>(element.x, element.y),
             element.angle,
             pointFrom(cx, cy),
           )
-        : getCurveShape<Point>(
+        : getCurveShape<GlobalPoint>(
             roughShape,
-            pointFrom<Point>(element.x, element.y),
+            pointFrom<GlobalPoint>(element.x, element.y),
             element.angle,
             pointFrom(cx, cy),
           );
@@ -193,10 +193,10 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   }
 };
 
-export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
+export const getBoundTextShape = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape<Point> | null => {
+): GeometricShape<GlobalPoint> | null => {
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (boundTextElement) {
@@ -221,9 +221,7 @@ export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
   return null;
 };
 
-export const getControlPointsForBezierCurve = <
-  P extends GlobalPoint | LocalPoint,
->(
+export const getControlPointsForBezierCurve = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -265,7 +263,7 @@ export const getControlPointsForBezierCurve = <
   return controlPoints;
 };
 
-export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
+export const getBezierXY = <P extends GenericPoint>(
   p0: P,
   p1: P,
   p2: P,
@@ -282,7 +280,7 @@ export const getBezierXY = <P extends GlobalPoint | LocalPoint>(
   return pointFrom(tx, ty);
 };
 
-const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
+const getPointsInBezierCurve = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -312,7 +310,7 @@ const getPointsInBezierCurve = <P extends GlobalPoint | LocalPoint>(
   return pointsOnCurve;
 };
 
-const getBezierCurveArcLengths = <P extends GlobalPoint | LocalPoint>(
+const getBezierCurveArcLengths = <P extends GenericPoint>(
   element: NonDeleted<ExcalidrawLinearElement>,
   endPoint: P,
 ) => {
@@ -435,7 +433,9 @@ export const aabbForElement = (
   return bounds;
 };
 
-export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+export const pointInsideBounds = <
+  P extends GlobalPoint | LocalPoint | ViewportPoint,
+>(
   p: P,
   bounds: Bounds,
 ): boolean =>
@@ -474,20 +474,29 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   return 0;
 };
 
-// Checks if the first and last point are close enough
-// to be considered a loop
-export const isPathALoop = (
-  points: ExcalidrawLinearElement["points"],
-  /** supply if you want the loop detection to account for current zoom */
-  zoomValue: Zoom["value"] = 1 as NormalizedZoomValue,
-): boolean => {
-  if (points.length >= 3) {
-    const [first, last] = [points[0], points[points.length - 1]];
-    const distance = pointDistance(first, last);
+export const getDiamondPoints = (
+  element: ExcalidrawDiamondElement,
+  offset: number = 0,
+) => {
+  // Here we add +1 to avoid these numbers to be 0
+  // otherwise rough.js will throw an error complaining about it
+  const topX = Math.floor(element.width / 2) + 1;
+  const topY = 0;
+  const rightX = element.width;
+  const rightY = Math.floor(element.height / 2) + 1;
+  const bottomX = topX;
+  const bottomY = element.height;
+  const leftX = 0;
+  const leftY = rightY;
 
-    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
-    // really close we make the threshold smaller, and vice versa.
-    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
-  }
-  return false;
+  return [
+    topX - offset,
+    topY - offset,
+    rightX + offset,
+    rightY + offset,
+    bottomX + offset,
+    bottomY + offset,
+    leftX - offset,
+    leftY - offset,
+  ];
 };

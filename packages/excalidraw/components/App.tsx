@@ -187,7 +187,6 @@ import type {
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
 } from "../element/types";
-import { getCenter, getDistance } from "../gesture";
 import {
   editGroupForSelectedElement,
   getElementsInGroup,
@@ -230,7 +229,6 @@ import {
   getBoundTextShape,
   getCornerRadius,
   getElementShape,
-  isPathALoop,
 } from "../shapes";
 import { getSelectionBoxShape } from "../../utils/geometry/shape";
 import { isPointInShape } from "../../utils/collision";
@@ -264,7 +262,6 @@ import type {
 } from "../types";
 import {
   debounce,
-  distance,
   getFontString,
   getNearestScrollableContainer,
   isInputLike,
@@ -444,8 +441,22 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
-import type { LocalPoint, Radians } from "../../math";
-import { pointFrom, pointDistance, vector } from "../../math";
+import type {
+  GlobalPoint,
+  LocalPoint,
+  Radians,
+  ViewportPoint,
+} from "../../math";
+import {
+  pathIsALoop,
+  pointFrom,
+  pointCenter,
+  pointDistance,
+  pointSubtract,
+  rangeExtent,
+  rangeInclusive,
+  vector,
+} from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -589,7 +600,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
-  lastViewportPosition = { x: 0, y: 0 };
+  lastViewportPosition = pointFrom<ViewportPoint>(0, 0);
 
   animationFrameHandler = new AnimationFrameHandler();
 
@@ -918,8 +929,7 @@ class App extends React.Component<AppProps, AppState> {
   private isIframeLikeElementCenter(
     el: ExcalidrawIframeLikeElement | null,
     event: React.PointerEvent<HTMLElement> | PointerEvent,
-    sceneX: number,
-    sceneY: number,
+    [sceneX, sceneY]: GlobalPoint,
   ) {
     return (
       el &&
@@ -997,8 +1007,8 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <>
         {embeddableElements.map((el) => {
-          const { x, y } = sceneCoordsToViewportCoords(
-            { sceneX: el.x, sceneY: el.y },
+          const [x, y] = sceneCoordsToViewportCoords(
+            pointFrom(el.x, el.y),
             this.state,
           );
 
@@ -1284,19 +1294,19 @@ class App extends React.Component<AppProps, AppState> {
         if (frameNameDiv) {
           const box = frameNameDiv.getBoundingClientRect();
           const boxSceneTopLeft = viewportCoordsToSceneCoords(
-            { clientX: box.x, clientY: box.y },
+            pointFrom(box.x, box.y),
             this.state,
           );
           const boxSceneBottomRight = viewportCoordsToSceneCoords(
-            { clientX: box.right, clientY: box.bottom },
+            pointFrom(box.right, box.bottom),
             this.state,
           );
 
           bounds = {
-            x: boxSceneTopLeft.x,
-            y: boxSceneTopLeft.y,
-            width: boxSceneBottomRight.x - boxSceneTopLeft.x,
-            height: boxSceneBottomRight.y - boxSceneTopLeft.y,
+            x: boxSceneTopLeft[0],
+            y: boxSceneTopLeft[1],
+            width: boxSceneBottomRight[0] - boxSceneTopLeft[0],
+            height: boxSceneBottomRight[1] - boxSceneTopLeft[1],
             angle: 0,
             zoom: this.state.zoom.value,
             versionNonce: frameElement.versionNonce,
@@ -1344,8 +1354,8 @@ class App extends React.Component<AppProps, AppState> {
         return null;
       }
 
-      const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x, sceneY: f.y },
+      const [x1, y1] = sceneCoordsToViewportCoords(
+        pointFrom(f.x, f.y),
         this.state,
       );
 
@@ -2780,12 +2790,10 @@ class App extends React.Component<AppProps, AppState> {
       maybeBindLinearElement(
         multiElement,
         this.state,
-        tupleToCoors(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            multiElement,
-            -1,
-            nonDeletedElementsMap,
-          ),
+        LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          multiElement,
+          -1,
+          nonDeletedElementsMap,
         ),
         this.scene.getNonDeletedElementsMap(),
         this.scene.getNonDeletedElements(),
@@ -2928,8 +2936,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const elementUnderCursor = document.elementFromPoint(
-        this.lastViewportPosition.x,
-        this.lastViewportPosition.y,
+        this.lastViewportPosition[0],
+        this.lastViewportPosition[1],
       );
       if (
         event &&
@@ -2939,11 +2947,8 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-        {
-          clientX: this.lastViewportPosition.x,
-          clientY: this.lastViewportPosition.y,
-        },
+      const [sceneX, sceneY] = viewportCoordsToSceneCoords(
+        this.lastViewportPosition,
         this.state,
       );
 
@@ -3152,24 +3157,24 @@ class App extends React.Component<AppProps, AppState> {
     elements = restoreElements(elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
-    const elementsCenterX = distance(minX, maxX) / 2;
-    const elementsCenterY = distance(minY, maxY) / 2;
+    const elementsCenterX = rangeExtent(rangeInclusive(minX, maxX)) / 2;
+    const elementsCenterY = rangeExtent(rangeInclusive(minY, maxY)) / 2;
 
     const clientX =
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? this.lastViewportPosition.x
+        ? this.lastViewportPosition[0]
         : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? this.lastViewportPosition.y
+        ? this.lastViewportPosition[1]
         : this.state.height / 2 + this.state.offsetTop;
 
-    const { x, y } = viewportCoordsToSceneCoords(
-      { clientX, clientY },
+    const [x, y] = viewportCoordsToSceneCoords(
+      pointFrom(clientX, clientY),
       this.state,
     );
 
@@ -3195,7 +3200,7 @@ class App extends React.Component<AppProps, AppState> {
 
     syncMovedIndices(nextElements, arrayToMap(newElements));
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointFrom(x, y));
 
     if (topLayerFrame) {
       const eligibleElements = filterElementsEligibleAsFrameChildren(
@@ -3365,11 +3370,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private addTextFromPaste(text: string, isPlainPaste = false) {
-    const { x, y } = viewportCoordsToSceneCoords(
-      {
-        clientX: this.lastViewportPosition.x,
-        clientY: this.lastViewportPosition.y,
-      },
+    const [x, y] = viewportCoordsToSceneCoords(
+      this.lastViewportPosition,
       this.state,
     );
 
@@ -3407,10 +3409,9 @@ class App extends React.Component<AppProps, AppState> {
       (acc: ExcalidrawTextElement[], line, idx) => {
         const originalText = normalizeText(line).trim();
         if (originalText.length) {
-          const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-            x,
-            y: currentY,
-          });
+          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
+            pointFrom(x, currentY),
+          );
 
           let metrics = measureText(originalText, fontString, lineHeight);
           const isTextUnwrapped = metrics.width > maxTextWidth;
@@ -3850,8 +3851,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      this.lastViewportPosition.x = event.clientX;
-      this.lastViewportPosition.y = event.clientY;
+      this.lastViewportPosition = pointFrom(event.clientX, event.clientY);
     },
   );
 
@@ -4242,11 +4242,8 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               this.scene.getNonDeletedElementsMap(),
             );
-            const sceneX = midPoint.x;
-            const sceneY = midPoint.y;
             this.startTextEditing({
-              sceneX,
-              sceneY,
+              sceneCoords: midPoint,
               container,
             });
             event.preventDefault();
@@ -4622,8 +4619,8 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => ({
         ...getStateForZoom(
           {
-            viewportX: this.lastViewportPosition.x,
-            viewportY: this.lastViewportPosition.y,
+            viewportX: this.lastViewportPosition[0],
+            viewportY: this.lastViewportPosition[1],
             nextZoom: getNormalizedZoom(initialScale * event.scale),
           },
           state,
@@ -4684,11 +4681,8 @@ class App extends React.Component<AppProps, AppState> {
       id: element.id,
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
-        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          {
-            sceneX: x,
-            sceneY: y,
-          },
+        const [viewportX, viewportY] = sceneCoordsToViewportCoords(
+          pointFrom(x, y),
           this.state,
         );
         return [
@@ -4774,10 +4768,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getTextElementAtPosition(
-    x: number,
-    y: number,
+    position: GlobalPoint,
   ): NonDeleted<ExcalidrawTextElement> | null {
-    const element = this.getElementAtPosition(x, y, {
+    const element = this.getElementAtPosition(position, {
       includeBoundTextElement: true,
     });
     if (element && isTextElement(element) && !element.isDeleted) {
@@ -4787,8 +4780,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getElementAtPosition(
-    x: number,
-    y: number,
+    sceneCoords: GlobalPoint,
     opts?: {
       preferSelected?: boolean;
       includeBoundTextElement?: boolean;
@@ -4796,8 +4788,7 @@ class App extends React.Component<AppProps, AppState> {
     },
   ): NonDeleted<ExcalidrawElement> | null {
     const allHitElements = this.getElementsAtPosition(
-      x,
-      y,
+      sceneCoords,
       opts?.includeBoundTextElement,
       opts?.includeLockedElements,
     );
@@ -4816,8 +4807,7 @@ class App extends React.Component<AppProps, AppState> {
       // If we're hitting element with highest z-index only on its bounding box
       // while also hitting other element figure, the latter should be considered.
       return hitElementItself({
-        x,
-        y,
+        sceneCoords,
         element: elementWithHighestZIndex,
         shape: getElementShape(
           elementWithHighestZIndex,
@@ -4841,8 +4831,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getElementsAtPosition(
-    x: number,
-    y: number,
+    scenePointer: GlobalPoint,
     includeBoundTextElement: boolean = false,
     includeLockedElements: boolean = false,
   ): NonDeleted<ExcalidrawElement>[] {
@@ -4862,14 +4851,14 @@ class App extends React.Component<AppProps, AppState> {
                   !(isTextElement(element) && element.containerId)),
             )
     )
-      .filter((el) => this.hitElement(x, y, el))
+      .filter((el) => this.hitElement(scenePointer, el))
       .filter((element) => {
         // hitting a frame's element from outside the frame is not considered a hit
         const containingFrame = getContainingFrame(element, elementsMap);
         return containingFrame &&
           this.state.frameRendering.enabled &&
           this.state.frameRendering.clip
-          ? isCursorInFrame({ x, y }, containingFrame, elementsMap)
+          ? isCursorInFrame(scenePointer, containingFrame, elementsMap)
           : true;
       })
       .filter((el) => {
@@ -4893,8 +4882,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private hitElement(
-    x: number,
-    y: number,
+    sceneCoords: GlobalPoint,
     element: ExcalidrawElement,
     considerBoundingBox = true,
   ) {
@@ -4910,13 +4898,12 @@ class App extends React.Component<AppProps, AppState> {
         this.getElementHitThreshold(),
       );
 
-      return isPointInShape(pointFrom(x, y), selectionShape);
+      return isPointInShape(sceneCoords, selectionShape);
     }
 
     // take bound text element into consideration for hit collision as well
     const hitBoundTextOfElement = hitElementBoundText(
-      x,
-      y,
+      sceneCoords,
       getBoundTextShape(element, this.scene.getNonDeletedElementsMap()),
     );
     if (hitBoundTextOfElement) {
@@ -4924,8 +4911,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     return hitElementItself({
-      x,
-      y,
+      sceneCoords,
       element,
       shape: getElementShape(element, this.scene.getNonDeletedElementsMap()),
       threshold: this.getElementHitThreshold(),
@@ -4935,7 +4921,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private getTextBindableContainerAtPosition(x: number, y: number) {
+  private getTextBindableContainerAtPosition(position: GlobalPoint) {
     const elements = this.scene.getNonDeletedElements();
     const selectedElements = this.scene.getSelectedElements(this.state);
     if (selectedElements.length === 1) {
@@ -4956,8 +4942,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         isArrowElement(elements[index]) &&
         hitElementItself({
-          x,
-          y,
+          sceneCoords: position,
           element: elements[index],
           shape: getElementShape(
             elements[index],
@@ -4968,7 +4953,12 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         hitElement = elements[index];
         break;
-      } else if (x1 < x && x < x2 && y1 < y && y < y2) {
+      } else if (
+        x1 < position[0] &&
+        position[0] < x2 &&
+        y1 < position[1] &&
+        position[1] < y2
+      ) {
         hitElement = elements[index];
         break;
       }
@@ -4978,16 +4968,13 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private startTextEditing = ({
-    sceneX,
-    sceneY,
+    sceneCoords,
     insertAtParentCenter = true,
     container,
     autoEdit = true,
   }: {
-    /** X position to insert text at */
-    sceneX: number;
-    /** Y position to insert text at */
-    sceneY: number;
+    /** The position to insert text at */
+    sceneCoords: GlobalPoint;
     /** whether to attempt to insert at element center if applicable */
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
@@ -4998,8 +4985,7 @@ class App extends React.Component<AppProps, AppState> {
     let parentCenterPosition =
       insertAtParentCenter &&
       this.getTextWysiwygSnappedToCenterPosition(
-        sceneX,
-        sceneY,
+        sceneCoords,
         this.state,
         container,
       );
@@ -5025,10 +5011,10 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElementsMap(),
         );
       } else {
-        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+        existingTextElement = this.getTextElementAtPosition(sceneCoords);
       }
     } else {
-      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
+      existingTextElement = this.getTextElementAtPosition(sceneCoords);
     }
 
     const fontFamily =
@@ -5056,32 +5042,30 @@ class App extends React.Component<AppProps, AppState> {
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
       mutateElement(container, { height: newHeight, width: newWidth });
-      sceneX = container.x + newWidth / 2;
-      sceneY = container.y + newHeight / 2;
+      sceneCoords = pointFrom(
+        container.x + newWidth / 2,
+        container.y + newHeight / 2,
+      );
       if (parentCenterPosition) {
         parentCenterPosition = this.getTextWysiwygSnappedToCenterPosition(
-          sceneX,
-          sceneY,
+          sceneCoords,
           this.state,
           container,
         );
       }
     }
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: sceneX,
-      y: sceneY,
-    });
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
           x: parentCenterPosition
             ? parentCenterPosition.elementCenterX
-            : sceneX,
+            : sceneCoords[0],
           y: parentCenterPosition
             ? parentCenterPosition.elementCenterY
-            : sceneY,
+            : sceneCoords[1],
           strokeColor: this.state.currentItemStrokeColor,
           backgroundColor: this.state.currentItemBackgroundColor,
           fillStyle: this.state.currentItemFillStyle,
@@ -5169,15 +5153,15 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.interactiveCanvas);
 
-    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-      event,
+    let sceneCoords = viewportCoordsToSceneCoords(
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
     if (selectedGroupIds.length > 0) {
-      const hitElement = this.getElementAtPosition(sceneX, sceneY);
+      const hitElement = this.getElementAtPosition(sceneCoords);
 
       const selectedGroupId =
         hitElement &&
@@ -5203,7 +5187,7 @@ class App extends React.Component<AppProps, AppState> {
 
     resetCursor(this.interactiveCanvas);
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
-      const hitElement = this.getElementAtPosition(sceneX, sceneY);
+      const hitElement = this.getElementAtPosition(sceneCoords);
 
       if (isIframeLikeElement(hitElement)) {
         this.setState({
@@ -5212,15 +5196,14 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+      const container = this.getTextBindableContainerAtPosition(sceneCoords);
 
       if (container) {
         if (
           hasBoundTextElement(container) ||
           !isTransparent(container.backgroundColor) ||
           hitElementItself({
-            x: sceneX,
-            y: sceneY,
+            sceneCoords,
             element: container,
             shape: getElementShape(
               container,
@@ -5235,14 +5218,12 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          sceneX = midPoint.x;
-          sceneY = midPoint.y;
+          sceneCoords = midPoint;
         }
       }
 
       this.startTextEditing({
-        sceneX,
-        sceneY,
+        sceneCoords,
         insertAtParentCenter: !event.altKey,
         container,
       });
@@ -5250,7 +5231,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private getElementLinkAtPosition = (
-    scenePointer: Readonly<{ x: number; y: number }>,
+    scenePointer: GlobalPoint,
     hitElement: NonDeletedExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
     // Reversing so we traverse the elements in decreasing order
@@ -5269,7 +5250,7 @@ class App extends React.Component<AppProps, AppState> {
           element,
           this.scene.getNonDeletedElementsMap(),
           this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
+          scenePointer,
           this.device.editor.isMobile,
         )
       );
@@ -5299,7 +5280,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
-      this.lastPointerDownEvent!,
+      pointFrom(
+        this.lastPointerDownEvent!.clientX,
+        this.lastPointerDownEvent!.clientY,
+      ),
       this.state,
     );
     const elementsMap = this.scene.getNonDeletedElementsMap();
@@ -5307,18 +5291,21 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement,
       elementsMap,
       this.state,
-      pointFrom(lastPointerDownCoords.x, lastPointerDownCoords.y),
+      lastPointerDownCoords,
       this.device.editor.isMobile,
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
-      this.lastPointerUpEvent!,
+      pointFrom(
+        this.lastPointerUpEvent!.clientX,
+        this.lastPointerUpEvent!.clientY,
+      ),
       this.state,
     );
     const lastPointerUpHittingLinkIcon = isPointHittingLink(
       this.hitLinkElement,
       elementsMap,
       this.state,
-      pointFrom(lastPointerUpCoords.x, lastPointerUpCoords.y),
+      lastPointerUpCoords,
       this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
@@ -5349,10 +5336,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getTopLayerFrameAtSceneCoords = (sceneCoords: {
-    x: number;
-    y: number;
-  }) => {
+  private getTopLayerFrameAtSceneCoords = (sceneCoords: GlobalPoint) => {
     const elementsMap = this.scene.getNonDeletedElementsMap();
     const frames = this.scene
       .getNonDeletedFramesLikes()
@@ -5370,10 +5354,10 @@ class App extends React.Component<AppProps, AppState> {
     this.lastPointerMoveEvent = event.nativeEvent;
 
     if (gesture.pointers.has(event.pointerId)) {
-      gesture.pointers.set(event.pointerId, {
-        x: event.clientX,
-        y: event.clientY,
-      });
+      gesture.pointers.set(
+        event.pointerId,
+        pointFrom(event.clientX, event.clientY),
+      );
     }
 
     const initialScale = gesture.initialScale;
@@ -5383,12 +5367,11 @@ class App extends React.Component<AppProps, AppState> {
       initialScale &&
       gesture.initialDistance
     ) {
-      const center = getCenter(gesture.pointers);
-      const deltaX = center.x - gesture.lastCenter.x;
-      const deltaY = center.y - gesture.lastCenter.y;
+      const [pointer1, pointer2] = Array.from(gesture.pointers.values());
+      const center = pointCenter(pointer1, pointer2);
+      const [deltaX, deltaY] = pointSubtract(center, gesture.lastCenter);
       gesture.lastCenter = center;
-
-      const distance = getDistance(Array.from(gesture.pointers.values()));
+      const distance = pointDistance(pointer1, pointer2);
       const scaleFactor =
         this.state.activeTool.type === "freedraw" && this.state.penMode
           ? 1
@@ -5401,8 +5384,8 @@ class App extends React.Component<AppProps, AppState> {
       this.setState((state) => {
         const zoomState = getStateForZoom(
           {
-            viewportX: center.x,
-            viewportY: center.y,
+            viewportX: center[0],
+            viewportY: center[1],
             nextZoom,
           },
           state,
@@ -5454,8 +5437,10 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
-    const { x: scenePointerX, y: scenePointerY } = scenePointer;
+    const scenePointer = viewportCoordsToSceneCoords(
+      pointFrom(event.clientX, event.clientY),
+      this.state,
+    );
 
     if (
       !this.state.newElement &&
@@ -5465,8 +5450,8 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElements(),
         this,
         {
-          x: scenePointerX,
-          y: scenePointerY,
+          x: scenePointer[0],
+          y: scenePointer[1],
         },
         event,
         this.scene.getNonDeletedElementsMap(),
@@ -5510,8 +5495,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       const editingLinearElement = LinearElementEditor.handlePointerMove(
         event,
-        scenePointerX,
-        scenePointerY,
+        scenePointer,
         this,
         this.scene.getNonDeletedElementsMap(),
       );
@@ -5568,7 +5552,7 @@ class App extends React.Component<AppProps, AppState> {
         // threshold, add a point
         if (
           pointDistance(
-            pointFrom(scenePointerX - rx, scenePointerY - ry),
+            pointFrom(scenePointer[0] - rx, scenePointer[1] - ry),
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
@@ -5577,7 +5561,10 @@ class App extends React.Component<AppProps, AppState> {
             {
               points: [
                 ...points,
-                pointFrom<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
+                pointFrom<LocalPoint>(
+                  scenePointer[0] - rx,
+                  scenePointer[1] - ry,
+                ),
               ],
             },
             false,
@@ -5591,7 +5578,7 @@ class App extends React.Component<AppProps, AppState> {
         points.length > 2 &&
         lastCommittedPoint &&
         pointDistance(
-          pointFrom(scenePointerX - rx, scenePointerY - ry),
+          pointFrom(scenePointer[0] - rx, scenePointer[1] - ry),
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
@@ -5605,8 +5592,8 @@ class App extends React.Component<AppProps, AppState> {
         );
       } else {
         const [gridX, gridY] = getGridPoint(
-          scenePointerX,
-          scenePointerY,
+          scenePointer[0],
+          scenePointer[1],
           event[KEYS.CTRL_OR_CMD] || isElbowArrow(multiElement)
             ? null
             : this.getEffectiveGridSize(),
@@ -5630,7 +5617,9 @@ class App extends React.Component<AppProps, AppState> {
             ));
         }
 
-        if (isPathALoop(points, this.state.zoom.value)) {
+        if (
+          pathIsALoop(points, LINE_CONFIRM_THRESHOLD / this.state.zoom.value)
+        ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
         if (isElbowArrow(multiElement)) {
@@ -5700,8 +5689,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         this.handleHoverSelectedLinearElement(
           this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
+          scenePointer,
         );
       }
 
@@ -5714,8 +5702,7 @@ class App extends React.Component<AppProps, AppState> {
           getElementWithTransformHandleType(
             elements,
             this.state,
-            scenePointerX,
-            scenePointerY,
+            scenePointer,
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
@@ -5735,8 +5722,7 @@ class App extends React.Component<AppProps, AppState> {
     } else if (selectedElements.length > 1 && !isOverScrollBar) {
       const transformHandleType = getTransformHandleTypeFromCoords(
         getCommonBounds(selectedElements),
-        scenePointerX,
-        scenePointerY,
+        scenePointer,
         this.state.zoom,
         event.pointerType,
         this.device,
@@ -5752,10 +5738,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const hitElement = this.getElementAtPosition(
-      scenePointer.x,
-      scenePointer.y,
-    );
+    const hitElement = this.getElementAtPosition(scenePointer);
 
     this.hitLinkElement = this.getElementLinkAtPosition(
       scenePointer,
@@ -5796,8 +5779,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (this.state.selectedLinearElement) {
         this.handleHoverSelectedLinearElement(
           this.state.selectedLinearElement,
-          scenePointerX,
-          scenePointerY,
+          scenePointer,
         );
       } else if (
         // if using cmd/ctrl, we're not dragging
@@ -5814,12 +5796,7 @@ class App extends React.Component<AppProps, AppState> {
           if (
             hitElement &&
             isIframeLikeElement(hitElement) &&
-            this.isIframeLikeElementCenter(
-              hitElement,
-              event,
-              scenePointerX,
-              scenePointerY,
-            )
+            this.isIframeLikeElementCenter(hitElement, event, scenePointer)
           ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
             this.setState({
@@ -5841,9 +5818,9 @@ class App extends React.Component<AppProps, AppState> {
   private handleEraser = (
     event: PointerEvent,
     pointerDownState: PointerDownState,
-    scenePointer: { x: number; y: number },
+    scenePointer: GlobalPoint,
   ) => {
-    this.eraserTrail.addPointToPath(scenePointer.x, scenePointer.y);
+    this.eraserTrail.addPointToPath(scenePointer[0], scenePointer[1]);
 
     let didChange = false;
 
@@ -5886,15 +5863,12 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
-    const distance = pointDistance(
-      pointFrom(pointerDownState.lastCoords.x, pointerDownState.lastCoords.y),
-      pointFrom(scenePointer.x, scenePointer.y),
-    );
+    const distance = pointDistance(pointerDownState.lastCoords, scenePointer);
     const threshold = this.getElementHitThreshold();
-    const p = { ...pointerDownState.lastCoords };
+    let p = pointerDownState.lastCoords;
     let samplingInterval = 0;
     while (samplingInterval <= distance) {
-      const hitElements = this.getElementsAtPosition(p.x, p.y);
+      const hitElements = this.getElementsAtPosition(p);
       processElements(hitElements);
 
       // Exit since we reached current point
@@ -5906,14 +5880,14 @@ class App extends React.Component<AppProps, AppState> {
       samplingInterval = Math.min(samplingInterval + threshold, distance);
 
       const distanceRatio = samplingInterval / distance;
-      const nextX = (1 - distanceRatio) * p.x + distanceRatio * scenePointer.x;
-      const nextY = (1 - distanceRatio) * p.y + distanceRatio * scenePointer.y;
-      p.x = nextX;
-      p.y = nextY;
+      const nextX =
+        (1 - distanceRatio) * p[0] + distanceRatio * scenePointer[0];
+      const nextY =
+        (1 - distanceRatio) * p[1] + distanceRatio * scenePointer[1];
+      p = pointFrom(nextX, nextY);
     }
 
-    pointerDownState.lastCoords.x = scenePointer.x;
-    pointerDownState.lastCoords.y = scenePointer.y;
+    pointerDownState.lastCoords = pointFrom(scenePointer[0], scenePointer[1]);
 
     if (didChange) {
       for (const element of this.scene.getNonDeletedElements()) {
@@ -5944,8 +5918,7 @@ class App extends React.Component<AppProps, AppState> {
 
   handleHoverSelectedLinearElement(
     linearElementEditor: LinearElementEditor,
-    scenePointerX: number,
-    scenePointerY: number,
+    sceneCoords: GlobalPoint,
   ) {
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -5962,8 +5935,7 @@ class App extends React.Component<AppProps, AppState> {
       let segmentMidPointHoveredCoords = null;
       if (
         hitElementItself({
-          x: scenePointerX,
-          y: scenePointerY,
+          sceneCoords,
           element,
           shape: getElementShape(
             element,
@@ -5975,23 +5947,22 @@ class App extends React.Component<AppProps, AppState> {
           element,
           elementsMap,
           this.state.zoom,
-          scenePointerX,
-          scenePointerY,
+          sceneCoords,
         );
         segmentMidPointHoveredCoords =
           LinearElementEditor.getSegmentMidpointHitCoords(
             linearElementEditor,
-            { x: scenePointerX, y: scenePointerY },
+            sceneCoords,
             this.state,
             this.scene.getNonDeletedElementsMap(),
           );
 
         if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
+        } else if (this.hitElement(sceneCoords, element)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
-      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
+      } else if (this.hitElement(sceneCoords, element)) {
         if (
           !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
@@ -6267,13 +6238,16 @@ class App extends React.Component<AppProps, AppState> {
         multiElement: null,
       });
 
-      const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+      const sceneCoords = viewportCoordsToSceneCoords(
+        pointFrom(event.clientX, event.clientY),
+        this.state,
+      );
 
-      const frame = this.getTopLayerFrameAtSceneCoords({ x, y });
+      const frame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
 
       mutateElement(pendingImageElement, {
-        x,
-        y,
+        x: sceneCoords[0],
+        y: sceneCoords[1],
         frameId: frame ? frame.id : null,
       });
     } else if (this.state.activeTool.type === "freedraw") {
@@ -6294,8 +6268,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "laser") {
       this.laserTrails.startPath(
-        pointerDownState.lastCoords.x,
-        pointerDownState.lastCoords.y,
+        pointerDownState.lastCoords[0],
+        pointerDownState.lastCoords[1],
       );
     } else if (
       this.state.activeTool.type !== "eraser" &&
@@ -6316,8 +6290,8 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.activeTool.type === "eraser") {
       this.eraserTrail.startPath(
-        pointerDownState.lastCoords.x,
-        pointerDownState.lastCoords.y,
+        pointerDownState.lastCoords[0],
+        pointerDownState.lastCoords[1],
       );
     }
 
@@ -6353,25 +6327,17 @@ class App extends React.Component<AppProps, AppState> {
     this.lastPointerUpEvent = event;
 
     const scenePointer = viewportCoordsToSceneCoords(
-      { clientX: event.clientX, clientY: event.clientY },
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
     const clicklength =
       event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
 
     if (this.device.editor.isMobile && clicklength < 300) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
+      const hitElement = this.getElementAtPosition(scenePointer);
       if (
         isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          event,
-          scenePointer.x,
-          scenePointer.y,
-        )
+        this.isIframeLikeElementCenter(hitElement, event, scenePointer)
       ) {
         this.handleEmbeddableCenterClick(hitElement);
         return;
@@ -6379,10 +6345,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (this.device.isTouchScreen) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
+      const hitElement = this.getElementAtPosition(scenePointer);
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
         hitElement,
@@ -6400,7 +6363,7 @@ class App extends React.Component<AppProps, AppState> {
           this.hitLinkElement,
           this.scene.getNonDeletedElementsMap(),
           this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
+          scenePointer,
         )
       ) {
         this.handleEmbeddableCenterClick(this.hitLinkElement);
@@ -6571,24 +6534,26 @@ class App extends React.Component<AppProps, AppState> {
   private updateGestureOnPointerDown(
     event: React.PointerEvent<HTMLElement>,
   ): void {
-    gesture.pointers.set(event.pointerId, {
-      x: event.clientX,
-      y: event.clientY,
-    });
+    gesture.pointers.set(
+      event.pointerId,
+      pointFrom(event.clientX, event.clientY),
+    );
 
     if (gesture.pointers.size === 2) {
-      gesture.lastCenter = getCenter(gesture.pointers);
+      const [pointer1, pointer2] = Array.from(gesture.pointers.values());
+      gesture.lastCenter = pointCenter(pointer1, pointer2);
       gesture.initialScale = this.state.zoom.value;
-      gesture.initialDistance = getDistance(
-        Array.from(gesture.pointers.values()),
-      );
+      gesture.initialDistance = pointDistance(pointer1, pointer2);
     }
   }
 
   private initialPointerDownState(
     event: React.PointerEvent<HTMLElement>,
   ): PointerDownState {
-    const origin = viewportCoordsToSceneCoords(event, this.state);
+    const origin = viewportCoordsToSceneCoords(
+      pointFrom(event.clientX, event.clientY),
+      this.state,
+    );
     const selectedElements = this.scene.getSelectedElements(this.state);
     const [minX, minY, maxX, maxY] = getCommonBounds(selectedElements);
     const isElbowArrowOnly = selectedElements.findIndex(isElbowArrow) === 0;
@@ -6598,8 +6563,8 @@ class App extends React.Component<AppProps, AppState> {
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
       originInGrid: tupleToCoors(
         getGridPoint(
-          origin.x,
-          origin.y,
+          origin[0],
+          origin[1],
           event[KEYS.CTRL_OR_CMD] || isElbowArrowOnly
             ? null
             : this.getEffectiveGridSize(),
@@ -6611,7 +6576,7 @@ class App extends React.Component<AppProps, AppState> {
         event.clientY - this.state.offsetTop,
       ),
       // we need to duplicate because we'll be updating this state
-      lastCoords: { ...origin },
+      lastCoords: origin,
       originalElements: this.scene
         .getNonDeletedElements()
         .reduce((acc, element) => {
@@ -6663,8 +6628,7 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
     isDraggingScrollBar = true;
-    pointerDownState.lastCoords.x = event.clientX;
-    pointerDownState.lastCoords.y = event.clientY;
+    pointerDownState.lastCoords = pointFrom(event.clientX, event.clientY);
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) {
@@ -6728,8 +6692,7 @@ class App extends React.Component<AppProps, AppState> {
           getElementWithTransformHandleType(
             elements,
             this.state,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+            pointerDownState.origin,
             this.state.zoom,
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
@@ -6745,8 +6708,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (selectedElements.length > 1) {
         pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
           getCommonBounds(selectedElements),
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
+          pointerDownState.origin,
           this.state.zoom,
           event.pointerType,
           this.device,
@@ -6759,8 +6721,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.resize.handleType,
             selectedElements,
             elementsMap,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+            pointerDownState.origin,
           ),
         );
         if (
@@ -6802,18 +6763,12 @@ class App extends React.Component<AppProps, AppState> {
         // hitElement may already be set above, so check first
         pointerDownState.hit.element =
           pointerDownState.hit.element ??
-          this.getElementAtPosition(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          );
+          this.getElementAtPosition(pointerDownState.origin);
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           const hitLinkElement = this.getElementLinkAtPosition(
-            {
-              x: pointerDownState.origin.x,
-              y: pointerDownState.origin.y,
-            },
+            pointerDownState.origin,
             pointerDownState.hit.element,
           );
           if (hitLinkElement) {
@@ -6824,8 +6779,7 @@ class App extends React.Component<AppProps, AppState> {
         // For overlapped elements one position may hit
         // multiple elements
         pointerDownState.hit.allHitElements = this.getElementsAtPosition(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
+          pointerDownState.origin,
         );
 
         const hitElement = pointerDownState.hit.element;
@@ -6998,7 +6952,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private isHittingCommonBoundingBoxOfSelectedElements(
-    point: Readonly<{ x: number; y: number }>,
+    point: GlobalPoint,
     selectedElements: readonly ExcalidrawElement[],
   ): boolean {
     if (selectedElements.length < 2) {
@@ -7009,10 +6963,10 @@ class App extends React.Component<AppProps, AppState> {
     const threshold = this.getElementHitThreshold();
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
-      point.x > x1 - threshold &&
-      point.x < x2 + threshold &&
-      point.y > y1 - threshold &&
-      point.y < y2 + threshold
+      point[0] > x1 - threshold &&
+      point[0] < x2 + threshold &&
+      point[1] > y1 - threshold &&
+      point[1] < y2 + threshold
     );
   }
 
@@ -7026,24 +6980,25 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.editingTextElement) {
       return;
     }
-    let sceneX = pointerDownState.origin.x;
-    let sceneY = pointerDownState.origin.y;
 
-    const element = this.getElementAtPosition(sceneX, sceneY, {
+    let sceneCoords = pointerDownState.origin;
+
+    const element = this.getElementAtPosition(sceneCoords, {
       includeBoundTextElement: true,
     });
 
     // FIXME
-    let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+    let container = this.getTextBindableContainerAtPosition(sceneCoords);
 
     if (hasBoundTextElement(element)) {
       container = element as ExcalidrawTextContainer;
-      sceneX = element.x + element.width / 2;
-      sceneY = element.y + element.height / 2;
+      sceneCoords = pointFrom(
+        element.x + element.width / 2,
+        element.y + element.height / 2,
+      );
     }
     this.startTextEditing({
-      sceneX,
-      sceneY,
+      sceneCoords,
       insertAtParentCenter: !event.altKey,
       container,
       autoEdit: false,
@@ -7064,15 +7019,14 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     // Begin a mark capture. This does not have to update state yet.
     const [gridX, gridY] = getGridPoint(
-      pointerDownState.origin.x,
-      pointerDownState.origin.y,
+      pointerDownState.origin[0],
+      pointerDownState.origin[1],
       null,
     );
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: gridX,
-      y: gridY,
-    });
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
+      pointFrom(gridX, gridY),
+    );
 
     const simulatePressure = event.pressure === 0.5;
 
@@ -7236,10 +7190,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const topLayerFrame = addToFrameUnderCursor
-      ? this.getTopLayerFrameAtSceneCoords({
-          x: gridX,
-          y: gridY,
-        })
+      ? this.getTopLayerFrameAtSceneCoords(pointFrom(gridX, gridY))
       : null;
 
     const element = newImageElement({
@@ -7272,7 +7223,10 @@ class App extends React.Component<AppProps, AppState> {
       // finalize if completing a loop
       if (
         multiElement.type === "line" &&
-        isPathALoop(multiElement.points, this.state.zoom.value)
+        pathIsALoop(
+          multiElement.points,
+          LINE_CONFIRM_THRESHOLD / this.state.zoom.value,
+        )
       ) {
         mutateElement(multiElement, {
           lastCommittedPoint:
@@ -7301,8 +7255,8 @@ class App extends React.Component<AppProps, AppState> {
         lastCommittedPoint &&
         pointDistance(
           pointFrom(
-            pointerDownState.origin.x - rx,
-            pointerDownState.origin.y - ry,
+            pointerDownState.origin[0] - rx,
+            pointerDownState.origin[1] - ry,
           ),
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
@@ -7328,15 +7282,14 @@ class App extends React.Component<AppProps, AppState> {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
+        pointerDownState.origin[0],
+        pointerDownState.origin[1],
         event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
-      const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-        x: gridX,
-        y: gridY,
-      });
+      const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
+        pointFrom(gridX, gridY),
+      );
 
       /* If arrow is pre-arrowheads, it will have undefined for both start and end arrowheads.
       If so, we want it to be null for start and "arrow" for end. If the linear item is not
@@ -7446,17 +7399,16 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
-      pointerDownState.origin.x,
-      pointerDownState.origin.y,
+      pointerDownState.origin[0],
+      pointerDownState.origin[1],
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
         : this.getEffectiveGridSize(),
     );
 
-    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: gridX,
-      y: gridY,
-    });
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
+      pointFrom(gridX, gridY),
+    );
 
     const baseElementAttributes = {
       x: gridX,
@@ -7504,8 +7456,8 @@ class App extends React.Component<AppProps, AppState> {
     type: Extract<ToolType, "frame" | "magicframe">,
   ): void => {
     const [gridX, gridY] = getGridPoint(
-      pointerDownState.origin.x,
-      pointerDownState.origin.y,
+      pointerDownState.origin[0],
+      pointerDownState.origin[1],
       this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
         ? null
         : this.getEffectiveGridSize(),
@@ -7616,8 +7568,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.drag.offset = tupleToCoors(
           getDragOffsetXY(
             this.scene.getSelectedElements(this.state),
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
+            pointerDownState.origin[0],
+            pointerDownState.origin[1],
           ),
         );
       }
@@ -7630,7 +7582,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+      const pointerCoords = viewportCoordsToSceneCoords(
+        pointFrom(event.clientX, event.clientY),
+        this.state,
+      );
 
       if (isEraserActive(this.state)) {
         this.handleEraser(event, pointerDownState, pointerCoords);
@@ -7638,12 +7593,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.activeTool.type === "laser") {
-        this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
+        this.laserTrails.addPointToPath(pointerCoords[0], pointerCoords[1]);
       }
 
       const [gridX, gridY] = getGridPoint(
-        pointerCoords.x,
-        pointerCoords.y,
+        pointerCoords[0],
+        pointerCoords[1],
         event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
@@ -7657,17 +7612,14 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeTool.type === "line")
       ) {
         if (
-          pointDistance(
-            pointFrom(pointerCoords.x, pointerCoords.y),
-            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-          ) < DRAGGING_THRESHOLD
+          pointDistance(pointerCoords, pointerDownState.origin) <
+          DRAGGING_THRESHOLD
         ) {
           return;
         }
       }
       if (pointerDownState.resize.isResizing) {
-        pointerDownState.lastCoords.x = pointerCoords.x;
-        pointerDownState.lastCoords.y = pointerCoords.y;
+        pointerDownState.lastCoords = pointerCoords;
         if (this.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
@@ -7733,8 +7685,7 @@ class App extends React.Component<AppProps, AppState> {
         const didDrag = LinearElementEditor.handlePointDragging(
           event,
           this,
-          pointerCoords.x,
-          pointerCoords.y,
+          pointerCoords,
           (element, pointsSceneCoords) => {
             this.maybeSuggestBindingsForLinearElementAtCoords(
               element,
@@ -7745,8 +7696,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
         );
         if (didDrag) {
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
+          pointerDownState.lastCoords = pointerCoords;
           pointerDownState.drag.hasOccurred = true;
           if (
             this.state.editingLinearElement &&
@@ -7814,8 +7764,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.activeEmbeddable?.state !== "active"
         ) {
           const dragOffset = {
-            x: pointerCoords.x - pointerDownState.origin.x,
-            y: pointerCoords.y - pointerDownState.origin.y,
+            x: pointerCoords[0] - pointerDownState.origin[0],
+            y: pointerCoords[1] - pointerDownState.origin[1],
           };
 
           const originalElements = [
@@ -7979,8 +7929,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.selectionElement) {
-        pointerDownState.lastCoords.x = pointerCoords.x;
-        pointerDownState.lastCoords.y = pointerCoords.y;
+        pointerDownState.lastCoords = pointerCoords;
         this.maybeDragNewGenericElement(pointerDownState, event);
       } else {
         // It is very important to read this.state within each move event,
@@ -7993,8 +7942,8 @@ class App extends React.Component<AppProps, AppState> {
 
         if (newElement.type === "freedraw") {
           const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          const dx = pointerCoords[0] - newElement.x;
+          const dy = pointerCoords[1] - newElement.y;
 
           const lastPoint = points.length > 0 && points[points.length - 1];
           const discardPoint =
@@ -8028,8 +7977,8 @@ class App extends React.Component<AppProps, AppState> {
             ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
               newElement.x,
               newElement.y,
-              pointerCoords.x,
-              pointerCoords.y,
+              pointerCoords[0],
+              pointerCoords[1],
             ));
           }
 
@@ -8076,8 +8025,7 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
         } else {
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
+          pointerDownState.lastCoords = pointerCoords;
           this.maybeDragNewGenericElement(pointerDownState, event, false);
         }
       }
@@ -8191,21 +8139,27 @@ class App extends React.Component<AppProps, AppState> {
   ): boolean {
     if (pointerDownState.scrollbars.isOverHorizontal) {
       const x = event.clientX;
-      const dx = x - pointerDownState.lastCoords.x;
+      const dx = x - pointerDownState.lastCoords[0];
       this.translateCanvas({
         scrollX: this.state.scrollX - dx / this.state.zoom.value,
       });
-      pointerDownState.lastCoords.x = x;
+      pointerDownState.lastCoords = pointFrom(
+        x,
+        pointerDownState.lastCoords[1],
+      );
       return true;
     }
 
     if (pointerDownState.scrollbars.isOverVertical) {
       const y = event.clientY;
-      const dy = y - pointerDownState.lastCoords.y;
+      const dy = y - pointerDownState.lastCoords[1];
       this.translateCanvas({
         scrollY: this.state.scrollY - dy / this.state.zoom.value,
       });
-      pointerDownState.lastCoords.y = y;
+      pointerDownState.lastCoords = pointFrom(
+        pointerDownState.lastCoords[0],
+        y,
+      );
       return true;
     }
     return false;
@@ -8347,13 +8301,13 @@ class App extends React.Component<AppProps, AppState> {
 
       if (newElement?.type === "freedraw") {
         const pointerCoords = viewportCoordsToSceneCoords(
-          childEvent,
+          pointFrom(childEvent.clientX, childEvent.clientY),
           this.state,
         );
 
         const points = newElement.points;
-        let dx = pointerCoords.x - newElement.x;
-        let dy = pointerCoords.y - newElement.y;
+        let dx = pointerCoords[0] - newElement.x;
+        let dy = pointerCoords[1] - newElement.y;
 
         // Allows dots to avoid being flagged as infinitely small
         if (dx === points[0][0] && dy === points[0][1]) {
@@ -8407,7 +8361,7 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
         }
         const pointerCoords = viewportCoordsToSceneCoords(
-          childEvent,
+          pointFrom(childEvent.clientX, childEvent.clientY),
           this.state,
         );
 
@@ -8416,8 +8370,8 @@ class App extends React.Component<AppProps, AppState> {
             points: [
               ...newElement.points,
               pointFrom<LocalPoint>(
-                pointerCoords.x - newElement.x,
-                pointerCoords.y - newElement.y,
+                pointerCoords[0] - newElement.x,
+                pointerCoords[1] - newElement.y,
               ),
             ],
           });
@@ -8531,7 +8485,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (pointerDownState.drag.hasOccurred) {
-        const sceneCoords = viewportCoordsToSceneCoords(childEvent, this.state);
+        const sceneCoords = viewportCoordsToSceneCoords(
+          pointFrom(childEvent.clientX, childEvent.clientY),
+          this.state,
+        );
 
         // when editing the points of a linear element, we check if the
         // linear element still is in the frame afterwards
@@ -8735,16 +8692,10 @@ class App extends React.Component<AppProps, AppState> {
 
         if (draggedDistance === 0) {
           const scenePointer = viewportCoordsToSceneCoords(
-            {
-              clientX: pointerEnd.clientX,
-              clientY: pointerEnd.clientY,
-            },
+            pointFrom(pointerEnd.clientX, pointerEnd.clientY),
             this.state,
           );
-          const hitElements = this.getElementsAtPosition(
-            scenePointer.x,
-            scenePointer.y,
-          );
+          const hitElements = this.getElementsAtPosition(scenePointer);
           hitElements.forEach((hitElement) =>
             this.elementsPendingErasure.add(hitElement.id),
           );
@@ -8917,8 +8868,7 @@ class App extends React.Component<AppProps, AppState> {
         ((hitElement &&
           hitElementBoundingBoxOnly(
             {
-              x: pointerDownState.origin.x,
-              y: pointerDownState.origin.y,
+              sceneCoords: pointerDownState.origin,
               element: hitElement,
               shape: getElementShape(
                 hitElement,
@@ -9025,8 +8975,7 @@ class App extends React.Component<AppProps, AppState> {
         this.isIframeLikeElementCenter(
           hitElement,
           this.lastPointerUpEvent,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
+          pointerDownState.origin,
         )
       ) {
         this.handleEmbeddableCenterClick(hitElement);
@@ -9279,8 +9228,8 @@ class App extends React.Component<AppProps, AppState> {
       const clientX = this.state.width / 2 + this.state.offsetLeft;
       const clientY = this.state.height / 2 + this.state.offsetTop;
 
-      const { x, y } = viewportCoordsToSceneCoords(
-        { clientX, clientY },
+      const [x, y] = viewportCoordsToSceneCoords(
+        pointFrom(clientX, clientY),
         this.state,
       );
 
@@ -9470,10 +9419,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private maybeSuggestBindingAtCursor = (pointerCoords: {
-    x: number;
-    y: number;
-  }): void => {
+  private maybeSuggestBindingAtCursor = (pointerCoords: GlobalPoint): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
       this.scene.getNonDeletedElements(),
@@ -9488,10 +9434,7 @@ class App extends React.Component<AppProps, AppState> {
   private maybeSuggestBindingsForLinearElementAtCoords = (
     linearElement: NonDeleted<ExcalidrawLinearElement>,
     /** scene coords */
-    pointerCoords: {
-      x: number;
-      y: number;
-    }[],
+    pointerCoords: GlobalPoint[],
     // During line creation the start binding hasn't been written yet
     // into `linearElement`
     oppositeBindingBoundElement?: ExcalidrawBindableElement | null,
@@ -9577,8 +9520,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
-    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-      event,
+    const [sceneX, sceneY] = viewportCoordsToSceneCoords(
+      pointFrom(event.clientX, event.clientY),
       this.state,
     );
 
@@ -9770,8 +9713,11 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const { x, y } = viewportCoordsToSceneCoords(event, this.state);
-    const element = this.getElementAtPosition(x, y, {
+    const position = viewportCoordsToSceneCoords(
+      pointFrom(event.clientX, event.clientY),
+      this.state,
+    );
+    const element = this.getElementAtPosition(position, {
       preferSelected: true,
       includeLockedElements: true,
     });
@@ -9779,7 +9725,7 @@ class App extends React.Component<AppProps, AppState> {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const isHittingCommonBoundBox =
       this.isHittingCommonBoundingBoxOfSelectedElements(
-        { x, y },
+        position,
         selectedElements,
       );
 
@@ -9833,12 +9779,16 @@ class App extends React.Component<AppProps, AppState> {
       dragNewElement({
         newElement: selectionElement,
         elementType: this.state.activeTool.type,
-        originX: pointerDownState.origin.x,
-        originY: pointerDownState.origin.y,
-        x: pointerCoords.x,
-        y: pointerCoords.y,
-        width: distance(pointerDownState.origin.x, pointerCoords.x),
-        height: distance(pointerDownState.origin.y, pointerCoords.y),
+        originX: pointerDownState.origin[0],
+        originY: pointerDownState.origin[1],
+        x: pointerCoords[0],
+        y: pointerCoords[1],
+        width: rangeExtent(
+          rangeInclusive(pointerDownState.origin[0], pointerCoords[0]),
+        ),
+        height: rangeExtent(
+          rangeInclusive(pointerDownState.origin[1], pointerCoords[1]),
+        ),
         shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
         shouldResizeFromCenter: shouldResizeFromCenter(event),
         zoom: this.state.zoom.value,
@@ -9853,8 +9803,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let [gridX, gridY] = getGridPoint(
-      pointerCoords.x,
-      pointerCoords.y,
+      pointerCoords[0],
+      pointerCoords[1],
       event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
     );
 
@@ -9899,8 +9849,12 @@ class App extends React.Component<AppProps, AppState> {
       originY: pointerDownState.originInGrid.y,
       x: gridX,
       y: gridY,
-      width: distance(pointerDownState.originInGrid.x, gridX),
-      height: distance(pointerDownState.originInGrid.y, gridY),
+      width: rangeExtent(
+        rangeInclusive(pointerDownState.originInGrid.x, gridX),
+      ),
+      height: rangeExtent(
+        rangeInclusive(pointerDownState.originInGrid.y, gridY),
+      ),
       shouldMaintainAspectRatio: isImageElement(newElement)
         ? !shouldMaintainAspectRatio(event)
         : shouldMaintainAspectRatio(event),
@@ -9962,8 +9916,8 @@ class App extends React.Component<AppProps, AppState> {
     });
     const pointerCoords = pointerDownState.lastCoords;
     let [resizeX, resizeY] = getGridPoint(
-      pointerCoords.x - pointerDownState.resize.offset.x,
-      pointerCoords.y - pointerDownState.resize.offset.y,
+      pointerCoords[0] - pointerDownState.resize.offset.x,
+      pointerCoords[1] - pointerDownState.resize.offset.y,
       event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
     );
 
@@ -9993,8 +9947,8 @@ class App extends React.Component<AppProps, AppState> {
     // during dragging
     if (!this.state.selectedElementsAreBeingDragged) {
       const [gridX, gridY] = getGridPoint(
-        pointerCoords.x,
-        pointerCoords.y,
+        pointerCoords[0],
+        pointerCoords[1],
         event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
       );
 
@@ -10201,8 +10155,8 @@ class App extends React.Component<AppProps, AppState> {
         this.translateCanvas((state) => ({
           ...getStateForZoom(
             {
-              viewportX: this.lastViewportPosition.x,
-              viewportY: this.lastViewportPosition.y,
+              viewportX: this.lastViewportPosition[0],
+              viewportY: this.lastViewportPosition[1],
               nextZoom: getNormalizedZoom(newZoom),
             },
             state,
@@ -10230,36 +10184,37 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private getTextWysiwygSnappedToCenterPosition(
-    x: number,
-    y: number,
+    position: GlobalPoint,
     appState: AppState,
     container?: ExcalidrawTextContainer | null,
   ) {
     if (container) {
-      let elementCenterX = container.x + container.width / 2;
-      let elementCenterY = container.y + container.height / 2;
-
-      const elementCenter = getContainerCenter(
+      let elementCenter = pointFrom<GlobalPoint>(
+        container.x + container.width / 2,
+        container.y + container.height / 2,
+      );
+      const containerCenter = getContainerCenter(
         container,
         appState,
         this.scene.getNonDeletedElementsMap(),
       );
-      if (elementCenter) {
-        elementCenterX = elementCenter.x;
-        elementCenterY = elementCenter.y;
+      if (containerCenter) {
+        elementCenter = containerCenter;
       }
-      const distanceToCenter = Math.hypot(
-        x - elementCenterX,
-        y - elementCenterY,
-      );
+      const distanceToCenter = pointDistance(position, elementCenter);
       const isSnappedToCenter =
         distanceToCenter < TEXT_TO_CENTER_SNAP_THRESHOLD;
       if (isSnappedToCenter) {
-        const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-          { sceneX: elementCenterX, sceneY: elementCenterY },
+        const [viewportX, viewportY] = sceneCoordsToViewportCoords(
+          elementCenter,
           appState,
         );
-        return { viewportX, viewportY, elementCenterX, elementCenterY };
+        return {
+          viewportX,
+          viewportY,
+          elementCenterX: elementCenter[0],
+          elementCenterY: elementCenter[1],
+        };
       }
     }
   }
@@ -10268,8 +10223,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!x || !y) {
       return;
     }
-    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-      { clientX: x, clientY: y },
+    const [sceneX, sceneY] = viewportCoordsToSceneCoords(
+      pointFrom(x, y),
       this.state,
     );
 
