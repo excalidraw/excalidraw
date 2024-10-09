@@ -565,6 +565,7 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
 export const getArrowheadAngle = (arrowhead: Arrowhead): Degrees => {
   switch (arrowhead) {
     case "bar":
+    case "crows_feet":
       return 90 as Degrees;
     case "arrow":
       return 20 as Degrees;
@@ -708,6 +709,14 @@ export const getArrowheadPoints = (
     }
 
     return [x2, y2, x3, y3, ox, oy, x4, y4];
+  }
+
+  if (arrowhead === "crows_feet") {
+    // point opposite to the arrowhead point
+    const ox = xs - nx * minSize;
+    const oy = ys - ny * minSize;
+
+    return [ox, oy, x4, y4, x3, y3];
   }
 
   return [x2, y2, x3, y3, x4, y4];

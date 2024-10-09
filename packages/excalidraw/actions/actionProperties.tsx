@@ -53,6 +53,7 @@ import {
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
+  ArrowheadCrowsFeetIcon,
 } from "../components/icons";
 import {
   ARROW_TYPE,
@@ -1452,6 +1453,12 @@ const getArrowheadOptions = (flip: boolean) => {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
+      keyBinding: null,
+    },
+    {
+      value: "crows_feet",
+      text: t("labels.arrowhead_crows_feet"),
+      icon: <ArrowheadCrowsFeetIcon flip={flip} />,
       keyBinding: null,
     },
   ] as const;
