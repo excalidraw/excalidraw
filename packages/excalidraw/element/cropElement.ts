@@ -12,8 +12,6 @@ import {
   pointFromVector,
   clamp,
 } from "../../math";
-import { updateBoundElements } from "./binding";
-import { mutateElement } from "./mutateElement";
 import type { TransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
@@ -21,16 +19,13 @@ import type {
   ExcalidrawImageElement,
   ImageCrop,
   NonDeleted,
-  NonDeletedSceneElementsMap,
 } from "./types";
 import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-import type { AppClassProperties } from "../types";
-import { isInitializedImageElement } from "./typeChecks";
 
-const _cropElement = (
+export const cropElement = (
   element: ExcalidrawImageElement,
   transformHandle: TransformHandleType,
   naturalWidth: number,
@@ -150,36 +145,6 @@ const _cropElement = (
     height: nextHeight,
     crop,
   };
-};
-
-export const cropElement = (
-  element: ExcalidrawImageElement,
-  elementsMap: NonDeletedSceneElementsMap,
-  imageCache: AppClassProperties["imageCache"],
-  transformHandle: TransformHandleType,
-  pointerX: number,
-  pointerY: number,
-) => {
-  const image =
-    isInitializedImageElement(element) && imageCache.get(element.fileId)?.image;
-
-  if (image && !(image instanceof Promise)) {
-    mutateElement(
-      element,
-      _cropElement(
-        element,
-        transformHandle,
-        image.naturalWidth,
-        image.naturalHeight,
-        pointerX,
-        pointerY,
-      ),
-    );
-
-    updateBoundElements(element, elementsMap, {
-      oldSize: { width: element.width, height: element.height },
-    });
-  }
 };
 
 const recomputeOrigin = (

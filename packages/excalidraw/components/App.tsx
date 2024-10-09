@@ -9398,7 +9398,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * inserts image into elements array and rerenders
    */
-  private insertImageElement = async (
+  insertImageElement = async (
     imageElement: ExcalidrawImageElement,
     imageFile: File,
     showCursorImagePreview?: boolean,
@@ -9551,7 +9551,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private initializeImageDimensions = (
+  initializeImageDimensions = (
     imageElement: ExcalidrawImageElement,
     forceNaturalSize = false,
   ) => {
@@ -10161,19 +10161,34 @@ class App extends React.Component<AppProps, AppState> {
       this.getEffectiveGridSize(),
     );
 
-    if (transformHandleType) {
-      cropElement(
-        this.state.croppingElement,
-        this.scene.getNonDeletedElementsMap(),
-        this.imageCache,
-        transformHandleType,
-        x,
-        y,
-      );
+    const element = this.state.croppingElement;
 
-      this.setState({
-        isCropping: transformHandleType && transformHandleType !== "rotation",
-      });
+    if (transformHandleType) {
+      const image =
+        isInitializedImageElement(element) &&
+        this.imageCache.get(element.fileId)?.image;
+
+      if (image && !(image instanceof Promise)) {
+        mutateElement(
+          element,
+          cropElement(
+            element,
+            transformHandleType,
+            image.naturalWidth,
+            image.naturalHeight,
+            x,
+            y,
+          ),
+        );
+
+        updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
+          oldSize: { width: element.width, height: element.height },
+        });
+
+        this.setState({
+          isCropping: transformHandleType && transformHandleType !== "rotation",
+        });
+      }
 
       return true;
     }
