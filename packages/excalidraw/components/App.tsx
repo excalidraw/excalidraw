@@ -7343,6 +7343,7 @@ class App extends React.Component<AppProps, AppState> {
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
               elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+              fixedSegments: this.state.currentItemArrowType === ARROW_TYPE.elbow ? [] : null
             })
           : newLinearElement({
               type: elementType,

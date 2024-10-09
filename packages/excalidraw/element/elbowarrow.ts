@@ -13,6 +13,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -45,7 +46,6 @@ import type {
   Arrowhead,
   ElementsMap,
   ExcalidrawBindableElement,
-  ExcalidrawElement,
   FixedPointBinding,
 } from "./types";
 
@@ -83,11 +83,7 @@ export const updateElbowArrowPoints = (
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   // Segment index
-  const nextFixedSegments = (
-    updates.fixedSegments ??
-    arrow.fixedSegments ??
-    []
-  ).sort();
+  const nextFixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
 
   // Determine the arrow parts based on fixed segments
   let prevIdx = 0;
@@ -98,106 +94,68 @@ export const updateElbowArrowPoints = (
   });
   parts.push([prevIdx, updates.points.length - 1]);
 
-  // Generate the part ends
-  const temporaryElementsMap = new Map<string, Partial<ExcalidrawElement>>(
-    elementsMap,
-  );
-  const points = parts.flatMap(([startIdx, endIdx], id) => {
-    const partGlobalPoints = updates.points.map((p) =>
-      pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
-    );
-    const startGlobalCoords = partGlobalPoints[startIdx];
-    const endGlobalCoords = partGlobalPoints[endIdx];
-    const startDirection = vectorToHeading(
-      vectorFromPoint(endGlobalCoords, startGlobalCoords),
-    );
-    const endDirection = vectorToHeading(
-      vectorFromPoint(startGlobalCoords, endGlobalCoords),
-    );
-    if (startIdx !== 0) {
-      temporaryElementsMap.set(`temp-start-${id}`, {
-        id: `temp-start-${id}`,
-        type: "rectangle",
-        x: startGlobalCoords[0],
-        y: startGlobalCoords[1],
-        width: 10,
-        height: 10,
-      });
-    }
-    if (endIdx !== updates.points.length - 1) {
-      temporaryElementsMap.set(`temp-end-${id}`, {
-        id: `temp-end-${id}`,
-        type: "rectangle",
-        x: endGlobalCoords[0],
-        y: endGlobalCoords[1],
-        width: 10,
-        height: 10,
-      });
-    }
-
-    return (
-      routeElbowArrow(
+  const points = Array.from(updates.points);
+  const unified = parts
+    .map(([startIdx, endIdx], id) => {
+      if (startIdx !== 0) {
+        points[startIdx] = arrow.points[startIdx];
+      }
+      if (endIdx !== points.length - 1) {
+        points[endIdx] = arrow.points[endIdx];
+      }
+      debugDrawPoint(
+        pointFrom<GlobalPoint>(
+          arrow.x + points[startIdx][0],
+          arrow.y + points[startIdx][1],
+        ),
         {
-          x: partGlobalPoints[startIdx][0],
-          y: partGlobalPoints[startIdx][1],
-          startArrowhead: startIdx === 0 ? arrow.startArrowhead : null,
-          endArrowhead:
-            endIdx === updates.points.length - 1 ? arrow.endArrowhead : null,
-          startBinding:
-            startIdx === 0
-              ? arrow.startBinding
-              : {
-                  elementId: `temp-start-${id}`,
-                  fixedPoint: [
-                    compareHeading(startDirection, HEADING_LEFT)
-                      ? 0
-                      : compareHeading(startDirection, HEADING_RIGHT)
-                      ? 1
-                      : 0.5001,
-                    compareHeading(startDirection, HEADING_UP)
-                      ? 0
-                      : compareHeading(startDirection, HEADING_DOWN)
-                      ? 1
-                      : 0.5001,
-                  ],
-                  focus: 0,
-                  gap: 0,
-                },
-          endBinding:
-            endIdx === updates.points.length - 1
-              ? arrow.endBinding
-              : {
-                  elementId: `temp-end-${id}`,
-                  fixedPoint: [
-                    compareHeading(endDirection, HEADING_LEFT)
-                      ? 0
-                      : compareHeading(endDirection, HEADING_RIGHT)
-                      ? 1
-                      : 0.5001,
-                    compareHeading(endDirection, HEADING_UP)
-                      ? 0
-                      : compareHeading(endDirection, HEADING_DOWN)
-                      ? 1
-                      : 0.5001,
-                  ],
-                  focus: 0,
-                  gap: 0,
-                },
+          color: id === 0 ? "green" : "red",
         },
-        temporaryElementsMap as SceneElementsMap,
-        [
-          pointFrom(0, 0),
-          pointFrom(
-            partGlobalPoints[endIdx][0] - partGlobalPoints[startIdx][0],
-            partGlobalPoints[endIdx][1] - partGlobalPoints[startIdx][1],
-          ),
-        ],
-        options,
-      ) ?? []
-    );
-  });
+      );
+      debugDrawPoint(
+        pointFrom<GlobalPoint>(
+          arrow.x + points[endIdx][0],
+          arrow.y + points[endIdx][1],
+        ),
+        {
+          color: id === 0 ? "green" : "red",
+        },
+      );
+      return (
+        routeElbowArrow(
+          {
+            x: arrow.x + points[startIdx][0],
+            y: arrow.y + points[startIdx][1],
+            startArrowhead: startIdx === 0 ? arrow.startArrowhead : null,
+            endArrowhead:
+              endIdx === points.length - 1 ? arrow.endArrowhead : null,
+            startBinding: startIdx === 0 ? arrow.startBinding : null,
+            endBinding: endIdx === points.length - 1 ? arrow.endBinding : null,
+          },
+          elementsMap,
+          [
+            pointFrom(0, 0),
+            pointFrom(
+              points[endIdx][0] - points[startIdx][0],
+              points[endIdx][1] - points[startIdx][1],
+            ),
+          ],
+          options,
+        ) ?? []
+      );
+    })
+    .flatMap((segment, idx, segments) => {
+      if (idx === 0) {
+        return segment.slice(0, -1);
+      }
+      if (idx === segments.length - 1) {
+        return segment.slice(1);
+      }
 
-  return normalizedArrowElementUpdate(points, nextFixedSegments);
+      return segment.slice(1, -1);
+    });
+
+  return normalizedArrowElementUpdate(unified, nextFixedSegments);
 };
 
 /**
@@ -233,7 +191,6 @@ const routeElbowArrow = (
     LocalPoint,
     GlobalPoint
   >(nextPoints[nextPoints.length - 1], vector(arrow.x, arrow.y));
-
   const startElement =
     arrow.startBinding &&
     getBindableElementForId(arrow.startBinding.elementId, elementsMap);
