@@ -5,8 +5,6 @@ import { SHIFT_LOCKING_ANGLE } from "../constants";
 import type { AppState, Offsets, Zoom } from "../types";
 import { getCommonBounds, getElementBounds } from "./bounds";
 import { viewportCoordsToSceneCoords } from "../utils";
-import { findClosest } from "../../utils/binarysearch";
-
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'
@@ -230,23 +228,4 @@ export const getNormalizedDimensions = (
   }
 
   return ret;
-};
-
-export const getSnappedCoordinates = (dx: number, dy: number) => {
-  const angle = Math.atan2(dy, dx);
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  const snappingAngles = [
-    0, Math.PI / 6, Math.PI / 4, Math.PI / 3, Math.PI / 2,
-    (2 * Math.PI) / 3, (3 * Math.PI) / 4, (5 * Math.PI) / 6,
-    Math.PI, (7 * Math.PI) / 6, (5 * Math.PI) / 4, (4 * Math.PI) / 3,
-    (3 * Math.PI) / 2, (5 * Math.PI) / 3, (7 * Math.PI) / 4, (11 * Math.PI) / 6
-  ];
-
-  const closestAngle = findClosest(snappingAngles, angle);
-
-  const snappedDx = Math.cos(closestAngle) * distance;
-  const snappedDy = Math.sin(closestAngle) * distance;
-
-  return { dx: snappedDx, dy: snappedDy };
 };

@@ -210,7 +210,6 @@ import {
 import {
   isElementCompletelyInViewport,
   isElementInViewport,
-  getSnappedCoordinates,
 } from "../element/sizeHelpers";
 import {
   calculateScrollCenter,
@@ -290,6 +289,7 @@ import {
   isShallowEqual,
   arrayToMap,
   toBrandedType,
+  compareAnglesForPoints,
 } from "../utils";
 import {
   createSrcDoc,
@@ -391,6 +391,7 @@ import {
   SnapCache,
   isGridModeEnabled,
   getGridPoint,
+  getFreedrawSnappingCoords,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -446,7 +447,7 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { pointFrom, pointDistance, vector, pointDistanceSq } from "../../math";
+import { pointFrom, pointDistance, vector } from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -7993,47 +7994,23 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          let dx, dy;
+          let nextPoint = pointFrom<LocalPoint>(
+            pointerCoords.x - newElement.x,
+            pointerCoords.y - newElement.y,
+          );
 
-          if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
-            // If rotation with a discrete angle is needed
-            ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
-              newElement.x,
-              newElement.y,
-              pointerCoords.x,
-              pointerCoords.y
-            ));
-          } else {
-            // Default calculation for dx and dy
-            dx = pointerCoords.x - newElement.x;
-            dy = pointerCoords.y - newElement.y;
+          if (shouldRotateWithDiscreteAngle(event)) {
+            nextPoint = getFreedrawSnappingCoords(nextPoint);
           }
 
-          if(event.shiftKey) {
-            const { dx: snappedDx, dy: snappedDy } = getSnappedCoordinates(dx, dy);
-            dx = snappedDx;
-            dy = snappedDy;
-          }
-
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          
-          // Ensure that points are discarded if they are either too close (less than minDistance) or too far (greater than maxDistance) from the last point
-          const minDistance = 15;
-          const maxDistance = 200;
-
-          const minDistanceSq = Math.pow(minDistance, 2);
-          const maxDistanceSq = Math.pow(maxDistance, 2);
-
-          const currentPoint: LocalPoint = [dx, dy] as LocalPoint;
-
-          const distanceFromLastPointSq = lastPoint 
-          ? pointDistanceSq(lastPoint, currentPoint) 
-          : Infinity;
-
-          const discardPoint = lastPoint && (distanceFromLastPointSq < minDistanceSq || distanceFromLastPointSq > maxDistanceSq);
-
-          if (!discardPoint) {
+          if (
+            !shouldRotateWithDiscreteAngle(event) ||
+            newElement.points.length <= 2 ||
+            compareAnglesForPoints(
+              nextPoint,
+              newElement.points[newElement.points.length - 1],
+            )
+          ) {
             const pressures = newElement.simulatePressure
               ? newElement.pressures
               : [...newElement.pressures, event.pressure];
@@ -8041,7 +8018,7 @@ class App extends React.Component<AppProps, AppState> {
             mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points: [...newElement.points, nextPoint],
                 pressures,
               },
               false,
@@ -8398,11 +8375,19 @@ class App extends React.Component<AppProps, AppState> {
           ? []
           : [...newElement.pressures, childEvent.pressure];
 
-        mutateElement(newElement, {
-          points: [...points, pointFrom<LocalPoint>(dx, dy)],
-          pressures,
-          lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
-        });
+        if (
+          !shouldRotateWithDiscreteAngle(childEvent) ||
+          compareAnglesForPoints(
+            pointFrom<LocalPoint>(dx, dy),
+            points[points.length - 1],
+          )
+        ) {
+          mutateElement(newElement, {
+            points: [...points, pointFrom<LocalPoint>(dx, dy)],
+            pressures,
+            lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
+          });
+        }
 
         this.actionManager.executeAction(actionFinalize);
 
