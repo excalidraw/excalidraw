@@ -35,6 +35,7 @@ import {
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
+  actionToggleCropEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -10388,6 +10389,8 @@ class App extends React.Component<AppProps, AppState> {
       actionPaste,
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
+      CONTEXT_MENU_SEPARATOR,
+      actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,
       ...options,
       CONTEXT_MENU_SEPARATOR,

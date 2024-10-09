@@ -117,6 +117,51 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "paletteName": "Finish image cropping",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -4658,6 +4703,51 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "paletteName": "Finish image cropping",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -5784,6 +5874,51 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "trackEvent": {
           "category": "history",
         },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "paletteName": "Finish image cropping",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -7638,6 +7773,51 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "paletteName": "Finish image cropping",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -8531,6 +8711,51 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "history",
         },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "paletteName": "Finish image cropping",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
