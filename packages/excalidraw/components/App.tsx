@@ -8011,6 +8011,7 @@ class App extends React.Component<AppProps, AppState> {
           if (
             !shouldRotateWithDiscreteAngle(event) ||
             newElement.points.length <= 2 ||
+            // Don't draw if the user is too far away from the ideal line
             compareAnglesForPoints(nextPoint, lastPoint)
           ) {
             const pressures = newElement.simulatePressure
