@@ -438,7 +438,7 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { updateElbowArrowPoints } from "../element/routing";
+import { updateElbowArrowPoints } from "../element/elbowarrow";
 import {
   FlowChartCreator,
   FlowChartNavigator,
