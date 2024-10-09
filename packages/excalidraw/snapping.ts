@@ -1,4 +1,4 @@
-import type { InclusiveRange } from "../math";
+import type { InclusiveRange, LocalPoint, Radians } from "../math";
 import {
   pointFrom,
   pointRotateRads,
@@ -7,6 +7,8 @@ import {
   rangesOverlap,
   type GlobalPoint,
 } from "../math";
+import type { OrderedArray } from "../utils";
+import { findNearestNumber } from "../utils";
 import { TOOL_TYPE } from "./constants";
 import type { Bounds } from "./element/bounds";
 import {
@@ -1422,4 +1424,58 @@ export const getGridPoint = (
     ];
   }
   return [x, y];
+};
+
+const DEFAULT_FREEDRAW_SNAPPING_ANGLES = [
+  -(11 * Math.PI) / 6,
+  -(7 * Math.PI) / 4,
+  -(5 * Math.PI) / 3,
+  -(3 * Math.PI) / 2,
+  -(4 * Math.PI) / 3,
+  -(5 * Math.PI) / 4,
+  -(7 * Math.PI) / 6,
+  -Math.PI,
+  -(2 * Math.PI) / 3,
+  -(3 * Math.PI) / 4,
+  -(5 * Math.PI) / 6,
+  -Math.PI / 2,
+  -Math.PI / 3,
+  -Math.PI / 4,
+  -Math.PI / 6,
+  0,
+  Math.PI / 6,
+  Math.PI / 4,
+  Math.PI / 3,
+  Math.PI / 2,
+  (2 * Math.PI) / 3,
+  (3 * Math.PI) / 4,
+  (5 * Math.PI) / 6,
+  Math.PI,
+  (7 * Math.PI) / 6,
+  (5 * Math.PI) / 4,
+  (4 * Math.PI) / 3,
+  (3 * Math.PI) / 2,
+  (5 * Math.PI) / 3,
+  (7 * Math.PI) / 4,
+  (11 * Math.PI) / 6,
+].sort((a, b) => a - b) as OrderedArray<Radians>;
+
+/**
+ * Used in calculating "steady" freedraw line drawing where the
+ * generated points are angle locked
+ */
+export const getFreedrawSnappingCoords = <
+  Point extends LocalPoint | GlobalPoint,
+>(
+  [dx, dy]: Point,
+  snappingAngles: OrderedArray<Radians> = DEFAULT_FREEDRAW_SNAPPING_ANGLES,
+): Point => {
+  const angle = Math.atan2(dy, dx) as Radians;
+  const radius = Math.sqrt(dx * dx + dy * dy);
+  const closestAngle = findNearestNumber(snappingAngles, angle);
+
+  return pointFrom(
+    Math.cos(closestAngle) * radius,
+    Math.sin(closestAngle) * radius,
+  );
 };
