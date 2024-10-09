@@ -659,7 +659,6 @@ export const updateBoundElements = (
     LinearElementEditor.movePoints(
       element,
       updates,
-      elementsMap,
       {
         ...(changedElement.id === element.startBinding?.elementId
           ? { startBinding: bindings.startBinding }

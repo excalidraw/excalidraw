@@ -7723,36 +7723,32 @@ class App extends React.Component<AppProps, AppState> {
             elementsMap,
           );
           const isHorizontal = startPoint[0] === endPoint[0];
-          LinearElementEditor.movePoints(
-            arrow,
-            [
-              {
-                index: segmentIdx! - 1,
-                point: LinearElementEditor.pointFromAbsoluteCoords(
-                  arrow,
-                  pointFrom(
-                    isHorizontal ? pointerCoords.x : startPoint[0],
-                    !isHorizontal ? pointerCoords.y : startPoint[1],
-                  ),
-                  elementsMap,
+          LinearElementEditor.movePoints(arrow, [
+            {
+              index: segmentIdx! - 1,
+              point: LinearElementEditor.pointFromAbsoluteCoords(
+                arrow,
+                pointFrom(
+                  isHorizontal ? pointerCoords.x : startPoint[0],
+                  !isHorizontal ? pointerCoords.y : startPoint[1],
                 ),
-                isDragging: true,
-              },
-              {
-                index: segmentIdx!,
-                point: LinearElementEditor.pointFromAbsoluteCoords(
-                  arrow,
-                  pointFrom(
-                    isHorizontal ? pointerCoords.x : endPoint[0],
-                    !isHorizontal ? pointerCoords.y : endPoint[1],
-                  ),
-                  elementsMap,
+                elementsMap,
+              ),
+              isDragging: true,
+            },
+            {
+              index: segmentIdx!,
+              point: LinearElementEditor.pointFromAbsoluteCoords(
+                arrow,
+                pointFrom(
+                  isHorizontal ? pointerCoords.x : endPoint[0],
+                  !isHorizontal ? pointerCoords.y : endPoint[1],
                 ),
-                isDragging: true,
-              },
-            ],
-            elementsMap,
-          );
+                elementsMap,
+              ),
+              isDragging: true,
+            },
+          ]);
           didDrag = true;
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&

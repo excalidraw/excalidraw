@@ -289,20 +289,16 @@ export class LinearElementEditor {
           event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
         );
 
-        LinearElementEditor.movePoints(
-          element,
-          [
-            {
-              index: selectedIndex,
-              point: pointFrom(
-                width + referencePoint[0],
-                height + referencePoint[1],
-              ),
-              isDragging: selectedIndex === lastClickedPoint,
-            },
-          ],
-          elementsMap,
-        );
+        LinearElementEditor.movePoints(element, [
+          {
+            index: selectedIndex,
+            point: pointFrom(
+              width + referencePoint[0],
+              height + referencePoint[1],
+            ),
+            isDragging: selectedIndex === lastClickedPoint,
+          },
+        ]);
       } else {
         const newDraggingPointPosition = LinearElementEditor.createPointAt(
           element,
@@ -337,7 +333,6 @@ export class LinearElementEditor {
               isDragging: pointIndex === lastClickedPoint,
             };
           }),
-          elementsMap,
         );
       }
 
@@ -420,19 +415,15 @@ export class LinearElementEditor {
           selectedPoint === element.points.length - 1
         ) {
           if (isPathALoop(element.points, appState.zoom.value)) {
-            LinearElementEditor.movePoints(
-              element,
-              [
-                {
-                  index: selectedPoint,
-                  point:
-                    selectedPoint === 0
-                      ? element.points[element.points.length - 1]
-                      : element.points[0],
-                },
-              ],
-              elementsMap,
-            );
+            LinearElementEditor.movePoints(element, [
+              {
+                index: selectedPoint,
+                point:
+                  selectedPoint === 0
+                    ? element.points[element.points.length - 1]
+                    : element.points[0],
+              },
+            ]);
           }
 
           const bindingElement = isBindingEnabled(appState)
@@ -934,22 +925,14 @@ export class LinearElementEditor {
     }
 
     if (lastPoint === lastUncommittedPoint) {
-      LinearElementEditor.movePoints(
-        element,
-        [
-          {
-            index: element.points.length - 1,
-            point: newPoint,
-          },
-        ],
-        elementsMap,
-      );
+      LinearElementEditor.movePoints(element, [
+        {
+          index: element.points.length - 1,
+          point: newPoint,
+        },
+      ]);
     } else {
-      LinearElementEditor.addPoints(
-        element,
-        [{ point: newPoint }],
-        elementsMap,
-      );
+      LinearElementEditor.addPoints(element, [{ point: newPoint }]);
     }
     return {
       ...appState.editingLinearElement,
@@ -1178,16 +1161,12 @@ export class LinearElementEditor {
     // potentially expanding the bounding box
     if (pointAddedToEnd) {
       const lastPoint = element.points[element.points.length - 1];
-      LinearElementEditor.movePoints(
-        element,
-        [
-          {
-            index: element.points.length - 1,
-            point: pointFrom(lastPoint[0] + 30, lastPoint[1] + 30),
-          },
-        ],
-        elementsMap,
-      );
+      LinearElementEditor.movePoints(element, [
+        {
+          index: element.points.length - 1,
+          point: pointFrom(lastPoint[0] + 30, lastPoint[1] + 30),
+        },
+      ]);
     }
 
     return {
@@ -1232,37 +1211,23 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    LinearElementEditor._updatePoints(
-      element,
-      nextPoints,
-      offsetX,
-      offsetY,
-      elementsMap,
-    );
+    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
   }
 
   static addPoints(
     element: NonDeleted<ExcalidrawLinearElement>,
     targetPoints: { point: LocalPoint }[],
-    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   ) {
     const offsetX = 0;
     const offsetY = 0;
 
     const nextPoints = [...element.points, ...targetPoints.map((x) => x.point)];
-    LinearElementEditor._updatePoints(
-      element,
-      nextPoints,
-      offsetX,
-      offsetY,
-      elementsMap,
-    );
+    LinearElementEditor._updatePoints(element, nextPoints, offsetX, offsetY);
   }
 
   static movePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
     targetPoints: { index: number; point: LocalPoint; isDragging?: boolean }[],
-    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
@@ -1313,7 +1278,6 @@ export class LinearElementEditor {
       nextPoints,
       offsetX,
       offsetY,
-      elementsMap,
       otherUpdates,
       {
         isDragging: targetPoints.reduce(
@@ -1428,7 +1392,6 @@ export class LinearElementEditor {
     nextPoints: readonly LocalPoint[],
     offsetX: number,
     offsetY: number,
-    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;

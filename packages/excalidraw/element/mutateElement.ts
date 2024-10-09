@@ -34,8 +34,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { fileId } = updates as any;
-  const { points } = updates as any;
+  const { points, fileId } = updates as any;
 
   if (typeof points !== "undefined") {
     if (isElbowArrow(element)) {
