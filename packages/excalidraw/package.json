@@ -1,26 +1,8 @@
 {
   "name": "excalidraw_karat",
-  "version": "0.0.27-alpha-22",
+  "version": "0.0.27-alpha-24",
   "type": "module",
-  "exports": {
-    ".": {
-      "development": "./dist/dev/index.js",
-      "types": "./dist/excalidraw/index.d.ts",
-      "default": "./dist/dev/index.js"
-    },
-    "./index.css": {
-      "development": "./dist/dev/index.css",
-      "default": "./dist/prod/index.css"
-    },
-    "./entry.js": {
-      "development": "./dist/dev/excalidraw-app/entry.js",
-      "default": "./dist/dev/excalidraw-app/entry.js"
-    },
-    "./entry.css": {
-      "development": "./dist/dev/excalidraw-app/entry.css",
-      "default": "./dist/dev/excalidraw-app/entry.css"
-    }
-  },
+ 
   "types": "./dist/excalidraw/index.d.ts",
   "files": [
     "dist/*"
