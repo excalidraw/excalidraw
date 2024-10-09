@@ -456,7 +456,7 @@ import {
   vectorFromPoint,
   vectorSubtract,
   vectorDot,
-  vectorMagnitude,
+  vectorNormalize,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 
@@ -7969,34 +7969,20 @@ class App extends React.Component<AppProps, AppState> {
                     croppingElement.angle,
                   ),
                 );
-                const topEdge = vectorSubtract(topRight, topLeft);
-                const leftEdge = vectorSubtract(bottomLeft, topLeft);
+                const topEdge = vectorNormalize(
+                  vectorSubtract(topRight, topLeft),
+                );
+                const leftEdge = vectorNormalize(
+                  vectorSubtract(bottomLeft, topLeft),
+                );
 
                 /**
-                 * project instantDrafOffset onto leftEdge to find out the y scalar
-                 *                                 topEdge to find out the x scalar
+                 * project instantDrafOffset onto leftEdge and topEdge to decompose
                  */
 
-                const scaleY =
-                  vectorDot(instantDragOffset, leftEdge) /
-                  vectorDot(leftEdge, leftEdge);
-                const scaleX =
-                  vectorDot(instantDragOffset, topEdge) /
-                  vectorDot(topEdge, topEdge);
-
-                instantDragOffset = vectorScale(
-                  vector(scaleX, scaleY),
-                  /**
-                   * projection results in small x and y scalars
-                   * scale to account for this
-                   */
-                  Math.min(
-                    Math.max(
-                      vectorMagnitude(topEdge),
-                      vectorMagnitude(leftEdge),
-                    ),
-                    100,
-                  ),
+                instantDragOffset = vector(
+                  vectorDot(instantDragOffset, topEdge),
+                  vectorDot(instantDragOffset, leftEdge),
                 );
               }
 
