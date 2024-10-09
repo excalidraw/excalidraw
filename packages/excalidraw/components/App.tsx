@@ -447,7 +447,7 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { pointFrom, pointDistance, vector } from "../../math";
+import { pointFrom, pointDistance, vector, pointsEqual } from "../../math";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -7994,6 +7994,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
+          const lastPoint = newElement.points[newElement.points.length - 1];
           let nextPoint = pointFrom<LocalPoint>(
             pointerCoords.x - newElement.x,
             pointerCoords.y - newElement.y,
@@ -8003,13 +8004,14 @@ class App extends React.Component<AppProps, AppState> {
             nextPoint = getFreedrawSnappingCoords(nextPoint);
           }
 
+          if (pointsEqual(lastPoint, nextPoint)) {
+            newElement.points.slice(0, -1);
+          }
+
           if (
             !shouldRotateWithDiscreteAngle(event) ||
             newElement.points.length <= 2 ||
-            compareAnglesForPoints(
-              nextPoint,
-              newElement.points[newElement.points.length - 1],
-            )
+            compareAnglesForPoints(nextPoint, lastPoint)
           ) {
             const pressures = newElement.simulatePressure
               ? newElement.pressures
