@@ -281,6 +281,7 @@ const initializeScene = async (opts: {
   console.log('roomlinkdata', roomLinkData, opts.collabAPI);
   if (roomLinkData && opts.collabAPI) {
     const { excalidrawAPI } = opts;
+  console.log('exAPi jawn', excalidrawAPI)
     opts.collabAPI.setUsername(customUsername);
 
     const scene = await opts.collabAPI.startCollaboration(roomLinkData);

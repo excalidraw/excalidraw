@@ -1,6 +1,7 @@
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
+const { defineConfig } = require("vite");
 
 // Will be used later for treeshaking
 //const fs = require("fs");
@@ -98,7 +99,7 @@ const createESMBrowserBuild = async () => {
 // });
 
 const rawConfig = {
-  entryPoints: ["index.tsx"],
+  entryPoints: ["index.tsx", "excalidraw-app/entry.ts"],
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
@@ -106,7 +107,7 @@ const rawConfig = {
     ".json": "copy",
     ".woff2": "file",
   },
-  packages: "external",
+  // packages: "external",
 };
 
 const createESMRawBuild = async () => {
@@ -131,22 +132,11 @@ const createESMRawBuild = async () => {
   });
 };
 
-const cjsConfig = {
-  entryPoints: ["index.tsx"],
-  bundle: true,
-  format: "cjs", // Set format to CommonJS
-  plugins: [sassPlugin()],
-  loader: {
-    ".json": "copy",
-    ".woff2": "file",
-  },
-};
-
 // Function to create CJS build
 const createCJSBuild = async () => {
   // Development unminified build with source maps
   await build({
-    ...cjsConfig,
+    ...rawConfig,
     sourcemap: true,
     outdir: "dist/cjs/dev", // Output directory for CJS dev build
     define: {

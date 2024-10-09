@@ -417,6 +417,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     decryptionKey: string,
   ): Promise<ValueOf<SocketUpdateDataSource>> => {
     try {
+      console.log('decrypting data with', iv, encryptedData, decryptionKey)
       const decrypted = await decryptData(iv, encryptedData, decryptionKey);
 
       const decodedData = new TextDecoder("utf-8").decode(
@@ -424,8 +425,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
       return JSON.parse(decodedData);
     } catch (error) {
-      window.alert(t("alerts.decryptFailed"));
-      console.error(error);
+      // window.alert(t("alerts.decryptFailed"));
+      console.error(`decrypError ${error}`);
       return {
         type: WS_SUBTYPES.INVALID_RESPONSE,
       };

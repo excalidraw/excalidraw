@@ -53,23 +53,23 @@ export class TopErrorBoundary extends React.Component<
   }
 
   private async createGithubIssue() {
-    let body = "";
-    try {
-      const templateStrFn = (
-        await import(
-          /* webpackChunkName: "bug-issue-template" */ "../bug-issue-template"
-        )
-      ).default;
-      body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
-    } catch (error: any) {
-      console.error(error);
-    }
+    // let body = "";
+    // try {
+    //   const templateStrFn = (
+    //     await import(
+    //       "../bug-issue-template"
+    //     )
+    //   ).default;
+    //   body = encodeURIComponent(templateStrFn(this.state.sentryEventId));
+    // } catch (error: any) {
+    //   console.error(error);
+    // }
 
-    window.open(
-      `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`,
-      "_blank",
-      "noopener noreferrer",
-    );
+    // window.open(
+    //   `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`,
+    //   "_blank",
+    //   "noopener noreferrer",
+    // );
   }
 
   private errorSplash() {
