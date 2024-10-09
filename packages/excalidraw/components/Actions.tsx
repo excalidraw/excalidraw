@@ -129,7 +129,7 @@ export const SelectedShapeActions = ({
     !isElbowArrow(targetElements[0]);
 
   const showCropEditorAction =
-    !appState.croppingElement &&
+    !appState.croppingElementId &&
     targetElements.length === 1 &&
     isImageElement(targetElements[0]);
 

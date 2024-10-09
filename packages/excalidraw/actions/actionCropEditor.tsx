@@ -32,7 +32,7 @@ export const actionToggleCropEditor = register({
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     if (
-      !appState.croppingElement &&
+      !appState.croppingElementId &&
       selectedElements.length === 1 &&
       isImageElement(selectedElements[0])
     ) {

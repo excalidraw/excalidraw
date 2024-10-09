@@ -177,7 +177,7 @@ export type StaticCanvasAppState = Readonly<
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     // Cropping
-    croppingElement: AppState["croppingElement"];
+    croppingElementId: AppState["croppingElementId"];
   }
 >;
 
@@ -202,7 +202,7 @@ export type InteractiveCanvasAppState = Readonly<
     editingTextElement: AppState["editingTextElement"];
     // Cropping
     isCropping: AppState["isCropping"];
-    croppingElement: AppState["croppingElement"];
+    croppingElementId: AppState["croppingElementId"];
     // Search matches
     searchMatches: AppState["searchMatches"];
   }
@@ -394,7 +394,7 @@ export interface AppState {
 
   /** image cropping */
   isCropping: boolean;
-  croppingElement: ExcalidrawImageElement | null;
+  croppingElementId: ExcalidrawElement["id"] | null;
 
   searchMatches: readonly SearchMatch[];
 }

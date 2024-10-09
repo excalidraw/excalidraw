@@ -54,6 +54,7 @@ import oc from "open-color";
 import {
   isElbowArrow,
   isFrameLikeElement,
+  isImageElement,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
@@ -949,8 +950,7 @@ const _renderInteractiveScene = ({
             activeEmbeddable:
               appState.activeEmbeddable?.element === element &&
               appState.activeEmbeddable.state === "active",
-            padding:
-              element.id === appState.croppingElement?.id ? 0 : undefined,
+            padding: element.id === appState.croppingElementId ? 0 : undefined,
           });
         }
       }
@@ -1004,7 +1004,7 @@ const _renderInteractiveScene = ({
         // do not show transform handles when text is being edited
         !isTextElement(appState.editingTextElement) &&
         // do not show transform handles when image is being cropped
-        !appState.croppingElement
+        !appState.croppingElementId
       ) {
         renderTransformHandles(
           context,
@@ -1015,14 +1015,18 @@ const _renderInteractiveScene = ({
         );
       }
 
-      if (appState.croppingElement && !appState.isCropping) {
-        renderCropHandles(
-          context,
-          renderConfig,
-          appState,
-          appState.croppingElement,
-          elementsMap,
-        );
+      if (appState.croppingElementId && !appState.isCropping) {
+        const croppingElement = elementsMap.get(appState.croppingElementId);
+
+        if (croppingElement && isImageElement(croppingElement)) {
+          renderCropHandles(
+            context,
+            renderConfig,
+            appState,
+            croppingElement,
+            elementsMap,
+          );
+        }
       }
     } else if (selectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding =

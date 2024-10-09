@@ -11,7 +11,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   },
   "collaborators": Map {},
   "contextMenu": null,
-  "croppingElement": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",

@@ -440,9 +440,6 @@ const drawElementOnCanvas = (
         // TODO: check why only croppingElement has the latest update
         const { x, y, width, height } = element.crop
           ? element.crop
-          : element === appState.croppingElement &&
-            appState.croppingElement.crop
-          ? appState.croppingElement.crop
           : {
               x: 0,
               y: 0,
@@ -942,7 +939,7 @@ export const renderElement = (
         }
 
         if (
-          element.id === appState.croppingElement?.id &&
+          element.id === appState.croppingElementId &&
           isImageElement(elementWithCanvas.element) &&
           elementWithCanvas.element.crop !== null
         ) {

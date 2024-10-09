@@ -100,7 +100,7 @@ const getHints = ({
     return t("hints.text_editing");
   }
 
-  if (appState.croppingElement) {
+  if (appState.croppingElementId) {
     return t("hints.leaveCropEditor");
   }
 

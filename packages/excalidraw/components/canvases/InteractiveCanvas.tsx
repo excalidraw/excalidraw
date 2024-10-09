@@ -204,7 +204,7 @@ const getRelevantAppStateProps = (
   zenModeEnabled: appState.zenModeEnabled,
   editingTextElement: appState.editingTextElement,
   isCropping: appState.isCropping,
-  croppingElement: appState.croppingElement,
+  croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
 });
 

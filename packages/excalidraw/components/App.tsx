@@ -3939,7 +3939,7 @@ class App extends React.Component<AppProps, AppState> {
       if (!isInputLike(event.target)) {
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
-          this.state.croppingElement
+          this.state.croppingElementId
         ) {
           this.finishImageCropping();
           return;
@@ -5174,13 +5174,13 @@ class App extends React.Component<AppProps, AppState> {
 
   private startImageCropping = (image: ExcalidrawImageElement) => {
     this.setState({
-      croppingElement: image,
+      croppingElementId: image.id,
     });
   };
 
   private finishImageCropping = () => {
     this.setState({
-      croppingElement: null,
+      croppingElementId: null,
     });
   };
 
@@ -6797,7 +6797,7 @@ class App extends React.Component<AppProps, AppState> {
             });
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
-          } else if (this.state.croppingElement) {
+          } else if (this.state.croppingElementId) {
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
           } else {
@@ -6874,8 +6874,8 @@ class App extends React.Component<AppProps, AppState> {
           );
 
         if (
-          this.state.croppingElement &&
-          pointerDownState.hit.element !== this.state.croppingElement
+          this.state.croppingElementId &&
+          pointerDownState.hit.element?.id !== this.state.croppingElementId
         ) {
           this.finishImageCropping();
         }
@@ -7921,93 +7921,101 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           // #region move crop region
-          const croppingElement = this.state.croppingElement;
-          if (
-            croppingElement &&
-            croppingElement.crop !== null &&
-            pointerDownState.hit.element === croppingElement
-          ) {
-            const crop = croppingElement.crop;
-            const image =
-              isInitializedImageElement(croppingElement) &&
-              this.imageCache.get(croppingElement.fileId)?.image;
+          if (this.state.croppingElementId) {
+            const croppingElement = this.scene
+              .getNonDeletedElementsMap()
+              .get(this.state.croppingElementId);
 
-            if (image && !(image instanceof Promise)) {
-              // scale the offset by at least a factor of 2 to improve ux
-              let instantDragOffset = vectorScale(
-                vector(
-                  pointerCoords.x - lastPointerCoords.x,
-                  pointerCoords.y - lastPointerCoords.y,
-                ),
-                Math.max(this.state.zoom.value, 2),
-              );
+            if (
+              croppingElement &&
+              isImageElement(croppingElement) &&
+              croppingElement.crop !== null &&
+              pointerDownState.hit.element === croppingElement
+            ) {
+              const crop = croppingElement.crop;
+              const image =
+                isInitializedImageElement(croppingElement) &&
+                this.imageCache.get(croppingElement.fileId)?.image;
 
-              if (croppingElement.angle !== 0) {
-                const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-                  croppingElement,
-                  elementsMap,
-                );
-
-                const topLeft = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x1, y1),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
+              if (image && !(image instanceof Promise)) {
+                // scale the offset by at least a factor of 2 to improve ux
+                let instantDragOffset = vectorScale(
+                  vector(
+                    pointerCoords.x - lastPointerCoords.x,
+                    pointerCoords.y - lastPointerCoords.y,
                   ),
-                );
-                const topRight = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x2, y1),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const bottomLeft = vectorFromPoint(
-                  pointRotateRads(
-                    pointFrom(x1, y2),
-                    pointFrom(cx, cy),
-                    croppingElement.angle,
-                  ),
-                );
-                const topEdge = vectorNormalize(
-                  vectorSubtract(topRight, topLeft),
-                );
-                const leftEdge = vectorNormalize(
-                  vectorSubtract(bottomLeft, topLeft),
+                  Math.max(this.state.zoom.value, 2),
                 );
 
-                /**
-                 * project instantDrafOffset onto leftEdge and topEdge to decompose
-                 */
+                if (croppingElement.angle !== 0) {
+                  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+                    croppingElement,
+                    elementsMap,
+                  );
 
-                instantDragOffset = vector(
-                  vectorDot(instantDragOffset, topEdge),
-                  vectorDot(instantDragOffset, leftEdge),
-                );
+                  const topLeft = vectorFromPoint(
+                    pointRotateRads(
+                      pointFrom(x1, y1),
+                      pointFrom(cx, cy),
+                      croppingElement.angle,
+                    ),
+                  );
+                  const topRight = vectorFromPoint(
+                    pointRotateRads(
+                      pointFrom(x2, y1),
+                      pointFrom(cx, cy),
+                      croppingElement.angle,
+                    ),
+                  );
+                  const bottomLeft = vectorFromPoint(
+                    pointRotateRads(
+                      pointFrom(x1, y2),
+                      pointFrom(cx, cy),
+                      croppingElement.angle,
+                    ),
+                  );
+                  const topEdge = vectorNormalize(
+                    vectorSubtract(topRight, topLeft),
+                  );
+                  const leftEdge = vectorNormalize(
+                    vectorSubtract(bottomLeft, topLeft),
+                  );
+
+                  /**
+                   * project instantDrafOffset onto leftEdge and topEdge to decompose
+                   */
+
+                  instantDragOffset = vector(
+                    vectorDot(instantDragOffset, topEdge),
+                    vectorDot(instantDragOffset, leftEdge),
+                  );
+                }
+
+                const nextCrop = {
+                  ...crop,
+                  x: clamp(
+                    crop.x -
+                      instantDragOffset[0] *
+                        Math.sign(croppingElement.scale[0]),
+                    0,
+                    image.naturalWidth - crop.width,
+                  ),
+                  y: clamp(
+                    crop.y -
+                      instantDragOffset[1] *
+                        Math.sign(croppingElement.scale[1]),
+                    0,
+                    image.naturalHeight - crop.height,
+                  ),
+                };
+
+                mutateElement(croppingElement, {
+                  crop: nextCrop,
+                });
+
+                return;
               }
-
-              const nextCrop = {
-                ...crop,
-                x: clamp(
-                  crop.x -
-                    instantDragOffset[0] * Math.sign(croppingElement.scale[0]),
-                  0,
-                  image.naturalWidth - crop.width,
-                ),
-                y: clamp(
-                  crop.y -
-                    instantDragOffset[1] * Math.sign(croppingElement.scale[1]),
-                  0,
-                  image.naturalHeight - crop.height,
-                ),
-              };
-
-              mutateElement(croppingElement, {
-                crop: nextCrop,
-              });
             }
-
-            return;
           }
 
           // Snap cache *must* be synchronously popuplated before initial drag,
@@ -8392,7 +8400,7 @@ class App extends React.Component<AppProps, AppState> {
       const {
         newElement,
         resizingElement,
-        croppingElement,
+        croppingElementId,
         multiElement,
         activeTool,
         isResizing,
@@ -8897,16 +8905,16 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      // click outside the cropping region to exit o0ol
+      // click outside the cropping region to exit
       if (
         // not in the cropping mode at all
-        !croppingElement ||
+        !croppingElementId ||
         // in the cropping mode
-        (croppingElement &&
+        (croppingElementId &&
           // not cropping and no hit element
           ((!hitElement && !isCropping) ||
             // hitting something else
-            (hitElement && hitElement !== croppingElement)))
+            (hitElement && hitElement.id !== croppingElementId)))
       ) {
         this.finishImageCropping();
       }
@@ -10136,7 +10144,7 @@ class App extends React.Component<AppProps, AppState> {
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
     // to crop, we must already be in the cropping mode, where croppingElement has been set
-    if (!this.state.croppingElement) {
+    if (!this.state.croppingElementId) {
       return false;
     }
 
@@ -10148,18 +10156,24 @@ class App extends React.Component<AppProps, AppState> {
       this.getEffectiveGridSize(),
     );
 
-    const element = this.state.croppingElement;
+    const croppingElement = this.scene
+      .getNonDeletedElementsMap()
+      .get(this.state.croppingElementId);
 
-    if (transformHandleType) {
+    if (
+      transformHandleType &&
+      croppingElement &&
+      isImageElement(croppingElement)
+    ) {
       const image =
-        isInitializedImageElement(element) &&
-        this.imageCache.get(element.fileId)?.image;
+        isInitializedImageElement(croppingElement) &&
+        this.imageCache.get(croppingElement.fileId)?.image;
 
       if (image && !(image instanceof Promise)) {
         mutateElement(
-          element,
+          croppingElement,
           cropElement(
-            element,
+            croppingElement,
             transformHandleType,
             image.naturalWidth,
             image.naturalHeight,
@@ -10168,9 +10182,16 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
 
-        updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
-          oldSize: { width: element.width, height: element.height },
-        });
+        updateBoundElements(
+          croppingElement,
+          this.scene.getNonDeletedElementsMap(),
+          {
+            oldSize: {
+              width: croppingElement.width,
+              height: croppingElement.height,
+            },
+          },
+        );
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",
@@ -10201,7 +10222,7 @@ class App extends React.Component<AppProps, AppState> {
       // Elbow arrows cannot be transformed (resized or rotated).
       (selectedElements.length === 1 && isElbowArrow(selectedElements[0])) ||
       // Do not resize when in crop mode
-      this.state.croppingElement
+      this.state.croppingElementId
     ) {
       return false;
     }

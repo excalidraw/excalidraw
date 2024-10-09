@@ -117,7 +117,7 @@ export const getDefaultAppState = (): Omit<
     userToFollow: null,
     followedBy: new Set(),
     isCropping: false,
-    croppingElement: null,
+    croppingElementId: null,
     searchMatches: [],
   };
 };
@@ -240,7 +240,7 @@ const APP_STATE_STORAGE_CONF = (<
   userToFollow: { browser: false, export: false, server: false },
   followedBy: { browser: false, export: false, server: false },
   isCropping: { browser: false, export: false, server: false },
-  croppingElement: { browser: false, export: false, server: false },
+  croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
 });
 

@@ -75,36 +75,36 @@ const compareCrops = (cropA: ImageCrop, cropB: ImageCrop) => {
 describe("Enter and leave the crop editor", () => {
   it("enter the editor by double clicking", () => {
     const image = h.elements[0];
-    expect(h.state.croppingElement).toBe(null);
+    expect(h.state.croppingElementId).toBe(null);
     mouse.doubleClickOn(image);
-    expect(h.state.croppingElement).not.toBe(null);
-    expect(h.state.croppingElement?.id).toBe(image.id);
+    expect(h.state.croppingElementId).not.toBe(null);
+    expect(h.state.croppingElementId).toBe(image.id);
   });
 
   it("enter the editor by pressing enter", () => {
     const image = h.elements[0];
-    expect(h.state.croppingElement).toBe(null);
+    expect(h.state.croppingElementId).toBe(null);
     Keyboard.keyDown(KEYS.ENTER);
-    expect(h.state.croppingElement).not.toBe(null);
-    expect(h.state.croppingElement?.id).toBe(image.id);
+    expect(h.state.croppingElementId).not.toBe(null);
+    expect(h.state.croppingElementId).toBe(image.id);
   });
 
   it("leave the editor by clicking outside", () => {
     const image = h.elements[0];
     Keyboard.keyDown(KEYS.ENTER);
-    expect(h.state.croppingElement).not.toBe(null);
+    expect(h.state.croppingElementId).not.toBe(null);
 
     mouse.click(image.x - 20, image.y - 20);
-    expect(h.state.croppingElement).toBe(null);
+    expect(h.state.croppingElementId).toBe(null);
   });
 
   it("leave the editor by pressing escape", () => {
     const image = h.elements[0];
     mouse.doubleClickOn(image);
-    expect(h.state.croppingElement).not.toBe(null);
+    expect(h.state.croppingElementId).not.toBe(null);
 
     Keyboard.keyDown(KEYS.ESCAPE);
-    expect(h.state.croppingElement).toBe(null);
+    expect(h.state.croppingElementId).toBe(null);
   });
 });
 
@@ -222,7 +222,7 @@ describe("Cropping and other features", async () => {
       generateRandomNaturalWidthAndHeight(image);
 
     mouse.doubleClickOn(image);
-    expect(h.state.croppingElement).not.toBe(null);
+    expect(h.state.croppingElementId).not.toBe(null);
     UI.crop(image, "nw", naturalWidth, naturalHeight, [
       initialWidth / 2,
       initialHeight / 2,
@@ -249,7 +249,7 @@ describe("Cropping and other features", async () => {
       generateRandomNaturalWidthAndHeight(image);
 
     mouse.doubleClickOn(image);
-    expect(h.state.croppingElement).not.toBe(null);
+    expect(h.state.croppingElementId).not.toBe(null);
     UI.crop(image, "nw", naturalWidth, naturalHeight, [
       initialWidth / 2,
       initialHeight / 4,
