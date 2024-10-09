@@ -385,7 +385,7 @@ body.excalidraw-cursor-resize * {
   }
 
   .App-menu__left {
-    overflow-y: auto;
+    overflow-y: visible;
     padding: 0.75rem;
     width: 12.5rem;
     box-sizing: border-box;

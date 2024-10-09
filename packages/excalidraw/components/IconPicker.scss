@@ -98,6 +98,21 @@
     }
   }
 
+  .picker-footer {
+    display: flex;
+    justify-content: end;
+    padding: 0.5rem;
+  }
+
+  .picker-footer-link {
+    color: var(--color-promo);
+  }
+
+  .picker-footer-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
   .picker-keybinding {
     position: absolute;
     bottom: 2px;
