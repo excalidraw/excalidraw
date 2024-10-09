@@ -124,19 +124,17 @@
     <!-- Following placeholder is replaced during the build step -->
     <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
 
-    <% } else { %>
-    <script>
-      window.EXCALIDRAW_ASSET_PATH = window.origin;
-    </script>
-    <% } %>
-
-    <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <!-- Register Assistant as the UI font, before the scene inits -->
     <link
       rel="stylesheet"
       href="../packages/excalidraw/fonts/assets/fonts.css"
       type="text/css"
     />
+
+    <% } else { %>
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
     <% } %>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -221,38 +219,38 @@
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
-      <!-- 100% privacy friendly analytics -->
-      <script>
-        // need to load this script dynamically bcs. of iframe embed tracking
-        var scriptEle = document.createElement("script");
-        scriptEle.setAttribute(
-          "src",
-          "https://scripts.simpleanalyticscdn.com/latest.js",
-        );
-        scriptEle.setAttribute("type", "text/javascript");
-        scriptEle.setAttribute("defer", true);
-        scriptEle.setAttribute("async", true);
-        // if iframe
-        if (window.self !== window.top) {
-          scriptEle.setAttribute("data-auto-collect", true);
-        }
+    <!-- 100% privacy friendly analytics -->
+    <script>
+      // need to load this script dynamically bcs. of iframe embed tracking
+      var scriptEle = document.createElement("script");
+      scriptEle.setAttribute(
+        "src",
+        "https://scripts.simpleanalyticscdn.com/latest.js",
+      );
+      scriptEle.setAttribute("type", "text/javascript");
+      scriptEle.setAttribute("defer", true);
+      scriptEle.setAttribute("async", true);
+      // if iframe
+      if (window.self !== window.top) {
+        scriptEle.setAttribute("data-auto-collect", true);
+      }
 
-        document.body.appendChild(scriptEle);
+      document.body.appendChild(scriptEle);
 
-        // if iframe
-        if (window.self !== window.top) {
-          scriptEle.addEventListener("load", () => {
-            if (window.sa_pageview) {
-              window.window.sa_event(action, {
-                category: "iframe",
-                label: "embed",
-                value: window.location.pathname,
-              });
-            }
-          });
-        }
-      </script>
-      <!-- end LEGACY GOOGLE ANALYTICS -->
+      // if iframe
+      if (window.self !== window.top) {
+        scriptEle.addEventListener("load", () => {
+          if (window.sa_pageview) {
+            window.window.sa_event(action, {
+              category: "iframe",
+              label: "embed",
+              value: window.location.pathname,
+            });
+          }
+        });
+      }
+    </script>
+    <!-- end LEGACY GOOGLE ANALYTICS -->
     <% } %>
   </body>
 </html>
