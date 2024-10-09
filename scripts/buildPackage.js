@@ -39,47 +39,47 @@ const { defineConfig } = require("vite");
 //   return files;
 // }
 
-const browserConfig = {
-  entryPoints: ["index.tsx"],
-  bundle: true,
-  format: "esm",
-  plugins: [
-    sassPlugin(),
-    externalGlobalPlugin({
-      react: "React",
-      "react-dom": "ReactDOM",
-    }),
-  ],
-  splitting: true,
-  loader: {
-    ".woff2": "file",
-  },
-};
-const createESMBrowserBuild = async () => {
-  // Development unminified build with source maps
-  await build({
-    ...browserConfig,
-    outdir: "dist/browser/dev",
-    sourcemap: true,
-    chunkNames: "excalidraw-assets-dev/[name]-[hash]",
-    assetNames: "excalidraw-assets-dev/[name]-[hash]",
-    define: {
-      "import.meta.env": JSON.stringify({ DEV: true }),
-    },
-  });
+// const browserConfig = {
+//   entryPoints: ["index.tsx"],
+//   bundle: true,
+//   format: "esm",
+//   plugins: [
+//     sassPlugin(),
+//     externalGlobalPlugin({
+//       react: "React",
+//       "react-dom": "ReactDOM",
+//     }),
+//   ],
+//   splitting: true,
+//   loader: {
+//     ".woff2": "file",
+//   },
+// };
+// const createESMBrowserBuild = async () => {
+//   // Development unminified build with source maps
+//   await build({
+//     ...browserConfig,
+//     outdir: "dist/browser/dev",
+//     sourcemap: true,
+//     chunkNames: "excalidraw-assets-dev/[name]-[hash]",
+//     assetNames: "excalidraw-assets-dev/[name]-[hash]",
+//     define: {
+//       "import.meta.env": JSON.stringify({ DEV: true }),
+//     },
+//   });
 
-  // production minified build without sourcemaps
-  await build({
-    ...browserConfig,
-    outdir: "dist/browser/prod",
-    minify: true,
-    chunkNames: "excalidraw-assets/[name]-[hash]",
-    assetNames: "excalidraw-assets/[name]-[hash]",
-    define: {
-      "import.meta.env": JSON.stringify({ PROD: true }),
-    },
-  });
-};
+//   // production minified build without sourcemaps
+//   await build({
+//     ...browserConfig,
+//     outdir: "dist/browser/prod",
+//     minify: true,
+//     chunkNames: "excalidraw-assets/[name]-[hash]",
+//     assetNames: "excalidraw-assets/[name]-[hash]",
+//     define: {
+//       "import.meta.env": JSON.stringify({ PROD: true }),
+//     },
+//   });
+// };
 
 // const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;
 // const filesinExcalidrawPackage = [

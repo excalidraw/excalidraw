@@ -16,6 +16,7 @@ const root = createRoot(rootElement);
 // registerSW();
 
 function App() {
+  console.log('Rendering example app from excalidraw-app/index.tsx');
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
   const excalidrawAPIRefCallback = useCallback(
@@ -31,14 +32,13 @@ function App() {
     },
     [],
   );
-
   return (
     <StrictMode>
       <ExcalidrawApp
         firebaseConfig={JSON.parse(import.meta.env.VITE_APP_FIREBASE_CONFIG)}
         collabServerUrl={import.meta.env.VITE_APP_WS_SERVER_URL}
         roomLinkData={{
-          roomId: "localTestRoomId02",
+          roomId: "nonsense_room-12313123123132",
           roomKey: "yx8WgrzkcceYyZFXAo4_9g", // arbitrary constant key
         }}
         username={"Karat Engineer"}
