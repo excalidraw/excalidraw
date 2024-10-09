@@ -823,6 +823,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1029,6 +1030,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1245,6 +1247,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1576,6 +1579,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -1907,6 +1911,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2123,6 +2128,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2363,6 +2369,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -2664,6 +2671,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3033,6 +3041,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3508,6 +3517,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -3831,6 +3841,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -4154,6 +4165,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -5340,6 +5352,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -6467,6 +6480,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -7402,6 +7416,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -8314,6 +8329,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
@@ -9208,6 +9224,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,

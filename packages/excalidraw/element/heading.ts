@@ -55,6 +55,11 @@ export const vectorToHeading = (vec: Vector): Heading => {
 export const compareHeading = (a: Heading, b: Heading) =>
   a[0] === b[0] && a[1] === b[1];
 
+export const headingIsHorizontal = (a: Heading) =>
+  compareHeading(a, HEADING_RIGHT) || compareHeading(a, HEADING_LEFT);
+
+export const headingIsVertical = (a: Heading) => !headingIsHorizontal(a);
+
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.

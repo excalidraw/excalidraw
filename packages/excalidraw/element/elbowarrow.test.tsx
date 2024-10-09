@@ -9,14 +9,14 @@ import {
   render,
 } from "../tests/test-utils";
 import { bindLinearElement } from "./binding";
-import { Excalidraw } from "../index";
-import { mutateElbowArrow } from "./routing";
+import { Excalidraw, mutateElement } from "../index";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
 } from "./types";
 import { ARROW_TYPE } from "../constants";
+import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
 
 const { h } = window;
@@ -31,10 +31,12 @@ describe("elbow arrow routing", () => {
       elbowed: true,
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
-    mutateElbowArrow(arrow, scene.getNonDeletedElementsMap(), [
-      pointFrom(-45 - arrow.x, -100.1 - arrow.y),
-      pointFrom(45 - arrow.x, 99.9 - arrow.y),
-    ]);
+    mutateElement(arrow, {
+      points: [
+        pointFrom<LocalPoint>(-45 - arrow.x, -100.1 - arrow.y),
+        pointFrom<LocalPoint>(45 - arrow.x, 99.9 - arrow.y),
+      ],
+    });
     expect(arrow.points).toEqual([
       [0, 0],
       [0, 100],
@@ -81,7 +83,9 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    mutateElbowArrow(arrow, elementsMap, [pointFrom(0, 0), pointFrom(90, 200)]);
+    mutateElement(arrow, {
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
+    });
 
     expect(arrow.points).toEqual([
       [0, 0],

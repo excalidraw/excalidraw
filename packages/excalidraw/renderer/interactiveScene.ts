@@ -507,36 +507,10 @@ const renderLinearPointHandles = (
 
   midPoints.forEach((segmentMidPoint) => {
     if (
-      appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
-      LinearElementEditor.arePointsEqual(
-        segmentMidPoint,
-        appState.selectedLinearElement.segmentMidPointHoveredCoords,
-      )
+      isElbowArrow(element) ||
+      appState.editingLinearElement ||
+      points.length === 2
     ) {
-      // The order of renderingSingleLinearPoint and highLight points is different
-      // inside vs outside editor as hover states are different,
-      // in editor when hovered the original point is not visible as hover state fully covers it whereas outside the
-      // editor original point is visible and hover state is just an outer circle.
-      if (appState.editingLinearElement) {
-        renderSingleLinearPoint(
-          context,
-          appState,
-          segmentMidPoint,
-          radius,
-          false,
-        );
-        highlightPoint(segmentMidPoint, context, appState);
-      } else {
-        highlightPoint(segmentMidPoint, context, appState);
-        renderSingleLinearPoint(
-          context,
-          appState,
-          segmentMidPoint,
-          radius,
-          false,
-        );
-      }
-    } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
         appState,
