@@ -321,6 +321,7 @@ export interface AppState {
   theme: Theme;
   gridSize: number | null;
   viewModeEnabled: boolean;
+  hideLibraryButton: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -686,6 +687,7 @@ export interface ExcalidrawImperativeAPI {
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  zoomToFit: InstanceType<typeof App>["zoomToFit"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

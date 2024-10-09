@@ -7,6 +7,7 @@ import {
   zoomAreaIcon,
   ZoomInIcon,
   ZoomOutIcon,
+  ZoomToFitIcon,
   ZoomResetIcon,
 } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
@@ -438,6 +439,18 @@ export const actionZoomToFit = register({
     event.shiftKey &&
     !event.altKey &&
     !event[KEYS.CTRL_OR_CMD],
+  PanelComponent: ({ updateData, data }) => (
+    <ToolButton
+      type="button"
+      className="zoom-to-fit-button zoom-button"
+      icon={ZoomToFitIcon}
+      title={`${t("toolBar.zoomToFit")} — ${getShortcutKey("Shift+1")}`}
+      aria-label={t("toolBar.zoomToFit")}
+      onClick={() => {
+        updateData(null);
+      }}
+    />
+  ),
 });
 
 export const actionToggleTheme = register({

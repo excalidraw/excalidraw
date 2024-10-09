@@ -476,21 +476,22 @@ describe("select single element on the scene", () => {
   });
 });
 
-describe("tool locking & selection", () => {
-  it("should not select newly created element while tool is locked", async () => {
-    await render(<Excalidraw />);
+// This test makes no sense, we have removed the "Lock tool" functionality and now it's locking the selected elements
+// describe("tool locking & selection", () => {
+//   it("should not select newly created element while tool is locked", async () => {
+//     await render(<Excalidraw />);
 
-    UI.clickTool("lock");
-    expect(h.state.activeTool.locked).toBe(true);
+//     UI.clickTool("lock");
+//     expect(h.state.activeTool.locked).toBe(true);
 
-    for (const { value } of Object.values(SHAPES)) {
-      if (value !== "image" && value !== "selection" && value !== "eraser") {
-        const element = UI.createElement(value);
-        expect(h.state.selectedElementIds[element.id]).not.toBe(true);
-      }
-    }
-  });
-});
+//     for (const { value } of Object.values(SHAPES)) {
+//       if (value !== "image" && value !== "selection" && value !== "eraser") {
+//         const element = UI.createElement(value);
+//         expect(h.state.selectedElementIds[element.id]).not.toBe(true);
+//       }
+//     }
+//   });
+// });
 
 describe("selectedElementIds stability", () => {
   beforeEach(async () => {

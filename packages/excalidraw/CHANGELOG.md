@@ -77,6 +77,18 @@ Please add the latest change on the top under the correct section.
 
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
 
+
+## Alkemio Fork
+- First version of Alkemio forked Excalidraw
+- ZoomToFit feature exposed through the external API
+- Added ZoomToFit button to the zoom toolbar
+- Added ZoomToFit flag to initialData to fit items on load
+- [Alkemio Fork of Excalidraw: Expose Zoom to fit feature #1](todo)
+- Added `hideLibraryButton` to the appState to be able to hide the button from outside.
+- Changed the toolbar Lock button behavior. Now it locks/unlocks elements instead of the tool in use
+- Changed behavior. Pasting elements is better handled and now it doesn't end up as a big text node with JSON inside.
+
+
 ## 0.17.3 (2024-02-09)
 
 ### Fixes

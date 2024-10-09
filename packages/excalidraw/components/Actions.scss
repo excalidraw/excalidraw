@@ -48,6 +48,22 @@
 }
 
 .zoom-in-button {
+  /*
+    Added zoom-to-fit button, so this button is no longer the last button, removed the rounded border:
+    border-top-right-radius: var(--border-radius-lg) !important;
+    border-bottom-right-radius: var(--border-radius-lg) !important;
+    */
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
+  
+    .ToolIcon__icon {
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+    }
+  }
+  
+  .zoom-to-fit-button {
   border-top-right-radius: var(--border-radius-lg) !important;
   border-bottom-right-radius: var(--border-radius-lg) !important;
 

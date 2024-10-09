@@ -1,3 +1,117 @@
+
+<p align="center"> <a href="https://alkemio.foundation/" target="blank"><img src="https://alkemio.foundation/uploads/logos/alkemio-logo.svg" width="400" alt="Alkemio Logo" /></a>
+
+</p>
+<p align="center"><i>Enabling society to collaborate. Building a better future, together.</i></p>
+# Alkemio fork of Excalidraw v0.17.0
+
+### Upgrade procedure
+```
+  git fetch --tags upstream
+  git checkout 0.16.1-alkemio-1
+  git merge v0.17.0
+  git push --set-upstream origin 0.17.0-alkemio-1
+```
+
+### List of differences with standard Excalidraw
+- ZoomToFit feature exposed through the external API
+- Added ZoomToFit button to the zoom toolbar
+- Added ZoomToFit flag to initialData to fit items on load
+- Modified the paste functionality to avoid pasting elements (such as images) as JSON when editing text.
+- Added `hideLibraryButton` to the appState to be able to hide the button from outside.
+- Changed the toolbar Lock button behavior. Now it locks/unlocks elements instead of the tool in use
+- Changed the load from file behavior to fix multi-user collaboration bug. Now elements loaded will have version number > currentScene version number
+
+### Testing locally inside Alkemio client
+```
+npm link
+cd ../client-web
+npm link @alkemio/excalidraw --save
+```
+
+### Build and publish the new npm package:
+Find in json files any `'alkemio-XX'` and set the version you want to publish
+```
+yarn
+cd src/packages/excalidraw
+yarn install
+yarn build:umd
+yarn pack
+yarn publish
+```
+
+## Change Log
+
+### Alkemio fork of Excalidraw v0.17.0-alkemio-4
+- Added `hideLibraryButton` to the appState to be able to hide the button from outside.
+- Changed the toolbar Lock button behavior. Now it locks/unlocks elements instead of the tool in use
+
+### Alkemio fork of Excalidraw v0.17.0-alkemio-3-beta
+- Changed behavior. Pasting elements is better handled and now it doesn't end up as a big text node with JSON inside.
+
+### Alkemio fork of Excalidraw v0.17.0
+- Upgraded from Excalidraw v0.16.1 to v0.17.0
+- Applied the new styles of the buttons to Alkemio's ZoomToFit added button.
+
+
+### Alkemio fork of Excalidraw v0.16.1
+
+- Upgraded from Excalidraw v0.15.2 to v0.16.1
+
+  - Sync master branch from github
+  - `git pull`
+  - Sync tags:
+
+  ```
+  $ git fetch --tags upstream
+  ## Assuming upstream is already pointing to the excalidraw repo, if not, just run:
+  $ git remote add upstream git@github.com:excalidraw/excalidraw.git
+  ```
+
+  - Checkout a new Branch pointing to the same commit as the tag:
+
+  ```
+  $ git checkout -b branch-v0.16.1 tags/v0.16.1
+  ```
+
+  - Push the new branch to GitHub and create the PR there or merge localy if there are conflicts
+
+- Fixed merge conflicts and a small issue with the zoomToFit icon, they have added a function with the same name.
+
+### Alkemio fork of Excalidraw v0.15.2
+
+#### Modifications:
+
+- ZoomToFit feature exposed through the external API
+- Added ZoomToFit button to the zoom toolbar
+- Added ZoomToFit flag to initialData to fit items on load
+
+#### Development guidelines
+
+- First of all, Excalidraw uses yarn as package manager, so first thing to do is make sure you have yarn installed in your system. `npm install --global yarn`.
+- Clone the repository to a local folder: `git clone git@github.com:alkem-io/excalidraw.git` and create a feature branch to store your work.
+- Follow the original Excalidraw instructions below to run and debug with the included test application - Just `yarn ; yarn start` should work.
+- To test/debug Excalidraw inside our client-web application:
+  - Execute `npm link` in the root of your cloned repository.
+  - Go to your client-web folder and execute: `npm link @alkemio/excalidraw --save`
+- When you're done with the development commit and push everything, create a Pull Request in the alkem-io/excalidraw repository to merge your branch to develop.
+- Once is merged to `develop`, checkout `develop` branch and see below how to build and publish the package to NPM repository.
+- Make sure you switch back the package in your client-web to use the published @alkemio/excalidraw package's new version instead of the old one or the linked one if you changed it.
+
+#### Build and publish a new npm package:
+
+```
+yarn
+cd src/packages/excalidraw
+yarn install
+yarn build:umd
+yarn pack
+yarn publish
+```
+
+<hr />
+
+
 <a href="https://excalidraw.com/" target="_blank" rel="noopener">
   <picture>
     <source media="(prefers-color-scheme: dark)" alt="Excalidraw" srcset="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png" />

@@ -6,13 +6,13 @@ import {
 import { API } from "./tests/helpers/api";
 
 describe("parseClipboard()", () => {
-  it("should parse JSON as plaintext if not excalidraw-api/clipboard data", async () => {
+  it("should parse JSON as plaintext if not excalidraw-api/clipboard data", () => {
     let text;
     let clipboardData;
     // -------------------------------------------------------------------------
 
     text = "123";
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({ types: { "text/plain": text } }),
     );
     expect(clipboardData.text).toBe(text);
@@ -20,7 +20,7 @@ describe("parseClipboard()", () => {
     // -------------------------------------------------------------------------
 
     text = "[123]";
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({ types: { "text/plain": text } }),
     );
     expect(clipboardData.text).toBe(text);
@@ -28,17 +28,17 @@ describe("parseClipboard()", () => {
     // -------------------------------------------------------------------------
 
     text = JSON.stringify({ val: 42 });
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({ types: { "text/plain": text } }),
     );
     expect(clipboardData.text).toBe(text);
   });
 
-  it("should parse valid excalidraw JSON if inside text/plain", async () => {
+  it("should parse valid excalidraw JSON if inside text/plain", () => {
     const rect = API.createElement({ type: "rectangle" });
 
     const json = serializeAsClipboardJSON({ elements: [rect], files: null });
-    const clipboardData = await parseClipboard(
+    const clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/plain": json,
@@ -48,14 +48,14 @@ describe("parseClipboard()", () => {
     expect(clipboardData.elements).toEqual([rect]);
   });
 
-  it("should parse valid excalidraw JSON if inside text/html", async () => {
+  it("should parse valid excalidraw JSON if inside text/html", () => {
     const rect = API.createElement({ type: "rectangle" });
 
     let json;
     let clipboardData;
     // -------------------------------------------------------------------------
     json = serializeAsClipboardJSON({ elements: [rect], files: null });
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": json,
@@ -65,7 +65,7 @@ describe("parseClipboard()", () => {
     expect(clipboardData.elements).toEqual([rect]);
     // -------------------------------------------------------------------------
     json = serializeAsClipboardJSON({ elements: [rect], files: null });
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": `<div> ${json}</div>`,
@@ -76,10 +76,10 @@ describe("parseClipboard()", () => {
     // -------------------------------------------------------------------------
   });
 
-  it("should parse <image> `src` urls out of text/html", async () => {
+  it("should parse <image> `src` urls out of text/html", () => {
     let clipboardData;
     // -------------------------------------------------------------------------
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": `<img src="https://example.com/image.png" />`,
@@ -93,7 +93,7 @@ describe("parseClipboard()", () => {
       },
     ]);
     // -------------------------------------------------------------------------
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": `<div><img src="https://example.com/image.png" /></div><a><img src="https://example.com/image2.png" /></a>`,
@@ -112,8 +112,8 @@ describe("parseClipboard()", () => {
     ]);
   });
 
-  it("should parse text content alongside <image> `src` urls out of text/html", async () => {
-    const clipboardData = await parseClipboard(
+  it("should parse text content alongside <image> `src` urls out of text/html", () => {
+    const clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": `<a href="https://example.com">hello </a><div><img src="https://example.com/image.png" /></div><b>my friend!</b>`,
@@ -137,10 +137,10 @@ describe("parseClipboard()", () => {
     ]);
   });
 
-  it("should parse spreadsheet from either text/plain and text/html", async () => {
+  it("should parse spreadsheet from either text/plain and text/html", () => {
     let clipboardData;
     // -------------------------------------------------------------------------
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/plain": `a	b
@@ -156,7 +156,7 @@ describe("parseClipboard()", () => {
       values: [2, 5, 10],
     });
     // -------------------------------------------------------------------------
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": `a	b
@@ -172,7 +172,7 @@ describe("parseClipboard()", () => {
       values: [2, 5, 10],
     });
     // -------------------------------------------------------------------------
-    clipboardData = await parseClipboard(
+    clipboardData = parseClipboard(
       createPasteEvent({
         types: {
           "text/html": `<html>

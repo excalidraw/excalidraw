@@ -1,5 +1,5 @@
 {
-  "private": true,
+  "private": false,
   "name": "excalidraw-monorepo",
   "workspaces": [
     "excalidraw-app",
@@ -56,7 +56,7 @@
   "engines": {
     "node": "18.0.0 - 20.x.x"
   },
-  "homepage": ".",
+  "homepage": "https://github.com/alkem-io/excalidraw-fork",
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
     "build-node": "node ./scripts/build-node.js",

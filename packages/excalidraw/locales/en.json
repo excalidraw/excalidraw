@@ -256,6 +256,8 @@
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
+    "lockElements": "Toggle Lock for selected elements",
+    "zoomToFit": "Zoom to fit all elements",
     "penMode": "Pen mode - prevent touch",
     "link": "Add / Update link for a selected shape",
     "eraser": "Eraser",

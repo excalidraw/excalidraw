@@ -304,8 +304,8 @@ export const textWysiwyg = ({
   updateWysiwygStyle();
 
   if (onChange) {
-    editable.onpaste = async (event) => {
-      const clipboardData = await parseClipboard(event, true);
+    editable.onpaste = (event) => {
+      const clipboardData = parseClipboard(event, true);
       if (!clipboardData.text) {
         return;
       }
