@@ -7938,8 +7938,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.imageCache.get(croppingElement.fileId)?.image;
 
               if (image && !(image instanceof Promise)) {
-                // scale the offset by at least a factor of 2 to improve ux
-                let instantDragOffset = vectorScale(
+                const instantDragOffset = vectorScale(
                   vector(
                     pointerCoords.x - lastPointerCoords.x,
                     pointerCoords.y - lastPointerCoords.y,
@@ -7947,63 +7946,56 @@ class App extends React.Component<AppProps, AppState> {
                   Math.max(this.state.zoom.value, 2),
                 );
 
-                if (croppingElement.angle !== 0) {
-                  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-                    croppingElement,
-                    elementsMap,
-                  );
+                const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+                  croppingElement,
+                  elementsMap,
+                );
 
-                  const topLeft = vectorFromPoint(
-                    pointRotateRads(
-                      pointFrom(x1, y1),
-                      pointFrom(cx, cy),
-                      croppingElement.angle,
-                    ),
-                  );
-                  const topRight = vectorFromPoint(
-                    pointRotateRads(
-                      pointFrom(x2, y1),
-                      pointFrom(cx, cy),
-                      croppingElement.angle,
-                    ),
-                  );
-                  const bottomLeft = vectorFromPoint(
-                    pointRotateRads(
-                      pointFrom(x1, y2),
-                      pointFrom(cx, cy),
-                      croppingElement.angle,
-                    ),
-                  );
-                  const topEdge = vectorNormalize(
-                    vectorSubtract(topRight, topLeft),
-                  );
-                  const leftEdge = vectorNormalize(
-                    vectorSubtract(bottomLeft, topLeft),
-                  );
+                const topLeft = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x1, y1),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const topRight = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x2, y1),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const bottomLeft = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x1, y2),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const topEdge = vectorNormalize(
+                  vectorSubtract(topRight, topLeft),
+                );
+                const leftEdge = vectorNormalize(
+                  vectorSubtract(bottomLeft, topLeft),
+                );
 
-                  /**
-                   * project instantDrafOffset onto leftEdge and topEdge to decompose
-                   */
-
-                  instantDragOffset = vector(
-                    vectorDot(instantDragOffset, topEdge),
-                    vectorDot(instantDragOffset, leftEdge),
-                  );
-                }
+                // project instantDrafOffset onto leftEdge and topEdge to decompose
+                const offsetVector = vector(
+                  vectorDot(instantDragOffset, topEdge),
+                  vectorDot(instantDragOffset, leftEdge),
+                );
 
                 const nextCrop = {
                   ...crop,
                   x: clamp(
                     crop.x -
-                      instantDragOffset[0] *
-                        Math.sign(croppingElement.scale[0]),
+                      offsetVector[0] * Math.sign(croppingElement.scale[0]),
                     0,
                     image.naturalWidth - crop.width,
                   ),
                   y: clamp(
                     crop.y -
-                      instantDragOffset[1] *
-                        Math.sign(croppingElement.scale[1]),
+                      offsetVector[1] * Math.sign(croppingElement.scale[1]),
                     0,
                     image.naturalHeight - crop.height,
                   ),
