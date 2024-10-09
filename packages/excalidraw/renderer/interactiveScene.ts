@@ -950,7 +950,11 @@ const _renderInteractiveScene = ({
             activeEmbeddable:
               appState.activeEmbeddable?.element === element &&
               appState.activeEmbeddable.state === "active",
-            padding: element.id === appState.croppingElementId ? 0 : undefined,
+            padding:
+              element.id === appState.croppingElementId ||
+              isImageElement(element)
+                ? 0
+                : undefined,
           });
         }
       }
