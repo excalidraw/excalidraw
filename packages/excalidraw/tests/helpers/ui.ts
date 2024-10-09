@@ -36,6 +36,7 @@ import { createTestHook } from "../../components/App";
 import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
 import { pointFrom, pointRotateRads } from "../../../math";
 import { cropElement } from "../../element/cropElement";
+import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
