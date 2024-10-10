@@ -1,7 +1,5 @@
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
-const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
-const { defineConfig } = require("vite");
 
 // Will be used later for treeshaking
 //const fs = require("fs");
@@ -99,7 +97,7 @@ const { defineConfig } = require("vite");
 // });
 
 const rawConfig = {
-  entryPoints: ["index.tsx", "excalidraw-app/entry.ts"],
+  entryPoints: ["excalidraw-app/App.tsx"],
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
@@ -107,7 +105,11 @@ const rawConfig = {
     ".json": "copy",
     ".woff2": "file",
   },
-  // packages: "external",
+  // These must be here otherwise we get duplicate versions of react errors.
+  // Maybe be a better solution available with dedupe at the link below,
+  // but this will do for now.
+  // https://github.com/evanw/esbuild/issues/3419
+  external: ['react', 'react-dom', 'use-sync-external-store'],
 };
 
 const createESMRawBuild = async () => {

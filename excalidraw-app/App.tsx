@@ -328,6 +328,7 @@ const initializeScene = async (opts: {
 };
 
 const ExcalidrawWrapper = () => {
+  console.log('Rendeing ExcalidrawWrapper');
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = false;
   console.log('Collab disabled', isCollabDisabled);
@@ -1160,6 +1161,6 @@ export {
   customFirebaseConfig,
   customFirebaseToken,
   onCollabRoomSave,
+  ExcalidrawApp
 };
-
 export default ExcalidrawApp;
