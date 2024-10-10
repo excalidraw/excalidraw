@@ -14,6 +14,7 @@ import type {
 import { sanitizeHTMLAttribute } from "../data/url";
 import type { MarkRequired } from "../utility-types";
 import { StoreAction } from "../store";
+import { t } from "../i18n";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 
@@ -51,6 +52,12 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_TUTAR_WITH_USER_ID = 
+  /^https:\/\/web\.tutar\.app\?api-key=([a-zA-Z0-9_-]+)&user-id=([a-zA-Z0-9_-]+)$/;
+
+const RE_TUTAR_WITHOUT_USER_ID = 
+  /^https:\/\/web\.tutar\.app\?api-key=([a-zA-Z0-9_-]+)$/;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -66,6 +73,7 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
   "giphy.com",
   "reddit.com",
+  "web.tutar.app",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -79,6 +87,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
+  "web.tutar.app",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -261,6 +270,52 @@ export const getEmbedLink = (
           </style>
         `),
       intrinsicSize: { w: 550, h: 720 },
+      sandbox: { allowSameOrigin },
+    };
+    embeddedLinkCache.set(link, ret);
+    return ret;
+  }
+
+  const tutarLinkWithUserId = link.match(RE_TUTAR_WITH_USER_ID);
+  if(tutarLinkWithUserId) {
+    const [, apiKey, userId] = link.match(RE_TUTAR_WITH_USER_ID)!;
+    const safeURL = sanitizeHTMLAttribute(
+      `https://web.tutar.app?api-key=${apiKey}&user-id=${userId}`,
+    );
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: () =>
+        createSrcDoc(`
+          <iframe
+            src="https://web.tutar.app?api-key=<API-KEY>"
+            id="3d-viewer"
+            allow="camera"
+            allowFullScreen ></iframe>
+        `),
+      intrinsicSize: { w: 550, h: 550 },
+      sandbox: { allowSameOrigin },
+    };
+    embeddedLinkCache.set(link, ret);
+    return ret;
+  }
+
+  const tutarLinkWithoutUserId = link.match(RE_TUTAR_WITHOUT_USER_ID);
+  if(tutarLinkWithoutUserId) {
+    const [, apiKey] = link.match(RE_TUTAR_WITHOUT_USER_ID)!;
+    const safeURL = sanitizeHTMLAttribute(
+      `https://web.tutar.app?api-key=${apiKey}`,
+    );
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: () =>
+        createSrcDoc(`
+          <iframe
+            src="https://web.tutar.app?api-key=<API-KEY>"
+            id="3d-viewer"
+            allow="camera"
+            allowFullScreen ></iframe>
+        `),
+      intrinsicSize: { w: 550, h: 550 },
       sandbox: { allowSameOrigin },
     };
     embeddedLinkCache.set(link, ret);
