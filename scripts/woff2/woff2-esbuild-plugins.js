@@ -93,7 +93,6 @@ module.exports.woff2ServerPlugin = (options = {}) => {
         },
       );
 
-      // TODO: strip away some unnecessary glyphs
       build.onEnd(async () => {
         if (!generateTtf) {
           return;
@@ -109,6 +108,28 @@ module.exports.woff2ServerPlugin = (options = {}) => {
           return;
         }
 
+        const xiaolaiPath = path.resolve(
+          __dirname,
+          "./assets/Xiaolai-Regular.ttf",
+        );
+        const emojiPath = path.resolve(
+          __dirname,
+          "./assets/NotoEmoji-Regular.ttf",
+        );
+
+        // need to use the same em size as built-in fonts, otherwise pyftmerge throws (modified manually with font forge)
+        const emojiPath_2048 = path.resolve(
+          __dirname,
+          "./assets/NotoEmoji-Regular-2048.ttf",
+        );
+
+        const xiaolaiFont = Font.create(fs.readFileSync(xiaolaiPath), {
+          type: "ttf",
+        });
+        const emojiFont = Font.create(fs.readFileSync(emojiPath), {
+          type: "ttf",
+        });
+
         const sortedFonts = Array.from(fonts.entries()).sort(
           ([family1], [family2]) => (family1 > family2 ? 1 : -1),
         );
@@ -116,13 +137,19 @@ module.exports.woff2ServerPlugin = (options = {}) => {
         // for now we are interested in the regular families only
         for (const [family, { Regular }] of sortedFonts) {
           if (family.includes("Xiaolai")) {
-            // don't generate ttf for Xiaolai, as we have it hardcoded
+            // don't generate ttf for Xiaolai, as we have it hardcoded as one ttf
             continue;
           }
 
-          const baseFont = Regular[0];
+          const fallbackFontsPaths = [];
+          const shouldIncludeXiaolaiFallback = family.includes("Excalifont");
 
-          const tempFilePaths = Regular.map((_, index) =>
+          if (shouldIncludeXiaolaiFallback) {
+            fallbackFontsPaths.push(xiaolaiPath);
+          }
+
+          const baseFont = Regular[0];
+          const tempPaths = Regular.map((_, index) =>
             path.resolve(outputDir, `temp_${family}_${index}.ttf`),
           );
 
@@ -133,38 +160,28 @@ module.exports.woff2ServerPlugin = (options = {}) => {
             }
 
             // write down the buffer
-            fs.writeFileSync(tempFilePaths[index], font.write({ type: "ttf" }));
+            fs.writeFileSync(tempPaths[index], font.write({ type: "ttf" }));
           }
 
-          const fallbackFilePath2048 = path.resolve(
-            __dirname,
-            "./assets/XiaolaiNotoEmoji-2048.ttf",
-          );
-          const fallbackFilePath1000 = path.resolve(
-            __dirname,
-            "./assets/XiaolaiNotoEmoji-1000.ttf",
-          );
-
-          const fallbackBuffer = fs.readFileSync(fallbackFilePath2048);
-          const fallbackFont = Font.create(fallbackBuffer, { type: "ttf" });
           const mergedFontPath = path.resolve(outputDir, `${family}.ttf`);
 
-          if (baseFont.data.head.unitsPerEm !== 1000) {
-            execSync(
-              `pyftmerge --output-file="${mergedFontPath}" "${tempFilePaths.join(
-                '" "',
-              )}" "${fallbackFilePath2048}"`,
-            );
+          if (baseFont.data.head.unitsPerEm === 2048) {
+            fallbackFontsPaths.push(emojiPath_2048);
           } else {
-            execSync(
-              `pyftmerge --output-file="${mergedFontPath}" "${tempFilePaths.join(
-                '" "',
-              )}" "${fallbackFilePath1000}"`,
-            );
+            fallbackFontsPaths.push(emojiPath);
           }
 
+          // drop Vertical related metrics, otherwise it does not allow us to merge the fonts
+          // vhea (Vertical Header Table)
+          // vmtx (Vertical Metrics Table)
+          execSync(
+            `pyftmerge --drop-tables=vhea,vmtx --output-file="${mergedFontPath}" "${tempPaths.join(
+              '" "',
+            )}" "${fallbackFontsPaths.join('" "')}"`,
+          );
+
           // cleanup
-          for (const path of tempFilePaths) {
+          for (const path of tempPaths) {
             fs.rmSync(path);
           }
 
@@ -175,13 +192,22 @@ module.exports.woff2ServerPlugin = (options = {}) => {
             hinting: true,
           });
 
-          // keep copyright & licence per both fonts, as per the OFL licence
+          const getNameField = (field) => {
+            const base = baseFont.data.name[field];
+            const xiaolai = xiaolaiFont.data.name[field];
+            const emoji = emojiFont.data.name[field];
+
+            return shouldIncludeXiaolaiFallback
+              ? `${base} & ${xiaolai} & ${emoji}`
+              : `${base} & ${emoji}`;
+          };
+
           mergedFont.set({
             ...mergedFont.data,
             name: {
               ...mergedFont.data.name,
-              copyright: `${baseFont.data.name.copyright} & ${fallbackFont.data.name.copyright}`,
-              licence: `${baseFont.data.name.licence} & ${fallbackFont.data.name.licence}`,
+              copyright: getNameField("copyright"),
+              licence: getNameField("licence"),
             },
           });
 
@@ -192,7 +218,7 @@ module.exports.woff2ServerPlugin = (options = {}) => {
           console.info(`Generated "${family}"`);
           if (Regular.length > 1) {
             console.info(
-              `- by merging ${Regular.length} woff2 files and 1 fallback ttf file`,
+              `- by merging ${Regular.length} woff2 fonts and related fallback fonts`,
             );
           }
           console.info(
