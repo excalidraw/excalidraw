@@ -8,6 +8,7 @@ import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { isDarwin, isFirefox, isWindows } from "../constants";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import pjson from "../package.json";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -53,6 +54,7 @@ const Header = () => (
 const Section = (props: { title: string; children: React.ReactNode }) => (
   <>
     <h3>{props.title}</h3>
+    <h6>{pjson.version}</h6>
     <div className="HelpDialog__islands-container">{props.children}</div>
   </>
 );
