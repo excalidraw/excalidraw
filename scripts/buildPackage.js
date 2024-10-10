@@ -105,7 +105,7 @@ const rawConfig = {
     ".json": "copy",
     ".woff2": "file",
   },
-  // These must be here otherwise we get duplicate versions of react errors.
+  // These must be here otherwise we get duplicate versions of react errors in Hyperpad.
   // Maybe be a better solution available with dedupe at the link below,
   // but this will do for now.
   // https://github.com/evanw/esbuild/issues/3419
@@ -139,6 +139,7 @@ const createCJSBuild = async () => {
   // Development unminified build with source maps
   await build({
     ...rawConfig,
+    format: 'cjs',
     sourcemap: true,
     outdir: "dist/cjs/dev", // Output directory for CJS dev build
     define: {
