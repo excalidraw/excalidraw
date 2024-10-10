@@ -137,7 +137,8 @@ export type ImageCrop = {
   y: number;
   width: number;
   height: number;
-  naturalDimension: [number, number];
+  naturalWidth: number;
+  naturalHeight: number;
 };
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &

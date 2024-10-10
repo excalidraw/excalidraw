@@ -11,6 +11,7 @@ import {
   vectorScale,
   pointFromVector,
   clamp,
+  isCloseTo,
 } from "../../math";
 import type { TransformHandleType } from "./transformHandles";
 import type {
@@ -64,12 +65,14 @@ export const cropElement = (
 
   let nextWidth = element.width;
   let nextHeight = element.height;
-  const crop = element.crop ?? {
+
+  let crop: ImageCrop | null = element.crop ?? {
     x: 0,
     y: 0,
     width: naturalWidth,
     height: naturalHeight,
-    naturalDimension: [naturalWidth, naturalHeight],
+    naturalWidth,
+    naturalHeight,
   };
 
   const previousCropHeight = crop.height;
@@ -137,6 +140,14 @@ export const cropElement = (
     nextWidth,
     nextHeight,
   );
+
+  // reset crop to null if we're back to orig size
+  if (
+    isCloseTo(crop.width, crop.naturalWidth) &&
+    isCloseTo(crop.height, crop.naturalHeight)
+  ) {
+    crop = null;
+  }
 
   return {
     x: newOrigin[0],
@@ -242,12 +253,12 @@ export const getUncroppedImageElement = (
         topLeftVector,
         vectorScale(
           topEdgeNormalized,
-          (-cropX * width) / element.crop.naturalDimension[0],
+          (-cropX * width) / element.crop.naturalWidth,
         ),
       ),
       vectorScale(
         leftEdgeNormalized,
-        (-cropY * height) / element.crop.naturalDimension[1],
+        (-cropY * height) / element.crop.naturalHeight,
       ),
     );
 
@@ -282,9 +293,9 @@ export const getUncroppedImageElement = (
 export const getUncroppedWidthAndHeight = (element: ExcalidrawImageElement) => {
   if (element.crop) {
     const width =
-      element.width / (element.crop.width / element.crop.naturalDimension[0]);
+      element.width / (element.crop.width / element.crop.naturalWidth);
     const height =
-      element.height / (element.crop.height / element.crop.naturalDimension[1]);
+      element.height / (element.crop.height / element.crop.naturalHeight);
 
     return {
       width,
@@ -309,11 +320,11 @@ const adjustCropPosition = (
   const flipY = scale[1] === -1;
 
   if (flipX) {
-    cropX = crop.naturalDimension[0] - Math.abs(cropX) - crop.width;
+    cropX = crop.naturalWidth - Math.abs(cropX) - crop.width;
   }
 
   if (flipY) {
-    cropY = crop.naturalDimension[1] - Math.abs(cropY) - crop.height;
+    cropY = crop.naturalHeight - Math.abs(cropY) - crop.height;
   }
 
   return {

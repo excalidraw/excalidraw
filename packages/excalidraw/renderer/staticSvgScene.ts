@@ -428,11 +428,9 @@ const renderElementToSvg = (
             symbol.setAttribute(
               "viewBox",
               `${
-                element.crop.x /
-                (element.crop.naturalDimension[0] / uncroppedWidth)
+                element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
               } ${
-                element.crop.y /
-                (element.crop.naturalDimension[1] / uncroppedHeight)
+                element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
               } ${width} ${height}`,
             );
             image.setAttribute("width", `${uncroppedWidth}`);

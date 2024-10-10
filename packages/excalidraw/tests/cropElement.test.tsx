@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { vi } from "vitest";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import type { ExcalidrawImageElement, ImageCrop } from "../element/types";
-import { GlobalTestState, render } from "./test-utils";
+import { act, GlobalTestState, render } from "./test-utils";
 import { Excalidraw, exportToCanvas, exportToSvg } from "..";
 import { API } from "./helpers/api";
 import type { NormalizedZoomValue } from "../types";
@@ -60,15 +60,7 @@ const compareCrops = (cropA: ImageCrop, cropB: ImageCrop) => {
     const propA = cropA[key];
     const propB = cropB[key];
 
-    if (key === "naturalDimension") {
-      const [naturalWidthA, naturalHeightA] = propA as [number, number];
-      const [naturalWidthB, naturalHeightB] = propB as [number, number];
-
-      expect(naturalWidthA).toBeCloseTo(naturalWidthB);
-      expect(naturalHeightA).toBeCloseTo(naturalHeightB);
-    } else {
-      expect(propA as number).toBeCloseTo(propB as number);
-    }
+    expect(propA as number).toBeCloseTo(propB as number);
   });
 };
 
@@ -158,7 +150,9 @@ describe("Cropping and other features", async () => {
     ]);
     Keyboard.keyDown(KEYS.ESCAPE);
     const duplicatedImage = duplicateElement(null, new Map(), image, {});
-    h.app.scene.insertElement(duplicatedImage);
+    act(() => {
+      h.app.scene.insertElement(duplicatedImage);
+    });
 
     expect(duplicatedImage.width).toBe(image.width);
     expect(duplicatedImage.height).toBe(image.height);

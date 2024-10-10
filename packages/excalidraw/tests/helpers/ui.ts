@@ -590,7 +590,7 @@ export class UI {
       clientY + mouseMove[1],
     );
 
-    mutateElement(element, mutations);
+    API.updateElement(element, mutations);
   }
 
   static rotate(

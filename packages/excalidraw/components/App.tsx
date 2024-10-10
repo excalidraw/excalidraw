@@ -5173,15 +5173,19 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private startImageCropping = (image: ExcalidrawImageElement) => {
+    this.store.shouldCaptureIncrement();
     this.setState({
       croppingElementId: image.id,
     });
   };
 
   private finishImageCropping = () => {
-    this.setState({
-      croppingElementId: null,
-    });
+    if (this.state.croppingElementId) {
+      this.store.shouldCaptureIncrement();
+      this.setState({
+        croppingElementId: null,
+      });
+    }
   };
 
   private handleCanvasDoubleClick = (
