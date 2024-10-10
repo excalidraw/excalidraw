@@ -10,7 +10,6 @@ export const actionToggleCropEditor = register({
   name: "cropEditor",
   label: "helpDialog.cropStart",
   icon: cropIcon,
-  paletteName: "Finish image cropping",
   viewMode: true,
   trackEvent: { category: "menu" },
   keywords: ["image", "crop"],
@@ -24,7 +23,7 @@ export const actionToggleCropEditor = register({
       appState: {
         ...appState,
         isCropping: false,
-        croppingElement: selectedElement,
+        croppingElementId: selectedElement.id,
       },
       storeAction: StoreAction.CAPTURE,
     };
