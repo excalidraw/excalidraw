@@ -375,6 +375,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               />
             )}
             <Shortcut
+              label={t("labels.copyAsSvg")}
+              shortcuts={[getShortcutKey("Shift+Ctrl+C")]}
+            />
+            <Shortcut
               label={t("labels.copyStyles")}
               shortcuts={[getShortcutKey("CtrlOrCmd+Alt+C")]}
             />
