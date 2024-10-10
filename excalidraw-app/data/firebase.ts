@@ -43,6 +43,8 @@ const _loadFirebase = async () => {
   ).default;
   await import(/* webpackChunkName: "firebase" */ "firebase/auth");
 
+  await import(/* webpackChunkName: "firebase" */ "firebase/auth");
+
   if (!isFirebaseInitialized) {
     try {
       firebase.initializeApp(customFirebaseConfig);

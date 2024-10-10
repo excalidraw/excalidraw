@@ -1722,4 +1722,117 @@ Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/
 
 ## 0.1.0
 
-First release of `@excalidraw/excalidraw`
+First release of `@excalidraw/excalidraw`## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+### Features
+
+- Support Mermaid Class diagrams 🥳 [#7381](https://github.com/excalidraw/excalidraw/pull/7381)
+
+- Add support for more UML arrowheads [#7391](https://github.com/excalidraw/excalidraw/pull/7391)
+
+- TTD dialog UI tweaks [#7384](https://github.com/excalidraw/excalidraw/pull/7384)
+
+- TTD dialog tweaks [#7346](https://github.com/excalidraw/excalidraw/pull/7346)
+
+- Text-to-diagram [#7325](https://github.com/excalidraw/excalidraw/pull/7325)
+
+- D2c tweaks [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
+
+- Wireframe-to-code [#7334](https://github.com/excalidraw/excalidraw/pull/7334)
+
+- Expose `ActionManager.registerAction` through `ExcalidrawImperativeAPI` [#6995](https://github.com/excalidraw/excalidraw/pull/6995)
+
+- Change frame resizing behavior [#7307](https://github.com/excalidraw/excalidraw/pull/7307)
+
+### Fixes
+
+- Umd build so it can be used in browser [#7349](https://github.com/excalidraw/excalidraw/pull/7349)
+
+- Disable caching bounds for arrow labels [#7343](https://github.com/excalidraw/excalidraw/pull/7343)
+
+- Bounds cached prematurely resulting in incorrectly rendered labels [#7339](https://github.com/excalidraw/excalidraw/pull/7339)
+
+- T2c settings dialog spacing for apps that use CSS resets [#7337](https://github.com/excalidraw/excalidraw/pull/7337)
+
+- Make zoomToFit fitToViewport account for sidebar [#7298](https://github.com/excalidraw/excalidraw/pull/7298)
+
+### Build
+
+- Allow a range of major node versions [#7306](https://github.com/excalidraw/excalidraw/pull/7306)
+
+- Use caret for specifying node version to avoid major upgrades automatically [#7297](https://github.com/excalidraw/excalidraw/pull/7297)
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+## Excalidraw Library
+
+**_This section lists the updates made to the excalidraw library and will not affect the integration._**
+
+---
+
