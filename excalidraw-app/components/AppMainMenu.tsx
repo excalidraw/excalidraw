@@ -29,7 +29,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.ItemLink
+      {/* <MainMenu.ItemLink
         icon={ExcalLogo}
         href={`${
           import.meta.env.VITE_APP_PLUS_LP
@@ -37,8 +37,8 @@ export const AppMainMenu: React.FC<{
         className=""
       >
         Excalidraw+
-      </MainMenu.ItemLink>
-      <MainMenu.DefaultItems.Socials />
+      </MainMenu.ItemLink> */}
+      {/* <MainMenu.DefaultItems.Socials /> */}
       {import.meta.env.DEV && (
         <MainMenu.Item
           icon={eyeIcon}
