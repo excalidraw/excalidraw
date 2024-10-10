@@ -138,7 +138,8 @@ export type ActionName =
   | "commandPalette"
   | "autoResize"
   | "elementStats"
-  | "searchMenu";
+  | "searchMenu"
+  | "cropEditor";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
