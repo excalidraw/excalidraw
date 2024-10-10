@@ -1,6 +1,10 @@
 import React from "react";
 import { KEYS } from "../keys";
+<<<<<<< HEAD:packages/excalidraw/tests/shortcuts.test.tsx
 import { Excalidraw } from "../index";
+=======
+import { Excalidraw } from "../packages/excalidraw";
+>>>>>>> karat:src/tests/shortcuts.test.tsx
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { fireEvent, render, waitFor } from "./test-utils";

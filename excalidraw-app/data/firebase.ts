@@ -14,6 +14,7 @@ import type {
   DataURL,
 } from "../../packages/excalidraw/types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
+<<<<<<< HEAD
 import { decompressData } from "../../packages/excalidraw/data/encode";
 import {
   encryptData,
@@ -30,6 +31,18 @@ import { customFirebaseConfig, customFirebaseToken} from "../App";
 // private
 // -----------------------------------------------------------------------------
 
+=======
+import { decompressData } from "../../src/data/encode";
+import { encryptData, decryptData } from "../../src/data/encryption";
+import { MIME_TYPES } from "../../src/constants";
+import { reconcileElements } from "../collab/reconciliation";
+import { getSyncableElements, SyncableExcalidrawElement } from ".";
+import { ResolutionType } from "../../src/utility-types";
+import { customFirebaseConfig, customFirebaseToken } from "../index";
+
+// private
+// -----------------------------------------------------------------------------
+>>>>>>> karat
 let firebasePromise: Promise<typeof import("firebase/app").default> | null =
   null;
 let firestorePromise: Promise<any> | null | true = null;
@@ -41,6 +54,8 @@ const _loadFirebase = async () => {
   const firebase = (
     await import(/* webpackChunkName: "firebase" */ "firebase/app")
   ).default;
+  await import(/* webpackChunkName: "firebase" */ "firebase/auth");
+
   await import(/* webpackChunkName: "firebase" */ "firebase/auth");
 
   if (!isFirebaseInitialized) {

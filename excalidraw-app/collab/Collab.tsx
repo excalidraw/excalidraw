@@ -80,6 +80,7 @@ import { resetBrowserStateVersions } from "../data/tabSync";
 import { LocalData } from "../data/LocalData";
 import { atom } from "jotai";
 import { appJotaiStore } from "../app-jotai";
+<<<<<<< HEAD
 import type { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
@@ -90,6 +91,9 @@ import type {
 } from "../../packages/excalidraw/data/reconcile";
 import { customCollabServerUrl, onCollabRoomSave } from "../App";
 
+=======
+import { customCollabServerUrl, onCollabRoomSave } from "..";
+>>>>>>> karat
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
@@ -487,6 +491,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     try {
       const socketServerData = await getCollabServer(customCollabServerUrl);
+<<<<<<< HEAD
+=======
+
+>>>>>>> karat
       this.portal.socket = this.portal.open(
         socketIOClient(socketServerData.url, {
           transports: socketServerData.polling
@@ -995,6 +1003,14 @@ if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
   window.collab = window.collab || ({} as Window["collab"]);
 }
 
+<<<<<<< HEAD
 export default Collab;
+=======
+const _Collab: React.FC<PublicProps> = (props) => {
+  return <Collab {...props} modalIsShown={false} />; // modalIsShown={false} will prevent this modal from ever being shown
+};
+
+export default _Collab;
+>>>>>>> karat
 
 export type TCollabClass = Collab;

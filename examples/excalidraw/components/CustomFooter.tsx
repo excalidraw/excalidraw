@@ -1,5 +1,11 @@
+<<<<<<< HEAD:examples/excalidraw/components/CustomFooter.tsx
 import type * as TExcalidraw from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/dist/excalidraw/types";
+=======
+import { ExcalidrawImperativeAPI } from "../../../types";
+import { MIME_TYPES } from "../";
+import { Button } from "../../../components/Button";
+>>>>>>> karat:src/packages/excalidraw/example/CustomFooter.tsx
 
 const COMMENT_SVG = (
   <svg

@@ -1,7 +1,12 @@
 import React from "react";
+<<<<<<< HEAD
 import { loginIcon } from "../../packages/excalidraw/components/icons";
 import { useI18n } from "../../packages/excalidraw/i18n";
 import { WelcomeScreen } from "../../packages/excalidraw/index";
+=======
+import { useI18n } from "../../src/i18n";
+import { WelcomeScreen } from "../../src/packages/excalidraw/index";
+>>>>>>> karat
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { POINTER_EVENTS } from "../../packages/excalidraw/constants";
 

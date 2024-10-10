@@ -1,4 +1,5 @@
 import React from "react";
+<<<<<<< HEAD
 import {
   loginIcon,
   ExcalLogo,
@@ -9,6 +10,10 @@ import { MainMenu } from "../../packages/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
 import { saveDebugState } from "./DebugCanvas";
+=======
+import { MainMenu } from "../../src/packages/excalidraw/index";
+import { LanguageList } from "./LanguageList";
+>>>>>>> karat
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -24,6 +29,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
+<<<<<<< HEAD
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />
@@ -56,6 +62,12 @@ export const AppMainMenu: React.FC<{
           Visual Debug
         </MainMenu.Item>
       )}
+=======
+      <MainMenu.DefaultItems.Help />
+      <MainMenu.DefaultItems.ClearCanvas />
+      <MainMenu.Separator />
+      <MainMenu.DefaultItems.Socials />
+>>>>>>> karat
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme
         allowSystemTheme

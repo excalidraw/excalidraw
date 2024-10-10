@@ -68,6 +68,16 @@ const generateRoomId = async () => {
   return bytesToHexString(buffer);
 };
 
+<<<<<<< HEAD
+=======
+/**
+ * Right now the reason why we resolve connection params (url, polling...)
+ * from upstream is to allow changing the params immediately when needed without
+ * having to wait for clients to update the SW.
+ *
+ * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
+ */
+>>>>>>> karat
 export const getCollabServer = async (
   collabServerUrl: string,
 ): Promise<{
@@ -78,7 +88,11 @@ export const getCollabServer = async (
     url: collabServerUrl,
     polling: true,
   };
+<<<<<<< HEAD
 }
+=======
+};
+>>>>>>> karat
 
 export type EncryptedData = {
   data: ArrayBuffer;

@@ -28,12 +28,22 @@ describe("Test MobileMenu", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+<<<<<<< HEAD
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
         firebaseToken=""
         onCollabRoomSave={() => Promise.resolve()}
       />,
     ); // @ts-ignore
+=======
+        firebaseToken=""
+        theme="dark"
+        excalidrawAPIRefCallback={() => {}}
+        onCollabRoomSave={() => Promise.resolve()}
+      />,
+    );
+    // @ts-ignore
+>>>>>>> karat
     h.app.refreshViewportBreakpoints();
     // @ts-ignore
     h.app.refreshEditorBreakpoints();

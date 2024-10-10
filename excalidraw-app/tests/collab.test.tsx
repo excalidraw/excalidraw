@@ -68,7 +68,11 @@ vi.mock("socket.io-client", () => {
  * i.e. multiplayer history tests could be a good first candidate, as we could test both history stacks simultaneously.
  */
 describe("collaboration", () => {
+<<<<<<< HEAD
   it("should allow to undo / redo even on force-deleted elements", async () => {
+=======
+  it("creating room should reset deleted elements", async () => {
+>>>>>>> karat
     await render(
       <ExcalidrawApp
         firebaseConfig={{
@@ -81,6 +85,7 @@ describe("collaboration", () => {
         collabServerUrl="https://test.com"
         roomLinkData={null}
         username={""}
+<<<<<<< HEAD
         theme="dark"
         excalidrawAPIRefCallback={() => {}}
         firebaseToken=""
@@ -115,6 +120,36 @@ describe("collaboration", () => {
         newElementWith(h.elements[1], { isDeleted: true }),
       ]),
       storeAction: StoreAction.CAPTURE,
+=======
+        firebaseToken=""
+        theme="dark"
+        excalidrawAPIRefCallback={() => {}}
+        onCollabRoomSave={() => Promise.resolve()}
+      />,
+    );
+    // To update the scene with deleted elements before starting collab
+    updateSceneData({
+      elements: [
+        API.createElement({ type: "rectangle", id: "A" }),
+        API.createElement({
+          type: "rectangle",
+          id: "B",
+          isDeleted: true,
+        }),
+      ],
+    });
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: "A" }),
+        expect.objectContaining({ id: "B", isDeleted: true }),
+      ]);
+      expect(API.getStateHistory().length).toBe(1);
+    });
+    window.collab.startCollaboration(null);
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+      expect(API.getStateHistory().length).toBe(1);
+>>>>>>> karat
     });
 
     await waitFor(() => {

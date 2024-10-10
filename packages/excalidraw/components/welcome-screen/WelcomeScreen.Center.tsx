@@ -109,7 +109,11 @@ Center.displayName = "Center";
 
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
+<<<<<<< HEAD:packages/excalidraw/components/welcome-screen/WelcomeScreen.Center.tsx
     <div className="welcome-screen-center__logo excalifont welcome-screen-decor">
+=======
+    <div className="welcome-screen-center__logo virgil welcome-screen-decor">
+>>>>>>> karat:src/components/welcome-screen/WelcomeScreen.Center.tsx
       {/* {children || <ExcalidrawLogo withText />} */}
     </div>
   );
@@ -118,7 +122,11 @@ Logo.displayName = "Logo";
 
 const Heading = ({ children }: { children: React.ReactNode }) => {
   return (
+<<<<<<< HEAD:packages/excalidraw/components/welcome-screen/WelcomeScreen.Center.tsx
     <div className="welcome-screen-center__heading welcome-screen-decor excalifont">
+=======
+    <div className="welcome-screen-center__heading welcome-screen-decor virgil">
+>>>>>>> karat:src/components/welcome-screen/WelcomeScreen.Center.tsx
       {/* {children} */}
     </div>
   );

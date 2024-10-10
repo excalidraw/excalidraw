@@ -11,6 +11,7 @@ import ExcalidrawApp from "../App";
 
 describe("Test LanguageList", () => {
   it("rerenders UI on language change", async () => {
+<<<<<<< HEAD
       await render(
         <ExcalidrawApp
           firebaseConfig={{
@@ -29,6 +30,27 @@ describe("Test LanguageList", () => {
           onCollabRoomSave={() => Promise.resolve()}
         />,
       );
+=======
+    await render(
+      <ExcalidrawApp
+        firebaseConfig={{
+          apiKey: "",
+          authDomain: "",
+          databaseURL: "",
+          projectId: "",
+          storageBucket: "",
+        }}
+        collabServerUrl="https://test.com"
+        roomLinkData={null}
+        username={""}
+        firebaseToken=""
+        theme="dark"
+        excalidrawAPIRefCallback={() => {}}
+        onCollabRoomSave={() => Promise.resolve()}
+      />,
+    );
+
+>>>>>>> karat
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");
     // english lang should display `thin` label
