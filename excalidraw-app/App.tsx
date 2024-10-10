@@ -278,10 +278,8 @@ const initializeScene = async (opts: {
     }
   }
 
-  console.log('roomlinkdata', roomLinkData, opts.collabAPI);
   if (roomLinkData && opts.collabAPI) {
     const { excalidrawAPI } = opts;
-  console.log('exAPi jawn', excalidrawAPI)
     opts.collabAPI.setUsername(customUsername);
 
     const scene = await opts.collabAPI.startCollaboration(roomLinkData);
@@ -328,10 +326,8 @@ const initializeScene = async (opts: {
 };
 
 const ExcalidrawWrapper = () => {
-  console.log('Rendeing ExcalidrawWrapper');
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = false;
-  console.log('Collab disabled', isCollabDisabled);
 
   const [appTheme, setAppTheme] = useAtom(appThemeAtom);
   const { editorTheme } = useHandleAppTheme();

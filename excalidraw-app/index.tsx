@@ -16,7 +16,6 @@ const root = createRoot(rootElement);
 // registerSW();
 
 function App() {
-  console.log('Rendering example app from excalidraw-app/index.tsx');
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
   const excalidrawAPIRefCallback = useCallback(

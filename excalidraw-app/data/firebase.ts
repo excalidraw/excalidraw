@@ -48,7 +48,6 @@ const _loadFirebase = async () => {
       firebase.initializeApp(customFirebaseConfig);
       try {
         try {
-          console.log('customFirebaseToken', customFirebaseToken);
           await firebase.auth().signInWithCustomToken(customFirebaseToken);
         } catch (tokenError) {
           try {

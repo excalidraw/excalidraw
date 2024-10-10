@@ -417,7 +417,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     decryptionKey: string,
   ): Promise<ValueOf<SocketUpdateDataSource>> => {
     try {
-      console.log('decrypting data with', iv, encryptedData, decryptionKey)
       const decrypted = await decryptData(iv, encryptedData, decryptionKey);
 
       const decodedData = new TextDecoder("utf-8").decode(

@@ -11,14 +11,6 @@
     "./index.css": {
       "development": "./dist/dev/App.css",
       "default": "./dist/prod/App.css"
-    },
-    "./eApp.js": {
-      "development": "./dist/excalidraw-app/App.js",
-      "default": "./dist/excalidraw-app/App.js"
-    },
-    "./entry.css": {
-      "development": "./dist/dev/excalidraw-app/entry.css",
-      "default": "./dist/dev/excalidraw-app/entry.css"
     }
   },
   "types": "./dist/excalidraw/index.d.ts",
