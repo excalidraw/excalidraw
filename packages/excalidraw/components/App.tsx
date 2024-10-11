@@ -4943,7 +4943,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
-        this.getElementHitThreshold(),
+        isImageElement(element) ? 0 : this.getElementHitThreshold(),
       );
 
       return isPointInShape(pointFrom(x, y), selectionShape);

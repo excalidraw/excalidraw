@@ -26,6 +26,8 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 
+const MINIMAL_CROP_SIZE = 10;
+
 export const cropElement = (
   element: ExcalidrawImageElement,
   transformHandle: TransformHandleType,
@@ -85,7 +87,7 @@ export const cropElement = (
     const pointerDeltaY = pointerY - element.y;
     nextHeight = clamp(
       element.height - pointerDeltaY,
-      1,
+      MINIMAL_CROP_SIZE,
       isFlippedByY ? uncroppedHeight - croppedTop : element.height + croppedTop,
     );
     crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
@@ -96,7 +98,7 @@ export const cropElement = (
   } else if (transformHandle.includes("s")) {
     nextHeight = clamp(
       pointerY - element.y,
-      1,
+      MINIMAL_CROP_SIZE,
       isFlippedByY ? element.height + croppedTop : uncroppedHeight - croppedTop,
     );
     crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
@@ -112,7 +114,7 @@ export const cropElement = (
 
     nextWidth = clamp(
       element.width - pointerDeltaX,
-      1,
+      MINIMAL_CROP_SIZE,
       isFlippedByX ? uncroppedWidth - croppedLeft : element.width + croppedLeft,
     );
 
@@ -124,7 +126,7 @@ export const cropElement = (
   } else if (transformHandle.includes("e")) {
     nextWidth = clamp(
       pointerX - element.x,
-      1,
+      MINIMAL_CROP_SIZE,
       isFlippedByX ? element.width + croppedLeft : uncroppedWidth - croppedLeft,
     );
     crop.width = nextWidth * naturalWidthToUncropped;
