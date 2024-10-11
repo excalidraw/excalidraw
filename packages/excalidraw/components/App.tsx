@@ -6349,15 +6349,21 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    this.removePointer(event);
-    this.lastPointerUpEvent = event;
+    this.removePointer(event); // always remove pointer on pointerUp
+    this.lastPointerUpEvent = event; // save last pointer up event
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
       this.state,
-    );
+    ); // viewCoords to sceneCoords means we need to adjust for canvas scale, because canvas is scaled to fit the window
     const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
+      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0); // this is to distinguish between click and drag
+
+    // Variable to track the initial pointer down position
+    const pointerDownPosition = {
+      x: this.lastPointerDownEvent?.clientX, // x position of the pointer down event
+      y: this.lastPointerDownEvent?.clientY, // y position of the pointer down event; clientY is a read-only property of the MouseEvent interface that returns the vertical coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the page).
+    };
 
     if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
