@@ -186,6 +186,7 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
+  ExcalidrawElementType,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -6357,7 +6358,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0); // this is to distinguish between click and drag
+      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0); // this is to distinguish between click and drag; a click is less than 300ms, a drag is more than 300ms; 300ms comes from the default value of the clicklength in the browser
 
     // Ensure lastPointerDownEvent is not defined before accessing its properties
     if (!this.lastPointerDownEvent) {
@@ -6375,6 +6376,50 @@ class App extends React.Component<AppProps, AppState> {
       Math.pow(event.clientX - pointerDownPosition.x, 2) +
         Math.pow(event.clientY - pointerDownPosition.y, 2),
     );
+
+    const addElement = (element: any /* : Partial<ExcalidrawElement> */) => {
+      // TODO: here we need the right ExcalidrawElement type
+      const newElement = {
+        ...element,
+        // const id = ... ?
+        // isDeleted: false ?
+        // other properties as needed
+      };
+    };
+
+    // if the distance is less than 5px and the click length is less than 300ms, then it is a click
+    const dragTreshold = 5;
+    if (distanceMoved < dragTreshold && clicklength < 300) {
+      // check the selected tool for shape creation
+      if (
+        [
+          "rectangle",
+          "ellipse",
+          "diamond",
+          "arrow",
+          "line",
+          "freedraw",
+        ].includes(this.state.activeTool.type)
+      ) {
+        const newElement = {
+          // TODO: here we need the right ExcalidrawElement type
+
+          type: this.state.activeTool.type,
+          width: 100,
+          height: 100,
+          x: scenePointer.x - 50, // Center the shape
+          y: scenePointer.y - 50, // Center the shape
+          // For later: Inlude other properties as needed (color, stroke, etc.)
+        };
+
+        // Add the new element to the scene (call the function from above)
+        addElement(newElement);
+      }
+    }
+
+    this.setState((prevState) => ({
+      // ....
+    })); // TODO: Update the state with the new element
 
     if (this.device.editor.isMobile && clicklength < 300) {
       const hitElement = this.getElementAtPosition(
