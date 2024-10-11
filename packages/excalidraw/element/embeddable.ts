@@ -287,7 +287,7 @@ export const getEmbedLink = (
       srcdoc: () =>
         createSrcDoc(`
           <iframe
-            src="https://web.tutar.app?api-key=<API-KEY>"
+            src="${safeURL}"
             id="3d-viewer"
             allow="camera"
             allowFullScreen ></iframe>
@@ -310,7 +310,7 @@ export const getEmbedLink = (
       srcdoc: () =>
         createSrcDoc(`
           <iframe
-            src="https://web.tutar.app?api-key=<API-KEY>"
+            src="${safeURL}"
             id="3d-viewer"
             allow="camera"
             allowFullScreen ></iframe>
