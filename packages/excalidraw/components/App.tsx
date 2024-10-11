@@ -6036,6 +6036,8 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
+    this.lastPointerDownEvent = event; // set the pointer down event and store the inital value
+
     if (this.state.searchMatches) {
       this.setState((state) => ({
         searchMatches: state.searchMatches.map((searchMatch) => ({
