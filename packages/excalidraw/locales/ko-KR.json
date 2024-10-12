@@ -243,7 +243,7 @@
     "saveLibraryError": "라이브러리를 저장공간에 저장하지 못했습니다. 변경 사항들을 잃지 않으려면 라이브러리를 로컬 저장소에 저장하여 주세요.",
     "collabSaveFailed": "데이터베이스에 저장하지 못했습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
     "collabSaveFailed_sizeExceeded": "데이터베이스에 저장하지 못했습니다. 캔버스가 너무 큰 거 같습니다. 문제가 계속 된다면, 작업 내용을 잃지 않도록 로컬 저장소에 저장해 주세요.",
-    "imageToolNotSupported": "",
+    "imageToolNotSupported": "이미지가 비활성화되어 있습니다.",
     "brave_measure_text_error": {
       "line1": "귀하께서는 <bold>강력한 지문 차단 설정</bold>이 활성화된 Brave browser를 사용하고 계신 것 같습니다.",
       "line2": "이 기능으로 인해 화이트보드의 <bold>텍스트 요소들</bold>이 손상될 수 있습니다.",
@@ -252,12 +252,12 @@
     },
     "libraryElementTypeError": {
       "embeddable": "임베드 요소들은 라이브러리에 추가할 수 없습니다.",
-      "iframe": "",
+      "iframe": "IFrame 요소는 라이브러리에 추가할 수 없습니다.",
       "image": "라이브러리에 이미지 삽입 기능은 곧 지원될 예정입니다!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "붙여넣는 데 실패했습니다(시스템 클립보드를 읽을 수 없습니다).",
+    "asyncPasteFailedOnParse": "붙여넣는 데 실패했습니다.",
+    "copyToSystemClipboardFailed": "클립보드로 복사하지 못했습니다."
   },
   "toolBar": {
     "selection": "선택",
@@ -272,31 +272,31 @@
     "library": "라이브러리",
     "lock": "선택된 도구 유지하기",
     "penMode": "펜 모드 - 터치 방지",
-    "link": "",
+    "link": "선택한 도형에 링크 추가 / 변경",
     "eraser": "지우개",
     "frame": "프레임 도구",
-    "magicframe": "",
+    "magicframe": "와이어프레임을 코드로",
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid를 Excalidraw로"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "rectangle": "직사각형",
+    "diamond": "마름모",
+    "ellipse": "타원",
+    "arrow": "화살표",
+    "line": "선",
+    "freedraw": "자유 선",
+    "text": "텍스트",
+    "image": "이미지",
+    "group": "그룹",
+    "frame": "프레임",
+    "magicframe": "와이어프레임을 코드로",
+    "embeddable": "웹 임베드",
+    "selection": "선택한 요소",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "캔버스 동작",
@@ -304,10 +304,10 @@
     "shapes": "모양"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "ESC를 눌러서 검색 종료",
     "canvasPanning": "캔버스를 옮기려면 마우스 휠이나 스페이스바를 누르고 드래그하거나, 손 도구를 사용하기",
     "linearElement": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요.",
-    "arrowTool": "",
+    "arrowTool": "여러 점을 연결하려면 클릭하고, 직선을 그리려면 바로 드래그하세요. 화살표 종류를 바꾸려면 {{arrowShortcut}} 키를 누르세요.",
     "freeDraw": "클릭 후 드래그하세요. 완료되면 놓으세요.",
     "text": "팁: 선택 툴로 아무 곳이나 더블 클릭해 텍스트를 추가할 수도 있습니다.",
     "embeddable": "클릭 및 드래그하여 웹사이트 임베드 만들기",
