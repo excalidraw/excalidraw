@@ -97,30 +97,33 @@ export const updateElbowArrowPoints = (
   const points = Array.from(updates.points);
   const unified = parts
     .map(([startIdx, endIdx], id) => {
-      if (startIdx !== 0) {
+      if (startIdx !== 0 && !updates.fixedSegments?.length) {
         points[startIdx] = arrow.points[startIdx];
+        debugDrawPoint(
+          pointFrom<GlobalPoint>(
+            arrow.x + points[startIdx][0],
+            arrow.y + points[startIdx][1],
+          ),
+          {
+            //color: id === 0 ? "green" : "red",
+            color: "green",
+          },
+        );
       }
-      if (endIdx !== points.length - 1) {
+      if (endIdx !== points.length - 1 && !updates.fixedSegments?.length) {
         points[endIdx] = arrow.points[endIdx];
+        debugDrawPoint(
+          pointFrom<GlobalPoint>(
+            arrow.x + points[endIdx][0],
+            arrow.y + points[endIdx][1],
+          ),
+          {
+            //color: id === 0 ? "green" : "red",
+            color: "red",
+          },
+        );
       }
-      debugDrawPoint(
-        pointFrom<GlobalPoint>(
-          arrow.x + points[startIdx][0],
-          arrow.y + points[startIdx][1],
-        ),
-        {
-          color: id === 0 ? "green" : "red",
-        },
-      );
-      debugDrawPoint(
-        pointFrom<GlobalPoint>(
-          arrow.x + points[endIdx][0],
-          arrow.y + points[endIdx][1],
-        ),
-        {
-          color: id === 0 ? "green" : "red",
-        },
-      );
+
       return (
         routeElbowArrow(
           {
@@ -145,14 +148,18 @@ export const updateElbowArrowPoints = (
       );
     })
     .flatMap((segment, idx, segments) => {
-      if (idx === 0) {
-        return segment.slice(0, -1);
-      }
-      if (idx === segments.length - 1) {
-        return segment.slice(1);
+      if (segments.length > 1) {
+        if (idx === 0) {
+          return segment.slice(0, -1);
+        }
+        if (idx === segments.length - 1) {
+          return segment.slice(1);
+        }
+
+        return segment.slice(1, -1);
       }
 
-      return segment.slice(1, -1);
+      return segment;
     });
 
   return normalizedArrowElementUpdate(unified, nextFixedSegments);
