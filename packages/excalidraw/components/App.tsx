@@ -446,7 +446,6 @@ import {
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom, pointDistance, vector } from "../../math";
-import { fixBindingsAfterDuplication2 } from "../element/bindingTest";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -7959,13 +7958,7 @@ class App extends React.Component<AppProps, AppState> {
               elementsToAppend,
               oldIdToDuplicatedId,
             );
-            // fixBindingsAfterDuplication(
-            //   nextSceneElements,
-            //   elementsToAppend,
-            //   oldIdToDuplicatedId,
-            //   "duplicatesServeAsOld",
-            // );
-            fixBindingsAfterDuplication2(
+            fixBindingsAfterDuplication(
               nextSceneElements,
               elementsToAppend,
               oldIdToDuplicatedId,
