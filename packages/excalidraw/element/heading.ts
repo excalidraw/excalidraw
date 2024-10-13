@@ -68,7 +68,7 @@ export const headingForPointFromElement = <
 >(
   element: Readonly<ExcalidrawBindableElement>,
   aabb: Readonly<Bounds>,
-  p: Readonly<LocalPoint | GlobalPoint>,
+  p: Readonly<Point>,
 ): Heading => {
   const SEARCH_CONE_MULTIPLIER = 2;
 
@@ -122,14 +122,22 @@ export const headingForPointFromElement = <
       element.angle,
     );
 
-    if (triangleIncludesPoint([top, right, midPoint] as Triangle<Point>, p)) {
+    if (
+      triangleIncludesPoint<Point>([top, right, midPoint] as Triangle<Point>, p)
+    ) {
       return headingForDiamond(top, right);
     } else if (
-      triangleIncludesPoint([right, bottom, midPoint] as Triangle<Point>, p)
+      triangleIncludesPoint<Point>(
+        [right, bottom, midPoint] as Triangle<Point>,
+        p,
+      )
     ) {
       return headingForDiamond(right, bottom);
     } else if (
-      triangleIncludesPoint([bottom, left, midPoint] as Triangle<Point>, p)
+      triangleIncludesPoint<Point>(
+        [bottom, left, midPoint] as Triangle<Point>,
+        p,
+      )
     ) {
       return headingForDiamond(bottom, left);
     }
@@ -158,17 +166,17 @@ export const headingForPointFromElement = <
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
 
-  return triangleIncludesPoint(
+  return triangleIncludesPoint<Point>(
     [topLeft, topRight, midPoint] as Triangle<Point>,
     p,
   )
     ? HEADING_UP
-    : triangleIncludesPoint(
+    : triangleIncludesPoint<Point>(
         [topRight, bottomRight, midPoint] as Triangle<Point>,
         p,
       )
     ? HEADING_RIGHT
-    : triangleIncludesPoint(
+    : triangleIncludesPoint<Point>(
         [bottomRight, bottomLeft, midPoint] as Triangle<Point>,
         p,
       )
