@@ -12,7 +12,7 @@ import {
   FONT_FAMILY,
   FONT_FAMILY_FALLBACKS,
   WINDOWS_EMOJI_FALLBACK_FONT,
-  CJK_HANDWRITTEN_FALLBACK_FONT,
+  CJK_HAND_DRAWN_FALLBACK_FONT,
 } from "../constants";
 import { FONT_METADATA, type FontMetadata } from "./metadata";
 import { charWidth, getContainerElement } from "../element/textElement";
@@ -111,7 +111,7 @@ export class Fonts {
         didUpdate = true;
         ShapeCache.delete(element);
 
-        // clear the width cache, so that we don't perform subsuequnt wrapping based on the stale fallback font metrics
+        // clear the width cache, so that we don't perform subsequent wrapping based on the stale fallback font metrics
         charWidth.clearCache(getFontString(element));
 
         const container = getContainerElement(element, elementsMap);
@@ -240,7 +240,7 @@ export class Fonts {
     init("Virgil", ...VirgilFontFaces);
 
     // fallback font faces
-    init(CJK_HANDWRITTEN_FALLBACK_FONT, ...XiaolaiFontFaces);
+    init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);
     init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
 
     Fonts._initialized = true;

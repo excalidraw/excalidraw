@@ -92,7 +92,7 @@ const lazyLoadSharedSubsetChunk = async () => {
   return subsetShared;
 };
 
-// TODO: could be extended with multiple commands in the future
+// could be extended with multiple commands in the future
 type SubsetWorkerData = {
   command: typeof Commands.Subset;
   arrayBuffer: ArrayBuffer;

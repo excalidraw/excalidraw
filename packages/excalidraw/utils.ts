@@ -1207,6 +1207,8 @@ export class PromisePool<T> {
   public all() {
     const listener = (event: { data: { result: void | [number, T] } }) => {
       if (event.data.result) {
+        // by default pool does not return the results, so we are gathering them manually
+        // with the correct call order (represented by the index in the tuple)
         const [index, value] = event.data.result;
         this.entries[index] = value;
       }

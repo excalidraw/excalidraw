@@ -116,8 +116,7 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   }
 
   private getUnicodeRangeRegex() {
-    // TODO: consider having actual unicode ranges for all the fonts or even splitting the exiting fonts based on the ranges
-    const ranges = this.fontFace.unicodeRange
+    const unicodeRangeRegex = this.fontFace.unicodeRange
       .split(/,\s*/)
       .map((range) => {
         const [start, end] = range.replace("U+", "").split("-");
@@ -128,12 +127,12 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
       })
       .join("");
 
-    return new RegExp(`[${ranges}]`);
+    return new RegExp(`[${unicodeRangeRegex}]`);
   }
 
   private static createUrls(uri: string): URL[] | DataURL[] {
     if (uri.startsWith("data")) {
-      // don't create the URL as it's expensive
+      // don't create the URL instance, as parsing the huge dataurl string is expensive
       return [uri];
     }
 

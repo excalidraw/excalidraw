@@ -36,8 +36,8 @@ export class WorkerPool<T, R> {
     },
   ) {
     this.workerUrl = workerUrl;
-    // by default, active & idle workers will be terminated after 5 seconds of inactivity
-    this.workerTTL = options.ttl || 5_000;
+    // by default, active & idle workers will be terminated after 500ms of inactivity
+    this.workerTTL = options.ttl || 500;
 
     this.initWorker = options.initWorker;
   }
@@ -124,11 +124,13 @@ export class WorkerPool<T, R> {
         this.idleWorkers.delete(worker);
 
         // eslint-disable-next-line no-console
-        console.debug("Idle worker has been released from the pool.");
+        console.debug(
+          "Job finished! Idle worker has been released from the pool.",
+        );
       } else if (reject) {
         reject();
       } else {
-        console.error("Active worker has been terminated!");
+        console.error("Worker has been terminated!");
       }
     }, this.workerTTL);
 

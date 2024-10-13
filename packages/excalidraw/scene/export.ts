@@ -27,7 +27,7 @@ import {
   THEME_FILTER,
   FONT_FAMILY_FALLBACKS,
   getFontFamilyFallbacks,
-  CJK_HANDWRITTEN_FALLBACK_FONT,
+  CJK_HAND_DRAWN_FALLBACK_FONT,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -483,7 +483,7 @@ const getFontFaces = async (
   const uniqueCodePoints = Array.from(codePoints);
 
   const containsCJKFallback = orderedFamilies.find((x) =>
-    getFontFamilyFallbacks(x).includes(CJK_HANDWRITTEN_FALLBACK_FONT),
+    getFontFamilyFallbacks(x).includes(CJK_HAND_DRAWN_FALLBACK_FONT),
   );
 
   // quick check for Han might match a bit more, which is fine
@@ -491,7 +491,7 @@ const getFontFaces = async (
     // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
     // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
     orderedFamilies.unshift(
-      FONT_FAMILY_FALLBACKS[CJK_HANDWRITTEN_FALLBACK_FONT],
+      FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT],
     );
   }
 

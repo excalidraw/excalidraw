@@ -82,6 +82,8 @@ const _CJK_CHAR =
 const _CJK_BREAK_NOT_AFTER_BUT_BEFORE = /<\(\[\{/u;
 const _CJK_BREAK_NOT_BEFORE_BUT_AFTER = />\)\]\}.,:;\?!/u;
 const _CJK_BREAK_ALWAYS = /　〃〜～〰＃＆＊＋－／＝｜￢￣￤/u;
+const _CJK_SYMBOLS_AND_PUNCTUATION =
+  /（）［］｛｝〈〉《》｟｠｢｣「」『』【】〖〗〔〕〘〙〚〛＜＞〝〞＇〟・。ﾟﾞ，、．：；？！％ー/u;
 
 /**
  * Following characters break with any character, even though are mostly used with CJK.
@@ -180,7 +182,11 @@ const getBreakLineRegex = () => {
   return cachedBreakLineRegex;
 };
 
-const CJK_REGEX = new RegExp(`[${_CJK_CHAR.source}]`, "u");
+const CJK_REGEX = new RegExp(
+  `[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}${_CJK_SYMBOLS_AND_PUNCTUATION.source}]`,
+  "u",
+);
+
 const EMOJI_REGEX = new RegExp(`${_EMOJI_CHAR.source}`, "u");
 
 export const containsCJK = (text: string) => {
@@ -572,12 +578,11 @@ export const getTextHeight = (
 export const parseTokens = (line: string) => {
   const breakLineRegex = getBreakLineRegex();
 
-  // TODO: consider using a debounced-cache for the tokens (i.e. based on the line hash, as can be done only once during a resize)
-  // filtering due to multi-codepoint chars like 🗺
+  // filtering due to multi-codepoint chars like 👨‍👩‍👧‍👦
   return line.split(breakLineRegex).filter(Boolean);
 };
 
-// handles multi-byte chars (é, 中) and purposefully does not handle multi-codepoint char (🌍, 👩🏽‍🦰)
+// handles multi-byte chars (é, 中) and purposefully does not handle multi-codepoint char (👨‍👩‍👧‍👦, 👩🏽‍🦰)
 const isSingleCharacter = (maybeSingleCharacter: string) => {
   return (
     maybeSingleCharacter.codePointAt(0) !== undefined &&
