@@ -3934,8 +3934,8 @@ class App extends React.Component<AppProps, AppState> {
     (containers: NonDeletedExcalidrawElement[]) => {
       containers.forEach((el: ExcalidrawElement) => {
         const [x, y] = pointRotateRads(
-          point(el.x + el.width, el.y + el.height),
-          point(el.x + el.width / 2, el.y + el.height / 2),
+          pointFrom(el.x + el.width, el.y + el.height),
+          pointFrom(el.x + el.width / 2, el.y + el.height / 2),
           el.angle,
         );
         resizeSingleElement(
