@@ -116,18 +116,21 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   }
 
   private getUnicodeRangeRegex() {
+    // using \u{h} or \u{hhhhh} to match even more digits, otherwise we get an "Invalid Unicode escape" error
+    // e.g. U+0-1007F -> \u{0}-\u{1007F}
     const unicodeRangeRegex = this.fontFace.unicodeRange
       .split(/,\s*/)
       .map((range) => {
         const [start, end] = range.replace("U+", "").split("-");
         if (end) {
-          return `\\u${start}-\\u${end}`;
+          return `\\u{${start}}-\\u{${end}}`;
         }
-        return `\\u${start}`;
+
+        return `\\u{${start}}`;
       })
       .join("");
 
-    return new RegExp(`[${unicodeRangeRegex}]`);
+    return new RegExp(`[${unicodeRangeRegex}]`, "u");
   }
 
   private static createUrls(uri: string): URL[] | DataURL[] {
