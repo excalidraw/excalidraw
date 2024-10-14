@@ -32,7 +32,7 @@ export const subsetWoff2GlyphsByCodepoints = async (
 
   return promiseTry(async () => {
     try {
-      const workerPool = await getOrCreateWorkerPool(codePoints);
+      const workerPool = await getOrCreateWorkerPool();
       // copy the buffer to avoid working on top of the detached array buffer in the fallback
       // i.e. in case the worker throws, the array buffer does not get automatically detached, even if the worker is terminated
       const arrayBufferCopy = arrayBuffer.slice(0);
@@ -40,6 +40,7 @@ export const subsetWoff2GlyphsByCodepoints = async (
         {
           command: Commands.Subset,
           arrayBuffer: arrayBufferCopy,
+          codePoints,
         } as const,
         { transfer: [arrayBufferCopy] },
       );
@@ -96,6 +97,7 @@ const lazyLoadSharedSubsetChunk = async () => {
 type SubsetWorkerData = {
   command: typeof Commands.Subset;
   arrayBuffer: ArrayBuffer;
+  codePoints: Array<number>;
 };
 
 type SubsetWorkerResult<T extends SubsetWorkerData["command"]> =
@@ -110,22 +112,16 @@ let workerPool: Promise<
  *
  * @throws implicitly if anything goes wrong - worker pool creation, loading wasm, initializing worker, etc.
  */
-const getOrCreateWorkerPool = (codePoints: Array<number>) => {
+const getOrCreateWorkerPool = () => {
   if (!workerPool) {
     // immediate concurrent-friendly return, to ensure we have only one pool instance
     workerPool = promiseTry(async () => {
       const { WorkerUrl } = await lazyLoadWorkerSubsetChunk();
-      const { Commands } = await lazyLoadSharedSubsetChunk();
 
       const pool = WorkerPool.create<
         SubsetWorkerData,
         SubsetWorkerResult<SubsetWorkerData["command"]>
-      >(WorkerUrl, {
-        initWorker: (worker: Worker) => {
-          // initialize the newly created worker with codepoints
-          worker.postMessage({ command: Commands.Init, codePoints });
-        },
-      });
+      >(WorkerUrl);
 
       return pool;
     });

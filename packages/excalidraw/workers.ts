@@ -1,8 +1,6 @@
 import { WorkerInTheMainChunkError, WorkerUrlNotDefinedError } from "./errors";
 import { debounce } from "./utils";
 
-type InitializeWorker = (worker: Worker) => void;
-
 class IdleWorker {
   public instance: Worker;
 
@@ -26,20 +24,15 @@ export class WorkerPool<T, R> {
   private readonly workerUrl: URL;
   private readonly workerTTL: number;
 
-  private readonly initWorker: InitializeWorker;
-
   private constructor(
     workerUrl: URL,
     options: {
-      initWorker: InitializeWorker;
       ttl?: number;
     },
   ) {
     this.workerUrl = workerUrl;
     // by default, active & idle workers will be terminated after 500ms of inactivity
     this.workerTTL = options.ttl || 500;
-
-    this.initWorker = options.initWorker;
   }
 
   /**
@@ -53,9 +46,8 @@ export class WorkerPool<T, R> {
   public static create<T, R>(
     workerUrl: URL | undefined,
     options: {
-      initWorker: InitializeWorker;
       ttl?: number;
-    },
+    } = {},
   ): WorkerPool<T, R> {
     if (!workerUrl) {
       throw new WorkerUrlNotDefinedError();
@@ -133,8 +125,6 @@ export class WorkerPool<T, R> {
         console.error("Worker has been terminated!");
       }
     }, this.workerTTL);
-
-    this.initWorker(worker.instance);
 
     return worker;
   }

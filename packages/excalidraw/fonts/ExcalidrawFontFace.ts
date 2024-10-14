@@ -116,7 +116,8 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   }
 
   private getUnicodeRangeRegex() {
-    // using \u{h} or \u{hhhhh} to match even more digits, otherwise we get an "Invalid Unicode escape" error
+    // using \u{h} or \u{hhhhh} to match any number of hex digits,
+    // otherwise we would get an "Invalid Unicode escape" error
     // e.g. U+0-1007F -> \u{0}-\u{1007F}
     const unicodeRangeRegex = this.fontFace.unicodeRange
       .split(/,\s*/)

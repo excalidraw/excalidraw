@@ -14,7 +14,6 @@ import loadHbSubset from "../wasm/hb-subset-loader";
  * Shared commands between the main thread and worker threads.
  */
 export const Commands = {
-  Init: "INIT",
   Subset: "SUBSET",
 } as const;
 
