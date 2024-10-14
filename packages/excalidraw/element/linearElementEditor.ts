@@ -1275,17 +1275,13 @@ export class LinearElementEditor {
 
     if (isElbowArrow(element)) {
       otherUpdates = otherUpdates || {};
-      otherUpdates.fixedSegments = Array.from(
-        new Set([
-          ...(element.fixedSegments ?? []),
-          // The segments being fixed are always the
-          // sub-ranges (minus their first idx)
-          ...targetPoints
-            .map((target) => target.index)
-            .sort()
-            .filter((i, _, a) => a.findIndex((t) => t === i - 1) > -1),
-        ]),
-      ).sort();
+      // The segments being fixed are always the
+      // sub-ranges (minus their first idx)
+      otherUpdates.fixedSegments = targetPoints
+        .map((target) => target.index)
+        .sort()
+        .filter((i, _, a) => a.findIndex((t) => t === i - 1) > -1)
+        .sort();
     }
 
     LinearElementEditor._updatePoints(
