@@ -528,11 +528,20 @@ break it now`,
       ]);
     });
 
+    it("should tokenize decomposed chars into their composed variants", () => {
+      // each input character is in a decomposed form
+      const text = "čでäぴέ다й한";
+      expect(text.normalize("NFC").length).toEqual(8);
+      expect(text).toEqual(text.normalize("NFD"));
+
+      const tokens = parseTokens(text);
+      expect(tokens.length).toEqual(8);
+      expect(tokens).toEqual(["č", "で", "ä", "ぴ", "έ", "다", "й", "한"]);
+    });
+
     it("should tokenize artificial CJK", () => {
       const text = `《道德經》醫-醫こんにちは世界！안녕하세요세계；다.다...원/달(((다)))[[1]]〚({((한))>)〛た…[Hello] World？ニューヨーク・￥3700.55す。090-1234-5678￥1,000〜＄5,000「素晴らしい！」〔重要〕＃１：Taro君30％は、（たなばた）〰￥110±￥570で20℃〜9:30〜10:00【一番】`;
-      const tokens = parseTokens(text);
 
-      // console.log(tokens);
       // [
       //   '《道',    '德',             '經》',        '醫-',
       //   '醫',      'こ',             'ん',          'に',
@@ -553,6 +562,7 @@ break it now`,
       //   '9:30',    '〜',             '10:00',       '【一',
       //   '番】'
       // ]
+      const tokens = parseTokens(text);
 
       // Latin
       expect(tokens).toContain("[[1]]");

@@ -578,8 +578,9 @@ export const getTextHeight = (
 export const parseTokens = (line: string) => {
   const breakLineRegex = getBreakLineRegex();
 
-  // filtering due to multi-codepoint chars like 👨‍👩‍👧‍👦
-  return line.split(breakLineRegex).filter(Boolean);
+  // normalizing to single-codepoint composed chars due to canonical equivalence of multi-codepoint versions for chars like č, で (~ so that we don't break a line in between c and ˇ)
+  // filtering due to multi-codepoint chars like 👨‍👩‍👧‍👦, 👩🏽‍🦰
+  return line.normalize("NFC").split(breakLineRegex).filter(Boolean);
 };
 
 // handles multi-byte chars (é, 中) and purposefully does not handle multi-codepoint char (👨‍👩‍👧‍👦, 👩🏽‍🦰)
