@@ -13,6 +13,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawBounds } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -327,7 +328,10 @@ export const updateElbowArrowPoints = (
             endPoint![1] - startPoint![1],
           ),
         ],
-        options,
+        {
+          ...options,
+          disableDongles: true,
+        },
       ) ?? [],
   );
 
@@ -360,6 +364,7 @@ const routeElbowArrow = (
   options?: {
     isDragging?: boolean;
     disableBinding?: boolean;
+    disableDongles?: boolean;
   },
 ): GlobalPoint[] | null => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -426,25 +431,29 @@ const routeElbowArrow = (
   const startElementBounds = hoveredStartElement
     ? aabbForElement(
         hoveredStartElement,
-        offsetFromHeading(
-          startHeading,
-          arrow.startArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
-          1,
-        ),
+        options?.disableDongles
+          ? [0, 0, 0, 0]
+          : offsetFromHeading(
+              startHeading,
+              arrow.startArrowhead
+                ? FIXED_BINDING_DISTANCE * 6
+                : FIXED_BINDING_DISTANCE * 2,
+              1,
+            ),
       )
     : startPointBounds;
   const endElementBounds = hoveredEndElement
     ? aabbForElement(
         hoveredEndElement,
-        offsetFromHeading(
-          endHeading,
-          arrow.endArrowhead
-            ? FIXED_BINDING_DISTANCE * 6
-            : FIXED_BINDING_DISTANCE * 2,
-          1,
-        ),
+        options?.disableDongles
+          ? [0, 0, 0, 0]
+          : offsetFromHeading(
+              endHeading,
+              arrow.endArrowhead
+                ? FIXED_BINDING_DISTANCE * 6
+                : FIXED_BINDING_DISTANCE * 2,
+              1,
+            ),
       )
     : endPointBounds;
   const boundsOverlap =
@@ -511,6 +520,9 @@ const routeElbowArrow = (
     hoveredStartElement && aabbForElement(hoveredStartElement),
     hoveredEndElement && aabbForElement(hoveredEndElement),
   );
+
+  dynamicAABBs.forEach((b) => debugDrawBounds(b));
+
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -525,9 +537,13 @@ const routeElbowArrow = (
   // Canculate Grid positions
   const grid = calculateGrid(
     dynamicAABBs,
-    startDonglePosition ? startDonglePosition : startGlobalPoint,
+    startDonglePosition && !options?.disableDongles
+      ? startDonglePosition
+      : startGlobalPoint,
     startHeading,
-    endDonglePosition ? endDonglePosition : endGlobalPoint,
+    endDonglePosition && !options?.disableDongles
+      ? endDonglePosition
+      : endGlobalPoint,
     endHeading,
     commonBounds,
   );
@@ -547,6 +563,7 @@ const routeElbowArrow = (
     startNode.closed = true;
   }
   const dongleOverlap =
+    !options?.disableDongles &&
     startDongle &&
     endDongle &&
     (pointInsideBounds(startDongle.pos, dynamicAABBs[1]) ||
