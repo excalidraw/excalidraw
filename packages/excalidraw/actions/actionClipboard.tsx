@@ -156,7 +156,6 @@ export const actionCopyAsSvg = register({
 
       return {
         appState: {
-          ...appState,
           toast: {
             message: t("toast.copyToClipboardAsSvg", {
               exportSelection: selectedElements.length
@@ -174,7 +173,6 @@ export const actionCopyAsSvg = register({
       console.error(error);
       return {
         appState: {
-          ...appState,
           errorMessage: error.message,
         },
         storeAction: StoreAction.NONE,
