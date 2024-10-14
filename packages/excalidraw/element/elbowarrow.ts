@@ -1,5 +1,4 @@
 import {
-  lineSegment,
   pointFrom,
   pointScaleFromOrigin,
   pointTranslate,
@@ -13,8 +12,7 @@ import {
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
-import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds, debugDrawLine, debugDrawPoint } from "../visualdebug";
+import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -94,6 +92,7 @@ const createFakeElement = (
 const mapSegmentsToFakeMidElements = (
   arrow: ExcalidrawElbowArrowElement,
   segments: number[][],
+  points: LocalPoint[],
 ): {
   el: Ordered<ExcalidrawElement> | null;
   startHeading: Heading | null;
@@ -116,21 +115,19 @@ const mapSegmentsToFakeMidElements = (
     }
 
     const start = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[prevSegment[1]][0],
-      arrow.y + arrow.points[prevSegment[1]][1],
+      arrow.x + points[prevSegment[1]][0],
+      arrow.y + points[prevSegment[1]][1],
     );
     const end = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[startIdx][0],
-      arrow.y + arrow.points[startIdx][1],
+      arrow.x + points[startIdx][0],
+      arrow.y + points[startIdx][1],
     );
     const el = createFakeElement(
       arrow,
-      arrow.points[prevSegment[1]],
-      arrow.points[startIdx],
+      points[prevSegment[1]],
+      points[startIdx],
     );
     const bounds = [el.x, el.y, el.x + el.width, el.y + el.height] as Bounds;
-
-    debugDrawBounds(bounds);
 
     prevSegment = [startIdx, endIdx];
 
@@ -190,7 +187,25 @@ export const updateElbowArrowPoints = (
   const points = Array.from(updates.points);
 
   // Determine the arrow parts based on fixed segments
-  const segments = getArrowSegments(nextFixedSegments, updates.points);
+  const segments = getArrowSegments(nextFixedSegments, points);
+
+  // Override segment end points
+  segments.forEach(([startIdx, endIdx], segmentIdx) => {
+    if (
+      startIdx !== 0 &&
+      !updates.fixedSegments?.[segmentIdx] &&
+      arrow.fixedSegments?.[segmentIdx]
+    ) {
+      points[startIdx] = arrow.points[startIdx];
+    }
+    if (
+      endIdx !== arrow.points.length - 1 &&
+      !updates.fixedSegments?.[segmentIdx] &&
+      arrow.fixedSegments?.[segmentIdx]
+    ) {
+      points[endIdx] = arrow.points[arrow.points.length - 1];
+    }
+  });
 
   // Create a fake element at every segment mid point
   const segmentUpdates: {
@@ -202,18 +217,18 @@ export const updateElbowArrowPoints = (
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
-  }[] = segments.map(() => ({
+  }[] = segments.map(([startIdx, endIdx]) => ({
     startPoint: null,
     endPoint: null,
-    startIdx: -1,
-    endIdx: -1,
+    startIdx,
+    endIdx,
     startBinding: null,
     endBinding: null,
     startArrowhead: null,
     endArrowhead: null,
   }));
 
-  mapSegmentsToFakeMidElements(arrow, segments).forEach(
+  mapSegmentsToFakeMidElements(arrow, segments, points).forEach(
     (item, idx, elements) => {
       if (item.el) {
         fakeElementsMap.set(item.el.id, item.el);
@@ -279,10 +294,6 @@ export const updateElbowArrowPoints = (
               arrow.x + points[item.endIdx][0],
               arrow.y + points[item.endIdx][1],
             );
-
-      // idx > 0 &&
-      //   debugDrawPoint(segmentUpdates[idx].startPoint, { color: "green" });
-      // idx > 0 && debugDrawPoint(segmentUpdates[idx].endPoint, { color: "red" });
     },
   );
 
