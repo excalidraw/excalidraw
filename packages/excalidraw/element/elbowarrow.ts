@@ -1,4 +1,5 @@
 import {
+  lineSegment,
   pointFrom,
   pointScaleFromOrigin,
   pointTranslate,
@@ -13,7 +14,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
+import { debugDrawBounds, debugDrawLine, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -33,7 +34,6 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
-  headingForPointFromElement,
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
@@ -226,65 +226,63 @@ export const updateElbowArrowPoints = (
       segmentUpdates[idx].endArrowhead =
         item?.endIdx === points.length - 1 ? arrow.endArrowhead : null;
       segmentUpdates[idx].startBinding =
-        elements[idx - 1]?.el && elements[idx - 1]?.startHeading
+        item.el && item.startHeading
           ? {
-              elementId: elements[idx - 1].el!.id,
+              elementId: item.el!.id,
               focus: 0,
               gap: 0,
-              fixedPoint: compareHeading(
-                elements[idx - 1].startHeading!,
-                HEADING_DOWN,
-              )
+              fixedPoint: compareHeading(item.startHeading, HEADING_DOWN)
                 ? [0.51, 1]
-                : compareHeading(elements[idx - 1].startHeading!, HEADING_LEFT)
+                : compareHeading(item.startHeading, HEADING_LEFT)
                 ? [0, 0.51]
-                : compareHeading(elements[idx - 1].startHeading!, HEADING_UP)
+                : compareHeading(item.startHeading, HEADING_UP)
                 ? [0.51, 0]
                 : [1, 0.51],
             }
           : null;
       segmentUpdates[idx].endBinding =
-        item.el && item.endHeading
+        elements[idx + 1]?.el && elements[idx + 1]?.endHeading
           ? {
-              elementId: item.el!.id,
+              elementId: elements[idx + 1].el!.id,
               focus: 0,
               gap: 0,
-              fixedPoint: compareHeading(item.endHeading, HEADING_DOWN)
+              fixedPoint: compareHeading(
+                elements[idx + 1].endHeading!,
+                HEADING_DOWN,
+              )
                 ? [0.51, 1]
-                : compareHeading(item.endHeading, HEADING_LEFT)
+                : compareHeading(elements[idx + 1].endHeading!, HEADING_LEFT)
                 ? [0, 0.51]
-                : compareHeading(item.endHeading, HEADING_UP)
+                : compareHeading(elements[idx + 1].endHeading!, HEADING_UP)
                 ? [0.51, 0]
                 : [1, 0.51],
             }
           : null;
       segmentUpdates[idx].startPoint =
-        elements[idx - 1]?.el && segmentUpdates[idx].startBinding
+        item.el && segmentUpdates[idx].startBinding
           ? getGlobalFixedPointForBindableElement(
               segmentUpdates[idx].startBinding!.fixedPoint,
-              elements[idx - 1].el! as ExcalidrawBindableElement,
+              item.el as ExcalidrawBindableElement,
             )
           : pointFrom<GlobalPoint>(
               arrow.x + points[item.startIdx][0],
               arrow.y + points[item.startIdx][1],
             );
+
       segmentUpdates[idx].endPoint =
-        item.el && segmentUpdates[idx].endBinding
+        elements[idx + 1]?.el && segmentUpdates[idx].endBinding
           ? getGlobalFixedPointForBindableElement(
               segmentUpdates[idx].endBinding!.fixedPoint,
-              item.el as ExcalidrawBindableElement,
+              elements[idx + 1].el as ExcalidrawBindableElement,
             )
           : pointFrom<GlobalPoint>(
               arrow.x + points[item.endIdx][0],
               arrow.y + points[item.endIdx][1],
             );
 
-      // elements[idx - 1]?.el &&
-      //   segmentUpdates[idx].startBinding &&
-      //   debugDrawPoint(segmentUpdates[idx].startPoint!, { color: "green" });
-      // item.el &&
-      //   segmentUpdates[idx].endBinding &&
-      //   debugDrawPoint(segmentUpdates[idx].endPoint!, { color: "red" });
+      // idx > 0 &&
+      //   debugDrawPoint(segmentUpdates[idx].startPoint, { color: "green" });
+      // idx > 0 && debugDrawPoint(segmentUpdates[idx].endPoint, { color: "red" });
     },
   );
 
@@ -322,6 +320,17 @@ export const updateElbowArrowPoints = (
           options,
         ) ?? [],
     )
+    // .map((segment, six) => {
+    //   segment.forEach((p, idx) => {
+    //     //six === 1 && debugDrawPoint(p);
+    //     idx > 0 &&
+    //       debugDrawLine(lineSegment<GlobalPoint>(segment[idx - 1], p), {
+    //         color: six > 0 ? "red" : "green",
+    //       });
+    //   });
+
+    //   return segment;
+    // })
     .flatMap((segment, idx, segments) => {
       // if (segments.length > 1) {
       //   if (idx === 0) {
