@@ -13,7 +13,6 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -82,10 +81,10 @@ const createFakeElement = (
   ({
     ...newElement({
       type: "rectangle",
-      x: (arrow.x + start[0] + arrow.x + end[0]) / 2 - 1,
-      y: (arrow.y + start[1] + arrow.y + end[1]) / 2 - 1,
-      width: 2,
-      height: 2,
+      x: (arrow.x + start[0] + arrow.x + end[0]) / 2 - 2.5,
+      y: (arrow.y + start[1] + arrow.y + end[1]) / 2 - 2.5,
+      width: 5,
+      height: 5,
     }),
     index: "DONOTSYNC" as FractionalIndex,
   } as Ordered<ExcalidrawBindableElement>);
@@ -198,7 +197,7 @@ export const updateElbowArrowPoints = (
   const segments = getArrowSegments(nextFixedSegments, points);
 
   // Override segment end points
-  segments.forEach(([startIdx, endIdx], segmentIdx) => {
+  segments.forEach(([startIdx], segmentIdx) => {
     if (
       !updates.fixedSegments?.find((i) => i === segmentIdx + 1) &&
       arrow.fixedSegments?.find((i) => i === segmentIdx + 1)
