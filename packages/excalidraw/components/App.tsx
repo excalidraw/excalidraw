@@ -6036,7 +6036,7 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
-    this.lastPointerDownEvent = event; // set the pointer down event and store the inital value
+    /* this.lastPointerDownEvent = event; */ // set the pointer down event and store the inital value
 
     if (this.state.searchMatches) {
       this.setState((state) => ({
@@ -6352,6 +6352,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    const CLICK_THRESHOLD = 300; // 300ms
+
     this.removePointer(event); // always remove pointer on pointerUp
     this.lastPointerUpEvent = event; // save last pointer up event
 
@@ -6360,70 +6362,82 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
     );
     const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0); // this is to distinguish between click and drag; a click is less than 300ms, a drag is more than 300ms; 300ms comes from the default value of the clicklength in the browser
+      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0); // this is to distinguish between click and drag
 
     // Ensure lastPointerDownEvent is not defined before accessing its properties
-    if (!this.lastPointerDownEvent) {
-      return; // return if lastPointerDownEvent is not defined
+    let pointerDownPosition: GlobalPoint | null = null;
+
+    if (this.lastPointerDownEvent) {
+      pointerDownPosition = pointFrom<GlobalPoint>(
+        this.lastPointerDownEvent.clientX,
+        this.lastPointerDownEvent.clientY,
+      );
     }
 
-    // Variable to track the initial pointer down position => this happens right before the pointer up event to compare with the pointer up position
-    const pointerDownPosition = {
-      x: this.lastPointerDownEvent?.clientX, // x position of the pointer down event
-      y: this.lastPointerDownEvent?.clientY, // y position of the pointer down event; clientY is a read-only property of the MouseEvent interface that returns the vertical coordinate within the application's viewport at which the event occurred (as opposed to the coordinate within the page).
-    };
-
     // Calculate the distance moved during the inital pointer down position to the pointer up position
-    const distanceMoved = Math.sqrt(
-      Math.pow(event.clientX - pointerDownPosition.x, 2) +
-        Math.pow(event.clientY - pointerDownPosition.y, 2),
+    const pointerUpPosition = pointFrom<GlobalPoint>(
+      event.clientX,
+      event.clientY,
     );
+    const distanceMoved = pointDistance(pointerDownPosition, pointerUpPosition);
 
-    const addElement = (element: any /* : Partial<ExcalidrawElement> */) => {
-      // TODO: here we need the right ExcalidrawElement type
-      const newElement = {
-        ...element,
-        // const id = ... ?
-        // isDeleted: false ?
-        // other properties as needed
-      };
-    };
-
-    // if the distance is less than 5px and the click length is less than 300ms, then it is a click
     const dragTreshold = 5;
-    if (distanceMoved < dragTreshold && clicklength < 300) {
+    if (distanceMoved < dragTreshold && clicklength < CLICK_THRESHOLD) {
+      // if the distance is less than 5px and the click length is less than 300ms, then it´s a click
       // check the selected tool for shape creation
       if (
-        [
-          "rectangle",
-          "ellipse",
-          "diamond",
-          "arrow",
-          "line",
-          "freedraw",
-        ].includes(this.state.activeTool.type)
+        ["rectangle", "ellipse", "diamond", "arrow", "line"].includes(
+          this.state.activeTool.type,
+        )
       ) {
         const newElement = {
-          // TODO: here we need the right ExcalidrawElement type
-
+          id: nanoid(),
           type: this.state.activeTool.type,
           width: 100,
           height: 100,
-          x: scenePointer.x - 50, // Center the shape
-          y: scenePointer.y - 50, // Center the shape
-          // For later: Inlude other properties as needed (color, stroke, etc.)
+          x: scenePointer.x - 50,
+          y: scenePointer.y - 50,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+          isDeleted: false,
+          points:
+            this.state.activeTool.type === "line" ||
+            this.state.activeTool.type === "arrow"
+              ? [pointFrom(0, 0), pointFrom(0, 10)]
+              : [],
         };
 
+        if (
+          this.state.activeTool.type === "line" ||
+          this.state.activeTool.type === "arrow"
+        ) {
+          // Provide points for line and arrow tools
+          newElement.points = [
+            pointFrom(0, 0), // Starting point
+            pointFrom(0, 10), // End point
+          ];
+        }
+
         // Add the new element to the scene (call the function from above)
-        addElement(newElement);
+        this.scene.insertElement(newElement);
+
+        this.setState((prevState) => ({
+          ...prevState,
+          multiElement: null,
+          newElement: newElement,
+          selectionElement:
+            this.state.activeTool.type === "selection"
+              ? newElement
+              : prevState.selectionElement,
+        }));
       }
     }
 
-    this.setState((prevState) => ({
-      // ....
-    })); // TODO: Update the state with the new element
-
-    if (this.device.editor.isMobile && clicklength < 300) {
+    if (this.device.editor.isMobile && clicklength < CLICK_THRESHOLD) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
