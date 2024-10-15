@@ -437,7 +437,6 @@ const drawElementOnCanvas = (
           context.clip();
         }
 
-        // TODO: check why only croppingElement has the latest update
         const { x, y, width, height } = element.crop
           ? element.crop
           : {
