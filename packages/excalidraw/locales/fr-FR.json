@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (contour)",
     "arrowhead_diamond": "Losange",
     "arrowhead_diamond_outline": "Losange (contour)",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowtypes": "Type de flèche",
+    "arrowtype_sharp": "Flèche pointue",
+    "arrowtype_round": "Flèche incurvée",
+    "arrowtype_elbowed": "Flèche coudée",
     "fontSize": "Taille de la police",
     "fontFamily": "Police",
     "addWatermark": "Ajouter \"Réalisé avec Excalidraw\"",
@@ -113,7 +113,7 @@
     "share": "Partager",
     "showStroke": "Afficher le sélecteur de couleur de trait",
     "showBackground": "Afficher le sélecteur de couleur de fond",
-    "showFonts": "",
+    "showFonts": "Afficher le sélecteur de polices",
     "toggleTheme": "Basculer mode clair/sombre",
     "theme": "Thème",
     "personalLib": "Bibliothèque personnelle",
@@ -164,10 +164,10 @@
   },
   "search": {
     "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "noMatch": "Aucun résultat trouvé...",
+    "singleResult": "résultat",
+    "multipleResults": "résultats",
+    "placeholder": "Rechercher du texte sur la toile..."
   },
   "buttons": {
     "clearReset": "Réinitialiser le canevas",
@@ -304,10 +304,10 @@
     "shapes": "Formes"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Échapper pour annuler la recherche",
     "canvasPanning": "Pour déplacer la zone de dessin, maintenez la molette de la souris enfoncée ou la barre d'espace tout en faisant glisser, ou utiliser l'outil main.",
     "linearElement": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne",
-    "arrowTool": "",
+    "arrowTool": "Cliquez pour démarrer plusieurs points, faites glisser pour une seule ligne. Appuyez à nouveau sur {{arrowShortcut}} pour changer le type de flèche.",
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
@@ -470,15 +470,15 @@
   },
   "stats": {
     "angle": "Angle",
-    "shapes": "",
+    "shapes": "Formes",
     "height": "Hauteur",
     "scene": "Scène",
     "selected": "Sélection",
     "storage": "Stockage",
     "fullTitle": "Propriétés du canevas et des formes",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "title": "Propriétés",
+    "generalStats": "Général",
+    "elementProperties": "Propriétés de la forme",
     "total": "Total",
     "version": "Version",
     "versionCopy": "Cliquer pour copier",
@@ -578,11 +578,11 @@
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "ancien"
     },
     "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "availableFonts": "Polices disponibles",
+    "empty": "Aucune police trouvée"
   },
   "userList": {
     "empty": "Aucun utilisateurs trouvé",
