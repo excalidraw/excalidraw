@@ -138,7 +138,6 @@ describe("search", () => {
         await waitFor(() => {
           expect(h.app.state.searchMatches.length).toBe(1);
           expect(h.app.state.searchMatches[0].focus).toBe(true);
-          console.log("here firstly", h.app.state.searchMatches[0]);
           expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(0);
         });
       });
