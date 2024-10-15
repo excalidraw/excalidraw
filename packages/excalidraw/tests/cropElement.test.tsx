@@ -133,6 +133,69 @@ describe("Crop an image", () => {
     expect(image.height).toBeLessThan(initialHeight);
     expect(image.height).toBeGreaterThan(0);
   });
+
+  it("Preserve aspect ratio", async () => {
+    let image = h.elements[0] as ExcalidrawImageElement;
+    const initialWidth = image.width;
+    const initialHeight = image.height;
+
+    const { naturalWidth, naturalHeight } =
+      generateRandomNaturalWidthAndHeight(image);
+
+    UI.crop(image, "w", naturalWidth, naturalHeight, [initialWidth / 3, 0]);
+
+    let resizedWidth = image.width;
+    let resizedHeight = image.height;
+
+    // max height, cropping should not change anything
+    UI.crop(
+      image,
+      "w",
+      naturalWidth,
+      naturalHeight,
+      [-initialWidth / 3, 0],
+      true,
+    );
+    expect(image.width).toBe(resizedWidth);
+    expect(image.height).toBe(resizedHeight);
+
+    // re-crop to initial state
+    UI.crop(image, "w", naturalWidth, naturalHeight, [-initialWidth / 3, 0]);
+    // change crop height and width
+    UI.crop(image, "s", naturalWidth, naturalHeight, [0, -initialHeight / 2]);
+    UI.crop(image, "e", naturalWidth, naturalHeight, [-initialWidth / 3, 0]);
+
+    resizedWidth = image.width;
+    resizedHeight = image.height;
+
+    // test corner handle aspect ratio preserving
+    UI.crop(image, "se", naturalWidth, naturalHeight, [initialWidth, 0], true);
+    expect(image.width / image.height).toBe(resizedWidth / resizedHeight);
+    expect(image.width).toBeLessThanOrEqual(initialWidth);
+    expect(image.height).toBeLessThanOrEqual(initialHeight);
+
+    // reset
+    image = API.createElement({ type: "image", width: 200, height: 100 });
+    API.setElements([image]);
+    API.setAppState({
+      selectedElementIds: {
+        [image.id]: true,
+      },
+    });
+
+    // 50 x 50 square
+    UI.crop(image, "nw", naturalWidth, naturalHeight, [150, 50]);
+    UI.crop(image, "n", naturalWidth, naturalHeight, [0, -100], true);
+    expect(image.width).toEqual(image.height);
+    // image is at the corner, not space to its right to expand, should not be able to resize
+    expect(image.height).toBeCloseTo(50);
+
+    UI.crop(image, "nw", naturalWidth, naturalHeight, [-150, -100], true);
+    expect(image.width).toEqual(image.height);
+    // max height should be reached
+    expect(image.height).toEqual(initialHeight);
+    expect(image.width).toBe(initialHeight);
+  });
 });
 
 describe("Cropping and other features", async () => {

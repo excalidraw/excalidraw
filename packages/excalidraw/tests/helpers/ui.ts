@@ -569,6 +569,7 @@ export class UI {
     naturalWidth: number,
     naturalHeight: number,
     mouseMove: [deltaX: number, deltaY: number],
+    keepAspectRatio = false,
   ) {
     const handleCoords = getTransformHandles(
       element,
@@ -588,6 +589,7 @@ export class UI {
       naturalHeight,
       clientX + mouseMove[0],
       clientY + mouseMove[1],
+      keepAspectRatio ? element.width / element.height : undefined,
     );
 
     API.updateElement(element, mutations);
