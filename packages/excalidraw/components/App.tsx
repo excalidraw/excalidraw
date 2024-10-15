@@ -1544,6 +1544,7 @@ class App extends React.Component<AppProps, AppState> {
                           elements={this.scene.getNonDeletedElements()}
                           onLockToggle={this.toggleLock}
                           onPenModeToggle={this.togglePenMode}
+                          onFullscreenToggle={this.toggleFullscreenMode}
                           onHandToolToggle={this.onHandToolToggle}
                           langCode={getLanguage().code}
                           renderTopRightUI={renderTopRightUI}
@@ -3550,6 +3551,29 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+      };
+    });
+  };
+
+  toggleFullscreenMode = (force: boolean | null) => {
+    const toggleFullscreen = async (enter: boolean) => {
+      const elem = document.documentElement;
+
+      if (enter) {
+        await elem.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    };
+
+    this.setState((prevState) => {
+      const newFullscreenMode = force ?? !prevState.fullscreenMode;
+
+      // Toggle fullscreen based on the new state
+      toggleFullscreen(newFullscreenMode);
+
+      return {
+        fullscreenMode: !prevState.fullscreenMode,
       };
     });
   };
