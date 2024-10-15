@@ -12,7 +12,6 @@ import {
   pointFromVector,
   clamp,
   isCloseTo,
-  round,
 } from "../../math";
 import type { TransformHandleType } from "./transformHandles";
 import type {
@@ -384,11 +383,6 @@ export const cropElement = (
     nextHeight,
     !!widthAspectRatio,
   );
-
-  crop.x = round(crop.x, 6);
-  crop.y = round(crop.y, 6);
-  crop.width = round(crop.width, 6);
-  crop.height = round(crop.height, 6);
 
   // reset crop to null if we're back to orig size
   if (
