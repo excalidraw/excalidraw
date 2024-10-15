@@ -7,32 +7,26 @@ import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import {
-  selectGroupsForSelectedElements,
-  getSelectedGroupForElement,
-  getElementsInGroup,
-} from "../groups";
+import { getSelectedGroupForElement, getElementsInGroup } from "../groups";
 import type { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
 import type { ActionResult } from "./types";
-import { DEFAULT_GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
 } from "../element/textElement";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
+import { isFrameLikeElement } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
   bindElementsToFramesAfterDuplication,
   getFrameChildren,
 } from "../frame";
-import {
-  excludeElementsInFramesFromSelection,
-  getSelectedElements,
-} from "../scene/selection";
+import { getSelectedElements } from "../scene/selection";
 import { syncMovedIndices } from "../fractionalIndex";
 import { StoreAction } from "../store";
+import { mutateElement } from "../element/mutateElement";
+import { DEFAULT_GRID_SIZE } from "../constants";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -58,9 +52,9 @@ export const actionDuplicateSelection = register({
         return false;
       }
     }
-
+    const elements2 = app.scene.getElementsIncludingDeleted();
     return {
-      ...duplicateElements(elements, appState),
+      ...duplicateElements(elements2, appState),
       storeAction: StoreAction.CAPTURE,
     };
   },
@@ -99,11 +93,16 @@ const duplicateElements = (
       appState.editingGroupId,
       groupIdMap,
       element,
-      {
-        x: element.x + DEFAULT_GRID_SIZE / 2,
-        y: element.y + DEFAULT_GRID_SIZE / 2,
-      },
     );
+    // const newElement = duplicateElement(
+    //   appState.editingGroupId,
+    //   groupIdMap,
+    //   element,
+    //   {
+    //     x: element.x + DEFAULT_GRID_SIZE / 2,
+    //     y: element.y + DEFAULT_GRID_SIZE / 2,
+    //   },
+    // );
     duplicatedElementsMap.set(newElement.id, newElement);
     oldIdToDuplicatedId.set(element.id, newElement.id);
     oldElements.push(element);
@@ -217,6 +216,11 @@ const duplicateElements = (
           ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
         );
       }
+      // mutate the origninal element a bit to up
+      mutateElement(element, {
+        x: element.x - DEFAULT_GRID_SIZE,
+        y: element.y - DEFAULT_GRID_SIZE,
+      });
     } else {
       elementsWithClones.push(...markAsProcessed([element]));
     }
@@ -254,10 +258,19 @@ const duplicateElements = (
     oldElements,
     oldIdToDuplicatedId,
   );
+  // elementsWithClones
+  //   .filter((ele) =>
+  //     oldElements.some((e) => oldIdToDuplicatedId.get(e.id) === ele.id),
+  //   )
+  //   .forEach((ele) => {
+  //     mutateElement(ele, { strokeColor: "rgba(8, 255, 0, 1)" });
+  //   });
+
   fixBindingsAfterDuplication(
-    elementsWithClones,
+    finalElements,
     oldElements,
     oldIdToDuplicatedId,
+    "duplicatesServeAsOld",
   );
   bindElementsToFramesAfterDuplication(
     finalElements,
@@ -265,30 +278,10 @@ const duplicateElements = (
     oldIdToDuplicatedId,
   );
 
-  const nextElementsToSelect =
-    excludeElementsInFramesFromSelection(newElements);
-
   return {
     elements: finalElements,
     appState: {
       ...appState,
-      ...selectGroupsForSelectedElements(
-        {
-          editingGroupId: appState.editingGroupId,
-          selectedElementIds: nextElementsToSelect.reduce(
-            (acc: Record<ExcalidrawElement["id"], true>, element) => {
-              if (!isBoundToContainer(element)) {
-                acc[element.id] = true;
-              }
-              return acc;
-            },
-            {},
-          ),
-        },
-        getNonDeletedElements(finalElements),
-        appState,
-        null,
-      ),
     },
   };
 };

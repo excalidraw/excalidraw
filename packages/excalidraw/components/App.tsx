@@ -7897,7 +7897,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.hit.hasBeenDuplicated = true;
 
             const nextElements = [];
-            const elementsToAppend = [];
+            const elementsToAppend: ExcalidrawElement[] = [];
             const groupIdMap = new Map();
             const oldIdToDuplicatedId = new Map();
             const hitElement = pointerDownState.hit.element;
