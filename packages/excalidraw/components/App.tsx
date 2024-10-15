@@ -10161,11 +10161,20 @@ class App extends React.Component<AppProps, AppState> {
       croppingElement &&
       isImageElement(croppingElement)
     ) {
+      const croppingAtStateStart = pointerDownState.originalElements.get(
+        croppingElement.id,
+      );
+
       const image =
         isInitializedImageElement(croppingElement) &&
         this.imageCache.get(croppingElement.fileId)?.image;
 
-      if (image && !(image instanceof Promise)) {
+      if (
+        croppingAtStateStart &&
+        isImageElement(croppingAtStateStart) &&
+        image &&
+        !(image instanceof Promise)
+      ) {
         mutateElement(
           croppingElement,
           cropElement(
@@ -10175,6 +10184,9 @@ class App extends React.Component<AppProps, AppState> {
             image.naturalHeight,
             x,
             y,
+            event.shiftKey
+              ? croppingAtStateStart.width / croppingAtStateStart.height
+              : undefined,
           ),
         );
 

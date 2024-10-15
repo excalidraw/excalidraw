@@ -781,7 +781,7 @@ const _renderInteractiveScene = ({
   }
 
   // Paint selection element
-  if (appState.selectionElement) {
+  if (appState.selectionElement && !appState.isCropping) {
     try {
       renderSelectionElement(
         appState.selectionElement,

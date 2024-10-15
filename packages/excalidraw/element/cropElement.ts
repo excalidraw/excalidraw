@@ -12,6 +12,7 @@ import {
   pointFromVector,
   clamp,
   isCloseTo,
+  round,
 } from "../../math";
 import type { TransformHandleType } from "./transformHandles";
 import type {
@@ -35,6 +36,7 @@ export const cropElement = (
   naturalHeight: number,
   pointerX: number,
   pointerY: number,
+  widthAspectRatio?: number,
 ) => {
   const { width: uncroppedWidth, height: uncroppedHeight } =
     getUncroppedWidthAndHeight(element);
@@ -83,57 +85,296 @@ export const cropElement = (
   const isFlippedByX = element.scale[0] === -1;
   const isFlippedByY = element.scale[1] === -1;
 
+  let changeInHeight = pointerY - element.y;
+  let changeInWidth = pointerX - element.x;
+
   if (transformHandle.includes("n")) {
-    const pointerDeltaY = pointerY - element.y;
     nextHeight = clamp(
-      element.height - pointerDeltaY,
+      element.height - changeInHeight,
       MINIMAL_CROP_SIZE,
       isFlippedByY ? uncroppedHeight - croppedTop : element.height + croppedTop,
     );
-    crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
+  }
 
-    if (!isFlippedByY) {
-      crop.y = crop.y + (previousCropHeight - crop.height);
-    }
-  } else if (transformHandle.includes("s")) {
+  if (transformHandle.includes("s")) {
+    changeInHeight = pointerY - element.y - element.height;
     nextHeight = clamp(
-      pointerY - element.y,
+      element.height + changeInHeight,
       MINIMAL_CROP_SIZE,
       isFlippedByY ? element.height + croppedTop : uncroppedHeight - croppedTop,
     );
-    crop.height = (nextHeight / uncroppedHeight) * naturalHeight;
-
-    if (isFlippedByY) {
-      const changeInCropHeight = previousCropHeight - crop.height;
-      crop.y += changeInCropHeight;
-    }
   }
 
-  if (transformHandle.includes("w")) {
-    const pointerDeltaX = pointerX - element.x;
+  if (transformHandle.includes("e")) {
+    changeInWidth = pointerX - element.x - element.width;
 
     nextWidth = clamp(
-      element.width - pointerDeltaX,
-      MINIMAL_CROP_SIZE,
-      isFlippedByX ? uncroppedWidth - croppedLeft : element.width + croppedLeft,
-    );
-
-    crop.width = (nextWidth / uncroppedWidth) * naturalWidth;
-
-    if (!isFlippedByX) {
-      crop.x += previousCropWidth - crop.width;
-    }
-  } else if (transformHandle.includes("e")) {
-    nextWidth = clamp(
-      pointerX - element.x,
+      element.width + changeInWidth,
       MINIMAL_CROP_SIZE,
       isFlippedByX ? element.width + croppedLeft : uncroppedWidth - croppedLeft,
     );
+  }
+
+  if (transformHandle.includes("w")) {
+    nextWidth = clamp(
+      element.width - changeInWidth,
+      MINIMAL_CROP_SIZE,
+      isFlippedByX ? uncroppedWidth - croppedLeft : element.width + croppedLeft,
+    );
+  }
+
+  const updateCropWidthAndHeight = (crop: ImageCrop) => {
+    crop.height = nextHeight * naturalHeightToUncropped;
     crop.width = nextWidth * naturalWidthToUncropped;
-    if (isFlippedByX) {
-      const changeInCropWidth = previousCropWidth - crop.width;
-      crop.x += changeInCropWidth;
+  };
+
+  updateCropWidthAndHeight(crop);
+
+  const adjustFlipForHandle = (
+    handle: TransformHandleType,
+    crop: ImageCrop,
+  ) => {
+    updateCropWidthAndHeight(crop);
+    if (handle.includes("n")) {
+      if (!isFlippedByY) {
+        crop.y += previousCropHeight - crop.height;
+      }
     }
+    if (handle.includes("s")) {
+      if (isFlippedByY) {
+        crop.y += previousCropHeight - crop.height;
+      }
+    }
+    if (handle.includes("e")) {
+      if (isFlippedByX) {
+        crop.x += previousCropWidth - crop.width;
+      }
+    }
+    if (handle.includes("w")) {
+      if (!isFlippedByX) {
+        crop.x += previousCropWidth - crop.width;
+      }
+    }
+  };
+
+  switch (transformHandle) {
+    case "n": {
+      if (widthAspectRatio) {
+        const distanceToLeft = croppedLeft + element.width / 2;
+        const distanceToRight =
+          uncroppedWidth - croppedLeft - element.width / 2;
+
+        const MAX_WIDTH = Math.min(distanceToLeft, distanceToRight) * 2;
+
+        nextWidth = clamp(
+          nextHeight * widthAspectRatio,
+          MINIMAL_CROP_SIZE,
+          MAX_WIDTH,
+        );
+        nextHeight = nextWidth / widthAspectRatio;
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+
+      if (widthAspectRatio) {
+        crop.x += (previousCropWidth - crop.width) / 2;
+      }
+
+      break;
+    }
+    case "s": {
+      if (widthAspectRatio) {
+        const distanceToLeft = croppedLeft + element.width / 2;
+        const distanceToRight =
+          uncroppedWidth - croppedLeft - element.width / 2;
+
+        const MAX_WIDTH = Math.min(distanceToLeft, distanceToRight) * 2;
+
+        nextWidth = clamp(
+          nextHeight * widthAspectRatio,
+          MINIMAL_CROP_SIZE,
+          MAX_WIDTH,
+        );
+        nextHeight = nextWidth / widthAspectRatio;
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+
+      if (widthAspectRatio) {
+        crop.x += (previousCropWidth - crop.width) / 2;
+      }
+
+      break;
+    }
+    case "w": {
+      if (widthAspectRatio) {
+        const distanceToTop = croppedTop + element.height / 2;
+        const distanceToBottom =
+          uncroppedHeight - croppedTop - element.height / 2;
+
+        const MAX_HEIGHT = Math.min(distanceToTop, distanceToBottom) * 2;
+
+        nextHeight = clamp(
+          nextWidth / widthAspectRatio,
+          MINIMAL_CROP_SIZE,
+          MAX_HEIGHT,
+        );
+        nextWidth = nextHeight * widthAspectRatio;
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+
+      if (widthAspectRatio) {
+        crop.y += (previousCropHeight - crop.height) / 2;
+      }
+
+      break;
+    }
+    case "e": {
+      if (widthAspectRatio) {
+        const distanceToTop = croppedTop + element.height / 2;
+        const distanceToBottom =
+          uncroppedHeight - croppedTop - element.height / 2;
+
+        const MAX_HEIGHT = Math.min(distanceToTop, distanceToBottom) * 2;
+
+        nextHeight = clamp(
+          nextWidth / widthAspectRatio,
+          MINIMAL_CROP_SIZE,
+          MAX_HEIGHT,
+        );
+        nextWidth = nextHeight * widthAspectRatio;
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+
+      if (widthAspectRatio) {
+        crop.y += (previousCropHeight - crop.height) / 2;
+      }
+
+      break;
+    }
+    case "ne": {
+      if (widthAspectRatio) {
+        if (changeInWidth > -changeInHeight) {
+          const MAX_HEIGHT = isFlippedByY
+            ? uncroppedHeight - croppedTop
+            : croppedTop + element.height;
+
+          nextHeight = clamp(
+            nextWidth / widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_HEIGHT,
+          );
+          nextWidth = nextHeight * widthAspectRatio;
+        } else {
+          const MAX_WIDTH = isFlippedByX
+            ? croppedLeft + element.width
+            : uncroppedWidth - croppedLeft;
+
+          nextWidth = clamp(
+            nextHeight * widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_WIDTH,
+          );
+          nextHeight = nextWidth / widthAspectRatio;
+        }
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+      break;
+    }
+    case "nw": {
+      if (widthAspectRatio) {
+        if (changeInWidth < changeInHeight) {
+          const MAX_HEIGHT = isFlippedByY
+            ? uncroppedHeight - croppedTop
+            : croppedTop + element.height;
+          nextHeight = clamp(
+            nextWidth / widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_HEIGHT,
+          );
+          nextWidth = nextHeight * widthAspectRatio;
+        } else {
+          const MAX_WIDTH = isFlippedByX
+            ? uncroppedWidth - croppedLeft
+            : croppedLeft + element.width;
+
+          nextWidth = clamp(
+            nextHeight * widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_WIDTH,
+          );
+          nextHeight = nextWidth / widthAspectRatio;
+        }
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+      break;
+    }
+    case "se": {
+      if (widthAspectRatio) {
+        if (changeInWidth > changeInHeight) {
+          const MAX_HEIGHT = isFlippedByY
+            ? croppedTop + element.height
+            : uncroppedHeight - croppedTop;
+
+          nextHeight = clamp(
+            nextWidth / widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_HEIGHT,
+          );
+          nextWidth = nextHeight * widthAspectRatio;
+        } else {
+          const MAX_WIDTH = isFlippedByX
+            ? croppedLeft + element.width
+            : uncroppedWidth - croppedLeft;
+
+          nextWidth = clamp(
+            nextHeight * widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_WIDTH,
+          );
+          nextHeight = nextWidth / widthAspectRatio;
+        }
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+      break;
+    }
+    case "sw": {
+      if (widthAspectRatio) {
+        if (-changeInWidth > changeInHeight) {
+          const MAX_HEIGHT = isFlippedByY
+            ? croppedTop + element.height
+            : uncroppedHeight - croppedTop;
+
+          nextHeight = clamp(
+            nextWidth / widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_HEIGHT,
+          );
+          nextWidth = nextHeight * widthAspectRatio;
+        } else {
+          const MAX_WIDTH = isFlippedByX
+            ? uncroppedWidth - croppedLeft
+            : croppedLeft + element.width;
+
+          nextWidth = clamp(
+            nextHeight * widthAspectRatio,
+            MINIMAL_CROP_SIZE,
+            MAX_WIDTH,
+          );
+          nextHeight = nextWidth / widthAspectRatio;
+        }
+      }
+
+      adjustFlipForHandle(transformHandle, crop);
+      break;
+    }
+    default:
+      break;
   }
 
   const newOrigin = recomputeOrigin(
@@ -141,7 +382,13 @@ export const cropElement = (
     transformHandle,
     nextWidth,
     nextHeight,
+    !!widthAspectRatio,
   );
+
+  crop.x = round(crop.x, 6);
+  crop.y = round(crop.y, 6);
+  crop.width = round(crop.width, 6);
+  crop.height = round(crop.height, 6);
 
   // reset crop to null if we're back to orig size
   if (
@@ -165,6 +412,7 @@ const recomputeOrigin = (
   transformHandle: TransformHandleType,
   width: number,
   height: number,
+  shouldMaintainAspectRatio?: boolean,
 ) => {
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
     stateAtCropStart,
@@ -197,6 +445,15 @@ const recomputeOrigin = (
   if (transformHandle === "sw") {
     const topRight = [startBottomRight[0], startTopLeft[1]];
     newTopLeft = [topRight[0] - Math.abs(newBoundsWidth), topRight[1]];
+  }
+
+  if (shouldMaintainAspectRatio) {
+    if (["s", "n"].includes(transformHandle)) {
+      newTopLeft[0] = startCenter[0] - newBoundsWidth / 2;
+    }
+    if (["e", "w"].includes(transformHandle)) {
+      newTopLeft[1] = startCenter[1] - newBoundsHeight / 2;
+    }
   }
 
   // adjust topLeft to new rotation point
