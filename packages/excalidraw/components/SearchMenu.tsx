@@ -8,7 +8,7 @@ import type { AppClassProperties } from "../types";
 import { isTextElement, newTextElement } from "../element";
 import type { ExcalidrawTextElement } from "../element/types";
 import { measureText } from "../element/textElement";
-import { addEventListener, getFontString } from "../utils";
+import { addEventListener, detectTextDirection, getFontString } from "../utils";
 import { KEYS } from "../keys";
 import clsx from "clsx";
 import { atom, useAtom } from "jotai";
@@ -544,6 +544,69 @@ const normalizeWrappedText = (
   return normalizedLines.join("\n");
 };
 
+const calculateOffset = ({
+  textToStart,
+  textElement,
+  matchedWordWidth,
+  line,
+  lineNumber,
+}: {
+  textToStart: string;
+  textElement: ExcalidrawTextElement;
+  matchedWordWidth: number;
+  line: string;
+  lineNumber: number;
+}) => {
+  const startTextMeasures = measureText(
+    textToStart,
+    getFontString(textElement),
+    textElement.lineHeight,
+    true,
+  );
+
+  let offsetX = textToStart === "" ? 0 : startTextMeasures.width;
+
+  const direction = detectTextDirection(textElement.originalText);
+  const isRTL = direction === "rtl";
+
+  if (isRTL) {
+    offsetX = textElement.width - offsetX - matchedWordWidth;
+  }
+
+  const textAlignmentStartMapping = {
+    ltr: "left",
+    rtl: "right",
+  } as const;
+
+  const isStartAligned =
+    textElement.textAlign === textAlignmentStartMapping[direction];
+
+  if (!isStartAligned && line.length > 0) {
+    const lineMeasures = measureText(
+      line,
+      getFontString(textElement),
+      textElement.lineHeight,
+      true,
+    );
+
+    const spaceToStart =
+      textElement.textAlign === "center"
+        ? (textElement.width - lineMeasures.width) / 2
+        : textElement.width - lineMeasures.width;
+
+    if (isRTL) {
+      offsetX -= spaceToStart;
+    } else {
+      offsetX += spaceToStart;
+    }
+  }
+
+  return {
+    offsetX,
+    offsetY: lineNumber * startTextMeasures.height,
+  };
+};
+
 const getMatchedLines = (
   textElement: ExcalidrawTextElement,
   searchQuery: SearchQuery,
@@ -606,42 +669,19 @@ const getMatchedLines = (
       const matchedWord = remainingQuery.slice(0, matchCapacity);
       remainingQuery = remainingQuery.slice(matchCapacity);
 
-      const offset = measureText(
-        textToStart,
-        getFontString(textElement),
-        textElement.lineHeight,
-        true,
-      );
-
-      // measureText returns a non-zero width for the empty string
-      // which is not what we're after here, hence the check and the correction
-      if (textToStart === "") {
-        offset.width = 0;
-      }
-
-      if (textElement.textAlign !== "left" && lineIndexRange.line.length > 0) {
-        const lineLength = measureText(
-          lineIndexRange.line,
-          getFontString(textElement),
-          textElement.lineHeight,
-          true,
-        );
-
-        const spaceToStart =
-          textElement.textAlign === "center"
-            ? (textElement.width - lineLength.width) / 2
-            : textElement.width - lineLength.width;
-        offset.width += spaceToStart;
-      }
-
       const { width, height } = measureText(
         matchedWord,
         getFontString(textElement),
         textElement.lineHeight,
       );
 
-      const offsetX = offset.width;
-      const offsetY = lineIndexRange.lineNumber * offset.height;
+      const { offsetX, offsetY } = calculateOffset({
+        textToStart,
+        textElement,
+        matchedWordWidth: width,
+        line: lineIndexRange.line,
+        lineNumber: lineIndexRange.lineNumber,
+      });
 
       matchedLines.push({
         offsetX,

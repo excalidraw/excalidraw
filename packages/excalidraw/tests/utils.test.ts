@@ -11,3 +11,22 @@ describe("Test isTransparent", () => {
     expect(utils.isTransparent("#ced4da")).toEqual(false);
   });
 });
+
+describe("Test detectTextDirection", () => {
+  it.each([
+    ["ltr", ""],
+    ["ltr", "hello world"],
+    ["rtl", "שלום עולם"],
+    ["rtl", "مرحبا بالعالم"],
+    ["rtl", "مرحبا"],
+    ["rtl", "שלום"],
+    ["rtl", "עולם"],
+    ["rtl", "مرحبا بكم"],
+    ["rtl", "أهلا وسهلا"],
+    ["rtl", "أهلا"],
+    ["rtl", "وسهلا"],
+    ["ltr", "hello עולם world עולם"],
+  ])("should return %s when text is %s", (expected, text) => {
+    expect(utils.detectTextDirection(text)).toEqual(expected);
+  });
+});
