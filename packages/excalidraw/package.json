@@ -1,5 +1,5 @@
 {
-  "name": "@excalidraw/excalidraw",
+  "name": "@betternotion/excalidraw",
   "version": "0.17.1",
   "main": "./dist/prod/index.js",
   "type": "module",
