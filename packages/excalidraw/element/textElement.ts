@@ -81,7 +81,7 @@ const _CJK_CHAR =
  */
 const _CJK_BREAK_NOT_AFTER_BUT_BEFORE = /<\(\[\{/u;
 const _CJK_BREAK_NOT_BEFORE_BUT_AFTER = />\)\]\}.,:;\?!/u;
-const _CJK_BREAK_ALWAYS = /　〃〜～〰＃＆＊＋－／＝｜￢￣￤/u;
+const _CJK_BREAK_ALWAYS = /　〃〜～〰＃＆＊＋－ー／＝｜￢￣￤/u;
 const _CJK_SYMBOLS_AND_PUNCTUATION =
   /（）［］｛｝〈〉《》｟｠｢｣「」『』【】〖〗〔〕〘〙〚〛＜＞〝〞＇〟・。ﾟﾞ，、．：；？！％ー/u;
 
@@ -98,7 +98,7 @@ const _CJK_SYMBOLS_AND_PUNCTUATION =
  */
 const _ANY_BREAK_NOT_AFTER_BUT_BEFORE = /（［｛〈《｟｢「『【〖〔〘〚＜〝/u;
 const _ANY_BREAK_NOT_BEFORE_BUT_AFTER =
-  /）］｝〉》｠｣」』】〗〕〙〛＞〞＇〟・。ﾟﾞ，、．：；？！％ー±‥…\//u;
+  /）］｝〉》｠｣」』】〗〕〙〛＞〞＇〟・。ﾟﾞ，、．：；？！％±‥…\//u;
 
 /**
  * Natural breaking points for any grammars.
