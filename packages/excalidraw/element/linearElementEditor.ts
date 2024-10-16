@@ -1298,26 +1298,26 @@ export class LinearElementEditor {
           .map<FixedSegment>((idx) => {
             if (nextPoints[idx][0] === nextPoints[idx - 1][0]) {
               const anchor = pointFrom<GlobalPoint>(
-                nextPoints[idx][0],
-                (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
+                element.x + nextPoints[idx][0],
+                element.y + (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
               );
               return {
                 anchor,
                 heading:
-                  anchor[1] > nextPoints[idx - 1][1]
+                  anchor[1] > element.y + nextPoints[idx - 1][1]
                     ? HEADING_UP
                     : HEADING_DOWN,
                 index: idx,
               };
             }
             const anchor = pointFrom<GlobalPoint>(
-              (nextPoints[idx][0] - nextPoints[idx - 1][0]) / 2,
-              nextPoints[idx][1],
+              element.x + (nextPoints[idx][0] - nextPoints[idx - 1][0]) / 2,
+              element.y + nextPoints[idx][1],
             );
             return {
               anchor,
               heading:
-                anchor[0] > nextPoints[idx - 1][0]
+                anchor[0] > element.x + nextPoints[idx - 1][0]
                   ? HEADING_LEFT
                   : HEADING_RIGHT,
               index: idx,
