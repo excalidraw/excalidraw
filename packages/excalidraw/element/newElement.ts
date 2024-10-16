@@ -18,6 +18,7 @@ import type {
   ExcalidrawIframeElement,
   ElementsMap,
   ExcalidrawArrowElement,
+  FixedSegment,
 } from "./types";
 import {
   arrayToMap,
@@ -457,7 +458,7 @@ export const newArrowElement = (
     endArrowhead?: Arrowhead | null;
     points?: ExcalidrawArrowElement["points"];
     elbowed?: boolean;
-    fixedSegments?: number[] | null;
+    fixedSegments?: FixedSegment[] | null;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawArrowElement> => {
   return {

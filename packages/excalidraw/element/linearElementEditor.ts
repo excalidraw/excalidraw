@@ -10,6 +10,7 @@ import type {
   OrderedExcalidrawElement,
   FixedPointBinding,
   SceneElementsMap,
+  FixedSegment,
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
@@ -65,6 +66,12 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
+import {
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_RIGHT,
+  HEADING_UP,
+} from "./heading";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1231,7 +1238,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: number[] | null;
+      fixedSegments?: FixedSegment[] | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1274,14 +1281,49 @@ export class LinearElementEditor {
     });
 
     if (isElbowArrow(element)) {
-      otherUpdates = otherUpdates || {};
-      // The segments being fixed are always the
-      // sub-ranges (minus their first idx)
-      otherUpdates.fixedSegments = targetPoints
-        .map((target) => target.index)
-        .sort()
-        .filter((i, _, a) => a.findIndex((t) => t === i - 1) > -1)
-        .sort();
+      otherUpdates = {
+        ...otherUpdates,
+        fixedSegments: targetPoints
+          .map((target) => target.index)
+          .sort()
+          // The segment id being fixed is always the last point index of the
+          // arrow segment, so it's always  > 0. Also segments should always
+          // be 2 points.
+          .filter((i, _, a) => a.findIndex((t) => t === i - 1) > -1)
+          // Map segments to mid points of the given segment represented by
+          // the two points, and the direction. The segment idx we will need
+          // to know if a given segment is manually moved.
+          // NOTE: Segment indices are not permanent, the arrow update
+          // might simplify the arrow and remove/merge segments.
+          .map<FixedSegment>((idx) => {
+            if (nextPoints[idx][0] === nextPoints[idx - 1][0]) {
+              const anchor = pointFrom<GlobalPoint>(
+                nextPoints[idx][0],
+                (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
+              );
+              return {
+                anchor,
+                heading:
+                  anchor[1] > nextPoints[idx - 1][1]
+                    ? HEADING_UP
+                    : HEADING_DOWN,
+                index: idx,
+              };
+            }
+            const anchor = pointFrom<GlobalPoint>(
+              (nextPoints[idx][0] - nextPoints[idx - 1][0]) / 2,
+              nextPoints[idx][1],
+            );
+            return {
+              anchor,
+              heading:
+                anchor[0] > nextPoints[idx - 1][0]
+                  ? HEADING_LEFT
+                  : HEADING_RIGHT,
+              index: idx,
+            };
+          }),
+      };
     }
 
     LinearElementEditor._updatePoints(
@@ -1406,7 +1448,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: number[] | null;
+      fixedSegments?: FixedSegment[] | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1417,7 +1459,7 @@ export class LinearElementEditor {
       const updates: {
         startBinding?: FixedPointBinding | null;
         endBinding?: FixedPointBinding | null;
-        fixedSegments?: number[] | null;
+        fixedSegments?: FixedSegment[] | null;
         points?: LocalPoint[];
       } = {};
       if (otherUpdates?.startBinding !== undefined) {
@@ -1435,7 +1477,7 @@ export class LinearElementEditor {
             : null;
       }
       if (otherUpdates?.fixedSegments) {
-        updates.fixedSegments = otherUpdates.fixedSegments.sort();
+        updates.fixedSegments = otherUpdates.fixedSegments;
       }
 
       updates.points = Array.from(nextPoints);
