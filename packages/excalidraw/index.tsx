@@ -230,6 +230,16 @@ export {
   exportToBlob,
   exportToSvg,
   exportToClipboard,
+  getCommonBoundingBox, //zsviczian
+  getMaximumGroups, //zsviczian
+  intersectElementWithLine, //zsviczian
+  determineFocusDistance, //zsviczian
+  measureText, //zsviczian
+  getLineHeight, //zsviczian
+  wrapText, //zsviczian
+  getFontString, //zsviczian
+  getBoundTextMaxWidth, //zsviczian
+  getFontFamilyString, //zsviczian
 } from "../utils/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
