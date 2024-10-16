@@ -63,7 +63,7 @@ import { actionToggleStats } from "../actions";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
-import { FullscreenModeButton } from "./FullScreenModeButton";
+import { FullscreenModeButton } from "./FullscreenModeButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;

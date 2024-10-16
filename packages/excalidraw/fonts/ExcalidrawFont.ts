@@ -14,8 +14,8 @@ export interface Font {
 }
 export const UNPKG_FALLBACK_URL = `https://unpkg.com/${
   import.meta.env.VITE_PKG_NAME
-    ? `${import.meta.env.VITE_PKG_NAME}@${import.meta.env.PKG_VERSION}` // should be provided by vite during package build
-    : "@excalidraw/excalidraw" // fallback to latest package version (i.e. for app)
+    ? `${import.meta.env.VITE_PKG_NAME}@${import.meta.env.VITE_PKG_VERSION}` // should be provided by vite during package build
+    : "@betternotion/excalidraw" // fallback to latest package version (i.e. for app)
 }/dist/prod/`;
 
 export class ExcalidrawFont implements Font {
