@@ -1,5 +1,19 @@
 @import "../css/variables.module.scss";
 
+@keyframes successStatusAnimation {
+  0% {
+    transform: scale(0.35);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 .excalidraw {
   .ExcButton {
     --text-color: transparent;
@@ -16,16 +30,29 @@
 
     .Spinner {
       --spinner-color: var(--color-surface-lowest);
-      position: absolute;
-      visibility: visible;
     }
 
-    &[disabled] {
+    .ExcButton__statusIcon {
+      visibility: visible;
+      position: absolute;
+
+      width: 1.2rem;
+      height: 1.2rem;
+
+      animation: successStatusAnimation 0.5s cubic-bezier(0.3, 1, 0.6, 1);
+    }
+
+    &.ExcButton--status-loading,
+    &.ExcButton--status-success {
       pointer-events: none;
 
       .ExcButton__contents {
         visibility: hidden;
       }
+    }
+
+    &[disabled] {
+      pointer-events: none;
     }
 
     &,
@@ -115,6 +142,46 @@
         &:active {
           --text-color: var(--color-danger-darker);
           --border-color: var(--color-danger-darker);
+        }
+      }
+    }
+
+    &--color-success {
+      &.ExcButton--variant-filled {
+        --text-color: var(--color-success-text);
+        --back-color: var(--color-success);
+
+        .Spinner {
+          --spinner-color: var(--color-success);
+        }
+
+        &:hover {
+          --back-color: var(--color-success-darker);
+        }
+
+        &:active {
+          --back-color: var(--color-success-darkest);
+        }
+      }
+
+      &.ExcButton--variant-outlined,
+      &.ExcButton--variant-icon {
+        --text-color: var(--color-success-contrast);
+        --border-color: var(--color-success-contrast);
+        --back-color: transparent;
+
+        .Spinner {
+          --spinner-color: var(--color-success-contrast);
+        }
+
+        &:hover {
+          --text-color: var(--color-success-contrast-hover);
+          --border-color: var(--color-success-contrast-hover);
+        }
+
+        &:active {
+          --text-color: var(--color-success-contrast-active);
+          --border-color: var(--color-success-contrast-active);
         }
       }
     }

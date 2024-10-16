@@ -1,3 +1,5 @@
+import type { Radians } from "../math";
+import { pointFrom } from "../math";
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
@@ -203,7 +205,7 @@ const chartXLabels = (
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
-        angle: 5.87,
+        angle: 5.87 as Radians,
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
@@ -258,10 +260,7 @@ const chartLines = (
     x,
     y,
     width: chartWidth,
-    points: [
-      [0, 0],
-      [chartWidth, 0],
-    ],
+    points: [pointFrom(0, 0), pointFrom(chartWidth, 0)],
   });
 
   const yLine = newLinearElement({
@@ -272,10 +271,7 @@ const chartLines = (
     x,
     y,
     height: chartHeight,
-    points: [
-      [0, 0],
-      [0, -chartHeight],
-    ],
+    points: [pointFrom(0, 0), pointFrom(0, -chartHeight)],
   });
 
   const maxLine = newLinearElement({
@@ -288,10 +284,7 @@ const chartLines = (
     strokeStyle: "dotted",
     width: chartWidth,
     opacity: GRID_OPACITY,
-    points: [
-      [0, 0],
-      [chartWidth, 0],
-    ],
+    points: [pointFrom(0, 0), pointFrom(chartWidth, 0)],
   });
 
   return [xLine, yLine, maxLine];
@@ -448,10 +441,7 @@ const chartTypeLine = (
       height: cy,
       strokeStyle: "dotted",
       opacity: GRID_OPACITY,
-      points: [
-        [0, 0],
-        [0, cy],
-      ],
+      points: [pointFrom(0, 0), pointFrom(0, cy)],
     });
   });
 

@@ -2,13 +2,16 @@ import { useEffect, useMemo, useState, memo } from "react";
 import { getCommonBounds } from "../../element/bounds";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
-import type { AppState, ExcalidrawProps } from "../../types";
+import type {
+  AppClassProperties,
+  AppState,
+  ExcalidrawProps,
+} from "../../types";
 import { CloseIcon } from "../icons";
 import { Island } from "../Island";
 import { throttle } from "lodash";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
-
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
 import { elementsAreInSameGroup } from "../../groups";
@@ -17,14 +20,18 @@ import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
 import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
-import type Scene from "../../scene/Scene";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
 import { isElbowArrow } from "../../element/typeChecks";
+import CanvasGrid from "./CanvasGrid";
+import clsx from "clsx";
+
+import "./Stats.scss";
+import { isGridModeEnabled } from "../../snapping";
 
 interface StatsProps {
-  scene: Scene;
+  app: AppClassProperties;
   onClose: () => void;
   renderCustomStats: ExcalidrawProps["renderCustomStats"];
 }
@@ -33,11 +40,12 @@ const STATS_TIMEOUT = 50;
 
 export const Stats = (props: StatsProps) => {
   const appState = useExcalidrawAppState();
-  const sceneNonce = props.scene.getSceneNonce() || 1;
-  const selectedElements = props.scene.getSelectedElements({
+  const sceneNonce = props.app.scene.getSceneNonce() || 1;
+  const selectedElements = props.app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
     includeBoundTextElement: false,
   });
+  const gridModeEnabled = isGridModeEnabled(props.app);
 
   return (
     <StatsInner
@@ -45,23 +53,71 @@ export const Stats = (props: StatsProps) => {
       appState={appState}
       sceneNonce={sceneNonce}
       selectedElements={selectedElements}
+      gridModeEnabled={gridModeEnabled}
     />
   );
 };
 
+const StatsRow = ({
+  children,
+  columns = 1,
+  heading,
+  style,
+  ...rest
+}: {
+  children: React.ReactNode;
+  columns?: number;
+  heading?: boolean;
+  style?: React.CSSProperties;
+} & React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={clsx("exc-stats__row", { "exc-stats__row--heading": heading })}
+    style={{
+      gridTemplateColumns: `repeat(${columns}, 1fr)`,
+      ...style,
+    }}
+    {...rest}
+  >
+    {children}
+  </div>
+);
+StatsRow.displayName = "StatsRow";
+
+const StatsRows = ({
+  children,
+  order,
+  style,
+  ...rest
+}: {
+  children: React.ReactNode;
+  order?: number;
+  style?: React.CSSProperties;
+} & React.HTMLAttributes<HTMLDivElement>) => (
+  <div className="exc-stats__rows" style={{ order, ...style }} {...rest}>
+    {children}
+  </div>
+);
+StatsRows.displayName = "StatsRows";
+
+Stats.StatsRow = StatsRow;
+Stats.StatsRows = StatsRows;
+
 export const StatsInner = memo(
   ({
-    scene,
+    app,
     onClose,
     renderCustomStats,
     selectedElements,
     appState,
     sceneNonce,
+    gridModeEnabled,
   }: StatsProps & {
     sceneNonce: number;
     selectedElements: readonly NonDeletedExcalidrawElement[];
     appState: AppState;
+    gridModeEnabled: boolean;
   }) => {
+    const scene = app.scene;
     const elements = scene.getNonDeletedElements();
     const elementsMap = scene.getNonDeletedElementsMap();
     const setAppState = useExcalidrawSetAppState();
@@ -106,7 +162,7 @@ export const StatsInner = memo(
     }, [selectedElements, appState]);
 
     return (
-      <div className="Stats">
+      <div className="exc-stats">
         <Island padding={3}>
           <div className="title">
             <h2>{t("stats.title")}</h2>
@@ -121,7 +177,6 @@ export const StatsInner = memo(
             openTrigger={() =>
               setAppState((state) => {
                 return {
-                  ...state,
                   stats: {
                     open: true,
                     panels: state.stats.panels ^ STATS_PANELS.generalStats,
@@ -130,26 +185,36 @@ export const StatsInner = memo(
               })
             }
           >
-            <table>
-              <tbody>
-                <tr>
-                  <th colSpan={2}>{t("stats.scene")}</th>
-                </tr>
-                <tr>
-                  <td>{t("stats.elements")}</td>
-                  <td>{elements.length}</td>
-                </tr>
-                <tr>
-                  <td>{t("stats.width")}</td>
-                  <td>{sceneDimension.width}</td>
-                </tr>
-                <tr>
-                  <td>{t("stats.height")}</td>
-                  <td>{sceneDimension.height}</td>
-                </tr>
-                {renderCustomStats?.(elements, appState)}
-              </tbody>
-            </table>
+            <StatsRows>
+              <StatsRow heading>{t("stats.scene")}</StatsRow>
+              <StatsRow columns={2}>
+                <div>{t("stats.shapes")}</div>
+                <div>{elements.length}</div>
+              </StatsRow>
+              <StatsRow columns={2}>
+                <div>{t("stats.width")}</div>
+                <div>{sceneDimension.width}</div>
+              </StatsRow>
+              <StatsRow columns={2}>
+                <div>{t("stats.height")}</div>
+                <div>{sceneDimension.height}</div>
+              </StatsRow>
+              {gridModeEnabled && (
+                <>
+                  <StatsRow heading>Canvas</StatsRow>
+                  <StatsRow>
+                    <CanvasGrid
+                      property="gridStep"
+                      scene={scene}
+                      appState={appState}
+                      setAppState={setAppState}
+                    />
+                  </StatsRow>
+                </>
+              )}
+            </StatsRows>
+
+            {renderCustomStats?.(elements, appState)}
           </Collapsible>
 
           {selectedElements.length > 0 && (
@@ -167,7 +232,6 @@ export const StatsInner = memo(
                 openTrigger={() =>
                   setAppState((state) => {
                     return {
-                      ...state,
                       stats: {
                         open: true,
                         panels:
@@ -177,117 +241,139 @@ export const StatsInner = memo(
                   })
                 }
               >
-                {singleElement && (
-                  <div className="sectionContent">
-                    <div className="elementType">
-                      {t(`element.${singleElement.type}`)}
-                    </div>
+                <StatsRows>
+                  {singleElement && (
+                    <>
+                      <StatsRow heading data-testid="stats-element-type">
+                        {t(`element.${singleElement.type}`)}
+                      </StatsRow>
 
-                    <div className="statsItem">
-                      <Position
-                        element={singleElement}
-                        property="x"
-                        elementsMap={elementsMap}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <Position
-                        element={singleElement}
-                        property="y"
-                        elementsMap={elementsMap}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <Dimension
-                        property="width"
-                        element={singleElement}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <Dimension
-                        property="height"
-                        element={singleElement}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      {!isElbowArrow(singleElement) && (
-                        <Angle
-                          property="angle"
+                      <StatsRow>
+                        <Position
+                          element={singleElement}
+                          property="x"
+                          elementsMap={elementsMap}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <Position
+                          element={singleElement}
+                          property="y"
+                          elementsMap={elementsMap}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <Dimension
+                          property="width"
                           element={singleElement}
                           scene={scene}
                           appState={appState}
                         />
+                      </StatsRow>
+                      <StatsRow>
+                        <Dimension
+                          property="height"
+                          element={singleElement}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      {!isElbowArrow(singleElement) && (
+                        <StatsRow>
+                          <Angle
+                            property="angle"
+                            element={singleElement}
+                            scene={scene}
+                            appState={appState}
+                          />
+                        </StatsRow>
                       )}
-                      <FontSize
-                        property="fontSize"
-                        element={singleElement}
-                        scene={scene}
-                        appState={appState}
-                      />
-                    </div>
-                  </div>
-                )}
+                      <StatsRow>
+                        <FontSize
+                          property="fontSize"
+                          element={singleElement}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                    </>
+                  )}
 
-                {multipleElements && (
-                  <div className="sectionContent">
-                    {elementsAreInSameGroup(multipleElements) && (
-                      <div className="elementType">{t("element.group")}</div>
-                    )}
+                  {multipleElements && (
+                    <>
+                      {elementsAreInSameGroup(multipleElements) && (
+                        <StatsRow heading>{t("element.group")}</StatsRow>
+                      )}
 
-                    <div className="elementsCount">
-                      <div>{t("stats.elements")}</div>
-                      <div>{selectedElements.length}</div>
-                    </div>
+                      <StatsRow columns={2} style={{ margin: "0.3125rem 0" }}>
+                        <div>{t("stats.shapes")}</div>
+                        <div>{selectedElements.length}</div>
+                      </StatsRow>
 
-                    <div className="statsItem">
-                      <MultiPosition
-                        property="x"
-                        elements={multipleElements}
-                        elementsMap={elementsMap}
-                        atomicUnits={atomicUnits}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <MultiPosition
-                        property="y"
-                        elements={multipleElements}
-                        elementsMap={elementsMap}
-                        atomicUnits={atomicUnits}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <MultiDimension
-                        property="width"
-                        elements={multipleElements}
-                        elementsMap={elementsMap}
-                        atomicUnits={atomicUnits}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <MultiDimension
-                        property="height"
-                        elements={multipleElements}
-                        elementsMap={elementsMap}
-                        atomicUnits={atomicUnits}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <MultiAngle
-                        property="angle"
-                        elements={multipleElements}
-                        scene={scene}
-                        appState={appState}
-                      />
-                      <MultiFontSize
-                        property="fontSize"
-                        elements={multipleElements}
-                        scene={scene}
-                        appState={appState}
-                        elementsMap={elementsMap}
-                      />
-                    </div>
-                  </div>
-                )}
+                      <StatsRow>
+                        <MultiPosition
+                          property="x"
+                          elements={multipleElements}
+                          elementsMap={elementsMap}
+                          atomicUnits={atomicUnits}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <MultiPosition
+                          property="y"
+                          elements={multipleElements}
+                          elementsMap={elementsMap}
+                          atomicUnits={atomicUnits}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <MultiDimension
+                          property="width"
+                          elements={multipleElements}
+                          elementsMap={elementsMap}
+                          atomicUnits={atomicUnits}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <MultiDimension
+                          property="height"
+                          elements={multipleElements}
+                          elementsMap={elementsMap}
+                          atomicUnits={atomicUnits}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <MultiAngle
+                          property="angle"
+                          elements={multipleElements}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
+                      <StatsRow>
+                        <MultiFontSize
+                          property="fontSize"
+                          elements={multipleElements}
+                          scene={scene}
+                          appState={appState}
+                          elementsMap={elementsMap}
+                        />
+                      </StatsRow>
+                    </>
+                  )}
+                </StatsRows>
               </Collapsible>
             </div>
           )}
@@ -299,7 +385,9 @@ export const StatsInner = memo(
     return (
       prev.sceneNonce === next.sceneNonce &&
       prev.selectedElements === next.selectedElements &&
-      prev.appState.stats.panels === next.appState.stats.panels
+      prev.appState.stats.panels === next.appState.stats.panels &&
+      prev.gridModeEnabled === next.gridModeEnabled &&
+      prev.appState.gridStep === next.appState.gridStep
     );
   },
 );

@@ -7,6 +7,7 @@ import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { arrayToMap } from "../utils";
+import { pointFrom } from "../../math";
 
 const { h } = window;
 
@@ -32,10 +33,10 @@ describe("element binding", () => {
       width: 100,
       height: 1,
       points: [
-        [0, 0],
-        [0, 0],
-        [100, 0],
-        [100, 0],
+        pointFrom(0, 0),
+        pointFrom(0, 0),
+        pointFrom(100, 0),
+        pointFrom(100, 0),
       ],
     });
     API.setElements([rect, arrow]);
@@ -314,10 +315,7 @@ describe("element binding", () => {
     const arrow1 = API.createElement({
       type: "arrow",
       id: "arrow1",
-      points: [
-        [0, 0],
-        [0, -87.45777932247563],
-      ],
+      points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "rectangle1",
         focus: 0.2,
@@ -335,10 +333,7 @@ describe("element binding", () => {
     const arrow2 = API.createElement({
       type: "arrow",
       id: "arrow2",
-      points: [
-        [0, 0],
-        [0, -87.45777932247563],
-      ],
+      points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "text1",
         focus: 0.2,

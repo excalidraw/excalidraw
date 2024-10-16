@@ -5,17 +5,13 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPointBinding,
   FontFamilyValues,
   OrderedExcalidrawElement,
   PointBinding,
   StrokeRoundness,
 } from "../element/types";
-import type {
-  AppState,
-  BinaryFiles,
-  LibraryItem,
-  NormalizedZoomValue,
-} from "../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
@@ -26,6 +22,7 @@ import {
 import {
   isArrowElement,
   isElbowArrow,
+  isFixedPointBinding,
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -39,6 +36,8 @@ import {
   ROUNDNESS,
   DEFAULT_SIDEBAR,
   DEFAULT_ELEMENT_PROPS,
+  DEFAULT_GRID_SIZE,
+  DEFAULT_GRID_STEP,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -51,6 +50,14 @@ import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
+import { normalizeFixedPoint } from "../element/binding";
+import {
+  getNormalizedGridSize,
+  getNormalizedGridStep,
+  getNormalizedZoom,
+} from "../scene";
+import type { LocalPoint, Radians } from "../../math";
+import { isFiniteNumber, pointFrom } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -96,8 +103,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const repairBinding = (
   element: ExcalidrawLinearElement,
-  binding: PointBinding | null,
-): PointBinding | null => {
+  binding: PointBinding | FixedPointBinding | null,
+): PointBinding | FixedPointBinding | null => {
   if (!binding) {
     return null;
   }
@@ -105,9 +112,11 @@ const repairBinding = (
   return {
     ...binding,
     focus: binding.focus || 0,
-    fixedPoint: isElbowArrow(element)
-      ? binding.fixedPoint ?? ([0, 0] as [number, number])
-      : null,
+    ...(isElbowArrow(element) && isFixedPointBinding(binding)
+      ? {
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+        }
+      : {}),
   };
 };
 
@@ -145,7 +154,7 @@ const restoreElementWithProperties = <
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
-    angle: element.angle || 0,
+    angle: element.angle || (0 as Radians),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
     strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
@@ -259,10 +268,7 @@ const restoreElement = (
       let y = element.y;
       let points = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [
-              [0, 0],
-              [element.width, element.height],
-            ]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
@@ -286,14 +292,11 @@ const restoreElement = (
       });
     case "arrow": {
       const { startArrowhead = null, endArrowhead = "arrow" } = element;
-      let x = element.x;
-      let y = element.y;
-      let points = // migrate old arrow model to new one
+      let x: number | undefined = element.x;
+      let y: number | undefined = element.y;
+      let points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [
-              [0, 0],
-              [element.width, element.height],
-            ]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
@@ -613,19 +616,24 @@ export const restoreAppState = (
       locked: nextAppState.activeTool.locked ?? false,
     },
     // Migrates from previous version where appState.zoom was a number
-    zoom:
-      typeof appState.zoom === "number"
-        ? {
-            value: appState.zoom as NormalizedZoomValue,
-          }
-        : appState.zoom?.value
-        ? appState.zoom
-        : defaultAppState.zoom,
+    zoom: {
+      value: getNormalizedZoom(
+        isFiniteNumber(appState.zoom)
+          ? appState.zoom
+          : appState.zoom?.value ?? defaultAppState.zoom.value,
+      ),
+    },
     openSidebar:
       // string (legacy)
       typeof (appState.openSidebar as any as string) === "string"
         ? { name: DEFAULT_SIDEBAR.name }
         : nextAppState.openSidebar,
+    gridSize: getNormalizedGridSize(
+      isFiniteNumber(appState.gridSize) ? appState.gridSize : DEFAULT_GRID_SIZE,
+    ),
+    gridStep: getNormalizedGridStep(
+      isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
+    ),
   };
 };
 

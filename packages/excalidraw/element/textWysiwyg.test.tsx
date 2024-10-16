@@ -19,6 +19,7 @@ import type {
 import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
+import { pointFrom } from "../../math";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -41,10 +42,7 @@ describe("textWysiwyg", () => {
         type: "line",
         width: 100,
         height: 0,
-        points: [
-          [0, 0],
-          [100, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
       });
       const textSize = 20;
       const text = API.createElement({
@@ -61,9 +59,9 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(
-        (h.state.editingElement as ExcalidrawTextElement).containerId,
+        (h.state.editingTextElement as ExcalidrawTextElement).containerId,
       ).toBe(null);
     });
 
@@ -105,7 +103,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(boundText2.id);
+      expect(h.state.editingTextElement?.id).toBe(boundText2.id);
     });
 
     it("should not create bound text on ENTER if text exists at container center", () => {
@@ -133,7 +131,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
     });
 
     it("should edit existing bound text on ENTER even if higher z-index unbound text exists at container center", () => {
@@ -174,7 +172,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.keyPress(KEYS.ENTER);
 
-      expect(h.state.editingElement?.id).toBe(boundText.id);
+      expect(h.state.editingTextElement?.id).toBe(boundText.id);
     });
 
     it("should edit text under cursor when clicked with text tool", async () => {
@@ -195,7 +193,7 @@ describe("textWysiwyg", () => {
       const editor = await getTextEditor(textEditorSelector, false);
 
       expect(editor).not.toBe(null);
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
     });
 
@@ -217,7 +215,7 @@ describe("textWysiwyg", () => {
       const editor = await getTextEditor(textEditorSelector, false);
 
       expect(editor).not.toBe(null);
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
     });
 
@@ -286,7 +284,7 @@ describe("textWysiwyg", () => {
       mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
       const editor = await getTextEditor(textEditorSelector);
       expect(editor).not.toBe(null);
-      expect(h.state.editingElement?.id).toBe(text.id);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
 
       const nextText = `${wrappedText} is great!`;
@@ -881,7 +879,7 @@ describe("textWysiwyg", () => {
 
       expect(await getTextEditor(textEditorSelector, false)).toBe(null);
 
-      expect(h.state.editingElement).toBe(null);
+      expect(h.state.editingTextElement).toBe(null);
 
       expect(text.fontFamily).toEqual(FONT_FAMILY.Excalifont);
 

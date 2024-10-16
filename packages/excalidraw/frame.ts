@@ -11,7 +11,6 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import { isPointWithinBounds } from "./math";
 import {
   getBoundTextElement,
   getContainerElement,
@@ -30,6 +29,7 @@ import { getElementLineSegments } from "./element/bounds";
 import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
+import { isPointWithinBounds, pointFrom } from "../math";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -159,9 +159,9 @@ export const isCursorInFrame = (
   const [fx1, fy1, fx2, fy2] = getElementAbsoluteCoords(frame, elementsMap);
 
   return isPointWithinBounds(
-    [fx1, fy1],
-    [cursorCoords.x, cursorCoords.y],
-    [fx2, fy2],
+    pointFrom(fx1, fy1),
+    pointFrom(cursorCoords.x, cursorCoords.y),
+    pointFrom(fx2, fy2),
   );
 };
 

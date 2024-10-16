@@ -29,10 +29,10 @@ exports[`given element A and group of elements B and given both are selected whe
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -48,7 +48,9 @@ exports[`given element A and group of elements B and given both are selected whe
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -82,6 +84,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id2": true,
@@ -407,7 +410,7 @@ History {
 
 exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected > [end of test] number of elements 1`] = `0`;
 
-exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected > [end of test] number of renders 1`] = `21`;
+exports[`given element A and group of elements B and given both are selected when user clicks on B, on pointer up only elements from B should be selected > [end of test] number of renders 1`] = `18`;
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] appState 1`] = `
 {
@@ -438,10 +441,10 @@ exports[`given element A and group of elements B and given both are selected whe
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -457,7 +460,9 @@ exports[`given element A and group of elements B and given both are selected whe
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -491,6 +496,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -807,7 +813,7 @@ History {
 
 exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] number of elements 1`] = `0`;
 
-exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] number of renders 1`] = `19`;
+exports[`given element A and group of elements B and given both are selected when user shift-clicks on B, on pointer up only element A should be selected > [end of test] number of renders 1`] = `16`;
 
 exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] appState 1`] = `
 {
@@ -838,10 +844,10 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": "id10",
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -857,7 +863,9 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": false,
   "isLoading": false,
@@ -887,6 +895,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id7": true,
   },
@@ -1346,7 +1355,7 @@ History {
 
 exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of renders 1`] = `29`;
+exports[`regression tests > Cmd/Ctrl-click exclusively select element under pointer > [end of test] number of renders 1`] = `26`;
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] appState 1`] = `
 {
@@ -1377,10 +1386,10 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1396,7 +1405,9 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1426,6 +1437,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -1544,7 +1556,7 @@ History {
 
 exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `11`;
+exports[`regression tests > Drags selected element when hitting only bounding box and keeps element selected > [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests > adjusts z order when grouping > [end of test] appState 1`] = `
 {
@@ -1575,10 +1587,10 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1594,7 +1606,9 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1626,6 +1640,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id2": true,
@@ -1913,7 +1928,7 @@ History {
 
 exports[`regression tests > adjusts z order when grouping > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > adjusts z order when grouping > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > adjusts z order when grouping > [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] appState 1`] = `
 {
@@ -1944,10 +1959,10 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -1963,7 +1978,9 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -1995,6 +2012,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -2147,7 +2165,7 @@ History {
 
 exports[`regression tests > alt-drag duplicates an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `9`;
+exports[`regression tests > alt-drag duplicates an element > [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests > arrow keys > [end of test] appState 1`] = `
 {
@@ -2178,10 +2196,10 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2197,7 +2215,9 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2227,6 +2247,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -2321,7 +2342,7 @@ History {
 
 exports[`regression tests > arrow keys > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > arrow keys > [end of test] number of renders 1`] = `13`;
+exports[`regression tests > arrow keys > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] appState 1`] = `
 {
@@ -2352,10 +2373,10 @@ exports[`regression tests > can drag element that covers another element, while 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2371,7 +2392,9 @@ exports[`regression tests > can drag element that covers another element, while 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2403,6 +2426,7 @@ exports[`regression tests > can drag element that covers another element, while 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -2635,7 +2659,7 @@ History {
 
 exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > can drag element that covers another element, while another elem is selected > [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests > change the properties of a shape > [end of test] appState 1`] = `
 {
@@ -2666,10 +2690,10 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2685,7 +2709,9 @@ exports[`regression tests > change the properties of a shape > [end of test] app
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2715,6 +2741,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -2875,7 +2902,7 @@ History {
 
 exports[`regression tests > change the properties of a shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > change the properties of a shape > [end of test] number of renders 1`] = `10`;
+exports[`regression tests > change the properties of a shape > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > click on an element and drag it > [dragged] appState 1`] = `
 {
@@ -2906,10 +2933,10 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -2925,7 +2952,9 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -2957,6 +2986,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -3112,7 +3142,7 @@ History {
 
 exports[`regression tests > click on an element and drag it > [dragged] number of elements 1`] = `1`;
 
-exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `9`;
+exports[`regression tests > click on an element and drag it > [dragged] number of renders 1`] = `8`;
 
 exports[`regression tests > click on an element and drag it > [end of test] appState 1`] = `
 {
@@ -3143,10 +3173,10 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3162,7 +3192,9 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3194,6 +3226,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -3336,7 +3369,7 @@ History {
 
 exports[`regression tests > click on an element and drag it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `11`;
+exports[`regression tests > click on an element and drag it > [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests > click to select a shape > [end of test] appState 1`] = `
 {
@@ -3367,10 +3400,10 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3386,7 +3419,9 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3418,6 +3453,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -3586,7 +3622,7 @@ History {
 
 exports[`regression tests > click to select a shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click to select a shape > [end of test] number of renders 1`] = `12`;
+exports[`regression tests > click to select a shape > [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests > click-drag to select a group > [end of test] appState 1`] = `
 {
@@ -3617,10 +3653,10 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3636,7 +3672,9 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3668,6 +3706,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -3891,7 +3930,7 @@ History {
 
 exports[`regression tests > click-drag to select a group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `17`;
+exports[`regression tests > click-drag to select a group > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] appState 1`] = `
 {
@@ -3922,10 +3961,10 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -3941,7 +3980,9 @@ exports[`regression tests > deleting last but one element in editing group shoul
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -3971,6 +4012,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -4299,7 +4341,7 @@ History {
 
 exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] number of renders 1`] = `19`;
+exports[`regression tests > deleting last but one element in editing group should unselect the group > [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] appState 1`] = `
 {
@@ -4330,10 +4372,10 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "currentItemTextAlign": "left",
   "cursorButton": "down",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4349,7 +4391,9 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -4382,6 +4426,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4576,7 +4621,7 @@ History {
 
 exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `13`;
+exports[`regression tests > deselects group of selected elements on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] appState 1`] = `
 {
@@ -4607,10 +4652,10 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4626,7 +4671,9 @@ exports[`regression tests > deselects group of selected elements on pointer up w
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -4659,6 +4706,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4823,7 +4871,7 @@ History {
 
 exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] number of renders 1`] = `13`;
+exports[`regression tests > deselects group of selected elements on pointer up when pointer hits common bounding box without hitting any element > [end of test] number of renders 1`] = `11`;
 
 exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] appState 1`] = `
 {
@@ -4854,10 +4902,10 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "currentItemTextAlign": "left",
   "cursorButton": "down",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -4873,7 +4921,9 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -4905,6 +4955,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5027,7 +5078,7 @@ History {
 
 exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `8`;
+exports[`regression tests > deselects selected element on pointer down when pointer doesn't hit any element > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] appState 1`] = `
 {
@@ -5058,10 +5109,10 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5077,7 +5128,9 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -5109,6 +5162,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5220,7 +5274,7 @@ History {
 
 exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] number of renders 1`] = `8`;
+exports[`regression tests > deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > double click to edit a group > [end of test] appState 1`] = `
 {
@@ -5251,10 +5305,10 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": "id3",
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5270,7 +5324,9 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -5300,6 +5356,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id2": true,
   },
@@ -5596,7 +5653,7 @@ History {
 
 exports[`regression tests > double click to edit a group > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > double click to edit a group > [end of test] number of renders 1`] = `18`;
+exports[`regression tests > double click to edit a group > [end of test] number of renders 1`] = `15`;
 
 exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] appState 1`] = `
 {
@@ -5627,10 +5684,10 @@ exports[`regression tests > drags selected elements from point inside common bou
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5646,7 +5703,9 @@ exports[`regression tests > drags selected elements from point inside common bou
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -5679,6 +5738,7 @@ exports[`regression tests > drags selected elements from point inside common bou
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -5880,7 +5940,7 @@ History {
 
 exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of renders 1`] = `14`;
+exports[`regression tests > drags selected elements from point inside common bounding box that doesn't hit any element and keeps elements selected after dragging > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > draw every type of shape > [end of test] appState 1`] = `
 {
@@ -5911,10 +5971,10 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -5930,7 +5990,9 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -5960,6 +6022,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -6682,7 +6745,7 @@ History {
 
 exports[`regression tests > draw every type of shape > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `43`;
+exports[`regression tests > draw every type of shape > [end of test] number of renders 1`] = `33`;
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] appState 1`] = `
 {
@@ -6713,10 +6776,10 @@ exports[`regression tests > given a group of selected elements with an element t
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -6732,7 +6795,9 @@ exports[`regression tests > given a group of selected elements with an element t
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -6765,6 +6830,7 @@ exports[`regression tests > given a group of selected elements with an element t
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -7006,7 +7072,7 @@ History {
 
 exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] number of renders 1`] = `17`;
+exports[`regression tests > given a group of selected elements with an element that is not selected inside the group common bounding box when element that is not selected is clicked should switch selection to not selected element on pointer up > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] appState 1`] = `
 {
@@ -7037,10 +7103,10 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7056,7 +7122,9 @@ exports[`regression tests > given a selected element A and a not selected elemen
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -7088,6 +7156,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -7276,7 +7345,7 @@ History {
 
 exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of renders 1`] = `14`;
+exports[`regression tests > given a selected element A and a not selected element B with higher z-index than A and given B partially overlaps A when there's a shift-click on the overlapped section B is added to the selection > [end of test] number of renders 1`] = `12`;
 
 exports[`regression tests > given selected element A with lower z-index than unselected element B and given B is partially over A when clicking intersection between A and B B should be selected on pointer up > [end of test] appState 1`] = `
 {
@@ -7307,10 +7376,10 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7326,7 +7395,9 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -7358,6 +7429,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -7535,10 +7607,10 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7554,7 +7626,9 @@ exports[`regression tests > given selected element A with lower z-index than uns
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -7586,6 +7660,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -7766,10 +7841,10 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7785,7 +7860,9 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -7815,6 +7892,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -7909,7 +7987,7 @@ History {
 
 exports[`regression tests > key 2 selects rectangle tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 2 selects rectangle tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 2 selects rectangle tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 3 selects diamond tool > [end of test] appState 1`] = `
 {
@@ -7940,10 +8018,10 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -7959,7 +8037,9 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -7989,6 +8069,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -8083,7 +8164,7 @@ History {
 
 exports[`regression tests > key 3 selects diamond tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 3 selects diamond tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 3 selects diamond tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 1`] = `
 {
@@ -8114,10 +8195,10 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8133,7 +8214,9 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -8163,6 +8246,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -8257,7 +8341,7 @@ History {
 
 exports[`regression tests > key 4 selects ellipse tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 4 selects ellipse tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 4 selects ellipse tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`] = `
 {
@@ -8288,10 +8372,10 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8307,7 +8391,9 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -8337,12 +8423,14 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": LinearElementEditor {
+    "elbowed": false,
     "elementId": "id0",
     "endBindingElement": "keep",
     "hoverPointIndex": -1,
@@ -8473,7 +8561,7 @@ History {
 
 exports[`regression tests > key 5 selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 5 selects arrow tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 6 selects line tool > [end of test] appState 1`] = `
 {
@@ -8504,10 +8592,10 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8523,7 +8611,9 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -8553,12 +8643,14 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": LinearElementEditor {
+    "elbowed": false,
     "elementId": "id0",
     "endBindingElement": "keep",
     "hoverPointIndex": -1,
@@ -8688,7 +8780,7 @@ History {
 
 exports[`regression tests > key 6 selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 6 selects line tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key 7 selects freedraw tool > [end of test] appState 1`] = `
 {
@@ -8719,10 +8811,10 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8738,7 +8830,9 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -8768,6 +8862,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8876,7 +8971,7 @@ History {
 
 exports[`regression tests > key 7 selects freedraw tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key 7 selects freedraw tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key 7 selects freedraw tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key a selects arrow tool > [end of test] appState 1`] = `
 {
@@ -8907,10 +9002,10 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -8926,7 +9021,9 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -8956,12 +9053,14 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": LinearElementEditor {
+    "elbowed": false,
     "elementId": "id0",
     "endBindingElement": "keep",
     "hoverPointIndex": -1,
@@ -9092,7 +9191,7 @@ History {
 
 exports[`regression tests > key a selects arrow tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key a selects arrow tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key d selects diamond tool > [end of test] appState 1`] = `
 {
@@ -9123,10 +9222,10 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9142,7 +9241,9 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -9172,6 +9273,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -9266,7 +9368,7 @@ History {
 
 exports[`regression tests > key d selects diamond tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key d selects diamond tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key d selects diamond tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key l selects line tool > [end of test] appState 1`] = `
 {
@@ -9297,10 +9399,10 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9316,7 +9418,9 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -9346,12 +9450,14 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectedLinearElement": LinearElementEditor {
+    "elbowed": false,
     "elementId": "id0",
     "endBindingElement": "keep",
     "hoverPointIndex": -1,
@@ -9481,7 +9587,7 @@ History {
 
 exports[`regression tests > key l selects line tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key l selects line tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key o selects ellipse tool > [end of test] appState 1`] = `
 {
@@ -9512,10 +9618,10 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9531,7 +9637,9 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -9561,6 +9669,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -9655,7 +9764,7 @@ History {
 
 exports[`regression tests > key o selects ellipse tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key o selects ellipse tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key o selects ellipse tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key p selects freedraw tool > [end of test] appState 1`] = `
 {
@@ -9686,10 +9795,10 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9705,7 +9814,9 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -9735,6 +9846,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -9843,7 +9955,7 @@ History {
 
 exports[`regression tests > key p selects freedraw tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key p selects freedraw tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key p selects freedraw tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > key r selects rectangle tool > [end of test] appState 1`] = `
 {
@@ -9874,10 +9986,10 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -9893,7 +10005,9 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -9923,6 +10037,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -10017,7 +10132,7 @@ History {
 
 exports[`regression tests > key r selects rectangle tool > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > key r selects rectangle tool > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > key r selects rectangle tool > [end of test] number of renders 1`] = `6`;
 
 exports[`regression tests > make a group and duplicate it > [end of test] appState 1`] = `
 {
@@ -10048,10 +10163,10 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10067,7 +10182,9 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -10101,6 +10218,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -10525,7 +10643,7 @@ History {
 
 exports[`regression tests > make a group and duplicate it > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > make a group and duplicate it > [end of test] number of renders 1`] = `20`;
+exports[`regression tests > make a group and duplicate it > [end of test] number of renders 1`] = `17`;
 
 exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] appState 1`] = `
 {
@@ -10556,10 +10674,10 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10575,7 +10693,9 @@ exports[`regression tests > noop interaction after undo shouldn't create history
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -10607,6 +10727,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -10796,7 +10917,7 @@ History {
 
 exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of renders 1`] = `16`;
+exports[`regression tests > noop interaction after undo shouldn't create history entry > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
 {
@@ -10827,10 +10948,10 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "currentItemTextAlign": "left",
   "cursorButton": "down",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10846,7 +10967,9 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -10876,6 +10999,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "scrollX": "-6.25000",
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10947,10 +11071,10 @@ exports[`regression tests > shift click on selected element should deselect it o
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -10966,7 +11090,9 @@ exports[`regression tests > shift click on selected element should deselect it o
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -10998,6 +11124,7 @@ exports[`regression tests > shift click on selected element should deselect it o
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -11109,7 +11236,7 @@ History {
 
 exports[`regression tests > shift click on selected element should deselect it on pointer up > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > shift click on selected element should deselect it on pointer up > [end of test] number of renders 1`] = `8`;
+exports[`regression tests > shift click on selected element should deselect it on pointer up > [end of test] number of renders 1`] = `7`;
 
 exports[`regression tests > shift-click to multiselect, then drag > [end of test] appState 1`] = `
 {
@@ -11140,10 +11267,10 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11159,7 +11286,9 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -11192,6 +11321,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -11414,7 +11544,7 @@ History {
 
 exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of renders 1`] = `15`;
+exports[`regression tests > shift-click to multiselect, then drag > [end of test] number of renders 1`] = `13`;
 
 exports[`regression tests > should group elements and ungroup them > [end of test] appState 1`] = `
 {
@@ -11445,10 +11575,10 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11464,7 +11594,9 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -11498,6 +11630,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -11820,7 +11953,7 @@ History {
 
 exports[`regression tests > should group elements and ungroup them > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > should group elements and ungroup them > [end of test] number of renders 1`] = `21`;
+exports[`regression tests > should group elements and ungroup them > [end of test] number of renders 1`] = `18`;
 
 exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] appState 1`] = `
 {
@@ -11851,10 +11984,10 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -11870,7 +12003,9 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -11905,6 +12040,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -12427,7 +12563,7 @@ History {
 
 exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of renders 1`] = `29`;
+exports[`regression tests > single-clicking on a subgroup of a selected group should not alter selection > [end of test] number of renders 1`] = `25`;
 
 exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] appState 1`] = `
 {
@@ -12458,10 +12594,10 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -12477,7 +12613,9 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -12510,6 +12648,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "scrollX": 60,
   "scrollY": 60,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -12581,10 +12720,10 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": "id3",
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -12600,7 +12739,9 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -12632,6 +12773,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -13128,7 +13270,7 @@ History {
 
 exports[`regression tests > supports nested groups > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > supports nested groups > [end of test] number of renders 1`] = `26`;
+exports[`regression tests > supports nested groups > [end of test] number of renders 1`] = `23`;
 
 exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] appState 1`] = `
 {
@@ -13159,10 +13301,10 @@ exports[`regression tests > switches from group of selected elements to another 
   "currentItemTextAlign": "left",
   "cursorButton": "down",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13178,7 +13320,9 @@ exports[`regression tests > switches from group of selected elements to another 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -13211,6 +13355,7 @@ exports[`regression tests > switches from group of selected elements to another 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -13460,7 +13605,7 @@ History {
 
 exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] number of renders 1`] = `17`;
+exports[`regression tests > switches from group of selected elements to another element on pointer down > [end of test] number of renders 1`] = `14`;
 
 exports[`regression tests > switches selected element on pointer down > [end of test] appState 1`] = `
 {
@@ -13491,10 +13636,10 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "currentItemTextAlign": "left",
   "cursorButton": "down",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13510,7 +13655,9 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -13542,6 +13689,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id0": true,
   },
@@ -13719,7 +13867,7 @@ History {
 
 exports[`regression tests > switches selected element on pointer down > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > switches selected element on pointer down > [end of test] number of renders 1`] = `12`;
+exports[`regression tests > switches selected element on pointer down > [end of test] number of renders 1`] = `10`;
 
 exports[`regression tests > two-finger scroll works > [end of test] appState 1`] = `
 {
@@ -13750,10 +13898,10 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "currentItemTextAlign": "left",
   "cursorButton": "down",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13769,7 +13917,9 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -13799,6 +13949,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "scrollX": 20,
   "scrollY": "-18.53553",
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -13870,10 +14021,10 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -13889,7 +14040,9 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -13919,6 +14072,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {
     "id1": true,
   },
@@ -14212,7 +14366,7 @@ History {
 
 exports[`regression tests > undo/redo drawing an element > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `24`;
+exports[`regression tests > undo/redo drawing an element > [end of test] number of renders 1`] = `20`;
 
 exports[`regression tests > updates fontSize & fontFamily appState > [end of test] appState 1`] = `
 {
@@ -14243,10 +14397,10 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -14262,7 +14416,9 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -14292,6 +14448,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -14363,10 +14520,10 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "currentItemTextAlign": "left",
   "cursorButton": "up",
   "defaultSidebarDockedPreference": false,
-  "editingElement": null,
   "editingFrame": null,
   "editingGroupId": null,
   "editingLinearElement": null,
+  "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -14382,7 +14539,9 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
     "outline": true,
   },
   "frameToHighlight": null,
-  "gridSize": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
   "height": 768,
   "isBindingEnabled": true,
   "isLoading": false,
@@ -14415,6 +14574,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
+  "searchMatches": [],
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},

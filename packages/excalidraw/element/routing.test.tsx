@@ -17,25 +17,11 @@ import type {
   ExcalidrawElbowArrowElement,
 } from "./types";
 import { ARROW_TYPE } from "../constants";
+import { pointFrom } from "../../math";
 
 const { h } = window;
 
 const mouse = new Pointer("mouse");
-
-const getStatsProperty = (label: string) => {
-  const elementStats = UI.queryStats()?.querySelector("#elementStats");
-
-  if (elementStats) {
-    const properties = elementStats?.querySelector(".statsItem");
-    return (
-      properties?.querySelector?.(
-        `.drag-input-container[data-testid="${label}"]`,
-      ) || null
-    );
-  }
-
-  return null;
-};
 
 describe("elbow arrow routing", () => {
   it("can properly generate orthogonal arrow points", () => {
@@ -45,9 +31,9 @@ describe("elbow arrow routing", () => {
       elbowed: true,
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
-    mutateElbowArrow(arrow, scene, [
-      [-45 - arrow.x, -100.1 - arrow.y],
-      [45 - arrow.x, 99.9 - arrow.y],
+    mutateElbowArrow(arrow, scene.getNonDeletedElementsMap(), [
+      pointFrom(-45 - arrow.x, -100.1 - arrow.y),
+      pointFrom(45 - arrow.x, 99.9 - arrow.y),
     ]);
     expect(arrow.points).toEqual([
       [0, 0],
@@ -83,10 +69,7 @@ describe("elbow arrow routing", () => {
       y: -100.1,
       width: 90,
       height: 200,
-      points: [
-        [0, 0],
-        [90, 200],
-      ],
+      points: [pointFrom(0, 0), pointFrom(90, 200)],
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(rectangle1);
     scene.insertElement(rectangle2);
@@ -98,10 +81,7 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    mutateElbowArrow(arrow, scene, [
-      [0, 0],
-      [90, 200],
-    ]);
+    mutateElbowArrow(arrow, elementsMap, [pointFrom(0, 0), pointFrom(90, 200)]);
 
     expect(arrow.points).toEqual([
       [0, 0],
@@ -114,7 +94,16 @@ describe("elbow arrow routing", () => {
 
 describe("elbow arrow ui", () => {
   beforeEach(async () => {
+    localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
   });
 
   it("can follow bound shapes", async () => {
@@ -150,8 +139,8 @@ describe("elbow arrow ui", () => {
     expect(arrow.elbowed).toBe(true);
     expect(arrow.points).toEqual([
       [0, 0],
-      [35, 0],
-      [35, 200],
+      [45, 0],
+      [45, 200],
       [90, 200],
     ]);
   });
@@ -183,17 +172,9 @@ describe("elbow arrow ui", () => {
       h.state,
     )[0] as ExcalidrawArrowElement;
 
-    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
-      button: 2,
-      clientX: 1,
-      clientY: 1,
-    });
-    const contextMenu = UI.queryContextMenu();
-    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
-
     mouse.click(51, 51);
 
-    const inputAngle = getStatsProperty("A")?.querySelector(
+    const inputAngle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
@@ -202,8 +183,8 @@ describe("elbow arrow ui", () => {
       [0, 0],
       [35, 0],
       [35, 90],
-      [25, 90],
-      [25, 165],
+      [35, 90], // Note that coordinates are rounded above!
+      [35, 165],
       [103, 165],
     ]);
   });

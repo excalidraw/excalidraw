@@ -240,6 +240,55 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <button
+      aria-label="Find on canvas"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="search-menu-button"
+      title="Find on canvas"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-width="1.5"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"
+            />
+            <path
+              d="M21 21l-6 -6"
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Find on canvas
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Ctrl+F
+      </div>
+    </button>
+    <button
       aria-label="Help"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"

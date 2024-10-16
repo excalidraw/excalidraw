@@ -31,6 +31,7 @@ import type {
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FixedPointBinding,
   FractionalIndex,
   SceneElementsMap,
 } from "../element/types";
@@ -44,7 +45,8 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
-import type Scene from "../scene/Scene";
+import type { LocalPoint, Radians } from "../../math";
+import { pointFrom } from "../../math";
 
 const { h } = window;
 
@@ -118,7 +120,6 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
-              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -140,7 +141,6 @@ describe("history", () => {
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
               Snapshot.empty(),
-              {} as Scene,
             ) as any,
         );
       } catch (e) {
@@ -756,7 +756,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
           isDeleted: false,
@@ -964,7 +964,7 @@ describe("history", () => {
       expect(API.getRedoStack().length).toBe(0);
       expect(assertSelectedElements(h.elements[0]));
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
           isDeleted: false,
@@ -2041,22 +2041,22 @@ describe("history", () => {
             width: 178.9000000000001,
             height: 236.10000000000002,
             points: [
-              [0, 0],
-              [178.9000000000001, 0],
-              [178.9000000000001, 236.10000000000002],
+              pointFrom(0, 0),
+              pointFrom(178.9000000000001, 0),
+              pointFrom(178.9000000000001, 236.10000000000002),
             ],
             startBinding: {
               elementId: "KPrBI4g_v9qUB1XxYLgSz",
               focus: -0.001587301587301948,
               gap: 5,
               fixedPoint: [1.0318471337579618, 0.49920634920634904],
-            },
+            } as FixedPointBinding,
             endBinding: {
               elementId: "u2JGnnmoJ0VATV4vCNJE5",
               focus: -0.0016129032258049847,
               gap: 3.537079145500037,
               fixedPoint: [0.4991935483870975, -0.03875193720914723],
-            },
+            } as FixedPointBinding,
           },
         ],
         storeAction: StoreAction.CAPTURE,
@@ -2159,12 +2159,12 @@ describe("history", () => {
         elements: [
           newElementWith(h.elements[0] as ExcalidrawLinearElement, {
             points: [
-              [0, 0],
-              [5, 5],
-              [10, 10],
-              [15, 15],
-              [20, 20],
-            ],
+              pointFrom(0, 0),
+              pointFrom(5, 5),
+              pointFrom(10, 10),
+              pointFrom(15, 15),
+              pointFrom(20, 20),
+            ] as LocalPoint[],
           }),
         ],
         storeAction: StoreAction.UPDATE,
@@ -2730,7 +2730,7 @@ describe("history", () => {
       expect(API.getUndoStack().length).toBe(4);
       expect(API.getRedoStack().length).toBe(0);
       expect(h.state.editingLinearElement).toBeNull();
-      expect(h.state.selectedLinearElement).toBeNull();
+      expect(h.state.selectedLinearElement).not.toBeNull();
 
       // Simulate remote update
       API.updateScene({
@@ -2743,8 +2743,8 @@ describe("history", () => {
       });
 
       Keyboard.undo();
-      expect(API.getUndoStack().length).toBe(0);
-      expect(API.getRedoStack().length).toBe(4);
+      expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(3);
       expect(h.state.editingLinearElement).toBeNull();
       expect(h.state.selectedLinearElement).toBeNull();
 
@@ -4006,7 +4006,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 200,
               y: 200,
-              angle: 90,
+              angle: 90 as Radians,
             }),
           ],
           storeAction: StoreAction.CAPTURE,
@@ -4124,7 +4124,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 205,
               y: 205,
-              angle: 90,
+              angle: 90 as Radians,
             }),
           ],
           storeAction: StoreAction.CAPTURE,
@@ -4456,7 +4456,7 @@ describe("history", () => {
           elements: [
             h.elements[0],
             newElementWith(h.elements[1], { boundElements: [] }),
-            newElementWith(h.elements[2] as ExcalidrawLinearElement, {
+            newElementWith(h.elements[2] as ExcalidrawElbowArrowElement, {
               endBinding: {
                 elementId: remoteContainer.id,
                 gap: 1,
@@ -4656,7 +4656,7 @@ describe("history", () => {
         // Simulate remote update
         API.updateScene({
           elements: [
-            newElementWith(h.elements[0] as ExcalidrawLinearElement, {
+            newElementWith(h.elements[0] as ExcalidrawElbowArrowElement, {
               startBinding: {
                 elementId: rect1.id,
                 gap: 1,

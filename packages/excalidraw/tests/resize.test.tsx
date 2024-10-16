@@ -4,10 +4,10 @@ import { render } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
+  ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
-import type { Point } from "../types";
 import type { Bounds } from "../element/bounds";
 import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
@@ -16,6 +16,8 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
+import type { LocalPoint } from "../../math";
+import { pointFrom } from "../../math";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -217,18 +219,18 @@ describe("generic element", () => {
 });
 
 describe.each(["line", "freedraw"] as const)("%s element", (type) => {
-  const points: Record<typeof type, Point[]> = {
+  const points: Record<typeof type, LocalPoint[]> = {
     line: [
-      [0, 0],
-      [60, -20],
-      [20, 40],
-      [-40, 0],
+      pointFrom(0, 0),
+      pointFrom(60, -20),
+      pointFrom(20, 40),
+      pointFrom(-40, 0),
     ],
     freedraw: [
-      [0, 0],
-      [-2.474600807561444, 41.021700699972],
-      [3.6627956000014024, 47.84174560617245],
-      [40.495224145598115, 47.15909710753482],
+      pointFrom(0, 0),
+      pointFrom(-2.474600807561444, 41.021700699972),
+      pointFrom(3.6627956000014024, 47.84174560617245),
+      pointFrom(40.495224145598115, 47.15909710753482),
     ],
   };
 
@@ -296,11 +298,11 @@ describe("arrow element", () => {
   it("resizes with a label", async () => {
     const arrow = UI.createElement("arrow", {
       points: [
-        [0, 0],
-        [40, 140],
-        [80, 60], // label's anchor
-        [180, 20],
-        [200, 120],
+        pointFrom(0, 0),
+        pointFrom(40, 140),
+        pointFrom(80, 60), // label's anchor
+        pointFrom(180, 20),
+        pointFrom(200, 120),
       ],
     });
     const label = await UI.editText(arrow, "Hello");
@@ -336,6 +338,62 @@ describe("arrow element", () => {
     );
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
+  });
+
+  it("flips the fixed point binding on negative resize for single bindable", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize(rectangle, "se", [-200, -150]);
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+  });
+
+  it("flips the fixed point binding on negative resize for group selection", () => {
+    const rectangle = UI.createElement("rectangle", {
+      x: -100,
+      y: -75,
+      width: 95,
+      height: 100,
+    });
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+    mouse.reset();
+    mouse.moveTo(-5, 0);
+    mouse.click();
+    mouse.moveTo(120, 200);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+
+    UI.resize([rectangle, arrow], "nw", [300, 350]);
+
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.144, 2);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
 
@@ -694,24 +752,24 @@ describe("multiple selection", () => {
       x: 60,
       y: 40,
       points: [
-        [0, 0],
-        [-40, 40],
-        [-60, 0],
-        [0, -40],
-        [40, 20],
-        [0, 40],
+        pointFrom(0, 0),
+        pointFrom(-40, 40),
+        pointFrom(-60, 0),
+        pointFrom(0, -40),
+        pointFrom(40, 20),
+        pointFrom(0, 40),
       ],
     });
     const freedraw = UI.createElement("freedraw", {
       x: 63.56072661326618,
       y: 100,
       points: [
-        [0, 0],
-        [-43.56072661326618, 18.15048126846341],
-        [-43.56072661326618, 29.041198460587566],
-        [-38.115368017204105, 42.652452795512204],
-        [-19.964886748740696, 66.24829266003775],
-        [19.056612930986716, 77.1390098521619],
+        pointFrom(0, 0),
+        pointFrom(-43.56072661326618, 18.15048126846341),
+        pointFrom(-43.56072661326618, 29.041198460587566),
+        pointFrom(-38.115368017204105, 42.652452795512204),
+        pointFrom(-19.964886748740696, 66.24829266003775),
+        pointFrom(19.056612930986716, 77.1390098521619),
       ],
     });
 
@@ -832,7 +890,6 @@ describe("multiple selection", () => {
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );
-    expect(leftBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(leftBoundArrow.endBinding?.focus).toBe(leftArrowBinding.focus);
 
     expect(rightBoundArrow.x).toBeCloseTo(210);
@@ -847,7 +904,6 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );
-    expect(rightBoundArrow.endBinding?.fixedPoint).toBeNull();
     expect(rightBoundArrow.endBinding?.focus).toBe(rightArrowBinding.focus);
   });
 
@@ -1050,13 +1106,13 @@ describe("multiple selection", () => {
       x: 60,
       y: 0,
       points: [
-        [0, 0],
-        [-40, 40],
-        [-20, 60],
-        [20, 20],
-        [40, 40],
-        [-20, 100],
-        [-60, 60],
+        pointFrom(0, 0),
+        pointFrom(-40, 40),
+        pointFrom(-20, 60),
+        pointFrom(20, 20),
+        pointFrom(40, 40),
+        pointFrom(-20, 100),
+        pointFrom(-60, 60),
       ],
     });
 

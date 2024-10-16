@@ -11,16 +11,21 @@ import {
   isLinearElement,
   isTextElement,
 } from "../excalidraw/element/typeChecks";
-import { isValueInRange, rotatePoint } from "../excalidraw/math";
-import type { Point } from "../excalidraw/types";
 import type { Bounds } from "../excalidraw/element/bounds";
 import { getElementBounds } from "../excalidraw/element/bounds";
 import { arrayToMap } from "../excalidraw/utils";
+import type { LocalPoint } from "../math";
+import {
+  rangeIncludesValue,
+  pointFrom,
+  pointRotateRads,
+  rangeInclusive,
+} from "../math";
 
 type Element = NonDeletedExcalidrawElement;
 type Elements = readonly NonDeletedExcalidrawElement[];
 
-type Points = readonly Point[];
+type Points = readonly LocalPoint[];
 
 /** @returns vertices relative to element's top-left [0,0] position  */
 const getNonLinearElementRelativePoints = (
@@ -28,20 +33,25 @@ const getNonLinearElementRelativePoints = (
     Element,
     ExcalidrawLinearElement | ExcalidrawFreeDrawElement
   >,
-): [TopLeft: Point, TopRight: Point, BottomRight: Point, BottomLeft: Point] => {
+): [
+  TopLeft: LocalPoint,
+  TopRight: LocalPoint,
+  BottomRight: LocalPoint,
+  BottomLeft: LocalPoint,
+] => {
   if (element.type === "diamond") {
     return [
-      [element.width / 2, 0],
-      [element.width, element.height / 2],
-      [element.width / 2, element.height],
-      [0, element.height / 2],
+      pointFrom(element.width / 2, 0),
+      pointFrom(element.width, element.height / 2),
+      pointFrom(element.width / 2, element.height),
+      pointFrom(0, element.height / 2),
     ];
   }
   return [
-    [0, 0],
-    [0 + element.width, 0],
-    [0 + element.width, element.height],
-    [0, element.height],
+    pointFrom(0, 0),
+    pointFrom(0 + element.width, 0),
+    pointFrom(0 + element.width, element.height),
+    pointFrom(0, element.height),
   ];
 };
 
@@ -84,10 +94,10 @@ const getRotatedBBox = (element: Element): Bounds => {
   const points = getElementRelativePoints(element);
 
   const { cx, cy } = getMinMaxPoints(points);
-  const centerPoint: Point = [cx, cy];
+  const centerPoint = pointFrom<LocalPoint>(cx, cy);
 
-  const rotatedPoints = points.map((point) =>
-    rotatePoint([point[0], point[1]], centerPoint, element.angle),
+  const rotatedPoints = points.map((p) =>
+    pointRotateRads(p, centerPoint, element.angle),
   );
   const { minX, minY, maxX, maxY } = getMinMaxPoints(rotatedPoints);
 
@@ -135,10 +145,16 @@ export const elementPartiallyOverlapsWithOrContainsBBox = (
   const elementBBox = getRotatedBBox(element);
 
   return (
-    (isValueInRange(elementBBox[0], bbox[0], bbox[2]) ||
-      isValueInRange(bbox[0], elementBBox[0], elementBBox[2])) &&
-    (isValueInRange(elementBBox[1], bbox[1], bbox[3]) ||
-      isValueInRange(bbox[1], elementBBox[1], elementBBox[3]))
+    (rangeIncludesValue(elementBBox[0], rangeInclusive(bbox[0], bbox[2])) ||
+      rangeIncludesValue(
+        bbox[0],
+        rangeInclusive(elementBBox[0], elementBBox[2]),
+      )) &&
+    (rangeIncludesValue(elementBBox[1], rangeInclusive(bbox[1], bbox[3])) ||
+      rangeIncludesValue(
+        bbox[1],
+        rangeInclusive(elementBBox[1], elementBBox[3]),
+      ))
   );
 };
 

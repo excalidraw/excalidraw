@@ -9,6 +9,8 @@ import type {
   ExcalidrawFrameElement,
   ExcalidrawElementType,
   ExcalidrawMagicFrameElement,
+  ExcalidrawElbowArrowElement,
+  ExcalidrawArrowElement,
 } from "../../element/types";
 import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
@@ -27,7 +29,7 @@ import {
   newImageElement,
   newMagicFrameElement,
 } from "../../element/newElement";
-import type { AppState, Point } from "../../types";
+import type { AppState } from "../../types";
 import { getSelectedElements } from "../../scene/selection";
 import { isLinearElementType } from "../../element/typeChecks";
 import type { Mutable } from "../../utility-types";
@@ -36,6 +38,7 @@ import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
 import type { Action } from "../../actions/types";
 import { mutateElement } from "../../element/mutateElement";
+import { pointFrom, type LocalPoint, type Radians } from "../../../math";
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.
@@ -75,11 +78,12 @@ export class API {
     });
   };
 
-  static updateElement = (
-    ...[element, updates]: Parameters<typeof mutateElement>
+  // eslint-disable-next-line prettier/prettier
+  static updateElement = <T extends ExcalidrawElement>(
+    ...args: Parameters<typeof mutateElement<T>>
   ) => {
     act(() => {
-      mutateElement(element, updates);
+      mutateElement<T>(...args);
     });
   };
 
@@ -124,6 +128,10 @@ export class API {
     });
     expect(API.getSelectedElements().length).toBe(0);
   };
+
+  static getElement = <T extends ExcalidrawElement>(element: T): T => {
+    return h.app.scene.getElementsMapIncludingDeleted().get(element.id) as T || element;
+  }
 
   static createElement = <
     T extends Exclude<ExcalidrawElementType, "selection"> = "rectangle",
@@ -171,16 +179,22 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
-    points?: T extends "arrow" | "line" ? readonly Point[] : never;
+    points?: T extends "arrow" | "line" ? readonly LocalPoint[] : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
     status?: T extends "image" ? ExcalidrawImageElement["status"] : never;
     startBinding?: T extends "arrow"
-      ? ExcalidrawLinearElement["startBinding"]
+      ? ExcalidrawArrowElement["startBinding"] | ExcalidrawElbowArrowElement["startBinding"]
       : never;
     endBinding?: T extends "arrow"
-      ? ExcalidrawLinearElement["endBinding"]
+      ? ExcalidrawArrowElement["endBinding"] | ExcalidrawElbowArrowElement["endBinding"]
+      : never;
+    startArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["startArrowhead"] | ExcalidrawElbowArrowElement["startArrowhead"]
+      : never;
+    endArrowhead?: T extends "arrow"
+      ? ExcalidrawArrowElement["endArrowhead"] | ExcalidrawElbowArrowElement["endArrowhead"]
       : never;
     elbowed?: boolean;
   }): T extends "arrow" | "line"
@@ -218,7 +232,7 @@ export class API {
       y,
       frameId: rest.frameId ?? null,
       index: rest.index ?? null,
-      angle: rest.angle ?? 0,
+      angle: (rest.angle ?? 0) as Radians,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
       backgroundColor:
         rest.backgroundColor ?? appState.currentItemBackgroundColor,
@@ -293,8 +307,8 @@ export class API {
           height,
           type,
           points: rest.points ?? [
-            [0, 0],
-            [100, 100],
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
           ],
           elbowed: rest.elbowed ?? false,
         });
@@ -306,8 +320,8 @@ export class API {
           height,
           type,
           points: rest.points ?? [
-            [0, 0],
-            [100, 100],
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 100),
           ],
         });
         break;
@@ -338,6 +352,8 @@ export class API {
     if (element.type === "arrow") {
       element.startBinding = rest.startBinding ?? null;
       element.endBinding = rest.endBinding ?? null;
+      element.startArrowhead = rest.startArrowhead ?? null;
+      element.endArrowhead = rest.endArrowhead ?? null;
     }
     if (id) {
       element.id = id;

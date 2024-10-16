@@ -1,10 +1,10 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import { rotate } from "../../math";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
+import { pointFrom, pointRotateRads } from "../../../math";
 
 interface PositionProps {
   property: "x" | "y";
@@ -32,11 +32,9 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     origElement.x + origElement.width / 2,
     origElement.y + origElement.height / 2,
   ];
-  const [topLeftX, topLeftY] = rotate(
-    origElement.x,
-    origElement.y,
-    cx,
-    cy,
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(origElement.x, origElement.y),
+    pointFrom(cx, cy),
     origElement.angle,
   );
 
@@ -94,11 +92,9 @@ const Position = ({
   scene,
   appState,
 }: PositionProps) => {
-  const [topLeftX, topLeftY] = rotate(
-    element.x,
-    element.y,
-    element.x + element.width / 2,
-    element.y + element.height / 2,
+  const [topLeftX, topLeftY] = pointRotateRads(
+    pointFrom(element.x, element.y),
+    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     element.angle,
   );
   const value =

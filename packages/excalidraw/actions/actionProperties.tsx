@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppClassProperties, AppState, Point, Primitive } from "../types";
+import type { AppClassProperties, AppState, Primitive } from "../types";
 import type { StoreActionType } from "../store";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -115,6 +115,8 @@ import {
 } from "../element/binding";
 import { mutateElbowArrow } from "../element/routing";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import type { LocalPoint } from "../../math";
+import { pointFrom, vector } from "../../math";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -133,7 +135,7 @@ export const changeProperty = (
   return elements.map((element) => {
     if (
       selectedElementIds.get(element.id) ||
-      element.id === appState.editingElement?.id
+      element.id === appState.editingTextElement?.id
     ) {
       return callback(element);
     }
@@ -148,13 +150,13 @@ export const getFormValue = function <T extends Primitive>(
   isRelevantElement: true | ((element: ExcalidrawElement) => boolean),
   defaultValue: T | ((isSomeElementSelected: boolean) => T),
 ): T {
-  const editingElement = appState.editingElement;
+  const editingTextElement = appState.editingTextElement;
   const nonDeletedElements = getNonDeletedElements(elements);
 
   let ret: T | null = null;
 
-  if (editingElement) {
-    ret = getAttribute(editingElement);
+  if (editingTextElement) {
+    ret = getAttribute(editingTextElement);
   }
 
   if (!ret) {
@@ -850,7 +852,7 @@ export const actionChangeFontFamily = register({
         ExcalidrawTextElement,
         ExcalidrawElement | null
       >();
-      let uniqueGlyphs = new Set<string>();
+      let uniqueChars = new Set<string>();
       let skipFontFaceCheck = false;
 
       const fontsCache = Array.from(Fonts.loadedFontsCache.values());
@@ -898,8 +900,8 @@ export const actionChangeFontFamily = register({
               }
 
               if (!skipFontFaceCheck) {
-                uniqueGlyphs = new Set([
-                  ...uniqueGlyphs,
+                uniqueChars = new Set([
+                  ...uniqueChars,
                   ...Array.from(newElement.originalText),
                 ]);
               }
@@ -919,12 +921,9 @@ export const actionChangeFontFamily = register({
       const fontString = `10px ${getFontFamilyString({
         fontFamily: nextFontFamily,
       })}`;
-      const glyphs = Array.from(uniqueGlyphs.values()).join();
+      const chars = Array.from(uniqueChars.values()).join();
 
-      if (
-        skipFontFaceCheck ||
-        window.document.fonts.check(fontString, glyphs)
-      ) {
+      if (skipFontFaceCheck || window.document.fonts.check(fontString, chars)) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
@@ -936,8 +935,8 @@ export const actionChangeFontFamily = register({
           );
         }
       } else {
-        // otherwise try to load all font faces for the given glyphs and redraw elements once our font faces loaded
-        window.document.fonts.load(fontString, glyphs).then((fontFaces) => {
+        // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
+        window.document.fonts.load(fontString, chars).then((fontFaces) => {
           for (const [element, container] of elementContainerMapping) {
             // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
             const latestElement = app.scene.getElement(element.id);
@@ -1076,19 +1075,20 @@ export const actionChangeFontFamily = register({
               // open, populate the cache from scratch
               cachedElementsRef.current.clear();
 
-              const { editingElement } = appState;
+              const { editingTextElement } = appState;
 
-              if (editingElement?.type === "text") {
-                // retrieve the latest version from the scene, as `editingElement` isn't mutated
-                const latestEditingElement = app.scene.getElement(
-                  editingElement.id,
+              // still check type to be safe
+              if (editingTextElement?.type === "text") {
+                // retrieve the latest version from the scene, as `editingTextElement` isn't mutated
+                const latesteditingTextElement = app.scene.getElement(
+                  editingTextElement.id,
                 );
 
                 // inside the wysiwyg editor
                 cachedElementsRef.current.set(
-                  editingElement.id,
+                  editingTextElement.id,
                   newElementWith(
-                    latestEditingElement || editingElement,
+                    latesteditingTextElement || editingTextElement,
                     {},
                     true,
                   ),
@@ -1648,12 +1648,12 @@ export const actionChangeArrowType = register({
 
           mutateElbowArrow(
             newElement,
-            app.scene,
+            elementsMap,
             [finalStartPoint, finalEndPoint].map(
-              (point) =>
-                [point[0] - newElement.x, point[1] - newElement.y] as Point,
+              (p): LocalPoint =>
+                pointFrom(p[0] - newElement.x, p[1] - newElement.y),
             ),
-            [0, 0],
+            vector(0, 0),
             {
               ...(startElement && newElement.startBinding
                 ? {
@@ -1684,19 +1684,6 @@ export const actionChangeArrowType = register({
                   }
                 : {}),
             },
-          );
-        } else {
-          mutateElement(
-            newElement,
-            {
-              startBinding: newElement.startBinding
-                ? { ...newElement.startBinding, fixedPoint: null }
-                : null,
-              endBinding: newElement.endBinding
-                ? { ...newElement.endBinding, fixedPoint: null }
-                : null,
-            },
-            false,
           );
         }
 

@@ -13,13 +13,14 @@ import type {
   NonDeletedSceneElementsMap,
 } from "../../element/types";
 import type Scene from "../../scene/Scene";
-import type { AppState, Point } from "../../types";
+import type { AppState } from "../../types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit, resizeElement } from "./utils";
 import type { AtomicUnit } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
+import { pointFrom, type GlobalPoint } from "../../../math";
 
 interface MultiDimensionProps {
   property: "width" | "height";
@@ -66,7 +67,6 @@ const resizeElementInGroup = (
   origElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
-  scene: Scene,
 ) => {
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
   const { width: oldWidth, height: oldHeight } = latestElement;
@@ -78,7 +78,7 @@ const resizeElementInGroup = (
   );
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
-    updateBoundElements(latestElement, elementsMap, scene, {
+    updateBoundElements(latestElement, elementsMap, {
       oldSize: { width: oldWidth, height: oldHeight },
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
@@ -105,13 +105,12 @@ const resizeGroup = (
   nextHeight: number,
   initialHeight: number,
   aspectRatio: number,
-  anchor: Point,
+  anchor: GlobalPoint,
   property: MultiDimensionProps["property"],
   latestElements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
-  scene: Scene,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -135,7 +134,6 @@ const resizeGroup = (
       origElement,
       elementsMap,
       originalElementsMap,
-      scene,
     );
   }
 };
@@ -184,13 +182,12 @@ const handleDimensionChange: DragInputCallbackType<
           nextHeight,
           initialHeight,
           aspectRatio,
-          [x1, y1],
+          pointFrom(x1, y1),
           property,
           latestElements,
           originalElements,
           elementsMap,
           originalElementsMap,
-          scene,
         );
       } else {
         const [el] = elementsInUnit;
@@ -290,13 +287,12 @@ const handleDimensionChange: DragInputCallbackType<
         nextHeight,
         initialHeight,
         aspectRatio,
-        [x1, y1],
+        pointFrom(x1, y1),
         property,
         latestElements,
         originalElements,
         elementsMap,
         originalElementsMap,
-        scene,
       );
     } else {
       const [el] = elementsInUnit;

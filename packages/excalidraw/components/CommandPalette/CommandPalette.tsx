@@ -43,8 +43,12 @@ import { InlineIcon } from "../InlineIcon";
 import { SHAPES } from "../../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
-import { actionClearCanvas, actionLink } from "../../actions";
-import { jotaiScope, jotaiStore } from "../../jotai";
+import {
+  actionClearCanvas,
+  actionLink,
+  actionToggleSearchMenu,
+} from "../../actions";
+import { jotaiStore } from "../../jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import type { CommandPaletteItem } from "./types";
 import * as defaultItems from "./defaultCommandPaletteItems";
@@ -414,6 +418,15 @@ function CommandPaletteInner({
                 },
               });
             }
+          },
+        },
+        {
+          label: t("search.title"),
+          category: DEFAULT_CATEGORIES.app,
+          icon: searchIcon,
+          viewMode: true,
+          perform: () => {
+            actionManager.executeAction(actionToggleSearchMenu);
           },
         },
         {

@@ -30,8 +30,12 @@ import {
   shouldShowBoundingBox,
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import type { InteractiveCanvasAppState, Point } from "../types";
-import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  FRAME_STYLE,
+  THEME,
+} from "../constants";
+import { type InteractiveCanvasAppState } from "../types";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
@@ -48,7 +52,6 @@ import {
 } from "./helpers";
 import oc from "open-color";
 import {
-  isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
   isLinearElement,
@@ -69,7 +72,8 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import { getCornerRadius } from "../math";
+import type { GlobalPoint, LocalPoint, Radians } from "../../math";
+import { getCornerRadius } from "../shapes";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -101,7 +105,7 @@ const renderLinearElementPointHighlight = (
   context.restore();
 };
 
-const highlightPoint = (
+const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -168,7 +172,7 @@ const strokeDiamondWithRotation = (
   context.restore();
 };
 
-const renderSingleLinearPoint = (
+const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: Point,
@@ -499,7 +503,7 @@ const renderLinearPointHandles = (
     element,
     elementsMap,
     appState,
-  ).filter((midPoint) => midPoint !== null) as Point[];
+  ).filter((midPoint): midPoint is GlobalPoint => midPoint !== null);
 
   midPoints.forEach((segmentMidPoint) => {
     if (
@@ -680,8 +684,11 @@ const _renderInteractiveScene = ({
     }
   }
 
-  if (appState.editingElement && isTextElement(appState.editingElement)) {
-    const textElement = allElementsMap.get(appState.editingElement.id) as
+  if (
+    appState.editingTextElement &&
+    isTextElement(appState.editingTextElement)
+  ) {
+    const textElement = allElementsMap.get(appState.editingTextElement.id) as
       | ExcalidrawTextElement
       | undefined;
     if (textElement && !textElement.autoResize) {
@@ -799,7 +806,6 @@ const _renderInteractiveScene = ({
             // Elbow arrow elements cannot be selected when bound on either end
             (
               isSingleLinearElementSelected &&
-              isArrowElement(element) &&
               isElbowArrow(element) &&
               (element.startBinding || element.endBinding)
             )
@@ -894,7 +900,7 @@ const _renderInteractiveScene = ({
         !appState.viewModeEnabled &&
         showBoundingBox &&
         // do not show transform handles when text is being edited
-        !isTextElement(appState.editingElement)
+        !isTextElement(appState.editingTextElement)
       ) {
         renderTransformHandles(
           context,
@@ -928,7 +934,7 @@ const _renderInteractiveScene = ({
       context.setLineDash(initialLineDash);
       const transformHandles = getTransformHandlesFromCoords(
         [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2],
-        0,
+        0 as Radians,
         appState.zoom,
         "mouse",
         isFrameSelected
@@ -948,9 +954,48 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
+  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+    const element = elementsMap.get(id);
+
+    if (element && isTextElement(element)) {
+      const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
+        element,
+        elementsMap,
+        true,
+      );
+
+      context.save();
+      if (appState.theme === THEME.LIGHT) {
+        if (focus) {
+          context.fillStyle = "rgba(255, 124, 0, 0.4)";
+        } else {
+          context.fillStyle = "rgba(255, 226, 0, 0.4)";
+        }
+      } else if (focus) {
+        context.fillStyle = "rgba(229, 82, 0, 0.4)";
+      } else {
+        context.fillStyle = "rgba(99, 52, 0, 0.4)";
+      }
+
+      context.translate(appState.scrollX, appState.scrollY);
+      context.translate(cx, cy);
+      context.rotate(element.angle);
+
+      matchedLines.forEach((matchedLine) => {
+        context.fillRect(
+          elementX1 + matchedLine.offsetX - cx,
+          elementY1 + matchedLine.offsetY - cy,
+          matchedLine.width,
+          matchedLine.height,
+        );
+      });
+
+      context.restore();
+    }
+  });
+
   renderSnaps(context, appState);
 
-  // Reset zoom
   context.restore();
 
   renderRemoteCursors({
