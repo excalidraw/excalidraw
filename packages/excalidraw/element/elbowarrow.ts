@@ -47,7 +47,6 @@ import type {
   Arrowhead,
   ElementsMap,
   ExcalidrawBindableElement,
-  ExcalidrawElement,
   FixedPointBinding,
   FixedSegment,
   FractionalIndex,
@@ -74,103 +73,6 @@ type Grid = {
 };
 
 const BASE_PADDING = 40;
-
-const createFakeElement = (
-  arrow: ExcalidrawElbowArrowElement,
-  start: LocalPoint,
-  end: LocalPoint,
-) =>
-  ({
-    ...newElement({
-      type: "rectangle",
-      x: (arrow.x + start[0] + arrow.x + end[0]) / 2 - 2.5,
-      y: (arrow.y + start[1] + arrow.y + end[1]) / 2 - 2.5,
-      width: 5,
-      height: 5,
-    }),
-    index: "DONOTSYNC" as FractionalIndex,
-  } as Ordered<ExcalidrawBindableElement>);
-
-const mapSegmentsToFakeMidElements = (
-  arrow: ExcalidrawElbowArrowElement,
-  segments: number[][],
-  points: LocalPoint[],
-): {
-  el: Ordered<ExcalidrawElement> | null;
-  startHeading: Heading | null;
-  endHeading: Heading | null;
-  startIdx: number;
-  endIdx: number;
-}[] => {
-  let prevSegment: [number, number] | null = null;
-
-  return segments.map(([startIdx, endIdx], idx) => {
-    if (!prevSegment) {
-      prevSegment = [startIdx, endIdx];
-      return {
-        el: null,
-        startHeading: null,
-        endHeading: null,
-        startIdx,
-        endIdx,
-      };
-    }
-
-    const start = pointFrom<GlobalPoint>(
-      arrow.x + points[prevSegment[1]][0],
-      arrow.y + points[prevSegment[1]][1],
-    );
-    const end = pointFrom<GlobalPoint>(
-      arrow.x + points[startIdx][0],
-      arrow.y + points[startIdx][1],
-    );
-    const el = createFakeElement(
-      arrow,
-      points[prevSegment[1]],
-      points[startIdx],
-    );
-    const bounds = [el.x, el.y, el.x + el.width, el.y + el.height] as Bounds;
-
-    prevSegment = [startIdx, endIdx];
-
-    return {
-      el,
-      startHeading: e2h(bounds, start),
-      endHeading: e2h(bounds, end),
-      startIdx,
-      endIdx,
-    };
-  });
-};
-
-const e2h = (bounds: Bounds, point: GlobalPoint): Heading => {
-  const center = pointFrom(
-    (bounds[0] + bounds[2]) / 2,
-    (bounds[1] + bounds[3]) / 2,
-  );
-  return point[0] - center[0] < 0.05
-    ? point[1] > center[1]
-      ? HEADING_DOWN
-      : HEADING_UP
-    : point[0] > center[0]
-    ? HEADING_RIGHT
-    : HEADING_LEFT;
-};
-
-const getArrowSegments = (
-  fixedSegmentIds: number[],
-  points: readonly LocalPoint[],
-) => {
-  let prevIdx = 0;
-  const segments = fixedSegmentIds.map((segmentIdx) => {
-    const ret = [prevIdx, segmentIdx];
-    prevIdx = segmentIdx - 1;
-    return ret;
-  });
-  segments.push([prevIdx, points.length - 1]);
-
-  return segments;
-};
 
 const segmentListMerge = (
   oldFixedSegments: FixedSegment[],
@@ -202,8 +104,6 @@ export const updateElbowArrowPoints = (
     disableBinding?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  invariant(updates.points.length > 1, "Too few points");
-
   const fakeElementsMap = toBrandedType<SceneElementsMap>(new Map(elementsMap));
   const nextFixedSegments = segmentListMerge(
     arrow.fixedSegments ?? [],
@@ -219,61 +119,75 @@ export const updateElbowArrowPoints = (
   let previousVal: {
     point: GlobalPoint;
     fixedPoint: FixedPointBinding["fixedPoint"] | null;
+    elementId: string | null;
   } = {
     point: pointFrom(
       arrow.x + updates.points[0][0],
       arrow.y + updates.points[0][1],
     ),
     fixedPoint: null,
+    elementId: null,
   };
-  const pointPairs = nextFixedSegments.map((segment, segmentIdx) => {
-    const el = {
-      ...newElement({
-        type: "rectangle",
-        x: segment.anchor[0] - 2.5,
-        y: segment.anchor[1] - 2.5,
-        width: 5,
-        height: 5,
-      }),
-      index: "DONOTSYNC" as FractionalIndex,
-    } as Ordered<ExcalidrawBindableElement>;
-    fakeElementsMap.set(el.id, el);
+  const pointPairs: ExcalidrawElbowArrowElement[] = nextFixedSegments.map(
+    (segment, segmentIdx) => {
+      const el = {
+        ...newElement({
+          type: "rectangle",
+          x: segment.anchor[0] - 2.5,
+          y: segment.anchor[1] - 2.5,
+          width: 5,
+          height: 5,
+        }),
+        index: "DONOTSYNC" as FractionalIndex,
+      } as Ordered<ExcalidrawBindableElement>;
+      fakeElementsMap.set(el.id, el);
 
-    const endFixedPoint = getGlobalFixedPointForBindableElement(
-      compareHeading(segment.heading, HEADING_DOWN)
-        ? [0.5, 1]
-        : compareHeading(segment.heading, HEADING_LEFT)
-        ? [0, 0.5]
-        : compareHeading(segment.heading, HEADING_UP)
-        ? [0.5, 0]
-        : [1, 0.5],
-      el,
-    );
-    const nextStartHeading = getGlobalFixedPointForBindableElement(
-      compareHeading(segment.heading, HEADING_DOWN)
-        ? [0.5, 0]
-        : compareHeading(segment.heading, HEADING_LEFT)
-        ? [1, 0.5]
-        : compareHeading(segment.heading, HEADING_UP)
-        ? [0.5, 1]
-        : [0, 0.5],
-      el,
-    );
-    const tmp = {
-      x: previousVal.point[0],
-      y: previousVal.point[1],
-      startArrowhead: segmentIdx === 0 ? arrow.startArrowhead : null,
-      endArrowhead: null as Arrowhead | null,
-      startBinding: segmentIdx === 0 ? arrow.startBinding : {
-        elementId:
-      }
-      points: [
-        pointFrom(0, 0),
-        getGlobalFixedPointForBindableElement(endFixedPoint, el),
-      ],
-    };
-    previousVal = {
-      point: getGlobalFixedPointForBindableElement(
+      const endFixedPoint = getGlobalFixedPointForBindableElement(
+        compareHeading(segment.heading, HEADING_DOWN)
+          ? [0.5, 1]
+          : compareHeading(segment.heading, HEADING_LEFT)
+          ? [0, 0.5]
+          : compareHeading(segment.heading, HEADING_UP)
+          ? [0.5, 0]
+          : [1, 0.5],
+        el,
+      );
+      const endGlobalPoint = getGlobalFixedPointForBindableElement(
+        endFixedPoint,
+        el,
+      );
+
+      const tmp = {
+        ...arrow,
+        x: previousVal.point[0],
+        y: previousVal.point[1],
+        startArrowhead: segmentIdx === 0 ? arrow.startArrowhead : null,
+        endArrowhead: null as Arrowhead | null,
+        startBinding:
+          segmentIdx === 0
+            ? arrow.startBinding
+            : ({
+                elementId: previousVal.elementId,
+                focus: 0,
+                gap: 0,
+                fixedPoint: previousVal.fixedPoint,
+              } as FixedPointBinding),
+        endBinding: {
+          elementId: el.id,
+          focus: 0,
+          gap: 0,
+          fixedPoint: endFixedPoint,
+        } as FixedPointBinding | null,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(
+            endGlobalPoint[0] - previousVal.point[0],
+            endGlobalPoint[1] - previousVal.point[1],
+          ),
+        ],
+        fixedSegments: nextFixedSegments,
+      };
+      const nextStartFixedPoint = getGlobalFixedPointForBindableElement(
         compareHeading(segment.heading, HEADING_DOWN)
           ? [0.5, 0]
           : compareHeading(segment.heading, HEADING_LEFT)
@@ -282,156 +196,44 @@ export const updateElbowArrowPoints = (
           ? [0.5, 1]
           : [0, 0.5],
         el,
-      ),
-      fixedPoint: nextStartHeading,
-    };
-    return tmp;
-  });
+      );
+      previousVal = {
+        point: getGlobalFixedPointForBindableElement(nextStartFixedPoint, el),
+        fixedPoint: nextStartFixedPoint,
+        elementId: el.id,
+      };
+      return tmp;
+    },
+  );
   pointPairs.push({
+    ...arrow,
     x: previousVal.point[0],
     y: previousVal.point[1],
     points: [pointFrom(0, 0), updates.points[updates.points.length - 1]],
     startArrowhead: null,
     endArrowhead: arrow.endArrowhead,
+    startBinding:
+      nextFixedSegments.length === 0
+        ? arrow.startBinding
+        : {
+            elementId: previousVal.elementId!,
+            focus: 0,
+            gap: 0,
+            fixedPoint: previousVal.fixedPoint!,
+          },
+    endBinding: arrow.endBinding,
   });
 
-  // // Determine the arrow parts based on fixed segments
-  // const segments = getArrowSegments(nextFixedSegments, points);
-
-  // // Override segment end points
-  // segments.forEach(([startIdx], segmentIdx) => {
-  //   if (
-  //     !updates.fixedSegments?.find((i) => i === segmentIdx + 1) &&
-  //     arrow.fixedSegments?.find((i) => i === segmentIdx + 1)
-  //   ) {
-  //     points[startIdx + 1] = arrow.points[startIdx + 1];
-  //     points[startIdx] = arrow.points[startIdx];
-  //   }
-  // });
-
-  // // Create a fake element at every segment mid point
-  // const segmentUpdates: {
-  //   startPoint: GlobalPoint | null;
-  //   endPoint: GlobalPoint | null;
-  //   startIdx: number;
-  //   endIdx: number;
-  //   startBinding: FixedPointBinding | null;
-  //   endBinding: FixedPointBinding | null;
-  //   startArrowhead: Arrowhead | null;
-  //   endArrowhead: Arrowhead | null;
-  // }[] = segments.map(([startIdx, endIdx]) => ({
-  //   startPoint: null,
-  //   endPoint: null,
-  //   startIdx,
-  //   endIdx,
-  //   startBinding: null,
-  //   endBinding: null,
-  //   startArrowhead: null,
-  //   endArrowhead: null,
-  // }));
-
-  // mapSegmentsToFakeMidElements(arrow, segments, points).forEach(
-  //   (item, idx, elements) => {
-  //     if (item.el) {
-  //       fakeElementsMap.set(item.el.id, item.el);
-  //     }
-
-  //     segmentUpdates[idx].startIdx = item?.startIdx ?? 0;
-  //     segmentUpdates[idx].endIdx = item?.endIdx ?? elements.length - 1;
-  //     segmentUpdates[idx].startArrowhead =
-  //       item?.startIdx === 0 ? arrow.startArrowhead : null;
-  //     segmentUpdates[idx].endArrowhead =
-  //       item?.endIdx === points.length - 1 ? arrow.endArrowhead : null;
-  //     segmentUpdates[idx].startBinding =
-  //       item.el && item.startHeading
-  //         ? {
-  //             elementId: item.el!.id,
-  //             focus: 0,
-  //             gap: 0,
-  //             fixedPoint: compareHeading(item.startHeading, HEADING_DOWN)
-  //               ? [0.5, 1]
-  //               : compareHeading(item.startHeading, HEADING_LEFT)
-  //               ? [0, 0.5]
-  //               : compareHeading(item.startHeading, HEADING_UP)
-  //               ? [0.5, 0]
-  //               : [1, 0.5],
-  //           }
-  //         : null;
-  //     segmentUpdates[idx].endBinding =
-  //       elements[idx + 1]?.el && elements[idx + 1]?.endHeading
-  //         ? {
-  //             elementId: elements[idx + 1].el!.id,
-  //             focus: 0,
-  //             gap: 0,
-  //             fixedPoint: compareHeading(
-  //               elements[idx + 1].endHeading!,
-  //               HEADING_DOWN,
-  //             )
-  //               ? [0.5, 1]
-  //               : compareHeading(elements[idx + 1].endHeading!, HEADING_LEFT)
-  //               ? [0, 0.5]
-  //               : compareHeading(elements[idx + 1].endHeading!, HEADING_UP)
-  //               ? [0.5, 0]
-  //               : [1, 0.5],
-  //           }
-  //         : null;
-  //     segmentUpdates[idx].startPoint =
-  //       item.el && segmentUpdates[idx].startBinding
-  //         ? getGlobalFixedPointForBindableElement(
-  //             segmentUpdates[idx].startBinding!.fixedPoint,
-  //             item.el as ExcalidrawBindableElement,
-  //           )
-  //         : pointFrom<GlobalPoint>(
-  //             arrow.x + points[item.startIdx][0],
-  //             arrow.y + points[item.startIdx][1],
-  //           );
-
-  //     segmentUpdates[idx].endPoint =
-  //       elements[idx + 1]?.el && segmentUpdates[idx].endBinding
-  //         ? getGlobalFixedPointForBindableElement(
-  //             segmentUpdates[idx].endBinding!.fixedPoint,
-  //             elements[idx + 1].el as ExcalidrawBindableElement,
-  //           )
-  //         : pointFrom<GlobalPoint>(
-  //             arrow.x + points[item.endIdx][0],
-  //             arrow.y + points[item.endIdx][1],
-  //           );
-  //   },
-  // );
-
-  // // Calculate points
-  // const unified = segmentUpdates.flatMap(
-  //   ({
-  //     startIdx,
-  //     endIdx,
-  //     startBinding,
-  //     endBinding,
-  //     startArrowhead,
-  //     endArrowhead,
-  //     startPoint,
-  //     endPoint,
-  //   }) =>
-  //     routeElbowArrow(
-  //       {
-  //         x: startPoint![0],
-  //         y: startPoint![1],
-  //         startArrowhead,
-  //         endArrowhead,
-  //         startBinding: startIdx === 0 ? arrow.startBinding : startBinding,
-  //         endBinding:
-  //           endIdx === points.length - 1 ? arrow.endBinding : endBinding,
-  //       },
-  //       fakeElementsMap,
-  //       [
-  //         pointFrom(0, 0),
-  //         pointFrom(
-  //           endPoint![0] - startPoint![0],
-  //           endPoint![1] - startPoint![1],
-  //         ),
-  //       ],
-  //       options,
-  //     ) ?? [],
-  // );
+  const unified = pointPairs.flatMap((tmp, idx) => {
+    return (
+      routeElbowArrow(
+        tmp,
+        fakeElementsMap,
+        tmp.points,
+        idx === pointPairs.length - 1 ? options : undefined,
+      ) ?? []
+    );
+  });
 
   return normalizedArrowElementUpdate(
     simplifyElbowArrowPoints(unified),
@@ -1280,14 +1082,14 @@ const getBindableElementForId = (
 
 const normalizedArrowElementUpdate = (
   global: GlobalPoint[],
-  nextFixedSegments: number[],
+  nextFixedSegments: FixedSegment[] | null,
 ): {
   points: LocalPoint[];
   x: number;
   y: number;
   width: number;
   height: number;
-  fixedSegments: number[] | null;
+  fixedSegments: FixedSegment[] | null;
 } => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
@@ -1303,7 +1105,7 @@ const normalizedArrowElementUpdate = (
     points,
     x: offsetX,
     y: offsetY,
-    fixedSegments: nextFixedSegments.length ? nextFixedSegments : null,
+    fixedSegments: nextFixedSegments?.length ? nextFixedSegments : null,
     ...getSizeFromPoints(points),
   };
 };
