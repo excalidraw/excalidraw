@@ -490,7 +490,7 @@
     "copyStyles": "Slogi kopirani.",
     "copyToClipboard": "Kopirano v odložišče.",
     "copyToClipboardAsPng": "Kopirano v odložišče kot PNG ({{exportSelection}}, {{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Kopirano v odložišče kot SVG ({{exportSelection}}, {{exportColorScheme}})",
     "fileSaved": "Datoteka shranjena.",
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
