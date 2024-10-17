@@ -490,6 +490,7 @@
     "copyStyles": "S'han copiat els estils.",
     "copyToClipboard": "S'ha copiat al porta-retalls.",
     "copyToClipboardAsPng": "S'ha copiat {{exportSelection}} al porta-retalls en format PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "S'ha desat el fitxer.",
     "fileSavedToFilename": "S'ha desat a {filename}",
     "canvas": "el llenç",
