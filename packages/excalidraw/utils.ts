@@ -1,3 +1,4 @@
+import type { GlobalPoint, LocalPoint } from "../math";
 import { average } from "../math";
 import { COLOR_PALETTE } from "./colors";
 import type { EVENT } from "./constants";
@@ -1170,3 +1171,10 @@ export const safelyParseJSON = (json: string): Record<string, any> | null => {
     return null;
   }
 };
+
+export const compareAnglesForPoints = <Point extends LocalPoint | GlobalPoint>(
+  p1: Point,
+  p2: Point,
+  threshold: number = 0.005,
+): boolean =>
+  Math.abs(Math.atan2(p1[0], p1[1]) - Math.atan2(p2[0], p2[1])) < threshold;

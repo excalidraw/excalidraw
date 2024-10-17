@@ -217,7 +217,7 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
   a: P,
   b: P,
 ): number {
-  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2);
 }
 
 /**
