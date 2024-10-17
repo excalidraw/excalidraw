@@ -503,7 +503,11 @@ const renderLinearPointHandles = (
     element,
     elementsMap,
     appState,
-  ).filter((midPoint): midPoint is GlobalPoint => midPoint !== null);
+  ).filter(
+    (midPoint, idx, midPoints): midPoint is GlobalPoint =>
+      midPoint !== null &&
+      !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
+  );
 
   midPoints.forEach((segmentMidPoint) => {
     if (
