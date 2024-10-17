@@ -490,6 +490,7 @@
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para a área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Ficheiro guardado.",
     "fileSavedToFilename": "Guardado como {filename}",
     "canvas": "área de desenho",
