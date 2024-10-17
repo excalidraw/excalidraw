@@ -6,6 +6,7 @@ import type {
   ActionResult,
   PanelComponentProps,
   ActionSource,
+  ActionPredicateFn,
 } from "./types";
 import type {
   ExcalidrawElement,
@@ -45,6 +46,7 @@ const trackAction = (
 
 export class ActionManager {
   actions = {} as Record<ActionName, Action>;
+  actionPredicates = [] as ActionPredicateFn[];
 
   updater: (actionResult: ActionResult | Promise<ActionResult>) => void;
 
@@ -72,6 +74,37 @@ export class ActionManager {
     this.app = app;
   }
 
+  registerActionPredicate(predicate: ActionPredicateFn) {
+    if (!this.actionPredicates.includes(predicate)) {
+      this.actionPredicates.push(predicate);
+    }
+  }
+
+  filterActions(
+    filter: ActionPredicateFn,
+    opts?: {
+      elements?: readonly ExcalidrawElement[];
+      data?: Record<string, any>;
+    },
+  ): Action[] {
+    // For testing
+    if (this === undefined) {
+      return [];
+    }
+    const elements = opts?.elements ?? this.getElementsIncludingDeleted();
+    const appState = this.getAppState();
+    const data = opts?.data;
+
+    const actions: Action[] = [];
+    for (const key in this.actions) {
+      const action = this.actions[key as ActionName];
+      if (filter(action, elements, appState, this.app, data)) {
+        actions.push(action);
+      }
+    }
+    return actions;
+  }
+
   registerAction(action: Action) {
     this.actions[action.name] = action;
   }
@@ -88,7 +121,7 @@ export class ActionManager {
         (action) =>
           (action.name in canvasActions
             ? canvasActions[action.name as keyof typeof canvasActions]
-            : true) &&
+            : this.isActionEnabled(action, { noPredicates: true })) &&
           action.keyTest &&
           action.keyTest(
             event,
@@ -147,7 +180,7 @@ export class ActionManager {
       "PanelComponent" in this.actions[name] &&
       (name in canvasActions
         ? canvasActions[name as keyof typeof canvasActions]
-        : true)
+        : this.isActionEnabled(this.actions[name], { noPredicates: true }))
     ) {
       const action = this.actions[name];
       const PanelComponent = action.PanelComponent!;
@@ -169,6 +202,7 @@ export class ActionManager {
 
       return (
         <PanelComponent
+          key={name}
           elements={this.getElementsIncludingDeleted()}
           appState={this.getAppState()}
           updateData={updateData}
@@ -182,13 +216,31 @@ export class ActionManager {
     return null;
   };
 
-  isActionEnabled = (action: Action) => {
-    const elements = this.getElementsIncludingDeleted();
+  isActionEnabled = (
+    action: Action,
+    opts?: {
+      elements?: readonly ExcalidrawElement[];
+      data?: Record<string, any>;
+      noPredicates?: boolean;
+    },
+  ): boolean => {
+    const elements = opts?.elements ?? this.getElementsIncludingDeleted();
     const appState = this.getAppState();
+    const data = opts?.data;
 
-    return (
-      !action.predicate ||
-      action.predicate(elements, appState, this.app.props, this.app)
-    );
+    if (
+      !opts?.noPredicates &&
+      action.predicate &&
+      !action.predicate(elements, appState, this.app.props, this.app, data)
+    ) {
+      return false;
+    }
+    let enabled = true;
+    this.actionPredicates.forEach((fn) => {
+      if (!fn(action, elements, appState, this.app, data)) {
+        enabled = false;
+      }
+    });
+    return enabled;
   };
 }
