@@ -1,10 +1,10 @@
 SplineFontDB: 3.2
-FontName: ComicShannsMono-Regular
-FullName: Comic Shanns Mono Regular
-FamilyName: Comic Shanns Mono-Regular
+FontName: ComicShanns-Regular
+FullName: Comic Shanns Regular
+FamilyName: Comic Shanns Regular
 Weight: Regular
 Copyright: MIT License\n\nCopyright (c) 2018 Shannon Miwa\nCopyright (c) 2023 Jesus Gonzalez\nCopyright (c) 2023 Rodrigo Batista de Moraes\nCopyright (c) 2024 Fini Jastrow\nCopyright (c) 2024 Kyle Beechly\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.
-Version: 1.3.1
+Version: 1.3.0
 ItalicAngle: 0
 UnderlinePosition: 0
 UnderlineWidth: 0
@@ -22,7 +22,7 @@ OS2Version: 3
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 0
 CreationTime: 1608751085
-ModificationTime: 1728928886
+ModificationTime: 1729165733
 PfmFamily: 49
 TTFWeight: 400
 TTFWidth: 5
@@ -76,7 +76,7 @@ BlueShift 2 10
 EndPrivate
 TeXData: 1 0 0 576716 288358 192238 488639 1048576 192238 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
 AnchorClass2: "aa""" 
-BeginChars: 65541 339
+BeginChars: 65541 338
 
 StartChar: .notdef
 Encoding: 65536 -1 0
@@ -6495,7 +6495,7 @@ SplineSet
  256.815429688 478.776367188 248.84765625 475.516601562 243.002929688 468.997070312 c 0
  234.3359375 459.330078125 229.002929688 447.163085938 227.002929688 432.49609375 c 0
 EndSplineSet
-Validated: 524297
+Validated: 9
 EndChar
 
 StartChar: Agrave
@@ -12065,7 +12065,7 @@ SplineSet
     0 0 z
   EndSpiro
 EndSplineSet
-Validated: 524289
+Validated: 1
 EndChar
 
 StartChar: lslash
@@ -12214,27 +12214,6 @@ SplineSet
  143.080343862 345.430453194 l 0
  155.974244253 352.669765514 l 2
  176.789460293 363.526817525 176.789460293 363.526817525 180.638948681 408.746255487 c 2xc0
-EndSplineSet
-Validated: 524289
-EndChar
-
-StartChar: uni0000
-Encoding: 0 0 338
-Width: 500
-Flags: HW
-LayerCount: 2
-Fore
-SplineSet
-50 -250 m 1
- 50 700 l 1
- 450 700 l 1
- 450 -250 l 1
- 50 -250 l 1
-100 -200 m 1
- 400 -200 l 1
- 400 650 l 1
- 100 650 l 1
- 100 -200 l 1
 EndSplineSet
 Validated: 1
 EndChar
