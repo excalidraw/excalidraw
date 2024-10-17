@@ -490,7 +490,7 @@
     "copyStyles": "Skopiowano style.",
     "copyToClipboard": "Skopiowano do schowka.",
     "copyToClipboardAsPng": "Skopiowano {{exportSelection}} do schowka jako PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Skopiowano {{exportSelection}} do schowka jako SVG\n({{exportColorScheme}})",
     "fileSaved": "Zapisano plik.",
     "fileSavedToFilename": "Zapisano jako {filename}",
     "canvas": "płótno",
