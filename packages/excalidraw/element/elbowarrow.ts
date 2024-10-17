@@ -12,7 +12,7 @@ import {
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
-import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
