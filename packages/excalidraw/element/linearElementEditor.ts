@@ -1296,12 +1296,13 @@ export class LinearElementEditor {
           // NOTE: Segment indices are not permanent, the arrow update
           // might simplify the arrow and remove/merge segments.
           .map<FixedSegment>((idx) => {
-            if (nextPoints[idx][0] === nextPoints[idx - 1][0]) {
+            let res;
+            if (nextPoints[idx][0] - nextPoints[idx - 1][0] < 0.05) {
               const anchor = pointFrom<GlobalPoint>(
                 element.x + nextPoints[idx][0],
                 element.y + (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
               );
-              return {
+              res = {
                 anchor,
                 heading:
                   anchor[1] > element.y + nextPoints[idx - 1][1]
@@ -1309,19 +1310,22 @@ export class LinearElementEditor {
                     : HEADING_DOWN,
                 index: idx,
               };
+            } else {
+              const anchor = pointFrom<GlobalPoint>(
+                element.x + (nextPoints[idx][0] - nextPoints[idx - 1][0]) / 2,
+                element.y + nextPoints[idx][1],
+              );
+              res = {
+                anchor,
+                heading:
+                  anchor[0] > element.x + nextPoints[idx - 1][0]
+                    ? HEADING_LEFT
+                    : HEADING_RIGHT,
+                index: idx,
+              };
             }
-            const anchor = pointFrom<GlobalPoint>(
-              element.x + (nextPoints[idx][0] - nextPoints[idx - 1][0]) / 2,
-              element.y + nextPoints[idx][1],
-            );
-            return {
-              anchor,
-              heading:
-                anchor[0] > element.x + nextPoints[idx - 1][0]
-                  ? HEADING_LEFT
-                  : HEADING_RIGHT,
-              index: idx,
-            };
+
+            return res;
           }),
       };
     }
