@@ -490,6 +490,7 @@
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
     "copyToClipboardAsPng": "Tersalin {{exportSelection}} ke clipboard sebagai PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "File tersimpan.",
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
