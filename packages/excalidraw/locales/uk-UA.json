@@ -490,6 +490,7 @@
     "copyStyles": "Скопійовані стилі.",
     "copyToClipboard": "Скопіювати до буферу обміну.",
     "copyToClipboardAsPng": "Скопійовано {{exportSelection}} до буфера обміну як PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Файл збережено.",
     "fileSavedToFilename": "Збережено в {filename}",
     "canvas": "полотно",
