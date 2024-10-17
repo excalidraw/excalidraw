@@ -490,6 +490,7 @@
     "copyStyles": "Iɣunab yettwaneɣlen.",
     "copyToClipboard": "Yettwaɣel ɣer tecfawit.",
     "copyToClipboardAsPng": "{{exportSelection}} yettwanɣel ɣer tecfawit am PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Afaylu yettwasekles.",
     "fileSavedToFilename": "Yettwasekles di {filename}",
     "canvas": "taɣzut n usuneɣ",
