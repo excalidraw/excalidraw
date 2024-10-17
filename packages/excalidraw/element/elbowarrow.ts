@@ -32,6 +32,7 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
+  headingIsVertical,
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
@@ -118,10 +119,10 @@ export const updateElbowArrowPoints = (
     updates?.fixedSegments ?? [],
   );
 
-  invariant(
-    nextFixedSegments.findIndex((s) => s.index === arrow.points.length - 1) ===
-      -1,
-    "Last fixed segment is endpoint!",
+  const arrowStartPoint = pointFrom<GlobalPoint>(arrow.x, arrow.y);
+  const arrowEndPoint = pointFrom<GlobalPoint>(
+    arrow.x + updates.points[updates.points.length - 1][0],
+    arrow.y + updates.points[updates.points.length - 1][1],
   );
 
   let previousVal: {
@@ -138,18 +139,20 @@ export const updateElbowArrowPoints = (
   };
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
+      const heading = segment.heading;
       let anchor = segment.anchor;
       if (arrow.startBinding && arrow.endBinding) {
-        const start = pointFrom<GlobalPoint>(arrow.x, arrow.y);
-        const end = pointFrom<GlobalPoint>(
-          arrow.x + updates.points[updates.points.length - 1][0],
-          arrow.y + updates.points[updates.points.length - 1][1],
-        );
-        anchor =
-          compareHeading(segment.heading, HEADING_UP) ||
-          compareHeading(segment.heading, HEADING_DOWN)
-            ? pointFrom<GlobalPoint>(anchor[0], (start[1] + end[1]) / 2)
-            : pointFrom<GlobalPoint>((start[0] + end[0]) / 2, anchor[1]);
+        if (headingIsVertical(heading)) {
+          anchor = pointFrom<GlobalPoint>(
+            anchor[0],
+            (arrowStartPoint[1] + arrowEndPoint[1]) / 2,
+          );
+        } else {
+          anchor = pointFrom<GlobalPoint>(
+            (arrowStartPoint[0] + arrowEndPoint[0]) / 2,
+            anchor[1],
+          );
+        }
       }
       const el = {
         ...newElement({
@@ -164,13 +167,13 @@ export const updateElbowArrowPoints = (
       fakeElementsMap.set(el.id, el);
 
       const endFixedPoint: [number, number] = compareHeading(
-        segment.heading,
+        heading,
         HEADING_DOWN,
       )
         ? [0.5, 1]
-        : compareHeading(segment.heading, HEADING_LEFT)
+        : compareHeading(heading, HEADING_LEFT)
         ? [0, 0.5]
-        : compareHeading(segment.heading, HEADING_UP)
+        : compareHeading(heading, HEADING_UP)
         ? [0.5, 0]
         : [1, 0.5];
       const endGlobalPoint = getGlobalFixedPointForBindableElement(
@@ -200,13 +203,13 @@ export const updateElbowArrowPoints = (
         },
       };
       const nextStartFixedPoint: [number, number] = compareHeading(
-        segment.heading,
+        heading,
         HEADING_DOWN,
       )
         ? [0.5, 0]
-        : compareHeading(segment.heading, HEADING_LEFT)
+        : compareHeading(heading, HEADING_LEFT)
         ? [1, 0.5]
-        : compareHeading(segment.heading, HEADING_UP)
+        : compareHeading(heading, HEADING_UP)
         ? [0.5, 1]
         : [0, 0.5];
       const endLocalPoint = pointFrom<LocalPoint>(
@@ -267,9 +270,17 @@ export const updateElbowArrowPoints = (
         point[0],
         (point[1] + previous[1]) / 2,
       );
+
       res = {
         anchor,
-        heading: anchor[1] > previous[1] ? HEADING_UP : HEADING_DOWN,
+        heading:
+          anchor[1] > previous[1]
+            ? arrowStartPoint[1] > arrowEndPoint[1]
+              ? HEADING_DOWN
+              : HEADING_UP
+            : arrowEndPoint[1] > arrowStartPoint[1]
+            ? HEADING_UP
+            : HEADING_DOWN,
         index: nfsBase + prevPoints.length,
       };
     } else {
@@ -277,9 +288,17 @@ export const updateElbowArrowPoints = (
         (point[0] + previous[0]) / 2,
         point[1],
       );
+
       res = {
         anchor,
-        heading: anchor[0] > previous[0] ? HEADING_LEFT : HEADING_RIGHT,
+        heading:
+          anchor[0] > previous[0]
+            ? arrowStartPoint[0] > arrowEndPoint[0]
+              ? HEADING_RIGHT
+              : HEADING_LEFT
+            : arrowEndPoint[0] > arrowStartPoint[0]
+            ? HEADING_LEFT
+            : HEADING_RIGHT,
         index: nfsBase + prevPoints.length,
       };
     }
