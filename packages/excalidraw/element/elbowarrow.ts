@@ -13,6 +13,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -228,12 +229,46 @@ export const updateElbowArrowPoints = (
     },
     [
       pointFrom<LocalPoint>(0, 0),
+      // Translate from unsegmented local array point -> global point -> last segment local point
       pointFrom<LocalPoint>(
-        updates.points[updates.points.length - 1][0] - previousVal.point[0],
-        updates.points[updates.points.length - 1][1] - previousVal.point[1],
+        arrow.x +
+          updates.points[updates.points.length - 1][0] -
+          previousVal.point[0],
+        arrow.y +
+          updates.points[updates.points.length - 1][1] -
+          previousVal.point[1],
       ),
     ],
   ]);
+
+  const nfs = pointPairs.slice(1).map(([{ x, y }, points], idx) => {
+    const point = pointFrom<GlobalPoint>(x + points[0][0], y + points[0][1]);
+    const [prevState, prevPoints] = pointPairs[idx - 1];
+    const previous = pointFrom<GlobalPoint>(
+      prevState.x + prevPoints[prevPoints.length - 1][0],
+      prevState.y + prevPoints[prevPoints.length - 1][1],
+    );
+    if (point[0] === previous[0]) {
+      const anchor = pointFrom<GlobalPoint>(
+        point[0],
+        (point[1] + previous[1]) / 2,
+      );
+      return {
+        anchor,
+        heading: anchor[1] > previous[1] ? HEADING_UP : HEADING_DOWN,
+        index: idx,
+      };
+    }
+    const anchor = pointFrom<GlobalPoint>(
+      (point[0] + previous[0]) / 2,
+      point[1],
+    );
+    return {
+      anchor,
+      heading: anchor[0] > previous[0] ? HEADING_LEFT : HEADING_RIGHT,
+      index: idx,
+    };
+  });
 
   const unified = pointPairs
     .map(([state, points], idx) => {
@@ -251,22 +286,13 @@ export const updateElbowArrowPoints = (
         ) ?? [],
       );
 
-      const base =
-        nextFixedSegments.length > 1 ? nextFixedSegments[idx - 1].index : 0;
-      if (nextFixedSegments[idx]) {
-        nextFixedSegments[idx].index = base + raw.length - 2;
-      }
-
       return raw;
     })
     .flatMap((s) => {
       return s;
     });
-
-  return normalizedArrowElementUpdate(
-    simplifyElbowArrowPoints(unified),
-    nextFixedSegments,
-  );
+  //console.log(JSON.stringify(nfs, undefined, 2));
+  return normalizedArrowElementUpdate(simplifyElbowArrowPoints(unified), nfs);
 };
 
 /**
@@ -381,10 +407,6 @@ const routeElbowArrow = (
         ),
       )
     : endPointBounds;
-  //debugDrawBounds(startElementBounds, { color: "cyan" });
-  //debugDrawBounds(endElementBounds, { color: "blue" });
-  // debugDrawPoint(endGlobalPoint, { color: "yellow", permanent: true });
-  //debugDrawPoint(origEndGlobalPoint, { color: "red", permanent: true });
   const boundsOverlap =
     pointInsideBounds(
       startGlobalPoint,
