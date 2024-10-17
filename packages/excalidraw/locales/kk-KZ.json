@@ -490,6 +490,7 @@
     "copyStyles": "Стильдер көшірілді.",
     "copyToClipboard": "",
     "copyToClipboardAsPng": "",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Файл сақталды.",
     "fileSavedToFilename": "{filename} сақталды",
     "canvas": "",
