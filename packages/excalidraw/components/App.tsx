@@ -4739,10 +4739,13 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
         }
 
-        this.setState({
-          newElement: null,
-          editingTextElement: null,
+        flushSync(() => {
+          this.setState({
+            newElement: null,
+            editingTextElement: null,
+          });
         });
+
         if (this.state.activeTool.locked) {
           setCursorForShape(this.interactiveCanvas, this.state);
         }
