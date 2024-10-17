@@ -206,7 +206,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "svg",
           "clipboard",
@@ -4724,7 +4723,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "svg",
           "clipboard",
@@ -5852,7 +5850,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "svg",
           "clipboard",
@@ -6932,7 +6929,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "svg",
           "clipboard",
@@ -7701,7 +7697,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "svg",
           "clipboard",
@@ -8596,7 +8591,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
             />
           </g>
         </svg>,
-        "keyTest": [Function],
         "keywords": [
           "svg",
           "clipboard",

@@ -182,7 +182,6 @@ export const actionCopyAsSvg = register({
   predicate: (elements) => {
     return probablySupportsClipboardWriteText && elements.length > 0;
   },
-  keyTest: (event) => event.code === CODES.C && event.ctrlKey && event.shiftKey,
   keywords: ["svg", "clipboard", "copy"],
 });
 
