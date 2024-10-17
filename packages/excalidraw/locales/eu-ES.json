@@ -490,6 +490,7 @@
     "copyStyles": "Estiloak kopiatu dira.",
     "copyToClipboard": "Arbelean kopiatu da.",
     "copyToClipboardAsPng": "{{exportSelection}} kopiatu da arbelean PNG gisa\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fitxategia gorde da.",
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
