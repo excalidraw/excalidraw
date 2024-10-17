@@ -490,6 +490,7 @@
     "copyStyles": "Kopierade stilar.",
     "copyToClipboard": "Kopierad till urklipp.",
     "copyToClipboardAsPng": "Kopierade {{exportSelection}} till urklipp som PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fil sparad.",
     "fileSavedToFilename": "Sparad till {filename}",
     "canvas": "arbetsyta",
