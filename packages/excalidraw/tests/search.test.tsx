@@ -102,6 +102,335 @@ describe("search", () => {
     expect(h.app.state.searchMatches[1].focus).toBe(false);
   });
 
+  describe("LTR and RTL", () => {
+    describe("LTR", () => {
+      it("should work with LTR text", async () => {
+        const scrollIntoViewMock = jest.fn();
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+        API.setElements([
+          API.createElement({
+            type: "text",
+            text: "aaa bbb ccc",
+            width: 159.31779010087632,
+          }),
+        ]);
+
+        expect(h.app.state.openSidebar).toBeNull();
+
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyPress(KEYS.F);
+        });
+
+        expect(h.app.state.openSidebar).not.toBeNull();
+        expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+        expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+        const searchInput =
+          h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+            `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+          );
+
+        expect(searchInput?.matches(":focus")).toBe(true);
+
+        updateTextEditor(searchInput!, "aaa");
+
+        await waitFor(() => {
+          expect(h.app.state.searchMatches.length).toBe(1);
+          expect(h.app.state.searchMatches[0].focus).toBe(true);
+          expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(0);
+        });
+      });
+
+      it("should work with LTR text and center alignment", async () => {
+        const scrollIntoViewMock = jest.fn();
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+        API.setElements([
+          API.createElement({
+            type: "text",
+            text: "aaa bbb ccc",
+            width: 159.31779010087632,
+            textAlign: "center",
+          }),
+        ]);
+
+        expect(h.app.state.openSidebar).toBeNull();
+
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyPress(KEYS.F);
+        });
+
+        expect(h.app.state.openSidebar).not.toBeNull();
+        expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+        expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+        const searchInput =
+          h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+            `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+          );
+
+        expect(searchInput?.matches(":focus")).toBe(true);
+
+        updateTextEditor(searchInput!, "bbb");
+
+        await waitFor(() => {
+          expect(h.app.state.searchMatches.length).toBe(1);
+          expect(h.app.state.searchMatches[0].focus).toBe(true);
+          expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(
+            64.65889505043816,
+          );
+        });
+      });
+
+      it("should work with LTR text and right alignment", async () => {
+        const scrollIntoViewMock = jest.fn();
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+        API.setElements([
+          API.createElement({
+            type: "text",
+            text: "aaa bbb ccc",
+            width: 159.31779010087632,
+            textAlign: "right",
+          }),
+        ]);
+
+        expect(h.app.state.openSidebar).toBeNull();
+
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyPress(KEYS.F);
+        });
+
+        expect(h.app.state.openSidebar).not.toBeNull();
+        expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+        expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+        const searchInput =
+          h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+            `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+          );
+
+        expect(searchInput?.matches(":focus")).toBe(true);
+
+        updateTextEditor(searchInput!, "ccc");
+
+        await waitFor(() => {
+          expect(h.app.state.searchMatches.length).toBe(1);
+          expect(h.app.state.searchMatches[0].focus).toBe(true);
+          expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(
+            129.31779010087632,
+          );
+        });
+      });
+    });
+
+    describe("RTL", () => {
+      it("should work with RTL text", async () => {
+        const scrollIntoViewMock = jest.fn();
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+        API.setElements([
+          API.createElement({
+            type: "text",
+            text: "אאא בבב גגג דדד",
+            width: 152.173828125,
+            textAlign: "right",
+          }),
+        ]);
+
+        expect(h.app.state.openSidebar).toBeNull();
+
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyPress(KEYS.F);
+        });
+
+        expect(h.app.state.openSidebar).not.toBeNull();
+        expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+        expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+        const searchInput =
+          h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+            `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+          );
+
+        expect(searchInput?.matches(":focus")).toBe(true);
+
+        updateTextEditor(searchInput!, "אאא");
+
+        await waitFor(() => {
+          expect(h.app.state.searchMatches.length).toBe(1);
+          expect(h.app.state.searchMatches[0].focus).toBe(true);
+          // Despite the fact that search query matched start of the text in RTL mode, offset should be at the end of the text box
+          expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(
+            122.173828125,
+          );
+        });
+      });
+
+      it("should work with RTL text and center alignment", async () => {
+        const scrollIntoViewMock = jest.fn();
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+        API.setElements([
+          API.createElement({
+            type: "text",
+            text: "אאא בבב גגג דדד",
+            width: 152.173828125,
+            textAlign: "center",
+          }),
+        ]);
+
+        expect(h.app.state.openSidebar).toBeNull();
+
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyPress(KEYS.F);
+        });
+
+        expect(h.app.state.openSidebar).not.toBeNull();
+        expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+        expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+        const searchInput =
+          h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+            `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+          );
+
+        expect(searchInput?.matches(":focus")).toBe(true);
+
+        updateTextEditor(searchInput!, "גגג");
+
+        await waitFor(() => {
+          expect(h.app.state.searchMatches.length).toBe(1);
+          expect(h.app.state.searchMatches[0].focus).toBe(true);
+          expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(
+            41.0869140625,
+          );
+        });
+      });
+
+      it("should work with RTL text and left alignment", async () => {
+        const scrollIntoViewMock = jest.fn();
+        window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+        API.setElements([
+          API.createElement({
+            type: "text",
+            text: "אאא בבב גגג דדד",
+            width: 152.173828125,
+            textAlign: "left",
+          }),
+        ]);
+
+        expect(h.app.state.openSidebar).toBeNull();
+
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyPress(KEYS.F);
+        });
+
+        expect(h.app.state.openSidebar).not.toBeNull();
+        expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+        expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+        const searchInput =
+          h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+            `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+          );
+
+        expect(searchInput?.matches(":focus")).toBe(true);
+
+        updateTextEditor(searchInput!, "דדד");
+
+        await waitFor(() => {
+          expect(h.app.state.searchMatches.length).toBe(1);
+          expect(h.app.state.searchMatches[0].focus).toBe(true);
+          expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(0);
+        });
+      });
+    });
+
+    it("should work with mixed LTR and RTL text", async () => {
+      const scrollIntoViewMock = jest.fn();
+      window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+      API.setElements([
+        API.createElement({
+          type: "text",
+          text: "אאא בבב גגג דדד",
+          width: 152.173828125,
+          textAlign: "right",
+        }),
+        API.createElement({
+          type: "text",
+          text: "aaa bbb ccc ddd",
+          textAlign: "left",
+          width: 159.31779010087632,
+        }),
+        API.createElement({
+          type: "text",
+          text: "aaa בבב bbb גגג ddd",
+          textAlign: "left",
+          width: 195.67397093772888,
+        }),
+      ]);
+
+      expect(h.app.state.openSidebar).toBeNull();
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.F);
+      });
+
+      expect(h.app.state.openSidebar).not.toBeNull();
+      expect(h.app.state.openSidebar?.name).toBe(DEFAULT_SIDEBAR.name);
+      expect(h.app.state.openSidebar?.tab).toBe(CANVAS_SEARCH_TAB);
+
+      const searchInput =
+        h.app.excalidrawContainerValue.container?.querySelector<HTMLInputElement>(
+          `.${CLASSES.SEARCH_MENU_INPUT_WRAPPER} input`,
+        );
+
+      expect(searchInput?.matches(":focus")).toBe(true);
+
+      updateTextEditor(searchInput!, "בבב");
+
+      await waitFor(() => {
+        // Finds "אאא בבב גגג דדד"
+        expect(h.app.state.searchMatches.length).toBe(2);
+        expect(h.app.state.searchMatches[0].focus).toBe(true);
+        expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(
+          82.173828125,
+        );
+      });
+
+      Keyboard.keyPress(KEYS.ENTER, searchInput!);
+
+      await waitFor(() => {
+        // Finds "aaa בבב bbb גגג ddd"
+        expect(h.app.state.searchMatches.length).toBe(2);
+        expect(h.app.state.searchMatches[1].focus).toBe(true);
+        expect(h.app.state.searchMatches[1].matchedLines[0].offsetX).toBe(40);
+      });
+
+      updateTextEditor(searchInput!, "bbb");
+
+      await waitFor(() => {
+        // Finds "aaa bbb ccc ddd"
+        expect(h.app.state.searchMatches.length).toBe(2);
+        expect(h.app.state.searchMatches[0].focus).toBe(true);
+        expect(h.app.state.searchMatches[0].matchedLines[0].offsetX).toBe(40);
+      });
+
+      Keyboard.keyPress(KEYS.ENTER, searchInput!);
+
+      await waitFor(() => {
+        // Finds "aaa בבב bbb גגג ddd"
+        expect(h.app.state.searchMatches.length).toBe(2);
+        expect(h.app.state.searchMatches[1].focus).toBe(true);
+        expect(h.app.state.searchMatches[1].matchedLines[0].offsetX).toBe(80);
+      });
+    });
+  });
+
   it("should match text split across multiple lines", async () => {
     const scrollIntoViewMock = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;

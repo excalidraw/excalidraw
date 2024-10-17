@@ -1170,3 +1170,32 @@ export const safelyParseJSON = (json: string): Record<string, any> | null => {
     return null;
   }
 };
+
+export const detectTextDirection = (text: string) => {
+  // Define the ranges for RTL scripts
+  const rtlRanges = [
+    [0x0590, 0x05ff], // Hebrew
+    [0x0600, 0x06ff], // Arabic
+    [0x0700, 0x074f], // Syriac
+    [0x0750, 0x077f], // Arabic Supplement
+    [0x08a0, 0x08ff], // Arabic Extended-A
+    [0xfb50, 0xfdff], // Arabic Presentation Forms-A
+    [0xfe70, 0xfeff], // Arabic Presentation Forms-B
+    [0x10800, 0x10fff], // Aramaic, Phoenician, Lydian, etc.
+  ];
+
+  function isRtlChar(char: string) {
+    const code = char.charCodeAt(0);
+    return rtlRanges.some(([start, end]) => code >= start && code <= end);
+  }
+
+  for (const char of text) {
+    if (isRtlChar(char)) {
+      return "rtl";
+    } else if (/[A-Za-z]/.test(char)) {
+      return "ltr";
+    }
+  }
+
+  return "ltr";
+};
