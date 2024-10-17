@@ -490,6 +490,7 @@
     "copyStyles": "प्रतिलिपित शैली",
     "copyToClipboard": "क्लिपबोर्ड में प्रतिलिपित",
     "copyToClipboardAsPng": "{{exportSelection}} को क्लिपबोर्ड पर पी-एन-जी( {{exportColorScheme}}) पर प्रतिरूपित किया गया",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "फ़ाइल सुरक्षित की गयी",
     "fileSavedToFilename": "{filename} में सुरक्षित की गयी",
     "canvas": "चित्रपटल",
