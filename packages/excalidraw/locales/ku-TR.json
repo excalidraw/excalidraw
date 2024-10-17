@@ -490,6 +490,7 @@
     "copyStyles": "ستایلی کۆپیکراو.",
     "copyToClipboard": "لەبەرگیرایەوە بۆ تەختەنوس.",
     "copyToClipboardAsPng": "کۆپی کراوە {{exportSelection}} بۆ کلیپبۆرد وەک PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "فایل هەڵگیرا.",
     "fileSavedToFilename": "هەڵگیراوە بۆ {filename}",
     "canvas": "تابلۆ",
