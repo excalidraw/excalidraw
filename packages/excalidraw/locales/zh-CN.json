@@ -490,6 +490,7 @@
     "copyStyles": "样式已拷贝。",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",
