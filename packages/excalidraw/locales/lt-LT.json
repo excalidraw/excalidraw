@@ -490,6 +490,7 @@
     "copyStyles": "",
     "copyToClipboard": "Nukopijuota į iškarpinę.",
     "copyToClipboardAsPng": "",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Failas išsaugotas.",
     "fileSavedToFilename": "Išsaugota į {filename}",
     "canvas": "drobė",
