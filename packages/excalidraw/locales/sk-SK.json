@@ -490,6 +490,7 @@
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
