@@ -190,6 +190,7 @@ import type {
 import { getCenter, getDistance } from "../gesture";
 import {
   editGroupForSelectedElement,
+  elementsAreInSameGroup,
   getElementsInGroup,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
@@ -4211,6 +4212,7 @@ class App extends React.Component<AppProps, AppState> {
         event.preventDefault();
       } else if (event.key === KEYS.ENTER) {
         const selectedElements = this.scene.getSelectedElements(this.state);
+        const selectedGroupIds = getSelectedGroupIds(this.state);
         if (selectedElements.length === 1) {
           const selectedElement = selectedElements[0];
           if (event[KEYS.CTRL_OR_CMD]) {
@@ -4257,6 +4259,13 @@ class App extends React.Component<AppProps, AppState> {
               editingFrame: selectedElement.id,
             });
           }
+        } else if (
+          selectedGroupIds.length === 1 &&
+          elementsAreInSameGroup(selectedElements)
+        ) {
+          this.setState({
+            editingGroupId: selectedGroupIds[0],
+          });
         }
       } else if (
         !event.ctrlKey &&
