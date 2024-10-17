@@ -280,6 +280,7 @@ export interface AppState {
     locked: boolean;
   } & ActiveTool;
   penMode: boolean;
+  fullscreenMode: boolean;
   penDetected: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
@@ -645,6 +646,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
+  toggleFullscreenMode: App["toggleFullscreenMode"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];
