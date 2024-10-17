@@ -490,6 +490,7 @@
     "copyStyles": "Kopierte stilane.",
     "copyToClipboard": "Kopiert til utklippstavla.",
     "copyToClipboardAsPng": "Kopierte {{exportSelection}} til utklippstavla som PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fila er lagra.",
     "fileSavedToFilename": "Lagra som {filename}",
     "canvas": "lerret",
