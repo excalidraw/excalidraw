@@ -490,6 +490,7 @@
     "copyStyles": "Tyylit kopioitiin.",
     "copyToClipboard": "Kopioitiin leikepöydälle.",
     "copyToClipboardAsPng": "Kopioitiin {{exportSelection}} leikepöydälle PNG:nä\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Tiedosto tallennettu.",
     "fileSavedToFilename": "Tallennettiin kohteeseen {filename}",
     "canvas": "piirtoalue",
