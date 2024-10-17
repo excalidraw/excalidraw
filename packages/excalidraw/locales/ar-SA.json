@@ -490,6 +490,7 @@
     "copyStyles": "نسخت الانماط.",
     "copyToClipboard": "نسخ إلى الحافظة.",
     "copyToClipboardAsPng": "تم نسخ {{exportSelection}} إلى الحافظة بصيغة PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "تم حفظ الملف.",
     "fileSavedToFilename": "حفظ باسم {filename}",
     "canvas": "لوحة الرسم",
