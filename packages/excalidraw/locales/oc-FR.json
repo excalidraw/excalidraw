@@ -490,6 +490,7 @@
     "copyStyles": "Estiles copiats.",
     "copyToClipboard": "Copiats al quichapapièrs.",
     "copyToClipboardAsPng": "{{exportSelection}} copiat coma PNG ({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fichièr enregistrat.",
     "fileSavedToFilename": "Enregistrat jos {filename}",
     "canvas": "canabàs",
