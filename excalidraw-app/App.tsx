@@ -126,6 +126,8 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import type { SaveWarningRef } from "./components/SaveWarning";
+import { SaveWarning } from "./components/SaveWarning";
 
 polyfill();
 
@@ -330,6 +332,8 @@ const ExcalidrawWrapper = () => {
   const { editorTheme } = useHandleAppTheme();
 
   const [langCode, setLangCode] = useAppLangCode();
+
+  const activityRef = useRef<SaveWarningRef | null>(null);
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -615,6 +619,8 @@ const ExcalidrawWrapper = () => {
       collabAPI.syncElements(elements);
     }
 
+    activityRef.current?.activity();
+
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
@@ -856,6 +862,7 @@ const ExcalidrawWrapper = () => {
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
         />
+        <SaveWarning ref={activityRef} />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
           isCollabEnabled={!isCollabDisabled}
