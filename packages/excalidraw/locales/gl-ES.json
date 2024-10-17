@@ -490,6 +490,7 @@
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado ao portapapeis.",
     "copyToClipboardAsPng": "Copiar {{exportSelection}} ao portapapeis como PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Ficheiro gardado.",
     "fileSavedToFilename": "Gardado en {filename}",
     "canvas": "lenzo",
