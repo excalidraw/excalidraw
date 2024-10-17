@@ -490,6 +490,7 @@
     "copyStyles": "Копирани стилове.",
     "copyToClipboard": "Копирано в клипборда.",
     "copyToClipboardAsPng": "Копира {{exportSelection}} в клипборда като PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Файлът е запазен.",
     "fileSavedToFilename": "Запазен към {filename}",
     "canvas": "платно",
