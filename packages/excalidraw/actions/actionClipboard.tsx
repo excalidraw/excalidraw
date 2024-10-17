@@ -147,14 +147,32 @@ export const actionCopyAsSvg = register({
           name: app.getName(),
         },
       );
+
+      const selectedElements = app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        includeBoundTextElement: true,
+        includeElementsInFrames: true,
+      });
+
       return {
+        appState: {
+          toast: {
+            message: t("toast.copyToClipboardAsSvg", {
+              exportSelection: selectedElements.length
+                ? t("toast.selection")
+                : t("toast.canvas"),
+              exportColorScheme: appState.exportWithDarkMode
+                ? t("buttons.darkMode")
+                : t("buttons.lightMode"),
+            }),
+          },
+        },
         storeAction: StoreAction.NONE,
       };
     } catch (error: any) {
       console.error(error);
       return {
         appState: {
-          ...appState,
           errorMessage: error.message,
         },
         storeAction: StoreAction.NONE,
@@ -164,6 +182,7 @@ export const actionCopyAsSvg = register({
   predicate: (elements) => {
     return probablySupportsClipboardWriteText && elements.length > 0;
   },
+  keyTest: (event) => event.code === CODES.C && event.ctrlKey && event.shiftKey,
   keywords: ["svg", "clipboard", "copy"],
 });
 

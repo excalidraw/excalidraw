@@ -67,6 +67,7 @@
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
     "cross-env": "7.0.3",
+    "es6-promise-pool": "2.5.0",
     "fractional-indexing": "3.2.0",
     "fuzzy": "0.1.3",
     "image-blob-reduce": "3.0.1",

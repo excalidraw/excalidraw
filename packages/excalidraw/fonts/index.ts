@@ -8,30 +8,28 @@ import type {
 import { ShapeCache } from "../scene/ShapeCache";
 import { isTextElement } from "../element";
 import { getFontString } from "../utils";
-import { FONT_FAMILY } from "../constants";
 import {
-  LOCAL_FONT_PROTOCOL,
-  FONT_METADATA,
-  RANGES,
-  type FontMetadata,
-} from "./metadata";
-import { ExcalidrawFont, type Font } from "./ExcalidrawFont";
-import { getContainerElement } from "../element/textElement";
-
-import Virgil from "./assets/Virgil-Regular.woff2";
-import Excalifont from "./assets/Excalifont-Regular.woff2";
-import Cascadia from "./assets/CascadiaCode-Regular.woff2";
-import ComicShanns from "./assets/ComicShanns-Regular.woff2";
-import LiberationSans from "./assets/LiberationSans-Regular.woff2";
-
-import LilitaLatin from "./assets/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYEF8RXi4EwQ.woff2";
-import LilitaLatinExt from "./assets/Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2";
-
-import NunitoLatin from "./assets/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2";
-import NunitoLatinExt from "./assets/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTo3j6zbXWjgevT5.woff2";
-import NunitoCyrilic from "./assets/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2";
-import NunitoCyrilicExt from "./assets/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTk3j6zbXWjgevT5.woff2";
-import NunitoVietnamese from "./assets/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTs3j6zbXWjgevT5.woff2";
+  FONT_FAMILY,
+  FONT_FAMILY_FALLBACKS,
+  WINDOWS_EMOJI_FALLBACK_FONT,
+  CJK_HAND_DRAWN_FALLBACK_FONT,
+} from "../constants";
+import { FONT_METADATA, type FontMetadata } from "./metadata";
+import { charWidth, getContainerElement } from "../element/textElement";
+import {
+  ExcalidrawFontFace,
+  type IExcalidrawFontFace,
+} from "./ExcalidrawFontFace";
+import { CascadiaFontFaces } from "./woff2/Cascadia";
+import { ComicFontFaces } from "./woff2/Comic";
+import { ExcalifontFontFaces } from "./woff2/Excalifont";
+import { HelveticaFontFaces } from "./woff2/Helvetica";
+import { LiberationFontFaces } from "./woff2/Liberation";
+import { LilitaFontFaces } from "./woff2/Lilita";
+import { NunitoFontFaces } from "./woff2/Nunito";
+import { VirgilFontFaces } from "./woff2/Virgil";
+import { XiaolaiFontFaces } from "./woff2/Xiaolai";
+import { EmojiFontFaces } from "./woff2/Emoji";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -43,7 +41,7 @@ export class Fonts {
         number,
         {
           metadata: FontMetadata;
-          fonts: Font[];
+          fontFaces: IExcalidrawFontFace[];
         }
       >
     | undefined;
@@ -85,20 +83,23 @@ export class Fonts {
    * of the supplied fontFaces has not already been processed.
    */
   public onLoaded = (fontFaces: readonly FontFace[]) => {
-    if (
-      // bail if all fonts with have been processed. We're checking just a
-      // subset of the font properties (though it should be enough), so it
-      // can technically bail on a false positive.
-      fontFaces.every((fontFace) => {
-        const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}-${fontFace.unicodeRange}`;
-        if (Fonts.loadedFontsCache.has(sig)) {
-          return true;
-        }
+    // bail if all fonts with have been processed. We're checking just a
+    // subset of the font properties (though it should be enough), so it
+    // can technically bail on a false positive.
+    let shouldBail = true;
+
+    for (const fontFace of fontFaces) {
+      const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}-${fontFace.unicodeRange}`;
+
+      // make sure to update our cache with all the loaded font faces
+      if (!Fonts.loadedFontsCache.has(sig)) {
         Fonts.loadedFontsCache.add(sig);
-        return false;
-      })
-    ) {
-      return false;
+        shouldBail = false;
+      }
+    }
+
+    if (shouldBail) {
+      return;
     }
 
     let didUpdate = false;
@@ -109,6 +110,10 @@ export class Fonts {
       if (isTextElement(element)) {
         didUpdate = true;
         ShapeCache.delete(element);
+
+        // clear the width cache, so that we don't perform subsequent wrapping based on the stale fallback font metrics
+        charWidth.clearCache(getFontString(element));
+
         const container = getContainerElement(element, elementsMap);
         if (container) {
           ShapeCache.delete(container);
@@ -125,26 +130,27 @@ export class Fonts {
    * Load font faces for a given scene and trigger scene update.
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
-    const sceneFamilies = this.getSceneFontFamilies();
+    const sceneFamilies = this.getSceneFamilies();
     const loaded = await Fonts.loadFontFaces(sceneFamilies);
     this.onLoaded(loaded);
     return loaded;
   };
 
   /**
-   * Gets all the font families for the given scene.
+   * Load all registered font faces.
    */
-  public getSceneFontFamilies = () => {
-    return Fonts.getFontFamilies(this.scene.getNonDeletedElements());
+  public static loadAllFonts = async (): Promise<FontFace[]> => {
+    const allFamilies = Fonts.getAllFamilies();
+    return Fonts.loadFontFaces(allFamilies);
   };
 
   /**
    * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
    */
-  public static loadFontsForElements = async (
+  public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
-    const fontFamilies = Fonts.getFontFamilies(elements);
+    const fontFamilies = Fonts.getElementsFamilies(elements);
     return await Fonts.loadFontFaces(fontFamilies);
   };
 
@@ -152,13 +158,13 @@ export class Fonts {
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
-    for (const { fonts, metadata } of Fonts.registered.values()) {
+    for (const { fontFaces, metadata } of Fonts.registered.values()) {
       // skip registering font faces for local fonts (i.e. Helvetica)
       if (metadata.local) {
         continue;
       }
 
-      for (const { fontFace } of fonts) {
+      for (const { fontFace } of fontFaces) {
         if (!window.document.fonts.has(fontFace)) {
           window.document.fonts.add(fontFace);
         }
@@ -183,7 +189,7 @@ export class Fonts {
             console.error(
               `Failed to load font "${fontString}" from urls "${Fonts.registered
                 .get(fontFamily)
-                ?.fonts.map((x) => x.urls)}"`,
+                ?.fontFaces.map((x) => x.urls)}"`,
               e,
             );
           }
@@ -202,82 +208,58 @@ export class Fonts {
   private static init() {
     const fonts = {
       registered: new Map<
-        ValueOf<typeof FONT_FAMILY>,
-        { metadata: FontMetadata; fonts: Font[] }
+        ValueOf<typeof FONT_FAMILY | typeof FONT_FAMILY_FALLBACKS>,
+        { metadata: FontMetadata; fontFaces: IExcalidrawFontFace[] }
       >(),
     };
 
-    // TODO: let's tweak this once we know how `register` will be exposed as part of the custom fonts API
-    const _register = register.bind(fonts);
+    const init = (
+      family: keyof typeof FONT_FAMILY | keyof typeof FONT_FAMILY_FALLBACKS,
+      ...fontFacesDescriptors: ExcalidrawFontFaceDescriptor[]
+    ) => {
+      const fontFamily =
+        FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
+        FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
 
-    _register("Virgil", FONT_METADATA[FONT_FAMILY.Virgil], {
-      uri: Virgil,
-    });
+      // default to Excalifont metrics
+      const metadata =
+        FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
 
-    _register("Excalifont", FONT_METADATA[FONT_FAMILY.Excalifont], {
-      uri: Excalifont,
-    });
+      register.call(fonts, family, metadata, ...fontFacesDescriptors);
+    };
 
+    init("Cascadia", ...CascadiaFontFaces);
+    init("Comic Shanns", ...ComicFontFaces);
+    init("Excalifont", ...ExcalifontFontFaces);
     // keeping for backwards compatibility reasons, uses system font (Helvetica on MacOS, Arial on Win)
-    _register("Helvetica", FONT_METADATA[FONT_FAMILY.Helvetica], {
-      uri: LOCAL_FONT_PROTOCOL,
-    });
-
+    init("Helvetica", ...HelveticaFontFaces);
     // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept in for consistency)
-    _register(
-      "Liberation Sans",
-      FONT_METADATA[FONT_FAMILY["Liberation Sans"]],
-      {
-        uri: LiberationSans,
-      },
-    );
+    init("Liberation Sans", ...LiberationFontFaces);
+    init("Lilita One", ...LilitaFontFaces);
+    init("Nunito", ...NunitoFontFaces);
+    init("Virgil", ...VirgilFontFaces);
 
-    _register("Cascadia", FONT_METADATA[FONT_FAMILY.Cascadia], {
-      uri: Cascadia,
-    });
-
-    _register("Comic Shanns", FONT_METADATA[FONT_FAMILY["Comic Shanns"]], {
-      uri: ComicShanns,
-    });
-
-    _register(
-      "Lilita One",
-      FONT_METADATA[FONT_FAMILY["Lilita One"]],
-      { uri: LilitaLatinExt, descriptors: { unicodeRange: RANGES.LATIN_EXT } },
-      { uri: LilitaLatin, descriptors: { unicodeRange: RANGES.LATIN } },
-    );
-
-    _register(
-      "Nunito",
-      FONT_METADATA[FONT_FAMILY.Nunito],
-      {
-        uri: NunitoCyrilicExt,
-        descriptors: { unicodeRange: RANGES.CYRILIC_EXT, weight: "500" },
-      },
-      {
-        uri: NunitoCyrilic,
-        descriptors: { unicodeRange: RANGES.CYRILIC, weight: "500" },
-      },
-      {
-        uri: NunitoVietnamese,
-        descriptors: { unicodeRange: RANGES.VIETNAMESE, weight: "500" },
-      },
-      {
-        uri: NunitoLatinExt,
-        descriptors: { unicodeRange: RANGES.LATIN_EXT, weight: "500" },
-      },
-      {
-        uri: NunitoLatin,
-        descriptors: { unicodeRange: RANGES.LATIN, weight: "500" },
-      },
-    );
+    // fallback font faces
+    init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);
+    init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
 
     Fonts._initialized = true;
 
     return fonts.registered;
   }
 
-  private static getFontFamilies(
+  /**
+   * Gets all the font families for the given scene.
+   */
+  public getSceneFamilies = () => {
+    return Fonts.getElementsFamilies(this.scene.getNonDeletedElements());
+  };
+
+  private static getAllFamilies() {
+    return Array.from(Fonts.registered.keys());
+  }
+
+  private static getElementsFamilies(
     elements: ReadonlyArray<ExcalidrawElement>,
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
@@ -296,30 +278,34 @@ export class Fonts {
  *
  * @param family font family
  * @param metadata font metadata
- * @param params array of the rest of the FontFace parameters [uri: string, descriptors: FontFaceDescriptors?] ,
+ * @param fontFacesDecriptors font faces descriptors
  */
 function register(
   this:
     | Fonts
     | {
         registered: Map<
-          ValueOf<typeof FONT_FAMILY>,
-          { metadata: FontMetadata; fonts: Font[] }
+          number,
+          { metadata: FontMetadata; fontFaces: IExcalidrawFontFace[] }
         >;
       },
   family: string,
   metadata: FontMetadata,
-  ...params: Array<{ uri: string; descriptors?: FontFaceDescriptors }>
+  ...fontFacesDecriptors: ExcalidrawFontFaceDescriptor[]
 ) {
-  // TODO: likely we will need to abandon number "id" in order to support custom fonts
-  const familyId = FONT_FAMILY[family as keyof typeof FONT_FAMILY];
-  const registeredFamily = this.registered.get(familyId);
+  // TODO: likely we will need to abandon number value in order to support custom fonts
+  const fontFamily =
+    FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
+    FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
+
+  const registeredFamily = this.registered.get(fontFamily);
 
   if (!registeredFamily) {
-    this.registered.set(familyId, {
+    this.registered.set(fontFamily, {
       metadata,
-      fonts: params.map(
-        ({ uri, descriptors }) => new ExcalidrawFont(family, uri, descriptors),
+      fontFaces: fontFacesDecriptors.map(
+        ({ uri, descriptors }) =>
+          new ExcalidrawFontFace(family, uri, descriptors),
       ),
     });
   }
@@ -357,3 +343,8 @@ export const getLineHeight = (fontFamily: FontFamilyValues) => {
 
   return lineHeight as ExcalidrawTextElement["lineHeight"];
 };
+
+export interface ExcalidrawFontFaceDescriptor {
+  uri: string;
+  descriptors?: FontFaceDescriptors;
+}

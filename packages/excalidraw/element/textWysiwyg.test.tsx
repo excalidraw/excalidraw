@@ -917,7 +917,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.text).toBe("Hello \nWorld!");
+      expect(text.text).toBe("Hello\nWorld!");
       expect(text.originalText).toBe("Hello World!");
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
@@ -1220,7 +1220,7 @@ describe("textWysiwyg", () => {
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
+        "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
