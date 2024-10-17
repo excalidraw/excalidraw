@@ -1324,12 +1324,12 @@ export class LinearElementEditor {
                 index: idx,
               };
             }
-            //console.log("LINEAR", res);
+
             return res;
           }),
       };
     }
-    console.log("...");
+
     LinearElementEditor._updatePoints(
       element,
       nextPoints,

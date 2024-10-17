@@ -262,7 +262,7 @@ export const updateElbowArrowPoints = (
       prevState.y + prevPoints[prevPoints.length - 1][1],
     );
     let res;
-    if (point[0] - previous[0] < 0.05) {
+    if (Math.abs(point[0] - previous[0]) < 0.05) {
       const anchor = pointFrom<GlobalPoint>(
         point[0],
         (point[1] + previous[1]) / 2,
