@@ -7771,6 +7771,7 @@ class App extends React.Component<AppProps, AppState> {
               },
             });
           }
+          
           return;
         }
       }
@@ -7802,6 +7803,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({
           frameToHighlight:
             topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null,
+            
         });
 
         // Marking that click was used for dragging to check
@@ -7828,6 +7830,7 @@ class App extends React.Component<AppProps, AppState> {
 
           // We only drag in one direction if shift is pressed
           const lockDirection = event.shiftKey;
+          // const a=event[KEYS.TAB];
 
           if (lockDirection) {
             const distanceX = Math.abs(dragOffset.x);
@@ -7879,7 +7882,8 @@ class App extends React.Component<AppProps, AppState> {
             // should be removed
             selectionElement: null,
           });
-
+          
+          
           if (
             selectedElements.length !== 1 ||
             !isElbowArrow(selectedElements[0])
@@ -7888,16 +7892,25 @@ class App extends React.Component<AppProps, AppState> {
               suggestedBindings: getSuggestedBindingsForArrows(
                 selectedElements,
                 this.scene.getNonDeletedElementsMap(),
-              ),
+              )
             });
           }
-
+          // keyTest:(event)=>
+          window.addEventListener('keydown', (event) => {
+            if (event.key === 'Tab' && event.altKey) {
+              pointerDownState.hit.hasBeenDuplicated = false; // Reset duplication state
+            }
+          });
+          
           // We duplicate the selected element if alt is pressed on pointer move
-          if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
+          if (event.altKey&& !pointerDownState.hit.hasBeenDuplicated) {
             // Move the currently selected elements to the top of the z index stack, and
             // put the duplicates where the selected elements used to be.
             // (the origin point where the dragging started)
+            // onKeyDown={(event) => {
+            
 
+           
             pointerDownState.hit.hasBeenDuplicated = true;
 
             const nextElements = [];
@@ -7980,6 +7993,7 @@ class App extends React.Component<AppProps, AppState> {
           }
           return;
         }
+       
       }
 
       if (this.state.selectionElement) {
