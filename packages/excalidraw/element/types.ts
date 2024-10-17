@@ -1,4 +1,4 @@
-import type { LocalPoint, Radians } from "../../math";
+import type { GlobalPoint, LocalPoint, Radians } from "../../math";
 import type {
   FONT_FAMILY,
   ROUNDNESS,
@@ -12,6 +12,7 @@ import type {
   Merge,
   ValueOf,
 } from "../utility-types";
+import type { Heading } from "./heading";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -283,6 +284,12 @@ export type FixedPointBinding = Merge<
   }
 >;
 
+export type FixedSegment = {
+  anchor: GlobalPoint;
+  heading: Heading;
+  index: number;
+};
+
 export type Arrowhead =
   | "arrow"
   | "bar"
@@ -309,6 +316,7 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
+    fixedSegments: FixedSegment[] | null;
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<
@@ -317,6 +325,7 @@ export type ExcalidrawElbowArrowElement = Merge<
     elbowed: true;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
+    fixedSegments: FixedSegment[] | null;
   }
 >;
 

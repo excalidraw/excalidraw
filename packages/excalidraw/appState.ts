@@ -117,6 +117,7 @@ export const getDefaultAppState = (): Omit<
     userToFollow: null,
     followedBy: new Set(),
     searchMatches: [],
+    flippedFixedPointBindings: false,
   };
 };
 
@@ -238,6 +239,7 @@ const APP_STATE_STORAGE_CONF = (<
   userToFollow: { browser: false, export: false, server: false },
   followedBy: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
+  flippedFixedPointBindings: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
