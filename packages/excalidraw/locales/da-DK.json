@@ -490,6 +490,7 @@
     "copyStyles": "Kopieret stilarter.",
     "copyToClipboard": "Kopieret til klippebord.",
     "copyToClipboardAsPng": "Kopieret {{exportSelection}} til klippebord som PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fil gemt.",
     "fileSavedToFilename": "Gemt som {filename}",
     "canvas": "",
