@@ -97,8 +97,7 @@ const createESMBrowserBuild = async () => {
 //   );
 // });
 
-const rawConfig = {
-  entryPoints: ["index.tsx"],
+const rawConfigCommon = {
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
@@ -107,28 +106,55 @@ const rawConfig = {
     ".woff2": "file",
   },
   packages: "external",
+  // chunks are always external, so they are not bundled within and get build separately
+  external: ["*.chunk"],
 };
 
-const createESMRawBuild = async () => {
-  // Development unminified build with source maps
-  await build({
-    ...rawConfig,
+const rawConfigIndex = {
+  ...rawConfigCommon,
+  entryPoints: ["index.tsx"],
+};
+
+const rawConfigChunks = {
+  ...rawConfigCommon,
+  // create a separate chunk for each
+  entryPoints: ["**/*.chunk.ts"],
+};
+
+function buildDev(chunkConfig) {
+  const config = {
+    ...chunkConfig,
     sourcemap: true,
-    outdir: "dist/dev",
     define: {
       "import.meta.env": JSON.stringify({ DEV: true }),
     },
-  });
+    outdir: "dist/dev",
+  };
 
-  // production minified build without sourcemaps
-  await build({
-    ...rawConfig,
+  return build(config);
+}
+
+function buildProd(chunkConfig) {
+  const config = {
+    ...chunkConfig,
     minify: true,
-    outdir: "dist/prod",
     define: {
       "import.meta.env": JSON.stringify({ PROD: true }),
     },
-  });
+    outdir: "dist/prod",
+  };
+
+  return build(config);
+}
+
+const createESMRawBuild = async () => {
+  // development unminified build with source maps
+  await buildDev(rawConfigIndex);
+  await buildDev(rawConfigChunks);
+
+  // production minified buld without sourcemaps
+  await buildProd(rawConfigIndex);
+  await buildProd(rawConfigChunks);
 };
 
 createESMRawBuild();
