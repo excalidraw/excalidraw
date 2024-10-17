@@ -10,6 +10,7 @@ exports[`restoreElements > should restore arrow element correctly 1`] = `
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
+  "fixedSegments": [],
   "frameId": null,
   "groupIds": [],
   "height": 100,

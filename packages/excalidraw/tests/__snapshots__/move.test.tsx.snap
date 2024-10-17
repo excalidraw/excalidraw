@@ -195,6 +195,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
     "gap": 10,
   },
   "fillStyle": "solid",
+  "fixedSegments": [],
   "frameId": null,
   "groupIds": [],
   "height": "81.47368",
