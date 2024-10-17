@@ -490,6 +490,7 @@
     "copyStyles": "סגנונות הועתקו.",
     "copyToClipboard": "הועתק ללוח.",
     "copyToClipboardAsPng": "{{exportSelection}} הועתקה ללוח כ-PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "קנבאס",
