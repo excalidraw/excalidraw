@@ -490,6 +490,7 @@
     "copyStyles": "Stijlen gekopieerd.",
     "copyToClipboard": "Gekopieerd naar het klembord.",
     "copyToClipboardAsPng": "{{exportSelection}} naar klembord gekopieerd als PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Bestand opgeslagen.",
     "fileSavedToFilename": "Opgeslagen als {filename}",
     "canvas": "canvas",
