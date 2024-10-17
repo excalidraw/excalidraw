@@ -13,7 +13,6 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -139,11 +138,24 @@ export const updateElbowArrowPoints = (
   };
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
+      let anchor = segment.anchor;
+      if (arrow.startBinding && arrow.endBinding) {
+        const start = pointFrom<GlobalPoint>(arrow.x, arrow.y);
+        const end = pointFrom<GlobalPoint>(
+          arrow.x + updates.points[updates.points.length - 1][0],
+          arrow.y + updates.points[updates.points.length - 1][1],
+        );
+        anchor =
+          compareHeading(segment.heading, HEADING_UP) ||
+          compareHeading(segment.heading, HEADING_DOWN)
+            ? pointFrom<GlobalPoint>(anchor[0], (start[1] + end[1]) / 2)
+            : pointFrom<GlobalPoint>((start[0] + end[0]) / 2, anchor[1]);
+      }
       const el = {
         ...newElement({
           type: "rectangle",
-          x: segment.anchor[0] - 5,
-          y: segment.anchor[1] - 5,
+          x: anchor[0] - 5,
+          y: anchor[1] - 5,
           width: 10,
           height: 10,
         }),
@@ -414,8 +426,6 @@ const routeElbowArrow = (
         ),
       )
     : endPointBounds;
-  debugDrawBounds(startElementBounds, { color: "pink", permanent: false });
-  debugDrawBounds(endElementBounds, { color: "green", permanent: false });
   const boundsOverlap =
     pointInsideBounds(
       startGlobalPoint,
