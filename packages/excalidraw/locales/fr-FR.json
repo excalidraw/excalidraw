@@ -490,6 +490,7 @@
     "copyStyles": "Styles copiés.",
     "copyToClipboard": "Copié dans le presse-papier.",
     "copyToClipboardAsPng": "{{exportSelection}} copié dans le presse-papier en PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fichier enregistré.",
     "fileSavedToFilename": "Enregistré sous {filename}",
     "canvas": "canevas",
