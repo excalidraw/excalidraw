@@ -52,9 +52,8 @@ export const actionDuplicateSelection = register({
         return false;
       }
     }
-    const elements2 = app.scene.getElementsIncludingDeleted();
     return {
-      ...duplicateElements(elements2, appState),
+      ...duplicateElements(elements, appState),
       storeAction: StoreAction.CAPTURE,
     };
   },
@@ -94,15 +93,6 @@ const duplicateElements = (
       groupIdMap,
       element,
     );
-    // const newElement = duplicateElement(
-    //   appState.editingGroupId,
-    //   groupIdMap,
-    //   element,
-    //   {
-    //     x: element.x + DEFAULT_GRID_SIZE / 2,
-    //     y: element.y + DEFAULT_GRID_SIZE / 2,
-    //   },
-    // );
     duplicatedElementsMap.set(newElement.id, newElement);
     oldIdToDuplicatedId.set(element.id, newElement.id);
     oldElements.push(element);
@@ -175,6 +165,10 @@ const duplicateElements = (
               ),
             ]),
           );
+          mutateElement(element, {
+            x: element.x - DEFAULT_GRID_SIZE,
+            y: element.y - DEFAULT_GRID_SIZE,
+          });
           continue;
         }
         if (boundTextElement) {
@@ -186,6 +180,10 @@ const duplicateElements = (
               duplicateAndOffsetElement(boundTextElement),
             ]),
           );
+          mutateElement(element, {
+            x: element.x - DEFAULT_GRID_SIZE,
+            y: element.y - DEFAULT_GRID_SIZE,
+          });
           continue;
         }
         if (isElementAFrameLike) {
@@ -199,7 +197,10 @@ const duplicateElements = (
               duplicateAndOffsetElement(element),
             ]),
           );
-
+          mutateElement(element, {
+            x: element.x - DEFAULT_GRID_SIZE,
+            y: element.y - DEFAULT_GRID_SIZE,
+          });
           continue;
         }
       }
@@ -254,17 +255,10 @@ const duplicateElements = (
   // ---------------------------------------------------------------------------
 
   bindTextToShapeAfterDuplication(
-    elementsWithClones,
+    finalElements,
     oldElements,
     oldIdToDuplicatedId,
   );
-  // elementsWithClones
-  //   .filter((ele) =>
-  //     oldElements.some((e) => oldIdToDuplicatedId.get(e.id) === ele.id),
-  //   )
-  //   .forEach((ele) => {
-  //     mutateElement(ele, { strokeColor: "rgba(8, 255, 0, 1)" });
-  //   });
 
   fixBindingsAfterDuplication(
     finalElements,
@@ -272,6 +266,7 @@ const duplicateElements = (
     oldIdToDuplicatedId,
     "duplicatesServeAsOld",
   );
+
   bindElementsToFramesAfterDuplication(
     finalElements,
     oldElements,
