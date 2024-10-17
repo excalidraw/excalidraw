@@ -328,7 +328,9 @@
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
-    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping",
+    "enterCropEditor": "Double click the image or press ENTER to crop the image",
+    "leaveCropEditor": "Click outside the image or press ENTER or ESCAPE to finish cropping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zoom to selection",
     "toggleElementLock": "Lock/unlock selection",
     "movePageUpDown": "Move page up/down",
-    "movePageLeftRight": "Move page left/right"
+    "movePageLeftRight": "Move page left/right",
+    "cropStart": "Crop image",
+    "cropFinish": "Finish image cropping"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
