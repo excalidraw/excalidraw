@@ -167,7 +167,7 @@
     "noMatch": "Keine Treffer gefunden...",
     "singleResult": "Ergebnis",
     "multipleResults": "Ergebnisse",
-    "placeholder": ""
+    "placeholder": "Text auf Zeichenfläche suchen..."
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
@@ -490,6 +490,7 @@
     "copyStyles": "Formatierungen kopiert.",
     "copyToClipboard": "In die Zwischenablage kopiert.",
     "copyToClipboardAsPng": "{{exportSelection}} als PNG in die Zwischenablage kopiert\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Datei gespeichert.",
     "fileSavedToFilename": "Als {filename} gespeichert",
     "canvas": "Zeichenfläche",
