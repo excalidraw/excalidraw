@@ -490,6 +490,7 @@
     "copyStyles": "Αντιγράφηκαν στυλ.",
     "copyToClipboard": "Αντιγράφηκε στο πρόχειρο.",
     "copyToClipboardAsPng": "Αντιγράφηκε {{exportSelection}} στο πρόχειρο ως PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Το αρχείο αποθηκεύτηκε.",
     "fileSavedToFilename": "Αποθηκεύτηκε στο {filename}",
     "canvas": "καμβάς",
