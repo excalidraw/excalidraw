@@ -490,6 +490,7 @@
     "copyStyles": "Nokopēja stilus.",
     "copyToClipboard": "Nokopēja starpliktuvē.",
     "copyToClipboardAsPng": "Nokopēja {{exportSelection}} starpliktuvē kā PNG ({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Datne saglabāta.",
     "fileSavedToFilename": "Saglabāts kā {filename}",
     "canvas": "tāfeli",
