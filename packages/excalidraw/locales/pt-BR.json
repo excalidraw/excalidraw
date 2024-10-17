@@ -490,6 +490,7 @@
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG ({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Arquivo salvo.",
     "fileSavedToFilename": "Salvo em {filename}",
     "canvas": "tela",
