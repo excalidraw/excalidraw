@@ -490,6 +490,7 @@
     "copyStyles": "ஒயில்கள் நகலெடுக்கப்பட்டன.",
     "copyToClipboard": "நகலகத்திற்கு நகலெடுக்கப்பட்டது.",
     "copyToClipboardAsPng": "{{exportSelection}}-ஐ நகலகத்திற்கு PNG ஆக நகலெடுத்தது\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "கோப்பு சேமிக்கப்பட்டது.",
     "fileSavedToFilename": "{filename}-க்கு சேமிக்கப்பட்டது",
     "canvas": "கித்தான்",
