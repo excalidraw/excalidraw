@@ -490,6 +490,7 @@
     "copyStyles": "کپی سبک.",
     "copyToClipboard": "در کلیپ‌بورد کپی شد.",
     "copyToClipboardAsPng": "کپی {{exportSelection}} در کلیپبورد به عنوان PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "فایل ذخیره شد.",
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
