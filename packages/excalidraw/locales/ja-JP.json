@@ -490,6 +490,7 @@
     "copyStyles": "スタイルをコピーしました。",
     "copyToClipboard": "クリップボードにコピー",
     "copyToClipboardAsPng": "{{exportSelection}} を PNG 形式でクリップボードにコピーしました\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "ファイルを保存しました",
     "fileSavedToFilename": "{filename} に保存しました",
     "canvas": "キャンバス",
