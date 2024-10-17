@@ -490,6 +490,7 @@
     "copyStyles": "Stiller kopyalandı.",
     "copyToClipboard": "Panoya kopyalandı.",
     "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Dosya kaydedildi.",
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",
