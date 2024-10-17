@@ -1297,7 +1297,7 @@ export class LinearElementEditor {
           // might simplify the arrow and remove/merge segments.
           .map<FixedSegment>((idx) => {
             let res;
-            if (nextPoints[idx][0] - nextPoints[idx - 1][0] < 0.05) {
+            if (Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) < 0.05) {
               const anchor = pointFrom<GlobalPoint>(
                 element.x + nextPoints[idx][0],
                 element.y + (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
@@ -1324,12 +1324,12 @@ export class LinearElementEditor {
                 index: idx,
               };
             }
-
+            //console.log("LINEAR", res);
             return res;
           }),
       };
     }
-
+    console.log("...");
     LinearElementEditor._updatePoints(
       element,
       nextPoints,
