@@ -490,6 +490,7 @@
     "copyStyles": "Másolt stílusok.",
     "copyToClipboard": "Vágólapra másolva.",
     "copyToClipboardAsPng": "Az {{exportSelection}} PNG formátumban a vágólapra másolva \n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "",
     "fileSaved": "Fájl elmentve.",
     "fileSavedToFilename": "Mentve mint {filename}",
     "canvas": "rajzvászon",
