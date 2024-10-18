@@ -84,6 +84,13 @@ export const KEYS = {
 
 export type Key = keyof typeof KEYS;
 
+export const KeyCodeMap = new Map([
+  [KEYS.Z, CODES.Z],
+  [KEYS.Y, CODES.Y],
+]);
+
+type KeyCodeMapKeys = Parameters<typeof KeyCodeMap["get"]>[0];
+
 export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_LEFT ||
   key === KEYS.ARROW_RIGHT ||
@@ -92,6 +99,9 @@ export const isArrowKey = (key: string) =>
 
 export const isAlphabetic = (key: string) =>
   /^[a-zA-Z]$/.test(key);
+
+export const matchKey = (event: KeyboardEvent | React.KeyboardEvent<Element>, key: KeyCodeMapKeys) =>
+  event.key.toLowerCase() === key || !isAlphabetic(event.key) && event.code === KeyCodeMap.get(key);
 
 export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
