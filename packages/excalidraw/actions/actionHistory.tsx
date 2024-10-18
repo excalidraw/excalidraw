@@ -5,7 +5,7 @@ import { t } from "../i18n";
 import type { History } from "../history";
 import { HistoryChangedEvent } from "../history";
 import type { AppClassProperties, AppState } from "../types";
-import { KEYS, CODES, isInEnglishAlphabet } from "../keys";
+import { KEYS, CODES, isAlphabetic } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import type { SceneElementsMap } from "../element/types";
