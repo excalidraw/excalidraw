@@ -304,7 +304,7 @@
     "shapes": "形状"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "按 esc 取消搜索",
     "canvasPanning": "要移动画布，请按住鼠标滚轮或空格键同时拖拽鼠标，或使用抓手工具。",
     "linearElement": "点击创建多个点 拖动创建直线",
     "arrowTool": "点击创建多个点，拖动创建直线。按 {{arrowShortcut}} 切换箭头类型。",
@@ -490,7 +490,7 @@
     "copyStyles": "样式已拷贝。",
     "copyToClipboard": "已复制到剪切板。",
     "copyToClipboardAsPng": "已将 {{exportSelection}} 作为 PNG 复制到剪贴板\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "已将 {{exportSelection}} 作为 SVG 复制到剪贴板\n({{exportColorScheme}})",
     "fileSaved": "文件已保存。",
     "fileSavedToFilename": "保存到 {filename}",
     "canvas": "画布",
