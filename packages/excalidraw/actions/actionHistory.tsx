@@ -106,7 +106,7 @@ export const createRedoAction: ActionCreator = (history, store) => ({
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&
-      (isInEnglishAlphabet(event.key) && event.key.toLowerCase() === KEYS.Z || !isInEnglishAlphabet(event.key) && event.code === CODES.Z)) ||
+      (event.key.toLowerCase() === KEYS.Z || (!isAlphabetic(event.key) && event.code === CODES.Z))) ||
     (isWindows && event.ctrlKey && !event.shiftKey && (isInEnglishAlphabet(event.key) && event.key.toLowerCase() === KEYS.Y || !isInEnglishAlphabet(event.key) && event.code === CODES.Y)),
   PanelComponent: ({ updateData, data }) => {
     const { isRedoStackEmpty } = useEmitter(
