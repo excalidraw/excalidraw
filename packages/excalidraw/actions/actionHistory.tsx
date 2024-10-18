@@ -5,7 +5,7 @@ import { t } from "../i18n";
 import type { History } from "../history";
 import { HistoryChangedEvent } from "../history";
 import type { AppClassProperties, AppState } from "../types";
-import { KEYS, CODES } from "../keys";
+import { KEYS, CODES, isInEnglishAlphabet } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import type { SceneElementsMap } from "../element/types";
@@ -64,7 +64,7 @@ export const createUndoAction: ActionCreator = (history, store) => ({
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
-    event.code === CODES.Z &&
+    (isInEnglishAlphabet(event.key) && event.key.toLowerCase() === KEYS.Z || !isInEnglishAlphabet(event.key) &&event.code === CODES.Z) &&
     !event.shiftKey,
   PanelComponent: ({ updateData, data }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
@@ -106,8 +106,8 @@ export const createRedoAction: ActionCreator = (history, store) => ({
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] &&
       event.shiftKey &&
-      event.code === CODES.Z) ||
-    (isWindows && event.ctrlKey && !event.shiftKey && event.code === CODES.Y),
+      (isInEnglishAlphabet(event.key) && event.key.toLowerCase() === KEYS.Z || !isInEnglishAlphabet(event.key) && event.code === CODES.Z)) ||
+    (isWindows && event.ctrlKey && !event.shiftKey && (isInEnglishAlphabet(event.key) && event.key.toLowerCase() === KEYS.Y || !isInEnglishAlphabet(event.key) && event.code === CODES.Y)),
   PanelComponent: ({ updateData, data }) => {
     const { isRedoStackEmpty } = useEmitter(
       history.onHistoryChangedEmitter,

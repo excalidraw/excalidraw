@@ -90,6 +90,9 @@ export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_DOWN ||
   key === KEYS.ARROW_UP;
 
+export const isInEnglishAlphabet = (key: string) =>
+  /^[a-zA-Z]$/.test(key);
+
 export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
 
