@@ -539,6 +539,8 @@ const gesture: Gesture = {
   initialScale: null,
 };
 
+let velocityX = 0;
+
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
@@ -746,6 +748,17 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAction(
       createRedoAction(this.history, this.store),
     );
+
+    setInterval(() => {
+      if (!this.device.isTouchScreen) {
+        return;
+      }
+
+      this.translateCanvas((state) => ({
+        scrollX: state.scrollX - velocityX / state.zoom.value,
+      }));
+      velocityX /= 1 + 1 / 64;
+    });
   }
 
   private onWindowMessage(event: MessageEvent) {
@@ -8021,6 +8034,15 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               newElement,
             });
+
+            if (visualViewport) {
+              const feedback =
+                (event.pageX - visualViewport.pageLeft) / visualViewport.width;
+              if (feedback >= 0.625) {
+                const delta = Math.abs(dy) * this.state.zoom.value;
+                velocityX += ((feedback - 0.625) * delta) / 64;
+              }
+            }
           }
         } else if (isLinearElement(newElement)) {
           pointerDownState.drag.hasOccurred = true;
