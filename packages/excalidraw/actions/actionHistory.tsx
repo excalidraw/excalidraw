@@ -64,7 +64,7 @@ export const createUndoAction: ActionCreator = (history, store) => ({
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
-    (isInEnglishAlphabet(event.key) && event.key.toLowerCase() === KEYS.Z || !isInEnglishAlphabet(event.key) &&event.code === CODES.Z) &&
+    (event.key.toLowerCase() === KEYS.Z || (!isAlphabetic(event.key) && event.code === CODES.Z)) &&
     !event.shiftKey,
   PanelComponent: ({ updateData, data }) => {
     const { isUndoStackEmpty } = useEmitter<HistoryChangedEvent>(
