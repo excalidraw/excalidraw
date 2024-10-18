@@ -1,19 +1,10 @@
 import { promiseTry } from "../utils";
-import { LOCAL_FONT_PROTOCOL } from "./metadata";
-import { subsetWoff2GlyphsByCodepoints } from "./subset/subset-main";
+import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
+import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
 
 type DataURL = string;
 
-export interface IExcalidrawFontFace {
-  urls: URL[] | DataURL[];
-  fontFace: FontFace;
-  toCSS(
-    characters: string,
-    codePoints: Array<number>,
-  ): Promise<string> | undefined;
-}
-
-export class ExcalidrawFontFace implements IExcalidrawFontFace {
+export class ExcalidrawFontFace {
   public readonly urls: URL[] | DataURL[];
   public readonly fontFace: FontFace;
 
@@ -98,6 +89,10 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
   public fetchFont(url: URL | DataURL): Promise<ArrayBuffer> {
     return promiseTry(async () => {
       const response = await fetch(url, {
+        // always prefer cache (even stale), otherwise it always triggers an unnecessary validation request
+        // which we don't need as we are controlling freshness of the fonts with the stable hash suffix in the url
+        // https://developer.mozilla.org/en-US/docs/Web/API/Request/cache
+        cache: "force-cache",
         headers: {
           Accept: "font/woff2",
         },
