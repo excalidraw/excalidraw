@@ -63,6 +63,7 @@ import { actionToggleStats } from "../actions";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
+import { FullscreenModeButton } from "./FullscreenModeButton";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -74,6 +75,7 @@ interface LayerUIProps {
   onLockToggle: () => void;
   onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
+  onFullscreenToggle: AppClassProperties["toggleFullscreenMode"];
   showExitZenModeBtn: boolean;
   langCode: Language["code"];
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
@@ -132,6 +134,7 @@ const LayerUI = ({
   onLockToggle,
   onHandToolToggle,
   onPenModeToggle,
+  onFullscreenToggle,
   showExitZenModeBtn,
   renderTopRightUI,
   renderCustomStats,
@@ -275,6 +278,11 @@ const LayerUI = ({
                             onChange={() => onPenModeToggle(null)}
                             title={t("toolBar.penMode")}
                             penDetected={appState.penDetected}
+                          />
+                          <FullscreenModeButton
+                            checked={appState.fullscreenMode}
+                            onChange={() => onFullscreenToggle(null)}
+                            title={t("toolBar.fullscreenMode")}
                           />
                           <LockButton
                             checked={appState.activeTool.locked}

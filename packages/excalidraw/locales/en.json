@@ -272,6 +272,7 @@
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Pen mode - prevent touch",
+    "fullscreenMode": "Toggle Fullscreen",
     "link": "Add / Update link for a selected shape",
     "eraser": "Eraser",
     "frame": "Frame tool",
