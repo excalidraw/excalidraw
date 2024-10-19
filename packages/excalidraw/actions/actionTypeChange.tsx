@@ -7,6 +7,7 @@ import { newElement, redrawTextBoundingBox } from "../element";
 import { isFlowchartNodeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
+import { KEYS } from "../keys";
 
 import { randomInteger } from "../random";
 import { StoreAction } from "../store";
@@ -14,6 +15,45 @@ import type { AppClassProperties, AppState } from "../types";
 import { changeProperty, getFormValue } from "./actionProperties";
 import { register } from "./register";
 
+const changeShapeForAllSelected = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+  value: "rectangle" | "diamond" | "ellipse",
+  app: AppClassProperties,
+) => {
+  const newElements = changeProperty(elements, appState, (el) => {
+    if (el.type !== value && isFlowchartNodeElement(el)) {
+      const side = el.width > el.height ? el.width : el.height;
+      const newShape = newElement({
+        ...el,
+        width: side,
+        height: side,
+        type: value,
+        versionNonce: randomInteger(),
+      });
+      return newShape;
+    }
+    return el;
+  });
+  newElements.forEach((ele) => {
+    if (ele.type === "text" && ele.containerId) {
+      const container = newElements.find((e) => e.id === ele.containerId);
+      if (container === undefined) {
+        return;
+      }
+      redrawTextBoundingBox(
+        ele,
+        container,
+        app.scene.getNonDeletedElementsMap(),
+      );
+    }
+  });
+
+  return {
+    elements: newElements,
+    storeAction: StoreAction.CAPTURE,
+  };
+};
 export const actionChangeShapeType = register({
   name: "changeShapeType",
   label: "labels.shapeType",
@@ -100,4 +140,48 @@ export const actionChangeShapeType = register({
       />
     </fieldset>
   ),
+});
+
+export const actionChangeToRectangle = register({
+  name: "changeToRectangle",
+  label: "labels.changeToRectangle",
+  trackEvent: { category: "element", action: "changeToRectangle" },
+  perform: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    app: AppClassProperties,
+  ) => {
+    return changeShapeForAllSelected(elements, appState, "rectangle", app);
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS[2],
+});
+
+export const actionChangeToDiamond = register({
+  name: "changeToDiamond",
+  label: "labels.changeToDiamond",
+  trackEvent: { category: "element", action: "changeToDiamond" },
+  perform: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    value: "diamond",
+    app: AppClassProperties,
+  ) => {
+    return changeShapeForAllSelected(elements, appState, "diamond", app);
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS[3],
+});
+
+export const actionChangeToEllipse = register({
+  name: "changeToEllipse",
+  label: "labels.changeToEllipse",
+  trackEvent: { category: "element", action: "changeToEllipse" },
+  perform: (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    value: "ellipse",
+    app: AppClassProperties,
+  ) => {
+    return changeShapeForAllSelected(elements, appState, "ellipse", app);
+  },
+  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS[4],
 });

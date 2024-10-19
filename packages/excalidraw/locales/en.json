@@ -156,9 +156,9 @@
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
     "autoResize": "Enable text auto-resizing",
-    "changeToRectangle": "Change shape type to rectangle",
-    "changeToDiamond": "Change shape type to diamond",
-    "changeToEllipse": "Change shape type to ellipse",
+    "changeToRectangle": "CtrlOrCmd+2",
+    "changeToDiamond": "CtrlOrCmd+3",
+    "changeToEllipse": "CtrlOrCmd+4",
     "changeShapesTypes": "Shapes types"
   },
   "library": {
