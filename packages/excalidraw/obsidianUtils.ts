@@ -145,7 +145,7 @@ export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer
       return arrayBuffer;
     }
     if (["Assistant-Regular.woff2", "Assistant-Medium.woff2", "Assistant-SemiBold.woff2", "Assistant-Bold.woff2"].includes(filename)) {
-      return "https://unpkg.com/@zsviczian/excalidraw@0.17.1-obsidian-58/dist/excalidraw-assets/" + filename;
+      return "https://unpkg.com/@zsviczian/excalidraw@0.17.6-1/dist/excalidraw-assets/" + filename;
     }
   }
   return;
