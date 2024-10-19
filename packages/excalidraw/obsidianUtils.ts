@@ -1,7 +1,7 @@
 import { FreedrawIcon } from "./components/icons";
 import { FONT_FAMILY } from "./constants";
 import { Fonts, register } from "./fonts";
-import { Font } from "./fonts/ExcalidrawFont";
+import { IExcalidrawFontFace } from "./fonts/ExcalidrawFontFace";
 import type { FontMetadata } from "./fonts/metadata";
 import { FONT_METADATA } from "./fonts/metadata";
 
@@ -77,7 +77,7 @@ export function getFontFamilies(): string[] {
     if (fontFaces.metadata.local) {
       continue;
     }
-    for (const font of fontFaces.fonts) {
+    for (const font of fontFaces.fontFaces) {
       if (font.fontFace.family === "Local Font") {
         continue;
       }
@@ -105,7 +105,7 @@ export async function registerFontsInCSS() {
     if (fontFaces.metadata.local) {
       continue;
     }
-    for (const font of fontFaces.fonts) {
+    for (const font of fontFaces.fontFaces) {
       try {
         const content = await font.getContentLegacy();
         cssContent += `@font-face {font-family: ${font.fontFace.family}; src: url(${content});}\n`;
@@ -120,7 +120,7 @@ export async function registerFontsInCSS() {
 export async function getCSSFontDefinition(
   fontFamily: number,
 ): Promise<string> {
-  const fontFaces = Fonts.registered.get(fontFamily)?.fonts;
+  const fontFaces = Fonts.registered.get(fontFamily)?.fontFaces;
   if (!fontFaces) {
     return "";
   }
