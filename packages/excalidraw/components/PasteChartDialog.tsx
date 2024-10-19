@@ -48,6 +48,9 @@ const ChartPreviewBtn = (props: {
           viewBackgroundColor: oc.white,
         },
         null, // files
+        {
+          skipInliningFonts: true,
+        },
       );
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
