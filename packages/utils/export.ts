@@ -224,4 +224,5 @@ export {
   getFontFamilies,
   registerFontsInCSS,
   getCSSFontDefinition,
+  loadSceneFonts,
 } from "../excalidraw/obsidianUtils"; //zsviczian

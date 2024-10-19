@@ -154,7 +154,8 @@ export class Fonts {
     return await Fonts.loadFontFaces(fontFamilies);
   };
 
-  private static async loadFontFaces(
+  //zsviczian made public
+  public static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
@@ -266,7 +267,8 @@ export class Fonts {
     return Array.from(Fonts.registered.keys());
   }
 
-  private static getElementsFamilies(
+  //zsviczian made public
+  public static getElementsFamilies(
     elements: ReadonlyArray<ExcalidrawElement>,
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(

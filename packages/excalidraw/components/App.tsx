@@ -2712,10 +2712,10 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // rerender text elements on font load to fix #637 && #1553
       // zsviczian In Obsidian this is not needed as I manage font load separately
-      /*addEventListener(document.fonts, "loadingdone", (event) => {
+      addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
         this.fonts.onLoaded(loadedFontFaces);
-      }),*/
+      }),
       // Safari-only desktop pinch zoom
       addEventListener(
         document,

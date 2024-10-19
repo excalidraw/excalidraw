@@ -270,6 +270,7 @@ export {
   getFontFamilyString, //zsviczian
   registerFontsInCSS, //zsviczian
   getCSSFontDefinition, //zsviczian
+  loadSceneFonts, //zsviczian
 } from "../utils/export";
 
 export { refreshTextDimensions } from "./element/newElement"; //zsviczian

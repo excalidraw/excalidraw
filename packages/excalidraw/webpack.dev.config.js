@@ -72,7 +72,8 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset/inline", //zsviczian
+        type: "asset/resource",
+        //type: "asset/inline", //zsviczian
       },
     ],
   },

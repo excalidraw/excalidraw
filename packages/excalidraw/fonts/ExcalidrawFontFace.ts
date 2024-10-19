@@ -1,4 +1,5 @@
 import { stringToBase64, toByteString } from "../data/encode";
+import { fetchFontFromVault } from "../obsidianUtils";
 import { promiseTry } from "../utils";
 import { LOCAL_FONT_PROTOCOL } from "./metadata";
 import { subsetWoff2GlyphsByCodepoints } from "./subset/subset-main";
@@ -104,6 +105,10 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
 
   public fetchFont(url: URL | DataURL): Promise<ArrayBuffer> {
     return promiseTry(async () => {
+      const ab = await fetchFontFromVault(url); //zsviczian
+      if (ab) {
+        return ab;
+      }
       const response = await fetch(url, {
         headers: {
           Accept: "font/woff2",
@@ -234,6 +239,14 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
       }
 
       try {
+        const arrayBuffer = await fetchFontFromVault(url); //zsviczian
+        if(arrayBuffer) {
+          return `data:font/woff2;base64,${await stringToBase64(
+            await toByteString(arrayBuffer),
+            true,
+          )}`;
+        }
+
         const response = await fetch(url, {
           headers: {
             Accept: "font/woff2",
@@ -241,7 +254,7 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
         });
 
         if (response.ok) {
-          const mimeType = await response.headers.get("Content-Type");
+          const mimeType = response.headers.get("Content-Type");
           const buffer = await response.arrayBuffer();
 
           return `data:${mimeType};base64,${await stringToBase64(

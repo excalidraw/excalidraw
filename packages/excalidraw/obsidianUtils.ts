@@ -1,7 +1,7 @@
 import { FreedrawIcon } from "./components/icons";
 import { FONT_FAMILY } from "./constants";
+import { NonDeletedExcalidrawElement } from "./element/types";
 import { Fonts, register } from "./fonts";
-import { IExcalidrawFontFace } from "./fonts/ExcalidrawFontFace";
 import type { FontMetadata } from "./fonts/metadata";
 import { FONT_METADATA } from "./fonts/metadata";
 
@@ -130,4 +130,20 @@ export async function getCSSFontDefinition(
   }
   const content = await fontFace.getContentLegacy();
   return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`;
+}
+
+export async function loadSceneFonts(elements: NonDeletedExcalidrawElement[]): Promise<void> {
+  const fontFamilies = Fonts.getElementsFamilies(elements);
+  await Fonts.loadFontFaces(fontFamilies);
+}
+
+export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer|undefined> {
+  if(typeof url === "string" && !url.startsWith("data") && url.endsWith(".woff2")) {
+    const arrayBuffer = hostPlugin.loadFontFromFile(decodeURIComponent(url.substring(url.lastIndexOf("/")+1)))
+    if(arrayBuffer) {
+      return arrayBuffer;
+    }
+  }
+  return;
+
 }
