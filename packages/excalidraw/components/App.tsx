@@ -2260,11 +2260,12 @@ class App extends React.Component<AppProps, AppState> {
         editingTextElement = null;
       }
 
-      this.setState((state) => {
-        // using Object.assign instead of spread to fool TS 4.2.2+ into
-        // regarding the resulting type as not containing undefined
-        // (which the following expression will never contain)
-        return Object.assign(actionResult.appState || {}, {
+      this.setState((prevAppState) => {
+        const actionAppState = actionResult.appState || {};
+
+        return {
+          ...prevAppState,
+          ...actionAppState,
           // NOTE this will prevent opening context menu using an action
           // or programmatically from the host, so it will need to be
           // rewritten later
@@ -2275,7 +2276,7 @@ class App extends React.Component<AppProps, AppState> {
           theme,
           name,
           errorMessage,
-        });
+        };
       });
 
       didUpdate = true;
@@ -5200,24 +5201,13 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
         }
 
-        this.setState({
-          newElement: null,
-          editingTextElement: null,
+        flushSync(() => {
+          this.setState({
+            newElement: null,
+            editingTextElement: null,
+          });
         });
 
-        //zsviczian
-        //when closing the color palette color picker popup while editing a text element
-        //sometimes even though setState was executed here successfully, there is a race condition
-        //resulting in editingTexElement not being set to null
-        //if this happens, this workaround will force it to null
-        setTimeout(() => {
-          if (this.state.editingTextElement) {
-            this.setState({
-              newElement: null,
-              editingTextElement: null,
-            });
-          }
-        });
         if (this.state.activeTool.locked) {
           setCursorForShape(this.interactiveCanvas, this.state);
         }
