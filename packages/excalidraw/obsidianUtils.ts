@@ -137,13 +137,16 @@ export async function loadSceneFonts(elements: NonDeletedExcalidrawElement[]): P
   await Fonts.loadFontFaces(fontFamilies);
 }
 
-export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer|undefined> {
+export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer|undefined|string> {
   if(typeof url === "string" && !url.startsWith("data") && url.endsWith(".woff2")) {
-    const arrayBuffer = hostPlugin.loadFontFromFile(decodeURIComponent(url.substring(url.lastIndexOf("/")+1)))
+    const filename = decodeURIComponent(url.substring(url.lastIndexOf("/")+1));
+    const arrayBuffer = hostPlugin.loadFontFromFile(filename)
     if(arrayBuffer) {
       return arrayBuffer;
     }
+    if (["Assistant-Regular.woff2", "Assistant-Medium.woff2", "Assistant-SemiBold.woff2", "Assistant-Bold.woff2"].includes(filename)) {
+      return "https://unpkg.com/@zsviczian/excalidraw@0.17.1-obsidian-58/dist/excalidraw-assets/" + filename;
+    }
   }
   return;
-
 }
