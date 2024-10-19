@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "Assistant";
-  src: url(../woff2/Assistant/Assistant-Regular.woff2) format("woff2");
+  src: url(https://unpkg.com/@zsviczian/excalidraw@0.17.6-2/dist/excalidraw-assets/Assistant-Regular.woff2) format("woff2");
   font-weight: 400;
   style: normal;
   display: swap;
@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: "Assistant";
-  src: url(../woff2/Assistant/Assistant-Medium.woff2) format("woff2");
+  src: url(https://unpkg.com/@zsviczian/excalidraw@0.17.6-2/dist/excalidraw-assets/Assistant-Medium.woff2) format("woff2");
   font-weight: 500;
   style: normal;
   display: swap;
@@ -20,7 +20,7 @@
 
 @font-face {
   font-family: "Assistant";
-  src: url(../woff2/Assistant/Assistant-SemiBold.woff2) format("woff2");
+  src: url(https://unpkg.com/@zsviczian/excalidraw@0.17.6-2/dist/excalidraw-assets/Assistant-SemiBold.woff2) format("woff2");
   font-weight: 600;
   style: normal;
   display: swap;
@@ -28,7 +28,7 @@
 
 @font-face {
   font-family: "Assistant";
-  src: url(../woff2/Assistant/Assistant-Bold.woff2) format("woff2");
+  src: url(https://unpkg.com/@zsviczian/excalidraw@0.17.6-2/dist/excalidraw-assets/Assistant-Bold.woff2) format("woff2");
   font-weight: 700;
   style: normal;
   display: swap;

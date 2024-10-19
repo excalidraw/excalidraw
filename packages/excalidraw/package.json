@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.17.6-1",
+  "version": "0.17.6-2",
   "main": "main.js",
   "types": "types/excalidraw/index.d.ts",
   "files": [
@@ -118,7 +118,8 @@
     "webpack-bundle-analyzer": "4.5.0",
     "webpack-cli": "4.10.0",
     "webpack-dev-server": "4.9.3",
-    "webpack-merge": "5.8.0"
+    "webpack-merge": "5.8.0",
+    "copy-webpack-plugin": "12.0.2"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",

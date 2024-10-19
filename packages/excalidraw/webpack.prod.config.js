@@ -6,6 +6,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //zsviczian
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: "production",
@@ -120,6 +121,28 @@ module.exports = {
       "process.env": parseEnvVariables(
         path.resolve(__dirname, "../../.env.production"),
       ),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'fonts/woff2/Assistant'), // Path to your font files
+          to: path.resolve(__dirname, 'dist/excalidraw-assets'), // First output path
+          globOptions: {
+            dot: true,
+            gitignore: true,
+            ignore: ['*.DS_Store'], // Ignore any unwanted files
+          },
+        },
+        {
+          from: path.resolve(__dirname, 'fonts/woff2/Assistant'), // Same source path
+          to: path.resolve(__dirname, 'dist/excalidraw-assets-dev'), // Second output path
+          globOptions: {
+            dot: true,
+            gitignore: true,
+            ignore: ['*.DS_Store'], // Ignore any unwanted files
+          },
+        },
+      ],
     }),
   ],
   externals: {

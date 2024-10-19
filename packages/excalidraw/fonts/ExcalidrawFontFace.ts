@@ -107,11 +107,7 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
     return promiseTry(async () => {
       const result = await fetchFontFromVault(url); //zsviczian
       if (result) {
-        if (typeof result === "string") {
-          url = result;
-        } else {
-          return result;
-        }
+        return result;
       }
       const response = await fetch(url, {
         headers: {
@@ -235,7 +231,7 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
     const errorMessages = [];
 
     while (i < this.urls.length) {
-      let url = this.urls[i];
+      const url = this.urls[i];
 
       if (typeof url === "string" && url.startsWith("data:")) {
         // it's dataurl, the font is inlined as base64, no need to fetch
@@ -245,15 +241,10 @@ export class ExcalidrawFontFace implements IExcalidrawFontFace {
       try {
         const result = await fetchFontFromVault(url); //zsviczian
         if(result) {
-          if(typeof result === "string") {
-            url = result;
-          } else {
-            return `data:font/woff2;base64,${await stringToBase64(
-              await toByteString(result),
-              true,
-            )}`;
-          }
-          
+          return `data:font/woff2;base64,${await stringToBase64(
+            await toByteString(result),
+            true,
+          )}`;
         }
 
         const response = await fetch(url, {
