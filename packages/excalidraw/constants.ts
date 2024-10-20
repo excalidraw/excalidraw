@@ -116,6 +116,9 @@ export const CLASSES = {
   SEARCH_MENU_INPUT_WRAPPER: "layer-ui__search-inputWrapper",
 };
 
+export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
+export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
+
 /**
  * // TODO: shouldn't be really `const`, likely neither have integers as values, due to value for the custom fonts, which should likely be some hash.
  *
@@ -134,6 +137,22 @@ export const FONT_FAMILY = {
   "Lilita One": 7,
   "Comic Shanns": 8,
   "Liberation Sans": 9,
+};
+
+export const FONT_FAMILY_FALLBACKS = {
+  [CJK_HAND_DRAWN_FALLBACK_FONT]: 100,
+  [WINDOWS_EMOJI_FALLBACK_FONT]: 1000,
+};
+
+export const getFontFamilyFallbacks = (
+  fontFamily: number,
+): Array<keyof typeof FONT_FAMILY_FALLBACKS> => {
+  switch (fontFamily) {
+    case FONT_FAMILY.Excalifont:
+      return [CJK_HAND_DRAWN_FALLBACK_FONT, WINDOWS_EMOJI_FALLBACK_FONT];
+    default:
+      return [WINDOWS_EMOJI_FALLBACK_FONT];
+  }
 };
 
 export const THEME = {
@@ -156,8 +175,6 @@ export const FRAME_STYLE = {
   nameFontSize: 14,
   nameLineHeight: 1.25,
 };
-
-export const WINDOWS_EMOJI_FALLBACK_FONT = "Segoe UI Emoji";
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
