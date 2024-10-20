@@ -163,10 +163,10 @@
     "hint_emptyPrivateLibrary": "Vyberte položku z plátna pre jej pridanie do knižnice."
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
+    "title": "Vyhľadať v plátne",
+    "noMatch": "Neboli nájdené žiadne výsledky...",
+    "singleResult": "výsledok",
+    "multipleResults": "výsledky",
     "placeholder": "Vyhľadať text v plátne..."
   },
   "buttons": {
@@ -304,7 +304,7 @@
     "shapes": "Tvary"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Stačte Escape pre zrušenie vyhľadávania",
     "canvasPanning": "Pre pohyb plátna podržte koliesko myši alebo medzerník počas ťahania, alebo použite nástroj ruka",
     "linearElement": "Kliknite na vloženie viacerých bodov, potiahnite na vytvorenie jednej priamky",
     "arrowTool": "Kliknite pre začatie pridávania viacerých bodov, potiahnite pre pridanie jednej čiary. Stlačte znovu {{arrowShortcut}} pre zmenu typu šípky.",
@@ -490,7 +490,7 @@
     "copyStyles": "Štýly skopírované.",
     "copyToClipboard": "Skopírované do schránky.",
     "copyToClipboardAsPng": "Kopírovanie {{exportSelection}} do schránky ako PNG prebehlo úspešne\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Kopírovanie {{exportSelection}} do schránky ako SVG prebehlo úspešne\n({{exportColorScheme}})",
     "fileSaved": "Súbor uložený.",
     "fileSavedToFilename": "Uložený ako {filename}",
     "canvas": "plátna",
