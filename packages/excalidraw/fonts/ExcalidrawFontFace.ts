@@ -34,16 +34,17 @@ export class ExcalidrawFontFace {
    *
    * Retrieves `undefined` otherwise.
    */
-  public toCSS(
-    characters: string,
-    codePoints: Array<number>,
-  ): Promise<string> | undefined {
+  public toCSS(characters: string): Promise<string> | undefined {
     // quick exit in case the characters are not within this font face's unicode range
     if (!this.getUnicodeRangeRegex().test(characters)) {
       return;
     }
 
-    return this.getContent(codePoints).then(
+    const codepoints = Array.from(characters).map(
+      (char) => char.codePointAt(0)!,
+    );
+
+    return this.getContent(codepoints).then(
       (content) =>
         `@font-face { font-family: ${this.fontFace.family}; src: url(${content}); }`,
     );
