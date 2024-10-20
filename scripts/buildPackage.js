@@ -158,7 +158,5 @@ const createESMRawBuild = async () => {
   await buildProd(rawConfigChunks);
 };
 
-(async () => {
-  await createESMRawBuild();
-  await createESMBrowserBuild();
-})();
+createESMRawBuild();
+createESMBrowserBuild();
