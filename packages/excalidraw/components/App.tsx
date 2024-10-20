@@ -736,7 +736,7 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = new Fonts({ scene: this.scene });
+    this.fonts = new Fonts(this.scene);
     this.history = new History();
 
     this.actionManager.registerAll(actions);
@@ -2471,7 +2471,7 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
-    this.fonts = new Fonts({ scene: this.scene });
+    this.fonts = new Fonts(this.scene);
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
