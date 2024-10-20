@@ -92,7 +92,7 @@ module.exports.woff2BrowserPlugin = () => {
       />
       <link
         rel="preload"
-        href="${OSS_FONTS_CDN}fonts/ComicShanns/ComicShanns-Regular-9442f8c1c9f00f0d5e4102a78672fad9.woff2"
+        href="${OSS_FONTS_CDN}fonts/ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2"
         as="font"
         type="font/woff2"
         crossorigin="anonymous"
