@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { InitializeApp } from "./components/InitializeApp";
 import App from "./components/App";
 import { isShallowEqual } from "./utils";
+import polyfill from "./polyfill";
 
 import "./css/app.scss";
 import "./css/styles.scss";
-import "./fonts/css/fonts.css";
-import polyfill from "./polyfill";
+import "./fonts/fonts.css";
 
 import type { AppProps, ExcalidrawProps } from "./types";
 import { defaultLang } from "./i18n";

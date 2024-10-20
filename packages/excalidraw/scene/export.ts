@@ -459,8 +459,7 @@ const getFontFaces = async (
   elements: readonly ExcalidrawElement[],
 ): Promise<string[]> => {
   const fontFamilies = new Set<number>();
-  const characters = new Set<string>();
-  const codePoints = new Set<number>();
+  const charsPerFamily: Record<number, Set<string>> = {};
 
   for (const element of elements) {
     if (!isTextElement(element)) {
@@ -471,35 +470,39 @@ const getFontFaces = async (
 
     // gather unique codepoints only when inlining fonts
     for (const char of element.originalText) {
-      if (!characters.has(char)) {
-        characters.add(char);
-        codePoints.add(char.codePointAt(0)!);
+      if (!charsPerFamily[element.fontFamily]) {
+        charsPerFamily[element.fontFamily] = new Set();
       }
+
+      charsPerFamily[element.fontFamily].add(char);
     }
   }
 
   const orderedFamilies = Array.from(fontFamilies);
-  const uniqueChars = Array.from(characters).join("");
-  const uniqueCodePoints = Array.from(codePoints);
 
-  const containsCJKFallback = orderedFamilies.find((x) =>
+  // for simplicity, assuming we have just one family with the CJK handdrawn fallback
+  const familyWithCJK = orderedFamilies.find((x) =>
     getFontFamilyFallbacks(x).includes(CJK_HAND_DRAWN_FALLBACK_FONT),
   );
 
-  // quick check for Han might match a bit more, which is fine
-  if (containsCJKFallback && containsCJK(uniqueChars)) {
-    // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
-    // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
-    orderedFamilies.unshift(
-      FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT],
-    );
+  if (familyWithCJK) {
+    const characters = getChars(charsPerFamily[familyWithCJK]);
+
+    if (containsCJK(characters)) {
+      const family = FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT];
+
+      // adding the same characters to the CJK handrawn family
+      charsPerFamily[family] = new Set(characters);
+
+      // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
+      // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
+      orderedFamilies.unshift(
+        FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT],
+      );
+    }
   }
 
-  const iterator = fontFacesIterator(
-    orderedFamilies,
-    uniqueChars,
-    uniqueCodePoints,
-  );
+  const iterator = fontFacesIterator(orderedFamilies, charsPerFamily);
 
   // don't trigger hundreds of concurrent requests (each performing fetch, creating a worker, etc.),
   // instead go three requests at a time, in a controlled manner, without completely blocking the main thread
@@ -513,8 +516,7 @@ const getFontFaces = async (
 
 function* fontFacesIterator(
   families: Array<number>,
-  characters: string,
-  codePoints: Array<number>,
+  charsPerFamily: Record<number, Set<string>>,
 ): Generator<Promise<void | readonly [number, string]>> {
   for (const [familyIndex, family] of families.entries()) {
     const { fontFaces, metadata } = Fonts.registered.get(family) ?? {};
@@ -535,13 +537,15 @@ function* fontFacesIterator(
     for (const [fontFaceIndex, fontFace] of fontFaces.entries()) {
       yield promiseTry(async () => {
         try {
-          const fontFaceCSS = await fontFace.toCSS(characters, codePoints);
+          const characters = getChars(charsPerFamily[family]);
+          const fontFaceCSS = await fontFace.toCSS(characters);
 
           if (!fontFaceCSS) {
             return;
           }
 
-          const fontFaceOrder = familyIndex + fontFaceIndex;
+          // giving a buffer of 10K font faces per family
+          const fontFaceOrder = familyIndex * 10_000 + fontFaceIndex;
           const fontFaceTuple = [fontFaceOrder, fontFaceCSS] as const;
 
           return fontFaceTuple;
@@ -555,3 +559,6 @@ function* fontFacesIterator(
     }
   }
 }
+
+const getChars = (characterSet: Set<string>) =>
+  Array.from(characterSet).join("");

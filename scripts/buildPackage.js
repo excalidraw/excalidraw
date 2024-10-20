@@ -101,6 +101,7 @@ const rawConfigCommon = {
   bundle: true,
   format: "esm",
   plugins: [sassPlugin()],
+  assetNames: "[dir]/[name]-[hash]",
   loader: {
     ".json": "copy",
     ".woff2": "file",
