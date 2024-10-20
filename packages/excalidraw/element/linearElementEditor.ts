@@ -1245,6 +1245,28 @@ export class LinearElementEditor {
     },
   ) {
     const { points } = element;
+    let targets = Array.from(targetPoints);
+    const indices = targets.map((p) => p.index).sort();
+
+    if (isElbowArrow(element)) {
+      // Do not allow modifying the first segment
+      if (indices[0] === 0 && indices[1] === 1) {
+        targets = targets.slice(2);
+      }
+      // Do not allow modifying the last segment
+      if (
+        indices[indices.length - 1] !== undefined &&
+        indices[indices.length - 1] === element.points.length - 1 &&
+        indices[indices.length - 2] !== undefined &&
+        indices[indices.length - 2] === element.points.length - 2
+      ) {
+        targets = targets.slice(0, -2);
+      }
+      // If no point remains to modify, return
+      if (targets.length < 1) {
+        return;
+      }
+    }
 
     // in case we're moving start point, instead of modifying its position
     // which would break the invariant of it being at [0,0], we move
@@ -1254,7 +1276,7 @@ export class LinearElementEditor {
     let offsetX = 0;
     let offsetY = 0;
 
-    const selectedOriginPoint = targetPoints.find(({ index }) => index === 0);
+    const selectedOriginPoint = targets.find(({ index }) => index === 0);
 
     if (selectedOriginPoint) {
       offsetX =
@@ -1264,7 +1286,7 @@ export class LinearElementEditor {
     }
 
     const nextPoints: LocalPoint[] = points.map((p, idx) => {
-      const selectedPointData = targetPoints.find((t) => t.index === idx);
+      const selectedPointData = targets.find((t) => t.index === idx);
       if (selectedPointData) {
         if (selectedPointData.index === 0) {
           return p;
@@ -1283,9 +1305,7 @@ export class LinearElementEditor {
     if (isElbowArrow(element)) {
       otherUpdates = {
         ...otherUpdates,
-        fixedSegments: targetPoints
-          .map((target) => target.index)
-          .sort()
+        fixedSegments: indices
           // The segment id being fixed is always the last point index of the
           // arrow segment, so it's always  > 0. Also segments should always
           // be 2 points.
@@ -1337,7 +1357,7 @@ export class LinearElementEditor {
       offsetY,
       otherUpdates,
       {
-        isDragging: targetPoints.reduce(
+        isDragging: targets.reduce(
           (dragging, targetPoint): boolean =>
             dragging || targetPoint.isDragging === true,
           false,
