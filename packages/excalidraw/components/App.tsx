@@ -436,7 +436,6 @@ import {
   getExcalidrawContentEl,
   getMaxZoom,
   hideFreedrawPenmodeCursor,
-  initializeObsidianUtils,
 } from "../obsidianUtils";
 import {
   hitElementBoundText,
@@ -680,7 +679,6 @@ class App extends React.Component<AppProps, AppState> {
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
       initState, //zsviczian
-      obsidianHostPlugin, //zsviczian
       name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
     this.state = {
@@ -699,7 +697,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
-    initializeObsidianUtils(obsidianHostPlugin.deref()); //zsviczian
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,

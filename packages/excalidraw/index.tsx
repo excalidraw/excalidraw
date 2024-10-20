@@ -61,7 +61,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderMermaid, //zsviczian
     onContextMenu, //zsviczian
     aiEnabled,
-    obsidianHostPlugin,
     showDeprecatedFonts,
   } = props;
 
@@ -161,7 +160,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderMermaid={renderMermaid} //zsviczian
           onContextMenu={onContextMenu} //zsviczian
           aiEnabled={aiEnabled !== false}
-          obsidianHostPlugin={obsidianHostPlugin} //zsviczian
           showDeprecatedFonts={showDeprecatedFonts}
         >
           {children}
@@ -265,6 +263,7 @@ export {
   getBoundTextMaxWidth, //zsviczian
   mermaidToExcalidraw, //zsviczian
   destroyObsidianUtils, //zsviczian
+  initializeObsidianUtils, //zsviczian
   registerLocalFont, //zsviczian
   getFontFamilies, //zsviczian
   getFontFamilyString, //zsviczian

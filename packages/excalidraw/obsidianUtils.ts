@@ -133,14 +133,14 @@ export async function getCSSFontDefinition(
 }
 
 export async function loadSceneFonts(elements: NonDeletedExcalidrawElement[]): Promise<void> {
-  const fontFamilies = Fonts.getElementsFamilies(elements);
-  await Fonts.loadFontFaces(fontFamilies);
+  await Fonts.loadElementsFonts(elements);
 }
 
 export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer|undefined> {
+  url = typeof url === "string" ? url : url.toString();
   if(typeof url === "string" && !url.startsWith("data") && url.endsWith(".woff2")) {
     const filename = decodeURIComponent(url.substring(url.lastIndexOf("/")+1));
-    const arrayBuffer = hostPlugin.loadFontFromFile(filename)
+    const arrayBuffer = await hostPlugin.loadFontFromFile(filename)
     if(arrayBuffer) {
       return arrayBuffer;
     }

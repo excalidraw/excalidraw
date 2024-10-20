@@ -548,7 +548,9 @@ function* fontFacesIterator(
             return;
           }
 
-          const fontFaceOrder = familyIndex + fontFaceIndex;
+          const fontFaceOrder = Number(
+            familyIndex.toString() + fontFaceIndex.toString(),
+          );
           const fontFaceTuple = [fontFaceOrder, fontFaceCSS] as const;
 
           return fontFaceTuple;

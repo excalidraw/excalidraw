@@ -72,9 +72,12 @@ module.exports = {
         ],
       },
       {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        test: /^(?!.*Xiaolai).*?\.(woff|woff2|eot|ttf|otf)$/,
+        type: "asset/inline",
+      },
+      {
+        test: /(Xiaolai.*woff2)$/,
         type: "asset/resource",
-        //type: "asset/inline", //zsviczian
       },
     ],
   },
