@@ -328,7 +328,9 @@
     "deepBoxSelect": "Eutsi Ctrl edo Cmd sakatuta aukeraketa sakona egiteko eta arrastatzea saihesteko",
     "eraserRevert": "Eduki Alt sakatuta ezabatzeko markatutako elementuak leheneratzeko",
     "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera.",
-    "disableSnapping": "Eduki sakatuta Ctrl edo Cmd tekla atxikipena desgaitzeko"
+    "disableSnapping": "Eduki sakatuta Ctrl edo Cmd tekla atxikipena desgaitzeko",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zooma hautapenera",
     "toggleElementLock": "Blokeatu/desbloketatu hautapena",
     "movePageUpDown": "Mugitu orria gora/behera",
-    "movePageLeftRight": "Mugitu orria ezker/eskuin"
+    "movePageLeftRight": "Mugitu orria ezker/eskuin",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
