@@ -328,7 +328,9 @@
     "deepBoxSelect": "Hold CTRL/CMD for å markere dypt og forhindre flytting",
     "eraserRevert": "Hold Alt for å reversere elementene merket for sletting",
     "firefox_clipboard_write": "Denne funksjonen kan sannsynligvis aktiveres ved å sette \"dom.events.asyncClipboard.clipboardItem\" flagget til \"true\". For å endre nettleserens flagg i Firefox, besøk \"about:config\"-siden.",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikke vise forhåndsvisning",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zoom til utvalg",
     "toggleElementLock": "Lås/lås opp utvalg",
     "movePageUpDown": "Flytt side opp/ned",
-    "movePageLeftRight": "Flytt siden til venstre/høyre"
+    "movePageLeftRight": "Flytt siden til venstre/høyre",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Tøm lerret"
