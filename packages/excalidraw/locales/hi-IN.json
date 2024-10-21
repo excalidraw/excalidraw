@@ -328,7 +328,9 @@
     "deepBoxSelect": "गहरे चयन के लिये और ड्रेग रोकथाम के लिये कंट्रोल-या-कमांड दबायें रख़े",
     "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
-    "disableSnapping": "स्नैपिंग को निष्क्रिय करने के लिए कंट्रोल-या-कमांड दबाए रखें"
+    "disableSnapping": "स्नैपिंग को निष्क्रिय करने के लिए कंट्रोल-या-कमांड दबाए रखें",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -399,7 +401,9 @@
     "zoomToSelection": "चयन तक ज़ूम करे",
     "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
     "movePageUpDown": "पृष्ठ ऊपर/नीचे करे",
-    "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे"
+    "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "चित्रपलट स्वच्छ करे"
