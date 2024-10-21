@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.17.6-3",
+  "version": "0.17.6-4",
   "main": "main.js",
   "types": "types/excalidraw/index.d.ts",
   "files": [

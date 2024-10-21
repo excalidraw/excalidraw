@@ -128,7 +128,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'fonts/woff2/Assistant'), // Path to your font files
+          from: path.resolve(__dirname, 'fonts/Assistant'), // Path to your font files
           to: path.resolve(__dirname, 'dist/excalidraw-assets'), // First output path
           globOptions: {
             dot: true,
@@ -137,7 +137,7 @@ module.exports = {
           },
         },
         {
-          from: path.resolve(__dirname, 'fonts/woff2/Assistant'), // Same source path
+          from: path.resolve(__dirname, 'fonts/Assistant'), // Same source path
           to: path.resolve(__dirname, 'dist/excalidraw-assets-dev'), // Second output path
           globOptions: {
             dot: true,

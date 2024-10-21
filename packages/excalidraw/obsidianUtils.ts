@@ -1,7 +1,7 @@
 import { FreedrawIcon } from "./components/icons";
 import { FONT_FAMILY } from "./constants";
 import { NonDeletedExcalidrawElement } from "./element/types";
-import { Fonts, register } from "./fonts";
+import { Fonts } from "./fonts";
 import type { FontMetadata } from "./fonts/FontMetadata";
 import { FONT_METADATA } from "./fonts/FontMetadata";
 
@@ -63,12 +63,11 @@ export function registerLocalFont(
   fontMetrics: FontMetadata & { name: string },
   uri: string,
 ) {
-  const _register = register.bind({ registered: Fonts.registered });
   FONT_METADATA[FONT_FAMILY["Local Font"]] = {
     metrics: fontMetrics.metrics,
     icon: FreedrawIcon,
   };
-  _register("Local Font", fontMetrics, { uri });
+  Fonts.register("Local Font", fontMetrics, { uri });
 }
 
 export function getFontFamilies(): string[] {
