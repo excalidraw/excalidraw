@@ -328,7 +328,9 @@
     "deepBoxSelect": "CtrlOrCmd را برای انتخاب عمیق و جلوگیری از کشیدن نگه دارید",
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
     "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
-    "disableSnapping": "نگه داشتن کنترل یا کامند برای غیر فعال شدن چفت شدن"
+    "disableSnapping": "نگه داشتن کنترل یا کامند برای غیر فعال شدن چفت شدن",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -399,7 +401,9 @@
     "zoomToSelection": "بزرگنمایی قسمت انتخاب شده",
     "toggleElementLock": "قفل/بازکردن انتخاب شده ها",
     "movePageUpDown": "حرکت صفحه به بالا/پایین",
-    "movePageLeftRight": "حرکت صفحه به چپ/راست"
+    "movePageLeftRight": "حرکت صفحه به چپ/راست",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "پاک کردن بوم"
