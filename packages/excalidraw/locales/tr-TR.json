@@ -328,7 +328,9 @@
     "deepBoxSelect": "Ctrl/Cmd tuşuna basılı tutarak derin seçim yapın ya da sürüklemeyi engelleyin",
     "eraserRevert": "Alt tuşuna basılı tutarak silinme için işaretlenmiş ögeleri tersine çevirin",
     "firefox_clipboard_write": "Bu özelliği etkinleştirmek muhtemelen \"dom.events.asyncClipboard.clipboardItem\" bayrağını \"true\" olarak ayarlayarak yapılabilir. Firefox'ta tarayıcı bayraklarını değiştirmek için \"about:config\" sayfasını ziyaret edin.",
-    "disableSnapping": "Yapışmayı devre dışı bırakmak için CtrlOrCmd tuşunu basılı tutun"
+    "disableSnapping": "Yapışmayı devre dışı bırakmak için CtrlOrCmd tuşunu basılı tutun",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Seçime yakınlaş",
     "toggleElementLock": "Seçimi Kilitle/çöz",
     "movePageUpDown": "Sayfayı yukarı/aşağı kaydır",
-    "movePageLeftRight": "Sayfayı sola/sağa kaydır"
+    "movePageLeftRight": "Sayfayı sola/sağa kaydır",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
