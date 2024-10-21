@@ -203,6 +203,8 @@ const getRelevantAppStateProps = (
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
   editingTextElement: appState.editingTextElement,
+  isCropping: appState.isCropping,
+  croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
 });
 
