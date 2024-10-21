@@ -328,7 +328,9 @@
     "deepBoxSelect": "Mantenha a tecla CtrlOrCmd carregada para selecção profunda, impedindo o arrastamento",
     "eraserRevert": "Mantenha premida a tecla Alt para reverter os elementos marcados para eliminação",
     "firefox_clipboard_write": "Esta função pode provavelmente ser ativada definindo a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
-    "disableSnapping": "Mantenha premida a tecla CtrlOuCmd para desativar a atração"
+    "disableSnapping": "Mantenha premida a tecla CtrlOuCmd para desativar a atração",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Enquadrar vista na seleção",
     "toggleElementLock": "Bloquear / desbloquear seleção",
     "movePageUpDown": "Mover página para cima / baixo",
-    "movePageLeftRight": "Mover página para esquerda / direita"
+    "movePageLeftRight": "Mover página para esquerda / direita",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Apagar área de desenho"
