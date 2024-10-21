@@ -107,6 +107,7 @@ const getRelevantAppStateProps = (
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
   currentHoveredFontFamily: appState.currentHoveredFontFamily,
+  croppingElementId: appState.croppingElementId,
 });
 
 const areEqual = (

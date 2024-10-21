@@ -20,7 +20,7 @@ import type { AppState, Device, Zoom } from "../types";
 import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import { SIDE_RESIZING_THRESHOLD } from "../constants";
-import { isLinearElement } from "./typeChecks";
+import { isImageElement, isLinearElement } from "./typeChecks";
 import type { GlobalPoint, LineSegment, LocalPoint } from "../../math";
 import {
   pointFrom,
@@ -90,7 +90,11 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
 
     // do not resize from the sides for linear elements with only two points
     if (!(isLinearElement(element) && element.points.length <= 2)) {
-      const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
+      const SPACING = isImageElement(element)
+        ? 0
+        : SIDE_RESIZING_THRESHOLD / zoom.value;
+      const ZOOMED_SIDE_RESIZING_THRESHOLD =
+        SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
         pointFrom(x1 - SPACING, y1 - SPACING),
         pointFrom(x2 + SPACING, y2 + SPACING),
@@ -104,7 +108,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
           pointOnLineSegment(
             pointFrom(x, y),
             side as LineSegment<Point>,
-            SPACING,
+            ZOOMED_SIDE_RESIZING_THRESHOLD,
           )
         ) {
           return dir as TransformHandleType;

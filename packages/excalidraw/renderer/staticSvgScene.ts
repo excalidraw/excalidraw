@@ -37,6 +37,7 @@ import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
 import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 import { getVerticalOffset } from "../fonts";
 import { getCornerRadius, isPathALoop } from "../shapes";
+import { getUncroppedWidthAndHeight } from "../element/cropElement";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -417,11 +418,27 @@ const renderElementToSvg = (
           symbol.id = symbolId;
 
           const image = svgRoot.ownerDocument!.createElementNS(SVG_NS, "image");
-
-          image.setAttribute("width", "100%");
-          image.setAttribute("height", "100%");
           image.setAttribute("href", fileData.dataURL);
           image.setAttribute("preserveAspectRatio", "none");
+
+          if (element.crop) {
+            const { width: uncroppedWidth, height: uncroppedHeight } =
+              getUncroppedWidthAndHeight(element);
+
+            symbol.setAttribute(
+              "viewBox",
+              `${
+                element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
+              } ${
+                element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
+              } ${width} ${height}`,
+            );
+            image.setAttribute("width", `${uncroppedWidth}`);
+            image.setAttribute("height", `${uncroppedHeight}`);
+          } else {
+            image.setAttribute("width", "100%");
+            image.setAttribute("height", "100%");
+          }
 
           symbol.appendChild(image);
 

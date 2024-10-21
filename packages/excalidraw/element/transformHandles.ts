@@ -11,6 +11,7 @@ import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import {
   isElbowArrow,
   isFrameLikeElement,
+  isImageElement,
   isLinearElement,
 } from "./typeChecks";
 import {
@@ -129,6 +130,7 @@ export const getTransformHandlesFromCoords = (
   pointerType: PointerType,
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 4,
+  spacing = DEFAULT_TRANSFORM_HANDLE_SPACING,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -140,8 +142,7 @@ export const getTransformHandlesFromCoords = (
   const width = x2 - x1;
   const height = y2 - y1;
   const dashedLineMargin = margin / zoom.value;
-  const centeringOffset =
-    (size - DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / (2 * zoom.value);
+  const centeringOffset = (size - spacing * 2) / (2 * zoom.value);
 
   const transformHandles: TransformHandles = {
     nw: omitSides.nw
@@ -301,8 +302,10 @@ export const getTransformHandles = (
       rotation: true,
     };
   }
-  const dashedLineMargin = isLinearElement(element)
+  const margin = isLinearElement(element)
     ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8
+    : isImageElement(element)
+    ? 0
     : DEFAULT_TRANSFORM_HANDLE_SPACING;
   return getTransformHandlesFromCoords(
     getElementAbsoluteCoords(element, elementsMap, true),
@@ -310,7 +313,8 @@ export const getTransformHandles = (
     zoom,
     pointerType,
     omitSides,
-    dashedLineMargin,
+    margin,
+    isImageElement(element) ? 0 : undefined,
   );
 };
 

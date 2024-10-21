@@ -105,7 +105,7 @@ console.error = (...args) => {
   // the react's act() warning usually doesn't contain any useful stack trace
   // so we're catching the log and re-logging the message with the test name,
   // also stripping the actual component stack trace as it's not useful
-  if (args[0]?.includes("act(")) {
+  if (args[0]?.includes?.("act(")) {
     _consoleError(
       yellow(
         `<<< WARNING: test "${
