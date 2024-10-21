@@ -328,7 +328,9 @@
     "deepBoxSelect": "Удерживайте Ctrl или Cmd для глубокого выделения, чтобы предотвратить перетаскивание",
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\".",
-    "disableSnapping": "Удерживайте CtrlOrCmd, чтобы отключить привязку"
+    "disableSnapping": "Удерживайте CtrlOrCmd, чтобы отключить привязку",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Увеличить до выделенного",
     "toggleElementLock": "Заблокировать/разблокировать выделение",
     "movePageUpDown": "Сдвинуть страницу вверх/вниз",
-    "movePageLeftRight": "Сдвинуть страницу вправо/влево"
+    "movePageLeftRight": "Сдвинуть страницу вправо/влево",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
