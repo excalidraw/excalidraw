@@ -328,7 +328,9 @@
     "deepBoxSelect": "CtrlOrCmd を押し続けることでドラッグを抑止し、深い選択を行います",
     "eraserRevert": "Alt を押し続けることで削除マークされた要素を元に戻す",
     "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。",
-    "disableSnapping": "CtrlOrCmd を押している間スナップを無効化"
+    "disableSnapping": "CtrlOrCmd を押している間スナップを無効化",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "プレビューを表示できません",
@@ -399,7 +401,9 @@
     "zoomToSelection": "選択要素にズーム",
     "toggleElementLock": "選択したアイテムをロック/ロック解除",
     "movePageUpDown": "ページを上下に移動",
-    "movePageLeftRight": "ページを左右に移動"
+    "movePageLeftRight": "ページを左右に移動",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "キャンバスを消去"
