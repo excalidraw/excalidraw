@@ -5,7 +5,7 @@
   "dependencies": {
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "@excalidraw/excalidraw": "*"
+    "@betternotion/excalidraw": "*"
   },
   "devDependencies": {
     "typescript": "^5"
