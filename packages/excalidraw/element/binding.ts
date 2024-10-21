@@ -659,7 +659,6 @@ export const updateBoundElements = (
     LinearElementEditor.movePoints(
       element,
       updates,
-      elementsMap,
       {
         ...(changedElement.id === element.startBinding?.elementId
           ? { startBinding: bindings.startBinding }
@@ -2204,7 +2203,6 @@ export const getGlobalFixedPointForBindableElement = (
   element: ExcalidrawBindableElement,
 ): GlobalPoint => {
   const [fixedX, fixedY] = normalizeFixedPoint(fixedPointRatio);
-
   return pointRotateRads(
     pointFrom(
       element.x + element.width * fixedX,
@@ -2218,7 +2216,7 @@ export const getGlobalFixedPointForBindableElement = (
   );
 };
 
-const getGlobalFixedPoints = (
+export const getGlobalFixedPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
 ): [GlobalPoint, GlobalPoint] => {
@@ -2259,13 +2257,22 @@ const getGlobalFixedPoints = (
 export const getArrowLocalFixedPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
-) => {
+): LocalPoint[] => {
   const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
+  const points = Array.from(arrow.points);
 
-  return [
-    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
-    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
-  ];
+  points[0] = LinearElementEditor.pointFromAbsoluteCoords(
+    arrow,
+    startPoint,
+    elementsMap,
+  );
+  points[points.length - 1] = LinearElementEditor.pointFromAbsoluteCoords(
+    arrow,
+    endPoint,
+    elementsMap,
+  );
+
+  return points;
 };
 
 export const normalizeFixedPoint = <T extends FixedPoint | null>(
