@@ -328,7 +328,9 @@
     "deepBoxSelect": "Podržte Ctrl/Cmd pro hluboký výběr a pro zabránění táhnutí",
     "eraserRevert": "Podržením klávesy Alt vrátíte prvky označené pro smazání",
     "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Náhled nelze zobrazit",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Přiblížit na výběr",
     "toggleElementLock": "Zamknout/odemknout výběr",
     "movePageUpDown": "Posunout stránku nahoru/dolů",
-    "movePageLeftRight": "Přesunout stránku doleva/doprava"
+    "movePageLeftRight": "Přesunout stránku doleva/doprava",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Vymazat plátno"
