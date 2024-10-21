@@ -328,7 +328,9 @@
     "deepBoxSelect": "החזק Ctrl / Cmd לבחירה עמוקה ולמניעת גרירה",
     "eraserRevert": "החזק Alt להחזרת רכיבים מסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
-    "disableSnapping": "החזיקו את מקש Ctrl או Cmd כדי להשבית את ההצמדה"
+    "disableSnapping": "החזיקו את מקש Ctrl או Cmd כדי להשבית את ההצמדה",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
@@ -399,7 +401,9 @@
     "zoomToSelection": "התמקד בבחירה",
     "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
     "movePageUpDown": "זוז עמוד למעלה/למטה",
-    "movePageLeftRight": "זוז עמוד שמאלה/ימינה"
+    "movePageLeftRight": "זוז עמוד שמאלה/ימינה",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "ניקוי הקנבס"
