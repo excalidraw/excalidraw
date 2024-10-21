@@ -328,7 +328,9 @@
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -399,7 +401,9 @@
     "zoomToSelection": "",
     "toggleElementLock": "",
     "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": ""
