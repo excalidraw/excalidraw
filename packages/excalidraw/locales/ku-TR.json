@@ -328,7 +328,9 @@
     "deepBoxSelect": "CtrlOrCmd ڕابگرە بۆ هەڵبژاردنی قووڵ، و بۆ ڕێگریکردن لە ڕاکێشان",
     "eraserRevert": "بۆ گەڕاندنەوەی ئەو توخمانەی کە بۆ سڕینەوە نیشانە کراون، Alt ڕابگرە",
     "firefox_clipboard_write": "ئەم تایبەتمەندییە بە ئەگەرێکی زۆرەوە دەتوانرێت چالاک بکرێت بە ڕێکخستنی ئاڵای \"dom.events.asyncClipboard.clipboardItem\" بۆ \"true\". بۆ گۆڕینی ئاڵاکانی وێبگەڕ لە فایەرفۆکسدا، سەردانی لاپەڕەی \"about:config\" بکە.",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "ناتوانرێ پێشبینین پیشان بدرێت",
@@ -399,7 +401,9 @@
     "zoomToSelection": "زووم بکە بۆ دەستنیشانکراوەکان",
     "toggleElementLock": "قفڵ/کردنەوەی دەستنیشانکراوەکان",
     "movePageUpDown": "لاپەڕەکە بجوڵێنە بۆ سەرەوە/خوارەوە",
-    "movePageLeftRight": "لاپەڕەکە بجوڵێنە بۆ چەپ/ڕاست"
+    "movePageLeftRight": "لاپەڕەکە بجوڵێنە بۆ چەپ/ڕاست",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "تابلۆکە خاوێن بکەرەوە"
