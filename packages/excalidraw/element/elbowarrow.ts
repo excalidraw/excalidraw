@@ -311,20 +311,19 @@ export const updateElbowArrowPoints = (
 
   const unified = pointPairs
     .map(([state, points], idx) => {
-      const raw = simplifyElbowArrowPoints(
+      const raw =
         routeElbowArrow(
           state,
           fakeElementsMap,
           points,
-          idx === 0,
-          idx === pointPairs.length - 1,
+          nextFixedSegments.length > 0 && idx === 0,
+          nextFixedSegments.length > 0 && idx === pointPairs.length - 1,
           idx === pointPairs.length - 1 || idx === 0
             ? options
             : {
                 disableBinding: true,
               },
-        ) ?? [],
-      );
+        ) ?? [];
 
       return raw;
     })
@@ -332,7 +331,7 @@ export const updateElbowArrowPoints = (
       return s;
     });
 
-  return normalizedArrowElementUpdate(simplifyElbowArrowPoints(unified), nfs);
+  return normalizeArrowElementUpdate(getElbowArrowCornerPoints(unified), nfs);
 };
 
 /**
@@ -534,7 +533,6 @@ const routeElbowArrow = (
     hoveredStartElement && aabbForElement(hoveredStartElement),
     hoveredEndElement && aabbForElement(hoveredEndElement),
   );
-  dynamicAABBs.forEach((b) => debugDrawBounds(b));
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -1195,7 +1193,7 @@ const getBindableElementForId = (
   return null;
 };
 
-const normalizedArrowElementUpdate = (
+const normalizeArrowElementUpdate = (
   global: GlobalPoint[],
   nextFixedSegments: FixedSegment[] | null,
 ): {
@@ -1225,25 +1223,32 @@ const normalizedArrowElementUpdate = (
   };
 };
 
-/// If last and current segments have the same heading, skip the middle point
-const simplifyElbowArrowPoints = (points: GlobalPoint[]): GlobalPoint[] =>
-  points
-    .slice(2)
-    .reduce(
-      (result, p) =>
-        compareHeading(
-          vectorToHeading(
-            vectorFromPoint(
-              result[result.length - 1],
-              result[result.length - 2],
-            ),
-          ),
-          vectorToHeading(vectorFromPoint(p, result[result.length - 1])),
-        )
-          ? [...result.slice(0, -1), p]
-          : [...result, p],
-      [points[0] ?? [0, 0], points[1] ?? [1, 0]],
-    );
+const getElbowArrowCornerPoints = (points: GlobalPoint[]): GlobalPoint[] => {
+  if (points.length > 1) {
+    let previousHorizontal = points[0][1] === points[1][1];
+    return points.filter((p, idx) => {
+      // The very first and last points are always kept
+      if (idx === 0 || idx === points.length - 1) {
+        return true;
+      }
+      const next = points[idx + 1];
+      const nextHorizontal = p[1] === next[1];
+      let result = true;
+      if (
+        (previousHorizontal && nextHorizontal) ||
+        (!previousHorizontal && !nextHorizontal)
+      ) {
+        result = false;
+      }
+
+      previousHorizontal = nextHorizontal;
+
+      return result;
+    });
+  }
+
+  return points;
+};
 
 const neighborIndexToHeading = (idx: number): Heading => {
   switch (idx) {
