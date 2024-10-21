@@ -328,7 +328,9 @@
     "deepBoxSelect": "Maintenir Ctrl ou Cmd pour sélectionner dans les groupes et empêcher le déplacement",
     "eraserRevert": "Maintenez Alt enfoncé pour annuler les éléments marqués pour suppression",
     "firefox_clipboard_write": "Cette fonctionnalité devrait pouvoir être activée en définissant l'option \"dom.events.asyncClipboard.clipboard.clipboardItem\" à \"true\". Pour modifier les paramètres du navigateur dans Firefox, visitez la page \"about:config\".",
-    "disableSnapping": "Maintenez CtrlOuCmd pour désactiver l'aimantation"
+    "disableSnapping": "Maintenez CtrlOuCmd pour désactiver l'aimantation",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossible d’afficher l’aperçu",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zoomer sur la sélection",
     "toggleElementLock": "Verrouiller/déverrouiller la sélection",
     "movePageUpDown": "Déplacer la page vers le haut/bas",
-    "movePageLeftRight": "Déplacer la page vers la gauche/droite"
+    "movePageLeftRight": "Déplacer la page vers la gauche/droite",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Effacer la zone de dessin"
