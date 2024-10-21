@@ -154,6 +154,17 @@ export const SelectedShapeActions = ({
         </>
       )}
 
+      {targetElements.some((ele) => {
+        if (
+          ele.type === "rectangle" ||
+          ele.type === "diamond" ||
+          ele.type === "ellipse"
+        ) {
+          return true;
+        }
+        return false;
+      }) && <>{renderAction("changeShapeType")}</>}
+
       {(canChangeRoundness(appState.activeTool.type) ||
         targetElements.some((element) => canChangeRoundness(element.type))) && (
         <>{renderAction("changeRoundness")}</>

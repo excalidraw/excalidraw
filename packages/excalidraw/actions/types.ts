@@ -134,7 +134,11 @@ export type ActionName =
   | "commandPalette"
   | "autoResize"
   | "elementStats"
-  | "searchMenu";
+  | "searchMenu"
+  | "changeShapeType"
+  | "changeToRectangle"
+  | "changeToDiamond"
+  | "changeToEllipse";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
