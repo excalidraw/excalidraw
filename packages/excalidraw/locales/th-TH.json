@@ -328,7 +328,9 @@
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "",
@@ -399,7 +401,9 @@
     "zoomToSelection": "",
     "toggleElementLock": "",
     "movePageUpDown": "",
-    "movePageLeftRight": "ย้ายหน้าไปด้าน ซ้าย/ขวา"
+    "movePageLeftRight": "ย้ายหน้าไปด้าน ซ้าย/ขวา",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": ""
