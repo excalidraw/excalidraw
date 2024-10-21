@@ -328,7 +328,9 @@
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Невъзможност за показване на preview",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Приближи селекцията",
     "toggleElementLock": "Заключи/Отключи селекция",
     "movePageUpDown": "Премести страница нагоре/надолу",
-    "movePageLeftRight": "Премести страница наляво/надясно"
+    "movePageLeftRight": "Премести страница наляво/надясно",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Изчисти платното"
