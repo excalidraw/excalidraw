@@ -328,7 +328,9 @@
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
     "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus",
     "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\".",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Perbesar ke seleksi",
     "toggleElementLock": "Kunci/lepas seleksi",
     "movePageUpDown": "Pindah halaman keatas/kebawah",
-    "movePageLeftRight": "Pindah halaman kebawah/keatas"
+    "movePageLeftRight": "Pindah halaman kebawah/keatas",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
