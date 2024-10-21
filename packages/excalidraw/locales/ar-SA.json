@@ -328,7 +328,9 @@
     "deepBoxSelect": "اضغط على Ctrl\\Cmd للاختيار العميق، ولمنع السحب",
     "eraserRevert": "اضغط على Alt لاستعادة العناصر المعلَّمة للحذف",
     "firefox_clipboard_write": "يمكن على الأرجح تمكين هذه الميزة عن طريق تعيين علم \"dom.events.asyncClipboard.clipboardItem\" إلى \"true\". لتغيير أعلام المتصفح في Firefox، قم بزيارة صفحة \"about:config\".",
-    "disableSnapping": "اضغط على Ctrl أو Cmd لتعطيل الالتقاط"
+    "disableSnapping": "اضغط على Ctrl أو Cmd لتعطيل الالتقاط",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -399,7 +401,9 @@
     "zoomToSelection": "تكبير للعنصر المحدد",
     "toggleElementLock": "إغلاق/فتح المحدد",
     "movePageUpDown": "نقل الصفحة أعلى/أسفل",
-    "movePageLeftRight": "نقل الصفحة يسار/يمين"
+    "movePageLeftRight": "نقل الصفحة يسار/يمين",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "مسح اللوحة"
