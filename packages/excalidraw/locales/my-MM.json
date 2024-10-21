@@ -328,7 +328,9 @@
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "နမူနာမပြသနိုင်ပါ",
@@ -399,7 +401,9 @@
     "zoomToSelection": "",
     "toggleElementLock": "",
     "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": ""
