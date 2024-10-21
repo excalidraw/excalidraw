@@ -328,7 +328,9 @@
     "deepBoxSelect": "按住 Ctrl 或 Cmd 以深度選取並避免拖曳",
     "eraserRevert": "按住 Alt 以反選取已標記待刪除的元素",
     "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。",
-    "disableSnapping": "按住 Ctrl 或 Cmd 以禁用吸附"
+    "disableSnapping": "按住 Ctrl 或 Cmd 以禁用吸附",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "無法顯示預覽",
@@ -399,7 +401,9 @@
     "zoomToSelection": "縮放至選取區",
     "toggleElementLock": "鎖定/解鎖已選的項目",
     "movePageUpDown": "向上/下移動頁面",
-    "movePageLeftRight": "向左/右移動頁面"
+    "movePageLeftRight": "向左/右移動頁面",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "清除畫布"
