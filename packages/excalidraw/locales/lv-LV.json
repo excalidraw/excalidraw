@@ -328,7 +328,9 @@
     "deepBoxSelect": "Turient nospiestu Ctrl vai Cmd, lai atlasītu dziļumā un lai nepieļautu objektu pavilkšanu",
     "eraserRevert": "Turiet Alt, lai noņemtu elementus no dzēsšanas atlases",
     "firefox_clipboard_write": "Šis iestatījums var tikt ieslēgts ar \"dom.events.asyncClipboard.clipboardItem\" marķieri pārslēgtu uz \"true\". Lai mainītu pārlūka marķierus Firefox, apmeklē \"about:config\" lapu.",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nevar rādīt priekšskatījumu",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Iestatīt mērogu, lai rādītu atlasi",
     "toggleElementLock": "Fiksēt/atbrīvot atlasīto",
     "movePageUpDown": "Pārvietot lapu augšup/lejup",
-    "movePageLeftRight": "Pārvietot lapu pa labi/kreisi"
+    "movePageLeftRight": "Pārvietot lapu pa labi/kreisi",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Notīrīt tāfeli"
