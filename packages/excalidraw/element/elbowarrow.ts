@@ -13,7 +13,6 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -257,6 +256,24 @@ export const updateElbowArrowPoints = (
     ],
   ]);
 
+  const points = pointPairs.map(([state, points], idx) => {
+    const raw =
+      routeElbowArrow(
+        state,
+        fakeElementsMap,
+        points,
+        nextFixedSegments.length > 0 && idx === 0,
+        nextFixedSegments.length > 0 && idx === pointPairs.length - 1,
+        idx === pointPairs.length - 1 || idx === 0
+          ? options
+          : {
+              disableBinding: true,
+            },
+      ) ?? [];
+
+    return raw;
+  });
+
   let nfsBase = 0;
   const nfs = pointPairs.slice(1).map(([{ x, y }, points], idx) => {
     const point = pointFrom<GlobalPoint>(x + points[0][0], y + points[0][1]);
@@ -309,29 +326,10 @@ export const updateElbowArrowPoints = (
     return res;
   });
 
-  const unified = pointPairs
-    .map(([state, points], idx) => {
-      const raw =
-        routeElbowArrow(
-          state,
-          fakeElementsMap,
-          points,
-          nextFixedSegments.length > 0 && idx === 0,
-          nextFixedSegments.length > 0 && idx === pointPairs.length - 1,
-          idx === pointPairs.length - 1 || idx === 0
-            ? options
-            : {
-                disableBinding: true,
-              },
-        ) ?? [];
-
-      return raw;
-    })
-    .flatMap((s) => {
-      return s;
-    });
-
-  return normalizeArrowElementUpdate(getElbowArrowCornerPoints(unified), nfs);
+  return normalizeArrowElementUpdate(
+    getElbowArrowCornerPoints(points.flat()),
+    nfs,
+  );
 };
 
 /**
