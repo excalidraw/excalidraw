@@ -328,7 +328,9 @@
     "deepBoxSelect": "",
     "eraserRevert": "মুছে ফেলার জন্য চিহ্নিত উপাদানগুলিকে ফিরিয়ে আনতে অল্ট ধরে রাখুন",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "প্রিভিউ দেখাতে অপারগ",
@@ -399,7 +401,9 @@
     "zoomToSelection": "",
     "toggleElementLock": "",
     "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": ""
