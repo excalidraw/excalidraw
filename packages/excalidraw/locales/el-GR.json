@@ -328,7 +328,9 @@
     "deepBoxSelect": "Κρατήστε πατημένο το CtrlOrCmd για να επιλέξετε βαθιά, και να αποτρέψετε τη μεταφορά",
     "eraserRevert": "Κρατήστε πατημένο το Alt για να επαναφέρετε τα στοιχεία που σημειώθηκαν για διαγραφή",
     "firefox_clipboard_write": "Αυτή η επιλογή μπορεί πιθανώς να ενεργοποιηθεί αλλάζοντας την ρύθμιση \"dom.events.asyncClipboard.clipboardItem\" σε \"true\". Για να αλλάξετε τις ρυθμίσεις του προγράμματος περιήγησης στο Firefox, επισκεφθείτε τη σελίδα \"about:config\".",
-    "disableSnapping": "Κρατήστε πατημένο το Ctrl ή το Cmd για απενεργοποίηση προσκόλλησης"
+    "disableSnapping": "Κρατήστε πατημένο το Ctrl ή το Cmd για απενεργοποίηση προσκόλλησης",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Αδυναμία εμφάνισης προεπισκόπησης",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Ζουμ στην επιλογή",
     "toggleElementLock": "Κλείδωμα/Ξεκλείδωμα επιλογής",
     "movePageUpDown": "Μετακίνηση σελίδας πάνω/κάτω",
-    "movePageLeftRight": "Μετακίνηση σελίδας αριστερά/δεξιά"
+    "movePageLeftRight": "Μετακίνηση σελίδας αριστερά/δεξιά",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Καθαρισμός καμβά"
