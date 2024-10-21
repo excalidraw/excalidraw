@@ -328,7 +328,9 @@
     "deepBoxSelect": "CtrlOrCmd 키를 눌러서 깊게 선택하고, 드래그하지 않도록 하기",
     "eraserRevert": "Alt를 눌러서 삭제하도록 지정된 요소를 되돌리기",
     "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요.",
-    "disableSnapping": "CtrlOrCmd 키를 눌러서 다른 요소와의 정렬 무시하기"
+    "disableSnapping": "CtrlOrCmd 키를 눌러서 다른 요소와의 정렬 무시하기",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "미리보기를 볼 수 없습니다",
@@ -399,7 +401,9 @@
     "zoomToSelection": "선택 영역으로 확대/축소",
     "toggleElementLock": "선택한 항목을 잠금/잠금 해제",
     "movePageUpDown": "페이지 움직이기 위/아래",
-    "movePageLeftRight": "페이지 움직이기 좌/우"
+    "movePageLeftRight": "페이지 움직이기 좌/우",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "캔버스 지우기"
