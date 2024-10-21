@@ -328,7 +328,9 @@
     "deepBoxSelect": "Halte CtrlOrCmd gedrückt, um innerhalb der Gruppe auszuwählen, und um Ziehen zu vermeiden",
     "eraserRevert": "Halte Alt gedrückt, um die zum Löschen markierten Elemente zurückzusetzen",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
-    "disableSnapping": "Halte CtrlOrCmd gedrückt, um das Einrasten zu deaktivieren"
+    "disableSnapping": "Halte CtrlOrCmd gedrückt, um das Einrasten zu deaktivieren",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Auf Auswahl zoomen",
     "toggleElementLock": "Auswahl sperren/entsperren",
     "movePageUpDown": "Seite nach oben/unten verschieben",
-    "movePageLeftRight": "Seite nach links/rechts verschieben"
+    "movePageLeftRight": "Seite nach links/rechts verschieben",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
