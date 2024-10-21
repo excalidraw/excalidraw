@@ -328,7 +328,9 @@
     "deepBoxSelect": "Ține apăsată tasta Ctrl sau Cmd pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
     "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere",
     "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”.",
-    "disableSnapping": "Ține apăsat CtrlOrCmd pentru a dezactiva ancorarea"
+    "disableSnapping": "Ține apăsat CtrlOrCmd pentru a dezactiva ancorarea",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Transfocare la selecție",
     "toggleElementLock": "Blocare/deblocare selecție",
     "movePageUpDown": "Deplasare pagină sus/jos",
-    "movePageLeftRight": "Deplasare pagină stânga/dreapta"
+    "movePageLeftRight": "Deplasare pagină stânga/dreapta",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
