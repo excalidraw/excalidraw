@@ -1239,6 +1239,22 @@ export const ArrowheadArrowIcon = React.memo(
     ),
 );
 
+export const ArrowheadCrowsFeetIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        stroke="currentColor"
+        strokeWidth={2}
+        fill="none"
+      >
+        <path d="M34 10H6M24 10L34 17M24 10L34 3" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+
 export const ArrowheadCircleIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
