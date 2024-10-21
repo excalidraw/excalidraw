@@ -328,7 +328,9 @@
     "deepBoxSelect": "Håll Ctrl eller Cmd för att djupvälja, och för att förhindra att dra",
     "eraserRevert": "Håll Alt för att återställa de element som är markerade för borttagning",
     "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan.",
-    "disableSnapping": "Håll Ctrl eller Cmd för att inaktivera fästning"
+    "disableSnapping": "Håll Ctrl eller Cmd för att inaktivera fästning",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zooma till markering",
     "toggleElementLock": "Lås/Lås upp valda",
     "movePageUpDown": "Flytta sida upp/ner",
-    "movePageLeftRight": "Flytta sida vänster/höger"
+    "movePageLeftRight": "Flytta sida vänster/höger",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Rensa canvas"
