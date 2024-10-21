@@ -328,7 +328,9 @@
     "deepBoxSelect": "Manteniu CtrlOrCmd per a selecció profunda, i per a evitar l'arrossegament",
     "eraserRevert": "Mantingueu premuda Alt per a revertir els elements seleccionats per a esborrar",
     "firefox_clipboard_write": "És probable que aquesta funció es pugui activar posant la marca \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Per canviar les marques del navegador al Firefox, visiteu la pàgina \"about:config\".",
-    "disableSnapping": "Manteniu premut CtrlOrCmd per a desactivar l'ajustament"
+    "disableSnapping": "Manteniu premut CtrlOrCmd per a desactivar l'ajustament",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "No es pot mostrar la previsualització",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zoom per veure la selecció",
     "toggleElementLock": "Blocar/desblocar la selecció",
     "movePageUpDown": "Mou la pàgina cap amunt/a baix",
-    "movePageLeftRight": "Mou la pàgina cap a l'esquerra/dreta"
+    "movePageLeftRight": "Mou la pàgina cap a l'esquerra/dreta",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Neteja el llenç"
