@@ -328,7 +328,9 @@
     "deepBoxSelect": "Втримуйте Ctrl/Cmd для глибокого виділення та щоб попередити перетягування",
     "eraserRevert": "Втримуйте клавішу Alt, щоб повернути елементи позначені для видалення",
     "firefox_clipboard_write": "Цю функцію можна ввімкнути, встановивши значення \"true\" для налаштування \"dom.events.asyncClipboard.clipboardItem\". Перейдіть на сторінку «about:config», щоб змінити налаштування браузера у Firefox.",
-    "disableSnapping": "Утримуйте Ctrl чи Cmd, щоб відключити прив'язку"
+    "disableSnapping": "Утримуйте Ctrl чи Cmd, щоб відключити прив'язку",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Не вдається показати попередній перегляд",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Наблизити вибране",
     "toggleElementLock": "Заблокувати/розблокувати вибране",
     "movePageUpDown": "Пересунути сторінку вгору/вниз",
-    "movePageLeftRight": "Пересунути сторінку вліво/вправо"
+    "movePageLeftRight": "Пересунути сторінку вліво/вправо",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Очистити полотно"
