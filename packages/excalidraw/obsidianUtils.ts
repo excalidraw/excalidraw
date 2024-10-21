@@ -2,8 +2,8 @@ import { FreedrawIcon } from "./components/icons";
 import { FONT_FAMILY } from "./constants";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { Fonts, register } from "./fonts";
-import type { FontMetadata } from "./fonts/metadata";
-import { FONT_METADATA } from "./fonts/metadata";
+import type { FontMetadata } from "./fonts/FontMetadata";
+import { FONT_METADATA } from "./fonts/FontMetadata";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
