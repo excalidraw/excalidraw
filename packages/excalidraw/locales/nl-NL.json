@@ -328,7 +328,9 @@
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan voorbeeld niet tonen",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Inzoomen op selectie",
     "toggleElementLock": "",
     "movePageUpDown": "Pagina omhoog/omlaag",
-    "movePageLeftRight": "Verplaats pagina links/rechts"
+    "movePageLeftRight": "Verplaats pagina links/rechts",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Wis canvas"
