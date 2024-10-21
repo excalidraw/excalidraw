@@ -328,7 +328,9 @@
     "deepBoxSelect": "Hald inne Ctrl / Cmd for å velje djupt, og forhindre flytting",
     "eraserRevert": "Hald inne Alt for å reversere markering av element for sletting",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Kan ikkje vise førehandsvising",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zoom til utval",
     "toggleElementLock": "",
     "movePageUpDown": "",
-    "movePageLeftRight": ""
+    "movePageLeftRight": "",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Tøm lerretet"
