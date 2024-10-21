@@ -328,7 +328,9 @@
     "deepBoxSelect": "ஆழ்ந்துத் தேரவும் பிடித்திழுத்தலைத் தவிர்க்கவும் CtrlOrCmdஐ அழுத்திப்பிடி",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "முன்னோட்டம் காட்ட இயலவில்லை",
@@ -399,7 +401,9 @@
     "zoomToSelection": "தெரிவுக்கு விரிவாக்கு",
     "toggleElementLock": "தேர்ந்தெடுப்பைப் பூட்டு/பூட்டவிழ்",
     "movePageUpDown": "மேலே/கீழே நகர்த்தவும்",
-    "movePageLeftRight": "இடது/வலது பக்கம் நகர்த்தவும்"
+    "movePageLeftRight": "இடது/வலது பக்கம் நகர்த்தவும்",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "கித்தானைத் துடை"
