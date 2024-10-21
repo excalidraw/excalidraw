@@ -328,7 +328,9 @@
     "deepBoxSelect": "Podržte CtrlOrCmd na výber v skupine alebo zamedzeniu potiahnutia",
     "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie",
     "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\".",
-    "disableSnapping": "Podržte CtrlOrCmd pre vypnutie prichytávania"
+    "disableSnapping": "Podržte CtrlOrCmd pre vypnutie prichytávania",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Priblížiť na výber",
     "toggleElementLock": "Zamknúť/odomknúť vybrané",
     "movePageUpDown": "Posunúť stranu hore/dole",
-    "movePageLeftRight": "Posunúť stranu doľava/doprava"
+    "movePageLeftRight": "Posunúť stranu doľava/doprava",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
