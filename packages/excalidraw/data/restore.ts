@@ -190,6 +190,10 @@ const restoreElementWithProperties = <
   }
 
   return {
+    // spread the original element properties to not lose unknown ones
+    // for forward-compatibility
+    ...element,
+    // normalized properties
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
