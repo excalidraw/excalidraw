@@ -328,7 +328,9 @@
     "deepBoxSelect": "Tieni premuto CtrlOCmd per selezionare in profondità e per impedire il trascinamento",
     "eraserRevert": "Tieni premuto Alt per ripristinare gli elementi contrassegnati per l'eliminazione",
     "firefox_clipboard_write": "Questa funzione può essere abilitata impostando il flag \"dom.events.asyncClipboard.clipboardItem\" su \"true\". Per modificare i flag del browser in Firefox, visitare la pagina \"about:config\".",
-    "disableSnapping": "Tieni premuto Ctrl o Cmd per disabilitare lo snap"
+    "disableSnapping": "Tieni premuto Ctrl o Cmd per disabilitare lo snap",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Impossibile visualizzare l'anteprima",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Zoom alla selezione",
     "toggleElementLock": "Blocca/sblocca selezione",
     "movePageUpDown": "Sposta la pagina su/giù",
-    "movePageLeftRight": "Sposta la pagina a sinistra/destra"
+    "movePageLeftRight": "Sposta la pagina a sinistra/destra",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Svuota la tela"
