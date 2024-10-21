@@ -328,7 +328,9 @@
     "deepBoxSelect": "Käytä syvävalintaa ja estä raahaus painamalla CtrlOrCmd",
     "eraserRevert": "Pidä Alt alaspainettuna, kumotaksesi merkittyjen elementtien poistamisen",
     "firefox_clipboard_write": "Tämä ominaisuus voidaan todennäköisesti ottaa käyttöön asettamalla \"dom.events.asyncClipboard.clipboardItem\" kohta \"true\":ksi. Vaihtaaksesi selaimen kohdan Firefoxissa, käy \"about:config\" sivulla.",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Esikatselua ei voitu näyttää",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Näytä valinta",
     "toggleElementLock": "Lukitse / poista lukitus valinta",
     "movePageUpDown": "Siirrä sivua ylös/alas",
-    "movePageLeftRight": "Siirrä sivua vasemmalle/oikealle"
+    "movePageLeftRight": "Siirrä sivua vasemmalle/oikealle",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Pyyhi piirtoalue"
