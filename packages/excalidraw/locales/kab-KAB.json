@@ -328,7 +328,9 @@
     "deepBoxSelect": "Ṭṭef CtrlOrCmd akken ad tferneḍ s telqey, yerna ad trewleḍ i uzuɣer",
     "eraserRevert": "Ssed Alt akken ad tsefsxeḍ iferdisen yettwacerḍen i tukksa",
     "firefox_clipboard_write": "",
-    "disableSnapping": ""
+    "disableSnapping": "",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Ulamek abeqqeḍ n teskant",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Simɣur ɣer tefrayt",
     "toggleElementLock": "Sekkeṛ/kkes asekker i tefrayt",
     "movePageUpDown": "Smutti asebter d asawen/akessar",
-    "movePageLeftRight": "Smutti asebter s azelmaḍ/ayfus"
+    "movePageLeftRight": "Smutti asebter s azelmaḍ/ayfus",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Sfeḍ taɣzut n usuneɣ"
