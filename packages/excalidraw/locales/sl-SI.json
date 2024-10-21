@@ -328,7 +328,9 @@
     "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
     "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
     "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\".",
-    "disableSnapping": "Držite CtrlOrCmd, da onemogočite pripenjanje"
+    "disableSnapping": "Držite CtrlOrCmd, da onemogočite pripenjanje",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Približaj na izbor",
     "toggleElementLock": "Zakleni/odkleni izbor",
     "movePageUpDown": "Premakni stran gor/dol",
-    "movePageLeftRight": "Premakni stran levo/desno"
+    "movePageLeftRight": "Premakni stran levo/desno",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
