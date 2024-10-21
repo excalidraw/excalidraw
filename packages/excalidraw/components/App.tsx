@@ -7730,15 +7730,15 @@ class App extends React.Component<AppProps, AppState> {
             segmentIdx!,
             elementsMap,
           );
-          const isHorizontal = startPoint[0] === endPoint[0];
+          const isHorizontal = startPoint[1] === endPoint[1];
           LinearElementEditor.movePoints(arrow, [
             {
               index: segmentIdx! - 1,
               point: LinearElementEditor.pointFromAbsoluteCoords(
                 arrow,
                 pointFrom(
-                  isHorizontal ? pointerCoords.x : startPoint[0],
-                  !isHorizontal ? pointerCoords.y : startPoint[1],
+                  !isHorizontal ? pointerCoords.x : startPoint[0],
+                  isHorizontal ? pointerCoords.y : startPoint[1],
                 ),
                 elementsMap,
               ),
@@ -7749,8 +7749,8 @@ class App extends React.Component<AppProps, AppState> {
               point: LinearElementEditor.pointFromAbsoluteCoords(
                 arrow,
                 pointFrom(
-                  isHorizontal ? pointerCoords.x : endPoint[0],
-                  !isHorizontal ? pointerCoords.y : endPoint[1],
+                  !isHorizontal ? pointerCoords.x : endPoint[0],
+                  isHorizontal ? pointerCoords.y : endPoint[1],
                 ),
                 elementsMap,
               ),
