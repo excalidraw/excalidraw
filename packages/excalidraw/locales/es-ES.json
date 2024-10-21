@@ -328,7 +328,9 @@
     "deepBoxSelect": "Mantén CtrlOrCmd para seleccionar en profundidad, y para evitar arrastrar",
     "eraserRevert": "Mantenga pulsado Alt para revertir los elementos marcados para su eliminación",
     "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\".",
-    "disableSnapping": "Mantén pulsado CtrlOrCmd para desactivar el ajuste"
+    "disableSnapping": "Mantén pulsado CtrlOrCmd para desactivar el ajuste",
+    "enterCropEditor": "",
+    "leaveCropEditor": ""
   },
   "canvasError": {
     "cannotShowPreview": "No se puede mostrar la vista previa",
@@ -399,7 +401,9 @@
     "zoomToSelection": "Ampliar selección",
     "toggleElementLock": "Bloquear/desbloquear selección",
     "movePageUpDown": "Mover página hacia arriba/abajo",
-    "movePageLeftRight": "Mover página hacia la izquierda/derecha"
+    "movePageLeftRight": "Mover página hacia la izquierda/derecha",
+    "cropStart": "",
+    "cropFinish": ""
   },
   "clearCanvasDialog": {
     "title": "Borrar lienzo"
