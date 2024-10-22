@@ -8,7 +8,7 @@ import {
 import { isTextElement } from "../element";
 import { charWidth, getContainerElement } from "../element/textElement";
 import { ShapeCache } from "../scene/ShapeCache";
-import { getFontString } from "../utils";
+import { getFontString, PromisePool, promiseTry } from "../utils";
 import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 
 import { CascadiaFontFaces } from "./Cascadia";
@@ -183,25 +183,41 @@ export class Fonts {
       }
     }
 
-    const loadedFontFaces = await Promise.all(
-      fontFamilies.map(async (fontFamily) => {
-        const fontString = getFontString({
-          fontFamily,
-          fontSize: 16,
-        });
+    // loading 10 font faces at a time, in a controlled manner
+    const iterator = Fonts.fontFacesLoader(fontFamilies, charsPerFamily);
+    const concurrency = 10;
+    const fontFaces = await new PromisePool(iterator, concurrency).all();
+    return fontFaces.flat().filter(Boolean);
+  }
 
-        // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
-        // for Safari on init, we rather check with the actual "text" param, even though it's longer, as otherwise fonts might remain unloaded
-        const text =
-          isSafari && charsPerFamily
-            ? Fonts.getCharacters(charsPerFamily, fontFamily)
-            : "";
+  private static *fontFacesLoader(
+    fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
+    charsPerFamily?: Record<number, Set<string>>,
+  ): Generator<Promise<void | readonly [number, FontFace[]]>> {
+    for (const [index, fontFamily] of fontFamilies.entries()) {
+      const fontString = getFontString({
+        fontFamily,
+        fontSize: 16,
+      });
 
-        if (!window.document.fonts.check(fontString, text)) {
+      // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
+      // for Safari on init, we rather check with the actual "text" param, even though it's longer, as otherwise fonts might remain unloaded
+      const text =
+        isSafari && charsPerFamily
+          ? Fonts.getCharacters(charsPerFamily, fontFamily)
+          : "";
+
+      if (!window.document.fonts.check(fontString, text)) {
+        yield promiseTry(async () => {
           try {
             // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
             // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
-            return await window.document.fonts.load(fontString, text);
+            const fontFaces = await window.document.fonts.load(
+              fontString,
+              text,
+            );
+
+            return [index, fontFaces];
           } catch (e) {
             // don't let it all fail if just one font fails to load
             console.error(
@@ -211,13 +227,9 @@ export class Fonts {
               e,
             );
           }
-        }
-
-        return Promise.resolve();
-      }),
-    );
-
-    return loadedFontFaces.flat().filter(Boolean) as FontFace[];
+        });
+      }
+    }
   }
 
   /**

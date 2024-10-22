@@ -44,7 +44,7 @@ import {
 import { newTextElement } from "../element";
 import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import { isFrameLikeElement, isTextElement } from "../element/typeChecks";
+import { isFrameLikeElement } from "../element/typeChecks";
 import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
@@ -483,11 +483,10 @@ const getFontFaces = async (
     }
   }
 
-  const iterator = fontFacesIterator(orderedFamilies, charsPerFamily);
-
   // don't trigger hundreds of concurrent requests (each performing fetch, creating a worker, etc.),
   // instead go three requests at a time, in a controlled manner, without completely blocking the main thread
   // and avoiding potential issues such as rate limits
+  const iterator = fontFacesStylesGenerator(orderedFamilies, charsPerFamily);
   const concurrency = 3;
   const fontFaces = await new PromisePool(iterator, concurrency).all();
 
@@ -495,7 +494,7 @@ const getFontFaces = async (
   return Array.from(new Set(fontFaces));
 };
 
-function* fontFacesIterator(
+function* fontFacesStylesGenerator(
   families: Array<number>,
   charsPerFamily: Record<number, Set<string>>,
 ): Generator<Promise<void | readonly [number, string]>> {
