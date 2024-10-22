@@ -23,11 +23,21 @@ const changeShapeForAllSelected = (
 ) => {
   const newElements = changeProperty(elements, appState, (el) => {
     if (el.type !== value && isFlowchartNodeElement(el)) {
-      const side = el.width > el.height ? el.width : el.height;
+      if (el.roundness && el.roundness.type >= 2) {
+        const newShape = newElement({
+          ...el,
+          width: el.width,
+          height: el.height,
+          type: value,
+          roundness: { type: 2, value: el.roundness.value },
+          versionNonce: randomInteger(),
+        });
+        return newShape;
+      }
       const newShape = newElement({
         ...el,
-        width: side,
-        height: side,
+        width: el.width,
+        height: el.height,
         type: value,
         versionNonce: randomInteger(),
       });
@@ -66,11 +76,21 @@ export const actionChangeShapeType = register({
   ) => {
     const newElements = changeProperty(elements, appState, (el) => {
       if (el.type !== value && isFlowchartNodeElement(el)) {
-        const side = el.width > el.height ? el.width : el.height;
+        if (el.roundness && el.roundness.type >= 2) {
+          const newShape = newElement({
+            ...el,
+            width: el.width,
+            height: el.height,
+            type: value,
+            roundness: { type: 2, value: el.roundness.value },
+            versionNonce: randomInteger(),
+          });
+          return newShape;
+        }
         const newShape = newElement({
           ...el,
-          width: side,
-          height: side,
+          width: el.width,
+          height: el.height,
           type: value,
           versionNonce: randomInteger(),
         });
