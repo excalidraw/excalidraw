@@ -20,6 +20,7 @@ import { newElementWith } from "../../packages/excalidraw/element/mutateElement"
 import { encryptData } from "../../packages/excalidraw/data/encryption";
 import type { Socket } from "socket.io-client";
 import { StoreAction } from "../../packages/excalidraw";
+import emojione from "emojione";
 
 class Portal {
   collab: TCollabClass;
@@ -251,6 +252,30 @@ class Portal {
       this.socket.emit(WS_EVENTS.USER_FOLLOW_CHANGE, payload);
     }
   };
+
+  insertEmoji(emoji: string, position: { x: number; y: number }) {
+    const emojiHTML = emojione.toImage(emoji);
+
+    const newElement = {
+      id: `emoji-${Date.now()}`,
+      type: "emoji",
+      emoji: emojiHTML,
+      x: position.x,
+      y: position.y,
+      width: 50, // or any size you prefer
+      height: 50,
+      version: 1,
+      versionNonce: 0,
+      isDeleted: false,
+    };
+
+    this.collab.excalidrawAPI.updateScene({
+      elements: [...this.collab.excalidrawAPI.getSceneElements(), newElement],
+      appState: {},
+    });
+
+    this.broadcastScene(WS_SUBTYPES.UPDATE, [newElement], false);
+  }
 }
 
 export default Portal;
