@@ -203,6 +203,8 @@ const getRelevantAppStateProps = (
   editingTextElement: appState.editingTextElement,
   gridColor: appState.gridColor, //zsviczian
   highlightSearchResult: appState.highlightSearchResult, //zsviczian
+  isCropping: appState.isCropping,
+  croppingElementId: appState.croppingElementId,
   searchMatches: appState.searchMatches,
 });
 
