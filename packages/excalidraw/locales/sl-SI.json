@@ -329,8 +329,8 @@
     "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
     "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\".",
     "disableSnapping": "Držite CtrlOrCmd, da onemogočite pripenjanje",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Dvokliknite sliko ali pritisnite ENTER, da jo obrežete",
+    "leaveCropEditor": "Kliknite zunaj slike ali pritisnite ENTER ali ESCAPE, da končate obrezovanje"
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
@@ -402,8 +402,8 @@
     "toggleElementLock": "Zakleni/odkleni izbor",
     "movePageUpDown": "Premakni stran gor/dol",
     "movePageLeftRight": "Premakni stran levo/desno",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Obreži sliko",
+    "cropFinish": "Dokončaj obrezovanje slike"
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
