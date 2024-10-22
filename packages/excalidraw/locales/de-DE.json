@@ -329,8 +329,8 @@
     "eraserRevert": "Halte Alt gedrückt, um die zum Löschen markierten Elemente zurückzusetzen",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
     "disableSnapping": "Halte CtrlOrCmd gedrückt, um das Einrasten zu deaktivieren",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Doppelklicke auf das Bild oder drücke ENTER, um das Bild zuschneiden",
+    "leaveCropEditor": "Klicke außerhalb des Bildes oder drücke ENTER oder ESCAPE um das Zuschneiden zu beenden"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
@@ -402,8 +402,8 @@
     "toggleElementLock": "Auswahl sperren/entsperren",
     "movePageUpDown": "Seite nach oben/unten verschieben",
     "movePageLeftRight": "Seite nach links/rechts verschieben",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Bild zuschneiden",
+    "cropFinish": "Zuschneiden des Bildes beenden"
   },
   "clearCanvasDialog": {
     "title": "Zeichenfläche löschen"
