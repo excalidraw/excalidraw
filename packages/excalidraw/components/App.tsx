@@ -2306,7 +2306,11 @@ class App extends React.Component<AppProps, AppState> {
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
     this.clearImageShapeCache();
-    this.fonts.loadSceneFonts();
+
+    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
+    this.fonts.loadSceneFonts().then((fontFaces) => {
+      this.fonts.onLoaded(fontFaces);
+    });
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2549,8 +2553,8 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(document.fonts, "loadingdone", (event) => {
-        const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onLoaded(loadedFontFaces);
+        const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+        this.fonts.onLoaded(fontFaces);
       }),
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -3218,9 +3222,11 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
 
+    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
     if (isSafari) {
-      // paste event may not fire font loading even on safari, so let's load the fonts manually
-      this.fonts.loadSceneFonts();
+      Fonts.loadElementsFonts(newElements).then((fontFaces) => {
+        this.fonts.onLoaded(fontFaces);
+      });
     }
 
     if (opts.files) {

@@ -9,14 +9,7 @@ import type {
 import type { Bounds } from "../element/bounds";
 import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
-import {
-  arrayToMap,
-  distance,
-  getFontString,
-  PromisePool,
-  promiseTry,
-  toBrandedType,
-} from "../utils";
+import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import type { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
@@ -25,9 +18,6 @@ import {
   SVG_NS,
   THEME,
   THEME_FILTER,
-  FONT_FAMILY_FALLBACKS,
-  getFontFamilyFallbacks,
-  CJK_HAND_DRAWN_FALLBACK_FONT,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -49,7 +39,6 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
-import { containsCJK } from "../element/textElement";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -376,7 +365,10 @@ export const exportToSvg = async (
         </clipPath>`;
   }
 
-  const fontFaces = opts?.skipInliningFonts ? [] : await getFontFaces(elements);
+  const fontFaces = !opts?.skipInliningFonts
+    ? await Fonts.generateFontFaceDeclarations(elements)
+    : [];
+
   const delimiter = "\n      "; // 6 spaces
 
   svgRoot.innerHTML = `
@@ -454,89 +446,3 @@ export const getExportSize = (
 
   return [width, height];
 };
-
-const getFontFaces = async (
-  elements: readonly ExcalidrawElement[],
-): Promise<string[]> => {
-  const orderedFamilies = Fonts.getUniqueFamilies(elements);
-  const charsPerFamily = Fonts.getCharsPerFamily(elements);
-
-  // for simplicity, assuming we have just one family with the CJK handdrawn fallback
-  const familyWithCJK = orderedFamilies.find((x) =>
-    getFontFamilyFallbacks(x).includes(CJK_HAND_DRAWN_FALLBACK_FONT),
-  );
-
-  if (familyWithCJK) {
-    const characters = Fonts.getCharacters(charsPerFamily, familyWithCJK);
-
-    if (containsCJK(characters)) {
-      const family = FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT];
-
-      // adding the same characters to the CJK handrawn family
-      charsPerFamily[family] = new Set(characters);
-
-      // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
-      // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
-      orderedFamilies.unshift(
-        FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT],
-      );
-    }
-  }
-
-  // don't trigger hundreds of concurrent requests (each performing fetch, creating a worker, etc.),
-  // instead go three requests at a time, in a controlled manner, without completely blocking the main thread
-  // and avoiding potential issues such as rate limits
-  const iterator = fontFacesStylesGenerator(orderedFamilies, charsPerFamily);
-  const concurrency = 3;
-  const fontFaces = await new PromisePool(iterator, concurrency).all();
-
-  // dedup just in case (i.e. could be the same font faces with 0 glyphs)
-  return Array.from(new Set(fontFaces));
-};
-
-function* fontFacesStylesGenerator(
-  families: Array<number>,
-  charsPerFamily: Record<number, Set<string>>,
-): Generator<Promise<void | readonly [number, string]>> {
-  for (const [familyIndex, family] of families.entries()) {
-    const { fontFaces, metadata } = Fonts.registered.get(family) ?? {};
-
-    if (!Array.isArray(fontFaces)) {
-      console.error(
-        `Couldn't find registered fonts for font-family "${family}"`,
-        Fonts.registered,
-      );
-      continue;
-    }
-
-    if (metadata?.local) {
-      // don't inline local fonts
-      continue;
-    }
-
-    for (const [fontFaceIndex, fontFace] of fontFaces.entries()) {
-      yield promiseTry(async () => {
-        try {
-          const characters = Fonts.getCharacters(charsPerFamily, family);
-          const fontFaceCSS = await fontFace.toCSS(characters);
-
-          if (!fontFaceCSS) {
-            return;
-          }
-
-          // giving a buffer of 10K font faces per family
-          const fontFaceOrder = familyIndex * 10_000 + fontFaceIndex;
-          const fontFaceTuple = [fontFaceOrder, fontFaceCSS] as const;
-
-          return fontFaceTuple;
-        } catch (error) {
-          console.error(
-            `Couldn't transform font-face to css for family "${fontFace.fontFace.family}"`,
-            error,
-          );
-        }
-      });
-    }
-  }
-}
-

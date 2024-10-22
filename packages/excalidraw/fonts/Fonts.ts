@@ -4,9 +4,14 @@ import {
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
   isSafari,
+  getFontFamilyFallbacks,
 } from "../constants";
 import { isTextElement } from "../element";
-import { charWidth, getContainerElement } from "../element/textElement";
+import {
+  charWidth,
+  containsCJK,
+  getContainerElement,
+} from "../element/textElement";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getFontString, PromisePool, promiseTry } from "../utils";
 import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
@@ -75,6 +80,13 @@ export class Fonts {
   }
 
   /**
+   * Get all the font families for the given scene.
+   */
+  public getSceneFamilies = () => {
+    return Fonts.getUniqueFamilies(this.scene.getNonDeletedElements());
+  };
+
+  /**
    * if we load a (new) font, it's likely that text elements using it have
    * already been rendered using a fallback font. Thus, we want invalidate
    * their shapes and rerender. See #637.
@@ -82,7 +94,7 @@ export class Fonts {
    * Invalidates text elements and rerenders scene, provided that at least one
    * of the supplied fontFaces has not already been processed.
    */
-  public onLoaded = (fontFaces: readonly FontFace[]) => {
+  public onLoaded = (fontFaces: readonly FontFace[]): void => {
     // bail if all fonts with have been processed. We're checking just a
     // subset of the font properties (though it should be enough), so it
     // can technically bail on a false positive.
@@ -133,8 +145,9 @@ export class Fonts {
    * fire (looking at you Safari), so on init we manually load all
    * fonts and rerender scene text elements once done.
    *
-   * For Safari we we make sure to check against each loaded font face,
-   * with the actual elements, otherwise fonts might remain unloaded.
+   * For Safari we make sure to check against each loaded font face
+   * with the unique characters per family in the scene,
+   * otherwise fonts might remain unloaded.
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
@@ -142,9 +155,25 @@ export class Fonts {
       ? Fonts.getCharsPerFamily(this.scene.getNonDeletedElements())
       : undefined;
 
-    const loaded = await Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
-    this.onLoaded(loaded);
-    return loaded;
+    return Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
+  };
+
+  /**
+   * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
+   *
+   * For Safari we make sure to check against each loaded font face,
+   * with the unique characters per family in the elements
+   * otherwise fonts might remain unloaded.
+   */
+  public static loadElementsFonts = async (
+    elements: readonly ExcalidrawElement[],
+  ): Promise<FontFace[]> => {
+    const fontFamilies = Fonts.getUniqueFamilies(elements);
+    const charsPerFamily = isSafari
+      ? Fonts.getCharsPerFamily(elements)
+      : undefined;
+
+    return Fonts.loadFontFaces(fontFamilies, charsPerFamily);
   };
 
   /**
@@ -156,14 +185,44 @@ export class Fonts {
   };
 
   /**
-   * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
+   * Generate CSS @font-face declarations for the given elements.
    */
-  public static loadElementsFonts = async (
+  public static async generateFontFaceDeclarations(
     elements: readonly ExcalidrawElement[],
-  ): Promise<FontFace[]> => {
-    const fontFamilies = Fonts.getUniqueFamilies(elements);
-    return await Fonts.loadFontFaces(fontFamilies);
-  };
+  ) {
+    const families = Fonts.getUniqueFamilies(elements);
+    const charsPerFamily = Fonts.getCharsPerFamily(elements);
+
+    // for simplicity, assuming we have just one family with the CJK handdrawn fallback
+    const familyWithCJK = families.find((x) =>
+      getFontFamilyFallbacks(x).includes(CJK_HAND_DRAWN_FALLBACK_FONT),
+    );
+
+    if (familyWithCJK) {
+      const characters = Fonts.getCharacters(charsPerFamily, familyWithCJK);
+
+      if (containsCJK(characters)) {
+        const family = FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT];
+
+        // adding the same characters to the CJK handrawn family
+        charsPerFamily[family] = new Set(characters);
+
+        // the order between the families and fallbacks is important, as fallbacks need to be defined first and in the reversed order
+        // so that they get overriden with the later defined font faces, i.e. in case they share some codepoints
+        families.unshift(FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT]);
+      }
+    }
+
+    // don't trigger hundreds of concurrent requests (each performing fetch, creating a worker, etc.),
+    // instead go three requests at a time, in a controlled manner, without completely blocking the main thread
+    // and avoiding potential issues such as rate limits
+    const iterator = Fonts.fontFacesStylesGenerator(families, charsPerFamily);
+    const concurrency = 3;
+    const fontFaces = await new PromisePool(iterator, concurrency).all();
+
+    // dedup just in case (i.e. could be the same font faces with 0 glyphs)
+    return Array.from(new Set(fontFaces));
+  }
 
   private static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
@@ -195,33 +254,30 @@ export class Fonts {
     charsPerFamily?: Record<number, Set<string>>,
   ): Generator<Promise<void | readonly [number, FontFace[]]>> {
     for (const [index, fontFamily] of fontFamilies.entries()) {
-      const fontString = getFontString({
+      const font = getFontString({
         fontFamily,
         fontSize: 16,
       });
 
       // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
-      // for Safari on init, we rather check with the actual "text" param, even though it's longer, as otherwise fonts might remain unloaded
+      // for Safari on init, we rather check with the "text" param, even though it's less efficient, as otherwise fonts might remain unloaded
       const text =
         isSafari && charsPerFamily
           ? Fonts.getCharacters(charsPerFamily, fontFamily)
           : "";
 
-      if (!window.document.fonts.check(fontString, text)) {
+      if (!window.document.fonts.check(font, text)) {
         yield promiseTry(async () => {
           try {
             // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
             // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
-            const fontFaces = await window.document.fonts.load(
-              fontString,
-              text,
-            );
+            const fontFaces = await window.document.fonts.load(font, text);
 
             return [index, fontFaces];
           } catch (e) {
             // don't let it all fail if just one font fails to load
             console.error(
-              `Failed to load font "${fontString}" from urls "${Fonts.registered
+              `Failed to load font "${font}" from urls "${Fonts.registered
                 .get(fontFamily)
                 ?.fontFaces.map((x) => x.urls)}"`,
               e,
@@ -230,6 +286,92 @@ export class Fonts {
         });
       }
     }
+  }
+
+  private static *fontFacesStylesGenerator(
+    families: Array<number>,
+    charsPerFamily: Record<number, Set<string>>,
+  ): Generator<Promise<void | readonly [number, string]>> {
+    for (const [familyIndex, family] of families.entries()) {
+      const { fontFaces, metadata } = Fonts.registered.get(family) ?? {};
+
+      if (!Array.isArray(fontFaces)) {
+        console.error(
+          `Couldn't find registered fonts for font-family "${family}"`,
+          Fonts.registered,
+        );
+        continue;
+      }
+
+      if (metadata?.local) {
+        // don't inline local fonts
+        continue;
+      }
+
+      for (const [fontFaceIndex, fontFace] of fontFaces.entries()) {
+        yield promiseTry(async () => {
+          try {
+            const characters = Fonts.getCharacters(charsPerFamily, family);
+            const fontFaceCSS = await fontFace.toCSS(characters);
+
+            if (!fontFaceCSS) {
+              return;
+            }
+
+            // giving a buffer of 10K font faces per family
+            const fontFaceOrder = familyIndex * 10_000 + fontFaceIndex;
+            const fontFaceTuple = [fontFaceOrder, fontFaceCSS] as const;
+
+            return fontFaceTuple;
+          } catch (error) {
+            console.error(
+              `Couldn't transform font-face to css for family "${fontFace.fontFace.family}"`,
+              error,
+            );
+          }
+        });
+      }
+    }
+  }
+
+  /**
+   * Register a new font.
+   *
+   * @param family font family
+   * @param metadata font metadata
+   * @param fontFacesDecriptors font faces descriptors
+   */
+  private static register(
+    this:
+      | Fonts
+      | {
+          registered: Map<
+            number,
+            { metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }
+          >;
+        },
+    family: string,
+    metadata: FontMetadata,
+    ...fontFacesDecriptors: ExcalidrawFontFaceDescriptor[]
+  ) {
+    // TODO: likely we will need to abandon number value in order to support custom fonts
+    const fontFamily =
+      FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
+      FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
+
+    const registeredFamily = this.registered.get(fontFamily);
+
+    if (!registeredFamily) {
+      this.registered.set(fontFamily, {
+        metadata,
+        fontFaces: fontFacesDecriptors.map(
+          ({ uri, descriptors }) =>
+            new ExcalidrawFontFace(family, uri, descriptors),
+        ),
+      });
+    }
+
+    return this.registered;
   }
 
   /**
@@ -279,56 +421,9 @@ export class Fonts {
   }
 
   /**
-   * Register a new font.
-   *
-   * @param family font family
-   * @param metadata font metadata
-   * @param fontFacesDecriptors font faces descriptors
+   * Get all the unique font families for the given elements.
    */
-  private static register(
-    this:
-      | Fonts
-      | {
-          registered: Map<
-            number,
-            { metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }
-          >;
-        },
-    family: string,
-    metadata: FontMetadata,
-    ...fontFacesDecriptors: ExcalidrawFontFaceDescriptor[]
-  ) {
-    // TODO: likely we will need to abandon number value in order to support custom fonts
-    const fontFamily =
-      FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
-      FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
-
-    const registeredFamily = this.registered.get(fontFamily);
-
-    if (!registeredFamily) {
-      this.registered.set(fontFamily, {
-        metadata,
-        fontFaces: fontFacesDecriptors.map(
-          ({ uri, descriptors }) =>
-            new ExcalidrawFontFace(family, uri, descriptors),
-        ),
-      });
-    }
-
-    return this.registered;
-  }
-
-  /**
-   * Gets all the font families for the given scene.
-   */
-  public getSceneFamilies = () => {
-    return Fonts.getUniqueFamilies(this.scene.getNonDeletedElements());
-  };
-
-  /**
-   * Gets all the unique font families for the given elements.
-   */
-  public static getUniqueFamilies(
+  private static getUniqueFamilies(
     elements: ReadonlyArray<ExcalidrawElement>,
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
@@ -342,9 +437,9 @@ export class Fonts {
   }
 
   /**
-   * Gets all the unique characters per font family for the given scene.
+   * Get all the unique characters per font family for the given scene.
    */
-  public static getCharsPerFamily(
+  private static getCharsPerFamily(
     elements: ReadonlyArray<ExcalidrawElement>,
   ): Record<number, Set<string>> {
     const charsPerFamily: Record<number, Set<string>> = {};
@@ -367,7 +462,10 @@ export class Fonts {
     return charsPerFamily;
   }
 
-  public static getCharacters(
+  /**
+   * Get characters for a given family.
+   */
+  private static getCharacters(
     charsPerFamily: Record<number, Set<string>>,
     family: number,
   ) {
@@ -376,6 +474,9 @@ export class Fonts {
       : "";
   }
 
+  /**
+   * Get all registered font families.
+   */
   private static getAllFamilies() {
     return Array.from(Fonts.registered.keys());
   }
