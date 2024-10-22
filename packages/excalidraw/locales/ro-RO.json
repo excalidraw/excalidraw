@@ -329,8 +329,8 @@
     "eraserRevert": "Ține apăsată tasta Alt pentru a anula elementele marcate pentru ștergere",
     "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”.",
     "disableSnapping": "Ține apăsat CtrlOrCmd pentru a dezactiva ancorarea",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Dă dublu clic pe imagine sau apasă ENTER pentru a decupa imaginea",
+    "leaveCropEditor": "Dă clic în afara imaginii sau apasă ENTER sau ESCAPE pentru a finaliza decuparea"
   },
   "canvasError": {
     "cannotShowPreview": "Nu se poate afișa previzualizarea",
@@ -402,8 +402,8 @@
     "toggleElementLock": "Blocare/deblocare selecție",
     "movePageUpDown": "Deplasare pagină sus/jos",
     "movePageLeftRight": "Deplasare pagină stânga/dreapta",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Decupare imagine",
+    "cropFinish": "Finalizare decupare imagine"
   },
   "clearCanvasDialog": {
     "title": "Ștergere pânză"
@@ -494,7 +494,7 @@
     "copyStyles": "Stiluri copiate.",
     "copyToClipboard": "Copiat în memoria temporară.",
     "copyToClipboardAsPng": "S-a copiat {{exportSelection}} în memoria temporară sub formă de PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "S-a copiat {{exportSelection}} în memoria temporară sub formă de SVG\n({{exportColorScheme}})",
     "fileSaved": "Fișier salvat.",
     "fileSavedToFilename": "Salvat în {filename}",
     "canvas": "pânza",
