@@ -2,7 +2,7 @@ import { ButtonIconSelect } from "../components/ButtonIconSelect";
 
 import { DiamondIcon, EllipseIcon, RectangleIcon } from "../components/icons";
 
-import { newElement, redrawTextBoundingBox } from "../element";
+import { newElement } from "../element";
 
 import { isFlowchartNodeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
@@ -23,43 +23,38 @@ const changeShapeForAllSelected = (
 ) => {
   const newElements = changeProperty(elements, appState, (el) => {
     if (el.type !== value && isFlowchartNodeElement(el)) {
-      let roundness = undefined;
-
-      if (el.roundness) {
-        const roundnessType =
-          value === "diamond"
-            ? 2
-            : value === "rectangle"
-            ? 3
-            : el.roundness.type;
-        roundness = { type: roundnessType, value: el.roundness.value };
+      if (el.roundness && value === "diamond") {
+        const newShape = newElement({
+          ...el,
+          width: el.width,
+          height: el.height,
+          type: value,
+          roundness: { type: 2, value: el.roundness.value },
+          versionNonce: randomInteger(),
+        });
+        return newShape;
       }
-
+      if (el.roundness && value === "rectangle") {
+        const newShape = newElement({
+          ...el,
+          width: el.width,
+          height: el.height,
+          type: value,
+          roundness: { type: 3, value: el.roundness.value },
+          versionNonce: randomInteger(),
+        });
+        return newShape;
+      }
       const newShape = newElement({
         ...el,
         width: el.width,
         height: el.height,
         type: value,
-        roundness,
         versionNonce: randomInteger(),
       });
-
       return newShape;
     }
     return el;
-  });
-  newElements.forEach((ele) => {
-    if (ele.type === "text" && ele.containerId) {
-      const container = newElements.find((e) => e.id === ele.containerId);
-      if (container === undefined) {
-        return;
-      }
-      redrawTextBoundingBox(
-        ele,
-        container,
-        app.scene.getNonDeletedElementsMap(),
-      );
-    }
   });
 
   return {
@@ -79,43 +74,38 @@ export const actionChangeShapeType = register({
   ) => {
     const newElements = changeProperty(elements, appState, (el) => {
       if (el.type !== value && isFlowchartNodeElement(el)) {
-        let roundness = undefined;
-
-        if (el.roundness) {
-          const roundnessType =
-            value === "diamond"
-              ? 2
-              : value === "rectangle"
-              ? 3
-              : el.roundness.type;
-          roundness = { type: roundnessType, value: el.roundness.value };
+        if (el.roundness && value === "diamond") {
+          const newShape = newElement({
+            ...el,
+            width: el.width,
+            height: el.height,
+            type: value,
+            roundness: { type: 2, value: el.roundness.value },
+            versionNonce: randomInteger(),
+          });
+          return newShape;
         }
-
+        if (el.roundness && value === "rectangle") {
+          const newShape = newElement({
+            ...el,
+            width: el.width,
+            height: el.height,
+            type: value,
+            roundness: { type: 3, value: el.roundness.value },
+            versionNonce: randomInteger(),
+          });
+          return newShape;
+        }
         const newShape = newElement({
           ...el,
           width: el.width,
           height: el.height,
           type: value,
-          roundness,
           versionNonce: randomInteger(),
         });
-
         return newShape;
       }
       return el;
-    });
-    newElements.forEach((ele) => {
-      if (ele.type === "text" && ele.containerId) {
-        const container = newElements.find((e) => e.id === ele.containerId);
-        if (container === undefined) {
-          return;
-        }
-        redrawTextBoundingBox(
-          ele,
-          container,
-          app.scene.getNonDeletedElementsMap(),
-        );
-      }
     });
 
     return {
