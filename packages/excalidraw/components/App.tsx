@@ -48,7 +48,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
+import { ARROW_TYPE, isSafari, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -2306,10 +2306,6 @@ class App extends React.Component<AppProps, AppState> {
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
     this.clearImageShapeCache();
-    // FontFaceSet loadingdone event we listen on may not always
-    // fire (looking at you Safari), so on init we manually load all
-    // fonts and rerender scene text elements once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
     this.fonts.loadSceneFonts();
   };
 
@@ -3221,6 +3217,11 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     });
+
+    if (isSafari) {
+      // paste event may not fire font loading even on safari, so let's load the fonts manually
+      this.fonts.loadSceneFonts();
+    }
 
     if (opts.files) {
       this.files = { ...this.files, ...opts.files };

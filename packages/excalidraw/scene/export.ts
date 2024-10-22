@@ -458,27 +458,8 @@ export const getExportSize = (
 const getFontFaces = async (
   elements: readonly ExcalidrawElement[],
 ): Promise<string[]> => {
-  const fontFamilies = new Set<number>();
-  const charsPerFamily: Record<number, Set<string>> = {};
-
-  for (const element of elements) {
-    if (!isTextElement(element)) {
-      continue;
-    }
-
-    fontFamilies.add(element.fontFamily);
-
-    // gather unique codepoints only when inlining fonts
-    for (const char of element.originalText) {
-      if (!charsPerFamily[element.fontFamily]) {
-        charsPerFamily[element.fontFamily] = new Set();
-      }
-
-      charsPerFamily[element.fontFamily].add(char);
-    }
-  }
-
-  const orderedFamilies = Array.from(fontFamilies);
+  const orderedFamilies = Fonts.getUniqueFamilies(elements);
+  const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
   // for simplicity, assuming we have just one family with the CJK handdrawn fallback
   const familyWithCJK = orderedFamilies.find((x) =>
@@ -486,7 +467,7 @@ const getFontFaces = async (
   );
 
   if (familyWithCJK) {
-    const characters = getChars(charsPerFamily[familyWithCJK]);
+    const characters = Fonts.getCharacters(charsPerFamily, familyWithCJK);
 
     if (containsCJK(characters)) {
       const family = FONT_FAMILY_FALLBACKS[CJK_HAND_DRAWN_FALLBACK_FONT];
@@ -537,7 +518,7 @@ function* fontFacesIterator(
     for (const [fontFaceIndex, fontFace] of fontFaces.entries()) {
       yield promiseTry(async () => {
         try {
-          const characters = getChars(charsPerFamily[family]);
+          const characters = Fonts.getCharacters(charsPerFamily, family);
           const fontFaceCSS = await fontFace.toCSS(characters);
 
           if (!fontFaceCSS) {
@@ -560,5 +541,3 @@ function* fontFacesIterator(
   }
 }
 
-const getChars = (characterSet: Set<string>) =>
-  Array.from(characterSet).join("");

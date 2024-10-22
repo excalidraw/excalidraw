@@ -3,6 +3,7 @@ import {
   FONT_FAMILY_FALLBACKS,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
+  isSafari,
 } from "../constants";
 import { isTextElement } from "../element";
 import { charWidth, getContainerElement } from "../element/textElement";
@@ -127,10 +128,21 @@ export class Fonts {
 
   /**
    * Load font faces for a given scene and trigger scene update.
+   *
+   * FontFaceSet loadingdone event we listen on may not always
+   * fire (looking at you Safari), so on init we manually load all
+   * fonts and rerender scene text elements once done.
+   *
+   * For Safari we we make sure to check against each loaded font face,
+   * with the actual elements, otherwise fonts might remain unloaded.
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const loaded = await Fonts.loadFontFaces(sceneFamilies);
+    const charsPerFamily = isSafari
+      ? Fonts.getCharsPerFamily(this.scene.getNonDeletedElements())
+      : undefined;
+
+    const loaded = await Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
     this.onLoaded(loaded);
     return loaded;
   };
@@ -149,12 +161,13 @@ export class Fonts {
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
-    const fontFamilies = Fonts.getElementsFamilies(elements);
+    const fontFamilies = Fonts.getUniqueFamilies(elements);
     return await Fonts.loadFontFaces(fontFamilies);
   };
 
   private static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
+    charsPerFamily?: Record<number, Set<string>>,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
     for (const { fontFaces, metadata } of Fonts.registered.values()) {
@@ -178,11 +191,17 @@ export class Fonts {
         });
 
         // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
-        if (!window.document.fonts.check(fontString)) {
+        // for Safari on init, we rather check with the actual "text" param, even though it's longer, as otherwise fonts might remain unloaded
+        const text =
+          isSafari && charsPerFamily
+            ? Fonts.getCharacters(charsPerFamily, fontFamily)
+            : "";
+
+        if (!window.document.fonts.check(fontString, text)) {
           try {
             // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
             // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
-            return await window.document.fonts.load(fontString);
+            return await window.document.fonts.load(fontString, text);
           } catch (e) {
             // don't let it all fail if just one font fails to load
             console.error(
@@ -291,14 +310,13 @@ export class Fonts {
    * Gets all the font families for the given scene.
    */
   public getSceneFamilies = () => {
-    return Fonts.getElementsFamilies(this.scene.getNonDeletedElements());
+    return Fonts.getUniqueFamilies(this.scene.getNonDeletedElements());
   };
 
-  private static getAllFamilies() {
-    return Array.from(Fonts.registered.keys());
-  }
-
-  private static getElementsFamilies(
+  /**
+   * Gets all the unique font families for the given elements.
+   */
+  public static getUniqueFamilies(
     elements: ReadonlyArray<ExcalidrawElement>,
   ): Array<ExcalidrawTextElement["fontFamily"]> {
     return Array.from(
@@ -309,6 +327,45 @@ export class Fonts {
         return families;
       }, new Set<number>()),
     );
+  }
+
+  /**
+   * Gets all the unique characters per font family for the given scene.
+   */
+  public static getCharsPerFamily(
+    elements: ReadonlyArray<ExcalidrawElement>,
+  ): Record<number, Set<string>> {
+    const charsPerFamily: Record<number, Set<string>> = {};
+
+    for (const element of elements) {
+      if (!isTextElement(element)) {
+        continue;
+      }
+
+      // gather unique codepoints only when inlining fonts
+      for (const char of element.originalText) {
+        if (!charsPerFamily[element.fontFamily]) {
+          charsPerFamily[element.fontFamily] = new Set();
+        }
+
+        charsPerFamily[element.fontFamily].add(char);
+      }
+    }
+
+    return charsPerFamily;
+  }
+
+  public static getCharacters(
+    charsPerFamily: Record<number, Set<string>>,
+    family: number,
+  ) {
+    return charsPerFamily[family]
+      ? Array.from(charsPerFamily[family]).join("")
+      : "";
+  }
+
+  private static getAllFamilies() {
+    return Array.from(Fonts.registered.keys());
   }
 }
 
