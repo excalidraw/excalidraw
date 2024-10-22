@@ -23,24 +23,27 @@ const changeShapeForAllSelected = (
 ) => {
   const newElements = changeProperty(elements, appState, (el) => {
     if (el.type !== value && isFlowchartNodeElement(el)) {
-      if (el.roundness && el.roundness.type >= 2) {
-        const newShape = newElement({
-          ...el,
-          width: el.width,
-          height: el.height,
-          type: value,
-          roundness: { type: 2, value: el.roundness.value },
-          versionNonce: randomInteger(),
-        });
-        return newShape;
+      let roundness = undefined;
+
+      if (el.roundness) {
+        const roundnessType =
+          value === "diamond"
+            ? 2
+            : value === "rectangle"
+            ? 3
+            : el.roundness.type;
+        roundness = { type: roundnessType, value: el.roundness.value };
       }
+
       const newShape = newElement({
         ...el,
         width: el.width,
         height: el.height,
         type: value,
+        roundness,
         versionNonce: randomInteger(),
       });
+
       return newShape;
     }
     return el;
@@ -76,24 +79,27 @@ export const actionChangeShapeType = register({
   ) => {
     const newElements = changeProperty(elements, appState, (el) => {
       if (el.type !== value && isFlowchartNodeElement(el)) {
-        if (el.roundness && el.roundness.type >= 2) {
-          const newShape = newElement({
-            ...el,
-            width: el.width,
-            height: el.height,
-            type: value,
-            roundness: { type: 2, value: el.roundness.value },
-            versionNonce: randomInteger(),
-          });
-          return newShape;
+        let roundness = undefined;
+
+        if (el.roundness) {
+          const roundnessType =
+            value === "diamond"
+              ? 2
+              : value === "rectangle"
+              ? 3
+              : el.roundness.type;
+          roundness = { type: roundnessType, value: el.roundness.value };
         }
+
         const newShape = newElement({
           ...el,
           width: el.width,
           height: el.height,
           type: value,
+          roundness,
           versionNonce: randomInteger(),
         });
+
         return newShape;
       }
       return el;
