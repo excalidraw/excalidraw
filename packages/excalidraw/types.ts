@@ -182,6 +182,8 @@ export type StaticCanvasAppState = Readonly<
     gridColor: AppState["gridColor"]; //zsviczian
     frameColor: AppState["frameColor"]; //zsviczian
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
+    // Cropping
+    croppingElementId: AppState["croppingElementId"];
   }
 >;
 
@@ -206,6 +208,9 @@ export type InteractiveCanvasAppState = Readonly<
     editingTextElement: AppState["editingTextElement"];
     gridColor: AppState["gridColor"]; //zsviczian
     highlightSearchResult: AppState["highlightSearchResult"]; //zsviczian
+    // Cropping
+    isCropping: AppState["isCropping"];
+    croppingElementId: AppState["croppingElementId"];
     // Search matches
     searchMatches: AppState["searchMatches"];
   }
@@ -227,6 +232,7 @@ export type ObservedElementsAppState = {
   editingLinearElementId: LinearElementEditor["elementId"] | null;
   // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
+  croppingElementId: AppState["croppingElementId"];
 };
 
 export interface AppState {
@@ -417,6 +423,11 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+
+  /** image cropping */
+  isCropping: boolean;
+  croppingElementId: ExcalidrawElement["id"] | null;
+
   searchMatches: readonly SearchMatch[];
 }
 
