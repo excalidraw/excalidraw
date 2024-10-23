@@ -330,7 +330,7 @@
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
     "disableSnapping": "Przytrzymaj Ctrl lub Cmd, aby wyłączyć przyciąganie",
     "enterCropEditor": "Kliknij dwukrotnie na obraz lub naciśnij ENTER, aby przyciąć obraz",
-    "leaveCropEditor": "Kliknij na zewnątrz obrazu lub naciśnij ENTER lub ESCAPE, aby zakończyć przycinanie"
+    "leaveCropEditor": "Kliknij poza obrazem albo naciśnij ENTER lub ESCAPE, aby zakończyć przycinanie"
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
@@ -402,8 +402,8 @@
     "toggleElementLock": "Zablokuj/odblokuj zaznaczenie",
     "movePageUpDown": "Przesuń stronę w górę/w dół",
     "movePageLeftRight": "Przenieś stronę w lewo/prawo",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Przytnij obraz",
+    "cropFinish": "Zakończ przycinanie obrazu"
   },
   "clearCanvasDialog": {
     "title": "Wyczyść płótno"
