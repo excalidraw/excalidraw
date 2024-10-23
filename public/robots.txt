@@ -6,6 +6,7 @@ Disallow:
 
 User-agent: *
 Allow: /$
+Allow: /
 Allow: /sitemap.xml
 Disallow: /
 
