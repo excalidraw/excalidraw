@@ -12,8 +12,9 @@ export function destroyObsidianUtils() {
   hostPlugin = null;
 }
 
-export function initializeObsidianUtils(obsidianPlugin: any) {
-  hostPlugin = obsidianPlugin;
+export function initializeObsidianUtils() {
+  //@ts-ignore
+  hostPlugin = app.plugins.plugins["obsidian-excalidraw-plugin"];
 }
 
 export function getAreaLimit() {

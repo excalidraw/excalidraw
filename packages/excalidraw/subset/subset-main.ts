@@ -4,7 +4,9 @@ import { WorkerInTheMainChunkError, WorkerUrlNotDefinedError } from "../errors";
 
 import type { Commands } from "./subset-shared.chunk";
 
-let shouldUseWorkers = typeof Worker !== "undefined";
+// one day maybe... I don't knwo how to convert this to work locally in Obsidian :(
+// https://chatgpt.com/c/67191889-c740-800a-bebb-a0fca2e800fd
+let shouldUseWorkers = false; //zsviczian typeof Worker !== "undefined";
 
 /**
  * Tries to subset glyphs in a font based on the used codepoints, returning the font as dataurl.

@@ -263,7 +263,6 @@ export {
   getBoundTextMaxWidth, //zsviczian
   mermaidToExcalidraw, //zsviczian
   destroyObsidianUtils, //zsviczian
-  initializeObsidianUtils, //zsviczian
   registerLocalFont, //zsviczian
   getFontFamilies, //zsviczian
   getFontFamilyString, //zsviczian

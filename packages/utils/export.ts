@@ -220,7 +220,6 @@ export { getBoundTextMaxWidth } from "../excalidraw/element/textElement"; //zsvi
 export { mermaidToExcalidraw } from "../excalidraw/components/TTDDialog/MermaidToExcalidraw"; //zsviczian
 export {
   destroyObsidianUtils,
-  initializeObsidianUtils,
   registerLocalFont,
   getFontFamilies,
   registerFontsInCSS,

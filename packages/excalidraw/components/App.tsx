@@ -437,6 +437,7 @@ import {
   getExcalidrawContentEl,
   getMaxZoom,
   hideFreedrawPenmodeCursor,
+  initializeObsidianUtils,
 } from "../obsidianUtils";
 import {
   hitElementBoundText,
@@ -711,6 +712,7 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.id = nanoid();
+    initializeObsidianUtils();
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
