@@ -325,9 +325,11 @@ export type ExcalidrawElbowArrowElement = Merge<
     elbowed: true;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
-    fixedSegments: FixedSegment[] | null;
+    fixedSegments: Sequential<FixedSegment> | null;
   }
 >;
+
+export type Sequential<T> = T[] & { __brand: "__sequential" };
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{

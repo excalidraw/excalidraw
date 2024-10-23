@@ -11,6 +11,8 @@ import type {
   FixedPointBinding,
   SceneElementsMap,
   FixedSegment,
+  ExcalidrawElbowArrowElement,
+  Sequential,
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
@@ -149,13 +151,13 @@ export class LinearElementEditor {
    * @param id the `elementId` from the instance of this class (so that we can
    *  statically guarantee this method returns an ExcalidrawLinearElement)
    */
-  static getElement(
+  static getElement<T extends ExcalidrawLinearElement>(
     id: InstanceType<typeof LinearElementEditor>["elementId"],
     elementsMap: ElementsMap,
-  ) {
+  ): T | null {
     const element = elementsMap.get(id);
     if (element) {
-      return element as NonDeleted<ExcalidrawLinearElement>;
+      return element as NonDeleted<T>;
     }
     return null;
   }
@@ -1238,7 +1240,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: FixedSegment[] | null;
+      fixedSegments?: Sequential<FixedSegment> | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1346,7 +1348,7 @@ export class LinearElementEditor {
             }
 
             return res;
-          }),
+          }) as Sequential<FixedSegment>,
       };
     }
 
@@ -1472,7 +1474,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: FixedSegment[] | null;
+      fixedSegments?: Sequential<FixedSegment> | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1483,7 +1485,7 @@ export class LinearElementEditor {
       const updates: {
         startBinding?: FixedPointBinding | null;
         endBinding?: FixedPointBinding | null;
-        fixedSegments?: FixedSegment[] | null;
+        fixedSegments?: Sequential<FixedSegment> | null;
         points?: LocalPoint[];
       } = {};
       if (otherUpdates?.startBinding !== undefined) {
@@ -1796,6 +1798,92 @@ export class LinearElementEditor {
 
     return coords;
   };
+
+  /**
+   *
+   */
+  static moveElbowArrowSegment(
+    linearElementEditor: LinearElementEditor,
+    pointerCoords: { x: number; y: number },
+    elementsMap: ElementsMap,
+  ): LinearElementEditor {
+    if (!linearElementEditor.elbowed) {
+      return linearElementEditor;
+    }
+
+    const { index: segmentIdx } =
+      linearElementEditor.pointerDownState.segmentMidpoint;
+    const element = LinearElementEditor.getElement<ExcalidrawElbowArrowElement>(
+      linearElementEditor.elementId,
+      elementsMap,
+    );
+
+    if (!element || !segmentIdx) {
+      return linearElementEditor;
+    }
+
+    // Calculate the expected / existing position of the
+    // segment in the `fixedSegments` array on the arrow
+    let currFixedSegmentsArrayIdx =
+      element.fixedSegments?.findIndex(
+        (segment) => segment.index === segmentIdx,
+      ) ?? -1;
+    if (currFixedSegmentsArrayIdx < 0) {
+      // Segment not yet fixed - we expect it to fall into this place in the array:
+      currFixedSegmentsArrayIdx =
+        element.fixedSegments?.filter((segment) => segment.index < segmentIdx)
+          ?.length ?? 0;
+    }
+
+    const startPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      element,
+      segmentIdx - 1,
+      elementsMap,
+    );
+    const endPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      element,
+      segmentIdx,
+      elementsMap,
+    );
+    const isHorizontal = startPoint[1] === endPoint[1];
+    LinearElementEditor.movePoints(element, [
+      {
+        index: segmentIdx! - 1,
+        point: LinearElementEditor.pointFromAbsoluteCoords(
+          element,
+          pointFrom(
+            !isHorizontal ? pointerCoords.x : startPoint[0],
+            isHorizontal ? pointerCoords.y : startPoint[1],
+          ),
+          elementsMap,
+        ),
+        isDragging: true,
+      },
+      {
+        index: segmentIdx!,
+        point: LinearElementEditor.pointFromAbsoluteCoords(
+          element,
+          pointFrom(
+            !isHorizontal ? pointerCoords.x : endPoint[0],
+            isHorizontal ? pointerCoords.y : endPoint[1],
+          ),
+          elementsMap,
+        ),
+        isDragging: true,
+      },
+    ]);
+
+    return {
+      ...linearElementEditor,
+      pointerDownState: {
+        ...linearElementEditor.pointerDownState,
+        segmentMidpoint: {
+          ...linearElementEditor.pointerDownState.segmentMidpoint,
+          index: element.fixedSegments![currFixedSegmentsArrayIdx].index, // Update index for the next frame
+        },
+      },
+    };
+  }
 }
 
 const normalizeSelectedPoints = (

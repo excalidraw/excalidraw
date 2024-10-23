@@ -186,7 +186,6 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
-  ExcalidrawElbowArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -7656,8 +7655,6 @@ class App extends React.Component<AppProps, AppState> {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
 
-        let didDrag = false;
-
         if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
@@ -7704,60 +7701,41 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         } else if (
-          isElbowArrow(
-            LinearElementEditor.getElement(
-              this.state.selectedLinearElement.elementId,
-              elementsMap,
-            )!,
-          ) &&
-          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-            .index
+          linearElementEditor.elbowed &&
+          linearElementEditor.pointerDownState.segmentMidpoint.index
         ) {
-          const arrow = LinearElementEditor.getElement(
-            this.state.selectedLinearElement.elementId,
-            elementsMap,
-          ) as ExcalidrawElbowArrowElement;
-          const { index: segmentIdx } =
-            this.state.selectedLinearElement.pointerDownState.segmentMidpoint;
-          const startPoint =
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              arrow,
-              segmentIdx! - 1,
-              elementsMap,
-            );
-          const endPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            arrow,
-            segmentIdx!,
+          const ret = LinearElementEditor.moveElbowArrowSegment(
+            this.state.selectedLinearElement,
+            pointerCoords,
             elementsMap,
           );
-          const isHorizontal = startPoint[1] === endPoint[1];
-          LinearElementEditor.movePoints(arrow, [
-            {
-              index: segmentIdx! - 1,
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                arrow,
-                pointFrom(
-                  !isHorizontal ? pointerCoords.x : startPoint[0],
-                  isHorizontal ? pointerCoords.y : startPoint[1],
-                ),
-                elementsMap,
-              ),
-              isDragging: true,
-            },
-            {
-              index: segmentIdx!,
-              point: LinearElementEditor.pointFromAbsoluteCoords(
-                arrow,
-                pointFrom(
-                  !isHorizontal ? pointerCoords.x : endPoint[0],
-                  isHorizontal ? pointerCoords.y : endPoint[1],
-                ),
-                elementsMap,
-              ),
-              isDragging: true,
-            },
-          ]);
-          didDrag = true;
+
+          // Since we are reading from previous state which is not possible with
+          // automatic batching in React 18 hence using flush sync to synchronously
+          // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
+
+          flushSync(() => {
+            if (this.state.selectedLinearElement) {
+              this.setState({
+                selectedLinearElement: {
+                  ...this.state.selectedLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                  selectedPointsIndices: ret.selectedPointsIndices,
+                },
+              });
+            }
+            if (this.state.editingLinearElement) {
+              this.setState({
+                editingLinearElement: {
+                  ...this.state.editingLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                  selectedPointsIndices: ret.selectedPointsIndices,
+                },
+              });
+            }
+          });
+
+          return;
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
           !linearElementEditor.pointerDownState.segmentMidpoint.added
@@ -7765,21 +7743,20 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        didDrag =
-          LinearElementEditor.handlePointDragging(
-            event,
-            this,
-            pointerCoords.x,
-            pointerCoords.y,
-            (element, pointsSceneCoords) => {
-              this.maybeSuggestBindingsForLinearElementAtCoords(
-                element,
-                pointsSceneCoords,
-              );
-            },
-            linearElementEditor,
-            this.scene,
-          ) || didDrag;
+        const didDrag = LinearElementEditor.handlePointDragging(
+          event,
+          this,
+          pointerCoords.x,
+          pointerCoords.y,
+          (element, pointsSceneCoords) => {
+            this.maybeSuggestBindingsForLinearElementAtCoords(
+              element,
+              pointsSceneCoords,
+            );
+          },
+          linearElementEditor,
+          this.scene,
+        );
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;

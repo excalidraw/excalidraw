@@ -51,6 +51,7 @@ import type {
   FixedSegment,
   FractionalIndex,
   Ordered,
+  Sequential,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -328,7 +329,7 @@ export const updateElbowArrowPoints = (
 
   return normalizeArrowElementUpdate(
     getElbowArrowCornerPoints(points.flat()),
-    nfs,
+    nfs as Sequential<FixedSegment>,
   );
 };
 
@@ -1193,14 +1194,14 @@ const getBindableElementForId = (
 
 const normalizeArrowElementUpdate = (
   global: GlobalPoint[],
-  nextFixedSegments: FixedSegment[] | null,
+  nextFixedSegments: Sequential<FixedSegment> | null,
 ): {
   points: LocalPoint[];
   x: number;
   y: number;
   width: number;
   height: number;
-  fixedSegments: FixedSegment[] | null;
+  fixedSegments: Sequential<FixedSegment> | null;
 } => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
