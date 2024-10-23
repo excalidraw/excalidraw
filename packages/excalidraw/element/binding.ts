@@ -771,7 +771,10 @@ export const updateBoundElements = (
           isBindableElement(bindableElement) &&
           (bindingProp === "startBinding" || bindingProp === "endBinding") &&
           (changedElement.id === element[bindingProp]?.elementId ||
-            changedElement.id === element[bindingProp === "startBinding" ? "endBinding" : "startBinding"]?.elementId)
+            changedElement.id ===
+              element[
+                bindingProp === "startBinding" ? "endBinding" : "startBinding"
+              ]?.elementId)
         ) {
           const point = updateBoundPoint(
             element,
