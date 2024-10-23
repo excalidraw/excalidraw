@@ -25,14 +25,8 @@ export default defineConfig({
       output: {
         assetFileNames(chunkInfo) {
           if (chunkInfo?.name?.endsWith(".woff2")) {
-            // TODO: consider splitting all fonts similar to Xiaolai
-            // fonts don't change often, so hash is not necessary
-            // put on root so we are flexible about the CDN path
-            if (chunkInfo.name.includes("Xiaolai")) {
-              return "[name][extname]";
-            } else {
-              return "[name]-[hash][extname]";
-            }
+            const family = chunkInfo.name.split("-")[0];
+            return `fonts/${family}/[name][extname]`;
           }
 
           return "assets/[name]-[hash][extname]";
