@@ -14,7 +14,6 @@ import type {
 import { sanitizeHTMLAttribute } from "../data/url";
 import type { MarkRequired } from "../utility-types";
 import { StoreAction } from "../store";
-import { t } from "../i18n";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 
