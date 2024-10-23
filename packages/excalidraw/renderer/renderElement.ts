@@ -137,6 +137,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
+  imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
 }
@@ -334,6 +335,7 @@ const generateElementCanvas = (
       getContainingFrame(element, elementsMap)?.opacity || 100,
     boundTextCanvas,
     angle: element.angle,
+    imageCrop: isImageElement(element) ? element.crop : null,
   };
 };
 
@@ -535,6 +537,7 @@ const generateElementWithCanvas = (
     !appState?.shouldCacheIgnoreZoom;
   const boundTextElement = getBoundTextElement(element, elementsMap);
   const boundTextElementVersion = boundTextElement?.version || null;
+  const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
@@ -544,6 +547,7 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
+    prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
     // since we rotate the canvas when copying from cached canvas, we don't
     // regenerate the cached canvas. But we need to in case of labels which are
@@ -966,23 +970,13 @@ export const renderElement = (
           context.restore();
         }
 
-        const _elementWithCanvas = generateElementCanvas(
-          elementWithCanvas.element,
-          allElementsMap,
-          appState.zoom,
+        drawElementFromCanvas(
+          elementWithCanvas,
+          context,
           renderConfig,
           appState,
+          allElementsMap,
         );
-
-        if (_elementWithCanvas) {
-          drawElementFromCanvas(
-            _elementWithCanvas,
-            context,
-            renderConfig,
-            appState,
-            allElementsMap,
-          );
-        }
 
         // reset
         context.imageSmoothingEnabled = currentImageSmoothingStatus;
