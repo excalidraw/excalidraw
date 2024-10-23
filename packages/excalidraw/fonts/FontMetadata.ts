@@ -147,3 +147,14 @@ export const GOOGLE_FONTS_RANGES = {
 
 /** local protocol to skip the local font from registering or inlining */
 export const LOCAL_FONT_PROTOCOL = "local:";
+
+export const loadFallbackFont = (fontFamily: string) => {
+  if (fontFamily in FONT_FAMILY_FALLBACKS && !document.fonts.check(`12px ${fontFamily}`)) {
+    const link = document.createElement('link');
+    link.href = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(' ', '+')}&display=swap`;
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }
+};
+
+loadFallbackFont('Xiaolai');
