@@ -329,8 +329,8 @@
     "eraserRevert": "Przytrzymaj Alt, aby przywrócić elementy oznaczone do usunięcia",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
     "disableSnapping": "Przytrzymaj Ctrl lub Cmd, aby wyłączyć przyciąganie",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Kliknij dwukrotnie na obraz lub naciśnij ENTER, aby przyciąć obraz",
+    "leaveCropEditor": "Kliknij na zewnątrz obrazu lub naciśnij ENTER lub ESCAPE, aby zakończyć przycinanie"
   },
   "canvasError": {
     "cannotShowPreview": "Nie można wyświetlić podglądu",
