@@ -4,6 +4,7 @@ Disallow:
 User-agent: facebookexternalhit
 Disallow:
 
-user-agent: *
-Allow: /$
-Disallow: /
+User-agent: *
+Disallow:
+
+Sitemap: https://excalidraw.com/sitemap.xml
