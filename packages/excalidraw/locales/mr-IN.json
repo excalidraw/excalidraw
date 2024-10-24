@@ -329,8 +329,8 @@
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे",
     "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा.",
     "disableSnapping": "स्नैपिंग अक्षम करण्या साठी CtrlOrCmd दाबून ठेवा",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "प्रतिमा ला कापण्या साठी प्रतिमा ला डबल क्लिक करा किंवा एंटर दाबा",
+    "leaveCropEditor": "कापणे सम्पूर्ण करण्या साठी प्रतिमा च्या बाहेर क्लिक करा किव्हा एंटर अथवा ऐसकेप बटन दाबा"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन दाखवू शकत नाही",
@@ -402,7 +402,7 @@
     "toggleElementLock": "कुलूपातून आत/बाहेर निवड",
     "movePageUpDown": "पान वर/खाली करा",
     "movePageLeftRight": "पान डावी/उजवी कडे करा",
-    "cropStart": "",
+    "cropStart": "प्रतिमा ची कापणी करा",
     "cropFinish": ""
   },
   "clearCanvasDialog": {
