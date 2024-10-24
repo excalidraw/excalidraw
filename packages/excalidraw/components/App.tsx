@@ -7792,6 +7792,10 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             elementsMap,
           );
+          // console.log(
+          //   this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+          //     .index,
+          // );
 
           // Since we are reading from previous state which is not possible with
           // automatic batching in React 18 hence using flush sync to synchronously

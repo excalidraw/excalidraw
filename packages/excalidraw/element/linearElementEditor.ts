@@ -59,6 +59,7 @@ import {
   type LocalPoint,
   pointDistance,
   pointTranslate,
+  PRECISION,
 } from "../../math";
 import {
   getBezierCurveLength,
@@ -1319,7 +1320,9 @@ export class LinearElementEditor {
           // might simplify the arrow and remove/merge segments.
           .map<FixedSegment>((idx) => {
             let res;
-            if (Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) < 0.05) {
+            if (
+              Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) < PRECISION
+            ) {
               const anchor = pointFrom<GlobalPoint>(
                 element.x + nextPoints[idx][0],
                 element.y + (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
@@ -1327,7 +1330,8 @@ export class LinearElementEditor {
               res = {
                 anchor,
                 heading:
-                  anchor[1] > element.y + nextPoints[idx - 1][1]
+                  element.y + nextPoints[idx][1] >
+                  element.y + nextPoints[idx - 1][1]
                     ? HEADING_UP
                     : HEADING_DOWN,
                 index: idx,
@@ -1340,7 +1344,8 @@ export class LinearElementEditor {
               res = {
                 anchor,
                 heading:
-                  anchor[0] > element.x + nextPoints[idx - 1][0]
+                  element.x + nextPoints[idx][0] >
+                  element.x + nextPoints[idx - 1][0]
                     ? HEADING_LEFT
                     : HEADING_RIGHT,
                 index: idx,
@@ -1846,6 +1851,7 @@ export class LinearElementEditor {
       elementsMap,
     );
     const isHorizontal = startPoint[1] === endPoint[1];
+
     LinearElementEditor.movePoints(element, [
       {
         index: segmentIdx! - 1,
@@ -1873,13 +1879,30 @@ export class LinearElementEditor {
       },
     ]);
 
+    const newIndex = element.fixedSegments![currFixedSegmentsArrayIdx].index;
+    // debugDrawPoint(
+    //   pointFrom<GlobalPoint>(
+    //     element.x + element.points[newIndex][0],
+    //     element.y + element.points[newIndex][1],
+    //   ),
+    //   { color: "red", permanent: true },
+    // );
+
+    // debugDrawPoint(
+    //   pointFrom<GlobalPoint>(
+    //     element.x + element.points[newIndex - 1][0],
+    //     element.y + element.points[newIndex - 1][1],
+    //   ),
+    //   { color: "green", permanent: true },
+    // );
+
     return {
       ...linearElementEditor,
       pointerDownState: {
         ...linearElementEditor.pointerDownState,
         segmentMidpoint: {
           ...linearElementEditor.pointerDownState.segmentMidpoint,
-          index: element.fixedSegments![currFixedSegmentsArrayIdx].index, // Update index for the next frame
+          index: newIndex, // Update index for the next frame
         },
       },
     };

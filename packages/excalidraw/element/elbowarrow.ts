@@ -285,6 +285,13 @@ export const updateElbowArrowPoints = (
 
   const simplifiedPointGroups = getElbowArrowCornerPoints(rawPointGroups);
 
+  // simplifiedPointGroups.forEach((group, idx) =>
+  //   group.forEach((p) =>
+  //     debugDrawPoint(p, { color: idx > 0 ? "green" : "red", permanent: true }),
+  //   ),
+  // );
+  // debugCloseFrame();
+
   let currentGroupIdx = 0;
   const nfs = multiDimensionalArrayDeepFlatMapper<
     GlobalPoint,
@@ -303,6 +310,7 @@ export const updateElbowArrowPoints = (
       );
       const segmentHorizontal =
         Math.abs(prevGroupLastPoint[1] - point[1]) < PRECISION;
+
       return {
         anchor,
         index,
