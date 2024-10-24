@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@excalidraw/excalidraw": "*",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "@excalidraw/excalidraw": "*"
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "typescript": "^5"
