@@ -7,7 +7,7 @@ import {
   SVG_NS,
 } from "../constants";
 import { normalizeLink, toValidURL } from "../data/url";
-import { getElementAbsoluteCoords } from "../element";
+import { getElementAbsoluteCoords, hashString } from "../element";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
@@ -411,7 +411,26 @@ const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        const symbolId = `image-${fileData.id}`;
+        // TODO set to `false` before merging
+        const { reuseImages = true } = renderConfig;
+
+        let symbolId = `image-${fileData.id}`;
+
+        let uncroppedWidth = element.width;
+        let uncroppedHeight = element.height;
+        if (element.crop) {
+          ({ width: uncroppedWidth, height: uncroppedHeight } =
+            getUncroppedWidthAndHeight(element));
+
+          symbolId = `image-crop-${fileData.id}-${hashString(
+            `${uncroppedWidth}x${uncroppedHeight}`,
+          )}`;
+        }
+
+        if (!reuseImages) {
+          symbolId = `image-${element.id}`;
+        }
+
         let symbol = svgRoot.querySelector(`#${symbolId}`);
         if (!symbol) {
           symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
@@ -421,18 +440,7 @@ const renderElementToSvg = (
           image.setAttribute("href", fileData.dataURL);
           image.setAttribute("preserveAspectRatio", "none");
 
-          if (element.crop) {
-            const { width: uncroppedWidth, height: uncroppedHeight } =
-              getUncroppedWidthAndHeight(element);
-
-            symbol.setAttribute(
-              "viewBox",
-              `${
-                element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
-              } ${
-                element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
-              } ${width} ${height}`,
-            );
+          if (element.crop || !reuseImages) {
             image.setAttribute("width", `${uncroppedWidth}`);
             image.setAttribute("height", `${uncroppedHeight}`);
           } else {
@@ -476,12 +484,46 @@ const renderElementToSvg = (
         }
 
         const g = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+
+        let normalizedCropX = 0;
+        let normalizedCropY = 0;
+
+        if (element.crop) {
+          const { width: uncroppedWidth, height: uncroppedHeight } =
+            getUncroppedWidthAndHeight(element);
+          normalizedCropX =
+            element.crop.x / (element.crop.naturalWidth / uncroppedWidth);
+          normalizedCropY =
+            element.crop.y / (element.crop.naturalHeight / uncroppedHeight);
+        }
+
+        if (element.crop) {
+          use.setAttribute("width", `100%`);
+          use.setAttribute("height", `100%`);
+
+          const mask = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
+          mask.setAttribute("id", `mask-image-crop-${element.id}`);
+          mask.setAttribute("fill", "#fff");
+          const maskRect = svgRoot.ownerDocument!.createElementNS(
+            SVG_NS,
+            "rect",
+          );
+          maskRect.setAttribute("x", `${normalizedCropX}`);
+          maskRect.setAttribute("y", `${normalizedCropY}`);
+          maskRect.setAttribute("width", `${width}`);
+          maskRect.setAttribute("height", `${height}`);
+
+          mask.appendChild(maskRect);
+          root.appendChild(mask);
+          g.setAttribute("mask", `url(#${mask.id})`);
+        }
+
         g.appendChild(use);
         g.setAttribute(
           "transform",
-          `translate(${offsetX || 0} ${
-            offsetY || 0
-          }) rotate(${degree} ${cx} ${cy})`,
+          `translate(${offsetX - normalizedCropX} ${
+            offsetY - normalizedCropY
+          }) rotate(${degree} ${cx + normalizedCropX} ${cy + normalizedCropY})`,
         );
 
         if (element.roundness) {
