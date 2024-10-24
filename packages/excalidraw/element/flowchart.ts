@@ -259,7 +259,7 @@ const addNewNode = (
     opacity: element.opacity,
     link: element.link,
     locked: element.locked,
-    customData: element.customData
+    customData: element.customData,
   });
 
   invariant(
