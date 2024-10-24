@@ -1823,7 +1823,12 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    if (!element || !segmentIdx) {
+    if (
+      !element ||
+      !segmentIdx ||
+      segmentIdx === 1 ||
+      segmentIdx === element.points.length - 1
+    ) {
       return linearElementEditor;
     }
 
@@ -1880,21 +1885,6 @@ export class LinearElementEditor {
     ]);
 
     const newIndex = element.fixedSegments![currFixedSegmentsArrayIdx].index;
-    // debugDrawPoint(
-    //   pointFrom<GlobalPoint>(
-    //     element.x + element.points[newIndex][0],
-    //     element.y + element.points[newIndex][1],
-    //   ),
-    //   { color: "red", permanent: true },
-    // );
-
-    // debugDrawPoint(
-    //   pointFrom<GlobalPoint>(
-    //     element.x + element.points[newIndex - 1][0],
-    //     element.y + element.points[newIndex - 1][1],
-    //   ),
-    //   { color: "green", permanent: true },
-    // );
 
     return {
       ...linearElementEditor,

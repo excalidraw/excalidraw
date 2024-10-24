@@ -5868,7 +5868,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               activeEmbeddable: { element: hitElement, state: "hover" },
             });
-          } else {
+          } else if (!hitElement || !isElbowArrow(hitElement)) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
@@ -6001,6 +6001,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     if (this.state.selectedLinearElement) {
+      const elementIsElbowArrow = isElbowArrow(element);
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
       if (
@@ -6028,15 +6029,33 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.scene.getNonDeletedElementsMap(),
           );
+        const segmentMidPointIndex =
+          (segmentMidPointHoveredCoords &&
+            LinearElementEditor.getSegmentMidPointIndex(
+              linearElementEditor,
+              this.state,
+              segmentMidPointHoveredCoords,
+              elementsMap,
+            )) ??
+          -1;
 
-        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
+        if (
+          (!elementIsElbowArrow &&
+            (hoverPointIndex >= 0 || segmentMidPointHoveredCoords)) ||
+          (elementIsElbowArrow &&
+            segmentMidPointIndex > 1 &&
+            segmentMidPointIndex < element.points.length - 1)
+        ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
+        } else if (
+          !elementIsElbowArrow &&
+          this.hitElement(scenePointerX, scenePointerY, element)
+        ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
-          !isElbowArrow(element) ||
+          !elementIsElbowArrow ||
           !(element.startBinding || element.endBinding)
         ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
