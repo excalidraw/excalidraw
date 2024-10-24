@@ -189,7 +189,6 @@ import type {
   NonDeletedSceneElementsMap,
   Sequential,
   FixedSegment,
-  ExcalidrawElbowArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -5250,21 +5249,12 @@ class App extends React.Component<AppProps, AppState> {
             segmentMidPoint,
             elementsMap,
           );
-        const fixedSegments = selectedElements[0].fixedSegments?.filter(
-          (segment) => segment.index !== index,
+        const fixedSegments = selectedElements[0].fixedSegments?.map(
+          (segment) =>
+            segment.index !== index ? segment : { ...segment, anchor: null },
         ) as Sequential<FixedSegment> | null;
-        const el = elementsMap.get(
-          selectedElements[0].id,
-        )! as ExcalidrawElbowArrowElement;
-        mutateElement(el, {
-          fixedSegments,
-          points: [
-            selectedElements[0].points[0],
-            selectedElements[0].points[
-              selectedElements[0].points[0].length - 1
-            ],
-          ],
-        });
+
+        mutateElement(selectedElements[0], { fixedSegments });
 
         return;
       }

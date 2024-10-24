@@ -96,15 +96,24 @@ const segmentListMerge = (
   oldFixedSegments: FixedSegment[],
   newFixedSegments: FixedSegment[],
 ): FixedSegment[] => {
-  const oldSegments: [number, FixedSegment][] = oldFixedSegments.map(
-    (segment) => [segment.index, segment],
-  );
-  const newSegments: [number, FixedSegment][] = newFixedSegments.map(
-    (segment) => [segment.index, segment],
-  );
-  return Array.from<FixedSegment>(
-    new Map([...oldSegments, ...newSegments]).values(),
-  ).sort((a, b) => a.index - b.index);
+  let fixedSegments = oldFixedSegments;
+  newFixedSegments.forEach((segment) => {
+    if (segment.anchor == null) {
+      // Delete segment request
+      fixedSegments = fixedSegments.filter((s) => s.index !== segment.index);
+    } else {
+      const idx = fixedSegments.findIndex((s) => s.index === segment.index);
+      if (idx > -1) {
+        // Modify segment request
+        fixedSegments[idx] = segment;
+      } else {
+        // Add segment request
+        fixedSegments.push(segment);
+      }
+    }
+  });
+
+  return fixedSegments.sort((a, b) => a.index - b.index);
 };
 
 /**
@@ -114,7 +123,7 @@ export const updateElbowArrowPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   updates: {
-    points: readonly LocalPoint[];
+    points?: readonly LocalPoint[];
     fixedSegments?: FixedSegment[];
   },
   options?: {
@@ -122,16 +131,18 @@ export const updateElbowArrowPoints = (
     disableBinding?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  const updatedPoints = updates.points ?? arrow.points;
+
   const fakeElementsMap = toBrandedType<SceneElementsMap>(new Map(elementsMap));
   const nextFixedSegments = segmentListMerge(
     arrow.fixedSegments ?? [],
     updates?.fixedSegments ?? [],
   );
-
+  //console.log(nextFixedSegments);
   const arrowStartPoint = pointFrom<GlobalPoint>(arrow.x, arrow.y);
   const arrowEndPoint = pointFrom<GlobalPoint>(
-    arrow.x + updates.points[updates.points.length - 1][0],
-    arrow.y + updates.points[updates.points.length - 1][1],
+    arrow.x + updatedPoints[updatedPoints.length - 1][0],
+    arrow.y + updatedPoints[updatedPoints.length - 1][1],
   );
 
   let previousVal: {
@@ -140,8 +151,8 @@ export const updateElbowArrowPoints = (
     elementId: string | null;
   } = {
     point: pointFrom<GlobalPoint>(
-      arrow.x + updates.points[0][0],
-      arrow.y + updates.points[0][1],
+      arrow.x + updatedPoints[0][0],
+      arrow.y + updatedPoints[0][1],
     ),
     fixedPoint: arrow.startBinding?.fixedPoint ?? null,
     elementId: arrow.startBinding?.elementId ?? null,
@@ -265,10 +276,10 @@ export const updateElbowArrowPoints = (
       // Translate from unsegmented local array point -> global point -> last segment local point
       pointFrom<LocalPoint>(
         arrow.x +
-          updates.points[updates.points.length - 1][0] -
+          updatedPoints[updatedPoints.length - 1][0] -
           previousVal.point[0],
         arrow.y +
-          updates.points[updates.points.length - 1][1] -
+          updatedPoints[updatedPoints.length - 1][1] -
           previousVal.point[1],
       ),
     ],
