@@ -39,6 +39,7 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
+  headingIsHorizontal,
   headingIsVertical,
   vectorToHeading,
 } from "./heading";
@@ -148,7 +149,7 @@ export const updateElbowArrowPoints = (
 
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
-      const heading = segment.heading;
+      let heading = segment.heading;
       let anchor = segment.anchor;
       if (arrow.startBinding && arrow.endBinding) {
         if (headingIsVertical(heading)) {
@@ -174,6 +175,14 @@ export const updateElbowArrowPoints = (
         index: "DONOTSYNC" as FractionalIndex,
       } as Ordered<ExcalidrawBindableElement>;
       fakeElementsMap.set(el.id, el);
+
+      heading = headingIsHorizontal(heading)
+        ? previousVal.point[0] > anchor[0]
+          ? HEADING_RIGHT
+          : HEADING_LEFT
+        : previousVal.point[1] > anchor[1]
+        ? HEADING_DOWN
+        : HEADING_UP;
 
       const endFixedPoint: [number, number] = compareHeading(
         heading,
@@ -285,13 +294,6 @@ export const updateElbowArrowPoints = (
 
   const simplifiedPointGroups = getElbowArrowCornerPoints(rawPointGroups);
 
-  // simplifiedPointGroups.forEach((group, idx) =>
-  //   group.forEach((p) =>
-  //     debugDrawPoint(p, { color: idx > 0 ? "green" : "red", permanent: true }),
-  //   ),
-  // );
-  // debugCloseFrame();
-
   let currentGroupIdx = 0;
   const nfs = multiDimensionalArrayDeepFlatMapper<
     GlobalPoint,
@@ -315,10 +317,10 @@ export const updateElbowArrowPoints = (
         anchor,
         index,
         heading: segmentHorizontal
-          ? anchor[0] > prevGroupLastPoint[0]
+          ? point[0] > prevGroupLastPoint[0]
             ? HEADING_LEFT
             : HEADING_RIGHT
-          : anchor[1] > prevGroupLastPoint[1]
+          : point[1] > prevGroupLastPoint[1]
           ? HEADING_UP
           : HEADING_DOWN,
       };
