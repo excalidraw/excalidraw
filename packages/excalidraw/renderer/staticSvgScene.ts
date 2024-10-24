@@ -7,7 +7,7 @@ import {
   SVG_NS,
 } from "../constants";
 import { normalizeLink, toValidURL } from "../data/url";
-import { getElementAbsoluteCoords } from "../element";
+import { getElementAbsoluteCoords, hashString } from "../element";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
@@ -411,7 +411,8 @@ const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        const symbolId = `image-${fileData.id}`;
+        const cropHash = hashString(JSON.stringify(element.crop));
+        const symbolId = `image-${fileData.id}-${cropHash}`;
         let symbol = svgRoot.querySelector(`#${symbolId}`);
         if (!symbol) {
           symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
