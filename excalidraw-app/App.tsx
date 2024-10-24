@@ -126,6 +126,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import { CloudExport } from "./CloudExport";
 
 polyfill();
 
@@ -1125,6 +1126,11 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
+  const isCloudExportWindow = window.location.pathname === "/cloud-export";
+  if (isCloudExportWindow) {
+    return <CloudExport />;
+  }
+
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
