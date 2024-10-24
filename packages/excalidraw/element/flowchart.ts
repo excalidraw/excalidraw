@@ -257,9 +257,6 @@ const addNewNode = (
     strokeStyle: element.strokeStyle,
     fillStyle: element.fillStyle,
     opacity: element.opacity,
-    link: element.link,
-    locked: element.locked,
-    customData: element.customData,
   });
 
   invariant(
@@ -338,9 +335,6 @@ export const addNewNodes = (
       strokeStyle: startNode.strokeStyle,
       fillStyle: startNode.fillStyle,
       opacity: startNode.opacity,
-      link: startNode.link,
-      locked: startNode.locked,
-      customData: startNode.customData,
     });
 
     invariant(
