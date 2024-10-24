@@ -7,7 +7,7 @@ import {
   SVG_NS,
 } from "../constants";
 import { normalizeLink, toValidURL } from "../data/url";
-import { getElementAbsoluteCoords } from "../element";
+import { getElementAbsoluteCoords, hashString } from "../element";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
@@ -411,7 +411,8 @@ const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        const symbolId = `image-${fileData.id}`;
+        const cropHash = hashString(JSON.stringify(element.crop));
+        const symbolId = `image-${fileData.id}-${cropHash}`;
         let symbol = svgRoot.querySelector(`#${symbolId}`);
         if (!symbol) {
           symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
@@ -424,17 +425,17 @@ const renderElementToSvg = (
           if (element.crop) {
             const { width: uncroppedWidth, height: uncroppedHeight } =
               getUncroppedWidthAndHeight(element);
-
-            symbol.setAttribute(
-              "viewBox",
-              `${
-                element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
-              } ${
-                element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
-              } ${width} ${height}`,
-            );
             image.setAttribute("width", `${uncroppedWidth}`);
             image.setAttribute("height", `${uncroppedHeight}`);
+
+            image.setAttribute(
+              "transform",
+              `translate(${
+                -element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
+              } ${
+                -element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
+              })`,
+            );
           } else {
             image.setAttribute("width", "100%");
             image.setAttribute("height", "100%");
