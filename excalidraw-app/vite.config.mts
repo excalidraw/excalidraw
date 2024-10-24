@@ -5,6 +5,7 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
+import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
 // To load .env.local variables
@@ -52,6 +53,13 @@ export default defineConfig({
     assetsInlineLimit: 0,
   },
   plugins: [
+    Sitemap({
+      hostname: "https://excalidraw.com",
+      outDir: "build",
+      changefreq: "monthly",
+      // its static in public folder
+      generateRobotsTxt: false,
+    }),
     woff2BrowserPlugin(),
     react(),
     checker({
@@ -75,14 +83,19 @@ export default defineConfig({
       },
 
       workbox: {
-        // don't precache fonts, locales and separate chunks 
-        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js", "**/*.chunk-*.js"],
+        // don't precache fonts, locales and separate chunks
+        globIgnores: [
+          "fonts.css",
+          "**/locales/**",
+          "service-worker.js",
+          "**/*.chunk-*.js",
+        ],
         runtimeCaching: [
           {
             urlPattern: new RegExp(".+.woff2"),
-            handler: 'CacheFirst',
+            handler: "CacheFirst",
             options: {
-              cacheName: 'fonts',
+              cacheName: "fonts",
               expiration: {
                 maxEntries: 1000,
                 maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
