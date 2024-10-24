@@ -329,8 +329,8 @@
     "eraserRevert": "खोडण्या साठी घेतलेल्या वस्तु ना घेण्या साठी Alt दाबून ठेवावे",
     "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा.",
     "disableSnapping": "स्नैपिंग अक्षम करण्या साठी CtrlOrCmd दाबून ठेवा",
-    "enterCropEditor": "प्रतिमा ला कापण्या साठी प्रतिमा ला डबल क्लिक करा किंवा एंटर दाबा",
-    "leaveCropEditor": "कापणे सम्पूर्ण करण्या साठी प्रतिमा च्या बाहेर क्लिक करा किव्हा एंटर अथवा ऐसकेप बटन दाबा"
+    "enterCropEditor": "प्रतिमा ला कापण्या साठी प्रतिमा ला डबल क्लिक करा किव्हा एंटर दाबा",
+    "leaveCropEditor": "कापणे संपूर्ण करावयांस प्रतिमा बाहेर क्लिक करा किव्हा एंटर अथवा एस्केप दाबा"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन दाखवू शकत नाही",
@@ -402,8 +402,8 @@
     "toggleElementLock": "कुलूपातून आत/बाहेर निवड",
     "movePageUpDown": "पान वर/खाली करा",
     "movePageLeftRight": "पान डावी/उजवी कडे करा",
-    "cropStart": "प्रतिमा ची कापणी करा",
-    "cropFinish": ""
+    "cropStart": "प्रतिमा ह्याची कापणी करा",
+    "cropFinish": "प्रतिमा ह्याची कापणी संपूर्ण करा"
   },
   "clearCanvasDialog": {
     "title": "पटल स्वच्छ करा"
@@ -494,7 +494,7 @@
     "copyStyles": "कॉपी केलेली शैली.",
     "copyToClipboard": "फळी वर कॉपी झाली.",
     "copyToClipboardAsPng": "{{exportSelection}} फळी वर पी-एन-जी स्वरूपात कॉपी झाली\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} फळी वर एस-वी-जी स्वरूपात कॉपी झाली\n({{exportColorScheme}})",
     "fileSaved": "फ़ाइल जतन झाली.",
     "fileSavedToFilename": "{filename} मधे जतन झाली",
     "canvas": "पटल",
