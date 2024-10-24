@@ -329,8 +329,8 @@
     "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
     "disableSnapping": "स्नैपिंग को निष्क्रिय करने के लिए कंट्रोल-या-कमांड दबाए रखें",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "प्रतिमा काटने के लिये प्रतिमा पर डबल क्लिक करे अथवा एंटर दबायें",
+    "leaveCropEditor": "प्रतिमा के काटने की प्रक्रिया समाप्त करने हेतु यातो प्रतिमा के बाहर क्लिक करे अथवा एंटर या ऐस्केप बटन दबायें"
   },
   "canvasError": {
     "cannotShowPreview": "पूर्वावलोकन नहीं दिखा सकते हैं",
@@ -402,8 +402,8 @@
     "toggleElementLock": "ताले के अंदर/बाहर चुनाव",
     "movePageUpDown": "पृष्ठ ऊपर/नीचे करे",
     "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "प्रतिमा काटें",
+    "cropFinish": "प्रतिमा काटना समाप्त करें"
   },
   "clearCanvasDialog": {
     "title": "चित्रपलट स्वच्छ करे"
@@ -494,7 +494,7 @@
     "copyStyles": "प्रतिलिपित शैली",
     "copyToClipboard": "क्लिपबोर्ड में प्रतिलिपित",
     "copyToClipboardAsPng": "{{exportSelection}} को क्लिपबोर्ड पर पी-एन-जी( {{exportColorScheme}}) पर प्रतिरूपित किया गया",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} को क्लिपबोर्ड पर एस-वी-जी ( {{exportColorScheme}}) स्वरूप में प्रतिलिपित किया",
     "fileSaved": "फ़ाइल सुरक्षित की गयी",
     "fileSavedToFilename": "{filename} में सुरक्षित की गयी",
     "canvas": "चित्रपटल",
