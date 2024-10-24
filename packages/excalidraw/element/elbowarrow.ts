@@ -2,6 +2,7 @@ import {
   pointFrom,
   pointScaleFromOrigin,
   pointTranslate,
+  PRECISION,
   vector,
   vectorCross,
   vectorFromPoint,
@@ -12,7 +13,13 @@ import {
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
-import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import {
+  isAnyTrue,
+  multiDimensionalArrayDeepFilter,
+  multiDimensionalArrayDeepFlatMapper,
+  toBrandedType,
+  tupleToCoors,
+} from "../utils";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -138,6 +145,7 @@ export const updateElbowArrowPoints = (
     fixedPoint: arrow.startBinding?.fixedPoint ?? null,
     elementId: arrow.startBinding?.elementId ?? null,
   };
+
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
       const heading = segment.heading;
@@ -257,7 +265,7 @@ export const updateElbowArrowPoints = (
     ],
   ]);
 
-  const points = pointPairs.map(([state, points], idx) => {
+  const rawPointGroups = pointPairs.map(([state, points], idx) => {
     const raw =
       routeElbowArrow(
         state,
@@ -275,62 +283,45 @@ export const updateElbowArrowPoints = (
     return raw;
   });
 
-  let nfsBase = 0;
-  const nfs = pointPairs.slice(1).map(([{ x, y }, points], idx) => {
-    const point = pointFrom<GlobalPoint>(x + points[0][0], y + points[0][1]);
-    const [prevState, prevPoints] = pointPairs[idx];
-    const previous = pointFrom<GlobalPoint>(
-      prevState.x + prevPoints[prevPoints.length - 1][0],
-      prevState.y + prevPoints[prevPoints.length - 1][1],
-    );
-    let res;
-    if (Math.abs(point[0] - previous[0]) < 0.05) {
-      const anchor = pointFrom<GlobalPoint>(
-        point[0],
-        (point[1] + previous[1]) / 2,
-      );
+  const simplifiedPointGroups = getElbowArrowCornerPoints(rawPointGroups);
 
-      res = {
-        anchor,
-        heading:
-          anchor[1] > previous[1]
-            ? arrowStartPoint[1] > arrowEndPoint[1]
-              ? HEADING_DOWN
-              : HEADING_UP
-            : arrowEndPoint[1] > arrowStartPoint[1]
-            ? HEADING_UP
-            : HEADING_DOWN,
-        index: nfsBase + prevPoints.length,
-      };
-    } else {
-      const anchor = pointFrom<GlobalPoint>(
-        (point[0] + previous[0]) / 2,
-        point[1],
-      );
+  let currentGroupIdx = 0;
+  const nfs = multiDimensionalArrayDeepFlatMapper<
+    GlobalPoint,
+    FixedSegment | null
+  >(simplifiedPointGroups, (point, [groupIdx], points, index) => {
+    if (currentGroupIdx < groupIdx) {
+      // Watch for the case when point group idx changes,
+      // that's where we need to generate a fixed segment
+      // i.e. we are the first point of the group excluding the first group
+      currentGroupIdx = groupIdx;
 
-      res = {
+      const prevGroupLastPoint = points[index - 1];
+      const anchor = pointFrom<GlobalPoint>(
+        (prevGroupLastPoint[0] + point[0]) / 2,
+        (prevGroupLastPoint[1] + point[1]) / 2,
+      );
+      const segmentHorizontal =
+        Math.abs(prevGroupLastPoint[1] - point[1]) < PRECISION;
+      return {
         anchor,
-        heading:
-          anchor[0] > previous[0]
-            ? arrowStartPoint[0] > arrowEndPoint[0]
-              ? HEADING_RIGHT
-              : HEADING_LEFT
-            : arrowEndPoint[0] > arrowStartPoint[0]
+        index,
+        heading: segmentHorizontal
+          ? anchor[0] > prevGroupLastPoint[0]
             ? HEADING_LEFT
-            : HEADING_RIGHT,
-        index: nfsBase + prevPoints.length,
+            : HEADING_RIGHT
+          : anchor[1] > prevGroupLastPoint[1]
+          ? HEADING_UP
+          : HEADING_DOWN,
       };
     }
 
-    nfsBase += prevPoints.length - 1;
+    return null;
+  }).filter(
+    (segment): segment is FixedSegment => segment != null,
+  ) as Sequential<FixedSegment>;
 
-    return res;
-  });
-
-  return normalizeArrowElementUpdate(
-    getElbowArrowCornerPoints(points.flat()),
-    nfs as Sequential<FixedSegment>,
-  );
+  return normalizeArrowElementUpdate(simplifiedPointGroups.flat(), nfs);
 };
 
 /**
@@ -1222,31 +1213,34 @@ const normalizeArrowElementUpdate = (
   };
 };
 
-const getElbowArrowCornerPoints = (points: GlobalPoint[]): GlobalPoint[] => {
+const getElbowArrowCornerPoints = (
+  pointGroups: GlobalPoint[][],
+): GlobalPoint[][] => {
+  const points = pointGroups.flat();
+  let previousHorizontal = points[0][1] === points[1][1];
   if (points.length > 1) {
-    let previousHorizontal = points[0][1] === points[1][1];
-    return points.filter((p, idx) => {
+    return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
       // The very first and last points are always kept
       if (idx === 0 || idx === points.length - 1) {
         return true;
       }
+
       const next = points[idx + 1];
       const nextHorizontal = p[1] === next[1];
-      let result = true;
       if (
         (previousHorizontal && nextHorizontal) ||
         (!previousHorizontal && !nextHorizontal)
       ) {
-        result = false;
+        previousHorizontal = nextHorizontal;
+        return false;
       }
 
       previousHorizontal = nextHorizontal;
-
-      return result;
+      return true;
     });
   }
 
-  return points;
+  return pointGroups;
 };
 
 const neighborIndexToHeading = (idx: number): Heading => {
