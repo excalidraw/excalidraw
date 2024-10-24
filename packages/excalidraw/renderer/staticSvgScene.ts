@@ -424,17 +424,17 @@ const renderElementToSvg = (
           if (element.crop) {
             const { width: uncroppedWidth, height: uncroppedHeight } =
               getUncroppedWidthAndHeight(element);
-
-            symbol.setAttribute(
-              "viewBox",
-              `${
-                element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
-              } ${
-                element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
-              } ${width} ${height}`,
-            );
             image.setAttribute("width", `${uncroppedWidth}`);
             image.setAttribute("height", `${uncroppedHeight}`);
+
+            image.setAttribute(
+              "transform",
+              `translate(${
+                -element.crop.x / (element.crop.naturalWidth / uncroppedWidth)
+              } ${
+                -element.crop.y / (element.crop.naturalHeight / uncroppedHeight)
+              })`,
+            );
           } else {
             image.setAttribute("width", "100%");
             image.setAttribute("height", "100%");
