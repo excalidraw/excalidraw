@@ -187,6 +187,9 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
+  Sequential,
+  FixedSegment,
+  ExcalidrawElbowArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -5208,6 +5211,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const selectedElements = this.scene.getSelectedElements(this.state);
 
+    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
+
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         event[KEYS.CTRL_OR_CMD] &&
@@ -5221,6 +5229,44 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
+      } else if (
+        isElbowArrow(selectedElements[0]) &&
+        this.state.selectedLinearElement
+      ) {
+        // Delete fixed segment point
+        this.store.shouldCaptureIncrement();
+        const elementsMap = this.scene.getNonDeletedElementsMap();
+        const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+          this.state.selectedLinearElement,
+          { x: sceneX, y: sceneY },
+          this.state,
+          elementsMap,
+        );
+        const index =
+          segmentMidPoint &&
+          LinearElementEditor.getSegmentMidPointIndex(
+            this.state.selectedLinearElement,
+            this.state,
+            segmentMidPoint,
+            elementsMap,
+          );
+        const fixedSegments = selectedElements[0].fixedSegments?.filter(
+          (segment) => segment.index !== index,
+        ) as Sequential<FixedSegment> | null;
+        const el = elementsMap.get(
+          selectedElements[0].id,
+        )! as ExcalidrawElbowArrowElement;
+        mutateElement(el, {
+          fixedSegments,
+          points: [
+            selectedElements[0].points[0],
+            selectedElements[0].points[
+              selectedElements[0].points[0].length - 1
+            ],
+          ],
+        });
+
+        return;
       }
     }
 
@@ -5230,11 +5276,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     resetCursor(this.interactiveCanvas);
-
-    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-    );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
@@ -7806,6 +7847,7 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor.elbowed &&
           linearElementEditor.pointerDownState.segmentMidpoint.index
         ) {
+          this.store.shouldCaptureIncrement();
           const ret = LinearElementEditor.moveElbowArrowSegment(
             this.state.selectedLinearElement,
             pointerCoords,
