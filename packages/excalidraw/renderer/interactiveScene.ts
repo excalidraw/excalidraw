@@ -514,12 +514,24 @@ const renderLinearPointHandles = (
       !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
   );
 
-  midPoints.forEach((segmentMidPoint) => {
-    if (
-      isElbowArrow(element) ||
-      appState.editingLinearElement ||
-      points.length === 2
-    ) {
+  midPoints.forEach((segmentMidPoint, segmentIdx) => {
+    if (isElbowArrow(element)) {
+      const isFixedSegmentMidPoint =
+        (element.fixedSegments?.findIndex(
+          // First segment is always unfixable and plus one to address the
+          // fixedSegments array = +2 offset
+          (segment) => segment.index === segmentIdx + 2,
+        ) ?? -1) === -1;
+
+      renderSingleLinearPoint(
+        context,
+        appState,
+        segmentMidPoint,
+        POINT_HANDLE_SIZE / 2,
+        false,
+        isFixedSegmentMidPoint,
+      );
+    } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
         appState,
