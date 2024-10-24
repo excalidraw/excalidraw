@@ -1225,3 +1225,41 @@ export class PromisePool<T> {
     });
   }
 }
+
+export const multiDimensionalArrayDeepFilter = <T>(
+  matrix: T[][],
+  f: (item: T, index: number) => boolean,
+) => {
+  let pointer = 0;
+  return matrix
+    .map((group) => group.filter((item) => f(item, pointer++)))
+    .filter((group) => group.length > 0);
+};
+
+export const multiDimensionalArrayDeepMapper = <T, U>(
+  matrix: T[][],
+  f: (
+    item: T,
+    index: [rowIdx: number, colIdx: number],
+    arr: T[],
+    idx: number,
+  ) => U,
+) => {
+  let pointer = 0;
+  const flatArray = matrix.flat();
+  return matrix
+    .map((group, groupIdx) =>
+      group.map((item, idx) => f(item, [groupIdx, idx], flatArray, pointer++)),
+    )
+    .filter((group) => group.length > 0);
+};
+
+export const multiDimensionalArrayDeepFlatMapper = <T, U>(
+  matrix: T[][],
+  f: (
+    item: T,
+    index: [rowIdx: number, colIdx: number],
+    arr: T[],
+    idx: number,
+  ) => U,
+) => multiDimensionalArrayDeepMapper(matrix, f).flat();

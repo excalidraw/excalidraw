@@ -508,39 +508,29 @@ const renderLinearPointHandles = (
     element,
     elementsMap,
     appState,
-  ).filter((midPoint): midPoint is GlobalPoint => midPoint !== null);
+  ).filter(
+    (midPoint, idx, midPoints): midPoint is GlobalPoint =>
+      midPoint !== null &&
+      !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
+  );
 
-  midPoints.forEach((segmentMidPoint) => {
-    if (
-      appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
-      LinearElementEditor.arePointsEqual(
+  midPoints.forEach((segmentMidPoint, segmentIdx) => {
+    if (isElbowArrow(element)) {
+      const isFixedSegmentMidPoint =
+        (element.fixedSegments?.findIndex(
+          // First segment is always unfixable and plus one to address the
+          // fixedSegments array = +2 offset
+          (segment) => segment.index === segmentIdx + 2,
+        ) ?? -1) === -1;
+
+      renderSingleLinearPoint(
+        context,
+        appState,
         segmentMidPoint,
-        appState.selectedLinearElement.segmentMidPointHoveredCoords,
-      )
-    ) {
-      // The order of renderingSingleLinearPoint and highLight points is different
-      // inside vs outside editor as hover states are different,
-      // in editor when hovered the original point is not visible as hover state fully covers it whereas outside the
-      // editor original point is visible and hover state is just an outer circle.
-      if (appState.editingLinearElement) {
-        renderSingleLinearPoint(
-          context,
-          appState,
-          segmentMidPoint,
-          radius,
-          false,
-        );
-        highlightPoint(segmentMidPoint, context, appState);
-      } else {
-        highlightPoint(segmentMidPoint, context, appState);
-        renderSingleLinearPoint(
-          context,
-          appState,
-          segmentMidPoint,
-          radius,
-          false,
-        );
-      }
+        POINT_HANDLE_SIZE / 2,
+        false,
+        isFixedSegmentMidPoint,
+      );
     } else if (appState.editingLinearElement || points.length === 2) {
       renderSingleLinearPoint(
         context,
