@@ -254,8 +254,12 @@ const addNewNode = (
     backgroundColor: element.backgroundColor,
     strokeColor: element.strokeColor,
     strokeWidth: element.strokeWidth,
+    strokeStyle: element.strokeStyle,
     fillStyle: element.fillStyle,
     opacity: element.opacity,
+    link: element.link,
+    locked: element.locked,
+    customData: element.customData
   });
 
   invariant(
@@ -331,8 +335,12 @@ export const addNewNodes = (
       backgroundColor: startNode.backgroundColor,
       strokeColor: startNode.strokeColor,
       strokeWidth: startNode.strokeWidth,
+      strokeStyle: startNode.strokeStyle,
       fillStyle: startNode.fillStyle,
       opacity: startNode.opacity,
+      link: startNode.link,
+      locked: startNode.locked,
+      customData: startNode.customData,
     });
 
     invariant(
