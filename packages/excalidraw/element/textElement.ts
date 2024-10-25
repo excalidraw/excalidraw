@@ -71,20 +71,8 @@ const _EMOJI_CHAR =
  */
 const _CJK_CHAR =
   /\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}/u;
-
-/**
- * Following characters break only with CJK, not with alphabetic characters.
- * This is essential for Korean, as it uses alphabetic punctuation, but expects CJK-like breaking points.
- *
- * Hello((た)) → ["Hello", "((た))"]
- * Hello((World)) → ["Hello((World))"]
- */
-const _CJK_BREAK_NOT_AFTER_BUT_BEFORE = /<\(\[\{/u;
-const _CJK_BREAK_NOT_BEFORE_BUT_AFTER = />\)\]\}.,:;\?!/u;
-const _CJK_BREAK_ALWAYS = /　〃〜～〰＃＆＊＋－ー／＝｜￢￣￤/u;
 const _CJK_SYMBOLS_AND_PUNCTUATION =
   /（）［］｛｝〈〉《》｟｠｢｣「」『』【】〖〗〔〕〘〙〚〛＜＞〝〞＇〟・。ﾟﾞ，、．：；？！％ー/u;
-
 /**
  * Following characters break with any character, even though are mostly used with CJK.
  *
@@ -96,9 +84,11 @@ const _CJK_SYMBOLS_AND_PUNCTUATION =
  *      ↑ BREAK BEFORE "「" (lookahead)
  *         ↑ BREAK AFTER "」" (lookbehind)
  */
-const _ANY_BREAK_NOT_AFTER_BUT_BEFORE = /（［｛〈《｟｢「『【〖〔〘〚＜〝/u;
-const _ANY_BREAK_NOT_BEFORE_BUT_AFTER =
-  /）］｝〉》｠｣」』】〗〕〙〛＞〞＇〟・。ﾟﾞ，、．：；？！％±‥…\//u;
+const _CJK_BREAK_NOT_AFTER_BUT_BEFORE =
+  /（［｛〈《｟｢「『【〖〔〘〚＜〝<\(\[\{/u;
+const _CJK_BREAK_NOT_BEFORE_BUT_AFTER =
+  /）］｝〉》｠｣」』】〗〕〙〛＞〞＇〟・。ﾟﾞ，、．：；？！％±‥…\/>\)\]\}.,:;\?!/u;
+const _CJK_BREAK_ALWAYS = /　〃〜～〰＃＆＊＋－ー／＝｜￢￣￤/u;
 
 /**
  * Natural breaking points for any grammars.
@@ -132,8 +122,8 @@ const BREAK_LINE_REGEX_SIMPLE = new RegExp(
 // Hello「World」→ ["Hello", "「World」"]
 //      ↑ BREAK BEFORE "「"
 const getLookaheadBreakingPoints = () => {
-  const ANY_BREAKING_POINT = `(?<![${_ANY_BREAK_NOT_AFTER_BUT_BEFORE.source}])(?=[${_ANY_BREAK_NOT_AFTER_BUT_BEFORE.source}${_ANY_BREAK_ALWAYS.source}])`;
-  const CJK_BREAKING_POINT = `(?<![${_ANY_BREAK_NOT_AFTER_BUT_BEFORE.source}${_CJK_BREAK_NOT_AFTER_BUT_BEFORE.source}])(?=[${_CJK_BREAK_NOT_AFTER_BUT_BEFORE.source}]*[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`;
+  const ANY_BREAKING_POINT = `(?=[${_ANY_BREAK_ALWAYS.source}])`;
+  const CJK_BREAKING_POINT = `(?<![${_CJK_BREAK_NOT_AFTER_BUT_BEFORE.source}])(?=[${_CJK_BREAK_NOT_AFTER_BUT_BEFORE.source}]*[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}])`;
   return new RegExp(`(?:${ANY_BREAKING_POINT}|${CJK_BREAKING_POINT})`, "u");
 };
 
@@ -146,8 +136,8 @@ const getLookaheadBreakingPoints = () => {
 //「Hello」World → ["「Hello」", "World"]
 //       ↑ BREAK AFTER "」"
 const getLookbehindBreakingPoints = () => {
-  const ANY_BREAKING_POINT = `(?![${_ANY_BREAK_NOT_BEFORE_BUT_AFTER.source}])(?<=[${_ANY_BREAK_NOT_BEFORE_BUT_AFTER.source}${_ANY_BREAK_ALWAYS.source}${_ANY_BREAK_AFTER.source}])`;
-  const CJK_BREAKING_POINT = `(?![${_ANY_BREAK_NOT_BEFORE_BUT_AFTER.source}${_CJK_BREAK_NOT_BEFORE_BUT_AFTER.source}${_ANY_BREAK_AFTER.source}])(?<=[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}][${_CJK_BREAK_NOT_BEFORE_BUT_AFTER.source}]*)`;
+  const ANY_BREAKING_POINT = `(?<=[${_ANY_BREAK_ALWAYS.source}${_ANY_BREAK_AFTER.source}])`;
+  const CJK_BREAKING_POINT = `(?![${_CJK_BREAK_NOT_BEFORE_BUT_AFTER.source}${_ANY_BREAK_AFTER.source}])(?<=[${_CJK_CHAR.source}${_CJK_BREAK_ALWAYS.source}][${_CJK_BREAK_NOT_BEFORE_BUT_AFTER.source}]*)`;
   return new RegExp(`(?:${ANY_BREAKING_POINT}|${CJK_BREAKING_POINT})`, "u");
 };
 
