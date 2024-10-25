@@ -33,6 +33,7 @@ import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
+  updateBoundElements,
 } from "./binding";
 import { invariant, tupleToCoors } from "../utils";
 import {
@@ -349,6 +350,23 @@ export class LinearElementEditor {
 
       // suggest bindings for first and last point if selected
       if (isBindingElement(element, false)) {
+        if (element.startBinding) {
+          const startBindingElement = element.startBinding
+            ? elementsMap.get(element.startBinding.elementId)
+            : null;
+          if (startBindingElement) {
+            updateBoundElements(startBindingElement, elementsMap);
+          }
+        }
+        if (element.endBinding) {
+          const endBindingElement = element.endBinding
+            ? elementsMap.get(element.endBinding.elementId)
+            : null;
+
+          if (endBindingElement) {
+            updateBoundElements(endBindingElement, elementsMap);
+          }
+        }
         const coords: { x: number; y: number }[] = [];
 
         const firstSelectedIndex = selectedPointsIndices[0];
