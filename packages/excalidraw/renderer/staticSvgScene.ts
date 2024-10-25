@@ -464,27 +464,6 @@ const renderElementToSvg = (
           use.setAttribute("filter", IMAGE_INVERT_FILTER);
         }
 
-        use.setAttribute("width", `${width}`);
-        use.setAttribute("height", `${height}`);
-        use.setAttribute("opacity", `${opacity}`);
-
-        // We first apply `scale` transforms (horizontal/vertical mirroring)
-        // on the <use> element, then apply translation and rotation
-        // on the <g> element which wraps the <use>.
-        // Doing this separately is a quick hack to to work around compositing
-        // the transformations correctly (the transform-origin was not being
-        // applied correctly).
-        if (element.scale[0] !== 1 || element.scale[1] !== 1) {
-          const translateX = element.scale[0] !== 1 ? -width : 0;
-          const translateY = element.scale[1] !== 1 ? -height : 0;
-          use.setAttribute(
-            "transform",
-            `scale(${element.scale[0]}, ${element.scale[1]}) translate(${translateX} ${translateY})`,
-          );
-        }
-
-        const g = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
-
         let normalizedCropX = 0;
         let normalizedCropY = 0;
 
@@ -497,10 +476,33 @@ const renderElementToSvg = (
             element.crop.y / (element.crop.naturalHeight / uncroppedHeight);
         }
 
-        if (element.crop) {
-          use.setAttribute("width", `100%`);
-          use.setAttribute("height", `100%`);
+        const adjustedCenterX = cx + normalizedCropX;
+        const adjustedCenterY = cy + normalizedCropY;
 
+        use.setAttribute("width", `${width + normalizedCropX}`);
+        use.setAttribute("height", `${height + normalizedCropY}`);
+        use.setAttribute("opacity", `${opacity}`);
+
+        // We first apply `scale` transforms (horizontal/vertical mirroring)
+        // on the <use> element, then apply translation and rotation
+        // on the <g> element which wraps the <use>.
+        // Doing this separately is a quick hack to to work around compositing
+        // the transformations correctly (the transform-origin was not being
+        // applied correctly).
+        if (element.scale[0] !== 1 || element.scale[1] !== 1) {
+          use.setAttribute(
+            "transform",
+            `translate(${adjustedCenterX} ${adjustedCenterY}) scale(${
+              element.scale[0]
+            } ${
+              element.scale[1]
+            }) translate(${-adjustedCenterX} ${-adjustedCenterY})`,
+          );
+        }
+
+        const g = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+
+        if (element.crop) {
           const mask = svgRoot.ownerDocument!.createElementNS(SVG_NS, "mask");
           mask.setAttribute("id", `mask-image-crop-${element.id}`);
           mask.setAttribute("fill", "#fff");
@@ -508,6 +510,7 @@ const renderElementToSvg = (
             SVG_NS,
             "rect",
           );
+
           maskRect.setAttribute("x", `${normalizedCropX}`);
           maskRect.setAttribute("y", `${normalizedCropY}`);
           maskRect.setAttribute("width", `${width}`);
@@ -523,7 +526,7 @@ const renderElementToSvg = (
           "transform",
           `translate(${offsetX - normalizedCropX} ${
             offsetY - normalizedCropY
-          }) rotate(${degree} ${cx + normalizedCropX} ${cy + normalizedCropY})`,
+          }) rotate(${degree} ${adjustedCenterX} ${adjustedCenterY})`,
         );
 
         if (element.roundness) {
