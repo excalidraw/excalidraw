@@ -4,6 +4,7 @@ import { NonDeletedExcalidrawElement } from "./element/types";
 import { Fonts } from "./fonts";
 import type { FontMetadata } from "./fonts/FontMetadata";
 import { FONT_METADATA } from "./fonts/FontMetadata";
+import { AppState } from "./types";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
@@ -146,4 +147,12 @@ export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer
     }
   }
   return;
+}
+
+//zsviczian (single finger panning in pen mode)
+export function isTouchInPenMode(appState: AppState, event: React.PointerEvent<HTMLElement> | MouseEvent) {
+  const isReactPointerEvent = 'nativeEvent' in event;
+  return appState.penMode &&
+    (!isReactPointerEvent || (event.pointerType !== "pen")) &&
+    !["laser", "selection", "eraser", "hand"].includes(appState.activeTool.type);
 }

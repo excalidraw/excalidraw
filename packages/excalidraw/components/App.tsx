@@ -438,6 +438,7 @@ import {
   getMaxZoom,
   hideFreedrawPenmodeCursor,
   initializeObsidianUtils,
+  isTouchInPenMode,
 } from "../obsidianUtils";
 import {
   hitElementBoundText,
@@ -5990,7 +5991,8 @@ class App extends React.Component<AppProps, AppState> {
       isHoldingSpace ||
       isPanning ||
       isDraggingScrollBar ||
-      isHandToolActive(this.state)
+      isHandToolActive(this.state) ||
+      isTouchInPenMode(this.state, event) //zsviczian (single finger panning in pen mode)
     ) {
       return;
     }
@@ -7044,7 +7046,8 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
-          //!isLastPointerActive added by zsviczian (but don't remember why....)
+          isTouchInPenMode(this.state, event) ||
+          //!isLaserPointerActive added by zsviczian (but don't remember why....)
           (this.state.viewModeEnabled && !isLaserPointerActive(this.state)))
       )
     ) {
