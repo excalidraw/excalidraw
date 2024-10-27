@@ -411,7 +411,6 @@ const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        // TODO set to `false` before merging
         const { reuseImages = true } = renderConfig;
 
         let symbolId = `image-${fileData.id}`;
