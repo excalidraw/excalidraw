@@ -1319,11 +1319,11 @@ export class LinearElementEditor {
           // NOTE: Segment indices are not permanent, the arrow update
           // might simplify the arrow and remove/merge segments.
           .map<FixedSegment>((idx) => {
-            let res;
             if (
-              Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) < PRECISION
+              Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) <
+              Math.abs(nextPoints[idx][1] - nextPoints[idx - 1][1])
             ) {
-              res = {
+              return {
                 anchor: pointFrom<GlobalPoint>(
                   element.x + nextPoints[idx][0],
                   (element.y +
@@ -1339,26 +1339,24 @@ export class LinearElementEditor {
                     : HEADING_DOWN,
                 index: idx,
               };
-            } else {
-              res = {
-                anchor: pointFrom<GlobalPoint>(
-                  (element.x +
-                    nextPoints[idx][0] +
-                    element.x +
-                    nextPoints[idx - 1][0]) /
-                    2,
-                  element.y + nextPoints[idx][1],
-                ),
-                heading:
-                  element.x + nextPoints[idx][0] >
-                  element.x + nextPoints[idx - 1][0]
-                    ? HEADING_LEFT
-                    : HEADING_RIGHT,
-                index: idx,
-              };
             }
 
-            return res;
+            return {
+              anchor: pointFrom<GlobalPoint>(
+                (element.x +
+                  nextPoints[idx][0] +
+                  element.x +
+                  nextPoints[idx - 1][0]) /
+                  2,
+                element.y + nextPoints[idx][1],
+              ),
+              heading:
+                element.x + nextPoints[idx][0] >
+                element.x + nextPoints[idx - 1][0]
+                  ? HEADING_LEFT
+                  : HEADING_RIGHT,
+              index: idx,
+            };
           }) as Sequential<FixedSegment>,
       };
     }
@@ -1852,17 +1850,17 @@ export class LinearElementEditor {
           ?.length ?? 0;
     }
 
-    const startPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      element,
-      segmentIdx - 1,
-      elementsMap,
+    const startPoint = pointFrom<GlobalPoint>(
+      element.x + element.points[segmentIdx - 1][0],
+      element.y + element.points[segmentIdx - 1][1],
     );
-    const endPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      element,
-      segmentIdx,
-      elementsMap,
+    const endPoint = pointFrom<GlobalPoint>(
+      element.x + element.points[segmentIdx][0],
+      element.y + element.points[segmentIdx][1],
     );
-    const isHorizontal = startPoint[1] === endPoint[1];
+    const isHorizontal =
+      Math.abs(startPoint[1] - endPoint[1]) <
+      Math.abs(startPoint[0] - endPoint[0]);
 
     LinearElementEditor.movePoints(element, [
       {

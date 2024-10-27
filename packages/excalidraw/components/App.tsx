@@ -7837,7 +7837,6 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor.elbowed &&
           linearElementEditor.pointerDownState.segmentMidpoint.index
         ) {
-          this.store.shouldCaptureIncrement();
           const [gridX, gridY] = getGridPoint(
             pointerCoords.x,
             pointerCoords.y,
