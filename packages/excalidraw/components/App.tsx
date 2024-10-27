@@ -7847,36 +7847,36 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement,
             { x: gridX, y: gridY },
             elementsMap,
+            this.state,
           );
-          // console.log(
-          //   this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-          //     .index,
-          // );
 
           // Since we are reading from previous state which is not possible with
           // automatic batching in React 18 hence using flush sync to synchronously
           // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
 
-          flushSync(() => {
-            if (this.state.selectedLinearElement) {
-              this.setState({
-                selectedLinearElement: {
-                  ...this.state.selectedLinearElement,
-                  pointerDownState: ret.pointerDownState,
-                  selectedPointsIndices: ret.selectedPointsIndices,
-                },
-              });
-            }
-            if (this.state.editingLinearElement) {
-              this.setState({
-                editingLinearElement: {
-                  ...this.state.editingLinearElement,
-                  pointerDownState: ret.pointerDownState,
-                  selectedPointsIndices: ret.selectedPointsIndices,
-                },
-              });
-            }
-          });
+          if (
+            this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+              .index !== ret.pointerDownState.segmentMidpoint.index
+          ) {
+            flushSync(() => {
+              if (this.state.selectedLinearElement) {
+                this.setState({
+                  selectedLinearElement: {
+                    ...this.state.selectedLinearElement,
+                    pointerDownState: ret.pointerDownState,
+                  },
+                });
+              }
+              if (this.state.editingLinearElement) {
+                this.setState({
+                  editingLinearElement: {
+                    ...this.state.editingLinearElement,
+                    pointerDownState: ret.pointerDownState,
+                  },
+                });
+              }
+            });
+          }
 
           return;
         } else if (

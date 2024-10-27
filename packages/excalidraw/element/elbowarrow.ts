@@ -2,7 +2,6 @@ import {
   pointFrom,
   pointScaleFromOrigin,
   pointTranslate,
-  PRECISION,
   vector,
   vectorCross,
   vectorFromPoint,
@@ -40,7 +39,6 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   headingIsHorizontal,
-  headingIsVertical,
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
@@ -138,12 +136,17 @@ export const updateElbowArrowPoints = (
     arrow.fixedSegments ?? [],
     updates?.fixedSegments ?? [],
   );
-  //console.log(nextFixedSegments);
-  const arrowStartPoint = pointFrom<GlobalPoint>(arrow.x, arrow.y);
-  const arrowEndPoint = pointFrom<GlobalPoint>(
-    arrow.x + updatedPoints[updatedPoints.length - 1][0],
-    arrow.y + updatedPoints[updatedPoints.length - 1][1],
-  );
+
+  // const references = [pointFrom<GlobalPoint>(arrow.x, arrow.y)];
+  // nextFixedSegments.forEach((segment) => {
+  //   references.push(segment.anchor);
+  // });
+  // references.push(
+  //   pointFrom<GlobalPoint>(
+  //     arrow.x + updatedPoints[updatedPoints.length - 1][0],
+  //     arrow.y + updatedPoints[updatedPoints.length - 1][1],
+  //   ),
+  // );
 
   let previousVal: {
     point: GlobalPoint;
@@ -161,20 +164,20 @@ export const updateElbowArrowPoints = (
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
       let heading = segment.heading;
-      let anchor = segment.anchor;
-      if (arrow.startBinding && arrow.endBinding) {
-        if (headingIsVertical(heading)) {
-          anchor = pointFrom<GlobalPoint>(
-            anchor[0],
-            (arrowStartPoint[1] + arrowEndPoint[1]) / 2,
-          );
-        } else {
-          anchor = pointFrom<GlobalPoint>(
-            (arrowStartPoint[0] + arrowEndPoint[0]) / 2,
-            anchor[1],
-          );
-        }
-      }
+      const anchor = segment.anchor;
+      // if (arrow.startBinding && arrow.endBinding) {
+      //   if (headingIsVertical(heading)) {
+      //     anchor = pointFrom<GlobalPoint>(
+      //       anchor[0],
+      //       (references[segmentIdx][1] + references[segmentIdx + 2][1]) / 2, //(arrowStartPoint[1] + arrowEndPoint[1]) / 2,
+      //     );
+      //   } else {
+      //     anchor = pointFrom<GlobalPoint>(
+      //       (references[segmentIdx][0] + references[segmentIdx + 2][0]) / 2, //(arrowStartPoint[0] + arrowEndPoint[0]) / 2,
+      //       anchor[1],
+      //     );
+      //   }
+      // }
       const el = {
         ...newElement({
           type: "rectangle",
@@ -321,8 +324,10 @@ export const updateElbowArrowPoints = (
         (prevGroupLastPoint[0] + point[0]) / 2,
         (prevGroupLastPoint[1] + point[1]) / 2,
       );
-      const segmentHorizontal =
-        Math.abs(prevGroupLastPoint[1] - point[1]) < PRECISION;
+
+      const segmentHorizontal = headingIsHorizontal(
+        nextFixedSegments[currentGroupIdx - 1].heading,
+      );
 
       return {
         anchor,

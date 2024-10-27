@@ -1817,6 +1817,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor,
     pointerCoords: { x: number; y: number },
     elementsMap: ElementsMap,
+    appState: AppState,
   ): LinearElementEditor {
     if (!linearElementEditor.elbowed) {
       return linearElementEditor;
@@ -1889,6 +1890,12 @@ export class LinearElementEditor {
         isDragging: true,
       },
     ]);
+
+    LinearElementEditor.updateEditorMidPointsCache(
+      element,
+      elementsMap,
+      appState,
+    );
 
     const newIndex = element.fixedSegments![currFixedSegmentsArrayIdx].index;
 
