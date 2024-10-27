@@ -93,10 +93,10 @@ type ElbowArrowState = {
 const BASE_PADDING = 40;
 
 const segmentListMerge = (
-  oldFixedSegments: FixedSegment[],
-  newFixedSegments: FixedSegment[],
+  oldFixedSegments: readonly FixedSegment[],
+  newFixedSegments: readonly FixedSegment[],
 ): FixedSegment[] => {
-  let fixedSegments = oldFixedSegments;
+  let fixedSegments = Array.from(oldFixedSegments);
   newFixedSegments.forEach((segment) => {
     if (segment.anchor == null) {
       // Delete segment request

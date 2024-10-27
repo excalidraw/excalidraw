@@ -1323,12 +1323,15 @@ export class LinearElementEditor {
             if (
               Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) < PRECISION
             ) {
-              const anchor = pointFrom<GlobalPoint>(
-                element.x + nextPoints[idx][0],
-                element.y + (nextPoints[idx][1] - nextPoints[idx - 1][1]) / 2,
-              );
               res = {
-                anchor,
+                anchor: pointFrom<GlobalPoint>(
+                  element.x + nextPoints[idx][0],
+                  (element.y +
+                    nextPoints[idx][1] +
+                    element.y +
+                    nextPoints[idx - 1][1]) /
+                    2,
+                ),
                 heading:
                   element.y + nextPoints[idx][1] >
                   element.y + nextPoints[idx - 1][1]
@@ -1337,12 +1340,15 @@ export class LinearElementEditor {
                 index: idx,
               };
             } else {
-              const anchor = pointFrom<GlobalPoint>(
-                element.x + (nextPoints[idx][0] - nextPoints[idx - 1][0]) / 2,
-                element.y + nextPoints[idx][1],
-              );
               res = {
-                anchor,
+                anchor: pointFrom<GlobalPoint>(
+                  (element.x +
+                    nextPoints[idx][0] +
+                    element.x +
+                    nextPoints[idx - 1][0]) /
+                    2,
+                  element.y + nextPoints[idx][1],
+                ),
                 heading:
                   element.x + nextPoints[idx][0] >
                   element.x + nextPoints[idx - 1][0]

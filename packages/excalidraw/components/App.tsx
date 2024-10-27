@@ -7838,9 +7838,14 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor.pointerDownState.segmentMidpoint.index
         ) {
           this.store.shouldCaptureIncrement();
+          const [gridX, gridY] = getGridPoint(
+            pointerCoords.x,
+            pointerCoords.y,
+            event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+          );
           const ret = LinearElementEditor.moveElbowArrowSegment(
             this.state.selectedLinearElement,
-            pointerCoords,
+            { x: gridX, y: gridY },
             elementsMap,
           );
           // console.log(
