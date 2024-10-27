@@ -52,7 +52,7 @@ export type SVGRenderConfig = {
    *
    * @default true
    */
-  reuseImages?: boolean;
+  reuseImages: boolean;
 };
 
 export type InteractiveCanvasRenderConfig = {
