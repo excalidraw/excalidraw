@@ -22,6 +22,7 @@ import {
 import { getFontString } from "../utils";
 import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 import { getGridPoint } from "../snapping";
+import { LinearElementEditor } from "./linearElementEditor";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -42,9 +43,10 @@ export const dragSelectedElements = (
     return;
   }
 
-  const selectedElements = _selectedElements.filter(
-    (el) => !(isElbowArrow(el) && el.startBinding && el.endBinding),
-  );
+  const selectedElements = _selectedElements;
+  // .filter(
+  //   (el) => !(isElbowArrow(el) && el.startBinding && el.endBinding),
+  // );
 
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
@@ -78,10 +80,17 @@ export const dragSelectedElements = (
 
   elementsToUpdate.forEach((element) => {
     updateElementCoords(pointerDownState, element, adjustedOffset);
-    if (
+    if (isElbowArrow(element)) {
+      mutateElement(element, {
+        fixedSegments: LinearElementEditor.restoreFixedSegments(
+          element,
+          element.x,
+          element.y,
+        ),
+      });
+    }
+    if (!isArrowElement(element)) {
       // skip arrow labels since we calculate its position during render
-      !isArrowElement(element)
-    ) {
       const textElement = getBoundTextElement(
         element,
         scene.getNonDeletedElementsMap(),
@@ -89,10 +98,10 @@ export const dragSelectedElements = (
       if (textElement) {
         updateElementCoords(pointerDownState, textElement, adjustedOffset);
       }
+      updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
+        simultaneouslyUpdated: Array.from(elementsToUpdate),
+      });
     }
-    updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
-      simultaneouslyUpdated: Array.from(elementsToUpdate),
-    });
   });
 };
 

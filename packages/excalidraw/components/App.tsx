@@ -7862,10 +7862,6 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           );
 
-          // Since we are reading from previous state which is not possible with
-          // automatic batching in React 18 hence using flush sync to synchronously
-          // update the state. Check https://github.com/excalidraw/excalidraw/pull/5508 for more details.
-
           if (
             this.state.selectedLinearElement.pointerDownState.segmentMidpoint
               .index !== ret.pointerDownState.segmentMidpoint.index

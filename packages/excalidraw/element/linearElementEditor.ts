@@ -1381,55 +1381,53 @@ export class LinearElementEditor {
     element: ExcalidrawElbowArrowElement,
     x: number,
     y: number,
-  ) {
-    return (
-      element.fixedSegments?.map((segment) => {
-        if (
-          Math.abs(
-            element.points[segment.index][0] -
-              element.points[segment.index - 1][0],
-          ) <
-          Math.abs(
-            element.points[segment.index][1] -
-              element.points[segment.index - 1][1],
-          )
-        ) {
-          return {
-            anchor: pointFrom<GlobalPoint>(
-              x + element.points[segment.index][0],
-              (y +
-                element.points[segment.index][1] +
-                y +
-                element.points[segment.index - 1][1]) /
-                2,
-            ),
-            heading:
-              y + element.points[segment.index][1] >
-              y + element.points[segment.index - 1][1]
-                ? HEADING_UP
-                : HEADING_DOWN,
-            index: segment.index,
-          };
-        }
-
+  ): Sequential<FixedSegment> | null {
+    return (element.fixedSegments?.map((segment) => {
+      if (
+        Math.abs(
+          element.points[segment.index][0] -
+            element.points[segment.index - 1][0],
+        ) <
+        Math.abs(
+          element.points[segment.index][1] -
+            element.points[segment.index - 1][1],
+        )
+      ) {
         return {
           anchor: pointFrom<GlobalPoint>(
-            (x +
-              element.points[segment.index][0] +
-              x +
-              element.points[segment.index - 1][0]) /
+            x + element.points[segment.index][0],
+            (y +
+              element.points[segment.index][1] +
+              y +
+              element.points[segment.index - 1][1]) /
               2,
-            y + element.points[segment.index][1],
           ),
           heading:
-            x + element.points[segment.index][0] >
-            x + element.points[segment.index - 1][0]
-              ? HEADING_LEFT
-              : HEADING_RIGHT,
+            y + element.points[segment.index][1] >
+            y + element.points[segment.index - 1][1]
+              ? HEADING_UP
+              : HEADING_DOWN,
           index: segment.index,
         };
-      }) ?? null
-    );
+      }
+
+      return {
+        anchor: pointFrom<GlobalPoint>(
+          (x +
+            element.points[segment.index][0] +
+            x +
+            element.points[segment.index - 1][0]) /
+            2,
+          y + element.points[segment.index][1],
+        ),
+        heading:
+          x + element.points[segment.index][0] >
+          x + element.points[segment.index - 1][0]
+            ? HEADING_LEFT
+            : HEADING_RIGHT,
+        index: segment.index,
+      };
+    }) ?? null) as Sequential<FixedSegment>;
   }
 
   static shouldAddMidpoint(
