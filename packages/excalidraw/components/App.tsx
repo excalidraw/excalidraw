@@ -5991,8 +5991,7 @@ class App extends React.Component<AppProps, AppState> {
       isHoldingSpace ||
       isPanning ||
       isDraggingScrollBar ||
-      isHandToolActive(this.state) ||
-      isTouchInPenMode(this.state, event) //zsviczian (single finger panning in pen mode)
+      isHandToolActive(this.state)
     ) {
       return;
     }
@@ -9911,7 +9910,9 @@ class App extends React.Component<AppProps, AppState> {
               created: Date.now(),
               lastRetrieved: Date.now(),
               //@ts-ignore
-              name: imageFile?.name, // zsviczian
+              name: (imageFile?.name && imageFile.name !== "image.png")
+              ? imageFile.name
+              : undefined, // zsviczian
             },
           };
           const cachedImageData = this.imageCache.get(fileId);

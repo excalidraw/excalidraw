@@ -151,8 +151,11 @@ export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer
 
 //zsviczian (single finger panning in pen mode)
 export function isTouchInPenMode(appState: AppState, event: React.PointerEvent<HTMLElement> | MouseEvent) {
+  if(!hostPlugin.settings.penModeSingleFingerPanning) {
+    return false;
+  }
   const isReactPointerEvent = 'nativeEvent' in event;
   return appState.penMode &&
     (!isReactPointerEvent || (event.pointerType !== "pen")) &&
-    !["laser", "selection", "eraser", "hand"].includes(appState.activeTool.type);
+    ![ "text" ].includes(appState.activeTool.type);
 }
