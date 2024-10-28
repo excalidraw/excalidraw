@@ -68,7 +68,6 @@ import {
   pointRotateRads,
   type Radians,
 } from "../../math";
-import { debugDrawPoint } from "../visualdebug";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
