@@ -48,6 +48,13 @@ export type SVGRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   frameColor?: AppState["frameColor"]; //zsviczian
   embedsValidationStatus: EmbedsValidationStatus;
+  /**
+   * whether to attempt to reuse images as much as possible through symbols
+   * (reduces SVG size, but may be incompoatible with some SVG renderers)
+   *
+   * @default true
+   */
+  reuseImages: boolean;
 };
 
 export type InteractiveCanvasRenderConfig = {

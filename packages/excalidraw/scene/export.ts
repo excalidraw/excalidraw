@@ -288,6 +288,7 @@ export const exportToSvg = async (
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
     skipInliningFonts?: true;
+    reuseImages?: boolean;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -430,6 +431,7 @@ export const exportToSvg = async (
               .map((element) => [element.id, true]),
           )
         : new Map(),
+      reuseImages: opts?.reuseImages ?? true,
     },
   );
 
