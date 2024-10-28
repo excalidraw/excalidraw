@@ -39,6 +39,7 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   headingIsHorizontal,
+  headingIsVertical,
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
@@ -137,16 +138,16 @@ export const updateElbowArrowPoints = (
     updates?.fixedSegments ?? [],
   );
 
-  // const references = [pointFrom<GlobalPoint>(arrow.x, arrow.y)];
-  // nextFixedSegments.forEach((segment) => {
-  //   references.push(segment.anchor);
-  // });
-  // references.push(
-  //   pointFrom<GlobalPoint>(
-  //     arrow.x + updatedPoints[updatedPoints.length - 1][0],
-  //     arrow.y + updatedPoints[updatedPoints.length - 1][1],
-  //   ),
-  // );
+  const references: GlobalPoint[] = [pointFrom<GlobalPoint>(arrow.x, arrow.y)];
+  nextFixedSegments.forEach((segment) => {
+    references.push(segment.anchor);
+  });
+  references.push(
+    pointFrom<GlobalPoint>(
+      arrow.x + updatedPoints[updatedPoints.length - 1][0],
+      arrow.y + updatedPoints[updatedPoints.length - 1][1],
+    ),
+  );
 
   let previousVal: {
     point: GlobalPoint;
@@ -164,20 +165,26 @@ export const updateElbowArrowPoints = (
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
       let heading = segment.heading;
-      const anchor = segment.anchor;
-      // if (arrow.startBinding && arrow.endBinding) {
-      //   if (headingIsVertical(heading)) {
-      //     anchor = pointFrom<GlobalPoint>(
-      //       anchor[0],
-      //       (references[segmentIdx][1] + references[segmentIdx + 2][1]) / 2, //(arrowStartPoint[1] + arrowEndPoint[1]) / 2,
-      //     );
-      //   } else {
-      //     anchor = pointFrom<GlobalPoint>(
-      //       (references[segmentIdx][0] + references[segmentIdx + 2][0]) / 2, //(arrowStartPoint[0] + arrowEndPoint[0]) / 2,
-      //       anchor[1],
-      //     );
-      //   }
-      // }
+      let anchor = segment.anchor;
+
+      // Allow shifting the focus point of both fixed segment borders
+      // are far away in one direction, creating a "valley" otherwise
+      const prevRef = references[segmentIdx];
+      const nextRef = references[segmentIdx + 2];
+
+      if (prevRef && nextRef) {
+        if (headingIsVertical(heading)) {
+          anchor = pointFrom<GlobalPoint>(
+            anchor[0],
+            (prevRef[1] + nextRef[1]) / 2,
+          );
+        } else {
+          anchor = pointFrom<GlobalPoint>(
+            (prevRef[0] + nextRef[0]) / 2,
+            anchor[1],
+          );
+        }
+      }
       const el = {
         ...newElement({
           type: "rectangle",
