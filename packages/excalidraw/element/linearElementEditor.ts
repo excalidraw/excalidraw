@@ -350,23 +350,6 @@ export class LinearElementEditor {
 
       // suggest bindings for first and last point if selected
       if (isBindingElement(element, false)) {
-        if (element.startBinding) {
-          const startBindingElement = element.startBinding
-            ? elementsMap.get(element.startBinding.elementId)
-            : null;
-          if (startBindingElement) {
-            updateBoundElements(startBindingElement, elementsMap);
-          }
-        }
-        if (element.endBinding) {
-          const endBindingElement = element.endBinding
-            ? elementsMap.get(element.endBinding.elementId)
-            : null;
-
-          if (endBindingElement) {
-            updateBoundElements(endBindingElement, elementsMap);
-          }
-        }
         const coords: { x: number; y: number }[] = [];
 
         const firstSelectedIndex = selectedPointsIndices[0];
@@ -398,6 +381,36 @@ export class LinearElementEditor {
 
         if (coords.length) {
           maybeSuggestBinding(element, coords);
+        }
+      }
+
+      if (selectedPointsIndices && draggingPoint) {
+        const isDraggingPointBound =
+          (lastClickedPoint === 0 && element.startBinding) ||
+          (lastClickedPoint === element.points.length - 1 &&
+            element.endBinding);
+
+        if (!isDraggingPointBound) {
+          const oppositePointIndex =
+            lastClickedPoint === 0 ? element.points.length - 1 : 0;
+          if (oppositePointIndex === 0 && element.startBinding) {
+            const startBindingElement = elementsMap.get(
+              element.startBinding.elementId,
+            );
+            updateBoundElements(startBindingElement!, elementsMap, {
+              simultaneouslyUpdated: [startBindingElement!],
+            });
+          } else if (
+            oppositePointIndex === element.points.length - 1 &&
+            element.endBinding
+          ) {
+            const endBindingElement = elementsMap.get(
+              element.endBinding.elementId,
+            );
+            updateBoundElements(endBindingElement!, elementsMap, {
+              simultaneouslyUpdated: [endBindingElement!],
+            });
+          }
         }
       }
 
