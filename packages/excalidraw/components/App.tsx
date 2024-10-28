@@ -3198,10 +3198,23 @@ class App extends React.Component<AppProps, AppState> {
 
     const newElements = duplicateElements(
       elements.map((element) => {
-        return newElementWith(element, {
+        let newElement = newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
         });
+
+        if (isElbowArrow(newElement)) {
+          newElement = {
+            ...newElement,
+            fixedSegments: LinearElementEditor.restoreFixedSegments(
+              newElement,
+              newElement.x,
+              newElement.y,
+            ),
+          };
+        }
+
+        return newElement;
       }),
       {
         randomizeSeed: !opts.retainSeed,

@@ -1377,6 +1377,61 @@ export class LinearElementEditor {
     );
   }
 
+  static restoreFixedSegments(
+    element: ExcalidrawElbowArrowElement,
+    x: number,
+    y: number,
+  ) {
+    return (
+      element.fixedSegments?.map((segment) => {
+        if (
+          Math.abs(
+            element.points[segment.index][0] -
+              element.points[segment.index - 1][0],
+          ) <
+          Math.abs(
+            element.points[segment.index][1] -
+              element.points[segment.index - 1][1],
+          )
+        ) {
+          return {
+            anchor: pointFrom<GlobalPoint>(
+              x + element.points[segment.index][0],
+              (y +
+                element.points[segment.index][1] +
+                y +
+                element.points[segment.index - 1][1]) /
+                2,
+            ),
+            heading:
+              y + element.points[segment.index][1] >
+              y + element.points[segment.index - 1][1]
+                ? HEADING_UP
+                : HEADING_DOWN,
+            index: segment.index,
+          };
+        }
+
+        return {
+          anchor: pointFrom<GlobalPoint>(
+            (x +
+              element.points[segment.index][0] +
+              x +
+              element.points[segment.index - 1][0]) /
+              2,
+            y + element.points[segment.index][1],
+          ),
+          heading:
+            x + element.points[segment.index][0] >
+            x + element.points[segment.index - 1][0]
+              ? HEADING_LEFT
+              : HEADING_RIGHT,
+          index: segment.index,
+        };
+      }) ?? null
+    );
+  }
+
   static shouldAddMidpoint(
     linearElementEditor: LinearElementEditor,
     pointerCoords: PointerCoords,
