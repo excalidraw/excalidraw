@@ -320,13 +320,18 @@ export const updateElbowArrowPoints = (
       currentGroupIdx = groupIdx;
 
       const prevGroupLastPoint = points[index - 1];
-      const anchor = pointFrom<GlobalPoint>(
-        (prevGroupLastPoint[0] + point[0]) / 2,
-        (prevGroupLastPoint[1] + point[1]) / 2,
-      );
 
       const segmentHorizontal = headingIsHorizontal(
         nextFixedSegments[currentGroupIdx - 1].heading,
+      );
+
+      const anchor = pointFrom<GlobalPoint>(
+        segmentHorizontal
+          ? (prevGroupLastPoint[0] + point[0]) / 2
+          : nextFixedSegments[currentGroupIdx - 1].anchor[0],
+        segmentHorizontal
+          ? nextFixedSegments[currentGroupIdx - 1].anchor[1]
+          : (prevGroupLastPoint[1] + point[1]) / 2,
       );
 
       return {
@@ -1243,7 +1248,10 @@ const getElbowArrowCornerPoints = (
   pointGroups: GlobalPoint[][],
 ): GlobalPoint[][] => {
   const points = pointGroups.flat();
-  let previousHorizontal = points[0][1] === points[1][1];
+
+  let previousHorizontal =
+    Math.abs(points[0][1] - points[1][1]) <
+    Math.abs(points[0][0] - points[1][0]);
   if (points.length > 1) {
     return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
       // The very first and last points are always kept
@@ -1252,11 +1260,9 @@ const getElbowArrowCornerPoints = (
       }
 
       const next = points[idx + 1];
-      const nextHorizontal = p[1] === next[1];
-      if (
-        (previousHorizontal && nextHorizontal) ||
-        (!previousHorizontal && !nextHorizontal)
-      ) {
+      const nextHorizontal =
+        Math.abs(p[1] - next[1]) < Math.abs(p[0] - next[0]);
+      if (previousHorizontal === nextHorizontal) {
         previousHorizontal = nextHorizontal;
         return false;
       }

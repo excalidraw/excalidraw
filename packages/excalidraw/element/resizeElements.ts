@@ -1088,7 +1088,7 @@ export const resizeMultipleElements = (
         } as ExcalidrawElbowArrowElement,
         elementsMap,
       );
-      debugDrawPoint(startPoint);
+
       const points = Array.from(update.points || element.points);
       points[0] = pointFrom(0, 0);
       points[points.length - 1] = pointFrom(
