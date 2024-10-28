@@ -59,7 +59,6 @@ import {
   type LocalPoint,
   pointDistance,
   pointTranslate,
-  PRECISION,
 } from "../../math";
 import {
   getBezierCurveLength,
@@ -1865,25 +1864,17 @@ export class LinearElementEditor {
     LinearElementEditor.movePoints(element, [
       {
         index: segmentIdx! - 1,
-        point: LinearElementEditor.pointFromAbsoluteCoords(
-          element,
-          pointFrom(
-            !isHorizontal ? pointerCoords.x : startPoint[0],
-            isHorizontal ? pointerCoords.y : startPoint[1],
-          ),
-          elementsMap,
+        point: pointFrom<LocalPoint>(
+          (!isHorizontal ? pointerCoords.x : startPoint[0]) - element.x,
+          (isHorizontal ? pointerCoords.y : startPoint[1]) - element.y,
         ),
         isDragging: true,
       },
       {
         index: segmentIdx!,
-        point: LinearElementEditor.pointFromAbsoluteCoords(
-          element,
-          pointFrom(
-            !isHorizontal ? pointerCoords.x : endPoint[0],
-            isHorizontal ? pointerCoords.y : endPoint[1],
-          ),
-          elementsMap,
+        point: pointFrom<LocalPoint>(
+          (!isHorizontal ? pointerCoords.x : endPoint[0]) - element.x,
+          (isHorizontal ? pointerCoords.y : endPoint[1]) - element.y,
         ),
         isDragging: true,
       },
