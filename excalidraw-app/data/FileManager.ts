@@ -63,15 +63,19 @@ export class FileManager {
   isFileTracked = (id: FileId) => {
     return (
       this.savedFiles.has(id) ||
-      this.fetchingFiles.has(id) ||
       this.savingFiles.has(id) ||
+      this.fetchingFiles.has(id) ||
       this.erroredFiles_fetch.has(id) ||
       this.erroredFiles_save.has(id)
     );
   };
 
-  isFileSaved = (file: BinaryFileData) => {
-    return this.savedFiles.get(file.id) === this.getFileVersion(file);
+  isFileSavedOrBeingSaved = (file: BinaryFileData) => {
+    const fileVersion = this.getFileVersion(file);
+    return (
+      this.savedFiles.get(file.id) === fileVersion ||
+      this.savingFiles.get(file.id) === fileVersion
+    );
   };
 
   getFileVersion = (file: BinaryFileData) => {
@@ -94,7 +98,7 @@ export class FileManager {
       if (
         fileData &&
         // NOTE if errored during save, won't retry due to this check
-        !this.isFileSaved(fileData)
+        !this.isFileSavedOrBeingSaved(fileData)
       ) {
         addedFiles.set(element.fileId, files[element.fileId]);
         this.savingFiles.set(element.fileId, this.getFileVersion(fileData));
