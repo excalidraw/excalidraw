@@ -62,10 +62,10 @@ describe("export", () => {
   });
 
   it("test encoding/decoding scene for SVG export", async () => {
-    const encoded = await encodeSvgMetadata({
+    const encoded = encodeSvgMetadata({
       text: serializeAsJSON(testElements, h.state, {}, "local"),
     });
-    const decoded = JSON.parse(await decodeSvgMetadata({ svg: encoded }));
+    const decoded = JSON.parse(decodeSvgMetadata({ svg: encoded }));
     expect(decoded.elements).toEqual([
       expect.objectContaining({ type: "text", text: "😀" }),
     ]);
