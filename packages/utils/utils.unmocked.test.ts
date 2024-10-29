@@ -27,7 +27,7 @@ describe("embedding scene data", () => {
 
       const svg = svgNode.outerHTML;
 
-      const parsedString = await decodeSvgMetadata({ svg });
+      const parsedString = decodeSvgMetadata({ svg });
       const importedData: ImportedDataState = JSON.parse(parsedString);
 
       expect(sourceElements.map((x) => x.id)).toEqual(

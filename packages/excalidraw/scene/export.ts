@@ -319,9 +319,7 @@ export const exportToSvg = async (
   // the tempScene hack which duplicates and regenerates ids
   if (exportEmbedScene) {
     try {
-      metadata = await (
-        await import("../data/image")
-      ).encodeSvgMetadata({
+      metadata = (await import("../data/image")).encodeSvgMetadata({
         // when embedding scene, we want to embed the origionally supplied
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
