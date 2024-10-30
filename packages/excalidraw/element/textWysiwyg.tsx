@@ -27,13 +27,13 @@ import {
   getTextWidth,
   normalizeText,
   redrawTextBoundingBox,
-  wrapText,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   computeContainerDimensionForBoundText,
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
+import { wrapText } from "./textWrapping";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,

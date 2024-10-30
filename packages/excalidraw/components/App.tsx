@@ -50,7 +50,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
+import { ARROW_TYPE, isSafari, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -306,8 +306,10 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
+  dataURLToString,
   generateIdFromFile,
   getDataURL,
+  getDataURL_sync,
   getFileFromEvent,
   ImageURLToFile,
   isImageFileHandle,
@@ -340,7 +342,6 @@ import {
   isValidTextContainer,
   measureText,
   normalizeText,
-  wrapText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -480,6 +481,7 @@ import {
   vectorNormalize,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
+import { wrapText } from "../element/textWrapping";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2231,9 +2233,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (actionResult.files) {
-      this.files = actionResult.replaceFiles
-        ? actionResult.files
-        : { ...this.files, ...actionResult.files };
+      this.addMissingFiles(actionResult.files, actionResult.replaceFiles);
       this.addNewImagesToImageCache();
     }
 
@@ -2430,11 +2430,11 @@ class App extends React.Component<AppProps, AppState> {
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
     this.clearImageShapeCache();
-    // FontFaceSet loadingdone event we listen on may not always
-    // fire (looking at you Safari), so on init we manually load all
-    // fonts and rerender scene text elements once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.loadSceneFonts();
+
+    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
+    this.fonts.loadSceneFonts().then((fontFaces) => {
+      this.fonts.onLoaded(fontFaces);
+    });
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2727,8 +2727,8 @@ class App extends React.Component<AppProps, AppState> {
       // rerender text elements on font load to fix #637 && #1553
       // zsviczian In Obsidian this is not needed as I manage font load separately
       addEventListener(document.fonts, "loadingdone", (event) => {
-        const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onLoaded(loadedFontFaces);
+        const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+        this.fonts.onLoaded(fontFaces);
       }),
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -3415,8 +3415,15 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
 
+    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
+    if (isSafari) {
+      Fonts.loadElementsFonts(newElements).then((fontFaces) => {
+        this.fonts.onLoaded(fontFaces);
+      });
+    }
+
     if (opts.files) {
-      this.files = { ...this.files, ...opts.files };
+      this.addMissingFiles(opts.files);
     }
 
     this.store.shouldCaptureIncrement();
@@ -3994,17 +4001,15 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  /** adds supplied files to existing files in the appState */
+  /**
+   * adds supplied files to existing files in the appState.
+   * NOTE if file already exists in editor state, the file data is not updated
+   * */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
-      const filesMap = files.reduce((acc, fileData) => {
-        acc.set(fileData.id, fileData);
-        return acc;
-      }, new Map<FileId, BinaryFileData>());
+      const { addedFiles } = this.addMissingFiles(files);
 
-      this.files = { ...this.files, ...Object.fromEntries(filesMap) };
-
-      this.clearImageShapeCache(Object.fromEntries(filesMap));
+      this.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
@@ -4062,6 +4067,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  //zsviczian
   public bringToFront: ExcalidrawImperativeAPI["bringToFront"] = (
     elements: readonly ExcalidrawElement[],
   ) => {
@@ -4074,6 +4080,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  //zsviczian
   public bringForward: ExcalidrawImperativeAPI["bringForward"] = (
     elements: readonly ExcalidrawElement[],
   ) => {
@@ -4086,6 +4093,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  //zsviczian
   public sendToBack: ExcalidrawImperativeAPI["sendToBack"] = (
     elements: readonly ExcalidrawElement[],
   ) => {
@@ -4095,6 +4103,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  //zsviczian
   public sendBackward: ExcalidrawImperativeAPI["sendBackward"] = (
     elements: readonly ExcalidrawElement[],
   ) => {
@@ -4105,6 +4114,41 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       ),
     );
+  };
+  
+  private addMissingFiles = (
+    files: BinaryFiles | BinaryFileData[],
+    replace = false,
+  ) => {
+    const nextFiles = replace ? {} : { ...this.files };
+    const addedFiles: BinaryFiles = {};
+
+    const _files = Array.isArray(files) ? files : Object.values(files);
+
+    for (const fileData of _files) {
+      if (nextFiles[fileData.id]) {
+        continue;
+      }
+
+      addedFiles[fileData.id] = fileData;
+      nextFiles[fileData.id] = fileData;
+
+      if (fileData.mimeType === MIME_TYPES.svg) {
+        const restoredDataURL = getDataURL_sync(
+          normalizeSVG(dataURLToString(fileData.dataURL)),
+          MIME_TYPES.svg,
+        );
+        if (fileData.dataURL !== restoredDataURL) {
+          // bump version so persistence layer can update the store
+          fileData.version = (fileData.version ?? 1) + 1;
+          fileData.dataURL = restoredDataURL;
+        }
+      }
+    }
+
+    this.files = nextFiles;
+
+    return { addedFiles };
   };
 
   public updateScene = withBatchedUpdates(
@@ -9833,7 +9877,7 @@ class App extends React.Component<AppProps, AppState> {
     if (mimeType === MIME_TYPES.svg) {
       try {
         imageFile = SVGStringToFile(
-          await normalizeSVG(await imageFile.text()),
+          normalizeSVG(await imageFile.text()),
           imageFile.name,
         );
       } catch (error: any) {
@@ -9901,9 +9945,8 @@ class App extends React.Component<AppProps, AppState> {
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
         try {
-          this.files = {
-            ...this.files,
-            [fileId]: {
+          this.addMissingFiles([
+            {
               mimeType,
               id: fileId,
               dataURL,
@@ -9914,7 +9957,7 @@ class App extends React.Component<AppProps, AppState> {
               ? imageFile.name
               : undefined, // zsviczian
             },
-          };
+          ]);
           const cachedImageData = this.imageCache.get(fileId);
           if (!cachedImageData) {
             this.addNewImagesToImageCache();
