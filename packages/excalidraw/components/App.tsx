@@ -306,8 +306,10 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
+  dataURLToString,
   generateIdFromFile,
   getDataURL,
+  getDataURL_sync,
   getFileFromEvent,
   ImageURLToFile,
   isImageFileHandle,
@@ -2124,9 +2126,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (actionResult.files) {
-      this.files = actionResult.replaceFiles
-        ? actionResult.files
-        : { ...this.files, ...actionResult.files };
+      this.addMissingFiles(actionResult.files, actionResult.replaceFiles);
       this.addNewImagesToImageCache();
     }
 
@@ -3253,7 +3253,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (opts.files) {
-      this.files = { ...this.files, ...opts.files };
+      this.addMissingFiles(opts.files);
     }
 
     this.store.shouldCaptureIncrement();
@@ -3762,22 +3762,55 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  /** adds supplied files to existing files in the appState */
+  /**
+   * adds supplied files to existing files in the appState.
+   * NOTE if file already exists in editor state, the file data is not updated
+   * */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
-      const filesMap = files.reduce((acc, fileData) => {
-        acc.set(fileData.id, fileData);
-        return acc;
-      }, new Map<FileId, BinaryFileData>());
+      const { addedFiles } = this.addMissingFiles(files);
 
-      this.files = { ...this.files, ...Object.fromEntries(filesMap) };
-
-      this.clearImageShapeCache(Object.fromEntries(filesMap));
+      this.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
     },
   );
+
+  private addMissingFiles = (
+    files: BinaryFiles | BinaryFileData[],
+    replace = false,
+  ) => {
+    const nextFiles = replace ? {} : { ...this.files };
+    const addedFiles: BinaryFiles = {};
+
+    const _files = Array.isArray(files) ? files : Object.values(files);
+
+    for (const fileData of _files) {
+      if (nextFiles[fileData.id]) {
+        continue;
+      }
+
+      addedFiles[fileData.id] = fileData;
+      nextFiles[fileData.id] = fileData;
+
+      if (fileData.mimeType === MIME_TYPES.svg) {
+        const restoredDataURL = getDataURL_sync(
+          normalizeSVG(dataURLToString(fileData.dataURL)),
+          MIME_TYPES.svg,
+        );
+        if (fileData.dataURL !== restoredDataURL) {
+          // bump version so persistence layer can update the store
+          fileData.version = (fileData.version ?? 1) + 1;
+          fileData.dataURL = restoredDataURL;
+        }
+      }
+    }
+
+    this.files = nextFiles;
+
+    return { addedFiles };
+  };
 
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
@@ -9360,7 +9393,7 @@ class App extends React.Component<AppProps, AppState> {
     if (mimeType === MIME_TYPES.svg) {
       try {
         imageFile = SVGStringToFile(
-          await normalizeSVG(await imageFile.text()),
+          normalizeSVG(await imageFile.text()),
           imageFile.name,
         );
       } catch (error: any) {
@@ -9428,16 +9461,15 @@ class App extends React.Component<AppProps, AppState> {
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
         try {
-          this.files = {
-            ...this.files,
-            [fileId]: {
+          this.addMissingFiles([
+            {
               mimeType,
               id: fileId,
               dataURL,
               created: Date.now(),
               lastRetrieved: Date.now(),
             },
-          };
+          ]);
           const cachedImageData = this.imageCache.get(fileId);
           if (!cachedImageData) {
             this.addNewImagesToImageCache();
