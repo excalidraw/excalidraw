@@ -183,8 +183,8 @@ export class LocalData {
       );
     },
     async saveFiles({ addedFiles }) {
-      const savedFiles = new Map<FileId, true>();
-      const erroredFiles = new Map<FileId, true>();
+      const savedFiles = new Map<FileId, BinaryFileData>();
+      const erroredFiles = new Map<FileId, BinaryFileData>();
 
       // before we use `storage` event synchronization, let's update the flag
       // optimistically. Hopefully nothing fails, and an IDB read executed
@@ -195,10 +195,10 @@ export class LocalData {
         [...addedFiles].map(async ([id, fileData]) => {
           try {
             await set(id, fileData, filesStore);
-            savedFiles.set(id, true);
+            savedFiles.set(id, fileData);
           } catch (error: any) {
             console.error(error);
-            erroredFiles.set(id, true);
+            erroredFiles.set(id, fileData);
           }
         }),
       );

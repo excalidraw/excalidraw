@@ -4,7 +4,7 @@ import type { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { wrapText } from "./textElement";
+import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 import type {
   ExcalidrawElement,

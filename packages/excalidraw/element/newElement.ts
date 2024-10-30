@@ -34,9 +34,9 @@ import { getResizedElementAbsoluteCoords } from "./bounds";
 import {
   measureText,
   normalizeText,
-  wrapText,
   getBoundTextMaxWidth,
 } from "./textElement";
+import { wrapText } from "./textWrapping";
 import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
