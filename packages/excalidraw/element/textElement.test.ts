@@ -47,6 +47,41 @@ describe("Test wrapText", () => {
     expect(res).toBe("don't wrap this number\n99,100.99");
   });
 
+  it("should trim all trailing whitespaces", () => {
+    const text = "Hello     ";
+    const maxWidth = 50;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("Hello");
+  });
+
+  it("should trim all but one trailing whitespaces", () => {
+    const text = "Hello     ";
+    const maxWidth = 60;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("Hello ");
+  });
+
+  it("should keep preceding whitespaces and trim all trailing whitespaces", () => {
+    const text = "  Hello  World";
+    const maxWidth = 90;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("  Hello\nWorld");
+  });
+
+  it("should keep some preceding whitespaces, trim trailing whitespaces, but kep those that fit in the trailing line", () => {
+    const text = "   Hello  World            ";
+    const maxWidth = 90;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("   Hello\nWorld    ");
+  });
+
+  it("should trim keep those whitespace that fit in the trailing line", () => {
+    const text = "Hello   Wo rl  d                     ";
+    const maxWidth = 100;
+    const res = wrapText(text, font, maxWidth);
+    expect(res).toBe("Hello   Wo\nrl  d     ");
+  });
+
   it("should support multiple (multi-codepoint) emojis", () => {
     const text = "😀🗺🔥👩🏽‍🦰👨‍👩‍👧‍👦🇨🇿";
     const maxWidth = 1;
