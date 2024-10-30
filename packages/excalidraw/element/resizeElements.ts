@@ -53,10 +53,10 @@ import {
   handleBindTextResize,
   getBoundTextMaxWidth,
   getApproxMinLineHeight,
-  wrapText,
   measureText,
   getMinTextElementWidth,
 } from "./textElement";
+import { wrapText } from "./textWrapping";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
 import type { GlobalPoint } from "../../math";

@@ -19,7 +19,6 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import {
   getBoundTextElementPosition,
-  wrapText,
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
@@ -28,6 +27,7 @@ import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 import type { GlobalPoint } from "../../math";
 import { pointCenter, pointFrom } from "../../math";
+import { wrapText } from "../element/textWrapping";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
