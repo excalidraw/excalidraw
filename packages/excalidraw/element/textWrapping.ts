@@ -68,7 +68,7 @@ const COMMON = {
 /**
  * Characters and symbols used in Chinese, Japanese and Korean.
  */
-export const CJK = {
+const CJK = {
   /**
    * Every CJK breaks before and after, unless it's paired with an opening or closing symbol.
    *

@@ -38,7 +38,6 @@ import { isFrameLikeElement } from "../element/typeChecks";
 import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
-import { containsCJK } from "../element/textWrapping";
 import { Fonts } from "../fonts";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
