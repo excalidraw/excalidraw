@@ -49,7 +49,7 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
+import { ARROW_TYPE, isSafari, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -2320,11 +2320,11 @@ class App extends React.Component<AppProps, AppState> {
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
     this.clearImageShapeCache();
-    // FontFaceSet loadingdone event we listen on may not always
-    // fire (looking at you Safari), so on init we manually load all
-    // fonts and rerender scene text elements once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.loadSceneFonts();
+
+    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
+    this.fonts.loadSceneFonts().then((fontFaces) => {
+      this.fonts.onLoaded(fontFaces);
+    });
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2567,8 +2567,8 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(document.fonts, "loadingdone", (event) => {
-        const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onLoaded(loadedFontFaces);
+        const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+        this.fonts.onLoaded(fontFaces);
       }),
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -3235,6 +3235,13 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     });
+
+    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
+    if (isSafari) {
+      Fonts.loadElementsFonts(newElements).then((fontFaces) => {
+        this.fonts.onLoaded(fontFaces);
+      });
+    }
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
