@@ -7089,6 +7089,7 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
+          //zsviczian
           isTouchInPenMode(this.state, event) ||
           //!isLaserPointerActive added by zsviczian (but don't remember why....)
           (this.state.viewModeEnabled && !isLaserPointerActive(this.state)))
