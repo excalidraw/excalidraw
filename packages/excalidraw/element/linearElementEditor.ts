@@ -27,6 +27,7 @@ import type {
   InteractiveCanvasAppState,
   AppClassProperties,
   NullableGridSize,
+  Zoom,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -612,7 +613,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     startPoint: GlobalPoint | LocalPoint,
     endPoint: GlobalPoint | LocalPoint,
-    zoom: AppState["zoom"],
+    zoom: Zoom,
   ) {
     let distance = pointDistance(
       pointFrom(startPoint[0], startPoint[1]),

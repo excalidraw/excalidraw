@@ -188,10 +188,10 @@ export const updateElbowArrowPoints = (
       const el = {
         ...newElement({
           type: "rectangle",
-          x: anchor[0] - 5,
-          y: anchor[1] - 5,
-          width: 10,
-          height: 10,
+          x: anchor[0] - 3,
+          y: anchor[1] - 3,
+          width: 6,
+          height: 6,
         }),
         index: "DONOTSYNC" as FractionalIndex,
       } as Ordered<ExcalidrawBindableElement>;

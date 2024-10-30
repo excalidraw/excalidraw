@@ -74,7 +74,12 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import type { GlobalPoint, LocalPoint, Radians } from "../../math";
+import {
+  pointFrom,
+  type GlobalPoint,
+  type LocalPoint,
+  type Radians,
+} from "../../math";
 import { getCornerRadius } from "../shapes";
 
 const renderLinearElementPointHighlight = (
@@ -504,44 +509,60 @@ const renderLinearPointHandles = (
   });
 
   //Rendering segment mid points
-  const midPoints = LinearElementEditor.getEditorMidPoints(
-    element,
-    elementsMap,
-    appState,
-  ).filter(
-    (midPoint, idx, midPoints): midPoint is GlobalPoint =>
-      midPoint !== null &&
-      !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
-  );
+  if (isElbowArrow(element)) {
+    const indices = element.fixedSegments?.map((s) => s.index) ?? [];
+    const fixedPoints = element.points.slice(0, -1).map((p, i) => {
+      return indices.includes(i + 1);
+    });
+    const globalPoint = element.points.map((p) =>
+      pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
+    );
+    globalPoint.slice(1, -2).forEach((p, idx) => {
+      if (
+        !LinearElementEditor.isSegmentTooShort(
+          element,
+          p,
+          element.points[idx + 2],
+          appState.zoom,
+        )
+      ) {
+        renderSingleLinearPoint(
+          context,
+          appState,
+          pointFrom<GlobalPoint>(
+            (p[0] + globalPoint[idx + 2][0]) / 2,
+            (p[1] + globalPoint[idx + 2][1]) / 2,
+          ),
+          POINT_HANDLE_SIZE / 2,
+          false,
+          !fixedPoints[idx + 1],
+        );
+      }
+    });
+  } else {
+    const midPoints = LinearElementEditor.getEditorMidPoints(
+      element,
+      elementsMap,
+      appState,
+    ).filter(
+      (midPoint, idx, midPoints): midPoint is GlobalPoint =>
+        midPoint !== null &&
+        !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
+    );
 
-  midPoints.forEach((segmentMidPoint, segmentIdx) => {
-    if (isElbowArrow(element)) {
-      const isFixedSegmentMidPoint =
-        (element.fixedSegments?.findIndex(
-          // First segment is always unfixable and plus one to address the
-          // fixedSegments array = +2 offset
-          (segment) => segment.index === segmentIdx + 2,
-        ) ?? -1) === -1;
-
-      renderSingleLinearPoint(
-        context,
-        appState,
-        segmentMidPoint,
-        POINT_HANDLE_SIZE / 2,
-        false,
-        isFixedSegmentMidPoint,
-      );
-    } else if (appState.editingLinearElement || points.length === 2) {
-      renderSingleLinearPoint(
-        context,
-        appState,
-        segmentMidPoint,
-        POINT_HANDLE_SIZE / 2,
-        false,
-        true,
-      );
-    }
-  });
+    midPoints.forEach((segmentMidPoint, segmentIdx) => {
+      if (appState.editingLinearElement || points.length === 2) {
+        renderSingleLinearPoint(
+          context,
+          appState,
+          segmentMidPoint,
+          POINT_HANDLE_SIZE / 2,
+          false,
+          true,
+        );
+      }
+    });
+  }
 
   context.restore();
 };
