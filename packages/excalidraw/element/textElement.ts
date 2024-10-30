@@ -681,7 +681,7 @@ const wrapLine = (
 
       lines.push(...precedingLines);
 
-      // trailing line of the wrapped word might still be joined with next token/s
+      // trailing line of the wrapped word might -still be joined with next token/s
       currentLine = trailingLine;
       currentLineWidth = getLineWidth(trailingLine, font, true);
       iterator = tokenIterator.next();
@@ -697,10 +697,43 @@ const wrapLine = (
 
   // iterator done, push the trailing line if exists
   if (currentLine) {
-    lines.push(currentLine.trimEnd());
+    const trailingLine = trimTrailingLine(currentLine, font, maxWidth);
+    lines.push(trailingLine);
   }
 
   return lines;
+};
+
+// similarly to browsers, does not trim all whitespaces, but only those exceeding the maxWidth
+const trimTrailingLine = (line: string, font: FontString, maxWidth: number) => {
+  const shouldTrimWhitespaces = getLineWidth(line, font, true) > maxWidth;
+
+  if (!shouldTrimWhitespaces) {
+    return line;
+  }
+
+  // defensively default to `trimeEnd` in case the regex does not match
+  let [, trimmedLine, whitespaces] = line.match(/^(.+?)(\s+)$/) ?? [
+    line,
+    line.trimEnd(),
+    "",
+  ];
+
+  let trimmedLineWidth = getLineWidth(trimmedLine, font, true);
+
+  for (const whitespace of Array.from(whitespaces)) {
+    const _charWidth = charWidth.calculate(whitespace, font);
+    const testLineWidth = trimmedLineWidth + _charWidth;
+
+    if (testLineWidth > maxWidth) {
+      break;
+    }
+
+    trimmedLine = trimmedLine + whitespace;
+    trimmedLineWidth = testLineWidth;
+  }
+
+  return trimmedLine;
 };
 
 export const wrapText = (
