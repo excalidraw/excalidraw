@@ -188,10 +188,10 @@ export const updateElbowArrowPoints = (
       const el = {
         ...newElement({
           type: "rectangle",
-          x: anchor[0] - 3,
-          y: anchor[1] - 3,
-          width: 6,
-          height: 6,
+          x: anchor[0] - 0.1,
+          y: anchor[1] - 0.1,
+          width: 0.2,
+          height: 0.2,
         }),
         index: "DONOTSYNC" as FractionalIndex,
       } as Ordered<ExcalidrawBindableElement>;
@@ -204,6 +204,32 @@ export const updateElbowArrowPoints = (
         : previousVal.point[1] > anchor[1]
         ? HEADING_DOWN
         : HEADING_UP;
+
+      // Detect hooks and flip the heading if needed
+      if (updatedPoints[segment.index - 3]) {
+        const isHook = !compareHeading(
+          vectorToHeading(
+            vectorFromPoint(
+              updatedPoints[segment.index - 1],
+              updatedPoints[segment.index],
+            ),
+          ),
+          vectorToHeading(
+            vectorFromPoint(
+              updatedPoints[segment.index - 3],
+              updatedPoints[segment.index - 2],
+            ),
+          ),
+        );
+        if (
+          isHook &&
+          ((headingIsHorizontal(heading) && previousVal.point[0] > anchor[0]) ||
+            (headingIsVertical(heading) && previousVal.point[1] > anchor[1]))
+        ) {
+          console.log("hook");
+          heading = flipHeading(heading);
+        }
+      }
 
       const endFixedPoint: [number, number] = compareHeading(
         heading,
