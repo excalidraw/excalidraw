@@ -7,11 +7,8 @@ import {
   getFontFamilyFallbacks,
 } from "../constants";
 import { isTextElement } from "../element";
-import {
-  charWidth,
-  containsCJK,
-  getContainerElement,
-} from "../element/textElement";
+import { charWidth, getContainerElement } from "../element/textElement";
+import { containsCJK } from "../element/textWrapping";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getFontString, PromisePool, promiseTry } from "../utils";
 import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
