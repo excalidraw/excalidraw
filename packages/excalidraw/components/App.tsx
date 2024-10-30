@@ -340,7 +340,6 @@ import {
   isValidTextContainer,
   measureText,
   normalizeText,
-  wrapText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -461,6 +460,7 @@ import {
   vectorNormalize,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
+import { wrapText } from "../element/textWrapping";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
