@@ -149,7 +149,7 @@ export const updateElbowArrowPoints = (
     ),
   );
 
-  let previousVal: {
+  let previousFixedSegment: {
     point: GlobalPoint;
     fixedPoint: FixedPointBinding["fixedPoint"] | null;
     elementId: string | null;
@@ -198,38 +198,12 @@ export const updateElbowArrowPoints = (
       fakeElementsMap.set(el.id, el);
 
       heading = headingIsHorizontal(heading)
-        ? previousVal.point[0] > anchor[0]
+        ? previousFixedSegment.point[0] > anchor[0]
           ? HEADING_RIGHT
           : HEADING_LEFT
-        : previousVal.point[1] > anchor[1]
+        : previousFixedSegment.point[1] > anchor[1]
         ? HEADING_DOWN
         : HEADING_UP;
-
-      // Detect hooks and flip the heading if needed
-      if (updatedPoints[segment.index - 3]) {
-        const isHook = !compareHeading(
-          vectorToHeading(
-            vectorFromPoint(
-              updatedPoints[segment.index - 1],
-              updatedPoints[segment.index],
-            ),
-          ),
-          vectorToHeading(
-            vectorFromPoint(
-              updatedPoints[segment.index - 3],
-              updatedPoints[segment.index - 2],
-            ),
-          ),
-        );
-        if (
-          isHook &&
-          ((headingIsHorizontal(heading) && previousVal.point[0] > anchor[0]) ||
-            (headingIsVertical(heading) && previousVal.point[1] > anchor[1]))
-        ) {
-          console.log("hook");
-          heading = flipHeading(heading);
-        }
-      }
 
       const endFixedPoint: [number, number] = compareHeading(
         heading,
@@ -241,24 +215,20 @@ export const updateElbowArrowPoints = (
         : compareHeading(heading, HEADING_UP)
         ? [0.5, 0]
         : [1, 0.5];
-      const endGlobalPoint = getGlobalFixedPointForBindableElement(
-        endFixedPoint,
-        el,
-      );
 
       const state = {
-        x: previousVal.point[0],
-        y: previousVal.point[1],
+        x: previousFixedSegment.point[0],
+        y: previousFixedSegment.point[1],
         startArrowhead: segmentIdx === 0 ? arrow.startArrowhead : null,
         endArrowhead: null as Arrowhead | null,
         startBinding:
           segmentIdx === 0
             ? arrow.startBinding
             : {
-                elementId: previousVal.elementId!,
+                elementId: previousFixedSegment.elementId!,
                 focus: 0,
                 gap: 0,
-                fixedPoint: previousVal.fixedPoint!,
+                fixedPoint: previousFixedSegment.fixedPoint!,
               },
         endBinding: {
           elementId: el.id,
@@ -277,12 +247,16 @@ export const updateElbowArrowPoints = (
         : compareHeading(heading, HEADING_UP)
         ? [0.5, 1]
         : [0, 0.5];
+      const segmentEndGlobalPoint = getGlobalFixedPointForBindableElement(
+        endFixedPoint,
+        el,
+      );
       const endLocalPoint = pointFrom<LocalPoint>(
-        endGlobalPoint[0] - previousVal.point[0],
-        endGlobalPoint[1] - previousVal.point[1],
+        segmentEndGlobalPoint[0] - previousFixedSegment.point[0],
+        segmentEndGlobalPoint[1] - previousFixedSegment.point[1],
       );
 
-      previousVal = {
+      previousFixedSegment = {
         point: getGlobalFixedPointForBindableElement(nextStartFixedPoint, el),
         fixedPoint: nextStartFixedPoint,
         elementId: el.id,
@@ -292,18 +266,18 @@ export const updateElbowArrowPoints = (
     });
   pointPairs.push([
     {
-      x: previousVal.point[0],
-      y: previousVal.point[1],
+      x: previousFixedSegment.point[0],
+      y: previousFixedSegment.point[1],
       startArrowhead: null,
       endArrowhead: arrow.endArrowhead,
       startBinding:
         nextFixedSegments.length === 0
           ? arrow.startBinding
           : {
-              elementId: previousVal.elementId!,
+              elementId: previousFixedSegment.elementId!,
               focus: 0,
               gap: 0,
-              fixedPoint: previousVal.fixedPoint!,
+              fixedPoint: previousFixedSegment.fixedPoint!,
             },
       endBinding: arrow.endBinding,
     },
@@ -313,28 +287,21 @@ export const updateElbowArrowPoints = (
       pointFrom<LocalPoint>(
         arrow.x +
           updatedPoints[updatedPoints.length - 1][0] -
-          previousVal.point[0],
+          previousFixedSegment.point[0],
         arrow.y +
           updatedPoints[updatedPoints.length - 1][1] -
-          previousVal.point[1],
+          previousFixedSegment.point[1],
       ),
     ],
   ]);
 
   const rawPointGroups = pointPairs.map(([state, points], idx) => {
     const raw =
-      routeElbowArrow(
-        state,
-        fakeElementsMap,
-        points,
-        nextFixedSegments.length > 0 && idx === 0,
-        nextFixedSegments.length > 0 && idx === pointPairs.length - 1,
-        idx === pointPairs.length - 1 || idx === 0
-          ? options
-          : {
-              disableBinding: true,
-            },
-      ) ?? [];
+      routeElbowArrow(state, fakeElementsMap, points, {
+        ...options,
+        ...(idx !== 0 ? { startIsMidPoint: true } : {}),
+        ...(idx !== pointPairs.length - 1 ? { endIsMidPoint: true } : {}),
+      }) ?? [];
 
     return raw;
   });
@@ -389,15 +356,30 @@ export const updateElbowArrowPoints = (
 };
 
 /**
- * Generate the elbow arrow segments
+ * Retrieves data necessary for calculating the elbow arrow path.
  *
- * @param arrow
- * @param elementsMap
- * @param nextPoints
- * @param options
- * @returns
+ * @param arrow - The arrow object containing its properties.
+ * @param elementsMap - A map of elements in the scene.
+ * @param nextPoints - The next set of points for the arrow.
+ * @param options - Optional parameters for the calculation.
+ * @param options.isDragging - Indicates if the arrow is being dragged.
+ * @param options.disableBinding - Indicates if binding should be disabled.
+ * @param options.startIsMidPoint - Indicates if the start point is a midpoint.
+ * @param options.endIsMidPoint - Indicates if the end point is a midpoint.
+ *
+ * @returns An object containing various properties needed for elbow arrow calculations:
+ * - dynamicAABBs: Dynamically generated axis-aligned bounding boxes.
+ * - startDonglePosition: The position of the start dongle.
+ * - startGlobalPoint: The global coordinates of the start point.
+ * - startHeading: The heading direction from the start point.
+ * - endDonglePosition: The position of the end dongle.
+ * - endGlobalPoint: The global coordinates of the end point.
+ * - endHeading: The heading direction from the end point.
+ * - commonBounds: The common bounding box that encompasses both start and end points.
+ * - hoveredStartElement: The element being hovered over at the start point.
+ * - hoveredEndElement: The element being hovered over at the end point.
  */
-const routeElbowArrow = (
+const getElbowArrowData = (
   arrow: {
     x: number;
     y: number;
@@ -408,13 +390,12 @@ const routeElbowArrow = (
   },
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   nextPoints: readonly LocalPoint[],
-  isStartSegment: boolean,
-  isEndSegment: boolean,
   options?: {
     isDragging?: boolean;
-    disableBinding?: boolean;
+    startIsMidPoint?: boolean;
+    endIsMidPoint?: boolean;
   },
-): GlobalPoint[] | null => {
+) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
     LocalPoint,
     GlobalPoint
@@ -484,6 +465,8 @@ const routeElbowArrow = (
           startHeading,
           arrow.startArrowhead
             ? FIXED_BINDING_DISTANCE * 6
+            : options?.startIsMidPoint
+            ? 0.01
             : FIXED_BINDING_DISTANCE * 2,
           1,
         ),
@@ -496,6 +479,8 @@ const routeElbowArrow = (
           endHeading,
           arrow.endArrowhead
             ? FIXED_BINDING_DISTANCE * 6
+            : options?.endIsMidPoint
+            ? 0.01
             : FIXED_BINDING_DISTANCE * 2,
           1,
         ),
@@ -526,7 +511,7 @@ const routeElbowArrow = (
       : [startElementBounds, endElementBounds],
   );
   const dynamicAABBs = generateDynamicAABBs(
-    isEndSegment
+    options?.startIsMidPoint
       ? ([
           hoveredStartElement!.x + hoveredStartElement!.width / 2 - 1,
           hoveredStartElement!.y + hoveredStartElement!.height / 2 - 1,
@@ -536,7 +521,7 @@ const routeElbowArrow = (
       : boundsOverlap
       ? startPointBounds
       : startElementBounds,
-    isStartSegment
+    options?.endIsMidPoint
       ? ([
           hoveredEndElement!.x + hoveredEndElement!.width / 2 - 1,
           hoveredEndElement!.y + hoveredEndElement!.height / 2 - 1,
@@ -547,7 +532,7 @@ const routeElbowArrow = (
       ? endPointBounds
       : endElementBounds,
     commonBounds,
-    isEndSegment
+    options?.startIsMidPoint
       ? [0, 0, 0, 0]
       : boundsOverlap
       ? offsetFromHeading(
@@ -565,7 +550,7 @@ const routeElbowArrow = (
                   : FIXED_BINDING_DISTANCE * 2),
           BASE_PADDING,
         ),
-    isStartSegment
+    options?.endIsMidPoint
       ? [0, 0, 0, 0]
       : boundsOverlap
       ? offsetFromHeading(
@@ -586,6 +571,8 @@ const routeElbowArrow = (
     boundsOverlap,
     hoveredStartElement && aabbForElement(hoveredStartElement),
     hoveredEndElement && aabbForElement(hoveredEndElement),
+    options?.endIsMidPoint,
+    options?.startIsMidPoint,
   );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
@@ -597,6 +584,61 @@ const routeElbowArrow = (
     endHeading,
     endGlobalPoint,
   );
+
+  return {
+    dynamicAABBs,
+    startDonglePosition,
+    startGlobalPoint,
+    startHeading,
+    endDonglePosition,
+    endGlobalPoint,
+    endHeading,
+    commonBounds,
+    hoveredStartElement,
+    hoveredEndElement,
+    boundsOverlap,
+    startElementBounds,
+    endElementBounds,
+  };
+};
+
+/**
+ * Generate the elbow arrow segments
+ *
+ * @param arrow
+ * @param elementsMap
+ * @param nextPoints
+ * @param options
+ * @returns
+ */
+const routeElbowArrow = (
+  arrow: {
+    x: number;
+    y: number;
+    startBinding: FixedPointBinding | null;
+    endBinding: FixedPointBinding | null;
+    startArrowhead: Arrowhead | null;
+    endArrowhead: Arrowhead | null;
+  },
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  nextPoints: readonly LocalPoint[],
+  options?: {
+    isDragging?: boolean;
+    startIsMidPoint?: boolean;
+    endIsMidPoint?: boolean;
+  },
+): GlobalPoint[] | null => {
+  const {
+    dynamicAABBs,
+    startDonglePosition,
+    startGlobalPoint,
+    startHeading,
+    endDonglePosition,
+    endGlobalPoint,
+    endHeading,
+    commonBounds,
+    hoveredEndElement,
+  } = getElbowArrowData(arrow, elementsMap, nextPoints, options);
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -820,6 +862,8 @@ const generateDynamicAABBs = (
   disableSideHack?: boolean,
   startElementBounds?: Bounds | null,
   endElementBounds?: Bounds | null,
+  disableSlideUnderForFirst?: boolean,
+  disableSlideUnderForSecond?: boolean,
 ): Bounds[] => {
   const startEl = startElementBounds ?? a;
   const endEl = endElementBounds ?? b;
@@ -830,28 +874,28 @@ const generateDynamicAABBs = (
 
   const first = [
     a[0] > b[2]
-      ? a[1] > b[3] || a[3] < b[1]
+      ? !disableSlideUnderForFirst && (a[1] > b[3] || a[3] < b[1])
         ? Math.min((startEl[0] + endEl[2]) / 2, a[0] - startLeft)
         : (startEl[0] + endEl[2]) / 2
       : a[0] > b[0]
       ? a[0] - startLeft
       : common[0] - startLeft,
     a[1] > b[3]
-      ? a[0] > b[2] || a[2] < b[0]
+      ? !disableSlideUnderForFirst && (a[0] > b[2] || a[2] < b[0])
         ? Math.min((startEl[1] + endEl[3]) / 2, a[1] - startUp)
         : (startEl[1] + endEl[3]) / 2
       : a[1] > b[1]
       ? a[1] - startUp
       : common[1] - startUp,
     a[2] < b[0]
-      ? a[1] > b[3] || a[3] < b[1]
+      ? !disableSlideUnderForFirst && (a[1] > b[3] || a[3] < b[1])
         ? Math.max((startEl[2] + endEl[0]) / 2, a[2] + startRight)
         : (startEl[2] + endEl[0]) / 2
       : a[2] < b[2]
       ? a[2] + startRight
       : common[2] + startRight,
     a[3] < b[1]
-      ? a[0] > b[2] || a[2] < b[0]
+      ? !disableSlideUnderForFirst && (a[0] > b[2] || a[2] < b[0])
         ? Math.max((startEl[3] + endEl[1]) / 2, a[3] + startDown)
         : (startEl[3] + endEl[1]) / 2
       : a[3] < b[3]
@@ -860,28 +904,28 @@ const generateDynamicAABBs = (
   ] as Bounds;
   const second = [
     b[0] > a[2]
-      ? b[1] > a[3] || b[3] < a[1]
+      ? !disableSlideUnderForSecond && (b[1] > a[3] || b[3] < a[1])
         ? Math.min((endEl[0] + startEl[2]) / 2, b[0] - endLeft)
         : (endEl[0] + startEl[2]) / 2
       : b[0] > a[0]
       ? b[0] - endLeft
       : common[0] - endLeft,
     b[1] > a[3]
-      ? b[0] > a[2] || b[2] < a[0]
+      ? !disableSlideUnderForSecond && (b[0] > a[2] || b[2] < a[0])
         ? Math.min((endEl[1] + startEl[3]) / 2, b[1] - endUp)
         : (endEl[1] + startEl[3]) / 2
       : b[1] > a[1]
       ? b[1] - endUp
       : common[1] - endUp,
     b[2] < a[0]
-      ? b[1] > a[3] || b[3] < a[1]
+      ? !disableSlideUnderForSecond && (b[1] > a[3] || b[3] < a[1])
         ? Math.max((endEl[2] + startEl[0]) / 2, b[2] + endRight)
         : (endEl[2] + startEl[0]) / 2
       : b[2] < a[2]
       ? b[2] + endRight
       : common[2] + endRight,
     b[3] < a[1]
-      ? b[0] > a[2] || b[2] < a[0]
+      ? !disableSlideUnderForSecond && (b[0] > a[2] || b[2] < a[0])
         ? Math.max((endEl[3] + startEl[1]) / 2, b[3] + endDown)
         : (endEl[3] + startEl[1]) / 2
       : b[3] < a[3]
