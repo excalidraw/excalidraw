@@ -127,7 +127,6 @@ export const updateElbowArrowPoints = (
   },
   options?: {
     isDragging?: boolean;
-    disableBinding?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   const updatedPoints = updates.points ?? arrow.points;
@@ -168,6 +167,15 @@ export const updateElbowArrowPoints = (
       let heading = segment.heading;
       let anchor = segment.anchor;
 
+      heading = headingIsHorizontal(heading)
+        ? previousFixedSegment.point[0] > anchor[0]
+          ? HEADING_RIGHT
+          : HEADING_LEFT
+        : previousFixedSegment.point[1] > anchor[1]
+        ? HEADING_DOWN
+        : HEADING_UP;
+      nextFixedSegments[segmentIdx].heading = heading;
+
       // Allow shifting the focus point of both fixed segment borders
       // are far away in one direction, creating a "valley" otherwise
       const prevRef = references[segmentIdx];
@@ -185,6 +193,7 @@ export const updateElbowArrowPoints = (
             anchor[1],
           );
         }
+        nextFixedSegments[segmentIdx].anchor = anchor;
       }
       const el = {
         ...newElement({
@@ -197,14 +206,6 @@ export const updateElbowArrowPoints = (
         index: "DONOTSYNC" as FractionalIndex,
       } as Ordered<ExcalidrawBindableElement>;
       fakeElementsMap.set(el.id, el);
-
-      heading = headingIsHorizontal(heading)
-        ? previousFixedSegment.point[0] > anchor[0]
-          ? HEADING_RIGHT
-          : HEADING_LEFT
-        : previousFixedSegment.point[1] > anchor[1]
-        ? HEADING_DOWN
-        : HEADING_UP;
 
       const endFixedPoint: [number, number] = compareHeading(
         heading,
@@ -320,31 +321,10 @@ export const updateElbowArrowPoints = (
       // i.e. we are the first point of the group excluding the first group
       currentGroupIdx = groupIdx;
 
-      const prevGroupLastPoint = points[index - 1];
-
-      const segmentHorizontal = headingIsHorizontal(
-        nextFixedSegments[currentGroupIdx - 1].heading,
-      );
-
-      const anchor = pointFrom<GlobalPoint>(
-        segmentHorizontal
-          ? (prevGroupLastPoint[0] + point[0]) / 2
-          : nextFixedSegments[currentGroupIdx - 1].anchor[0],
-        segmentHorizontal
-          ? nextFixedSegments[currentGroupIdx - 1].anchor[1]
-          : (prevGroupLastPoint[1] + point[1]) / 2,
-      );
-
       return {
-        anchor,
+        anchor: nextFixedSegments[currentGroupIdx - 1].anchor,
         index,
-        heading: segmentHorizontal
-          ? point[0] > prevGroupLastPoint[0]
-            ? HEADING_LEFT
-            : HEADING_RIGHT
-          : point[1] > prevGroupLastPoint[1]
-          ? HEADING_UP
-          : HEADING_DOWN,
+        heading: nextFixedSegments[currentGroupIdx - 1].heading,
       };
     }
 
@@ -417,26 +397,26 @@ const getElbowArrowData = (
   const startGlobalPoint = options?.startIsMidPoint
     ? origStartGlobalPoint
     : getGlobalPoint(
-    arrow.startBinding?.fixedPoint,
-    origStartGlobalPoint,
-    origEndGlobalPoint,
-    elementsMap,
-    startElement,
-    hoveredStartElement,
+        arrow.startBinding?.fixedPoint,
+        origStartGlobalPoint,
+        origEndGlobalPoint,
+        elementsMap,
+        startElement,
+        hoveredStartElement,
 
-    options?.isDragging,
-  );
+        options?.isDragging,
+      );
   const endGlobalPoint = options?.endIsMidPoint
     ? origEndGlobalPoint
     : getGlobalPoint(
-    arrow.endBinding?.fixedPoint,
-    origEndGlobalPoint,
-    origStartGlobalPoint,
-    elementsMap,
-    endElement,
-    hoveredEndElement,
-    options?.isDragging,
-  );
+        arrow.endBinding?.fixedPoint,
+        origEndGlobalPoint,
+        origStartGlobalPoint,
+        elementsMap,
+        endElement,
+        hoveredEndElement,
+        options?.isDragging,
+      );
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
