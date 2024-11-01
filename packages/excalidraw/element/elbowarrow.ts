@@ -162,7 +162,7 @@ export const updateElbowArrowPoints = (
         vectorFromPoint(
           anchor,
           pointFrom<GlobalPoint>(
-            headingIsVertical(heading) ? startDonglePosition[0] : anchor[0],
+            headingIsVertical(heading) ? anchor[0] : startDonglePosition[0],
             headingIsHorizontal(heading) ? anchor[1] : startDonglePosition[1],
           ),
         ),
@@ -185,6 +185,13 @@ export const updateElbowArrowPoints = (
             anchor,
           ),
         );
+      } else if (
+        (headingIsHorizontal(heading) &&
+          startDonglePosition[0] > endDonglePosition[0]) ||
+        (headingIsVertical(heading) &&
+          startDonglePosition[1] > endDonglePosition[1])
+      ) {
+        heading = flipHeading(heading);
       }
       nextFixedSegments[segmentIdx].heading = heading;
 
