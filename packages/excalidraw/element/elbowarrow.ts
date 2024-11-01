@@ -19,7 +19,6 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -197,13 +196,6 @@ export const updateElbowArrowPoints = (
           ? (startDonglePosition[1] + endDonglePosition[1]) / 2
           : anchor[1],
       );
-
-      // debugDrawPoint(startDonglePosition, { color: "green", permanent: true });
-      // debugDrawPoint(endDonglePosition, { color: "red", permanent: true });
-      // debugDrawPoint(startGlobalPoint, { color: "blue", permanent: true });
-      //debugDrawPoint(endGlobalPoint, { color: "blue", permanent: true });
-      // debugDrawPoint(anchor, { color: "black", permanent: false });
-
       nextFixedSegments[segmentIdx].anchor = anchor;
 
       const el = {
