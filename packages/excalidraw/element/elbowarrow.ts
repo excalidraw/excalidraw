@@ -19,6 +19,7 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -167,14 +168,28 @@ export const updateElbowArrowPoints = (
       let heading = segment.heading;
       let anchor = segment.anchor;
 
-      heading = headingIsHorizontal(heading)
-        ? previousFixedSegment.point[0] > anchor[0]
-          ? HEADING_RIGHT
-          : HEADING_LEFT
-        : previousFixedSegment.point[1] > anchor[1]
-        ? HEADING_DOWN
-        : HEADING_UP;
+      anchor = pointFrom<GlobalPoint>(
+        headingIsHorizontal(heading)
+          ? (startDonglePosition[0] + endDonglePosition[0]) / 2
+          : anchor[0],
+        headingIsVertical(heading)
+          ? anchor[1]
+          : (startDonglePosition[1] + endDonglePosition[1]) / 2,
+      );
+      heading = vectorToHeading(
+        vectorFromPoint(
+          anchor,
+          pointFrom<GlobalPoint>(
+            headingIsVertical(heading) ? startDonglePosition[0] : anchor[0],
+            headingIsHorizontal(heading) ? anchor[1] : startDonglePosition[1],
+          ),
+        ),
+      );
       nextFixedSegments[segmentIdx].heading = heading;
+
+      debugDrawPoint(startDonglePosition, { color: "green", permanent: false });
+      debugDrawPoint(endDonglePosition, { color: "red", permanent: false });
+      debugDrawPoint(anchor, { color: "blue", permanent: false });
 
       // Allow shifting the focus point of both fixed segment borders
       // are far away in one direction, creating a "valley" otherwise
@@ -491,7 +506,7 @@ const getElbowArrowData = (
         : startPointBounds,
     );
   const commonBounds = commonAABB(
-    boundsOverlap
+    boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
       ? [startPointBounds, endPointBounds]
       : [startElementBounds, endElementBounds],
   );
@@ -503,7 +518,7 @@ const getElbowArrowData = (
           hoveredStartElement!.x + hoveredStartElement!.width / 2 + 1,
           hoveredStartElement!.y + hoveredStartElement!.height / 2 + 1,
         ] as Bounds)
-      : boundsOverlap
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
       ? startPointBounds
       : startElementBounds,
     options?.endIsMidPoint
@@ -513,13 +528,13 @@ const getElbowArrowData = (
           hoveredEndElement!.x + hoveredEndElement!.width / 2 + 1,
           hoveredEndElement!.y + hoveredEndElement!.height / 2 + 1,
         ] as Bounds)
-      : boundsOverlap
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
       ? endPointBounds
       : endElementBounds,
     commonBounds,
     options?.startIsMidPoint
       ? [0, 0, 0, 0]
-      : boundsOverlap
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
       ? offsetFromHeading(
           startHeading,
           !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
@@ -537,7 +552,7 @@ const getElbowArrowData = (
         ),
     options?.endIsMidPoint
       ? [0, 0, 0, 0]
-      : boundsOverlap
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
       ? offsetFromHeading(
           endHeading,
           !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
@@ -553,7 +568,7 @@ const getElbowArrowData = (
                   : FIXED_BINDING_DISTANCE * 2),
           BASE_PADDING,
         ),
-    boundsOverlap,
+    boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint),
     hoveredStartElement && aabbForElement(hoveredStartElement),
     hoveredEndElement && aabbForElement(hoveredEndElement),
     options?.endIsMidPoint,
