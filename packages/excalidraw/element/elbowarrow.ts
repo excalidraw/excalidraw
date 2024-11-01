@@ -414,7 +414,9 @@ const getElbowArrowData = (
   const [hoveredStartElement, hoveredEndElement] = options?.isDragging
     ? getHoveredElements(origStartGlobalPoint, origEndGlobalPoint, elementsMap)
     : [startElement, endElement];
-  const startGlobalPoint = getGlobalPoint(
+  const startGlobalPoint = options?.startIsMidPoint
+    ? origStartGlobalPoint
+    : getGlobalPoint(
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
     origEndGlobalPoint,
@@ -424,7 +426,9 @@ const getElbowArrowData = (
 
     options?.isDragging,
   );
-  const endGlobalPoint = getGlobalPoint(
+  const endGlobalPoint = options?.endIsMidPoint
+    ? origEndGlobalPoint
+    : getGlobalPoint(
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
     origStartGlobalPoint,
