@@ -138,16 +138,17 @@ export const updateElbowArrowPoints = (
     updates?.fixedSegments ?? [],
   );
 
-  const references: GlobalPoint[] = [pointFrom<GlobalPoint>(arrow.x, arrow.y)];
+  const { startDonglePosition, endDonglePosition } = getElbowArrowData(
+    arrow,
+    elementsMap,
+    updatedPoints,
+  );
+
+  const references: GlobalPoint[] = [startDonglePosition];
   nextFixedSegments.forEach((segment) => {
     references.push(segment.anchor);
   });
-  references.push(
-    pointFrom<GlobalPoint>(
-      arrow.x + updatedPoints[updatedPoints.length - 1][0],
-      arrow.y + updatedPoints[updatedPoints.length - 1][1],
-    ),
-  );
+  references.push(endDonglePosition);
 
   let previousFixedSegment: {
     point: GlobalPoint;
