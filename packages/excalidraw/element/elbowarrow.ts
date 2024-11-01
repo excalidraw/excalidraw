@@ -138,17 +138,8 @@ export const updateElbowArrowPoints = (
     updates?.fixedSegments ?? [],
   );
 
-  const { startDonglePosition, endDonglePosition } = getElbowArrowData(
-    arrow,
-    elementsMap,
-    updatedPoints,
-  );
-
-  const references: GlobalPoint[] = [startDonglePosition];
-  nextFixedSegments.forEach((segment) => {
-    references.push(segment.anchor);
-  });
-  references.push(endDonglePosition);
+  const { startDonglePosition, endDonglePosition, startGlobalPoint } =
+    getElbowArrowData(arrow, elementsMap, updatedPoints);
 
   let previousFixedSegment: {
     point: GlobalPoint;
@@ -168,14 +159,6 @@ export const updateElbowArrowPoints = (
       let heading = segment.heading;
       let anchor = segment.anchor;
 
-      anchor = pointFrom<GlobalPoint>(
-        headingIsHorizontal(heading)
-          ? (startDonglePosition[0] + endDonglePosition[0]) / 2
-          : anchor[0],
-        headingIsVertical(heading)
-          ? anchor[1]
-          : (startDonglePosition[1] + endDonglePosition[1]) / 2,
-      );
       heading = vectorToHeading(
         vectorFromPoint(
           anchor,
@@ -185,31 +168,44 @@ export const updateElbowArrowPoints = (
           ),
         ),
       );
+
+      if (
+        (headingIsHorizontal(heading) &&
+          startDonglePosition[0] === endDonglePosition[0] &&
+          Math.abs(anchor[0] - startGlobalPoint[0]) > 26.5) ||
+        (headingIsVertical(heading) &&
+          startDonglePosition[1] === endDonglePosition[1] &&
+          Math.abs(anchor[1] - startGlobalPoint[1]) > 26.5)
+      ) {
+        heading = vectorToHeading(
+          vectorFromPoint(
+            pointFrom<GlobalPoint>(
+              headingIsVertical(heading) ? anchor[0] : startGlobalPoint[0],
+              headingIsHorizontal(heading) ? anchor[1] : startGlobalPoint[1],
+            ),
+            anchor,
+          ),
+        );
+      }
       nextFixedSegments[segmentIdx].heading = heading;
 
-      debugDrawPoint(startDonglePosition, { color: "green", permanent: false });
-      debugDrawPoint(endDonglePosition, { color: "red", permanent: false });
-      debugDrawPoint(anchor, { color: "blue", permanent: false });
+      anchor = pointFrom<GlobalPoint>(
+        headingIsHorizontal(heading)
+          ? (startDonglePosition[0] + endDonglePosition[0]) / 2
+          : anchor[0],
+        headingIsVertical(heading)
+          ? (startDonglePosition[1] + endDonglePosition[1]) / 2
+          : anchor[1],
+      );
 
-      // Allow shifting the focus point of both fixed segment borders
-      // are far away in one direction, creating a "valley" otherwise
-      const prevRef = references[segmentIdx];
-      const nextRef = references[segmentIdx + 2];
+      // debugDrawPoint(startDonglePosition, { color: "green", permanent: true });
+      // debugDrawPoint(endDonglePosition, { color: "red", permanent: true });
+      // debugDrawPoint(startGlobalPoint, { color: "blue", permanent: true });
+      //debugDrawPoint(endGlobalPoint, { color: "blue", permanent: true });
+      // debugDrawPoint(anchor, { color: "black", permanent: false });
 
-      if (prevRef && nextRef) {
-        if (headingIsVertical(heading)) {
-          anchor = pointFrom<GlobalPoint>(
-            anchor[0],
-            (prevRef[1] + nextRef[1]) / 2,
-          );
-        } else {
-          anchor = pointFrom<GlobalPoint>(
-            (prevRef[0] + nextRef[0]) / 2,
-            anchor[1],
-          );
-        }
-        nextFixedSegments[segmentIdx].anchor = anchor;
-      }
+      nextFixedSegments[segmentIdx].anchor = anchor;
+
       const el = {
         ...newElement({
           type: "rectangle",
@@ -584,6 +580,11 @@ const getElbowArrowData = (
     endHeading,
     endGlobalPoint,
   );
+
+  // options?.endIsMidPoint &&
+  //   debugDrawBounds(dynamicAABBs[0], { color: "green", permanent: true });
+  // options?.endIsMidPoint &&
+  //   debugDrawBounds(dynamicAABBs[1], { color: "red", permanent: true });
 
   return {
     dynamicAABBs,
@@ -1425,7 +1426,7 @@ const getBindPointHeading = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
-) =>
+): Heading =>
   getHeadingForElbowArrowSnap(
     p,
     otherPoint,
