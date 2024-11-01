@@ -33,6 +33,8 @@ import type {
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
 
+const NEVERSAFARI = false; //zsviczian
+
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
   // a static member to reduce memory footprint
@@ -148,7 +150,7 @@ export class Fonts {
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const charsPerFamily = isSafari
+    const charsPerFamily = NEVERSAFARI //zsviczian
       ? Fonts.getCharsPerFamily(this.scene.getNonDeletedElements())
       : undefined;
 
@@ -166,7 +168,7 @@ export class Fonts {
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
     const fontFamilies = Fonts.getUniqueFamilies(elements);
-    const charsPerFamily = isSafari
+    const charsPerFamily = NEVERSAFARI //zsviczian
       ? Fonts.getCharsPerFamily(elements)
       : undefined;
 
@@ -263,7 +265,7 @@ export class Fonts {
       // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
       // for Safari on init, we rather check with the "text" param, even though it's less efficient, as otherwise fonts might remain unloaded
       const text =
-        isSafari && charsPerFamily
+        NEVERSAFARI && charsPerFamily //zsviczian
           ? Fonts.getCharacters(charsPerFamily, fontFamily)
           : "";
 
