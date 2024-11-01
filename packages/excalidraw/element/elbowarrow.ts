@@ -19,7 +19,6 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -186,10 +185,6 @@ export const updateElbowArrowPoints = (
         ),
       );
       nextFixedSegments[segmentIdx].heading = heading;
-
-      debugDrawPoint(startDonglePosition, { color: "green", permanent: false });
-      debugDrawPoint(endDonglePosition, { color: "red", permanent: false });
-      debugDrawPoint(anchor, { color: "blue", permanent: false });
 
       // Allow shifting the focus point of both fixed segment borders
       // are far away in one direction, creating a "valley" otherwise
