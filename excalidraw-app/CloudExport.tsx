@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { STORAGE_KEYS } from "./app_constants";
 import { LocalData } from "./data/LocalData";
 import type {
@@ -6,22 +6,24 @@ import type {
   OrderedExcalidrawElement,
 } from "../packages/excalidraw/element/types";
 import type { AppState, BinaryFileData } from "../packages/excalidraw/types";
+import { ExcalidrawError } from "../packages/excalidraw/errors";
+import { base64urlToString } from "../packages/excalidraw/data/encode";
 
-const REQUEST_SCENE = "REQUEST_SCENE";
-const E_PLUS_DEV_URL = "http://localhost:3000";
+const EVENT_REQUEST_SCENE = "REQUEST_SCENE";
 
-const EXCALIDRAW_PLUS_ORIGIN = import.meta.env.PROD
-  ? import.meta.env.VITE_APP_PLUS_APP
-  : E_PLUS_DEV_URL;
+const EXCALIDRAW_PLUS_ORIGIN = import.meta.env.VITE_APP_PLUS_APP;
 
-type ParsedSceneData =
-  | {
-      status: "success";
-      elements: OrderedExcalidrawElement[];
-      appState: Pick<AppState, "viewBackgroundColor">;
-      files: { loadedFiles: BinaryFileData[]; erroredFiles: Map<FileId, true> };
-    }
-  | { status: "error"; errorMsg: string };
+type MESSAGE_DATA =
+  | SCENE_DATA_MESAGE
+  | { type: "ERROR"; message: string }
+  | { type: "READY" };
+
+type SCENE_DATA_MESAGE = {
+  type: "SCENE_DATA";
+  elements: OrderedExcalidrawElement[];
+  appState: Pick<AppState, "viewBackgroundColor">;
+  files: { loadedFiles: BinaryFileData[]; erroredFiles: Map<FileId, true> };
+};
 
 const parseSceneData = async ({
   rawElementsString,
@@ -29,9 +31,9 @@ const parseSceneData = async ({
 }: {
   rawElementsString: string | null;
   rawAppStateString: string | null;
-}): Promise<ParsedSceneData> => {
+}): Promise<SCENE_DATA_MESAGE> => {
   if (!rawElementsString || !rawAppStateString) {
-    return { status: "error", errorMsg: "Elements or appstate is missing." };
+    throw new ExcalidrawError("Elements or appstate is missing.");
   }
 
   try {
@@ -40,10 +42,7 @@ const parseSceneData = async ({
     ) as OrderedExcalidrawElement[];
 
     if (!elements.length) {
-      return {
-        status: "error",
-        errorMsg: "Scene is empty, nothing to export.",
-      };
+      throw new ExcalidrawError("Scene is empty, nothing to export.");
     }
 
     const appState = JSON.parse(rawAppStateString) as Pick<
@@ -61,13 +60,15 @@ const parseSceneData = async ({
     const files = await LocalData.fileStorage.getFiles(fileIds);
 
     return {
-      status: "success",
+      type: "SCENE_DATA",
       elements,
       appState,
       files,
     };
-  } catch {
-    return { status: "error", errorMsg: "Failed to parse scene data." };
+  } catch (error: any) {
+    throw error instanceof ExcalidrawError
+      ? error
+      : new ExcalidrawError("Failed to parse scene data.");
   }
 };
 
@@ -80,26 +81,18 @@ const verifyJWT = async ({
 }) => {
   try {
     if (!publicKey) {
-      throw new Error("Public key is undefined");
+      throw new ExcalidrawError("Public key is undefined");
     }
 
     const [header, payload, signature] = token.split(".");
 
     if (!header || !payload || !signature) {
-      throw new Error("Invalid JWT format");
+      throw new ExcalidrawError("Invalid JWT format");
     }
 
-    const decodeBase64Url = (str: string) => {
-      return atob(
-        str
-          .replace(/-/g, "+")
-          .replace(/_/g, "/")
-          .padEnd(str.length + ((4 - (str.length % 4)) % 4), "="),
-      );
-    };
-
-    const decodedPayload = decodeBase64Url(payload);
-    const decodedSignature = decodeBase64Url(signature);
+    // JWT is using Base64URL encoding
+    const decodedPayload = base64urlToString(payload);
+    const decodedSignature = base64urlToString(signature);
 
     const data = `${header}.${payload}`;
     const signatureArrayBuffer = Uint8Array.from(decodedSignature, (c) =>
@@ -144,22 +137,31 @@ const verifyJWT = async ({
 };
 
 export const CloudExport = () => {
-  useEffect(() => {
+  const readyRef = useRef(false);
+
+  useLayoutEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
       if (event.origin !== EXCALIDRAW_PLUS_ORIGIN) {
-        return;
+        throw new ExcalidrawError("Invalid origin");
       }
 
-      if (event.data.type === REQUEST_SCENE && event.data.jwt) {
-        const token = event.data.jwt;
+      if (event.data.type === EVENT_REQUEST_SCENE) {
+        if (!event.data.jwt) {
+          throw new ExcalidrawError("JWT is missing");
+        }
 
         try {
-          await verifyJWT({
-            token,
-            publicKey: import.meta.env.VITE_APP_OSS_SCENE_IMPORT_PUBLIC_KEY,
-          });
+          try {
+            await verifyJWT({
+              token: event.data.jwt,
+              publicKey: import.meta.env.VITE_APP_PLUS_EXPORT_PUBLIC_KEY,
+            });
+          } catch (error: any) {
+            console.error(`Failed to verify JWT: ${error.message}`);
+            throw new ExcalidrawError("Failed to verify JWT");
+          }
 
-          const parsedSceneData = await parseSceneData({
+          const parsedSceneData: MESSAGE_DATA = await parseSceneData({
             rawAppStateString: localStorage.getItem(
               STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
             ),
@@ -168,32 +170,32 @@ export const CloudExport = () => {
             ),
           });
 
-          const responseData: ParsedSceneData =
-            parsedSceneData.status === "success"
-              ? parsedSceneData
-              : { status: "error", errorMsg: parsedSceneData.errorMsg };
-
-          if (event.source) {
-            event.source.postMessage(responseData, {
-              targetOrigin: event.origin,
-            });
-          }
+          event.source!.postMessage(parsedSceneData, {
+            targetOrigin: EXCALIDRAW_PLUS_ORIGIN,
+          });
         } catch (error) {
-          console.error("Failed to verify JWT:", error);
-          if (event.source) {
-            const responseData: ParsedSceneData = {
-              status: "error",
-              errorMsg: error instanceof Error ? error.message : "Invalid JWT",
-            };
-            event.source.postMessage(responseData, {
-              targetOrigin: event.origin,
-            });
-          }
+          const responseData: MESSAGE_DATA = {
+            type: "ERROR",
+            message:
+              error instanceof ExcalidrawError
+                ? error.message
+                : "Failed to export scene data",
+          };
+          event.source!.postMessage(responseData, {
+            targetOrigin: EXCALIDRAW_PLUS_ORIGIN,
+          });
         }
       }
     };
 
     window.addEventListener("message", handleMessage);
+
+    // so we don't send twice in StrictMode
+    if (!readyRef.current) {
+      readyRef.current = true;
+      const message: MESSAGE_DATA = { type: "READY" };
+      window.parent.postMessage(message, EXCALIDRAW_PLUS_ORIGIN);
+    }
 
     return () => {
       window.removeEventListener("message", handleMessage);
