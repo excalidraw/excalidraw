@@ -21,6 +21,7 @@ import {
 } from "../constants";
 import type { MaybeTransformHandleType } from "./transformHandles";
 import { isTextElement } from ".";
+import { wrapText } from "./textWrapping";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 import type { AppState } from "../types";
@@ -343,7 +344,7 @@ let canvas: HTMLCanvasElement | undefined;
  *
  * `Math.ceil` of the final width adds additional buffer which stabilizes slight wrapping incosistencies.
  */
-const getLineWidth = (
+export const getLineWidth = (
   text: string,
   font: FontString,
   forceAdvanceWidth?: true,
@@ -408,193 +409,34 @@ export const getTextHeight = (
   return getLineHeightInPx(fontSize, lineHeight) * lineCount;
 };
 
-export const parseTokens = (text: string) => {
-  // Splitting words containing "-" as those are treated as separate words
-  // by css wrapping algorithm eg non-profit => non-, profit
-  const words = text.split("-");
-  if (words.length > 1) {
-    // non-proft org => ['non-', 'profit org']
-    words.forEach((word, index) => {
-      if (index !== words.length - 1) {
-        words[index] = word += "-";
-      }
-    });
-  }
-  // Joining the words with space and splitting them again with space to get the
-  // final list of tokens
-  // ['non-', 'profit org'] =>,'non- proft org' => ['non-','profit','org']
-  return words.join(" ").split(" ");
-};
-
-export const wrapText = (
-  text: string,
-  font: FontString,
-  maxWidth: number,
-): string => {
-  // if maxWidth is not finite or NaN which can happen in case of bugs in
-  // computation, we need to make sure we don't continue as we'll end up
-  // in an infinite loop
-  if (!Number.isFinite(maxWidth) || maxWidth < 0) {
-    return text;
-  }
-
-  const lines: Array<string> = [];
-  const originalLines = text.split("\n");
-  const spaceAdvanceWidth = getLineWidth(" ", font, true);
-
-  let currentLine = "";
-  let currentLineWidthTillNow = 0;
-
-  const push = (str: string) => {
-    if (str.trim()) {
-      lines.push(str);
-    }
-  };
-
-  const resetParams = () => {
-    currentLine = "";
-    currentLineWidthTillNow = 0;
-  };
-
-  for (const originalLine of originalLines) {
-    const currentLineWidth = getLineWidth(originalLine, font, true);
-
-    // Push the line if its <= maxWidth
-    if (currentLineWidth <= maxWidth) {
-      lines.push(originalLine);
-      continue;
-    }
-
-    const words = parseTokens(originalLine);
-    resetParams();
-
-    let index = 0;
-
-    while (index < words.length) {
-      const currentWordWidth = getLineWidth(words[index], font, true);
-
-      // This will only happen when single word takes entire width
-      if (currentWordWidth === maxWidth) {
-        push(words[index]);
-        index++;
-      }
-
-      // Start breaking longer words exceeding max width
-      else if (currentWordWidth > maxWidth) {
-        // push current line since the current word exceeds the max width
-        // so will be appended in next line
-        push(currentLine);
-
-        resetParams();
-
-        while (words[index].length > 0) {
-          const currentChar = String.fromCodePoint(
-            words[index].codePointAt(0)!,
-          );
-
-          const line = currentLine + currentChar;
-          // use advance width instead of the actual width as it's closest to the browser wapping algo
-          // use width of the whole line instead of calculating individual chars to accomodate for kerning
-          const lineAdvanceWidth = getLineWidth(line, font, true);
-          const charAdvanceWidth = charWidth.calculate(currentChar, font);
-
-          currentLineWidthTillNow = lineAdvanceWidth;
-          words[index] = words[index].slice(currentChar.length);
-
-          if (currentLineWidthTillNow >= maxWidth) {
-            push(currentLine);
-            currentLine = currentChar;
-            currentLineWidthTillNow = charAdvanceWidth;
-          } else {
-            currentLine = line;
-          }
-        }
-        // push current line if appending space exceeds max width
-        if (currentLineWidthTillNow + spaceAdvanceWidth >= maxWidth) {
-          push(currentLine);
-          resetParams();
-          // space needs to be appended before next word
-          // as currentLine contains chars which couldn't be appended
-          // to previous line unless the line ends with hyphen to sync
-          // with css word-wrap
-        } else if (!currentLine.endsWith("-")) {
-          currentLine += " ";
-          currentLineWidthTillNow += spaceAdvanceWidth;
-        }
-        index++;
-      } else {
-        // Start appending words in a line till max width reached
-        while (currentLineWidthTillNow < maxWidth && index < words.length) {
-          const word = words[index];
-          currentLineWidthTillNow = getLineWidth(
-            currentLine + word,
-            font,
-            true,
-          );
-
-          if (currentLineWidthTillNow > maxWidth) {
-            push(currentLine);
-            resetParams();
-
-            break;
-          }
-          index++;
-
-          // if word ends with "-" then we don't need to add space
-          // to sync with css word-wrap
-          const shouldAppendSpace = !word.endsWith("-");
-          currentLine += word;
-
-          if (shouldAppendSpace) {
-            currentLine += " ";
-          }
-
-          // Push the word if appending space exceeds max width
-          if (currentLineWidthTillNow + spaceAdvanceWidth >= maxWidth) {
-            if (shouldAppendSpace) {
-              lines.push(currentLine.slice(0, -1));
-            } else {
-              lines.push(currentLine);
-            }
-            resetParams();
-            break;
-          }
-        }
-      }
-    }
-
-    if (currentLine.slice(-1) === " ") {
-      // only remove last trailing space which we have added when joining words
-      currentLine = currentLine.slice(0, -1);
-      push(currentLine);
-    }
-  }
-
-  return lines.join("\n");
-};
-
 export const charWidth = (() => {
   const cachedCharWidth: { [key: FontString]: Array<number> } = {};
 
   const calculate = (char: string, font: FontString) => {
-    const ascii = char.charCodeAt(0);
+    const unicode = char.charCodeAt(0);
     if (!cachedCharWidth[font]) {
       cachedCharWidth[font] = [];
     }
-    if (!cachedCharWidth[font][ascii]) {
+    if (!cachedCharWidth[font][unicode]) {
       const width = getLineWidth(char, font, true);
-      cachedCharWidth[font][ascii] = width;
+      cachedCharWidth[font][unicode] = width;
     }
 
-    return cachedCharWidth[font][ascii];
+    return cachedCharWidth[font][unicode];
   };
 
   const getCache = (font: FontString) => {
     return cachedCharWidth[font];
   };
+
+  const clearCache = (font: FontString) => {
+    cachedCharWidth[font] = [];
+  };
+
   return {
     calculate,
     getCache,
+    clearCache,
   };
 })();
 

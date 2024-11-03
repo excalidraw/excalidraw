@@ -17,6 +17,7 @@ import {
   isArrowElement,
   hasBoundTextElement,
   isMagicFrameElement,
+  isImageElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -61,6 +62,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
 import { isRightAngleRads } from "../../math";
 import { getCornerRadius } from "../shapes";
+import { getUncroppedImageElement } from "../element/cropElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -135,6 +137,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
+  imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
 }
@@ -332,6 +335,7 @@ const generateElementCanvas = (
       getContainingFrame(element, elementsMap)?.opacity || 100,
     boundTextCanvas,
     angle: element.angle,
+    imageCrop: isImageElement(element) ? element.crop : null,
   };
 };
 
@@ -434,8 +438,22 @@ const drawElementOnCanvas = (
           );
           context.clip();
         }
+
+        const { x, y, width, height } = element.crop
+          ? element.crop
+          : {
+              x: 0,
+              y: 0,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            };
+
         context.drawImage(
           img,
+          x,
+          y,
+          width,
+          height,
           0 /* hardcoded for the selection box*/,
           0,
           element.width,
@@ -519,6 +537,7 @@ const generateElementWithCanvas = (
     !appState?.shouldCacheIgnoreZoom;
   const boundTextElement = getBoundTextElement(element, elementsMap);
   const boundTextElementVersion = boundTextElement?.version || null;
+  const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
@@ -528,6 +547,7 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
+    prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
     // since we rotate the canvas when copying from cached canvas, we don't
     // regenerate the cached canvas. But we need to in case of labels which are
@@ -919,6 +939,35 @@ export const renderElement = (
           // zero effect.
           //
           context.imageSmoothingEnabled = false;
+        }
+
+        if (
+          element.id === appState.croppingElementId &&
+          isImageElement(elementWithCanvas.element) &&
+          elementWithCanvas.element.crop !== null
+        ) {
+          context.save();
+          context.globalAlpha = 0.1;
+
+          const uncroppedElementCanvas = generateElementCanvas(
+            getUncroppedImageElement(elementWithCanvas.element, elementsMap),
+            allElementsMap,
+            appState.zoom,
+            renderConfig,
+            appState,
+          );
+
+          if (uncroppedElementCanvas) {
+            drawElementFromCanvas(
+              uncroppedElementCanvas,
+              context,
+              renderConfig,
+              appState,
+              allElementsMap,
+            );
+          }
+
+          context.restore();
         }
 
         drawElementFromCanvas(

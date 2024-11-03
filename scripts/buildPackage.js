@@ -1,7 +1,6 @@
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
-const { woff2BrowserPlugin } = require("./woff2/woff2-esbuild-plugins");
 
 // Will be used later for treeshaking
 //const fs = require("fs");
@@ -45,13 +44,15 @@ const browserConfig = {
   format: "esm",
   plugins: [
     sassPlugin(),
-    woff2BrowserPlugin(),
     externalGlobalPlugin({
       react: "React",
       "react-dom": "ReactDOM",
     }),
   ],
   splitting: true,
+  loader: {
+    ".woff2": "file",
+  },
 };
 const createESMBrowserBuild = async () => {
   // Development unminified build with source maps
@@ -96,37 +97,65 @@ const createESMBrowserBuild = async () => {
 //   );
 // });
 
-const rawConfig = {
-  entryPoints: ["index.tsx"],
+const rawConfigCommon = {
   bundle: true,
   format: "esm",
-  plugins: [sassPlugin(), woff2BrowserPlugin()],
+  plugins: [sassPlugin()],
+  assetNames: "[dir]/[name]-[hash]",
   loader: {
     ".json": "copy",
+    ".woff2": "file",
   },
   packages: "external",
+  // chunks are always external, so they are not bundled within and get build separately
+  external: ["*.chunk"],
 };
 
-const createESMRawBuild = async () => {
-  // Development unminified build with source maps
-  await build({
-    ...rawConfig,
+const rawConfigIndex = {
+  ...rawConfigCommon,
+  entryPoints: ["index.tsx"],
+};
+
+const rawConfigChunks = {
+  ...rawConfigCommon,
+  // create a separate chunk for each
+  entryPoints: ["**/*.chunk.ts"],
+};
+
+function buildDev(chunkConfig) {
+  const config = {
+    ...chunkConfig,
     sourcemap: true,
-    outdir: "dist/dev",
     define: {
       "import.meta.env": JSON.stringify({ DEV: true }),
     },
-  });
+    outdir: "dist/dev",
+  };
 
-  // production minified build without sourcemaps
-  await build({
-    ...rawConfig,
+  return build(config);
+}
+
+function buildProd(chunkConfig) {
+  const config = {
+    ...chunkConfig,
     minify: true,
-    outdir: "dist/prod",
     define: {
       "import.meta.env": JSON.stringify({ PROD: true }),
     },
-  });
+    outdir: "dist/prod",
+  };
+
+  return build(config);
+}
+
+const createESMRawBuild = async () => {
+  // development unminified build with source maps
+  await buildDev(rawConfigIndex);
+  await buildDev(rawConfigChunks);
+
+  // production minified buld without sourcemaps
+  await buildProd(rawConfigIndex);
+  await buildProd(rawConfigChunks);
 };
 
 createESMRawBuild();

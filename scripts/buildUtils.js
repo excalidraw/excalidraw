@@ -1,17 +1,17 @@
 const fs = require("fs");
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
-const {
-  woff2BrowserPlugin,
-  woff2ServerPlugin,
-} = require("./woff2/woff2-esbuild-plugins");
+const { woff2ServerPlugin } = require("./woff2/woff2-esbuild-plugins");
 
 const browserConfig = {
   entryPoints: ["index.ts"],
   bundle: true,
   format: "esm",
-  plugins: [sassPlugin(), woff2BrowserPlugin()],
+  plugins: [sassPlugin()],
   assetNames: "assets/[name]",
+  loader: {
+    ".woff2": "file",
+  },
 };
 
 // Will be used later for treeshaking
@@ -82,7 +82,6 @@ const rawConfig = {
   entryPoints: ["index.ts"],
   bundle: true,
   format: "esm",
-  packages: "external",
 };
 
 // const BASE_PATH = `${path.resolve(`${__dirname}/..`)}`;

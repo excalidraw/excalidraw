@@ -5,6 +5,7 @@ import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
+import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
 // To load .env.local variables
@@ -25,8 +26,8 @@ export default defineConfig({
       output: {
         assetFileNames(chunkInfo) {
           if (chunkInfo?.name?.endsWith(".woff2")) {
-            // put on root so we are flexible about the CDN path
-            return "[name]-[hash][extname]";
+            const family = chunkInfo.name.split("-")[0];
+            return `fonts/${family}/[name][extname]`;
           }
 
           return "assets/[name]-[hash][extname]";
@@ -48,8 +49,17 @@ export default defineConfig({
       },
     },
     sourcemap: true,
+    // don't auto-inline small assets (i.e. fonts hosted on CDN)
+    assetsInlineLimit: 0,
   },
   plugins: [
+    Sitemap({
+      hostname: "https://excalidraw.com",
+      outDir: "build",
+      changefreq: "monthly",
+      // its static in public folder
+      generateRobotsTxt: false,
+    }),
     woff2BrowserPlugin(),
     react(),
     checker({
@@ -73,17 +83,26 @@ export default defineConfig({
       },
 
       workbox: {
-        // Don't push fonts, locales and wasm to app precache
-        globIgnores: ["fonts.css", "**/locales/**", "service-worker.js", "**/*.wasm-*.js"],
+        // don't precache fonts, locales and separate chunks
+        globIgnores: [
+          "fonts.css",
+          "**/locales/**",
+          "service-worker.js",
+          "**/*.chunk-*.js",
+        ],
         runtimeCaching: [
           {
-            urlPattern: new RegExp("/.+.(ttf|woff2|otf)"),
+            urlPattern: new RegExp(".+.woff2"),
             handler: "CacheFirst",
             options: {
               cacheName: "fonts",
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
+              },
+              cacheableResponse: {
+                // 0 to cache "opaque" responses from cross-origin requests (i.e. CDN)
+                statuses: [0, 200],
               },
             },
           },
@@ -109,10 +128,10 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: new RegExp(".wasm-.+.js"),
+            urlPattern: new RegExp(".chunk-.+.js"),
             handler: "CacheFirst",
             options: {
-              cacheName: "wasm",
+              cacheName: "chunk",
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 90, // <== 90 days
