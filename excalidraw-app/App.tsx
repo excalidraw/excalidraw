@@ -1126,7 +1126,8 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
-  const isCloudExportWindow = window.location.pathname === "/cloud-export";
+  const isCloudExportWindow =
+    window.location.pathname === "/excalidraw-plus-export";
   if (isCloudExportWindow) {
     return <ExcalidrawPlusIframeExport />;
   }
