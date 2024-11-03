@@ -136,7 +136,7 @@ const verifyJWT = async ({
   }
 };
 
-export const CloudExport = () => {
+export const ExcalidrawPlusIframeExport = () => {
   const readyRef = useRef(false);
 
   useLayoutEffect(() => {
