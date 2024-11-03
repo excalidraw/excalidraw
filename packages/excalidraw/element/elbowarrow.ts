@@ -1,4 +1,5 @@
 import {
+  pointDistanceSq,
   pointFrom,
   pointScaleFromOrigin,
   pointTranslate,
@@ -137,8 +138,11 @@ export const updateElbowArrowPoints = (
     updates?.fixedSegments ?? [],
   );
 
-  const { startDonglePosition, endDonglePosition, startGlobalPoint } =
-    getElbowArrowData(arrow, elementsMap, updatedPoints);
+  const { startDonglePosition, endDonglePosition } = getElbowArrowData(
+    arrow,
+    elementsMap,
+    updatedPoints,
+  );
 
   let previousFixedSegment: {
     point: GlobalPoint;
@@ -158,38 +162,11 @@ export const updateElbowArrowPoints = (
       let heading = segment.heading;
       let anchor = segment.anchor;
 
-      heading = vectorToHeading(
-        vectorFromPoint(
-          anchor,
-          pointFrom<GlobalPoint>(
-            headingIsVertical(heading) ? anchor[0] : startDonglePosition[0],
-            headingIsHorizontal(heading) ? anchor[1] : startDonglePosition[1],
-          ),
-        ),
-      );
-
       if (
-        (headingIsHorizontal(heading) &&
-          startDonglePosition[0] === endDonglePosition[0] &&
-          Math.abs(anchor[0] - startGlobalPoint[0]) > 26.5) ||
-        (headingIsVertical(heading) &&
-          startDonglePosition[1] === endDonglePosition[1] &&
-          Math.abs(anchor[1] - startGlobalPoint[1]) > 26.5)
-      ) {
-        heading = vectorToHeading(
-          vectorFromPoint(
-            pointFrom<GlobalPoint>(
-              headingIsVertical(heading) ? anchor[0] : startGlobalPoint[0],
-              headingIsHorizontal(heading) ? anchor[1] : startGlobalPoint[1],
-            ),
-            anchor,
-          ),
-        );
-      } else if (
-        (headingIsHorizontal(heading) &&
-          startDonglePosition[0] > endDonglePosition[0]) ||
-        (headingIsVertical(heading) &&
-          startDonglePosition[1] > endDonglePosition[1])
+        pointDistanceSq(
+          updatedPoints[segment.index],
+          updatedPoints[segment.index - 1],
+        ) < 1.3
       ) {
         heading = flipHeading(heading);
       }
