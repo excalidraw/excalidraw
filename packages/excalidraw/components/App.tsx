@@ -7972,7 +7972,6 @@ class App extends React.Component<AppProps, AppState> {
               },
             });
           }
-
           if (!this.state.selectedLinearElement.isDragging) {
             this.setState({
               selectedLinearElement: {
