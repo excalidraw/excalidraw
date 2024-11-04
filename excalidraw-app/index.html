@@ -118,18 +118,18 @@
     <!-- Following placeholder is replaced during the build step -->
     <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
 
-    <% } else { %>
-    <script>
-      window.EXCALIDRAW_ASSET_PATH = window.origin;
-    </script>
-    <% } %>
-
     <!-- Register Assistant as the UI font, before the scene inits -->
     <link
       rel="stylesheet"
       href="../packages/excalidraw/fonts/fonts.css"
       type="text/css"
     />
+
+    <% } else { %>
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
+    <% } %>
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -212,6 +212,7 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
+    <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking
@@ -244,5 +245,6 @@
       }
     </script>
     <!-- end LEGACY GOOGLE ANALYTICS -->
+    <% } %>
   </body>
 </html>
