@@ -174,12 +174,26 @@ export const updateElbowArrowPoints = (
       }
       nextFixedSegments[segmentIdx].heading = heading;
 
+      const prevSegment = nextFixedSegments[segmentIdx - 1];
+      const nextSegment = nextFixedSegments[segmentIdx + 1];
+      const candidateStart = prevSegment
+        ? pointFrom<GlobalPoint>(
+            arrow.x + updatedPoints[prevSegment.index][0],
+            arrow.y + updatedPoints[prevSegment.index][1],
+          )
+        : startDonglePosition;
+      const candidateEnd = nextSegment
+        ? pointFrom<GlobalPoint>(
+            arrow.x + updatedPoints[nextSegment.index][0],
+            arrow.y + updatedPoints[nextSegment.index][1],
+          )
+        : endDonglePosition;
       anchor = pointFrom<GlobalPoint>(
         headingIsHorizontal(heading)
-          ? (startDonglePosition[0] + endDonglePosition[0]) / 2
+          ? (candidateStart[0] + candidateEnd[0]) / 2
           : anchor[0],
         headingIsVertical(heading)
-          ? (startDonglePosition[1] + endDonglePosition[1]) / 2
+          ? (candidateStart[1] + candidateEnd[1]) / 2
           : anchor[1],
       );
       nextFixedSegments[segmentIdx].anchor = anchor;
