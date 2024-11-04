@@ -446,6 +446,8 @@ import {
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom, pointDistance, vector } from "../../math";
+import { getElementsFromQuery } from "../element/shapeLinks";
+import { actionCopyShapeLink } from "../actions/actionCopyShapeLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2311,6 +2313,26 @@ class App extends React.Component<AppProps, AppState> {
     // fonts and rerender scene text elements once done. This also
     // seems faster even in browsers that do fire the loadingdone event.
     this.fonts.loadSceneFonts();
+
+    // navigate to elements from link if shape id is present in the URL
+    this.maybeNavigateToElementsFromLink(window.location.href);
+  };
+
+  private maybeNavigateToElementsFromLink = (link: string) => {
+    const url = new URL(link);
+    const elements = getElementsFromQuery(
+      url.search,
+      this.scene.getNonDeletedElementsMap(),
+    );
+    if (elements) {
+      this.scrollToContent(elements, {
+        fitToViewport: true,
+        maxZoom: 3,
+        minZoom: 1,
+      });
+      return true;
+    }
+    return false;
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -5341,6 +5363,10 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
         if (!customEvent?.defaultPrevented) {
+          if (this.maybeNavigateToElementsFromLink(url)) {
+            return;
+          }
+
           const target = isLocalLink(url) ? "_self" : "_blank";
           const newWindow = window.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/
@@ -10131,6 +10157,7 @@ class App extends React.Component<AppProps, AppState> {
       actionCopyStyles,
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
+      actionCopyShapeLink,
       actionGroup,
       actionTextAutoResize,
       actionUnbindText,
