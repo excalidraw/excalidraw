@@ -126,6 +126,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 polyfill();
 
@@ -1125,6 +1126,12 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
+  const isCloudExportWindow =
+    window.location.pathname === "/excalidraw-plus-export";
+  if (isCloudExportWindow) {
+    return <ExcalidrawPlusIframeExport />;
+  }
+
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
