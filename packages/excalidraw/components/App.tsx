@@ -2621,7 +2621,6 @@ class App extends React.Component<AppProps, AppState> {
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
         this.handleWheel,
-        { passive: false },
       ),
       addEventListener(
         this.excalidrawContainerRef.current,
