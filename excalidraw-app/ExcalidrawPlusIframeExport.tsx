@@ -13,17 +13,29 @@ const EVENT_REQUEST_SCENE = "REQUEST_SCENE";
 
 const EXCALIDRAW_PLUS_ORIGIN = import.meta.env.VITE_APP_PLUS_APP;
 
-type MESSAGE_DATA =
-  | SCENE_DATA_MESAGE
-  | { type: "ERROR"; message: string }
-  | { type: "READY" };
+// -----------------------------------------------------------------------------
+// outgoing message
+// -----------------------------------------------------------------------------
+type MESSAGE_REQUEST_SCENE = {
+  type: "REQUEST_SCENE";
+  jwt: string;
+};
 
-type SCENE_DATA_MESAGE = {
+type MESSAGE_FROM_PLUS = MESSAGE_REQUEST_SCENE;
+
+// incoming messages
+// -----------------------------------------------------------------------------
+type MESSAGE_READY = { type: "READY" };
+type MESSAGE_ERROR = { type: "ERROR"; message: string };
+type MESSAGE_SCENE_DATA = {
   type: "SCENE_DATA";
   elements: OrderedExcalidrawElement[];
   appState: Pick<AppState, "viewBackgroundColor">;
   files: { loadedFiles: BinaryFileData[]; erroredFiles: Map<FileId, true> };
 };
+
+type MESSAGE_FROM_EDITOR = MESSAGE_ERROR | MESSAGE_SCENE_DATA | MESSAGE_READY;
+// -----------------------------------------------------------------------------
 
 const parseSceneData = async ({
   rawElementsString,
@@ -31,7 +43,7 @@ const parseSceneData = async ({
 }: {
   rawElementsString: string | null;
   rawAppStateString: string | null;
-}): Promise<SCENE_DATA_MESAGE> => {
+}): Promise<MESSAGE_SCENE_DATA> => {
   if (!rawElementsString || !rawAppStateString) {
     throw new ExcalidrawError("Elements or appstate is missing.");
   }
@@ -140,7 +152,7 @@ export const ExcalidrawPlusIframeExport = () => {
   const readyRef = useRef(false);
 
   useLayoutEffect(() => {
-    const handleMessage = async (event: MessageEvent) => {
+    const handleMessage = async (event: MessageEvent<MESSAGE_FROM_PLUS>) => {
       if (event.origin !== EXCALIDRAW_PLUS_ORIGIN) {
         throw new ExcalidrawError("Invalid origin");
       }
@@ -161,7 +173,7 @@ export const ExcalidrawPlusIframeExport = () => {
             throw new ExcalidrawError("Failed to verify JWT");
           }
 
-          const parsedSceneData: MESSAGE_DATA = await parseSceneData({
+          const parsedSceneData: MESSAGE_SCENE_DATA = await parseSceneData({
             rawAppStateString: localStorage.getItem(
               STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
             ),
@@ -174,7 +186,7 @@ export const ExcalidrawPlusIframeExport = () => {
             targetOrigin: EXCALIDRAW_PLUS_ORIGIN,
           });
         } catch (error) {
-          const responseData: MESSAGE_DATA = {
+          const responseData: MESSAGE_ERROR = {
             type: "ERROR",
             message:
               error instanceof ExcalidrawError
@@ -193,7 +205,7 @@ export const ExcalidrawPlusIframeExport = () => {
     // so we don't send twice in StrictMode
     if (!readyRef.current) {
       readyRef.current = true;
-      const message: MESSAGE_DATA = { type: "READY" };
+      const message: MESSAGE_FROM_EDITOR = { type: "READY" };
       window.parent.postMessage(message, EXCALIDRAW_PLUS_ORIGIN);
     }
 
