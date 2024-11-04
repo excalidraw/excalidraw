@@ -18,24 +18,29 @@ export function initializeObsidianUtils() {
   hostPlugin = app.plugins.plugins["obsidian-excalidraw-plugin"];
 }
 
+function getHostPlugin() {
+  if(!hostPlugin) initializeObsidianUtils();
+  return hostPlugin;
+}
+
 export function getAreaLimit() {
-  return hostPlugin.excalidrawConfig.areaLimit ?? 16777216;
+  return getHostPlugin().excalidrawConfig.areaLimit ?? 16777216;
 }
 
 export function getWidthHeightLimit() {
-  return hostPlugin.excalidrawConfig.widthHeightLimit ?? 32767;
+  return getHostPlugin().excalidrawConfig.widthHeightLimit ?? 32767;
 }
 
 export function allowDoubleTapEraser() {
-  return hostPlugin.settings.penModeDoubleTapEraser;
+  return getHostPlugin().settings.penModeDoubleTapEraser;
 }
 
 export function getMaxZoom(): number {
-  return hostPlugin.settings.zoomToFitMaxLevel ?? 1;
+  return getHostPlugin().settings.zoomToFitMaxLevel ?? 1;
 }
 
 export function isExcaliBrainView() {
-  const excalidrawView = hostPlugin.activeExcalidrawView;
+  const excalidrawView = getHostPlugin().activeExcalidrawView;
   if (!excalidrawView) {
     return false;
   }
@@ -46,7 +51,7 @@ export function isExcaliBrainView() {
 }
 
 export function getExcalidrawContentEl(): HTMLElement {
-  const excalidrawView = hostPlugin.activeExcalidrawView;
+  const excalidrawView = getHostPlugin().activeExcalidrawView;
   if (!excalidrawView) {
     return document.body;
   }
@@ -54,11 +59,11 @@ export function getExcalidrawContentEl(): HTMLElement {
 }
 
 export function hideFreedrawPenmodeCursor() {
-  return !hostPlugin.settings.penModeCrosshairVisible;
+  return !getHostPlugin().settings.penModeCrosshairVisible;
 }
 
 export function getOpenAIDefaultVisionModel() {
-  return hostPlugin.settings.openAIDefaultVisionModel;
+  return getHostPlugin().settings.openAIDefaultVisionModel;
 }
 
 export function registerLocalFont(
@@ -133,15 +138,15 @@ export async function getCSSFontDefinition(
   return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`;
 }
 
-export async function loadSceneFonts(elements: NonDeletedExcalidrawElement[]): Promise<void> {
-  await Fonts.loadElementsFonts(elements);
+export async function loadSceneFonts(elements: NonDeletedExcalidrawElement[]): Promise<FontFace[]> {
+  return await Fonts.loadElementsFonts(elements);
 }
 
 export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer|undefined> {
   url = typeof url === "string" ? url : url.toString();
   if(typeof url === "string" && !url.startsWith("data") && url.endsWith(".woff2")) {
     const filename = decodeURIComponent(url.substring(url.lastIndexOf("/")+1));
-    const arrayBuffer = await hostPlugin.loadFontFromFile(filename)
+    const arrayBuffer = await getHostPlugin().loadFontFromFile(filename)
     if(arrayBuffer) {
       return arrayBuffer;
     }
@@ -151,7 +156,7 @@ export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer
 
 //zsviczian (single finger panning in pen mode)
 export function isTouchInPenMode(appState: AppState, event: React.PointerEvent<HTMLElement> | MouseEvent) {
-  if(!hostPlugin.settings.penModeSingleFingerPanning) {
+  if(!getHostPlugin().settings.penModeSingleFingerPanning) {
     return false;
   }
   const isReactPointerEvent = 'nativeEvent' in event;

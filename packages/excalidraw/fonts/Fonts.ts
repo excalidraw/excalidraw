@@ -33,8 +33,6 @@ import type {
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
 
-const NEVERSAFARI = false; //zsviczian
-
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
   // a static member to reduce memory footprint
@@ -99,7 +97,16 @@ export class Fonts {
     // can technically bail on a false positive.
     let shouldBail = true;
 
+    //zsviczian - Obsidian adds Excalidraw irrelevant fonts
+    const registeredFontFamilies = new Set<string>();
+    Fonts.registered.forEach((x:{ metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }) => 
+      registeredFontFamilies.add(x.fontFaces[0].fontFace.family));
+
     for (const fontFace of fontFaces) {
+      //zsviczian
+      if(!registeredFontFamilies.has(fontFace.family)) {
+        continue;
+      }
       const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}-${fontFace.unicodeRange}`;
 
       // make sure to update our cache with all the loaded font faces
@@ -150,7 +157,7 @@ export class Fonts {
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const charsPerFamily = NEVERSAFARI //zsviczian
+    const charsPerFamily = true //isSafari
       ? Fonts.getCharsPerFamily(this.scene.getNonDeletedElements())
       : undefined;
 
@@ -168,7 +175,7 @@ export class Fonts {
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
     const fontFamilies = Fonts.getUniqueFamilies(elements);
-    const charsPerFamily = NEVERSAFARI //zsviczian
+    const charsPerFamily = true //isSafari
       ? Fonts.getCharsPerFamily(elements)
       : undefined;
 
@@ -265,7 +272,7 @@ export class Fonts {
       // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
       // for Safari on init, we rather check with the "text" param, even though it's less efficient, as otherwise fonts might remain unloaded
       const text =
-        NEVERSAFARI && charsPerFamily //zsviczian
+        charsPerFamily //zsviczian && isSafari
           ? Fonts.getCharacters(charsPerFamily, fontFamily)
           : "";
 

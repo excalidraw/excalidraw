@@ -3416,11 +3416,11 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    /*if (isSafari) {
+    if (true) { //zsviczian - isSafari 
       Fonts.loadElementsFonts(newElements).then((fontFaces) => {
         this.fonts.onLoaded(fontFaces);
       });
-    }*/ //zsviczian - this might need testing on Ovsidian iPad, otherwise Obsidian is never on safari
+    }
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
