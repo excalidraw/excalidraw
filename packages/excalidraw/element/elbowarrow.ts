@@ -95,7 +95,7 @@ const BASE_PADDING = 40;
 const segmentListMerge = (
   oldFixedSegments: readonly FixedSegment[],
   newFixedSegments: readonly FixedSegment[],
-): FixedSegment[] => {
+): Sequential<FixedSegment> => {
   let fixedSegments = Array.from(oldFixedSegments);
   newFixedSegments.forEach((segment) => {
     if (segment.anchor == null) {
@@ -113,7 +113,9 @@ const segmentListMerge = (
     }
   });
 
-  return fixedSegments.sort((a, b) => a.index - b.index);
+  return fixedSegments.sort(
+    (a, b) => a.index - b.index,
+  ) as Sequential<FixedSegment>;
 };
 
 /**
@@ -133,7 +135,7 @@ export const updateElbowArrowPoints = (
   const updatedPoints = updates.points ?? arrow.points;
 
   const fakeElementsMap = toBrandedType<SceneElementsMap>(new Map(elementsMap));
-  const nextFixedSegments = segmentListMerge(
+  let nextFixedSegments = segmentListMerge(
     arrow.fixedSegments ?? [],
     updates?.fixedSegments ?? [],
   );
@@ -166,7 +168,7 @@ export const updateElbowArrowPoints = (
         pointDistanceSq(
           updatedPoints[segment.index],
           updatedPoints[segment.index - 1],
-        ) < 1.3
+        ) <= 4
       ) {
         heading = flipHeading(heading);
       }
@@ -298,7 +300,7 @@ export const updateElbowArrowPoints = (
   const simplifiedPointGroups = getElbowArrowCornerPoints(rawPointGroups);
 
   let currentGroupIdx = 0;
-  const nfs = multiDimensionalArrayDeepFlatMapper<
+  nextFixedSegments = multiDimensionalArrayDeepFlatMapper<
     GlobalPoint,
     FixedSegment | null
   >(simplifiedPointGroups, (point, [groupIdx], points, index) => {
@@ -320,7 +322,10 @@ export const updateElbowArrowPoints = (
     (segment): segment is FixedSegment => segment != null,
   ) as Sequential<FixedSegment>;
 
-  return normalizeArrowElementUpdate(simplifiedPointGroups.flat(), nfs);
+  return normalizeArrowElementUpdate(
+    simplifiedPointGroups.flat(),
+    nextFixedSegments,
+  );
 };
 
 /**

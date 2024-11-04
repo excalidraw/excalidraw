@@ -7901,6 +7901,17 @@ class App extends React.Component<AppProps, AppState> {
             elementsMap,
             this.state,
           );
+          const element = LinearElementEditor.getElement(
+            this.state.selectedLinearElement.elementId,
+            elementsMap,
+          );
+          if (element) {
+            LinearElementEditor.updateEditorMidPointsCache(
+              element,
+              elementsMap,
+              this.state,
+            );
+          }
 
           if (
             this.state.selectedLinearElement.pointerDownState.segmentMidpoint
@@ -8421,6 +8432,17 @@ class App extends React.Component<AppProps, AppState> {
                 this.scene.getNonDeletedElementsMap(),
               )
             : [];
+
+          if (
+            elementsWithinSelection.length === 1 &&
+            isLinearElement(elementsWithinSelection[0])
+          ) {
+            LinearElementEditor.updateEditorMidPointsCache(
+              elementsWithinSelection[0],
+              elementsMap,
+              this.state,
+            );
+          }
 
           this.setState((prevState) => {
             const nextSelectedElementIds = {
