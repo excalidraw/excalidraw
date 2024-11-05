@@ -23,6 +23,18 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
+// const expectPointsToBeCloseTo = (
+//   received: readonly LocalPoint[],
+//   expected: number[][],
+//   precision?: number,
+// ) => {
+//   expect(received.length).toBe(expected.length);
+//   received.forEach((point, index) => {
+//     expect(point[0]).toBeCloseTo(expected[index][0], precision);
+//     expect(point[1]).toBeCloseTo(expected[index][1], precision);
+//   });
+// };
+
 describe("elbow arrow routing", () => {
   it("can properly generate orthogonal arrow points", () => {
     const scene = new Scene();
@@ -187,9 +199,116 @@ describe("elbow arrow ui", () => {
       [0, 0],
       [35, 0],
       [35, 90],
-      [35, 90], // Note that coordinates are rounded above!
       [35, 165],
       [103, 165],
+    ]);
+  });
+});
+
+describe("elbow arrow segment move", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: 1,
+      clientY: 1,
+    });
+    const contextMenu = UI.queryContextMenu();
+    fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+  });
+
+  it("can move the second segment of an unconnected elbow arrow", () => {
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 0);
+    mouse.click();
+    mouse.moveTo(200, 200);
+    mouse.click();
+
+    mouse.reset();
+    mouse.moveTo(100, 100);
+    mouse.down();
+    mouse.moveTo(105, 100);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [105, 0],
+      [105, 148.55],
+      [200, 148.55],
+      [200, 200],
+    ]);
+
+    mouse.reset();
+    mouse.moveTo(105, 74.275);
+    mouse.doubleClick();
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [0, -2],
+      [100, -2],
+      [100, 200],
+      [200, 200],
+    ]);
+  });
+
+  it("can move the second segment of a fully connected elbow arrow", () => {
+    UI.createElement("rectangle", {
+      x: -100,
+      y: -50,
+      width: 100,
+      height: 100,
+    });
+    UI.createElement("rectangle", {
+      x: 200,
+      y: 150,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 0);
+    mouse.click();
+    mouse.moveTo(200, 200);
+    mouse.click();
+
+    mouse.reset();
+    mouse.moveTo(100, 100);
+    mouse.down();
+    mouse.moveTo(105, 100);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [100, 0],
+      [100, 200],
+      [190, 200],
+    ]);
+
+    mouse.reset();
+    mouse.moveTo(105, 74.275);
+    mouse.doubleClick();
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [100, 0],
+      [100, 200],
+      [190, 200],
     ]);
   });
 });

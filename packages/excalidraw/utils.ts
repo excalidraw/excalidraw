@@ -18,6 +18,7 @@ import type {
   Zoom,
 } from "./types";
 import type { MaybePromise, ResolutionType } from "./utility-types";
+import deepEql from "deep-eql";
 
 let mockDateTime: string | null = null;
 
@@ -982,6 +983,32 @@ export const memoize = <T extends Record<string, any>, R extends any>(
   };
 
   return ret as typeof func & { clear: () => void };
+};
+
+export const memo = <P, R>(
+  func: (...args: P[]) => R,
+): ((...args: P[]) => R) => {
+  let lastArgs: P[] | undefined;
+  let lastResult: R | "__empty__placeholder__excalidraw__" =
+    "__empty__placeholder__excalidraw__";
+
+  return (...args: P[]): R => {
+    if (
+      lastArgs &&
+      lastArgs.length === args.length &&
+      deepEql(lastArgs, args) &&
+      lastResult !== "__empty__placeholder__excalidraw__"
+    ) {
+      return lastResult;
+    }
+
+    const result = func(...args);
+
+    lastArgs = args;
+    lastResult = result;
+
+    return result;
+  };
 };
 
 /** Checks if value is inside given collection. Useful for type-safety. */
