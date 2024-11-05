@@ -7924,6 +7924,7 @@ class App extends React.Component<AppProps, AppState> {
         const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
         const frameToHighlight =
           topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null;
+        // Only update the state if there is a difference
         if (this.state.frameToHighlight !== frameToHighlight) {
           flushSync(() => {
             this.setState({ frameToHighlight });
