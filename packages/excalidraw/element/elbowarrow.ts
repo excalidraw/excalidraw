@@ -311,7 +311,9 @@ export const updateElbowArrowPoints = (
     return raw;
   });
 
-  const simplifiedPointGroups = getElbowArrowCornerPoints(rawPointGroups);
+  const simplifiedPointGroups = removeElbowArrowShortSegments(
+    getElbowArrowCornerPoints(rawPointGroups),
+  );
 
   let currentGroupIdx = 0;
   nextFixedSegments = multiDimensionalArrayDeepFlatMapper<
@@ -1322,10 +1324,11 @@ const getElbowArrowCornerPoints = (
 ): GlobalPoint[][] => {
   const points = pointGroups.flat();
 
-  let previousHorizontal =
-    Math.abs(points[0][1] - points[1][1]) <
-    Math.abs(points[0][0] - points[1][0]);
   if (points.length > 1) {
+    let previousHorizontal =
+      Math.abs(points[0][1] - points[1][1]) <
+      Math.abs(points[0][0] - points[1][0]);
+
     return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
       // The very first and last points are always kept
       if (idx === 0 || idx === points.length - 1) {
@@ -1342,6 +1345,25 @@ const getElbowArrowCornerPoints = (
 
       previousHorizontal = nextHorizontal;
       return true;
+    });
+  }
+
+  return pointGroups;
+};
+
+const removeElbowArrowShortSegments = (
+  pointGroups: GlobalPoint[][],
+): GlobalPoint[][] => {
+  const points = pointGroups.flat();
+
+  if (points.length >= 4) {
+    return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
+      if (idx === 0 || idx === points.length - 1) {
+        return true;
+      }
+
+      const prev = points[idx - 1];
+      return pointDistanceSq(prev, p) >= 1;
     });
   }
 
