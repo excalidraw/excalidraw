@@ -129,7 +129,7 @@
       "create": "Criar link",
       "createEmbed": "Criar link e incorporar",
       "label": "Link",
-      "labelEmbed": "",
+      "labelEmbed": "Vincular e incorporar",
       "empty": "Nenhum link foi definido"
     },
     "lineEditor": {
@@ -148,13 +148,13 @@
     "removeAllElementsFromFrame": "Remover todos os elementos do quadro",
     "eyeDropper": "Escolher cor da tela",
     "textToDiagram": "Texto para diagrama",
-    "prompt": "",
+    "prompt": "Prompt",
     "followUs": "Siga-nos",
     "discordChat": "Discord",
     "zoomToFitViewport": "",
-    "zoomToFitSelection": "",
-    "zoomToFit": "",
-    "installPWA": "",
+    "zoomToFitSelection": "Ampliar para ajustar a seleção",
+    "zoomToFit": "Ampliar para encaixar todos os elementos",
+    "installPWA": "Instalar excalidraw localmente (PWA)",
     "autoResize": "Habilitar redimensionamento automático de texto"
   },
   "library": {
@@ -196,7 +196,7 @@
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
     "lightMode": "Modo claro",
-    "systemMode": "",
+    "systemMode": "Modo do sistema",
     "zenMode": "Modo Zen",
     "objectsSnapMode": "Encaixar em objetos",
     "exitZenMode": "Sair do modo zen",
@@ -240,7 +240,7 @@
     "failedToFetchImage": "Falha ao buscar imagem.",
     "cannotResolveCollabServer": "Não foi possível conectar-se ao servidor colaborativo. Por favor, recarregue a página e tente novamente.",
     "importLibraryError": "Não foi possível carregar a biblioteca",
-    "saveLibraryError": "",
+    "saveLibraryError": "Não foi possível salvar a biblioteca no armazenamento. Salve sua biblioteca em um arquivo localmente para garantir que você não perca as alterações.",
     "collabSaveFailed": "Não foi possível salvar no banco de dados do servidor. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
     "collabSaveFailed_sizeExceeded": "Não foi possível salvar no banco de dados do servidor, a tela parece ser muito grande. Se os problemas persistirem, salve o arquivo localmente para garantir que não perca o seu trabalho.",
     "imageToolNotSupported": "Imagens estão desabilitadas.",
@@ -252,7 +252,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Elementos incorporáveis não podem ser adicionados à biblioteca.",
-      "iframe": "",
+      "iframe": "Elementos do IFrame não podem ser adicionados à biblioteca.",
       "image": "Suporte para adicionar imagens à biblioteca em breve!"
     },
     "asyncPasteFailedOnRead": "Não foi possível colar (não foi possível ler da área de transferência do sistema).",
@@ -275,12 +275,12 @@
     "link": "Adicionar / Atualizar link para uma forma selecionada",
     "eraser": "Borracha",
     "frame": "Ferramenta de quadro",
-    "magicframe": "",
-    "embeddable": "",
+    "magicframe": "Wireframe para código",
+    "embeddable": "Página web incorporada",
     "laser": "",
     "hand": "Mão (ferramenta de rolagem)",
     "extraTools": "Mais ferramentas",
-    "mermaidToExcalidraw": ""
+    "mermaidToExcalidraw": "Mermaid para Excalidraw"
   },
   "element": {
     "rectangle": "Retângulo",
@@ -288,15 +288,15 @@
     "ellipse": "Elipse",
     "arrow": "Seta",
     "line": "Linha",
-    "freedraw": "",
+    "freedraw": "Desenho livre",
     "text": "Texto",
     "image": "Imagem",
     "group": "Grupo",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
+    "frame": "Moldura",
+    "magicframe": "Wireframe para código",
+    "embeddable": "Página web incorporada",
     "selection": "Seleção",
-    "iframe": ""
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Ações da tela",
@@ -324,13 +324,13 @@
     "placeImage": "Clique para colocar a imagem, ou clique e arraste para definir manualmente o seu tamanho",
     "publishLibrary": "Publicar sua própria biblioteca",
     "bindTextToElement": "Pressione Enter para adicionar o texto",
-    "createFlowchart": "",
+    "createFlowchart": "Segure Ctrl ou Cmd e a tecla de seta para criar um fluxograma",
     "deepBoxSelect": "Pressione Ctrl/Cmd para seleção profunda e para evitar arrastar",
     "eraserRevert": "Segure a tecla Alt para inverter os elementos marcados para exclusão",
     "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
     "disableSnapping": "Pressione Ctrl/Cmd para desabilitar o encaixe",
     "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "leaveCropEditor": "Clique fora da imagem ou pressione ENTER ou ESC para finalizar o corte"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar pré-visualização",
@@ -403,7 +403,7 @@
     "movePageUpDown": "Mover a página para cima/baixo",
     "movePageLeftRight": "Mover a página para esquerda/direita",
     "cropStart": "",
-    "cropFinish": ""
+    "cropFinish": "Finalizar corte da imagem"
   },
   "clearCanvasDialog": {
     "title": "Limpar a tela"
@@ -572,10 +572,10 @@
     }
   },
   "mermaid": {
-    "title": "",
+    "title": "Mermaid para Excalidraw",
     "button": "Inserir",
     "description": "Atualmente apenas os diagramas<flowchartLink>Flowchart</flowchartLink><sequenceLink>Sequência,</sequenceLink> e <classLink>Class</classLink>são suportados. Os outros tipos serão renderizados como uma imagem no Excalidraw.",
-    "syntax": "",
+    "syntax": "Sintaxe em Mermaid",
     "preview": "Visualizar"
   },
   "quickSearch": {
@@ -585,7 +585,7 @@
     "badge": {
       "old": "antigo"
     },
-    "sceneFonts": "",
+    "sceneFonts": "Neste cenário",
     "availableFonts": "Fontes disponíveis",
     "empty": "Nenhuma fonte encontrada"
   },
