@@ -50,6 +50,7 @@ export class WorkerUrlNotDefinedError extends Error {
     this.code = code;
   }
 }
+
 export class WorkerInTheMainChunkError extends Error {
   public code;
   constructor(
@@ -59,5 +60,16 @@ export class WorkerInTheMainChunkError extends Error {
     super(message);
     this.name = "WorkerInTheMainChunkError";
     this.code = code;
+  }
+}
+
+/**
+ * Use this for generic, handled errors, so you can check against them
+ * and rethrow if needed
+ */
+export class ExcalidrawError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ExcalidrawError";
   }
 }
