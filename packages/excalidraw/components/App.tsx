@@ -8008,13 +8008,10 @@ class App extends React.Component<AppProps, AppState> {
           isFrameLikeElement(e),
         );
         const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
-        const frameToHighlight =
-          topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null;
-        if (this.state.frameToHighlight !== frameToHighlight) {
-          flushSync(() => {
-            this.setState({ frameToHighlight });
-          });
-        }
+        this.setState({
+          frameToHighlight:
+            topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null,
+        });
 
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -8161,9 +8158,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          flushSync(() => {
-            this.setState({ snapLines });
-          });
+          this.setState({ snapLines });
 
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
