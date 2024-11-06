@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@excalidraw/random-username": "1.0.0",
+    "@iterate-ai/viteplugin": "1.2.4",
     "@sentry/browser": "6.2.5",
     "@sentry/integrations": "6.2.5",
     "firebase": "8.3.3",
