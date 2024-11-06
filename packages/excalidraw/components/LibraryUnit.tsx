@@ -14,6 +14,7 @@ export const LibraryUnit = memo(
     elements,
     isPending,
     onClick,
+    onDoubleClick,
     selected,
     onToggle,
     onDrag,
@@ -23,6 +24,7 @@ export const LibraryUnit = memo(
     elements?: LibraryItem["elements"];
     isPending?: boolean;
     onClick: (id: LibraryItem["id"] | null) => void;
+    onDoubleClick?: () => void;
     selected: boolean;
     onToggle: (id: string, event: React.MouseEvent) => void;
     onDrag: (id: string, event: React.DragEvent) => void;
@@ -30,6 +32,9 @@ export const LibraryUnit = memo(
   }) => {
     const ref = useRef<HTMLDivElement | null>(null);
     const svg = useLibraryItemSvg(id, elements, svgCache);
+
+    const [clickCount, setClickCount] = useState(0);
+    const [lastClickTime, setLastClickTime] = useState(0);
 
     useEffect(() => {
       const node = ref.current;
@@ -49,8 +54,40 @@ export const LibraryUnit = memo(
 
     const [isHovered, setIsHovered] = useState(false);
     const isMobile = useDevice().editor.isMobile;
+
+    const handleClick = (event: React.MouseEvent) => {
+      const currentTime = new Date().getTime();
+      const timeSinceLastClick = currentTime - lastClickTime;
+
+      if (clickCount === 1 && timeSinceLastClick < 300) {
+        // Double click detected
+        onDoubleClick?.();
+        setClickCount(0);
+      } else {
+        // Single click
+        setClickCount(1);
+        setTimeout(() => setClickCount(0), 300);
+        
+        // Execute normal click handler
+        if (!!elements || !!isPending) {
+          if (id && event.shiftKey) {
+            onToggle(id, event);
+          } else {
+            onClick(id);
+          }
+        }
+      }
+
+      setLastClickTime(currentTime);
+    };
+
     const adder = isPending && (
-      <div className="library-unit__adder">{PlusIcon}</div>
+      <div 
+        className="library-unit__adder"
+        onClick={handleClick}
+      >
+        {PlusIcon}
+      </div>
     );
 
     return (
@@ -70,17 +107,7 @@ export const LibraryUnit = memo(
           })}
           ref={ref}
           draggable={!!elements}
-          onClick={
-            !!elements || !!isPending
-              ? (event) => {
-                  if (id && event.shiftKey) {
-                    onToggle(id, event);
-                  } else {
-                    onClick(id);
-                  }
-                }
-              : undefined
-          }
+          onClick={handleClick}
           onDragStart={(event) => {
             if (!id) {
               event.preventDefault();
