@@ -7,6 +7,7 @@ import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+import { iterateVitePlugin } from "@iterate-ai/viteplugin";
 
 // To load .env.local variables
 const envVars = loadEnv("", `../`);
@@ -232,6 +233,11 @@ export default defineConfig({
     }),
     createHtmlPlugin({
       minify: true,
+    }),
+    iterateVitePlugin({
+      apiKey: "c134bd372c5f417732ef06422d1f9ac118acc566db98d94862f2f43d3b7b2895", // Your API key
+      project: "excalidraw", // Project name
+      organization: "iterate-sandbox-a2", // Organization name
     }),
   ],
   publicDir: "../public",
