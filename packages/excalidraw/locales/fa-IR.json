@@ -8,10 +8,10 @@
     "moveCanvas": "جابجایی بوم",
     "cut": "بریدن",
     "copy": "کپی",
-    "copyAsPng": "کپی در حافطه موقت به صورت PNG",
-    "copyAsSvg": "کپی در حافطه موقت به صورت SVG",
-    "copyText": "کپی در حافطه موقت به صورت متن",
-    "copySource": "کپی Png در حافظه موقت",
+    "copyAsPng": "رونوشت در بریده‌دان در قالب PNG",
+    "copyAsSvg": "رونوشت در بریده‌دان در قالب SVG",
+    "copyText": "رونوشت در بریده‌دان در قالب متن",
+    "copySource": "رونوشت منبع در بریده‌دان",
     "convertToCode": "تبدیل به کد",
     "bringForward": "جلو آوردن",
     "sendToBack": "پس فرستادن",
@@ -174,7 +174,7 @@
     "exportJSON": "خروجی در فایل",
     "exportImage": "خروجی گرفتن از تصویر...",
     "export": "ذخیره در...",
-    "copyToClipboard": "کپی در حافظه موقت",
+    "copyToClipboard": "رونوشت در بریده‌دان در قالب",
     "copyLink": "کپی لینک",
     "save": "ذخیره در همین فایل",
     "saveAs": "ذخیره با نام",
@@ -216,7 +216,7 @@
     "couldNotLoadInvalidFile": "عدم توانایی در بازگذاری فایل نامعتبر",
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
-    "couldNotCopyToClipboard": "به کلیپ بورد کپی نشد.",
+    "couldNotCopyToClipboard": "در بریده‌دان رونویسی نشد.",
     "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
@@ -255,9 +255,9 @@
       "iframe": "عناصر IFrame نمی توانند به کتابخانه افزوده شوند.",
       "image": "پشتیبانی از افزودن تصاویر به کتابخانه به زودی اضافه خواهد شد!"
     },
-    "asyncPasteFailedOnRead": "نمی تواند جاگذاری شود (نمی تواند از کلیپبورد بخواند).",
+    "asyncPasteFailedOnRead": "نمی تواند جاگذاری شود (نمی تواند از بریده‌دان بخواند).",
     "asyncPasteFailedOnParse": "نمیتواند جایگذاری شود.",
-    "copyToSystemClipboardFailed": "نمی تواند در کلیپبورد کپی شود."
+    "copyToSystemClipboardFailed": "نمی تواند در بریده‌دان رونویسی شود."
   },
   "toolBar": {
     "selection": "گزینش",
@@ -329,8 +329,8 @@
     "eraserRevert": "Alt را نگه دارید تا عناصر علامت گذاری شده برای حذف برگردند",
     "firefox_clipboard_write": "احتمالاً می‌توان این ویژگی را با تنظیم پرچم «dom.events.asyncClipboard.clipboardItem» روی «true» فعال کرد. برای تغییر پرچم های مرورگر در فایرفاکس، از صفحه \"about:config\" دیدن کنید.",
     "disableSnapping": "نگه داشتن کنترل یا کامند برای غیر فعال شدن چفت شدن",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "دو بار روی تصویر بزنید یا Enter را فشار دهید تا تصویر را برش دهید",
+    "leaveCropEditor": "در خارج از تصویر کلیک کنید یا Enter یا Escape را فشار دهید تا برش تمام شود"
   },
   "canvasError": {
     "cannotShowPreview": "پیش نمایش نشان داده نمی شود",
@@ -402,8 +402,8 @@
     "toggleElementLock": "قفل/بازکردن انتخاب شده ها",
     "movePageUpDown": "حرکت صفحه به بالا/پایین",
     "movePageLeftRight": "حرکت صفحه به چپ/راست",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "برش تصویر",
+    "cropFinish": "پایان برش تصویر"
   },
   "clearCanvasDialog": {
     "title": "پاک کردن بوم"
@@ -460,12 +460,12 @@
     "title": {
       "exportToPng": "تبدیل به PNG",
       "exportToSvg": "تبدیل به SVG",
-      "copyPngToClipboard": "کپی PNG در حافظه موقت"
+      "copyPngToClipboard": "رونویسی PNG در بریده‌دان"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
+      "copyPngToClipboard": "رونویسی در بریده‌دان"
     }
   },
   "encrypted": {
@@ -479,10 +479,10 @@
     "scene": "صحنه",
     "selected": "انتخاب شده",
     "storage": "حافظه",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "ویژگی‌های بوم و شکل",
+    "title": "ویژگی‌ها",
+    "generalStats": "عمومی",
+    "elementProperties": "ویژگی‌های شکل",
     "total": "مجموع",
     "version": "نسخه",
     "versionCopy": "برای کپی کردن کلیک کنید",
@@ -492,15 +492,15 @@
   "toast": {
     "addedToLibrary": "به مجموعه اضافه شد",
     "copyStyles": "کپی سبک.",
-    "copyToClipboard": "در کلیپ‌بورد کپی شد.",
-    "copyToClipboardAsPng": "کپی {{exportSelection}} در کلیپبورد به عنوان PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboard": "در بریده‌دان رونویسی شد.",
+    "copyToClipboardAsPng": "{{exportSelection}} در بریده‌دان در قالب PNG\n({{exportColorScheme}}) ذخیره شد",
+    "copyToClipboardAsSvg": "{{exportSelection}} در بریده‌دان به عنوان\n({{exportColorScheme}}) رونویسی شد",
     "fileSaved": "فایل ذخیره شد.",
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
     "selection": "انتخاب",
     "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید",
-    "unableToEmbed": "",
+    "unableToEmbed": "قرار دادن این Url در حال حاضر مجاز نیست. درGitHub برای درخواست Url Whitelisted مشکلی ایجاد کنید",
     "unrecognizedLinkFormat": ""
   },
   "colors": {
@@ -534,17 +534,17 @@
     }
   },
   "colorPicker": {
-    "mostUsedCustomColors": "",
+    "mostUsedCustomColors": "رنگ های به‌تازگی به‌کار گرفته شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
     "hexCode": "کدِ هگز",
-    "noShades": ""
+    "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست"
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
-        "title": "",
-        "button": "",
+        "title": "صادر کردن به عنوان تصاویر",
+        "button": "صادر کردن به عنوان تصاویر",
         "description": ""
       },
       "saveToDisk": {
@@ -576,39 +576,39 @@
     "button": "",
     "description": "",
     "syntax": "",
-    "preview": ""
+    "preview": "پیشنمایش"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "جستجو فوری"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "قدیمی"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "در این صحنه",
+    "availableFonts": "قلم های در دسترس",
+    "empty": "قلمی یافت نشد"
   },
   "userList": {
-    "empty": "",
+    "empty": "کاربری یافت نشد",
     "hint": {
-      "text": "",
-      "followStatus": "",
-      "inCall": "",
-      "micMuted": "",
-      "isSpeaking": ""
+      "text": "روی کاربر بزنید تا دنبالش کنید",
+      "followStatus": "هم‌اینک این کاربر را دنبال میکنید",
+      "inCall": "کاربر در تماسی صوتی است",
+      "micMuted": "میکروفون کاربر بی‌صدا است",
+      "isSpeaking": "کاربر در حال صحبت است"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "تخته فرمان‌ها",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "انتخاب",
+      "confirm": "پذیرش",
+      "close": "بستن"
     },
-    "recents": "",
+    "recents": "اخیراً استفاده شده",
     "search": {
-      "placeholder": "",
+      "placeholder": "در منوها و دستورات را جستجو کنید هم سنگهای پنهان را کشف کنید",
       "noMatch": ""
     },
     "itemNotAvailable": "",
