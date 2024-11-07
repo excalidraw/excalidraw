@@ -15,6 +15,7 @@ import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import {
   isAnyTrue,
+  memo,
   multiDimensionalArrayDeepFilter,
   multiDimensionalArrayDeepFlatMapper,
   toBrandedType,
@@ -118,6 +119,24 @@ const segmentListMerge = (
   ) as Sequential<FixedSegment>;
 };
 
+const generatePoints = memo(
+  (
+    state: ElbowArrowState,
+    points: readonly LocalPoint[],
+    segmentIdx: number,
+    totalSegments: number,
+    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+    options?: {
+      isDragging?: boolean;
+    },
+  ) =>
+    routeElbowArrow(state, elementsMap, points, {
+      ...options,
+      ...(segmentIdx !== 0 ? { startIsMidPoint: true } : {}),
+      ...(segmentIdx !== totalSegments ? { endIsMidPoint: true } : {}),
+    }) ?? [],
+);
+
 /**
  *
  */
@@ -168,7 +187,24 @@ export const updateElbowArrowPoints = (
         pointDistanceSq(
           updatedPoints[segment.index],
           updatedPoints[segment.index - 1],
-        ) <= 4
+        ) <= 4 ||
+        (updatedPoints[segment.index - 2] &&
+          compareHeading(
+            vectorToHeading(
+              vectorFromPoint(
+                updatedPoints[segment.index],
+                updatedPoints[segment.index - 1],
+              ),
+            ),
+            flipHeading(
+              vectorToHeading(
+                vectorFromPoint(
+                  updatedPoints[segment.index - 1],
+                  updatedPoints[segment.index - 2],
+                ),
+              ),
+            ),
+          ))
       ) {
         heading = flipHeading(heading);
       }
@@ -300,19 +336,19 @@ export const updateElbowArrowPoints = (
     ],
   ]);
 
-  const rawPointGroups = pointPairs.map(([state, points], idx) => {
-    const raw =
-      routeElbowArrow(state, fakeElementsMap, points, {
-        ...options,
-        ...(idx !== 0 ? { startIsMidPoint: true } : {}),
-        ...(idx !== pointPairs.length - 1 ? { endIsMidPoint: true } : {}),
-      }) ?? [];
-
-    return raw;
-  });
-
   const simplifiedPointGroups = removeElbowArrowShortSegments(
-    getElbowArrowCornerPoints(rawPointGroups),
+    getElbowArrowCornerPoints(
+      pointPairs.map(([state, points], idx) =>
+        generatePoints(
+          state,
+          points,
+          idx,
+          pointPairs.length - 1,
+          fakeElementsMap,
+          options,
+        ),
+      ),
+    ),
   );
 
   let currentGroupIdx = 0;
@@ -610,14 +646,7 @@ const getElbowArrowData = (
  * @returns
  */
 const routeElbowArrow = (
-  arrow: {
-    x: number;
-    y: number;
-    startBinding: FixedPointBinding | null;
-    endBinding: FixedPointBinding | null;
-    startArrowhead: Arrowhead | null;
-    endArrowhead: Arrowhead | null;
-  },
+  arrow: ElbowArrowState,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   nextPoints: readonly LocalPoint[],
   options?: {
