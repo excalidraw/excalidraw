@@ -49,7 +49,12 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, isSafari, type EXPORT_IMAGE_TYPES } from "../constants";
+import {
+  ARROW_TYPE,
+  isSafari,
+  type EXPORT_IMAGE_TYPES,
+  ToolTypeEnum,
+} from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -290,6 +295,7 @@ import {
   isShallowEqual,
   arrayToMap,
   toBrandedType,
+  isToolSupported,
 } from "../utils";
 import {
   createSrcDoc,
@@ -2986,7 +2992,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // prefer spreadsheet data over image file (MS Office/Libre Office)
       if (isSupportedImageFile(file) && !data.spreadsheet) {
-        if (!this.isToolSupported("image")) {
+        if (!isToolSupported(ToolTypeEnum.Image, this.props.UIOptions.tools)) {
           this.setState({ errorMessage: t("errors.imageToolNotSupported") });
           return;
         }
@@ -3313,7 +3319,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       !isPlainPaste &&
       mixedContent.some((node) => node.type === "imageUrl") &&
-      this.isToolSupported("image")
+      isToolSupported(ToolTypeEnum.Image, this.props.UIOptions.tools)
     ) {
       const imageURLs = mixedContent
         .filter((node) => node.type === "imageUrl")
@@ -4552,16 +4558,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
-  // We purposely widen the `tool` type so this helper can be called with
-  // any tool without having to type check it
-  private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
-    return (
-      this.props.UIOptions.tools?.[
-        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
-      ] !== false
-    );
-  };
-
   setActiveTool = (
     tool: (
       | (
@@ -4574,7 +4570,7 @@ class App extends React.Component<AppProps, AppState> {
       | { type: "custom"; customType: string }
     ) & { locked?: boolean },
   ) => {
-    if (!this.isToolSupported(tool.type)) {
+    if (!isToolSupported(tool.type, this.props.UIOptions.tools)) {
       console.warn(
         `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
       );
@@ -9439,7 +9435,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     // we should be handling all cases upstream, but in case we forget to handle
     // a future case, let's throw here
-    if (!this.isToolSupported("image")) {
+    if (!isToolSupported(ToolTypeEnum.Image, this.props.UIOptions.tools)) {
       this.setState({ errorMessage: t("errors.imageToolNotSupported") });
       return;
     }
@@ -9833,7 +9829,10 @@ class App extends React.Component<AppProps, AppState> {
       // if image tool not supported, don't show an error here and let it fall
       // through so we still support importing scene data from images. If no
       // scene data encoded, we'll show an error then
-      if (isSupportedImageFile(file) && this.isToolSupported("image")) {
+      if (
+        isSupportedImageFile(file) &&
+        isToolSupported(ToolTypeEnum.Image, this.props.UIOptions.tools)
+      ) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
@@ -9946,7 +9945,7 @@ class App extends React.Component<AppProps, AppState> {
         if (
           imageSceneDataError &&
           error.code === "IMAGE_NOT_CONTAINS_SCENE_DATA" &&
-          !this.isToolSupported("image")
+          !isToolSupported(ToolTypeEnum.Image, this.props.UIOptions.tools)
         ) {
           this.setState({
             isLoading: false,

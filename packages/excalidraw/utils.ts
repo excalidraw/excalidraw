@@ -1,7 +1,11 @@
 import Pool from "es6-promise-pool";
 import { average } from "../math";
 import { COLOR_PALETTE } from "./colors";
-import type { EVENT } from "./constants";
+import {
+  EVENT,
+  isToolbarElementDropdown,
+  isToolbarElementTool,
+} from "./constants";
 import {
   DEFAULT_VERSION,
   FONT_FAMILY,
@@ -10,10 +14,13 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 import type { FontFamilyValues, FontString } from "./element/types";
-import type {
+import {
   ActiveTool,
   AppState,
+  ToolbarDropdownCustomItem,
+  ToolbarDropdownTool,
   ToolType,
+  UIOptions,
   UnsubscribeCallback,
   Zoom,
 } from "./types";
@@ -47,6 +54,33 @@ export const isToolIcon = (
   target: Element | EventTarget | null,
 ): target is HTMLElement =>
   target instanceof HTMLElement && target.className.includes("ToolIcon");
+
+// We purposely widen the `tool` type so this helper can be called with
+// any tool without having to type check it
+export const isToolSupported = <T extends ToolType | "custom">(
+  tool: T,
+  tools: UIOptions["tools"],
+) => {
+  return (
+    (tools || [])
+      .filter(isToolbarElementTool)
+      .some(({ tool: toolbarTool }) => toolbarTool === tool) ||
+    (tools || []).filter(isToolbarElementDropdown).some((dropdown) => {
+      return (
+        dropdown.elements
+          .filter((element): element is ToolbarDropdownTool => {
+            return element.type === "Tool";
+          })
+          .some(({ tool: toolbarTool }) => toolbarTool === tool) ||
+        dropdown.elements
+          .filter((element): element is ToolbarDropdownCustomItem => {
+            return element.type === "Item";
+          })
+          .some(({ selectKey }) => selectKey === tool)
+      );
+    })
+  );
+};
 
 export const isInputLike = (
   target: Element | EventTarget | null,

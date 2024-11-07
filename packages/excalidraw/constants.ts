@@ -1,5 +1,12 @@
 import cssVariables from "./css/variables.module.scss";
-import type { AppProps, AppState } from "./types";
+import {
+  AppProps,
+  AppState,
+  ToolbarElement,
+  ToolbarElementCustomItem,
+  ToolbarElementDropdown,
+  ToolbarElementTool,
+} from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
 
@@ -20,6 +27,24 @@ export const isIOS =
 // keeping function so it can be mocked in test
 export const isBrave = () =>
   (navigator as any).brave?.isBrave?.name === "isBrave";
+
+export const isToolbarElementDropdown = (
+  el: ToolbarElement,
+): el is ToolbarElementDropdown => {
+  return el.type === ToolbarElementTypeEnum.Dropdown;
+};
+
+export const isToolbarElementCustomItem = (
+  el: ToolbarElement,
+): el is ToolbarElementCustomItem => {
+  return el.type === ToolbarElementTypeEnum.CustomItem;
+};
+
+export const isToolbarElementTool = (
+  el: ToolbarElement,
+): el is ToolbarElementTool => {
+  return el.type === ToolbarElementTypeEnum.Tool;
+};
 
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
@@ -283,9 +308,6 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     toggleTheme: null,
     saveAsImage: true,
   },
-  tools: {
-    image: true,
-  },
 };
 
 // breakpoints
@@ -449,3 +471,28 @@ export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
   round: "round",
   elbow: "elbow",
 };
+
+export const ToolTypeEnum = Object.freeze({
+  Selection: "selection",
+  Rectangle: "rectangle",
+  Diamond: "diamond",
+  Ellipse: "ellipse",
+  Arrow: "arrow",
+  Line: "line",
+  Freedraw: "freedraw",
+  Text: "text",
+  Image: "image",
+  Eraser: "eraser",
+  Hand: "hand",
+  Frame: "frame",
+  Magicframe: "magicframe",
+  Embeddable: "embeddable",
+  Laser: "laser",
+});
+
+export const ToolbarElementTypeEnum = Object.freeze({
+  Separator: "Separator",
+  Dropdown: "Dropdown",
+  Tool: "Tool",
+  CustomItem: "CustomItem",
+});
