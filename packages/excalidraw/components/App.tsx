@@ -4007,7 +4007,7 @@ class App extends React.Component<AppProps, AppState> {
    * */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
-      const { addedFiles } = this.addMissingFiles(files);
+      const { addedFiles } = this.addMissingFiles(files, true); //zsviczian
 
       this.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
