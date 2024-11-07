@@ -1688,6 +1688,9 @@ export const actionChangeArrowType = register({
       ...appState,
       currentItemArrowType: value,
     };
+
+    // Change the arrow type and update any other state settings for
+    // the arrow.
     const selectedId = appState.selectedLinearElement?.elementId;
     if (selectedId) {
       const selected = newElements.find((el) => el.id === selectedId);
