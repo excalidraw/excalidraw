@@ -1548,145 +1548,159 @@ export const actionChangeArrowType = register({
   label: "Change arrow types",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    return {
-      elements: changeProperty(elements, appState, (el) => {
-        if (!isArrowElement(el)) {
-          return el;
-        }
-        const newElement = newElementWith(el, {
-          roundness:
-            value === ARROW_TYPE.round
-              ? {
-                  type: ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
-          elbowed: value === ARROW_TYPE.elbow,
-          points:
-            value === ARROW_TYPE.elbow || el.elbowed
-              ? [el.points[0], el.points[el.points.length - 1]]
-              : el.points,
+    const newElements = changeProperty(elements, appState, (el) => {
+      if (!isArrowElement(el)) {
+        return el;
+      }
+      const newElement = newElementWith(el, {
+        roundness:
+          value === ARROW_TYPE.round
+            ? {
+                type: ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : null,
+        elbowed: value === ARROW_TYPE.elbow,
+        points:
+          value === ARROW_TYPE.elbow || el.elbowed
+            ? [el.points[0], el.points[el.points.length - 1]]
+            : el.points,
+      });
+
+      if (isElbowArrow(newElement)) {
+        const elementsMap = app.scene.getNonDeletedElementsMap();
+
+        app.dismissLinearEditor();
+
+        const startGlobalPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            newElement,
+            0,
+            elementsMap,
+          );
+        const endGlobalPoint =
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            newElement,
+            -1,
+            elementsMap,
+          );
+        const startHoveredElement =
+          !newElement.startBinding &&
+          getHoveredElementForBinding(
+            tupleToCoors(startGlobalPoint),
+            elements,
+            elementsMap,
+            true,
+          );
+        const endHoveredElement =
+          !newElement.endBinding &&
+          getHoveredElementForBinding(
+            tupleToCoors(endGlobalPoint),
+            elements,
+            elementsMap,
+            true,
+          );
+        const startElement = startHoveredElement
+          ? startHoveredElement
+          : newElement.startBinding &&
+            (elementsMap.get(
+              newElement.startBinding.elementId,
+            ) as ExcalidrawBindableElement);
+        const endElement = endHoveredElement
+          ? endHoveredElement
+          : newElement.endBinding &&
+            (elementsMap.get(
+              newElement.endBinding.elementId,
+            ) as ExcalidrawBindableElement);
+
+        const finalStartPoint = startHoveredElement
+          ? bindPointToSnapToElementOutline(
+              startGlobalPoint,
+              endGlobalPoint,
+              startHoveredElement,
+              elementsMap,
+            )
+          : startGlobalPoint;
+        const finalEndPoint = endHoveredElement
+          ? bindPointToSnapToElementOutline(
+              endGlobalPoint,
+              startGlobalPoint,
+              endHoveredElement,
+              elementsMap,
+            )
+          : endGlobalPoint;
+
+        startHoveredElement &&
+          bindLinearElement(
+            newElement,
+            startHoveredElement,
+            "start",
+            elementsMap,
+          );
+        endHoveredElement &&
+          bindLinearElement(newElement, endHoveredElement, "end", elementsMap);
+
+        mutateElement(newElement, {
+          points: [finalStartPoint, finalEndPoint].map(
+            (p): LocalPoint =>
+              pointFrom(p[0] - newElement.x, p[1] - newElement.y),
+          ),
+          ...(startElement && newElement.startBinding
+            ? {
+                startBinding: {
+                  // @ts-ignore TS cannot discern check above
+                  ...newElement.startBinding!,
+                  ...calculateFixedPointForElbowArrowBinding(
+                    newElement,
+                    startElement,
+                    "start",
+                    elementsMap,
+                  ),
+                },
+              }
+            : {}),
+          ...(endElement && newElement.endBinding
+            ? {
+                endBinding: {
+                  // @ts-ignore TS cannot discern check above
+                  ...newElement.endBinding,
+                  ...calculateFixedPointForElbowArrowBinding(
+                    newElement,
+                    endElement,
+                    "end",
+                    elementsMap,
+                  ),
+                },
+              }
+            : {}),
         });
 
-        if (isElbowArrow(newElement)) {
-          const elementsMap = app.scene.getNonDeletedElementsMap();
+        LinearElementEditor.updateEditorMidPointsCache(
+          newElement,
+          elementsMap,
+          app.state,
+        );
+      }
 
-          app.dismissLinearEditor();
+      return newElement;
+    });
 
-          const startGlobalPoint =
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              newElement,
-              0,
-              elementsMap,
-            );
-          const endGlobalPoint =
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              newElement,
-              -1,
-              elementsMap,
-            );
-          const startHoveredElement =
-            !newElement.startBinding &&
-            getHoveredElementForBinding(
-              tupleToCoors(startGlobalPoint),
-              elements,
-              elementsMap,
-              true,
-            );
-          const endHoveredElement =
-            !newElement.endBinding &&
-            getHoveredElementForBinding(
-              tupleToCoors(endGlobalPoint),
-              elements,
-              elementsMap,
-              true,
-            );
-          const startElement = startHoveredElement
-            ? startHoveredElement
-            : newElement.startBinding &&
-              (elementsMap.get(
-                newElement.startBinding.elementId,
-              ) as ExcalidrawBindableElement);
-          const endElement = endHoveredElement
-            ? endHoveredElement
-            : newElement.endBinding &&
-              (elementsMap.get(
-                newElement.endBinding.elementId,
-              ) as ExcalidrawBindableElement);
+    const newState = {
+      ...appState,
+      currentItemArrowType: value,
+    };
+    const selectedId = appState.selectedLinearElement?.elementId;
+    if (selectedId) {
+      const selected = newElements.find((el) => el.id === selectedId);
+      if (selected) {
+        newState.selectedLinearElement = new LinearElementEditor(
+          selected as ExcalidrawLinearElement,
+        );
+      }
+    }
 
-          const finalStartPoint = startHoveredElement
-            ? bindPointToSnapToElementOutline(
-                startGlobalPoint,
-                endGlobalPoint,
-                startHoveredElement,
-                elementsMap,
-              )
-            : startGlobalPoint;
-          const finalEndPoint = endHoveredElement
-            ? bindPointToSnapToElementOutline(
-                endGlobalPoint,
-                startGlobalPoint,
-                endHoveredElement,
-                elementsMap,
-              )
-            : endGlobalPoint;
-
-          startHoveredElement &&
-            bindLinearElement(
-              newElement,
-              startHoveredElement,
-              "start",
-              elementsMap,
-            );
-          endHoveredElement &&
-            bindLinearElement(
-              newElement,
-              endHoveredElement,
-              "end",
-              elementsMap,
-            );
-
-          mutateElement(newElement, {
-            points: [finalStartPoint, finalEndPoint].map(
-              (p): LocalPoint =>
-                pointFrom(p[0] - newElement.x, p[1] - newElement.y),
-            ),
-            ...(startElement && newElement.startBinding
-              ? {
-                  startBinding: {
-                    // @ts-ignore TS cannot discern check above
-                    ...newElement.startBinding!,
-                    ...calculateFixedPointForElbowArrowBinding(
-                      newElement,
-                      startElement,
-                      "start",
-                      elementsMap,
-                    ),
-                  },
-                }
-              : {}),
-            ...(endElement && newElement.endBinding
-              ? {
-                  endBinding: {
-                    // @ts-ignore TS cannot discern check above
-                    ...newElement.endBinding,
-                    ...calculateFixedPointForElbowArrowBinding(
-                      newElement,
-                      endElement,
-                      "end",
-                      elementsMap,
-                    ),
-                  },
-                }
-              : {}),
-          });
-        }
-
-        return newElement;
-      }),
-      appState: {
-        ...appState,
-        currentItemArrowType: value,
-      },
+    return {
+      elements: newElements,
+      appState: newState,
       storeAction: StoreAction.CAPTURE,
     };
   },
