@@ -8,11 +8,10 @@ import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 
-
-export default defineConfig(({mode}) =>{
+export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
-// https://vitejs.dev/config/
+  // https://vitejs.dev/config/
   return {
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
@@ -152,7 +151,6 @@ export default defineConfig(({mode}) =>{
               src: "android-chrome-192x192.png",
               sizes: "192x192",
               type: "image/png",
-
             },
             {
               src: "apple-touch-icon.png",
@@ -238,5 +236,5 @@ export default defineConfig(({mode}) =>{
       }),
     ],
     publicDir: "../public",
-  }
+  };
 });
