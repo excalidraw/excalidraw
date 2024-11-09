@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         devOptions: {
           /* set this flag to true to enable in Development mode */
-          enabled: false,
+          enabled: envVars.VITE_APP_ENABLE_PWA === "true",
         },
 
         workbox: {
@@ -169,6 +169,7 @@ export default defineConfig(({ mode }) => {
             },
           ],
           start_url: "/",
+          id:"excalidraw",
           display: "standalone",
           theme_color: "#121212",
           background_color: "#ffffff",
