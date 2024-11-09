@@ -71,7 +71,7 @@ export default defineConfig(({ mode }) => {
             : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
         overlay: {
           initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
-          badgeStyle: "margin-bottomd: 4rem; margin-left: 1rem",
+          badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
         },
       }),
       svgrPlugin(),
