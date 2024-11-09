@@ -71,7 +71,7 @@ export default defineConfig(({ mode }) => {
             : { lintCommand: 'eslint "./**/*.{js,ts,tsx}"' },
         overlay: {
           initialIsOpen: envVars.VITE_APP_COLLAPSE_OVERLAY === "false",
-          badgeStyle: "margin-bottom: 4rem; margin-left: 1rem",
+          badgeStyle: "margin-bottomd: 4rem; margin-left: 1rem",
         },
       }),
       svgrPlugin(),
@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         devOptions: {
           /* set this flag to true to enable in Development mode */
-          enabled: false,
+          enabled: envVars.VITE_APP_ENABLE_PWA === "true",
         },
 
         workbox: {
@@ -169,6 +169,7 @@ export default defineConfig(({ mode }) => {
             },
           ],
           start_url: "/",
+          id:"excalidraw",
           display: "standalone",
           theme_color: "#121212",
           background_color: "#ffffff",
