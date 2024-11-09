@@ -281,7 +281,7 @@
     "laser": "Laser pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
-    "mermaidToExcalidraw": "Mermaid to Excalidraw"
+    "mermaidToExcalidraw": "Flowchart"
   },
   "element": {
     "rectangle": "Rectangle",
@@ -568,9 +568,9 @@
     }
   },
   "mermaid": {
-    "title": "Mermaid to Excalidraw",
+    "title": "Flowchart",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image.",
     "syntax": "Mermaid Syntax",
     "preview": "Preview"
   },
