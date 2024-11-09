@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         devOptions: {
           /* set this flag to true to enable in Development mode */
-          enabled: true,
+          enabled: false,
         },
 
         workbox: {
