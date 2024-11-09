@@ -170,7 +170,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 19,
+  "version": 21,
   "width": 100,
   "x": 100,
   "y": -50,
@@ -313,6 +313,9 @@ History {
                 "focus": "0.02970",
                 "gap": 1,
               },
+              "width": 98,
+              "x": 1,
+              "y": "0.99000",
             },
             "inserted": {
               "endBinding": {
@@ -336,6 +339,9 @@ History {
                 "focus": "0.02000",
                 "gap": 1,
               },
+              "width": 98,
+              "x": 1,
+              "y": "1.32340",
             },
           },
         },

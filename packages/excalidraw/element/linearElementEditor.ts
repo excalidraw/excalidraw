@@ -385,35 +385,58 @@ export class LinearElementEditor {
       }
 
       if (selectedPointsIndices && draggingPoint) {
-        const isDraggingPointBound =
-          (lastClickedPoint === 0 && element.startBinding) ||
-          (lastClickedPoint === element.points.length - 1 &&
-            element.endBinding);
+        // Temporarily remove the binding from the dragging point to avoid the element being pulled by the binding
+        let originalBinding: ExcalidrawBindableElement | "keep" | null = null;
+        if (lastClickedPoint === 0) {
+          originalBinding = element.startBinding as
+            | ExcalidrawBindableElement
+            | "keep"
+            | null;
+          bindOrUnbindLinearElement(element, null, "keep", elementsMap, scene);
+        } else if (lastClickedPoint === element.points.length - 1) {
+          originalBinding = element.endBinding as
+            | ExcalidrawBindableElement
+            | "keep"
+            | null;
+          bindOrUnbindLinearElement(element, "keep", null, elementsMap, scene);
+        }
 
-        if (!isDraggingPointBound) {
-          const oppositePointIndex =
-            lastClickedPoint === 0 ? element.points.length - 1 : 0;
-          if (oppositePointIndex === 0 && element.startBinding) {
-            const startBindingElement = elementsMap.get(
-              element.startBinding.elementId,
-            );
-            updateBoundElements(startBindingElement!, elementsMap, {
-              simultaneouslyUpdated: [startBindingElement!],
-            });
-          } else if (
-            oppositePointIndex === element.points.length - 1 &&
-            element.endBinding
-          ) {
-            const endBindingElement = elementsMap.get(
-              element.endBinding.elementId,
-            );
-            updateBoundElements(endBindingElement!, elementsMap, {
-              simultaneouslyUpdated: [endBindingElement!],
-            });
+        // Run updateBoundElements for the opposite point
+        if (element.startBinding) {
+          const startBindingElement = elementsMap.get(
+            element.startBinding.elementId,
+          );
+          if (startBindingElement) {
+            updateBoundElements(startBindingElement, elementsMap);
+          }
+        } else if (element.endBinding) {
+          const endBindingElement = elementsMap.get(
+            element.endBinding.elementId,
+          );
+          if (endBindingElement) {
+            updateBoundElements(endBindingElement, elementsMap);
           }
         }
-      }
 
+        // Restore the original binding
+        if (lastClickedPoint === 0) {
+          bindOrUnbindLinearElement(
+            element,
+            originalBinding,
+            "keep",
+            elementsMap,
+            scene,
+          );
+        } else if (lastClickedPoint === element.points.length - 1) {
+          bindOrUnbindLinearElement(
+            element,
+            "keep",
+            originalBinding,
+            elementsMap,
+            scene,
+          );
+        }
+      }
       return true;
     }
 
