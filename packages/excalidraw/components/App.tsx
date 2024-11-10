@@ -4007,7 +4007,7 @@ class App extends React.Component<AppProps, AppState> {
    * */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
-      const { addedFiles } = this.addMissingFiles(files, true); //zsviczian
+      const { addedFiles } = this.addMissingFiles(files, undefined, true); //zsviczian
 
       this.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
@@ -4119,6 +4119,7 @@ class App extends React.Component<AppProps, AppState> {
   private addMissingFiles = (
     files: BinaryFiles | BinaryFileData[],
     replace = false,
+    force = false, //zsviczian
   ) => {
     const nextFiles = replace ? {} : { ...this.files };
     const addedFiles: BinaryFiles = {};
@@ -4126,7 +4127,7 @@ class App extends React.Component<AppProps, AppState> {
     const _files = Array.isArray(files) ? files : Object.values(files);
 
     for (const fileData of _files) {
-      if (nextFiles[fileData.id]) {
+      if (!force && nextFiles[fileData.id]) { //zsviczian
         continue;
       }
 
@@ -11317,32 +11318,4 @@ declare global {
   }
 }
 
-/*  //zsviczian
-export const createTestHook = () => {
-  if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
-    window.h = window.h || ({} as Window["h"]);
-
-    Object.defineProperties(window.h, {
-      elements: {
-        configurable: true,
-        get() {
-          return this.app?.scene.getElementsIncludingDeleted();
-        },
-        set(elements: ExcalidrawElement[]) {
-          return this.app?.scene.replaceAllElements(
-            syncInvalidIndices(elements),
-          );
-        },
-      },
-      scene: {
-        configurable: true,
-        get() {
-          return this.app?.scene;
-        },
-      },
-    });
-  }
-};
-
-createTestHook();*/
 export default App;
