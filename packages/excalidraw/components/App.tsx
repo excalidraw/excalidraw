@@ -189,6 +189,7 @@ import type {
   NonDeletedSceneElementsMap,
   Sequential,
   FixedSegment,
+  ExcalidrawElbowArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -2326,6 +2327,17 @@ class App extends React.Component<AppProps, AppState> {
     // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
     this.fonts.loadSceneFonts().then((fontFaces) => {
       this.fonts.onLoaded(fontFaces);
+    });
+
+    // Elbow arrow segment midpoint cache needs to be updated after the scene (re)load
+    scene.elements.forEach((element) => {
+      if (isElbowArrow(element)) {
+        LinearElementEditor.updateEditorMidPointsCache(
+          element,
+          this.scene.getElementsMapIncludingDeleted(),
+          this.state,
+        );
+      }
     });
   };
 
