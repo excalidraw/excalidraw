@@ -87,7 +87,8 @@ export const actionClearCanvas = register({
   predicate: (elements, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.clearCanvas &&
-      !appState.viewModeEnabled
+      !appState.viewModeEnabled &&
+      !appState.shapeSelectionEnabled
     );
   },
   perform: (elements, appState, _, app) => {

@@ -92,6 +92,8 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  shapeSelectionEnabled: appState.shapeSelectionEnabled,
+  hoveredElementIds: appState.hoveredElementIds,
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,

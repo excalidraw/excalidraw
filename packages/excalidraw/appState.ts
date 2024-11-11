@@ -84,6 +84,7 @@ export const getDefaultAppState = (): Omit<
     scrollX: 0,
     scrollY: 0,
     selectedElementIds: {},
+    hoveredElementIds: {},
     selectedGroupIds: {},
     selectedElementsAreBeingDragged: false,
     selectionElement: null,
@@ -105,6 +106,8 @@ export const getDefaultAppState = (): Omit<
       value: 1 as NormalizedZoomValue,
     },
     viewModeEnabled: false,
+    shapeSelectionEnabled: false,
+    elementToLink: null,
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
@@ -208,6 +211,7 @@ const APP_STATE_STORAGE_CONF = (<
   scrollX: { browser: true, export: false, server: false },
   scrollY: { browser: true, export: false, server: false },
   selectedElementIds: { browser: true, export: false, server: false },
+  hoveredElementIds: { browser: false, export: false, server: false },
   selectedGroupIds: { browser: true, export: false, server: false },
   selectedElementsAreBeingDragged: {
     browser: false,
@@ -238,6 +242,8 @@ const APP_STATE_STORAGE_CONF = (<
   userToFollow: { browser: false, export: false, server: false },
   followedBy: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
+  shapeSelectionEnabled: { browser: false, export: false, server: false },
+  elementToLink: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

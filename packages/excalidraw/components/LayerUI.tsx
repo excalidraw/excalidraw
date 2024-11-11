@@ -63,6 +63,7 @@ import { actionToggleStats } from "../actions";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
+import ShapeLinkDialog from "./ShapeLinkDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -232,7 +233,8 @@ const LayerUI = ({
     const shouldShowStats =
       appState.stats.open &&
       !appState.zenModeEnabled &&
-      !appState.viewModeEnabled;
+      !appState.viewModeEnabled &&
+      !appState.shapeSelectionEnabled;
 
     return (
       <FixedSideContainer side="top">
@@ -241,7 +243,7 @@ const LayerUI = ({
             {renderCanvasActions()}
             {shouldRenderSelectedShapeActions && renderSelectedShapeActions()}
           </Stack.Col>
-          {!appState.viewModeEnabled && (
+          {!appState.viewModeEnabled && !appState.shapeSelectionEnabled && (
             <Section heading="shapes" className="shapes-section">
               {(heading: React.ReactNode) => (
                 <div style={{ position: "relative" }}>
@@ -341,6 +343,7 @@ const LayerUI = ({
             )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
+              !appState.shapeSelectionEnabled &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
                 appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
@@ -471,6 +474,18 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
+      <ShapeLinkDialog
+        isOpen={appState.shapeSelectionEnabled}
+        onClose={() => {
+          setAppState({
+            shapeSelectionEnabled: false,
+            hoveredElementIds: {},
+            elementToLink: null,
+          });
+        }}
+        elementsMap={app.scene.getNonDeletedElementsMap()}
+        appState={appState}
+      />
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}

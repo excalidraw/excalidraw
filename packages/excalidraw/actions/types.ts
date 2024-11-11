@@ -135,7 +135,8 @@ export type ActionName =
   | "autoResize"
   | "elementStats"
   | "searchMenu"
-  | "copyShapeLink";
+  | "copyShapeLink"
+  | "linkToShape";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

@@ -1,0 +1,39 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .ShapeLinkDialog {
+    position: absolute;
+    top: var(--editor-container-padding);
+    left: calc(var(--editor-container-padding) * 4);
+
+    z-index: 3;
+
+    border-radius: 10px;
+    padding: 1.5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-island);
+    background-color: var(--island-bg-color);
+
+    .ShapeLinkDialog__header {
+      h2 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      margin-bottom: 1.5rem;
+    }
+
+    .ShapeLinkDialog__actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+  }
+}

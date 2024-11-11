@@ -156,7 +156,12 @@
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
     "autoResize": "Enable text auto-resizing",
-    "copyShapeLink": "Copy link to shape"
+    "copyShapeLink": "Copy link to shape",
+    "linkToShape": "Link to shape"
+  },
+  "shapeLink": {
+    "title": "Link to shape",
+    "desc": "Click on a shape on canvas or paste a shape URL."
   },
   "library": {
     "noItems": "No items added yet...",

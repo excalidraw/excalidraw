@@ -154,6 +154,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         cursor: props.appState.viewModeEnabled
           ? CURSOR_TYPE.GRAB
           : CURSOR_TYPE.AUTO,
+        // background: "rgba(0, 0, 0, 0.5)",
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}
@@ -182,6 +183,7 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  shapeSelectionEnabled: appState.shapeSelectionEnabled,
   editingGroupId: appState.editingGroupId,
   editingLinearElement: appState.editingLinearElement,
   selectedElementIds: appState.selectedElementIds,

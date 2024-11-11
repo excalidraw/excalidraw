@@ -48,7 +48,12 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, type EXPORT_IMAGE_TYPES } from "../constants";
+import {
+  ARROW_TYPE,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
+  MAX_SHAPE_LINK_ZOOM,
+  type EXPORT_IMAGE_TYPES,
+} from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -446,8 +451,15 @@ import {
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom, pointDistance, vector } from "../../math";
-import { getElementsFromQuery } from "../element/shapeLinks";
-import { actionCopyShapeLink } from "../actions/actionCopyShapeLink";
+import {
+  canCreateShapeLinkFromElements,
+  createShapeLink,
+  getElementsFromQuery,
+} from "../element/shapeLinks";
+import {
+  actionCopyShapeLink,
+  actionLinkToShape,
+} from "../actions/actionShapeLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1188,6 +1200,9 @@ class App extends React.Component<AppProps, AppState> {
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                   null,
+                  this.state.shapeSelectionEnabled
+                    ? DEFAULT_REDUCED_GLOBAL_ALPHA
+                    : 1,
                 ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
@@ -1506,7 +1521,8 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
-          "excalidraw--view-mode": this.state.viewModeEnabled,
+          "excalidraw--view-mode":
+            this.state.viewModeEnabled || this.state.shapeSelectionEnabled,
           "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
@@ -1576,6 +1592,7 @@ class App extends React.Component<AppProps, AppState> {
                           trails={[this.laserTrails, this.eraserTrail]}
                         />
                         {selectedElements.length === 1 &&
+                          !this.state.shapeSelectionEnabled &&
                           this.state.showHyperlinkPopup && (
                             <Hyperlink
                               key={firstSelectedElement.id}
@@ -2327,8 +2344,7 @@ class App extends React.Component<AppProps, AppState> {
     if (elements) {
       this.scrollToContent(elements, {
         fitToViewport: true,
-        maxZoom: 3,
-        minZoom: 1,
+        maxZoom: MAX_SHAPE_LINK_ZOOM,
       });
       return true;
     }
@@ -2749,6 +2765,13 @@ class App extends React.Component<AppProps, AppState> {
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
       this.addEventListeners();
       this.deselectElements();
+    }
+
+    if (prevState.shapeSelectionEnabled !== this.state.shapeSelectionEnabled) {
+      this.deselectElements();
+      this.setState({
+        hoveredElementIds: {},
+      });
     }
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
@@ -3946,6 +3969,45 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (!isInputLike(event.target)) {
+        if (this.state.shapeSelectionEnabled) {
+          if (event.key === KEYS.ESCAPE) {
+            this.setState({
+              shapeSelectionEnabled: false,
+              elementToLink: null,
+            });
+
+            return;
+          }
+
+          if (event.key === KEYS.ENTER && this.state.elementToLink) {
+            const selectedElements = getSelectedElements(
+              this.scene.getNonDeletedElementsMap(),
+              this.state,
+            );
+
+            if (canCreateShapeLinkFromElements(selectedElements)) {
+              const elementToLink = this.scene
+                .getNonDeletedElementsMap()
+                .get(this.state.elementToLink);
+              if (elementToLink) {
+                mutateElement(elementToLink, {
+                  link: createShapeLink(
+                    selectedElements,
+                    window.location.origin,
+                  ),
+                });
+              }
+            }
+
+            this.setState({
+              shapeSelectionEnabled: false,
+              elementToLink: null,
+            });
+
+            return;
+          }
+        }
+
         if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
@@ -4413,7 +4475,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
-      if (this.state.viewModeEnabled) {
+      if (this.state.viewModeEnabled || this.state.shapeSelectionEnabled) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
       } else if (this.state.activeTool.type === "selection") {
         resetCursor(this.interactiveCanvas);
@@ -5738,6 +5800,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (!this.state.selectedLinearElement ||
           this.state.selectedLinearElement.hoverPointIndex === -1) &&
+        !this.state.shapeSelectionEnabled &&
         !(selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
       ) {
         const elementWithTransformHandleType =
@@ -5762,7 +5825,11 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-    } else if (selectedElements.length > 1 && !isOverScrollBar) {
+    } else if (
+      selectedElements.length > 1 &&
+      !isOverScrollBar &&
+      !this.state.shapeSelectionEnabled
+    ) {
       const transformHandleType = getTransformHandleTypeFromCoords(
         getCommonBounds(selectedElements),
         scenePointerX,
@@ -5821,6 +5888,8 @@ class App extends React.Component<AppProps, AppState> {
         );
       } else if (this.state.viewModeEnabled) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else if (this.state.shapeSelectionEnabled) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (this.state.selectedLinearElement) {
@@ -5865,6 +5934,26 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       }
+    }
+
+    if (this.state.shapeSelectionEnabled && hitElement) {
+      this.setState((prevState) => {
+        return {
+          hoveredElementIds: selectGroupsForSelectedElements(
+            {
+              editingGroupId: prevState.editingGroupId,
+              selectedElementIds: { [hitElement.id]: true },
+            },
+            this.scene.getNonDeletedElements(),
+            prevState,
+            this,
+          ).selectedElementIds,
+        };
+      });
+    } else if (this.state.shapeSelectionEnabled && !hitElement) {
+      this.setState({
+        hoveredElementIds: {},
+      });
     }
   };
 
@@ -6123,7 +6212,9 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        storeAction: StoreAction.UPDATE,
+        storeAction: this.state.shapeSelectionEnabled
+          ? StoreAction.NONE
+          : StoreAction.UPDATE,
       });
       return;
     }
@@ -6923,7 +7014,7 @@ class App extends React.Component<AppProps, AppState> {
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               this.setState((prevState) => {
-                const nextSelectedElementIds: { [id: string]: true } = {
+                let nextSelectedElementIds: { [id: string]: true } = {
                   ...prevState.selectedElementIds,
                   [hitElement.id]: true,
                 };
@@ -6991,6 +7082,23 @@ class App extends React.Component<AppProps, AppState> {
                           });
                       }
                     });
+                  }
+                }
+
+                // Finally, in shape selection mode, we'd like to
+                // keep only one shape or group selected at a time.
+                // This means, if the hitElement is a different shape or group
+                // than the previously selected ones, we deselect the previous ones
+                // and select the hitElement
+                if (prevState.shapeSelectionEnabled) {
+                  if (
+                    !hitElement.groupIds.some(
+                      (gid) => prevState.selectedGroupIds[gid],
+                    )
+                  ) {
+                    nextSelectedElementIds = {
+                      [hitElement.id]: true,
+                    };
                   }
                 }
 
@@ -7638,6 +7746,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ) {
     return withBatchedUpdatesThrottled((event: PointerEvent) => {
+      if (this.state.shapeSelectionEnabled) {
+        return;
+      }
+
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -10158,6 +10270,8 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionCopyShapeLink,
+      actionLinkToShape,
+      CONTEXT_MENU_SEPARATOR,
       actionGroup,
       actionTextAutoResize,
       actionUnbindText,

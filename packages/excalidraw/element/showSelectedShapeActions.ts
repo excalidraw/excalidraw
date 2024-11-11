@@ -8,6 +8,7 @@ export const showSelectedShapeActions = (
 ) =>
   Boolean(
     !appState.viewModeEnabled &&
+      !appState.shapeSelectionEnabled &&
       ((appState.activeTool.type !== "custom" &&
         (appState.editingTextElement ||
           (appState.activeTool.type !== "selection" &&

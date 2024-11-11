@@ -44,7 +44,38 @@ export const actionCopyShapeLink = register({
   },
   predicate: (elements, appState, appProps, app) =>
     canCreateShapeLinkFromElements(getSelectedElements(elements, appState)),
+});
+
+export const actionLinkToShape = register({
+  name: "linkToShape",
+  label: "labels.linkToShape",
+  perform: (elements, appState, _, app) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    if (selectedElements.length !== 1) {
+      return { elements, appState, app, storeAction: StoreAction.NONE };
+    }
+
+    return {
+      appState: {
+        ...appState,
+        shapeSelectionEnabled: true,
+        elementToLink: getSelectedElements(elements, appState)[0].id,
+      },
+      storeAction: StoreAction.CAPTURE,
+    };
+  },
+  predicate: (elements, appState, appProps, app) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    return (
+      !appState.shapeSelectionEnabled &&
+      selectedElements.length === 1 &&
+      canCreateShapeLinkFromElements(selectedElements)
+    );
+  },
+  trackEvent: false,
   keyTest: (event) => {
-    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K && event.altKey;
+    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.L;
   },
 });
