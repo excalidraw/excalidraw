@@ -189,7 +189,6 @@ import type {
   NonDeletedSceneElementsMap,
   Sequential,
   FixedSegment,
-  ExcalidrawElbowArrowElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
