@@ -9242,7 +9242,13 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // const midPointSelected =
+      //   (this.state.selectedLinearElement?.pointerDownState.segmentMidpoint
+      //     .index || -1) < 0;
+
       if (
+        // not elbow midpoint dragged
+        !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
         !pointerDownState.drag.hasOccurred &&
         // not resized
