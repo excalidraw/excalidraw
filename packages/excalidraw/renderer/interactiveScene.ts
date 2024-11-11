@@ -518,17 +518,26 @@ const renderLinearPointHandles = (
       pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
     );
     globalPoint.slice(1, -2).forEach((p, idx) => {
-      renderSingleLinearPoint(
-        context,
-        appState,
-        pointFrom<GlobalPoint>(
-          (p[0] + globalPoint[idx + 2][0]) / 2,
-          (p[1] + globalPoint[idx + 2][1]) / 2,
-        ),
-        POINT_HANDLE_SIZE / 2,
-        false,
-        !fixedPoints[idx + 1],
-      );
+      if (
+        !LinearElementEditor.isSegmentTooShort(
+          element,
+          p,
+          globalPoint[idx + 2],
+          appState.zoom,
+        )
+      ) {
+        renderSingleLinearPoint(
+          context,
+          appState,
+          pointFrom<GlobalPoint>(
+            (p[0] + globalPoint[idx + 2][0]) / 2,
+            (p[1] + globalPoint[idx + 2][1]) / 2,
+          ),
+          POINT_HANDLE_SIZE / 2,
+          false,
+          !fixedPoints[idx + 1],
+        );
+      }
     });
   } else {
     const midPoints = LinearElementEditor.getEditorMidPoints(

@@ -7957,6 +7957,7 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor,
           this.scene,
         );
+
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
@@ -7999,6 +8000,13 @@ class App extends React.Component<AppProps, AppState> {
         !isSelectingPointsInLineEditor
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
+
+        if (
+          selectedElements.length === 1 &&
+          isElbowArrow(selectedElements[0])
+        ) {
+          return;
+        }
 
         if (selectedElements.every((element) => element.locked)) {
           return;
