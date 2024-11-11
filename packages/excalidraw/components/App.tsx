@@ -4204,6 +4204,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (this.state.shapeSelectionEnabled) {
+        return;
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
