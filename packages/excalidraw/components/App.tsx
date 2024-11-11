@@ -5307,6 +5307,12 @@ class App extends React.Component<AppProps, AppState> {
 
         mutateElement(selectedElements[0], { fixedSegments });
 
+        LinearElementEditor.updateEditorMidPointsCache(
+          selectedElements[0],
+          elementsMap,
+          this.state,
+        );
+
         return;
       }
     }
