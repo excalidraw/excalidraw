@@ -5281,7 +5281,9 @@ class App extends React.Component<AppProps, AppState> {
         return;
       } else if (
         isElbowArrow(selectedElements[0]) &&
-        this.state.selectedLinearElement
+        this.state.selectedLinearElement &&
+        (this.state.selectedLinearElement?.pointerDownState?.segmentMidpoint
+          ?.index || -1) > -1
       ) {
         // Delete fixed segment point
         this.store.shouldCaptureIncrement();
