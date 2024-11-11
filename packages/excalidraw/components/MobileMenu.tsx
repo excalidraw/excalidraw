@@ -91,9 +91,10 @@ export const MobileMenu = ({
                 </Island>
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
-                  {!appState.viewModeEnabled && (
-                    <DefaultSidebarTriggerTunnel.Out />
-                  )}
+                  {!appState.viewModeEnabled &&
+                    !appState.shapeSelectionEnabled && (
+                      <DefaultSidebarTriggerTunnel.Out />
+                    )}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={() => onPenModeToggle(null)}
@@ -129,7 +130,7 @@ export const MobileMenu = ({
   };
 
   const renderAppToolbar = () => {
-    if (appState.viewModeEnabled) {
+    if (appState.viewModeEnabled || appState.shapeSelectionEnabled) {
       return (
         <div className="App-toolbar-content">
           <MainMenuTunnel.Out />
@@ -154,7 +155,9 @@ export const MobileMenu = ({
   return (
     <>
       {renderSidebars()}
-      {!appState.viewModeEnabled && renderToolbar()}
+      {!appState.viewModeEnabled &&
+        !appState.shapeSelectionEnabled &&
+        renderToolbar()}
       <div
         className="App-bottom-bar"
         style={{
@@ -166,6 +169,7 @@ export const MobileMenu = ({
         <Island padding={0}>
           {appState.openMenu === "shape" &&
           !appState.viewModeEnabled &&
+          !appState.shapeSelectionEnabled &&
           showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions
