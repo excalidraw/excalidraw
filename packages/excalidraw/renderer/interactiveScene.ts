@@ -508,21 +508,21 @@ const renderLinearPointHandles = (
     renderSingleLinearPoint(context, appState, point, radius, isSelected);
   });
 
-  //Rendering segment mid points
+  // Rendering segment mid points
   if (isElbowArrow(element)) {
     const indices = element.fixedSegments?.map((s) => s.index) ?? [];
     const fixedPoints = element.points.slice(0, -1).map((p, i) => {
       return indices.includes(i + 1);
     });
-    const globalPoint = element.points.map((p) =>
+    const globalPoints = element.points.map((p) =>
       pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
     );
-    globalPoint.slice(1, -2).forEach((p, idx) => {
+    globalPoints.slice(0, -1).forEach((p, idx) => {
       if (
         !LinearElementEditor.isSegmentTooShort(
           element,
           p,
-          globalPoint[idx + 2],
+          globalPoints[idx + 1],
           appState.zoom,
         )
       ) {
@@ -530,12 +530,12 @@ const renderLinearPointHandles = (
           context,
           appState,
           pointFrom<GlobalPoint>(
-            (p[0] + globalPoint[idx + 2][0]) / 2,
-            (p[1] + globalPoint[idx + 2][1]) / 2,
+            (p[0] + globalPoints[idx + 1][0]) / 2,
+            (p[1] + globalPoints[idx + 1][1]) / 2,
           ),
           POINT_HANDLE_SIZE / 2,
           false,
-          !fixedPoints[idx + 1],
+          !fixedPoints[idx],
         );
       }
     });
@@ -550,7 +550,7 @@ const renderLinearPointHandles = (
         !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
     );
 
-    midPoints.forEach((segmentMidPoint, segmentIdx) => {
+    midPoints.forEach((segmentMidPoint) => {
       if (appState.editingLinearElement || points.length === 2) {
         renderSingleLinearPoint(
           context,

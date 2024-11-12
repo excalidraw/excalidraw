@@ -1248,28 +1248,8 @@ export class LinearElementEditor {
     },
   ) {
     const { points } = element;
-    let targets = Array.from(targetPoints);
+    const targets = Array.from(targetPoints);
     const indices = targets.map((p) => p.index).sort();
-
-    if (isElbowArrow(element)) {
-      // Do not allow modifying the first segment
-      if (indices[0] === 0 && indices[1] === 1) {
-        targets = targets.slice(2);
-      }
-      // Do not allow modifying the last segment
-      if (
-        indices[indices.length - 1] !== undefined &&
-        indices[indices.length - 1] === element.points.length - 1 &&
-        indices[indices.length - 2] !== undefined &&
-        indices[indices.length - 2] === element.points.length - 2
-      ) {
-        targets = targets.slice(0, -2);
-      }
-      // If no point remains to modify, return
-      if (targets.length < 1) {
-        return;
-      }
-    }
 
     // in case we're moving start point, instead of modifying its position
     // which would break the invariant of it being at [0,0], we move
@@ -1881,12 +1861,7 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    if (
-      !element ||
-      !segmentIdx ||
-      segmentIdx === 1 ||
-      segmentIdx === element.points.length - 1
-    ) {
+    if (!element || !segmentIdx) {
       return linearElementEditor;
     }
 
@@ -1917,7 +1892,7 @@ export class LinearElementEditor {
 
     LinearElementEditor.movePoints(element, [
       {
-        index: segmentIdx! - 1,
+        index: segmentIdx - 1,
         point: pointFrom<LocalPoint>(
           (!isHorizontal ? pointerCoords.x : startPoint[0]) - element.x,
           (isHorizontal ? pointerCoords.y : startPoint[1]) - element.y,
@@ -1925,7 +1900,7 @@ export class LinearElementEditor {
         isDragging: true,
       },
       {
-        index: segmentIdx!,
+        index: segmentIdx,
         point: pointFrom<LocalPoint>(
           (!isHorizontal ? pointerCoords.x : endPoint[0]) - element.x,
           (isHorizontal ? pointerCoords.y : endPoint[1]) - element.y,
