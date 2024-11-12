@@ -114,7 +114,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   saveToActiveFile: [getShortcutKey("CtrlOrCmd+S")],
   toggleShortcuts: [getShortcutKey("?")],
   searchMenu: [getShortcutKey("CtrlOrCmd+F")],
-  copyShapeLink: [getShortcutKey("CtrlOrCmd+Alt+L")],
+  copyShapeLink: [getShortcutKey("Shift+L")],
   linkToShape: [getShortcutKey("CtrlOrCmd+L")],
 };
 

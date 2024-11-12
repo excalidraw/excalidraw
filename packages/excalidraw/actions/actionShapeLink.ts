@@ -42,6 +42,10 @@ export const actionCopyShapeLink = register({
       storeAction: StoreAction.NONE,
     };
   },
+  keyTest: (event) =>
+    event.shiftKey &&
+    event.key.toLowerCase() === KEYS.L &&
+    !event[KEYS.CTRL_OR_CMD],
   predicate: (elements, appState, appProps, app) =>
     canCreateShapeLinkFromElements(getSelectedElements(elements, appState)),
 });
@@ -76,6 +80,6 @@ export const actionLinkToShape = register({
   },
   trackEvent: false,
   keyTest: (event) => {
-    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.L;
+    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.L && !event.altKey;
   },
 });
