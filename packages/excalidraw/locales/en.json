@@ -161,7 +161,8 @@
   },
   "shapeLink": {
     "title": "Link to shape",
-    "desc": "Click on a shape on canvas or paste a shape URL."
+    "desc": "Click on a shape on canvas or paste a shape URL.",
+    "notFound": "Linked shape is not found in the scene."
   },
   "library": {
     "noItems": "No items added yet...",

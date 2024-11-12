@@ -2345,6 +2345,18 @@ class App extends React.Component<AppProps, AppState> {
       });
       return true;
     }
+
+    if (url.host === window.location.host) {
+      this.setState({
+        toast: {
+          message: t("shapeLink.notFound"),
+          duration: 3000,
+          closable: true,
+        },
+      });
+      return true;
+    }
+
     return false;
   };
 
