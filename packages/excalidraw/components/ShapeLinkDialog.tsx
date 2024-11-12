@@ -10,6 +10,7 @@ import { t } from "../i18n";
 import type { ElementsMap } from "../element/types";
 import { ToolButton } from "./ToolButton";
 import { TrashIcon } from "./icons";
+import { KEYS } from "../keys";
 
 const ShapeLinkDialog = ({
   onClose,
@@ -37,6 +38,30 @@ const ShapeLinkDialog = ({
     setNextLink(nextLink);
   }, [elementsMap, appState, appState.selectedElementIds, originalLink]);
 
+  const handleConfirm = () => {
+    if (
+      nextLink &&
+      appState.elementToLink &&
+      nextLink !== elementsMap.get(appState.elementToLink)?.link
+    ) {
+      const elementToLink = elementsMap.get(appState.elementToLink);
+      elementToLink &&
+        mutateElement(elementToLink, {
+          link: nextLink,
+        });
+    }
+
+    if (!nextLink && linkEdited && appState.elementToLink) {
+      const elementToLink = elementsMap.get(appState.elementToLink);
+      elementToLink &&
+        mutateElement(elementToLink, {
+          link: null,
+        });
+    }
+
+    onClose?.();
+  };
+
   return (
     <div className="ShapeLinkDialog">
       <div className="ShapeLinkDialog__header">
@@ -52,6 +77,11 @@ const ShapeLinkDialog = ({
               setLinkEdited(true);
             }
             setNextLink(value);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === KEYS.ENTER) {
+              handleConfirm();
+            }
           }}
           className="ShapeLinkDialog__input-field"
         />
@@ -89,29 +119,7 @@ const ShapeLinkDialog = ({
 
         <DialogActionButton
           label={t("buttons.confirm")}
-          onClick={() => {
-            if (
-              nextLink &&
-              appState.elementToLink &&
-              nextLink !== elementsMap.get(appState.elementToLink)?.link
-            ) {
-              const elementToLink = elementsMap.get(appState.elementToLink);
-              elementToLink &&
-                mutateElement(elementToLink, {
-                  link: nextLink,
-                });
-            }
-
-            if (!nextLink && linkEdited && appState.elementToLink) {
-              const elementToLink = elementsMap.get(appState.elementToLink);
-              elementToLink &&
-                mutateElement(elementToLink, {
-                  link: null,
-                });
-            }
-
-            onClose?.();
-          }}
+          onClick={handleConfirm}
           actionType="primary"
         />
       </div>

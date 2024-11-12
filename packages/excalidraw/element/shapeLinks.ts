@@ -56,7 +56,7 @@ export const canCreateShapeLinkFromElements = (
     return true;
   }
 
-  if (elementsAreInSameGroup(selectedElements)) {
+  if (selectedElements.length > 1 && elementsAreInSameGroup(selectedElements)) {
     return true;
   }
 
