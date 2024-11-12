@@ -49,12 +49,6 @@ import {
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import {
-  ARROW_TYPE,
-  DEFAULT_REDUCED_GLOBAL_ALPHA,
-  MAX_SHAPE_LINK_ZOOM,
-  type EXPORT_IMAGE_TYPES,
-} from "../constants";
-import {
   APP_NAME,
   CURSOR_TYPE,
   DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
@@ -92,6 +86,9 @@ import {
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
+  ARROW_TYPE,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
+  type EXPORT_IMAGE_TYPES,
 } from "../constants";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -2343,8 +2340,8 @@ class App extends React.Component<AppProps, AppState> {
     );
     if (elements) {
       this.scrollToContent(elements, {
-        fitToViewport: true,
-        maxZoom: MAX_SHAPE_LINK_ZOOM,
+        fitToContent: true,
+        animate: true,
       });
       return true;
     }
