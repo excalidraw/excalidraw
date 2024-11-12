@@ -34,6 +34,7 @@ export const COLORS_PER_ROW = 5;
 export const DEFAULT_CHART_COLOR_INDEX = 4;
 
 export const DEFAULT_ELEMENT_STROKE_COLOR_INDEX = 4;
+export const DEFAULT_ELEMENT_DARK_STROKE_COLOR_INDEX = 2;
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX = 1;
 export const ELEMENTS_PALETTE_SHADE_INDEXES = [0, 2, 4, 6, 8] as const;
 export const CANVAS_PALETTE_SHADE_INDEXES = [0, 1, 2, 3, 4] as const;
@@ -94,6 +95,14 @@ export const DEFAULT_ELEMENT_STROKE_PICKS = [
   COLOR_PALETTE.yellow[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
 ] as ColorTuple;
 
+export const DEFAULT_ELEMENT_DARK_STROKE_PICKS = [
+  COLOR_PALETTE.white,
+  COLOR_PALETTE.red[DEFAULT_ELEMENT_DARK_STROKE_COLOR_INDEX],
+  COLOR_PALETTE.green[DEFAULT_ELEMENT_DARK_STROKE_COLOR_INDEX],
+  COLOR_PALETTE.blue[DEFAULT_ELEMENT_DARK_STROKE_COLOR_INDEX],
+  COLOR_PALETTE.yellow[DEFAULT_ELEMENT_DARK_STROKE_COLOR_INDEX],
+] as ColorTuple;
+
 // ORDER matters for positioning in quick picker
 export const DEFAULT_ELEMENT_BACKGROUND_PICKS = [
   COLOR_PALETTE.transparent,
@@ -114,6 +123,14 @@ export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
   "#fffce8",
   // radix bronze2
   "#fdf8f6",
+] as ColorTuple;
+
+export const DEFAULT_CANVAS_DARK_BACKGROUND_PICKS = [
+  COLOR_PALETTE.black,
+  "#404258",
+  "#474E68",
+  "#50577A",
+  "#6B728E",
 ] as ColorTuple;
 
 // -----------------------------------------------------------------------------
