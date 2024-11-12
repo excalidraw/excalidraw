@@ -316,6 +316,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
+        "keyTest": [Function],
         "label": "labels.copyShapeLink",
         "name": "copyShapeLink",
         "perform": [Function],
@@ -4887,6 +4888,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
+        "keyTest": [Function],
         "label": "labels.copyShapeLink",
         "name": "copyShapeLink",
         "perform": [Function],
@@ -6035,6 +6037,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
+        "keyTest": [Function],
         "label": "labels.copyShapeLink",
         "name": "copyShapeLink",
         "perform": [Function],
@@ -7906,6 +7909,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "keyTest": [Function],
         "label": "labels.copyShapeLink",
         "name": "copyShapeLink",
         "perform": [Function],
@@ -8821,6 +8825,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "keyTest": [Function],
         "label": "labels.copyShapeLink",
         "name": "copyShapeLink",
         "perform": [Function],
