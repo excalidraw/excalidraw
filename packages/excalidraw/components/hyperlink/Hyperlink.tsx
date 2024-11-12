@@ -201,9 +201,6 @@ export const Hyperlink = ({
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
-    if (isEditing) {
-      inputRef.current!.value = "";
-    }
     setAppState({ showHyperlinkPopup: false });
   }, [setAppState, element, isEditing]);
 
@@ -231,11 +228,6 @@ export const Hyperlink = ({
         left: `${x}px`,
         width: CONTAINER_WIDTH,
         padding: CONTAINER_PADDING,
-      }}
-      onClick={() => {
-        if (!element.link && !isEditing) {
-          setAppState({ showHyperlinkPopup: "editor" });
-        }
       }}
     >
       {isEditing ? (
