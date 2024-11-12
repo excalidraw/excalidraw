@@ -202,7 +202,7 @@ export const Hyperlink = ({
     trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
     setAppState({ showHyperlinkPopup: false });
-  }, [setAppState, element, isEditing]);
+  }, [setAppState, element]);
 
   const onEdit = () => {
     trackEvent("hyperlink", "edit", "popup-ui");

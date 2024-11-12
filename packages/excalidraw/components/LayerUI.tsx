@@ -474,18 +474,19 @@ const LayerUI = ({
         />
       )}
       <ActiveConfirmDialog />
-      <ShapeLinkDialog
-        isOpen={appState.shapeSelectionEnabled}
-        onClose={() => {
-          setAppState({
-            shapeSelectionEnabled: false,
-            hoveredElementIds: {},
-            elementToLink: null,
-          });
-        }}
-        elementsMap={app.scene.getNonDeletedElementsMap()}
-        appState={appState}
-      />
+      {appState.shapeSelectionEnabled && (
+        <ShapeLinkDialog
+          onClose={() => {
+            setAppState({
+              shapeSelectionEnabled: false,
+              hoveredElementIds: {},
+              elementToLink: null,
+            });
+          }}
+          elementsMap={app.scene.getNonDeletedElementsMap()}
+          appState={appState}
+        />
+      )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />
       {renderImageExportDialog()}
       {renderJSONExportDialog()}

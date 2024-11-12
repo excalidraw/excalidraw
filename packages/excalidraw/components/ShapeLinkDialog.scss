@@ -51,6 +51,28 @@
       }
     }
 
+    .ShapeLinkDialog__input {
+      display: flex;
+
+      .ShapeLinkDialog__input-field {
+        flex: 1;
+      }
+
+      .ShapeLinkDialog__remove {
+        color: $oc-red-9;
+        margin-left: 1rem;
+
+        .ToolIcon__icon {
+          width: 2rem;
+          height: 2rem;
+        }
+
+        .ToolIcon__icon svg {
+          color: $oc-red-6;
+        }
+      }
+    }
+
     .ShapeLinkDialog__actions {
       display: flex;
       justify-content: flex-end;

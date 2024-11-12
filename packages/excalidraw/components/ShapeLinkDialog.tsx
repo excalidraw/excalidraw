@@ -8,84 +8,114 @@ import { useEffect, useState } from "react";
 import "./ShapeLinkDialog.scss";
 import { t } from "../i18n";
 import type { ElementsMap } from "../element/types";
+import { ToolButton } from "./ToolButton";
+import { TrashIcon } from "./icons";
 
 const ShapeLinkDialog = ({
   onClose,
-  isOpen,
   elementsMap,
   appState,
 }: {
-  isOpen: boolean;
   elementsMap: ElementsMap;
   appState: UIAppState;
   onClose?: () => void;
 }) => {
   const originalLink = appState.elementToLink
-    ? elementsMap.get(appState.elementToLink)?.link
-    : "";
+    ? elementsMap.get(appState.elementToLink)?.link ?? null
+    : null;
 
-  const [nextLink, setNextLink] = useState<string | null>(null);
+  const [nextLink, setNextLink] = useState<string | null>(originalLink);
+  const [linkEdited, setLinkEdited] = useState(false);
 
   useEffect(() => {
     const selectedElements = getSelectedElements(elementsMap, appState);
     const nextLink =
       selectedElements.length > 0
         ? createShapeLink(selectedElements, window.location.origin)
-        : null;
+        : originalLink;
 
     setNextLink(nextLink);
-  }, [elementsMap, appState, appState.selectedElementIds]);
+  }, [elementsMap, appState, appState.selectedElementIds, originalLink]);
 
   return (
-    <>
-      {isOpen && (
-        <div className="ShapeLinkDialog">
-          <div className="ShapeLinkDialog__header">
-            <h2>{t("shapeLink.title")}</h2>
-            <p>{t("shapeLink.desc")}</p>
-          </div>
+    <div className="ShapeLinkDialog">
+      <div className="ShapeLinkDialog__header">
+        <h2>{t("shapeLink.title")}</h2>
+        <p>{t("shapeLink.desc")}</p>
+      </div>
 
-          <TextField
-            value={nextLink ?? originalLink ?? ""}
-            onChange={(value) => {
-              setNextLink(value);
+      <div className="ShapeLinkDialog__input">
+        <TextField
+          value={nextLink ?? ""}
+          onChange={(value) => {
+            if (!linkEdited) {
+              setLinkEdited(true);
+            }
+            setNextLink(value);
+          }}
+          className="ShapeLinkDialog__input-field"
+        />
+
+        {nextLink && (
+          <ToolButton
+            type="button"
+            title={t("buttons.remove")}
+            aria-label={t("buttons.remove")}
+            label={t("buttons.remove")}
+            onClick={() => {
+              // removes the link from the input
+              // but doesn't update the element
+
+              // when confirmed, will remove the link from the element
+              setNextLink(null);
+              setLinkEdited(true);
             }}
+            className="ShapeLinkDialog__remove"
+            icon={TrashIcon}
           />
+        )}
+      </div>
 
-          <div className="ShapeLinkDialog__actions">
-            <DialogActionButton
-              label={t("buttons.cancel")}
-              onClick={() => {
-                onClose?.();
-              }}
-              style={{
-                marginRight: 10,
-              }}
-            />
+      <div className="ShapeLinkDialog__actions">
+        <DialogActionButton
+          label={t("buttons.cancel")}
+          onClick={() => {
+            onClose?.();
+          }}
+          style={{
+            marginRight: 10,
+          }}
+        />
 
-            <DialogActionButton
-              label={t("buttons.confirm")}
-              onClick={() => {
-                if (
-                  nextLink &&
-                  nextLink !== originalLink &&
-                  appState.elementToLink
-                ) {
-                  const elementToLink = elementsMap.get(appState.elementToLink);
-                  elementToLink &&
-                    mutateElement(elementToLink, {
-                      link: nextLink,
-                    });
-                }
+        <DialogActionButton
+          label={t("buttons.confirm")}
+          onClick={() => {
+            if (
+              nextLink &&
+              appState.elementToLink &&
+              nextLink !== elementsMap.get(appState.elementToLink)?.link
+            ) {
+              const elementToLink = elementsMap.get(appState.elementToLink);
+              elementToLink &&
+                mutateElement(elementToLink, {
+                  link: nextLink,
+                });
+            }
 
-                onClose?.();
-              }}
-              actionType="primary"
-            />
-          </div>
-        </div>
-      )}
-    </>
+            if (!nextLink && linkEdited && appState.elementToLink) {
+              const elementToLink = elementsMap.get(appState.elementToLink);
+              elementToLink &&
+                mutateElement(elementToLink, {
+                  link: null,
+                });
+            }
+
+            onClose?.();
+          }}
+          actionType="primary"
+        />
+      </div>
+    </div>
   );
 };
 
