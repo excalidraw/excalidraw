@@ -16,7 +16,6 @@ import { getCommonBoundingBox } from "../element/bounds";
 import {
   bindOrUnbindLinearElements,
   isBindingEnabled,
-  updateBoundElements,
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
@@ -27,8 +26,6 @@ import {
   isLinearElement,
 } from "../element/typeChecks";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { debugDrawPoint } from "../visualdebug";
-import { pointFrom, type LocalPoint } from "../../math";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",

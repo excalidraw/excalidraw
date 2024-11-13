@@ -4,7 +4,6 @@ import { render } from "../tests/test-utils";
 import { API } from "../tests/helpers/api";
 import { pointFrom } from "../../math";
 import { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
-import { getCommonBoundingBox } from "../element/bounds";
 
 const { h } = window;
 
