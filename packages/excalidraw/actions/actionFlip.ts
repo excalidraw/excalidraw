@@ -3,7 +3,6 @@ import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
   ExcalidrawArrowElement,
-  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -20,11 +19,7 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
-import {
-  isArrowElement,
-  isElbowArrow,
-  isLinearElement,
-} from "../element/typeChecks";
+import { isArrowElement, isLinearElement } from "../element/typeChecks";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 
 export const actionFlipHorizontal = register({
