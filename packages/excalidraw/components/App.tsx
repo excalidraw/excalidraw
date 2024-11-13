@@ -448,11 +448,7 @@ import {
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom, pointDistance, vector } from "../../math";
-import {
-  canCreateShapeLinkFromElements,
-  createShapeLink,
-  getElementsFromQuery,
-} from "../element/shapeLinks";
+import { getElementsFromQuery } from "../element/shapeLinks";
 import {
   actionCopyShapeLink,
   actionLinkToShape,
@@ -3978,45 +3974,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (!isInputLike(event.target)) {
-        if (this.state.shapeSelectionEnabled) {
-          if (event.key === KEYS.ESCAPE) {
-            this.setState({
-              shapeSelectionEnabled: false,
-              elementToLink: null,
-            });
-
-            return;
-          }
-
-          if (event.key === KEYS.ENTER && this.state.elementToLink) {
-            const selectedElements = getSelectedElements(
-              this.scene.getNonDeletedElementsMap(),
-              this.state,
-            );
-
-            if (canCreateShapeLinkFromElements(selectedElements)) {
-              const elementToLink = this.scene
-                .getNonDeletedElementsMap()
-                .get(this.state.elementToLink);
-              if (elementToLink) {
-                mutateElement(elementToLink, {
-                  link: createShapeLink(
-                    selectedElements,
-                    window.location.origin,
-                  ),
-                });
-              }
-            }
-
-            this.setState({
-              shapeSelectionEnabled: false,
-              elementToLink: null,
-            });
-
-            return;
-          }
-        }
-
         if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart

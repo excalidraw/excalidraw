@@ -1,10 +1,10 @@
 import { TextField } from "./TextField";
-import type { UIAppState } from "../types";
+import type { AppState, UIAppState } from "../types";
 import DialogActionButton from "./DialogActionButton";
 import { getSelectedElements } from "../scene";
 import { createShapeLink } from "../element/shapeLinks";
 import { mutateElement } from "../element/mutateElement";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./ShapeLinkDialog.scss";
 import { t } from "../i18n";
 import type { ElementsMap } from "../element/types";
@@ -32,13 +32,17 @@ const ShapeLinkDialog = ({
     const selectedElements = getSelectedElements(elementsMap, appState);
     const nextLink =
       selectedElements.length > 0
-        ? createShapeLink(selectedElements, window.location.origin)
+        ? createShapeLink(
+            selectedElements,
+            window.location.origin,
+            appState as AppState,
+          )
         : originalLink;
 
     setNextLink(nextLink);
   }, [elementsMap, appState, appState.selectedElementIds, originalLink]);
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (
       nextLink &&
       appState.elementToLink &&
@@ -60,7 +64,25 @@ const ShapeLinkDialog = ({
     }
 
     onClose?.();
-  };
+  }, [nextLink, elementsMap, appState, linkEdited, onClose]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (appState.shapeSelectionEnabled && event.key === KEYS.ENTER) {
+        handleConfirm();
+      }
+
+      if (appState.shapeSelectionEnabled && event.key === KEYS.ESCAPE) {
+        onClose?.();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [appState, onClose, handleConfirm]);
 
   return (
     <div className="ShapeLinkDialog">

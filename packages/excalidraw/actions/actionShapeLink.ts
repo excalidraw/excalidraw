@@ -19,7 +19,8 @@ export const actionCopyShapeLink = register({
     try {
       if (window.location) {
         await copyTextToSystemClipboard(
-          createShapeLink(selectedElements, window.location.origin) ?? "",
+          createShapeLink(selectedElements, window.location.origin, appState) ??
+            "",
         );
         return {
           appState: {
