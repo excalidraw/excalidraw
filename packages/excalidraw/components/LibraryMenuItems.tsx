@@ -24,6 +24,7 @@ import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
+import LibrarySearch from "./LibrarySearch";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
@@ -203,6 +204,17 @@ export default function LibraryMenuItems({
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
 
+  const [publishedSearchQuery, setPublishedSearchQuery] = useState("");
+
+  const filteredPublishedItems = useMemo(() => {
+    const normalizedQuery = publishedSearchQuery.toLowerCase();
+
+    return publishedItems.filter((item) => {
+      const libraryItem = item as LibraryItem;
+      return libraryItem.name?.toLowerCase().includes(normalizedQuery);
+    });
+  }, [publishedItems, publishedSearchQuery]);
+
   return (
     <div
       className="library-menu-items-container"
@@ -295,17 +307,23 @@ export default function LibraryMenuItems({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            <LibraryMenuSectionGrid>
-              <LibraryMenuSection
-                itemsRenderedPerBatch={itemsRenderedPerBatch}
-                items={publishedItems}
-                onItemSelectToggle={onItemSelectToggle}
-                onItemDrag={onItemDrag}
-                onClick={onItemClick}
-                isItemSelected={isItemSelected}
-                svgCache={svgCache}
+            <>
+              <LibrarySearch
+                value={publishedSearchQuery}
+                onSearch={setPublishedSearchQuery}
               />
-            </LibraryMenuSectionGrid>
+              <LibraryMenuSectionGrid>
+                <LibraryMenuSection
+                  itemsRenderedPerBatch={itemsRenderedPerBatch}
+                  items={filteredPublishedItems}
+                  onItemSelectToggle={onItemSelectToggle}
+                  onItemDrag={onItemDrag}
+                  onClick={onItemClick}
+                  isItemSelected={isItemSelected}
+                  svgCache={svgCache}
+                />
+              </LibraryMenuSectionGrid>
+            </>
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{
