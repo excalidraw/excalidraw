@@ -37,8 +37,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   const { points, fileId } = updates as any;
 
   if (
-    typeof points !== "undefined" ||
-    Object.hasOwn(updates, "fixedSegments")
+    typeof points !== "undefined"
+    //|| Object.hasOwn(updates, "fixedSegments")
   ) {
     if (isElbowArrow(element)) {
       const mergedElementsMap = toBrandedType<SceneElementsMap>(

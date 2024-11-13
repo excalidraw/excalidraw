@@ -186,7 +186,6 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
-  NonDeletedSceneElementsMap,
   Sequential,
   FixedSegment,
 } from "../element/types";
@@ -291,7 +290,6 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
-  toBrandedType,
 } from "../utils";
 import {
   createSrcDoc,
@@ -441,7 +439,6 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { updateElbowArrowPoints } from "../element/elbowarrow";
 import {
   FlowChartCreator,
   FlowChartNavigator,
@@ -3138,45 +3135,45 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    let elements = opts.elements.map((el, _, elements) => {
-      if (isElbowArrow(el)) {
-        const startEndElements = [
-          el.startBinding &&
-            elements.find((l) => l.id === el.startBinding?.elementId),
-          el.endBinding &&
-            elements.find((l) => l.id === el.endBinding?.elementId),
-        ];
-        const startBinding = startEndElements[0] ? el.startBinding : null;
-        const endBinding = startEndElements[1] ? el.endBinding : null;
-        return {
-          ...el,
-          ...updateElbowArrowPoints(
-            {
-              ...el,
-              startBinding,
-              endBinding,
-            },
-            toBrandedType<NonDeletedSceneElementsMap>(
-              new Map(
-                startEndElements
-                  .filter((x) => x != null)
-                  .map(
-                    (el) =>
-                      [el!.id, el] as [
-                        string,
-                        Ordered<NonDeletedExcalidrawElement>,
-                      ],
-                  ),
-              ),
-            ),
-            { points: el.points },
-          ),
-        };
-      }
+    // let elements = opts.elements.map((el, _, elements) => {
+    //   if (isElbowArrow(el)) {
+    //     const startEndElements = [
+    //       el.startBinding &&
+    //         elements.find((l) => l.id === el.startBinding?.elementId),
+    //       el.endBinding &&
+    //         elements.find((l) => l.id === el.endBinding?.elementId),
+    //     ];
+    //     const startBinding = startEndElements[0] ? el.startBinding : null;
+    //     const endBinding = startEndElements[1] ? el.endBinding : null;
+    //     return {
+    //       ...el,
+    //       ...updateElbowArrowPoints(
+    //         {
+    //           ...el,
+    //           startBinding,
+    //           endBinding,
+    //         },
+    //         toBrandedType<NonDeletedSceneElementsMap>(
+    //           new Map(
+    //             startEndElements
+    //               .filter((x) => x != null)
+    //               .map(
+    //                 (el) =>
+    //                   [el!.id, el] as [
+    //                     string,
+    //                     Ordered<NonDeletedExcalidrawElement>,
+    //                   ],
+    //               ),
+    //           ),
+    //         ),
+    //         { points: el.points },
+    //       ),
+    //     };
+    //   }
 
-      return el;
-    });
-    elements = restoreElements(elements, null, undefined);
+    //   return el;
+    // });
+    const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -6131,11 +6128,17 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
+        if (
+          (!elementIsElbowArrow && hoverPointIndex >= 0) ||
+          segmentMidPointHoveredCoords
+        ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (
-          !elementIsElbowArrow &&
-          this.hitElement(scenePointerX, scenePointerY, element)
+          this.hitElement(scenePointerX, scenePointerY, element) &&
+          (!elementIsElbowArrow ||
+            (elementIsElbowArrow &&
+              !element.startBinding &&
+              !element.endBinding))
         ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
@@ -8005,12 +8008,12 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
-        if (
-          selectedElements.length === 1 &&
-          isElbowArrow(selectedElements[0])
-        ) {
-          return;
-        }
+        // if (
+        //   selectedElements.length === 1 &&
+        //   isElbowArrow(selectedElements[0])
+        // ) {
+        //   return;
+        // }
 
         if (selectedElements.every((element) => element.locked)) {
           return;
@@ -8248,6 +8251,12 @@ class App extends React.Component<AppProps, AppState> {
                   x: origElement.x,
                   y: origElement.y,
                 });
+                if (isElbowArrow(element)) {
+                  mutateElement(element, {
+                    startBinding: null,
+                    endBinding: null,
+                  });
+                }
 
                 // put duplicated element to pointerDownState.originalElements
                 // so that we can snap to the duplicated element without releasing

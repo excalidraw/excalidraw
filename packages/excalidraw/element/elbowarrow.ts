@@ -388,7 +388,6 @@ export const updateElbowArrowPoints = (
  * @param nextPoints - The next set of points for the arrow.
  * @param options - Optional parameters for the calculation.
  * @param options.isDragging - Indicates if the arrow is being dragged.
- * @param options.disableBinding - Indicates if binding should be disabled.
  * @param options.startIsMidPoint - Indicates if the start point is a midpoint.
  * @param options.endIsMidPoint - Indicates if the end point is a midpoint.
  *

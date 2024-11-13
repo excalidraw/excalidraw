@@ -44,9 +44,6 @@ export const dragSelectedElements = (
   }
 
   const selectedElements = _selectedElements;
-  // .filter(
-  //   (el) => !(isElbowArrow(el) && el.startBinding && el.endBinding),
-  // );
 
   // we do not want a frame and its elements to be selected at the same time
   // but when it happens (due to some bug), we want to avoid updating element
