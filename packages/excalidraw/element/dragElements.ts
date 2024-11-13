@@ -78,13 +78,18 @@ export const dragSelectedElements = (
   elementsToUpdate.forEach((element) => {
     updateElementCoords(pointerDownState, element, adjustedOffset);
     if (isElbowArrow(element)) {
-      mutateElement(element, {
-        fixedSegments: LinearElementEditor.restoreFixedSegments(
-          element,
-          element.x,
-          element.y,
-        ),
-      });
+      mutateElement(
+        element,
+        {
+          fixedSegments: LinearElementEditor.restoreFixedSegments(
+            element,
+            element.x,
+            element.y,
+          ),
+        },
+        true,
+        true,
+      );
     }
     if (!isArrowElement(element)) {
       // skip arrow labels since we calculate its position during render

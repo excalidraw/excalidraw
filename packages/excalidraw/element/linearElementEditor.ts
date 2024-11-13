@@ -1563,7 +1563,6 @@ export class LinearElementEditor {
         updates,
         true,
         options?.isDragging,
-        false,
         options?.changedElements,
       );
     } else {

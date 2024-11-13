@@ -27,7 +27,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
   informMutation = true,
   isDragging = false,
-  disableBinding = false,
   changedElements?: Map<string, OrderedExcalidrawElement>,
 ): TElement => {
   let didChange = false;
@@ -37,8 +36,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   const { points, fileId } = updates as any;
 
   if (
-    typeof points !== "undefined"
-    //|| Object.hasOwn(updates, "fixedSegments")
+    typeof points !== "undefined" ||
+    (!isDragging && Object.hasOwn(updates, "fixedSegments"))
   ) {
     if (isElbowArrow(element)) {
       const mergedElementsMap = toBrandedType<SceneElementsMap>(
@@ -62,7 +61,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           updates,
           {
             isDragging,
-            disableBinding,
           },
         ),
       };
