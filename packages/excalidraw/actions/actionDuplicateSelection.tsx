@@ -20,7 +20,11 @@ import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
 } from "../element/textElement";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
+import {
+  isBoundToContainer,
+  isElbowArrow,
+  isFrameLikeElement,
+} from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
@@ -102,6 +106,12 @@ const duplicateElements = (
       {
         x: element.x + DEFAULT_GRID_SIZE / 2,
         y: element.y + DEFAULT_GRID_SIZE / 2,
+        ...(isElbowArrow(element)
+          ? {
+              startBinding: null,
+              endBinding: null,
+            }
+          : {}),
       },
     );
     duplicatedElementsMap.set(newElement.id, newElement);
