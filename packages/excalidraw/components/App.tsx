@@ -6131,15 +6131,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-        if (
-          hoverPointIndex >= 0 ||
-          segmentMidPointHoveredCoords
-          // (!elementIsElbowArrow &&
-          //   (hoverPointIndex >= 0 || segmentMidPointHoveredCoords)) ||
-          // (elementIsElbowArrow &&
-          //   segmentMidPointIndex > 0 &&
-          //   segmentMidPointIndex < element.points.length)
-        ) {
+        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (
           !elementIsElbowArrow &&

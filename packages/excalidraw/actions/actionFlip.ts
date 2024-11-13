@@ -160,33 +160,15 @@ const flipElements = (
   // "move" across the canvas because of how arrows can bump against the "wall"
   // of the selection, so we need to center the group back to the original
   // position so that repeated flips don't accumulate the offset
-
-  const { elbowArrows, otherElements } = selectedElements.reduce(
-    (
-      acc: {
-        elbowArrows: ExcalidrawElbowArrowElement[];
-        otherElements: ExcalidrawElement[];
-      },
-      element,
-    ) =>
-      isElbowArrow(element)
-        ? { ...acc, elbowArrows: acc.elbowArrows.concat(element) }
-        : { ...acc, otherElements: acc.otherElements.concat(element) },
-    { elbowArrows: [], otherElements: [] },
-  );
-
   const { midX: newMidX, midY: newMidY } =
     getCommonBoundingBox(selectedElements);
   const [diffX, diffY] = [midX - newMidX, midY - newMidY];
-  otherElements.forEach((element) =>
+  selectedElements.forEach((element) => {
     mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
-    }),
-  );
-  elbowArrows.forEach((element) =>
-    mutateElement(element, { points: element.points }, false),
-  );
+    });
+  });
   // ---------------------------------------------------------------------------
 
   return selectedElements;
