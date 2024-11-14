@@ -2327,7 +2327,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private maybeNavigateToElementsFromLink = (link: string) => {
     const url = new URL(link);
-    const elements = getElementsFromQuery(
+    const { elements, isShapeLink } = getElementsFromQuery(
       url.search,
       this.scene.getNonDeletedElementsMap(),
     );
@@ -2339,7 +2339,7 @@ class App extends React.Component<AppProps, AppState> {
       return true;
     }
 
-    if (url.host === window.location.host) {
+    if (url.host === window.location.host && isShapeLink) {
       this.setState({
         toast: {
           message: t("shapeLink.notFound"),

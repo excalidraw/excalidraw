@@ -36,7 +36,10 @@ export const createShapeLink = (
 export const getElementsFromQuery = (
   query: string,
   elementsMap: ElementsMap,
-) => {
+): {
+  elements: ExcalidrawElement[] | null;
+  isShapeLink: boolean;
+} => {
   const searchParams = new URLSearchParams(query);
 
   if (searchParams.has("element")) {
@@ -44,9 +47,11 @@ export const getElementsFromQuery = (
     if (id) {
       const el = elementsMap.get(id);
       if (el) {
-        return [el];
+        return {
+          elements: el ? [el] : null,
+          isShapeLink: true,
+        };
       }
-      return null;
     }
   }
 
@@ -54,11 +59,18 @@ export const getElementsFromQuery = (
     const id = searchParams.get("group");
     if (id) {
       const elementsInGroup = getElementsInGroup(elementsMap, id);
-      return elementsInGroup;
+
+      return {
+        elements: elementsInGroup,
+        isShapeLink: true,
+      };
     }
   }
 
-  return null;
+  return {
+    elements: null,
+    isShapeLink: false,
+  };
 };
 
 export const canCreateShapeLinkFromElements = (
