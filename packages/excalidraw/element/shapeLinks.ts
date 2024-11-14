@@ -86,3 +86,19 @@ export const canCreateShapeLinkFromElements = (
 
   return false;
 };
+
+export const isShapeLink = (url: string) => {
+  try {
+    const _url = new URL(url);
+    const query = _url.search;
+    const searchParams = new URLSearchParams(query);
+    return (
+      (searchParams.has("element") || searchParams.has("group")) &&
+      _url.host === window.location.host
+    );
+  } catch (error) {
+    console.error(error);
+  }
+
+  return false;
+};

@@ -13,7 +13,7 @@ import type {
 } from "../../element/types";
 
 import { ToolButton } from "../ToolButton";
-import { FreedrawIcon, TrashIcon } from "../icons";
+import { FreedrawIcon, TrashIcon, lineEditorIcon } from "../icons";
 import { t } from "../../i18n";
 import {
   useCallback,
@@ -37,6 +37,7 @@ import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
 import { pointFrom, type GlobalPoint } from "../../../math";
+import { isShapeLink } from "../../element/shapeLinks";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -75,6 +76,7 @@ export const Hyperlink = ({
   const appProps = useAppProps();
 
   const linkVal = element.link || "";
+  const linkedToShape = isShapeLink(linkVal);
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -233,7 +235,7 @@ export const Hyperlink = ({
       {isEditing ? (
         <input
           className={clsx("excalidraw-hyperlinkContainer-input")}
-          placeholder="Type or paste your link here"
+          placeholder={t("labels.link.hint")}
           ref={inputRef}
           value={inputVal}
           onChange={(event) => setInputVal(event.target.value)}
@@ -283,7 +285,7 @@ export const Hyperlink = ({
         </div>
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
-        {!isEditing && (
+        {!isEditing && !linkedToShape && (
           <ToolButton
             type="button"
             title={t("buttons.edit")}
@@ -292,6 +294,21 @@ export const Hyperlink = ({
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
             icon={FreedrawIcon}
+          />
+        )}
+        {(!linkVal || linkedToShape) && (
+          <ToolButton
+            type="button"
+            title="Link to shape"
+            aria-label="Link to shape"
+            label="Link to shape"
+            onClick={() => {
+              setAppState({
+                shapeSelectionEnabled: true,
+                elementToLink: element.id,
+              });
+            }}
+            icon={lineEditorIcon}
           />
         )}
         {linkVal && !isEmbeddableElement(element) && (

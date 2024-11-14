@@ -130,7 +130,8 @@
       "createEmbed": "Create link & embed",
       "label": "Link",
       "labelEmbed": "Link & embed",
-      "empty": "No link is set"
+      "empty": "No link is set",
+      "hint": "Type or paste your link here"
     },
     "lineEditor": {
       "edit": "Edit line",
