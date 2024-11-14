@@ -449,10 +449,7 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom, pointDistance, vector } from "../../math";
 import { getElementsFromQuery } from "../element/shapeLinks";
-import {
-  actionCopyShapeLink,
-  actionLinkToShape,
-} from "../actions/actionShapeLink";
+import { actionCopyShapeLink } from "../actions/actionShapeLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -10240,7 +10237,6 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionCopyShapeLink,
-      actionLinkToShape,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
       actionTextAutoResize,

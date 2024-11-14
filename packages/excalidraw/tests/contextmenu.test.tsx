@@ -122,7 +122,6 @@ describe("contextMenu element", () => {
       "copyStyles",
       "pasteStyles",
       "copyShapeLink",
-      "linkToShape",
       "deleteSelectedElements",
       "addToLibrary",
       "flipHorizontal",
