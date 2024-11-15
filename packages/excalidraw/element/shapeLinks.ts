@@ -38,7 +38,7 @@ export const getElementsFromQuery = (
   elementsMap: ElementsMap,
 ): {
   elements: ExcalidrawElement[] | null;
-  isShapeLink: boolean;
+  isAShapeLink: boolean;
 } => {
   const searchParams = new URLSearchParams(query);
 
@@ -49,9 +49,14 @@ export const getElementsFromQuery = (
       if (el) {
         return {
           elements: el ? [el] : null,
-          isShapeLink: true,
+          isAShapeLink: true,
         };
       }
+
+      return {
+        elements: null,
+        isAShapeLink: true,
+      };
     }
   }
 
@@ -62,14 +67,14 @@ export const getElementsFromQuery = (
 
       return {
         elements: elementsInGroup,
-        isShapeLink: true,
+        isAShapeLink: true,
       };
     }
   }
 
   return {
     elements: null,
-    isShapeLink: false,
+    isAShapeLink: false,
   };
 };
 
@@ -97,8 +102,6 @@ export const isShapeLink = (url: string) => {
       _url.host === window.location.host
     );
   } catch (error) {
-    console.error(error);
+    return false;
   }
-
-  return false;
 };

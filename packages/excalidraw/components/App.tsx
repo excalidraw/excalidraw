@@ -2326,31 +2326,35 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private maybeNavigateToElementsFromLink = (link: string) => {
-    const url = new URL(link);
-    const { elements, isShapeLink } = getElementsFromQuery(
-      url.search,
-      this.scene.getNonDeletedElementsMap(),
-    );
-    if (elements) {
-      this.scrollToContent(elements, {
-        fitToContent: true,
-        animate: true,
-      });
-      return true;
-    }
+    try {
+      const url = new URL(link);
+      const { elements, isAShapeLink } = getElementsFromQuery(
+        url.search,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      if (elements && elements.length > 0) {
+        this.scrollToContent(elements, {
+          fitToContent: true,
+          animate: true,
+        });
+        return true;
+      }
 
-    if (url.host === window.location.host && isShapeLink) {
-      this.setState({
-        toast: {
-          message: t("shapeLink.notFound"),
-          duration: 3000,
-          closable: true,
-        },
-      });
-      return true;
-    }
+      if (url.host === window.location.host && isAShapeLink) {
+        this.setState({
+          toast: {
+            message: t("shapeLink.notFound"),
+            duration: 3000,
+            closable: true,
+          },
+        });
+        return true;
+      }
 
-    return false;
+      return false;
+    } catch (error) {
+      return false;
+    }
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
