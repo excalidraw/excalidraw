@@ -25,11 +25,13 @@ import type {
 } from "../scene/types";
 import {
   EXTERNAL_LINK_IMG,
+  SHAPE_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { throttleRAF } from "../utils";
 import { getBoundTextElement } from "../element/textElement";
+import { isShapeLink } from "../element/shapeLinks";
 
 const GridLineColor = {
   Bold: "#dddddd",
@@ -133,7 +135,13 @@ const frameClip = (
   );
 };
 
-let linkCanvasCache: any;
+const linkCanvasCache: {
+  cache: any;
+  isShapeLink: boolean;
+} = {
+  cache: null,
+  isShapeLink: false,
+};
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
@@ -153,24 +161,42 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    if (!linkCanvasCache || linkCanvasCache.zoom !== appState.zoom.value) {
-      linkCanvasCache = document.createElement("canvas");
-      linkCanvasCache.zoom = appState.zoom.value;
-      linkCanvasCache.width =
+    if (
+      !linkCanvasCache.cache ||
+      linkCanvasCache.cache.zoom !== appState.zoom.value ||
+      linkCanvasCache.isShapeLink !== isShapeLink(element.link)
+    ) {
+      linkCanvasCache.cache = document.createElement("canvas");
+      linkCanvasCache.cache.zoom = appState.zoom.value;
+      linkCanvasCache.cache.width =
         width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvasCache.height =
+      linkCanvasCache.cache.height =
         height * window.devicePixelRatio * appState.zoom.value;
-      const linkCanvasCacheContext = linkCanvasCache.getContext("2d")!;
+      const linkCanvasCacheContext = linkCanvasCache.cache.getContext("2d")!;
       linkCanvasCacheContext.scale(
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
       linkCanvasCacheContext.fillStyle = "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
-      linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
+
+      linkCanvasCache.isShapeLink = isShapeLink(element.link);
+
+      if (linkCanvasCache.isShapeLink) {
+        linkCanvasCacheContext.drawImage(SHAPE_LINK_IMG, 0, 0, width, height);
+      } else {
+        linkCanvasCacheContext.drawImage(
+          EXTERNAL_LINK_IMG,
+          0,
+          0,
+          width,
+          height,
+        );
+      }
+
       linkCanvasCacheContext.restore();
       context.drawImage(
-        linkCanvasCache,
+        linkCanvasCache.cache,
         x - centerX,
         y - centerY,
         width,
@@ -178,7 +204,7 @@ const renderLinkIcon = (
       );
     } else {
       context.drawImage(
-        linkCanvasCache,
+        linkCanvasCache.cache,
         x - centerX,
         y - centerY,
         width,

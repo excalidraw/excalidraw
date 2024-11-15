@@ -76,7 +76,7 @@ export const Hyperlink = ({
   const appProps = useAppProps();
 
   const linkVal = element.link || "";
-  const linkedToShape = isShapeLink(linkVal);
+  const linkedToShape = linkVal && isShapeLink(linkVal);
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
