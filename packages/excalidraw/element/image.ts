@@ -94,7 +94,7 @@ export const isHTMLSVGElement = (node: Node | null): node is SVGElement => {
   return node?.nodeName.toLowerCase() === "svg";
 };
 
-export const normalizeSVG = async (SVGString: string) => {
+export const normalizeSVG = (SVGString: string) => {
   const doc = new DOMParser().parseFromString(SVGString, MIME_TYPES.svg);
   const svg = doc.querySelector("svg");
   const errorNode = doc.querySelector("parsererror");

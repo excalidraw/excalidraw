@@ -32,7 +32,7 @@ export const encodePngMetadata = async ({
   const metadataChunk = tEXt.encode(
     MIME_TYPES.excalidraw,
     JSON.stringify(
-      await encode({
+      encode({
         text: metadata,
         compress: true,
       }),
@@ -59,7 +59,7 @@ export const decodePngMetadata = async (blob: Blob) => {
         }
         throw new Error("FAILED");
       }
-      return await decode(encodedData);
+      return decode(encodedData);
     } catch (error: any) {
       console.error(error);
       throw new Error("FAILED");
@@ -72,9 +72,9 @@ export const decodePngMetadata = async (blob: Blob) => {
 // SVG
 // -----------------------------------------------------------------------------
 
-export const encodeSvgMetadata = async ({ text }: { text: string }) => {
-  const base64 = await stringToBase64(
-    JSON.stringify(await encode({ text })),
+export const encodeSvgMetadata = ({ text }: { text: string }) => {
+  const base64 = stringToBase64(
+    JSON.stringify(encode({ text })),
     true /* is already byte string */,
   );
 
@@ -87,7 +87,7 @@ export const encodeSvgMetadata = async ({ text }: { text: string }) => {
   return metadata;
 };
 
-export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
+export const decodeSvgMetadata = ({ svg }: { svg: string }) => {
   if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
     const match = svg.match(
       /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
@@ -100,7 +100,7 @@ export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
     const isByteString = version !== "1";
 
     try {
-      const json = await base64ToString(match[1], isByteString);
+      const json = base64ToString(match[1], isByteString);
       const encodedData = JSON.parse(json);
       if (!("encoded" in encodedData)) {
         // legacy, un-encoded scene JSON
@@ -112,7 +112,7 @@ export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
         }
         throw new Error("FAILED");
       }
-      return await decode(encodedData);
+      return decode(encodedData);
     } catch (error: any) {
       console.error(error);
       throw new Error("FAILED");

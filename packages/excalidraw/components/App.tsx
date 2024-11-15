@@ -35,6 +35,7 @@ import {
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
+  actionToggleCropEditor,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -88,6 +89,7 @@ import {
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
+  isSafari,
   type EXPORT_IMAGE_TYPES,
 } from "../constants";
 import type { ExportedElements } from "../data";
@@ -305,8 +307,10 @@ import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
+  dataURLToString,
   generateIdFromFile,
   getDataURL,
+  getDataURL_sync,
   getFileFromEvent,
   ImageURLToFile,
   isImageFileHandle,
@@ -339,7 +343,6 @@ import {
   isValidTextContainer,
   measureText,
   normalizeText,
-  wrapText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -447,7 +450,20 @@ import {
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import type { LocalPoint, Radians } from "../../math";
-import { pointFrom, pointDistance, vector } from "../../math";
+import {
+  clamp,
+  pointFrom,
+  pointDistance,
+  vector,
+  pointRotateRads,
+  vectorScale,
+  vectorFromPoint,
+  vectorSubtract,
+  vectorDot,
+  vectorNormalize,
+} from "../../math";
+import { cropElement } from "../element/cropElement";
+import { wrapText } from "../element/textWrapping";
 import { getElementsFromQuery } from "../element/shapeLinks";
 import { actionCopyShapeLink } from "../actions/actionShapeLink";
 
@@ -593,6 +609,7 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
+  lastPointerMoveCoords: { x: number; y: number } | null = null;
   lastViewportPosition = { x: 0, y: 0 };
 
   animationFrameHandler = new AnimationFrameHandler();
@@ -2117,9 +2134,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (actionResult.files) {
-      this.files = actionResult.replaceFiles
-        ? actionResult.files
-        : { ...this.files, ...actionResult.files };
+      this.addMissingFiles(actionResult.files, actionResult.replaceFiles);
       this.addNewImagesToImageCache();
     }
 
@@ -2315,11 +2330,11 @@ class App extends React.Component<AppProps, AppState> {
     // clear the shape and image cache so that any images in initialData
     // can be loaded fresh
     this.clearImageShapeCache();
-    // FontFaceSet loadingdone event we listen on may not always
-    // fire (looking at you Safari), so on init we manually load all
-    // fonts and rerender scene text elements once done. This also
-    // seems faster even in browsers that do fire the loadingdone event.
-    this.fonts.loadSceneFonts();
+
+    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
+    this.fonts.loadSceneFonts().then((fontFaces) => {
+      this.fonts.onLoaded(fontFaces);
+    });
 
     // navigate to elements from link if shape id is present in the URL
     this.maybeNavigateToElementsFromLink(window.location.href);
@@ -2597,8 +2612,8 @@ class App extends React.Component<AppProps, AppState> {
       ),
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(document.fonts, "loadingdone", (event) => {
-        const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onLoaded(loadedFontFaces);
+        const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+        this.fonts.onLoaded(fontFaces);
       }),
       // Safari-only desktop pinch zoom
       addEventListener(
@@ -3273,8 +3288,15 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
 
+    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
+    if (isSafari) {
+      Fonts.loadElementsFonts(newElements).then((fontFaces) => {
+        this.fonts.onLoaded(fontFaces);
+      });
+    }
+
     if (opts.files) {
-      this.files = { ...this.files, ...opts.files };
+      this.addMissingFiles(opts.files);
     }
 
     this.store.shouldCaptureIncrement();
@@ -3783,22 +3805,55 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  /** adds supplied files to existing files in the appState */
+  /**
+   * adds supplied files to existing files in the appState.
+   * NOTE if file already exists in editor state, the file data is not updated
+   * */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
-      const filesMap = files.reduce((acc, fileData) => {
-        acc.set(fileData.id, fileData);
-        return acc;
-      }, new Map<FileId, BinaryFileData>());
+      const { addedFiles } = this.addMissingFiles(files);
 
-      this.files = { ...this.files, ...Object.fromEntries(filesMap) };
-
-      this.clearImageShapeCache(Object.fromEntries(filesMap));
+      this.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
     },
   );
+
+  private addMissingFiles = (
+    files: BinaryFiles | BinaryFileData[],
+    replace = false,
+  ) => {
+    const nextFiles = replace ? {} : { ...this.files };
+    const addedFiles: BinaryFiles = {};
+
+    const _files = Array.isArray(files) ? files : Object.values(files);
+
+    for (const fileData of _files) {
+      if (nextFiles[fileData.id]) {
+        continue;
+      }
+
+      addedFiles[fileData.id] = fileData;
+      nextFiles[fileData.id] = fileData;
+
+      if (fileData.mimeType === MIME_TYPES.svg) {
+        const restoredDataURL = getDataURL_sync(
+          normalizeSVG(dataURLToString(fileData.dataURL)),
+          MIME_TYPES.svg,
+        );
+        if (fileData.dataURL !== restoredDataURL) {
+          // bump version so persistence layer can update the store
+          fileData.version = (fileData.version ?? 1) + 1;
+          fileData.dataURL = restoredDataURL;
+        }
+      }
+    }
+
+    this.files = nextFiles;
+
+    return { addedFiles };
+  };
 
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
@@ -3975,6 +4030,28 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (!isInputLike(event.target)) {
+        if (
+          (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
+          this.state.croppingElementId
+        ) {
+          this.finishImageCropping();
+          return;
+        }
+
+        const selectedElements = getSelectedElements(
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (
+          selectedElements.length === 1 &&
+          isImageElement(selectedElements[0]) &&
+          event.key === KEYS.ENTER
+        ) {
+          this.startImageCropping(selectedElements[0]);
+          return;
+        }
+
         if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
@@ -4966,7 +5043,7 @@ class App extends React.Component<AppProps, AppState> {
       const selectionShape = getSelectionBoxShape(
         element,
         this.scene.getNonDeletedElementsMap(),
-        this.getElementHitThreshold(),
+        isImageElement(element) ? 0 : this.getElementHitThreshold(),
       );
 
       return isPointInShape(pointFrom(x, y), selectionShape);
@@ -5195,6 +5272,22 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private startImageCropping = (image: ExcalidrawImageElement) => {
+    this.store.shouldCaptureIncrement();
+    this.setState({
+      croppingElementId: image.id,
+    });
+  };
+
+  private finishImageCropping = () => {
+    if (this.state.croppingElementId) {
+      this.store.shouldCaptureIncrement();
+      this.setState({
+        croppingElementId: null,
+      });
+    }
+  };
+
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
@@ -5224,6 +5317,11 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
+    }
+
+    if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
+      this.startImageCropping(selectedElements[0]);
+      return;
     }
 
     resetCursor(this.interactiveCanvas);
@@ -6828,11 +6926,24 @@ class App extends React.Component<AppProps, AppState> {
             this.device,
           );
         if (elementWithTransformHandleType != null) {
-          this.setState({
-            resizingElement: elementWithTransformHandleType.element,
-          });
-          pointerDownState.resize.handleType =
-            elementWithTransformHandleType.transformHandleType;
+          if (
+            elementWithTransformHandleType.transformHandleType === "rotation"
+          ) {
+            this.setState({
+              resizingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          } else if (this.state.croppingElementId) {
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          } else {
+            this.setState({
+              resizingElement: elementWithTransformHandleType.element,
+            });
+            pointerDownState.resize.handleType =
+              elementWithTransformHandleType.transformHandleType;
+          }
         }
       } else if (selectedElements.length > 1) {
         pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
@@ -6898,6 +7009,13 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
+
+        if (
+          this.state.croppingElementId &&
+          pointerDownState.hit.element?.id !== this.state.croppingElementId
+        ) {
+          this.finishImageCropping();
+        }
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
@@ -7720,6 +7838,10 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.shapeSelectionEnabled) {
         return;
       }
+      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+      const lastPointerCoords =
+        this.lastPointerMoveCoords ?? pointerDownState.origin;
+      this.lastPointerMoveCoords = pointerCoords;
 
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
@@ -7742,8 +7864,6 @@ class App extends React.Component<AppProps, AppState> {
       if (this.handlePointerMoveOverScrollbars(event, pointerDownState)) {
         return;
       }
-
-      const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
 
       if (isEraserActive(this.state)) {
         this.handleEraser(event, pointerDownState, pointerCoords);
@@ -7781,6 +7901,9 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
+        if (this.maybeHandleCrop(pointerDownState, event)) {
+          return true;
+        }
         if (this.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
@@ -7954,6 +8077,96 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
+          // #region move crop region
+          if (this.state.croppingElementId) {
+            const croppingElement = this.scene
+              .getNonDeletedElementsMap()
+              .get(this.state.croppingElementId);
+
+            if (
+              croppingElement &&
+              isImageElement(croppingElement) &&
+              croppingElement.crop !== null &&
+              pointerDownState.hit.element === croppingElement
+            ) {
+              const crop = croppingElement.crop;
+              const image =
+                isInitializedImageElement(croppingElement) &&
+                this.imageCache.get(croppingElement.fileId)?.image;
+
+              if (image && !(image instanceof Promise)) {
+                const instantDragOffset = vectorScale(
+                  vector(
+                    pointerCoords.x - lastPointerCoords.x,
+                    pointerCoords.y - lastPointerCoords.y,
+                  ),
+                  Math.max(this.state.zoom.value, 2),
+                );
+
+                const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+                  croppingElement,
+                  elementsMap,
+                );
+
+                const topLeft = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x1, y1),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const topRight = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x2, y1),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const bottomLeft = vectorFromPoint(
+                  pointRotateRads(
+                    pointFrom(x1, y2),
+                    pointFrom(cx, cy),
+                    croppingElement.angle,
+                  ),
+                );
+                const topEdge = vectorNormalize(
+                  vectorSubtract(topRight, topLeft),
+                );
+                const leftEdge = vectorNormalize(
+                  vectorSubtract(bottomLeft, topLeft),
+                );
+
+                // project instantDrafOffset onto leftEdge and topEdge to decompose
+                const offsetVector = vector(
+                  vectorDot(instantDragOffset, topEdge),
+                  vectorDot(instantDragOffset, leftEdge),
+                );
+
+                const nextCrop = {
+                  ...crop,
+                  x: clamp(
+                    crop.x -
+                      offsetVector[0] * Math.sign(croppingElement.scale[0]),
+                    0,
+                    image.naturalWidth - crop.width,
+                  ),
+                  y: clamp(
+                    crop.y -
+                      offsetVector[1] * Math.sign(croppingElement.scale[1]),
+                    0,
+                    image.naturalHeight - crop.height,
+                  ),
+                };
+
+                mutateElement(croppingElement, {
+                  crop: nextCrop,
+                });
+
+                return;
+              }
+            }
+          }
+
           // Snap cache *must* be synchronously popuplated before initial drag,
           // otherwise the first drag even will not snap, causing a jump before
           // it snaps to its position if previously snapped already.
@@ -8087,6 +8300,7 @@ class App extends React.Component<AppProps, AppState> {
             this.maybeCacheVisibleGaps(event, selectedElements, true);
             this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
           }
+
           return;
         }
       }
@@ -8335,15 +8549,18 @@ class App extends React.Component<AppProps, AppState> {
       const {
         newElement,
         resizingElement,
+        croppingElementId,
         multiElement,
         activeTool,
         isResizing,
         isRotating,
+        isCropping,
       } = this.state;
 
       this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
+        isCropping: false,
         resizingElement: null,
         selectionElement: null,
         frameToHighlight: null,
@@ -8352,6 +8569,8 @@ class App extends React.Component<AppProps, AppState> {
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
       }));
+
+      this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);
@@ -8835,6 +9054,20 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      // click outside the cropping region to exit
+      if (
+        // not in the cropping mode at all
+        !croppingElementId ||
+        // in the cropping mode
+        (croppingElementId &&
+          // not cropping and no hit element
+          ((!hitElement && !isCropping) ||
+            // hitting something else
+            (hitElement && hitElement.id !== croppingElementId)))
+      ) {
+        this.finishImageCropping();
+      }
+
       const pointerStart = this.lastPointerDownEvent;
       const pointerEnd = this.lastPointerUpEvent || this.lastPointerMoveEvent;
 
@@ -9090,7 +9323,12 @@ class App extends React.Component<AppProps, AppState> {
         this.store.shouldCaptureIncrement();
       }
 
-      if (pointerDownState.drag.hasOccurred || isResizing || isRotating) {
+      if (
+        pointerDownState.drag.hasOccurred ||
+        isResizing ||
+        isRotating ||
+        isCropping
+      ) {
         // We only allow binding via linear elements, specifically via dragging
         // the endpoints ("start" or "end").
         const linearElements = this.scene
@@ -9196,7 +9434,7 @@ class App extends React.Component<AppProps, AppState> {
     if (mimeType === MIME_TYPES.svg) {
       try {
         imageFile = SVGStringToFile(
-          await normalizeSVG(await imageFile.text()),
+          normalizeSVG(await imageFile.text()),
           imageFile.name,
         );
       } catch (error: any) {
@@ -9264,16 +9502,15 @@ class App extends React.Component<AppProps, AppState> {
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
         try {
-          this.files = {
-            ...this.files,
-            [fileId]: {
+          this.addMissingFiles([
+            {
               mimeType,
               id: fileId,
               dataURL,
               created: Date.now(),
               lastRetrieved: Date.now(),
             },
-          };
+          ]);
           const cachedImageData = this.imageCache.get(fileId);
           if (!cachedImageData) {
             this.addNewImagesToImageCache();
@@ -9304,7 +9541,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * inserts image into elements array and rerenders
    */
-  private insertImageElement = async (
+  insertImageElement = async (
     imageElement: ExcalidrawImageElement,
     imageFile: File,
     showCursorImagePreview?: boolean,
@@ -9457,7 +9694,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private initializeImageDimensions = (
+  initializeImageDimensions = (
     imageElement: ExcalidrawImageElement,
     forceNaturalSize = false,
   ) => {
@@ -9505,7 +9742,13 @@ class App extends React.Component<AppProps, AppState> {
       const x = imageElement.x + imageElement.width / 2 - width / 2;
       const y = imageElement.y + imageElement.height / 2 - height / 2;
 
-      mutateElement(imageElement, { x, y, width, height });
+      mutateElement(imageElement, {
+        x,
+        y,
+        width,
+        height,
+        crop: null,
+      });
     }
   };
 
@@ -10044,6 +10287,83 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private maybeHandleCrop = (
+    pointerDownState: PointerDownState,
+    event: MouseEvent | KeyboardEvent,
+  ): boolean => {
+    // to crop, we must already be in the cropping mode, where croppingElement has been set
+    if (!this.state.croppingElementId) {
+      return false;
+    }
+
+    const transformHandleType = pointerDownState.resize.handleType;
+    const pointerCoords = pointerDownState.lastCoords;
+    const [x, y] = getGridPoint(
+      pointerCoords.x - pointerDownState.resize.offset.x,
+      pointerCoords.y - pointerDownState.resize.offset.y,
+      this.getEffectiveGridSize(),
+    );
+
+    const croppingElement = this.scene
+      .getNonDeletedElementsMap()
+      .get(this.state.croppingElementId);
+
+    if (
+      transformHandleType &&
+      croppingElement &&
+      isImageElement(croppingElement)
+    ) {
+      const croppingAtStateStart = pointerDownState.originalElements.get(
+        croppingElement.id,
+      );
+
+      const image =
+        isInitializedImageElement(croppingElement) &&
+        this.imageCache.get(croppingElement.fileId)?.image;
+
+      if (
+        croppingAtStateStart &&
+        isImageElement(croppingAtStateStart) &&
+        image &&
+        !(image instanceof Promise)
+      ) {
+        mutateElement(
+          croppingElement,
+          cropElement(
+            croppingElement,
+            transformHandleType,
+            image.naturalWidth,
+            image.naturalHeight,
+            x,
+            y,
+            event.shiftKey
+              ? croppingAtStateStart.width / croppingAtStateStart.height
+              : undefined,
+          ),
+        );
+
+        updateBoundElements(
+          croppingElement,
+          this.scene.getNonDeletedElementsMap(),
+          {
+            oldSize: {
+              width: croppingElement.width,
+              height: croppingElement.height,
+            },
+          },
+        );
+
+        this.setState({
+          isCropping: transformHandleType && transformHandleType !== "rotation",
+        });
+      }
+
+      return true;
+    }
+
+    return false;
+  };
+
   private maybeHandleResize = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
@@ -10060,7 +10380,9 @@ class App extends React.Component<AppProps, AppState> {
       // Frames cannot be rotated.
       (selectedFrames.length > 0 && transformHandleType === "rotation") ||
       // Elbow arrows cannot be transformed (resized or rotated).
-      (selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
+      (selectedElements.length === 1 && isElbowArrow(selectedElements[0])) ||
+      // Do not resize when in crop mode
+      this.state.croppingElementId
     ) {
       return false;
     }
@@ -10234,6 +10556,8 @@ class App extends React.Component<AppProps, AppState> {
       actionPaste,
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
+      CONTEXT_MENU_SEPARATOR,
+      actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,
       ...options,
       CONTEXT_MENU_SEPARATOR,

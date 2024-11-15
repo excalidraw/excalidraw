@@ -117,6 +117,50 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -805,6 +849,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "left": 30,
     "top": 40,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -849,6 +894,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1014,6 +1060,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1058,6 +1105,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1233,6 +1281,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1277,6 +1326,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1567,6 +1617,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1611,6 +1662,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1901,6 +1953,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1945,6 +1998,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -2120,6 +2174,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2164,6 +2219,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -2363,6 +2419,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2407,6 +2464,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -2667,6 +2725,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2711,6 +2770,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -3039,6 +3099,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3083,6 +3144,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -3517,6 +3579,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3561,6 +3624,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -3843,6 +3907,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3887,6 +3952,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -4169,6 +4235,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -4213,6 +4280,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -4681,6 +4749,50 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -5369,6 +5481,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -5413,6 +5526,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -5822,6 +5936,50 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -6510,6 +6668,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -6554,6 +6713,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -7448,6 +7608,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "left": -19,
     "top": -9,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -7492,6 +7653,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -7683,6 +7845,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "history",
         },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -8374,6 +8580,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -8418,6 +8625,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -8591,6 +8799,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "history",
         },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -9282,6 +9534,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "left": 80,
     "top": 90,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -9326,6 +9579,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "height": 100,
   "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
