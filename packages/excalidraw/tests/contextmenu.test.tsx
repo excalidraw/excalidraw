@@ -121,7 +121,6 @@ describe("contextMenu element", () => {
       "paste",
       "copyStyles",
       "pasteStyles",
-      "copyShapeLink",
       "deleteSelectedElements",
       "addToLibrary",
       "flipHorizontal",
@@ -132,6 +131,7 @@ describe("contextMenu element", () => {
       "bringToFront",
       "duplicateSelection",
       "hyperlink",
+      "copyShapeLink",
       "toggleElementLock",
     ];
 

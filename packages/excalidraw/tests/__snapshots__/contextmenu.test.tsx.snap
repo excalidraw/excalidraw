@@ -360,17 +360,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
-        "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
-      "separator",
-      {
         "PanelComponent": [Function],
         "icon": [Function],
         "keyTest": [Function],
@@ -771,6 +760,16 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "trackEvent": {
           "action": "click",
           "category": "hyperlink",
+        },
+      },
+      {
+        "keyTest": [Function],
+        "label": "labels.copyShapeLink",
+        "name": "copyShapeLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       {
@@ -4992,17 +4991,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
-        "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
-      "separator",
-      {
         "PanelComponent": [Function],
         "icon": [Function],
         "keyTest": [Function],
@@ -5403,6 +5391,16 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "trackEvent": {
           "action": "click",
           "category": "hyperlink",
+        },
+      },
+      {
+        "keyTest": [Function],
+        "label": "labels.copyShapeLink",
+        "name": "copyShapeLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       {
@@ -6179,17 +6177,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
-        "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
-      "separator",
-      {
         "PanelComponent": [Function],
         "icon": [Function],
         "keyTest": [Function],
@@ -6590,6 +6577,16 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "trackEvent": {
           "action": "click",
           "category": "hyperlink",
+        },
+      },
+      {
+        "keyTest": [Function],
+        "label": "labels.copyShapeLink",
+        "name": "copyShapeLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       {
@@ -8091,17 +8088,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
-      "separator",
-      {
         "PanelComponent": [Function],
         "icon": [Function],
         "keyTest": [Function],
@@ -8502,6 +8488,16 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "action": "click",
           "category": "hyperlink",
+        },
+      },
+      {
+        "keyTest": [Function],
+        "label": "labels.copyShapeLink",
+        "name": "copyShapeLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       {
@@ -9045,17 +9041,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
-        "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
-        "perform": [Function],
-        "predicate": [Function],
-        "trackEvent": {
-          "category": "element",
-        },
-      },
-      "separator",
-      {
         "PanelComponent": [Function],
         "icon": [Function],
         "keyTest": [Function],
@@ -9456,6 +9441,16 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "action": "click",
           "category": "hyperlink",
+        },
+      },
+      {
+        "keyTest": [Function],
+        "label": "labels.copyShapeLink",
+        "name": "copyShapeLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       {
