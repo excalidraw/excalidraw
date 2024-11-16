@@ -123,17 +123,17 @@ const generatePoints = memo(
   (
     state: ElbowArrowState,
     points: readonly LocalPoint[],
+    segmentIdx: number,
+    totalSegments: number,
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-    startIsMidPoint?: Heading,
-    endIsMidPoint?: Heading,
     options?: {
       isDragging?: boolean;
     },
   ) =>
     routeElbowArrow(state, elementsMap, points, {
       ...options,
-      startIsMidPoint,
-      endIsMidPoint,
+      ...(segmentIdx !== 0 ? { startIsMidPoint: true } : {}),
+      ...(segmentIdx !== totalSegments ? { endIsMidPoint: true } : {}),
     }) ?? [],
 );
 
@@ -342,11 +342,9 @@ export const updateElbowArrowPoints = (
         generatePoints(
           state,
           points,
+          idx,
+          pointPairs.length - 1,
           fakeElementsMap,
-          idx === 0 ? undefined : nextFixedSegments[idx - 1].heading,
-          idx === pointPairs.length - 1
-            ? undefined
-            : nextFixedSegments[idx].heading,
           options,
         ),
       ),
@@ -418,8 +416,8 @@ const getElbowArrowData = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    startIsMidPoint?: Heading;
-    endIsMidPoint?: Heading;
+    startIsMidPoint?: boolean;
+    endIsMidPoint?: boolean;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -540,78 +538,70 @@ const getElbowArrowData = (
       ? [startPointBounds, endPointBounds]
       : [startElementBounds, endElementBounds],
   );
-
-  const dynamicAABBs = !(options?.startIsMidPoint || options?.endIsMidPoint)
-    ? generateDynamicAABBs(
-        boundsOverlap ? startPointBounds : startElementBounds,
-        boundsOverlap ? endPointBounds : endElementBounds,
-        commonBounds,
-        boundsOverlap
-          ? offsetFromHeading(
-              startHeading,
-              !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
-              0,
-            )
-          : offsetFromHeading(
-              startHeading,
-              !hoveredStartElement && !hoveredEndElement
-                ? 0
-                : BASE_PADDING -
-                    (arrow.startArrowhead
-                      ? FIXED_BINDING_DISTANCE * 6
-                      : FIXED_BINDING_DISTANCE * 2),
-              BASE_PADDING,
-            ),
-        boundsOverlap
-          ? offsetFromHeading(
-              endHeading,
-              !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
-              0,
-            )
-          : offsetFromHeading(
-              endHeading,
-              !hoveredStartElement && !hoveredEndElement
-                ? 0
-                : BASE_PADDING -
-                    (arrow.endArrowhead
-                      ? FIXED_BINDING_DISTANCE * 6
-                      : FIXED_BINDING_DISTANCE * 2),
-              BASE_PADDING,
-            ),
-        boundsOverlap,
-        hoveredStartElement && aabbForElement(hoveredStartElement),
-        hoveredEndElement && aabbForElement(hoveredEndElement),
-      )
-    : generateSegmentedDynamicAABBs(
-        padAABB(
-          startElementBounds,
-          options?.startIsMidPoint
-            ? [0, 0, 0, 0]
-            : offsetFromHeading(
-                startHeading,
-                BASE_PADDING -
-                  (arrow.startArrowhead
-                    ? FIXED_BINDING_DISTANCE * 6
-                    : FIXED_BINDING_DISTANCE * 2),
-                BASE_PADDING,
-              ),
+  const dynamicAABBs = generateDynamicAABBs(
+    options?.startIsMidPoint
+      ? ([
+          hoveredStartElement!.x + hoveredStartElement!.width / 2 - 1,
+          hoveredStartElement!.y + hoveredStartElement!.height / 2 - 1,
+          hoveredStartElement!.x + hoveredStartElement!.width / 2 + 1,
+          hoveredStartElement!.y + hoveredStartElement!.height / 2 + 1,
+        ] as Bounds)
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
+      ? startPointBounds
+      : startElementBounds,
+    options?.endIsMidPoint
+      ? ([
+          hoveredEndElement!.x + hoveredEndElement!.width / 2 - 1,
+          hoveredEndElement!.y + hoveredEndElement!.height / 2 - 1,
+          hoveredEndElement!.x + hoveredEndElement!.width / 2 + 1,
+          hoveredEndElement!.y + hoveredEndElement!.height / 2 + 1,
+        ] as Bounds)
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
+      ? endPointBounds
+      : endElementBounds,
+    commonBounds,
+    options?.startIsMidPoint
+      ? [0, 0, 0, 0]
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
+      ? offsetFromHeading(
+          startHeading,
+          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
+          0,
+        )
+      : offsetFromHeading(
+          startHeading,
+          !hoveredStartElement && !hoveredEndElement
+            ? 0
+            : BASE_PADDING -
+                (arrow.startArrowhead
+                  ? FIXED_BINDING_DISTANCE * 6
+                  : FIXED_BINDING_DISTANCE * 2),
+          BASE_PADDING,
         ),
-        padAABB(
-          endElementBounds,
-          options?.endIsMidPoint
-            ? [0, 0, 0, 0]
-            : offsetFromHeading(
-                endHeading,
-                BASE_PADDING -
-                  (arrow.endArrowhead
-                    ? FIXED_BINDING_DISTANCE * 6
-                    : FIXED_BINDING_DISTANCE * 2),
-                BASE_PADDING,
-              ),
+    options?.endIsMidPoint
+      ? [0, 0, 0, 0]
+      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
+      ? offsetFromHeading(
+          endHeading,
+          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
+          0,
+        )
+      : offsetFromHeading(
+          endHeading,
+          !hoveredStartElement && !hoveredEndElement
+            ? 0
+            : BASE_PADDING -
+                (arrow.endArrowhead
+                  ? FIXED_BINDING_DISTANCE * 6
+                  : FIXED_BINDING_DISTANCE * 2),
+          BASE_PADDING,
         ),
-        options.startIsMidPoint,
-        options.endIsMidPoint,
-      );
+    boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint),
+    hoveredStartElement && aabbForElement(hoveredStartElement),
+    hoveredEndElement && aabbForElement(hoveredEndElement),
+    options?.endIsMidPoint,
+    options?.startIsMidPoint,
+  );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -622,6 +612,11 @@ const getElbowArrowData = (
     endHeading,
     endGlobalPoint,
   );
+
+  // options?.endIsMidPoint &&
+  //   debugDrawBounds(dynamicAABBs[0], { color: "green", permanent: true });
+  // options?.endIsMidPoint &&
+  //   debugDrawBounds(dynamicAABBs[1], { color: "red", permanent: true });
 
   return {
     dynamicAABBs,
@@ -655,8 +650,8 @@ const routeElbowArrow = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    startIsMidPoint?: Heading;
-    endIsMidPoint?: Heading;
+    startIsMidPoint?: boolean;
+    endIsMidPoint?: boolean;
   },
 ): GlobalPoint[] | null => {
   const {
@@ -879,43 +874,6 @@ const pathTo = (start: Node, node: Node) => {
 const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
-const padAABB = (bounds: Bounds, offset: [number, number, number, number]) =>
-  [
-    bounds[0] - offset[3],
-    bounds[1] - offset[0],
-    bounds[2] + offset[1],
-    bounds[3] + offset[2],
-  ] as Bounds;
-
-const generateSegmentedDynamicAABBs = (
-  a: Bounds,
-  b: Bounds,
-  startIsMidPoint?: Heading,
-  endIsMidPoint?: Heading,
-) => {
-  let first: Bounds = a;
-  let second: Bounds = b;
-
-  if (startIsMidPoint) {
-    first = [
-      Math.min(a[0], b[2]),
-      Math.min(a[1], b[3]),
-      Math.max(a[2], b[0]),
-      Math.max(a[3], b[1]),
-    ];
-  }
-  if (endIsMidPoint) {
-    second = [
-      Math.min(b[0], a[2]),
-      Math.min(b[1], a[3]),
-      Math.max(b[2], a[0]),
-      Math.max(b[3], a[1]),
-    ];
-  }
-
-  return [first, second];
-};
-
 /**
  * Create dynamically resizing, always touching
  * bounding boxes having a minimum extent represented
@@ -930,6 +888,8 @@ const generateDynamicAABBs = (
   disableSideHack?: boolean,
   startElementBounds?: Bounds | null,
   endElementBounds?: Bounds | null,
+  disableSlideUnderForFirst?: boolean,
+  disableSlideUnderForSecond?: boolean,
 ): Bounds[] => {
   const startEl = startElementBounds ?? a;
   const endEl = endElementBounds ?? b;
@@ -940,28 +900,28 @@ const generateDynamicAABBs = (
 
   const first = [
     a[0] > b[2]
-      ? a[1] > b[3] || a[3] < b[1]
+      ? !disableSlideUnderForFirst && (a[1] > b[3] || a[3] < b[1])
         ? Math.min((startEl[0] + endEl[2]) / 2, a[0] - startLeft)
         : (startEl[0] + endEl[2]) / 2
       : a[0] > b[0]
       ? a[0] - startLeft
       : common[0] - startLeft,
     a[1] > b[3]
-      ? a[0] > b[2] || a[2] < b[0]
+      ? !disableSlideUnderForFirst && (a[0] > b[2] || a[2] < b[0])
         ? Math.min((startEl[1] + endEl[3]) / 2, a[1] - startUp)
         : (startEl[1] + endEl[3]) / 2
       : a[1] > b[1]
       ? a[1] - startUp
       : common[1] - startUp,
     a[2] < b[0]
-      ? a[1] > b[3] || a[3] < b[1]
+      ? !disableSlideUnderForFirst && (a[1] > b[3] || a[3] < b[1])
         ? Math.max((startEl[2] + endEl[0]) / 2, a[2] + startRight)
         : (startEl[2] + endEl[0]) / 2
       : a[2] < b[2]
       ? a[2] + startRight
       : common[2] + startRight,
     a[3] < b[1]
-      ? a[0] > b[2] || a[2] < b[0]
+      ? !disableSlideUnderForFirst && (a[0] > b[2] || a[2] < b[0])
         ? Math.max((startEl[3] + endEl[1]) / 2, a[3] + startDown)
         : (startEl[3] + endEl[1]) / 2
       : a[3] < b[3]
@@ -970,28 +930,28 @@ const generateDynamicAABBs = (
   ] as Bounds;
   const second = [
     b[0] > a[2]
-      ? b[1] > a[3] || b[3] < a[1]
+      ? !disableSlideUnderForSecond && (b[1] > a[3] || b[3] < a[1])
         ? Math.min((endEl[0] + startEl[2]) / 2, b[0] - endLeft)
         : (endEl[0] + startEl[2]) / 2
       : b[0] > a[0]
       ? b[0] - endLeft
       : common[0] - endLeft,
     b[1] > a[3]
-      ? b[0] > a[2] || b[2] < a[0]
+      ? !disableSlideUnderForSecond && (b[0] > a[2] || b[2] < a[0])
         ? Math.min((endEl[1] + startEl[3]) / 2, b[1] - endUp)
         : (endEl[1] + startEl[3]) / 2
       : b[1] > a[1]
       ? b[1] - endUp
       : common[1] - endUp,
     b[2] < a[0]
-      ? b[1] > a[3] || b[3] < a[1]
+      ? !disableSlideUnderForSecond && (b[1] > a[3] || b[3] < a[1])
         ? Math.max((endEl[2] + startEl[0]) / 2, b[2] + endRight)
         : (endEl[2] + startEl[0]) / 2
       : b[2] < a[2]
       ? b[2] + endRight
       : common[2] + endRight,
     b[3] < a[1]
-      ? b[0] > a[2] || b[2] < a[0]
+      ? !disableSlideUnderForSecond && (b[0] > a[2] || b[2] < a[0])
         ? Math.max((endEl[3] + startEl[1]) / 2, b[3] + endDown)
         : (endEl[3] + startEl[1]) / 2
       : b[3] < a[3]
