@@ -538,70 +538,107 @@ const getElbowArrowData = (
       ? [startPointBounds, endPointBounds]
       : [startElementBounds, endElementBounds],
   );
-  const dynamicAABBs = generateDynamicAABBs(
-    options?.startIsMidPoint
-      ? ([
-          hoveredStartElement!.x + hoveredStartElement!.width / 2 - 1,
-          hoveredStartElement!.y + hoveredStartElement!.height / 2 - 1,
-          hoveredStartElement!.x + hoveredStartElement!.width / 2 + 1,
-          hoveredStartElement!.y + hoveredStartElement!.height / 2 + 1,
-        ] as Bounds)
-      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
-      ? startPointBounds
-      : startElementBounds,
-    options?.endIsMidPoint
-      ? ([
-          hoveredEndElement!.x + hoveredEndElement!.width / 2 - 1,
-          hoveredEndElement!.y + hoveredEndElement!.height / 2 - 1,
-          hoveredEndElement!.x + hoveredEndElement!.width / 2 + 1,
-          hoveredEndElement!.y + hoveredEndElement!.height / 2 + 1,
-        ] as Bounds)
-      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
-      ? endPointBounds
-      : endElementBounds,
-    commonBounds,
-    options?.startIsMidPoint
-      ? [0, 0, 0, 0]
-      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
-      ? offsetFromHeading(
-          startHeading,
-          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
-          0,
+  const dynamicAABBs =
+    options?.startIsMidPoint || options?.endIsMidPoint
+      ? generateSegmentedDynamicAABBs(
+          padAABB(
+            startElementBounds,
+            options?.startIsMidPoint
+              ? [0, 0, 0, 0]
+              : offsetFromHeading(
+                  startHeading,
+                  BASE_PADDING -
+                    (arrow.startArrowhead
+                      ? FIXED_BINDING_DISTANCE * 6
+                      : FIXED_BINDING_DISTANCE * 2),
+                  BASE_PADDING,
+                ),
+          ),
+          padAABB(
+            endElementBounds,
+            options?.endIsMidPoint
+              ? [0, 0, 0, 0]
+              : offsetFromHeading(
+                  endHeading,
+                  BASE_PADDING -
+                    (arrow.endArrowhead
+                      ? FIXED_BINDING_DISTANCE * 6
+                      : FIXED_BINDING_DISTANCE * 2),
+                  BASE_PADDING,
+                ),
+          ),
+          options?.startIsMidPoint,
+          options?.endIsMidPoint,
         )
-      : offsetFromHeading(
-          startHeading,
-          !hoveredStartElement && !hoveredEndElement
-            ? 0
-            : BASE_PADDING -
-                (arrow.startArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
-          BASE_PADDING,
-        ),
-    options?.endIsMidPoint
-      ? [0, 0, 0, 0]
-      : boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint)
-      ? offsetFromHeading(
-          endHeading,
-          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
-          0,
-        )
-      : offsetFromHeading(
-          endHeading,
-          !hoveredStartElement && !hoveredEndElement
-            ? 0
-            : BASE_PADDING -
-                (arrow.endArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
-          BASE_PADDING,
-        ),
-    boundsOverlap && !(options?.startIsMidPoint || options?.endIsMidPoint),
-    hoveredStartElement && aabbForElement(hoveredStartElement),
-    hoveredEndElement && aabbForElement(hoveredEndElement),
-    options?.endIsMidPoint,
-    options?.startIsMidPoint,
-  );
+      : generateDynamicAABBs(
+          options?.startIsMidPoint
+            ? ([
+                hoveredStartElement!.x + hoveredStartElement!.width / 2 - 1,
+                hoveredStartElement!.y + hoveredStartElement!.height / 2 - 1,
+                hoveredStartElement!.x + hoveredStartElement!.width / 2 + 1,
+                hoveredStartElement!.y + hoveredStartElement!.height / 2 + 1,
+              ] as Bounds)
+            : boundsOverlap &&
+              !(options?.startIsMidPoint || options?.endIsMidPoint)
+            ? startPointBounds
+            : startElementBounds,
+          options?.endIsMidPoint
+            ? ([
+                hoveredEndElement!.x + hoveredEndElement!.width / 2 - 1,
+                hoveredEndElement!.y + hoveredEndElement!.height / 2 - 1,
+                hoveredEndElement!.x + hoveredEndElement!.width / 2 + 1,
+                hoveredEndElement!.y + hoveredEndElement!.height / 2 + 1,
+              ] as Bounds)
+            : boundsOverlap &&
+              !(options?.startIsMidPoint || options?.endIsMidPoint)
+            ? endPointBounds
+            : endElementBounds,
+          commonBounds,
+          options?.startIsMidPoint
+            ? [0, 0, 0, 0]
+            : boundsOverlap &&
+              !(options?.startIsMidPoint || options?.endIsMidPoint)
+            ? offsetFromHeading(
+                startHeading,
+                !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
+                0,
+              )
+            : offsetFromHeading(
+                startHeading,
+                !hoveredStartElement && !hoveredEndElement
+                  ? 0
+                  : BASE_PADDING -
+                      (arrow.startArrowhead
+                        ? FIXED_BINDING_DISTANCE * 6
+                        : FIXED_BINDING_DISTANCE * 2),
+                BASE_PADDING,
+              ),
+          options?.endIsMidPoint
+            ? [0, 0, 0, 0]
+            : boundsOverlap &&
+              !(options?.startIsMidPoint || options?.endIsMidPoint)
+            ? offsetFromHeading(
+                endHeading,
+                !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
+                0,
+              )
+            : offsetFromHeading(
+                endHeading,
+                !hoveredStartElement && !hoveredEndElement
+                  ? 0
+                  : BASE_PADDING -
+                      (arrow.endArrowhead
+                        ? FIXED_BINDING_DISTANCE * 6
+                        : FIXED_BINDING_DISTANCE * 2),
+                BASE_PADDING,
+              ),
+          boundsOverlap &&
+            !(options?.startIsMidPoint || options?.endIsMidPoint),
+          hoveredStartElement && aabbForElement(hoveredStartElement),
+          hoveredEndElement && aabbForElement(hoveredEndElement),
+          options?.endIsMidPoint,
+          options?.startIsMidPoint,
+        );
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -612,11 +649,6 @@ const getElbowArrowData = (
     endHeading,
     endGlobalPoint,
   );
-
-  // options?.endIsMidPoint &&
-  //   debugDrawBounds(dynamicAABBs[0], { color: "green", permanent: true });
-  // options?.endIsMidPoint &&
-  //   debugDrawBounds(dynamicAABBs[1], { color: "red", permanent: true });
 
   return {
     dynamicAABBs,
@@ -873,6 +905,43 @@ const pathTo = (start: Node, node: Node) => {
 
 const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+
+const padAABB = (bounds: Bounds, offset: [number, number, number, number]) =>
+  [
+    bounds[0] - offset[3],
+    bounds[1] - offset[0],
+    bounds[2] + offset[1],
+    bounds[3] + offset[2],
+  ] as Bounds;
+
+const generateSegmentedDynamicAABBs = (
+  a: Bounds,
+  b: Bounds,
+  startIsMidPoint?: boolean,
+  endIsMidPoint?: boolean,
+) => {
+  let first: Bounds = a;
+  let second: Bounds = b;
+
+  if (startIsMidPoint) {
+    first = [
+      Math.min(a[0], b[2]),
+      Math.min(a[1], b[3]),
+      Math.max(a[2], b[0]),
+      Math.max(a[3], b[1]),
+    ];
+  }
+  if (endIsMidPoint) {
+    second = [
+      Math.min(b[0], a[2]),
+      Math.min(b[1], a[3]),
+      Math.max(b[2], a[0]),
+      Math.max(b[3], a[1]),
+    ];
+  }
+
+  return [first, second];
+};
 
 /**
  * Create dynamically resizing, always touching
