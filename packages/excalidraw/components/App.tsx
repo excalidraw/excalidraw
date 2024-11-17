@@ -2337,10 +2337,13 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     // navigate to elements from link if shape id is present in the URL
-    this.maybeNavigateToElementsFromLink(window.location.href);
+    this.maybeNavigateToElementsFromLink(window.location.href, false);
   };
 
-  private maybeNavigateToElementsFromLink = (link: string) => {
+  private maybeNavigateToElementsFromLink = (
+    link: string,
+    animate: boolean,
+  ) => {
     try {
       const url = new URL(link);
       const { elements, isAShapeLink } = getElementsFromQuery(
@@ -2350,7 +2353,7 @@ class App extends React.Component<AppProps, AppState> {
       if (elements && elements.length > 0) {
         this.scrollToContent(elements, {
           fitToContent: true,
-          animate: true,
+          animate,
         });
         return true;
       }
@@ -5494,7 +5497,7 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
         if (!customEvent?.defaultPrevented) {
-          if (this.maybeNavigateToElementsFromLink(url)) {
+          if (this.maybeNavigateToElementsFromLink(url, true)) {
             return;
           }
 
