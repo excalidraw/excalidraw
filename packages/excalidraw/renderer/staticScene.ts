@@ -25,13 +25,13 @@ import type {
 } from "../scene/types";
 import {
   EXTERNAL_LINK_IMG,
-  SHAPE_LINK_IMG,
+  ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { throttleRAF } from "../utils";
 import { getBoundTextElement } from "../element/textElement";
-import { isShapeLink } from "../element/shapeLinks";
+import { isElementLink } from "../element/elementLink";
 
 const GridLineColor = {
   Bold: "#dddddd",
@@ -164,7 +164,7 @@ const renderLinkIcon = (
     if (
       !linkCanvasCache.cache ||
       linkCanvasCache.cache.zoom !== appState.zoom.value ||
-      linkCanvasCache.isShapeLink !== isShapeLink(element.link)
+      linkCanvasCache.isShapeLink !== isElementLink(element.link)
     ) {
       linkCanvasCache.cache = document.createElement("canvas");
       linkCanvasCache.cache.zoom = appState.zoom.value;
@@ -180,10 +180,10 @@ const renderLinkIcon = (
       linkCanvasCacheContext.fillStyle = "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      linkCanvasCache.isShapeLink = isShapeLink(element.link);
+      linkCanvasCache.isShapeLink = isElementLink(element.link);
 
       if (linkCanvasCache.isShapeLink) {
-        linkCanvasCacheContext.drawImage(SHAPE_LINK_IMG, 0, 0, width, height);
+        linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
       } else {
         linkCanvasCacheContext.drawImage(
           EXTERNAL_LINK_IMG,

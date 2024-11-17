@@ -7,12 +7,12 @@ import { elementsAreInSameGroup, getElementsInGroup } from "../groups";
 import type { AppState } from "../types";
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
-export const createShapeLink = (
+export const createElementLink = (
   selectedElements: ExcalidrawElement[],
   prefix: string,
   appState: AppState,
 ) => {
-  if (canCreateShapeLinkFromElements(selectedElements)) {
+  if (canCreateLinkFromElements(selectedElements)) {
     if (selectedElements.length === 1) {
       return normalizeLink(`${prefix}/?element=${selectedElements[0].id}`);
     }
@@ -38,7 +38,7 @@ export const getElementsFromQuery = (
   elementsMap: ElementsMap,
 ): {
   elements: ExcalidrawElement[] | null;
-  isAShapeLink: boolean;
+  isElementLink: boolean;
 } => {
   const searchParams = new URLSearchParams(query);
 
@@ -49,13 +49,13 @@ export const getElementsFromQuery = (
       if (el) {
         return {
           elements: el ? [el] : null,
-          isAShapeLink: true,
+          isElementLink: true,
         };
       }
 
       return {
         elements: null,
-        isAShapeLink: true,
+        isElementLink: true,
       };
     }
   }
@@ -67,18 +67,18 @@ export const getElementsFromQuery = (
 
       return {
         elements: elementsInGroup,
-        isAShapeLink: true,
+        isElementLink: true,
       };
     }
   }
 
   return {
     elements: null,
-    isAShapeLink: false,
+    isElementLink: false,
   };
 };
 
-export const canCreateShapeLinkFromElements = (
+export const canCreateLinkFromElements = (
   selectedElements: ExcalidrawElement[],
 ) => {
   if (selectedElements.length === 1) {
@@ -92,7 +92,7 @@ export const canCreateShapeLinkFromElements = (
   return false;
 };
 
-export const isShapeLink = (url: string) => {
+export const isElementLink = (url: string) => {
   try {
     const _url = new URL(url);
     const query = _url.search;

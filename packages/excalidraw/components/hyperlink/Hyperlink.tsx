@@ -30,14 +30,14 @@ import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 import { getSelectedElements } from "../../scene";
 import { hitElementBoundingBox } from "../../element/collision";
 import { isLocalLink, normalizeLink } from "../../data/url";
-
-import "./Hyperlink.scss";
 import { trackEvent } from "../../analytics";
 import { useAppProps, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
 import { pointFrom, type GlobalPoint } from "../../../math";
-import { isShapeLink } from "../../element/shapeLinks";
+import { isElementLink } from "../../element/elementLink";
+
+import "./Hyperlink.scss";
 
 const CONTAINER_WIDTH = 320;
 const SPACE_BOTTOM = 85;
@@ -76,7 +76,7 @@ export const Hyperlink = ({
   const appProps = useAppProps();
 
   const linkVal = element.link || "";
-  const linkedToShape = linkVal && isShapeLink(linkVal);
+  const linkedToShape = linkVal && isElementLink(linkVal);
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -299,9 +299,9 @@ export const Hyperlink = ({
         {(!linkVal || linkedToShape) && (
           <ToolButton
             type="button"
-            title="Link to shape"
-            aria-label="Link to shape"
-            label="Link to shape"
+            title={t("labels.linkToElement")}
+            aria-label={t("labels.linkToElement")}
+            label={t("labels.linkToElement")}
             onClick={() => {
               setAppState({
                 shapeSelectionEnabled: true,

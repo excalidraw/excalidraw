@@ -464,8 +464,8 @@ import {
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
-import { getElementsFromQuery } from "../element/shapeLinks";
-import { actionCopyShapeLink } from "../actions/actionShapeLink";
+import { getElementsFromQuery } from "../element/elementLink";
+import { actionCopeElementLink } from "../actions/actionShapeLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -2346,7 +2346,7 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     try {
       const url = new URL(link);
-      const { elements, isAShapeLink } = getElementsFromQuery(
+      const { elements, isElementLink } = getElementsFromQuery(
         url.search,
         this.scene.getNonDeletedElementsMap(),
       );
@@ -2358,10 +2358,10 @@ class App extends React.Component<AppProps, AppState> {
         return true;
       }
 
-      if (url.host === window.location.host && isAShapeLink) {
+      if (url.host === window.location.host && isElementLink) {
         this.setState({
           toast: {
-            message: t("shapeLink.notFound"),
+            message: t("elementLink.notFound"),
             duration: 3000,
             closable: true,
           },
@@ -10585,8 +10585,10 @@ class App extends React.Component<AppProps, AppState> {
       actionFlipVertical,
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
+      CONTEXT_MENU_SEPARATOR,
       actionLink,
-      actionCopyShapeLink,
+      actionCopeElementLink,
+      CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,
       CONTEXT_MENU_SEPARATOR,

@@ -60,10 +60,10 @@ import { LaserPointerButton } from "./LaserPointerButton";
 import { TTDDialog } from "./TTDDialog/TTDDialog";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import ElementLinkDialog from "./ElementLinkDialog";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
-import ShapeLinkDialog from "./ShapeLinkDialog";
 
 interface LayerUIProps {
   actionManager: ActionManager;
@@ -475,7 +475,7 @@ const LayerUI = ({
       )}
       <ActiveConfirmDialog />
       {appState.shapeSelectionEnabled && (
-        <ShapeLinkDialog
+        <ElementLinkDialog
           onClose={() => {
             setAppState({
               shapeSelectionEnabled: false,

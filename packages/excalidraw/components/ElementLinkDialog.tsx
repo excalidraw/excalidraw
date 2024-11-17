@@ -2,17 +2,18 @@ import { TextField } from "./TextField";
 import type { AppState, UIAppState } from "../types";
 import DialogActionButton from "./DialogActionButton";
 import { getSelectedElements } from "../scene";
-import { createShapeLink } from "../element/shapeLinks";
+import { createElementLink } from "../element/elementLink";
 import { mutateElement } from "../element/mutateElement";
 import { useCallback, useEffect, useState } from "react";
-import "./ShapeLinkDialog.scss";
 import { t } from "../i18n";
 import type { ElementsMap } from "../element/types";
 import { ToolButton } from "./ToolButton";
 import { TrashIcon } from "./icons";
 import { KEYS } from "../keys";
 
-const ShapeLinkDialog = ({
+import "./ElementLinkDialog.scss";
+
+const ElementLinkDialog = ({
   onClose,
   elementsMap,
   appState,
@@ -32,7 +33,7 @@ const ShapeLinkDialog = ({
     const selectedElements = getSelectedElements(elementsMap, appState);
     const nextLink =
       selectedElements.length > 0
-        ? createShapeLink(
+        ? createElementLink(
             selectedElements,
             window.location.origin,
             appState as AppState,
@@ -85,13 +86,13 @@ const ShapeLinkDialog = ({
   }, [appState, onClose, handleConfirm]);
 
   return (
-    <div className="ShapeLinkDialog">
-      <div className="ShapeLinkDialog__header">
-        <h2>{t("shapeLink.title")}</h2>
-        <p>{t("shapeLink.desc")}</p>
+    <div className="ElementLinkDialog">
+      <div className="ElementLinkDialog__header">
+        <h2>{t("elementLink.title")}</h2>
+        <p>{t("elementLink.desc")}</p>
       </div>
 
-      <div className="ShapeLinkDialog__input">
+      <div className="ElementLinkDialog__input">
         <TextField
           value={nextLink ?? ""}
           onChange={(value) => {
@@ -105,7 +106,7 @@ const ShapeLinkDialog = ({
               handleConfirm();
             }
           }}
-          className="ShapeLinkDialog__input-field"
+          className="ElementLinkDialog__input-field"
         />
 
         {nextLink && (
@@ -122,13 +123,13 @@ const ShapeLinkDialog = ({
               setNextLink(null);
               setLinkEdited(true);
             }}
-            className="ShapeLinkDialog__remove"
+            className="ElementLinkDialog__remove"
             icon={TrashIcon}
           />
         )}
       </div>
 
-      <div className="ShapeLinkDialog__actions">
+      <div className="ElementLinkDialog__actions">
         <DialogActionButton
           label={t("buttons.cancel")}
           onClick={() => {
@@ -149,4 +150,4 @@ const ShapeLinkDialog = ({
   );
 };
 
-export default ShapeLinkDialog;
+export default ElementLinkDialog;

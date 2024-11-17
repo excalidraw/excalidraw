@@ -135,8 +135,8 @@ export type ActionName =
   | "autoResize"
   | "elementStats"
   | "searchMenu"
-  | "copyShapeLink"
-  | "linkToShape"
+  | "copyElementLink"
+  | "linkToElement"
   | "cropEditor";
 
 export type PanelComponentProps = {

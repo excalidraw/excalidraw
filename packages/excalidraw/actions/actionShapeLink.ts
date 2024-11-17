@@ -1,17 +1,17 @@
 import { copyTextToSystemClipboard } from "../clipboard";
 import {
-  canCreateShapeLinkFromElements,
-  createShapeLink,
-} from "../element/shapeLinks";
+  canCreateLinkFromElements,
+  createElementLink,
+} from "../element/elementLink";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { StoreAction } from "../store";
 import { register } from "./register";
 
-export const actionCopyShapeLink = register({
-  name: "copyShapeLink",
-  label: "labels.copyShapeLink",
+export const actionCopeElementLink = register({
+  name: "copyElementLink",
+  label: "labels.copyElementLink",
   trackEvent: { category: "element" },
   perform: async (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState);
@@ -19,13 +19,16 @@ export const actionCopyShapeLink = register({
     try {
       if (window.location) {
         await copyTextToSystemClipboard(
-          createShapeLink(selectedElements, window.location.origin, appState) ??
-            "",
+          createElementLink(
+            selectedElements,
+            window.location.origin,
+            appState,
+          ) ?? "",
         );
         return {
           appState: {
             toast: {
-              message: t("toast.shapeLinkCopied"),
+              message: t("toast.elementLinkCopied"),
               closable: true,
             },
           },
@@ -48,12 +51,12 @@ export const actionCopyShapeLink = register({
     event.key.toLowerCase() === KEYS.L &&
     !event[KEYS.CTRL_OR_CMD],
   predicate: (elements, appState, appProps, app) =>
-    canCreateShapeLinkFromElements(getSelectedElements(elements, appState)),
+    canCreateLinkFromElements(getSelectedElements(elements, appState)),
 });
 
-export const actionLinkToShape = register({
-  name: "linkToShape",
-  label: "labels.linkToShape",
+export const actionLinkToElement = register({
+  name: "linkToElement",
+  label: "labels.linkToElement",
   perform: (elements, appState, _, app) => {
     const selectedElements = getSelectedElements(elements, appState);
 
@@ -76,7 +79,7 @@ export const actionLinkToShape = register({
     return (
       !appState.shapeSelectionEnabled &&
       selectedElements.length === 1 &&
-      canCreateShapeLinkFromElements(selectedElements)
+      canCreateLinkFromElements(selectedElements)
     );
   },
   trackEvent: false,

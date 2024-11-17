@@ -728,6 +728,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -764,14 +765,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       {
         "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5359,6 +5361,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5395,14 +5398,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       {
         "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6545,6 +6549,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6581,14 +6586,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       {
         "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8456,6 +8462,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8492,14 +8499,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9409,6 +9417,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9445,14 +9454,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       {
         "keyTest": [Function],
-        "label": "labels.copyShapeLink",
-        "name": "copyShapeLink",
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg

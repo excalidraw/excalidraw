@@ -1,7 +1,7 @@
 @import "../css/variables.module.scss";
 
 .excalidraw {
-  .ShapeLinkDialog {
+  .ElementLinkDialog {
     position: absolute;
     top: var(--editor-container-padding);
     left: calc(var(--editor-container-padding) * 4);
@@ -26,7 +26,7 @@
       z-index: 5;
     }
 
-    .ShapeLinkDialog__header {
+    .ElementLinkDialog__header {
       h2 {
         margin-top: 0;
         margin-bottom: 0.5rem;
@@ -51,14 +51,14 @@
       }
     }
 
-    .ShapeLinkDialog__input {
+    .ElementLinkDialog__input {
       display: flex;
 
-      .ShapeLinkDialog__input-field {
+      .ElementLinkDialog__input-field {
         flex: 1;
       }
 
-      .ShapeLinkDialog__remove {
+      .ElementLinkDialog__remove {
         color: $oc-red-9;
         margin-left: 1rem;
 
@@ -73,7 +73,7 @@
       }
     }
 
-    .ShapeLinkDialog__actions {
+    .ElementLinkDialog__actions {
       display: flex;
       justify-content: flex-end;
       margin-top: 1.5rem;
