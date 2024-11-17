@@ -13,7 +13,7 @@ import type {
 } from "../../element/types";
 
 import { ToolButton } from "../ToolButton";
-import { FreedrawIcon, TrashIcon, lineEditorIcon } from "../icons";
+import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { t } from "../../i18n";
 import {
   useCallback,
@@ -308,7 +308,7 @@ export const Hyperlink = ({
                 elementToLink: element.id,
               });
             }}
-            icon={lineEditorIcon}
+            icon={elementLinkIcon}
           />
         )}
         {linkVal && !isEmbeddableElement(element) && (
