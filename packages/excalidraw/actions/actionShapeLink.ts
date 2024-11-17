@@ -67,7 +67,7 @@ export const actionLinkToElement = register({
     return {
       appState: {
         ...appState,
-        shapeSelectionEnabled: true,
+        openDialog: { name: "elementLinkSelector" },
         elementToLink: getSelectedElements(elements, appState)[0].id,
       },
       storeAction: StoreAction.CAPTURE,
@@ -77,7 +77,7 @@ export const actionLinkToElement = register({
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
-      !appState.shapeSelectionEnabled &&
+      appState.openDialog?.name !== "elementLinkSelector" &&
       selectedElements.length === 1 &&
       canCreateLinkFromElements(selectedElements)
     );

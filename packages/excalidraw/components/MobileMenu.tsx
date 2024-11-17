@@ -92,7 +92,7 @@ export const MobileMenu = ({
                 {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
                   {!appState.viewModeEnabled &&
-                    !appState.shapeSelectionEnabled && (
+                    appState.openDialog?.name !== "elementLinkSelector" && (
                       <DefaultSidebarTriggerTunnel.Out />
                     )}
                   <PenModeButton
@@ -130,7 +130,10 @@ export const MobileMenu = ({
   };
 
   const renderAppToolbar = () => {
-    if (appState.viewModeEnabled || appState.shapeSelectionEnabled) {
+    if (
+      appState.viewModeEnabled ||
+      appState.openDialog?.name === "elementLinkSelector"
+    ) {
       return (
         <div className="App-toolbar-content">
           <MainMenuTunnel.Out />
@@ -156,7 +159,7 @@ export const MobileMenu = ({
     <>
       {renderSidebars()}
       {!appState.viewModeEnabled &&
-        !appState.shapeSelectionEnabled &&
+        appState.openDialog?.name !== "elementLinkSelector" &&
         renderToolbar()}
       <div
         className="App-bottom-bar"
@@ -169,7 +172,7 @@ export const MobileMenu = ({
         <Island padding={0}>
           {appState.openMenu === "shape" &&
           !appState.viewModeEnabled &&
-          !appState.shapeSelectionEnabled &&
+          appState.openDialog?.name !== "elementLinkSelector" &&
           showSelectedShapeActions(appState, elements) ? (
             <Section className="App-mobile-menu" heading="selectedShapeActions">
               <SelectedShapeActions

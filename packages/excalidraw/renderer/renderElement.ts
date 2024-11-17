@@ -705,7 +705,7 @@ export const renderElement = (
   appState: StaticCanvasAppState,
 ) => {
   const reduceAlphaForSelection =
-    appState.shapeSelectionEnabled &&
+    appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&
     !appState.hoveredElementIds[element.id];
 

@@ -88,7 +88,7 @@ export const actionClearCanvas = register({
     return (
       !!app.props.UIOptions.canvasActions.clearCanvas &&
       !appState.viewModeEnabled &&
-      !appState.shapeSelectionEnabled
+      appState.openDialog?.name !== "elementLinkSelector"
     );
   },
   perform: (elements, appState, _, app) => {

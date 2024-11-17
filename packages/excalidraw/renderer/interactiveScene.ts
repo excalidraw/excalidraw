@@ -1129,7 +1129,7 @@ const _renderInteractiveScene = ({
   });
 
   // Paint shape selection mask over canvas
-  // if (appState.shapeSelectionEnabled) {
+  // if (appState.openDialog?.name === "elementLinkSelector") {
   //   context.save();
   //   context.globalAlpha = 0.5;
   //   context.fillStyle = "black";

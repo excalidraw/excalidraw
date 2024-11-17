@@ -304,7 +304,7 @@ export const Hyperlink = ({
             label={t("labels.linkToElement")}
             onClick={() => {
               setAppState({
-                shapeSelectionEnabled: true,
+                openDialog: { name: "elementLinkSelector" },
                 elementToLink: element.id,
               });
             }}

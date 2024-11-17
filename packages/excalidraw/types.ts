@@ -161,7 +161,7 @@ type _CommonCanvasAppState = {
   width: AppState["width"];
   height: AppState["height"];
   viewModeEnabled: AppState["viewModeEnabled"];
-  shapeSelectionEnabled: AppState["shapeSelectionEnabled"];
+  openDialog: AppState["openDialog"];
   editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
   selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
   frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
@@ -334,7 +334,9 @@ export interface AppState {
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
-    | { name: "commandPalette" };
+    | { name: "commandPalette" }
+    | { name: "elementLinkSelector" };
+
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -358,7 +360,6 @@ export interface AppState {
   gridStep: number;
   gridModeEnabled: boolean;
   viewModeEnabled: boolean;
-  shapeSelectionEnabled: boolean;
   elementToLink: ExcalidrawElement["id"] | null;
 
   /** top-most selected groups (i.e. does not include nested groups) */

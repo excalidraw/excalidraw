@@ -69,11 +69,17 @@ const ElementLinkDialog = ({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (appState.shapeSelectionEnabled && event.key === KEYS.ENTER) {
+      if (
+        appState.openDialog?.name === "elementLinkSelector" &&
+        event.key === KEYS.ENTER
+      ) {
         handleConfirm();
       }
 
-      if (appState.shapeSelectionEnabled && event.key === KEYS.ESCAPE) {
+      if (
+        appState.openDialog?.name === "elementLinkSelector" &&
+        event.key === KEYS.ESCAPE
+      ) {
         onClose?.();
       }
     };
