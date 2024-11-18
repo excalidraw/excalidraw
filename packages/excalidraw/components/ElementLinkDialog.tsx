@@ -109,6 +109,7 @@ const ElementLinkDialog = ({
             }
           }}
           className="ElementLinkDialog__input-field"
+          selectOnRender
         />
 
         {nextLink && (
