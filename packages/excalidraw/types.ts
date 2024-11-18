@@ -335,7 +335,7 @@ export interface AppState {
     | { name: "imageExport" | "help" | "jsonExport" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
-    | { name: "elementLinkSelector" };
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
 
   /**
    * Reflects user preference for whether the default sidebar should be docked.
@@ -360,7 +360,6 @@ export interface AppState {
   gridStep: number;
   gridModeEnabled: boolean;
   viewModeEnabled: boolean;
-  elementToLink: ExcalidrawElement["id"] | null;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
