@@ -2795,8 +2795,9 @@ class App extends React.Component<AppProps, AppState> {
 
     // cleanup
     if (
-      prevState.openDialog?.name === "elementLinkSelector" &&
-      this.state.openDialog?.name !== "elementLinkSelector"
+      (prevState.openDialog?.name === "elementLinkSelector" ||
+        this.state.openDialog?.name === "elementLinkSelector") &&
+      prevState.openDialog?.name !== this.state.openDialog?.name
     ) {
       this.deselectElements();
       this.setState({
