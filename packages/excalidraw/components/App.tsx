@@ -6021,24 +6021,27 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.openDialog?.name === "elementLinkSelector" && hitElement) {
       this.setState((prevState) => {
         return {
-          hoveredElementIds: selectGroupsForSelectedElements(
-            {
-              editingGroupId: prevState.editingGroupId,
-              selectedElementIds: { [hitElement.id]: true },
-            },
-            this.scene.getNonDeletedElements(),
-            prevState,
-            this,
-          ).selectedElementIds,
+          hoveredElementIds: updateStable(
+            prevState.hoveredElementIds,
+            selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: { [hitElement.id]: true },
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ).selectedElementIds,
+          ),
         };
       });
     } else if (
       this.state.openDialog?.name === "elementLinkSelector" &&
       !hitElement
     ) {
-      this.setState({
-        hoveredElementIds: {},
-      });
+      this.setState((prevState) => ({
+        hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
+      }));
     }
   };
 
