@@ -137,10 +137,10 @@ const frameClip = (
 
 const linkCanvasCache: {
   cache: any;
-  isShapeLink: boolean;
+  isElementLink: boolean;
 } = {
   cache: null,
-  isShapeLink: false,
+  isElementLink: false,
 };
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -164,7 +164,7 @@ const renderLinkIcon = (
     if (
       !linkCanvasCache.cache ||
       linkCanvasCache.cache.zoom !== appState.zoom.value ||
-      linkCanvasCache.isShapeLink !== isElementLink(element.link)
+      linkCanvasCache.isElementLink !== isElementLink(element.link)
     ) {
       linkCanvasCache.cache = document.createElement("canvas");
       linkCanvasCache.cache.zoom = appState.zoom.value;
@@ -180,9 +180,9 @@ const renderLinkIcon = (
       linkCanvasCacheContext.fillStyle = "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      linkCanvasCache.isShapeLink = isElementLink(element.link);
+      linkCanvasCache.isElementLink = isElementLink(element.link);
 
-      if (linkCanvasCache.isShapeLink) {
+      if (linkCanvasCache.isElementLink) {
         linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
       } else {
         linkCanvasCacheContext.drawImage(
