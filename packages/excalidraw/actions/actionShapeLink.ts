@@ -67,8 +67,10 @@ export const actionLinkToElement = register({
     return {
       appState: {
         ...appState,
-        openDialog: { name: "elementLinkSelector" },
-        elementToLink: getSelectedElements(elements, appState)[0].id,
+        openDialog: {
+          name: "elementLinkSelector",
+          sourceElementId: getSelectedElements(elements, appState)[0].id,
+        },
       },
       storeAction: StoreAction.CAPTURE,
     };

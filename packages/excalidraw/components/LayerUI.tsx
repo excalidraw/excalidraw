@@ -477,6 +477,7 @@ const LayerUI = ({
       <ActiveConfirmDialog />
       {appState.openDialog?.name === "elementLinkSelector" && (
         <ElementLinkDialog
+          sourceElementId={appState.openDialog.sourceElementId}
           onClose={() => {
             setAppState({
               openDialog: null,

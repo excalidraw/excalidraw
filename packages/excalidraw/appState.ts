@@ -106,7 +106,6 @@ export const getDefaultAppState = (): Omit<
       value: 1 as NormalizedZoomValue,
     },
     viewModeEnabled: false,
-    elementToLink: null,
     pendingImageElementId: null,
     showHyperlinkPopup: false,
     selectedLinearElement: null,
@@ -245,7 +244,6 @@ const APP_STATE_STORAGE_CONF = (<
   isCropping: { browser: false, export: false, server: false },
   croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
-  elementToLink: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

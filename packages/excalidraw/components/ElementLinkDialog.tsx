@@ -6,7 +6,7 @@ import { createElementLink } from "../element/elementLink";
 import { mutateElement } from "../element/mutateElement";
 import { useCallback, useEffect, useState } from "react";
 import { t } from "../i18n";
-import type { ElementsMap } from "../element/types";
+import type { ElementsMap, ExcalidrawElement } from "../element/types";
 import { ToolButton } from "./ToolButton";
 import { TrashIcon } from "./icons";
 import { KEYS } from "../keys";
@@ -14,17 +14,17 @@ import { KEYS } from "../keys";
 import "./ElementLinkDialog.scss";
 
 const ElementLinkDialog = ({
+  sourceElementId,
   onClose,
   elementsMap,
   appState,
 }: {
+  sourceElementId: ExcalidrawElement["id"];
   elementsMap: ElementsMap;
   appState: UIAppState;
   onClose?: () => void;
 }) => {
-  const originalLink = appState.elementToLink
-    ? elementsMap.get(appState.elementToLink)?.link ?? null
-    : null;
+  const originalLink = elementsMap.get(sourceElementId)?.link ?? null;
 
   const [nextLink, setNextLink] = useState<string | null>(originalLink);
   const [linkEdited, setLinkEdited] = useState(false);
@@ -44,20 +44,16 @@ const ElementLinkDialog = ({
   }, [elementsMap, appState, appState.selectedElementIds, originalLink]);
 
   const handleConfirm = useCallback(() => {
-    if (
-      nextLink &&
-      appState.elementToLink &&
-      nextLink !== elementsMap.get(appState.elementToLink)?.link
-    ) {
-      const elementToLink = elementsMap.get(appState.elementToLink);
+    if (nextLink && nextLink !== elementsMap.get(sourceElementId)?.link) {
+      const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
         mutateElement(elementToLink, {
           link: nextLink,
         });
     }
 
-    if (!nextLink && linkEdited && appState.elementToLink) {
-      const elementToLink = elementsMap.get(appState.elementToLink);
+    if (!nextLink && linkEdited && sourceElementId) {
+      const elementToLink = elementsMap.get(sourceElementId);
       elementToLink &&
         mutateElement(elementToLink, {
           link: null,
@@ -65,7 +61,7 @@ const ElementLinkDialog = ({
     }
 
     onClose?.();
-  }, [nextLink, elementsMap, appState, linkEdited, onClose]);
+  }, [sourceElementId, nextLink, elementsMap, linkEdited, onClose]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

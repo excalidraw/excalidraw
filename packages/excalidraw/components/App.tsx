@@ -2801,7 +2801,6 @@ class App extends React.Component<AppProps, AppState> {
       this.deselectElements();
       this.setState({
         hoveredElementIds: {},
-        elementToLink: null,
       });
     }
 
