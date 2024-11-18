@@ -465,7 +465,7 @@ import {
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
 import { getElementsFromQuery } from "../element/elementLink";
-import { actionCopeElementLink } from "../actions/actionShapeLink";
+import { actionCopeElementLink } from "../actions/actionElementLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
