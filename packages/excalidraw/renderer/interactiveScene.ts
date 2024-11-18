@@ -1128,15 +1128,6 @@ const _renderInteractiveScene = ({
     normalizedHeight,
   });
 
-  // Paint shape selection mask over canvas
-  // if (appState.openDialog?.name === "elementLinkSelector") {
-  //   context.save();
-  //   context.globalAlpha = 0.5;
-  //   context.fillStyle = "black";
-  //   context.fillRect(0, 0, canvas.width, canvas.height);
-  //   context.restore();
-  // }
-
   // Paint scrollbars
   let scrollBars;
   if (renderConfig.renderScrollbars) {
