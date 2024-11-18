@@ -112,7 +112,7 @@ const ElementLinkDialog = ({
           selectOnRender
         />
 
-        {!originalLink && nextLink && (
+        {originalLink && nextLink && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
