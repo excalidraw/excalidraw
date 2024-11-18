@@ -336,8 +336,8 @@ export const updateElbowArrowPoints = (
     ],
   ]);
 
-  const simplifiedPointGroups = removeElbowArrowShortSegments(
-    getElbowArrowCornerPoints(
+  const simplifiedPointGroups = getElbowArrowCornerPoints(
+    removeElbowArrowShortSegments(
       pointPairs.map(([state, points], idx) =>
         generatePoints(
           state,
@@ -1426,7 +1426,7 @@ const getElbowArrowCornerPoints = (
       Math.abs(points[0][1] - points[1][1]) <
       Math.abs(points[0][0] - points[1][0]);
 
-    return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
+    const ret = multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
       // The very first and last points are always kept
       if (idx === 0 || idx === points.length - 1) {
         return true;
@@ -1443,6 +1443,8 @@ const getElbowArrowCornerPoints = (
       previousHorizontal = nextHorizontal;
       return true;
     });
+
+    return ret;
   }
 
   return pointGroups;
