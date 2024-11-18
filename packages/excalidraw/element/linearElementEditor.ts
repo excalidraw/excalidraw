@@ -1860,7 +1860,7 @@ export class LinearElementEditor {
       elementsMap,
     );
 
-    if (!element || !segmentIdx) {
+    if (!element || !segmentIdx || segmentIdx < 1) {
       return linearElementEditor;
     }
 
