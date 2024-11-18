@@ -180,9 +180,8 @@ export const updateElbowArrowPoints = (
 
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
+      // Determine if we need to flip the heading for visual appeal
       let heading = segment.heading;
-      let anchor = segment.anchor;
-
       if (
         pointDistanceSq(
           updatedPoints[segment.index],
@@ -210,6 +209,8 @@ export const updateElbowArrowPoints = (
       }
       nextFixedSegments[segmentIdx].heading = heading;
 
+      // Calculate new anchor point (sliding anchor)
+      let anchor = segment.anchor;
       const prevSegment = nextFixedSegments[segmentIdx - 1];
       const nextSegment = nextFixedSegments[segmentIdx + 1];
       const candidateStart = prevSegment
