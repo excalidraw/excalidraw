@@ -2,7 +2,6 @@ import {
   distanceToLineSegment,
   lineSegment,
   pointDistance,
-  pointDistanceSq,
   pointFrom,
   pointScaleFromOrigin,
   pointTranslate,
@@ -20,11 +19,10 @@ import {
   isAnyTrue,
   memo,
   multiDimensionalArrayDeepFilter,
-  multiDimensionalArrayDeepFlatMapper,
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
+import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -45,7 +43,6 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   headingIsHorizontal,
-  headingIsVertical,
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
