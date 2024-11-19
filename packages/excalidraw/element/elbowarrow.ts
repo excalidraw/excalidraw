@@ -202,7 +202,18 @@ export const updateElbowArrowPoints = (
     updatedPoints,
   );
 
-  // Start segment is getting fixed, need to fix the first point to origin
+  // End segment is getting fixed - must happen before start segment move check!
+  if (
+    nextFixedSegments[nextFixedSegments.length - 1]?.index ===
+    updatedPoints.length - 1
+  ) {
+    nextFixedSegments[nextFixedSegments.length - 1].index =
+      updatedPoints.length - 2;
+    updatedPoints.push(arrow.points[arrow.points.length - 1]);
+    console.log("End segment is getting fixed");
+  }
+
+  // Start segment is getting fixed
   if (nextFixedSegments[0]?.index === 1) {
     nextFixedSegments[0].index = 2;
     updatedPoints.unshift(pointFrom<LocalPoint>(0, 0));
@@ -409,6 +420,11 @@ export const updateElbowArrowPoints = (
 
       if (segment.index === 1) {
         segment.index = 2;
+      }
+
+      if (segment.index === simplifiedPoints.length - 1) {
+        console.log("Finalize end fixed segment");
+        segment.index = simplifiedPoints.length - 2;
       }
 
       return segment;
