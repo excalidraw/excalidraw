@@ -1891,13 +1891,13 @@
   resolved "https://registry.yarnpkg.com/@excalidraw/markdown-to-text/-/markdown-to-text-0.1.2.tgz#1703705e7da608cf478f17bfe96fb295f55a23eb"
   integrity sha512-1nDXBNAojfi3oSFwJswKREkFm5wrSjqay81QlyRv2pkITG/XYB5v+oChENVBQLcxQwX4IUATWvXM5BcaNhPiIg==
 
-"@excalidraw/mermaid-to-excalidraw@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-1.1.0.tgz#a24a7aa3ad2e4f671054fdb670a8508bab463814"
-  integrity sha512-YP2roqrImzek1SpUAeToSTNhH5Gfw9ogdI5KHp7c+I/mX7SEW8oNqqX7CP+oHcUgNF6RrYIkqSrnMRN9/3EGLg==
+"@excalidraw/mermaid-to-excalidraw@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@excalidraw/mermaid-to-excalidraw/-/mermaid-to-excalidraw-1.1.1.tgz#b06cfa64cb125aea12b9f229c897b06104c12bac"
+  integrity sha512-sYij5SOcMPNoWcvgfxSCjb3EMx1RvevLiLiOjkUy2nexZVhvfTnuJXmI4gAJeVxXf4e5tEPqUChdCveC9dWoPw==
   dependencies:
     "@excalidraw/markdown-to-text" "0.1.2"
-    mermaid "10.9.0"
+    mermaid "10.9.3"
     nanoid "4.0.2"
 
 "@excalidraw/prettier-config@1.0.2":
@@ -5428,10 +5428,10 @@ domhandler@^4.2.0, domhandler@^4.3.1:
   dependencies:
     domelementtype "^2.2.0"
 
-dompurify@^3.0.5:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.1.4.tgz#42121304b2b3a6bae22f80131ff8a8f3f3c56be2"
-  integrity sha512-2gnshi6OshmuKil8rMZuQCGiUF3cUxHY3NGDzUAdUx/NPEe5DVnO8BDoAQouvgwnx0R/+a6jUn36Z0FSdq8vww==
+"dompurify@^3.0.5 <3.1.7":
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.1.6.tgz#43c714a94c6a7b8801850f82e756685300a027e2"
+  integrity sha512-cTOAhc36AalkjtBpfG6O8JimdTMWNXjiePT2xQH/ppBGi/4uIpmj8eKyIkMJErXWARyINV/sB38yf8JCLF5pbQ==
 
 domutils@^2.8.0:
   version "2.8.0"
@@ -7818,10 +7818,10 @@ merge2@^1.3.0, merge2@^1.4.1:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
 
-mermaid@10.9.0:
-  version "10.9.0"
-  resolved "https://registry.yarnpkg.com/mermaid/-/mermaid-10.9.0.tgz#4d1272fbe434bd8f3c2c150554dc8a23a9bf9361"
-  integrity sha512-swZju0hFox/B/qoLKK0rOxxgh8Cf7rJSfAUc1u8fezVihYMvrJAS45GzAxTVf4Q+xn9uMgitBcmWk7nWGXOs/g==
+mermaid@10.9.3:
+  version "10.9.3"
+  resolved "https://registry.yarnpkg.com/mermaid/-/mermaid-10.9.3.tgz#90bc6f15c33dbe5d9507fed31592cc0d88fee9f7"
+  integrity sha512-V80X1isSEvAewIL3xhmz/rVmc27CVljcsbWxkxlWJWY/1kQa4XOABqpDl2qQLGKzpKm6WbTfUEKImBlUfFYArw==
   dependencies:
     "@braintree/sanitize-url" "^6.0.1"
     "@types/d3-scale" "^4.0.3"
@@ -7832,7 +7832,7 @@ mermaid@10.9.0:
     d3-sankey "^0.12.3"
     dagre-d3-es "7.0.10"
     dayjs "^1.11.7"
-    dompurify "^3.0.5"
+    dompurify "^3.0.5 <3.1.7"
     elkjs "^0.9.0"
     katex "^0.16.9"
     khroma "^2.0.0"
