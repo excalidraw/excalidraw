@@ -127,6 +127,7 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { isElementLink } from "../packages/excalidraw/element/elementLink";
 
 polyfill();
 
@@ -848,25 +849,11 @@ const ExcalidrawWrapper = () => {
             </div>
           );
         }}
-        onLinkOpen={(element, event, linkType) => {
-          if (linkType === "element") {
+        onLinkOpen={(element, event) => {
+          if (element.link && isElementLink(element.link)) {
             event.preventDefault();
             excalidrawAPI?.navigateToLink(element.link, true);
           }
-        }}
-        generateLinkForSelection={(id, type) => {
-          const url = window.location.href;
-
-          try {
-            const link = new URL(url);
-            link.searchParams.set("elementLink", id);
-
-            return link.toString();
-          } catch (error) {
-            console.error(error);
-          }
-
-          return url;
         }}
       >
         <AppMainMenu

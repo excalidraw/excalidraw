@@ -464,7 +464,7 @@ import {
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
-import { getElementsFromQuery, isElementLink } from "../element/elementLink";
+import { getElementsFromQuery } from "../element/elementLink";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -5512,7 +5512,6 @@ class App extends React.Component<AppProps, AppState> {
               link: url,
             },
             customEvent,
-            isElementLink(url) ? "element" : "url",
           );
         }
         if (!customEvent?.defaultPrevented) {

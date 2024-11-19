@@ -541,7 +541,6 @@ export interface ExcalidrawProps {
     event: CustomEvent<{
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
-    linkType: "url" | "element",
   ) => void;
   onPointerDown?: (
     activeTool: AppState["activeTool"],

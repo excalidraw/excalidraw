@@ -2,6 +2,7 @@ import { copyTextToSystemClipboard } from "../clipboard";
 import { copyIcon, elementLinkIcon } from "../components/icons";
 import {
   canCreateLinkFromElements,
+  defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
 } from "../element/elementLink";
 import { t } from "../i18n";
@@ -27,7 +28,12 @@ export const actionCopyElementLink = register({
 
         if (idAndType && app.props.generateLinkForSelection) {
           await copyTextToSystemClipboard(
-            app.props.generateLinkForSelection(idAndType.id, idAndType.type),
+            app.props.generateLinkForSelection
+              ? app.props.generateLinkForSelection(idAndType.id, idAndType.type)
+              : defaultGetElementLinkFromSelection(
+                  idAndType.id,
+                  idAndType.type,
+                ),
           );
 
           return {
@@ -62,8 +68,7 @@ export const actionCopyElementLink = register({
     event.shiftKey &&
     event.key.toLowerCase() === KEYS.L &&
     !event[KEYS.CTRL_OR_CMD],
-  predicate: (elements, appState, appProps, app) =>
-    appProps.generateLinkForSelection !== undefined &&
+  predicate: (elements, appState) =>
     canCreateLinkFromElements(getSelectedElements(elements, appState)),
 });
 
@@ -96,7 +101,6 @@ export const actionLinkToElement = register({
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
-      appProps.generateLinkForSelection !== undefined &&
       appState.openDialog?.name !== "elementLinkSelector" &&
       selectedElements.length === 1 &&
       canCreateLinkFromElements(selectedElements)

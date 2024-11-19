@@ -5,33 +5,25 @@
 import { ELEMENT_LINK_KEY } from "../constants";
 import { normalizeLink } from "../data/url";
 import { elementsAreInSameGroup, getElementsInGroup } from "../groups";
-import type { AppState } from "../types";
+import type { AppProps, AppState } from "../types";
 import type { ElementsMap, ExcalidrawElement } from "./types";
 
-export const createElementLink = (
-  selectedElements: ExcalidrawElement[],
-  prefix: string,
-  appState: AppState,
-) => {
-  if (canCreateLinkFromElements(selectedElements)) {
-    if (selectedElements.length === 1) {
-      return normalizeLink(`${prefix}/?element=${selectedElements[0].id}`);
-    }
+export const defaultGetElementLinkFromSelection: Exclude<
+  AppProps["generateLinkForSelection"],
+  undefined
+> = (id, type) => {
+  const url = window.location.href;
 
-    if (selectedElements.length > 1) {
-      const selectedGroupId = Object.keys(appState.selectedGroupIds)[0];
+  try {
+    const link = new URL(url);
+    link.searchParams.set("elementLink", id);
 
-      if (selectedGroupId) {
-        return normalizeLink(`${prefix}/?group=${selectedGroupId}`);
-      }
-
-      return normalizeLink(
-        `${prefix}/?group=${selectedElements[0].groupIds[0]}`,
-      );
-    }
+    return normalizeLink(link.toString());
+  } catch (error) {
+    console.error(error);
   }
 
-  return null;
+  return normalizeLink(url);
 };
 
 export const getLinkIdAndTypeFromSelection = (

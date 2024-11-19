@@ -2,7 +2,10 @@ import { TextField } from "./TextField";
 import type { AppProps, AppState, UIAppState } from "../types";
 import DialogActionButton from "./DialogActionButton";
 import { getSelectedElements } from "../scene";
-import { getLinkIdAndTypeFromSelection } from "../element/elementLink";
+import {
+  defaultGetElementLinkFromSelection,
+  getLinkIdAndTypeFromSelection,
+} from "../element/elementLink";
 import { mutateElement } from "../element/mutateElement";
 import { useCallback, useEffect, useState } from "react";
 import { t } from "../i18n";
@@ -19,7 +22,7 @@ const ElementLinkDialog = ({
   onClose,
   elementsMap,
   appState,
-  generateLinkForSelection,
+  generateLinkForSelection = defaultGetElementLinkFromSelection,
 }: {
   sourceElementId: ExcalidrawElement["id"];
   elementsMap: ElementsMap;

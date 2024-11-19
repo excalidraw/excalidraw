@@ -142,6 +142,14 @@ This callback if supplied will get triggered when the library is updated and has
 
 It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
 
+### generateLinkForSelection
+
+This prop if passed will be used to replace the default link generation function. The idea is that the host app can take over the creation of element links, which can be used to navigate to a particular element or a group. If the host app chooses a different key for element link id, then the host app should also take care of the handling and the navigation in `onLinkOpen`.
+
+```tsx
+(id: string, type: "element" | "group") => string;
+```
+
 ### onLinkOpen
 
 This prop if passed will be triggered when clicked on `link`. To handle the redirect yourself (such as when using your own router for internal links), you must call `event.preventDefault()`.
@@ -177,14 +185,6 @@ const onLinkOpen: ExcalidrawProps["onLinkOpen"] = useCallback(
   },
   [history],
 );
-```
-
-### generateLinkForSelection
-
-This prop if passed will enable the creation of element links, which can be used to navigate to a particular element or a group.
-
-```tsx
-(id: string, type: "element" | "group") => string;
 ```
 
 ### langCode
