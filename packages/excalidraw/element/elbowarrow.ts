@@ -1,5 +1,7 @@
 import type { LineSegment } from "../../math";
 import {
+  distanceToLineSegment,
+  lineSegment,
   pointDistanceSq,
   pointFrom,
   pointScaleFromOrigin,
@@ -143,41 +145,34 @@ const generatePoints = memo(
     }) ?? [],
 );
 
-const pointCloseToSegment = (
-  isHorizontal: boolean,
-  a: GlobalPoint,
-  b: GlobalPoint,
-  anchor: GlobalPoint,
-  sensitivity: number = 4,
-) => {
-  if (isHorizontal) {
-    return (
-      ((a[0] <= anchor[0] && b[0] > anchor[0]) ||
-        (b[0] < anchor[0] && a[0] >= anchor[0])) &&
-      Math.abs(a[1] - anchor[1]) < sensitivity
-    );
-  }
-
-  return (
-    ((a[1] <= anchor[1] && b[1] > anchor[1]) ||
-      (b[1] < anchor[1] && a[1] >= anchor[1])) &&
-    Math.abs(a[0] - anchor[0]) < sensitivity
-  );
-};
-
 const anchorPointToSegmentIndex = (
   points: GlobalPoint[],
   anchor: GlobalPoint,
-) =>
-  points.slice(1).findIndex((next, idx) => {
-    const prev = points[idx];
-    return pointCloseToSegment(
-      Math.abs(prev[1] - next[1]) < 1,
-      prev,
-      next,
-      anchor,
-    );
-  }) + 1;
+  anchorIsHorizontal: boolean,
+) => {
+  let closestDistance = Infinity;
+  return points
+    .slice(1)
+    .map(
+      (point, idx) =>
+        [
+          distanceToLineSegment(anchor, lineSegment(points[idx], point)),
+          Math.abs(points[idx][1] - point[1]) < 1,
+          idx,
+        ] as [number, boolean, number],
+    )
+    .filter(
+      ([_, segmentIsHorizontal]) => segmentIsHorizontal === anchorIsHorizontal,
+    )
+    .reduce((acc, [distance, _, idx]) => {
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        return idx + 1;
+      }
+
+      return acc;
+    }, 0);
+};
 
 /**
  *
@@ -220,6 +215,7 @@ export const updateElbowArrowPoints = (
     startFixedPoint: arrow.startBinding?.fixedPoint ?? null,
     startElementId: arrow.startBinding?.elementId ?? null,
   };
+
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segmentEnd, segmentIdx) => {
       // Determine if we need to flip the heading for visual appeal
@@ -269,7 +265,7 @@ export const updateElbowArrowPoints = (
           );
       nextFixedSegments[segmentIdx].anchor = anchor;
 
-      // debugDrawPoint(anchor);
+      debugDrawPoint(anchor);
 
       const el = {
         ...newElement({
@@ -282,7 +278,6 @@ export const updateElbowArrowPoints = (
         index: "DONOTSYNC" as FractionalIndex,
       } as Ordered<ExcalidrawBindableElement>;
       fakeElementsMap.set(el.id, el);
-      debugDrawBounds(aabbForElement(el), { color: "green" });
 
       const endFixedPoint: [number, number] = compareHeading(
         heading,
@@ -395,10 +390,14 @@ export const updateElbowArrowPoints = (
   return normalizeArrowElementUpdate(
     simplifiedPoints,
     nextFixedSegments.map((segment, idx) => {
-      segment.index =
-        anchorPointToSegmentIndex(simplifiedPoints, segment.anchor) ?? -1;
-      console.log(segment.index, JSON.stringify(segment.anchor));
-      debugDrawPoint(segment.anchor, { permanent: true });
+      segment.index = anchorPointToSegmentIndex(
+        simplifiedPoints,
+        segment.anchor,
+        headingIsHorizontal(segment.heading),
+      );
+      if (segment.index === 0) {
+        debugDrawPoint(segment.anchor, { color: "red", permanent: true });
+      }
       segment.index === -1 && console.error(idx, "No segment found?");
       return segment;
     }) as Sequential<FixedSegment>,
