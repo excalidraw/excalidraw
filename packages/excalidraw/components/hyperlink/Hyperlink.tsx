@@ -269,7 +269,6 @@ export const Hyperlink = ({
                   link: normalizeLink(element.link),
                 },
                 customEvent,
-                isElementLink(element.link) ? "element" : "url",
               );
               if (customEvent.defaultPrevented) {
                 event.preventDefault();
