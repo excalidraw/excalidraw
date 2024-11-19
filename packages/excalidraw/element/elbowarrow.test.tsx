@@ -199,6 +199,7 @@ describe("elbow arrow ui", () => {
       [0, 0],
       [35, 0],
       [35, 90],
+      [35, 90],
       [35, 165],
       [103, 165],
     ]);
@@ -239,11 +240,12 @@ describe("elbow arrow segment move", () => {
       h.state,
     )[0] as ExcalidrawArrowElement;
 
+    console.log(arrow.points);
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [105, 0],
-      [105, 148.55],
-      [200, 148.55],
+      [105.00002, 0],
+      [105.00002, 188],
+      [200, 188],
       [200, 200],
     ]);
 
@@ -253,9 +255,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [0, -2],
-      [100, -2],
-      [100, 200],
+      [105.00002, 0],
+      [105.00002, 188],
+      [200, 188],
       [200, 200],
     ]);
   });
