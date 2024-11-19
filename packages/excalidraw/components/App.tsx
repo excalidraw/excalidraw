@@ -464,8 +464,8 @@ import {
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
-import { getElementsFromQuery } from "../element/elementLink";
-import { actionCopeElementLink } from "../actions/actionElementLink";
+import { getElementsFromQuery, isElementLink } from "../element/elementLink";
+import { actionCopyElementLink } from "../actions/actionElementLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -724,6 +724,7 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        navigateToLink: this.maybeNavigateToElementsFromLink,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -1589,6 +1590,9 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           app={this}
                           isCollaborating={this.props.isCollaborating}
+                          generateLinkForSelection={
+                            this.props.generateLinkForSelection
+                          }
                         >
                           {this.props.children}
                         </LayerUI>
@@ -2342,10 +2346,14 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeNavigateToElementsFromLink(window.location.href, false);
   };
 
-  private maybeNavigateToElementsFromLink = (
-    link: string,
+  maybeNavigateToElementsFromLink = (
+    link: string | undefined | null,
     animate: boolean,
   ) => {
+    if (!link) {
+      return false;
+    }
+
     try {
       const url = new URL(link);
       const { elements, isElementLink } = getElementsFromQuery(
@@ -5504,13 +5512,10 @@ class App extends React.Component<AppProps, AppState> {
               link: url,
             },
             customEvent,
+            isElementLink(url) ? "element" : "url",
           );
         }
         if (!customEvent?.defaultPrevented) {
-          if (this.maybeNavigateToElementsFromLink(url, true)) {
-            return;
-          }
-
           const target = isLocalLink(url) ? "_self" : "_blank";
           const newWindow = window.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/
@@ -10604,7 +10609,7 @@ class App extends React.Component<AppProps, AppState> {
       actionToggleLinearEditor,
       CONTEXT_MENU_SEPARATOR,
       actionLink,
-      actionCopeElementLink,
+      actionCopyElementLink,
       CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,

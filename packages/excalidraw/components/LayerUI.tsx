@@ -85,6 +85,7 @@ interface LayerUIProps {
   children?: React.ReactNode;
   app: AppClassProperties;
   isCollaborating: boolean;
+  generateLinkForSelection?: AppProps["generateLinkForSelection"];
 }
 
 const DefaultMainMenu: React.FC<{
@@ -142,6 +143,7 @@ const LayerUI = ({
   children,
   app,
   isCollaborating,
+  generateLinkForSelection,
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
@@ -485,6 +487,7 @@ const LayerUI = ({
           }}
           elementsMap={app.scene.getNonDeletedElementsMap()}
           appState={appState}
+          generateLinkForSelection={generateLinkForSelection}
         />
       )}
       <tunnels.OverwriteConfirmDialogTunnel.Out />

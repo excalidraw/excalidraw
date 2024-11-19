@@ -1,8 +1,8 @@
 import { TextField } from "./TextField";
-import type { AppState, UIAppState } from "../types";
+import type { AppProps, AppState, UIAppState } from "../types";
 import DialogActionButton from "./DialogActionButton";
 import { getSelectedElements } from "../scene";
-import { createElementLink } from "../element/elementLink";
+import { getLinkIdAndTypeFromSelection } from "../element/elementLink";
 import { mutateElement } from "../element/mutateElement";
 import { useCallback, useEffect, useState } from "react";
 import { t } from "../i18n";
@@ -12,17 +12,20 @@ import { TrashIcon } from "./icons";
 import { KEYS } from "../keys";
 
 import "./ElementLinkDialog.scss";
+import { normalizeLink } from "../data/url";
 
 const ElementLinkDialog = ({
   sourceElementId,
   onClose,
   elementsMap,
   appState,
+  generateLinkForSelection,
 }: {
   sourceElementId: ExcalidrawElement["id"];
   elementsMap: ElementsMap;
   appState: UIAppState;
   onClose?: () => void;
+  generateLinkForSelection: AppProps["generateLinkForSelection"];
 }) => {
   const originalLink = elementsMap.get(sourceElementId)?.link ?? null;
 
@@ -31,17 +34,29 @@ const ElementLinkDialog = ({
 
   useEffect(() => {
     const selectedElements = getSelectedElements(elementsMap, appState);
-    const nextLink =
-      selectedElements.length > 0
-        ? createElementLink(
-            selectedElements,
-            window.location.origin,
-            appState as AppState,
-          )
-        : originalLink;
+    let nextLink = originalLink;
+
+    if (selectedElements.length > 0 && generateLinkForSelection) {
+      const idAndType = getLinkIdAndTypeFromSelection(
+        selectedElements,
+        appState as AppState,
+      );
+
+      if (idAndType) {
+        nextLink = normalizeLink(
+          generateLinkForSelection(idAndType.id, idAndType.type),
+        );
+      }
+    }
 
     setNextLink(nextLink);
-  }, [elementsMap, appState, appState.selectedElementIds, originalLink]);
+  }, [
+    elementsMap,
+    appState,
+    appState.selectedElementIds,
+    originalLink,
+    generateLinkForSelection,
+  ]);
 
   const handleConfirm = useCallback(() => {
     if (nextLink && nextLink !== elementsMap.get(sourceElementId)?.link) {

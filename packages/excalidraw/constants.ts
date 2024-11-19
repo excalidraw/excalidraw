@@ -451,4 +451,4 @@ export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
 };
 
 export const DEFAULT_REDUCED_GLOBAL_ALPHA = 0.3;
-export const MAX_SHAPE_LINK_ZOOM = 1.5;
+export const ELEMENT_LINK_KEY = "elementLink";

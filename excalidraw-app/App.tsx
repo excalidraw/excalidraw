@@ -848,6 +848,26 @@ const ExcalidrawWrapper = () => {
             </div>
           );
         }}
+        onLinkOpen={(element, event, linkType) => {
+          if (linkType === "element") {
+            event.preventDefault();
+            excalidrawAPI?.navigateToLink(element.link, true);
+          }
+        }}
+        generateLinkForSelection={(id, type) => {
+          const url = window.location.href;
+
+          try {
+            const link = new URL(url);
+            link.searchParams.set("elementLink", id);
+
+            return link.toString();
+          } catch (error) {
+            console.error(error);
+          }
+
+          return url;
+        }}
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}

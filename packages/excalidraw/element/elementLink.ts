@@ -2,6 +2,7 @@
  * Create and link between shapes.
  */
 
+import { ELEMENT_LINK_KEY } from "../constants";
 import { normalizeLink } from "../data/url";
 import { elementsAreInSameGroup, getElementsInGroup } from "../groups";
 import type { AppState } from "../types";
@@ -33,6 +34,43 @@ export const createElementLink = (
   return null;
 };
 
+export const getLinkIdAndTypeFromSelection = (
+  selectedElements: ExcalidrawElement[],
+  appState: AppState,
+): {
+  id: string;
+  type: "element" | "group";
+} | null => {
+  if (
+    selectedElements.length > 0 &&
+    canCreateLinkFromElements(selectedElements)
+  ) {
+    if (selectedElements.length === 1) {
+      return {
+        id: selectedElements[0].id,
+        type: "element",
+      };
+    }
+
+    if (selectedElements.length > 1) {
+      const selectedGroupId = Object.keys(appState.selectedGroupIds)[0];
+
+      if (selectedGroupId) {
+        return {
+          id: selectedGroupId,
+          type: "group",
+        };
+      }
+      return {
+        id: selectedElements[0].groupIds[0],
+        type: "group",
+      };
+    }
+  }
+
+  return null;
+};
+
 export const getElementsFromQuery = (
   query: string,
   elementsMap: ElementsMap,
@@ -42,9 +80,10 @@ export const getElementsFromQuery = (
 } => {
   const searchParams = new URLSearchParams(query);
 
-  if (searchParams.has("element")) {
-    const id = searchParams.get("element");
+  if (searchParams.has(ELEMENT_LINK_KEY)) {
+    const id = searchParams.get(ELEMENT_LINK_KEY);
     if (id) {
+      // first check if the id is an element
       const el = elementsMap.get(id);
       if (el) {
         return {
@@ -53,22 +92,15 @@ export const getElementsFromQuery = (
         };
       }
 
-      return {
-        elements: null,
-        isElementLink: true,
-      };
-    }
-  }
-
-  if (searchParams.has("group")) {
-    const id = searchParams.get("group");
-    if (id) {
+      // then, check if the id is a group
       const elementsInGroup = getElementsInGroup(elementsMap, id);
 
-      return {
-        elements: elementsInGroup,
-        isElementLink: true,
-      };
+      if (elementsInGroup.length > 0) {
+        return {
+          elements: elementsInGroup,
+          isElementLink: true,
+        };
+      }
     }
   }
 
@@ -95,10 +127,8 @@ export const canCreateLinkFromElements = (
 export const isElementLink = (url: string) => {
   try {
     const _url = new URL(url);
-    const query = _url.search;
-    const searchParams = new URLSearchParams(query);
     return (
-      (searchParams.has("element") || searchParams.has("group")) &&
+      _url.searchParams.has(ELEMENT_LINK_KEY) &&
       _url.host === window.location.host
     );
   } catch (error) {

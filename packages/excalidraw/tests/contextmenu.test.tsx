@@ -56,7 +56,12 @@ describe("contextMenu element", () => {
     reseed(7);
     setDateTimeForTests("201933152653");
 
-    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await render(
+      <Excalidraw
+        handleKeyboardGlobally={true}
+        generateLinkForSelection={() => ""}
+      />,
+    );
   });
 
   beforeAll(() => {
