@@ -1,4 +1,3 @@
-import type { LineSegment } from "../../math";
 import {
   distanceToLineSegment,
   lineSegment,
@@ -188,7 +187,7 @@ export const updateElbowArrowPoints = (
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  const updatedPoints = updates.points ?? arrow.points;
+  const updatedPoints = Array.from(updates.points ?? arrow.points);
 
   const fakeElementsMap = toBrandedType<SceneElementsMap>(new Map(elementsMap));
 
@@ -202,6 +201,12 @@ export const updateElbowArrowPoints = (
     elementsMap,
     updatedPoints,
   );
+
+  // Start segment is getting fixed, need to fix the first point to origin
+  if (nextFixedSegments[0]?.index === 1) {
+    nextFixedSegments[0].index = 2;
+    updatedPoints.unshift(pointFrom<LocalPoint>(0, 0));
+  }
 
   let segmentStart: {
     startPoint: GlobalPoint;
@@ -389,16 +394,23 @@ export const updateElbowArrowPoints = (
 
   return normalizeArrowElementUpdate(
     simplifiedPoints,
-    nextFixedSegments.map((segment, idx) => {
+    nextFixedSegments.map((segment) => {
       segment.index = anchorPointToSegmentIndex(
         simplifiedPoints,
         segment.anchor,
         headingIsHorizontal(segment.heading),
       );
+
+      // TODO: Debug only, remove
       if (segment.index === 0) {
+        console.warn("Segment index is 0!");
         debugDrawPoint(segment.anchor, { color: "red", permanent: true });
       }
-      segment.index === -1 && console.error(idx, "No segment found?");
+
+      if (segment.index === 1) {
+        segment.index = 2;
+      }
+
       return segment;
     }) as Sequential<FixedSegment>,
   );
