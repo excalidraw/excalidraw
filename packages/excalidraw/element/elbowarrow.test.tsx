@@ -240,7 +240,6 @@ describe("elbow arrow segment move", () => {
       h.state,
     )[0] as ExcalidrawArrowElement;
 
-    console.log(arrow.points);
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
       [105.00002, 0],
