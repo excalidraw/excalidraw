@@ -1,6 +1,7 @@
 import {
   distanceToLineSegment,
   lineSegment,
+  pointDistance,
   pointDistanceSq,
   pointFrom,
   pointScaleFromOrigin,
@@ -210,7 +211,6 @@ export const updateElbowArrowPoints = (
     nextFixedSegments[nextFixedSegments.length - 1].index =
       updatedPoints.length - 2;
     updatedPoints.push(arrow.points[arrow.points.length - 1]);
-    console.log("End segment is getting fixed");
   }
 
   // Start segment is getting fixed
@@ -231,6 +231,8 @@ export const updateElbowArrowPoints = (
     startFixedPoint: arrow.startBinding?.fixedPoint ?? null,
     startElementId: arrow.startBinding?.elementId ?? null,
   };
+  debugDrawPoint(startDonglePosition, { color: "red" });
+  debugDrawPoint(endDonglePosition, { color: "green" });
 
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segmentEnd, segmentIdx) => {
@@ -266,9 +268,6 @@ export const updateElbowArrowPoints = (
         : HEADING_DOWN;
       nextFixedSegments[segmentIdx].heading = heading;
 
-      // debugDrawPoint(startHandle, { color: "red" });
-      // debugDrawPoint(endHandle, { color: "green" });
-
       // Calculate new anchor point (sliding anchor)
       const anchor = headingIsHorizontal(heading)
         ? pointFrom<GlobalPoint>(
@@ -281,6 +280,8 @@ export const updateElbowArrowPoints = (
           );
       nextFixedSegments[segmentIdx].anchor = anchor;
 
+      debugDrawPoint(startHandle, { color: "red" });
+      debugDrawPoint(endHandle, { color: "green" });
       debugDrawPoint(anchor);
 
       const el = {
@@ -423,7 +424,6 @@ export const updateElbowArrowPoints = (
       }
 
       if (segment.index === simplifiedPoints.length - 1) {
-        console.log("Finalize end fixed segment");
         segment.index = simplifiedPoints.length - 2;
       }
 
@@ -1514,7 +1514,7 @@ const removeElbowArrowShortSegments = (
       }
 
       const prev = points[idx - 1];
-      return pointDistanceSq(prev, p) >= 1;
+      return pointDistance(prev, p) > 0.2;
     });
   }
 
