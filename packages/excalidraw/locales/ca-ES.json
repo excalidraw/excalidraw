@@ -151,7 +151,7 @@
     "prompt": "Prompt",
     "followUs": "Seguiu-nos",
     "discordChat": "Xat de Discord",
-    "zoomToFitViewport": "",
+    "zoomToFitViewport": "Amplia per adaptar-se a la finestra",
     "zoomToFitSelection": "Zoom per veure la selecció",
     "zoomToFit": "Zoom per veure tots els elements",
     "installPWA": "Instal·la Excalidraw localment (PWA)",
@@ -163,11 +163,11 @@
     "hint_emptyPrivateLibrary": "Trieu un element o un llenç per a afegir-lo aquí."
   },
   "search": {
-    "title": "",
+    "title": "Troba al llenç",
     "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": ""
+    "singleResult": "resultat",
+    "multipleResults": "resultats",
+    "placeholder": "Troba al llenç..."
   },
   "buttons": {
     "clearReset": "Neteja el llenç",
@@ -175,7 +175,7 @@
     "exportImage": "Exporta la imatge...",
     "export": "Guardar a...",
     "copyToClipboard": "Copia al porta-retalls",
-    "copyLink": "",
+    "copyLink": "Copia l'enllaç",
     "save": "Desa al fitxer actual",
     "saveAs": "Anomena i desa",
     "load": "Obrir",
@@ -296,7 +296,7 @@
     "magicframe": "",
     "embeddable": "",
     "selection": "Selecció",
-    "iframe": ""
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Accions del llenç",
@@ -402,7 +402,7 @@
     "toggleElementLock": "Blocar/desblocar la selecció",
     "movePageUpDown": "Mou la pàgina cap amunt/a baix",
     "movePageLeftRight": "Mou la pàgina cap a l'esquerra/dreta",
-    "cropStart": "",
+    "cropStart": "Retallar l'imatge",
     "cropFinish": ""
   },
   "clearCanvasDialog": {
@@ -474,15 +474,15 @@
   },
   "stats": {
     "angle": "Angle",
-    "shapes": "",
+    "shapes": "Formes",
     "height": "Altura",
     "scene": "Escena",
     "selected": "Seleccionat",
     "storage": "Emmagatzematge",
     "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "title": "Propietats",
+    "generalStats": "General",
+    "elementProperties": "Propietats de la forma",
     "total": "Total",
     "version": "Versió",
     "versionCopy": "Feu clic per a copiar",
@@ -600,7 +600,7 @@
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Paleta d'ordres",
     "shortcuts": {
       "select": "Selecciona",
       "confirm": "Confirma",
@@ -608,7 +608,7 @@
     },
     "recents": "Usats recentment",
     "search": {
-      "placeholder": "",
+      "placeholder": "Cerca menús, ordres i descobreix joies amagades",
       "noMatch": "No hi ha ordres coincidents..."
     },
     "itemNotAvailable": "Ordre no disponible...",
