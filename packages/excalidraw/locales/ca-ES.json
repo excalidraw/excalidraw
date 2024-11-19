@@ -49,7 +49,7 @@
     "arrowtypes": "Tipus de fletxa",
     "arrowtype_sharp": "Fletxa Esmolada",
     "arrowtype_round": "Fletxa corba",
-    "arrowtype_elbowed": "",
+    "arrowtype_elbowed": "Fletxa de colzes",
     "fontSize": "Mida de lletra",
     "fontFamily": "Tipus de lletra",
     "addWatermark": "Afegeix-hi «Fet amb Excalidraw»",
@@ -164,7 +164,7 @@
   },
   "search": {
     "title": "Troba al llenç",
-    "noMatch": "",
+    "noMatch": "No hem trobat coincidències...",
     "singleResult": "resultat",
     "multipleResults": "resultats",
     "placeholder": "Troba al llenç..."
@@ -196,7 +196,7 @@
     "fullScreen": "Pantalla completa",
     "darkMode": "Mode fosc",
     "lightMode": "Mode clar",
-    "systemMode": "",
+    "systemMode": "Mode del sistema",
     "zenMode": "Mode zen",
     "objectsSnapMode": "Ajusta als objectes",
     "exitZenMode": "Surt de mode zen",
@@ -240,7 +240,7 @@
     "failedToFetchImage": "No s'ha pogut obtenir la imatge.",
     "cannotResolveCollabServer": "No ha estat possible connectar amb el servidor collab. Si us plau recarregueu la pàgina i torneu a provar.",
     "importLibraryError": "No s'ha pogut carregar la biblioteca",
-    "saveLibraryError": "",
+    "saveLibraryError": "No hem pogut desar la llibreria a l'emmagatzematge. Si us plau, deseu la vostra llibreria a un fitxer local per assegurar que no perds els canvis.",
     "collabSaveFailed": "No s'ha pogut desar a la base de dades de fons. Si els problemes persisteixen, hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
     "collabSaveFailed_sizeExceeded": "No s'ha pogut desar a la base de dades de fons, sembla que el llenç és massa gran. Hauríeu de desar el fitxer localment per assegurar-vos que no perdeu el vostre treball.",
     "imageToolNotSupported": "Les imatges no estan habilitades.",
@@ -251,7 +251,7 @@
       "line4": "Si els elements de text no es mostren correctament malgrat haver desactivat aquesta opció, si us plau, obriu una <issueLink>incidència</issueLink> a la nostra pàgina de GitHub o escriviu-nos a <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
+      "embeddable": "Els elements incrustables no poden afegir-se a la biblioteca.",
       "iframe": "",
       "image": ""
     },
