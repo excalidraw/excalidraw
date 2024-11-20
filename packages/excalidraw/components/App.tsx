@@ -10370,7 +10370,7 @@ class App extends React.Component<AppProps, AppState> {
           croppingElement,
           this.scene.getNonDeletedElementsMap(),
           {
-            oldSize: {
+            newSize: {
               width: croppingElement.width,
               height: croppingElement.height,
             },

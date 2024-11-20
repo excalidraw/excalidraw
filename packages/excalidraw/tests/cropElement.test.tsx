@@ -156,8 +156,8 @@ describe("Crop an image", () => {
       [-initialWidth / 3, 0],
       true,
     );
-    expect(image.width).toBe(resizedWidth);
-    expect(image.height).toBe(resizedHeight);
+    expect(image.width).toBeCloseTo(resizedWidth, 10);
+    expect(image.height).toBeCloseTo(resizedHeight, 10);
 
     // re-crop to initial state
     UI.crop(image, "w", naturalWidth, naturalHeight, [-initialWidth / 3, 0]);
