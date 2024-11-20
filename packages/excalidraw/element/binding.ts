@@ -576,11 +576,11 @@ export const updateBoundElements = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    oldSize?: { width: number; height: number };
+    newSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
   },
 ) => {
-  const { oldSize, simultaneouslyUpdated, changedElements } = options ?? {};
+  const { newSize, simultaneouslyUpdated, changedElements } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -603,12 +603,12 @@ export const updateBoundElements = (
       startBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
         element.startBinding,
-        oldSize,
+        newSize,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
         element.endBinding,
-        oldSize,
+        newSize,
       ),
     };
 
