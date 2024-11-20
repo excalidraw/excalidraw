@@ -10218,40 +10218,27 @@ class App extends React.Component<AppProps, AppState> {
         image &&
         !(image instanceof Promise)
       ) {
-        let snapOffset = {
-          x: 0,
-          y: 0,
+        const [gridX, gridY] = getGridPoint(
+          pointerCoords.x,
+          pointerCoords.y,
+          event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+        );
+
+        const dragOffset = {
+          x: gridX - pointerDownState.originInGrid.x,
+          y: gridY - pointerDownState.originInGrid.y,
         };
 
-        let snapLines = [];
+        this.maybeCacheReferenceSnapPoints(event, [croppingElement]);
 
-        if (this.state.objectsSnapModeEnabled) {
-          const [gridX, gridY] = getGridPoint(
-            pointerCoords.x,
-            pointerCoords.y,
-            event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-          );
-
-          const dragOffset = {
-            x: gridX - pointerDownState.originInGrid.x,
-            y: gridY - pointerDownState.originInGrid.y,
-          };
-
-          this.maybeCacheReferenceSnapPoints(event, [croppingElement]);
-
-          ({ snapOffset, snapLines } = snapResizingElements(
-            [croppingElement],
-            [croppingAtStateStart],
-            this,
-            event,
-            dragOffset,
-            transformHandleType,
-          ));
-
-          this.setState({
-            snapLines,
-          });
-        }
+        const { snapOffset, snapLines } = snapResizingElements(
+          [croppingElement],
+          [croppingAtStateStart],
+          this,
+          event,
+          dragOffset,
+          transformHandleType,
+        );
 
         mutateElement(
           croppingElement,
@@ -10281,6 +10268,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",
+          snapLines,
         });
       }
 
