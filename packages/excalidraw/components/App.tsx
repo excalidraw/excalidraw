@@ -6925,9 +6925,16 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        if (this.state.selectedLinearElement) {
-          const linearElementEditor =
-            this.state.editingLinearElement || this.state.selectedLinearElement;
+        let linearElementEditor =
+          this.state.editingLinearElement || this.state.selectedLinearElement;
+        const elementUnderCursor = this.getElementAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+        if (elementUnderCursor && isElbowArrow(elementUnderCursor)) {
+          linearElementEditor = new LinearElementEditor(elementUnderCursor);
+        }
+        if (linearElementEditor) {
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this,
