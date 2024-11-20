@@ -460,7 +460,7 @@ const resizeSingleTextElement = (
   }
 };
 
-export const resizeSingleElement = (
+const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,

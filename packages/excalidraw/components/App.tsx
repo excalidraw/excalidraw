@@ -6964,7 +6964,6 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
-
         if (
           this.state.croppingElementId &&
           pointerDownState.hit.element?.id !== this.state.croppingElementId
@@ -7848,7 +7847,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
       const elementsMap = this.scene.getNonDeletedElementsMap();
-
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
@@ -8014,13 +8012,6 @@ class App extends React.Component<AppProps, AppState> {
         !isSelectingPointsInLineEditor
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
-
-        // if (
-        //   selectedElements.length === 1 &&
-        //   isElbowArrow(selectedElements[0])
-        // ) {
-        //   return;
-        // }
 
         if (selectedElements.every((element) => element.locked)) {
           return;
@@ -8192,6 +8183,15 @@ class App extends React.Component<AppProps, AppState> {
               this.scene,
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+            );
+          selectedElements
+            .filter(isElbowArrow)
+            .forEach((element) =>
+              LinearElementEditor.updateEditorMidPointsCache(
+                element,
+                elementsMap,
+                this.state,
+              ),
             );
 
           this.setState({
@@ -8710,6 +8710,13 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
           lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
+        if (isElbowArrow(newElement)) {
+          LinearElementEditor.updateEditorMidPointsCache(
+            newElement,
+            elementsMap,
+            this.state,
+          );
+        }
 
         this.actionManager.executeAction(actionFinalize);
 
@@ -8778,6 +8785,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElements(),
             );
           }
+
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);
@@ -9052,10 +9060,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.elementId !== hitElement?.id &&
         isLinearElement(hitElement)
       ) {
-        const selectedELements = this.scene.getSelectedElements(this.state);
+        const selectedElements = this.scene.getSelectedElements(this.state);
         // set selectedLinearElement when no other element selected except
         // the one we've hit
-        if (selectedELements.length === 1) {
+        if (selectedElements.length === 1) {
           this.setState({
             selectedLinearElement: new LinearElementEditor(hitElement),
           });
@@ -10491,6 +10499,16 @@ class App extends React.Component<AppProps, AppState> {
       (flippedFixedPointBindings) =>
         this.setState({ flippedFixedPointBindings }),
     );
+
+    selectedElements
+      .filter(isElbowArrow)
+      .forEach((element) =>
+        LinearElementEditor.updateEditorMidPointsCache(
+          element,
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        ),
+      );
 
     if (transformed) {
       const suggestedBindings = getSuggestedBindingsForArrows(
