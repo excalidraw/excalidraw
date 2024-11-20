@@ -69,7 +69,6 @@ const resizeElementInGroup = (
   originalElementsMap: ElementsMap,
 ) => {
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
-  const { width: oldWidth, height: oldHeight } = latestElement;
 
   mutateElement(latestElement, updates, false);
   const boundTextElement = getBoundTextElement(
@@ -79,7 +78,7 @@ const resizeElementInGroup = (
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
     updateBoundElements(latestElement, elementsMap, {
-      oldSize: { width: oldWidth, height: oldHeight },
+      newSize: { width: updates.width, height: updates.height },
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {

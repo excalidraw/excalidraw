@@ -739,9 +739,9 @@ export const resizeSingleElement = (
     mutateElement(element, resizedElement);
 
     updateBoundElements(element, elementsMap, {
-      oldSize: {
-        width: stateAtResizeStart.width,
-        height: stateAtResizeStart.height,
+      newSize: {
+        width: resizedElement.width,
+        height: resizedElement.height,
       },
     });
 
@@ -999,14 +999,13 @@ export const resizeMultipleElements = (
     element,
     update: { boundTextFontSize, ...update },
   } of elementsAndUpdates) {
-    const { angle } = update;
-    const { width: oldWidth, height: oldHeight } = element;
+    const { angle, width: newWidth, height: newHeight } = update;
 
     mutateElement(element, update, false);
 
     updateBoundElements(element, elementsMap, {
       simultaneouslyUpdated: elementsToUpdate,
-      oldSize: { width: oldWidth, height: oldHeight },
+      newSize: { width: newWidth, height: newHeight },
     });
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
