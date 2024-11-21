@@ -5501,6 +5501,7 @@ class App extends React.Component<AppProps, AppState> {
       this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
+      hideHyperlinkToolip();
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
