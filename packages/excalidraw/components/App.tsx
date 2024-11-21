@@ -2557,19 +2557,27 @@ class App extends React.Component<AppProps, AppState> {
         { passive: false },
       ),
       addEventListener(window, EVENT.MESSAGE, this.onWindowMessage, false),
-      addEventListener(document, EVENT.POINTER_UP, this.removePointer), // #3553
-      addEventListener(document, EVENT.COPY, this.onCopy),
+      addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
+        passive: false,
+      }), // #3553
+      addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
       addEventListener(
         document,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
+        { passive: false },
       ),
       // rerender text elements on font load to fix #637 && #1553
-      addEventListener(document.fonts, "loadingdone", (event) => {
-        const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-        this.fonts.onLoaded(fontFaces);
-      }),
+      addEventListener(
+        document.fonts,
+        "loadingdone",
+        (event) => {
+          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+          this.fonts.onLoaded(fontFaces);
+        },
+        { passive: false },
+      ),
       // Safari-only desktop pinch zoom
       addEventListener(
         document,
@@ -2589,12 +2597,17 @@ class App extends React.Component<AppProps, AppState> {
         this.onGestureEnd as any,
         false,
       ),
-      addEventListener(window, EVENT.FOCUS, () => {
-        this.maybeCleanupAfterMissingPointerUp(null);
-        // browsers (chrome?) tend to free up memory a lot, which results
-        // in canvas context being cleared. Thus re-render on focus.
-        this.triggerRender(true);
-      }),
+      addEventListener(
+        window,
+        EVENT.FOCUS,
+        () => {
+          this.maybeCleanupAfterMissingPointerUp(null);
+          // browsers (chrome?) tend to free up memory a lot, which results
+          // in canvas context being cleared. Thus re-render on focus.
+          this.triggerRender(true);
+        },
+        { passive: false },
+      ),
     );
 
     if (this.state.viewModeEnabled) {
@@ -2610,9 +2623,12 @@ class App extends React.Component<AppProps, AppState> {
         document,
         EVENT.FULLSCREENCHANGE,
         this.onFullscreenChange,
+        { passive: false },
       ),
-      addEventListener(document, EVENT.PASTE, this.pasteFromClipboard),
-      addEventListener(document, EVENT.CUT, this.onCut),
+      addEventListener(document, EVENT.PASTE, this.pasteFromClipboard, {
+        passive: false,
+      }),
+      addEventListener(document, EVENT.CUT, this.onCut, { passive: false }),
       addEventListener(window, EVENT.RESIZE, this.onResize, false),
       addEventListener(window, EVENT.UNLOAD, this.onUnload, false),
       addEventListener(window, EVENT.BLUR, this.onBlur, false),
@@ -2620,6 +2636,7 @@ class App extends React.Component<AppProps, AppState> {
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
         this.handleWheel,
+        { passive: false },
       ),
       addEventListener(
         this.excalidrawContainerRef.current,
@@ -2641,6 +2658,7 @@ class App extends React.Component<AppProps, AppState> {
           getNearestScrollableContainer(this.excalidrawContainerRef.current!),
           EVENT.SCROLL,
           this.onScroll,
+          { passive: false },
         ),
       );
     }
@@ -9806,6 +9824,7 @@ class App extends React.Component<AppProps, AppState> {
       this.interactiveCanvas.addEventListener(
         EVENT.TOUCH_START,
         this.onTouchStart,
+        { passive: false },
       );
       this.interactiveCanvas.addEventListener(EVENT.TOUCH_END, this.onTouchEnd);
       // -----------------------------------------------------------------------
