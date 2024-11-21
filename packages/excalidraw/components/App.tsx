@@ -5431,18 +5431,17 @@ class App extends React.Component<AppProps, AppState> {
     scenePointer: Readonly<{ x: number; y: number }>,
     hitElement: NonDeletedExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
-    // Reversing so we traverse the elements in decreasing order
-    // of z-index
-    const elements = this.scene.getNonDeletedElements().slice().reverse();
-    let hitElementIndex = Infinity;
+    const elements = this.scene.getNonDeletedElements();
+    let hitElementIndex = -1;
 
-    return elements.find((element, index) => {
+    for (let index = elements.length - 1; index >= 0; index--) {
+      const element = elements[index];
       if (hitElement && element.id === hitElement.id) {
         hitElementIndex = index;
       }
-      return (
+      if (
         element.link &&
-        index <= hitElementIndex &&
+        index >= hitElementIndex &&
         isPointHittingLink(
           element,
           this.scene.getNonDeletedElementsMap(),
@@ -5450,8 +5449,10 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom(scenePointer.x, scenePointer.y),
           this.device.editor.isMobile,
         )
-      );
-    });
+      ) {
+        return element;
+      }
+    }
   };
 
   private redirectToLink = (
@@ -7033,6 +7034,15 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
+
+        this.hitLinkElement = this.getElementLinkAtPosition(
+          pointerDownState.origin,
+          pointerDownState.hit.element,
+        );
+
+        if (this.hitLinkElement) {
+          return true;
+        }
 
         if (
           this.state.croppingElementId &&
