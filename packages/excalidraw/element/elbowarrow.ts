@@ -160,7 +160,9 @@ export const updateElbowArrowPoints = (
 
   const nextFixedSegments = (updates.fixedSegments ?? arrow.fixedSegments ?? [])
     // Delete segment if anchor is null
-    .filter((segment) => segment.anchor != null);
+    .filter((segment) => segment.anchor != null)
+    // Due to the fixedSegment index sorting is essential!
+    .sort((a, b) => a.index - b.index);
 
   const { startDonglePosition, endDonglePosition } = getElbowArrowData(
     arrow,
