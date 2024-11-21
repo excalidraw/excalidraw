@@ -31,7 +31,7 @@ import { getSelectedElements } from "../../scene";
 import { hitElementBoundingBox } from "../../element/collision";
 import { isLocalLink, normalizeLink } from "../../data/url";
 import { trackEvent } from "../../analytics";
-import { useAppProps, useExcalidrawAppState } from "../App";
+import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
 import { pointFrom, type GlobalPoint } from "../../../math";
@@ -74,6 +74,7 @@ export const Hyperlink = ({
 }) => {
   const appState = useExcalidrawAppState();
   const appProps = useAppProps();
+  const device = useDevice();
 
   const linkVal = element.link || "";
   const linkedToShape = linkVal && isElementLink(linkVal);
@@ -172,6 +173,15 @@ export const Hyperlink = ({
 
   useEffect(() => {
     let timeoutId: number | null = null;
+
+    if (
+      inputRef &&
+      inputRef.current &&
+      !(device.viewport.isMobile || device.isTouchScreen)
+    ) {
+      inputRef.current.select();
+    }
+
     const handlePointerMove = (event: PointerEvent) => {
       if (isEditing) {
         return;
@@ -198,7 +208,15 @@ export const Hyperlink = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [appState, element, isEditing, setAppState, elementsMap]);
+  }, [
+    appState,
+    element,
+    isEditing,
+    setAppState,
+    elementsMap,
+    device.viewport.isMobile,
+    device.isTouchScreen,
+  ]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
