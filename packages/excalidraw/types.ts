@@ -36,7 +36,12 @@ import type { isOverScrollBars } from "./scene/scrollbars";
 import type { MaybeTransformHandleType } from "./element/transformHandles";
 import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
-import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
+import {
+  IMAGE_MIME_TYPES,
+  MIME_TYPES,
+  ToolbarElementTypeEnum,
+  ToolTypeEnum,
+} from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
@@ -117,22 +122,7 @@ export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
 export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
-export type ToolType =
-  | "selection"
-  | "rectangle"
-  | "diamond"
-  | "ellipse"
-  | "arrow"
-  | "line"
-  | "freedraw"
-  | "text"
-  | "image"
-  | "eraser"
-  | "hand"
-  | "frame"
-  | "magicframe"
-  | "embeddable"
-  | "laser";
+export type ToolType = typeof ToolTypeEnum[keyof typeof ToolTypeEnum];
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -603,12 +593,74 @@ export type CanvasActions = Partial<{
   saveAsImage: boolean;
 }>;
 
+export type ToolbarElementType =
+  typeof ToolbarElementTypeEnum[keyof typeof ToolbarElementTypeEnum];
+
+export type ToolbarDropdownTool = {
+  type: "Tool";
+  tool: ToolType;
+};
+
+export type ToolbarDropdownCustomItem = {
+  type: "Item";
+  selectKey?: string;
+  icon: JSX.Element;
+  label: string | JSX.Element;
+  testid: string;
+  badge?: string;
+  shortcut?: string;
+
+  onSelect: (app: AppClassProperties) => void;
+};
+
+export type ToolbarDropdownText = {
+  type: "Text";
+  text: string;
+};
+
+export type ToolbarElement = {
+  type: ToolbarElementType;
+};
+
+export interface ToolbarElementDropdown extends ToolbarElement {
+  type: "Dropdown";
+  id: string;
+  icon: JSX.Element;
+  elements: (
+    | ToolbarDropdownCustomItem
+    | ToolbarDropdownText
+    | ToolbarDropdownTool
+  )[];
+}
+
+export interface ToolbarElementTool extends ToolbarElement {
+  type: "Tool";
+  tool: ToolType;
+}
+
+export interface ToolbarElementCustomItem extends ToolbarElement {
+  type: "CustomItem";
+  tool: ToolType;
+
+  selectKey: string;
+  icon: JSX.Element;
+  label: string | JSX.Element;
+  testid: string;
+  badge?: string;
+  shortcut?: string;
+
+  onSelect: (app: AppClassProperties) => void;
+}
+
 export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
-  tools: {
-    image: boolean;
-  };
+  tools: (
+    | ToolbarElementCustomItem
+    | ToolbarElementTool
+    | ToolbarElementDropdown
+    | ToolbarElement
+  )[];
   /** @deprecated does nothing. Will be removed in 0.15 */
   welcomeScreen?: boolean;
 }>;

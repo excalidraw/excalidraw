@@ -8,15 +8,30 @@ import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
 
-import type { AppProps, ExcalidrawProps } from "./types";
-import { defaultLang } from "./i18n";
-import { DEFAULT_UI_OPTIONS } from "./constants";
+import { AppProps, ExcalidrawProps, ToolbarDropdownCustomItem } from "./types";
+import { defaultLang, t } from "./i18n";
+import {
+  DEFAULT_UI_OPTIONS,
+  ToolbarElementTypeEnum,
+  ToolTypeEnum,
+} from "./constants";
 import { Provider } from "jotai";
 import { jotaiScope, jotaiStore } from "./jotai";
 import Footer from "./components/footer/FooterCenter";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
+import {
+  brainIcon,
+  EmbedIcon,
+  extraToolsIcon,
+  frameToolIcon,
+  laserPointerToolIcon,
+  MagicIcon,
+  mermaidLogoIcon,
+} from "./components/icons";
+import { trackEvent } from "./analytics";
+import { KEYS } from "./keys";
 
 polyfill();
 
@@ -63,9 +78,117 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
     },
-    tools: {
-      image: props.UIOptions?.tools?.image ?? true,
-    },
+    tools: [
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Selection },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Rectangle },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Diamond },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Ellipse },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Arrow },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Line },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Freedraw },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Text },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Image },
+      { type: ToolbarElementTypeEnum.Tool, tool: ToolTypeEnum.Eraser },
+      { type: ToolbarElementTypeEnum.Separator },
+      {
+        type: ToolbarElementTypeEnum.Dropdown,
+        icon: (
+          <>
+            {extraToolsIcon}
+            {
+              <div
+                style={{
+                  display: "inline-flex",
+                  marginLeft: "auto",
+                  padding: "2px 4px",
+                  borderRadius: 6,
+                  fontSize: 8,
+                  fontFamily: "Cascadia, monospace",
+                  position: "absolute",
+                  background: "var(--color-promo)",
+                  color: "var(--color-surface-lowest)",
+                  bottom: 3,
+                  right: 4,
+                }}
+              >
+                AI
+              </div>
+            }
+          </>
+        ),
+        elements: [
+          {
+            type: "Item",
+            selectKey: ToolTypeEnum.Frame,
+            label: t("toolBar.frame"),
+            icon: frameToolIcon,
+            testid: "toolbar-frame",
+            shortcut: KEYS.F.toLocaleUpperCase(),
+            onSelect: (app) => app.setActiveTool({ type: ToolTypeEnum.Frame }),
+          },
+          {
+            type: "Item",
+            selectKey: ToolTypeEnum.Embeddable,
+            label: t("toolBar.embeddable"),
+            icon: EmbedIcon,
+            testid: "toolbar-embeddable",
+            onSelect: (app) =>
+              app.setActiveTool({ type: ToolTypeEnum.Embeddable }),
+          },
+          {
+            type: "Item",
+            selectKey: ToolTypeEnum.Laser,
+            label: t("toolBar.laser"),
+            icon: laserPointerToolIcon,
+            testid: "toolbar-laser",
+            shortcut: KEYS.K.toLocaleUpperCase(),
+            onSelect: (app) => app.setActiveTool({ type: ToolTypeEnum.Laser }),
+          },
+          {
+            type: "Text",
+            text: "Generate",
+          },
+          ...(aiEnabled
+            ? [
+                {
+                  type: "Item",
+                  label: t("labels.textToDiagram"),
+                  icon: brainIcon,
+                  testid: "toolbar-ttd",
+                  onSelect: (app) => {
+                    trackEvent("ai", "dialog open", "ttd");
+                    app.setOpenDialog({ name: "ttd", tab: "text-to-diagram" });
+                  },
+                  badge: "AI",
+                } as ToolbarDropdownCustomItem,
+              ]
+            : []),
+          {
+            type: "Item",
+            label: t("toolBar.mermaidToExcalidraw"),
+            icon: mermaidLogoIcon,
+            testid: "toolbar-embeddable",
+            onSelect: (app) => {
+              app.setOpenDialog({ name: "ttd", tab: "mermaid" });
+            },
+          },
+          ...(aiEnabled
+            ? [
+                {
+                  type: "Item",
+                  label: t("toolBar.magicframe"),
+                  icon: MagicIcon,
+                  testid: "toolbar-laser",
+                  onSelect: (app) => {
+                    app.onMagicframeToolSelect();
+                  },
+                  badge: "AI",
+                } as ToolbarDropdownCustomItem,
+              ]
+            : []),
+        ],
+      },
+    ],
   };
 
   if (canvasActions?.export) {

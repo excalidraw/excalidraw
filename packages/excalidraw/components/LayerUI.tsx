@@ -282,14 +282,14 @@ const LayerUI = ({
                             title={t("toolBar.lock")}
                           />
 
-                          <div className="App-toolbar__divider" />
-
                           <HandButton
                             checked={isHandToolActive(appState)}
                             onChange={() => onHandToolToggle()}
                             title={t("toolBar.hand")}
                             isMobile
                           />
+
+                          <div className="App-toolbar__divider" />
 
                           <ShapesSwitcher
                             appState={appState}

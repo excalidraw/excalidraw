@@ -48,7 +48,7 @@ import type {
 } from "./element/types";
 import { KEYS } from "./keys";
 import { ShapeCache } from "./scene/ShapeCache";
-import type { NormalizedZoomValue, Zoom } from "./types";
+import { NormalizedZoomValue, Zoom } from "./types";
 import { invariant } from "./utils";
 
 export const SHAPES = [
@@ -125,7 +125,7 @@ export const SHAPES = [
 ] as const;
 
 export const findShapeByKey = (key: string) => {
-  const shape = SHAPES.find((shape, index) => {
+  const shape = SHAPES.find((shape) => {
     return (
       (shape.numericKey != null && key === shape.numericKey.toString()) ||
       (shape.key &&

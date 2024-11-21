@@ -30,10 +30,11 @@ import {
 } from "../icons";
 import fuzzy from "fuzzy";
 import { useUIAppState } from "../../context/ui-appState";
-import type { AppProps, AppState, UIAppState } from "../../types";
+import type { AppState, UIAppState } from "../../types";
 import {
   capitalizeString,
   getShortcutKey,
+  isToolSupported,
   isWritableElement,
 } from "../../utils";
 import { atom, useAtom } from "jotai";
@@ -452,14 +453,7 @@ function CommandPaletteInner({
         ...SHAPES.reduce((acc: CommandPaletteItem[], shape) => {
           const { value, icon, key, numericKey } = shape;
 
-          if (
-            appProps.UIOptions.tools?.[
-              value as Extract<
-                typeof value,
-                keyof AppProps["UIOptions"]["tools"]
-              >
-            ] === false
-          ) {
+          if (!isToolSupported(value, appProps.UIOptions.tools)) {
             return acc;
           }
 
