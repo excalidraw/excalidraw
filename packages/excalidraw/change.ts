@@ -806,33 +806,37 @@ type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
  */
 export class ElementsChange implements Change<SceneElementsMap> {
   private constructor(
-    private readonly added: Map<string, Delta<ElementPartial>>,
-    private readonly removed: Map<string, Delta<ElementPartial>>,
-    private readonly updated: Map<string, Delta<ElementPartial>>,
+    private readonly added: Record<string, Delta<ElementPartial>>,
+    private readonly removed: Record<string, Delta<ElementPartial>>,
+    private readonly updated: Record<string, Delta<ElementPartial>>,
   ) {}
 
   public static create(
-    added: Map<string, Delta<ElementPartial>>,
-    removed: Map<string, Delta<ElementPartial>>,
-    updated: Map<string, Delta<ElementPartial>>,
+    added: Record<string, Delta<ElementPartial>>,
+    removed: Record<string, Delta<ElementPartial>>,
+    updated: Record<string, Delta<ElementPartial>>,
     options = { shouldRedistribute: false },
   ) {
     let change: ElementsChange;
 
     if (options.shouldRedistribute) {
-      const nextAdded = new Map<string, Delta<ElementPartial>>();
-      const nextRemoved = new Map<string, Delta<ElementPartial>>();
-      const nextUpdated = new Map<string, Delta<ElementPartial>>();
+      const nextAdded: Record<string, Delta<ElementPartial>> = {};
+      const nextRemoved: Record<string, Delta<ElementPartial>> = {};
+      const nextUpdated: Record<string, Delta<ElementPartial>> = {};
 
-      const deltas = [...added, ...removed, ...updated];
+      const deltas = [
+        ...Object.entries(added),
+        ...Object.entries(removed),
+        ...Object.entries(updated),
+      ];
 
       for (const [id, delta] of deltas) {
         if (this.satisfiesAddition(delta)) {
-          nextAdded.set(id, delta);
+          nextAdded[id] = delta;
         } else if (this.satisfiesRemoval(delta)) {
-          nextRemoved.set(id, delta);
+          nextRemoved[id] = delta;
         } else {
-          nextUpdated.set(id, delta);
+          nextUpdated[id] = delta;
         }
       }
 
@@ -873,7 +877,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     type: "added" | "removed" | "updated",
     satifies: (delta: Delta<ElementPartial>) => boolean,
   ) {
-    for (const [id, delta] of change[type].entries()) {
+    for (const [id, delta] of Object.entries(change[type])) {
       if (!satifies(delta)) {
         console.error(
           `Broken invariant for "${type}" delta, element "${id}", delta:`,
@@ -900,9 +904,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
       return ElementsChange.empty();
     }
 
-    const added = new Map<string, Delta<ElementPartial>>();
-    const removed = new Map<string, Delta<ElementPartial>>();
-    const updated = new Map<string, Delta<ElementPartial>>();
+    const added: Record<string, Delta<ElementPartial>> = {};
+    const removed: Record<string, Delta<ElementPartial>> = {};
+    const updated: Record<string, Delta<ElementPartial>> = {};
 
     // this might be needed only in same edge cases, like during collab, when `isDeleted` elements get removed or when we (un)intentionally remove the elements
     for (const prevElement of prevElements.values()) {
@@ -918,7 +922,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
           ElementsChange.stripIrrelevantProps,
         );
 
-        removed.set(prevElement.id, delta);
+        removed[prevElement.id] = delta;
       }
     }
 
@@ -938,7 +942,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
           ElementsChange.stripIrrelevantProps,
         );
 
-        added.set(nextElement.id, delta);
+        added[nextElement.id] = delta;
 
         continue;
       }
@@ -959,9 +963,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
         ) {
           // notice that other props could have been updated as well
           if (prevElement.isDeleted && !nextElement.isDeleted) {
-            added.set(nextElement.id, delta);
+            added[nextElement.id] = delta;
           } else {
-            removed.set(nextElement.id, delta);
+            removed[nextElement.id] = delta;
           }
 
           continue;
@@ -969,7 +973,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
 
         // making sure there are at least some changes
         if (!Delta.isEmpty(delta)) {
-          updated.set(nextElement.id, delta);
+          updated[nextElement.id] = delta;
         }
       }
     }
@@ -978,15 +982,23 @@ export class ElementsChange implements Change<SceneElementsMap> {
   }
 
   public static empty() {
-    return ElementsChange.create(new Map(), new Map(), new Map());
+    return ElementsChange.create({}, {}, {});
+  }
+
+  public static load(data: {
+    added: Record<string, Delta<ElementPartial>>;
+    removed: Record<string, Delta<ElementPartial>>;
+    updated: Record<string, Delta<ElementPartial>>;
+  }) {
+    return ElementsChange.create(data.added, data.removed, data.updated);
   }
 
   public inverse(): ElementsChange {
-    const inverseInternal = (deltas: Map<string, Delta<ElementPartial>>) => {
-      const inversedDeltas = new Map<string, Delta<ElementPartial>>();
+    const inverseInternal = (deltas: Record<string, Delta<ElementPartial>>) => {
+      const inversedDeltas: Record<string, Delta<ElementPartial>> = {};
 
-      for (const [id, delta] of deltas.entries()) {
-        inversedDeltas.set(id, Delta.create(delta.inserted, delta.deleted));
+      for (const [id, delta] of Object.entries(deltas)) {
+        inversedDeltas[id] = Delta.create(delta.inserted, delta.deleted);
       }
 
       return inversedDeltas;
@@ -1002,9 +1014,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
 
   public isEmpty(): boolean {
     return (
-      this.added.size === 0 &&
-      this.removed.size === 0 &&
-      this.updated.size === 0
+      Object.keys(this.added).length === 0 &&
+      Object.keys(this.removed).length === 0 &&
+      Object.keys(this.updated).length === 0
     );
   }
 
@@ -1036,11 +1048,11 @@ export class ElementsChange implements Change<SceneElementsMap> {
       };
 
     const applyLatestChangesInternal = (
-      deltas: Map<string, Delta<ElementPartial>>,
+      deltas: Record<string, Delta<ElementPartial>>,
     ) => {
-      const modifiedDeltas = new Map<string, Delta<ElementPartial>>();
+      const modifiedDeltas: Record<string, Delta<ElementPartial>> = {};
 
-      for (const [id, delta] of deltas.entries()) {
+      for (const [id, delta] of Object.entries(deltas)) {
         const existingElement = elements.get(id);
 
         if (existingElement) {
@@ -1051,9 +1063,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
             "inserted",
           );
 
-          modifiedDeltas.set(id, modifiedDelta);
+          modifiedDeltas[id] = modifiedDelta;
         } else {
-          modifiedDeltas.set(id, delta);
+          modifiedDeltas[id] = delta;
         }
       }
 
@@ -1158,8 +1170,8 @@ export class ElementsChange implements Change<SceneElementsMap> {
       flags,
     );
 
-    return (deltas: Map<string, Delta<ElementPartial>>) =>
-      Array.from(deltas.entries()).reduce((acc, [id, delta]) => {
+    return (deltas: Record<string, Delta<ElementPartial>>) =>
+      Object.entries(deltas).reduce((acc, [id, delta]) => {
         const element = getElement(id, delta.inserted);
 
         if (element) {
@@ -1331,20 +1343,21 @@ export class ElementsChange implements Change<SceneElementsMap> {
     };
 
     // removed delta is affecting the bindings always, as all the affected elements of the removed elements need to be unbound
-    for (const [id] of this.removed) {
+    for (const id of Object.keys(this.removed)) {
       ElementsChange.unbindAffected(prevElements, nextElements, id, updater);
     }
 
     // added delta is affecting the bindings always, all the affected elements of the added elements need to be rebound
-    for (const [id] of this.added) {
+    for (const id of Object.keys(this.added)) {
       ElementsChange.rebindAffected(prevElements, nextElements, id, updater);
     }
 
     // updated delta is affecting the binding only in case it contains changed binding or bindable property
-    for (const [id] of Array.from(this.updated).filter(([_, delta]) =>
-      Object.keys({ ...delta.deleted, ...delta.inserted }).find((prop) =>
-        bindingProperties.has(prop as BindingProp | BindableProp),
-      ),
+    for (const [id] of Array.from(Object.entries(this.updated)).filter(
+      ([_, delta]) =>
+        Object.keys({ ...delta.deleted, ...delta.inserted }).find((prop) =>
+          bindingProperties.has(prop as BindingProp | BindableProp),
+        ),
     )) {
       const updatedElement = nextElements.get(id);
       if (!updatedElement || updatedElement.isDeleted) {
@@ -1367,16 +1380,16 @@ export class ElementsChange implements Change<SceneElementsMap> {
       nextAffectedElements,
     );
 
-    for (const [id, delta] of added) {
-      this.added.set(id, delta);
+    for (const [id, delta] of Object.entries(added)) {
+      this.added[id] = delta;
     }
 
-    for (const [id, delta] of removed) {
-      this.removed.set(id, delta);
+    for (const [id, delta] of Object.entries(removed)) {
+      this.removed[id] = delta;
     }
 
-    for (const [id, delta] of updated) {
-      this.updated.set(id, delta);
+    for (const [id, delta] of Object.entries(updated)) {
+      this.updated[id] = delta;
     }
 
     return nextAffectedElements;

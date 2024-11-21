@@ -735,6 +735,7 @@ class App extends React.Component<AppProps, AppState> {
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
         onChange: (cb) => this.onChangeEmitter.on(cb),
+        onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
         onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
@@ -2436,6 +2437,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store.onStoreIncrementEmitter.on((increment) => {
       this.history.record(increment.elementsChange, increment.appStateChange);
+      this.props.onIncrement?.(increment);
     });
 
     this.scene.onUpdate(this.triggerRender);

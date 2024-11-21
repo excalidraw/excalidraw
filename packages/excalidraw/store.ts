@@ -75,7 +75,7 @@ export type StoreActionType = ValueOf<typeof StoreAction>;
 /**
  * Represent an increment to the Store.
  */
-class StoreIncrementEvent {
+export class StoreIncrementEvent {
   constructor(
     public readonly elementsChange: ElementsChange,
     public readonly appStateChange: AppStateChange,
@@ -395,6 +395,7 @@ export class Snapshot {
         !prev ||
         !next ||
         prev.id !== next.id ||
+        prev.version !== next.version ||
         prev.versionNonce !== next.versionNonce
       ) {
         return true;
