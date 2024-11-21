@@ -10381,6 +10381,7 @@ class App extends React.Component<AppProps, AppState> {
         transformHandleType,
         selectedElements,
         this.scene.getElementsMapIncludingDeleted(),
+        this.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
         selectedElements.some((element) => isImageElement(element))
