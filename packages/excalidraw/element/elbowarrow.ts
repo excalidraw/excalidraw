@@ -194,6 +194,7 @@ export const updateElbowArrowPoints = (
     arrow,
     elementsMap,
     updatedPoints,
+    options,
   );
 
   // End segment is getting fixed - must happen before start segment move check!
