@@ -131,7 +131,8 @@
       "label": "Link",
       "labelEmbed": "Link & embed",
       "empty": "No link is set",
-      "hint": "Type or paste your link here"
+      "hint": "Type or paste your link here",
+      "goToElement": "Go to target element"
     },
     "lineEditor": {
       "edit": "Edit line",

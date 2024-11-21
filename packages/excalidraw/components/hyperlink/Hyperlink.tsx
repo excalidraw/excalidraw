@@ -35,6 +35,7 @@ import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
 import { pointFrom, type GlobalPoint } from "../../../math";
+import { isElementLink } from "../../element/elementLink";
 
 import "./Hyperlink.scss";
 
@@ -401,7 +402,9 @@ const renderTooltip = (
 
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
-  tooltipDiv.textContent = element.link;
+  tooltipDiv.textContent = isElementLink(element.link)
+    ? t("labels.link.goToElement")
+    : element.link;
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
 
