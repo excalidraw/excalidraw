@@ -54,12 +54,6 @@
       content="https://excalidraw.com/og-image-3.png"
     />
 
-    <!-- General tags -->
-    <meta
-      name="description"
-      content="Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them."
-    />
-
     <!------------------------------------------------------------------------->
     <!--   to minimize white flash on load when user has dark mode enabled   -->
     <script>
@@ -124,27 +118,18 @@
     <!-- Following placeholder is replaced during the build step -->
     <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
 
+    <!-- Register Assistant as the UI font, before the scene inits -->
+    <link
+      rel="stylesheet"
+      href="../packages/excalidraw/fonts/fonts.css"
+      type="text/css"
+    />
+
     <% } else { %>
     <script>
       window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
     <% } %>
-
-    <!-- For Nunito only preload the latin range, which should be good enough for now -->
-    <link
-      rel="preload"
-      href="https://fonts.gstatic.com/s/nunito/v26/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-
-    <!-- Register Assistant as the UI font, before the scene inits -->
-    <link
-      rel="stylesheet"
-      href="../packages/excalidraw/fonts/assets/fonts.css"
-      type="text/css"
-    />
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -227,6 +212,7 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
+    <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking
@@ -259,5 +245,6 @@
       }
     </script>
     <!-- end LEGACY GOOGLE ANALYTICS -->
+    <% } %>
   </body>
 </html>

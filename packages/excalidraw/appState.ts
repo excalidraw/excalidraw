@@ -116,6 +116,9 @@ export const getDefaultAppState = (): Omit<
     objectsSnapModeEnabled: false,
     userToFollow: null,
     followedBy: new Set(),
+    isCropping: false,
+    croppingElementId: null,
+    searchMatches: [],
   };
 };
 
@@ -236,6 +239,9 @@ const APP_STATE_STORAGE_CONF = (<
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
   userToFollow: { browser: false, export: false, server: false },
   followedBy: { browser: false, export: false, server: false },
+  isCropping: { browser: false, export: false, server: false },
+  croppingElementId: { browser: false, export: false, server: false },
+  searchMatches: { browser: false, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

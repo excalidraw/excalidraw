@@ -30,8 +30,12 @@ import {
   shouldShowBoundingBox,
 } from "../element/transformHandles";
 import { arrayToMap, throttleRAF } from "../utils";
-import type { InteractiveCanvasAppState } from "../types";
-import { DEFAULT_TRANSFORM_HANDLE_SPACING, FRAME_STYLE } from "../constants";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  FRAME_STYLE,
+  THEME,
+} from "../constants";
+import { type InteractiveCanvasAppState } from "../types";
 
 import { renderSnaps } from "../renderer/renderSnaps";
 
@@ -48,9 +52,9 @@ import {
 } from "./helpers";
 import oc from "open-color";
 import {
-  isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
+  isImageElement,
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
@@ -59,6 +63,7 @@ import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   GroupId,
@@ -304,38 +309,42 @@ const renderBindingHighlightForSuggestedPointBinding = (
   });
 };
 
+type ElementSelectionBorder = {
+  angle: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  selectionColors: string[];
+  dashed?: boolean;
+  cx: number;
+  cy: number;
+  activeEmbeddable: boolean;
+  padding?: number;
+};
+
 const renderSelectionBorder = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  elementProperties: {
-    angle: number;
-    elementX1: number;
-    elementY1: number;
-    elementX2: number;
-    elementY2: number;
-    selectionColors: string[];
-    dashed?: boolean;
-    cx: number;
-    cy: number;
-    activeEmbeddable: boolean;
-  },
+  elementProperties: ElementSelectionBorder,
 ) => {
   const {
     angle,
-    elementX1,
-    elementY1,
-    elementX2,
-    elementY2,
+    x1,
+    y1,
+    x2,
+    y2,
     selectionColors,
     cx,
     cy,
     dashed,
     activeEmbeddable,
   } = elementProperties;
-  const elementWidth = elementX2 - elementX1;
-  const elementHeight = elementY2 - elementY1;
+  const elementWidth = x2 - x1;
+  const elementHeight = y2 - y1;
 
-  const padding = DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
+  const padding =
+    elementProperties.padding ?? DEFAULT_TRANSFORM_HANDLE_SPACING * 2;
 
   const linePadding = padding / appState.zoom.value;
   const lineWidth = 8 / appState.zoom.value;
@@ -357,8 +366,8 @@ const renderSelectionBorder = (
     context.lineDashOffset = (lineWidth + spaceWidth) * index;
     strokeRectWithRotation(
       context,
-      elementX1 - linePadding,
-      elementY1 - linePadding,
+      x1 - linePadding,
+      y1 - linePadding,
       elementWidth + linePadding * 2,
       elementHeight + linePadding * 2,
       cx,
@@ -430,18 +439,17 @@ const renderElementsBoxHighlight = (
   );
 
   const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
-    const [elementX1, elementY1, elementX2, elementY2] =
-      getCommonBounds(elements);
+    const [x1, y1, x2, y2] = getCommonBounds(elements);
     return {
       angle: 0,
-      elementX1,
-      elementX2,
-      elementY1,
-      elementY2,
+      x1,
+      x2,
+      y1,
+      y2,
       selectionColors: ["rgb(0,118,255)"],
       dashed: false,
-      cx: elementX1 + (elementX2 - elementX1) / 2,
-      cy: elementY1 + (elementY2 - elementY1) / 2,
+      cx: x1 + (x2 - x1) / 2,
+      cy: y1 + (y2 - y1) / 2,
       activeEmbeddable: false,
     };
   };
@@ -591,6 +599,111 @@ const renderTransformHandles = (
   });
 };
 
+const renderCropHandles = (
+  context: CanvasRenderingContext2D,
+  renderConfig: InteractiveCanvasRenderConfig,
+  appState: InteractiveCanvasAppState,
+  croppingElement: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
+): void => {
+  const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
+    croppingElement,
+    elementsMap,
+  );
+
+  const LINE_WIDTH = 3;
+  const LINE_LENGTH = 20;
+
+  const ZOOMED_LINE_WIDTH = LINE_WIDTH / appState.zoom.value;
+  const ZOOMED_HALF_LINE_WIDTH = ZOOMED_LINE_WIDTH / 2;
+
+  const HALF_WIDTH = cx - x1 + ZOOMED_LINE_WIDTH;
+  const HALF_HEIGHT = cy - y1 + ZOOMED_LINE_WIDTH;
+
+  const HORIZONTAL_LINE_LENGTH = Math.min(
+    LINE_LENGTH / appState.zoom.value,
+    HALF_WIDTH,
+  );
+  const VERTICAL_LINE_LENGTH = Math.min(
+    LINE_LENGTH / appState.zoom.value,
+    HALF_HEIGHT,
+  );
+
+  context.save();
+  context.fillStyle = renderConfig.selectionColor;
+  context.strokeStyle = renderConfig.selectionColor;
+  context.lineWidth = ZOOMED_LINE_WIDTH;
+
+  const handles: Array<
+    [
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+      [number, number],
+    ]
+  > = [
+    [
+      // x, y
+      [-HALF_WIDTH, -HALF_HEIGHT],
+      // horizontal line: first start and to
+      [0, ZOOMED_HALF_LINE_WIDTH],
+      [HORIZONTAL_LINE_LENGTH, ZOOMED_HALF_LINE_WIDTH],
+      // vertical line: second  start and to
+      [ZOOMED_HALF_LINE_WIDTH, 0],
+      [ZOOMED_HALF_LINE_WIDTH, VERTICAL_LINE_LENGTH],
+    ],
+    [
+      [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, -HALF_HEIGHT],
+      [ZOOMED_HALF_LINE_WIDTH, ZOOMED_HALF_LINE_WIDTH],
+      [
+        -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
+        ZOOMED_HALF_LINE_WIDTH,
+      ],
+      [0, 0],
+      [0, VERTICAL_LINE_LENGTH],
+    ],
+    [
+      [-HALF_WIDTH, HALF_HEIGHT],
+      [0, -ZOOMED_HALF_LINE_WIDTH],
+      [HORIZONTAL_LINE_LENGTH, -ZOOMED_HALF_LINE_WIDTH],
+      [ZOOMED_HALF_LINE_WIDTH, 0],
+      [ZOOMED_HALF_LINE_WIDTH, -VERTICAL_LINE_LENGTH],
+    ],
+    [
+      [HALF_WIDTH - ZOOMED_HALF_LINE_WIDTH, HALF_HEIGHT],
+      [ZOOMED_HALF_LINE_WIDTH, -ZOOMED_HALF_LINE_WIDTH],
+      [
+        -HORIZONTAL_LINE_LENGTH + ZOOMED_HALF_LINE_WIDTH,
+        -ZOOMED_HALF_LINE_WIDTH,
+      ],
+      [0, 0],
+      [0, -VERTICAL_LINE_LENGTH],
+    ],
+  ];
+
+  handles.forEach((handle) => {
+    const [[x, y], [x1s, y1s], [x1t, y1t], [x2s, y2s], [x2t, y2t]] = handle;
+
+    context.save();
+    context.translate(cx, cy);
+    context.rotate(croppingElement.angle);
+
+    context.beginPath();
+    context.moveTo(x + x1s, y + y1s);
+    context.lineTo(x + x1t, y + y1t);
+    context.stroke();
+
+    context.beginPath();
+    context.moveTo(x + x2s, y + y2s);
+    context.lineTo(x + x2t, y + y2t);
+    context.stroke();
+    context.restore();
+  });
+
+  context.restore();
+};
+
 const renderTextBox = (
   text: NonDeleted<ExcalidrawTextElement>,
   context: CanvasRenderingContext2D,
@@ -668,7 +781,7 @@ const _renderInteractiveScene = ({
   }
 
   // Paint selection element
-  if (appState.selectionElement) {
+  if (appState.selectionElement && !appState.isCropping) {
     try {
       renderSelectionElement(
         appState.selectionElement,
@@ -780,18 +893,7 @@ const _renderInteractiveScene = ({
       // Optimisation for finding quickly relevant element ids
       const locallySelectedIds = arrayToMap(selectedElements);
 
-      const selections: {
-        angle: number;
-        elementX1: number;
-        elementY1: number;
-        elementX2: number;
-        elementY2: number;
-        selectionColors: string[];
-        dashed?: boolean;
-        cx: number;
-        cy: number;
-        activeEmbeddable: boolean;
-      }[] = [];
+      const selections: ElementSelectionBorder[] = [];
 
       for (const element of elementsMap.values()) {
         const selectionColors = [];
@@ -803,7 +905,6 @@ const _renderInteractiveScene = ({
             // Elbow arrow elements cannot be selected when bound on either end
             (
               isSingleLinearElementSelected &&
-              isArrowElement(element) &&
               isElbowArrow(element) &&
               (element.startBinding || element.endBinding)
             )
@@ -831,14 +932,17 @@ const _renderInteractiveScene = ({
         }
 
         if (selectionColors.length) {
-          const [elementX1, elementY1, elementX2, elementY2, cx, cy] =
-            getElementAbsoluteCoords(element, elementsMap, true);
+          const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+            element,
+            elementsMap,
+            true,
+          );
           selections.push({
             angle: element.angle,
-            elementX1,
-            elementY1,
-            elementX2,
-            elementY2,
+            x1,
+            y1,
+            x2,
+            y2,
             selectionColors,
             dashed: !!remoteClients,
             cx,
@@ -846,24 +950,28 @@ const _renderInteractiveScene = ({
             activeEmbeddable:
               appState.activeEmbeddable?.element === element &&
               appState.activeEmbeddable.state === "active",
+            padding:
+              element.id === appState.croppingElementId ||
+              isImageElement(element)
+                ? 0
+                : undefined,
           });
         }
       }
 
       const addSelectionForGroupId = (groupId: GroupId) => {
         const groupElements = getElementsInGroup(elementsMap, groupId);
-        const [elementX1, elementY1, elementX2, elementY2] =
-          getCommonBounds(groupElements);
+        const [x1, y1, x2, y2] = getCommonBounds(groupElements);
         selections.push({
           angle: 0,
-          elementX1,
-          elementX2,
-          elementY1,
-          elementY2,
+          x1,
+          x2,
+          y1,
+          y2,
           selectionColors: [oc.black],
           dashed: true,
-          cx: elementX1 + (elementX2 - elementX1) / 2,
-          cy: elementY1 + (elementY2 - elementY1) / 2,
+          cx: x1 + (x2 - x1) / 2,
+          cy: y1 + (y2 - y1) / 2,
           activeEmbeddable: false,
         });
       };
@@ -898,7 +1006,9 @@ const _renderInteractiveScene = ({
         !appState.viewModeEnabled &&
         showBoundingBox &&
         // do not show transform handles when text is being edited
-        !isTextElement(appState.editingTextElement)
+        !isTextElement(appState.editingTextElement) &&
+        // do not show transform handles when image is being cropped
+        !appState.croppingElementId
       ) {
         renderTransformHandles(
           context,
@@ -907,6 +1017,20 @@ const _renderInteractiveScene = ({
           transformHandles,
           selectedElements[0].angle,
         );
+      }
+
+      if (appState.croppingElementId && !appState.isCropping) {
+        const croppingElement = elementsMap.get(appState.croppingElementId);
+
+        if (croppingElement && isImageElement(croppingElement)) {
+          renderCropHandles(
+            context,
+            renderConfig,
+            appState,
+            croppingElement,
+            elementsMap,
+          );
+        }
       }
     } else if (selectedElements.length > 1 && !appState.isRotating) {
       const dashedLinePadding =
@@ -952,9 +1076,48 @@ const _renderInteractiveScene = ({
     context.restore();
   }
 
+  appState.searchMatches.forEach(({ id, focus, matchedLines }) => {
+    const element = elementsMap.get(id);
+
+    if (element && isTextElement(element)) {
+      const [elementX1, elementY1, , , cx, cy] = getElementAbsoluteCoords(
+        element,
+        elementsMap,
+        true,
+      );
+
+      context.save();
+      if (appState.theme === THEME.LIGHT) {
+        if (focus) {
+          context.fillStyle = "rgba(255, 124, 0, 0.4)";
+        } else {
+          context.fillStyle = "rgba(255, 226, 0, 0.4)";
+        }
+      } else if (focus) {
+        context.fillStyle = "rgba(229, 82, 0, 0.4)";
+      } else {
+        context.fillStyle = "rgba(99, 52, 0, 0.4)";
+      }
+
+      context.translate(appState.scrollX, appState.scrollY);
+      context.translate(cx, cy);
+      context.rotate(element.angle);
+
+      matchedLines.forEach((matchedLine) => {
+        context.fillRect(
+          elementX1 + matchedLine.offsetX - cx,
+          elementY1 + matchedLine.offsetY - cy,
+          matchedLine.width,
+          matchedLine.height,
+        );
+      });
+
+      context.restore();
+    }
+  });
+
   renderSnaps(context, appState);
 
-  // Reset zoom
   context.restore();
 
   renderRemoteCursors({

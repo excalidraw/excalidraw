@@ -5,6 +5,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPointBinding,
   FontFamilyValues,
   OrderedExcalidrawElement,
   PointBinding,
@@ -21,6 +22,7 @@ import {
 import {
   isArrowElement,
   isElbowArrow,
+  isFixedPointBinding,
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -55,7 +57,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 import type { LocalPoint, Radians } from "../../math";
-import { isFiniteNumber, point } from "../../math";
+import { isFiniteNumber, pointFrom } from "../../math";
 
 type RestoredAppState = Omit<
   AppState,
@@ -101,8 +103,8 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
 
 const repairBinding = (
   element: ExcalidrawLinearElement,
-  binding: PointBinding | null,
-): PointBinding | null => {
+  binding: PointBinding | FixedPointBinding | null,
+): PointBinding | FixedPointBinding | null => {
   if (!binding) {
     return null;
   }
@@ -110,9 +112,11 @@ const repairBinding = (
   return {
     ...binding,
     focus: binding.focus || 0,
-    fixedPoint: isElbowArrow(element)
-      ? normalizeFixedPoint(binding.fixedPoint ?? [0, 0])
-      : null,
+    ...(isElbowArrow(element) && isFixedPointBinding(binding)
+      ? {
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+        }
+      : {}),
   };
 };
 
@@ -186,6 +190,10 @@ const restoreElementWithProperties = <
   }
 
   return {
+    // spread the original element properties to not lose unknown ones
+    // for forward-compatibility
+    ...element,
+    // normalized properties
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
@@ -254,6 +262,7 @@ const restoreElement = (
         status: element.status || "pending",
         fileId: element.fileId,
         scale: element.scale || [1, 1],
+        crop: element.crop ?? null,
       });
     case "line":
     // @ts-ignore LEGACY type
@@ -264,7 +273,7 @@ const restoreElement = (
       let y = element.y;
       let points = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [point(0, 0), point(element.width, element.height)]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {
@@ -292,7 +301,7 @@ const restoreElement = (
       let y: number | undefined = element.y;
       let points: readonly LocalPoint[] | undefined = // migrate old arrow model to new one
         !Array.isArray(element.points) || element.points.length < 2
-          ? [point(0, 0), point(element.width, element.height)]
+          ? [pointFrom(0, 0), pointFrom(element.width, element.height)]
           : element.points;
 
       if (points[0][0] !== 0 || points[0][1] !== 0) {

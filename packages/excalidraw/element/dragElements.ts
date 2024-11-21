@@ -16,6 +16,7 @@ import {
   isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
+  isImageElement,
   isTextElement,
 } from "./typeChecks";
 import { getFontString } from "../utils";
@@ -35,7 +36,6 @@ export const dragSelectedElements = (
 ) => {
   if (
     _selectedElements.length === 1 &&
-    isArrowElement(_selectedElements[0]) &&
     isElbowArrow(_selectedElements[0]) &&
     (_selectedElements[0].startBinding || _selectedElements[0].endBinding)
   ) {
@@ -43,13 +43,7 @@ export const dragSelectedElements = (
   }
 
   const selectedElements = _selectedElements.filter(
-    (el) =>
-      !(
-        isArrowElement(el) &&
-        isElbowArrow(el) &&
-        el.startBinding &&
-        el.endBinding
-      ),
+    (el) => !(isElbowArrow(el) && el.startBinding && el.endBinding),
   );
 
   // we do not want a frame and its elements to be selected at the same time
@@ -258,6 +252,14 @@ export const dragNewElement = ({
   }
 
   if (width !== 0 && height !== 0) {
+    let imageInitialDimension = null;
+    if (isImageElement(newElement)) {
+      imageInitialDimension = {
+        initialWidth: width,
+        initialHeight: height,
+      };
+    }
+
     mutateElement(
       newElement,
       {
@@ -266,6 +268,7 @@ export const dragNewElement = ({
         width,
         height,
         ...textAutoResize,
+        ...imageInitialDimension,
       },
       informMutation,
     );

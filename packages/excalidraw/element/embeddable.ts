@@ -4,7 +4,7 @@ import type { ExcalidrawProps } from "../types";
 import { getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { wrapText } from "./textElement";
+import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 import type {
   ExcalidrawElement,
@@ -45,6 +45,12 @@ const RE_GENERIC_EMBED =
 const RE_GIPHY =
   /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
 
+const RE_REDDIT =
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?reddit\.com\/r\/([a-zA-Z0-9_]+)\/comments\/([a-zA-Z0-9_]+)\/([a-zA-Z0-9_]+)\/?(?:\?[^#\s]*)?(?:#[^\s]*)?$/;
+
+const RE_REDDIT_EMBED =
+  /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -59,6 +65,7 @@ const ALLOWED_DOMAINS = new Set([
   "stackblitz.com",
   "val.town",
   "giphy.com",
+  "reddit.com",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -71,6 +78,7 @@ const ALLOW_SAME_ORIGIN = new Set([
   "x.com",
   "*.simplepdf.eu",
   "stackblitz.com",
+  "reddit.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -210,6 +218,24 @@ export const getEmbedLink = (
       srcdoc: (theme: string) =>
         createSrcDoc(
           `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${safeURL}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+        ),
+      intrinsicSize: { w: 480, h: 480 },
+      sandbox: { allowSameOrigin },
+    };
+    embeddedLinkCache.set(originalLink, ret);
+    return ret;
+  }
+
+  if (RE_REDDIT.test(link)) {
+    const [, page, postId, title] = link.match(RE_REDDIT)!;
+    const safeURL = sanitizeHTMLAttribute(
+      `https://reddit.com/r/${page}/comments/${postId}/${title}`,
+    );
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: (theme: string) =>
+        createSrcDoc(
+          `<blockquote class="reddit-embed-bq" data-embed-theme="${theme}"><a href="${safeURL}"></a><br></blockquote><script async="" src="https://embed.reddit.com/widgets.js" charset="UTF-8"></script>`,
         ),
       intrinsicSize: { w: 480, h: 480 },
       sandbox: { allowSameOrigin },
@@ -359,6 +385,11 @@ export const maybeParseEmbedSrc = (str: string): string => {
   const twitterMatch = str.match(RE_TWITTER_EMBED);
   if (twitterMatch && twitterMatch.length === 2) {
     return twitterMatch[1];
+  }
+
+  const redditMatch = str.match(RE_REDDIT_EMBED);
+  if (redditMatch && redditMatch.length === 2) {
+    return redditMatch[1];
   }
 
   const gistMatch = str.match(RE_GH_GIST_EMBED);

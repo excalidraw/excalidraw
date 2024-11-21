@@ -106,6 +106,11 @@ export type BinaryFileData = {
    * Epoch timestamp in milliseconds.
    */
   lastRetrieved?: number;
+  /**
+   * indicates the version of the file. This can be used to determine whether
+   * the file dataURL has changed e.g. as part of restore due to schema update.
+   */
+  version?: number;
 };
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
@@ -176,6 +181,8 @@ export type StaticCanvasAppState = Readonly<
     gridStep: AppState["gridStep"];
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
+    // Cropping
+    croppingElementId: AppState["croppingElementId"];
   }
 >;
 
@@ -198,6 +205,11 @@ export type InteractiveCanvasAppState = Readonly<
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
     editingTextElement: AppState["editingTextElement"];
+    // Cropping
+    isCropping: AppState["isCropping"];
+    croppingElementId: AppState["croppingElementId"];
+    // Search matches
+    searchMatches: AppState["searchMatches"];
   }
 >;
 
@@ -217,6 +229,7 @@ export type ObservedElementsAppState = {
   editingLinearElementId: LinearElementEditor["elementId"] | null;
   // Right now it's coupled to `editingLinearElement`, ideally it should not be really needed as we already have selectedElementIds & editingLinearElementId
   selectedLinearElementId: LinearElementEditor["elementId"] | null;
+  croppingElementId: AppState["croppingElementId"];
 };
 
 export interface AppState {
@@ -384,7 +397,24 @@ export interface AppState {
   userToFollow: UserToFollow | null;
   /** the socket ids of the users following the current user */
   followedBy: Set<SocketId>;
+
+  /** image cropping */
+  isCropping: boolean;
+  croppingElementId: ExcalidrawElement["id"] | null;
+
+  searchMatches: readonly SearchMatch[];
 }
+
+type SearchMatch = {
+  id: string;
+  focus: boolean;
+  matchedLines: {
+    offsetX: number;
+    offsetY: number;
+    width: number;
+    height: number;
+  }[];
+};
 
 export type UIAppState = Omit<
   AppState,
@@ -642,6 +672,9 @@ export type AppClassProperties = {
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
+  getEditorUIOffsets: App["getEditorUIOffsets"];
+  visibleElements: App["visibleElements"];
+  excalidrawContainerValue: App["excalidrawContainerValue"];
 };
 
 export type PointerDownState = Readonly<{
@@ -834,3 +867,10 @@ export type GenerateDiagramToCode = (props: {
   frame: ExcalidrawMagicFrameElement;
   children: readonly ExcalidrawElement[];
 }) => MaybePromise<{ html: string }>;
+
+export type Offsets = Partial<{
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}>;

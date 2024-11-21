@@ -19,7 +19,7 @@ import type {
 import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import { point } from "../../math";
+import { pointFrom } from "../../math";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
@@ -42,7 +42,7 @@ describe("textWysiwyg", () => {
         type: "line",
         width: 100,
         height: 0,
-        points: [point(0, 0), point(100, 0)],
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
       });
       const textSize = 20;
       const text = API.createElement({
@@ -917,7 +917,7 @@ describe("textWysiwyg", () => {
 
       Keyboard.exitTextEditor(editor);
       text = h.elements[1] as ExcalidrawTextElementWithContainer;
-      expect(text.text).toBe("Hello \nWorld!");
+      expect(text.text).toBe("Hello\nWorld!");
       expect(text.originalText).toBe("Hello World!");
       expect(text.y).toBe(
         rectangle.y + h.elements[0].height / 2 - text.height / 2,
@@ -1220,7 +1220,7 @@ describe("textWysiwyg", () => {
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online \nwhitebo\nard \ncollabo\nration \nmade \neasy",
+        "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,

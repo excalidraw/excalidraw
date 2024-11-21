@@ -22,7 +22,7 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://blog.excalidraw.com"
+      href="https://plus.excalidraw.com/blog"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -222,6 +222,16 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               ]}
               isOr={false}
             />
+            <Shortcut
+              label={t("helpDialog.cropStart")}
+              shortcuts={[t("helpDialog.doubleClick"), getShortcutKey("Enter")]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.cropFinish")}
+              shortcuts={[getShortcutKey("Enter"), getShortcutKey("Escape")]}
+              isOr={true}
+            />
             <Shortcut label={t("toolBar.lock")} shortcuts={[KEYS.Q]} />
             <Shortcut
               label={t("helpDialog.preventBinding")}
@@ -287,6 +297,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("stats.fullTitle")}
               shortcuts={[getShortcutKey("Alt+/")]}
+            />
+            <Shortcut
+              label={t("search.title")}
+              shortcuts={[getShortcutFromShortcutName("searchMenu")]}
             />
             <Shortcut
               label={t("commandPalette.title")}

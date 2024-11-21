@@ -1,4 +1,3 @@
-import type { ToolType } from "../../types";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -9,6 +8,7 @@ import type {
   ExcalidrawDiamondElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawImageElement,
 } from "../../element/types";
 import type { TransformHandleType } from "../../element/transformHandles";
 import {
@@ -34,7 +34,9 @@ import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
 import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
-import { point, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
+import { cropElement } from "../../element/cropElement";
+import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
@@ -69,8 +71,11 @@ export class Keyboard {
     }
   };
 
-  static keyDown = (key: string) => {
-    fireEvent.keyDown(document, {
+  static keyDown = (
+    key: string,
+    target: HTMLElement | Document | Window = document,
+  ) => {
+    fireEvent.keyDown(target, {
       key,
       ctrlKey,
       shiftKey,
@@ -78,8 +83,11 @@ export class Keyboard {
     });
   };
 
-  static keyUp = (key: string) => {
-    fireEvent.keyUp(document, {
+  static keyUp = (
+    key: string,
+    target: HTMLElement | Document | Window = document,
+  ) => {
+    fireEvent.keyUp(target, {
       key,
       ctrlKey,
       shiftKey,
@@ -87,9 +95,9 @@ export class Keyboard {
     });
   };
 
-  static keyPress = (key: string) => {
-    Keyboard.keyDown(key);
-    Keyboard.keyUp(key);
+  static keyPress = (key: string, target?: HTMLElement | Document | Window) => {
+    Keyboard.keyDown(key, target);
+    Keyboard.keyUp(key, target);
   };
 
   static codeDown = (code: string) => {
@@ -136,7 +144,7 @@ const getElementPointForSelection = (
   element: ExcalidrawElement,
 ): GlobalPoint => {
   const { x, y, width, height, angle } = element;
-  const target = point<GlobalPoint>(
+  const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
     y,
@@ -145,9 +153,12 @@ const getElementPointForSelection = (
 
   if (isLinearElement(element)) {
     const bounds = getElementPointsCoords(element, element.points);
-    center = point((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2);
+    center = pointFrom(
+      (bounds[0] + bounds[2]) / 2,
+      (bounds[1] + bounds[3]) / 2,
+    );
   } else {
-    center = point(x + width / 2, y + height / 2);
+    center = pointFrom(x + width / 2, y + height / 2);
   }
 
   if (isTextElement(element)) {
@@ -463,8 +474,8 @@ export class UI {
     const width = initialWidth ?? initialHeight ?? size;
     const height = initialHeight ?? size;
     const points: LocalPoint[] = initialPoints ?? [
-      point(0, 0),
-      point(width, height),
+      pointFrom(0, 0),
+      pointFrom(width, height),
     ];
 
     UI.clickTool(type);
@@ -550,6 +561,38 @@ export class UI {
     keyboardModifiers: KeyboardModifiers = {},
   ) {
     return transform(element, handle, mouseMove, keyboardModifiers);
+  }
+
+  static crop(
+    element: ExcalidrawImageElement,
+    handle: TransformHandleDirection,
+    naturalWidth: number,
+    naturalHeight: number,
+    mouseMove: [deltaX: number, deltaY: number],
+    keepAspectRatio = false,
+  ) {
+    const handleCoords = getTransformHandles(
+      element,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+      {},
+    )[handle]!;
+
+    const clientX = handleCoords[0] + handleCoords[2] / 2;
+    const clientY = handleCoords[1] + handleCoords[3] / 2;
+
+    const mutations = cropElement(
+      element,
+      handle,
+      naturalWidth,
+      naturalHeight,
+      clientX + mouseMove[0],
+      clientY + mouseMove[1],
+      keepAspectRatio ? element.width / element.height : undefined,
+    );
+
+    API.updateElement(element, mutations);
   }
 
   static rotate(

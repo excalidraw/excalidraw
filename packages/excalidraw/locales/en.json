@@ -162,6 +162,13 @@
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
     "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
   },
+  "search": {
+    "title": "Find on canvas",
+    "noMatch": "No matches found...",
+    "singleResult": "result",
+    "multipleResults": "results",
+    "placeholder": "Find text on canvas..."
+  },
   "buttons": {
     "clearReset": "Reset the canvas",
     "exportJSON": "Export to file",
@@ -297,6 +304,7 @@
     "shapes": "Shapes"
   },
   "hints": {
+    "dismissSearch": "Escape to dismiss search",
     "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
     "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",
@@ -320,7 +328,9 @@
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
-    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping",
+    "enterCropEditor": "Double click the image or press ENTER to crop the image",
+    "leaveCropEditor": "Click outside the image or press ENTER or ESCAPE to finish cropping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -391,7 +401,9 @@
     "zoomToSelection": "Zoom to selection",
     "toggleElementLock": "Lock/unlock selection",
     "movePageUpDown": "Move page up/down",
-    "movePageLeftRight": "Move page left/right"
+    "movePageLeftRight": "Move page left/right",
+    "cropStart": "Crop image",
+    "cropFinish": "Finish image cropping"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
@@ -482,6 +494,7 @@
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "Copied {{exportSelection}} to clipboard as SVG\n({{exportColorScheme}})",
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",

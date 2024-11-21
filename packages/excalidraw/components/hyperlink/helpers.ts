@@ -1,5 +1,5 @@
 import type { GlobalPoint, Radians } from "../../../math";
-import { point, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "../../../math";
 import { MIME_TYPES } from "../../constants";
 import type { Bounds } from "../../element/bounds";
 import { getElementAbsoluteCoords } from "../../element/bounds";
@@ -35,8 +35,8 @@ export const getLinkHandleFromCoords = (
   const y = y1 - dashedLineMargin - linkMarginY + centeringOffset;
 
   const [rotatedX, rotatedY] = pointRotateRads(
-    point(x + linkWidth / 2, y + linkHeight / 2),
-    point(centerX, centerY),
+    pointFrom(x + linkWidth / 2, y + linkHeight / 2),
+    pointFrom(centerX, centerY),
     angle,
   );
   return [
@@ -85,5 +85,10 @@ export const isPointHittingLink = (
   ) {
     return true;
   }
-  return isPointHittingLinkIcon(element, elementsMap, appState, point(x, y));
+  return isPointHittingLinkIcon(
+    element,
+    elementsMap,
+    appState,
+    pointFrom(x, y),
+  );
 };

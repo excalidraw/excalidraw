@@ -126,6 +126,7 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
 polyfill();
 
@@ -649,7 +650,12 @@ const ExcalidrawWrapper = () => {
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
-      debugRenderer(debugCanvasRef.current, appState, window.devicePixelRatio);
+      debugRenderer(
+        debugCanvasRef.current,
+        appState,
+        window.devicePixelRatio,
+        () => forceRefresh((prev) => !prev),
+      );
     }
   };
 
@@ -1120,6 +1126,12 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
+  const isCloudExportWindow =
+    window.location.pathname === "/excalidraw-plus-export";
+  if (isCloudExportWindow) {
+    return <ExcalidrawPlusIframeExport />;
+  }
+
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
