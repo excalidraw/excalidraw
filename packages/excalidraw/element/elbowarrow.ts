@@ -1508,7 +1508,7 @@ const removeElbowArrowShortSegments = (
       }
 
       const prev = points[idx - 1];
-      return pointDistance(prev, p) > 0.2;
+      return pointDistance(prev, p) > 0.3;
     });
   }
 

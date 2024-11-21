@@ -2564,6 +2564,7 @@ class App extends React.Component<AppProps, AppState> {
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
         this.handleWheel,
+        { passive: false },
       ),
       addEventListener(window, EVENT.MESSAGE, this.onWindowMessage, false),
       addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
