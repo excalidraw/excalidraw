@@ -7933,6 +7933,7 @@ class App extends React.Component<AppProps, AppState> {
             { x: gridX, y: gridY },
             elementsMap,
             this.state,
+            linearElementEditor.pointerDownState.segmentMidpoint.added,
           );
           const element = LinearElementEditor.getElement(
             this.state.selectedLinearElement.elementId,
@@ -7948,7 +7949,9 @@ class App extends React.Component<AppProps, AppState> {
 
           if (
             this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-              .index !== ret.pointerDownState.segmentMidpoint.index
+              .index !== ret.pointerDownState.segmentMidpoint.index ||
+            this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+              .added !== ret.pointerDownState.segmentMidpoint.added
           ) {
             flushSync(() => {
               if (this.state.selectedLinearElement) {

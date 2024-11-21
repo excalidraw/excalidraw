@@ -22,7 +22,6 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -94,32 +93,6 @@ type ElbowArrowState = {
 
 const BASE_PADDING = 40;
 
-const segmentListMerge = (
-  oldFixedSegments: readonly FixedSegment[],
-  newFixedSegments: readonly FixedSegment[],
-): Sequential<FixedSegment> => {
-  let fixedSegments = Array.from(oldFixedSegments);
-  newFixedSegments.forEach((segment) => {
-    if (segment.anchor == null) {
-      // Delete segment
-      fixedSegments = fixedSegments.filter((s) => s.index !== segment.index);
-    } else {
-      const idx = fixedSegments.findIndex((s) => s.index === segment.index);
-      if (idx > -1) {
-        // Update segment
-        fixedSegments[idx] = segment;
-      } else {
-        // Add segment request
-        fixedSegments.push(segment);
-      }
-    }
-  });
-
-  return fixedSegments.sort(
-    (a, b) => a.index - b.index,
-  ) as Sequential<FixedSegment>;
-};
-
 const generatePoints = memo(
   (
     state: ElbowArrowState,
@@ -185,10 +158,9 @@ export const updateElbowArrowPoints = (
 
   const fakeElementsMap = toBrandedType<SceneElementsMap>(new Map(elementsMap));
 
-  const nextFixedSegments = segmentListMerge(
-    arrow.fixedSegments ?? [],
-    updates?.fixedSegments ?? [],
-  );
+  const nextFixedSegments = (updates.fixedSegments ?? arrow.fixedSegments ?? [])
+    // Delete segment if anchor is null
+    .filter((segment) => segment.anchor != null);
 
   const { startDonglePosition, endDonglePosition } = getElbowArrowData(
     arrow,
@@ -225,8 +197,6 @@ export const updateElbowArrowPoints = (
     startFixedPoint: arrow.startBinding?.fixedPoint ?? null,
     startElementId: arrow.startBinding?.elementId ?? null,
   };
-  debugDrawPoint(startDonglePosition, { color: "red" });
-  debugDrawPoint(endDonglePosition, { color: "green" });
 
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segmentEnd, segmentIdx) => {
@@ -273,10 +243,6 @@ export const updateElbowArrowPoints = (
             (startHandle[1] + endHandle[1]) / 2,
           );
       nextFixedSegments[segmentIdx].anchor = anchor;
-
-      debugDrawPoint(startHandle, { color: "red" });
-      debugDrawPoint(endHandle, { color: "green" });
-      debugDrawPoint(anchor);
 
       const el = {
         ...newElement({
@@ -406,12 +372,6 @@ export const updateElbowArrowPoints = (
         segment.anchor,
         headingIsHorizontal(segment.heading),
       );
-
-      // TODO: Debug only, remove
-      if (segment.index === 0) {
-        console.warn("Segment index is 0!");
-        debugDrawPoint(segment.anchor, { color: "red", permanent: true });
-      }
 
       if (segment.index === 1) {
         segment.index = 2;
