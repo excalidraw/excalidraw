@@ -3068,11 +3068,6 @@
   dependencies:
     "@babel/runtime" "^7.12.5"
 
-"@tldraw/vec@1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@tldraw/vec/-/vec-1.7.1.tgz#5bfac9a56e11ad890cbd1c620293d7fcb23bf1ea"
-  integrity sha512-qM6Z9RvkLFFEzr91mmsA4HI14msyDgDDOu36csIzG5BYu2bFmEz5siQ8WntHgDtUjzJHP+VSSOTbAXhklEZHLA==
-
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
