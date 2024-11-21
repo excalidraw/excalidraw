@@ -7917,7 +7917,11 @@ class App extends React.Component<AppProps, AppState> {
           return;
         } else if (
           linearElementEditor.elbowed &&
-          linearElementEditor.pointerDownState.segmentMidpoint.index
+          linearElementEditor.pointerDownState.segmentMidpoint.index &&
+          pointDistance(
+            pointFrom(pointerCoords.x, pointerCoords.y),
+            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+          ) >= DRAGGING_THRESHOLD
         ) {
           const [gridX, gridY] = getGridPoint(
             pointerCoords.x,
