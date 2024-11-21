@@ -35,14 +35,13 @@ import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
 import { pointFrom, type GlobalPoint } from "../../../math";
-import { isElementLink } from "../../element/elementLink";
 
 import "./Hyperlink.scss";
 
-const CONTAINER_WIDTH = 320;
+const POPUP_WIDTH = 380;
+const POPUP_HEIGHT = 42;
+const POPUP_PADDING = 5;
 const SPACE_BOTTOM = 85;
-const CONTAINER_PADDING = 5;
-const CONTAINER_HEIGHT = 42;
 const AUTO_HIDE_TIMEOUT = 500;
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
@@ -77,7 +76,6 @@ export const Hyperlink = ({
   const device = useDevice();
 
   const linkVal = element.link || "";
-  const linkedToShape = linkVal && isElementLink(linkVal);
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -246,8 +244,8 @@ export const Hyperlink = ({
       style={{
         top: `${y}px`,
         left: `${x}px`,
-        width: CONTAINER_WIDTH,
-        padding: CONTAINER_PADDING,
+        width: POPUP_WIDTH,
+        padding: POPUP_PADDING,
       }}
     >
       {isEditing ? (
@@ -303,7 +301,7 @@ export const Hyperlink = ({
         </div>
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
-        {!isEditing && !linkedToShape && (
+        {!isEditing && (
           <ToolButton
             type="button"
             title={t("buttons.edit")}
@@ -314,23 +312,21 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        {(!linkVal || linkedToShape) && (
-          <ToolButton
-            type="button"
-            title={t("labels.linkToElement")}
-            aria-label={t("labels.linkToElement")}
-            label={t("labels.linkToElement")}
-            onClick={() => {
-              setAppState({
-                openDialog: {
-                  name: "elementLinkSelector",
-                  sourceElementId: element.id,
-                },
-              });
-            }}
-            icon={elementLinkIcon}
-          />
-        )}
+        <ToolButton
+          type="button"
+          title={t("labels.linkToElement")}
+          aria-label={t("labels.linkToElement")}
+          label={t("labels.linkToElement")}
+          onClick={() => {
+            setAppState({
+              openDialog: {
+                name: "elementLinkSelector",
+                sourceElementId: element.id,
+              },
+            });
+          }}
+          icon={elementLinkIcon}
+        />
         {linkVal && !isEmbeddableElement(element) && (
           <ToolButton
             type="button"
@@ -357,7 +353,7 @@ const getCoordsForPopover = (
     { sceneX: x1 + element.width / 2, sceneY: y1 },
     appState,
   );
-  const x = viewportX - appState.offsetLeft - CONTAINER_WIDTH / 2;
+  const x = viewportX - appState.offsetLeft - POPUP_WIDTH / 2;
   const y = viewportY - appState.offsetTop - SPACE_BOTTOM;
   return { x, y };
 };
@@ -479,9 +475,9 @@ const shouldHideLinkPopup = (
 
   if (
     clientX >= popoverX - threshold &&
-    clientX <= popoverX + CONTAINER_WIDTH + CONTAINER_PADDING * 2 + threshold &&
+    clientX <= popoverX + POPUP_WIDTH + POPUP_PADDING * 2 + threshold &&
     clientY >= popoverY - threshold &&
-    clientY <= popoverY + threshold + CONTAINER_PADDING * 2 + CONTAINER_HEIGHT
+    clientY <= popoverY + threshold + POPUP_PADDING * 2 + POPUP_HEIGHT
   ) {
     return false;
   }
