@@ -101,17 +101,13 @@ const segmentListMerge = (
   let fixedSegments = Array.from(oldFixedSegments);
   newFixedSegments.forEach((segment) => {
     if (segment.anchor == null) {
-      // Delete segment request
+      // Delete segment
       fixedSegments = fixedSegments.filter((s) => s.index !== segment.index);
     } else {
       const idx = fixedSegments.findIndex((s) => s.index === segment.index);
       if (idx > -1) {
-        // Modify segment request
-        fixedSegments[idx] = {
-          anchor: segment.anchor,
-          heading: fixedSegments[idx].heading,
-          index: segment.index,
-        };
+        // Update segment
+        fixedSegments[idx] = segment;
       } else {
         // Add segment request
         fixedSegments.push(segment);
