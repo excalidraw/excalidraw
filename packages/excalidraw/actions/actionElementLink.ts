@@ -26,7 +26,7 @@ export const actionCopyElementLink = register({
           appState,
         );
 
-        if (idAndType && app.props.generateLinkForSelection) {
+        if (idAndType) {
           await copyTextToSystemClipboard(
             app.props.generateLinkForSelection
               ? app.props.generateLinkForSelection(idAndType.id, idAndType.type)
