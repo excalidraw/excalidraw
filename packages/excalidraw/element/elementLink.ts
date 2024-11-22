@@ -16,7 +16,7 @@ export const defaultGetElementLinkFromSelection: Exclude<
 
   try {
     const link = new URL(url);
-    link.searchParams.set("elementLink", id);
+    link.searchParams.set(ELEMENT_LINK_KEY, id);
 
     return normalizeLink(link.toString());
   } catch (error) {
