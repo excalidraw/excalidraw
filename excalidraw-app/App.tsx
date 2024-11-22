@@ -852,7 +852,7 @@ const ExcalidrawWrapper = () => {
         onLinkOpen={(element, event) => {
           if (element.link && isElementLink(element.link)) {
             event.preventDefault();
-            excalidrawAPI?.navigateToLink(element.link, true);
+            excalidrawAPI?.scrollToContent(element.link, { animate: true });
           }
         }}
       >

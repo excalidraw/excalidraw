@@ -4,9 +4,9 @@
 
 import { ELEMENT_LINK_KEY } from "../constants";
 import { normalizeLink } from "../data/url";
-import { elementsAreInSameGroup, getElementsInGroup } from "../groups";
+import { elementsAreInSameGroup } from "../groups";
 import type { AppProps, AppState } from "../types";
-import type { ElementsMap, ExcalidrawElement } from "./types";
+import type { ExcalidrawElement } from "./types";
 
 export const defaultGetElementLinkFromSelection: Exclude<
   AppProps["generateLinkForSelection"],
@@ -63,45 +63,6 @@ export const getLinkIdAndTypeFromSelection = (
   return null;
 };
 
-export const getElementsFromQuery = (
-  query: string,
-  elementsMap: ElementsMap,
-): {
-  elements: ExcalidrawElement[] | null;
-  isElementLink: boolean;
-} => {
-  const searchParams = new URLSearchParams(query);
-
-  if (searchParams.has(ELEMENT_LINK_KEY)) {
-    const id = searchParams.get(ELEMENT_LINK_KEY);
-    if (id) {
-      // first check if the id is an element
-      const el = elementsMap.get(id);
-      if (el) {
-        return {
-          elements: el ? [el] : null,
-          isElementLink: true,
-        };
-      }
-
-      // then, check if the id is a group
-      const elementsInGroup = getElementsInGroup(elementsMap, id);
-
-      if (elementsInGroup.length > 0) {
-        return {
-          elements: elementsInGroup,
-          isElementLink: true,
-        };
-      }
-    }
-  }
-
-  return {
-    elements: null,
-    isElementLink: false,
-  };
-};
-
 export const canCreateLinkFromElements = (
   selectedElements: ExcalidrawElement[],
 ) => {
@@ -126,4 +87,16 @@ export const isElementLink = (url: string) => {
   } catch (error) {
     return false;
   }
+};
+
+export const parseElementLinkFromURL = (url: string) => {
+  try {
+    const { searchParams } = new URL(url);
+    if (searchParams.has(ELEMENT_LINK_KEY)) {
+      const id = searchParams.get(ELEMENT_LINK_KEY);
+      return id;
+    }
+  } catch {}
+
+  return null;
 };

@@ -464,8 +464,8 @@ import {
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
-import { getElementsFromQuery } from "../element/elementLink";
 import { actionCopyElementLink } from "../actions/actionElementLink";
+import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -724,7 +724,6 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
-        navigateToLink: this.maybeNavigateToElementsFromLink,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -2342,46 +2341,8 @@ class App extends React.Component<AppProps, AppState> {
       this.fonts.onLoaded(fontFaces);
     });
 
-    // navigate to elements from link if shape id is present in the URL
-    this.maybeNavigateToElementsFromLink(window.location.href, false);
-  };
-
-  maybeNavigateToElementsFromLink = (
-    link: string | undefined | null,
-    animate: boolean,
-  ) => {
-    if (!link) {
-      return false;
-    }
-
-    try {
-      const url = new URL(link);
-      const { elements, isElementLink } = getElementsFromQuery(
-        url.search,
-        this.scene.getNonDeletedElementsMap(),
-      );
-      if (elements && elements.length > 0) {
-        this.scrollToContent(elements, {
-          fitToContent: true,
-          animate,
-        });
-        return true;
-      }
-
-      if (url.host === window.location.host && isElementLink) {
-        this.setState({
-          toast: {
-            message: t("elementLink.notFound"),
-            duration: 3000,
-            closable: true,
-          },
-        });
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      return false;
+    if (isElementLink(window.location.href)) {
+      this.scrollToContent(window.location.href, { animate: false });
     }
   };
 
@@ -3675,7 +3636,14 @@ class App extends React.Component<AppProps, AppState> {
   private cancelInProgressAnimation: (() => void) | null = null;
 
   scrollToContent = (
+    /**
+     * target to scroll to
+     *
+     * - string - id of element or group, or url containing elementLink
+     * - ExcalidrawElement | ExcalidrawElement[] - element(s) objects
+     */
     target:
+      | string
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
     opts?: (
@@ -3702,6 +3670,34 @@ class App extends React.Component<AppProps, AppState> {
       canvasOffsets?: Offsets;
     },
   ) => {
+    if (typeof target === "string") {
+      let id: string | null;
+      if (isElementLink(target)) {
+        id = parseElementLinkFromURL(target);
+      } else {
+        id = target;
+      }
+      if (id) {
+        const elements = this.scene.getElementsFromId(id);
+
+        if (elements?.length) {
+          this.scrollToContent(elements, {
+            fitToContent: opts?.fitToContent ?? true,
+            animate: opts?.animate ?? true,
+          });
+        } else if (isElementLink(target)) {
+          this.setState({
+            toast: {
+              message: t("elementLink.notFound"),
+              duration: 3000,
+              closable: true,
+            },
+          });
+        }
+      }
+      return;
+    }
+
     this.cancelInProgressAnimation?.();
 
     // convert provided target into ExcalidrawElement[] if necessary
