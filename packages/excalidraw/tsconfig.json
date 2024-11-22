@@ -10,6 +10,9 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": [
+			"@cloudflare/workers-types/2023-07-01"
+		],
   }
 }
