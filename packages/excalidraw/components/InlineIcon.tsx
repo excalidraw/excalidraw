@@ -1,6 +1,13 @@
-export const InlineIcon = ({ icon }: { icon: React.ReactNode }) => {
+export const InlineIcon = ({
+  className,
+  icon,
+}: {
+  className?: string;
+  icon: React.ReactNode;
+}) => {
   return (
     <span
+      className={className}
       style={{
         width: "1em",
         margin: "0 0.5ex 0 0.5ex",

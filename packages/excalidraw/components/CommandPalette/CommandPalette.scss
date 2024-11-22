@@ -132,6 +132,14 @@ $verticalBreakpoint: 861px;
       width: 16px;
       height: 16px;
       margin-right: 6px;
+
+      .library-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+      }
     }
   }
 }
