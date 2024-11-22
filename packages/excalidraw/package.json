@@ -62,6 +62,8 @@
     "@excalidraw/random-username": "1.1.0",
     "@radix-ui/react-popover": "1.0.3",
     "@radix-ui/react-tabs": "1.0.2",
+    "@types/async-lock": "1.4.2",
+    "async-lock": "^1.4.1",
     "browser-fs-access": "0.29.1",
     "canvas-roundrect-polyfill": "0.0.1",
     "clsx": "1.1.1",
@@ -95,10 +97,12 @@
     "@babel/preset-env": "7.24.5",
     "@babel/preset-react": "7.24.1",
     "@babel/preset-typescript": "7.24.1",
+    "@cloudflare/workers-types": "^4.20241112.0",
     "@size-limit/preset-big-lib": "9.0.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "16.0.0",
+    "@types/async-lock": "^1.4.2",
     "@types/pako": "1.0.3",
     "@types/pica": "5.1.3",
     "@types/resize-observer-browser": "0.1.7",
@@ -122,7 +126,8 @@
     "size-limit": "9.0.0",
     "style-loader": "3.3.3",
     "ts-loader": "9.3.1",
-    "typescript": "4.9.4"
+    "typescript": "4.9.4",
+    "wrangler": "^3.60.3"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
@@ -132,6 +137,9 @@
     "pack": "yarn build:umd && yarn pack",
     "start": "node ../../scripts/buildExample.mjs && vite",
     "build:example": "node ../../scripts/buildExample.mjs",
-    "size": "yarn build:umd && size-limit"
+    "size": "yarn build:umd && size-limit",
+    "cf:deploy": "wrangler deploy",
+    "cf:dev": "wrangler dev",
+    "cf:typegen": "wrangler types"
   }
 }

@@ -667,7 +667,7 @@ const ExcalidrawWrapper = () => {
 
     // some appState like selections should also be transfered (we could even persist it)
     if (!elementsChange.isEmpty()) {
-      console.log(elementsChange)
+      console.log(elementsChange);
     }
   };
 
