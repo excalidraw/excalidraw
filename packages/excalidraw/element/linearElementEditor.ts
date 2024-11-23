@@ -77,7 +77,6 @@ import {
   headingIsHorizontal,
   headingIsVertical,
 } from "./heading";
-import { debugDrawPoint } from "../visualdebug";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1325,14 +1324,6 @@ export class LinearElementEditor {
     });
 
     if (isElbowArrow(element)) {
-      targets.forEach((target) => {
-        debugDrawPoint(
-          pointFrom<GlobalPoint>(
-            element.x + target.point[0],
-            element.y + target.point[1],
-          ),
-        );
-      });
       const newFixedSegments = indices
         // The segment id being fixed is always the last point index of the
         // arrow segment, so it's always  > 0. Also segments should always

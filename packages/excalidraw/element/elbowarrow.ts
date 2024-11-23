@@ -102,6 +102,7 @@ const generatePoints = memo(
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
     options?: {
       isDragging?: boolean;
+      heading?: Heading;
     },
   ) =>
     routeElbowArrow(state, elementsMap, points, {
@@ -168,7 +169,11 @@ export const updateElbowArrowPoints = (
     arrow,
     elementsMap,
     updatedPoints,
-    options,
+    {
+      ...options,
+      startIsMidPoint: nextFixedSegments.length !== 0,
+      endIsMidPoint: nextFixedSegments.length !== 0,
+    },
   );
 
   // End segment is getting fixed - must happen before start segment move check!
@@ -225,6 +230,7 @@ export const updateElbowArrowPoints = (
             nextFixedSegments[segmentIdx + 1]?.anchor[1] ??
               endDonglePosition[1],
           );
+
       const heading = headingIsHorizontal(segmentEnd.heading)
         ? startHandle[0] < endHandle[0]
           ? HEADING_LEFT
@@ -360,7 +366,10 @@ export const updateElbowArrowPoints = (
           idx,
           pointPairs.length - 1,
           fakeElementsMap,
-          options,
+          {
+            ...options,
+            heading: nextFixedSegments[idx]?.heading,
+          },
         ),
       ),
     ),
@@ -426,6 +435,7 @@ const getElbowArrowData = (
     isDragging?: boolean;
     startIsMidPoint?: boolean;
     endIsMidPoint?: boolean;
+    heading?: Heading;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -482,6 +492,46 @@ const getElbowArrowData = (
     hoveredEndElement,
     origEndGlobalPoint,
   );
+  const fixedStartDongle =
+    startHeading === HEADING_UP
+      ? pointFrom<GlobalPoint>(
+          startGlobalPoint[0],
+          startGlobalPoint[1] + BASE_PADDING,
+        )
+      : startHeading === HEADING_RIGHT
+      ? pointFrom<GlobalPoint>(
+          startGlobalPoint[0] + BASE_PADDING,
+          startGlobalPoint[1],
+        )
+      : startHeading === HEADING_DOWN
+      ? pointFrom<GlobalPoint>(
+          startGlobalPoint[0],
+          startGlobalPoint[1] - BASE_PADDING,
+        )
+      : pointFrom<GlobalPoint>(
+          startGlobalPoint[0] - BASE_PADDING,
+          startGlobalPoint[1],
+        );
+  const fixedEndDongle =
+    endHeading === HEADING_UP
+      ? pointFrom<GlobalPoint>(
+          endGlobalPoint[0],
+          endGlobalPoint[1] + BASE_PADDING,
+        )
+      : endHeading === HEADING_RIGHT
+      ? pointFrom<GlobalPoint>(
+          endGlobalPoint[0] + BASE_PADDING,
+          endGlobalPoint[1],
+        )
+      : endHeading === HEADING_DOWN
+      ? pointFrom<GlobalPoint>(
+          endGlobalPoint[0],
+          endGlobalPoint[1] - BASE_PADDING,
+        )
+      : pointFrom<GlobalPoint>(
+          endGlobalPoint[0] - BASE_PADDING,
+          endGlobalPoint[1],
+        );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
@@ -577,6 +627,9 @@ const getElbowArrowData = (
           ),
           options?.startIsMidPoint,
           options?.endIsMidPoint,
+          fixedStartDongle,
+          fixedEndDongle,
+          options?.heading,
         )
       : generateDynamicAABBs(
           options?.startIsMidPoint
@@ -647,6 +700,7 @@ const getElbowArrowData = (
           options?.endIsMidPoint,
           options?.startIsMidPoint,
         );
+
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -692,6 +746,7 @@ const routeElbowArrow = (
     isDragging?: boolean;
     startIsMidPoint?: boolean;
     endIsMidPoint?: boolean;
+    heading?: Heading;
   },
 ): GlobalPoint[] | null => {
   const {
@@ -925,30 +980,44 @@ const padAABB = (bounds: Bounds, offset: [number, number, number, number]) =>
 const generateSegmentedDynamicAABBs = (
   a: Bounds,
   b: Bounds,
-  startIsMidPoint?: boolean,
-  endIsMidPoint?: boolean,
-) => {
-  let first: Bounds = a;
-  let second: Bounds = b;
+  startIsMidPoint: boolean | undefined,
+  endIsMidPoint: boolean | undefined,
+  startDongle: GlobalPoint | undefined,
+  endDongle: GlobalPoint | undefined,
+  heading: Heading | undefined,
+): Bounds[] => {
+  let first = a;
+  let second = b;
 
-  if (startIsMidPoint) {
-    first = [
-      Math.min(a[0], b[2]),
-      Math.min(a[1], b[3]),
-      Math.max(a[2], b[0]),
-      Math.max(a[3], b[1]),
-    ];
-  }
-  if (endIsMidPoint) {
-    second = [
-      Math.min(b[0], a[2]),
-      Math.min(b[1], a[3]),
-      Math.max(b[2], a[0]),
-      Math.max(b[3], a[1]),
-    ];
+  if (startIsMidPoint && heading && startDongle && endDongle) {
+    if (headingIsHorizontal(heading)) {
+      if (startDongle[0] < endDongle[0]) {
+        first = [startDongle[0], a[1], endDongle[0], a[3]];
+      } else {
+        first = [endDongle[0], a[1], startDongle[0], a[3]];
+      }
+    } else if (startDongle[1] < endDongle[1]) {
+      first = [a[0], startDongle[1], a[2], endDongle[1]];
+    } else {
+      first = [a[0], endDongle[1], a[2], startDongle[1]];
+    }
   }
 
-  return [first, second];
+  if (endIsMidPoint && heading && startDongle && endDongle) {
+    if (headingIsHorizontal(heading)) {
+      if (startDongle[0] < endDongle[0]) {
+        second = [startDongle[0], b[1], endDongle[0], b[3]];
+      } else {
+        second = [endDongle[0], b[1], startDongle[0], b[3]];
+      }
+    } else if (startDongle[1] < endDongle[1]) {
+      second = [b[0], startDongle[1], b[2], endDongle[1]];
+    } else {
+      second = [b[0], endDongle[1], b[2], startDongle[1]];
+    }
+  }
+
+  return [first, second] as Bounds[];
 };
 
 /**
