@@ -165,16 +165,12 @@ export const updateElbowArrowPoints = (
     // Due to the fixedSegment index sorting is essential!
     .sort((a, b) => a.index - b.index);
 
-  const { startDonglePosition, endDonglePosition } = getElbowArrowData(
-    arrow,
-    elementsMap,
-    updatedPoints,
-    {
+  const { startDonglePosition, endDonglePosition, startHeading, endHeading } =
+    getElbowArrowData(arrow, elementsMap, updatedPoints, {
       ...options,
       startIsMidPoint: nextFixedSegments.length !== 0,
       endIsMidPoint: nextFixedSegments.length !== 0,
-    },
-  );
+    });
 
   // End segment is getting fixed - must happen before start segment move check!
   if (
@@ -205,30 +201,59 @@ export const updateElbowArrowPoints = (
     startElementId: arrow.startBinding?.elementId ?? null,
   };
 
+  const anchorStartDongleOffsets = [
+    startDonglePosition[0] - BASE_PADDING,
+    startDonglePosition[1] - BASE_PADDING,
+    startDonglePosition[0] + BASE_PADDING,
+    startDonglePosition[0] + BASE_PADDING,
+  ] as Bounds;
+  const anchorEndDongleOffsets = [
+    endDonglePosition[0] - BASE_PADDING,
+    endDonglePosition[1] - BASE_PADDING,
+    endDonglePosition[0] + BASE_PADDING,
+    endDonglePosition[0] + BASE_PADDING,
+  ] as Bounds;
+
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segmentEnd, segmentIdx) => {
       // Determine if we need to flip the heading for visual appeal
       const startHandle: GlobalPoint = headingIsHorizontal(segmentEnd.heading)
         ? pointFrom(
             nextFixedSegments[segmentIdx - 1]?.anchor[0] ??
-              startDonglePosition[0],
+              getDonglePosition(
+                anchorStartDongleOffsets,
+                startHeading,
+                startDonglePosition,
+              )[0],
             segmentEnd.anchor[1],
           )
         : pointFrom(
             segmentEnd.anchor[0],
             nextFixedSegments[segmentIdx - 1]?.anchor[1] ??
-              startDonglePosition[1],
+              getDonglePosition(
+                anchorStartDongleOffsets,
+                startHeading,
+                startDonglePosition,
+              )[1],
           );
       const endHandle: GlobalPoint = headingIsHorizontal(segmentEnd.heading)
         ? pointFrom(
             nextFixedSegments[segmentIdx + 1]?.anchor[0] ??
-              endDonglePosition[0],
+              getDonglePosition(
+                anchorEndDongleOffsets,
+                endHeading,
+                endDonglePosition,
+              )[0],
             segmentEnd.anchor[1],
           )
         : pointFrom(
             segmentEnd.anchor[0],
             nextFixedSegments[segmentIdx + 1]?.anchor[1] ??
-              endDonglePosition[1],
+              getDonglePosition(
+                anchorEndDongleOffsets,
+                endHeading,
+                endDonglePosition,
+              )[1],
           );
 
       const heading = headingIsHorizontal(segmentEnd.heading)
@@ -492,46 +517,6 @@ const getElbowArrowData = (
     hoveredEndElement,
     origEndGlobalPoint,
   );
-  const fixedStartDongle =
-    startHeading === HEADING_UP
-      ? pointFrom<GlobalPoint>(
-          startGlobalPoint[0],
-          startGlobalPoint[1] + BASE_PADDING,
-        )
-      : startHeading === HEADING_RIGHT
-      ? pointFrom<GlobalPoint>(
-          startGlobalPoint[0] + BASE_PADDING,
-          startGlobalPoint[1],
-        )
-      : startHeading === HEADING_DOWN
-      ? pointFrom<GlobalPoint>(
-          startGlobalPoint[0],
-          startGlobalPoint[1] - BASE_PADDING,
-        )
-      : pointFrom<GlobalPoint>(
-          startGlobalPoint[0] - BASE_PADDING,
-          startGlobalPoint[1],
-        );
-  const fixedEndDongle =
-    endHeading === HEADING_UP
-      ? pointFrom<GlobalPoint>(
-          endGlobalPoint[0],
-          endGlobalPoint[1] + BASE_PADDING,
-        )
-      : endHeading === HEADING_RIGHT
-      ? pointFrom<GlobalPoint>(
-          endGlobalPoint[0] + BASE_PADDING,
-          endGlobalPoint[1],
-        )
-      : endHeading === HEADING_DOWN
-      ? pointFrom<GlobalPoint>(
-          endGlobalPoint[0],
-          endGlobalPoint[1] - BASE_PADDING,
-        )
-      : pointFrom<GlobalPoint>(
-          endGlobalPoint[0] - BASE_PADDING,
-          endGlobalPoint[1],
-        );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
@@ -627,8 +612,10 @@ const getElbowArrowData = (
           ),
           options?.startIsMidPoint,
           options?.endIsMidPoint,
-          fixedStartDongle,
-          fixedEndDongle,
+          startHeading,
+          endHeading,
+          startGlobalPoint,
+          endGlobalPoint,
           options?.heading,
         )
       : generateDynamicAABBs(
@@ -982,12 +969,22 @@ const generateSegmentedDynamicAABBs = (
   b: Bounds,
   startIsMidPoint: boolean | undefined,
   endIsMidPoint: boolean | undefined,
-  startDongle: GlobalPoint | undefined,
-  endDongle: GlobalPoint | undefined,
+  startHeading: Heading,
+  endHeading: Heading,
+  startGlobalPoint: GlobalPoint,
+  endGlobalPoint: GlobalPoint,
   heading: Heading | undefined,
 ): Bounds[] => {
   let first = a;
   let second = b;
+  // const startDongle = startIsMidPoint
+  //   ? startGlobalPoint
+  //   : getDonglePosition(a, startHeading, startGlobalPoint);
+  // const endDongle = endIsMidPoint
+  //   ? endGlobalPoint
+  //   : getDonglePosition(b, endHeading, endGlobalPoint);
+  const startDongle = getDonglePosition(a, startHeading, startGlobalPoint);
+  const endDongle = getDonglePosition(b, endHeading, endGlobalPoint);
 
   if (startIsMidPoint && heading && startDongle && endDongle) {
     if (headingIsHorizontal(heading)) {
@@ -1015,6 +1012,13 @@ const generateSegmentedDynamicAABBs = (
     } else {
       second = [b[0], endDongle[1], b[2], startDongle[1]];
     }
+  }
+
+  const boundsOverlap =
+    pointInsideBounds(startGlobalPoint, second) ||
+    pointInsideBounds(endGlobalPoint, first);
+  if (boundsOverlap) {
+    return [a, b];
   }
 
   return [first, second] as Bounds[];
