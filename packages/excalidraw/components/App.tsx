@@ -5465,12 +5465,7 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerUpEvent!.clientY,
       ),
     );
-    if (
-      !this.hitLinkElement ||
-      // For touch screen allow dragging threshold else strict check
-      (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
-      (!isTouchScreen && draggedDistance !== 0)
-    ) {
+    if (!this.hitLinkElement || draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
