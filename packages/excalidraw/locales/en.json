@@ -125,9 +125,8 @@
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
-      "editEmbed": "Edit link & embed",
-      "create": "Create link",
-      "createEmbed": "Create link & embed",
+      "editEmbed": "Edit embeddable link",
+      "create": "Add link",
       "label": "Link",
       "labelEmbed": "Link & embed",
       "empty": "No link is set",

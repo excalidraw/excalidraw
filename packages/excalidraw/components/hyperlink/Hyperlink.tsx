@@ -364,12 +364,10 @@ export const getContextMenuLabel = (
   appState: UIAppState,
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
-  const label = selectedElements[0]?.link
-    ? isEmbeddableElement(selectedElements[0])
-      ? "labels.link.editEmbed"
-      : "labels.link.edit"
-    : isEmbeddableElement(selectedElements[0])
-    ? "labels.link.createEmbed"
+  const label = isEmbeddableElement(selectedElements[0])
+    ? "labels.link.editEmbed"
+    : selectedElements[0]?.link
+    ? "labels.link.edit"
     : "labels.link.create";
   return label;
 };
