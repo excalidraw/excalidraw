@@ -241,21 +241,6 @@ const maybeParseHTMLPaste = (
 export const readSystemClipboard = async () => {
   const types: { [key in AllowedPasteMimeTypes]?: string } = {};
 
-  try {
-    if (navigator.clipboard?.readText) {
-      return { "text/plain": await navigator.clipboard?.readText() };
-    }
-  } catch (error: any) {
-    // @ts-ignore
-    if (navigator.clipboard?.read) {
-      console.warn(
-        `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
-      );
-    } else {
-      throw error;
-    }
-  }
-
   let clipboardItems: ClipboardItems;
 
   try {
@@ -267,6 +252,34 @@ export const readSystemClipboard = async () => {
       );
       return types;
     }
+    throw error;
+  }
+
+  try {
+    if (navigator.clipboard?.read) {
+      const readClipboard = await navigator.clipboard?.read();
+      const textItem = readClipboard.find((item) => 
+        item.types.includes("text/plain")
+      );
+      if (textItem) {
+        const readText = await navigator.clipboard.readText();
+        if (readText) {
+          return { "text/plain": readText };
+        }
+      }
+      const imageItem = readClipboard.find((item) => 
+        item.types.some(type => type.startsWith("image/"))
+      );
+      if (imageItem) {
+        const imageType = imageItem.types.find(type => type.startsWith("image/")) || "image/png";
+        const imageBlob = await imageItem.getType(imageType);
+        const imageUrl = URL.createObjectURL(imageBlob);
+        return { [imageType]: imageUrl };
+      }
+    }
+  } catch (error: any) {
+    // @ts-ignore
+    console.warn(`Error reading system clipboard: ${error.message}`);
     throw error;
   }
 
@@ -319,9 +332,21 @@ const parseClipboardEvent = async (
       return mixedContent;
     }
 
-    const text = event.clipboardData?.getData("text/plain");
+    const imageType = event.clipboardData?.types[0]?.startsWith("image/") ? event.clipboardData?.types[0] : "image/png";
 
-    return { type: "text", value: (text || "").trim() };
+    const image = event.clipboardData?.getData(imageType);
+
+    if (image) {
+      return {
+        type: "mixedContent",
+        value: [{ type: "imageUrl", value: image }],
+      };
+    }
+
+    const text = event.clipboardData?.getData("text/plain");
+    
+    return { type: "text", value: text?.trim() || "" };
+
   } catch {
     return { type: "text", value: "" };
   }
