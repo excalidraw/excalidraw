@@ -24,7 +24,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
     </button>
     <a
       class="dropdown-menu-item dropdown-menu-item-base"
-      href="blog.excalidaw.com"
+      href="https://plus.excalidraw.com/blog"
       rel="noreferrer"
       target="_blank"
     >
