@@ -125,12 +125,13 @@
     "createContainerFromText": "La tekst flyte i en beholder",
     "link": {
       "edit": "Rediger lenke",
-      "editEmbed": "Rediger lenke og bygg inn",
-      "create": "Opprett lenke",
-      "createEmbed": "Opprett lenke og bygg inn",
+      "editEmbed": "",
+      "create": "",
       "label": "Lenke",
       "labelEmbed": "Lenk & bygg inn",
-      "empty": "Ingen lenke er valgt"
+      "empty": "Ingen lenke er valgt",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Rediger linje",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Ingen elementer lagt til ennå...",
@@ -501,7 +509,8 @@
     "selection": "utvalg",
     "pasteAsSingleElement": "Bruk {{shortcut}} for å lime inn som ett enkelt element,\neller lim inn i en eksisterende tekstbehandler",
     "unableToEmbed": "Innbygging av denne nettadressen er ikke tillatt. Oppret en sak på GitHub for å be om url-hvitelisting",
-    "unrecognizedLinkFormat": "Linken du bygget inn samsvarer ikke med det forventede formatet. Prøv å lime inn \"bygg inn\"-strengen fra kildesiden"
+    "unrecognizedLinkFormat": "Linken du bygget inn samsvarer ikke med det forventede formatet. Prøv å lime inn \"bygg inn\"-strengen fra kildesiden",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Gjennomsiktig",
