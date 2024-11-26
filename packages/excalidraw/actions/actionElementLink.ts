@@ -6,7 +6,6 @@ import {
   getLinkIdAndTypeFromSelection,
 } from "../element/elementLink";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { StoreAction } from "../store";
 import { register } from "./register";
@@ -64,10 +63,6 @@ export const actionCopyElementLink = register({
       storeAction: StoreAction.NONE,
     };
   },
-  keyTest: (event) =>
-    event.shiftKey &&
-    event.key.toLowerCase() === KEYS.L &&
-    !event[KEYS.CTRL_OR_CMD],
   predicate: (elements, appState) =>
     canCreateLinkFromElements(getSelectedElements(elements, appState)),
 });
@@ -107,7 +102,4 @@ export const actionLinkToElement = register({
     );
   },
   trackEvent: false,
-  keyTest: (event) => {
-    return event[KEYS.CTRL_OR_CMD] && event.key === KEYS.L && !event.altKey;
-  },
 });

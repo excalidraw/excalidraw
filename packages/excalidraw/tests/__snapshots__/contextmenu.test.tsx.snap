@@ -790,7 +790,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
             />
           </React.Fragment>
         </svg>,
-        "keyTest": [Function],
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -5425,7 +5424,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
             />
           </React.Fragment>
         </svg>,
-        "keyTest": [Function],
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -6637,7 +6635,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
             />
           </React.Fragment>
         </svg>,
-        "keyTest": [Function],
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -8572,7 +8569,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
             />
           </React.Fragment>
         </svg>,
-        "keyTest": [Function],
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],
@@ -9551,7 +9547,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
             />
           </React.Fragment>
         </svg>,
-        "keyTest": [Function],
         "label": "labels.copyElementLink",
         "name": "copyElementLink",
         "perform": [Function],

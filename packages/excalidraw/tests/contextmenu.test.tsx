@@ -22,6 +22,7 @@ import { copiedStyles } from "../actions/actionStyles";
 import { API } from "./helpers/api";
 import { setDateTimeForTests } from "../utils";
 import { vi } from "vitest";
+import type { ActionName } from "../actions/types";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(
@@ -115,7 +116,7 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
-    const expectedShortcutNames: ShortcutName[] = [
+    const expectedContextMenuItems: ActionName[] = [
       "cut",
       "copy",
       "paste",
@@ -136,10 +137,10 @@ describe("contextMenu element", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenuOptions?.length).toBe(expectedShortcutNames.length);
-    expectedShortcutNames.forEach((shortcutName) => {
+    expect(contextMenuOptions?.length).toBe(expectedContextMenuItems.length);
+    expectedContextMenuItems.forEach((item) => {
       expect(
-        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+        contextMenu?.querySelector(`li[data-testid="${item}"]`),
       ).not.toBeNull();
     });
   });
@@ -264,7 +265,7 @@ describe("contextMenu element", () => {
     const contextMenu = UI.queryContextMenu();
     const contextMenuOptions =
       contextMenu?.querySelectorAll(".context-menu li");
-    const expectedShortcutNames: ShortcutName[] = [
+    const expectedContextMenuItems: ActionName[] = [
       "cut",
       "copy",
       "paste",
@@ -285,10 +286,10 @@ describe("contextMenu element", () => {
     ];
 
     expect(contextMenu).not.toBeNull();
-    expect(contextMenuOptions?.length).toBe(expectedShortcutNames.length);
-    expectedShortcutNames.forEach((shortcutName) => {
+    expect(contextMenuOptions?.length).toBe(expectedContextMenuItems.length);
+    expectedContextMenuItems.forEach((item) => {
       expect(
-        contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
+        contextMenu?.querySelector(`li[data-testid="${item}"]`),
       ).not.toBeNull();
     });
   });
