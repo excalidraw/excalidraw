@@ -125,12 +125,13 @@
     "createContainerFromText": "Încadrare text într-un container",
     "link": {
       "edit": "Editare URL",
-      "editEmbed": "Editare URL și încorporare",
-      "create": "Creare URL",
-      "createEmbed": "Creare URL și încorporare",
+      "editEmbed": "",
+      "create": "",
       "label": "URL",
       "labelEmbed": "URL și încorporare",
-      "empty": "Nu este setat niciun URL"
+      "empty": "Nu este setat niciun URL",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editare linie",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Transfocare pentru a cuprinde selecția",
     "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
     "installPWA": "Instalează Excalidraw la nivel local (PWA)",
-    "autoResize": "Activare autoredimensionare text"
+    "autoResize": "Activare autoredimensionare text",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Niciun element adăugat încă...",
@@ -501,7 +509,8 @@
     "selection": "selecția",
     "pasteAsSingleElement": "Folosește {{shortcut}} pentru a insera ca un singur element\nsau insera într-un editor de text existent",
     "unableToEmbed": "Încorporarea acestui URL nu este permisă momentan. Deschideți un tichet cu probleme pe GitHub pentru a solicita adăugarea acestui URL în lista albă",
-    "unrecognizedLinkFormat": "URL-ul pe care l-ai încorporat nu coincide cu formatul așteptat. Încearcă să lipești șirul „de încorporat” furnizat de pagina sursă"
+    "unrecognizedLinkFormat": "URL-ul pe care l-ai încorporat nu coincide cu formatul așteptat. Încearcă să lipești șirul „de încorporat” furnizat de pagina sursă",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparent",
