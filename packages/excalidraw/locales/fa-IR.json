@@ -125,12 +125,13 @@
     "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
-      "editEmbed": "ویرایش لینک و افزونه",
-      "create": "ایجاد پیوند",
-      "createEmbed": "ساخت لینک و افزونه",
+      "editEmbed": "",
+      "create": "",
       "label": "لینک",
       "labelEmbed": "لینک و افزونه",
-      "empty": "هیچ لینکی ست نشده"
+      "empty": "هیچ لینکی ست نشده",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "ویرایش لینک",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "بزرگنمایی به اندازه قسمت انتخاب شده",
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "installPWA": "نصب Excalidraw روی دستگاه (PWA)",
-    "autoResize": "فعالسازی تنظیم خودکار سایز"
+    "autoResize": "فعالسازی تنظیم خودکار سایز",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -501,7 +509,8 @@
     "selection": "انتخاب",
     "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید",
     "unableToEmbed": "قرار دادن این Url در حال حاضر مجاز نیست. درGitHub برای درخواست Url Whitelisted مشکلی ایجاد کنید",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "شفاف",
