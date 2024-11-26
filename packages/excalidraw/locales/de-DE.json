@@ -125,12 +125,13 @@
     "createContainerFromText": "Text in Container einbetten",
     "link": {
       "edit": "Link bearbeiten",
-      "editEmbed": "Link bearbeiten & einbetten",
-      "create": "Link erstellen",
-      "createEmbed": "Link erstellen & einbetten",
+      "editEmbed": "",
+      "create": "",
       "label": "Link",
       "labelEmbed": "Verlinken & einbetten",
-      "empty": "Kein Link festgelegt"
+      "empty": "Kein Link festgelegt",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Linie bearbeiten",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Zoom auf Auswahl anpassen",
     "zoomToFit": "Zoom auf alle Elemente anpassen",
     "installPWA": "Excalidraw lokal installieren (PWA)",
-    "autoResize": "Aktiviere automatische Textgrößenanpassung"
+    "autoResize": "Aktiviere automatische Textgrößenanpassung",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Noch keine Elemente hinzugefügt...",
@@ -501,7 +509,8 @@
     "selection": "Auswahl",
     "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
     "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
-    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird"
+    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparent",
