@@ -126,11 +126,12 @@
     "link": {
       "edit": "Muokkaa linkkiä",
       "editEmbed": "",
-      "create": "Luo linkki",
-      "createEmbed": "",
+      "create": "",
       "label": "Linkki",
       "labelEmbed": "",
-      "empty": "Linkkiä ei ole asetettu"
+      "empty": "Linkkiä ei ole asetettu",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Muokkaa riviä",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Kirjastossa ei ole vielä yhtään kohdetta...",
@@ -501,7 +509,8 @@
     "selection": "valinta",
     "pasteAsSingleElement": "Käytä {{shortcut}} liittääksesi yhtenä elementtinä,\ntai liittääksesi olemassa olevaan tekstieditoriin",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Läpinäkyvä",
