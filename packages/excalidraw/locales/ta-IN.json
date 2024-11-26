@@ -125,12 +125,13 @@
     "createContainerFromText": "உரையைக் கொள்கலனுள் சுருட்டு",
     "link": {
       "edit": "தொடுப்பைத் திருத்து",
-      "editEmbed": "தொடுப்பைத் திருத்தி உட்பொதி",
-      "create": "தொடுப்பைப் படை",
-      "createEmbed": "தொடுப்பை உருவாக்கி உட்பொதி",
+      "editEmbed": "",
+      "create": "",
       "label": "தொடுப்பு",
       "labelEmbed": "தொடுப்பு & உட்பொதிப்பு",
-      "empty": "தொடுப்பு அமைக்கப்படவில்லை"
+      "empty": "தொடுப்பு அமைக்கப்படவில்லை",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "தொடுப்பைத் திருத்து",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "இதுவரை உருப்படிகள் சேரக்கப்படவில்லை...",
@@ -501,7 +509,8 @@
     "selection": "தெரிவு",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "ஒளிபுகுத்தன்மை",
