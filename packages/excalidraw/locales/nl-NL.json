@@ -125,12 +125,13 @@
     "createContainerFromText": "",
     "link": {
       "edit": "Wijzig link",
-      "editEmbed": "Link bewerken & insluiten",
-      "create": "Maak link",
-      "createEmbed": "Link maken en insluiten",
+      "editEmbed": "",
+      "create": "",
       "label": "Link",
       "labelEmbed": "Link toevoegen & insluiten",
-      "empty": "Er is geen link ingesteld"
+      "empty": "Er is geen link ingesteld",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Bewerk regel",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Nog geen items toegevoegd...",
@@ -501,7 +509,8 @@
     "selection": "selectie",
     "pasteAsSingleElement": "Gebruik {{shortcut}} om te plakken als een enkel element,\nof plak in een bestaande teksteditor",
     "unableToEmbed": "Het insluiten van deze url is momenteel niet toegestaan. Zet een probleem op GitHub om de URL op de whitelist te zetten",
-    "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken"
+    "unrecognizedLinkFormat": "De link die u hebt ingesloten komt niet overeen met het verwachte formaat. Probeer de 'embed' string van de bronsite te plakken",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparant",
