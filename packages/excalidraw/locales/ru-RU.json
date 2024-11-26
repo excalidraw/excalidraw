@@ -125,12 +125,13 @@
     "createContainerFromText": "Поместить текст в контейнер",
     "link": {
       "edit": "Редактировать ссылку",
-      "editEmbed": "Редактировать ссылку и встроить",
-      "create": "Создать ссылку",
-      "createEmbed": "Создать ссылку и встроить",
+      "editEmbed": "",
+      "create": "",
       "label": "Ссылка",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Редактирование строки",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Увеличить до выделенного",
     "zoomToFit": "",
     "installPWA": "Установить Excalidraw локально (PWA)",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -501,7 +509,8 @@
     "selection": "выделение",
     "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор",
     "unableToEmbed": "Встраивание этого url в данный момент не разрешено. Сделать запрос на GitHub для добавления url в белый список",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Прозрачный",
