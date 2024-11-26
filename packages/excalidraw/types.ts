@@ -750,6 +750,7 @@ export interface ExcalidrawImperativeAPI {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
+  store: InstanceType<typeof App>["store"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];

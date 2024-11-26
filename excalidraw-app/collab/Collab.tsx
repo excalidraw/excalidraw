@@ -89,7 +89,9 @@ import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
 } from "../../packages/excalidraw/data/reconcile";
+import { ExcalidrawSyncClient } from "../../packages/excalidraw/sync/client";
 
+export const syncAPIAtom = atom<ExcalidrawSyncClient | null>(null);
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
@@ -235,6 +237,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
+    appJotaiStore.set(
+      syncAPIAtom,
+      new ExcalidrawSyncClient(this.excalidrawAPI),
+    );
 
     if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       window.collab = window.collab || ({} as Window["collab"]);

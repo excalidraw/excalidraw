@@ -138,8 +138,8 @@
     "start": "node ../../scripts/buildExample.mjs && vite",
     "build:example": "node ../../scripts/buildExample.mjs",
     "size": "yarn build:umd && size-limit",
-    "cf:deploy": "wrangler deploy",
-    "cf:dev": "wrangler dev",
-    "cf:typegen": "wrangler types"
+    "sync:deploy": "wrangler deploy",
+    "sync:dev": "wrangler dev",
+    "sync:typegen": "wrangler types"
   }
 }

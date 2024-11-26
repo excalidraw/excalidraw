@@ -32,6 +32,7 @@ import type {
 } from "./element/types";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
+import { randomId } from "./random";
 import { getObservedAppState } from "./store";
 import type {
   AppState,
@@ -795,27 +796,33 @@ export class AppStateChange implements Change<AppState> {
   }
 }
 
-type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
-  ElementUpdate<Ordered<T>>,
-  "seed"
->;
+type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> =
+  ElementUpdate<Ordered<T>>;
 
 /**
  * Elements change is a low level primitive to capture a change between two sets of elements.
  * It does so by encapsulating forward and backward `Delta`s, allowing to time-travel in both directions.
  */
 export class ElementsChange implements Change<SceneElementsMap> {
+  public readonly id: string;
+
   private constructor(
     private readonly added: Record<string, Delta<ElementPartial>>,
     private readonly removed: Record<string, Delta<ElementPartial>>,
     private readonly updated: Record<string, Delta<ElementPartial>>,
-  ) {}
+    options: { changeId: string },
+  ) {
+    this.id = options.changeId;
+  }
 
   public static create(
     added: Record<string, Delta<ElementPartial>>,
     removed: Record<string, Delta<ElementPartial>>,
     updated: Record<string, Delta<ElementPartial>>,
-    options = { shouldRedistribute: false },
+    options: { changeId: string; shouldRedistribute: boolean } = {
+      changeId: randomId(),
+      shouldRedistribute: false,
+    },
   ) {
     let change: ElementsChange;
 
@@ -840,9 +847,13 @@ export class ElementsChange implements Change<SceneElementsMap> {
         }
       }
 
-      change = new ElementsChange(nextAdded, nextRemoved, nextUpdated);
+      change = new ElementsChange(nextAdded, nextRemoved, nextUpdated, {
+        changeId: options.changeId,
+      });
     } else {
-      change = new ElementsChange(added, removed, updated);
+      change = new ElementsChange(added, removed, updated, {
+        changeId: options.changeId,
+      });
     }
 
     if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
@@ -985,12 +996,13 @@ export class ElementsChange implements Change<SceneElementsMap> {
     return ElementsChange.create({}, {}, {});
   }
 
-  public static load(data: {
-    added: Record<string, Delta<ElementPartial>>;
-    removed: Record<string, Delta<ElementPartial>>;
-    updated: Record<string, Delta<ElementPartial>>;
-  }) {
-    return ElementsChange.create(data.added, data.removed, data.updated);
+  public static load(payload: string) {
+    const { id, added, removed, updated } = JSON.parse(payload);
+
+    return ElementsChange.create(added, removed, updated, {
+      changeId: id,
+      shouldRedistribute: false,
+    });
   }
 
   public inverse(): ElementsChange {
@@ -1077,6 +1089,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     const updated = applyLatestChangesInternal(this.updated);
 
     return ElementsChange.create(added, removed, updated, {
+      changeId: this.id,
       shouldRedistribute: true, // redistribute the deltas as `isDeleted` could have been updated
     });
   }
@@ -1101,9 +1114,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
         flags,
       );
 
-      const addedElements = applyDeltas(this.added);
-      const removedElements = applyDeltas(this.removed);
-      const updatedElements = applyDeltas(this.updated);
+      const addedElements = applyDeltas("added", this.added);
+      const removedElements = applyDeltas("removed", this.removed);
+      const updatedElements = applyDeltas("updated", this.updated);
 
       const affectedElements = this.resolveConflicts(elements, nextElements);
 
@@ -1156,22 +1169,27 @@ export class ElementsChange implements Change<SceneElementsMap> {
     }
   }
 
-  private static createApplier = (
-    nextElements: SceneElementsMap,
-    snapshot: Map<string, OrderedExcalidrawElement>,
-    flags: {
-      containsVisibleDifference: boolean;
-      containsZindexDifference: boolean;
-    },
-  ) => {
-    const getElement = ElementsChange.createGetter(
-      nextElements,
-      snapshot,
-      flags,
-    );
+  private static createApplier =
+    (
+      nextElements: SceneElementsMap,
+      snapshot: Map<string, OrderedExcalidrawElement>,
+      flags: {
+        containsVisibleDifference: boolean;
+        containsZindexDifference: boolean;
+      },
+    ) =>
+    (
+      type: "added" | "removed" | "updated",
+      deltas: Record<string, Delta<ElementPartial>>,
+    ) => {
+      const getElement = ElementsChange.createGetter(
+        type,
+        nextElements,
+        snapshot,
+        flags,
+      );
 
-    return (deltas: Record<string, Delta<ElementPartial>>) =>
-      Object.entries(deltas).reduce((acc, [id, delta]) => {
+      return Object.entries(deltas).reduce((acc, [id, delta]) => {
         const element = getElement(id, delta.inserted);
 
         if (element) {
@@ -1182,10 +1200,11 @@ export class ElementsChange implements Change<SceneElementsMap> {
 
         return acc;
       }, new Map<string, OrderedExcalidrawElement>());
-  };
+    };
 
   private static createGetter =
     (
+      type: "added" | "removed" | "updated",
       elements: SceneElementsMap,
       snapshot: Map<string, OrderedExcalidrawElement>,
       flags: {
@@ -1211,6 +1230,15 @@ export class ElementsChange implements Change<SceneElementsMap> {
           ) {
             flags.containsVisibleDifference = true;
           }
+        } else if (type === "added") {
+          // for additions the element does not have to exist (i.e. remote update)
+          // TODO: the version itself might be different!
+          element = newElementWith(
+            { id, version: 1 } as OrderedExcalidrawElement,
+            {
+              ...partial,
+            },
+          );
         }
       }
 
@@ -1574,8 +1602,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
   private static stripIrrelevantProps(
     partial: Partial<OrderedExcalidrawElement>,
   ): ElementPartial {
-    const { id, updated, version, versionNonce, seed, ...strippedPartial } =
-      partial;
+    const { id, updated, version, versionNonce, ...strippedPartial } = partial;
 
     return strippedPartial;
   }

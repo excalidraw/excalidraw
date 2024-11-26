@@ -54,6 +54,7 @@ import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
   isOfflineAtom,
+  syncAPIAtom,
 } from "./collab/Collab";
 import {
   exportToBackend,
@@ -359,10 +360,19 @@ const ExcalidrawWrapper = () => {
 
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
+  const [syncAPI] = useAtom(syncAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+
+  useEffect(() => {
+    syncAPI?.reconnect();
+
+    return () => {
+      syncAPI?.disconnect();
+    };
+  }, [syncAPI]);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -667,7 +677,7 @@ const ExcalidrawWrapper = () => {
 
     // some appState like selections should also be transfered (we could even persist it)
     if (!elementsChange.isEmpty()) {
-      console.log(elementsChange);
+      syncAPI?.push("durable", [elementsChange]);
     }
   };
 
