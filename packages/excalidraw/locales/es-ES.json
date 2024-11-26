@@ -125,12 +125,13 @@
     "createContainerFromText": "Envolver el texto en un contenedor",
     "link": {
       "edit": "Editar enlace",
-      "editEmbed": "Editar enlace e incrustar",
-      "create": "Crear enlace",
-      "createEmbed": "Crear enlace e incrustar",
+      "editEmbed": "",
+      "create": "",
       "label": "Enlace",
       "labelEmbed": "Enlazar e incrustar",
-      "empty": "No se ha establecido un enlace"
+      "empty": "No se ha establecido un enlace",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar línea",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "No hay elementos añadidos todavía...",
@@ -501,7 +509,8 @@
     "selection": "selección",
     "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un solo elemento,\no pegar en un editor de texto existente",
     "unableToEmbed": "Incorporar esta url no está permitido actualmente. Señale esta incidencia en nuestro GitHub para solicitar que esta url esté entre las permitidas",
-    "unrecognizedLinkFormat": "El enlace que incrustó no coincide con el formato esperado. Por favor intente pegar la cadena 'embed' proporcionada por el sitio de origen"
+    "unrecognizedLinkFormat": "El enlace que incrustó no coincide con el formato esperado. Por favor intente pegar la cadena 'embed' proporcionada por el sitio de origen",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparente",
