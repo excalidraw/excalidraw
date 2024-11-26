@@ -26,6 +26,10 @@ import {
   StoreAction,
   reconcileElements,
 } from "../packages/excalidraw";
+import {
+  exportToBlob,
+  getNonDeletedElements,
+} from "../packages/excalidraw/index";
 import type {
   AppState,
   ExcalidrawImperativeAPI,
@@ -127,6 +131,9 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { fileSave } from "../packages/excalidraw/data/filesystem";
+import type { ExportToCanvasConfig } from "../packages/excalidraw/scene/export";
+import { exportToCanvas } from "../packages/utils";
 
 polyfill();
 
@@ -607,6 +614,24 @@ const ExcalidrawWrapper = () => {
     };
   }, [excalidrawAPI]);
 
+  const canvasPreviewContainerRef = useRef<HTMLDivElement>(null);
+
+  const [config, setConfig] = useState<ExportToCanvasConfig>(
+    JSON.parse(localStorage.getItem("_exportConfig") || "null") || {
+      width: 300,
+      height: 100,
+      padding: 2,
+      scale: 1,
+      position: "none",
+      fit: "contain",
+      canvasBackgroundColor: "yellow",
+    },
+  );
+
+  useEffect(() => {
+    localStorage.setItem("_exportConfig", JSON.stringify(config));
+  }, [config]);
+
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -614,6 +639,93 @@ const ExcalidrawWrapper = () => {
   ) => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
+    }
+
+    {
+      const frame = elements.find(
+        (el) => el.strokeStyle === "dashed" && !el.isDeleted,
+      );
+
+      const zoom = appState.zoom.value;
+
+      exportToCanvas({
+        data: {
+          elements: getNonDeletedElements(elements).filter(
+            (x) => x.id !== frame?.id,
+          ),
+          // .concat(
+          //   restoreElements(
+          //     [
+          //       // @ts-ignore
+          //       {
+          //         type: "rectangle",
+          //         width: appState.width / zoom,
+          //         height: appState.height / zoom,
+          //         x: -appState.scrollX,
+          //         y: -appState.scrollY,
+          //         fillStyle: "solid",
+          //         strokeColor: "transparent",
+          //         backgroundColor: "rgba(0,0,0,0.05)",
+          //         roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS, value: 40 },
+          //       },
+          //     ],
+          //     null,
+          //   ),
+          // ),
+          appState,
+          files,
+        },
+        config: {
+          //   // light yellow
+          //   // canvasBackgroundColor: "#fff9c4",
+          //   // width,
+          //   // maxWidthOrHeight: 120,
+          //   // scale: 0.01,
+          //   // scale: 2,
+          //   // origin: "content",
+          //   // fit: "cover",
+          //   // scale: 2,
+          //   // x: 0,
+          //   // y: 0,
+          //   padding: 20,
+
+          // ...config,
+
+          // width: config.width,
+          // height: config.height,
+          // maxWidthOrHeight: config.maxWidthOrHeight,
+          // widthOrHeight: config.widthOrHeight,
+          // padding: config.padding,
+          ...(frame
+            ? {
+                ...config,
+                width: frame.width,
+                height: frame.height,
+                x: frame.x,
+                y: frame.y,
+              }
+            : config),
+          //   // height: 140,
+          //   // x: -appState.scrollX,
+          //   // y: -appState.scrollY,
+          //   // height: 150,
+          //   // height: appState.height,
+          //   // scale,
+          //   // zoom: { value: appState.zoom.value },
+          //   // getDimensions(width,height) {
+          //   //   setCanvasSize({ width, height })
+          //   //   return {width: 300, height: 150}
+          //   // }
+        },
+      }).then((canvas) => {
+        if (canvasPreviewContainerRef.current) {
+          canvasPreviewContainerRef.current.replaceChildren(canvas);
+          document.querySelector(
+            ".dims",
+          )!.innerHTML = `${canvas.width}x${canvas.height}`;
+          // canvas.style.width = "100%";
+        }
+      });
     }
 
     // this check is redundant, but since this is a hot path, it's best
@@ -1121,6 +1233,233 @@ const ExcalidrawWrapper = () => {
           />
         )}
       </Excalidraw>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          position: "fixed",
+          bottom: 60,
+          right: 60,
+          zIndex: 9999999999,
+          color: "black",
+        }}
+      >
+        <div style={{ display: "flex", gap: "1rem", flexDirection: "column" }}>
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <label>
+              center{" "}
+              <input
+                type="checkbox"
+                checked={config.position === "center"}
+                onChange={() =>
+                  setConfig((s) => ({
+                    ...s,
+                    position: s.position === "center" ? "topLeft" : "center",
+                  }))
+                }
+              />
+            </label>
+            <label>
+              fit{" "}
+              <select
+                value={config.fit}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    fit: event.target.value as any,
+                  }))
+                }
+              >
+                <option value="none">none</option>
+                <option value="contain">contain</option>
+                <option value="cover">cover</option>
+              </select>
+            </label>
+            <label>
+              padding{" "}
+              <input
+                type="number"
+                max={600}
+                style={{ width: "3rem" }}
+                value={config.padding}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    padding: !event.target.value.trim()
+                      ? undefined
+                      : Math.min(parseInt(event.target.value as any), 600),
+                  }))
+                }
+              />
+            </label>
+            <label>
+              scale{" "}
+              <input
+                type="number"
+                max={4}
+                style={{ width: "3rem" }}
+                value={config.scale}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    scale: !event.target.value.trim()
+                      ? undefined
+                      : Math.min(parseFloat(event.target.value as any), 4),
+                  }))
+                }
+              />
+            </label>
+          </div>
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <label
+              style={{
+                opacity:
+                  config.maxWidthOrHeight != null ||
+                  config.widthOrHeight != null
+                    ? 0.5
+                    : undefined,
+              }}
+            >
+              width{" "}
+              <input
+                type="number"
+                max={600}
+                style={{ width: "3rem" }}
+                value={config.width}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    width: !event.target.value.trim()
+                      ? undefined
+                      : Math.min(parseInt(event.target.value as any), 600),
+                  }))
+                }
+              />
+            </label>
+            <label
+              style={{
+                opacity:
+                  config.maxWidthOrHeight != null ||
+                  config.widthOrHeight != null
+                    ? 0.5
+                    : undefined,
+              }}
+            >
+              height{" "}
+              <input
+                type="number"
+                max={600}
+                style={{ width: "3rem" }}
+                value={config.height}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    height: !event.target.value.trim()
+                      ? undefined
+                      : Math.min(parseInt(event.target.value as any), 600),
+                  }))
+                }
+              />
+            </label>
+            <label>
+              x{" "}
+              <input
+                type="number"
+                style={{ width: "3rem" }}
+                value={config.x}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    x: !event.target.value.trim()
+                      ? undefined
+                      : parseFloat(event.target.value as any) ?? undefined,
+                  }))
+                }
+              />
+            </label>
+            <label>
+              y{" "}
+              <input
+                type="number"
+                style={{ width: "3rem" }}
+                value={config.y}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    y: !event.target.value.trim()
+                      ? undefined
+                      : parseFloat(event.target.value as any) ?? undefined,
+                  }))
+                }
+              />
+            </label>
+            <label
+              style={{
+                opacity: config.widthOrHeight != null ? 0.5 : undefined,
+              }}
+            >
+              maxWH{" "}
+              <input
+                type="number"
+                max={600}
+                style={{ width: "3rem" }}
+                value={config.maxWidthOrHeight}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    maxWidthOrHeight: !event.target.value.trim()
+                      ? undefined
+                      : Math.min(parseInt(event.target.value as any), 600),
+                  }))
+                }
+              />
+            </label>
+            <label>
+              widthOrHeight{" "}
+              <input
+                type="number"
+                max={600}
+                style={{ width: "3rem" }}
+                value={config.widthOrHeight}
+                onChange={(event) =>
+                  setConfig((s) => ({
+                    ...s,
+                    widthOrHeight: !event.target.value.trim()
+                      ? undefined
+                      : Math.min(parseInt(event.target.value as any), 600),
+                  }))
+                }
+              />
+            </label>
+          </div>
+        </div>
+        <div className="dims">0x0</div>
+        <div
+          ref={canvasPreviewContainerRef}
+          onClick={() => {
+            exportToBlob({
+              data: {
+                elements: excalidrawAPI!.getSceneElements(),
+                files: null,
+              },
+              config,
+            }).then((blob) => {
+              fileSave(blob, {
+                name: "xx",
+                extension: "png",
+                description: "xxx",
+              });
+            });
+          }}
+          style={{
+            borderRadius: 12,
+            border: "1px solid #777",
+            overflow: "hidden",
+            padding: 10,
+            backgroundColor: "pink",
+          }}
+        />
+      </div>
     </div>
   );
 };

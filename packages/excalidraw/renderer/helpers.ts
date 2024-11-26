@@ -34,15 +34,16 @@ export const bootstrapCanvas = ({
   normalizedHeight,
   theme,
   isExporting,
-  viewBackgroundColor,
+  canvasBackgroundColor,
 }: {
   canvas: HTMLCanvasElement;
   scale: number;
   normalizedWidth: number;
   normalizedHeight: number;
   theme?: AppState["theme"];
+  // static canvas only
   isExporting?: StaticCanvasRenderConfig["isExporting"];
-  viewBackgroundColor?: StaticCanvasAppState["viewBackgroundColor"];
+  canvasBackgroundColor?: string | null;
 }): CanvasRenderingContext2D => {
   const context = canvas.getContext("2d")!;
 
@@ -54,17 +55,17 @@ export const bootstrapCanvas = ({
   }
 
   // Paint background
-  if (typeof viewBackgroundColor === "string") {
+  if (typeof canvasBackgroundColor === "string") {
     const hasTransparence =
-      viewBackgroundColor === "transparent" ||
-      viewBackgroundColor.length === 5 || // #RGBA
-      viewBackgroundColor.length === 9 || // #RRGGBBA
-      /(hsla|rgba)\(/.test(viewBackgroundColor);
+      canvasBackgroundColor === "transparent" ||
+      canvasBackgroundColor.length === 5 || // #RGBA
+      canvasBackgroundColor.length === 9 || // #RRGGBBA
+      /(hsla|rgba)\(/.test(canvasBackgroundColor);
     if (hasTransparence) {
       context.clearRect(0, 0, normalizedWidth, normalizedHeight);
     }
     context.save();
-    context.fillStyle = viewBackgroundColor;
+    context.fillStyle = canvasBackgroundColor;
     context.fillRect(0, 0, normalizedWidth, normalizedHeight);
     context.restore();
   } else {

@@ -164,8 +164,10 @@ const getArrowheadShapes = (
   arrowhead: Arrowhead,
   generator: RoughGenerator,
   options: Options,
-  canvasBackgroundColor: string,
+  canvasBackgroundColor: string | null,
 ) => {
+  canvasBackgroundColor = canvasBackgroundColor || "transparent";
+
   const arrowheadPoints = getArrowheadPoints(
     element,
     shape,
@@ -293,7 +295,7 @@ export const _generateElementShape = (
     embedsValidationStatus,
   }: {
     isExporting: boolean;
-    canvasBackgroundColor: string;
+    canvasBackgroundColor: string | null;
     embedsValidationStatus: EmbedsValidationStatus | null;
   },
 ): Drawable | Drawable[] | null => {

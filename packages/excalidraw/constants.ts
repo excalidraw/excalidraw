@@ -1,7 +1,7 @@
 import cssVariables from "./css/variables.module.scss";
 import type { AppProps, AppState } from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
-import { COLOR_PALETTE } from "./colors";
+import type { NormalizedZoomValue } from "./types";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
@@ -108,7 +108,6 @@ export const YOUTUBE_STATES = {
 
 export const ENV = {
   TEST: "test",
-  DEVELOPMENT: "development",
 };
 
 export const CLASSES = {
@@ -184,6 +183,14 @@ export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
 export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
+export const DEFAULT_ZOOM_VALUE = 1 as NormalizedZoomValue;
+
+// -----------------------------------------------
+// !!! these colors are tied to color picker !!!
+export const COLOR_WHITE = "#ffffff";
+export const COLOR_CHARCOAL_BLACK = "#1e1e1e";
+export const COLOR_TRANSPARENT = "transparent";
+// -----------------------------------------------
 
 export const SIDE_RESIZING_THRESHOLD = 2 * DEFAULT_TRANSFORM_HANDLE_SPACING;
 // a small epsilon to make side resizing always take precedence
@@ -192,8 +199,6 @@ const EPSILON = 0.00001;
 export const DEFAULT_COLLISION_THRESHOLD =
   2 * SIDE_RESIZING_THRESHOLD - EPSILON;
 
-export const COLOR_WHITE = "#ffffff";
-export const COLOR_CHARCOAL_BLACK = "#1e1e1e";
 // keep this in sync with CSS
 export const COLOR_VOICE_CALL = "#a2f1a6";
 
@@ -384,8 +389,8 @@ export const DEFAULT_ELEMENT_PROPS: {
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
-  strokeColor: COLOR_PALETTE.black,
-  backgroundColor: COLOR_PALETTE.transparent,
+  strokeColor: COLOR_CHARCOAL_BLACK,
+  backgroundColor: COLOR_TRANSPARENT,
   fillStyle: "solid",
   strokeWidth: 2,
   strokeStyle: "solid",

@@ -97,7 +97,6 @@ const getRelevantAppStateProps = (
   theme: appState.theme,
   pendingImageElementId: appState.pendingImageElementId,
   shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
-  viewBackgroundColor: appState.viewBackgroundColor,
   exportScale: appState.exportScale,
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,

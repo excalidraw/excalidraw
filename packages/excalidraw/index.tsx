@@ -226,7 +226,6 @@ export {
 export { reconcileElements } from "./data/reconcile";
 
 export {
-  exportToCanvas,
   exportToBlob,
   exportToSvg,
   exportToClipboard,
@@ -273,6 +272,8 @@ export { useDevice } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
+
+export { exportToCanvas } from "./scene/export";
 
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";

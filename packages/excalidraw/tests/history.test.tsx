@@ -15,7 +15,11 @@ import { getDefaultAppState } from "../appState";
 import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import {
+  COLOR_CHARCOAL_BLACK,
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+} from "../constants";
 import type { AppState } from "../types";
 import { arrayToMap } from "../utils";
 import {
@@ -77,7 +81,7 @@ const checkpoint = (name: string) => {
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const transparent = COLOR_PALETTE.transparent;
-const black = COLOR_PALETTE.black;
+const black = COLOR_CHARCOAL_BLACK;
 const red = COLOR_PALETTE.red[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const blue = COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
 const yellow = COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
