@@ -125,13 +125,13 @@
     "createContainerFromText": "将文本包围在容器中",
     "link": {
       "edit": "编辑链接",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "编辑嵌入链接",
+      "create": "添加链接",
       "label": "链接",
       "labelEmbed": "链接与嵌入",
       "empty": "未设定链接",
-      "hint": "",
-      "goToElement": ""
+      "hint": "在此处输入或粘贴您的链接",
+      "goToElement": "前往目标元素"
     },
     "lineEditor": {
       "edit": "编辑线条",
@@ -157,13 +157,13 @@
     "zoomToFit": "缩放以适应所有元素",
     "installPWA": "在本地安装 Excalidraw (PWA)",
     "autoResize": "启用文本自动缩放",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "复制此对象的链接",
+    "linkToElement": "链接到对象"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "链接到对象",
+    "desc": "点击画布上的形状或粘贴链接。",
+    "notFound": "在画布上找不到链接的对象。"
   },
   "library": {
     "noItems": "尚未添加任何项目……",
@@ -510,7 +510,7 @@
     "pasteAsSingleElement": "使用 {{shortcut}} 粘贴为单个元素，\n或粘贴到现有的文本编辑器里",
     "unableToEmbed": "目前不允许嵌入此网址。请在 GitHub 上提 issue 请求将此网址加入白名单",
     "unrecognizedLinkFormat": "您嵌入的链接不符合格式要求。请尝试粘贴源网站提供的“嵌入 (embed)”字符串",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "链接已复制到剪贴板"
   },
   "colors": {
     "transparent": "透明",
