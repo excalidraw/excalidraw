@@ -126,11 +126,12 @@
     "link": {
       "edit": "Editar ligazón",
       "editEmbed": "",
-      "create": "Crear ligazón",
-      "createEmbed": "",
+      "create": "",
       "label": "Ligazón",
       "labelEmbed": "",
-      "empty": "Non se estableceu un enlace"
+      "empty": "Non se estableceu un enlace",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar liña",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Aínda non hai elementos engadidos...",
@@ -501,7 +509,8 @@
     "selection": "selección",
     "pasteAsSingleElement": "Usa {{shortcut}} para pegar como un único elemento\nou pega nun editor de texto existente",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparente",
