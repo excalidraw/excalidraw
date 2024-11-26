@@ -125,13 +125,13 @@
     "createContainerFromText": "Поместить текст в контейнер",
     "link": {
       "edit": "Редактировать ссылку",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Редактировать встраиваемую ссылку",
+      "create": "Добавить ссылку",
       "label": "Ссылка",
       "labelEmbed": "",
       "empty": "",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Введите или вставьте ссылку здесь",
+      "goToElement": "Перейти к элементу"
     },
     "lineEditor": {
       "edit": "Редактирование строки",
@@ -157,7 +157,7 @@
     "zoomToFit": "",
     "installPWA": "Установить Excalidraw локально (PWA)",
     "autoResize": "",
-    "copyElementLink": "",
+    "copyElementLink": "Скопировать ссылку на объект",
     "linkToElement": ""
   },
   "elementLink": {
