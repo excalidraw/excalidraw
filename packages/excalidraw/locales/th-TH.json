@@ -125,12 +125,13 @@
     "createContainerFromText": "จัดข้อความในที่บรรจุ",
     "link": {
       "edit": "แก้ไขลิงก์",
-      "editEmbed": "แก้ไขลิงค์และการฝัง",
-      "create": "สร้างลิงค์",
-      "createEmbed": "สร้างลิงค์และการฝัง",
+      "editEmbed": "",
+      "create": "",
       "label": "ลิงค์",
       "labelEmbed": "ลิงค์และการฝัง",
-      "empty": "ไม่ได้ใส่ลิงค์"
+      "empty": "ไม่ได้ใส่ลิงค์",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "แก้ไขเส้น",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
@@ -501,7 +509,8 @@
     "selection": "",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "",
