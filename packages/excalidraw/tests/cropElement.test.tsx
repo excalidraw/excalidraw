@@ -193,7 +193,7 @@ describe("Crop an image", () => {
     UI.crop(image, "nw", naturalWidth, naturalHeight, [-150, -100], true);
     expect(image.width).toEqual(image.height);
     // max height should be reached
-    expect(image.height).toEqual(initialHeight);
+    expect(image.height).toBeCloseTo(initialHeight, 10);
     expect(image.width).toBe(initialHeight);
   });
 });

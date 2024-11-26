@@ -74,8 +74,14 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import type { GlobalPoint, LocalPoint, Radians } from "../../math";
+import {
+  pointFrom,
+  type GlobalPoint,
+  type LocalPoint,
+  type Radians,
+} from "../../math";
 import { getCornerRadius } from "../shapes";
+import { headingIsHorizontal } from "../element/heading";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -503,55 +509,75 @@ const renderLinearPointHandles = (
     renderSingleLinearPoint(context, appState, point, radius, isSelected);
   });
 
-  //Rendering segment mid points
-  const midPoints = LinearElementEditor.getEditorMidPoints(
-    element,
-    elementsMap,
-    appState,
-  ).filter((midPoint): midPoint is GlobalPoint => midPoint !== null);
-
-  midPoints.forEach((segmentMidPoint) => {
-    if (
-      appState?.selectedLinearElement?.segmentMidPointHoveredCoords &&
-      LinearElementEditor.arePointsEqual(
-        segmentMidPoint,
-        appState.selectedLinearElement.segmentMidPointHoveredCoords,
-      )
-    ) {
-      // The order of renderingSingleLinearPoint and highLight points is different
-      // inside vs outside editor as hover states are different,
-      // in editor when hovered the original point is not visible as hover state fully covers it whereas outside the
-      // editor original point is visible and hover state is just an outer circle.
-      if (appState.editingLinearElement) {
-        renderSingleLinearPoint(
-          context,
-          appState,
-          segmentMidPoint,
-          radius,
-          false,
-        );
-        highlightPoint(segmentMidPoint, context, appState);
-      } else {
-        highlightPoint(segmentMidPoint, context, appState);
-        renderSingleLinearPoint(
-          context,
-          appState,
-          segmentMidPoint,
-          radius,
-          false,
+  // Rendering segment mid points
+  if (isElbowArrow(element)) {
+    const fixedPoints = element.points.slice(0, -1).map((p, i) => {
+      const fixedSegmentIdx =
+        element.fixedSegments?.findIndex(
+          (fixedSegment) => fixedSegment.index === i + 1,
+        ) ?? -1;
+      if (fixedSegmentIdx > -1) {
+        return headingIsHorizontal(
+          element.fixedSegments![fixedSegmentIdx].heading,
         );
       }
-    } else if (appState.editingLinearElement || points.length === 2) {
-      renderSingleLinearPoint(
-        context,
-        appState,
-        segmentMidPoint,
-        POINT_HANDLE_SIZE / 2,
-        false,
-        true,
-      );
-    }
-  });
+
+      return null;
+    });
+    const globalPoints = element.points.map((p) =>
+      pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
+    );
+    globalPoints.slice(0, -1).forEach((p, idx) => {
+      if (
+        !LinearElementEditor.isSegmentTooShort(
+          element,
+          p,
+          globalPoints[idx + 1],
+          appState.zoom,
+        )
+      ) {
+        const isHorizontal =
+          Math.abs(p[0] - globalPoints[idx + 1][0]) >
+          Math.abs(p[1] - globalPoints[idx + 1][1]);
+        renderSingleLinearPoint(
+          context,
+          appState,
+          pointFrom<GlobalPoint>(
+            (p[0] + globalPoints[idx + 1][0]) / 2,
+            (p[1] + globalPoints[idx + 1][1]) / 2,
+          ),
+          POINT_HANDLE_SIZE / 2,
+          false,
+          !(fixedPoints[idx] !== null
+            ? fixedPoints[idx] === isHorizontal
+            : false),
+        );
+      }
+    });
+  } else {
+    const midPoints = LinearElementEditor.getEditorMidPoints(
+      element,
+      elementsMap,
+      appState,
+    ).filter(
+      (midPoint, idx, midPoints): midPoint is GlobalPoint =>
+        midPoint !== null &&
+        !(isElbowArrow(element) && (idx === 0 || idx === midPoints.length - 1)),
+    );
+
+    midPoints.forEach((segmentMidPoint) => {
+      if (appState.editingLinearElement || points.length === 2) {
+        renderSingleLinearPoint(
+          context,
+          appState,
+          segmentMidPoint,
+          POINT_HANDLE_SIZE / 2,
+          false,
+          true,
+        );
+      }
+    });
+  }
 
   context.restore();
 };

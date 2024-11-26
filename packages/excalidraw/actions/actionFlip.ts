@@ -25,8 +25,8 @@ import {
   isElbowArrow,
   isLinearElement,
 } from "../element/typeChecks";
-import { mutateElbowArrow } from "../element/routing";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -132,35 +132,6 @@ const flipElements = (
     });
   }
 
-  const { minX, minY, maxX, maxY, midX, midY } =
-    getCommonBoundingBox(selectedElements);
-
-  resizeMultipleElements(
-    elementsMap,
-    selectedElements,
-    elementsMap,
-    "nw",
-    true,
-    true,
-    flipDirection === "horizontal" ? maxX : minX,
-    flipDirection === "horizontal" ? minY : maxY,
-  );
-
-  bindOrUnbindLinearElements(
-    selectedElements.filter(isLinearElement),
-    elementsMap,
-    app.scene.getNonDeletedElements(),
-    app.scene,
-    isBindingEnabled(appState),
-    [],
-  );
-
-  // ---------------------------------------------------------------------------
-  // flipping arrow elements (and potentially other) makes the selection group
-  // "move" across the canvas because of how arrows can bump against the "wall"
-  // of the selection, so we need to center the group back to the original
-  // position so that repeated flips don't accumulate the offset
-
   const { elbowArrows, otherElements } = selectedElements.reduce(
     (
       acc: {
@@ -175,28 +146,37 @@ const flipElements = (
     { elbowArrows: [], otherElements: [] },
   );
 
-  const { midX: newMidX, midY: newMidY } =
-    getCommonBoundingBox(selectedElements);
-  const [diffX, diffY] = [midX - newMidX, midY - newMidY];
-  otherElements.forEach((element) =>
-    mutateElement(element, {
-      x: element.x + diffX,
-      y: element.y + diffY,
-    }),
+  const { minX, minY, maxX, maxY } = getCommonBoundingBox(otherElements);
+
+  resizeMultipleElements(
+    elementsMap,
+    otherElements,
+    elementsMap,
+    "nw",
+    true,
+    true,
+    flipDirection === "horizontal" ? maxX : minX,
+    flipDirection === "horizontal" ? minY : maxY,
+    true,
   );
-  elbowArrows.forEach((element) =>
-    mutateElbowArrow(
-      element,
+
+  bindOrUnbindLinearElements(
+    selectedElements.filter(isLinearElement),
+    elementsMap,
+    app.scene.getNonDeletedElements(),
+    app.scene,
+    isBindingEnabled(appState),
+    [],
+  );
+
+  elbowArrows.forEach((elbowArrow) => {
+    mutateElement(elbowArrow, { points: elbowArrow.points });
+    LinearElementEditor.updateEditorMidPointsCache(
+      elbowArrow,
       elementsMap,
-      element.points,
-      undefined,
-      undefined,
-      {
-        informMutation: false,
-      },
-    ),
-  );
-  // ---------------------------------------------------------------------------
+      app.state,
+    );
+  });
 
   return selectedElements;
 };

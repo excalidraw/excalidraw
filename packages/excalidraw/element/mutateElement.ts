@@ -1,10 +1,17 @@
-import type { ExcalidrawElement } from "./types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { isElbowArrow } from "./typeChecks";
+import { updateElbowArrowPoints } from "./elbowarrow";
+import type { Radians } from "../../math";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -19,6 +26,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
+  isDragging = false,
+  changedElements?: Map<string, OrderedExcalidrawElement>,
 ): TElement => {
   let didChange = false;
 
@@ -26,8 +35,38 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points, fileId } = updates as any;
 
-  if (typeof points !== "undefined") {
-    updates = { ...getSizeFromPoints(points), ...updates };
+  if (
+    typeof points !== "undefined" ||
+    (!isDragging && Object.hasOwn(updates, "fixedSegments"))
+  ) {
+    if (isElbowArrow(element)) {
+      const mergedElementsMap = toBrandedType<SceneElementsMap>(
+        new Map([
+          ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
+          ...(changedElements ?? []),
+        ]),
+      );
+
+      updates = {
+        ...updates,
+        angle: 0 as Radians,
+        ...updateElbowArrowPoints(
+          {
+            ...element,
+            x: updates.x || element.x,
+            y: updates.y || element.y,
+          },
+          mergedElementsMap,
+          // @ts-ignore
+          updates,
+          {
+            isDragging,
+          },
+        ),
+      };
+    } else {
+      updates = { ...getSizeFromPoints(points), ...updates };
+    }
   }
 
   for (const key in updates) {
