@@ -125,12 +125,13 @@
     "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
-      "editEmbed": "Ubah link & embed",
-      "create": "Buat tautan",
-      "createEmbed": "Ubah tautan & embed",
+      "editEmbed": "",
+      "create": "",
       "label": "Tautan",
       "labelEmbed": "Tautan & Embed",
-      "empty": "Tidak ada tautan yang ditetapkan"
+      "empty": "Tidak ada tautan yang ditetapkan",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Edit tautan",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Memperbesar agar sesuai dengan pilihan",
     "zoomToFit": "Memperbesar agar sesuai dengan semua elemen",
     "installPWA": "Install Excalidraw secara lokal (PWA)",
-    "autoResize": "Mengaktifkan pengubahan ukuran teks secara otomatis"
+    "autoResize": "Mengaktifkan pengubahan ukuran teks secara otomatis",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -501,7 +509,8 @@
     "selection": "pilihan",
     "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada",
     "unableToEmbed": "Menyematkan url ini saat ini tidak diizinkan. Ajukan masalah di GitHub untuk meminta url masuk daftar whitelisted",
-    "unrecognizedLinkFormat": "Tautan yang Anda sematkan tidak sesuai dengan format yang diharapkan. Coba tempelkan string 'sematkan' yang disediakan oleh situs sumber"
+    "unrecognizedLinkFormat": "Tautan yang Anda sematkan tidak sesuai dengan format yang diharapkan. Coba tempelkan string 'sematkan' yang disediakan oleh situs sumber",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparan",
