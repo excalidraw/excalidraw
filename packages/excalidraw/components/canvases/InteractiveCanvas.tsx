@@ -154,7 +154,6 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         cursor: props.appState.viewModeEnabled
           ? CURSOR_TYPE.GRAB
           : CURSOR_TYPE.AUTO,
-        // background: "rgba(0, 0, 0, 0.5)",
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}

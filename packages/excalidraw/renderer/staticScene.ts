@@ -135,13 +135,16 @@ const frameClip = (
   );
 };
 
-const linkCanvasCache: {
-  cache: any;
-  isElementLink: boolean;
+type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+
+const linkIconCanvasCache: {
+  regularLink: LinkIconCanvas | null;
+  elementLink: LinkIconCanvas | null;
 } = {
-  cache: null,
-  isElementLink: false,
+  regularLink: null,
+  elementLink: null,
 };
+
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
@@ -161,18 +164,22 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    if (
-      !linkCanvasCache.cache ||
-      linkCanvasCache.cache.zoom !== appState.zoom.value ||
-      linkCanvasCache.isElementLink !== isElementLink(element.link)
-    ) {
-      linkCanvasCache.cache = document.createElement("canvas");
-      linkCanvasCache.cache.zoom = appState.zoom.value;
-      linkCanvasCache.cache.width =
-        width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvasCache.cache.height =
+    const canvasKey = isElementLink(element.link)
+      ? "elementLink"
+      : "regularLink";
+
+    let linkCanvas = linkIconCanvasCache[canvasKey];
+
+    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+      linkCanvas = Object.assign(document.createElement("canvas"), {
+        zoom: appState.zoom.value,
+      });
+      linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
+      linkCanvas.height =
         height * window.devicePixelRatio * appState.zoom.value;
-      const linkCanvasCacheContext = linkCanvasCache.cache.getContext("2d")!;
+      linkIconCanvasCache[canvasKey] = linkCanvas;
+
+      const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
@@ -180,9 +187,7 @@ const renderLinkIcon = (
       linkCanvasCacheContext.fillStyle = "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      linkCanvasCache.isElementLink = isElementLink(element.link);
-
-      if (linkCanvasCache.isElementLink) {
+      if (canvasKey === "elementLink") {
         linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
       } else {
         linkCanvasCacheContext.drawImage(
@@ -195,22 +200,8 @@ const renderLinkIcon = (
       }
 
       linkCanvasCacheContext.restore();
-      context.drawImage(
-        linkCanvasCache.cache,
-        x - centerX,
-        y - centerY,
-        width,
-        height,
-      );
-    } else {
-      context.drawImage(
-        linkCanvasCache.cache,
-        x - centerX,
-        y - centerY,
-        width,
-        height,
-      );
     }
+    context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
 };
