@@ -125,12 +125,13 @@
     "createContainerFromText": "コンテナ内でテキストを折り返す",
     "link": {
       "edit": "リンクを編集",
-      "editEmbed": "リンクの編集と埋め込み",
-      "create": "リンクを作成",
-      "createEmbed": "リンクの作成と埋め込み",
+      "editEmbed": "",
+      "create": "",
       "label": "リンク",
       "labelEmbed": "リンクと埋め込み",
-      "empty": "リンクが設定されていません"
+      "empty": "リンクが設定されていません",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "行を編集",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "まだアイテムが追加されていません…",
@@ -501,7 +509,8 @@
     "selection": "選択",
     "pasteAsSingleElement": "{{shortcut}} を使用して単一の要素として貼り付けるか、\n既存のテキストエディタに貼り付け",
     "unableToEmbed": "この URL の埋め込みは現在許可されていません。URL のホワイトリストへの追加をリクエストするには、GitHub で Issue を上げてください。",
-    "unrecognizedLinkFormat": "埋め込もうとしたリンクは期待するフォーマットと一致しません。埋め込み元のサイトで提供される「embed」の文字列を貼り付けてください。"
+    "unrecognizedLinkFormat": "埋め込もうとしたリンクは期待するフォーマットと一致しません。埋め込み元のサイトで提供される「embed」の文字列を貼り付けてください。",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "透明",
