@@ -126,11 +126,12 @@
     "link": {
       "edit": "កែតំណភ្ជាប់",
       "editEmbed": "",
-      "create": "បង្កើតតំណភ្ជាប់",
-      "createEmbed": "",
+      "create": "",
       "label": "តំណ",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "កែសម្រួលបន្ទាត់",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "មិនទាន់មានធាតុបន្ថែមទេ...",
@@ -501,7 +509,8 @@
     "selection": "ការជ្រើសរើស",
     "pasteAsSingleElement": "ប្រើ {{shortcut}} ដើម្បីបិទភ្ជាប់ជាធាតុតែមួយ,\nឬបិទភ្ជាប់ទៅក្នុងកម្មវិធីនិពន្ធអត្ថបទដែលមានស្រាប់",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "ថ្លាមើលធ្លុះ",
