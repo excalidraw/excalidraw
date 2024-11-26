@@ -13,6 +13,7 @@ All `props` are _optional_.
 | [`onScrollChange`](#onscrollchange) | `function` | \_ | This prop if passed gets triggered when scrolling the canvas. |
 | [`onPaste`](#onpaste) | `function` | \_ | Callback to be triggered if passed when something is pasted into the scene |
 | [`onLibraryChange`](#onlibrarychange) | `function` | \_ | The callback if supplied is triggered when the library is updated and receives the library items. |
+| [`generateLinkForSelection`](#generateLinkForSelection) | `function` | \_ | Allows you to override `url` generation when linking to Excalidraw elements. |
 | [`onLinkOpen`](#onlinkopen) | `function` | \_ | The callback if supplied is triggered when any link is opened. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string to be used in Excalidraw |
 | [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | \_ | Render function that renders custom UI in top right corner |
@@ -214,8 +215,7 @@ This prop indicates whether the shows the grid. When supplied, the value takes p
 
 ### libraryReturnUrl
 
-If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com).  
-Defaults to _window.location.origin + window.location.pathname_. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
+If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Defaults to _window.location.origin + window.location.pathname_. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
 
 ### theme
 
