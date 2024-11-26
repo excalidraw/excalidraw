@@ -126,11 +126,12 @@
     "link": {
       "edit": "Ẓreg aseɣwen",
       "editEmbed": "",
-      "create": "Snulfu-d aseɣwen",
-      "createEmbed": "",
+      "create": "",
       "label": "Aseɣwen",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Ẓreg izirig",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Ulac iferdisen yettwarnan yakan...",
@@ -501,7 +509,8 @@
     "selection": "tafrayt",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Afrawan",
