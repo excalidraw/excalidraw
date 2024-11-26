@@ -126,11 +126,12 @@
     "link": {
       "edit": "Siltemeni ózgertiw",
       "editEmbed": "",
-      "create": "Siltemeni jaratıw",
-      "createEmbed": "",
+      "create": "",
       "label": "Silteme",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Qatardı ózgertiw",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "",
@@ -501,7 +509,8 @@
     "selection": "",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "",
