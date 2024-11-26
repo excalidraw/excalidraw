@@ -362,6 +362,7 @@ const renderElementToSvg = (
         root.appendChild(g);
       } else {
         addToRoot(group, element);
+        // @ts-expect-error
         root.append(maskPath);
       }
       break;

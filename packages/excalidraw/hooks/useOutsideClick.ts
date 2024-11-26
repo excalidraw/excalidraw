@@ -30,7 +30,7 @@ export function useOutsideClick<T extends HTMLElement>(
         return;
       }
 
-      const isInsideOverride = isInside?.(_event, ref.current);
+      const isInsideOverride = isInside?.(_event as any, ref.current);
 
       if (isInsideOverride === true) {
         return;

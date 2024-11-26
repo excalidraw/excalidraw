@@ -26,6 +26,7 @@ const polyfill = () => {
   if (!Element.prototype.replaceChildren) {
     Element.prototype.replaceChildren = function (...nodes) {
       this.innerHTML = "";
+      // @ts-expect-error
       this.append(...nodes);
     };
   }
