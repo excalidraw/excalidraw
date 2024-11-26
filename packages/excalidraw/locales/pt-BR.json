@@ -125,12 +125,13 @@
     "createContainerFromText": "Envolver texto em um contêiner",
     "link": {
       "edit": "Editar link",
-      "editEmbed": "Editar link e incorporar",
-      "create": "Criar link",
-      "createEmbed": "Criar link e incorporar",
+      "editEmbed": "",
+      "create": "",
       "label": "Link",
       "labelEmbed": "Vincular e incorporar",
-      "empty": "Nenhum link foi definido"
+      "empty": "Nenhum link foi definido",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar linha",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Ampliar para ajustar a seleção",
     "zoomToFit": "Ampliar para encaixar todos os elementos",
     "installPWA": "Instalar excalidraw localmente (PWA)",
-    "autoResize": "Habilitar redimensionamento automático de texto"
+    "autoResize": "Habilitar redimensionamento automático de texto",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Nenhum item adicionado ainda...",
@@ -501,7 +509,8 @@
     "selection": "seleção",
     "pasteAsSingleElement": "Use {{shortcut}} para colar como um único elemento,\nou cole em um editor de texto já existente",
     "unableToEmbed": "No momento não é permitido incorporar esta URL. Crie uma issue no GitHub para solicitar a lista branca da URL",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparente",
