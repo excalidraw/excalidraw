@@ -49,7 +49,6 @@ import {
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { ARROW_TYPE, isSafari, type EXPORT_IMAGE_TYPES } from "../constants";
 import {
   APP_NAME,
   CURSOR_TYPE,
@@ -88,6 +87,10 @@ import {
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
+  ARROW_TYPE,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
+  isSafari,
+  type EXPORT_IMAGE_TYPES,
 } from "../constants";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -458,6 +461,8 @@ import {
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
+import { actionCopyElementLink } from "../actions/actionElementLink";
+import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1199,6 +1204,9 @@ class App extends React.Component<AppProps, AppState> {
                   getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
                   this.elementsPendingErasure,
                   null,
+                  this.state.openDialog?.name === "elementLinkSelector"
+                    ? DEFAULT_REDUCED_GLOBAL_ALPHA
+                    : 1,
                 ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
@@ -1517,7 +1525,9 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         className={clsx("excalidraw excalidraw-container", {
-          "excalidraw--view-mode": this.state.viewModeEnabled,
+          "excalidraw--view-mode":
+            this.state.viewModeEnabled ||
+            this.state.openDialog?.name === "elementLinkSelector",
           "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
@@ -1576,6 +1586,9 @@ class App extends React.Component<AppProps, AppState> {
                           }
                           app={this}
                           isCollaborating={this.props.isCollaborating}
+                          generateLinkForSelection={
+                            this.props.generateLinkForSelection
+                          }
                         >
                           {this.props.children}
                         </LayerUI>
@@ -1587,6 +1600,8 @@ class App extends React.Component<AppProps, AppState> {
                           trails={[this.laserTrails, this.eraserTrail]}
                         />
                         {selectedElements.length === 1 &&
+                          this.state.openDialog?.name !==
+                            "elementLinkSelector" &&
                           this.state.showHyperlinkPopup && (
                             <Hyperlink
                               key={firstSelectedElement.id}
@@ -2333,6 +2348,10 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
     });
+
+    if (isElementLink(window.location.href)) {
+      this.scrollToContent(window.location.href, { animate: false });
+    }
   };
 
   private isMobileBreakpoint = (width: number, height: number) => {
@@ -2767,6 +2786,18 @@ class App extends React.Component<AppProps, AppState> {
     if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
       this.addEventListeners();
       this.deselectElements();
+    }
+
+    // cleanup
+    if (
+      (prevState.openDialog?.name === "elementLinkSelector" ||
+        this.state.openDialog?.name === "elementLinkSelector") &&
+      prevState.openDialog?.name !== this.state.openDialog?.name
+    ) {
+      this.deselectElements();
+      this.setState({
+        hoveredElementIds: {},
+      });
     }
 
     if (prevProps.zenModeEnabled !== this.props.zenModeEnabled) {
@@ -3631,7 +3662,14 @@ class App extends React.Component<AppProps, AppState> {
   private cancelInProgressAnimation: (() => void) | null = null;
 
   scrollToContent = (
+    /**
+     * target to scroll to
+     *
+     * - string - id of element or group, or url containing elementLink
+     * - ExcalidrawElement | ExcalidrawElement[] - element(s) objects
+     */
     target:
+      | string
       | ExcalidrawElement
       | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
     opts?: (
@@ -3658,6 +3696,34 @@ class App extends React.Component<AppProps, AppState> {
       canvasOffsets?: Offsets;
     },
   ) => {
+    if (typeof target === "string") {
+      let id: string | null;
+      if (isElementLink(target)) {
+        id = parseElementLinkFromURL(target);
+      } else {
+        id = target;
+      }
+      if (id) {
+        const elements = this.scene.getElementsFromId(id);
+
+        if (elements?.length) {
+          this.scrollToContent(elements, {
+            fitToContent: opts?.fitToContent ?? true,
+            animate: opts?.animate ?? true,
+          });
+        } else if (isElementLink(target)) {
+          this.setState({
+            toast: {
+              message: t("elementLink.notFound"),
+              duration: 3000,
+              closable: true,
+            },
+          });
+        }
+      }
+      return;
+    }
+
     this.cancelInProgressAnimation?.();
 
     // convert provided target into ExcalidrawElement[] if necessary
@@ -4222,6 +4288,10 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
+      if (this.state.openDialog?.name === "elementLinkSelector") {
+        return;
+      }
+
       if (this.actionManager.handleKeyDown(event)) {
         return;
       }
@@ -4493,7 +4563,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (event.key === KEYS.SPACE) {
-      if (this.state.viewModeEnabled) {
+      if (
+        this.state.viewModeEnabled ||
+        this.state.openDialog?.name === "elementLinkSelector"
+      ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
       } else if (this.state.activeTool.type === "selection") {
         resetCursor(this.interactiveCanvas);
@@ -5396,18 +5469,17 @@ class App extends React.Component<AppProps, AppState> {
     scenePointer: Readonly<{ x: number; y: number }>,
     hitElement: NonDeletedExcalidrawElement | null,
   ): ExcalidrawElement | undefined => {
-    // Reversing so we traverse the elements in decreasing order
-    // of z-index
-    const elements = this.scene.getNonDeletedElements().slice().reverse();
-    let hitElementIndex = Infinity;
+    const elements = this.scene.getNonDeletedElements();
+    let hitElementIndex = -1;
 
-    return elements.find((element, index) => {
+    for (let index = elements.length - 1; index >= 0; index--) {
+      const element = elements[index];
       if (hitElement && element.id === hitElement.id) {
         hitElementIndex = index;
       }
-      return (
+      if (
         element.link &&
-        index <= hitElementIndex &&
+        index >= hitElementIndex &&
         isPointHittingLink(
           element,
           this.scene.getNonDeletedElementsMap(),
@@ -5415,8 +5487,10 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom(scenePointer.x, scenePointer.y),
           this.device.editor.isMobile,
         )
-      );
-    });
+      ) {
+        return element;
+      }
+    }
   };
 
   private redirectToLink = (
@@ -5433,12 +5507,7 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerUpEvent!.clientY,
       ),
     );
-    if (
-      !this.hitLinkElement ||
-      // For touch screen allow dragging threshold else strict check
-      (isTouchScreen && draggedDistance > DRAGGING_THRESHOLD) ||
-      (!isTouchScreen && draggedDistance !== 0)
-    ) {
+    if (!this.hitLinkElement || draggedDistance > DRAGGING_THRESHOLD) {
       return;
     }
     const lastPointerDownCoords = viewportCoordsToSceneCoords(
@@ -5465,6 +5534,7 @@ class App extends React.Component<AppProps, AppState> {
       this.device.editor.isMobile,
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
+      hideHyperlinkToolip();
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
@@ -5832,6 +5902,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (!this.state.selectedLinearElement ||
           this.state.selectedLinearElement.hoverPointIndex === -1) &&
+        this.state.openDialog?.name !== "elementLinkSelector" &&
         !(selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
       ) {
         const elementWithTransformHandleType =
@@ -5856,7 +5927,11 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
       }
-    } else if (selectedElements.length > 1 && !isOverScrollBar) {
+    } else if (
+      selectedElements.length > 1 &&
+      !isOverScrollBar &&
+      this.state.openDialog?.name !== "elementLinkSelector"
+    ) {
       const transformHandleType = getTransformHandleTypeFromCoords(
         getCommonBounds(selectedElements),
         scenePointerX,
@@ -5915,6 +5990,8 @@ class App extends React.Component<AppProps, AppState> {
         );
       } else if (this.state.viewModeEnabled) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+      } else if (this.state.openDialog?.name === "elementLinkSelector") {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (isOverScrollBar) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       } else if (this.state.selectedLinearElement) {
@@ -5959,6 +6036,32 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
       }
+    }
+
+    if (this.state.openDialog?.name === "elementLinkSelector" && hitElement) {
+      this.setState((prevState) => {
+        return {
+          hoveredElementIds: updateStable(
+            prevState.hoveredElementIds,
+            selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: { [hitElement.id]: true },
+              },
+              this.scene.getNonDeletedElements(),
+              prevState,
+              this,
+            ).selectedElementIds,
+          ),
+        };
+      });
+    } else if (
+      this.state.openDialog?.name === "elementLinkSelector" &&
+      !hitElement
+    ) {
+      this.setState((prevState) => ({
+        hoveredElementIds: updateStable(prevState.hoveredElementIds, {}),
+      }));
     }
   };
 
@@ -6213,7 +6316,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        storeAction: StoreAction.UPDATE,
+        storeAction:
+          this.state.openDialog?.name === "elementLinkSelector"
+            ? StoreAction.NONE
+            : StoreAction.UPDATE,
       });
       return;
     }
@@ -6947,6 +7053,16 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
+
+        this.hitLinkElement = this.getElementLinkAtPosition(
+          pointerDownState.origin,
+          pointerDownState.hit.element,
+        );
+
+        if (this.hitLinkElement) {
+          return true;
+        }
+
         if (
           this.state.croppingElementId &&
           pointerDownState.hit.element?.id !== this.state.croppingElementId
@@ -7040,7 +7156,7 @@ class App extends React.Component<AppProps, AppState> {
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               this.setState((prevState) => {
-                const nextSelectedElementIds: { [id: string]: true } = {
+                let nextSelectedElementIds: { [id: string]: true } = {
                   ...prevState.selectedElementIds,
                   [hitElement.id]: true,
                 };
@@ -7108,6 +7224,23 @@ class App extends React.Component<AppProps, AppState> {
                           });
                       }
                     });
+                  }
+                }
+
+                // Finally, in shape selection mode, we'd like to
+                // keep only one shape or group selected at a time.
+                // This means, if the hitElement is a different shape or group
+                // than the previously selected ones, we deselect the previous ones
+                // and select the hitElement
+                if (prevState.openDialog?.name === "elementLinkSelector") {
+                  if (
+                    !hitElement.groupIds.some(
+                      (gid) => prevState.selectedGroupIds[gid],
+                    )
+                  ) {
+                    nextSelectedElementIds = {
+                      [hitElement.id]: true,
+                    };
                   }
                 }
 
@@ -7759,6 +7892,9 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ) {
     return withBatchedUpdatesThrottled((event: PointerEvent) => {
+      if (this.state.openDialog?.name === "elementLinkSelector") {
+        return;
+      }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
       const lastPointerCoords =
         this.lastPointerMoveCoords ?? pointerDownState.origin;
@@ -10574,7 +10710,10 @@ class App extends React.Component<AppProps, AppState> {
       actionFlipVertical,
       CONTEXT_MENU_SEPARATOR,
       actionToggleLinearEditor,
+      CONTEXT_MENU_SEPARATOR,
       actionLink,
+      actionCopyElementLink,
+      CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,
       CONTEXT_MENU_SEPARATOR,
