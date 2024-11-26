@@ -125,12 +125,13 @@
     "createContainerFromText": "Avvolgi il testo in un container",
     "link": {
       "edit": "Modifica link",
-      "editEmbed": "Modifica collegamento e incorpora",
-      "create": "Crea link",
-      "createEmbed": "Crea collegamento e incorpora",
+      "editEmbed": "",
+      "create": "",
       "label": "Link",
       "labelEmbed": "Collega & incorpora",
-      "empty": "Nessun collegamento impostato"
+      "empty": "Nessun collegamento impostato",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Modifica linea",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Ingrandisci per adattare la selezione",
     "zoomToFit": "Zoom per adattare tutti gli elementi",
     "installPWA": "Installa Excalidraw localmente (PWA)",
-    "autoResize": "Abilita ridimensionamento automatico del testo"
+    "autoResize": "Abilita ridimensionamento automatico del testo",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Nessun elemento ancora aggiunto...",
@@ -501,7 +509,8 @@
     "selection": "selezione",
     "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
     "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
-    "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine"
+    "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Trasparente",
