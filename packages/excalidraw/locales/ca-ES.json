@@ -125,12 +125,13 @@
     "createContainerFromText": "Ajusta el text al contenidor",
     "link": {
       "edit": "Edita l'enllaç",
-      "editEmbed": "Edita l'enllaç i encasta'l",
-      "create": "Crea un enllaç",
-      "createEmbed": "Crea l'enllaç i encasta'l",
+      "editEmbed": "",
+      "create": "",
       "label": "Enllaç",
       "labelEmbed": "Enllaça i encasta",
-      "empty": "No s'ha definit cap enllaç"
+      "empty": "No s'ha definit cap enllaç",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar línia",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Zoom per veure la selecció",
     "zoomToFit": "Zoom per veure tots els elements",
     "installPWA": "Instal·la Excalidraw localment (PWA)",
-    "autoResize": "Activa la redimensió de text automàtica"
+    "autoResize": "Activa la redimensió de text automàtica",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Encara no s'hi han afegit elements...",
@@ -501,7 +509,8 @@
     "selection": "la selecció",
     "pasteAsSingleElement": "Fer servir {{shortcut}} per enganxar com un sol element,\no enganxeu-lo en un editor de text existent",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparent",
