@@ -125,12 +125,13 @@
     "createContainerFromText": "",
     "link": {
       "edit": "লিঙ্ক সংশোধন",
-      "editEmbed": "লিংক এডিট ও এম্বেড করুন",
-      "create": "লিঙ্ক তৈরী",
-      "createEmbed": "লিংক তৈরি ও এম্বেড করুন",
+      "editEmbed": "",
+      "create": "",
       "label": "লিঙ্ক নামকরণ",
       "labelEmbed": "লিংক ও এম্বেড",
-      "empty": "কোন লিংক সেট করা নেই"
+      "empty": "কোন লিংক সেট করা নেই",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "লাইন সম্পাদনা করুন",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "সংগ্রহে কিছু যোগ করা হয়নি",
@@ -501,7 +509,8 @@
     "selection": "বাছাই",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "",
