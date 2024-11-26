@@ -125,12 +125,13 @@
     "createContainerFromText": "نص مغلف في حاوية",
     "link": {
       "edit": "تعديل الرابط",
-      "editEmbed": "تحرير الرابط وإدراجه",
-      "create": "إنشاء رابط",
-      "createEmbed": "إنشاء رابط و إدراجه",
+      "editEmbed": "",
+      "create": "",
       "label": "رابط",
       "labelEmbed": "رابط و إدراج",
-      "empty": "لم يتم تعيين رابط"
+      "empty": "لم يتم تعيين رابط",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "تحرير السطر",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "تكبير للعنصر المحدد",
     "zoomToFit": "تكبير لتلائم جميع العناصر",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "لا توجد عناصر أضيفت بعد...",
@@ -501,7 +509,8 @@
     "selection": "العنصر المحدد",
     "pasteAsSingleElement": "استخدم {{shortcut}} للصق كعنصر واحد،\nأو لصق في محرر نص موجود",
     "unableToEmbed": "تضمين هذا الرابط غير مسموح حاليًا. افتح بلاغاً على GitHub لطلب عنوان Url القائمة البيضاء",
-    "unrecognizedLinkFormat": "الرابط الذي ضمنته لا يتطابق مع التنسيق المتوقع. الرجاء محاولة لصق النص 'المضمن' المُزوَد من موقع المصدر"
+    "unrecognizedLinkFormat": "الرابط الذي ضمنته لا يتطابق مع التنسيق المتوقع. الرجاء محاولة لصق النص 'المضمن' المُزوَد من موقع المصدر",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "شفاف",
