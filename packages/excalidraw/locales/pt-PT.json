@@ -125,12 +125,13 @@
     "createContainerFromText": "Envolver texto num recipiente",
     "link": {
       "edit": "Editar hiperligação",
-      "editEmbed": "Editar hiperligação e incorporar",
-      "create": "Criar hiperligação",
-      "createEmbed": "Criar hiperligação e incorporar",
+      "editEmbed": "",
+      "create": "",
       "label": "Hiperligação",
       "labelEmbed": "Hiperligar e incorporar",
-      "empty": "Não está definida nenhuma hiperligação"
+      "empty": "Não está definida nenhuma hiperligação",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editar linha",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Aproximar para enquadrar a seleção",
     "zoomToFit": "Aproximar para enquadrar todos os elementos",
     "installPWA": "Instalar Excalidraw localmente (PWA)",
-    "autoResize": "Ativar redimensionamento automático do texto"
+    "autoResize": "Ativar redimensionamento automático do texto",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Ainda não foram adicionados itens...",
@@ -501,7 +509,8 @@
     "selection": "seleção",
     "pasteAsSingleElement": "Usar {{shortcut}} para colar como um único elemento,\nou colar num editor de texto existente",
     "unableToEmbed": "A incorporação deste URL não é atualmente permitida. Reporte o problema no GitHub para solicitar a inclusão do URL na lista branca para deixar de o bloquear",
-    "unrecognizedLinkFormat": "A ligação que incorporou não corresponde ao formato esperado. Tente colar a cadeia de caracteres 'incorporada' fornecida pelo sítio de origem"
+    "unrecognizedLinkFormat": "A ligação que incorporou não corresponde ao formato esperado. Tente colar a cadeia de caracteres 'incorporada' fornecida pelo sítio de origem",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparente",
