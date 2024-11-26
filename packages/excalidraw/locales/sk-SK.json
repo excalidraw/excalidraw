@@ -125,12 +125,13 @@
     "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
-      "editEmbed": "Editovať a zapustiť odkaz",
-      "create": "Vytvoriť odkaz",
-      "createEmbed": "Vytvoriť a zapustiť odkaz",
+      "editEmbed": "",
+      "create": "",
       "label": "Odkaz",
       "labelEmbed": "Zapustiť odkaz",
-      "empty": "Nie je nastavený žiaden odkaz"
+      "empty": "Nie je nastavený žiaden odkaz",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Upraviť čiaru",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Priblížiť na výber",
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "installPWA": "Inštalovať Excalidraw lokálne (PWA)",
-    "autoResize": "Zapnúť automatickú zmenu veľkosti textu"
+    "autoResize": "Zapnúť automatickú zmenu veľkosti textu",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
@@ -501,7 +509,8 @@
     "selection": "výberu",
     "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu",
     "unableToEmbed": "Zapustenie tejto URL nie je povolené. Vytvorte issue na GitHub-e a požiadajte povolenie tejto URL",
-    "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou"
+    "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Priehľadná",
