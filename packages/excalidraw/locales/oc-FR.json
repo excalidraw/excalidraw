@@ -125,12 +125,13 @@
     "createContainerFromText": "Envelopar lo tèxte dins un contenedor",
     "link": {
       "edit": "Modificar lo ligam",
-      "editEmbed": "Modificar lo ligam e l’integracion",
-      "create": "Crear un ligam",
-      "createEmbed": "Crear un ligam e son integracion",
+      "editEmbed": "",
+      "create": "",
       "label": "Ligam",
       "labelEmbed": "Ligam e integracion",
-      "empty": "Cap de ligam pas definit"
+      "empty": "Cap de ligam pas definit",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Modificar la linha",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Cap d’element pas encara apondut...",
@@ -501,7 +509,8 @@
     "selection": "seleccion",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparéncia",
