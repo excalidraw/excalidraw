@@ -241,6 +241,24 @@ const maybeParseHTMLPaste = (
 export const readSystemClipboard = async () => {
   const types: { [key in AllowedPasteMimeTypes]?: string } = {};
 
+  try {
+    if (navigator.clipboard?.readText) {
+      const readText = await navigator.clipboard?.readText();
+      if (readText) {
+        return { "text/plain": readText };
+      }
+    }
+  } catch (error: any) {
+    // @ts-ignore
+    if (navigator.clipboard?.read) {
+      console.warn(
+        `navigator.clipboard.readText() failed (${error.message}). Failling back to navigator.clipboard.read()`,
+      );
+    } else {
+      throw error;
+    }
+  }
+
   let clipboardItems: ClipboardItems;
 
   try {
@@ -255,41 +273,23 @@ export const readSystemClipboard = async () => {
     throw error;
   }
 
-  try {
-    if (navigator.clipboard?.read) {
-      const readClipboard = await navigator.clipboard?.read();
-      const textItem = readClipboard.find((item) => 
-        item.types.includes("text/plain")
-      );
-      if (textItem) {
-        const readText = await navigator.clipboard.readText();
-        if (readText) {
-          return { "text/plain": readText };
-        }
-      }
-      const imageItem = readClipboard.find((item) => 
-        item.types.some(type => type.startsWith("image/"))
-      );
-      if (imageItem) {
-        const imageType = imageItem.types.find(type => type.startsWith("image/")) || "image/png";
-        const imageBlob = await imageItem.getType(imageType);
-        const imageUrl = URL.createObjectURL(imageBlob);
-        return { [imageType]: imageUrl };
-      }
-    }
-  } catch (error: any) {
-    // @ts-ignore
-    console.warn(`Error reading system clipboard: ${error.message}`);
-    throw error;
-  }
-
   for (const item of clipboardItems) {
     for (const type of item.types) {
       if (!isMemberOf(ALLOWED_PASTE_MIME_TYPES, type)) {
         continue;
       }
       try {
-        types[type] = await (await item.getType(type)).text();
+        if (type === "text/plain" || type === "text/html") {
+          types[type] = await (await item.getType(type)).text();
+        }
+         else if (type.startsWith("image/")) {
+          const imageBlob = (await item.getType(type));
+          const imageUrl = URL.createObjectURL(imageBlob);
+          types[type] = imageUrl;
+        }
+        else {
+          console.warn(`Unsupported clipboard type: ${type}`);
+        }
       } catch (error: any) {
         console.warn(
           `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
@@ -331,22 +331,18 @@ const parseClipboardEvent = async (
 
       return mixedContent;
     }
-
-    const imageType = event.clipboardData?.types[0]?.startsWith("image/") ? event.clipboardData?.types[0] : "image/png";
-
-    const image = event.clipboardData?.getData(imageType);
-
-    if (image) {
-      return {
-        type: "mixedContent",
-        value: [{ type: "imageUrl", value: image }],
-      };
+    const imageType = event.clipboardData?.types.find(type => type.startsWith("image/"));
+    
+    if (imageType) {
+      const image = event.clipboardData?.getData(imageType);
+      if (image) {
+        return { type: "mixedContent", value: [{ type: "imageUrl", value: image }] };
+      }
     }
 
     const text = event.clipboardData?.getData("text/plain");
-    
-    return { type: "text", value: text?.trim() || "" };
 
+    return { type: "text", value: (text || "").trim() };
   } catch {
     return { type: "text", value: "" };
   }
