@@ -125,12 +125,13 @@
     "createContainerFromText": "Zawijaj tekst w kontenerze",
     "link": {
       "edit": "Edytuj łącze",
-      "editEmbed": "Edytuj i osadź link",
-      "create": "Utwórz łącze",
-      "createEmbed": "Stwórz i osadź link",
+      "editEmbed": "",
+      "create": "",
       "label": "Łącze",
       "labelEmbed": "Podlinkuj i osadź",
-      "empty": "Brakujący link"
+      "empty": "Brakujący link",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Edytuj linię",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Dopasuj widok do zaznaczenia",
     "zoomToFit": "Dopasuj widok do całej zawartości",
     "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)",
-    "autoResize": "Włącz automatyczne zmiany rozmiaru tekstu"
+    "autoResize": "Włącz automatyczne zmiany rozmiaru tekstu",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Nie dodano jeszcze żadnych elementów...",
@@ -501,7 +509,8 @@
     "selection": "zaznaczenie",
     "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu",
     "unableToEmbed": "Osadzenie tego linku jest obecnie niedozwolone. Zgłoś propozycję na portalu GitHub, aby dodać go do listy dozwolonych wyjątków",
-    "unrecognizedLinkFormat": "Osadzony link ma niewłaściwy format. Spróbuj wkleić całą zawartość pola \"embed\" z oryginalnej strony."
+    "unrecognizedLinkFormat": "Osadzony link ma niewłaściwy format. Spróbuj wkleić całą zawartość pola \"embed\" z oryginalnej strony.",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Przezroczysty",
