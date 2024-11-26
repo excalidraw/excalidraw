@@ -25,8 +25,8 @@ const load = (): Promise<{
   return new Promise(async (resolve, reject) => {
     try {
       const module = await WebAssembly.instantiate(binary);
+      // @ts-expect-error
       const harfbuzzJsWasm = module.instance.exports;
-      // @ts-expect-error since `.buffer` is custom prop
       const heapu8 = new Uint8Array(harfbuzzJsWasm.memory.buffer);
 
       const hbSubset = {

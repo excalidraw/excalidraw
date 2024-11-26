@@ -309,19 +309,23 @@ export const exportToBackend = async (
       body: payload.buffer,
     });
     const json = await response.json();
+    // @ts-expect-error
     if (json.id) {
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
+      // @ts-expect-error
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
       await saveFilesToFirebase({
+        // @ts-expect-error
         prefix: `/files/shareLinks/${json.id}`,
         files: filesToUpload,
       });
 
       return { url: urlString, errorMessage: null };
+      // @ts-expect-error
     } else if (json.error_class === "RequestTooLargeError") {
       return {
         url: null,

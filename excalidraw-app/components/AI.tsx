@@ -83,6 +83,7 @@ export const AIComponents = ({
           }
 
           try {
+            // @ts-expect-error
             const { html } = await response.json();
 
             if (!html) {
@@ -140,9 +141,11 @@ export const AIComponents = ({
                 };
               }
 
+              // @ts-expect-error
               throw new Error(json.message || "Generation failed...");
             }
 
+            // @ts-expect-error
             const generatedResponse = json.generatedResponse;
             if (!generatedResponse) {
               throw new Error("Generation failed...");

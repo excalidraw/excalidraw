@@ -97,7 +97,7 @@
     "@babel/preset-env": "7.24.5",
     "@babel/preset-react": "7.24.1",
     "@babel/preset-typescript": "7.24.1",
-    "@cloudflare/workers-types": "^4.20241112.0",
+    "@cloudflare/workers-types": "4.20241112.0",
     "@size-limit/preset-big-lib": "9.0.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "5.16.2",
@@ -140,6 +140,6 @@
     "size": "yarn build:umd && size-limit",
     "sync:deploy": "wrangler deploy",
     "sync:dev": "wrangler dev",
-    "sync:typegen": "wrangler types"
+    "sync:typegen": "wrangler types --experimental-include-runtime=\"./worker-runtime.d.ts\""
   }
 }

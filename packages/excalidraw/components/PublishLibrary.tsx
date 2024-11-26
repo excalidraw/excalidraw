@@ -304,6 +304,7 @@ const PublishLibrary = ({
       .then(
         (response) => {
           if (response.ok) {
+            // @ts-expect-error
             return response.json().then(({ url }) => {
               // flush data from local storage
               EditorLocalStorage.delete(EDITOR_LS_KEYS.PUBLISH_LIBRARY);
@@ -321,6 +322,7 @@ const PublishLibrary = ({
             })
             .then((error) => {
               throw new Error(
+                // @ts-expect-error
                 error.message || response.statusText || "something went wrong",
               );
             });

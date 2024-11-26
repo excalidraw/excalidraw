@@ -225,7 +225,7 @@ const maybeParseHTMLPaste = (
 
   try {
     const doc = new DOMParser().parseFromString(html, "text/html");
-
+    // @ts-expect-error
     const content = parseHTMLTree(doc.body);
 
     if (content.length) {
