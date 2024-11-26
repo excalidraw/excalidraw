@@ -126,11 +126,12 @@
     "link": {
       "edit": "ਕੜੀ ਸੋਧੋ",
       "editEmbed": "",
-      "create": "ਕੜੀ ਬਣਾਓ",
-      "createEmbed": "",
+      "create": "",
       "label": "ਕੜੀ",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "ਪੰਕਤੀ ਸੋਧੋ",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਚੀਜ ਜੋੜੀ ਨਹੀਂ ਗਈ...",
@@ -501,7 +509,8 @@
     "selection": "ਚੋਣ",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "ਪਾਰਦਰਸ਼ੀ",
