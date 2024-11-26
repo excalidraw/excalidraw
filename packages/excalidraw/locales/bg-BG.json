@@ -126,11 +126,12 @@
     "link": {
       "edit": "Редактирай линк",
       "editEmbed": "",
-      "create": "Създай линк",
-      "createEmbed": "",
+      "create": "",
       "label": "Линк",
       "labelEmbed": "",
-      "empty": "Няма зададен линк"
+      "empty": "Няма зададен линк",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Редактирай линия",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Приближи селекцията",
     "zoomToFit": "Приближи всички елементи",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Няма добавени неща все още...",
@@ -501,7 +509,8 @@
     "selection": "селекция",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Прозрачен",
