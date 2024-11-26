@@ -1,3 +1,5 @@
+import type { ElementsChange } from "../change";
+
 export type RELAY_PAYLOAD = { buffer: ArrayBuffer };
 export type PULL_PAYLOAD = { lastAcknowledgedVersion: number };
 export type PUSH_PAYLOAD = {
@@ -5,11 +7,7 @@ export type PUSH_PAYLOAD = {
   changes: Array<CLIENT_CHANGE>;
 };
 
-export type CLIENT_CHANGE = {
-  id: string;
-  appStateChange: any;
-  elementsChange: any;
-};
+export type CLIENT_CHANGE = ElementsChange;
 
 export type CLIENT_MESSAGE =
   | { type: "relay"; payload: RELAY_PAYLOAD }
@@ -23,7 +21,10 @@ export type SERVER_MESSAGE =
       payload: { changes: Array<CLIENT_CHANGE> } | RELAY_PAYLOAD;
     }
   | { type: "acknowledged"; payload: { changes: Array<SERVER_CHANGE> } }
-  | { type: "rejected"; payload: { ids: Array<string>; message: string } };
+  | {
+      type: "rejected";
+      payload: { changes: Array<CLIENT_CHANGE>; message: string };
+    };
 
 export interface ChangesRepository {
   saveAll(changes: Array<CLIENT_CHANGE>): Array<SERVER_CHANGE>;

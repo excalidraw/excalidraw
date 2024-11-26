@@ -8,7 +8,7 @@ import type {
 export class DurableChangesRepository implements ChangesRepository {
   constructor(private storage: DurableObjectStorage) {
     // #region DEV ONLY
-    this.storage.sql.exec(`DROP TABLE IF EXISTS changes;`);
+    // this.storage.sql.exec(`DROP TABLE IF EXISTS changes;`);
     // #endregion
 
     this.storage.sql.exec(`CREATE TABLE IF NOT EXISTS changes(

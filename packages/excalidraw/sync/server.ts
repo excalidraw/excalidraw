@@ -78,6 +78,7 @@ export class ExcalidrawSyncServer {
     }
 
     if (versionΔ > 0) {
+      // TODO: for versioning we need deletions, but not for the "snapshot" update
       const changes = this.changesRepository.getSinceVersion(
         lastAcknowledgedClientVersion,
       );
@@ -106,8 +107,8 @@ export class ExcalidrawSyncServer {
           return this.send(client, {
             type: "rejected",
             payload: {
-              ids: changes.map((i) => i.id),
               message: error.message,
+              changes,
             },
           });
         }
