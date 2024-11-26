@@ -125,12 +125,13 @@
     "createContainerFromText": "ארוז טקסט במיכל",
     "link": {
       "edit": "עריכת קישור",
-      "editEmbed": "ערוך קישור ושבץ",
-      "create": "יצירת קישור",
-      "createEmbed": "צור קישור ושבץ",
+      "editEmbed": "",
+      "create": "",
       "label": "קישור",
       "labelEmbed": "קשר ושבץ",
-      "empty": "לא נקבע קישור"
+      "empty": "לא נקבע קישור",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "ערוך קו",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "להתמקד בחלק הנבחר",
     "zoomToFit": "להציג את כל האלמנטים",
     "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
-    "autoResize": "לאפשר התאמה אוטומטית של גודל הטקסט"
+    "autoResize": "לאפשר התאמה אוטומטית של גודל הטקסט",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -501,7 +509,8 @@
     "selection": "בחירה",
     "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים",
     "unableToEmbed": "הטמעת כתובת הרשת הזו אינה מותרת לעת עתה. העלו סוגיה ב-GitHub כדי לבקש שכתובת זו תכנס לרשימה המותרת",
-    "unrecognizedLinkFormat": "הקישור שהוטמע אינו בפורמט המצופה. אנא נסו להדביק מחדש את מחרוזת ההטמעה מהאתר המבוקש"
+    "unrecognizedLinkFormat": "הקישור שהוטמע אינו בפורמט המצופה. אנא נסו להדביק מחדש את מחרוזת ההטמעה מהאתר המבוקש",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "שקוף",
