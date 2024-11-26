@@ -4,9 +4,9 @@
   .ElementLinkDialog {
     position: absolute;
     top: var(--editor-container-padding);
-    left: calc(var(--editor-container-padding) * 4);
+    left: var(--editor-container-padding);
 
-    z-index: 3;
+    z-index: var(--zIndex-modal);
 
     border-radius: 10px;
     padding: 1.5rem;
