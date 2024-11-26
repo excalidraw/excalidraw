@@ -125,12 +125,13 @@
     "createContainerFromText": "텍스트를 컨테이너에 담기",
     "link": {
       "edit": "링크 수정하기",
-      "editEmbed": "링크 & 임베드 수정하기",
-      "create": "링크 만들기",
-      "createEmbed": "링크 & 임베드 만들기",
+      "editEmbed": "",
+      "create": "",
       "label": "링크",
       "labelEmbed": "링크 & 임베드",
-      "empty": "링크를 지정하지 않았습니다"
+      "empty": "링크를 지정하지 않았습니다",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "선 수정하기",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "선택 영역으로 확대/축소",
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "installPWA": "Excalidraw 설치(PWA)",
-    "autoResize": "텍스트 크기 자동 조절 켜기"
+    "autoResize": "텍스트 크기 자동 조절 켜기",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "추가된 아이템 없음",
@@ -501,7 +509,8 @@
     "selection": "선택한 요소",
     "pasteAsSingleElement": "단일 요소로 붙여넣거나, 기존 텍스트 에디터에 붙여넣으려면 {{shortcut}} 을 사용하세요.",
     "unableToEmbed": "이 URL의 임베딩이 허용되지 않았습니다. GitHub에 이슈를 남겨서 이 URL이 화이트리스트에 등재될 수 있도록 요청하세요",
-    "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 텍스트를 그대로 붙여 넣어 주세요"
+    "unrecognizedLinkFormat": "임베딩하려는 링크의 형식이 잘못된 것 같습니다. 원본 사이트에서 제공하는 \"임베딩\" 텍스트를 그대로 붙여 넣어 주세요",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "투명",
