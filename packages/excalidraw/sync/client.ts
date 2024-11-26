@@ -8,7 +8,14 @@ import throttle from "lodash.throttle";
 
 export class ExcalidrawSyncClient {
   // TODO: add prod url
-  private static readonly HOST_URL = "ws://localhost:8787";
+  private static readonly HOST_URL = import.meta.env.DEV
+    ? "ws://localhost:8787"
+    : "https://excalidraw-sync.marcel-529.workers.dev";
+
+  private static readonly ROOM_ID = import.meta.env.DEV
+    ? "test_room_dev"
+    : "test_room_prod";
+
   private static readonly RECONNECT_INTERVAL = 10_000;
 
   private lastAcknowledgedVersion = 0;
@@ -27,7 +34,10 @@ export class ExcalidrawSyncClient {
 
   private isConnecting: { done: (error?: Error) => void } | null = null;
 
-  constructor(api: ExcalidrawImperativeAPI, roomId: string = "test_room_1") {
+  constructor(
+    api: ExcalidrawImperativeAPI,
+    roomId: string = ExcalidrawSyncClient.ROOM_ID,
+  ) {
     this.api = api;
     this.roomId = roomId;
 
