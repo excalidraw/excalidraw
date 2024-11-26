@@ -26,7 +26,7 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 
-const MINIMAL_CROP_SIZE = 10;
+export const MINIMAL_CROP_SIZE = 10;
 
 export const cropElement = (
   element: ExcalidrawImageElement,
@@ -583,5 +583,43 @@ const adjustCropPosition = (
   return {
     cropX,
     cropY,
+  };
+};
+
+export const getFlipAdjustedCropPosition = (
+  element: ExcalidrawImageElement,
+  natural = false,
+) => {
+  const crop = element.crop;
+  if (!crop) {
+    return null;
+  }
+
+  const isFlippedByX = element.scale[0] === -1;
+  const isFlippedByY = element.scale[1] === -1;
+
+  let cropX = crop.x;
+  let cropY = crop.y;
+
+  if (isFlippedByX) {
+    cropX = crop.naturalWidth - crop.width - crop.x;
+  }
+
+  if (isFlippedByY) {
+    cropY = crop.naturalHeight - crop.height - crop.y;
+  }
+
+  if (natural) {
+    return {
+      x: cropX,
+      y: cropY,
+    };
+  }
+
+  const { width, height } = getUncroppedWidthAndHeight(element);
+
+  return {
+    x: cropX / (crop.naturalWidth / width),
+    y: cropY / (crop.naturalHeight / height),
   };
 };
