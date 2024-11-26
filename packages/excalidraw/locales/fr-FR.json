@@ -125,12 +125,13 @@
     "createContainerFromText": "Encadrer le texte dans un conteneur",
     "link": {
       "edit": "Modifier le lien",
-      "editEmbed": "Éditer le lien & intégrer",
-      "create": "Ajouter un lien",
-      "createEmbed": "Créer un lien & intégrer",
+      "editEmbed": "",
+      "create": "",
       "label": "Lien",
       "labelEmbed": "Lier & intégrer",
-      "empty": "Aucun lien défini"
+      "empty": "Aucun lien défini",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Modifier la ligne",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Zoomer pour s'adapter à la sélection",
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "installPWA": "Installer Excalidraw localement (PWA)",
-    "autoResize": "Activer le redimensionnement automatique du texte"
+    "autoResize": "Activer le redimensionnement automatique du texte",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Aucun élément n'a encore été ajouté ...",
@@ -501,7 +509,8 @@
     "selection": "sélection",
     "pasteAsSingleElement": "Utiliser {{shortcut}} pour coller comme un seul élément,\nou coller dans un éditeur de texte existant",
     "unableToEmbed": "Intégrer cet URL n'est actuellement pas autorisé. Ouvrez un ticket sur GitHub pour demander son ajout à la liste blanche",
-    "unrecognizedLinkFormat": "Le lien que vous avez intégré ne correspond pas au format attendu. Veuillez essayer de coller la chaîne d'intégration fournie par le site source"
+    "unrecognizedLinkFormat": "Le lien que vous avez intégré ne correspond pas au format attendu. Veuillez essayer de coller la chaîne d'intégration fournie par le site source",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Transparent",
