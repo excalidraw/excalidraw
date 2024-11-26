@@ -449,3 +449,6 @@ export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
   round: "round",
   elbow: "elbow",
 };
+
+export const DEFAULT_REDUCED_GLOBAL_ALPHA = 0.3;
+export const ELEMENT_LINK_KEY = "element";

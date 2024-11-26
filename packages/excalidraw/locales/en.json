@@ -125,12 +125,13 @@
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
-      "editEmbed": "Edit link & embed",
-      "create": "Create link",
-      "createEmbed": "Create link & embed",
+      "editEmbed": "Edit embeddable link",
+      "create": "Add link",
       "label": "Link",
       "labelEmbed": "Link & embed",
-      "empty": "No link is set"
+      "empty": "No link is set",
+      "hint": "Type or paste your link here",
+      "goToElement": "Go to target element"
     },
     "lineEditor": {
       "edit": "Edit line",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Zoom to fit selection",
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
-    "autoResize": "Enable text auto-resizing"
+    "autoResize": "Enable text auto-resizing",
+    "copyElementLink": "Copy link to object",
+    "linkToElement": "Link to object"
+  },
+  "elementLink": {
+    "title": "Link to object",
+    "desc": "Click on a shape on canvas or paste a link.",
+    "notFound": "Linked object wasn't found on canvas."
   },
   "library": {
     "noItems": "No items added yet...",
@@ -501,7 +509,8 @@
     "selection": "selection",
     "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor",
     "unableToEmbed": "Embedding this url is currently not allowed. Raise an issue on GitHub to request the url whitelisted",
-    "unrecognizedLinkFormat": "The link you embedded does not match the expected format. Please try to paste the 'embed' string provided by the source site"
+    "unrecognizedLinkFormat": "The link you embedded does not match the expected format. Please try to paste the 'embed' string provided by the source site",
+    "elementLinkCopied": "Link copied to clipboard"
   },
   "colors": {
     "transparent": "Transparent",
