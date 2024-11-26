@@ -125,12 +125,13 @@
     "createContainerFromText": "Bilatu testua edukiontzi batean",
     "link": {
       "edit": "Editatu esteka",
-      "editEmbed": "Editatu esteka eta kapsulatu",
-      "create": "Sortu esteka",
-      "createEmbed": "Sortu esteka eta kapsulatu",
+      "editEmbed": "",
+      "create": "",
       "label": "Esteka",
       "labelEmbed": "Esteka eta kapsula",
-      "empty": "Ez da estekarik ezarri"
+      "empty": "Ez da estekarik ezarri",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Editatu lerroa",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Zoom hautapenera",
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "installPWA": "Instalatu Excalidraw lokalean (PWA)",
-    "autoResize": "Textu zabalera automatikoa aktibatu"
+    "autoResize": "Textu zabalera automatikoa aktibatu",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
@@ -501,7 +509,8 @@
     "selection": "hautapena",
     "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean",
     "unableToEmbed": "Url hau txertatzea ez da une honetan onartzen. Sortu issue bat GitHub-en Urla zerrenda zurian sartzea eskatzeko",
-    "unrecognizedLinkFormat": "Kapsulatu duzun esteka ez dator bat espero den formatuarekin. Mesedez, saiatu iturburu-guneak emandako 'kapsulatu' katea itsasten"
+    "unrecognizedLinkFormat": "Kapsulatu duzun esteka ez dator bat espero den formatuarekin. Mesedez, saiatu iturburu-guneak emandako 'kapsulatu' katea itsasten",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Gardena",
