@@ -126,11 +126,12 @@
     "link": {
       "edit": "دەستکاریکردنی بەستەر",
       "editEmbed": "",
-      "create": "دروستکردنی بەستەر",
-      "createEmbed": "",
+      "create": "",
       "label": "بەستەر",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "دەستکاری کردنی دێڕ",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "هێشتا هیچ بڕگەیەک زیاد نەکراوە...",
@@ -501,7 +509,8 @@
     "selection": "دەستنیشانکراوەکان",
     "pasteAsSingleElement": "بۆ دانانەوە وەکو یەک توخم یان دانانەوە بۆ نێو دەسکاریکەرێکی دەق کە بوونی هەیە {{shortcut}} بەکاربهێنە",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "ڕوون",
