@@ -125,12 +125,13 @@
     "createContainerFromText": "Metni bileşen içinde sar",
     "link": {
       "edit": "Bağlantıyı düzenle",
-      "editEmbed": "Bağlantıyı düzenle & yerleştir",
-      "create": "Bağlantı oluştur",
-      "createEmbed": "Bağlantı oluştur & yerleştir",
+      "editEmbed": "",
+      "create": "",
       "label": "Bağlantı",
       "labelEmbed": "Bağlantı & yerleştirme",
-      "empty": "Herhangi bir bağlantı oluşturulmadı"
+      "empty": "Herhangi bir bağlantı oluşturulmadı",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Çizgiyi düzenle",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Seçime sığdırmak için yakınlaştır",
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "installPWA": "Excalidraw'ı yerel olarak yükle (PWA)",
-    "autoResize": "Metni otomatik yeniden boyutlandırmayı etkinleştir"
+    "autoResize": "Metni otomatik yeniden boyutlandırmayı etkinleştir",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Öğe eklenmedi...",
@@ -501,7 +509,8 @@
     "selection": "seçim",
     "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın",
     "unableToEmbed": "Bu URL'i yerleştirmeye şu anda izin verilmiyor. URL'in beyaz listeye alınmasını istiyorsanız GitHub'da bir issue açın",
-    "unrecognizedLinkFormat": "Yerleştirdiğiniz bağlantı beklenen biçime uymuyor. Lütfen kaynak sitenin sağladığı \"yerleştir\" dizesini yapıştırmayı deneyin"
+    "unrecognizedLinkFormat": "Yerleştirdiğiniz bağlantı beklenen biçime uymuyor. Lütfen kaynak sitenin sağladığı \"yerleştir\" dizesini yapıştırmayı deneyin",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Şeffaf",
