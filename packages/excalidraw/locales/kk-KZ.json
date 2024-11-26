@@ -127,10 +127,11 @@
       "edit": "",
       "editEmbed": "",
       "create": "",
-      "createEmbed": "",
       "label": "",
       "labelEmbed": "",
-      "empty": ""
+      "empty": "",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "",
     "zoomToFit": "",
     "installPWA": "",
-    "autoResize": ""
+    "autoResize": "",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "",
@@ -501,7 +509,8 @@
     "selection": "таңдау",
     "pasteAsSingleElement": "",
     "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unrecognizedLinkFormat": "",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "",
