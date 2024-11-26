@@ -125,12 +125,13 @@
     "createContainerFromText": "Radbryt text i en avgränsad yta",
     "link": {
       "edit": "Redigera länk",
-      "editEmbed": "Redigera länk & bädda in",
-      "create": "Skapa länk",
-      "createEmbed": "Skapa länk & bädda in",
+      "editEmbed": "",
+      "create": "",
       "label": "Länk",
       "labelEmbed": "Länka & bädda in",
-      "empty": "Ingen länk är angiven"
+      "empty": "Ingen länk är angiven",
+      "hint": "",
+      "goToElement": ""
     },
     "lineEditor": {
       "edit": "Redigera linje",
@@ -155,7 +156,14 @@
     "zoomToFitSelection": "Zooma för att passa urval",
     "zoomToFit": "Zooma för att rymma alla element",
     "installPWA": "Installera Excalidraw lokalt (PWA)",
-    "autoResize": "Aktivera automatisk skalning av text"
+    "autoResize": "Aktivera automatisk skalning av text",
+    "copyElementLink": "",
+    "linkToElement": ""
+  },
+  "elementLink": {
+    "title": "",
+    "desc": "",
+    "notFound": ""
   },
   "library": {
     "noItems": "Inga objekt tillagda ännu...",
@@ -501,7 +509,8 @@
     "selection": "markering",
     "pasteAsSingleElement": "Använd {{shortcut}} för att klistra in som ett enda element,\neller klistra in i en befintlig textredigerare",
     "unableToEmbed": "Att bädda in denna webbadress är för närvarande inte tillåtet. Skapa en problemrapport på GitHub för att begära att webbadressen vitlistas.",
-    "unrecognizedLinkFormat": "Länken du bäddade in matchar inte det förväntade formatet. Försök klistra in 'embed'-strängen som tillhandahålls av källwebbplatsen"
+    "unrecognizedLinkFormat": "Länken du bäddade in matchar inte det förväntade formatet. Försök klistra in 'embed'-strängen som tillhandahålls av källwebbplatsen",
+    "elementLinkCopied": ""
   },
   "colors": {
     "transparent": "Genomskinlig",
