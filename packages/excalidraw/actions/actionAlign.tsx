@@ -50,7 +50,7 @@ const alignSelectedElements = (
     selectedElements,
     elementsMap,
     alignment,
-    selectedGroupIds
+    selectedGroupIds,
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);
