@@ -3870,14 +3870,18 @@ class App extends React.Component<AppProps, AppState> {
       nextFiles[fileData.id] = fileData;
 
       if (fileData.mimeType === MIME_TYPES.svg) {
-        const restoredDataURL = getDataURL_sync(
-          normalizeSVG(dataURLToString(fileData.dataURL)),
-          MIME_TYPES.svg,
-        );
-        if (fileData.dataURL !== restoredDataURL) {
-          // bump version so persistence layer can update the store
-          fileData.version = (fileData.version ?? 1) + 1;
-          fileData.dataURL = restoredDataURL;
+        try {
+          const restoredDataURL = getDataURL_sync(
+            normalizeSVG(dataURLToString(fileData.dataURL)),
+            MIME_TYPES.svg,
+          );
+          if (fileData.dataURL !== restoredDataURL) {
+            // bump version so persistence layer can update the store
+            fileData.version = (fileData.version ?? 1) + 1;
+            fileData.dataURL = restoredDataURL;
+          }
+        } catch (error) {
+          console.error(error);
         }
       }
     }
