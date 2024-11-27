@@ -13,7 +13,7 @@ export const alignElements = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   alignment: Alignment,
-  selectedGroupIds: GroupId[]
+  selectedGroupIds: GroupId[],
 ): ExcalidrawElement[] => {
   const groups: ExcalidrawElement[][] = getMaximumGroups(
     selectedElements,
@@ -27,7 +27,7 @@ export const alignElements = (
     groups.length === 1 && selectedGroupIds.length === 1
       ? getInternalGroups(selectedElements, elementsMap, selectedGroupIds[0])
       : groups;
-  
+
   return unpackedGroups.flatMap((group) => {
     const translation = calculateTranslation(
       group,

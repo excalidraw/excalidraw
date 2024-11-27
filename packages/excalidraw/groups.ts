@@ -358,20 +358,23 @@ export const getMaximumGroups = (
 export const getInternalGroups = (
   elements: ExcalidrawElement[],
   elementsMap: ElementsMap,
-  selectedGroupId: GroupId
+  selectedGroupId: GroupId,
 ): ExcalidrawElement[][] => {
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
   >();
   elements.forEach((element: ExcalidrawElement) => {
-    const selectedGroupIndex= element.groupIds.findIndex((groupId) => groupId === selectedGroupId);
-    const groupId = selectedGroupIndex > 0
-      ? element.groupIds[selectedGroupIndex - 1]
-      : element.id;
-    
+    const selectedGroupIndex = element.groupIds.findIndex(
+      (groupId) => groupId === selectedGroupId,
+    );
+    const groupId =
+      selectedGroupIndex > 0
+        ? element.groupIds[selectedGroupIndex - 1]
+        : element.id;
+
     const currentGroupMembers = groups.get(groupId) || [];
-    
+
     // Include bound text if present when grouping
     const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
@@ -381,7 +384,7 @@ export const getInternalGroups = (
   });
 
   return Array.from(groups.values());
-}
+};
 
 export const getNonDeletedGroupIds = (elements: ElementsMap) => {
   const nonDeletedGroupIds = new Set<string>();
