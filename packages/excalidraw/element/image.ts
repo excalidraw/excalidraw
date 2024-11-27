@@ -105,18 +105,23 @@ export const normalizeSVG = (SVGString: string) => {
       svg.setAttribute("xmlns", SVG_NS);
     }
 
-    if (svg.getAttribute("width") === "100%") {
-      svg.removeAttribute("width");
+    let width = svg.getAttribute("width");
+    let height = svg.getAttribute("height");
+
+    // Do not use % or auto values for width/height
+    // to avoid scaling issues when rendering at different sizes/zoom levels
+    if (width?.includes("%") || width === "auto") {
+      width = null;
+    }
+    if (height?.includes("%") || height === "auto") {
+      height = null;
     }
 
-    if (svg.getAttribute("height") === "100%") {
-      svg.removeAttribute("height");
-    }
+    const viewBox = svg.getAttribute("viewBox");
 
-    if (!svg.hasAttribute("width") || !svg.hasAttribute("height")) {
-      const viewBox = svg.getAttribute("viewBox");
-      let width = svg.getAttribute("width") || "50";
-      let height = svg.getAttribute("height") || "50";
+    if (!width || !height) {
+      width = width || "50";
+      height = height || "50";
 
       if (viewBox) {
         const match = viewBox.match(/\d+ +\d+ +(\d+) +(\d+)/);
@@ -125,12 +130,13 @@ export const normalizeSVG = (SVGString: string) => {
         }
       }
 
-      if (!viewBox) {
-        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-      }
-
       svg.setAttribute("width", width);
       svg.setAttribute("height", height);
+    }
+
+    // Make sure viewBox is set
+    if (!viewBox) {
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     }
 
     return svg.outerHTML;
