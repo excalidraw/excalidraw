@@ -13,6 +13,7 @@ import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
+import { getSelectedGroupIds } from "../groups";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
@@ -43,11 +44,13 @@ const alignSelectedElements = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   const elementsMap = arrayToMap(elements);
+  const selectedGroupIds = getSelectedGroupIds(appState);
 
   const updatedElements = alignElements(
     selectedElements,
     elementsMap,
     alignment,
+    selectedGroupIds
   );
 
   const updatedElementsMap = arrayToMap(updatedElements);

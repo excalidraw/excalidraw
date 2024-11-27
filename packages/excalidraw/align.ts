@@ -1,8 +1,8 @@
-import type { ElementsMap, ExcalidrawElement } from "./element/types";
+import type { ElementsMap, ExcalidrawElement, GroupId } from "./element/types";
 import { newElementWith } from "./element/mutateElement";
 import type { BoundingBox } from "./element/bounds";
 import { getCommonBoundingBox } from "./element/bounds";
-import { getMaximumGroups } from "./groups";
+import { getInternalGroups, getMaximumGroups } from "./groups";
 
 export interface Alignment {
   position: "start" | "center" | "end";
@@ -13,6 +13,7 @@ export const alignElements = (
   selectedElements: ExcalidrawElement[],
   elementsMap: ElementsMap,
   alignment: Alignment,
+  selectedGroupIds: GroupId[]
 ): ExcalidrawElement[] => {
   const groups: ExcalidrawElement[][] = getMaximumGroups(
     selectedElements,
@@ -23,10 +24,10 @@ export const alignElements = (
   // #8522 Allow grouped elements to align within group
   // --------------------------------------------------
   const unpackedGroups =
-    groups.length > 1
-      ? groups
-      : groups.flatMap((group) => group.map((elements) => [elements]));
-
+    groups.length === 1 && selectedGroupIds.length === 1
+      ? getInternalGroups(selectedElements, elementsMap, selectedGroupIds[0])
+      : groups;
+  
   return unpackedGroups.flatMap((group) => {
     const translation = calculateTranslation(
       group,
