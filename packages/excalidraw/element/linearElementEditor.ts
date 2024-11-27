@@ -10,9 +10,6 @@ import type {
   OrderedExcalidrawElement,
   FixedPointBinding,
   SceneElementsMap,
-  FixedSegment,
-  ExcalidrawElbowArrowElement,
-  Sequential,
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
@@ -36,7 +33,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { invariant, toBrandedType, tupleToCoors } from "../utils";
+import { invariant, tupleToCoors } from "../utils";
 import {
   isBindingElement,
   isElbowArrow,
@@ -69,14 +66,6 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
-import {
-  HEADING_DOWN,
-  HEADING_LEFT,
-  HEADING_RIGHT,
-  HEADING_UP,
-  headingIsHorizontal,
-  headingIsVertical,
-} from "./heading";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1278,7 +1267,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: Sequential<FixedSegment> | null;
+      fixedSegments?: number[] | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1287,7 +1276,6 @@ export class LinearElementEditor {
   ) {
     const { points } = element;
     const targets = Array.from(targetPoints);
-    const indices = targets.map((p) => p.index).sort();
 
     // in case we're moving start point, instead of modifying its position
     // which would break the invariant of it being at [0,0], we move
@@ -1323,129 +1311,6 @@ export class LinearElementEditor {
       return offsetX || offsetY ? pointFrom(p[0] - offsetX, p[1] - offsetY) : p;
     });
 
-    if (isElbowArrow(element)) {
-      const newFixedSegments = indices
-        // The segment id being fixed is always the last point index of the
-        // arrow segment, so it's always  > 0. Also segments should always
-        // be 2 points.
-        .filter((i, _, a) => a.findIndex((t) => t === i - 1) > -1)
-        // Map segments to mid points of the given segment represented by
-        // the two points, and the direction. The segment idx we will need
-        // to know if a given segment is manually moved.
-        // NOTE: Segment indices are not permanent, the arrow update
-        // might simplify the arrow and remove/merge segments.
-        .map<FixedSegment>((idx) => {
-          // When moved segment lines up with previous or next segment
-          // The heading direction flips, so we use the old direction
-          // to override and ensure a consistent heading during the
-          // full drag operation.
-          const origHeading = element.fixedSegments?.find(
-            (s) => s.index === idx,
-          )?.heading;
-          const override = options?.elbowArrowSegmentOverride ?? false;
-          if (override && origHeading) {
-            if (headingIsVertical(origHeading)) {
-              return {
-                anchor: pointFrom<GlobalPoint>(
-                  element.x + nextPoints[idx][0],
-                  (element.y +
-                    nextPoints[idx][1] +
-                    element.y +
-                    nextPoints[idx - 1][1]) /
-                    2,
-                ),
-                heading: origHeading,
-                index: idx,
-              };
-            }
-
-            return {
-              anchor: pointFrom<GlobalPoint>(
-                (element.x +
-                  nextPoints[idx][0] +
-                  element.x +
-                  nextPoints[idx - 1][0]) /
-                  2,
-                element.y + nextPoints[idx][1],
-              ),
-              heading: origHeading,
-              index: idx,
-            };
-          }
-          // If this is the first render of the mid segment dragging
-          // then calculate the direction freely.
-          if (
-            Math.abs(nextPoints[idx][0] - nextPoints[idx - 1][0]) <
-            Math.abs(nextPoints[idx][1] - nextPoints[idx - 1][1])
-          ) {
-            return {
-              anchor: pointFrom<GlobalPoint>(
-                element.x + nextPoints[idx][0],
-                (element.y +
-                  nextPoints[idx][1] +
-                  element.y +
-                  nextPoints[idx - 1][1]) /
-                  2,
-              ),
-              heading:
-                element.y + nextPoints[idx][1] >
-                element.y + nextPoints[idx - 1][1]
-                  ? HEADING_UP
-                  : HEADING_DOWN,
-              index: idx,
-            };
-          }
-
-          return {
-            anchor: pointFrom<GlobalPoint>(
-              (element.x +
-                nextPoints[idx][0] +
-                element.x +
-                nextPoints[idx - 1][0]) /
-                2,
-              element.y + nextPoints[idx][1],
-            ),
-            heading:
-              element.x + nextPoints[idx][0] >
-              element.x + nextPoints[idx - 1][0]
-                ? HEADING_LEFT
-                : HEADING_RIGHT,
-            index: idx,
-          };
-        }) as Sequential<FixedSegment>;
-
-      let fixedSegments =
-        element.fixedSegments ?? toBrandedType<Sequential<FixedSegment>>([]);
-      newFixedSegments.forEach((segment) => {
-        if (segment.anchor == null) {
-          // Delete segment
-          fixedSegments = fixedSegments.filter(
-            (s) => s.index !== segment.index,
-          ) as Sequential<FixedSegment>;
-        } else {
-          const idx =
-            fixedSegments?.findIndex((s) => s.index === segment.index) ?? -1;
-          if (idx > -1) {
-            // Update segment
-            fixedSegments[idx] = {
-              anchor: segment.anchor,
-              heading: options?.elbowArrowSegmentOverride
-                ? fixedSegments[idx].heading
-                : segment.heading,
-              index: segment.index,
-            };
-          } else {
-            // Add segment request
-            fixedSegments.push(segment);
-          }
-        }
-      });
-      otherUpdates = {
-        ...otherUpdates,
-        fixedSegments: fixedSegments.length > 0 ? fixedSegments : null,
-      };
-    }
-
     LinearElementEditor._updatePoints(
       element,
       nextPoints,
@@ -1461,59 +1326,6 @@ export class LinearElementEditor {
         changedElements: options?.changedElements,
       },
     );
-  }
-
-  static restoreFixedSegments(
-    element: ExcalidrawElbowArrowElement,
-    x: number,
-    y: number,
-  ): Sequential<FixedSegment> | null {
-    return (element.fixedSegments?.map((segment) => {
-      if (
-        Math.abs(
-          element.points[segment.index][0] -
-            element.points[segment.index - 1][0],
-        ) <
-        Math.abs(
-          element.points[segment.index][1] -
-            element.points[segment.index - 1][1],
-        )
-      ) {
-        return {
-          anchor: pointFrom<GlobalPoint>(
-            x + element.points[segment.index][0],
-            (y +
-              element.points[segment.index][1] +
-              y +
-              element.points[segment.index - 1][1]) /
-              2,
-          ),
-          heading:
-            y + element.points[segment.index][1] >
-            y + element.points[segment.index - 1][1]
-              ? HEADING_UP
-              : HEADING_DOWN,
-          index: segment.index,
-        };
-      }
-
-      return {
-        anchor: pointFrom<GlobalPoint>(
-          (x +
-            element.points[segment.index][0] +
-            x +
-            element.points[segment.index - 1][0]) /
-            2,
-          y + element.points[segment.index][1],
-        ),
-        heading:
-          x + element.points[segment.index][0] >
-          x + element.points[segment.index - 1][0]
-            ? HEADING_LEFT
-            : HEADING_RIGHT,
-        index: segment.index,
-      };
-    }) ?? null) as Sequential<FixedSegment>;
   }
 
   static shouldAddMidpoint(
@@ -1621,7 +1433,6 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: Sequential<FixedSegment> | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1632,7 +1443,6 @@ export class LinearElementEditor {
       const updates: {
         startBinding?: FixedPointBinding | null;
         endBinding?: FixedPointBinding | null;
-        fixedSegments?: Sequential<FixedSegment> | null;
         points?: LocalPoint[];
       } = {};
       if (otherUpdates?.startBinding !== undefined) {
@@ -1648,9 +1458,6 @@ export class LinearElementEditor {
           isFixedPointBinding(otherUpdates.endBinding)
             ? otherUpdates.endBinding
             : null;
-      }
-      if (otherUpdates?.fixedSegments) {
-        updates.fixedSegments = otherUpdates.fixedSegments;
       }
 
       updates.points = Array.from(nextPoints);
@@ -1945,104 +1752,50 @@ export class LinearElementEditor {
     return coords;
   };
 
-  /**
-   *
-   */
-  static moveElbowArrowSegment(
+  static deleteFixedSegment(
     linearElementEditor: LinearElementEditor,
-    pointerCoords: { x: number; y: number },
-    elementsMap: ElementsMap,
-    appState: AppState,
-    added: boolean,
-  ): LinearElementEditor {
-    if (!linearElementEditor.elbowed) {
-      return linearElementEditor;
-    }
-
-    const { index: segmentIdx } =
-      linearElementEditor.pointerDownState.segmentMidpoint;
-    const element = LinearElementEditor.getElement<ExcalidrawElbowArrowElement>(
+    state: AppState,
+    x: number,
+    y: number,
+    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  ) {
+    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+      linearElementEditor,
+      { x, y },
+      state,
+      elementsMap,
+    );
+    const index =
+      segmentMidPoint &&
+      LinearElementEditor.getSegmentMidPointIndex(
+        linearElementEditor,
+        state,
+        segmentMidPoint,
+        elementsMap,
+      );
+    const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
       elementsMap,
     );
 
-    if (!element || !segmentIdx) {
-      return linearElementEditor;
+    if (index && index > 0 && element && isElbowArrow(element)) {
+      const start = element.points[index - 1];
+      const end = element.points[index];
+
+      mutateElement(element, {
+        fixedSegments: element.fixedSegments?.filter(
+          (segment) =>
+            !pointsEqual(segment.start, start) &&
+            !pointsEqual(segment.end, end),
+        ),
+      });
+
+      LinearElementEditor.updateEditorMidPointsCache(
+        element,
+        elementsMap,
+        state,
+      );
     }
-
-    // Calculate the expected / existing position of the
-    // segment in the `fixedSegments` array on the arrow
-    let currFixedSegmentsArrayIdx =
-      element.fixedSegments?.findIndex(
-        (segment) => segment.index === segmentIdx,
-      ) ?? -1;
-    if (currFixedSegmentsArrayIdx < 0) {
-      // Segment not yet fixed - we expect it to fall into this place in the array:
-      currFixedSegmentsArrayIdx =
-        element.fixedSegments?.filter((segment) => segment.index < segmentIdx)
-          ?.length ?? 0;
-    }
-
-    const startPoint = pointFrom<GlobalPoint>(
-      element.x + element.points[segmentIdx - 1][0],
-      element.y + element.points[segmentIdx - 1][1],
-    );
-    const endPoint = pointFrom<GlobalPoint>(
-      element.x + element.points[segmentIdx][0],
-      element.y + element.points[segmentIdx][1],
-    );
-    const origHeading = element.fixedSegments?.find(
-      (s) => s.index === segmentIdx,
-    )?.heading;
-    const isHorizontal =
-      added && origHeading
-        ? headingIsHorizontal(origHeading)
-        : Math.abs(startPoint[1] - endPoint[1]) <
-          Math.abs(startPoint[0] - endPoint[0]);
-
-    LinearElementEditor.movePoints(
-      element,
-      [
-        {
-          index: segmentIdx - 1,
-          point: pointFrom<LocalPoint>(
-            (!isHorizontal ? pointerCoords.x : startPoint[0]) - element.x,
-            (isHorizontal ? pointerCoords.y : startPoint[1]) - element.y,
-          ),
-          isDragging: true,
-        },
-        {
-          index: segmentIdx,
-          point: pointFrom<LocalPoint>(
-            (!isHorizontal ? pointerCoords.x : endPoint[0]) - element.x,
-            (isHorizontal ? pointerCoords.y : endPoint[1]) - element.y,
-          ),
-          isDragging: true,
-        },
-      ],
-      undefined,
-      { elbowArrowSegmentOverride: added },
-    );
-
-    LinearElementEditor.updateEditorMidPointsCache(
-      element,
-      elementsMap,
-      appState,
-    );
-
-    const newIndex = element.fixedSegments![currFixedSegmentsArrayIdx].index;
-
-    return {
-      ...linearElementEditor,
-      pointerDownState: {
-        ...linearElementEditor.pointerDownState,
-        segmentMidpoint: {
-          ...linearElementEditor.pointerDownState.segmentMidpoint,
-          index: newIndex, // Update index for the next frame
-          added: true,
-        },
-      },
-    };
   }
 }
 

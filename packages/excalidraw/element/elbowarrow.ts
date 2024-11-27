@@ -1,9 +1,8 @@
 import {
-  distanceToLineSegment,
-  lineSegment,
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
+  pointsEqual,
   pointTranslate,
   vector,
   vectorCross,
@@ -16,6 +15,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import {
+  invariant,
   isAnyTrue,
   memo,
   multiDimensionalArrayDeepFilter,
@@ -45,7 +45,6 @@ import {
   vectorToHeading,
 } from "./heading";
 import type { ElementUpdate } from "./mutateElement";
-import { newElement } from "./newElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
@@ -58,9 +57,6 @@ import type {
   ExcalidrawBindableElement,
   FixedPointBinding,
   FixedSegment,
-  FractionalIndex,
-  Ordered,
-  Sequential,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -112,35 +108,6 @@ const generatePoints = memo(
     }) ?? [],
 );
 
-const anchorPointToSegmentIndex = (
-  points: GlobalPoint[],
-  anchor: GlobalPoint,
-  anchorIsHorizontal: boolean,
-) => {
-  let closestDistance = Infinity;
-  return points
-    .slice(1)
-    .map(
-      (point, idx) =>
-        [
-          distanceToLineSegment(anchor, lineSegment(points[idx], point)),
-          Math.abs(points[idx][1] - point[1]) < 1,
-          idx,
-        ] as [number, boolean, number],
-    )
-    .filter(
-      ([_, segmentIsHorizontal]) => segmentIsHorizontal === anchorIsHorizontal,
-    )
-    .reduce((acc, [distance, _, idx]) => {
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        return idx + 1;
-      }
-
-      return acc;
-    }, 0);
-};
-
 /**
  *
  */
@@ -148,238 +115,103 @@ export const updateElbowArrowPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   updates: {
-    points?: readonly LocalPoint[];
-    fixedSegments?: FixedSegment[];
+    points: readonly LocalPoint[];
   },
   options?: {
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  invariant(
+    arrow.points.length < 2 || arrow.points.length === updates.points.length,
+    "Updated point array length must match the arrow point length (i.e. you can't add new points manually to elbow arrows)",
+  );
+
   const updatedPoints = Array.from(updates.points ?? arrow.points);
 
-  const fakeElementsMap = toBrandedType<SceneElementsMap>(new Map(elementsMap));
+  const nextFixedSegments = arrow.points
+    .map((p, idx) => {
+      const existingSegment = arrow.fixedSegments?.find(
+        (segment) =>
+          segment.start[0] === arrow.points[idx - 1][0] &&
+          segment.start[1] === arrow.points[idx - 1][1] &&
+          segment.end[0] === arrow.points[idx][0] &&
+          segment.end[1] === arrow.points[idx][1],
+      );
+      if (existingSegment) {
+        return [existingSegment, idx] as const;
+      }
 
-  const nextFixedSegments = (updates.fixedSegments ?? arrow.fixedSegments ?? [])
-    // Delete segment if anchor is null
-    .filter((segment) => segment.anchor != null)
-    // Due to the fixedSegment index sorting is essential!
-    .sort((a, b) => a.index - b.index);
+      if (
+        idx > 0 &&
+        !pointsEqual(p, updatedPoints[idx]) &&
+        !pointsEqual(arrow.points[idx - 1], updatedPoints[idx - 1])
+      ) {
+        // If the previous point is not the same as the updated previous point
+        // and the current point is not the same as the updated point, then a
+        // new segment is being moved / fixed
+        return [
+          {
+            start: updatedPoints[idx - 1],
+            end: updatedPoints[idx],
+          },
+          idx,
+        ] as const;
+      }
 
-  const { startDonglePosition, endDonglePosition, startHeading, endHeading } =
-    getElbowArrowData(arrow, elementsMap, updatedPoints, {
-      ...options,
-      startIsMidPoint: nextFixedSegments.length !== 0,
-      endIsMidPoint: nextFixedSegments.length !== 0,
-    });
+      return null;
+    })
+    .filter((segment) => segment !== null)
+    .sort((a, b) => a![1] - b![1])
+    // @ts-ignore
+    .map(([segment, _]): FixedSegment => segment);
 
-  // End segment is getting fixed - must happen before start segment move check!
-  if (
-    nextFixedSegments[nextFixedSegments.length - 1]?.index ===
-    updatedPoints.length - 1
-  ) {
-    nextFixedSegments[nextFixedSegments.length - 1].index =
-      updatedPoints.length - 2;
-    updatedPoints.push(arrow.points[arrow.points.length - 1]);
-  }
-
-  // Start segment is getting fixed
-  if (nextFixedSegments[0]?.index === 1) {
-    nextFixedSegments[0].index = 2;
-    updatedPoints.unshift(pointFrom<LocalPoint>(0, 0));
-  }
-
-  let segmentStart: {
-    startPoint: GlobalPoint;
-    startFixedPoint: FixedPointBinding["fixedPoint"] | null;
-    startElementId: string | null;
-  } = {
-    startPoint: pointFrom<GlobalPoint>(
-      arrow.x + updatedPoints[0][0],
-      arrow.y + updatedPoints[0][1],
-    ),
-    startFixedPoint: arrow.startBinding?.fixedPoint ?? null,
-    startElementId: arrow.startBinding?.elementId ?? null,
+  let state = {
+    x: arrow.x,
+    y: arrow.y,
+    startBinding: arrow.startBinding,
+    endBinding: null,
+    startArrowhead: arrow.startArrowhead,
+    endArrowhead: null,
   };
-
-  const anchorStartDongleOffsets = [
-    startDonglePosition[0] - BASE_PADDING,
-    startDonglePosition[1] - BASE_PADDING,
-    startDonglePosition[0] + BASE_PADDING,
-    startDonglePosition[0] + BASE_PADDING,
-  ] as Bounds;
-  const anchorEndDongleOffsets = [
-    endDonglePosition[0] - BASE_PADDING,
-    endDonglePosition[1] - BASE_PADDING,
-    endDonglePosition[0] + BASE_PADDING,
-    endDonglePosition[0] + BASE_PADDING,
-  ] as Bounds;
+  let startPoint = updatedPoints[0];
 
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
-    nextFixedSegments.map((segmentEnd, segmentIdx) => {
-      // Determine if we need to flip the heading for visual appeal
-      const startHandle: GlobalPoint = headingIsHorizontal(segmentEnd.heading)
-        ? pointFrom(
-            nextFixedSegments[segmentIdx - 1]?.anchor[0] ??
-              getDonglePosition(
-                anchorStartDongleOffsets,
-                startHeading,
-                startDonglePosition,
-              )[0],
-            segmentEnd.anchor[1],
-          )
-        : pointFrom(
-            segmentEnd.anchor[0],
-            nextFixedSegments[segmentIdx - 1]?.anchor[1] ??
-              getDonglePosition(
-                anchorStartDongleOffsets,
-                startHeading,
-                startDonglePosition,
-              )[1],
-          );
-      const endHandle: GlobalPoint = headingIsHorizontal(segmentEnd.heading)
-        ? pointFrom(
-            nextFixedSegments[segmentIdx + 1]?.anchor[0] ??
-              getDonglePosition(
-                anchorEndDongleOffsets,
-                endHeading,
-                endDonglePosition,
-              )[0],
-            segmentEnd.anchor[1],
-          )
-        : pointFrom(
-            segmentEnd.anchor[0],
-            nextFixedSegments[segmentIdx + 1]?.anchor[1] ??
-              getDonglePosition(
-                anchorEndDongleOffsets,
-                endHeading,
-                endDonglePosition,
-              )[1],
-          );
-
-      const heading = headingIsHorizontal(segmentEnd.heading)
-        ? startHandle[0] < endHandle[0]
-          ? HEADING_LEFT
-          : HEADING_RIGHT
-        : startHandle[1] < endHandle[1]
-        ? HEADING_UP
-        : HEADING_DOWN;
-      nextFixedSegments[segmentIdx].heading = heading;
-
-      // Calculate new anchor point (sliding anchor)
-      const anchor = headingIsHorizontal(heading)
-        ? pointFrom<GlobalPoint>(
-            (startHandle[0] + endHandle[0]) / 2,
-            segmentEnd.anchor[1],
-          )
-        : pointFrom<GlobalPoint>(
-            segmentEnd.anchor[0],
-            (startHandle[1] + endHandle[1]) / 2,
-          );
-      nextFixedSegments[segmentIdx].anchor = anchor;
-
-      const el = {
-        ...newElement({
-          type: "rectangle",
-          x: anchor[0] - 0.1,
-          y: anchor[1] - 0.1,
-          width: 0.2,
-          height: 0.2,
-        }),
-        index: "DONOTSYNC" as FractionalIndex,
-      } as Ordered<ExcalidrawBindableElement>;
-      fakeElementsMap.set(el.id, el);
-
-      const endFixedPoint: [number, number] = compareHeading(
-        heading,
-        HEADING_DOWN,
-      )
-        ? [0.5, 1]
-        : compareHeading(heading, HEADING_LEFT)
-        ? [0, 0.5]
-        : compareHeading(heading, HEADING_UP)
-        ? [0.5, 0]
-        : [1, 0.5];
-
-      const state = {
-        x: segmentStart.startPoint[0],
-        y: segmentStart.startPoint[1],
-        startArrowhead: segmentIdx === 0 ? arrow.startArrowhead : null,
-        endArrowhead: null as Arrowhead | null,
-        startBinding:
-          segmentIdx === 0
-            ? arrow.startBinding
-            : {
-                elementId: segmentStart.startElementId!,
-                focus: 0,
-                gap: 0,
-                fixedPoint: segmentStart.startFixedPoint!,
-              },
-        endBinding: {
-          elementId: el.id,
-          focus: 0,
-          gap: 0,
-          fixedPoint: endFixedPoint,
-        },
-      };
-      const nextStartFixedPoint: [number, number] = compareHeading(
-        heading,
-        HEADING_DOWN,
-      )
-        ? [0.5, 0]
-        : compareHeading(heading, HEADING_LEFT)
-        ? [1, 0.5]
-        : compareHeading(heading, HEADING_UP)
-        ? [0.5, 1]
-        : [0, 0.5];
-      const segmentEndGlobalPoint = getGlobalFixedPointForBindableElement(
-        endFixedPoint,
-        el,
+    nextFixedSegments.map((segment, segmentIdx) => {
+      const start = pointFrom<LocalPoint>(
+        segment.start[0] - startPoint[0],
+        segment.start[1] - startPoint[1],
       );
-      const endLocalPoint = pointFrom<LocalPoint>(
-        segmentEndGlobalPoint[0] - segmentStart.startPoint[0],
-        segmentEndGlobalPoint[1] - segmentStart.startPoint[1],
+      const end = pointFrom<LocalPoint>(
+        segment.end[0] - startPoint[0],
+        segment.end[1] - startPoint[1],
       );
+      const ret: [ElbowArrowState, readonly LocalPoint[]] = [
+        state,
+        [startPoint, segmentIdx === 0 ? end : start],
+      ];
 
-      segmentStart = {
-        startPoint: getGlobalFixedPointForBindableElement(
-          nextStartFixedPoint,
-          el,
-        ),
-        startFixedPoint: nextStartFixedPoint,
-        startElementId: el.id,
+      startPoint =
+        segmentIdx === nextFixedSegments.length - 1
+          ? segment.start
+          : segment.end;
+
+      state = {
+        ...state,
+        x: arrow.x + segment.end[0],
+        y: arrow.y + segment.end[1],
+        startBinding: null,
+        startArrowhead: null,
       };
 
-      return [state, [pointFrom<LocalPoint>(0, 0), endLocalPoint]];
+      return ret;
     });
   pointPairs.push([
     {
-      x: segmentStart.startPoint[0],
-      y: segmentStart.startPoint[1],
-      startArrowhead: null,
-      endArrowhead: arrow.endArrowhead,
-      startBinding:
-        nextFixedSegments.length === 0
-          ? arrow.startBinding
-          : {
-              elementId: segmentStart.startElementId!,
-              focus: 0,
-              gap: 0,
-              fixedPoint: segmentStart.startFixedPoint!,
-            },
+      ...state,
       endBinding: arrow.endBinding,
+      endArrowhead: arrow.endArrowhead,
     },
-    [
-      pointFrom<LocalPoint>(0, 0),
-      // Translate from unsegmented local array point -> global point -> last segment local point
-      pointFrom<LocalPoint>(
-        arrow.x +
-          updatedPoints[updatedPoints.length - 1][0] -
-          segmentStart.startPoint[0],
-        arrow.y +
-          updatedPoints[updatedPoints.length - 1][1] -
-          segmentStart.startPoint[1],
-      ),
-    ],
+    [startPoint, updatedPoints[updatedPoints.length - 1]],
   ]);
 
   const simplifiedPoints = getElbowArrowCornerPoints(
@@ -390,36 +222,14 @@ export const updateElbowArrowPoints = (
           points,
           idx,
           pointPairs.length - 1,
-          fakeElementsMap,
-          {
-            ...options,
-            heading: nextFixedSegments[idx]?.heading,
-          },
+          elementsMap,
+          options,
         ),
       ),
     ),
   ).flat();
 
-  return normalizeArrowElementUpdate(
-    simplifiedPoints,
-    nextFixedSegments.map((segment) => {
-      segment.index = anchorPointToSegmentIndex(
-        simplifiedPoints,
-        segment.anchor,
-        headingIsHorizontal(segment.heading),
-      );
-
-      if (segment.index === 1) {
-        segment.index = 2;
-      }
-
-      if (segment.index === simplifiedPoints.length - 1) {
-        segment.index = simplifiedPoints.length - 2;
-      }
-
-      return segment;
-    }) as Sequential<FixedSegment>,
-  );
+  return normalizeArrowElementUpdate(simplifiedPoints, nextFixedSegments);
 };
 
 /**
@@ -1469,14 +1279,14 @@ const getBindableElementForId = (
 
 const normalizeArrowElementUpdate = (
   global: GlobalPoint[],
-  nextFixedSegments: Sequential<FixedSegment> | null,
+  nextFixedSegments: FixedSegment[] | null,
 ): {
   points: LocalPoint[];
   x: number;
   y: number;
   width: number;
   height: number;
-  fixedSegments: Sequential<FixedSegment> | null;
+  fixedSegments: FixedSegment[] | null;
 } => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
@@ -1492,7 +1302,8 @@ const normalizeArrowElementUpdate = (
     points,
     x: offsetX,
     y: offsetY,
-    fixedSegments: nextFixedSegments?.length ? nextFixedSegments : null,
+    fixedSegments:
+      (nextFixedSegments?.length ?? 0) > 0 ? nextFixedSegments : null,
     ...getSizeFromPoints(points),
   };
 };

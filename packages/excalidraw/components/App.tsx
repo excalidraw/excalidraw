@@ -186,8 +186,6 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
-  Sequential,
-  FixedSegment,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -3223,21 +3221,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const newElements = duplicateElements(
       elements.map((element) => {
-        let newElement = newElementWith(element, {
+        const newElement = newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
         });
-
-        if (isElbowArrow(newElement)) {
-          newElement = {
-            ...newElement,
-            fixedSegments: LinearElementEditor.restoreFixedSegments(
-              newElement,
-              newElement.x,
-              newElement.y,
-            ),
-          };
-        }
 
         return newElement;
       }),
@@ -5312,34 +5299,13 @@ class App extends React.Component<AppProps, AppState> {
         (this.state.selectedLinearElement?.pointerDownState?.segmentMidpoint
           ?.index || -1) > -1
       ) {
-        // Delete fixed segment point
         this.store.shouldCaptureIncrement();
-        const elementsMap = this.scene.getNonDeletedElementsMap();
-        const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+        LinearElementEditor.deleteFixedSegment(
           this.state.selectedLinearElement,
-          { x: sceneX, y: sceneY },
           this.state,
-          elementsMap,
-        );
-        const index =
-          segmentMidPoint &&
-          LinearElementEditor.getSegmentMidPointIndex(
-            this.state.selectedLinearElement,
-            this.state,
-            segmentMidPoint,
-            elementsMap,
-          );
-        const fixedSegments = selectedElements[0].fixedSegments?.map(
-          (segment) =>
-            segment.index !== index ? segment : { ...segment, anchor: null },
-        ) as Sequential<FixedSegment> | null;
-
-        mutateElement(selectedElements[0], { fixedSegments });
-
-        LinearElementEditor.updateEditorMidPointsCache(
-          selectedElements[0],
-          elementsMap,
-          this.state,
+          sceneX,
+          sceneY,
+          this.scene.getNonDeletedElementsMap(),
         );
 
         return;
@@ -7923,54 +7889,49 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
           ) >= DRAGGING_THRESHOLD
         ) {
+          // Move fixed segment
           const [gridX, gridY] = getGridPoint(
             pointerCoords.x,
             pointerCoords.y,
             event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
           );
-          const ret = LinearElementEditor.moveElbowArrowSegment(
-            this.state.selectedLinearElement,
-            { x: gridX, y: gridY },
-            elementsMap,
-            this.state,
-            linearElementEditor.pointerDownState.segmentMidpoint.added,
-          );
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const segmentMidPoint =
+            LinearElementEditor.getSegmentMidpointHitCoords(
+              this.state.selectedLinearElement,
+              { x: pointerDownState.origin.x, y: pointerDownState.origin.y },
+              this.state,
+              elementsMap,
+            );
+          const index =
+            segmentMidPoint &&
+            LinearElementEditor.getSegmentMidPointIndex(
+              this.state.selectedLinearElement,
+              this.state,
+              segmentMidPoint,
+              elementsMap,
+            );
           const element = LinearElementEditor.getElement(
             this.state.selectedLinearElement.elementId,
             elementsMap,
           );
-          if (element) {
+
+          if (element && index && index > 0) {
+            LinearElementEditor.movePoints(element, [
+              {
+                index: index - 1,
+                point: pointFrom<LocalPoint>(
+                  gridX - element.x,
+                  gridY - element.y,
+                ),
+                isDragging: true,
+              },
+            ]);
             LinearElementEditor.updateEditorMidPointsCache(
               element,
               elementsMap,
               this.state,
             );
-          }
-
-          if (
-            this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-              .index !== ret.pointerDownState.segmentMidpoint.index ||
-            this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-              .added !== ret.pointerDownState.segmentMidpoint.added
-          ) {
-            flushSync(() => {
-              if (this.state.selectedLinearElement) {
-                this.setState({
-                  selectedLinearElement: {
-                    ...this.state.selectedLinearElement,
-                    pointerDownState: ret.pointerDownState,
-                  },
-                });
-              }
-              if (this.state.editingLinearElement) {
-                this.setState({
-                  editingLinearElement: {
-                    ...this.state.editingLinearElement,
-                    pointerDownState: ret.pointerDownState,
-                  },
-                });
-              }
-            });
           }
 
           return;

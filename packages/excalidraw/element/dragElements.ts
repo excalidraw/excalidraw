@@ -22,7 +22,6 @@ import {
 import { getFontString } from "../utils";
 import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 import { getGridPoint } from "../snapping";
-import { LinearElementEditor } from "./linearElementEditor";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -77,20 +76,6 @@ export const dragSelectedElements = (
 
   elementsToUpdate.forEach((element) => {
     updateElementCoords(pointerDownState, element, adjustedOffset);
-    if (isElbowArrow(element)) {
-      mutateElement(
-        element,
-        {
-          fixedSegments: LinearElementEditor.restoreFixedSegments(
-            element,
-            element.x,
-            element.y,
-          ),
-        },
-        true,
-        true,
-      );
-    }
     if (!isArrowElement(element)) {
       // skip arrow labels since we calculate its position during render
       const textElement = getBoundTextElement(

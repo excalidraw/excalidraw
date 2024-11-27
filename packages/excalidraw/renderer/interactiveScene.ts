@@ -81,7 +81,6 @@ import {
   type Radians,
 } from "../../math";
 import { getCornerRadius } from "../shapes";
-import { headingIsHorizontal } from "../element/heading";
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -489,7 +488,7 @@ const renderLinearPointHandles = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
   context.lineWidth = 1 / appState.zoom.value;
-  const points = LinearElementEditor.getPointsGlobalCoordinates(
+  const points: GlobalPoint[] = LinearElementEditor.getPointsGlobalCoordinates(
     element,
     elementsMap,
   );
@@ -511,46 +510,32 @@ const renderLinearPointHandles = (
 
   // Rendering segment mid points
   if (isElbowArrow(element)) {
-    const fixedPoints = element.points.slice(0, -1).map((p, i) => {
-      const fixedSegmentIdx =
-        element.fixedSegments?.findIndex(
-          (fixedSegment) => fixedSegment.index === i + 1,
-        ) ?? -1;
-      if (fixedSegmentIdx > -1) {
-        return headingIsHorizontal(
-          element.fixedSegments![fixedSegmentIdx].heading,
-        );
-      }
-
-      return null;
-    });
-    const globalPoints = element.points.map((p) =>
-      pointFrom<GlobalPoint>(element.x + p[0], element.y + p[1]),
-    );
-    globalPoints.slice(0, -1).forEach((p, idx) => {
+    const fixedSegments = element.fixedSegments || [];
+    points.slice(0, -1).forEach((p, idx) => {
       if (
         !LinearElementEditor.isSegmentTooShort(
           element,
           p,
-          globalPoints[idx + 1],
+          points[idx + 1],
           appState.zoom,
         )
       ) {
-        const isHorizontal =
-          Math.abs(p[0] - globalPoints[idx + 1][0]) >
-          Math.abs(p[1] - globalPoints[idx + 1][1]);
         renderSingleLinearPoint(
           context,
           appState,
           pointFrom<GlobalPoint>(
-            (p[0] + globalPoints[idx + 1][0]) / 2,
-            (p[1] + globalPoints[idx + 1][1]) / 2,
+            (p[0] + points[idx + 1][0]) / 2,
+            (p[1] + points[idx + 1][1]) / 2,
           ),
           POINT_HANDLE_SIZE / 2,
           false,
-          !(fixedPoints[idx] !== null
-            ? fixedPoints[idx] === isHorizontal
-            : false),
+          !fixedSegments.find(
+            (segment) =>
+              segment.start[0] === points[idx - 1][0] &&
+              segment.start[1] === points[idx - 1][1] &&
+              segment.end[0] === points[idx][0] &&
+              segment.end[1] === points[idx][1],
+          ),
         );
       }
     });
