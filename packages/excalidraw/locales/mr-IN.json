@@ -125,13 +125,13 @@
     "createContainerFromText": "मजकूर कंटेनर मधे मोडून दाखवा",
     "link": {
       "edit": "दुवा संपादन",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "जड़ित असलेलि कड़ी चे संपादन",
+      "create": "कड़ी जोडा",
       "label": "दुवा",
       "labelEmbed": "कड़ी आणि रूतवणे",
       "empty": "कुठलिही कड़ी दिली नाही",
-      "hint": "",
-      "goToElement": ""
+      "hint": "आपली कड़ी एथे टाइप करा अथवा चिपकवा",
+      "goToElement": "निर्धारित घटक या वर जावे"
     },
     "lineEditor": {
       "edit": "रेघ संपादन",
@@ -157,12 +157,12 @@
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
     "installPWA": "एक्षकाली ड्रॉ स्थानीय स्वरूपात इंस्टॉल करावे (PWA)",
     "autoResize": "स्वयं आकार पुनः निर्धारण",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "वस्तु ची कड़ी कॉपी करावे",
+    "linkToElement": "वस्तु ची कड़ी"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
+    "title": "वस्तु ची कड़ी",
+    "desc": "चित्र-पटल वरचा कोणताही आकारा वर क्लिक करावे अथवा कड़ी चिपकावे.",
     "notFound": ""
   },
   "library": {
