@@ -13,7 +13,7 @@ export class ExcalidrawSyncClient {
     : "https://excalidraw-sync.marcel-529.workers.dev";
 
   private static readonly ROOM_ID = import.meta.env.DEV
-    ? "test_room_dev"
+    ? "test_room_x"
     : "test_room_prod";
 
   private static readonly RECONNECT_INTERVAL = 10_000;
@@ -22,9 +22,14 @@ export class ExcalidrawSyncClient {
 
   private readonly api: ExcalidrawImperativeAPI;
   private readonly roomId: string;
-  private readonly queuedChanges: Map<string, CLIENT_CHANGE> = new Map();
+  private readonly queuedChanges: Map<
+    string,
+    { queuedAt: number; change: CLIENT_CHANGE }
+  > = new Map();
+  public readonly acknowledgedChanges: Array<ElementsChange> = [];
+
   private get localChanges() {
-    return Array.from(this.queuedChanges.values());
+    return Array.from(this.queuedChanges.values()).map(({ change }) => change);
   }
 
   private server: WebSocket | null = null;
@@ -45,6 +50,7 @@ export class ExcalidrawSyncClient {
     this.lastAcknowledgedVersion = 0;
   }
 
+  // TODO: throttle does not work that well here (after some period it tries to reconnect too often)
   public reconnect = throttle(
     async () => {
       try {
@@ -58,7 +64,7 @@ export class ExcalidrawSyncClient {
           return;
         }
 
-        console.trace("Reconnecting to the sync server...");
+        console.info("Reconnecting to the sync server...");
 
         const isConnecting = {
           done: () => {},
@@ -109,6 +115,7 @@ export class ExcalidrawSyncClient {
         this.server?.removeEventListener("close", this.onClose);
         this.server?.removeEventListener("error", this.onError);
         this.server?.removeEventListener("open", this.onOpen);
+        this.server?.close();
 
         if (error) {
           this.isConnecting?.done(error);
@@ -143,15 +150,19 @@ export class ExcalidrawSyncClient {
     this.pull();
   };
 
-  private onClose = () =>
+  private onClose = (event: CloseEvent) => {
+    console.log("close", event);
     this.disconnect(
-      new Error(`Received "closed" event on the sync connection`),
+      new Error(`Received "${event.type}" event on the sync connection`),
     );
+  };
 
-  private onError = (event: Event) =>
+  private onError = (event: Event) => {
+    console.log("error", event);
     this.disconnect(
       new Error(`Received "${event.type}" on the sync connection`),
     );
+  };
 
   // TODO: could be an array buffer
   private onMessage = (event: MessageEvent) => {
@@ -193,7 +204,10 @@ export class ExcalidrawSyncClient {
     if (type === "durable") {
       // TODO: persist in idb (with insertion order)
       for (const change of changes) {
-        this.queuedChanges.set(change.id, change);
+        this.queuedChanges.set(change.id, {
+          queuedAt: Date.now(),
+          change,
+        });
       }
 
       // batch all queued changes
@@ -226,21 +240,20 @@ export class ExcalidrawSyncClient {
       this.api.getSceneElementsIncludingDeleted().map((el) => [el.id, el]),
     ) as SceneElementsMap;
 
-    console.log("remote changes", remoteChanges);
-    console.log("local changes", this.localChanges);
-
     try {
       // apply remote changes
       for (const remoteChange of remoteChanges) {
         if (this.queuedChanges.has(remoteChange.id)) {
+          const { change, queuedAt } = this.queuedChanges.get(remoteChange.id)!;
+          this.acknowledgedChanges.push(change);
+          console.info(
+            `Acknowledged change "${remoteChange.id}" after ${
+              Date.now() - queuedAt
+            }ms`,
+          );
           // local change acknowledge by the server, safe to remove
           this.queuedChanges.delete(remoteChange.id);
         } else {
-          [elements] = ElementsChange.load(remoteChange.payload).applyTo(
-            elements,
-            this.api.store.snapshot.elements,
-          );
-
           // TODO: we might not need to be that strict here
           if (this.lastAcknowledgedVersion + 1 !== remoteChange.version) {
             throw new Error(
@@ -249,10 +262,24 @@ export class ExcalidrawSyncClient {
               }", but received "${remoteChange.version}"`,
             );
           }
+
+          const change = ElementsChange.load(remoteChange.payload);
+          [elements] = change.applyTo(
+            elements,
+            this.api.store.snapshot.elements,
+          );
+          this.acknowledgedChanges.push(change);
         }
 
         this.lastAcknowledgedVersion = remoteChange.version;
       }
+
+      console.debug(`${now()} remote changes`, remoteChanges);
+      console.debug(`${now()} local changes`, this.localChanges);
+      console.debug(
+        `${now()} acknowledged changes`,
+        this.acknowledgedChanges.slice(-remoteChanges.length),
+      );
 
       // apply local changes
       // TODO: only necessary when remote changes modified same element properties!
@@ -298,3 +325,8 @@ export class ExcalidrawSyncClient {
     this.server?.send(JSON.stringify(message));
   }
 }
+
+const now = () => {
+  const date = new Date();
+  return `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}]`;
+};

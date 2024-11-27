@@ -19,8 +19,8 @@ export class DurableChangesRepository implements ChangesRepository {
 		);`);
   }
 
-  public saveAll = (changes: Array<CLIENT_CHANGE>) =>
-    this.storage.transactionSync(() => {
+  public saveAll = (changes: Array<CLIENT_CHANGE>) => {
+    return this.storage.transactionSync(() => {
       const prevVersion = this.getLastVersion();
       const nextVersion = prevVersion + changes.length;
 
@@ -45,14 +45,16 @@ export class DurableChangesRepository implements ChangesRepository {
 
       return this.getSinceVersion(prevVersion);
     });
+  };
 
-  public getSinceVersion = (version: number): Array<SERVER_CHANGE> =>
-    this.storage.sql
+  public getSinceVersion = (version: number): Array<SERVER_CHANGE> => {
+    return this.storage.sql
       .exec<SERVER_CHANGE>(
         `SELECT id, payload, version FROM changes WHERE version > (?) ORDER BY version ASC;`,
         version,
       )
       .toArray();
+  };
 
   public getLastVersion = (): number => {
     const result = this.storage.sql

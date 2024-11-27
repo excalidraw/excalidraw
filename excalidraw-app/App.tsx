@@ -16,6 +16,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
+  SceneElementsMap,
 } from "../packages/excalidraw/element/types";
 import { useCallbackRefState } from "../packages/excalidraw/hooks/useCallbackRefState";
 import { t } from "../packages/excalidraw/i18n";
@@ -129,6 +130,9 @@ import DebugCanvas, {
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+import type { ElementsChange } from "../packages/excalidraw/change";
 
 polyfill();
 
@@ -361,16 +365,26 @@ const ExcalidrawWrapper = () => {
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [syncAPI] = useAtom(syncAPIAtom);
+  const [nextVersion, setNextVersion] = useState(-1);
+  const currentVersion = useRef(-1);
+  const [acknowledgedChanges, setAcknowledgedChanges] = useState<
+    ElementsChange[]
+  >([]);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      setAcknowledgedChanges([...(syncAPI?.acknowledgedChanges ?? [])]);
+    }, 250);
+
     syncAPI?.reconnect();
 
     return () => {
       syncAPI?.disconnect();
+      clearInterval(interval);
     };
   }, [syncAPI]);
 
@@ -803,6 +817,44 @@ const ExcalidrawWrapper = () => {
     },
   };
 
+  const debouncedTimeTravel = debounce((value: number) => {
+    let elements = new Map(
+      excalidrawAPI?.getSceneElements().map((x) => [x.id, x]),
+    );
+
+    let changes: ElementsChange[] = [];
+
+    const goingLeft =
+      currentVersion.current === -1 || value - currentVersion.current <= 0;
+
+    if (goingLeft) {
+      changes = acknowledgedChanges
+        .slice(value)
+        .reverse()
+        .map((x) => x.inverse());
+    } else {
+      changes = acknowledgedChanges.slice(currentVersion.current, value) ?? [];
+    }
+
+    for (const change of changes) {
+      [elements] = change.applyTo(
+        elements as SceneElementsMap,
+        excalidrawAPI?.store.snapshot.elements!,
+      );
+    }
+
+    excalidrawAPI?.updateScene({
+      appState: {
+        ...excalidrawAPI?.getAppState(),
+        viewModeEnabled: value !== acknowledgedChanges.length,
+      },
+      elements: Array.from(elements.values()),
+      storeAction: StoreAction.UPDATE,
+    });
+
+    currentVersion.current = value;
+  }, 0);
+
   return (
     <div
       style={{ height: "100%" }}
@@ -810,6 +862,23 @@ const ExcalidrawWrapper = () => {
         "is-collaborating": isCollaborating,
       })}
     >
+      <Slider
+        style={{
+          position: "fixed",
+          bottom: "25px",
+          zIndex: 999,
+          width: "60%",
+          left: "25%",
+        }}
+        step={1}
+        min={0}
+        max={acknowledgedChanges.length}
+        value={nextVersion === -1 ? acknowledgedChanges.length : nextVersion}
+        onChange={(value) => {
+          setNextVersion(value as number);
+          debouncedTimeTravel(value as number);
+        }}
+      />
       <Excalidraw
         excalidrawAPI={excalidrawRefCallback}
         onChange={onChange}
