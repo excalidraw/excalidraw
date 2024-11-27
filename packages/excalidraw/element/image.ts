@@ -105,16 +105,31 @@ export const normalizeSVG = (SVGString: string) => {
       svg.setAttribute("xmlns", SVG_NS);
     }
 
+    if (svg.getAttribute("width") === "100%") {
+      svg.removeAttribute("width");
+    }
+
+    if (svg.getAttribute("height") === "100%") {
+      svg.removeAttribute("height");
+    }
+
     if (!svg.hasAttribute("width") || !svg.hasAttribute("height")) {
       const viewBox = svg.getAttribute("viewBox");
-      let width = svg.getAttribute("width") || "50";
-      let height = svg.getAttribute("height") || "50";
+      // use 300 & 150 as default to match with the SVG speficiation default
+      let width = svg.getAttribute("width") || "300";
+      let height = svg.getAttribute("height") || "150";
+
       if (viewBox) {
         const match = viewBox.match(/\d+ +\d+ +(\d+) +(\d+)/);
         if (match) {
           [, width, height] = match;
         }
       }
+
+      if (!viewBox) {
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      }
+
       svg.setAttribute("width", width);
       svg.setAttribute("height", height);
     }
