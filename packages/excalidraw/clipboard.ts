@@ -243,7 +243,10 @@ export const readSystemClipboard = async () => {
 
   try {
     if (navigator.clipboard?.readText) {
-      return { "text/plain": await navigator.clipboard?.readText() };
+      const readText = await navigator.clipboard?.readText();
+      if (readText) {
+        return { "text/plain": readText };
+      }
     }
   } catch (error: any) {
     // @ts-ignore
@@ -276,7 +279,17 @@ export const readSystemClipboard = async () => {
         continue;
       }
       try {
-        types[type] = await (await item.getType(type)).text();
+        if (type === "text/plain" || type === "text/html") {
+          types[type] = await (await item.getType(type)).text();
+        }
+         else if (type.startsWith("image/")) {
+          const imageBlob = (await item.getType(type));
+          const imageUrl = URL.createObjectURL(imageBlob);
+          types[type] = imageUrl;
+        }
+        else {
+          console.warn(`Unsupported clipboard type: ${type}`);
+        }
       } catch (error: any) {
         console.warn(
           `Cannot retrieve ${type} from clipboardItem: ${error.message}`,
@@ -317,6 +330,14 @@ const parseClipboardEvent = async (
       }
 
       return mixedContent;
+    }
+    const imageType = event.clipboardData?.types.find(type => type.startsWith("image/"));
+    
+    if (imageType) {
+      const image = event.clipboardData?.getData(imageType);
+      if (image) {
+        return { type: "mixedContent", value: [{ type: "imageUrl", value: image }] };
+      }
     }
 
     const text = event.clipboardData?.getData("text/plain");
