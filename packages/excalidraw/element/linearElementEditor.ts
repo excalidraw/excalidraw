@@ -1296,22 +1296,33 @@ export class LinearElementEditor {
         selectedOriginPoint.point[1] + points[selectedOriginPoint.index][1];
     }
 
-    const nextPoints: LocalPoint[] = points.map((p, idx) => {
-      const selectedPointData = targetPoints.find((t) => t.index === idx);
-      if (selectedPointData) {
-        if (selectedPointData.index === 0) {
+    const nextPoints: LocalPoint[] = isElbowArrow(element)
+      ? points.map((p, idx) => {
+          const selectedPointData = targetPoints.find((t) => t.index === idx);
+          if (selectedPointData) {
+            return selectedPointData.point;
+          }
+
           return p;
-        }
+        })
+      : points.map((p, idx) => {
+          const selectedPointData = targetPoints.find((t) => t.index === idx);
+          if (selectedPointData) {
+            if (selectedPointData.index === 0) {
+              return p;
+            }
 
-        const deltaX =
-          selectedPointData.point[0] - points[selectedPointData.index][0];
-        const deltaY =
-          selectedPointData.point[1] - points[selectedPointData.index][1];
+            const deltaX =
+              selectedPointData.point[0] - points[selectedPointData.index][0];
+            const deltaY =
+              selectedPointData.point[1] - points[selectedPointData.index][1];
 
-        return pointFrom(p[0] + deltaX - offsetX, p[1] + deltaY - offsetY);
-      }
-      return offsetX || offsetY ? pointFrom(p[0] - offsetX, p[1] - offsetY) : p;
-    });
+            return pointFrom(p[0] + deltaX - offsetX, p[1] + deltaY - offsetY);
+          }
+          return offsetX || offsetY
+            ? pointFrom(p[0] - offsetX, p[1] - offsetY)
+            : p;
+        });
 
     LinearElementEditor._updatePoints(
       element,

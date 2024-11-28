@@ -134,7 +134,6 @@ export const updateElbowArrowPoints = (
     updatedPoints
       .map((point, idx) => !pointsEqual(arrow.points[idx], point))
       .filter((diff) => diff).length;
-  console.log(isSegmentMove);
 
   if (
     arrow.points.length > 2 &&
