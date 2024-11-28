@@ -25,6 +25,7 @@ import type {
   AppClassProperties,
   NullableGridSize,
   Zoom,
+  PointerDownState,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -57,6 +58,7 @@ import {
   type LocalPoint,
   pointDistance,
   pointTranslate,
+  vectorFromPoint,
 } from "../../math";
 import {
   getBezierCurveLength,
@@ -66,6 +68,7 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
+import { headingIsHorizontal, vectorToHeading } from "./heading";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1275,7 +1278,6 @@ export class LinearElementEditor {
     },
   ) {
     const { points } = element;
-    const targets = Array.from(targetPoints);
 
     // in case we're moving start point, instead of modifying its position
     // which would break the invariant of it being at [0,0], we move
@@ -1285,7 +1287,7 @@ export class LinearElementEditor {
     let offsetX = 0;
     let offsetY = 0;
 
-    const selectedOriginPoint = targets.find(({ index }) => index === 0);
+    const selectedOriginPoint = targetPoints.find(({ index }) => index === 0);
 
     if (selectedOriginPoint) {
       offsetX =
@@ -1295,7 +1297,7 @@ export class LinearElementEditor {
     }
 
     const nextPoints: LocalPoint[] = points.map((p, idx) => {
-      const selectedPointData = targets.find((t) => t.index === idx);
+      const selectedPointData = targetPoints.find((t) => t.index === idx);
       if (selectedPointData) {
         if (selectedPointData.index === 0) {
           return p;
@@ -1318,7 +1320,7 @@ export class LinearElementEditor {
       offsetY,
       otherUpdates,
       {
-        isDragging: targets.reduce(
+        isDragging: targetPoints.reduce(
           (dragging, targetPoint): boolean =>
             dragging || targetPoint.isDragging === true,
           false,
@@ -1790,6 +1792,66 @@ export class LinearElementEditor {
         ),
       });
 
+      LinearElementEditor.updateEditorMidPointsCache(
+        element,
+        elementsMap,
+        state,
+      );
+    }
+  }
+
+  static moveFixedSegment(
+    linearElement: LinearElementEditor,
+    x: number,
+    y: number,
+    elementsMap: ElementsMap,
+    pointerDownState: PointerDownState,
+    state: AppState,
+  ) {
+    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+      linearElement,
+      { x: pointerDownState.origin.x, y: pointerDownState.origin.y },
+      state,
+      elementsMap,
+    );
+    const index =
+      segmentMidPoint &&
+      LinearElementEditor.getSegmentMidPointIndex(
+        linearElement,
+        state,
+        segmentMidPoint,
+        elementsMap,
+      );
+    const element = LinearElementEditor.getElement(
+      linearElement.elementId,
+      elementsMap,
+    );
+
+    if (element && index && index > 0) {
+      const isHorizontal = headingIsHorizontal(
+        vectorToHeading(
+          vectorFromPoint(element.points[index], element.points[index - 1]),
+        ),
+      );
+
+      LinearElementEditor.movePoints(element, [
+        {
+          index: index - 1,
+          point: pointFrom<LocalPoint>(
+            !isHorizontal ? x - element.x : element.points[index - 1][0],
+            isHorizontal ? y - element.y : element.points[index - 1][1],
+          ),
+          isDragging: true,
+        },
+        {
+          index,
+          point: pointFrom<LocalPoint>(
+            !isHorizontal ? x - element.x : element.points[index][0],
+            isHorizontal ? y - element.y : element.points[index][1],
+          ),
+          isDragging: true,
+        },
+      ]);
       LinearElementEditor.updateEditorMidPointsCache(
         element,
         elementsMap,

@@ -7889,52 +7889,20 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
           ) >= DRAGGING_THRESHOLD
         ) {
-          // Move fixed segment
           const [gridX, gridY] = getGridPoint(
             pointerCoords.x,
             pointerCoords.y,
             event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
           );
-          const elementsMap = this.scene.getNonDeletedElementsMap();
-          const segmentMidPoint =
-            LinearElementEditor.getSegmentMidpointHitCoords(
-              this.state.selectedLinearElement,
-              { x: pointerDownState.origin.x, y: pointerDownState.origin.y },
-              this.state,
-              elementsMap,
-            );
-          const index =
-            segmentMidPoint &&
-            LinearElementEditor.getSegmentMidPointIndex(
-              this.state.selectedLinearElement,
-              this.state,
-              segmentMidPoint,
-              elementsMap,
-            );
-          const element = LinearElementEditor.getElement(
-            this.state.selectedLinearElement.elementId,
-            elementsMap,
+
+          return LinearElementEditor.moveFixedSegment(
+            this.state.selectedLinearElement,
+            gridX,
+            gridY,
+            this.scene.getNonDeletedElementsMap(),
+            pointerDownState,
+            this.state,
           );
-
-          if (element && index && index > 0) {
-            LinearElementEditor.movePoints(element, [
-              {
-                index: index - 1,
-                point: pointFrom<LocalPoint>(
-                  gridX - element.x,
-                  gridY - element.y,
-                ),
-                isDragging: true,
-              },
-            ]);
-            LinearElementEditor.updateEditorMidPointsCache(
-              element,
-              elementsMap,
-              this.state,
-            );
-          }
-
-          return;
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
           !linearElementEditor.pointerDownState.segmentMidpoint.added

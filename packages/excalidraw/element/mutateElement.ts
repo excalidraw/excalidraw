@@ -61,6 +61,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           },
         ),
       };
+      //console.log(updates);
     } else {
       updates = { ...getSizeFromPoints(points), ...updates };
     }

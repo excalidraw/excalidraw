@@ -22,6 +22,7 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
+import { debugCloseFrame, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -128,21 +129,52 @@ export const updateElbowArrowPoints = (
 
   const updatedPoints = Array.from(updates.points ?? arrow.points);
 
+  const isSegmentMove =
+    arrow.points.length > 2 &&
+    updatedPoints
+      .map((point, idx) => !pointsEqual(arrow.points[idx], point))
+      .filter((diff) => diff).length;
+  console.log(isSegmentMove);
+
+  if (
+    arrow.points.length > 2 &&
+    !pointsEqual(arrow.points[0], updatedPoints[0]) &&
+    !pointsEqual(arrow.points[1], updatedPoints[1])
+  ) {
+    updatedPoints.unshift(arrow.points[0]);
+  }
+  if (
+    arrow.points.length > 2 &&
+    !pointsEqual(
+      arrow.points[arrow.points.length - 1],
+      updatedPoints[updatedPoints.length - 1],
+    ) &&
+    !pointsEqual(
+      arrow.points[arrow.points.length - 2],
+      updatedPoints[updatedPoints.length - 2],
+    )
+  ) {
+    updatedPoints.push(arrow.points[arrow.points.length - 1]);
+  }
+  //console.log(arrow.points.length, updatedPoints.length);
   const nextFixedSegments = arrow.points
     .map((p, idx) => {
-      const existingSegment = arrow.fixedSegments?.find(
-        (segment) =>
-          segment.start[0] === arrow.points[idx - 1][0] &&
-          segment.start[1] === arrow.points[idx - 1][1] &&
-          segment.end[0] === arrow.points[idx][0] &&
-          segment.end[1] === arrow.points[idx][1],
-      );
+      const existingSegment =
+        idx > 1
+          ? arrow.fixedSegments?.find(
+              (segment) =>
+                segment.start[0] === arrow.points[idx - 1][0] &&
+                segment.start[1] === arrow.points[idx - 1][1] &&
+                segment.end[0] === arrow.points[idx][0] &&
+                segment.end[1] === arrow.points[idx][1],
+            )
+          : undefined;
       if (existingSegment) {
         return [existingSegment, idx] as const;
       }
 
       if (
-        idx > 0 &&
+        idx > 1 &&
         !pointsEqual(p, updatedPoints[idx]) &&
         !pointsEqual(arrow.points[idx - 1], updatedPoints[idx - 1])
       ) {
@@ -160,10 +192,28 @@ export const updateElbowArrowPoints = (
 
       return null;
     })
-    .filter((segment) => segment !== null)
+    .filter((segment) => segment != null)
     .sort((a, b) => a![1] - b![1])
     // @ts-ignore
     .map(([segment, _]): FixedSegment => segment);
+
+  nextFixedSegments.forEach((segment) => {
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        arrow.x + segment.start[0],
+        arrow.y + segment.start[1],
+      ),
+      { color: "green", permanent: true },
+    );
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        arrow.x + segment.end[0],
+        arrow.y + segment.end[1],
+      ),
+      { color: "red", permanent: true },
+    );
+  });
+  debugCloseFrame();
 
   let state = {
     x: arrow.x,
