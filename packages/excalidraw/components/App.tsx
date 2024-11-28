@@ -190,6 +190,7 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
+  ExcalidrawElementType,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -6261,6 +6262,8 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
+    /* this.lastPointerDownEvent = event; */ // set the pointer down event and store the inital value
+
     if (this.state.searchMatches) {
       this.setState((state) => ({
         searchMatches: state.searchMatches.map((searchMatch) => ({
@@ -6578,17 +6581,92 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
-    this.removePointer(event);
-    this.lastPointerUpEvent = event;
+    const CLICK_THRESHOLD = 300; // 300ms
+
+    this.removePointer(event); // always remove pointer on pointerUp
+    this.lastPointerUpEvent = event; // save last pointer up event
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
       this.state,
     );
     const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
+      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0); // this is to distinguish between click and drag
 
-    if (this.device.editor.isMobile && clicklength < 300) {
+    // Ensure lastPointerDownEvent is not defined before accessing its properties
+    let pointerDownPosition: GlobalPoint | null = null;
+
+    if (this.lastPointerDownEvent) {
+      pointerDownPosition = pointFrom<GlobalPoint>(
+        this.lastPointerDownEvent.clientX,
+        this.lastPointerDownEvent.clientY,
+      );
+    }
+
+    // Calculate the distance moved during the inital pointer down position to the pointer up position
+    const pointerUpPosition = pointFrom<GlobalPoint>(
+      event.clientX,
+      event.clientY,
+    );
+    const distanceMoved = pointDistance(pointerDownPosition, pointerUpPosition);
+
+    const dragTreshold = 5;
+    if (distanceMoved < dragTreshold && clicklength < CLICK_THRESHOLD) {
+      // if the distance is less than 5px and the click length is less than 300ms, then it´s a click
+      // check the selected tool for shape creation
+      if (
+        ["rectangle", "ellipse", "diamond", "arrow", "line"].includes(
+          this.state.activeTool.type,
+        )
+      ) {
+        const newElement = {
+          id: nanoid(),
+          type: this.state.activeTool.type,
+          width: 100,
+          height: 100,
+          x: scenePointer.x - 50,
+          y: scenePointer.y - 50,
+          strokeColor: this.state.currentItemStrokeColor,
+          backgroundColor: this.state.currentItemBackgroundColor,
+          fillStyle: this.state.currentItemFillStyle,
+          strokeWidth: this.state.currentItemStrokeWidth,
+          roughness: this.state.currentItemRoughness,
+          opacity: this.state.currentItemOpacity,
+          isDeleted: false,
+          points:
+            this.state.activeTool.type === "line" ||
+            this.state.activeTool.type === "arrow"
+              ? [pointFrom(0, 0), pointFrom(0, 10)]
+              : [],
+        };
+
+        if (
+          this.state.activeTool.type === "line" ||
+          this.state.activeTool.type === "arrow"
+        ) {
+          // Provide points for line and arrow tools
+          newElement.points = [
+            pointFrom(0, 0), // Starting point
+            pointFrom(0, 10), // End point
+          ];
+        }
+
+        // Add the new element to the scene (call the function from above)
+        this.scene.insertElement(newElement);
+
+        this.setState((prevState) => ({
+          ...prevState,
+          multiElement: null,
+          newElement: newElement,
+          selectionElement:
+            this.state.activeTool.type === "selection"
+              ? newElement
+              : prevState.selectionElement,
+        }));
+      }
+    }
+
+    if (this.device.editor.isMobile && clicklength < CLICK_THRESHOLD) {
       const hitElement = this.getElementAtPosition(
         scenePointer.x,
         scenePointer.y,
