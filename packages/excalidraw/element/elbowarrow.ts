@@ -22,6 +22,7 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
+import { debugCloseFrame, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -177,7 +178,7 @@ export const updateElbowArrowPoints = (
     ) {
       updatedPoints.push(arrow.points[arrow.points.length - 1]);
     }
-    //console.log(arrow.points.length, updatedPoints.length);
+
     nextFixedSegments = arrow.points
       .map((p, idx) => {
         const existingSegment =
@@ -218,26 +219,24 @@ export const updateElbowArrowPoints = (
       // @ts-ignore
       .map(([segment, _]): FixedSegment => segment);
 
-    // nextFixedSegments.forEach((segment) => {
-    //   debugDrawPoint(
-    //     pointFrom<GlobalPoint>(
-    //       arrow.x + segment.start[0],
-    //       arrow.y + segment.start[1],
-    //     ),
-    //     { color: "green", permanent: true },
-    //   );
-    //   debugDrawPoint(
-    //     pointFrom<GlobalPoint>(
-    //       arrow.x + segment.end[0],
-    //       arrow.y + segment.end[1],
-    //     ),
-    //     { color: "red", permanent: true },
-    //   );
-    // });
-    // debugCloseFrame();
+    nextFixedSegments.forEach((segment) => {
+      debugDrawPoint(
+        pointFrom<GlobalPoint>(
+          arrow.x + segment.start[0],
+          arrow.y + segment.start[1],
+        ),
+        { color: "green", permanent: true },
+      );
+      debugDrawPoint(
+        pointFrom<GlobalPoint>(
+          arrow.x + segment.end[0],
+          arrow.y + segment.end[1],
+        ),
+        { color: "red", permanent: true },
+      );
+    });
+    debugCloseFrame();
   }
-
-  //debugDrawPoint(pointFrom<GlobalPoint>(arrow.x, arrow.y), { permanent: true });
 
   let state = {
     x: arrow.x,
@@ -251,23 +250,18 @@ export const updateElbowArrowPoints = (
 
   const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
     nextFixedSegments.map((segment, segmentIdx) => {
-      const start = pointFrom<LocalPoint>(
-        segment.start[0] - startPoint[0],
-        segment.start[1] - startPoint[1],
-      );
-      const end = pointFrom<LocalPoint>(
-        segment.end[0] - startPoint[0],
-        segment.end[1] - startPoint[1],
-      );
       const ret: [ElbowArrowState, readonly LocalPoint[]] = [
         state,
-        [startPoint, segmentIdx === 0 ? end : start],
+        [
+          startPoint,
+          pointFrom<LocalPoint>(
+            arrow.x + segment.start[0] - state.x,
+            arrow.y + segment.start[1] - state.y,
+          ),
+        ],
       ];
 
-      startPoint =
-        segmentIdx === nextFixedSegments.length - 1
-          ? segment.start
-          : segment.end;
+      startPoint = pointFrom<LocalPoint>(0, 0);
 
       state = {
         ...state,
@@ -285,7 +279,13 @@ export const updateElbowArrowPoints = (
       endBinding: arrow.endBinding,
       endArrowhead: arrow.endArrowhead,
     },
-    [startPoint, updatedPoints[updatedPoints.length - 1]],
+    [
+      startPoint,
+      pointFrom<LocalPoint>(
+        arrow.x + updatedPoints[updatedPoints.length - 1][0] - state.x,
+        arrow.y + updatedPoints[updatedPoints.length - 1][1] - state.y,
+      ),
+    ],
   ]);
 
   const simplifiedPoints = getElbowArrowCornerPoints(
