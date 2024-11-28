@@ -22,7 +22,6 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugCloseFrame, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -122,97 +121,123 @@ export const updateElbowArrowPoints = (
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  if (arrow.points.length < 2) {
+    return { points: updates.points };
+  }
   invariant(
-    arrow.points.length < 2 || arrow.points.length === updates.points.length,
+    arrow.points.length === updates.points.length,
     "Updated point array length must match the arrow point length (i.e. you can't add new points manually to elbow arrows)",
   );
 
-  const updatedPoints = Array.from(updates.points ?? arrow.points);
+  const updatedPoints = Array.from(updates.points); // TODO: Do we need the cloning here?
+  const renormalizedUpdatedPoints = updatedPoints.map((point, idx) => {
+    if (idx === 0) {
+      return point;
+    }
 
-  const isSegmentMove =
-    arrow.points.length > 2 &&
-    updatedPoints
-      .map((point, idx) => !pointsEqual(arrow.points[idx], point))
-      .filter((diff) => diff).length;
-
-  if (
-    arrow.points.length > 2 &&
-    !pointsEqual(arrow.points[0], updatedPoints[0]) &&
-    !pointsEqual(arrow.points[1], updatedPoints[1])
-  ) {
-    updatedPoints.unshift(arrow.points[0]);
-  }
-  if (
-    arrow.points.length > 2 &&
-    !pointsEqual(
-      arrow.points[arrow.points.length - 1],
-      updatedPoints[updatedPoints.length - 1],
-    ) &&
-    !pointsEqual(
-      arrow.points[arrow.points.length - 2],
-      updatedPoints[updatedPoints.length - 2],
-    )
-  ) {
-    updatedPoints.push(arrow.points[arrow.points.length - 1]);
-  }
-  //console.log(arrow.points.length, updatedPoints.length);
-  const nextFixedSegments = arrow.points
-    .map((p, idx) => {
-      const existingSegment =
-        idx > 1
-          ? arrow.fixedSegments?.find(
-              (segment) =>
-                segment.start[0] === arrow.points[idx - 1][0] &&
-                segment.start[1] === arrow.points[idx - 1][1] &&
-                segment.end[0] === arrow.points[idx][0] &&
-                segment.end[1] === arrow.points[idx][1],
-            )
-          : undefined;
-      if (existingSegment) {
-        return [existingSegment, idx] as const;
-      }
-
-      if (
-        idx > 1 &&
-        !pointsEqual(p, updatedPoints[idx]) &&
-        !pointsEqual(arrow.points[idx - 1], updatedPoints[idx - 1])
-      ) {
-        // If the previous point is not the same as the updated previous point
-        // and the current point is not the same as the updated point, then a
-        // new segment is being moved / fixed
-        return [
-          {
-            start: updatedPoints[idx - 1],
-            end: updatedPoints[idx],
-          },
-          idx,
-        ] as const;
-      }
-
-      return null;
-    })
-    .filter((segment) => segment != null)
-    .sort((a, b) => a![1] - b![1])
-    // @ts-ignore
-    .map(([segment, _]): FixedSegment => segment);
-
-  nextFixedSegments.forEach((segment) => {
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        arrow.x + segment.start[0],
-        arrow.y + segment.start[1],
-      ),
-      { color: "green", permanent: true },
-    );
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        arrow.x + segment.end[0],
-        arrow.y + segment.end[1],
-      ),
-      { color: "red", permanent: true },
+    return pointFrom<LocalPoint>(
+      point[0] - updatedPoints[0][0],
+      point[1] - updatedPoints[0][1],
     );
   });
-  debugCloseFrame();
+
+  // Check is needed because fixed point binding might re-adjust
+  // the end or start point
+  const firstAndLastPointMoved =
+    renormalizedUpdatedPoints.length > 2 && // Edge case where we have a linear arrow
+    !pointsEqual(arrow.points[0], renormalizedUpdatedPoints[0]) &&
+    !pointsEqual(
+      arrow.points[arrow.points.length - 1],
+      renormalizedUpdatedPoints[renormalizedUpdatedPoints.length - 1],
+    );
+  const isSegmentMove =
+    arrow.points.length >= 2 &&
+    renormalizedUpdatedPoints
+      .map((point, idx) => !pointsEqual(arrow.points[idx], point))
+      .filter((diff) => diff).length === 2 &&
+    !firstAndLastPointMoved;
+
+  let nextFixedSegments: FixedSegment[] = [];
+  if (isSegmentMove) {
+    if (
+      !pointsEqual(arrow.points[0], updatedPoints[0]) &&
+      !pointsEqual(arrow.points[1], updatedPoints[1])
+    ) {
+      updatedPoints.unshift(arrow.points[0]);
+    }
+    if (
+      !pointsEqual(
+        arrow.points[arrow.points.length - 1],
+        updatedPoints[updatedPoints.length - 1],
+      ) &&
+      !pointsEqual(
+        arrow.points[arrow.points.length - 2],
+        updatedPoints[updatedPoints.length - 2],
+      )
+    ) {
+      updatedPoints.push(arrow.points[arrow.points.length - 1]);
+    }
+    //console.log(arrow.points.length, updatedPoints.length);
+    nextFixedSegments = arrow.points
+      .map((p, idx) => {
+        const existingSegment =
+          idx > 1
+            ? arrow.fixedSegments?.find(
+                (segment) =>
+                  segment.start[0] === arrow.points[idx - 1][0] &&
+                  segment.start[1] === arrow.points[idx - 1][1] &&
+                  segment.end[0] === arrow.points[idx][0] &&
+                  segment.end[1] === arrow.points[idx][1],
+              )
+            : undefined;
+        if (existingSegment) {
+          return [existingSegment, idx] as const;
+        }
+
+        if (
+          idx > 1 &&
+          !pointsEqual(p, updatedPoints[idx]) &&
+          !pointsEqual(arrow.points[idx - 1], updatedPoints[idx - 1])
+        ) {
+          // If the previous point is not the same as the updated previous point
+          // and the current point is not the same as the updated point, then a
+          // new segment is being moved / fixed
+          return [
+            {
+              start: updatedPoints[idx - 1],
+              end: updatedPoints[idx],
+            },
+            idx,
+          ] as const;
+        }
+
+        return null;
+      })
+      .filter((segment) => segment != null)
+      .sort((a, b) => a![1] - b![1])
+      // @ts-ignore
+      .map(([segment, _]): FixedSegment => segment);
+
+    // nextFixedSegments.forEach((segment) => {
+    //   debugDrawPoint(
+    //     pointFrom<GlobalPoint>(
+    //       arrow.x + segment.start[0],
+    //       arrow.y + segment.start[1],
+    //     ),
+    //     { color: "green", permanent: true },
+    //   );
+    //   debugDrawPoint(
+    //     pointFrom<GlobalPoint>(
+    //       arrow.x + segment.end[0],
+    //       arrow.y + segment.end[1],
+    //     ),
+    //     { color: "red", permanent: true },
+    //   );
+    // });
+    // debugCloseFrame();
+  }
+
+  //debugDrawPoint(pointFrom<GlobalPoint>(arrow.x, arrow.y), { permanent: true });
 
   let state = {
     x: arrow.x,
