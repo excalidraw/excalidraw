@@ -24,7 +24,7 @@ export const alignElements = (
   // #8522 Allow grouped elements to align within group
   // --------------------------------------------------
   const unpackedGroups =
-    groups.length === 1 && selectedGroupIds.length === 1
+    groups.length === 1 && selectedGroupIds.length <= 1
       ? getInternalGroups(selectedElements, elementsMap, selectedGroupIds[0])
       : groups;
 

@@ -358,21 +358,43 @@ export const getMaximumGroups = (
 export const getInternalGroups = (
   elements: ExcalidrawElement[],
   elementsMap: ElementsMap,
-  selectedGroupId: GroupId,
+  selectedGroupId: GroupId | undefined,
 ): ExcalidrawElement[][] => {
+  const getInternalGroupId = (
+    element: ExcalidrawElement,
+    selectedGroupId: GroupId | undefined,
+    allInSameGroup: boolean,
+  ): GroupId => {
+    if (!selectedGroupId) {
+      return element.id;
+    }
+
+    const selectedGroupIndex = element.groupIds.findIndex(
+      (groupId) => groupId === selectedGroupId,
+    );
+
+    if (selectedGroupIndex === 0 && !allInSameGroup) {
+      return selectedGroupId as GroupId;
+    }
+
+    return selectedGroupIndex > 0
+      ? element.groupIds[selectedGroupIndex - 1]
+      : element.id;
+  };
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
   >();
-  elements.forEach((element: ExcalidrawElement) => {
-    const selectedGroupIndex = element.groupIds.findIndex(
-      (groupId) => groupId === selectedGroupId,
-    );
-    const groupId =
-      selectedGroupIndex > 0
-        ? element.groupIds[selectedGroupIndex - 1]
-        : element.id;
+  const allInSameGroup = selectedGroupId
+    ? elements.every((element) => isElementInGroup(element, selectedGroupId))
+    : false;
 
+  elements.forEach((element: ExcalidrawElement) => {
+    const groupId = getInternalGroupId(
+      element,
+      selectedGroupId,
+      allInSameGroup,
+    );
     const currentGroupMembers = groups.get(groupId) || [];
 
     // Include bound text if present when grouping
