@@ -531,10 +531,10 @@ const renderLinearPointHandles = (
           false,
           !fixedSegments.find(
             (segment) =>
-              segment.start[0] === points[idx][0] &&
-              segment.start[1] === points[idx][1] &&
-              segment.end[0] === points[idx + 1][0] &&
-              segment.end[1] === points[idx + 1][1],
+              element.x + segment.start[0] === points[idx][0] &&
+              element.y + segment.start[1] === points[idx][1] &&
+              element.x + segment.end[0] === points[idx + 1][0] &&
+              element.y + segment.end[1] === points[idx + 1][1],
           ),
         );
       }
