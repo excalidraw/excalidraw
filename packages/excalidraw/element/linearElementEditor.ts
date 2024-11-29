@@ -521,11 +521,12 @@ export class LinearElementEditor {
     ) {
       return editorMidPointsCache.points;
     }
-    LinearElementEditor.updateEditorMidPointsCache(
-      element,
-      elementsMap,
-      appState,
-    );
+    !isElbowArrow(element) &&
+      LinearElementEditor.updateEditorMidPointsCache(
+        element,
+        elementsMap,
+        appState,
+      );
     return editorMidPointsCache.points!;
   };
 
