@@ -21,7 +21,7 @@
     "copyStyles": "کپی سبک",
     "pasteStyles": "جایگذاری سبک",
     "stroke": "حاشیه",
-    "changeStroke": "تغییر رنگ خط",
+    "changeStroke": "تغییر رنگ حاشیه",
     "background": "پس زمینه",
     "changeBackground": "تغییر رنگ پس زمینه",
     "fill": "رنگ آمیزی",
@@ -32,10 +32,10 @@
     "strokeStyle_dotted": "نقطه چین",
     "sloppiness": "دقت",
     "opacity": "شفافیت",
-    "textAlign": "چیدمان متن",
+    "textAlign": "تراز متن",
     "edges": "لبه ها",
     "sharp": "تیز",
-    "round": "دور",
+    "round": "گرد",
     "arrowheads": "سر پیکان",
     "arrowhead_none": "هیچ کدام",
     "arrowhead_arrow": "پیکان",
@@ -53,7 +53,7 @@
     "fontSize": "اندازه قلم",
     "fontFamily": "نوع قلم",
     "addWatermark": "\"ساخته شده با Excalidraw\" را اضافه کن",
-    "handDrawn": "دست نویس",
+    "handDrawn": "دست‌نویس",
     "normal": "عادی",
     "code": "کد",
     "small": "کوچک",
@@ -75,15 +75,15 @@
     "cartoonist": "کارتونیست",
     "fileTitle": "نام فایل",
     "colorPicker": "انتخابگر رنگ",
-    "canvasColors": "رنگ های بوم",
-    "canvasBackground": "بوم",
+    "canvasColors": "اسنفاده شده در بوم",
+    "canvasBackground": "پس‌زمینه بوم",
     "drawingCanvas": "بوم نقاشی",
     "clearCanvas": "پاکسازی بوم",
     "layers": "لایه ها",
     "actions": "عملیات",
     "language": "زبان",
     "liveCollaboration": "همکاری آنلاین...",
-    "duplicateSelection": "تکرار",
+    "duplicateSelection": "تکراری",
     "untitled": "بدون عنوان",
     "name": "نام",
     "yourName": "نام شما",
@@ -117,7 +117,7 @@
     "toggleTheme": "تغییر وضعیت پوسته روشن/تیره",
     "theme": "پوسته",
     "personalLib": "کتابخانه شخصی",
-    "excalidrawLib": "کتابخانه",
+    "excalidrawLib": "کتابخانه Excalidraw",
     "decreaseFontSize": "کاهش اندازه فونت",
     "increaseFontSize": "افزایش دادن اندازه فونت",
     "unbindText": "بازکردن نوشته",
@@ -125,13 +125,13 @@
     "createContainerFromText": "متن را در یک جایگاه بپیچید",
     "link": {
       "edit": "ویرایش لینک",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "تغیر لینک",
+      "create": "افزودن لینک",
       "label": "لینک",
       "labelEmbed": "لینک و افزونه",
       "empty": "هیچ لینکی ست نشده",
-      "hint": "",
-      "goToElement": ""
+      "hint": "لینک خود را بنویسید یا جایگذاری کنید",
+      "goToElement": "رفتن به المان مد نظر"
     },
     "lineEditor": {
       "edit": "ویرایش لینک",
@@ -147,7 +147,7 @@
     "sidebarLock": "باز نگه داشتن سایدبار",
     "selectAllElementsInFrame": "همه آیتم های در فریم را انتخاب کنید",
     "removeAllElementsFromFrame": "حذف همه آیتم های داخل فریم",
-    "eyeDropper": "انتخاب رنگ از کرباس",
+    "eyeDropper": "انتخاب رنگ از بوم",
     "textToDiagram": "متن به دیاگرام",
     "prompt": "فوری",
     "followUs": "ما را دنبال کنید",
@@ -157,12 +157,12 @@
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "installPWA": "نصب Excalidraw روی دستگاه (PWA)",
     "autoResize": "فعالسازی تنظیم خودکار سایز",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "کپی لینک به آیتم",
+    "linkToElement": "لینک به آیتم"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
+    "title": "لینک به آیتم",
+    "desc": "روی شکل یا بوم کلیک کنید، یا لینک را جایگذاری کنید.",
     "notFound": ""
   },
   "library": {
@@ -175,14 +175,14 @@
     "noMatch": "هیچ موردی یافت نشد...",
     "singleResult": "نتیجه",
     "multipleResults": "نتایج",
-    "placeholder": "جستجوی متن در بوم"
+    "placeholder": "جستجوی متن در بوم..."
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
     "exportJSON": "خروجی در فایل",
     "exportImage": "خروجی گرفتن از تصویر...",
     "export": "ذخیره در...",
-    "copyToClipboard": "رونوشت در بریده‌دان در قالب",
+    "copyToClipboard": "کپی در حافظه موقت",
     "copyLink": "کپی لینک",
     "save": "ذخیره در همین فایل",
     "saveAs": "ذخیره با نام",
@@ -206,10 +206,10 @@
     "lightMode": "حالت روشن",
     "systemMode": "حالت سیستم",
     "zenMode": "حالت ذن",
-    "objectsSnapMode": "به اشیاء ضربه بزنید",
+    "objectsSnapMode": "به اشیاء بچسبد",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
-    "clear": "پاک کردن",
+    "clear": "پاکسازی",
     "remove": "پاک کردن",
     "embed": "تغییر افزونه",
     "publishLibrary": "انتشار",
@@ -225,7 +225,7 @@
     "importBackendFailed": "بارگیری از پشت صحنه با شکست مواجه شد.",
     "cannotExportEmptyCanvas": "بوم خالی قابل تبدیل نیست.",
     "couldNotCopyToClipboard": "در بریده‌دان رونویسی نشد.",
-    "decryptFailed": "رمزگشایی داده ها امکان پذیر نیست.",
+    "decryptFailed": "رمزگشایی داده ها امکان‌پذیر نیست.",
     "uploadedSecurly": "آپلود با رمزگذاری دو طرفه انجام میشود، به این معنی که سرور Excalidraw و اشخاص ثالث نمی توانند مطالب شما را بخوانند.",
     "loadSceneOverridePrompt": "بارگزاری یک طرح خارجی محتوای فعلی رو از بین میبرد. آیا میخواهید ادامه دهید؟",
     "collabStopOverridePrompt": "با توقف بوم نقاشی، نقشه قبلی و ذخیره شده محلی شما را بازنویسی می کند. مطمئنی؟\n\n(اگر می خواهید نقاشی محلی خود را حفظ کنید، به سادگی برگه مرورگر را ببندید.)",
@@ -256,16 +256,16 @@
       "line1": "به نظر می‌رسد از مرورگر Brave با تنظیم <bold> مسدود کردن شدید اثرانگشت</bold> استفاده می‌کنید.",
       "line2": "این می تواند منجر به شکستن <bold>عناصر متن</bold> در نقاشی های شما شود.",
       "line3": "اکیداً توصیه می کنیم این تنظیم را غیرفعال کنید. برای نحوه انجام این کار می‌توانید <link>این مراحل</link> را دنبال کنید.",
-      "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید."
+      "line4": "اگر غیرفعال کردن این تنظیم نمایش عناصر متنی را برطرف نکرد، لطفاً یک <issueLink>مشکل</issueLink> را در GitHub ما باز کنید یا برای ما در <discordLink>Discord</discordLink> بنویسید"
     },
     "libraryElementTypeError": {
       "embeddable": "عناصر افزوده شده نمی توانند به کتابخانه افزوده شوند.",
       "iframe": "عناصر IFrame نمی توانند به کتابخانه افزوده شوند.",
       "image": "پشتیبانی از افزودن تصاویر به کتابخانه به زودی اضافه خواهد شد!"
     },
-    "asyncPasteFailedOnRead": "نمی تواند جاگذاری شود (نمی تواند از بریده‌دان بخواند).",
+    "asyncPasteFailedOnRead": "نمی تواند جاگذاری شود (نمی تواند از کلیپبورد بخواند).",
     "asyncPasteFailedOnParse": "نمیتواند جایگذاری شود.",
-    "copyToSystemClipboardFailed": "نمی تواند در بریده‌دان رونویسی شود."
+    "copyToSystemClipboardFailed": "نمی تواند در کلیپبورد کپی شود."
   },
   "toolBar": {
     "selection": "گزینش",
@@ -300,7 +300,7 @@
     "text": "متن",
     "image": "تصویر",
     "group": "گروه",
-    "frame": "چارچوب",
+    "frame": "قاب",
     "magicframe": "وایرفریم به کد",
     "embeddable": "افزونه وب",
     "selection": "انتخاب",
@@ -309,7 +309,7 @@
   "headings": {
     "canvasActions": "عملیات روی بوم",
     "selectedShapeActions": "عملیات روی شکل انتخاب شده",
-    "shapes": "شکل‌ها"
+    "shapes": "اشکال"
   },
   "hints": {
     "dismissSearch": "لغو جستجو با فشردن Esc",
@@ -326,7 +326,7 @@
     "resize": "می توانید با نگه داشتن SHIFT در هنگام تغییر اندازه، نسبت ها را محدود کنید،ALT را برای تغییر اندازه از مرکز نگه دارید",
     "resizeImage": "با نگه داشتن SHIFT می توانید آزادانه اندازه را تغییر دهید،\nبرای تغییر اندازه از مرکز، ALT را نگه دارید",
     "rotate": "با نگه داشتن SHIFT هنگام چرخش می توانید زاویه ها را محدود کنید",
-    "lineEditor_info": "CtrlOrCmd را نگه دارید و دوبار کلیک کنید یا CtrlOrCmd + Enter را فشار دهید تا نقاط را ویرایش کنید.",
+    "lineEditor_info": "CtrlOrCmd را نگه دارید و دوبار کلیک کنید یا CtrlOrCmd + Enter را فشار دهید تا نقاط را ویرایش کنید",
     "lineEditor_pointSelected": "برای حذف نقطه Delete برای کپی زدن Ctrl یا Cmd+D را بزنید و یا برای جابجایی بکشید",
     "lineEditor_nothingSelected": "یک نقطه را برای ویرایش انتخاب کنید (SHIFT را برای انتخاب چندگانه نگه دارید)،\nیا Alt را نگه دارید و برای افزودن نقاط جدید کلیک کنید",
     "placeImage": "برای قرار دادن تصویر کلیک کنید، یا کلیک کنید و بکشید تا اندازه آن به صورت دستی تنظیم شود",
@@ -347,7 +347,7 @@
   },
   "errorSplash": {
     "headingMain": "مشکلی رخ داده. امتحان کنید <button> بارگذاری مجدد صفحه </button>.",
-    "clearCanvasMessage": "اگر بازنشانی صفحه مشکل را حل نکرد این را امتحان کنید ",
+    "clearCanvasMessage": "اگر بازنشانی صفحه مشکل را حل نکرد <button>پاک کردن بوم</button> را امتحان کنید.",
     "clearCanvasCaveat": " این باعث میشود کارهای شما ذخیره نشود ",
     "trackedToSentry": "خطا با شناسه {{eventId}} در سیستم ما رهگیری شد.",
     "openIssueMessage": "ما بسیار محتاط بودیم که اطلاعات صحنه شما را در خطا لحاظ نکنیم. اگر صحنه شما خصوصی نیست، لطفاً ما را دنبال کنید\n<button> رد یابی خطا </button>. لطفاً اطلاعات زیر را با کپی و جایگذاری در مشکل GitHub وارد کنید.",
@@ -424,13 +424,13 @@
     "twitterUsername": "نام کاربری توییتر",
     "libraryName": "نام کتابخانه",
     "libraryDesc": "توضیحات کتابخانه",
-    "website": "تارنما",
+    "website": "وب‎سایت",
     "placeholder": {
       "authorName": "نام یا نام کاربری شما",
       "libraryName": "اسم کتابخانه",
       "libraryDesc": "شرحی از کتابخانه شما برای کمک به مردم برای درک استفاده از آن",
       "githubHandle": "دسته GitHub (اختیاری)، بنابراین می توانید پس از ارسال برای بررسی، کتابخانه را ویرایش کنید",
-      "twitterHandle": "نام کاربری توییتر (اختیاری)، بنابراین می دانیم هنگام تبلیغ در توییتر به چه کسی اعتبار دهیم",
+      "twitterHandle": "نام کاربری توییتر (اختیاری)، بنابراین می‌دانیم هنگام تبلیغ در توییتر به چه کسی اعتبار دهیم",
       "website": "پیوند به وب سایت شخصی شما یا هر جای دیگر (اختیاری)"
     },
     "errors": {
@@ -450,7 +450,7 @@
   },
   "confirmDialog": {
     "resetLibrary": "تنظیم مجدد کتابخانه",
-    "removeItemsFromLib": "موارد انتخاب شده از موارد پسندیده حذف شوند"
+    "removeItemsFromLib": "موارد انتخاب شده از کتابخوانه حذف شوند"
   },
   "imageExportDialog": {
     "header": "خروجی گرفتن از تصویر",
@@ -468,12 +468,12 @@
     "title": {
       "exportToPng": "تبدیل به PNG",
       "exportToSvg": "تبدیل به SVG",
-      "copyPngToClipboard": "رونویسی PNG در بریده‌دان"
+      "copyPngToClipboard": "کپی PNG در حافظه موقت"
     },
     "button": {
       "exportToPng": "PNG",
       "exportToSvg": "SVG",
-      "copyPngToClipboard": "رونویسی در بریده‌دان"
+      "copyPngToClipboard": "کپی در حافظه موقت"
     }
   },
   "encrypted": {
@@ -482,7 +482,7 @@
   },
   "stats": {
     "angle": "زاویه",
-    "shapes": "شکل‌ها",
+    "shapes": "اشکال",
     "height": "ارتفاع",
     "scene": "صحنه",
     "selected": "انتخاب شده",
@@ -499,10 +499,10 @@
   },
   "toast": {
     "addedToLibrary": "به مجموعه اضافه شد",
-    "copyStyles": "کپی سبک.",
-    "copyToClipboard": "در بریده‌دان رونویسی شد.",
-    "copyToClipboardAsPng": "{{exportSelection}} در بریده‌دان در قالب PNG\n({{exportColorScheme}}) ذخیره شد",
-    "copyToClipboardAsSvg": "{{exportSelection}} در بریده‌دان به عنوان\n({{exportColorScheme}}) رونویسی شد",
+    "copyStyles": "سبک کپی شد.",
+    "copyToClipboard": "در کلیپ‌بورد کپی شد.",
+    "copyToClipboardAsPng": "کپی {{exportSelection}} در حافظه موقت به عنوان PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "{{exportSelection}} در حافظه موقت به عنوان\n({{exportColorScheme}}) رونویسی شد",
     "fileSaved": "فایل ذخیره شد.",
     "fileSavedToFilename": "ذخیره در {filename}",
     "canvas": "بوم",
@@ -612,7 +612,7 @@
     "title": "تخته فرمان‌ها",
     "shortcuts": {
       "select": "انتخاب",
-      "confirm": "پذیرش",
+      "confirm": "تایید",
       "close": "بستن"
     },
     "recents": "اخیراً استفاده شده",
@@ -621,6 +621,6 @@
       "noMatch": "دستوری یافت نشد..."
     },
     "itemNotAvailable": "دستور در دسترس نیست...",
-    "shortcutHint": "برای تخته دستورات‌ {{shortcut}} را بکار بگیرید"
+    "shortcutHint": "برای تخته دستور ها {{shortcut}} را بکار بگیرید"
   }
 }
