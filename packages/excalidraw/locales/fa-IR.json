@@ -163,7 +163,7 @@
   "elementLink": {
     "title": "لینک به آیتم",
     "desc": "روی شکل یا بوم کلیک کنید، یا لینک را جایگذاری کنید.",
-    "notFound": ""
+    "notFound": "آیتم لینک شده در بوم پیدا نشد."
   },
   "library": {
     "noItems": "آیتمی به اینجا اضافه نشده...",
@@ -509,8 +509,8 @@
     "selection": "انتخاب",
     "pasteAsSingleElement": "از {{shortcut}} برای چسباندن به عنوان یک عنصر استفاده کنید،\nیا در یک ویرایشگر متن موجود جایگذاری کنید",
     "unableToEmbed": "قرار دادن این Url در حال حاضر مجاز نیست. درGitHub برای درخواست Url Whitelisted مشکلی ایجاد کنید",
-    "unrecognizedLinkFormat": "",
-    "elementLinkCopied": ""
+    "unrecognizedLinkFormat": "پیوندی که افزودید با قالب مورد انتظار مطابقت ندارد. لطفاً سعی کنید رشته \"افزونه\" ارائه شده توسط سایت منبع را بچسبانید",
+    "elementLinkCopied": "لینک در کلیپ‌بورد کپی شد"
   },
   "colors": {
     "transparent": "شفاف",
@@ -554,37 +554,37 @@
       "exportToImage": {
         "title": "صادر کردن به عنوان تصاویر",
         "button": "صادر کردن به عنوان تصاویر",
-        "description": ""
+        "description": "خروجی از داده های صحنه به عنوان تصویر که میتوانید بعدا بیافزایید."
       },
       "saveToDisk": {
         "title": "ذخیره در دیسک",
         "button": "ذخیره در دیسک",
-        "description": ""
+        "description": "خروجی از داده های صحنه را به عنوان فایل که بعدا می توانید بیافزایید."
       },
       "excalidrawPlus": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "Excalidraw+",
+        "button": "خروجی به Excalidraw+",
+        "description": "ذخیره صفحه در میز کار Excalidraw+."
       }
     },
     "modal": {
       "loadFromFile": {
         "title": "بارگذاری از فایل",
         "button": "بارگذاری از فایل",
-        "description": ""
+        "description": "بارگذاری از فایل <bold>جایگزین بشه با محتوای موجود</bold>.<br></br> می توانید ابتدا با استفاده از یکی از گزینه های زیر از نقاشی خود نسخه پشتیبان تهیه کنید."
       },
       "shareableLink": {
-        "title": "",
-        "button": "",
-        "description": ""
+        "title": "بارگذاری از پیوند",
+        "button": "جایگزینی محتوای من",
+        "description": "بارگذاری از فایل <bold>جایگزین بشه با محتوای موجود</bold>.<br></br> می توانید ابتدا با استفاده از یکی از گزینه های زیر از نقاشی خود نسخه پشتیبان تهیه کنید."
       }
     }
   },
   "mermaid": {
-    "title": "",
-    "button": "",
-    "description": "",
-    "syntax": "",
+    "title": "مرمید به excalidraw",
+    "button": "درج",
+    "description": "فعلا فقط <flowchartLink> فلوچارت </flowchartLink> ، <sequenceLink> توالی </sequenceLink> و <classLink> کلاس </classLink> نمودارها پشتیبانی می شوند. انواع دیگر به صورت تصویر در Excalidraw ارائه خواهند شد.",
+    "syntax": "مرمید syntax",
     "preview": "پیشنمایش"
   },
   "quickSearch": {
