@@ -159,8 +159,9 @@ export function isTouchInPenMode(appState: AppState, event: React.PointerEvent<H
   if(!getHostPlugin().settings.penModeSingleFingerPanning) {
     return false;
   }
+  //isReactPointerEvent typecheck is here only to please typescript, else event.pointerType === "touch" should be enough
   const isReactPointerEvent = 'nativeEvent' in event;
   return appState.penMode &&
-    (!isReactPointerEvent || (event.pointerType !== "pen")) &&
+    (!isReactPointerEvent || (event.pointerType === "touch")) &&
     ![ "text" ].includes(appState.activeTool.type);
 }
