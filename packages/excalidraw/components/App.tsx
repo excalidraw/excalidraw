@@ -750,6 +750,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         scrollToContent: this.scrollToContent,
         zoomToFit: this.zoomToFit, //zsviczian
+        getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
         startLineEditor: this.startLineEditor, //zsviczian
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
@@ -4017,6 +4018,35 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+
+  //zsviczian
+  getColorAtScenePoint = ({ sceneX, sceneY }: { sceneX: number; sceneY: number }): string | null =>
+  {
+    if (!this.canvas) {
+      console.error("Canvas not available");
+      return null;
+    }
+  
+    const { x,y } = sceneCoordsToViewportCoords({ sceneX, sceneY }, this.state);
+    const context = this.canvas.getContext("2d");
+    if (!context) {
+      console.error("2D context not available");
+      return null;
+    }
+  
+    // Get pixel data directly from the given scene coordinates
+    const pixelData = context.getImageData(x, y, 1, 1).data;
+    const [r, g, b, a] = pixelData;
+  
+    // Check for transparency
+    if (a === 0) {
+      return this.state.theme === "light" ? "rgba(255,255,255,1)" : "rgba(0,0,0,1)";
+    }
+  
+    // Return the color in rgba format
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+  }
+
   //zsviczian
   startLineEditor = (
     el: ExcalidrawLinearElement,
@@ -5265,8 +5295,8 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     //zsviczian
-    if (isExistingElement && this.props.onBeforeTextEdit) {
-      const text = this.props.onBeforeTextEdit(element);
+    if (this.props.onBeforeTextEdit) {
+      const text = this.props.onBeforeTextEdit(element, isExistingElement);
       if (text && text !== element.originalText) {
         this.scene.replaceAllElements([
           ...this.scene.getElementsIncludingDeleted().map((_element) => {

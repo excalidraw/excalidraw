@@ -569,7 +569,7 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
-  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string; //zsviczian
+  onBeforeTextEdit?: (textElement: ExcalidrawTextElement, isExistingElement: boolean) => string; //zsviczian
   onBeforeTextSubmit?: (
     textElement: ExcalidrawTextElement,
     nextText: string, //wrapped
@@ -817,6 +817,7 @@ export interface ExcalidrawImperativeAPI {
     clear: InstanceType<typeof App>["resetHistory"];
   };
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
+  getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian
   startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
