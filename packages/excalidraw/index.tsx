@@ -50,6 +50,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onLinkOpen,
     onLinkHover, //zsviczian
     onViewModeChange, //zsviczian
+    generateLinkForSelection,
     onPointerDown,
     onPointerUp,
     onScrollChange,
@@ -150,6 +151,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onLinkOpen={onLinkOpen}
           onLinkHover={onLinkHover} //zsviczian
           onViewModeChange={onViewModeChange} //zsviczian
+          generateLinkForSelection={generateLinkForSelection}
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
@@ -336,3 +338,4 @@ export {
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
+export { isElementLink } from "./element/elementLink";

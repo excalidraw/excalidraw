@@ -164,6 +164,7 @@ type _CommonCanvasAppState = {
   width: AppState["width"];
   height: AppState["height"];
   viewModeEnabled: AppState["viewModeEnabled"];
+  openDialog: AppState["openDialog"];
   editingGroupId: AppState["editingGroupId"]; // TODO: move to interactive canvas if possible
   selectedElementIds: AppState["selectedElementIds"]; // TODO: move to interactive canvas if possible
   frameToHighlight: AppState["frameToHighlight"]; // TODO: move to interactive canvas if possible
@@ -187,6 +188,7 @@ export type StaticCanvasAppState = Readonly<
     gridColor: AppState["gridColor"]; //zsviczian
     frameColor: AppState["frameColor"]; //zsviczian
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
+    hoveredElementIds: AppState["hoveredElementIds"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
   }
@@ -340,7 +342,9 @@ export interface AppState {
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
-    | { name: "commandPalette" };
+    | { name: "commandPalette" }
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
+
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -352,6 +356,7 @@ export interface AppState {
 
   lastPointerDownWith: PointerType;
   selectedElementIds: Readonly<{ [id: string]: true }>;
+  hoveredElementIds: Readonly<{ [id: string]: true }>;
   previousSelectedElementIds: { [id: string]: true };
   selectedElementsAreBeingDragged: boolean;
   shouldCacheIgnoreZoom: boolean;
@@ -574,6 +579,7 @@ export interface ExcalidrawProps {
   generateIdForFile?: (file: File) => string | Promise<string>;
   onThemeChange?: (newTheme: string) => void; //zsviczian
   onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian
+  generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
