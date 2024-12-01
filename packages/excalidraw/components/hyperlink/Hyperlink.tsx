@@ -313,6 +313,7 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
+        {/* //zsviczian - do not show the link to element button
         <ToolButton
           type="button"
           title={t("labels.linkToElement")}
@@ -328,6 +329,7 @@ export const Hyperlink = ({
           }}
           icon={elementLinkIcon}
         />
+        */}
         {linkVal && !isEmbeddableElement(element) && (
           <ToolButton
             type="button"

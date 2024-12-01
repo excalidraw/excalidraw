@@ -63,8 +63,8 @@ export const actionCopyElementLink = register({
       storeAction: StoreAction.NONE,
     };
   },
-  predicate: (elements, appState) =>
-    canCreateLinkFromElements(getSelectedElements(elements, appState)),
+  predicate: (elements, appState) => false, //zsviczian - this action should not be visible in Obsidian
+    //canCreateLinkFromElements(getSelectedElements(elements, appState)),
 });
 
 export const actionLinkToElement = register({
@@ -92,7 +92,8 @@ export const actionLinkToElement = register({
       storeAction: StoreAction.CAPTURE,
     };
   },
-  predicate: (elements, appState, appProps, app) => {
+  predicate: (elements, appState, appProps, app) => false, //zsviczian - this action should not be visible in Obsidian
+  /*{
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
@@ -100,6 +101,6 @@ export const actionLinkToElement = register({
       selectedElements.length === 1 &&
       canCreateLinkFromElements(selectedElements)
     );
-  },
+  },*/
   trackEvent: false,
 });
