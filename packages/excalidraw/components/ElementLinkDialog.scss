@@ -1,0 +1,87 @@
+@import "../css/variables.module.scss";
+
+.excalidraw {
+  .ElementLinkDialog {
+    position: absolute;
+    top: var(--editor-container-padding);
+    left: var(--editor-container-padding);
+
+    z-index: var(--zIndex-modal);
+
+    border-radius: 10px;
+    padding: 1.5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-island);
+    background-color: var(--island-bg-color);
+
+    @include isMobile {
+      left: 0;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      width: calc(100% - 1rem);
+      box-sizing: border-box;
+      z-index: 5;
+    }
+
+    .ElementLinkDialog__header {
+      h2 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+
+        @include isMobile {
+          font-size: 1.25rem;
+        }
+      }
+
+      p {
+        margin: 0;
+
+        @include isMobile {
+          font-size: 0.875rem;
+        }
+      }
+
+      margin-bottom: 1.5rem;
+
+      @include isMobile {
+        margin-bottom: 1rem;
+      }
+    }
+
+    .ElementLinkDialog__input {
+      display: flex;
+
+      .ElementLinkDialog__input-field {
+        flex: 1;
+      }
+
+      .ElementLinkDialog__remove {
+        color: $oc-red-9;
+        margin-left: 1rem;
+
+        .ToolIcon__icon {
+          width: 2rem;
+          height: 2rem;
+        }
+
+        .ToolIcon__icon svg {
+          color: $oc-red-6;
+        }
+      }
+    }
+
+    .ElementLinkDialog__actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+
+      @include isMobile {
+        font-size: 0.875rem;
+        margin-top: 1rem;
+      }
+    }
+  }
+}

@@ -152,8 +152,6 @@ export const resizeElement = (
     nextHeight = Math.max(nextHeight, minHeight);
   }
 
-  const { width: oldWidth, height: oldHeight } = latestElement;
-
   mutateElement(
     latestElement,
     {
@@ -202,7 +200,7 @@ export const resizeElement = (
   }
 
   updateBoundElements(latestElement, elementsMap, {
-    oldSize: { width: oldWidth, height: oldHeight },
+    newSize: { width: nextWidth, height: nextHeight },
   });
 
   if (boundTextElement && boundTextFont) {
