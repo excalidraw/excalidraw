@@ -126,11 +126,11 @@
     "link": {
       "edit": "Modifica link",
       "editEmbed": "",
-      "create": "",
+      "create": "Aggiungi link",
       "label": "Link",
       "labelEmbed": "Collega & incorpora",
       "empty": "Nessun collegamento impostato",
-      "hint": "",
+      "hint": "Digita o incolla qui il tuo link",
       "goToElement": ""
     },
     "lineEditor": {
@@ -157,11 +157,11 @@
     "zoomToFit": "Zoom per adattare tutti gli elementi",
     "installPWA": "Installa Excalidraw localmente (PWA)",
     "autoResize": "Abilita ridimensionamento automatico del testo",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "Copia il link all'oggetto",
+    "linkToElement": "Link all'oggetto"
   },
   "elementLink": {
-    "title": "",
+    "title": "Link all'oggetto",
     "desc": "",
     "notFound": ""
   },
@@ -172,9 +172,9 @@
   },
   "search": {
     "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
+    "noMatch": "Non è stato trovato nessun risultato...",
+    "singleResult": "risultato",
+    "multipleResults": "risultati",
     "placeholder": ""
   },
   "buttons": {
@@ -510,7 +510,7 @@
     "pasteAsSingleElement": "Usa {{shortcut}} per incollare come un singolo elemento,\no incollare in un editor di testo esistente",
     "unableToEmbed": "Incorporare questo url non è permesso. Crea una issue su GitHub per richiedere che l'url sia autorizzato",
     "unrecognizedLinkFormat": "Il link che hai incorporato non corrisponde al formato previsto. Prova a incollare la stringa 'embed' fornita dal sito di origine",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Link copiato negli appunti"
   },
   "colors": {
     "transparent": "Trasparente",
@@ -599,7 +599,7 @@
     "empty": "Nessun font trovato"
   },
   "userList": {
-    "empty": "",
+    "empty": "Nessun utente trovato",
     "hint": {
       "text": "Clicca sull'utente per seguirlo",
       "followStatus": "Stai attualmente seguendo questo utente",
