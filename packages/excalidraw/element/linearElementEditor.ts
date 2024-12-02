@@ -25,7 +25,6 @@ import type {
   AppClassProperties,
   NullableGridSize,
   Zoom,
-  PointerDownState,
 } from "../types";
 import { mutateElement } from "./mutateElement";
 
@@ -1807,23 +1806,22 @@ export class LinearElementEditor {
     x: number,
     y: number,
     elementsMap: ElementsMap,
-    pointerDownState: PointerDownState,
     state: AppState,
   ) {
-    // const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
-    //   linearElement,
-    //   { x, y },
-    //   state,
-    //   elementsMap,
-    // );
-    // const index =
-    //   segmentMidPoint &&
-    //   LinearElementEditor.getSegmentMidPointIndex(
-    //     linearElement,
-    //     state,
-    //     segmentMidPoint,
-    //     elementsMap,
-    //   );
+    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
+      linearElement,
+      { x, y },
+      state,
+      elementsMap,
+    );
+    const index =
+      segmentMidPoint &&
+      LinearElementEditor.getSegmentMidPointIndex(
+        linearElement,
+        state,
+        segmentMidPoint,
+        elementsMap,
+      );
 
     const element = LinearElementEditor.getElement(
       linearElement.elementId,
@@ -1834,38 +1832,7 @@ export class LinearElementEditor {
       return;
     }
 
-    const index =
-      element.points.length -
-      element.points
-        // @ts-ignore
-        .toReversed()
-        .findIndex((p: LocalPoint, idx: number, points: LocalPoint[]) => {
-          if (idx === 0) {
-            return false;
-          }
-
-          const other = points[idx - 1];
-          const midPoint = pointFrom<GlobalPoint>(
-            (element.x + other[0] + element.x + p[0]) / 2,
-            (element.y + other[1] + element.y + p[1]) / 2,
-          );
-
-          if (
-            pointDistance(
-              //pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-              pointFrom(x, y),
-              midPoint,
-            ) *
-              state.zoom.value <
-            LinearElementEditor.POINT_HANDLE_SIZE + 1
-          ) {
-            return true;
-          }
-
-          return false;
-        });
-
-    if (index > 0 && index < element.points.length) {
+    if (index && index > 0 && index < element.points.length) {
       const isHorizontal = headingIsHorizontal(
         vectorToHeading(
           vectorFromPoint(element.points[index], element.points[index - 1]),
