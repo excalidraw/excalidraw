@@ -35,35 +35,38 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points, fileId } = updates as any;
 
-  if (typeof points !== "undefined") {
-    if (isElbowArrow(element)) {
-      const mergedElementsMap = toBrandedType<SceneElementsMap>(
-        new Map([
-          ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
-          ...(changedElements ?? []),
-        ]),
-      );
+  if (isElbowArrow(element)) {
+    const mergedElementsMap = toBrandedType<SceneElementsMap>(
+      new Map([
+        ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
+        ...(changedElements ?? []),
+      ]),
+    );
 
-      updates = {
-        ...updates,
-        angle: 0 as Radians,
-        ...updateElbowArrowPoints(
-          {
-            ...element,
-            x: updates.x || element.x,
-            y: updates.y || element.y,
-          },
-          mergedElementsMap,
-          // @ts-ignore
-          updates,
-          {
-            isDragging,
-          },
-        ),
-      };
-    } else {
-      updates = { ...getSizeFromPoints(points), ...updates };
-    }
+    updates = {
+      ...updates,
+      angle: 0 as Radians,
+      ...updateElbowArrowPoints(
+        {
+          ...element,
+          x: updates.x || element.x,
+          y: updates.y || element.y,
+        },
+        mergedElementsMap,
+        // @ts-ignore
+        {
+          ...updates,
+          points: points || element.points,
+        },
+        {
+          isDragging,
+        },
+      ),
+    };
+  }
+
+  if (typeof points !== "undefined") {
+    updates = { ...getSizeFromPoints(points), ...updates };
   }
 
   for (const key in updates) {

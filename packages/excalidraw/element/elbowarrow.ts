@@ -113,6 +113,7 @@ export const updateElbowArrowPoints = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   updates: {
     points: readonly LocalPoint[];
+    fixedSegments?: FixedSegment[];
   },
   options?: {
     isDragging?: boolean;
@@ -159,7 +160,8 @@ export const updateElbowArrowPoints = (
       .filter((diff) => diff).length === 2 &&
     !firstAndLastPointMoved;
 
-  let nextFixedSegments: FixedSegment[] = arrow.fixedSegments ?? [];
+  let nextFixedSegments: FixedSegment[] =
+    updates.fixedSegments ?? arrow.fixedSegments ?? [];
   if (isSegmentMove) {
     // if (
     //   !pointsEqual(arrow.points[0], updatedPoints[0]) &&
