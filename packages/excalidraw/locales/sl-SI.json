@@ -125,13 +125,13 @@
     "createContainerFromText": "Zavij besedilo v vsebnik",
     "link": {
       "edit": "Uredi povezavo",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Uredi vdelano povezavo",
+      "create": "Dodaj povezavo",
       "label": "Povezava",
       "labelEmbed": "Povezava in vdelovanje",
       "empty": "Povezava ni nastavljena",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Tukaj vnesite ali prilepite svojo povezavo",
+      "goToElement": "Pojdite na ciljni element"
     },
     "lineEditor": {
       "edit": "Uredi črto",
@@ -157,13 +157,13 @@
     "zoomToFit": "Približaj na vse elemente",
     "installPWA": "Namesti Excalidraw lokalno (PWA)",
     "autoResize": "Omogoči samodejno spreminjanje velikosti besedila",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "Kopiraj povezavo do objekta",
+    "linkToElement": "Povezava do objekta"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Povezava do objekta",
+    "desc": "Kliknite obliko na platnu ali prilepite povezavo.",
+    "notFound": "Objekta s povezave ni bilo mogoče najti na platnu."
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
@@ -510,7 +510,7 @@
     "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil",
     "unableToEmbed": "Vdelava tega URL-ja trenutno ni dovoljena. Ustvarite vprašanje na GitHub-u in prosite za vmestitev URL-ja na seznam dovoljenih",
     "unrecognizedLinkFormat": "Povezava, ki ste jo vdelali, se ne ujema s pričakovano obliko. Poskusite prilepiti niz za vdelavo, ki ste ga prejeli na izvorni strani",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Povezava kopirana na odložišče"
   },
   "colors": {
     "transparent": "Prosojno",
