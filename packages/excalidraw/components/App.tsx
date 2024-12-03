@@ -8131,7 +8131,7 @@ class App extends React.Component<AppProps, AppState> {
 
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
-          !this.state.editingFrame &&
+          if (!this.state.editingFrame) {
             dragSelectedElements(
               pointerDownState,
               selectedElements,
@@ -8140,15 +8140,23 @@ class App extends React.Component<AppProps, AppState> {
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
             );
-          selectedElements
-            .filter(isElbowArrow)
-            .forEach((element) =>
-              LinearElementEditor.updateEditorMidPointsCache(
-                element,
-                elementsMap,
-                this.state,
-              ),
-            );
+            selectedElements
+              .flatMap(
+                (draggedElement) =>
+                  (isLinearElement(draggedElement)
+                    ? [draggedElement]
+                    : draggedElement.boundElements?.map((binding) =>
+                        elementsMap.get(binding.id),
+                      ) ?? []) as ExcalidrawLinearElement[],
+              )
+              .forEach((element) =>
+                LinearElementEditor.updateEditorMidPointsCache(
+                  element,
+                  elementsMap,
+                  this.state,
+                ),
+              );
+          }
 
           this.setState({
             selectedElementsAreBeingDragged: true,
