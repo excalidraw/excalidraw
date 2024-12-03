@@ -22,6 +22,7 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
+import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -94,6 +95,7 @@ const generatePoints = memo(
     state: ElbowArrowState,
     points: readonly LocalPoint[],
     totalSegments: number,
+    currentSegment: number,
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
     options?: {
       isDragging?: boolean;
@@ -101,7 +103,23 @@ const generatePoints = memo(
   ) =>
     routeElbowArrow(state, elementsMap, points, {
       ...options,
-      ...(totalSegments > 0 ? { turnOffAvoidance: true } : {}),
+      ...(totalSegments > 0
+        ? {
+            startMidPointHeading:
+              currentSegment > 0
+                ? vectorToHeading(vectorFromPoint(points[1], points[0]))
+                : undefined,
+            endMidPointHeading:
+              currentSegment < totalSegments
+                ? vectorToHeading(
+                    vectorFromPoint(
+                      points[points.length - 2],
+                      points[points.length - 1],
+                    ),
+                  )
+                : undefined,
+          }
+        : {}),
     }) ?? [],
 );
 
@@ -279,11 +297,12 @@ export const updateElbowArrowPoints = (
 
   const simplifiedPoints = getElbowArrowCornerPoints(
     removeElbowArrowShortSegments(
-      pointPairs.map(([state, points]) => {
+      pointPairs.map(([state, points], idx) => {
         const nextPoints = generatePoints(
           state,
           points,
           pointPairs.length - 1,
+          idx,
           elementsMap,
           options,
         );
@@ -395,7 +414,8 @@ const getElbowArrowData = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    turnOffAvoidance?: boolean;
+    startMidPointHeading?: Heading;
+    endMidPointHeading?: Heading;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -422,7 +442,6 @@ const getElbowArrowData = (
     elementsMap,
     startElement,
     hoveredStartElement,
-
     options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
@@ -485,7 +504,6 @@ const getElbowArrowData = (
       )
     : endPointBounds;
   const boundsOverlap =
-    options?.turnOffAvoidance ||
     pointInsideBounds(
       startGlobalPoint,
       hoveredEndElement
@@ -509,47 +527,84 @@ const getElbowArrowData = (
       ? [startPointBounds, endPointBounds]
       : [startElementBounds, endElementBounds],
   );
-  const dynamicAABBs = generateDynamicAABBs(
-    boundsOverlap ? startPointBounds : startElementBounds,
-    boundsOverlap ? endPointBounds : endElementBounds,
-    commonBounds,
-    boundsOverlap
-      ? offsetFromHeading(
+  const dynamicAABBs =
+    options?.startMidPointHeading || options?.endMidPointHeading
+      ? generateSegmentedDynamicAABBs(
+          padAABB(
+            startElementBounds,
+            pointsEqual(origStartGlobalPoint, startGlobalPoint)
+              ? [0, 0, 0, 0]
+              : offsetFromHeading(
+                  startHeading,
+                  BASE_PADDING -
+                    (arrow.startArrowhead
+                      ? FIXED_BINDING_DISTANCE * 6
+                      : FIXED_BINDING_DISTANCE * 2),
+                  BASE_PADDING,
+                ),
+          ),
+          padAABB(
+            endElementBounds,
+            options?.startMidPointHeading && options?.endMidPointHeading
+              ? [0, 0, 0, 0]
+              : offsetFromHeading(
+                  endHeading,
+                  BASE_PADDING -
+                    (arrow.endArrowhead
+                      ? FIXED_BINDING_DISTANCE * 6
+                      : FIXED_BINDING_DISTANCE * 2),
+                  BASE_PADDING,
+                ),
+          ),
+          options?.startMidPointHeading,
+          options?.endMidPointHeading,
           startHeading,
-          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
-          0,
-        )
-      : offsetFromHeading(
-          startHeading,
-          !hoveredStartElement && !hoveredEndElement
-            ? 0
-            : BASE_PADDING -
-                (arrow.startArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
-          BASE_PADDING,
-        ),
-    boundsOverlap
-      ? offsetFromHeading(
           endHeading,
-          !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
-          0,
+          startGlobalPoint,
+          endGlobalPoint,
         )
-      : offsetFromHeading(
-          endHeading,
-          !hoveredStartElement && !hoveredEndElement
-            ? 0
-            : BASE_PADDING -
-                (arrow.endArrowhead
-                  ? FIXED_BINDING_DISTANCE * 6
-                  : FIXED_BINDING_DISTANCE * 2),
-          BASE_PADDING,
-        ),
-    boundsOverlap,
-    hoveredStartElement && aabbForElement(hoveredStartElement),
-    hoveredEndElement && aabbForElement(hoveredEndElement),
-  );
-
+      : generateDynamicAABBs(
+          boundsOverlap ? startPointBounds : startElementBounds,
+          boundsOverlap ? endPointBounds : endElementBounds,
+          commonBounds,
+          boundsOverlap
+            ? offsetFromHeading(
+                startHeading,
+                !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
+                0,
+              )
+            : offsetFromHeading(
+                startHeading,
+                !hoveredStartElement && !hoveredEndElement
+                  ? 0
+                  : BASE_PADDING -
+                      (arrow.startArrowhead
+                        ? FIXED_BINDING_DISTANCE * 6
+                        : FIXED_BINDING_DISTANCE * 2),
+                BASE_PADDING,
+              ),
+          boundsOverlap
+            ? offsetFromHeading(
+                endHeading,
+                !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
+                0,
+              )
+            : offsetFromHeading(
+                endHeading,
+                !hoveredStartElement && !hoveredEndElement
+                  ? 0
+                  : BASE_PADDING -
+                      (arrow.endArrowhead
+                        ? FIXED_BINDING_DISTANCE * 6
+                        : FIXED_BINDING_DISTANCE * 2),
+                BASE_PADDING,
+              ),
+          boundsOverlap,
+          hoveredStartElement && aabbForElement(hoveredStartElement),
+          hoveredEndElement && aabbForElement(hoveredEndElement),
+        );
+  //dynamicAABBs.forEach((aabb) => debugDrawBounds(aabb));
+  false && console.log("DDDDD");
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -593,7 +648,8 @@ const routeElbowArrow = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    turnOffAvoidance?: boolean;
+    startMidPointHeading?: Heading;
+    endMidPointHeading?: Heading;
   },
 ): GlobalPoint[] | null => {
   const {
@@ -816,73 +872,75 @@ const pathTo = (start: Node, node: Node) => {
 const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
-// const padAABB = (bounds: Bounds, offset: [number, number, number, number]) =>
-//   [
-//     bounds[0] - offset[3],
-//     bounds[1] - offset[0],
-//     bounds[2] + offset[1],
-//     bounds[3] + offset[2],
-//   ] as Bounds;
+const padAABB = (bounds: Bounds, offset: [number, number, number, number]) =>
+  [
+    bounds[0] - offset[3],
+    bounds[1] - offset[0],
+    bounds[2] + offset[1],
+    bounds[3] + offset[2],
+  ] as Bounds;
 
-// const generateSegmentedDynamicAABBs = (
-//   a: Bounds,
-//   b: Bounds,
-//   startIsMidPoint: boolean | undefined,
-//   endIsMidPoint: boolean | undefined,
-//   startHeading: Heading,
-//   endHeading: Heading,
-//   startGlobalPoint: GlobalPoint,
-//   endGlobalPoint: GlobalPoint,
-//   heading: Heading | undefined,
-// ): Bounds[] => {
-//   let first = a;
-//   let second = b;
-//   // const startDongle = startIsMidPoint
-//   //   ? startGlobalPoint
-//   //   : getDonglePosition(a, startHeading, startGlobalPoint);
-//   // const endDongle = endIsMidPoint
-//   //   ? endGlobalPoint
-//   //   : getDonglePosition(b, endHeading, endGlobalPoint);
-//   const startDongle = getDonglePosition(a, startHeading, startGlobalPoint);
-//   const endDongle = getDonglePosition(b, endHeading, endGlobalPoint);
+const generateSegmentedDynamicAABBs = (
+  a: Bounds,
+  b: Bounds,
+  startMidPointHeading: Heading | undefined,
+  endMidPointHeading: Heading | undefined,
+  startHeading: Heading,
+  endHeading: Heading,
+  startGlobalPoint: GlobalPoint,
+  endGlobalPoint: GlobalPoint,
+): Bounds[] => {
+  const startDongle = getDonglePosition(a, startHeading, startGlobalPoint);
+  const endDongle = getDonglePosition(b, endHeading, endGlobalPoint);
 
-//   if (startIsMidPoint && heading && startDongle && endDongle) {
-//     if (headingIsHorizontal(heading)) {
-//       if (startDongle[0] < endDongle[0]) {
-//         first = [startDongle[0], a[1], endDongle[0], a[3]];
-//       } else {
-//         first = [endDongle[0], a[1], startDongle[0], a[3]];
-//       }
-//     } else if (startDongle[1] < endDongle[1]) {
-//       first = [a[0], startDongle[1], a[2], endDongle[1]];
-//     } else {
-//       first = [a[0], endDongle[1], a[2], startDongle[1]];
-//     }
-//   }
+  let first = a;
+  let second = b;
+  false &&
+    console.log(
+      "generateSegmentedDynamicAABBs",
+      !!startMidPointHeading,
+      !!endMidPointHeading,
+    );
+  if (startMidPointHeading && startDongle && endDongle) {
+    if (headingIsHorizontal(startMidPointHeading)) {
+      if (startDongle[0] < endDongle[0]) {
+        first = [startDongle[0], a[1], endDongle[0], a[3]];
+      } else {
+        first = [endDongle[0], a[1], startDongle[0], a[3]];
+      }
+    } else if (startDongle[1] < endDongle[1]) {
+      first = [a[0], startDongle[1], a[2], endDongle[1]];
+    } else {
+      first = [a[0], endDongle[1], a[2], startDongle[1]];
+    }
+  }
 
-//   if (endIsMidPoint && heading && startDongle && endDongle) {
-//     if (headingIsHorizontal(heading)) {
-//       if (startDongle[0] < endDongle[0]) {
-//         second = [startDongle[0], b[1], endDongle[0], b[3]];
-//       } else {
-//         second = [endDongle[0], b[1], startDongle[0], b[3]];
-//       }
-//     } else if (startDongle[1] < endDongle[1]) {
-//       second = [b[0], startDongle[1], b[2], endDongle[1]];
-//     } else {
-//       second = [b[0], endDongle[1], b[2], startDongle[1]];
-//     }
-//   }
+  if (endMidPointHeading && startDongle && endDongle) {
+    if (headingIsHorizontal(endMidPointHeading)) {
+      if (startDongle[0] < endDongle[0]) {
+        second = [startDongle[0], b[1], endDongle[0], b[3]];
+      } else {
+        second = [endDongle[0], b[1], startDongle[0], b[3]];
+      }
+    } else if (startDongle[1] < endDongle[1]) {
+      second = [b[0], startDongle[1], b[2], endDongle[1]];
+    } else {
+      second = [b[0], endDongle[1], b[2], startDongle[1]];
+    }
+  }
+  endMidPointHeading && debugDrawBounds(second, { color: "red" });
+  endMidPointHeading && debugDrawBounds(first, { color: "green" });
+  endMidPointHeading && debugDrawPoint(startGlobalPoint, { color: "green" });
+  endMidPointHeading && debugDrawPoint(endGlobalPoint, { color: "red" });
+  const boundsOverlap =
+    pointInsideBounds(startGlobalPoint, second) ||
+    pointInsideBounds(endGlobalPoint, first);
+  if (boundsOverlap) {
+    return [a, b];
+  }
 
-//   const boundsOverlap =
-//     pointInsideBounds(startGlobalPoint, second) ||
-//     pointInsideBounds(endGlobalPoint, first);
-//   if (boundsOverlap) {
-//     return [a, b];
-//   }
-
-//   return [first, second] as Bounds[];
-// };
+  return [first, second] as Bounds[];
+};
 
 /**
  * Create dynamically resizing, always touching
