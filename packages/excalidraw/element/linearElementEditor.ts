@@ -279,7 +279,6 @@ export class LinearElementEditor {
         selectedPointsIndices.length === 1 &&
         element.points.length > 1
       ) {
-        console.log('shouldRotateWithDiscreteAngle');
         let selectedIndex = selectedPointsIndices[0];
         
         // For elbow arrows with shift pressed
@@ -290,10 +289,8 @@ export class LinearElementEditor {
           // Calculate angle in degrees (0-360)
           const angle = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 360) % 360;
           const snapAngle = Math.round(angle / 22.5) * 22.5;
-          console.log(snapAngle)
           // Only remove midpoints for cardinal angles
           if ([0, 90, 180, 270, 360].includes(snapAngle)) {
-            console.log('TRUE')
             const newPoints = [
               element.points[0],
               element.points[element.points.length - 1]
@@ -1543,9 +1540,6 @@ export class LinearElementEditor {
     scenePointer: GlobalPoint,
     gridSize: NullableGridSize,
   ) {
-    console.log('element', element)
-    console.log('referencePoint', referencePoint)
-    console.log('elementsMap', elementsMap)
     const referencePointCoords = LinearElementEditor.getPointGlobalCoordinates(
       element,
       referencePoint,
