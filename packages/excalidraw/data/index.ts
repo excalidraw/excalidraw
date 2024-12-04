@@ -121,13 +121,12 @@ export const exportAsImage = async ({
           exportBackground: cfg.exportBackground,
           exportWithDarkMode: data.appState.exportWithDarkMode,
           viewBackgroundColor: data.appState.viewBackgroundColor,
-          exportPadding: cfg.padding,
           exportScale: data.appState.exportScale,
           exportEmbedScene: data.appState.exportEmbedScene && type === "svg",
         },
         files: data.files,
       },
-      config: { exportingFrame: cfg.exportingFrame },
+      config: { exportingFrame: cfg.exportingFrame, padding: cfg.padding },
     });
     if (type === "svg") {
       return fileSave(
