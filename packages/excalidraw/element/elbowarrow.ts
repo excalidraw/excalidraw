@@ -4,7 +4,6 @@ import {
   pointScaleFromOrigin,
   pointsEqual,
   pointTranslate,
-  PRECISION,
   vector,
   vectorCross,
   vectorFromPoint,
@@ -23,7 +22,6 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugDrawBounds, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -369,21 +367,6 @@ export const updateElbowArrowPoints = (
     } else {
       console.warn("Could not find similar point which shouldn't happen");
     }
-
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        x + nextFixedSegments[idx].start[0],
-        y + nextFixedSegments[idx].start[1],
-      ),
-      { color: "green", permanent: false },
-    );
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        x + nextFixedSegments[idx].end[0],
-        y + nextFixedSegments[idx].end[1],
-      ),
-      { color: "red", permanent: false },
-    );
   });
 
   return normalizeArrowElementUpdate(simplifiedPoints, nextFixedSegments);
@@ -569,8 +552,6 @@ const getElbowArrowData = (
           ),
           options?.startMidPointHeading,
           options?.endMidPointHeading,
-          startHeading,
-          endHeading,
           startGlobalPoint,
           endGlobalPoint,
         )
@@ -614,8 +595,7 @@ const getElbowArrowData = (
           hoveredStartElement && aabbForElement(hoveredStartElement),
           hoveredEndElement && aabbForElement(hoveredEndElement),
         );
-  //dynamicAABBs.forEach((aabb) => debugDrawBounds(aabb));
-  false && console.log("DDDDD");
+
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -896,22 +876,12 @@ const generateSegmentedDynamicAABBs = (
   b: Bounds,
   startMidPointHeading: Heading | undefined,
   endMidPointHeading: Heading | undefined,
-  startHeading: Heading,
-  endHeading: Heading,
   startGlobalPoint: GlobalPoint,
   endGlobalPoint: GlobalPoint,
 ): Bounds[] => {
-  // const startDongle = getDonglePosition(a, startHeading, startGlobalPoint);
-  // const endDongle = getDonglePosition(b, endHeading, endGlobalPoint);
-
   let first = a;
   let second = b;
-  false &&
-    console.log(
-      "generateSegmentedDynamicAABBs",
-      !!startMidPointHeading,
-      !!endMidPointHeading,
-    );
+
   if (startMidPointHeading) {
     first = [
       startGlobalPoint[0] - 0.0001,
@@ -925,17 +895,6 @@ const generateSegmentedDynamicAABBs = (
       Math.max(b[2], startGlobalPoint[0] - 0.0001),
       Math.max(b[3], startGlobalPoint[1] - 0.0001),
     ];
-    // if (headingIsHorizontal(startMidPointHeading)) {
-    //   if (startDongle[0] < endDongle[0]) {
-    //     first = [startDongle[0], a[1], endDongle[0], a[3]];
-    //   } else {
-    //     first = [endDongle[0], a[1], startDongle[0], a[3]];
-    //   }
-    // } else if (startDongle[1] < endDongle[1]) {
-    //   first = [a[0], startDongle[1], a[2], endDongle[1]];
-    // } else {
-    //   first = [a[0], endDongle[1], a[2], startDongle[1]];
-    // }
   }
 
   if (endMidPointHeading) {
@@ -951,22 +910,8 @@ const generateSegmentedDynamicAABBs = (
       Math.max(a[2], endGlobalPoint[0] - 0.0001),
       Math.max(a[3], endGlobalPoint[1] - 0.0001),
     ];
-    // if (headingIsHorizontal(endMidPointHeading)) {
-    //   if (startDongle[0] < endDongle[0]) {
-    //     second = [startDongle[0], b[1], endDongle[0], b[3]];
-    //   } else {
-    //     second = [endDongle[0], b[1], startDongle[0], b[3]];
-    //   }
-    // } else if (startDongle[1] < endDongle[1]) {
-    //   second = [b[0], startDongle[1], b[2], endDongle[1]];
-    // } else {
-    //   second = [b[0], endDongle[1], b[2], startDongle[1]];
-    // }
   }
-  // endMidPointHeading && debugDrawBounds(second, { color: "red" });
-  // endMidPointHeading && debugDrawBounds(first, { color: "green" });
-  // endMidPointHeading && debugDrawPoint(startGlobalPoint, { color: "green" });
-  // endMidPointHeading && debugDrawPoint(endGlobalPoint, { color: "red" });
+
   const boundsOverlap =
     pointInsideBounds(startGlobalPoint, second) ||
     pointInsideBounds(endGlobalPoint, first);
