@@ -890,8 +890,8 @@ const generateSegmentedDynamicAABBs = (
   startGlobalPoint: GlobalPoint,
   endGlobalPoint: GlobalPoint,
 ): Bounds[] => {
-  const startDongle = getDonglePosition(a, startHeading, startGlobalPoint);
-  const endDongle = getDonglePosition(b, endHeading, endGlobalPoint);
+  // const startDongle = getDonglePosition(a, startHeading, startGlobalPoint);
+  // const endDongle = getDonglePosition(b, endHeading, endGlobalPoint);
 
   let first = a;
   let second = b;
@@ -901,37 +901,61 @@ const generateSegmentedDynamicAABBs = (
       !!startMidPointHeading,
       !!endMidPointHeading,
     );
-  if (startMidPointHeading && startDongle && endDongle) {
-    if (headingIsHorizontal(startMidPointHeading)) {
-      if (startDongle[0] < endDongle[0]) {
-        first = [startDongle[0], a[1], endDongle[0], a[3]];
-      } else {
-        first = [endDongle[0], a[1], startDongle[0], a[3]];
-      }
-    } else if (startDongle[1] < endDongle[1]) {
-      first = [a[0], startDongle[1], a[2], endDongle[1]];
-    } else {
-      first = [a[0], endDongle[1], a[2], startDongle[1]];
-    }
+  if (startMidPointHeading) {
+    first = [
+      startGlobalPoint[0] - 0.0001,
+      startGlobalPoint[1] - 0.0001,
+      startGlobalPoint[0] + 0.0001,
+      startGlobalPoint[1] + 0.0001,
+    ];
+    second = [
+      Math.min(b[0], startGlobalPoint[0] + 0.0001),
+      Math.min(b[1], startGlobalPoint[1] + 0.0001),
+      Math.max(b[2], startGlobalPoint[0] - 0.0001),
+      Math.max(b[3], startGlobalPoint[1] - 0.0001),
+    ];
+    // if (headingIsHorizontal(startMidPointHeading)) {
+    //   if (startDongle[0] < endDongle[0]) {
+    //     first = [startDongle[0], a[1], endDongle[0], a[3]];
+    //   } else {
+    //     first = [endDongle[0], a[1], startDongle[0], a[3]];
+    //   }
+    // } else if (startDongle[1] < endDongle[1]) {
+    //   first = [a[0], startDongle[1], a[2], endDongle[1]];
+    // } else {
+    //   first = [a[0], endDongle[1], a[2], startDongle[1]];
+    // }
   }
 
-  if (endMidPointHeading && startDongle && endDongle) {
-    if (headingIsHorizontal(endMidPointHeading)) {
-      if (startDongle[0] < endDongle[0]) {
-        second = [startDongle[0], b[1], endDongle[0], b[3]];
-      } else {
-        second = [endDongle[0], b[1], startDongle[0], b[3]];
-      }
-    } else if (startDongle[1] < endDongle[1]) {
-      second = [b[0], startDongle[1], b[2], endDongle[1]];
-    } else {
-      second = [b[0], endDongle[1], b[2], startDongle[1]];
-    }
+  if (endMidPointHeading) {
+    second = [
+      endGlobalPoint[0] - 0.0001,
+      endGlobalPoint[1] - 0.0001,
+      endGlobalPoint[0] + 0.0001,
+      endGlobalPoint[1] + 0.0001,
+    ];
+    first = [
+      Math.min(a[0], endGlobalPoint[0] + 0.0001),
+      Math.min(a[1], endGlobalPoint[1] + 0.0001),
+      Math.max(a[2], endGlobalPoint[0] - 0.0001),
+      Math.max(a[3], endGlobalPoint[1] - 0.0001),
+    ];
+    // if (headingIsHorizontal(endMidPointHeading)) {
+    //   if (startDongle[0] < endDongle[0]) {
+    //     second = [startDongle[0], b[1], endDongle[0], b[3]];
+    //   } else {
+    //     second = [endDongle[0], b[1], startDongle[0], b[3]];
+    //   }
+    // } else if (startDongle[1] < endDongle[1]) {
+    //   second = [b[0], startDongle[1], b[2], endDongle[1]];
+    // } else {
+    //   second = [b[0], endDongle[1], b[2], startDongle[1]];
+    // }
   }
-  endMidPointHeading && debugDrawBounds(second, { color: "red" });
-  endMidPointHeading && debugDrawBounds(first, { color: "green" });
-  endMidPointHeading && debugDrawPoint(startGlobalPoint, { color: "green" });
-  endMidPointHeading && debugDrawPoint(endGlobalPoint, { color: "red" });
+  // endMidPointHeading && debugDrawBounds(second, { color: "red" });
+  // endMidPointHeading && debugDrawBounds(first, { color: "green" });
+  // endMidPointHeading && debugDrawPoint(startGlobalPoint, { color: "green" });
+  // endMidPointHeading && debugDrawPoint(endGlobalPoint, { color: "red" });
   const boundsOverlap =
     pointInsideBounds(startGlobalPoint, second) ||
     pointInsideBounds(endGlobalPoint, first);
