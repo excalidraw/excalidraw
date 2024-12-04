@@ -321,7 +321,7 @@ export class LinearElementEditor {
                 width + referencePoint[0],
                 height + referencePoint[1],
               ),
-              isDragging: selectedIndex !== lastClickedPoint,
+              isDragging: selectedIndex === lastClickedPoint,
             },
           ],
           elementsMap,
