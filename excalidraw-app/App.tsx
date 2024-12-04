@@ -25,6 +25,7 @@ import {
   TTDDialogTrigger,
   StoreAction,
   reconcileElements,
+  exportToCanvas,
 } from "../packages/excalidraw";
 import {
   exportToBlob,
@@ -133,7 +134,6 @@ import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import { fileSave } from "../packages/excalidraw/data/filesystem";
 import type { ExportToCanvasConfig } from "../packages/excalidraw/scene/export";
-import { exportToCanvas } from "../packages/utils";
 
 polyfill();
 
@@ -645,8 +645,6 @@ const ExcalidrawWrapper = () => {
       const frame = elements.find(
         (el) => el.strokeStyle === "dashed" && !el.isDeleted,
       );
-
-      const zoom = appState.zoom.value;
 
       exportToCanvas({
         data: {
@@ -1401,7 +1399,7 @@ const ExcalidrawWrapper = () => {
               maxWH{" "}
               <input
                 type="number"
-                max={600}
+                // max={600}
                 style={{ width: "3rem" }}
                 value={config.maxWidthOrHeight}
                 onChange={(event) =>
@@ -1409,7 +1407,7 @@ const ExcalidrawWrapper = () => {
                     ...s,
                     maxWidthOrHeight: !event.target.value.trim()
                       ? undefined
-                      : Math.min(parseInt(event.target.value as any), 600),
+                      : parseInt(event.target.value as any),
                   }))
                 }
               />
@@ -1440,7 +1438,7 @@ const ExcalidrawWrapper = () => {
             exportToBlob({
               data: {
                 elements: excalidrawAPI!.getSceneElements(),
-                files: null,
+                files: excalidrawAPI?.getFiles() || null,
               },
               config,
             }).then((blob) => {

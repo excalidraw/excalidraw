@@ -2,8 +2,8 @@ import { atom, useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { COLOR_PALETTE } from "../colors";
 import { jotaiScope } from "../jotai";
-import { exportToSvg } from "../../utils/export";
 import type { LibraryItem } from "../types";
+import { exportToSvg } from "../scene/export";
 
 export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 

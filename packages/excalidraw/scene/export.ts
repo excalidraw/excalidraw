@@ -21,6 +21,7 @@ import {
   SVG_NS,
   THEME,
   THEME_FILTER,
+  MIME_TYPES,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -28,14 +29,14 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { restoreAppState } from "../data/restore";
+import { restore, restoreAppState } from "../data/restore";
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
 } from "../frame";
-import { newTextElement } from "../element";
+import { getNonDeletedElements, newTextElement } from "../element";
 import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameLikeElement } from "../element/typeChecks";
@@ -43,6 +44,12 @@ import type { RenderableElementsMap } from "./types";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
 import { Fonts } from "../fonts";
+import { encodePngMetadata } from "../data/image";
+import {
+  copyBlobToClipboardAsPng,
+  copyTextToSystemClipboard,
+  copyToClipboard,
+} from "../clipboard";
 
 const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
 
@@ -153,9 +160,13 @@ const prepareElementsForRender = ({
   return nextElements;
 };
 
+type ExportToCanvasAppState = Partial<
+  Omit<AppState, "offsetTop" | "offsetLeft">
+>;
+
 export type ExportToCanvasData = {
   elements: readonly NonDeletedExcalidrawElement[];
-  appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
+  appState?: ExportToCanvasAppState;
   files: BinaryFiles | null;
 };
 
@@ -632,6 +643,18 @@ export const exportToCanvas = async ({
   return canvas;
 };
 
+type ExportToSvgConfig = Pick<
+  ExportToCanvasConfig,
+  "canvasBackgroundColor" | "padding" | "theme" | "exportingFrame"
+> & {
+  /**
+   * if true, all embeddables passed in will be rendered when possible.
+   */
+  renderEmbeddables?: boolean;
+  skipInliningFonts?: true;
+  reuseImages?: boolean;
+};
+
 export const exportToSvg = async ({
   data,
   config,
@@ -640,31 +663,28 @@ export const exportToSvg = async ({
     elements: readonly NonDeletedExcalidrawElement[];
     appState: {
       exportBackground: boolean;
-      exportPadding?: number;
       exportScale?: number;
       viewBackgroundColor: string;
       exportWithDarkMode?: boolean;
       exportEmbedScene?: boolean;
       frameRendering?: AppState["frameRendering"];
+      gridModeEnabled?: boolean;
     };
     files: BinaryFiles | null;
   };
-  config?: {
-    /**
-     * if true, all embeddables passed in will be rendered when possible.
-     */
-    renderEmbeddables?: boolean;
-    exportingFrame?: ExcalidrawFrameLikeElement | null;
-    skipInliningFonts?: true;
-    reuseImages?: boolean;
-  };
+  config?: ExportToSvgConfig;
 }): Promise<SVGSVGElement> => {
   // clone
   const cfg = Object.assign({}, config);
 
   cfg.exportingFrame = cfg.exportingFrame ?? null;
 
-  const elements = data.elements;
+  const { elements: restoredElements } = restore(
+    { ...data, files: data.files || {} },
+    null,
+    null,
+  );
+  const elements = getNonDeletedElements(restoredElements);
 
   const frameRendering = getFrameRenderingConfig(
     cfg?.exportingFrame ?? null,
@@ -672,12 +692,13 @@ export const exportToSvg = async ({
   );
 
   let {
-    exportPadding = DEFAULT_EXPORT_PADDING,
     exportWithDarkMode = false,
     viewBackgroundColor,
     exportScale = 1,
     exportEmbedScene,
   } = data.appState;
+
+  let padding = cfg.padding ?? 0;
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -687,7 +708,7 @@ export const exportToSvg = async ({
   });
 
   if (cfg.exportingFrame) {
-    exportPadding = 0;
+    padding = 0;
   }
 
   let metadata = "";
@@ -719,8 +740,8 @@ export const exportToSvg = async ({
       : getRootElements(elementsForRender),
   );
 
-  width += exportPadding * 2;
-  height += exportPadding * 2;
+  width += padding * 2;
+  height += padding * 2;
 
   // initialize SVG root
   const svgRoot = document.createElementNS(SVG_NS, "svg");
@@ -733,8 +754,8 @@ export const exportToSvg = async ({
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  const offsetX = -minX + exportPadding;
-  const offsetY = -minY + exportPadding;
+  const offsetX = -minX + padding;
+  const offsetY = -minY + padding;
 
   const frameElements = getFrameLikeElements(elements);
 
@@ -829,4 +850,104 @@ export const getCanvasSize = (
   const height = distance(minY, maxY);
 
   return [minX, minY, width, height];
+};
+
+export { MIME_TYPES };
+
+type ExportToBlobConfig = ExportToCanvasConfig & {
+  mimeType?: string;
+  quality?: number;
+};
+
+export const exportToBlob = async ({
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+  config?: ExportToBlobConfig;
+}): Promise<Blob> => {
+  let { mimeType = MIME_TYPES.png, quality } = config || {};
+
+  if (mimeType === MIME_TYPES.png && typeof quality === "number") {
+    console.warn(`"quality" will be ignored for "${MIME_TYPES.png}" mimeType`);
+  }
+
+  // typo in MIME type (should be "jpeg")
+  if (mimeType === "image/jpg") {
+    mimeType = MIME_TYPES.jpg;
+  }
+
+  if (mimeType === MIME_TYPES.jpg && !config?.canvasBackgroundColor === false) {
+    console.warn(
+      `Defaulting "exportBackground" to "true" for "${MIME_TYPES.jpg}" mimeType`,
+    );
+    config = {
+      ...config,
+      canvasBackgroundColor: data.appState?.viewBackgroundColor || COLOR_WHITE,
+    };
+  }
+
+  const canvas = await exportToCanvas({ data, config });
+
+  quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      async (blob) => {
+        if (!blob) {
+          return reject(new Error("couldn't export to blob"));
+        }
+        if (
+          blob &&
+          mimeType === MIME_TYPES.png &&
+          data.appState?.exportEmbedScene
+        ) {
+          blob = await encodePngMetadata({
+            blob,
+            metadata: serializeAsJSON(
+              // NOTE as long as we're using the Scene hack, we need to ensure
+              // we pass the original, uncloned elements when serializing
+              // so that we keep ids stable
+              data.elements,
+              data.appState,
+              data.files || {},
+              "local",
+            ),
+          });
+        }
+        resolve(blob);
+      },
+      mimeType,
+      quality,
+    );
+  });
+};
+
+export const exportToClipboard = async ({
+  type,
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+} & (
+  | { type: "png"; config?: ExportToBlobConfig }
+  | { type: "svg"; config?: ExportToSvgConfig }
+  | { type: "json"; config?: never }
+)) => {
+  if (type === "svg") {
+    const svg = await exportToSvg({
+      data: {
+        ...data,
+        appState: restoreAppState(data.appState, null),
+      },
+      config,
+    });
+    await copyTextToSystemClipboard(svg.outerHTML);
+  } else if (type === "png") {
+    await copyBlobToClipboardAsPng(exportToBlob({ data, config }));
+  } else if (type === "json") {
+    await copyToClipboard(data.elements, data.files);
+  } else {
+    throw new Error("Invalid export type");
+  }
 };

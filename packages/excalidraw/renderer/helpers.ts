@@ -1,4 +1,4 @@
-import type { StaticCanvasAppState, AppState } from "../types";
+import type { AppState } from "../types";
 
 import type { StaticCanvasRenderConfig } from "../scene/types";
 

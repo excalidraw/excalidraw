@@ -1,6 +1,6 @@
 import { decodePngMetadata, decodeSvgMetadata } from "../excalidraw/data/image";
 import type { ImportedDataState } from "../excalidraw/data/types";
-import * as utils from "../utils";
+import { exportToBlob, exportToSvg } from "../excalidraw/scene/export";
 import { API } from "../excalidraw/tests/helpers/api";
 
 // NOTE this test file is using the actual API, unmocked. Hence splitting it
@@ -15,13 +15,14 @@ describe("embedding scene data", () => {
 
       const sourceElements = [rectangle, ellipse];
 
-      const svgNode = await utils.exportToSvg({
+      const svgNode = await exportToSvg({
         data: {
           elements: sourceElements,
           appState: {
             viewBackgroundColor: "#ffffff",
             gridModeEnabled: false,
             exportEmbedScene: true,
+            exportBackground: true,
           },
           files: null,
         },
@@ -47,7 +48,7 @@ describe("embedding scene data", () => {
 
       const sourceElements = [rectangle, ellipse];
 
-      const blob = await utils.exportToBlob({
+      const blob = await exportToBlob({
         data: {
           elements: sourceElements,
           appState: {
