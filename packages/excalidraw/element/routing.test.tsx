@@ -311,7 +311,6 @@ describe("elbow arrow ui", () => {
     mouse.reset();
     mouse.moveTo(0, 0);
     mouse.click();
-    mouse.moveTo(30, 20);
     fireEvent.keyDown(document, { key: "Shift" }); // Enable snapping
     mouse.moveTo(50, 20); 
     fireEvent.keyUp(document, { key: "Shift" })
