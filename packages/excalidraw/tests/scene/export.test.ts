@@ -11,9 +11,15 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { exportToCanvas, exportToSvg } from "../../../utils";
 import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
+import { diagramFactory } from "../fixtures/diagramFixture";
+import { vi } from "vitest";
+
+const DEFAULT_OPTIONS = {
+  exportBackground: false,
+  viewBackgroundColor: "#ffffff",
+};
 
 describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;
@@ -45,11 +51,6 @@ describe("exportToSvg", () => {
       index: "a3",
     },
   ] as NonDeletedExcalidrawElement[];
-
-  const DEFAULT_OPTIONS = {
-    exportBackground: false,
-    viewBackgroundColor: "#ffffff",
-  };
 
   it("with default arguments", async () => {
     const svgElement = await exportUtils.exportToSvg({
@@ -127,7 +128,6 @@ describe("exportToSvg", () => {
         elements: ELEMENTS,
         appState: {
           ...DEFAULT_OPTIONS,
-          exportPadding: 0,
         },
         files: null,
       },
@@ -149,7 +149,6 @@ describe("exportToSvg", () => {
         elements: ELEMENTS,
         appState: {
           ...DEFAULT_OPTIONS,
-          exportPadding: 0,
           exportScale: SCALE,
         },
         files: null,
@@ -226,7 +225,7 @@ describe("exporting frames", () => {
         }),
       ];
 
-      const canvas = await exportToCanvas({
+      const canvas = await exportUtils.exportToCanvas({
         data: {
           elements,
           files: null,
@@ -259,7 +258,7 @@ describe("exporting frames", () => {
         }),
       ];
 
-      const canvas = await exportToCanvas({
+      const canvas = await exportUtils.exportToCanvas({
         data: {
           elements,
           files: null,
@@ -302,8 +301,12 @@ describe("exporting frames", () => {
         y: 0,
       });
 
-      const svg = await exportToSvg({
-        data: { elements: [rectOverlapping, frame, frameChild], files: null },
+      const svg = await exportUtils.exportToSvg({
+        data: {
+          elements: [rectOverlapping, frame, frameChild],
+          files: null,
+          appState: DEFAULT_OPTIONS,
+        },
         config: {
           padding: 0,
           exportingFrame: frame,
@@ -347,8 +350,12 @@ describe("exporting frames", () => {
         y: 0,
       });
 
-      const svg = await exportToSvg({
-        data: { elements: [frameChild, frame, elementOutside], files: null },
+      const svg = await exportUtils.exportToSvg({
+        data: {
+          elements: [frameChild, frame, elementOutside],
+          files: null,
+          appState: DEFAULT_OPTIONS,
+        },
         config: {
           padding: 0,
           exportingFrame: frame,
@@ -416,8 +423,12 @@ describe("exporting frames", () => {
         true,
       );
 
-      const svg = await exportToSvg({
-        data: { elements: exportedElements, files: null },
+      const svg = await exportUtils.exportToSvg({
+        data: {
+          elements: exportedElements,
+          files: null,
+          appState: DEFAULT_OPTIONS,
+        },
         config: {
           padding: 0,
           exportingFrame,
@@ -462,10 +473,11 @@ describe("exporting frames", () => {
         false,
       );
 
-      const svg = await exportToSvg({
+      const svg = await exportUtils.exportToSvg({
         data: {
           elements: exportedElements,
           files: null,
+          appState: DEFAULT_OPTIONS,
         },
         config: {
           padding: 0,
@@ -525,10 +537,11 @@ describe("exporting frames", () => {
         true,
       );
 
-      const svg = await exportToSvg({
+      const svg = await exportUtils.exportToSvg({
         data: {
           elements: exportedElements,
           files: null,
+          appState: DEFAULT_OPTIONS,
         },
         config: {
           padding: 0,
@@ -546,6 +559,50 @@ describe("exporting frames", () => {
 
       expect(svg.getAttribute("width")).toBe(frame1.width.toString());
       expect(svg.getAttribute("height")).toBe(frame1.height.toString());
+    });
+  });
+});
+
+describe("exportToBlob", async () => {
+  describe("mime type", () => {
+    it("should change image/jpg to image/jpeg", async () => {
+      const blob = await exportUtils.exportToBlob({
+        data: {
+          ...diagramFactory(),
+
+          appState: {
+            exportBackground: true,
+          },
+        },
+        config: {
+          getDimensions: (width, height) => ({ width, height, scale: 1 }),
+          // testing typo in MIME type (jpg → jpeg)
+          mimeType: "image/jpg",
+        },
+      });
+      expect(blob?.type).toBe(exportUtils.MIME_TYPES.jpg);
+    });
+    it("should default to image/png", async () => {
+      const blob = await exportUtils.exportToBlob({
+        data: diagramFactory(),
+      });
+      expect(blob?.type).toBe(exportUtils.MIME_TYPES.png);
+    });
+
+    it("should warn when using quality with image/png", async () => {
+      const consoleSpy = vi
+        .spyOn(console, "warn")
+        .mockImplementationOnce(() => void 0);
+      await exportUtils.exportToBlob({
+        data: diagramFactory(),
+        config: {
+          mimeType: exportUtils.MIME_TYPES.png,
+          quality: 1,
+        },
+      });
+      expect(consoleSpy).toHaveBeenCalledWith(
+        `"quality" will be ignored for "${exportUtils.MIME_TYPES.png}" mimeType`,
+      );
     });
   });
 });

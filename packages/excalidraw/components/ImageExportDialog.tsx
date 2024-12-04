@@ -23,7 +23,6 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import type { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../../utils/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -36,6 +35,7 @@ import { FilledButton } from "./FilledButton";
 import { cloneJSON } from "../utils";
 import { prepareElementsForExport } from "../data";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
+import { exportToCanvas } from "../scene/export";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;

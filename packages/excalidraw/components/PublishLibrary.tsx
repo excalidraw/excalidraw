@@ -7,7 +7,6 @@ import { t } from "../i18n";
 import Trans from "./Trans";
 
 import type { LibraryItems, LibraryItem, UIAppState } from "../types";
-import { exportToCanvas, exportToSvg } from "../../utils/export";
 import {
   COLOR_WHITE,
   EDITOR_LS_KEYS,
@@ -25,6 +24,7 @@ import { ToolButton } from "./ToolButton";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 
 import "./PublishLibrary.scss";
+import { exportToCanvas, exportToSvg } from "../scene/export";
 
 interface PublishLibraryDataParams {
   authorName: string;

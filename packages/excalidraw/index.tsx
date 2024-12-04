@@ -225,12 +225,6 @@ export {
 
 export { reconcileElements } from "./data/reconcile";
 
-export {
-  exportToBlob,
-  exportToSvg,
-  exportToClipboard,
-} from "../utils/export";
-
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
   loadFromBlob,
@@ -273,7 +267,12 @@ export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
 
-export { exportToCanvas } from "./scene/export";
+export {
+  exportToCanvas,
+  exportToBlob,
+  exportToClipboard,
+  exportToSvg,
+} from "./scene/export";
 
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
