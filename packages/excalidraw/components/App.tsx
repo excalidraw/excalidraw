@@ -3221,12 +3221,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const newElements = duplicateElements(
       elements.map((element) => {
-        const newElement = newElementWith(element, {
+        return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
         });
-
-        return newElement;
       }),
       {
         randomizeSeed: !opts.retainSeed,
@@ -7919,7 +7917,6 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor,
           this.scene,
         );
-
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
@@ -8749,7 +8746,6 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElements(),
             );
           }
-
           this.setState({ suggestedBindings: [], startBoundElement: null });
           if (!activeTool.locked) {
             resetCursor(this.interactiveCanvas);

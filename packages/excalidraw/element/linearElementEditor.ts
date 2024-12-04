@@ -1291,7 +1291,7 @@ export class LinearElementEditor {
 
     if (selectedOriginPoint) {
       offsetX =
-        selectedOriginPoint.point[0] + points[selectedOriginPoint.index][0]; // points[selectedOriginPoint.index] = points[0]
+        selectedOriginPoint.point[0] + points[selectedOriginPoint.index][0];
       offsetY =
         selectedOriginPoint.point[1] + points[selectedOriginPoint.index][1];
     }
@@ -1310,7 +1310,6 @@ export class LinearElementEditor {
 
         return pointFrom(p[0] + deltaX - offsetX, p[1] + deltaY - offsetY);
       }
-
       return offsetX || offsetY ? pointFrom(p[0] - offsetX, p[1] - offsetY) : p;
     });
 

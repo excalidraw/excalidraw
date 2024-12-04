@@ -2203,6 +2203,7 @@ export const getGlobalFixedPointForBindableElement = (
   element: ExcalidrawBindableElement,
 ): GlobalPoint => {
   const [fixedX, fixedY] = normalizeFixedPoint(fixedPointRatio);
+
   return pointRotateRads(
     pointFrom(
       element.x + element.width * fixedX,
