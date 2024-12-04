@@ -4,6 +4,7 @@ import {
   pointScaleFromOrigin,
   pointsEqual,
   pointTranslate,
+  PRECISION,
   vector,
   vectorCross,
   vectorFromPoint,
@@ -312,6 +313,7 @@ export const updateElbowArrowPoints = (
     ),
   ).flat();
 
+  let segmentArrayPointer = 1;
   nextFixedSegments.forEach((_, idx) => {
     nextFixedSegments[idx].start = pointFrom<LocalPoint>(
       arrow.x + nextFixedSegments[idx].start[0] - simplifiedPoints[0][0],
@@ -321,6 +323,7 @@ export const updateElbowArrowPoints = (
       arrow.x + nextFixedSegments[idx].end[0] - simplifiedPoints[0][0],
       arrow.y + nextFixedSegments[idx].end[1] - simplifiedPoints[0][1],
     );
+
     const isHorizontal = headingIsHorizontal(
       vectorToHeading(
         vectorFromPoint(
@@ -329,50 +332,58 @@ export const updateElbowArrowPoints = (
         ),
       ),
     );
+    const x = simplifiedPoints[0][0];
+    const y = simplifiedPoints[0][1];
 
-    const similarIndices = simplifiedPoints
-      .map((p, i) => {
-        if (i > 0) {
-          const q = simplifiedPoints[i - 1];
+    const similarIdx =
+      1 +
+      (simplifiedPoints
+        .slice(segmentArrayPointer)
+        .map((p, i) => {
+          const q = simplifiedPoints[i + 1];
 
           if (
-            (isHorizontal &&
-              p[1] === simplifiedPoints[0][1] + nextFixedSegments[idx].end[1] &&
-              q[1] ===
-                simplifiedPoints[0][1] + nextFixedSegments[idx].start[1]) ||
-            (!isHorizontal &&
-              p[0] === simplifiedPoints[0][0] + nextFixedSegments[idx].end[0] &&
-              q[0] === simplifiedPoints[0][0] + nextFixedSegments[idx].start[0])
+            isHorizontal
+              ? Math.abs(p[1] - y - nextFixedSegments[idx].start[1]) < 0.1 &&
+                Math.abs(q[1] - y - nextFixedSegments[idx].end[1]) < 0.1
+              : Math.abs(p[0] - x - nextFixedSegments[idx].start[0]) < 0.1 &&
+                Math.abs(q[0] - x - nextFixedSegments[idx].end[0]) < 0.1
           ) {
+            segmentArrayPointer = i + 1;
             return i;
           }
-        }
 
-        return null;
-      })
-      .filter((i) => i != null) as number[];
+          return null;
+        })
+        .filter((i) => i != null)[0] ?? -1);
 
-    if (similarIndices.length > 0) {
-      const i = similarIndices[0];
-      nextFixedSegments[idx] = {
-        start: pointFrom<LocalPoint>(
-          isHorizontal
-            ? simplifiedPoints[i - 1][0] - simplifiedPoints[0][0]
-            : nextFixedSegments[idx].start[0],
-          !isHorizontal
-            ? simplifiedPoints[i - 1][1] - simplifiedPoints[0][1]
-            : nextFixedSegments[idx].start[1],
-        ),
-        end: pointFrom<LocalPoint>(
-          isHorizontal
-            ? simplifiedPoints[i][0] - simplifiedPoints[0][0]
-            : nextFixedSegments[idx].end[0],
-          !isHorizontal
-            ? simplifiedPoints[i][1] - simplifiedPoints[0][1]
-            : nextFixedSegments[idx].end[1],
-        ),
-      };
+    if (similarIdx != null) {
+      nextFixedSegments[idx].start = pointFrom<LocalPoint>(
+        simplifiedPoints[similarIdx][0] - x,
+        simplifiedPoints[similarIdx][1] - y,
+      );
+      nextFixedSegments[idx].end = pointFrom<LocalPoint>(
+        simplifiedPoints[similarIdx + 1][0] - x,
+        simplifiedPoints[similarIdx + 1][1] - y,
+      );
+    } else {
+      console.warn("Could not find similar point which shouldn't happen");
     }
+
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        x + nextFixedSegments[idx].start[0],
+        y + nextFixedSegments[idx].start[1],
+      ),
+      { color: "green", permanent: false },
+    );
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        x + nextFixedSegments[idx].end[0],
+        y + nextFixedSegments[idx].end[1],
+      ),
+      { color: "red", permanent: false },
+    );
   });
 
   return normalizeArrowElementUpdate(simplifiedPoints, nextFixedSegments);
