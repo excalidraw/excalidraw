@@ -280,29 +280,47 @@ export class LinearElementEditor {
         element.points.length > 1
       ) {
         let selectedIndex = selectedPointsIndices[0];
-        
+
         // For elbow arrows with shift pressed
         if (isElbowArrow(element)) {
-          const deltaX = scenePointerX - (element.x + element.points[selectedIndex === 0 ? 1 : selectedIndex - 1][0]);
-          const deltaY = scenePointerY - (element.y + element.points[selectedIndex === 0 ? 1 : selectedIndex - 1][1]);
-          
+          const deltaX =
+            scenePointerX -
+            (element.x +
+              element.points[selectedIndex === 0 ? 1 : selectedIndex - 1][0]);
+          const deltaY =
+            scenePointerY -
+            (element.y +
+              element.points[selectedIndex === 0 ? 1 : selectedIndex - 1][1]);
+
           // Calculate angle in degrees (0-360)
-          const angle = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 360) % 360;
+          const angle =
+            ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 360) % 360;
           const snapAngle = Math.round(angle / 15) * 15;
           // Only remove midpoints for cardinal angles
           if ([0, 90, 180, 270, 360].includes(snapAngle)) {
             const newPoints = [
               element.points[0],
-              element.points[element.points.length - 1]
+              element.points[element.points.length - 1],
             ];
-            mutateElement(element, { points: newPoints });
-            if(selectedIndex > 0){
+            mutateElbowArrow(
+              element,
+              elementsMap,
+              newPoints,
+              vector(0, 0),
+              {
+                startBinding: element.startBinding,
+                endBinding: element.endBinding,
+              },
+              { isDragging: true },
+            );
+            if (selectedIndex > 0) {
               selectedIndex = 1;
             }
           }
         }
 
-        const referencePoint = element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
+        const referencePoint =
+          element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
         
         const [width, height] = LinearElementEditor._getShiftLockedDelta(
           element,
@@ -326,8 +344,6 @@ export class LinearElementEditor {
           ],
           elementsMap,
         );
-
-        
       } else {
         const newDraggingPointPosition = LinearElementEditor.createPointAt(
           element,
@@ -1552,21 +1568,18 @@ export class LinearElementEditor {
 
       // Calculate angle in degrees (0-360)
       const angle = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 360) % 360;
-      
+
       // Snap to nearest 30 degrees
       const snapAngle = Math.round(angle / 15) * 15;
-      
+
       // Convert back to radians
       const snapAngleRad = (snapAngle * Math.PI) / 180;
-      
+
       // Calculate length of movement
       const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
       // Return movement based on snapped angle
-      return [
-        length * Math.cos(snapAngleRad),
-        length * Math.sin(snapAngleRad)
-      ];
+      return [length * Math.cos(snapAngleRad), length * Math.sin(snapAngleRad)];
     }
 
     const [gridX, gridY] = getGridPoint(
