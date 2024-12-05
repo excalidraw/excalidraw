@@ -79,7 +79,10 @@ import {
 } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../packages/excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "../packages/excalidraw/element/typeChecks";
+import {
+  isInitializedImageElement,
+  isRectangularElement,
+} from "../packages/excalidraw/element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
   LibraryIndexedDBAdapter,
@@ -641,89 +644,87 @@ const ExcalidrawWrapper = () => {
       collabAPI.syncElements(elements);
     }
 
-    {
-      const frame = elements.find(
-        (el) => el.strokeStyle === "dashed" && !el.isDeleted,
-      );
+    const nonDeletedElements = getNonDeletedElements(elements);
 
-      exportToCanvas({
-        data: {
-          elements: getNonDeletedElements(elements).filter(
-            (x) => x.id !== frame?.id,
-          ),
-          // .concat(
-          //   restoreElements(
-          //     [
-          //       // @ts-ignore
-          //       {
-          //         type: "rectangle",
-          //         width: appState.width / zoom,
-          //         height: appState.height / zoom,
-          //         x: -appState.scrollX,
-          //         y: -appState.scrollY,
-          //         fillStyle: "solid",
-          //         strokeColor: "transparent",
-          //         backgroundColor: "rgba(0,0,0,0.05)",
-          //         roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS, value: 40 },
-          //       },
-          //     ],
-          //     null,
-          //   ),
-          // ),
-          appState,
-          files,
-        },
-        config: {
-          //   // light yellow
-          //   // canvasBackgroundColor: "#fff9c4",
-          //   // width,
-          //   // maxWidthOrHeight: 120,
-          //   // scale: 0.01,
-          //   // scale: 2,
-          //   // origin: "content",
-          //   // scale: 2,
-          //   // x: 0,
-          //   // y: 0,
-          //   padding: 20,
+    const frame = nonDeletedElements.find(
+      (el) => el.strokeStyle === "dashed" && el.type === "rectangle",
+    );
 
-          // ...config,
+    exportToCanvas({
+      data: {
+        elements: nonDeletedElements.filter((x) => x.id !== frame?.id),
+        // .concat(
+        //   restoreElements(
+        //     [
+        //       // @ts-ignore
+        //       {
+        //         type: "rectangle",
+        //         width: appState.width / zoom,
+        //         height: appState.height / zoom,
+        //         x: -appState.scrollX,
+        //         y: -appState.scrollY,
+        //         fillStyle: "solid",
+        //         strokeColor: "transparent",
+        //         backgroundColor: "rgba(0,0,0,0.05)",
+        //         roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS, value: 40 },
+        //       },
+        //     ],
+        //     null,
+        //   ),
+        // ),
+        appState,
+        files,
+      },
+      config: {
+        //   // light yellow
+        //   // canvasBackgroundColor: "#fff9c4",
+        //   // width,
+        //   // maxWidthOrHeight: 120,
+        //   // scale: 0.01,
+        //   // scale: 2,
+        //   // origin: "content",
+        //   // scale: 2,
+        //   // x: 0,
+        //   // y: 0,
+        //   padding: 20,
 
-          // width: config.width,
-          // height: config.height,
-          // maxWidthOrHeight: config.maxWidthOrHeight,
-          // widthOrHeight: config.widthOrHeight,
-          // padding: config.padding,
-          ...(frame
-            ? {
-                ...config,
-                width: frame.width,
-                height: frame.height,
-                x: frame.x,
-                y: frame.y,
-              }
-            : config),
-          //   // height: 140,
-          //   // x: -appState.scrollX,
-          //   // y: -appState.scrollY,
-          //   // height: 150,
-          //   // height: appState.height,
-          //   // scale,
-          //   // zoom: { value: appState.zoom.value },
-          //   // getDimensions(width,height) {
-          //   //   setCanvasSize({ width, height })
-          //   //   return {width: 300, height: 150}
-          //   // }
-        },
-      }).then((canvas) => {
-        if (canvasPreviewContainerRef.current) {
-          canvasPreviewContainerRef.current.replaceChildren(canvas);
-          document.querySelector(
-            ".dims",
-          )!.innerHTML = `${canvas.width}x${canvas.height}`;
-          // canvas.style.width = "100%";
-        }
-      });
-    }
+        // ...config,
+
+        // width: config.width,
+        // height: config.height,
+        // maxWidthOrHeight: config.maxWidthOrHeight,
+        // widthOrHeight: config.widthOrHeight,
+        // padding: config.padding,
+        ...(frame
+          ? {
+              ...config,
+              width: frame.width,
+              height: frame.height,
+              x: frame.x,
+              y: frame.y,
+            }
+          : config),
+        //   // height: 140,
+        //   // x: -appState.scrollX,
+        //   // y: -appState.scrollY,
+        //   // height: 150,
+        //   // height: appState.height,
+        //   // scale,
+        //   // zoom: { value: appState.zoom.value },
+        //   // getDimensions(width,height) {
+        //   //   setCanvasSize({ width, height })
+        //   //   return {width: 300, height: 150}
+        //   // }
+      },
+    }).then((canvas) => {
+      if (canvasPreviewContainerRef.current) {
+        canvasPreviewContainerRef.current.replaceChildren(canvas);
+        document.querySelector(
+          ".dims",
+        )!.innerHTML = `${canvas.width}x${canvas.height}`;
+        // canvas.style.width = "100%";
+      }
+    });
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
