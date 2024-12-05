@@ -228,11 +228,28 @@ export default function LibraryMenuItems({
       }
     >
       {!isLibraryEmpty && (
-        <LibraryDropdownMenu
-          selectedItems={selectedItems}
-          onSelectItems={onSelectItems}
-          className="library-menu-dropdown-container--in-heading"
-        />
+        <div
+          style={{
+            display: "flex",
+            boxSizing: "border-box",
+            gap: "8px",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingTop: "8px",
+            width: "100%",
+          }}
+        >
+          <QuickSearch
+            ref={inputRef}
+            placeholder={t("library.searchPlaceholder")}
+            onChange={debounce(setPublishedSearchQuery, 20)}
+          />
+          <LibraryDropdownMenu
+            selectedItems={selectedItems}
+            onSelectItems={onSelectItems}
+            className="library-menu-dropdown-container--in-heading"
+          />
+        </div>
       )}
       <Stack.Col
         className="library-menu-items-container__items"
@@ -308,27 +325,17 @@ export default function LibraryMenuItems({
             </div>
           )}
           {publishedItems.length > 0 ? (
-            <>
-              <div style={{ width: "100%" }}>
-                <QuickSearch
-                  className="w-[400px]"
-                  ref={inputRef}
-                  placeholder={t("library.searchPlaceholder")}
-                  onChange={debounce(setPublishedSearchQuery, 20)}
-                />
-              </div>
-              <LibraryMenuSectionGrid>
-                <LibraryMenuSection
-                  itemsRenderedPerBatch={itemsRenderedPerBatch}
-                  items={filteredPublishedItems}
-                  onItemSelectToggle={onItemSelectToggle}
-                  onItemDrag={onItemDrag}
-                  onClick={onItemClick}
-                  isItemSelected={isItemSelected}
-                  svgCache={svgCache}
-                />
-              </LibraryMenuSectionGrid>
-            </>
+            <LibraryMenuSectionGrid>
+              <LibraryMenuSection
+                itemsRenderedPerBatch={itemsRenderedPerBatch}
+                items={filteredPublishedItems}
+                onItemSelectToggle={onItemSelectToggle}
+                onItemDrag={onItemDrag}
+                onClick={onItemClick}
+                isItemSelected={isItemSelected}
+                svgCache={svgCache}
+              />
+            </LibraryMenuSectionGrid>
           ) : unpublishedItems.length > 0 ? (
             <div
               style={{
