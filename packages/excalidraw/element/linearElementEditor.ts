@@ -321,7 +321,7 @@ export class LinearElementEditor {
 
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
-
+        
         const [width, height] = LinearElementEditor._getShiftLockedDelta(
           element,
           elementsMap,
