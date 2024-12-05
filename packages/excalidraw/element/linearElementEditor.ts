@@ -1274,7 +1274,6 @@ export class LinearElementEditor {
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
-      elbowArrowSegmentOverride?: boolean;
     },
   ) {
     const { points } = element;
@@ -1845,7 +1844,7 @@ export class LinearElementEditor {
             !isHorizontal ? x - element.x : element.points[index - 1][0],
             isHorizontal ? y - element.y : element.points[index - 1][1],
           ),
-          isDragging: true,
+          isDragging: false,
         },
         {
           index,
@@ -1853,7 +1852,7 @@ export class LinearElementEditor {
             !isHorizontal ? x - element.x : element.points[index][0],
             isHorizontal ? y - element.y : element.points[index][1],
           ),
-          isDragging: true,
+          isDragging: false,
         },
       ]);
       LinearElementEditor.updateEditorMidPointsCache(

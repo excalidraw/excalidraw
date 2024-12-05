@@ -325,6 +325,15 @@ export const updateElbowArrowPoints = (
     ),
   ).flat();
 
+  // The goal is to update next fixed segments to match the new arrow points.
+  // The solution here is to search for the exact x or y coordinates within the
+  // new points resspective to horizontal/vertical fixed segment, then mark the
+  // last position in the new points array where we left off. This is useful
+  // for optimization, but more importantly if two segments happen to line up
+  // then the second segment will be corrupted otherise, getting the same start
+  // and endpoints as the first segment. Ex.: In a 1. horizontal, 2. vertical,
+  // 3. horizontal, 4. vertical, 5. horizontal setup 1. and 5. can potentially
+  // line up perfectly.
   let segmentArrayPointer = 1;
   nextFixedSegments.forEach((_, idx) => {
     nextFixedSegments[idx].start = pointFrom<LocalPoint>(
@@ -538,32 +547,8 @@ const getElbowArrowData = (
   const dynamicAABBs =
     options?.startMidPointHeading || options?.endMidPointHeading
       ? generateSegmentedDynamicAABBs(
-          padAABB(
-            startElementBounds,
-            pointsEqual(origStartGlobalPoint, startGlobalPoint)
-              ? [0, 0, 0, 0]
-              : offsetFromHeading(
-                  startHeading,
-                  BASE_PADDING -
-                    (arrow.startArrowhead
-                      ? FIXED_BINDING_DISTANCE * 6
-                      : FIXED_BINDING_DISTANCE * 2),
-                  BASE_PADDING,
-                ),
-          ),
-          padAABB(
-            endElementBounds,
-            options?.startMidPointHeading && options?.endMidPointHeading
-              ? [0, 0, 0, 0]
-              : offsetFromHeading(
-                  endHeading,
-                  BASE_PADDING -
-                    (arrow.endArrowhead
-                      ? FIXED_BINDING_DISTANCE * 6
-                      : FIXED_BINDING_DISTANCE * 2),
-                  BASE_PADDING,
-                ),
-          ),
+          boundsOverlap ? startPointBounds : startElementBounds,
+          boundsOverlap ? endPointBounds : endElementBounds,
           options?.startMidPointHeading,
           options?.endMidPointHeading,
           startGlobalPoint,
@@ -609,7 +594,13 @@ const getElbowArrowData = (
           hoveredStartElement && aabbForElement(hoveredStartElement),
           hoveredEndElement && aabbForElement(hoveredEndElement),
         );
-
+  // options?.startMidPointHeading &&
+  //   dynamicAABBs.forEach((aabb, idx) => {
+  //     if (idx === 0) {
+  //       debugDrawPoint(pointFrom<GlobalPoint>(aabb[2], aabb[3]));
+  //     }
+  //     debugDrawBounds(aabb, { color: idx > 0 ? "red" : "green" });
+  //   });
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -876,14 +867,6 @@ const pathTo = (start: Node, node: Node) => {
 
 const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
-
-const padAABB = (bounds: Bounds, offset: [number, number, number, number]) =>
-  [
-    bounds[0] - offset[3],
-    bounds[1] - offset[0],
-    bounds[2] + offset[1],
-    bounds[3] + offset[2],
-  ] as Bounds;
 
 const generateSegmentedDynamicAABBs = (
   a: Bounds,
