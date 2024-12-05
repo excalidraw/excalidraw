@@ -351,6 +351,11 @@ export default function LibraryMenuItems({
               {t("library.noItems")}
             </div>
           ) : null}
+          {filteredPublishedItems.length === 0 &&
+            inputRef &&
+            publishedSearchQuery.length && (
+              <div style={{ margin: "1rem auto" }}>{t("search.noMatch")}</div>
+            )}
         </>
 
         {showBtn && (
