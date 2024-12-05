@@ -298,20 +298,44 @@ export class LinearElementEditor {
           const snapAngle = Math.round(angle / 15) * 15;
           // Only remove midpoints for cardinal angles
           if ([0, 90, 180, 270, 360].includes(snapAngle)) {
-            const newPoints = [
-              element.points[0],
-              element.points[element.points.length - 1],
-            ];
+            const { x: rx, y: ry } = element;
+            const [gridX, gridY] = getGridPoint(
+              scenePointerX,
+              scenePointerY,
+              null,
+            );
+
+            const [lastCommittedX, lastCommittedY] =
+              element.lastCommittedPoint ?? [0, 0];
+
+            let dxFromLastCommitted = gridX - rx - lastCommittedX;
+            let dyFromLastCommitted = gridY - ry - lastCommittedY;
+
+            ({ width: dxFromLastCommitted, height: dyFromLastCommitted } =
+              getLockedLinearCursorAlignSize(
+                // actual coordinate of the last committed point
+                lastCommittedX + rx,
+                lastCommittedY + ry,
+                // cursor-grid coordinate
+                gridX,
+                gridY,
+              ));
             mutateElbowArrow(
               element,
               elementsMap,
-              newPoints,
-              vector(0, 0),
+              [
+                ...element.points.slice(0, -1),
+                pointFrom<LocalPoint>(
+                  lastCommittedX + dxFromLastCommitted,
+                  lastCommittedY + dyFromLastCommitted,
+                ),
+              ],
+              undefined,
+              undefined,
               {
-                startBinding: element.startBinding,
-                endBinding: element.endBinding,
+                isDragging: true,
+                informMutation: false,
               },
-              { isDragging: true },
             );
             if (selectedIndex > 0) {
               selectedIndex = 1;
@@ -321,7 +345,7 @@ export class LinearElementEditor {
 
         const referencePoint =
           element.points[selectedIndex === 0 ? 1 : selectedIndex - 1];
-        
+
         const [width, height] = LinearElementEditor._getShiftLockedDelta(
           element,
           elementsMap,
