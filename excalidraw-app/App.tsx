@@ -681,7 +681,6 @@ const ExcalidrawWrapper = () => {
           //   // scale: 0.01,
           //   // scale: 2,
           //   // origin: "content",
-          //   // fit: "cover",
           //   // scale: 2,
           //   // x: 0,
           //   // y: 0,
@@ -1270,7 +1269,6 @@ const ExcalidrawWrapper = () => {
               >
                 <option value="none">none</option>
                 <option value="contain">contain</option>
-                <option value="cover">cover</option>
               </select>
             </label>
             <label>

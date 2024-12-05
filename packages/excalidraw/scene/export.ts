@@ -197,8 +197,6 @@ export type ExportToCanvasConfig = {
    * order to maintain the aspect ratio. It is recommended to set `position`
    * to `center` when using `fit=contain`.
    *
-   * When `fit` is set to `cover`, padding is disabled (set to 0).
-   *
    * When `fit` is set to `none` and either `width` or `height` or
    * `maxWidthOrHeight` is set, padding is simply adding to the bounding box
    * and the content may overflow the canvas, thus right or bottom padding
@@ -279,8 +277,6 @@ export type ExportToCanvasConfig = {
    *
    * - `none`    - no scaling.
    * - `contain` - scale to fit the frame. Includes `padding`.
-   * - `cover`   - scale to fill the frame while maintaining aspect ratio. If
-   *               content overflows, it will be cropped.
    *
    * If `maxWidthOrHeight` or `widthOrHeight` is set, `fit` is ignored.
    *
@@ -288,7 +284,7 @@ export type ExportToCanvasConfig = {
    * `widthOrHeight` is specified in which case `none` is the default (can be
    * changed). If `x` or `y` are specified, `none` is forced.
    */
-  fit?: "none" | "contain" | "cover";
+  fit?: "none" | "contain";
   /**
    * When either `x` or `y` are not specified, indicates how the canvas should
    * be aligned on the respective axis.
@@ -397,13 +393,6 @@ export const exportToCanvas = async ({
 
   if (cfg.x != null || cfg.x != null) {
     cfg.fit = "none";
-  }
-
-  if (cfg.fit === "cover") {
-    if (cfg.padding && !import.meta.env.PROD) {
-      console.warn("`padding` is ignored when `fit` is set to `cover`");
-    }
-    cfg.padding = 0;
   }
 
   cfg.padding = cfg.padding ?? 0;
@@ -536,12 +525,6 @@ export const exportToCanvas = async ({
       const hRatio = (height - cfg.padding * 2) / height;
       canvasScale = Math.min(wRatio, hRatio);
     }
-  } else if (cfg.fit === "cover") {
-    const wRatio = width / origWidth;
-    const hRatio = height / origHeight;
-    // scale the orig canvas to fill the the target frame
-    // (opposite of "contain")
-    canvasScale = Math.max(wRatio, hRatio);
   }
 
   x = cfg.x ?? origX;
