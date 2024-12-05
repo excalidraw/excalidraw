@@ -126,7 +126,7 @@ const generatePoints = memo(
  *
  */
 export const updateElbowArrowPoints = (
-  arrow: ExcalidrawElbowArrowElement,
+  arrow: Readonly<ExcalidrawElbowArrowElement>,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   updates: {
     points: readonly LocalPoint[];
@@ -141,11 +141,25 @@ export const updateElbowArrowPoints = (
   }
 
   invariant(
-    arrow.points.length === updates.points.length,
-    "Updated point array length must match the arrow point length (i.e. you can't add new points manually to elbow arrows)",
+    !updates.points ||
+      arrow.points.length === updates.points.length ||
+      updates.points.length === 2,
+    "Updated point array length must match the arrow point length, contain " +
+      "exactly the new start and end points or not be specified at all (i.e. " +
+      "you can't add new points between start and end manually to elbow arrows)",
   );
 
-  const updatedPoints = Array.from(updates.points); // TODO: Do we need the cloning here?
+  const updatedPoints = updates.points
+    ? updates.points.length === 2
+      ? arrow.points.map((p, idx) =>
+          idx === 0
+            ? updates.points[0]
+            : idx === arrow.points.length - 1
+            ? updates.points[1]
+            : p,
+        )
+      : Array.from(updates.points)
+    : Array.from(arrow.points);
   const renormalizedUpdatedPoints = updatedPoints.map((point, idx) => {
     if (idx === 0) {
       return point;
