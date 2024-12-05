@@ -47,21 +47,22 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     updates = {
       ...updates,
       angle: 0 as Radians,
-      ...updateElbowArrowPoints(
-        {
-          ...element,
-          x: updates.x || element.x,
-          y: updates.y || element.y,
-        },
-        mergedElementsMap,
-        {
-          fixedSegments: fixedSegments || element.fixedSegments,
-          points: points || element.points,
-        },
-        {
-          isDragging,
-        },
-      ),
+      ...(points &&
+        updateElbowArrowPoints(
+          {
+            ...element,
+            x: updates.x || element.x,
+            y: updates.y || element.y,
+          },
+          mergedElementsMap,
+          {
+            fixedSegments,
+            points,
+          },
+          {
+            isDragging,
+          },
+        )),
     };
   }
 

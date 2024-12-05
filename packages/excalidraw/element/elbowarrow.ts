@@ -130,7 +130,7 @@ export const updateElbowArrowPoints = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   updates: {
     points: readonly LocalPoint[];
-    fixedSegments?: FixedSegment[];
+    fixedSegments?: FixedSegment[] | null;
   },
   options?: {
     isDragging?: boolean;
