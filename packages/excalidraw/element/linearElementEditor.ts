@@ -288,7 +288,7 @@ export class LinearElementEditor {
           
           // Calculate angle in degrees (0-360)
           const angle = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 360) % 360;
-          const snapAngle = Math.round(angle / 22.5) * 22.5;
+          const snapAngle = Math.round(angle / 15) * 15;
           // Only remove midpoints for cardinal angles
           if ([0, 90, 180, 270, 360].includes(snapAngle)) {
             const newPoints = [
