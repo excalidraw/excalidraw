@@ -303,6 +303,7 @@ import {
 import type { ContextMenuItems } from "./ContextMenu";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import LayerUI from "./LayerUI";
+import type { ToastType } from "./Toast";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
@@ -1695,6 +1696,8 @@ class App extends React.Component<AppProps, AppState> {
                             onClose={() => this.setToast(null)}
                             duration={this.state.toast.duration}
                             closable={this.state.toast.closable}
+                            style={this.state.toast.style}
+                            type={this.state.toast.type}
                           />
                         )}
                         {this.state.contextMenu && (
@@ -3815,6 +3818,8 @@ class App extends React.Component<AppProps, AppState> {
       message: string;
       closable?: boolean;
       duration?: number;
+      style?: React.CSSProperties;
+      type?: ToastType;
     } | null,
   ) => {
     this.setState({ toast });

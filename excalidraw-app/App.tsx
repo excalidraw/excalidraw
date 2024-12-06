@@ -374,6 +374,7 @@ const ExcalidrawWrapper = () => {
           message: t("alerts.localStorageOverflow"),
           closable: true,
           duration: Infinity,
+          type: "danger",
         });
       }
     }
