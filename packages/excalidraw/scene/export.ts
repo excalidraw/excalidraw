@@ -14,7 +14,6 @@ import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
 import type { AppState, BinaryFiles } from "../types";
 import {
   COLOR_WHITE,
-  DEFAULT_EXPORT_PADDING,
   DEFAULT_ZOOM_VALUE,
   FRAME_STYLE,
   FONT_FAMILY,
@@ -22,6 +21,7 @@ import {
   THEME,
   THEME_FILTER,
   MIME_TYPES,
+  DEFAULT_SMALLEST_EXPORT_SIZE,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -335,11 +335,7 @@ export type ExportToCanvasConfig = {
   loadFonts?: () => Promise<void>;
 };
 
-/**
- * This API is usually used as a precursor to searializing to Blob or PNG,
- * but can also be used to create a canvas for other purposes.
- */
-export const exportToCanvas = async ({
+const configExportDimension = async ({
   data,
   config,
 }: {
@@ -349,7 +345,6 @@ export const exportToCanvas = async ({
   // clone
   const cfg = Object.assign({}, config);
 
-  const { files } = data;
   const { exportingFrame } = cfg;
 
   const elements = data.elements;
@@ -432,7 +427,7 @@ export const exportToCanvas = async ({
   // make the canvas fit into the frame (e.g. for `cfg.fit` set to `contain`).
   // If `cfg.scale` is set, we multiply the resulting canvasScale by it to
   // scale the output further.
-  let canvasScale = 1;
+  let exportScale = 1;
 
   const origCanvasSize = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
@@ -445,6 +440,45 @@ export const exportToCanvas = async ({
   const [origX, origY, origWidth, origHeight] = origCanvasSize;
   // variables for target bounding box
   let [x, y, width, height] = origCanvasSize;
+
+  if (cfg.fit === "contain") {
+    if (cfg.width != null) {
+      cfg.padding = Math.min(
+        cfg.padding,
+        (cfg.width - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+      );
+    }
+
+    if (cfg.height != null) {
+      cfg.padding = Math.min(
+        cfg.padding,
+        (cfg.height - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+      );
+    }
+
+    if (cfg.getDimensions != null) {
+      const ret = cfg.getDimensions(width, height);
+
+      width = ret.width;
+      height = ret.height;
+
+      cfg.padding = Math.min(
+        cfg.padding,
+        (width - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+        (height - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+      );
+    } else if (cfg.widthOrHeight != null) {
+      cfg.padding = Math.min(
+        cfg.padding,
+        (cfg.widthOrHeight - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+      );
+    } else if (cfg.maxWidthOrHeight != null) {
+      cfg.padding = Math.min(
+        cfg.padding,
+        (cfg.maxWidthOrHeight - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+      );
+    }
+  }
 
   if (cfg.width != null) {
     width = cfg.width;
@@ -475,7 +509,7 @@ export const exportToCanvas = async ({
   }
 
   if (cfg.maxWidthOrHeight != null || cfg.widthOrHeight != null) {
-    if (containPadding && cfg.padding) {
+    if (cfg.padding) {
       if (cfg.maxWidthOrHeight != null) {
         cfg.maxWidthOrHeight -= cfg.padding * 2;
       } else if (cfg.widthOrHeight != null) {
@@ -487,13 +521,13 @@ export const exportToCanvas = async ({
     if (cfg.widthOrHeight != null) {
       // calculate by how much do we need to scale the canvas to fit into the
       // target dimension (e.g. target: max 50px, actual: 70x100px => scale: 0.5)
-      canvasScale = cfg.widthOrHeight / max;
+      exportScale = cfg.widthOrHeight / max;
     } else if (cfg.maxWidthOrHeight != null) {
-      canvasScale = cfg.maxWidthOrHeight < max ? cfg.maxWidthOrHeight / max : 1;
+      exportScale = cfg.maxWidthOrHeight < max ? cfg.maxWidthOrHeight / max : 1;
     }
 
-    width *= canvasScale;
-    height *= canvasScale;
+    width *= exportScale;
+    height *= exportScale;
   } else if (cfg.getDimensions) {
     const ret = cfg.getDimensions(width, height);
 
@@ -519,11 +553,11 @@ export const exportToCanvas = async ({
       const wRatio = width / origWidth;
       const hRatio = height / origHeight;
       // scale the orig canvas to fit in the target frame
-      canvasScale = Math.min(wRatio, hRatio);
+      exportScale = Math.min(wRatio, hRatio);
     } else {
       const wRatio = (width - cfg.padding * 2) / width;
       const hRatio = (height - cfg.padding * 2) / height;
-      canvasScale = Math.min(wRatio, hRatio);
+      exportScale = Math.min(wRatio, hRatio);
     }
   }
 
@@ -546,38 +580,83 @@ export const exportToCanvas = async ({
   // aspect ratio dimensions.
   if (cfg.position === "center") {
     x -=
-      width / canvasScale / 2 -
+      width / exportScale / 2 -
       (cfg.x == null ? origWidth : width + cfg.padding * 2) / 2;
     y -=
-      height / canvasScale / 2 -
+      height / exportScale / 2 -
       (cfg.y == null ? origHeight : height + cfg.padding * 2) / 2;
   }
+
+  // rescale padding based on current canvasScale factor so that the resulting
+  // padding is kept the same as supplied by user (with the exception of
+  // `cfg.scale` being set, which also scales the padding)
+  const normalizedPadding = cfg.padding / exportScale;
+
+  // scale the whole frame by cfg.scale (on top of whatever canvasScale we
+  // calculated above)
+  exportScale *= cfg.scale;
+
+  width *= cfg.scale;
+  height *= cfg.scale;
+
+  const exportWidth = width + cfg.padding * 2 * cfg.scale;
+  const exportHeight = height + cfg.padding * 2 * cfg.scale;
+
+  return {
+    config: cfg,
+    normalizedPadding,
+    contentWidth: width,
+    contentHeight: height,
+    exportWidth,
+    exportHeight,
+    exportScale,
+    x,
+    y,
+    elementsForRender,
+    appState,
+    frameRendering,
+  };
+};
+
+/**
+ * This API is usually used as a precursor to searializing to Blob or PNG,
+ * but can also be used to create a canvas for other purposes.
+ */
+export const exportToCanvas = async ({
+  data,
+  config,
+}: {
+  data: ExportToCanvasData;
+  config?: ExportToCanvasConfig;
+}) => {
+  const {
+    config: cfg,
+    normalizedPadding,
+    contentWidth: width,
+    contentHeight: height,
+    exportWidth,
+    exportHeight,
+    exportScale,
+    x,
+    y,
+    elementsForRender,
+    appState,
+    frameRendering,
+  } = await configExportDimension({ data, config });
 
   const canvas = cfg.createCanvas
     ? cfg.createCanvas()
     : document.createElement("canvas");
 
-  // rescale padding based on current canvasScale factor so that the resulting
-  // padding is kept the same as supplied by user (with the exception of
-  // `cfg.scale` being set, which also scales the padding)
-  const normalizedPadding = cfg.padding / canvasScale;
-
-  // scale the whole frame by cfg.scale (on top of whatever canvasScale we
-  // calculated above)
-  canvasScale *= cfg.scale;
-
-  width *= cfg.scale;
-  height *= cfg.scale;
-
-  canvas.width = width + cfg.padding * 2 * cfg.scale;
-  canvas.height = height + cfg.padding * 2 * cfg.scale;
+  canvas.width = exportWidth;
+  canvas.height = exportHeight;
 
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),
     fileIds: getInitializedImageElements(elementsForRender).map(
       (element) => element.fileId,
     ),
-    files: files || {},
+    files: data.files || {},
   });
 
   renderStaticScene({
@@ -587,7 +666,7 @@ export const exportToCanvas = async ({
       arrayToMap(elementsForRender),
     ),
     allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
-      arrayToMap(syncInvalidIndices(elements)),
+      arrayToMap(syncInvalidIndices(data.elements)),
     ),
     visibleElements: elementsForRender,
     appState: {
@@ -604,7 +683,7 @@ export const exportToCanvas = async ({
       shouldCacheIgnoreZoom: false,
       theme: cfg.theme || THEME.LIGHT,
     },
-    scale: canvasScale,
+    scale: exportScale,
     renderConfig: {
       canvasBackgroundColor:
         cfg.canvasBackgroundColor === false
