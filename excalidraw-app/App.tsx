@@ -26,6 +26,7 @@ import {
   StoreAction,
   reconcileElements,
   exportToCanvas,
+  exportToSvg,
 } from "../packages/excalidraw";
 import {
   exportToBlob,
@@ -79,10 +80,7 @@ import {
 } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../packages/excalidraw/element/mutateElement";
-import {
-  isInitializedImageElement,
-  isRectangularElement,
-} from "../packages/excalidraw/element/typeChecks";
+import { isInitializedImageElement } from "../packages/excalidraw/element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
   LibraryIndexedDBAdapter,
@@ -136,7 +134,8 @@ import DebugCanvas, {
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import { fileSave } from "../packages/excalidraw/data/filesystem";
-import type { ExportToCanvasConfig } from "../packages/excalidraw/scene/export";
+import { type ExportSceneConfig } from "../packages/excalidraw/scene/export";
+import { round } from "../packages/math";
 
 polyfill();
 
@@ -618,18 +617,13 @@ const ExcalidrawWrapper = () => {
   }, [excalidrawAPI]);
 
   const canvasPreviewContainerRef = useRef<HTMLDivElement>(null);
+  const svgPreviewContainerRef = useRef<HTMLDivElement>(null);
 
-  const [config, setConfig] = useState<ExportToCanvasConfig>(
-    JSON.parse(localStorage.getItem("_exportConfig") || "null") || {
-      width: 300,
-      height: 100,
-      padding: 2,
-      scale: 1,
-      position: "none",
-      fit: "contain",
-      canvasBackgroundColor: "yellow",
-    },
-  );
+  const [config, setConfig] = useState<ExportSceneConfig>({
+    scale: 1,
+    position: "center",
+    fit: "contain",
+  });
 
   useEffect(() => {
     localStorage.setItem("_exportConfig", JSON.stringify(config));
@@ -676,25 +670,6 @@ const ExcalidrawWrapper = () => {
         files,
       },
       config: {
-        //   // light yellow
-        //   // canvasBackgroundColor: "#fff9c4",
-        //   // width,
-        //   // maxWidthOrHeight: 120,
-        //   // scale: 0.01,
-        //   // scale: 2,
-        //   // origin: "content",
-        //   // scale: 2,
-        //   // x: 0,
-        //   // y: 0,
-        //   padding: 20,
-
-        // ...config,
-
-        // width: config.width,
-        // height: config.height,
-        // maxWidthOrHeight: config.maxWidthOrHeight,
-        // widthOrHeight: config.widthOrHeight,
-        // padding: config.padding,
         ...(frame
           ? {
               ...config,
@@ -704,25 +679,40 @@ const ExcalidrawWrapper = () => {
               y: frame.y,
             }
           : config),
-        //   // height: 140,
-        //   // x: -appState.scrollX,
-        //   // y: -appState.scrollY,
-        //   // height: 150,
-        //   // height: appState.height,
-        //   // scale,
-        //   // zoom: { value: appState.zoom.value },
-        //   // getDimensions(width,height) {
-        //   //   setCanvasSize({ width, height })
-        //   //   return {width: 300, height: 150}
-        //   // }
       },
     }).then((canvas) => {
       if (canvasPreviewContainerRef.current) {
         canvasPreviewContainerRef.current.replaceChildren(canvas);
         document.querySelector(
-          ".dims",
-        )!.innerHTML = `${canvas.width}x${canvas.height}`;
-        // canvas.style.width = "100%";
+          ".canvas_dims",
+        )!.innerHTML = `${canvas.width}x${canvas.height} (canvas)`;
+      }
+    });
+
+    exportToSvg({
+      data: {
+        elements: nonDeletedElements.filter((x) => x.id !== frame?.id),
+        appState,
+        files,
+      },
+      config: {
+        ...(frame
+          ? {
+              ...config,
+              width: frame.width,
+              height: frame.height,
+              x: frame.x,
+              y: frame.y,
+            }
+          : config),
+      },
+    }).then((svg) => {
+      if (svgPreviewContainerRef.current) {
+        svgPreviewContainerRef.current.replaceChildren(svg);
+        document.querySelector(".svg_dims")!.innerHTML = `${round(
+          parseFloat(svg.getAttribute("width") ?? ""),
+          0,
+        )}x${round(parseFloat(svg.getAttribute("height") ?? ""), 0)} (svg)`;
       }
     });
 
@@ -1430,9 +1420,35 @@ const ExcalidrawWrapper = () => {
             </label>
           </div>
         </div>
-        <div className="dims">0x0</div>
+        <div className="canvas_dims">0x0</div>
         <div
           ref={canvasPreviewContainerRef}
+          onClick={() => {
+            exportToBlob({
+              data: {
+                elements: excalidrawAPI!.getSceneElements(),
+                files: excalidrawAPI?.getFiles() || null,
+              },
+              config,
+            }).then((blob) => {
+              fileSave(blob, {
+                name: "xx",
+                extension: "png",
+                description: "xxx",
+              });
+            });
+          }}
+          style={{
+            borderRadius: 12,
+            border: "1px solid #777",
+            overflow: "hidden",
+            padding: 10,
+            backgroundColor: "pink",
+          }}
+        />
+        <div className="svg_dims">0x0</div>
+        <div
+          ref={svgPreviewContainerRef}
           onClick={() => {
             exportToBlob({
               data: {
