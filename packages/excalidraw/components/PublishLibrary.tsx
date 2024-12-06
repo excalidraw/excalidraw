@@ -140,9 +140,6 @@ const SingleLibraryItem = ({
           },
           files: null,
         },
-        config: {
-          skipInliningFonts: true,
-        },
       });
       node.innerHTML = svg.outerHTML;
     })();

@@ -117,9 +117,7 @@ describe("exportToSvg", () => {
       },
     });
 
-    expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      `"_themeFilter_1883f3"`,
-    );
+    expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(`null`);
   });
 
   it("with exportPadding", async () => {
@@ -149,9 +147,11 @@ describe("exportToSvg", () => {
         elements: ELEMENTS,
         appState: {
           ...DEFAULT_OPTIONS,
-          exportScale: SCALE,
         },
         files: null,
+      },
+      config: {
+        scale: SCALE,
       },
     });
 

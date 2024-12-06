@@ -29,14 +29,14 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { restore, restoreAppState } from "../data/restore";
+import { restoreAppState } from "../data/restore";
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
 } from "../frame";
-import { getNonDeletedElements, newTextElement } from "../element";
+import { newTextElement } from "../element";
 import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
 import { isFrameLikeElement } from "../element/typeChecks";
@@ -164,13 +164,13 @@ type ExportToCanvasAppState = Partial<
   Omit<AppState, "offsetTop" | "offsetLeft">
 >;
 
-export type ExportToCanvasData = {
+export type ExportSceneData = {
   elements: readonly NonDeletedExcalidrawElement[];
   appState?: ExportToCanvasAppState;
   files: BinaryFiles | null;
 };
 
-export type ExportToCanvasConfig = {
+export type ExportSceneConfig = {
   theme?: Theme;
   /**
    * Canvas background. Valid values are:
@@ -339,8 +339,8 @@ const configExportDimension = async ({
   data,
   config,
 }: {
-  data: ExportToCanvasData;
-  config?: ExportToCanvasConfig;
+  data: ExportSceneData;
+  config?: ExportSceneConfig;
 }) => {
   // clone
   const cfg = Object.assign({}, config);
@@ -626,8 +626,8 @@ export const exportToCanvas = async ({
   data,
   config,
 }: {
-  data: ExportToCanvasData;
-  config?: ExportToCanvasConfig;
+  data: ExportSceneData;
+  config?: ExportSceneConfig;
 }) => {
   const {
     config: cfg,
@@ -706,7 +706,7 @@ export const exportToCanvas = async ({
 };
 
 type ExportToSvgConfig = Pick<
-  ExportToCanvasConfig,
+  ExportSceneConfig,
   "canvasBackgroundColor" | "padding" | "theme" | "exportingFrame"
 > & {
   /**
@@ -721,108 +721,75 @@ export const exportToSvg = async ({
   data,
   config,
 }: {
-  data: {
-    elements: readonly NonDeletedExcalidrawElement[];
-    appState: {
-      exportBackground: boolean;
-      exportScale?: number;
-      viewBackgroundColor: string;
-      exportWithDarkMode?: boolean;
-      exportEmbedScene?: boolean;
-      frameRendering?: AppState["frameRendering"];
-      gridModeEnabled?: boolean;
-    };
-    files: BinaryFiles | null;
-  };
-  config?: ExportToSvgConfig;
-}): Promise<SVGSVGElement> => {
-  // clone
-  const cfg = Object.assign({}, config);
-
-  cfg.exportingFrame = cfg.exportingFrame ?? null;
-
-  const { elements: restoredElements } = restore(
-    { ...data, files: data.files || {} },
-    null,
-    null,
-  );
-  const elements = getNonDeletedElements(restoredElements);
-
-  const frameRendering = getFrameRenderingConfig(
-    cfg?.exportingFrame ?? null,
-    data.appState.frameRendering ?? null,
-  );
-
-  let {
-    exportWithDarkMode = false,
-    viewBackgroundColor,
-    exportScale = 1,
-    exportEmbedScene,
-  } = data.appState;
-
-  let padding = cfg.padding ?? 0;
-
-  const elementsForRender = prepareElementsForRender({
-    elements,
-    exportingFrame: cfg.exportingFrame,
-    exportWithDarkMode,
+  data: ExportSceneData;
+  config?: ExportSceneConfig;
+}) => {
+  const {
+    config: cfg,
+    normalizedPadding,
+    exportWidth,
+    exportHeight,
+    exportScale,
+    x,
+    y,
+    elementsForRender,
+    appState,
     frameRendering,
-  });
+  } = await configExportDimension({ data, config });
 
-  if (cfg.exportingFrame) {
-    padding = 0;
+  const offsetX = -(x - normalizedPadding);
+  const offsetY = -(y - normalizedPadding);
+
+  const { elements } = data;
+
+  // initialize SVG root
+  const svgRoot = document.createElementNS(SVG_NS, "svg");
+  svgRoot.setAttribute("version", "1.1");
+  svgRoot.setAttribute("xmlns", SVG_NS);
+  svgRoot.setAttribute(
+    "viewBox",
+    `0 0 ${exportWidth / exportScale} ${exportHeight / exportScale}`,
+  );
+  svgRoot.setAttribute("width", `${exportWidth}`);
+  svgRoot.setAttribute("height", `${exportHeight}`);
+  if (cfg.theme === THEME.DARK) {
+    svgRoot.setAttribute("filter", THEME_FILTER);
   }
+
+  const fontFaces = cfg.loadFonts
+    ? await Fonts.generateFontFaceDeclarations(elements)
+    : [];
+
+  const delimiter = "\n      "; // 6 spaces
 
   let metadata = "";
 
   // we need to serialize the "original" elements before we put them through
   // the tempScene hack which duplicates and regenerates ids
-  if (exportEmbedScene) {
+  if (appState.exportEmbedScene) {
     try {
       metadata = (await import("../data/image")).encodeSvgMetadata({
         // when embedding scene, we want to embed the origionally supplied
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.
-        text: serializeAsJSON(
-          elements,
-          data.appState,
-          data.files || {},
-          "local",
-        ),
+        text: serializeAsJSON(elements, appState, data.files || {}, "local"),
       });
     } catch (error: any) {
       console.error(error);
     }
   }
 
-  let [minX, minY, width, height] = getCanvasSize(
-    cfg.exportingFrame
-      ? [cfg.exportingFrame]
-      : getRootElements(elementsForRender),
-  );
-
-  width += padding * 2;
-  height += padding * 2;
-
-  // initialize SVG root
-  const svgRoot = document.createElementNS(SVG_NS, "svg");
-  svgRoot.setAttribute("version", "1.1");
-  svgRoot.setAttribute("xmlns", SVG_NS);
-  svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svgRoot.setAttribute("width", `${width * exportScale}`);
-  svgRoot.setAttribute("height", `${height * exportScale}`);
-  if (exportWithDarkMode) {
-    svgRoot.setAttribute("filter", THEME_FILTER);
+  let exportContentClipPath = "";
+  if (cfg.width != null && cfg.height != null) {
+    exportContentClipPath = `<clipPath id="content">
+      <rect x="${offsetX}" y="${offsetY}" width="${exportWidth}" height="${exportWidth}"></rect>
+    </clipPath>`;
   }
-
-  const offsetX = -minX + padding;
-  const offsetY = -minY + padding;
-
-  const frameElements = getFrameLikeElements(elements);
 
   let exportingFrameClipPath = "";
   const elementsMap = arrayToMap(elements);
+  const frameElements = getFrameLikeElements(elements);
   for (const frame of frameElements) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame, elementsMap);
     const cx = (x2 - x1) / 2 - (frame.x - x1);
@@ -844,36 +811,33 @@ export const exportToSvg = async ({
         </clipPath>`;
   }
 
-  const fontFaces = !cfg?.skipInliningFonts
-    ? await Fonts.generateFontFaceDeclarations(elements)
-    : [];
-
-  const delimiter = "\n      "; // 6 spaces
-
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
   ${metadata}
   <defs>
-    <style class="style-fonts">${delimiter}${fontFaces.join(delimiter)}
-    </style>
+    <style class="style-fonts">${delimiter}${fontFaces.join(delimiter)}</style>
+    ${exportContentClipPath}
     ${exportingFrameClipPath}
   </defs>
   `;
 
   // render background rect
-  if (data.appState.exportBackground && viewBackgroundColor) {
+  if (appState.exportBackground && appState.viewBackgroundColor) {
     const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
-    rect.setAttribute("width", `${width}`);
-    rect.setAttribute("height", `${height}`);
-    rect.setAttribute("fill", viewBackgroundColor);
+    rect.setAttribute("width", `${exportWidth / exportScale}`);
+    rect.setAttribute("height", `${exportHeight / exportScale}`);
+    rect.setAttribute(
+      "fill",
+      cfg.canvasBackgroundColor || appState.viewBackgroundColor,
+    );
     svgRoot.appendChild(rect);
   }
 
   const rsvg = rough.svg(svgRoot);
 
-  const renderEmbeddables = cfg.renderEmbeddables ?? false;
+  // const renderEmbeddables = appState.embe ?? false;
 
   renderSceneToSvg(
     elementsForRender,
@@ -885,18 +849,18 @@ export const exportToSvg = async ({
       offsetX,
       offsetY,
       isExporting: true,
-      exportWithDarkMode,
-      renderEmbeddables,
+      exportWithDarkMode: cfg.theme === THEME.DARK,
+      renderEmbeddables: false,
       frameRendering,
-      canvasBackgroundColor: viewBackgroundColor,
-      embedsValidationStatus: renderEmbeddables
+      canvasBackgroundColor: appState.viewBackgroundColor,
+      embedsValidationStatus: false
         ? new Map(
             elementsForRender
               .filter((element) => isFrameLikeElement(element))
               .map((element) => [element.id, true]),
           )
         : new Map(),
-      reuseImages: cfg?.reuseImages ?? true,
+      reuseImages: true,
     },
   );
 
@@ -916,7 +880,7 @@ export const getCanvasSize = (
 
 export { MIME_TYPES };
 
-type ExportToBlobConfig = ExportToCanvasConfig & {
+type ExportToBlobConfig = ExportSceneConfig & {
   mimeType?: string;
   quality?: number;
 };
@@ -925,7 +889,7 @@ export const exportToBlob = async ({
   data,
   config,
 }: {
-  data: ExportToCanvasData;
+  data: ExportSceneData;
   config?: ExportToBlobConfig;
 }): Promise<Blob> => {
   let { mimeType = MIME_TYPES.png, quality } = config || {};
@@ -990,7 +954,7 @@ export const exportToClipboard = async ({
   data,
   config,
 }: {
-  data: ExportToCanvasData;
+  data: ExportSceneData;
 } & (
   | { type: "png"; config?: ExportToBlobConfig }
   | { type: "svg"; config?: ExportToSvgConfig }

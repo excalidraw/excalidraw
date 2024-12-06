@@ -19,10 +19,6 @@ const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
       },
       files: null,
     },
-    config: {
-      renderEmbeddables: false,
-      skipInliningFonts: true,
-    },
   });
 };
 

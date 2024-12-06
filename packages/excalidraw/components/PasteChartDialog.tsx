@@ -50,9 +50,6 @@ const ChartPreviewBtn = (props: {
           },
           files: null,
         },
-        config: {
-          skipInliningFonts: true,
-        },
       });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
