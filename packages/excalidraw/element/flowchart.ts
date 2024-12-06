@@ -254,6 +254,9 @@ const addNewNode = (
     backgroundColor: element.backgroundColor,
     strokeColor: element.strokeColor,
     strokeWidth: element.strokeWidth,
+    strokeStyle: element.strokeStyle,
+    fillStyle: element.fillStyle,
+    opacity: element.opacity,
   });
 
   invariant(
@@ -329,6 +332,9 @@ export const addNewNodes = (
       backgroundColor: startNode.backgroundColor,
       strokeColor: startNode.strokeColor,
       strokeWidth: startNode.strokeWidth,
+      strokeStyle: startNode.strokeStyle,
+      fillStyle: startNode.fillStyle,
+      opacity: startNode.opacity,
     });
 
     invariant(
