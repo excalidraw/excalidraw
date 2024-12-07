@@ -270,6 +270,9 @@ export const textWysiwyg = ({
         opacity: updatedTextElement.opacity / 100,
         filter: "var(--theme-filter)",
         maxHeight: `${editorMaxHeight}px`,
+        caretColor: updatedTextElement.strokeColor === "transparent" //zsviczian
+          ? "var(excalidraw-caret-color)"
+          : updatedTextElement.strokeColor, //zsviczian Set caret color
       });
       editable.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family

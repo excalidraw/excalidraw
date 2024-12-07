@@ -375,7 +375,7 @@ export class Fonts {
 
     const registeredFamily = this.registered.get(fontFamily);
 
-    if (!registeredFamily) {
+    if (!registeredFamily || family === "Local Font") {
       this.registered.set(fontFamily, {
         metadata,
         fontFaces: fontFacesDecriptors.map(
