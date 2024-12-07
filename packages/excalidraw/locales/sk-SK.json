@@ -125,13 +125,13 @@
     "createContainerFromText": "Zabaliť text do kontajneru",
     "link": {
       "edit": "Upraviť odkaz",
-      "editEmbed": "",
+      "editEmbed": "Editovať zapustený odkaz",
       "create": "Pridať odkaz",
       "label": "Odkaz",
       "labelEmbed": "Zapustiť odkaz",
       "empty": "Nie je nastavený žiaden odkaz",
-      "hint": "Zadajte alebo vložte váš odkaz sem",
-      "goToElement": ""
+      "hint": "Zadajte alebo vložte váš odkaz",
+      "goToElement": "Prejsť k cielenému prvku"
     },
     "lineEditor": {
       "edit": "Upraviť čiaru",
@@ -162,8 +162,8 @@
   },
   "elementLink": {
     "title": "Odkaz na objekt",
-    "desc": "",
-    "notFound": ""
+    "desc": "Kliknite na tvar na plátne alebo vložte odkaz.",
+    "notFound": "Odkázaný objekt nebol nájdený na plátne."
   },
   "library": {
     "noItems": "Zatiaľ neboli pridané žiadne položky...",
