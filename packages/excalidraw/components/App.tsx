@@ -333,7 +333,7 @@ import { fileOpen } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
   getApproxMinLineHeight,
-  getApproxMinLineWidth,
+  getApproxMinContainerWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
@@ -5223,7 +5223,7 @@ class App extends React.Component<AppProps, AppState> {
         fontSize,
         fontFamily,
       };
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(fontString),
         lineHeight,
       );

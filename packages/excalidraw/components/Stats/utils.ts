@@ -11,7 +11,7 @@ import {
 } from "../../element/resizeElements";
 import {
   getApproxMinLineHeight,
-  getApproxMinLineWidth,
+  getApproxMinContainerWidth,
   getBoundTextElement,
   getBoundTextMaxWidth,
   handleBindTextResize,
@@ -139,7 +139,7 @@ export const resizeElement = (
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
 
   if (boundTextElement) {
-    const minWidth = getApproxMinLineWidth(
+    const minWidth = getApproxMinContainerWidth(
       getFontString(boundTextElement),
       boundTextElement.lineHeight,
     );
