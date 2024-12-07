@@ -126,11 +126,11 @@
     "link": {
       "edit": "Upraviť odkaz",
       "editEmbed": "",
-      "create": "",
+      "create": "Pridať odkaz",
       "label": "Odkaz",
       "labelEmbed": "Zapustiť odkaz",
       "empty": "Nie je nastavený žiaden odkaz",
-      "hint": "",
+      "hint": "Zadajte alebo vložte váš odkaz sem",
       "goToElement": ""
     },
     "lineEditor": {
@@ -157,11 +157,11 @@
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "installPWA": "Inštalovať Excalidraw lokálne (PWA)",
     "autoResize": "Zapnúť automatickú zmenu veľkosti textu",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "Kopírovať odkaz na objekt",
+    "linkToElement": "Odkaz na objekt"
   },
   "elementLink": {
-    "title": "",
+    "title": "Odkaz na objekt",
     "desc": "",
     "notFound": ""
   },
@@ -337,8 +337,8 @@
     "eraserRevert": "Podržte Alt pre prehodenie položiek určených na vymazanie",
     "firefox_clipboard_write": "Táto sa funkcionalita sa dá zapnúť nastavením \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Pre zmenu nastavení vo Firefox-e otvorte stránku \"about:config\".",
     "disableSnapping": "Podržte CtrlOrCmd pre vypnutie prichytávania",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Kliknite dva krát na obrázok alebo stlačte ENTER pre jeho orezanie",
+    "leaveCropEditor": "Kliknite mimo obrázok, alebo stlačte ENTER alebo ESCAPE pre dokončenie jeho orezávania"
   },
   "canvasError": {
     "cannotShowPreview": "Nie je možné zobraziť náhľad plátna",
@@ -410,8 +410,8 @@
     "toggleElementLock": "Zamknúť/odomknúť vybrané",
     "movePageUpDown": "Posunúť stranu hore/dole",
     "movePageLeftRight": "Posunúť stranu doľava/doprava",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Orezať obrázok",
+    "cropFinish": "Dokončiť orezávanie obrázka"
   },
   "clearCanvasDialog": {
     "title": "Vyčistiť plátno"
@@ -510,7 +510,7 @@
     "pasteAsSingleElement": "Použitím {{shortcut}} vložte ako samostatný prvok alebo vložte do existujúceho editovaného textu",
     "unableToEmbed": "Zapustenie tejto URL nie je povolené. Vytvorte issue na GitHub-e a požiadajte povolenie tejto URL",
     "unrecognizedLinkFormat": "Odkaz, ktorý sa snažíte zapustiť nie je v očakávanom formáte. Prosím skúste vložiť 'odkaz na zdieľanie' poskytnutý zdrojovou webovou stránkou",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Odkaz bol skopírovaný do schránky"
   },
   "colors": {
     "transparent": "Priehľadná",
