@@ -302,6 +302,8 @@ export {
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
+
 export { isElementLink } from "@excalidraw/element";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+export type { ExcalidrawProps } from "./types";
