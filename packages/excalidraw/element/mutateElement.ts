@@ -36,7 +36,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   const { points, fileId } = updates as any;
 
   if (isElbowArrow(element)) {
-    const { fixedSegments } = element;
+    const { fixedSegments } = updates as any;
     const mergedElementsMap = toBrandedType<SceneElementsMap>(
       new Map([
         ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
@@ -47,7 +47,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     updates = {
       ...updates,
       angle: 0 as Radians,
-      ...(points &&
+      ...((points || fixedSegments) &&
         updateElbowArrowPoints(
           {
             ...element,
@@ -57,7 +57,10 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           mergedElementsMap,
           {
             fixedSegments,
-            points,
+            points: points ?? [
+              element.points[0],
+              element.points[element.points.length - 1],
+            ],
           },
           {
             isDragging,
