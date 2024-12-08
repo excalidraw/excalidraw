@@ -63,6 +63,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onContextMenu, //zsviczian
     aiEnabled,
     showDeprecatedFonts,
+    insertLinkAction, //zsviczian
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -163,6 +164,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onContextMenu={onContextMenu} //zsviczian
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
+          insertLinkAction={insertLinkAction} //zsviczian
         >
           {children}
         </App>

@@ -13,7 +13,7 @@ import type {
 } from "../../element/types";
 
 import { ToolButton } from "../ToolButton";
-import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
+import { FreedrawIcon, TrashIcon, searchIcon } from "../icons";
 import { t } from "../../i18n";
 import {
   useCallback,
@@ -311,6 +311,22 @@ export const Hyperlink = ({
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
             icon={FreedrawIcon}
+          />
+        )}
+        { //zsviczian - show the Obsidian search button
+          Boolean(appProps.insertLinkAction) && (
+          <ToolButton
+            type="button"
+            title="Obsidian Search"
+            aria-label="Obsidian Search"
+            label="Obsidian Search"
+            onClick={() => {
+              if(appProps.insertLinkAction) {
+                setAppState({ showHyperlinkPopup: false });
+                appProps.insertLinkAction(inputVal);
+              }
+            }}
+            icon={searchIcon}
           />
         )}
         {/* //zsviczian - do not show the link to element button
