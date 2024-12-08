@@ -8031,6 +8031,7 @@ class App extends React.Component<AppProps, AppState> {
 
           return LinearElementEditor.moveFixedSegment(
             this.state.selectedLinearElement,
+            linearElementEditor.pointerDownState.segmentMidpoint.index,
             gridX,
             gridY,
             this.scene.getNonDeletedElementsMap(),

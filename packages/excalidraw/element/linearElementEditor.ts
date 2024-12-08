@@ -1801,26 +1801,12 @@ export class LinearElementEditor {
 
   static moveFixedSegment(
     linearElement: LinearElementEditor,
+    index: number,
     x: number,
     y: number,
     elementsMap: ElementsMap,
     state: AppState,
   ) {
-    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
-      linearElement,
-      { x, y },
-      state,
-      elementsMap,
-    );
-    const index =
-      segmentMidPoint &&
-      LinearElementEditor.getSegmentMidPointIndex(
-        linearElement,
-        state,
-        segmentMidPoint,
-        elementsMap,
-      );
-
     const element = LinearElementEditor.getElement(
       linearElement.elementId,
       elementsMap,
