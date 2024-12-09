@@ -12,6 +12,8 @@ import type {
   ExcalidrawArrowElement,
   NonDeletedSceneElementsMap,
   SceneElementsMap,
+  ExcalidrawElbowArrowElement,
+  FixedPointBinding,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -32,7 +34,11 @@ import {
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
 import { getFontString } from "../utils";
-import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
+import {
+  getArrowLocalFixedPoints,
+  getGlobalFixedPoints,
+  updateBoundElements,
+} from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
@@ -53,7 +59,6 @@ import {
 import { wrapText } from "./textWrapping";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
-import { mutateElbowArrow } from "./routing";
 import type { GlobalPoint } from "../../math";
 import {
   pointCenter,
@@ -77,6 +82,8 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  flippedFixedPointBindings: boolean = false,
+  setFlippedFixedPointBindings?: (flippedFixedPointBindings: boolean) => void,
 ) => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
@@ -139,6 +146,8 @@ export const transformElements = (
         shouldMaintainAspectRatio,
         pointerX,
         pointerY,
+        flippedFixedPointBindings,
+        setFlippedFixedPointBindings,
       );
       return true;
     }
@@ -451,7 +460,7 @@ const resizeSingleTextElement = (
   }
 };
 
-export const resizeSingleElement = (
+const resizeSingleElement = (
   originalElements: PointerDownState["originalElements"],
   shouldMaintainAspectRatio: boolean,
   element: NonDeletedExcalidrawElement,
@@ -768,6 +777,8 @@ export const resizeMultipleElements = (
   shouldMaintainAspectRatio: boolean,
   pointerX: number,
   pointerY: number,
+  flippedFixedPointBindings: boolean = false,
+  setFlippedFixedPointBindings?: (flippedFixedPointBindings: boolean) => void,
 ) => {
   // map selected elements to the original elements. While it never should
   // happen that pointerDownState.originalElements won't contain the selected
@@ -987,19 +998,109 @@ export const resizeMultipleElements = (
       }
     }
 
-    elementsAndUpdates.push({
-      element: latest,
-      update,
-    });
+    // Elbow arrows must be the last to be mutated so the bound
+    // bound elements have their final position before the arrow
+    // is recalculated
+    if (isElbowArrow(latest)) {
+      elementsAndUpdates.push({
+        element: latest,
+        update,
+      });
+    } else {
+      elementsAndUpdates.unshift({
+        element: latest,
+        update,
+      });
+    }
+  }
+
+  let flipFixedPoint = false;
+  if (!flippedFixedPointBindings && (isFlippedByX || isFlippedByY)) {
+    flipFixedPoint = true;
+    setFlippedFixedPointBindings?.(true);
+  } else if (flippedFixedPointBindings && !isFlippedByX && !isFlippedByY) {
+    flipFixedPoint = true;
+    setFlippedFixedPointBindings?.(false);
   }
 
   const elementsToUpdate = elementsAndUpdates.map(({ element }) => element);
 
-  for (const {
+  for (let {
     element,
     update: { boundTextFontSize, ...update },
   } of elementsAndUpdates) {
     const { angle, width: newWidth, height: newHeight } = update;
+
+    if (isElbowArrow(element)) {
+      // If the resize gone into the inverse we need to flip the
+      // FixedPointBinding sides
+      if (flipFixedPoint) {
+        if (
+          element.startBinding &&
+          selectedElements.findIndex(
+            (el) =>
+              // @ts-ignore
+              el.id === element.startBinding?.elementId ||
+              // @ts-ignore
+              el.id === update.startBinding?.elementId,
+          ) !== -1
+        ) {
+          const binding = (update.startBinding ||
+            element.startBinding) as FixedPointBinding;
+          if (direction !== "n" && direction !== "s") {
+            binding.fixedPoint[0] = 1 - binding.fixedPoint[0];
+          }
+          if (direction !== "w" && direction !== "e") {
+            update.startBinding = element.startBinding;
+            binding.fixedPoint[1] = 1 - binding.fixedPoint[1];
+          }
+          update.startBinding = binding;
+        }
+        if (
+          element.endBinding &&
+          selectedElements.findIndex(
+            (el) =>
+              // @ts-ignore
+              el.id === element.endBinding?.elementId ||
+              // @ts-ignore
+              el.id === update.endBinding?.elementId,
+          ) !== -1
+        ) {
+          const binding = (update.endBinding ||
+            element.endBinding) as FixedPointBinding;
+          if (direction !== "n" && direction !== "s") {
+            binding.fixedPoint[0] = 1 - binding.fixedPoint[0];
+          }
+          if (direction !== "w" && direction !== "e") {
+            update.endBinding = element.endBinding;
+            binding.fixedPoint[1] = 1 - binding.fixedPoint[1];
+          }
+          update.endBinding = binding;
+        }
+      }
+
+      const [startPoint, endPoint] = getGlobalFixedPoints(
+        {
+          ...element,
+          ...update,
+        } as ExcalidrawElbowArrowElement,
+        elementsMap,
+      );
+
+      const points = Array.from(update.points || element.points);
+      points[0] = pointFrom(0, 0);
+      points[points.length - 1] = pointFrom(
+        endPoint[0] - startPoint[0],
+        endPoint[1] - startPoint[1],
+      );
+
+      update = {
+        ...update,
+        points,
+        x: startPoint[0],
+        y: startPoint[1],
+      };
+    }
 
     mutateElement(element, update, false);
 
@@ -1057,8 +1158,9 @@ const rotateMultipleElements = (
       );
 
       if (isElbowArrow(element)) {
-        const points = getArrowLocalFixedPoints(element, elementsMap);
-        mutateElbowArrow(element, elementsMap, points);
+        mutateElement(element, {
+          points: getArrowLocalFixedPoints(element, elementsMap),
+        });
       } else {
         mutateElement(
           element,

@@ -18,14 +18,12 @@ import {
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
 import { StoreAction } from "../store";
-import { mutateElbowArrow } from "../element/routing";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   app: AppClassProperties,
 ) => {
-  const elementsMap = app.scene.getNonDeletedElementsMap();
   const framesToBeDeleted = new Set(
     getSelectedElements(
       elements.filter((el) => isFrameLikeElement(el)),
@@ -52,7 +50,7 @@ const deleteSelectedElements = (
                     ? null
                     : bound.endBinding,
               });
-              mutateElbowArrow(bound, elementsMap, bound.points);
+              mutateElement(bound, { points: bound.points });
             }
           });
         }
