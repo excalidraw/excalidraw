@@ -22,6 +22,7 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
+import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -87,40 +88,19 @@ type ElbowArrowState = {
   endArrowhead: Arrowhead | null;
 };
 
-const BASE_PADDING = 40;
+type ElbowArrowData = {
+  dynamicAABBs: Bounds[];
+  startDonglePosition: GlobalPoint | null;
+  startGlobalPoint: GlobalPoint;
+  startHeading: Heading;
+  endDonglePosition: GlobalPoint | null;
+  endGlobalPoint: GlobalPoint;
+  endHeading: Heading;
+  commonBounds: Bounds;
+  hoveredEndElement: ExcalidrawBindableElement | null;
+};
 
-const generatePoints = memo(
-  (
-    state: ElbowArrowState,
-    points: readonly LocalPoint[],
-    totalSegments: number,
-    currentSegment: number,
-    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-    options?: {
-      isDragging?: boolean;
-    },
-  ) =>
-    routeElbowArrow(state, elementsMap, points, {
-      ...options,
-      ...(totalSegments > 0
-        ? {
-            startMidPointHeading:
-              currentSegment > 0
-                ? vectorToHeading(vectorFromPoint(points[1], points[0]))
-                : undefined,
-            endMidPointHeading:
-              currentSegment < totalSegments
-                ? vectorToHeading(
-                    vectorFromPoint(
-                      points[points.length - 2],
-                      points[points.length - 1],
-                    ),
-                  )
-                : undefined,
-          }
-        : {}),
-    }) ?? [],
-);
+const BASE_PADDING = 40;
 
 /**
  *
@@ -308,6 +288,15 @@ export const updateElbowArrowPoints = (
     ],
   ]);
 
+  const {
+    startHeading,
+    hoveredStartElement,
+    endHeading,
+    hoveredEndElement,
+    startGlobalPoint,
+    endGlobalPoint,
+  } = getElbowArrowData(arrow, elementsMap, updates.points);
+
   const simplifiedPoints = getElbowArrowCornerPoints(
     removeElbowArrowShortSegments(
       pointPairs.map(([state, ps], idx) => {
@@ -315,41 +304,67 @@ export const updateElbowArrowPoints = (
         const prevSegment = idx > 0 ? nextFixedSegments[idx - 1] : undefined;
         const nextSegment =
           idx < pointPairs.length - 1 ? nextFixedSegments[idx] : undefined;
-
-        if (nextSegment) {
+        let startSegmentHeading = undefined;
+        let endSegmentHeading = undefined;
+        let forcedStartHeading = undefined;
+        let forcedEndHeading = undefined;
+        if (nextSegment && !!hoveredStartElement) {
           if (idx === 0) {
-            const isHorizontal = headingIsHorizontal(
-              vectorToHeading(
-                vectorFromPoint(nextSegment.start, nextSegment.end),
-              ),
+            endSegmentHeading = vectorToHeading(
+              vectorFromPoint(nextSegment.start, nextSegment.end),
             );
-            points[points.length - 1] = pointFrom<LocalPoint>(
-              isHorizontal ? points[0][0] : points[points.length - 1][0],
-              !isHorizontal ? points[0][1] : points[points.length - 1][1],
-            );
+            const isHorizontal = headingIsHorizontal(endSegmentHeading);
+            if (headingIsHorizontal(startHeading) !== isHorizontal) {
+              points[points.length - 1] = pointFrom<LocalPoint>(
+                isHorizontal ? points[0][0] : points[points.length - 1][0],
+                !isHorizontal ? points[0][1] : points[points.length - 1][1],
+              );
+            } else {
+              forcedStartHeading = headingIsHorizontal(startHeading)
+                ? state.x < startGlobalPoint[0]
+                  ? HEADING_LEFT
+                  : HEADING_RIGHT
+                : state.y < startGlobalPoint[1]
+                ? HEADING_UP
+                : HEADING_DOWN;
+            }
           }
         }
-        if (prevSegment) {
+        if (prevSegment && !!hoveredEndElement) {
           if (idx === pointPairs.length - 1) {
-            const isHorizontal = headingIsHorizontal(
-              vectorToHeading(
-                vectorFromPoint(prevSegment.start, prevSegment.end),
-              ),
+            startSegmentHeading = vectorToHeading(
+              vectorFromPoint(prevSegment.start, prevSegment.end),
             );
-            points[0] = pointFrom<LocalPoint>(
-              isHorizontal ? points[points.length - 1][0] : points[0][0],
-              !isHorizontal ? points[points.length - 1][1] : points[0][1],
-            );
+            const isHorizontal = headingIsHorizontal(startSegmentHeading);
+            if (headingIsHorizontal(endHeading) !== isHorizontal) {
+              points[0] = pointFrom<LocalPoint>(
+                isHorizontal ? points[points.length - 1][0] : points[0][0],
+                !isHorizontal ? points[points.length - 1][1] : points[0][1],
+              );
+            } else {
+              forcedEndHeading = headingIsHorizontal(endHeading)
+                ? state.x < endGlobalPoint[0]
+                  ? HEADING_LEFT
+                  : HEADING_RIGHT
+                : state.y < endGlobalPoint[1]
+                ? HEADING_UP
+                : HEADING_DOWN;
+            }
           }
         }
-        const nextPoints = generatePoints(
-          state,
-          points,
-          pointPairs.length - 1,
-          idx,
-          elementsMap,
-          options,
-        );
+        const elbowArrowData = getElbowArrowData(state, elementsMap, points, {
+          ...options,
+          ...(pointPairs.length - 1 > 0
+            ? {
+                startMidPointHeading: startSegmentHeading,
+                endMidPointHeading: endSegmentHeading,
+                forcedStartHeading,
+                forcedEndHeading,
+              }
+            : {}),
+        });
+        false && console.log(elbowArrowData.endHeading);
+        const nextPoints = routeElbowArrow(state, elbowArrowData) ?? [];
 
         return nextPoints;
       }),
@@ -464,6 +479,8 @@ const getElbowArrowData = (
     isDragging?: boolean;
     startMidPointHeading?: Heading;
     endMidPointHeading?: Heading;
+    forcedStartHeading?: Heading;
+    forcedEndHeading?: Heading;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -501,24 +518,29 @@ const getElbowArrowData = (
     hoveredEndElement,
     options?.isDragging,
   );
-  const startHeading = getBindPointHeading(
-    startGlobalPoint,
-    endGlobalPoint,
-    elementsMap,
-    options?.startMidPointHeading || options?.endMidPointHeading
-      ? undefined
-      : hoveredStartElement,
-    origStartGlobalPoint,
-  );
-  const endHeading = getBindPointHeading(
-    endGlobalPoint,
-    startGlobalPoint,
-    elementsMap,
-    options?.startMidPointHeading || options?.endMidPointHeading
-      ? undefined
-      : hoveredEndElement,
-    origEndGlobalPoint,
-  );
+  const startHeading = options?.forcedStartHeading
+    ? options.forcedStartHeading
+    : getBindPointHeading(
+        startGlobalPoint,
+        endGlobalPoint,
+        elementsMap,
+        options?.startMidPointHeading || options?.endMidPointHeading
+          ? undefined
+          : hoveredStartElement,
+        origStartGlobalPoint,
+      );
+  const endHeading = options?.forcedEndHeading
+    ? options.forcedEndHeading
+    : getBindPointHeading(
+        endGlobalPoint,
+        startGlobalPoint,
+        elementsMap,
+        options?.startMidPointHeading || options?.endMidPointHeading
+          ? undefined
+          : hoveredEndElement,
+        origEndGlobalPoint,
+      );
+  false && console.log("dsfsgass", endHeading, options?.forcedEndHeading);
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
@@ -661,13 +683,7 @@ const getElbowArrowData = (
  */
 const routeElbowArrow = (
   arrow: ElbowArrowState,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  nextPoints: readonly LocalPoint[],
-  options?: {
-    isDragging?: boolean;
-    startMidPointHeading?: Heading;
-    endMidPointHeading?: Heading;
-  },
+  elbowArrowData: ElbowArrowData,
 ): GlobalPoint[] | null => {
   const {
     dynamicAABBs,
@@ -679,7 +695,7 @@ const routeElbowArrow = (
     endHeading,
     commonBounds,
     hoveredEndElement,
-  } = getElbowArrowData(arrow, elementsMap, nextPoints, options);
+  } = elbowArrowData;
 
   // Canculate Grid positions
   const grid = calculateGrid(
@@ -1409,6 +1425,7 @@ const removeElbowArrowShortSegments = (
       }
 
       const prev = points[idx - 1];
+
       return pointDistance(prev, p) > 0.3;
     });
   }
