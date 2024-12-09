@@ -329,7 +329,7 @@ export const resizeImageFile = async (
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight, alpha: true })],
     file.name,
     {
       type: opts.outputType || file.type,
