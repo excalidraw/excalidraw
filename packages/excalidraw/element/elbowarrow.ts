@@ -17,12 +17,10 @@ import { aabbForElement, pointInsideBounds } from "../shapes";
 import {
   invariant,
   isAnyTrue,
-  memo,
   multiDimensionalArrayDeepFilter,
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import { debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -363,7 +361,7 @@ export const updateElbowArrowPoints = (
               }
             : {}),
         });
-        false && console.log(elbowArrowData.endHeading);
+
         const nextPoints = routeElbowArrow(state, elbowArrowData) ?? [];
 
         return nextPoints;
@@ -540,7 +538,6 @@ const getElbowArrowData = (
           : hoveredEndElement,
         origEndGlobalPoint,
       );
-  false && console.log("dsfsgass", endHeading, options?.forcedEndHeading);
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
