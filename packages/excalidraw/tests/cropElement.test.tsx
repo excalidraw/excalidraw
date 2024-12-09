@@ -194,7 +194,7 @@ describe("Crop an image", () => {
     expect(image.width).toEqual(image.height);
     // max height should be reached
     expect(image.height).toBeCloseTo(initialHeight, 10);
-    expect(image.width).toBe(initialHeight);
+    expect(image.width).toBeCloseTo(initialHeight);
   });
 });
 

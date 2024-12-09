@@ -8283,9 +8283,16 @@ class App extends React.Component<AppProps, AppState> {
                 (draggedElement) =>
                   (isLinearElement(draggedElement)
                     ? [draggedElement]
-                    : draggedElement.boundElements?.map((binding) =>
-                        elementsMap.get(binding.id),
-                      ) ?? []) as ExcalidrawLinearElement[],
+                    : draggedElement.boundElements
+                        ?.map((binding) => {
+                          const el = elementsMap.get(binding.id);
+                          if (isLinearElement(el)) {
+                            return el;
+                          }
+                          return null;
+                        })
+                        .filter((el) => el != null) ??
+                      []) as ExcalidrawLinearElement[],
               )
               .forEach((element) =>
                 LinearElementEditor.updateEditorMidPointsCache(
