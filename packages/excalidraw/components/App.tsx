@@ -2337,7 +2337,7 @@ class App extends React.Component<AppProps, AppState> {
     this.fonts.loadSceneFonts().then((fontFaces) => {
       this.fonts.onLoaded(fontFaces);
     });
-    
+
     // Elbow arrow segment midpoint cache needs to be updated after the scene (re)load
     scene.elements.forEach((element) => {
       if (isElbowArrow(element)) {

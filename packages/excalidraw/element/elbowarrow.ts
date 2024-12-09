@@ -310,7 +310,38 @@ export const updateElbowArrowPoints = (
 
   const simplifiedPoints = getElbowArrowCornerPoints(
     removeElbowArrowShortSegments(
-      pointPairs.map(([state, points], idx) => {
+      pointPairs.map(([state, ps], idx) => {
+        const points = Array.from(ps);
+        const prevSegment = idx > 0 ? nextFixedSegments[idx - 1] : undefined;
+        const nextSegment =
+          idx < pointPairs.length - 1 ? nextFixedSegments[idx] : undefined;
+
+        if (nextSegment) {
+          if (idx === 0) {
+            const isHorizontal = headingIsHorizontal(
+              vectorToHeading(
+                vectorFromPoint(nextSegment.start, nextSegment.end),
+              ),
+            );
+            points[points.length - 1] = pointFrom<LocalPoint>(
+              isHorizontal ? points[0][0] : points[points.length - 1][0],
+              !isHorizontal ? points[0][1] : points[points.length - 1][1],
+            );
+          }
+        }
+        if (prevSegment) {
+          if (idx === pointPairs.length - 1) {
+            const isHorizontal = headingIsHorizontal(
+              vectorToHeading(
+                vectorFromPoint(prevSegment.start, prevSegment.end),
+              ),
+            );
+            points[0] = pointFrom<LocalPoint>(
+              isHorizontal ? points[points.length - 1][0] : points[0][0],
+              !isHorizontal ? points[points.length - 1][1] : points[0][1],
+            );
+          }
+        }
         const nextPoints = generatePoints(
           state,
           points,
@@ -474,14 +505,18 @@ const getElbowArrowData = (
     startGlobalPoint,
     endGlobalPoint,
     elementsMap,
-    hoveredStartElement,
+    options?.startMidPointHeading || options?.endMidPointHeading
+      ? undefined
+      : hoveredStartElement,
     origStartGlobalPoint,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
     elementsMap,
-    hoveredEndElement,
+    options?.startMidPointHeading || options?.endMidPointHeading
+      ? undefined
+      : hoveredEndElement,
     origEndGlobalPoint,
   );
   const startPointBounds = [
@@ -546,14 +581,7 @@ const getElbowArrowData = (
   );
   const dynamicAABBs =
     options?.startMidPointHeading || options?.endMidPointHeading
-      ? generateSegmentedDynamicAABBs(
-          boundsOverlap ? startPointBounds : startElementBounds,
-          boundsOverlap ? endPointBounds : endElementBounds,
-          options?.startMidPointHeading,
-          options?.endMidPointHeading,
-          startGlobalPoint,
-          endGlobalPoint,
-        )
+      ? [startPointBounds, endPointBounds]
       : generateDynamicAABBs(
           boundsOverlap ? startPointBounds : startElementBounds,
           boundsOverlap ? endPointBounds : endElementBounds,
@@ -594,13 +622,6 @@ const getElbowArrowData = (
           hoveredStartElement && aabbForElement(hoveredStartElement),
           hoveredEndElement && aabbForElement(hoveredEndElement),
         );
-  // options?.startMidPointHeading &&
-  //   dynamicAABBs.forEach((aabb, idx) => {
-  //     if (idx === 0) {
-  //       debugDrawPoint(pointFrom<GlobalPoint>(aabb[2], aabb[3]));
-  //     }
-  //     debugDrawBounds(aabb, { color: idx > 0 ? "red" : "green" });
-  //   });
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -867,57 +888,6 @@ const pathTo = (start: Node, node: Node) => {
 
 const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
-
-const generateSegmentedDynamicAABBs = (
-  a: Bounds,
-  b: Bounds,
-  startMidPointHeading: Heading | undefined,
-  endMidPointHeading: Heading | undefined,
-  startGlobalPoint: GlobalPoint,
-  endGlobalPoint: GlobalPoint,
-): Bounds[] => {
-  let first = a;
-  let second = b;
-
-  if (startMidPointHeading) {
-    first = [
-      startGlobalPoint[0] - 0.0001,
-      startGlobalPoint[1] - 0.0001,
-      startGlobalPoint[0] + 0.0001,
-      startGlobalPoint[1] + 0.0001,
-    ];
-    second = [
-      Math.min(b[0], startGlobalPoint[0] + 0.0001),
-      Math.min(b[1], startGlobalPoint[1] + 0.0001),
-      Math.max(b[2], startGlobalPoint[0] - 0.0001),
-      Math.max(b[3], startGlobalPoint[1] - 0.0001),
-    ];
-  }
-
-  if (endMidPointHeading) {
-    second = [
-      endGlobalPoint[0] - 0.0001,
-      endGlobalPoint[1] - 0.0001,
-      endGlobalPoint[0] + 0.0001,
-      endGlobalPoint[1] + 0.0001,
-    ];
-    first = [
-      Math.min(a[0], endGlobalPoint[0] + 0.0001),
-      Math.min(a[1], endGlobalPoint[1] + 0.0001),
-      Math.max(a[2], endGlobalPoint[0] - 0.0001),
-      Math.max(a[3], endGlobalPoint[1] - 0.0001),
-    ];
-  }
-
-  const boundsOverlap =
-    pointInsideBounds(startGlobalPoint, second) ||
-    pointInsideBounds(endGlobalPoint, first);
-  if (boundsOverlap) {
-    return [a, b];
-  }
-
-  return [first, second] as Bounds[];
-};
 
 /**
  * Create dynamically resizing, always touching
