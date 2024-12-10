@@ -8109,19 +8109,18 @@ class App extends React.Component<AppProps, AppState> {
             const MOVEMENT_BUFFER = 4;
   
             // this calculates the buffer for the movement based on the zoom level
-            const ZOOM_RELETIVE_MOVEMENT_BUFFER = MOVEMENT_BUFFER / this.state.zoom.value;
+            const ZOOM_RELETIVE_MOVEMENT_BUFFER: number = MOVEMENT_BUFFER / this.state.zoom.value;
+
+            console.log(ZOOM_RELETIVE_MOVEMENT_BUFFER); // TODO: remove
             
-            if(typeof(ZOOM_RELETIVE_MOVEMENT_BUFFER) === 'number'){
-  
               if (
-                pointDistance(
+                  !elementStartedMoving && pointDistance(
                   pointFrom(pointerCoords.x, pointerCoords.y),
                   pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-                ) < ZOOM_RELETIVE_MOVEMENT_BUFFER && !elementStartedMoving
+                ) < ZOOM_RELETIVE_MOVEMENT_BUFFER
               ) {
                 return;
               }
-            }
   
             // sets the elementStartedMoving to true so that the buffer is only used once
             elementStartedMoving = true;
