@@ -313,12 +313,12 @@ export const updateElbowArrowPoints = (
             );
             if (!forcedEndHeading) {
               forcedEndHeading = headingIsHorizontal(endSegmentHeading)
-                ? points[0][1] < points[points.length - 1][1]
-                  ? HEADING_UP
-                  : HEADING_DOWN
-                : points[0][0] < points[points.length - 1][0]
-                ? HEADING_LEFT
-                : HEADING_RIGHT;
+                ? points[0][1] > points[points.length - 1][1]
+                  ? HEADING_DOWN
+                  : HEADING_UP
+                : points[0][0] > points[points.length - 1][0]
+                ? HEADING_RIGHT
+                : HEADING_LEFT;
             }
             const isHorizontal = headingIsHorizontal(endSegmentHeading);
             if (headingIsHorizontal(startHeading) !== isHorizontal) {
@@ -328,10 +328,10 @@ export const updateElbowArrowPoints = (
               );
             } else {
               forcedStartHeading = headingIsHorizontal(startHeading)
-                ? state.x < startGlobalPoint[0]
+                ? state.x + points[points.length - 1][0] < startGlobalPoint[0]
                   ? HEADING_LEFT
                   : HEADING_RIGHT
-                : state.y < startGlobalPoint[1]
+                : state.y + points[points.length - 1][1] < startGlobalPoint[1]
                 ? HEADING_UP
                 : HEADING_DOWN;
             }
@@ -368,6 +368,9 @@ export const updateElbowArrowPoints = (
             }
           }
         }
+        // debugDrawPoint(endGlobalPoint, {
+        //   permanent: true,
+        // });
         const elbowArrowData = getElbowArrowData(state, elementsMap, points, {
           ...options,
           ...(pointPairs.length - 1 > 0
