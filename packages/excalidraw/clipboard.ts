@@ -331,14 +331,6 @@ const parseClipboardEvent = async (
 
       return mixedContent;
     }
-    const imageType = event.clipboardData?.types.find(type => type.startsWith("image/"));
-    
-    if (imageType) {
-      const image = event.clipboardData?.getData(imageType);
-      if (image) {
-        return { type: "mixedContent", value: [{ type: "imageUrl", value: image }] };
-      }
-    }
 
     const text = event.clipboardData?.getData("text/plain");
 
