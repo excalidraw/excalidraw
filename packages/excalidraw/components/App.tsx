@@ -3267,15 +3267,11 @@ class App extends React.Component<AppProps, AppState> {
         });
       } else if (data.text) {
         if (data.text && isMaybeMermaidDefinition(data.text)) {
-          const api = await import("@zsviczian/mermaid-to-excalidraw"); //zsviczian
+          const api = await import("@zsviczian/mermaid-to-excalidraw");
 
           try {
             const { elements: skeletonElements, files } =
-              await api.parseMermaidToExcalidraw(data.text, {
-                //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
-                fontSize: DEFAULT_FONT_SIZE,
-              });
-            //await api.parseMermaidToExcalidraw(data.text);
+              await api.parseMermaidToExcalidraw(data.text);
 
             const elements = convertToExcalidrawElements(skeletonElements, {
               regenerateIds: true,
