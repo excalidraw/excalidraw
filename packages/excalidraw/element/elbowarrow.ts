@@ -311,6 +311,15 @@ export const updateElbowArrowPoints = (
             endSegmentHeading = vectorToHeading(
               vectorFromPoint(nextSegment.start, nextSegment.end),
             );
+            if (!forcedEndHeading) {
+              forcedEndHeading = headingIsHorizontal(endSegmentHeading)
+                ? points[0][1] < points[points.length - 1][1]
+                  ? HEADING_UP
+                  : HEADING_DOWN
+                : points[0][0] < points[points.length - 1][0]
+                ? HEADING_LEFT
+                : HEADING_RIGHT;
+            }
             const isHorizontal = headingIsHorizontal(endSegmentHeading);
             if (headingIsHorizontal(startHeading) !== isHorizontal) {
               points[points.length - 1] = pointFrom<LocalPoint>(
@@ -333,6 +342,15 @@ export const updateElbowArrowPoints = (
             startSegmentHeading = vectorToHeading(
               vectorFromPoint(prevSegment.start, prevSegment.end),
             );
+            if (!forcedStartHeading) {
+              forcedStartHeading = headingIsHorizontal(startSegmentHeading)
+                ? points[0][1] < points[points.length - 1][1]
+                  ? HEADING_DOWN
+                  : HEADING_UP
+                : points[0][0] < points[points.length - 1][0]
+                ? HEADING_RIGHT
+                : HEADING_LEFT;
+            }
             const isHorizontal = headingIsHorizontal(startSegmentHeading);
             if (headingIsHorizontal(endHeading) !== isHorizontal) {
               points[0] = pointFrom<LocalPoint>(
@@ -594,7 +612,9 @@ const getElbowArrowData = (
         : startPointBounds,
     );
   const commonBounds = commonAABB(
-    boundsOverlap
+    options?.startMidPointHeading ||
+      options?.endMidPointHeading ||
+      boundsOverlap
       ? [startPointBounds, endPointBounds]
       : [startElementBounds, endElementBounds],
   );
