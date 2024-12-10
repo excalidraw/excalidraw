@@ -18,7 +18,7 @@ import { deepCopyElement } from "./element/newElement";
 import { mutateElement } from "./element/mutateElement";
 import { getContainingFrame } from "./frame";
 import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
-import { isSupportedImageFileType } from "./data/blob";
+import { createFile, isSupportedImageFileType } from "./data/blob";
 import { ExcalidrawError } from "./errors";
 
 type ElementsClipboard = {
@@ -77,7 +77,7 @@ export const createPasteEvent = ({
   types,
   files,
 }: {
-  types?: { [key in AllowedPasteMimeTypes]?: string };
+  types?: { [key in AllowedPasteMimeTypes]?: string | File };
   files?: File[];
 }) => {
   if (!types && !files) {
@@ -90,6 +90,11 @@ export const createPasteEvent = ({
 
   if (types) {
     for (const [type, value] of Object.entries(types)) {
+      if (typeof value !== "string") {
+        files = files || [];
+        files.push(value);
+        continue;
+      }
       try {
         event.clipboardData?.setData(type, value);
         if (event.clipboardData?.getData(type) !== value) {
@@ -245,7 +250,7 @@ const maybeParseHTMLPaste = (
  * Will prompt user for permission if not granted.
  */
 export const readSystemClipboard = async () => {
-  const types: { [key in AllowedPasteMimeTypes]?: string } = {};
+  const types: { [key in AllowedPasteMimeTypes]?: string | File } = {};
 
   let clipboardItems: ClipboardItems;
 
@@ -292,8 +297,8 @@ export const readSystemClipboard = async () => {
           types[type] = await (await item.getType(type)).text();
         } else if (isSupportedImageFileType(type)) {
           const imageBlob = await item.getType(type);
-          const imageUrl = URL.createObjectURL(imageBlob);
-          types[type] = imageUrl;
+          const file = createFile(imageBlob, type, undefined);
+          types[type] = file;
         } else {
           throw new ExcalidrawError(`Unsupported clipboard type: ${type}`);
         }
