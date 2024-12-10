@@ -1,10 +1,17 @@
-import type { ExcalidrawElement } from "./types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { isElbowArrow } from "./typeChecks";
+import { updateElbowArrowPoints } from "./elbowarrow";
+import type { Radians } from "../../math";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -19,12 +26,48 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
+  isDragging = false,
+  changedElements?: Map<string, OrderedExcalidrawElement>,
 ): TElement => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points, fileId } = updates as any;
+
+  if (isElbowArrow(element)) {
+    const { fixedSegments } = updates as any;
+    const mergedElementsMap = toBrandedType<SceneElementsMap>(
+      new Map([
+        ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
+        ...(changedElements ?? []),
+      ]),
+    );
+
+    updates = {
+      ...updates,
+      angle: 0 as Radians,
+      ...((points || fixedSegments) &&
+        updateElbowArrowPoints(
+          {
+            ...element,
+            x: updates.x || element.x,
+            y: updates.y || element.y,
+          },
+          mergedElementsMap,
+          {
+            fixedSegments,
+            points: points ?? [
+              element.points[0],
+              element.points[element.points.length - 1],
+            ],
+          },
+          {
+            isDragging,
+          },
+        )),
+    };
+  }
 
   if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };

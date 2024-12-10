@@ -5,7 +5,6 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FontString,
-  SceneElementsMap,
 } from "../element/types";
 import { Excalidraw, mutateElement } from "../index";
 import { reseed } from "../random";
@@ -1353,23 +1352,19 @@ describe("Test Linear Elements", () => {
       const [origStartX, origStartY] = [line.x, line.y];
 
       act(() => {
-        LinearElementEditor.movePoints(
-          line,
-          [
-            {
-              index: 0,
-              point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),
-            },
-            {
-              index: line.points.length - 1,
-              point: pointFrom(
-                line.points[line.points.length - 1][0] - 10,
-                line.points[line.points.length - 1][1] - 10,
-              ),
-            },
-          ],
-          new Map() as SceneElementsMap,
-        );
+        LinearElementEditor.movePoints(line, [
+          {
+            index: 0,
+            point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),
+          },
+          {
+            index: line.points.length - 1,
+            point: pointFrom(
+              line.points[line.points.length - 1][0] - 10,
+              line.points[line.points.length - 1][1] - 10,
+            ),
+          },
+        ]);
       });
       expect(line.x).toBe(origStartX + 10);
       expect(line.y).toBe(origStartY + 10);

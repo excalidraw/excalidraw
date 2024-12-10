@@ -217,7 +217,10 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
   a: P,
   b: P,
 ): number {
-  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const xDiff = b[0] - a[0];
+  const yDiff = b[1] - a[1];
+
+  return xDiff * xDiff + yDiff * yDiff;
 }
 
 /**

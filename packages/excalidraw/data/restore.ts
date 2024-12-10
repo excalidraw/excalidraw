@@ -320,6 +320,7 @@ const restoreElement = (
         x,
         y,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
+        fixedSegments: (element as ExcalidrawArrowElement).fixedSegments,
         ...getSizeFromPoints(points),
       });
     }
