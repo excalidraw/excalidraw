@@ -443,18 +443,23 @@ export const charWidth = (() => {
 const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 
 // FIXME rename to getApproxMinContainerWidth
-export const getApproxMinLineWidth = (
+export const getApproxMinContainerWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
 ) => {
   const maxCharWidth = getMaxCharWidth(font);
+  const minCharWidth = BOUND_TEXT_PADDING;
+  const fontSize = parseFloat(font) || 16; // Fallback to a default font size if parseFloat fails
+  const padding = Math.max(minCharWidth, fontSize); // Adjust padding based on font size or minCharWidth
+  const baseWidth = minCharWidth || maxCharWidth;
+
   if (maxCharWidth === 0) {
     return (
       measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight).width +
       BOUND_TEXT_PADDING * 2
     );
   }
-  return maxCharWidth + BOUND_TEXT_PADDING * 2;
+  return baseWidth + padding;
 };
 
 export const getMinCharWidth = (font: FontString) => {

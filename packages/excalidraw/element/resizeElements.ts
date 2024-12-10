@@ -40,7 +40,7 @@ import type {
 import type { PointerDownState } from "../types";
 import Scene from "../scene/Scene";
 import {
-  getApproxMinLineWidth,
+  getApproxMinContainerWidth,
   getBoundTextElement,
   getBoundTextElementId,
   getContainerElement,
@@ -571,7 +571,7 @@ export const resizeSingleElement = (
         fontSize: nextFont.size,
       };
     } else {
-      const minWidth = getApproxMinLineWidth(
+      const minWidth = getApproxMinContainerWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
       );
