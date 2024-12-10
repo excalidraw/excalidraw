@@ -106,11 +106,15 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+export const isSupportedImageFileType = (type: string | null | undefined) => {
+  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+};
+
 export const isSupportedImageFile = (
   blob: Blob | null | undefined,
 ): blob is Blob & { type: ValueOf<typeof IMAGE_MIME_TYPES> } => {
   const { type } = blob || {};
-  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+  return isSupportedImageFileType(type);
 };
 
 export const loadSceneOrLibraryFromBlob = async (
