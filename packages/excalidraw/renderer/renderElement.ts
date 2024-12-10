@@ -40,6 +40,7 @@ import type {
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MIME_TYPES,
@@ -109,10 +110,13 @@ export const getRenderOpacity = (
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
   pendingNodes: Readonly<PendingExcalidrawElements> | null,
+  globalAlpha: number = 1,
 ) => {
   // multiplying frame opacity with element opacity to combine them
   // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
-  let opacity = ((containingFrame?.opacity ?? 100) * element.opacity) / 10000;
+  let opacity =
+    (((containingFrame?.opacity ?? 100) * element.opacity) / 10000) *
+    globalAlpha;
 
   // if pending erasure, multiply again to combine further
   // (so that erasing always results in lower opacity than original)
@@ -700,11 +704,17 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  const reduceAlphaForSelection =
+    appState.openDialog?.name === "elementLinkSelector" &&
+    !appState.selectedElementIds[element.id] &&
+    !appState.hoveredElementIds[element.id];
+
   context.globalAlpha = getRenderOpacity(
     element,
     getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
     renderConfig.pendingFlowchartNodes,
+    reduceAlphaForSelection ? DEFAULT_REDUCED_GLOBAL_ALPHA : 1,
   );
 
   switch (element.type) {

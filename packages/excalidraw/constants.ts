@@ -2,6 +2,7 @@ import cssVariables from "./css/variables.module.scss";
 import type { AppProps, AppState } from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
+
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);
 export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
@@ -448,3 +449,6 @@ export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
   round: "round",
   elbow: "elbow",
 };
+
+export const DEFAULT_REDUCED_GLOBAL_ALPHA = 0.3;
+export const ELEMENT_LINK_KEY = "element";

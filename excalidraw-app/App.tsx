@@ -126,6 +126,8 @@ import DebugCanvas, {
   loadSavedDebugState,
 } from "./components/DebugCanvas";
 import { AIComponents } from "./components/AI";
+import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
+import { isElementLink } from "../packages/excalidraw/element/elementLink";
 
 polyfill();
 
@@ -847,6 +849,12 @@ const ExcalidrawWrapper = () => {
             </div>
           );
         }}
+        onLinkOpen={(element, event) => {
+          if (element.link && isElementLink(element.link)) {
+            event.preventDefault();
+            excalidrawAPI?.scrollToContent(element.link, { animate: true });
+          }
+        }}
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
@@ -1125,6 +1133,12 @@ const ExcalidrawWrapper = () => {
 };
 
 const ExcalidrawApp = () => {
+  const isCloudExportWindow =
+    window.location.pathname === "/excalidraw-plus-export";
+  if (isCloudExportWindow) {
+    return <ExcalidrawPlusIframeExport />;
+  }
+
   return (
     <TopErrorBoundary>
       <Provider unstable_createStore={() => appJotaiStore}>
