@@ -303,8 +303,7 @@ import {
 import type { ContextMenuItems } from "./ContextMenu";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import LayerUI from "./LayerUI";
-import type { ToastType } from "./Toast";
-import { Toast } from "./Toast";
+import { Toast, type ToastType } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
