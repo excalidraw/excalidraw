@@ -21,11 +21,11 @@ export class DurableRoom extends DurableObject {
     super(ctx, env);
 
     this.ctx.blockConcurrencyWhile(async () => {
-      // TODO: snapshot should likely be a transient store
-      // TODO: loaded the latest state from the db
+      // CFDO: snapshot should likely be a transient store
+      // CFDO: loaded the latest state from the db
       this.snapshot = {
-        // TODO: start persisting acknowledged version (not a scene version!)
-        // TODO: we don't persist appState, should we?
+        // CFDO: start persisting acknowledged version (not a scene version!)
+        // CFDO: we don't persist appState, should we?
         appState: {},
         elements: new Map(),
         version: 0,

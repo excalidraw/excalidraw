@@ -4,7 +4,7 @@ import type {
   SERVER_CHANGE,
 } from "../sync/protocol";
 
-// TODO: add senderId, possibly roomId as well
+// CFDO: add senderId, possibly roomId as well
 export class DurableChangesRepository implements ChangesRepository {
   constructor(private storage: DurableObjectStorage) {
     // #region DEV ONLY
@@ -24,7 +24,7 @@ export class DurableChangesRepository implements ChangesRepository {
       const prevVersion = this.getLastVersion();
       const nextVersion = prevVersion + changes.length;
 
-      // TODO: in theory payload could contain array of changes, if we would need to optimize writes
+      // CFDO: in theory payload could contain array of changes, if we would need to optimize writes
       for (const [index, change] of changes.entries()) {
         const version = prevVersion + index + 1;
         // unique id ensures that we don't acknowledge the same change twice

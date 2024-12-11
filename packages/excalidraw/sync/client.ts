@@ -7,7 +7,6 @@ import type { CLIENT_CHANGE, PUSH_PAYLOAD, SERVER_CHANGE } from "./protocol";
 import throttle from "lodash.throttle";
 
 export class ExcalidrawSyncClient {
-  // TODO: add prod url
   private static readonly HOST_URL = import.meta.env.DEV
     ? "ws://localhost:8787"
     : "https://excalidraw-sync.marcel-529.workers.dev";
@@ -46,11 +45,11 @@ export class ExcalidrawSyncClient {
     this.api = api;
     this.roomId = roomId;
 
-    // TODO: persist in idb
+    // CFDO: persist in idb
     this.lastAcknowledgedVersion = 0;
   }
 
-  // TODO: throttle does not work that well here (after some period it tries to reconnect too often)
+  // CFDO: throttle does not work that well here (after some period it tries to reconnect too often)
   public reconnect = throttle(
     async () => {
       try {
@@ -164,7 +163,7 @@ export class ExcalidrawSyncClient {
     );
   };
 
-  // TODO: could be an array buffer
+  // CFDO: could be an array buffer
   private onMessage = (event: MessageEvent) => {
     const [result, error] = Utils.try(() => JSON.parse(event.data as string));
 
@@ -202,7 +201,7 @@ export class ExcalidrawSyncClient {
     const payload: PUSH_PAYLOAD = { type, changes: [] };
 
     if (type === "durable") {
-      // TODO: persist in idb (with insertion order)
+      // CFDO: persist in idb (with insertion order)
       for (const change of changes) {
         this.queuedChanges.set(change.id, {
           queuedAt: Date.now(),
@@ -231,7 +230,7 @@ export class ExcalidrawSyncClient {
     });
   }
 
-  // TODO: refactor by applying all operations to store, not to the elements
+  // CFDO: refactor by applying all operations to store, not to the elements
   private handleAcknowledged(payload: { changes: Array<SERVER_CHANGE> }) {
     const { changes: remoteChanges } = payload;
 
@@ -254,7 +253,7 @@ export class ExcalidrawSyncClient {
           // local change acknowledge by the server, safe to remove
           this.queuedChanges.delete(remoteChange.id);
         } else {
-          // TODO: we might not need to be that strict here
+          // CFDO: we might not need to be that strict here
           if (this.lastAcknowledgedVersion + 1 !== remoteChange.version) {
             throw new Error(
               `Received out of order change, expected "${
@@ -282,7 +281,7 @@ export class ExcalidrawSyncClient {
       );
 
       // apply local changes
-      // TODO: only necessary when remote changes modified same element properties!
+      // CFDO: only necessary when remote changes modified same element properties!
       for (const localChange of this.localChanges) {
         [elements] = localChange.applyTo(
           elements,

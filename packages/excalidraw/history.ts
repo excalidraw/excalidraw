@@ -1,8 +1,11 @@
-import type { AppStateChange, ElementsChange } from "./change";
-import type { SceneElementsMap } from "./element/types";
 import { Emitter } from "./emitter";
-import type { Snapshot } from "./store";
+import type { SceneElementsMap } from "./element/types";
+import type { Store, StoreIncrement } from "./store";
 import type { AppState } from "./types";
+
+type HistoryEntry = StoreIncrement & {
+  skipRecording?: true;
+};
 
 type HistoryStack = HistoryEntry[];
 
@@ -18,8 +21,8 @@ export class History {
     [HistoryChangedEvent]
   >();
 
-  private readonly undoStack: HistoryStack = [];
-  private readonly redoStack: HistoryStack = [];
+  public readonly undoStack: HistoryStack = [];
+  public readonly redoStack: HistoryStack = [];
 
   public get isUndoStackEmpty() {
     return this.undoStack.length === 0;
@@ -29,6 +32,8 @@ export class History {
     return this.redoStack.length === 0;
   }
 
+  constructor(private readonly store: Store) {}
+
   public clear() {
     this.undoStack.length = 0;
     this.redoStack.length = 0;
@@ -37,13 +42,8 @@ export class History {
   /**
    * Record a local change which will go into the history
    */
-  public record(
-    elementsChange: ElementsChange,
-    appStateChange: AppStateChange,
-  ) {
-    const entry = HistoryEntry.create(appStateChange, elementsChange);
-
-    if (!entry.isEmpty()) {
+  public record(entry: HistoryEntry) {
+    if (!entry.skipRecording && !entry.isEmpty()) {
       // we have the latest changes, no need to `applyLatest`, which is done within `History.push`
       this.undoStack.push(entry.inverse());
 
@@ -60,29 +60,19 @@ export class History {
     }
   }
 
-  public undo(
-    elements: SceneElementsMap,
-    appState: AppState,
-    snapshot: Readonly<Snapshot>,
-  ) {
+  public undo(elements: SceneElementsMap, appState: AppState) {
     return this.perform(
       elements,
       appState,
-      snapshot,
       () => History.pop(this.undoStack),
       (entry: HistoryEntry) => History.push(this.redoStack, entry, elements),
     );
   }
 
-  public redo(
-    elements: SceneElementsMap,
-    appState: AppState,
-    snapshot: Readonly<Snapshot>,
-  ) {
+  public redo(elements: SceneElementsMap, appState: AppState) {
     return this.perform(
       elements,
       appState,
-      snapshot,
       () => History.pop(this.redoStack),
       (entry: HistoryEntry) => History.push(this.undoStack, entry, elements),
     );
@@ -91,7 +81,6 @@ export class History {
   private perform(
     elements: SceneElementsMap,
     appState: AppState,
-    snapshot: Readonly<Snapshot>,
     pop: () => HistoryEntry | null,
     push: (entry: HistoryEntry) => void,
   ): [SceneElementsMap, AppState] | void {
@@ -109,10 +98,17 @@ export class History {
       // iterate through the history entries in case they result in no visible changes
       while (historyEntry) {
         try {
+          // skip re-recording the history entry, as it gets emitted and is manually pushed to the undo / redo stack
+          Object.assign(historyEntry, { skipRecording: true });
+          // CFDO: consider encapsulating element & appState update inside applyIncrement
           [nextElements, nextAppState, containsVisibleChange] =
-            historyEntry.applyTo(nextElements, nextAppState, snapshot);
+            this.store.applyIncrementTo(
+              historyEntry,
+              nextElements,
+              nextAppState,
+            );
         } finally {
-          // make sure to always push / pop, even if the increment is corrupted
+          // make sure to always push, even if the increment is corrupted
           push(historyEntry);
         }
 
@@ -121,6 +117,10 @@ export class History {
         }
 
         historyEntry = pop();
+      }
+
+      if (nextElements === null || nextAppState === null) {
+        return;
       }
 
       return [nextElements, nextAppState];
@@ -154,57 +154,5 @@ export class History {
   ) {
     const updatedEntry = entry.inverse().applyLatestChanges(prevElements);
     return stack.push(updatedEntry);
-  }
-}
-
-export class HistoryEntry {
-  private constructor(
-    public readonly appStateChange: AppStateChange,
-    public readonly elementsChange: ElementsChange,
-  ) {}
-
-  public static create(
-    appStateChange: AppStateChange,
-    elementsChange: ElementsChange,
-  ) {
-    return new HistoryEntry(appStateChange, elementsChange);
-  }
-
-  public inverse(): HistoryEntry {
-    return new HistoryEntry(
-      this.appStateChange.inverse(),
-      this.elementsChange.inverse(),
-    );
-  }
-
-  public applyTo(
-    elements: SceneElementsMap,
-    appState: AppState,
-    snapshot: Readonly<Snapshot>,
-  ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] =
-      this.elementsChange.applyTo(elements, snapshot.elements);
-
-    const [nextAppState, appStateContainsVisibleChange] =
-      this.appStateChange.applyTo(appState, nextElements);
-
-    const appliedVisibleChanges =
-      elementsContainVisibleChange || appStateContainsVisibleChange;
-
-    return [nextElements, nextAppState, appliedVisibleChanges];
-  }
-
-  /**
-   * Apply latest (remote) changes to the history entry, creates new instance of `HistoryEntry`.
-   */
-  public applyLatestChanges(elements: SceneElementsMap): HistoryEntry {
-    const updatedElementsChange =
-      this.elementsChange.applyLatestChanges(elements);
-
-    return HistoryEntry.create(this.appStateChange, updatedElementsChange);
-  }
-
-  public isEmpty(): boolean {
-    return this.appStateChange.isEmpty() && this.elementsChange.isEmpty();
   }
 }

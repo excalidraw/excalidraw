@@ -32,7 +32,7 @@ export interface ChangesRepository {
   getLastVersion(): number;
 }
 
-// TODO: should come from the shared types package
+// CFDO: should come from the shared types package
 export type ExcalidrawElement = {
   id: string;
   type: any;

@@ -11,7 +11,7 @@ import type {
   SERVER_MESSAGE,
 } from "./protocol";
 
-// TODO: message could be binary (cbor, protobuf, etc.)
+// CFDO: message could be binary (cbor, protobuf, etc.)
 
 /**
  * Core excalidraw sync logic.
@@ -48,7 +48,7 @@ export class ExcalidrawSyncServer {
         return this.pull(client, payload);
       case "push":
         // apply each one-by-one to avoid race conditions
-        // TODO: in theory we do not need to block ephemeral appState changes
+        // CFDO: in theory we do not need to block ephemeral appState changes
         return this.lock.acquire("push", () => this.push(client, payload));
       default:
         console.error(`Unknown message type: ${type}`);
@@ -56,7 +56,7 @@ export class ExcalidrawSyncServer {
   }
 
   private pull(client: WebSocket, payload: PULL_PAYLOAD) {
-    // TODO: test for invalid payload
+    // CFDO: test for invalid payload
     const lastAcknowledgedClientVersion = payload.lastAcknowledgedVersion;
     const lastAcknowledgedServerVersion =
       this.changesRepository.getLastVersion();
@@ -70,7 +70,7 @@ export class ExcalidrawSyncServer {
     }
 
     if (versionΔ < 0) {
-      // TODO: restore the client from the snapshot / deltas?
+      // CFDO: restore the client from the snapshot / deltas?
       console.error(
         `Panic! Client claims to have higher acknowledged version than the latest one on the server!`,
       );
@@ -78,7 +78,7 @@ export class ExcalidrawSyncServer {
     }
 
     if (versionΔ > 0) {
-      // TODO: for versioning we need deletions, but not for the "snapshot" update
+      // CFDO: for versioning we need deletions, but not for the "snapshot" update
       const changes = this.changesRepository.getSinceVersion(
         lastAcknowledgedClientVersion,
       );
@@ -99,7 +99,7 @@ export class ExcalidrawSyncServer {
         return this.relay(client, { changes });
       case "durable":
         const [acknowledged, error] = Utils.try(() => {
-          // TODO: try to apply the changes to the snapshot
+          // CFDO: try to apply the changes to the snapshot
           return this.changesRepository.saveAll(changes);
         });
 

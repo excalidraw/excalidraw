@@ -710,7 +710,7 @@ class App extends React.Component<AppProps, AppState> {
     this.visibleElements = [];
 
     this.store = new Store();
-    this.history = new History();
+    this.history = new History(this.store);
 
     if (excalidrawAPI) {
       const api: ExcalidrawImperativeAPI = {
@@ -759,15 +759,11 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.fonts = new Fonts(this.scene);
-    this.history = new History();
+    this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
-    this.actionManager.registerAction(
-      createUndoAction(this.history, this.store),
-    );
-    this.actionManager.registerAction(
-      createRedoAction(this.history, this.store),
-    );
+    this.actionManager.registerAction(createUndoAction(this.history));
+    this.actionManager.registerAction(createRedoAction(this.history));
   }
 
   private onWindowMessage(event: MessageEvent) {
@@ -1821,6 +1817,10 @@ class App extends React.Component<AppProps, AppState> {
     return this.scene.getElementsIncludingDeleted();
   };
 
+  public getSceneElementsMapIncludingDeleted = () => {
+    return this.scene.getElementsMapIncludingDeleted();
+  }
+
   public getSceneElements = () => {
     return this.scene.getNonDeletedElements();
   };
@@ -2463,7 +2463,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.onStoreIncrementEmitter.on((increment) => {
-      this.history.record(increment.elementsChange, increment.appStateChange);
+      this.history.record(increment);
       this.props.onIncrement?.(increment);
     });
 

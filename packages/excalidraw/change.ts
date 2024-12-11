@@ -370,6 +370,7 @@ class Delta<T> {
       );
     }
 
+    // TODO: order the keys based on the most common ones to change (i.e. x/y, width/height, isDeleted, etc.)
     for (const key of keys) {
       const object1Value = object1[key as keyof T];
       const object2Value = object2[key as keyof T];
@@ -796,37 +797,41 @@ export class AppStateChange implements Change<AppState> {
   }
 }
 
-type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> =
-  ElementUpdate<Ordered<T>>;
+type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
+  ElementUpdate<Ordered<T>>,
+  "seed"
+>;
+
+type ElementsChangeOptions = {
+  id: string;
+  shouldRedistribute: boolean;
+};
 
 /**
  * Elements change is a low level primitive to capture a change between two sets of elements.
  * It does so by encapsulating forward and backward `Delta`s, allowing to time-travel in both directions.
  */
 export class ElementsChange implements Change<SceneElementsMap> {
-  public readonly id: string;
-
   private constructor(
+    public readonly id: string,
     private readonly added: Record<string, Delta<ElementPartial>>,
     private readonly removed: Record<string, Delta<ElementPartial>>,
     private readonly updated: Record<string, Delta<ElementPartial>>,
-    options: { changeId: string },
-  ) {
-    this.id = options.changeId;
-  }
+  ) {}
 
   public static create(
     added: Record<string, Delta<ElementPartial>>,
     removed: Record<string, Delta<ElementPartial>>,
     updated: Record<string, Delta<ElementPartial>>,
-    options: { changeId: string; shouldRedistribute: boolean } = {
-      changeId: randomId(),
+    options: ElementsChangeOptions = {
+      id: randomId(),
       shouldRedistribute: false,
     },
   ) {
+    const { id, shouldRedistribute } = options;
     let change: ElementsChange;
 
-    if (options.shouldRedistribute) {
+    if (shouldRedistribute) {
       const nextAdded: Record<string, Delta<ElementPartial>> = {};
       const nextRemoved: Record<string, Delta<ElementPartial>> = {};
       const nextUpdated: Record<string, Delta<ElementPartial>> = {};
@@ -847,13 +852,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
         }
       }
 
-      change = new ElementsChange(nextAdded, nextRemoved, nextUpdated, {
-        changeId: options.changeId,
-      });
+      change = new ElementsChange(id, nextAdded, nextRemoved, nextUpdated);
     } else {
-      change = new ElementsChange(added, removed, updated, {
-        changeId: options.changeId,
-      });
+      change = new ElementsChange(id, added, removed, updated);
     }
 
     if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
@@ -1000,7 +1001,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     const { id, added, removed, updated } = JSON.parse(payload);
 
     return ElementsChange.create(added, removed, updated, {
-      changeId: id,
+      id,
       shouldRedistribute: false,
     });
   }
@@ -1021,6 +1022,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     const updated = inverseInternal(this.updated);
 
     // notice we inverse removed with added not to break the invariants
+    // notice we force generate a new id
     return ElementsChange.create(removed, added, updated);
   }
 
@@ -1089,7 +1091,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     const updated = applyLatestChangesInternal(this.updated);
 
     return ElementsChange.create(added, removed, updated, {
-      changeId: this.id,
+      id: this.id,
       shouldRedistribute: true, // redistribute the deltas as `isDeleted` could have been updated
     });
   }
@@ -1232,7 +1234,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
           }
         } else if (type === "added") {
           // for additions the element does not have to exist (i.e. remote update)
-          // TODO: the version itself might be different!
+          // CFDO: the version itself might be different!
           element = newElementWith(
             { id, version: 1 } as OrderedExcalidrawElement,
             {
@@ -1602,7 +1604,8 @@ export class ElementsChange implements Change<SceneElementsMap> {
   private static stripIrrelevantProps(
     partial: Partial<OrderedExcalidrawElement>,
   ): ElementPartial {
-    const { id, updated, version, versionNonce, ...strippedPartial } = partial;
+    const { id, updated, version, versionNonce, seed, ...strippedPartial } =
+      partial;
 
     return strippedPartial;
   }

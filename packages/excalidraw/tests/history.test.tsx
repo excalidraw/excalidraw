@@ -16,7 +16,6 @@ import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
-import type { AppState } from "../types";
 import { arrayToMap } from "../utils";
 import {
   COLOR_PALETTE,
@@ -42,11 +41,11 @@ import {
 } from "../actions";
 import { vi } from "vitest";
 import { queryByText } from "@testing-library/react";
-import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
-import { Snapshot, StoreAction } from "../store";
+import { StoreAction, StoreIncrement } from "../store";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom } from "../../math";
+import type { AppState } from "../types.js";
 
 const { h } = window;
 
@@ -65,7 +64,8 @@ const checkpoint = (name: string) => {
     ...strippedAppState
   } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history).toMatchSnapshot(`[${name}] history`);
+  expect(h.history.undoStack).toMatchSnapshot(`[${name}] undo stack`);
+  expect(h.history.redoStack).toMatchSnapshot(`[${name}] redo stack`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements
     .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
@@ -99,14 +99,16 @@ describe("history", () => {
 
       API.setElements([rect]);
 
-      const corrupedEntry = HistoryEntry.create(
-        AppStateChange.empty(),
+      const corrupedEntry = new StoreIncrement(
         ElementsChange.empty(),
+        AppStateChange.empty(),
       );
 
-      vi.spyOn(corrupedEntry, "applyTo").mockImplementation(() => {
-        throw new Error("Oh no, I am corrupted!");
-      });
+      vi.spyOn(corrupedEntry.elementsChange, "applyTo").mockImplementation(
+        () => {
+          throw new Error("Oh no, I am corrupted!");
+        },
+      );
 
       (h.history as any).undoStack.push(corrupedEntry);
 
@@ -119,7 +121,6 @@ describe("history", () => {
             h.history.undo(
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
-              Snapshot.empty(),
             ) as any,
         );
       } catch (e) {
@@ -140,7 +141,6 @@ describe("history", () => {
             h.history.redo(
               arrayToMap(h.elements) as SceneElementsMap,
               appState,
-              Snapshot.empty(),
             ) as any,
         );
       } catch (e) {
@@ -437,8 +437,8 @@ describe("history", () => {
         expect(h.history.isUndoStackEmpty).toBeTruthy();
       });
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
       // noop
       API.executeAction(undoAction);
       expect(h.elements).toEqual([
@@ -514,8 +514,8 @@ describe("history", () => {
         expect.objectContaining({ id: "B", isDeleted: false }),
       ]);
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
       API.executeAction(undoAction);
 
       expect(API.getSnapshot()).toEqual([
@@ -1714,8 +1714,8 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
-      const redoAction = createRedoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
+      const redoAction = createRedoAction(h.history);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
@@ -1764,7 +1764,7 @@ describe("history", () => {
         />,
       );
 
-      const undoAction = createUndoAction(h.history, h.store);
+      const undoAction = createUndoAction(h.history);
 
       await waitFor(() => {
         expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);

@@ -46,9 +46,9 @@ const executeHistoryAction = (
   return { storeAction: StoreAction.NONE };
 };
 
-type ActionCreator = (history: History, store: Store) => Action;
+type ActionCreator = (history: History) => Action;
 
-export const createUndoAction: ActionCreator = (history, store) => ({
+export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
   label: "buttons.undo",
   icon: UndoIcon,
@@ -56,11 +56,7 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   viewMode: false,
   perform: (elements, appState, value, app) =>
     executeHistoryAction(app, appState, () =>
-      history.undo(
-        arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
-        appState,
-        store.snapshot,
-      ),
+      history.undo(arrayToMap(elements) as SceneElementsMap, appState),
     ),
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && matchKey(event, KEYS.Z) && !event.shiftKey,
@@ -87,19 +83,15 @@ export const createUndoAction: ActionCreator = (history, store) => ({
   },
 });
 
-export const createRedoAction: ActionCreator = (history, store) => ({
+export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
   label: "buttons.redo",
   icon: RedoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
-  perform: (elements, appState, _, app) =>
+  perform: (elements, appState, __, app) =>
     executeHistoryAction(app, appState, () =>
-      history.redo(
-        arrayToMap(elements) as SceneElementsMap, // TODO: #7348 refactor action manager to already include `SceneElementsMap`
-        appState,
-        store.snapshot,
-      ),
+      history.redo(arrayToMap(elements) as SceneElementsMap, appState),
     ),
   keyTest: (event) =>
     (event[KEYS.CTRL_OR_CMD] && event.shiftKey && matchKey(event, KEYS.Z)) ||

@@ -109,7 +109,7 @@ import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import type { RemoteExcalidrawElement } from "../packages/excalidraw/data/reconcile";
-import type { StoreIncrementEvent } from "../packages/excalidraw/store";
+import type { StoreIncrement } from "../packages/excalidraw/store";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
@@ -689,13 +689,14 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const onIncrement = (increment: StoreIncrementEvent) => {
+  const onIncrement = (increment: StoreIncrement) => {
     // ephemerals are not part of this (which is alright)
     // - wysiwyg, dragging elements / points, mouse movements, etc.
     const { elementsChange } = increment;
 
     // some appState like selections should also be transfered (we could even persist it)
     if (!elementsChange.isEmpty()) {
+      console.log(elementsChange)
       syncAPI?.push("durable", [elementsChange]);
     }
   };
