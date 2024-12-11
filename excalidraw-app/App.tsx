@@ -369,14 +369,13 @@ const ExcalidrawWrapper = () => {
 
   useEffect(() => {
     if (isLocalStorageOverflow) {
-      if (excalidrawAPI) {
-        excalidrawAPI.setToast({
-          message: t("alerts.localStorageOverflow"),
-          closable: true,
-          duration: Infinity,
-          type: "danger",
-        });
-      }
+      excalidrawAPI?.setToast({
+        message: t("alerts.localStorageOverflow"),
+        closable: true,
+        duration: Infinity,
+        type: "danger",
+        style: { textWrap: "balance" },
+      });
     }
   }, [isLocalStorageOverflow, excalidrawAPI]);
 

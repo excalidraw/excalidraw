@@ -239,7 +239,7 @@
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
     "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
-    "localStorageOverflow": "Save failed. Too many items!"
+    "localStorageOverflow": "Couldn't save the scene locally. Too many elements!"
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
