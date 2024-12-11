@@ -76,6 +76,7 @@ import type {
 } from "../scene/types";
 import {
   pointFrom,
+  PRECISION,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
@@ -531,10 +532,14 @@ const renderLinearPointHandles = (
           false,
           !fixedSegments.find(
             (segment) =>
-              element.x + segment.start[0] === points[idx][0] &&
-              element.y + segment.start[1] === points[idx][1] &&
-              element.x + segment.end[0] === points[idx + 1][0] &&
-              element.y + segment.end[1] === points[idx + 1][1],
+              Math.abs(element.x + segment.start[0] - points[idx][0]) <
+                PRECISION &&
+              Math.abs(element.y + segment.start[1] - points[idx][1]) <
+                PRECISION &&
+              Math.abs(element.x + segment.end[0] - points[idx + 1][0]) <
+                PRECISION &&
+              Math.abs(element.y + segment.end[1] - points[idx + 1][1]) <
+                PRECISION,
           ),
         );
       }
