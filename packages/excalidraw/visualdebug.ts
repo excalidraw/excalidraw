@@ -16,6 +16,8 @@ declare global {
       data: DebugElement[][];
       currentFrame?: number;
     };
+    debugDrawPoint: typeof debugDrawPoint;
+    debugDrawLine: typeof debugDrawLine;
   }
 }
 
