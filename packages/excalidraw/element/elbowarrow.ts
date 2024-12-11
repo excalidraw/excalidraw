@@ -127,7 +127,7 @@ export const updateElbowArrowPoints = (
       "you can't add new points between start and end manually to elbow arrows)",
   );
 
-  const updatedPoints = updates.points
+  const updatedPoints: LocalPoint[] = updates.points
     ? updates.points.length === 2
       ? arrow.points.map((p, idx) =>
           idx === 0
@@ -194,19 +194,16 @@ export const updateElbowArrowPoints = (
     nextFixedSegments = arrow.points
       .map((p, idx) => {
         const existingSegment =
-          idx > 1
-            ? arrow.fixedSegments?.find(
-                (segment) =>
-                  pointsEqual(
-                    segment.start,
-                    renormalizedUpdatedPoints[idx - 1],
-                  ) && pointsEqual(segment.end, renormalizedUpdatedPoints[idx]),
-              )
+          idx > 0
+            ? arrow.fixedSegments?.find((segment, i) => {
+                return (
+                  pointsEqual(segment.start, arrow.points[idx - 1]) &&
+                  pointsEqual(segment.end, arrow.points[idx])
+                );
+              })
             : undefined;
-        if (existingSegment) {
-          return [existingSegment, idx] as const;
-        }
 
+        let newSegment: FixedSegment | undefined;
         if (
           idx > 1 &&
           !pointsEqual(p, renormalizedUpdatedPoints[idx]) &&
@@ -219,21 +216,21 @@ export const updateElbowArrowPoints = (
           // and the current point is not the same as the updated point, then a
           // new segment is being moved / fixed
 
-          return [
-            {
-              start: renormalizedUpdatedPoints[idx - 1],
-              end: renormalizedUpdatedPoints[idx],
-            },
-            idx,
-          ] as const;
+          newSegment = {
+            start: renormalizedUpdatedPoints[idx - 1],
+            end: renormalizedUpdatedPoints[idx],
+          };
         }
-
-        return null;
+        (newSegment || existingSegment) &&
+          console.log(idx, newSegment, existingSegment);
+        return newSegment || existingSegment
+          ? ([newSegment ? newSegment : existingSegment, idx] as const)
+          : null;
       })
-      .filter((segment) => segment != null)
+      .filter((segment): segment is [FixedSegment, number] => segment != null)
       .sort((a, b) => a![1] - b![1])
-      // @ts-ignore
-      .map(([segment, _]): FixedSegment => segment);
+      .map((data) => data[0]);
+    console.log("------");
   }
 
   let state = {
