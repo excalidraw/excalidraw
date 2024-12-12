@@ -1,13 +1,13 @@
 import clsx from "clsx";
-import { activeColorPickerSectionAtom, type ColorPickerType } from "./colorPickerUtils";
+import { type ColorPickerType } from "./colorPickerUtils";
 import {
+  ColorTuple,
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
 } from "../../colors";
 import HotkeyLabel from "./HotkeyLabel";
-import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
-import { useAtom } from "jotai";
+import { topPicksColorPickerKeyNavHandler } from "./keyboardNavHandlers";
 
 interface TopPicksProps {
   onChange: (color: string) => void;
@@ -22,7 +22,7 @@ export const TopPicks = ({
   activeColor,
   topPicks,
 }: TopPicksProps) => {
-  let colors;
+  let colors: ColorTuple | readonly string[] | undefined;
   if (type === "elementStroke") {
     colors = DEFAULT_ELEMENT_STROKE_PICKS;
   }
@@ -45,25 +45,13 @@ export const TopPicks = ({
     return null;
   }
 
-  const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
-    activeColorPickerSectionAtom,
-  );
-
   return (
     <div className="color-picker__top-picks"
     onKeyDown={(event) => {
-      const handled = colorPickerKeyNavHandler({
+      const handled = topPicksColorPickerKeyNavHandler({
         event,
-        activeColorPickerSection,
-        null,
-        color,
         onChange,
-        onEyeDropperToggle,
-        customColors,
-        setActiveColorPickerSection,
-        updateData,
-        activeShade,
-        onEscape,
+        colors,
       });
 
       if (handled) {

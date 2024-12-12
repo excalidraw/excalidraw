@@ -3,6 +3,7 @@ import type {
   ColorPickerColor,
   ColorPalette,
   ColorPaletteCustom,
+  ColorTuple,
 } from "../../colors";
 import { COLORS_PER_ROW, COLOR_PALETTE } from "../../colors";
 import type { ValueOf } from "../../utility-types";
@@ -180,8 +181,8 @@ export const colorPickerKeyNavHandler = ({
       activeSectionIndex + indexOffset > sections.length - 1
         ? 0
         : activeSectionIndex + indexOffset < 0
-        ? sections.length - 1
-        : activeSectionIndex + indexOffset;
+          ? sections.length - 1
+          : activeSectionIndex + indexOffset;
 
     const nextSection = sections[nextSectionIndex];
 
@@ -282,5 +283,32 @@ export const colorPickerKeyNavHandler = ({
     }
   }
 
+  return false;
+};
+
+
+interface TopPicksColorPickerKeyNavHandlerProps {
+  event: React.KeyboardEvent;
+  onChange: (color: string) => void;
+  colors: ColorTuple | readonly string[] | undefined
+}
+/**
+ * @returns true if the event was handled
+ */
+export const topPicksColorPickerKeyNavHandler = ({
+  event,
+  onChange,
+  colors,
+}: TopPicksColorPickerKeyNavHandlerProps): boolean => {  
+  if (!colors) {
+    return false
+  }
+  if (["1", "2", "3", "4", "5"].includes(event.key)) {
+    const c = colors[Number(event.key) - 1];
+    if (c) {
+      onChange(colors[Number(event.key) - 1]);
+      return true;
+    }
+  }
   return false;
 };
