@@ -38,6 +38,7 @@ export interface MermaidToExcalidrawLibProps {
     parseMermaidToExcalidraw: (
       definition: string,
       config?: MermaidConfig,
+      forceSVG?: boolean, //zsviczian
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
 }

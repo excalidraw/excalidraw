@@ -1,3 +1,4 @@
+import { loadMermaidToExcalidrawLib } from "./MermaidToExcalidrawLib";
 import { Dialog } from "../Dialog";
 import { useApp, useAppProps, useExcalidrawSetAppState } from "../App";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
@@ -215,8 +216,9 @@ export const TTDDialogBase = withInternalFallback(
 
     useEffect(() => {
       const fn = async () => {
-        await mermaidToExcalidrawLib.api;
-        setMermaidToExcalidrawLib((prev) => ({ ...prev, loaded: true }));
+        //zsviczian decupling loding of API so it is available without opening TTDDialog
+        const mermaidToExcalidrawLib = await loadMermaidToExcalidrawLib();
+        setMermaidToExcalidrawLib(mermaidToExcalidrawLib);
       };
       fn();
     }, [mermaidToExcalidrawLib.api]);

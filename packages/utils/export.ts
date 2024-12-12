@@ -221,7 +221,7 @@ export { wrapText } from "../excalidraw/element/textWrapping"; //zsviczian
 export { getLineHeight } from "../excalidraw/fonts/index"; //zsviczian
 export { getFontString, getFontFamilyString } from "../excalidraw/utils"; //zsviczian
 export { getBoundTextMaxWidth } from "../excalidraw/element/textElement"; //zsviczian
-export { mermaidToExcalidraw } from "../excalidraw/components/TTDDialog/MermaidToExcalidraw"; //zsviczian
+export { mermaidToExcalidraw } from "../excalidraw/components/TTDDialog/MermaidToExcalidrawLib"; //zsviczian
 export {
   destroyObsidianUtils,
   registerLocalFont,
