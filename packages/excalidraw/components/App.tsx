@@ -1493,7 +1493,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
-    const { renderTopRightUI, renderCustomStats } = this.props;
+    const { renderTopLeftUI, renderTopRightUI, renderCustomStats } = this.props;
 
     const sceneNonce = this.scene.getSceneNonce();
     const { elementsMap, visibleElements } =
@@ -1573,6 +1573,7 @@ class App extends React.Component<AppProps, AppState> {
                           onHandToolToggle={this.onHandToolToggle}
                           langCode={getLanguage().code}
                           renderTopRightUI={renderTopRightUI}
+                          renderTopLeftUI={renderTopLeftUI}
                           renderCustomStats={renderCustomStats}
                           showExitZenModeBtn={
                             typeof this.props?.zenModeEnabled === "undefined" &&
