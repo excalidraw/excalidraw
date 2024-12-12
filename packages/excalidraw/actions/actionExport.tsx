@@ -185,8 +185,9 @@ export const actionSaveToActiveFile = register({
       return { storeAction: StoreAction.NONE };
     }
   },
-  keyTest: (event) =>
-    event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
+  // CFDO: temporary
+  // keyTest: (event) =>
+  //   event.key === KEYS.S && event[KEYS.CTRL_OR_CMD] && !event.shiftKey,
 });
 
 export const actionSaveFileToDisk = register({

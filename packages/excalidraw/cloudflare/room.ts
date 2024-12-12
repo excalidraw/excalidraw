@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { DurableChangesRepository } from "./changes";
+import { DurableIncrementsRepository } from "./repository";
 import { ExcalidrawSyncServer } from "../sync/server";
 
 import type { ExcalidrawElement } from "../element/types";
@@ -35,7 +35,7 @@ export class DurableRoom extends DurableObject {
     });
 
     this.sync = new ExcalidrawSyncServer(
-      new DurableChangesRepository(ctx.storage),
+      new DurableIncrementsRepository(ctx.storage),
     );
 
     // in case it hibernates, let's get take active connections

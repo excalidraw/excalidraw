@@ -65,3 +65,8 @@ export type MakeBrand<T extends string> = {
 
 /** Maybe just promise or already fulfilled one! */
 export type MaybePromise<T> = T | Promise<T>;
+
+/** Strip all the methods or functions from a type */
+export type DTO<T> = {
+  [K in keyof T as T[K] extends Function ? never : K]: T[K];
+};

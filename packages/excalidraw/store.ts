@@ -1,16 +1,17 @@
+import { ENV } from "./constants";
+import { Emitter } from "./emitter";
+import { randomId } from "./random";
+import { isShallowEqual } from "./utils";
 import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
-import { ENV } from "./constants";
 import { newElementWith } from "./element/mutateElement";
 import { deepCopyElement } from "./element/newElement";
+import type { AppState, ObservedAppState } from "./types";
+import type { DTO, ValueOf } from "./utility-types";
 import type {
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./element/types";
-import { Emitter } from "./emitter";
-import type { AppState, ObservedAppState } from "./types";
-import type { ValueOf } from "./utility-types";
-import { isShallowEqual } from "./utils";
 
 // hidden non-enumerable property for runtime checks
 const hiddenObservedAppStateProp = "__observedAppState";
@@ -96,31 +97,31 @@ export class Store {
    * Use to schedule calculation of a store increment.
    */
   // TODO: Suspicious that this is called so many places. Seems error-prone.
-  public shouldCaptureIncrement = () => {
+  public shouldCaptureIncrement() {
     this.scheduleAction(StoreAction.CAPTURE);
-  };
+  }
 
   /**
    * Use to schedule update of the snapshot, useful on updates for which we don't need to calculate increments (i.e. remote updates).
    */
-  public shouldUpdateSnapshot = () => {
+  public shouldUpdateSnapshot() {
     this.scheduleAction(StoreAction.UPDATE);
-  };
+  }
 
-  private scheduleAction = (action: StoreActionType) => {
+  private scheduleAction(action: StoreActionType) {
     this.scheduledActions.add(action);
     this.satisfiesScheduledActionsInvariant();
-  };
+  }
 
   /**
    * Based on the scheduled operation, either only updates store snapshot or also calculates increment and emits the result as a `StoreIncrement`.
    *
    * @emits StoreIncrement when increment is calculated.
    */
-  public commit = (
+  public commit(
     elements: Map<string, OrderedExcalidrawElement> | undefined,
     appState: AppState | ObservedAppState | undefined,
-  ): void => {
+  ): void {
     try {
       // Capture has precedence since it also performs update
       if (this.scheduledActions.has(StoreAction.CAPTURE)) {
@@ -133,17 +134,17 @@ export class Store {
       // Defensively reset all scheduled actions, potentially cleans up other runtime garbage
       this.scheduledActions = new Set();
     }
-  };
+  }
 
   /**
    * Performs diff calculation, calculates and emits the increment.
    *
    * @emits StoreIncrement when increment is calculated.
    */
-  public captureIncrement = (
+  public captureIncrement(
     elements: Map<string, OrderedExcalidrawElement> | undefined,
     appState: AppState | ObservedAppState | undefined,
-  ) => {
+  ) {
     const prevSnapshot = this.snapshot;
     const nextSnapshot = this.snapshot.maybeClone(elements, appState);
 
@@ -161,39 +162,39 @@ export class Store {
       if (!elementsChange.isEmpty() || !appStateChange.isEmpty()) {
         // Notify listeners with the increment
         this.onStoreIncrementEmitter.trigger(
-          new StoreIncrement(elementsChange, appStateChange),
+          StoreIncrement.create(elementsChange, appStateChange),
         );
       }
 
       // Update snapshot
       this.snapshot = nextSnapshot;
     }
-  };
+  }
 
   /**
    * Updates the snapshot without performing any diff calculation.
    */
-  public updateSnapshot = (
+  public updateSnapshot(
     elements: Map<string, OrderedExcalidrawElement> | undefined,
     appState: AppState | ObservedAppState | undefined,
-  ) => {
+  ) {
     const nextSnapshot = this.snapshot.maybeClone(elements, appState);
 
     if (this.snapshot !== nextSnapshot) {
       // Update snapshot
       this.snapshot = nextSnapshot;
     }
-  };
+  }
 
   /**
    * Filters out yet uncomitted elements from `nextElements`, which are part of in-progress local async actions (ephemerals) and thus were not yet commited to the snapshot.
    *
    * This is necessary in updates in which we receive reconciled elements, already containing elements which were not yet captured by the local store (i.e. collab).
    */
-  public filterUncomittedElements = (
+  public filterUncomittedElements(
     prevElements: Map<string, OrderedExcalidrawElement>,
     nextElements: Map<string, OrderedExcalidrawElement>,
-  ) => {
+  ) {
     for (const [id, prevElement] of prevElements.entries()) {
       const nextElement = nextElements.get(id);
 
@@ -215,18 +216,18 @@ export class Store {
     }
 
     return nextElements;
-  };
+  }
 
   /**
    * Apply and emit increment.
    *
    * @emits StoreIncrement when increment is applied.
    */
-  public applyIncrementTo = (
+  public applyIncrementTo(
     increment: StoreIncrement,
     elements: SceneElementsMap,
     appState: AppState,
-  ): [SceneElementsMap, AppState, boolean] => {
+  ): [SceneElementsMap, AppState, boolean] {
     const [nextElements, elementsContainVisibleChange] =
       increment.elementsChange.applyTo(elements, this.snapshot.elements);
 
@@ -239,17 +240,17 @@ export class Store {
     this.onStoreIncrementEmitter.trigger(increment);
 
     return [nextElements, nextAppState, appliedVisibleChanges];
-  };
+  }
 
   /**
    * Clears the store instance.
    */
-  public clear = (): void => {
+  public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledActions = new Set();
-  };
+  }
 
-  private satisfiesScheduledActionsInvariant = () => {
+  private satisfiesScheduledActionsInvariant() {
     if (!(this.scheduledActions.size >= 0 && this.scheduledActions.size <= 3)) {
       const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledActions.size}".`;
       console.error(message, this.scheduledActions.values());
@@ -258,20 +259,70 @@ export class Store {
         throw new Error(message);
       }
     }
-  };
+  }
 }
 
 /**
  * Represent an increment to the Store.
  */
 export class StoreIncrement {
-  constructor(
+  private constructor(
+    public readonly id: string,
     public readonly elementsChange: ElementsChange,
     public readonly appStateChange: AppStateChange,
   ) {}
 
+  /**
+   * Create a new instance of `StoreIncrement`.
+   */
+  public static create(
+    elementsChange: ElementsChange,
+    appStateChange: AppStateChange,
+    opts: {
+      id: string;
+    } = {
+      id: randomId(),
+    },
+  ) {
+    return new StoreIncrement(opts.id, elementsChange, appStateChange);
+  }
+
+  /**
+   * Restore a store increment instance from a DTO.
+   */
+  public static restore(storeIncrementDTO: DTO<StoreIncrement>) {
+    const { id, elementsChange, appStateChange } = storeIncrementDTO;
+    return new StoreIncrement(
+      id,
+      ElementsChange.restore(elementsChange),
+      AppStateChange.restore(appStateChange),
+    );
+  }
+
+  // CFDO: why it would be a string if it can be a DTO?
+  /**
+   * Parse and load the increment from the remote payload.
+   */
+  public static load(payload: string) {
+    // CFDO: ensure typesafety
+    const {
+      id,
+      elementsChange: { added, removed, updated },
+    } = JSON.parse(payload);
+
+    const elementsChange = ElementsChange.create(added, removed, updated, {
+      shouldRedistribute: false,
+    });
+
+    return new StoreIncrement(id, elementsChange, AppStateChange.empty());
+  }
+
+  /**
+   * Inverse store increment, creates new instance of `StoreIncrement`.
+   */
   public inverse(): StoreIncrement {
     return new StoreIncrement(
+      randomId(),
       this.elementsChange.inverse(),
       this.appStateChange.inverse(),
     );
@@ -281,10 +332,13 @@ export class StoreIncrement {
    * Apply latest (remote) changes to the increment, creates new instance of `StoreIncrement`.
    */
   public applyLatestChanges(elements: SceneElementsMap): StoreIncrement {
-    const updatedElementsChange =
-      this.elementsChange.applyLatestChanges(elements);
+    const inversedIncrement = this.inverse();
 
-    return new StoreIncrement(updatedElementsChange, this.appStateChange);
+    return new StoreIncrement(
+      inversedIncrement.id,
+      inversedIncrement.elementsChange.applyLatestChanges(elements),
+      inversedIncrement.appStateChange,
+    );
   }
 
   public isEmpty() {

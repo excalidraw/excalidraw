@@ -36,12 +36,16 @@ import type {
   BinaryFileData,
   BinaryFiles,
 } from "../../packages/excalidraw/types";
-import type { MaybePromise } from "../../packages/excalidraw/utility-types";
+import type {
+  DTO,
+  MaybePromise,
+} from "../../packages/excalidraw/utility-types";
 import { debounce } from "../../packages/excalidraw/utils";
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
+import { StoreIncrement } from "../../packages/excalidraw/store";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -65,34 +69,35 @@ class LocalFileManager extends FileManager {
   };
 }
 
-const saveDataStateToLocalStorage = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-) => {
-  try {
-    const _appState = clearAppStateForLocalStorage(appState);
+// CFDO: temporary
+// const saveDataStateToLocalStorage = (
+//   elements: readonly ExcalidrawElement[],
+//   appState: AppState,
+// ) => {
+//   try {
+//     const _appState = clearAppStateForLocalStorage(appState);
 
-    if (
-      _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
-      _appState.openSidebar.tab === CANVAS_SEARCH_TAB
-    ) {
-      _appState.openSidebar = null;
-    }
+//     if (
+//       _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+//       _appState.openSidebar.tab === CANVAS_SEARCH_TAB
+//     ) {
+//       _appState.openSidebar = null;
+//     }
 
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(clearElementsForLocalStorage(elements)),
-    );
-    localStorage.setItem(
-      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(_appState),
-    );
-    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
-  } catch (error: any) {
-    // Unable to access window.localStorage
-    console.error(error);
-  }
-};
+//     localStorage.setItem(
+//       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+//       JSON.stringify(clearElementsForLocalStorage(elements)),
+//     );
+//     localStorage.setItem(
+//       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+//       JSON.stringify(_appState),
+//     );
+//     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+//   } catch (error: any) {
+//     // Unable to access window.localStorage
+//     console.error(error);
+//   }
+// };
 
 type SavingLockTypes = "collaboration";
 
@@ -104,13 +109,12 @@ export class LocalData {
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
-
-      await this.fileStorage.saveFiles({
-        elements,
-        files,
-      });
-      onFilesSaved();
+      // saveDataStateToLocalStorage(elements, appState);
+      // await this.fileStorage.saveFiles({
+      //   elements,
+      //   files,
+      // });
+      // onFilesSaved();
     },
     SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   );
@@ -254,5 +258,68 @@ export class LibraryLocalStorageMigrationAdapter {
   }
   static clear() {
     localStorage.removeItem(STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY);
+  }
+}
+
+interface SyncIncrementPersistedData {
+  increments: DTO<StoreIncrement>[];
+}
+
+interface SyncMetaPersistedData {
+  lastAcknowledgedVersion: number;
+}
+
+export class SyncIndexedDBAdapter {
+  /** IndexedDB database and store name */
+  private static idb_name = STORAGE_KEYS.IDB_SYNC;
+  /** library data store keys */
+  private static incrementsKey = "increments";
+  private static metadataKey = "metadata";
+
+  private static store = createStore(
+    `${SyncIndexedDBAdapter.idb_name}-db`,
+    `${SyncIndexedDBAdapter.idb_name}-store`,
+  );
+
+  static async loadIncrements() {
+    const IDBData = await get<SyncIncrementPersistedData>(
+      SyncIndexedDBAdapter.incrementsKey,
+      SyncIndexedDBAdapter.store,
+    );
+
+    if (IDBData?.increments?.length) {
+      return {
+        increments: IDBData.increments.map((storeIncrementDTO) =>
+          StoreIncrement.restore(storeIncrementDTO),
+        ),
+      };
+    }
+
+    return null;
+  }
+
+  static async saveIncrements(data: SyncIncrementPersistedData): Promise<void> {
+    return set(
+      SyncIndexedDBAdapter.incrementsKey,
+      data,
+      SyncIndexedDBAdapter.store,
+    );
+  }
+
+  static async loadMetadata() {
+    const IDBData = await get<SyncMetaPersistedData>(
+      SyncIndexedDBAdapter.metadataKey,
+      SyncIndexedDBAdapter.store,
+    );
+
+    return IDBData || null;
+  }
+
+  static async saveMetadata(data: SyncMetaPersistedData): Promise<void> {
+    return set(
+      SyncIndexedDBAdapter.metadataKey,
+      data,
+      SyncIndexedDBAdapter.store,
+    );
   }
 }

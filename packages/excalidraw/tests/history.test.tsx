@@ -99,7 +99,7 @@ describe("history", () => {
 
       API.setElements([rect]);
 
-      const corrupedEntry = new StoreIncrement(
+      const corrupedEntry = StoreIncrement.create(
         ElementsChange.empty(),
         AppStateChange.empty(),
       );

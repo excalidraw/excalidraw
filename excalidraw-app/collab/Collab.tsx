@@ -78,7 +78,7 @@ import {
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import { decryptData } from "../../packages/excalidraw/data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
-import { LocalData } from "../data/LocalData";
+import { LocalData, SyncIndexedDBAdapter } from "../data/LocalData";
 import { appJotaiStore, atom } from "../app-jotai";
 import type { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
@@ -88,9 +88,9 @@ import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
 } from "../../packages/excalidraw/data/reconcile";
-import { ExcalidrawSyncClient } from "../../packages/excalidraw/sync/client";
+import { SyncClient } from "../../packages/excalidraw/sync/client";
 
-export const syncAPIAtom = atom<ExcalidrawSyncClient | null>(null);
+export const syncAPIAtom = atom<SyncClient | null>(null);
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
@@ -236,9 +236,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     };
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
-    appJotaiStore.set(
-      syncAPIAtom,
-      new ExcalidrawSyncClient(this.excalidrawAPI),
+
+    SyncClient.create(this.excalidrawAPI, SyncIndexedDBAdapter).then(
+      (syncAPI) => {
+        appJotaiStore.set(syncAPIAtom, syncAPI);
+      },
     );
 
     if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {

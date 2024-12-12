@@ -32,7 +32,6 @@ import type {
 } from "./element/types";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
-import { randomId } from "./random";
 import { getObservedAppState } from "./store";
 import type {
   AppState,
@@ -40,7 +39,7 @@ import type {
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import type { SubtypeOf, ValueOf } from "./utility-types";
+import type { DTO, SubtypeOf, ValueOf } from "./utility-types";
 import {
   arrayToMap,
   arrayToObject,
@@ -416,7 +415,7 @@ interface Change<T> {
 }
 
 export class AppStateChange implements Change<AppState> {
-  private constructor(private readonly delta: Delta<ObservedAppState>) {}
+  private constructor(public readonly delta: Delta<ObservedAppState>) {}
 
   public static calculate<T extends ObservedAppState>(
     prevAppState: T,
@@ -429,6 +428,13 @@ export class AppStateChange implements Change<AppState> {
       AppStateChange.postProcess,
     );
 
+    return new AppStateChange(delta);
+  }
+
+  public static restore(
+    appStateChangeDTO: DTO<AppStateChange>,
+  ): AppStateChange {
+    const { delta } = appStateChangeDTO;
     return new AppStateChange(delta);
   }
 
@@ -797,13 +803,13 @@ export class AppStateChange implements Change<AppState> {
   }
 }
 
+// CFDO: consider adding here (nonnullable) version & versionNonce & updated & seed (so that we have correct versions when recunstructing from remote)
 type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
   ElementUpdate<Ordered<T>>,
   "seed"
 >;
 
 type ElementsChangeOptions = {
-  id: string;
   shouldRedistribute: boolean;
 };
 
@@ -813,10 +819,9 @@ type ElementsChangeOptions = {
  */
 export class ElementsChange implements Change<SceneElementsMap> {
   private constructor(
-    public readonly id: string,
-    private readonly added: Record<string, Delta<ElementPartial>>,
-    private readonly removed: Record<string, Delta<ElementPartial>>,
-    private readonly updated: Record<string, Delta<ElementPartial>>,
+    public readonly added: Record<string, Delta<ElementPartial>>,
+    public readonly removed: Record<string, Delta<ElementPartial>>,
+    public readonly updated: Record<string, Delta<ElementPartial>>,
   ) {}
 
   public static create(
@@ -824,11 +829,10 @@ export class ElementsChange implements Change<SceneElementsMap> {
     removed: Record<string, Delta<ElementPartial>>,
     updated: Record<string, Delta<ElementPartial>>,
     options: ElementsChangeOptions = {
-      id: randomId(),
       shouldRedistribute: false,
     },
   ) {
-    const { id, shouldRedistribute } = options;
+    const { shouldRedistribute } = options;
     let change: ElementsChange;
 
     if (shouldRedistribute) {
@@ -852,9 +856,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
         }
       }
 
-      change = new ElementsChange(id, nextAdded, nextRemoved, nextUpdated);
+      change = new ElementsChange(nextAdded, nextRemoved, nextUpdated);
     } else {
-      change = new ElementsChange(id, added, removed, updated);
+      change = new ElementsChange(added, removed, updated);
     }
 
     if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
@@ -864,6 +868,13 @@ export class ElementsChange implements Change<SceneElementsMap> {
     }
 
     return change;
+  }
+
+  public static restore(
+    elementsChangeDTO: DTO<ElementsChange>,
+  ): ElementsChange {
+    const { added, removed, updated } = elementsChangeDTO;
+    return ElementsChange.create(added, removed, updated);
   }
 
   private static satisfiesAddition = ({
@@ -997,15 +1008,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
     return ElementsChange.create({}, {}, {});
   }
 
-  public static load(payload: string) {
-    const { id, added, removed, updated } = JSON.parse(payload);
-
-    return ElementsChange.create(added, removed, updated, {
-      id,
-      shouldRedistribute: false,
-    });
-  }
-
   public inverse(): ElementsChange {
     const inverseInternal = (deltas: Record<string, Delta<ElementPartial>>) => {
       const inversedDeltas: Record<string, Delta<ElementPartial>> = {};
@@ -1091,7 +1093,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
     const updated = applyLatestChangesInternal(this.updated);
 
     return ElementsChange.create(added, removed, updated, {
-      id: this.id,
       shouldRedistribute: true, // redistribute the deltas as `isDeleted` could have been updated
     });
   }
