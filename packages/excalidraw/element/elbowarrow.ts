@@ -169,8 +169,7 @@ export const updateElbowArrowPoints = (
       .filter((diff) => diff).length === 2 &&
     !firstAndLastPointMoved;
 
-  let nextFixedSegments: FixedSegment[] =
-    updates.fixedSegments ?? arrow.fixedSegments ?? [];
+  const pointSegments: (FixedSegment | null)[] = [];
   if (isSegmentMove) {
     // if (
     //   !pointsEqual(arrow.points[0], updatedPoints[0]) &&
@@ -191,47 +190,53 @@ export const updateElbowArrowPoints = (
     //   updatedPoints.push(arrow.points[arrow.points.length - 1]);
     // }
 
-    nextFixedSegments = arrow.points
-      .map((p, idx) => {
-        const existingSegment =
-          idx > 0
-            ? arrow.fixedSegments?.find((segment, i) => {
-                return (
-                  pointsEqual(segment.start, arrow.points[idx - 1]) &&
-                  pointsEqual(segment.end, arrow.points[idx])
-                );
-              })
-            : undefined;
-
-        let newSegment: FixedSegment | undefined;
-        if (
-          idx > 1 &&
-          !pointsEqual(p, renormalizedUpdatedPoints[idx]) &&
-          !pointsEqual(
-            arrow.points[idx - 1],
-            renormalizedUpdatedPoints[idx - 1],
-          )
-        ) {
-          // If the previous point is not the same as the updated previous point
-          // and the current point is not the same as the updated point, then a
-          // new segment is being moved / fixed
-
-          newSegment = {
-            start: renormalizedUpdatedPoints[idx - 1],
-            end: renormalizedUpdatedPoints[idx],
-          };
-        }
-        (newSegment || existingSegment) &&
-          console.log(idx, newSegment, existingSegment);
-        return newSegment || existingSegment
-          ? ([newSegment ? newSegment : existingSegment, idx] as const)
+    arrow.points.forEach((p, idx) => {
+      const existingSegment =
+        idx > 0
+          ? arrow.fixedSegments?.find((segment, i) => {
+              return (
+                pointsEqual(segment.start, arrow.points[idx - 1]) &&
+                pointsEqual(segment.end, arrow.points[idx])
+              );
+            }) ?? null
           : null;
-      })
-      .filter((segment): segment is [FixedSegment, number] => segment != null)
-      .sort((a, b) => a![1] - b![1])
-      .map((data) => data[0]);
-    console.log("------");
+
+      let newSegment: FixedSegment | null = null;
+      if (
+        idx > 1 &&
+        !pointsEqual(p, renormalizedUpdatedPoints[idx]) &&
+        !pointsEqual(arrow.points[idx - 1], renormalizedUpdatedPoints[idx - 1])
+      ) {
+        // If the previous point is not the same as the updated previous point
+        // and the current point is not the same as the updated point, then a
+        // new segment is being moved / fixed
+
+        newSegment = {
+          start: renormalizedUpdatedPoints[idx - 1],
+          end: renormalizedUpdatedPoints[idx],
+        };
+      }
+
+      if (newSegment || existingSegment) {
+        if (idx > 0 && pointSegments[idx - 1]) {
+          if (existingSegment) {
+            existingSegment.start = pointSegments[idx - 1]!.end;
+          }
+
+          if (newSegment) {
+            pointSegments[idx - 1]!.end = newSegment.start;
+          }
+        }
+
+        pointSegments.push(newSegment || existingSegment);
+      } else {
+        pointSegments.push(null);
+      }
+    });
   }
+  const nextFixedSegments: FixedSegment[] = isSegmentMove
+    ? pointSegments.filter((segment): segment is FixedSegment => !!segment)
+    : updates.fixedSegments ?? arrow.fixedSegments ?? [];
 
   let state = {
     x: arrow.x,
@@ -365,9 +370,7 @@ export const updateElbowArrowPoints = (
             }
           }
         }
-        // debugDrawPoint(endGlobalPoint, {
-        //   permanent: true,
-        // });
+
         const elbowArrowData = getElbowArrowData(state, elementsMap, points, {
           ...options,
           ...(pointPairs.length - 1 > 0
