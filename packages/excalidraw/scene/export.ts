@@ -441,7 +441,7 @@ const configExportDimension = async ({
   // variables for target bounding box
   let [x, y, width, height] = origCanvasSize;
 
-  if (cfg.fit === "contain") {
+  if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
     if (cfg.width != null) {
       cfg.padding = Math.min(
         cfg.padding,

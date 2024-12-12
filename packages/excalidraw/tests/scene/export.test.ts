@@ -15,6 +15,7 @@ import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 import { diagramFactory } from "../fixtures/diagramFixture";
 import { vi } from "vitest";
+import { isCloseTo } from "../../../math";
 
 const DEFAULT_OPTIONS = {
   exportBackground: false,
@@ -603,6 +604,625 @@ describe("exportToBlob", async () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         `"quality" will be ignored for "${exportUtils.MIME_TYPES.png}" mimeType`,
       );
+    });
+  });
+});
+
+describe("updated API", () => {
+  // set up
+  // a random set of elements
+  const ELEMENT_HEIGHT = 100;
+  const ELEMENT_WIDTH = 100;
+  const POSITION = 1000;
+  const getRandomPos = () => {
+    const randomNum = () =>
+      Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * POSITION);
+    return { x: randomNum(), y: randomNum() };
+  };
+  const ELEMENTS = [
+    {
+      ...diamondFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a0",
+      ...getRandomPos(),
+    },
+    {
+      ...ellipseFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a1",
+      ...getRandomPos(),
+    },
+    {
+      ...textFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a2",
+      ...getRandomPos(),
+    },
+    {
+      ...textFixture,
+      fontFamily: FONT_FAMILY.Nunito, // test embedding external font
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a3",
+      ...getRandomPos(),
+    },
+  ] as NonDeletedExcalidrawElement[];
+
+  // entire canvas
+  describe("exporting the entire canvas", () => {
+    const [, , canvasWidth, canvasHeight] = exportUtils.getCanvasSize(ELEMENTS);
+
+    it("fit = none, no padding", async () => {
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config: {
+          fit: "none",
+        },
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(canvas.width).toBeCloseTo(canvasWidth, 1);
+      expect(canvas.height).toBeCloseTo(canvasHeight, 1);
+    });
+
+    it("fit = contain, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config: {
+          fit: "contain",
+        },
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(isCloseTo(canvas.width, canvasWidth, 1)).toBe(true);
+      expect(isCloseTo(canvas.height, canvasHeight, 1)).toBe(true);
+    });
+
+    it("fit = none, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        padding: PADDING,
+      };
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(canvas.width).toBeCloseTo(canvasWidth + PADDING * 2);
+      expect(canvas.height).toBeCloseTo(canvasHeight + PADDING * 2);
+    });
+
+    it("fit = contain, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        padding: PADDING,
+      };
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+    });
+  });
+
+  // specified dimensions (w x h)
+  describe("exporting with specified dimensions", () => {
+    const dimension = {
+      width: 200,
+      height: 200,
+    };
+
+    it("fit = none, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        ...dimension,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(canvas.width).toBeCloseTo(dimension.width, 1);
+      expect(canvas.height).toBeCloseTo(dimension.height, 1);
+    });
+
+    it("fit = contain, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        ...dimension,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(canvas.width).toBeCloseTo(dimension.width, 1);
+      expect(canvas.height).toBeCloseTo(dimension.height, 1);
+    });
+
+    it("fit = none, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        padding: PADDING,
+        ...dimension,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(canvas.width).toBeCloseTo(dimension.width + PADDING * 2, 1);
+      expect(canvas.height).toBeCloseTo(dimension.height + PADDING * 2, 1);
+    });
+
+    it("fit = contain, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        padding: PADDING,
+        ...dimension,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+
+      expect(isCloseTo(canvas.width, dimension.width, 1)).toBe(true);
+      expect(isCloseTo(canvas.height, dimension.height, 1)).toBe(true);
+    });
+  });
+
+  // specified maxWH
+  describe("exporting with specified maxWidthOrHeight", () => {
+    const maxWH = 200;
+
+    it("fit = none, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        maxWidthOrHeight: maxWH,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+      expect(canvas.width).toBeLessThanOrEqual(maxWH);
+      expect(canvas.height).toBeLessThanOrEqual(maxWH);
+    });
+
+    it("fit = contain, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        maxWidthOrHeight: maxWH,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+      expect(canvas.width).toBeLessThanOrEqual(maxWH);
+      expect(canvas.height).toBeLessThanOrEqual(maxWH);
+    });
+
+    it("fit = none, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        padding: PADDING,
+        maxWidthOrHeight: maxWH,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+
+      expect(canvas.width).toBeLessThanOrEqual(maxWH);
+      expect(canvas.height).toBeLessThanOrEqual(maxWH);
+    });
+
+    it("fit = contain, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        padding: PADDING,
+        maxWidthOrHeight: maxWH,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+
+      expect(canvas.width).toBeLessThanOrEqual(maxWH);
+      expect(canvas.height).toBeLessThanOrEqual(maxWH);
+    });
+  });
+
+  // specified widthOrHeight
+  describe("exporting with specified widthOrHeight", () => {
+    const widthOrHeight = 200;
+
+    it("fit = none, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        widthOrHeight,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(canvas.width, widthOrHeight, 1) ||
+          isCloseTo(canvas.height, widthOrHeight, 1),
+      ).toBe(true);
+    });
+
+    it("fit = contain, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        widthOrHeight,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+
+      expect(
+        isCloseTo(canvas.width, widthOrHeight, 1) ||
+          isCloseTo(canvas.height, widthOrHeight, 1),
+      ).toBe(true);
+    });
+
+    it("fit = none, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        padding: PADDING,
+        widthOrHeight,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(canvas.width, widthOrHeight, 1) ||
+          isCloseTo(canvas.height, widthOrHeight, 1),
+      ).toBe(true);
+    });
+
+    it("fit = contain, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "contain",
+        padding: PADDING,
+        widthOrHeight,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(canvas.width, widthOrHeight, 1) ||
+          isCloseTo(canvas.height, widthOrHeight, 1),
+      ).toBe(true);
+    });
+  });
+
+  // specified position
+  describe("exporting with specified position", () => {
+    const [, , canvasWidth, canvasHeight] = exportUtils.getCanvasSize(ELEMENTS);
+    const position = { x: 100, y: 100 };
+
+    it("fit = none, no padding", async () => {
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        ...position,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("width") ?? ""),
+          canvas.width,
+          1,
+        ),
+      ).toBe(true);
+      expect(
+        isCloseTo(
+          parseFloat(svgElement.getAttribute("height") ?? ""),
+          canvas.height,
+          1,
+        ),
+      ).toBe(true);
+      expect(canvas.width).toBeCloseTo(canvasWidth, 1);
+      expect(canvas.height).toBeCloseTo(canvasHeight, 1);
+    });
+
+    it("fit = none, with padding", async () => {
+      const PADDING = Math.round(Math.random() * 100);
+
+      const config: exportUtils.ExportSceneConfig = {
+        fit: "none",
+        padding: PADDING,
+        ...position,
+      };
+
+      const svgElement = await exportUtils.exportToSvg({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      const canvas = await exportUtils.exportToCanvas({
+        data: { elements: ELEMENTS, appState: DEFAULT_OPTIONS, files: null },
+        config,
+      });
+
+      expect(svgElement.getAttribute("width")).toBeCloseTo(canvas.width);
+      expect(svgElement.getAttribute("height")).toBeCloseTo(canvas.height);
+      expect(canvas.width).toBeCloseTo(canvasWidth + PADDING * 2);
+      expect(canvas.height).toBeCloseTo(canvasHeight + PADDING * 2);
     });
   });
 });
