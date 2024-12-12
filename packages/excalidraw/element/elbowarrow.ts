@@ -22,6 +22,11 @@ import {
   tupleToCoors,
 } from "../utils";
 import {
+  debugDrawBounds,
+  debugDrawPoint,
+  debugDrawPoints,
+} from "../visualdebug";
+import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   avoidRectangularCorner,
@@ -308,72 +313,68 @@ export const updateElbowArrowPoints = (
         let endSegmentHeading = undefined;
         let forcedStartHeading = undefined;
         let forcedEndHeading = undefined;
-        if (nextSegment && !!hoveredStartElement) {
-          if (idx === 0) {
-            endSegmentHeading = vectorToHeading(
-              vectorFromPoint(nextSegment.start, nextSegment.end),
-            );
-            if (!forcedEndHeading) {
-              forcedEndHeading = headingIsHorizontal(endSegmentHeading)
-                ? points[0][1] > points[points.length - 1][1]
-                  ? HEADING_DOWN
-                  : HEADING_UP
-                : points[0][0] > points[points.length - 1][0]
-                ? HEADING_RIGHT
-                : HEADING_LEFT;
-            }
-            const isHorizontal = headingIsHorizontal(endSegmentHeading);
-            if (headingIsHorizontal(startHeading) !== isHorizontal) {
-              points[points.length - 1] = pointFrom<LocalPoint>(
-                isHorizontal ? points[0][0] : points[points.length - 1][0],
-                !isHorizontal ? points[0][1] : points[points.length - 1][1],
-              );
-            } else {
-              forcedStartHeading = headingIsHorizontal(startHeading)
-                ? state.x + points[points.length - 1][0] < startGlobalPoint[0]
-                  ? HEADING_LEFT
-                  : HEADING_RIGHT
-                : state.y + points[points.length - 1][1] < startGlobalPoint[1]
-                ? HEADING_UP
-                : HEADING_DOWN;
-            }
-          }
-        }
-        if (prevSegment && !!hoveredEndElement) {
-          if (idx === pointPairs.length - 1) {
-            startSegmentHeading = vectorToHeading(
-              vectorFromPoint(prevSegment.start, prevSegment.end),
-            );
-            if (!forcedStartHeading) {
-              forcedStartHeading = headingIsHorizontal(startSegmentHeading)
-                ? points[0][1] < points[points.length - 1][1]
-                  ? HEADING_DOWN
-                  : HEADING_UP
-                : points[0][0] < points[points.length - 1][0]
-                ? HEADING_RIGHT
-                : HEADING_LEFT;
-            }
-            const isHorizontal = headingIsHorizontal(startSegmentHeading);
-            if (headingIsHorizontal(endHeading) !== isHorizontal) {
-              points[0] = pointFrom<LocalPoint>(
-                isHorizontal ? points[points.length - 1][0] : points[0][0],
-                !isHorizontal ? points[points.length - 1][1] : points[0][1],
-              );
-            } else {
-              forcedEndHeading = headingIsHorizontal(endHeading)
-                ? state.x < endGlobalPoint[0]
-                  ? HEADING_LEFT
-                  : HEADING_RIGHT
-                : state.y < endGlobalPoint[1]
-                ? HEADING_UP
-                : HEADING_DOWN;
-            }
-          }
-        }
+        // if (nextSegment && hoveredStartElement && idx === 0) {
+        //   endSegmentHeading = vectorToHeading(
+        //     vectorFromPoint(nextSegment.start, nextSegment.end),
+        //   );
+        //   if (!forcedEndHeading) {
+        //     forcedEndHeading = headingIsHorizontal(endSegmentHeading)
+        //       ? points[0][1] > points[points.length - 1][1]
+        //         ? HEADING_DOWN
+        //         : HEADING_UP
+        //       : points[0][0] > points[points.length - 1][0]
+        //       ? HEADING_RIGHT
+        //       : HEADING_LEFT;
+        //   }
+        //   const isHorizontal = headingIsHorizontal(endSegmentHeading);
+        //   if (headingIsHorizontal(startHeading) !== isHorizontal) {
+        //     // points[points.length - 1] = pointFrom<LocalPoint>(
+        //     //   isHorizontal ? points[0][0] : points[points.length - 1][0],
+        //     //   !isHorizontal ? points[0][1] : points[points.length - 1][1],
+        //     // );
+        //   } else {
+        //     forcedStartHeading = headingIsHorizontal(startHeading)
+        //       ? state.x + points[points.length - 1][0] < startGlobalPoint[0]
+        //         ? HEADING_LEFT
+        //         : HEADING_RIGHT
+        //       : state.y + points[points.length - 1][1] < startGlobalPoint[1]
+        //       ? HEADING_UP
+        //       : HEADING_DOWN;
+        //   }
+        // }
+        // if (prevSegment && hoveredEndElement && idx === pointPairs.length - 1) {
+        //   startSegmentHeading = vectorToHeading(
+        //     vectorFromPoint(prevSegment.start, prevSegment.end),
+        //   );
+        //   if (!forcedStartHeading) {
+        //     forcedStartHeading = headingIsHorizontal(startSegmentHeading)
+        //       ? points[0][1] < points[points.length - 1][1]
+        //         ? HEADING_DOWN
+        //         : HEADING_UP
+        //       : points[0][0] < points[points.length - 1][0]
+        //       ? HEADING_RIGHT
+        //       : HEADING_LEFT;
+        //   }
+        //   const isHorizontal = headingIsHorizontal(startSegmentHeading);
+        //   if (headingIsHorizontal(endHeading) !== isHorizontal) {
+        //     // points[0] = pointFrom<LocalPoint>(
+        //     //   isHorizontal ? points[points.length - 1][0] : points[0][0],
+        //     //   !isHorizontal ? points[points.length - 1][1] : points[0][1],
+        //     // );
+        //   } else {
+        //     forcedEndHeading = headingIsHorizontal(endHeading)
+        //       ? state.x < endGlobalPoint[0]
+        //         ? HEADING_LEFT
+        //         : HEADING_RIGHT
+        //       : state.y < endGlobalPoint[1]
+        //       ? HEADING_UP
+        //       : HEADING_DOWN;
+        //   }
+        // }
 
         const elbowArrowData = getElbowArrowData(state, elementsMap, points, {
           ...options,
-          ...(pointPairs.length - 1 > 0
+          ...(pointPairs.length > 1
             ? {
                 startMidPointHeading: startSegmentHeading,
                 endMidPointHeading: endSegmentHeading,
@@ -382,13 +383,22 @@ export const updateElbowArrowPoints = (
               }
             : {}),
         });
-
+        // console.log(
+        //   forcedStartHeading,
+        //   forcedEndHeading,
+        //   elbowArrowData.endHeading,
+        // );
+        // elbowArrowData.dynamicAABBs.forEach((aabb) => {
+        //   debugDrawBounds(aabb);
+        // });
         const nextPoints = routeElbowArrow(state, elbowArrowData) ?? [];
 
         return nextPoints;
       }),
     ),
   ).flat();
+
+  console.log("-----");
 
   // The goal is to update next fixed segments to match the new arrow points.
   // The solution here is to search for the exact x or y coordinates within the
@@ -543,9 +553,10 @@ const getElbowArrowData = (
         startGlobalPoint,
         endGlobalPoint,
         elementsMap,
-        options?.startMidPointHeading || options?.endMidPointHeading
-          ? undefined
-          : hoveredStartElement,
+        // options?.startMidPointHeading || options?.endMidPointHeading
+        //   ? undefined
+        //   : hoveredStartElement,
+        hoveredStartElement,
         origStartGlobalPoint,
       );
   const endHeading = options?.forcedEndHeading
@@ -554,9 +565,10 @@ const getElbowArrowData = (
         endGlobalPoint,
         startGlobalPoint,
         elementsMap,
-        options?.startMidPointHeading || options?.endMidPointHeading
-          ? undefined
-          : hoveredEndElement,
+        // options?.startMidPointHeading || options?.endMidPointHeading
+        //   ? undefined
+        //   : hoveredEndElement,
+        hoveredEndElement,
         origEndGlobalPoint,
       );
   const startPointBounds = [
