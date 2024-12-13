@@ -46,19 +46,21 @@ export const TopPicks = ({
   }
 
   return (
-    <div className="color-picker__top-picks"
-    onKeyDown={(event) => {
-      const handled = topPicksColorPickerKeyNavHandler({
-        event,
-        onChange,
-        colors,
-      });
+    <div
+      className="color-picker__top-picks"
+      onKeyDown={(event) => {
+        const handled = topPicksColorPickerKeyNavHandler({
+          event,
+          onChange,
+          colors,
+        });
 
-      if (handled) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    }}>
+        if (handled) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }}
+    >
       {colors.map((color: string, index: number) => (
         <button
           className={clsx("color-picker__button", {

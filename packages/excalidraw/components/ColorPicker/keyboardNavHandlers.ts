@@ -181,8 +181,8 @@ export const colorPickerKeyNavHandler = ({
       activeSectionIndex + indexOffset > sections.length - 1
         ? 0
         : activeSectionIndex + indexOffset < 0
-          ? sections.length - 1
-          : activeSectionIndex + indexOffset;
+        ? sections.length - 1
+        : activeSectionIndex + indexOffset;
 
     const nextSection = sections[nextSectionIndex];
 
@@ -286,11 +286,10 @@ export const colorPickerKeyNavHandler = ({
   return false;
 };
 
-
 interface TopPicksColorPickerKeyNavHandlerProps {
   event: React.KeyboardEvent;
   onChange: (color: string) => void;
-  colors: ColorTuple | readonly string[] | undefined
+  colors: ColorTuple | readonly string[] | undefined;
 }
 /**
  * @returns true if the event was handled
@@ -299,9 +298,9 @@ export const topPicksColorPickerKeyNavHandler = ({
   event,
   onChange,
   colors,
-}: TopPicksColorPickerKeyNavHandlerProps): boolean => {  
+}: TopPicksColorPickerKeyNavHandlerProps): boolean => {
   if (!colors) {
-    return false
+    return false;
   }
   if (["1", "2", "3", "4", "5"].includes(event.key)) {
     const c = colors[Number(event.key) - 1];
