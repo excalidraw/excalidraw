@@ -1270,7 +1270,6 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
-      fixedSegments?: number[] | null;
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
@@ -1780,14 +1779,9 @@ export class LinearElementEditor {
     );
 
     if (index && index > 0 && element && isElbowArrow(element)) {
-      const start = element.points[index - 1];
-      const end = element.points[index];
-
       mutateElement(element, {
         fixedSegments: element.fixedSegments?.filter(
-          (segment) =>
-            !pointsEqual(segment.start, start) &&
-            !pointsEqual(segment.end, end),
+          (segment) => segment.index !== index,
         ),
       });
 

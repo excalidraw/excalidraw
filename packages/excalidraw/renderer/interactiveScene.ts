@@ -76,7 +76,6 @@ import type {
 } from "../scene/types";
 import {
   pointFrom,
-  PRECISION,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
@@ -511,7 +510,8 @@ const renderLinearPointHandles = (
 
   // Rendering segment mid points
   if (isElbowArrow(element)) {
-    const fixedSegments = element.fixedSegments || [];
+    const fixedSegments =
+      element.fixedSegments?.map((segment) => segment.index) || [];
     points.slice(0, -1).forEach((p, idx) => {
       if (
         !LinearElementEditor.isSegmentTooShort(
@@ -530,17 +530,7 @@ const renderLinearPointHandles = (
           ),
           POINT_HANDLE_SIZE / 2,
           false,
-          !fixedSegments.find(
-            (segment) =>
-              Math.abs(element.x + segment.start[0] - points[idx][0]) <
-                PRECISION &&
-              Math.abs(element.y + segment.start[1] - points[idx][1]) <
-                PRECISION &&
-              Math.abs(element.x + segment.end[0] - points[idx + 1][0]) <
-                PRECISION &&
-              Math.abs(element.y + segment.end[1] - points[idx + 1][1]) <
-                PRECISION,
-          ),
+          !fixedSegments.includes(idx + 1),
         );
       }
     });

@@ -319,6 +319,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type FixedSegment = {
   start: LocalPoint;
   end: LocalPoint;
+  index: number;
 };
 
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
