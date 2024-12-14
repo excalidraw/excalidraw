@@ -52,6 +52,8 @@ import type {
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";
 import { invariant } from "../../excalidraw/utils";
+import { isFrameLikeElement } from "../../excalidraw/element/typeChecks";
+import { FRAME_STYLE } from "../../excalidraw/constants";
 
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
@@ -155,6 +157,12 @@ export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
     elementsMap,
     true,
   );
+
+  if (isFrameLikeElement(element)) {
+    const frameNameOffset = FRAME_STYLE.nameOffsetY + FRAME_STYLE.nameFontSize;
+    y1 -= frameNameOffset;
+    y2 -= frameNameOffset;
+  }
 
   x1 -= padding;
   x2 += padding;
