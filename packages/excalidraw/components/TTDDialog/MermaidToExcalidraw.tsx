@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useDeferredValue } from "react";
 import type { BinaryFiles } from "../../types";
 import { useApp } from "../App";
 import type {
-  ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../../element/types";
 import { ArrowRightIcon } from "../icons";
@@ -19,17 +18,14 @@ import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
-import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
-import { parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw";
-import { DEFAULT_FONT_SIZE } from "../../constants";
-import { convertToExcalidrawElements } from "../../data/transform";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { EDITOR_LS_KEYS } from "../../constants";
 import { debounce, isDevEnv } from "../../utils";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
+//zsviczian
 const MERMAID_EXAMPLE =
-  "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
+  "flowchart TD\n  A[The Excalidraw Plugin is Community Supported] --> B{Will YOU support it?}\n  B -- 👍 Yes --> C[Long-term stability + new features]\n  B -- No 👎 --> D[Plugin eventually stops working 😢]\n  C --> E[Support at ❤️ https://ko-fi.com/zsolt]\n  E --> F[📢 Encourage others to support]\n  D --> G[🪦 R.I.P. Excalidraw Plugin]";
 
 const debouncedSaveMermaidDefinition = debounce(saveMermaidDataToStorage, 300);
 
@@ -40,13 +36,16 @@ const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   selectedElements: readonly NonDeletedExcalidrawElement[]; //zsviczian
 }) => {
+  const selectedMermaidImage = selectedElements.filter(
+    (el) => el.type === "image" && el.customData?.mermaidText,
+  )[0]; //zsviczian
   const [text, setText] = useState(
     () =>
+      selectedMermaidImage?.customData?.mermaidText || //zsviczian
       EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
       MERMAID_EXAMPLE,
   );
   const deferredText = useDeferredValue(text.trim());
-  const [loading, setLoading] = useState(true); //zsviczian
   const [error, setError] = useState<Error | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -58,17 +57,12 @@ const MermaidToExcalidraw = ({
   const app = useApp();
 
   useEffect(() => {
-    const selectedMermaidImage = selectedElements.filter(
-      (el) => el.type === "image" && el.customData?.mermaidText,
-    )[0]; //zsviczian
     convertMermaidToExcalidraw({
       canvasRef,
       data,
       mermaidToExcalidrawLib,
       setError,
-      mermaidDefinition: selectedMermaidImage
-        ? selectedMermaidImage.customData?.mermaidText
-        : deferredText, //zsviczian
+      mermaidDefinition: deferredText,
     }).catch((err) => {
       if (isDevEnv()) {
         console.error("Failed to parse mermaid definition", err);
@@ -76,7 +70,7 @@ const MermaidToExcalidraw = ({
     });
 
     debouncedSaveMermaidDefinition(deferredText);
-  }, [deferredText, mermaidToExcalidrawLib, selectedElements]); //zsviczian
+  }, [deferredText, mermaidToExcalidrawLib]); //zsviczian
 
   useEffect(
     () => () => {
@@ -145,44 +139,3 @@ const MermaidToExcalidraw = ({
   );
 };
 export default MermaidToExcalidraw;
-
-//zsviczian
-export const mermaidToExcalidraw = async (
-  mermaidDefinition: string,
-  opts: MermaidOptions = { fontSize: DEFAULT_FONT_SIZE },
-  forceSVG: boolean = false,
-): Promise<
-  | {
-      elements?: ExcalidrawElement[];
-      files?: any;
-      error?: string;
-    }
-  | undefined
-> => {
-  try {
-    const { elements, files } = await parseMermaidToExcalidraw(
-      mermaidDefinition,
-      opts,
-      forceSVG,
-    );
-
-    return {
-      elements: convertToExcalidrawElements(
-        elements.map((el) => {
-          if (el.type === "image") {
-            el.customData = { mermaidText: mermaidDefinition };
-          }
-          return el;
-        }),
-        {
-          regenerateIds: true,
-        },
-      ),
-      files,
-    };
-  } catch (e: any) {
-    return {
-      error: e.message,
-    };
-  }
-};

@@ -1,8 +1,7 @@
-import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
 import type { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
 import {
   DEFAULT_EXPORT_PADDING,
-  DEFAULT_FONT_SIZE,
   EDITOR_LS_KEYS,
 } from "../../constants";
 import { convertToExcalidrawElements, exportToCanvas } from "../../index";
@@ -38,8 +37,8 @@ export interface MermaidToExcalidrawLibProps {
   api: Promise<{
     parseMermaidToExcalidraw: (
       definition: string,
-      options: MermaidOptions, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
-      //config?: MermaidConfig, //zsviczian
+      config?: MermaidConfig,
+      forceSVG?: boolean, //zsviczian
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
 }
@@ -79,16 +78,10 @@ export const convertMermaidToExcalidraw = async ({
 
     let ret;
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
-        fontSize: DEFAULT_FONT_SIZE,
-      }); //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
-      //ret = await api.parseMermaidToExcalidraw(mermaidDefinition); //zsviczian
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
     } catch (err: any) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
-        {
-          fontSize: DEFAULT_FONT_SIZE, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
-        },
       );
     }
     const { elements, files } = ret;
