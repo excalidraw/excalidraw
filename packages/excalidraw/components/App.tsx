@@ -8029,7 +8029,7 @@ class App extends React.Component<AppProps, AppState> {
             event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
           );
 
-          return LinearElementEditor.moveFixedSegment(
+          const ret = LinearElementEditor.moveFixedSegment(
             this.state.selectedLinearElement,
             linearElementEditor.pointerDownState.segmentMidpoint.index,
             gridX,
@@ -8037,6 +8037,25 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
             this.state,
           );
+          flushSync(() => {
+            if (this.state.selectedLinearElement) {
+              this.setState({
+                selectedLinearElement: {
+                  ...this.state.selectedLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                },
+              });
+            }
+            if (this.state.editingLinearElement) {
+              this.setState({
+                editingLinearElement: {
+                  ...this.state.editingLinearElement,
+                  pointerDownState: ret.pointerDownState,
+                },
+              });
+            }
+          });
+          return;
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
           !linearElementEditor.pointerDownState.segmentMidpoint.added

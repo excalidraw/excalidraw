@@ -10,6 +10,7 @@ import type {
   OrderedExcalidrawElement,
   FixedPointBinding,
   SceneElementsMap,
+  FixedSegment,
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
@@ -1800,47 +1801,98 @@ export class LinearElementEditor {
     y: number,
     elementsMap: ElementsMap,
     state: AppState,
-  ) {
+  ): LinearElementEditor {
     const element = LinearElementEditor.getElement(
       linearElement.elementId,
       elementsMap,
     );
 
-    if (!element) {
-      return;
+    if (!element || !isElbowArrow(element)) {
+      return linearElement;
     }
 
-    if (index && index > 0 && index < element.points.length) {
+    if (
+      index &&
+      index > 0 &&
+      index < element.points.length &&
+      linearElement.pointerDownState.origin
+    ) {
       const isHorizontal = headingIsHorizontal(
         vectorToHeading(
           vectorFromPoint(element.points[index], element.points[index - 1]),
         ),
       );
+      const fixedSegments = (element.fixedSegments ?? []).reduce(
+        (segments, s) => {
+          segments[s.index] = s;
+          return segments;
+        },
+        {} as Record<number, FixedSegment>,
+      );
+      fixedSegments[index] = {
+        index,
+        start: pointFrom<LocalPoint>(
+          !isHorizontal
+            ? x - element.x
+            : fixedSegments[index]
+            ? fixedSegments[index].start[0]
+            : element.points[index - 1][0],
+          isHorizontal
+            ? y - element.y
+            : fixedSegments[index]
+            ? fixedSegments[index].start[1]
+            : element.points[index - 1][1],
+        ),
+        end: pointFrom<LocalPoint>(
+          !isHorizontal
+            ? x - element.x
+            : fixedSegments[index]
+            ? fixedSegments[index].end[0]
+            : element.points[index][0],
+          isHorizontal
+            ? y - element.y
+            : fixedSegments[index]
+            ? fixedSegments[index].end[1]
+            : element.points[index][1],
+        ),
+      };
+      const offset = Object.values(fixedSegments)
+        .map((segment) => segment.index)
+        .reduce((count, idx) => (idx < index ? count + 1 : count), 0);
 
-      LinearElementEditor.movePoints(element, [
-        {
-          index: index - 1,
-          point: pointFrom<LocalPoint>(
-            !isHorizontal ? x - element.x : element.points[index - 1][0],
-            isHorizontal ? y - element.y : element.points[index - 1][1],
-          ),
-          isDragging: false,
-        },
-        {
-          index,
-          point: pointFrom<LocalPoint>(
-            !isHorizontal ? x - element.x : element.points[index][0],
-            isHorizontal ? y - element.y : element.points[index][1],
-          ),
-          isDragging: false,
-        },
-      ]);
+      mutateElement(element, {
+        fixedSegments: Object.values(fixedSegments).sort(
+          (a, b) => a.index - b.index,
+        ),
+      });
+
+      // console.log(
+      //   index,
+      //   offset,
+      //   JSON.stringify(
+      //     Object.values(fixedSegments).sort((a, b) => a.index - b.index),
+      //   ),
+      // );
+
       LinearElementEditor.updateEditorMidPointsCache(
         element,
         elementsMap,
         state,
       );
+
+      return {
+        ...linearElement,
+        pointerDownState: {
+          ...linearElement.pointerDownState,
+          segmentMidpoint: {
+            ...linearElement.pointerDownState.segmentMidpoint,
+            index: element.fixedSegments![offset].index,
+          },
+        },
+      };
     }
+
+    return linearElement;
   }
 }
 

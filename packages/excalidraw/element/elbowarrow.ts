@@ -1,9 +1,7 @@
 import {
-  line,
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
-  pointsEqual,
   pointTranslate,
   vector,
   vectorCross,
@@ -22,12 +20,6 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
-import {
-  debugDrawBounds,
-  debugDrawLine,
-  debugDrawPoint,
-  debugDrawPoints,
-} from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -145,129 +137,8 @@ export const updateElbowArrowPoints = (
         )
       : Array.from(updates.points)
     : Array.from(arrow.points);
-  const renormalizedUpdatedPoints = updatedPoints.map((point, idx) => {
-    if (idx === 0) {
-      return point;
-    }
 
-    return pointFrom<LocalPoint>(
-      point[0] - updatedPoints[0][0],
-      point[1] - updatedPoints[0][1],
-    );
-  });
-
-  // Check is needed because fixed point binding might re-adjust
-  // the end or start point
-  const firstOrLastPointMoved =
-    renormalizedUpdatedPoints.length > 2 && // Edge case where we have a linear arrow
-    (!pointsEqual(arrow.points[0], renormalizedUpdatedPoints[0]) ||
-      !pointsEqual(
-        arrow.points[arrow.points.length - 1],
-        renormalizedUpdatedPoints[renormalizedUpdatedPoints.length - 1],
-      ));
-
-  // In some cases there are no changes requested but the function is called
-  // which causes some issues with fixed segment detection. It is also a good
-  // optimization to skip the whole process if there are no changes.
-  const isEmptyModification =
-    !updates.fixedSegments &&
-    !firstOrLastPointMoved &&
-    arrow.points.length >= 2 &&
-    renormalizedUpdatedPoints
-      .map((point, idx) => {
-        return (
-          arrow.points[idx][0] - point[0] === 0 &&
-          arrow.points[idx][1] - point[1] === 0
-        );
-      })
-      .filter((diff) => diff).length === arrow.points.length;
-  if (isEmptyModification) {
-    return arrow;
-  }
-
-  // We operate differently when a segment is moved vs when one of the endpoint
-  // is moved. Specifically when a segment is not moved, we skip segment updates
-  // completely, lending a stable experience.
-  const isSegmentMove =
-    arrow.points.length >= 2 &&
-    !firstOrLastPointMoved &&
-    renormalizedUpdatedPoints
-      .map((point, idx) => {
-        return (
-          arrow.points[idx][0] !== point[0] || arrow.points[idx][1] !== point[1]
-        );
-      })
-      .filter((diff) => diff).length === 2;
-  console.log("isSegmentMove", isSegmentMove);
-  const nextFixedSegments: FixedSegment[] = isSegmentMove
-    ? arrow.points
-        .map((p, idx) => {
-          const existingSegment =
-            idx > 0
-              ? arrow.fixedSegments?.find((segment) => segment.index === idx) ??
-                null
-              : null;
-
-          // If the previous point is not the same as the updated previous point
-          // and the current point is not the same as the updated point, then a
-          // new segment is being moved / fixed
-          let newSegment: FixedSegment | null = null;
-          if (
-            idx > 0 &&
-            !pointsEqual(p, renormalizedUpdatedPoints[idx]) &&
-            !pointsEqual(
-              arrow.points[idx - 1],
-              renormalizedUpdatedPoints[idx - 1],
-            )
-          ) {
-            const isHorizontal = headingIsHorizontal(
-              vectorToHeading(vectorFromPoint(p, arrow.points[idx - 1])),
-            );
-            // Force the segment to be at the exact same position as in the
-            // previous iteration, just offset, hence stability
-            newSegment = {
-              start: pointFrom<LocalPoint>(
-                !isHorizontal
-                  ? renormalizedUpdatedPoints[idx - 1][0]
-                  : existingSegment
-                  ? existingSegment.start[0]
-                  : arrow.points[idx - 1][0],
-                isHorizontal
-                  ? renormalizedUpdatedPoints[idx - 1][1]
-                  : existingSegment
-                  ? existingSegment.start[1]
-                  : arrow.points[idx - 1][1],
-              ),
-              end: pointFrom<LocalPoint>(
-                !isHorizontal
-                  ? renormalizedUpdatedPoints[idx][0]
-                  : existingSegment
-                  ? existingSegment.end[0]
-                  : p[0],
-                isHorizontal
-                  ? renormalizedUpdatedPoints[idx][1]
-                  : existingSegment
-                  ? existingSegment.end[1]
-                  : p[1],
-              ),
-              index: idx,
-            };
-          }
-
-          // if (idx > 0 && pointSegments[idx - 1]) {
-          //   if (existingSegment) {
-          //     existingSegment.start = pointSegments[idx - 1]!.end;
-          //   }
-
-          //   if (newSegment) {
-          //     pointSegments[idx - 1]!.end = newSegment.start;
-          //   }
-          // }
-
-          return newSegment || existingSegment || null;
-        })
-        .filter((segment): segment is FixedSegment => !!segment)
-    : updates.fixedSegments ?? arrow.fixedSegments ?? [];
+  const nextFixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
 
   let state = {
     x: arrow.x,
@@ -334,7 +205,7 @@ export const updateElbowArrowPoints = (
         let forcedStartHeading = undefined;
         let forcedEndHeading = undefined;
 
-        if (!isSegmentMove && !updates.fixedSegments) {
+        if (!updates.fixedSegments) {
           if (prevSegment) {
             prevSegmentHeading = vectorToHeading(
               vectorFromPoint(prevSegment.start, prevSegment.end),
