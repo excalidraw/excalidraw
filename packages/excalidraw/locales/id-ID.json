@@ -125,13 +125,13 @@
     "createContainerFromText": "Bungkus teks dalam kontainer",
     "link": {
       "edit": "Edit tautan",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Sunting tautan bisa semat",
+      "create": "Tambah tautan",
       "label": "Tautan",
       "labelEmbed": "Tautan & Embed",
       "empty": "Tidak ada tautan yang ditetapkan",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Ketik atau tempel tautan di sini",
+      "goToElement": "Ke unsur sasaran"
     },
     "lineEditor": {
       "edit": "Edit tautan",
@@ -157,13 +157,13 @@
     "zoomToFit": "Memperbesar agar sesuai dengan semua elemen",
     "installPWA": "Install Excalidraw secara lokal (PWA)",
     "autoResize": "Mengaktifkan pengubahan ukuran teks secara otomatis",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "Salin tautan ke objek",
+    "linkToElement": "Taut ke objek"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Taut ke objek",
+    "desc": "Pencet bentuk pada kanvas atau tempel tautan.",
+    "notFound": "Objek tertaut tidak ditemukan di kanvas."
   },
   "library": {
     "noItems": "Belum ada item yang ditambahkan...",
@@ -312,7 +312,7 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "Tekan Esc untuk batal cari",
     "canvasPanning": "Untuk memindahkan kanvas, tekan roda mouse atau spacebar sambil menyeret, atau menggunakan alat tangan",
     "linearElement": "Klik untuk memulai banyak poin, seret untuk satu baris",
     "arrowTool": "",
@@ -332,13 +332,13 @@
     "placeImage": "Klik untuk tempatkan gambar, atau klik dan jatuhkan untuk tetapkan ukuran secara manual",
     "publishLibrary": "Terbitkan pustaka Anda",
     "bindTextToElement": "Tekan enter untuk tambahkan teks",
-    "createFlowchart": "",
+    "createFlowchart": "Tahan Ctrl/Cmd dan tombol arah untuk ada bagan alir",
     "deepBoxSelect": "Tekan Ctrl atau Cmd untuk memilih yang di dalam, dan mencegah penggeseran",
     "eraserRevert": "Tahan Alt untuk mengembalikan elemen yang ditandai untuk dihapus",
     "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Tahan Ctrl/Cmd untuk lepas cantol",
+    "enterCropEditor": "Pencet 2x gambar atau tekan Enter untuk memangkas gambar",
+    "leaveCropEditor": "Pencet bagian luar gambar atau tekan Enter atau Esc untuk sudahi pangkas"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -354,11 +354,11 @@
     "sceneContent": "Pemandangan konten:"
   },
   "shareDialog": {
-    "or": ""
+    "or": "Atau"
   },
   "roomDialog": {
-    "desc_intro": "",
-    "desc_privacy": "",
+    "desc_intro": "Ajak orang-orang ikut menggambar denganmu.",
+    "desc_privacy": "Tenang, sesi ini terenkripsi ujung-ke-ujung, sepenuhnya privat. Bahkan gambarmu tidak terlihat server kami.",
     "button_startSession": "Mulai sesi",
     "button_stopSession": "Hentikan sesi",
     "desc_inProgressIntro": "Sesi kolaborasi sedang berlangsung sekarang.",
@@ -385,14 +385,14 @@
     "click": "klik",
     "deepSelect": "Pilih dalam",
     "deepBoxSelect": "Pilih dalam kotak, dan cegah penggeseran",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Buat bagan alir dari unsur generik",
+    "navigateFlowchart": "Menavigasi bagan alir",
     "curvedArrow": "Panah lengkung",
     "curvedLine": "Garis lengkung",
     "documentation": "Dokumentasi",
     "doubleClick": "klik-ganda",
     "drag": "seret",
-    "editor": "",
+    "editor": "Penyunting",
     "editLineArrowPoints": "Edit titik garis/panah",
     "editText": "Edit teks / tambah label",
     "github": "Menemukan masalah? Kirimkan",
@@ -410,8 +410,8 @@
     "toggleElementLock": "Kunci/lepas seleksi",
     "movePageUpDown": "Pindah halaman keatas/kebawah",
     "movePageLeftRight": "Pindah halaman kebawah/keatas",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Pangkas gambar",
+    "cropFinish": "Sudahi pangkas gambar"
   },
   "clearCanvasDialog": {
     "title": "Hapus kanvas"
@@ -471,8 +471,8 @@
       "copyPngToClipboard": "Salin PNG ke papan klip"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
+      "exportToPng": "PNG",
+      "exportToSvg": "SVG",
       "copyPngToClipboard": "Salin ke papan klip"
     }
   },
@@ -482,16 +482,16 @@
   },
   "stats": {
     "angle": "Sudut",
-    "shapes": "",
+    "shapes": "Bentuk",
     "height": "Tinggi",
     "scene": "Pemandangan",
     "selected": "Terpilih",
     "storage": "Penyimpanan",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
-    "total": "",
+    "fullTitle": "Properti Kanvas & Bentuk",
+    "title": "Properti",
+    "generalStats": "Umum",
+    "elementProperties": "Properti bentuk",
+    "total": "Jumlah",
     "version": "Versi",
     "versionCopy": "Klik untuk salin",
     "versionNotAvailable": "Versi tidak tersedia",
@@ -502,7 +502,7 @@
     "copyStyles": "Gaya tersalin.",
     "copyToClipboard": "Tersalin ke papan klip.",
     "copyToClipboardAsPng": "Tersalin {{exportSelection}} ke clipboard sebagai PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Menyalin {{exportSelection}} ke papan klip sebagai SVG\n({{exportColorScheme}})",
     "fileSaved": "File tersimpan.",
     "fileSavedToFilename": "Disimpan ke {filename}",
     "canvas": "kanvas",
@@ -510,7 +510,7 @@
     "pasteAsSingleElement": "Gunakan {{shortcut}} untuk menempelkan sebagai satu elemen,\natau tempelkan ke teks editor yang ada",
     "unableToEmbed": "Menyematkan url ini saat ini tidak diizinkan. Ajukan masalah di GitHub untuk meminta url masuk daftar whitelisted",
     "unrecognizedLinkFormat": "Tautan yang Anda sematkan tidak sesuai dengan format yang diharapkan. Coba tempelkan string 'sematkan' yang disediakan oleh situs sumber",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Tautan disalin ke papan klip"
   },
   "colors": {
     "transparent": "Transparan",
