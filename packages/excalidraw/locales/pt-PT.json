@@ -125,13 +125,13 @@
     "createContainerFromText": "Envolver texto num recipiente",
     "link": {
       "edit": "Editar hiperligação",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Editar hiperligação incorporável",
+      "create": "Adicionar hiperligação",
       "label": "Hiperligação",
       "labelEmbed": "Hiperligar e incorporar",
       "empty": "Não está definida nenhuma hiperligação",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Escreva ou cole a sua hiperligação aqui",
+      "goToElement": "Ir para o elemento alvo"
     },
     "lineEditor": {
       "edit": "Editar linha",
@@ -157,13 +157,13 @@
     "zoomToFit": "Aproximar para enquadrar todos os elementos",
     "installPWA": "Instalar Excalidraw localmente (PWA)",
     "autoResize": "Ativar redimensionamento automático do texto",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "copyElementLink": "Copiar hiperligação para o objeto",
+    "linkToElement": "Hiperligação para o objeto"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Hiperligação para o objeto",
+    "desc": "Clique numa forma na tela ou cole uma hiperligação.",
+    "notFound": "O objeto hiperligado não foi encontrado na tela."
   },
   "library": {
     "noItems": "Ainda não foram adicionados itens...",
@@ -337,8 +337,8 @@
     "eraserRevert": "Mantenha premida a tecla Alt para reverter os elementos marcados para eliminação",
     "firefox_clipboard_write": "Esta função pode provavelmente ser ativada definindo a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
     "disableSnapping": "Mantenha premida a tecla CtrlOuCmd para desativar a atração",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Clique duas vezes na imagem ou pressione ENTER para recortar a imagem",
+    "leaveCropEditor": "Clique fora da imagem ou pressione ENTER ou ESCAPE para finalizar o corte"
   },
   "canvasError": {
     "cannotShowPreview": "Não é possível mostrar uma pré-visualização",
@@ -410,8 +410,8 @@
     "toggleElementLock": "Bloquear / desbloquear seleção",
     "movePageUpDown": "Mover página para cima / baixo",
     "movePageLeftRight": "Mover página para esquerda / direita",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Recortar imagem",
+    "cropFinish": "Finalizar recorte da imagem"
   },
   "clearCanvasDialog": {
     "title": "Apagar área de desenho"
@@ -502,7 +502,7 @@
     "copyStyles": "Estilos copiados.",
     "copyToClipboard": "Copiado para a área de transferência.",
     "copyToClipboardAsPng": "{{exportSelection}} copiado para a área de transferência como PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} copiado para a área de transferência como SVG\n({{exportColorScheme}})",
     "fileSaved": "Ficheiro guardado.",
     "fileSavedToFilename": "Guardado como {filename}",
     "canvas": "área de desenho",
@@ -510,7 +510,7 @@
     "pasteAsSingleElement": "Usar {{shortcut}} para colar como um único elemento,\nou colar num editor de texto existente",
     "unableToEmbed": "A incorporação deste URL não é atualmente permitida. Reporte o problema no GitHub para solicitar a inclusão do URL na lista branca para deixar de o bloquear",
     "unrecognizedLinkFormat": "A ligação que incorporou não corresponde ao formato esperado. Tente colar a cadeia de caracteres 'incorporada' fornecida pelo sítio de origem",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Hiperligação copiada para a área de transferência"
   },
   "colors": {
     "transparent": "Transparente",
