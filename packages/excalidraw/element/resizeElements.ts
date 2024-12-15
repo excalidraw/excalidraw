@@ -79,7 +79,7 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
-) => {
+): boolean => {
   if (selectedElements.length === 1) {
     const [element] = selectedElements;
     if (transformHandleType === "rotation") {
