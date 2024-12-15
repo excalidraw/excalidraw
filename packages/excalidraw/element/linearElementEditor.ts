@@ -1922,12 +1922,10 @@ export class LinearElementEditor {
           midPoints[index]!,
           pointFrom(scenePointer.x, scenePointer.y),
         );
-        console.log(index, distance, threshold);
+
         if (distance <= threshold) {
           return [index + 1, midPoints[index]!];
         }
-      } else {
-        console.log(index, "null");
       }
 
       index++;

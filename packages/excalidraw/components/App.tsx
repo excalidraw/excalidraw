@@ -458,7 +458,6 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-  line,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
@@ -6457,7 +6456,6 @@ class App extends React.Component<AppProps, AppState> {
     this.updateBindingEnabledOnPointerMove(event);
 
     {
-      console.log("DOWN");
       const hitElement = this.getElementAtPosition(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
@@ -6475,7 +6473,6 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (midPoint) {
-          console.log("handleSelectionOnPointerDown", midPoint);
           this.setState((prev) => {
             return {
               elbowLinearElement: {
@@ -7951,15 +7948,10 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerMoveCoords ?? pointerDownState.origin;
       this.lastPointerMoveCoords = pointerCoords;
 
-      console.log(
-        "move",
-        this.state.elbowLinearElement?.elbowMidPointState.midPointIndex,
-      );
       if (
         this.state.elbowLinearElement &&
         this.state.elbowLinearElement.elbowMidPointState.midPointIndex !== -1
       ) {
-        console.log("requested");
         const [gridX, gridY] = getGridPoint(
           pointerCoords.x,
           pointerCoords.y,
