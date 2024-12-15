@@ -160,7 +160,7 @@ export const debugDrawPoints = (
     y: number;
     points: LocalPoint[];
   },
-  options: any,
+  options?: any,
 ) => {
   points.forEach((p) =>
     debugDrawPoint(pointFrom<GlobalPoint>(x + p[0], y + p[1]), options),

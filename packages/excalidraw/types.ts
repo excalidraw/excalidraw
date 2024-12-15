@@ -284,6 +284,7 @@ export interface AppState {
    */
   editingTextElement: NonDeletedExcalidrawElement | null;
   editingLinearElement: LinearElementEditor | null;
+  elbowLinearElement: LinearElementEditor | null;
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the

@@ -1,7 +1,9 @@
 import {
+  line,
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
+  pointsEqual,
   pointTranslate,
   vector,
   vectorCross,
@@ -20,6 +22,7 @@ import {
   toBrandedType,
   tupleToCoors,
 } from "../utils";
+import { debugDrawLine, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -126,6 +129,12 @@ export const updateElbowArrowPoints = (
       "you can't add new points between start and end manually to elbow arrows)",
   );
 
+  // invariant(
+  //   updates.fixedSegments &&
+  //     pointsEqual(updates.points[0], pointFrom<LocalPoint>(0, 0)),
+  //   "Cannot update fixed segments with arrow start point update due",
+  // );
+
   const updatedPoints: LocalPoint[] = updates.points
     ? updates.points.length === 2
       ? arrow.points.map((p, idx) =>
@@ -150,8 +159,15 @@ export const updateElbowArrowPoints = (
   };
   let startPoint = updatedPoints[0];
 
-  const pointPairs: [ElbowArrowState, readonly LocalPoint[]][] =
-    nextFixedSegments.map((segment) => {
+  const pointPairs: ([ElbowArrowState, readonly LocalPoint[]] | null)[] =
+    nextFixedSegments.map((segment, segmentIdx) => {
+      if (
+        segment.index - 1 ===
+        (nextFixedSegments[segmentIdx - 1]?.index ?? 0)
+      ) {
+        return null;
+      }
+
       const ret: [ElbowArrowState, readonly LocalPoint[]] = [
         state,
         [
@@ -192,10 +208,22 @@ export const updateElbowArrowPoints = (
 
   const { startHeading, endHeading, startGlobalPoint, endGlobalPoint } =
     getElbowArrowData(arrow, elementsMap, updates.points);
+  const mustKeepPoints = nextFixedSegments.flatMap((segment) => [
+    pointFrom<GlobalPoint>(
+      arrow.x + segment.start[0],
+      arrow.y + segment.start[1],
+    ),
+    pointFrom<GlobalPoint>(arrow.x + segment.end[0], arrow.y + segment.end[1]),
+  ]);
 
   const simplifiedPointGroups = getElbowArrowCornerPoints(
     removeElbowArrowShortSegments(
-      pointPairs.map(([state, ps], idx) => {
+      pointPairs.map((data, idx) => {
+        if (!data) {
+          return [];
+        }
+        const [state, ps] = data;
+
         const points = Array.from(ps);
         const prevSegment = idx > 0 ? nextFixedSegments[idx - 1] : undefined;
         const nextSegment =
@@ -268,7 +296,9 @@ export const updateElbowArrowPoints = (
 
         return nextPoints;
       }),
+      mustKeepPoints,
     ),
+    mustKeepPoints,
   );
   const simplifiedPoints = simplifiedPointGroups.flat();
 
@@ -304,34 +334,34 @@ export const updateElbowArrowPoints = (
     );
   });
 
-  // nextFixedSegments.forEach((segment) => {
-  //   debugDrawPoint(
-  //     pointFrom<GlobalPoint>(
-  //       simplifiedPoints[0][0] + segment.start[0],
-  //       simplifiedPoints[0][1] + segment.start[1],
-  //     ),
-  //     { permanent: true },
-  //   );
-  //   debugDrawPoint(
-  //     pointFrom<GlobalPoint>(
-  //       simplifiedPoints[0][0] + segment.end[0],
-  //       simplifiedPoints[0][1] + segment.end[1],
-  //     ),
-  //     { permanent: true },
-  //   );
-  //   debugDrawLine(
-  //     line(
-  //       pointFrom<GlobalPoint>(
-  //         simplifiedPoints[0][0] + segment.start[0],
-  //         simplifiedPoints[0][1] + segment.start[1],
-  //       ),
-  //       pointFrom<GlobalPoint>(
-  //         simplifiedPoints[0][0] + segment.end[0],
-  //         simplifiedPoints[0][1] + segment.end[1],
-  //       ),
-  //     ),
-  //   );
-  // });
+  nextFixedSegments.forEach((segment) => {
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        simplifiedPoints[0][0] + segment.start[0],
+        simplifiedPoints[0][1] + segment.start[1],
+      ),
+      { permanent: true },
+    );
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        simplifiedPoints[0][0] + segment.end[0],
+        simplifiedPoints[0][1] + segment.end[1],
+      ),
+      { permanent: true },
+    );
+    debugDrawLine(
+      line(
+        pointFrom<GlobalPoint>(
+          simplifiedPoints[0][0] + segment.start[0],
+          simplifiedPoints[0][1] + segment.start[1],
+        ),
+        pointFrom<GlobalPoint>(
+          simplifiedPoints[0][0] + segment.end[0],
+          simplifiedPoints[0][1] + segment.end[1],
+        ),
+      ),
+    );
+  });
 
   return normalizeArrowElementUpdate(simplifiedPoints, nextFixedSegments);
 };
@@ -1289,6 +1319,7 @@ const normalizeArrowElementUpdate = (
 
 const getElbowArrowCornerPoints = (
   pointGroups: GlobalPoint[][],
+  mustKeepPoints: GlobalPoint[],
 ): GlobalPoint[][] => {
   const points = pointGroups.flat();
 
@@ -1299,7 +1330,11 @@ const getElbowArrowCornerPoints = (
 
     const ret = multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
       // The very first and last points are always kept
-      if (idx === 0 || idx === points.length - 1) {
+      if (
+        idx === 0 ||
+        idx === points.length - 1 ||
+        mustKeepPoints.find((q) => pointsEqual(q, p))
+      ) {
         return true;
       }
 
@@ -1323,12 +1358,17 @@ const getElbowArrowCornerPoints = (
 
 const removeElbowArrowShortSegments = (
   pointGroups: GlobalPoint[][],
+  mustKeepPoints: GlobalPoint[],
 ): GlobalPoint[][] => {
   const points = pointGroups.flat();
 
   if (points.length >= 4) {
     return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
-      if (idx === 0 || idx === points.length - 1) {
+      if (
+        idx === 0 ||
+        idx === points.length - 1 ||
+        mustKeepPoints.find((q) => pointsEqual(q, p))
+      ) {
         return true;
       }
 

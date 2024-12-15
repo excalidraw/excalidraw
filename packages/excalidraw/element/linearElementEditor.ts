@@ -11,6 +11,7 @@ import type {
   FixedPointBinding,
   SceneElementsMap,
   FixedSegment,
+  ExcalidrawElbowArrowElement,
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
@@ -95,6 +96,11 @@ export class LinearElementEditor {
     };
   }>;
 
+  public readonly elbowMidPointState: Readonly<{
+    midPoint: GlobalPoint | null;
+    midPointIndex: number;
+  }>;
+
   /** whether you're dragging a point */
   public readonly isDragging: boolean;
   public readonly lastUncommittedPoint: LocalPoint | null;
@@ -132,6 +138,10 @@ export class LinearElementEditor {
         index: null,
         added: false,
       },
+    };
+    this.elbowMidPointState = {
+      midPoint: null,
+      midPointIndex: -1,
     };
     this.hoverPointIndex = -1;
     this.elbowed = isElbowArrow(element) && element.elbowed;
@@ -442,13 +452,13 @@ export class LinearElementEditor {
                     : element.points[0],
               },
             ]);
-            if (isElbowArrow(element)) {
-              LinearElementEditor.updateEditorMidPointsCache(
-                element,
-                elementsMap,
-                appState,
-              );
-            }
+            // if (isElbowArrow(element)) {
+            //   LinearElementEditor.updateEditorMidPointsCache(
+            //     element,
+            //     elementsMap,
+            //     appState,
+            //   );
+            // }
           }
 
           const bindingElement = isBindingEnabled(appState)
@@ -521,12 +531,11 @@ export class LinearElementEditor {
     ) {
       return editorMidPointsCache.points;
     }
-    !isElbowArrow(element) &&
-      LinearElementEditor.updateEditorMidPointsCache(
-        element,
-        elementsMap,
-        appState,
-      );
+    LinearElementEditor.updateEditorMidPointsCache(
+      element,
+      elementsMap,
+      appState,
+    );
     return editorMidPointsCache.points!;
   };
 
@@ -739,6 +748,7 @@ export class LinearElementEditor {
     if (!element) {
       return ret;
     }
+
     const segmentMidpoint = LinearElementEditor.getSegmentMidpointHitCoords(
       linearElementEditor,
       scenePointer,
@@ -957,13 +967,13 @@ export class LinearElementEditor {
           point: newPoint,
         },
       ]);
-      if (isElbowArrow(element)) {
-        LinearElementEditor.updateEditorMidPointsCache(
-          element,
-          elementsMap,
-          appState,
-        );
-      }
+      // if (isElbowArrow(element)) {
+      //   LinearElementEditor.updateEditorMidPointsCache(
+      //     element,
+      //     elementsMap,
+      //     appState,
+      //   );
+      // }
     } else {
       LinearElementEditor.addPoints(element, [{ point: newPoint }]);
     }
@@ -1200,13 +1210,13 @@ export class LinearElementEditor {
           point: pointFrom(lastPoint[0] + 30, lastPoint[1] + 30),
         },
       ]);
-      if (isElbowArrow(element)) {
-        LinearElementEditor.updateEditorMidPointsCache(
-          element,
-          elementsMap,
-          appState,
-        );
-      }
+      // if (isElbowArrow(element)) {
+      //   LinearElementEditor.updateEditorMidPointsCache(
+      //     element,
+      //     elementsMap,
+      //     appState,
+      //   );
+      // }
     }
 
     return {
@@ -1753,54 +1763,12 @@ export class LinearElementEditor {
     return coords;
   };
 
-  static deleteFixedSegment(
-    linearElementEditor: LinearElementEditor,
-    state: AppState,
-    x: number,
-    y: number,
-    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  ) {
-    const segmentMidPoint = LinearElementEditor.getSegmentMidpointHitCoords(
-      linearElementEditor,
-      { x, y },
-      state,
-      elementsMap,
-    );
-    const index =
-      segmentMidPoint &&
-      LinearElementEditor.getSegmentMidPointIndex(
-        linearElementEditor,
-        state,
-        segmentMidPoint,
-        elementsMap,
-      );
-    const element = LinearElementEditor.getElement(
-      linearElementEditor.elementId,
-      elementsMap,
-    );
-
-    if (index && index > 0 && element && isElbowArrow(element)) {
-      mutateElement(element, {
-        fixedSegments: element.fixedSegments?.filter(
-          (segment) => segment.index !== index,
-        ),
-      });
-
-      LinearElementEditor.updateEditorMidPointsCache(
-        element,
-        elementsMap,
-        state,
-      );
-    }
-  }
-
   static moveFixedSegment(
     linearElement: LinearElementEditor,
     index: number,
     x: number,
     y: number,
     elementsMap: ElementsMap,
-    state: AppState,
   ): LinearElementEditor {
     const element = LinearElementEditor.getElement(
       linearElement.elementId,
@@ -1811,12 +1779,7 @@ export class LinearElementEditor {
       return linearElement;
     }
 
-    if (
-      index &&
-      index > 0 &&
-      index < element.points.length &&
-      linearElement.pointerDownState.origin
-    ) {
+    if (index && index > 0 && index < element.points.length) {
       const isHorizontal = headingIsHorizontal(
         vectorToHeading(
           vectorFromPoint(element.points[index], element.points[index - 1]),
@@ -1860,6 +1823,16 @@ export class LinearElementEditor {
         .map((segment) => segment.index)
         .reduce((count, idx) => (idx < index ? count + 1 : count), 0);
 
+      // console.log(
+      //   index,
+      //   offset,
+      //   JSON.stringify(
+      //     Object.values(fixedSegments).sort((a, b) => a.index - b.index),
+      //     null,
+      //     2,
+      //   ),
+      // );
+
       mutateElement(element, {
         fixedSegments: Object.values(fixedSegments).sort(
           (a, b) => a.index - b.index,
@@ -1867,32 +1840,100 @@ export class LinearElementEditor {
       });
 
       // console.log(
-      //   index,
-      //   offset,
-      //   JSON.stringify(
-      //     Object.values(fixedSegments).sort((a, b) => a.index - b.index),
-      //   ),
+      //   "Post update",
+      //   JSON.stringify(element.fixedSegments, null, 2),
       // );
-
-      LinearElementEditor.updateEditorMidPointsCache(
-        element,
-        elementsMap,
-        state,
-      );
 
       return {
         ...linearElement,
-        pointerDownState: {
-          ...linearElement.pointerDownState,
-          segmentMidpoint: {
-            ...linearElement.pointerDownState.segmentMidpoint,
-            index: element.fixedSegments![offset].index,
-          },
+        elbowMidPointState: {
+          midPoint: pointFrom<GlobalPoint>(
+            element.x +
+              (element.fixedSegments![offset].start[0] +
+                element.fixedSegments![offset].end[0]) /
+                2,
+            element.y +
+              (element.fixedSegments![offset].start[1] +
+                element.fixedSegments![offset].end[1]) /
+                2,
+          ),
+          midPointIndex: element.fixedSegments![offset].index,
         },
       };
     }
 
     return linearElement;
+  }
+
+  static getElbowArrowMidPoints(
+    element: ExcalidrawElbowArrowElement,
+    elementsMap: ElementsMap,
+    appState: AppState,
+  ): (GlobalPoint | null)[] {
+    const points = LinearElementEditor.getPointsGlobalCoordinates(
+      element,
+      elementsMap,
+    );
+
+    let index = 1;
+    const midpoints: (GlobalPoint | null)[] = [];
+    while (index < points.length) {
+      if (
+        LinearElementEditor.isSegmentTooShort(
+          element,
+          element.points[index - 1],
+          element.points[index],
+          appState.zoom,
+        )
+      ) {
+        midpoints.push(null);
+      } else {
+        const segmentMidPoint = pointFrom<GlobalPoint>(
+          (points[index - 1][0] + points[index][0]) / 2,
+          (points[index - 1][1] + points[index][1]) / 2,
+        );
+        midpoints.push(segmentMidPoint);
+      }
+      index++;
+    }
+
+    return midpoints;
+  }
+
+  static getElbowArrowHitMidPointIndex(
+    element: ExcalidrawElbowArrowElement,
+    scenePointer: { x: number; y: number },
+    elementsMap: ElementsMap,
+    appState: AppState,
+  ): [number, GlobalPoint] | null {
+    const threshold =
+      LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
+
+    let index = 0;
+    const midPoints: (GlobalPoint | null)[] =
+      LinearElementEditor.getElbowArrowMidPoints(
+        element,
+        elementsMap,
+        appState,
+      );
+    while (index < midPoints.length) {
+      if (midPoints[index] !== null) {
+        const distance = pointDistance(
+          midPoints[index]!,
+          pointFrom(scenePointer.x, scenePointer.y),
+        );
+        console.log(index, distance, threshold);
+        if (distance <= threshold) {
+          return [index + 1, midPoints[index]!];
+        }
+      } else {
+        console.log(index, "null");
+      }
+
+      index++;
+    }
+
+    return null;
   }
 }
 

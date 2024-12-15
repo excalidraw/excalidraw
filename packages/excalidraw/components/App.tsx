@@ -458,6 +458,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
+  line,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
@@ -5368,22 +5369,24 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
-      } else if (
-        isElbowArrow(selectedElements[0]) &&
-        this.state.selectedLinearElement &&
-        (this.state.selectedLinearElement?.pointerDownState?.segmentMidpoint
-          ?.index || -1) > -1
-      ) {
-        this.store.shouldCaptureIncrement();
-        LinearElementEditor.deleteFixedSegment(
-          this.state.selectedLinearElement,
-          this.state,
-          sceneX,
-          sceneY,
+      } else if (isElbowArrow(selectedElements[0])) {
+        const midPoint = LinearElementEditor.getElbowArrowHitMidPointIndex(
+          selectedElements[0],
+          { x: sceneX, y: sceneY },
           this.scene.getNonDeletedElementsMap(),
+          this.state,
         );
+        if (midPoint && midPoint[0] > -1) {
+          this.store.shouldCaptureIncrement();
+          // deleteFixedSegment
+          mutateElement(selectedElements[0], {
+            fixedSegments: selectedElements[0].fixedSegments?.filter(
+              (segment) => segment.index !== midPoint[0],
+            ),
+          });
 
-        return;
+          return;
+        }
       }
     }
 
@@ -6453,6 +6456,41 @@ class App extends React.Component<AppProps, AppState> {
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
+    {
+      console.log("DOWN");
+      const hitElement = this.getElementAtPosition(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+      );
+      const linearElementEditor =
+        hitElement && isElbowArrow(hitElement)
+          ? new LinearElementEditor(hitElement)
+          : null;
+      if (hitElement && isElbowArrow(hitElement) && linearElementEditor) {
+        const midPoint = LinearElementEditor.getElbowArrowHitMidPointIndex(
+          hitElement,
+          viewportCoordsToSceneCoords(event, this.state),
+          this.scene.getNonDeletedElementsMap(),
+          this.state,
+        );
+
+        if (midPoint) {
+          console.log("handleSelectionOnPointerDown", midPoint);
+          this.setState((prev) => {
+            return {
+              elbowLinearElement: {
+                ...(prev.elbowLinearElement || linearElementEditor),
+                elbowMidPointState: {
+                  midPoint: midPoint[1],
+                  midPointIndex: midPoint[0],
+                },
+              },
+            };
+          });
+        }
+      }
+    }
+
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
     }
@@ -6609,11 +6647,12 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    const hitElement = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
+    );
+
     if (this.device.isTouchScreen) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
         hitElement,
@@ -6642,6 +6681,21 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({
         activeEmbeddable: null,
         selectedElementIds: {},
+      });
+    }
+
+    // Up event means that an operation is over. Update midpoints cache for
+    // elbow arrows so we can react to new operations properly.
+    // if (hitElement && isElbowArrow(hitElement)) {
+    //   LinearElementEditor.updateEditorMidPointsCache(
+    //     hitElement,
+    //     this.scene.getNonDeletedElementsMap(),
+    //     this.state,
+    //   );
+    // }
+    if (this.state.elbowLinearElement) {
+      this.setState({
+        elbowLinearElement: null,
       });
     }
   };
@@ -7018,15 +7072,8 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        let linearElementEditor =
+        const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
-        const elementUnderCursor = this.getElementAtPosition(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        );
-        if (elementUnderCursor && isElbowArrow(elementUnderCursor)) {
-          linearElementEditor = new LinearElementEditor(elementUnderCursor);
-        }
         if (linearElementEditor) {
           const ret = LinearElementEditor.handlePointerDown(
             event,
@@ -7259,7 +7306,7 @@ class App extends React.Component<AppProps, AppState> {
                     this,
                   ),
                   showHyperlinkPopup:
-                    hitElement.link || isEmbeddableElement(hitElement)
+                    hitElement!.link || isEmbeddableElement(hitElement)
                       ? "info"
                       : false,
                 };
@@ -7904,6 +7951,43 @@ class App extends React.Component<AppProps, AppState> {
         this.lastPointerMoveCoords ?? pointerDownState.origin;
       this.lastPointerMoveCoords = pointerCoords;
 
+      console.log(
+        "move",
+        this.state.elbowLinearElement?.elbowMidPointState.midPointIndex,
+      );
+      if (
+        this.state.elbowLinearElement &&
+        this.state.elbowLinearElement.elbowMidPointState.midPointIndex !== -1
+      ) {
+        console.log("requested");
+        const [gridX, gridY] = getGridPoint(
+          pointerCoords.x,
+          pointerCoords.y,
+          event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+        );
+
+        const ret = LinearElementEditor.moveFixedSegment(
+          this.state.elbowLinearElement,
+          this.state.elbowLinearElement.elbowMidPointState.midPointIndex,
+          gridX,
+          gridY,
+          this.scene.getNonDeletedElementsMap(),
+        );
+
+        flushSync(() => {
+          if (this.state.elbowLinearElement) {
+            this.setState({
+              elbowLinearElement: {
+                ...this.state.elbowLinearElement,
+                pointerDownState: ret.pointerDownState,
+                elbowMidPointState: ret.elbowMidPointState,
+              },
+            });
+          }
+        });
+        return;
+      }
+
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -8018,43 +8102,6 @@ class App extends React.Component<AppProps, AppState> {
             }
           });
 
-          return;
-        } else if (
-          linearElementEditor.elbowed &&
-          linearElementEditor.pointerDownState.segmentMidpoint.index
-        ) {
-          const [gridX, gridY] = getGridPoint(
-            pointerCoords.x,
-            pointerCoords.y,
-            event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-          );
-
-          const ret = LinearElementEditor.moveFixedSegment(
-            this.state.selectedLinearElement,
-            linearElementEditor.pointerDownState.segmentMidpoint.index,
-            gridX,
-            gridY,
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-          flushSync(() => {
-            if (this.state.selectedLinearElement) {
-              this.setState({
-                selectedLinearElement: {
-                  ...this.state.selectedLinearElement,
-                  pointerDownState: ret.pointerDownState,
-                },
-              });
-            }
-            if (this.state.editingLinearElement) {
-              this.setState({
-                editingLinearElement: {
-                  ...this.state.editingLinearElement,
-                  pointerDownState: ret.pointerDownState,
-                },
-              });
-            }
-          });
           return;
         } else if (
           linearElementEditor.pointerDownState.segmentMidpoint.value !== null &&
@@ -8297,29 +8344,6 @@ class App extends React.Component<AppProps, AppState> {
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
             );
-            selectedElements
-              .flatMap(
-                (draggedElement) =>
-                  (isLinearElement(draggedElement)
-                    ? [draggedElement]
-                    : draggedElement.boundElements
-                        ?.map((binding) => {
-                          const el = elementsMap.get(binding.id);
-                          if (isLinearElement(el)) {
-                            return el;
-                          }
-                          return null;
-                        })
-                        .filter((el) => el != null) ??
-                      []) as ExcalidrawLinearElement[],
-              )
-              .forEach((element) =>
-                LinearElementEditor.updateEditorMidPointsCache(
-                  element,
-                  elementsMap,
-                  this.state,
-                ),
-              );
           }
 
           this.setState({
@@ -8838,13 +8862,6 @@ class App extends React.Component<AppProps, AppState> {
           pressures,
           lastCommittedPoint: pointFrom<LocalPoint>(dx, dy),
         });
-        if (isElbowArrow(newElement)) {
-          LinearElementEditor.updateEditorMidPointsCache(
-            newElement,
-            elementsMap,
-            this.state,
-          );
-        }
 
         this.actionManager.executeAction(actionFinalize);
 
