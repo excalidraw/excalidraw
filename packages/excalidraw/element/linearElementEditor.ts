@@ -1819,24 +1819,18 @@ export class LinearElementEditor {
             : element.points[index][1],
         ),
       };
-      const offset = Object.values(fixedSegments)
+      const nextFixedSegments = Object.values(fixedSegments).sort(
+        (a, b) => a.index - b.index,
+      );
+      const offset = nextFixedSegments
         .map((segment) => segment.index)
         .reduce((count, idx) => (idx < index ? count + 1 : count), 0);
 
-      // console.log(
-      //   index,
-      //   offset,
-      //   JSON.stringify(
-      //     Object.values(fixedSegments).sort((a, b) => a.index - b.index),
-      //     null,
-      //     2,
-      //   ),
-      // );
+      // console.log(index, offset);
+      // console.log(JSON.stringify(nextFixedSegments, null, 2));
 
       mutateElement(element, {
-        fixedSegments: Object.values(fixedSegments).sort(
-          (a, b) => a.index - b.index,
-        ),
+        fixedSegments: nextFixedSegments,
       });
 
       // console.log(
