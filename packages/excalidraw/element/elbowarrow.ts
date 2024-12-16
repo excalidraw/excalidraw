@@ -157,18 +157,6 @@ export const updateElbowArrowPoints = (
   let prevIsHorizontal = headingIsHorizontal(startHeading);
   let prevPoint = startGlobalPoint;
 
-  while (simplifiedPoints.length < nextFixedSegments[0].index - 1) {
-    const p = pointFrom<GlobalPoint>(
-      arrow.x + updatedPoints[simplifiedPoints.length][0],
-      arrow.y + updatedPoints[simplifiedPoints.length][1],
-    );
-    prevIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(p, prevPoint)),
-    );
-    prevPoint = p;
-    simplifiedPoints.push(p);
-  }
-
   const shouldKeepPreviousPoint = () => {
     const [a, b, c] = simplifiedPoints.slice(-3);
     const prevIsHorizontal = Math.abs(a[1] - b[1]) < Math.abs(a[0] - b[0]);
@@ -180,6 +168,26 @@ export const updateElbowArrowPoints = (
 
     return true;
   };
+
+  while (simplifiedPoints.length < nextFixedSegments[0].index - 1) {
+    const p = pointFrom<GlobalPoint>(
+      prevIsHorizontal
+        ? arrow.x +
+            updatedPoints[simplifiedPoints.length][0] +
+            updatedPoints[0][0]
+        : prevPoint[0],
+      !prevIsHorizontal
+        ? arrow.y +
+            updatedPoints[simplifiedPoints.length][1] +
+            updatedPoints[0][1]
+        : prevPoint[1],
+    );
+    prevIsHorizontal = !headingIsHorizontal(
+      vectorToHeading(vectorFromPoint(p, prevPoint)),
+    );
+    prevPoint = p;
+    simplifiedPoints.push(p);
+  }
 
   nextFixedSegments.forEach((segment, segmentIdx) => {
     // Extend the point up to the next segment start
@@ -213,7 +221,7 @@ export const updateElbowArrowPoints = (
       arrow.y + segment.end[1],
     );
 
-    //nextFixedSegments[segmentIdx].index = simplifiedPoints.length - 1;
+    //nextFixedSegments[segmentIdx].index = simplifiedPoints.length;
     nextFixedSegments[segmentIdx].start = pointFrom<LocalPoint>(
       arrow.x + segment.start[0] - startGlobalPoint[0],
       arrow.y + segment.start[1] - startGlobalPoint[1],
