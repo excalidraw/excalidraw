@@ -273,6 +273,7 @@ export {
   registerFontsInCSS, //zsviczian
   getCSSFontDefinition, //zsviczian
   loadSceneFonts, //zsviczian
+  loadMermaid, //zsviczian
 } from "../utils/export";
 
 export { refreshTextDimensions } from "./element/newElement"; //zsviczian

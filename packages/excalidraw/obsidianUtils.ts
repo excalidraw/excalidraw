@@ -1,4 +1,6 @@
 import { FreedrawIcon } from "./components/icons";
+import { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
+import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { FONT_FAMILY } from "./constants";
 import { NonDeletedExcalidrawElement } from "./element/types";
 import { Fonts } from "./fonts";
@@ -164,4 +166,12 @@ export function isTouchInPenMode(appState: AppState, event: React.PointerEvent<H
   return appState.penMode &&
     (!isReactPointerEvent || (event.pointerType === "touch")) &&
     ![ "text" ].includes(appState.activeTool.type);
+}
+
+export async function getSharedMermaidInstance():Promise<MermaidToExcalidrawLibProps> {
+  return await getHostPlugin().getMermaid();
+}
+
+export async function loadMermaid(): Promise<MermaidToExcalidrawLibProps> {
+  return await loadMermaidLib();
 }

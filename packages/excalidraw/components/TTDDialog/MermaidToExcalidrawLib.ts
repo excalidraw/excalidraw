@@ -2,11 +2,19 @@ import { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
 import { convertToExcalidrawElements } from "../../data/transform";
 import { ExcalidrawElement } from "../../element/types";
 import { MermaidToExcalidrawLibProps } from "./common";
+import { getSharedMermaidInstance } from "../../obsidianUtils";
 
 let mermaidToExcalidrawLib: MermaidToExcalidrawLibProps | null = null;
 let queue: Promise<any> = Promise.resolve();
 
 export const loadMermaidToExcalidrawLib = async (): Promise<MermaidToExcalidrawLibProps> => {
+  if (!mermaidToExcalidrawLib) {
+    mermaidToExcalidrawLib = await getSharedMermaidInstance();
+  }
+  return mermaidToExcalidrawLib;
+};
+
+export const loadMermaidLib = async (): Promise<MermaidToExcalidrawLibProps> => {
   if (!mermaidToExcalidrawLib) {
     const api = import("@zsviczian/mermaid-to-excalidraw").then(module => ({
       parseMermaidToExcalidraw: module.parseMermaidToExcalidraw,

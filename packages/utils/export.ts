@@ -229,4 +229,6 @@ export {
   registerFontsInCSS,
   getCSSFontDefinition,
   loadSceneFonts,
+  getSharedMermaidInstance,
+  loadMermaid,
 } from "../excalidraw/obsidianUtils"; //zsviczian

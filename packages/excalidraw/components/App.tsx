@@ -2532,7 +2532,8 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
-    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    //zsviczian disabling this code
+    if (false && (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV)) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
