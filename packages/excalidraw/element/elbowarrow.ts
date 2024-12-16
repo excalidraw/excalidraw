@@ -236,11 +236,6 @@ export const updateElbowArrowPoints = (
   });
 
   while (simplifiedPoints.length < updatedPoints.length - 2) {
-    console.log(
-      "simplifiedPoints",
-      simplifiedPoints.length,
-      updatedPoints.length,
-    );
     const p = pointFrom<GlobalPoint>(
       arrow.x + updatedPoints[simplifiedPoints.length][0] + updatedPoints[0][0],
       arrow.y + updatedPoints[simplifiedPoints.length][1] + updatedPoints[0][1],
