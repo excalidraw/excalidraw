@@ -66,7 +66,7 @@ const config = {
             label: "Docs",
           },
           {
-            to: "https://blog.excalidraw.com",
+            to: "https://plus.excalidraw.com/blog",
             label: "Blog",
             position: "left",
           },
@@ -111,7 +111,7 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: "https://blog.excalidraw.com",
+                to: "https://plus.excalidraw.com/blog",
               },
               {
                 label: "GitHub",

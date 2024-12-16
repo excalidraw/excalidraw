@@ -294,6 +294,7 @@ export const SearchMenu = () => {
     // as well as to handle events before App ones
     return addEventListener(window, EVENT.KEYDOWN, eventHandler, {
       capture: true,
+      passive: false,
     });
   }, [setAppState, stableState, app]);
 
