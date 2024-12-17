@@ -157,6 +157,8 @@
     "zoomToFit": "Zooma för att rymma alla element",
     "installPWA": "Installera Excalidraw lokalt (PWA)",
     "autoResize": "Aktivera automatisk skalning av text",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "Kopiera länk till objektet",
     "linkToElement": "Länk till objektet"
   },
