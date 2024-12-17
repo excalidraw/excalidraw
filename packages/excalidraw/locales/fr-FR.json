@@ -157,6 +157,8 @@
     "zoomToFit": "Zoomer pour voir tous les éléments",
     "installPWA": "Installer Excalidraw localement (PWA)",
     "autoResize": "Activer le redimensionnement automatique du texte",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
