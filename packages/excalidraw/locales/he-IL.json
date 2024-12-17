@@ -157,6 +157,8 @@
     "zoomToFit": "להציג את כל האלמנטים",
     "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
     "autoResize": "לאפשר התאמה אוטומטית של גודל הטקסט",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
