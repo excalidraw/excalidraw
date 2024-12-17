@@ -157,6 +157,8 @@
     "zoomToFit": "Zoom per veure tots els elements",
     "installPWA": "Instal·la Excalidraw localment (PWA)",
     "autoResize": "Activa la redimensió de text automàtica",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
