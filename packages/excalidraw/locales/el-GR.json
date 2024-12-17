@@ -157,6 +157,8 @@
     "zoomToFit": "Εστίαση για να χωρέσει σε όλα τα στοιχεία",
     "installPWA": "Τοπική εγκατάσταση Excalidraw (PWA)",
     "autoResize": "Ενεργοποίηση αυτόματης αλλαγής μεγέθους κειμένου",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
