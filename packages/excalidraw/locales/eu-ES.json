@@ -157,6 +157,8 @@
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "installPWA": "Instalatu Excalidraw lokalean (PWA)",
     "autoResize": "Textu zabalera automatikoa aktibatu",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
