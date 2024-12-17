@@ -157,6 +157,8 @@
     "zoomToFit": "Dopasuj widok do całej zawartości",
     "installPWA": "Zainstaluj Excalidraw lokalnie (PWA)",
     "autoResize": "Włącz automatyczne zmiany rozmiaru tekstu",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
