@@ -1,7 +1,7 @@
 {
   "labels": {
-    "paste": "جای گذاری",
-    "pasteAsPlaintext": "جای‌گذاری به عنوان متن ساده",
+    "paste": "جایگذاری",
+    "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید",
@@ -14,7 +14,7 @@
     "copySource": "کپی منبع در حافظه موقت",
     "convertToCode": "تبدیل به کد",
     "bringForward": "جلو آوردن",
-    "sendToBack": "پس فرستادن",
+    "sendToBack": "ارسال به عقب",
     "bringToFront": "جلو آوردن",
     "sendBackward": "پس فرستادن",
     "delete": "حذف",
@@ -97,7 +97,7 @@
     "libraryLoadingMessage": "بارگذاری کتابخانه…",
     "libraries": "مرور کردن کتابخانه ها",
     "loadingScene": "باگذاری صحنه…",
-    "loadScene": "بارگذاری از فایل",
+    "loadScene": "بارگذاری صحنه از فایل",
     "align": "تراز",
     "alignTop": "تراز به بالا",
     "alignBottom": "تراز به پایین",
@@ -157,6 +157,8 @@
     "zoomToFit": "بزرگنمایی برای دیدن تمام آیتم ها",
     "installPWA": "نصب Excalidraw روی دستگاه (PWA)",
     "autoResize": "فعالسازی تنظیم خودکار سایز",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "کپی لینک به آیتم",
     "linkToElement": "لینک به آیتم"
   },
