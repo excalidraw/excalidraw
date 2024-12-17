@@ -157,6 +157,8 @@
     "zoomToFit": "सभी तत्व दिखे इतना झूम करें",
     "installPWA": "एक्सकाली ड्रॉ को स्थानीयरूप में इंस्टॉल करें (PWA)",
     "autoResize": "स्वयं आकार पुनः निर्धारण",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "वस्तु की कड़ी कॉपी करें",
     "linkToElement": "वस्तु की कड़ी"
   },
