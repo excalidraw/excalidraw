@@ -157,6 +157,8 @@
     "zoomToFit": "缩放以适应所有元素",
     "installPWA": "在本地安装 Excalidraw (PWA)",
     "autoResize": "启用文本自动缩放",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "复制此对象的链接",
     "linkToElement": "链接到对象"
   },
