@@ -157,6 +157,8 @@
     "zoomToFit": "모든 요소가 보이도록 확대/축소",
     "installPWA": "Excalidraw 설치(PWA)",
     "autoResize": "텍스트 크기 자동 조절 켜기",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
