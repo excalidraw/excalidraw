@@ -157,6 +157,8 @@
     "zoomToFit": "Přiblížit na zobrazení všech prvků",
     "installPWA": "Instalovat Excalidraw lokálně (PWA)",
     "autoResize": "Povolit automatickou změnu velikosti textu",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "Kopírovat odkaz na objekt",
     "linkToElement": "Odkaz na objekt"
   },
