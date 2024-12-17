@@ -157,6 +157,8 @@
     "zoomToFit": "تكبير لتلائم جميع العناصر",
     "installPWA": "",
     "autoResize": "",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
