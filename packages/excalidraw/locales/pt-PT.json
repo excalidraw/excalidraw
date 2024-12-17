@@ -157,6 +157,8 @@
     "zoomToFit": "Aproximar para enquadrar todos os elementos",
     "installPWA": "Instalar Excalidraw localmente (PWA)",
     "autoResize": "Ativar redimensionamento automático do texto",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "Copiar hiperligação para o objeto",
     "linkToElement": "Hiperligação para o objeto"
   },
