@@ -157,8 +157,8 @@
     "zoomToFit": "सर्व तत्व दिसतील असे दृश्यरूप आकार करा",
     "installPWA": "एक्षकाली ड्रॉ स्थानीय स्वरूपात इंस्टॉल करावे (PWA)",
     "autoResize": "स्वयं आकार पुनः निर्धारण",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "प्रतिमा कापणे",
+    "unCroppedDimension": "कापण्या पूर्विचे परिमाण",
     "copyElementLink": "वस्तू ह्याचा दुवा कॉपी करावे",
     "linkToElement": "वस्तू ह्याचा दुवा"
   },
