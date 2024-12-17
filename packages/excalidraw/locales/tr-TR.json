@@ -157,6 +157,8 @@
     "zoomToFit": "Tüm öğeleri sığdırmak için yakınlaştır",
     "installPWA": "Excalidraw'ı yerel olarak yükle (PWA)",
     "autoResize": "Metni otomatik yeniden boyutlandırmayı etkinleştir",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
