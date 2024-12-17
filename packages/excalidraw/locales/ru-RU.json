@@ -157,6 +157,8 @@
     "zoomToFit": "",
     "installPWA": "Установить Excalidraw локально (PWA)",
     "autoResize": "",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "Скопировать ссылку на объект",
     "linkToElement": ""
   },
