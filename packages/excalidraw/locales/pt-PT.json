@@ -157,8 +157,8 @@
     "zoomToFit": "Aproximar para enquadrar todos os elementos",
     "installPWA": "Instalar Excalidraw localmente (PWA)",
     "autoResize": "Ativar redimensionamento automático do texto",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "Corte de imagem",
+    "unCroppedDimension": "Dimensão sem corte",
     "copyElementLink": "Copiar hiperligação para o objeto",
     "linkToElement": "Hiperligação para o objeto"
   },
@@ -177,7 +177,7 @@
     "noMatch": "Não foram encontrados resultados...",
     "singleResult": "resultado",
     "multipleResults": "resultados",
-    "placeholder": ""
+    "placeholder": "Pesquisar texto na área de desenho..."
   },
   "buttons": {
     "clearReset": "Limpar a área de desenho",
