@@ -157,6 +157,8 @@
     "zoomToFit": "Transfocare pentru a cuprinde toate elementele",
     "installPWA": "Instalează Excalidraw la nivel local (PWA)",
     "autoResize": "Activare autoredimensionare text",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "Copiere link către obiect",
     "linkToElement": "Link către obiect"
   },
