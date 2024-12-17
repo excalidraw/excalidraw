@@ -10456,7 +10456,7 @@ class App extends React.Component<AppProps, AppState> {
     const [x, y] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      this.getEffectiveGridSize(),
+      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
     );
 
     const croppingElement = this.scene
@@ -10482,6 +10482,28 @@ class App extends React.Component<AppProps, AppState> {
         image &&
         !(image instanceof Promise)
       ) {
+        const [gridX, gridY] = getGridPoint(
+          pointerCoords.x,
+          pointerCoords.y,
+          event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+        );
+
+        const dragOffset = {
+          x: gridX - pointerDownState.originInGrid.x,
+          y: gridY - pointerDownState.originInGrid.y,
+        };
+
+        this.maybeCacheReferenceSnapPoints(event, [croppingElement]);
+
+        const { snapOffset, snapLines } = snapResizingElements(
+          [croppingElement],
+          [croppingAtStateStart],
+          this,
+          event,
+          dragOffset,
+          transformHandleType,
+        );
+
         mutateElement(
           croppingElement,
           cropElement(
@@ -10489,8 +10511,8 @@ class App extends React.Component<AppProps, AppState> {
             transformHandleType,
             image.naturalWidth,
             image.naturalHeight,
-            x,
-            y,
+            x + snapOffset.x,
+            y + snapOffset.y,
             event.shiftKey
               ? croppingAtStateStart.width / croppingAtStateStart.height
               : undefined,
@@ -10510,6 +10532,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",
+          snapLines,
         });
       }
 
