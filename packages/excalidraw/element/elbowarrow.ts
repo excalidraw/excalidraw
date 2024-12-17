@@ -152,7 +152,7 @@ export const updateElbowArrowPoints = (
   }
 
   const { startHeading, endHeading, startGlobalPoint, endGlobalPoint } =
-    getElbowArrowData(arrow, elementsMap, updates.points);
+    getElbowArrowData(arrow, elementsMap, updates.points, options);
   const simplifiedPoints: GlobalPoint[] = [startGlobalPoint];
   let prevIsHorizontal = headingIsHorizontal(startHeading);
   let prevPoint = startGlobalPoint;
