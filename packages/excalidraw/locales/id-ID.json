@@ -157,6 +157,8 @@
     "zoomToFit": "Memperbesar agar unsur pas semua",
     "installPWA": "Install Excalidraw secara lokal (PWA)",
     "autoResize": "Mengaktifkan pengubahan ukuran teks secara otomatis",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "Salin tautan ke objek",
     "linkToElement": "Taut ke objek"
   },
