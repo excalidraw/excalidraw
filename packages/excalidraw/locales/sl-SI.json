@@ -157,6 +157,8 @@
     "zoomToFit": "Približaj na vse elemente",
     "installPWA": "Namesti Excalidraw lokalno (PWA)",
     "autoResize": "Omogoči samodejno spreminjanje velikosti besedila",
+    "imageCropping": "Obrezovanje slike",
+    "unCroppedDimension": "Neobrezana dimenzija",
     "copyElementLink": "Kopiraj povezavo do objekta",
     "linkToElement": "Povezava do objekta"
   },
