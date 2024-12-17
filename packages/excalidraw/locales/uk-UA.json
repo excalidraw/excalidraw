@@ -157,6 +157,8 @@
     "zoomToFit": "Збільшити, щоб умістити всі елементи",
     "installPWA": "Встановити Excalidraw локально (PWA)",
     "autoResize": "Увімкнути автоматичне змінення розміру тексту",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
