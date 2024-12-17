@@ -157,6 +157,8 @@
     "zoomToFit": "Приближи всички елементи",
     "installPWA": "",
     "autoResize": "",
+    "imageCropping": "",
+    "unCroppedDimension": "",
     "copyElementLink": "",
     "linkToElement": ""
   },
