@@ -157,8 +157,8 @@
     "zoomToFit": "Zoom auf alle Elemente anpassen",
     "installPWA": "Excalidraw lokal installieren (PWA)",
     "autoResize": "Aktiviere automatische Textgrößenanpassung",
-    "imageCropping": "",
-    "unCroppedDimension": "",
+    "imageCropping": "Bild zuschneiden",
+    "unCroppedDimension": "Nicht zugeschnittene Dimension",
     "copyElementLink": "Link zum Objekt kopieren",
     "linkToElement": "Link zum Objekt"
   },
