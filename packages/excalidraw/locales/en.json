@@ -157,6 +157,8 @@
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
     "autoResize": "Enable text auto-resizing",
+    "imageCropping": "Image cropping",
+    "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
     "linkToElement": "Link to object"
   },
