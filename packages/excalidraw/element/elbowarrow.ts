@@ -2,6 +2,7 @@ import {
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
+  pointsEqual,
   pointTranslate,
   vector,
   vectorCross,
@@ -99,7 +100,10 @@ const shouldKeepPreviousPoint = (simplifiedPoints: readonly GlobalPoint[]) => {
   const prevIsHorizontal = Math.abs(a[1] - b[1]) < Math.abs(a[0] - b[0]);
   const nextIsHorizontal = Math.abs(b[1] - c[1]) < Math.abs(b[0] - c[0]);
 
-  if (prevIsHorizontal === nextIsHorizontal || pointDistance(b, c) < 0.3) {
+  if (
+    prevIsHorizontal === nextIsHorizontal
+    //|| pointDistance(b, c) < 0.3
+  ) {
     return false;
   }
 
@@ -171,8 +175,6 @@ export const updateElbowArrowPoints = (
     endHeading,
     startGlobalPoint,
     endGlobalPoint,
-    startDonglePosition,
-    endDonglePosition,
     hoveredStartElement,
     hoveredEndElement,
   } = getElbowArrowData(arrow, elementsMap, updates.points, options);
@@ -181,39 +183,33 @@ export const updateElbowArrowPoints = (
   let prevPoint = startGlobalPoint;
 
   {
-    const ref1 = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[simplifiedPoints.length][0],
-      arrow.y + arrow.points[simplifiedPoints.length][1],
+    const secondPoint = pointFrom<GlobalPoint>(
+      arrow.x + arrow.points[1][0],
+      arrow.y + arrow.points[1][1],
     );
-    const ref2 = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[simplifiedPoints.length + 1][0],
-      arrow.y + arrow.points[simplifiedPoints.length + 1][1],
+    const thirdPoint = pointFrom<GlobalPoint>(
+      arrow.x + arrow.points[2][0],
+      arrow.y + arrow.points[2][1],
     );
     const firstIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(ref1, ref2)),
+      vectorToHeading(vectorFromPoint(secondPoint, thirdPoint)),
     );
-    let p: GlobalPoint;
-    if (
-      hoveredStartElement &&
-      headingIsHorizontal(startHeading) === firstIsHorizontal
-    ) {
-      p = pointFrom<GlobalPoint>(
-        headingIsHorizontal(startHeading) ? ref2[0] : prevPoint[0],
-        !headingIsHorizontal(startHeading) ? ref2[1] : prevPoint[1],
-      );
-    } else {
-      p = pointFrom<GlobalPoint>(
-        !firstIsHorizontal ? ref1[0] : prevPoint[0],
-        firstIsHorizontal ? ref1[1] : prevPoint[1],
-      );
-    }
-
+    const p =
+      hoveredStartElement && prevIsHorizontal === firstIsHorizontal
+        ? pointFrom<GlobalPoint>(
+            headingIsHorizontal(startHeading) ? thirdPoint[0] : prevPoint[0],
+            !headingIsHorizontal(startHeading) ? thirdPoint[1] : prevPoint[1],
+          )
+        : pointFrom<GlobalPoint>(
+            !firstIsHorizontal ? secondPoint[0] : prevPoint[0],
+            firstIsHorizontal ? secondPoint[1] : prevPoint[1],
+          );
     prevIsHorizontal = !headingIsHorizontal(
       vectorToHeading(vectorFromPoint(p, prevPoint)),
     );
     prevPoint = p;
     simplifiedPoints.push(p);
-    debugDrawPoint(p, { permanent: true, color: "blue" });
+    //debugDrawPoint(p, { permanent: true, color: "blue" });
   }
 
   while (simplifiedPoints.length < nextFixedSegments[0].index - 1) {
@@ -235,13 +231,14 @@ export const updateElbowArrowPoints = (
       prevIsHorizontal ? arrow.x + segment.start[0] : prevPoint[0],
       !prevIsHorizontal ? arrow.y + segment.start[1] : prevPoint[1],
     );
-    simplifiedPoints.push(startConnectorPoint);
+    const globalStartPoint = pointFrom<GlobalPoint>(
+      arrow.x + segment.start[0],
+      arrow.y + segment.start[1],
+    );
 
-    // if (simplifiedPoints.length > 2) {
-    //   if (!shouldKeepPreviousPoint(simplifiedPoints)) {
-    //     simplifiedPoints.splice(simplifiedPoints.length - 2, 1);
-    //   }
-    // }
+    if (!pointsEqual(globalStartPoint, startConnectorPoint)) {
+      simplifiedPoints.push(startConnectorPoint);
+    }
 
     simplifiedPoints.push(
       pointFrom<GlobalPoint>(
@@ -261,6 +258,12 @@ export const updateElbowArrowPoints = (
       arrow.y + segment.end[1],
     );
 
+    prevIsHorizontal = headingIsHorizontal(
+      vectorToHeading(vectorFromPoint(segment.start, segment.end)),
+    );
+
+    simplifiedPoints.push(prevPoint);
+
     //nextFixedSegments[segmentIdx].index = simplifiedPoints.length;
     nextFixedSegments[segmentIdx].start = pointFrom<LocalPoint>(
       arrow.x + segment.start[0] - startGlobalPoint[0],
@@ -270,16 +273,6 @@ export const updateElbowArrowPoints = (
       arrow.x + segment.end[0] - startGlobalPoint[0],
       arrow.y + segment.end[1] - startGlobalPoint[1],
     );
-
-    prevIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(segment.start, segment.end)),
-    );
-
-    simplifiedPoints.push(prevPoint);
-
-    // if (!shouldKeepPreviousPoint(simplifiedPoints)) {
-    //   simplifiedPoints.splice(simplifiedPoints.length - 2, 1);
-    // }
   });
 
   while (simplifiedPoints.length < updatedPoints.length - 2) {
@@ -295,15 +288,15 @@ export const updateElbowArrowPoints = (
   }
 
   const endIsHorizontal = headingIsHorizontal(endHeading);
-  simplifiedPoints.push(
-    pointFrom<GlobalPoint>(
-      endIsHorizontal ? prevPoint[0] : endGlobalPoint[0],
-      !endIsHorizontal ? prevPoint[1] : endGlobalPoint[1],
-    ),
+  const secondToLast = pointFrom<GlobalPoint>(
+    endIsHorizontal ? prevPoint[0] : endGlobalPoint[0],
+    !endIsHorizontal ? prevPoint[1] : endGlobalPoint[1],
   );
-
+  if (!pointsEqual(secondToLast, prevPoint)) {
+    simplifiedPoints.push(secondToLast);
+  }
   // if (!shouldKeepPreviousPoint(simplifiedPoints)) {
-  //   simplifiedPoints.splice(simplifiedPoints.length - 2, 1);
+  //   simplifiedPoints.splice(-2, 1);
   // }
 
   simplifiedPoints.push(endGlobalPoint);
