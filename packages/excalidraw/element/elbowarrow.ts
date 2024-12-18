@@ -181,7 +181,7 @@ export const updateElbowArrowPoints = (
   const simplifiedPoints: GlobalPoint[] = [startGlobalPoint];
   let prevIsHorizontal = headingIsHorizontal(startHeading);
   let prevPoint = startGlobalPoint;
-
+  //console.log(nextFixedSegments.map((s) => s.index));
   {
     const secondPoint = pointFrom<GlobalPoint>(
       arrow.x + arrow.points[1][0],
@@ -223,6 +223,12 @@ export const updateElbowArrowPoints = (
     prevPoint = p;
     simplifiedPoints.push(p);
     //debugDrawPoint(p, { permanent: true, color: "red" });
+    // if (
+    //   simplifiedPoints.length > 3 &&
+    //   !shouldKeepPreviousPoint(simplifiedPoints)
+    // ) {
+    //   simplifiedPoints.splice(-2, 1);
+    // }
   }
 
   nextFixedSegments.forEach((segment, segmentIdx) => {
@@ -247,10 +253,11 @@ export const updateElbowArrowPoints = (
       ),
     );
 
-    // if (simplifiedPoints.length > 2) {
-    //   if (!shouldKeepPreviousPoint(simplifiedPoints)) {
-    //     simplifiedPoints.splice(simplifiedPoints.length - 2, 1);
-    //   }
+    // while (
+    //   simplifiedPoints.length > 2 &&
+    //   !shouldKeepPreviousPoint(simplifiedPoints)
+    // ) {
+    //   simplifiedPoints.splice(-2, 1);
     // }
 
     prevPoint = pointFrom<GlobalPoint>(
@@ -264,7 +271,15 @@ export const updateElbowArrowPoints = (
 
     simplifiedPoints.push(prevPoint);
 
-    //nextFixedSegments[segmentIdx].index = simplifiedPoints.length;
+    // while (
+    //   simplifiedPoints.length > 2 &&
+    //   !shouldKeepPreviousPoint(simplifiedPoints)
+    // ) {
+    //   simplifiedPoints.splice(-2, 1);
+    // }
+    // debugDrawPoint(simplifiedPoints[2], { permanent: true, color: "red" });
+    // debugDrawPoint(simplifiedPoints[1], { permanent: true, color: "green" });
+    nextFixedSegments[segmentIdx].index = simplifiedPoints.length - 1;
     nextFixedSegments[segmentIdx].start = pointFrom<LocalPoint>(
       arrow.x + segment.start[0] - startGlobalPoint[0],
       arrow.y + segment.start[1] - startGlobalPoint[1],
@@ -277,14 +292,17 @@ export const updateElbowArrowPoints = (
 
   while (simplifiedPoints.length < updatedPoints.length - 2) {
     const p = pointFrom<GlobalPoint>(
-      arrow.x + updatedPoints[simplifiedPoints.length][0] + updatedPoints[0][0],
-      arrow.y + updatedPoints[simplifiedPoints.length][1] + updatedPoints[0][1],
+      arrow.x + arrow.points[simplifiedPoints.length][0],
+      arrow.y + arrow.points[simplifiedPoints.length][1],
     );
     prevIsHorizontal = headingIsHorizontal(
       vectorToHeading(vectorFromPoint(p, prevPoint)),
     );
     prevPoint = p;
     simplifiedPoints.push(p);
+    // if (!shouldKeepPreviousPoint(simplifiedPoints)) {
+    //   simplifiedPoints.splice(-2, 1);
+    // }
   }
 
   const endIsHorizontal = headingIsHorizontal(endHeading);
