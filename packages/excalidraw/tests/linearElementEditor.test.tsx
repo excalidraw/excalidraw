@@ -1099,7 +1099,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": "370.91788",
+            "width": "366.11716",
           }
         `);
 
@@ -1111,7 +1111,7 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         {
-          "x": "275.91788",
+          "x": "271.11716",
           "y": 45,
         }
       `);
@@ -1128,9 +1128,9 @@ describe("Test Linear Elements", () => {
         [
           20,
           35,
-          "505.91788",
+          "501.11716",
           95,
-          "207.89077",
+          "205.45894",
           "52.50000",
         ]
       `);

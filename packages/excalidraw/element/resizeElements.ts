@@ -38,7 +38,7 @@ import type {
   TransformHandleDirection,
 } from "./transformHandles";
 import type { PointerDownState } from "../types";
-import Scene from "../scene/Scene";
+import type Scene from "../scene/Scene";
 import {
   getApproxMinLineWidth,
   getBoundTextElement,
@@ -116,6 +116,7 @@ export const transformElements = (
           getNextSingleWidthAndHeightFromPointer(
             latestElement,
             origElement,
+            elementsMap,
             originalElements,
             transformHandleType,
             pointerX,
@@ -975,6 +976,7 @@ export const resizeSingleElement = (
 const getNextSingleWidthAndHeightFromPointer = (
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
+  elementsMap: ElementsMap,
   originalElementsMap: ElementsMap,
   handleDirection: TransformHandleDirection,
   pointerX: number,
@@ -988,37 +990,56 @@ const getNextSingleWidthAndHeightFromPointer = (
   } = {},
 ) => {
   // Gets bounds corners
-  const [x1, y1, x2, y2] = getElementBounds(origElement, originalElementsMap);
-  const startTopLeft = pointFrom<GlobalPoint>(x1, y1);
-  const startBottomRight = pointFrom<GlobalPoint>(x2, y2);
-  const startCenter = pointFrom<GlobalPoint>(
-    x1 + origElement.width / 2,
-    y1 + origElement.height / 2,
+  const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
+    origElement,
+    origElement.width,
+    origElement.height,
+    true,
   );
+  const startTopLeft = pointFrom(x1, y1);
+  const startBottomRight = pointFrom(x2, y2);
+  const startCenter = pointCenter(startTopLeft, startBottomRight);
 
   // Calculate new dimensions based on cursor position
   const rotatedPointer = pointRotateRads(
-    pointFrom<GlobalPoint>(pointerX, pointerY),
+    pointFrom(pointerX, pointerY),
     startCenter,
     -origElement.angle as Radians,
   );
 
-  let scaleX = origElement.width / latestElement.width;
-  let scaleY = origElement.height / latestElement.height;
+  // Get bounds corners rendered on screen
+  const [esx1, esy1, esx2, esy2] = getResizedElementAbsoluteCoords(
+    latestElement,
+    latestElement.width,
+    latestElement.height,
+    true,
+  );
+
+  const boundsCurrentWidth = esx2 - esx1;
+  const boundsCurrentHeight = esy2 - esy1;
+
+  // It's important we set the initial scale value based on the width and height at resize start,
+  // otherwise previous dimensions affected by modifiers will be taken into account.
+  const atStartBoundsWidth = startBottomRight[0] - startTopLeft[0];
+  const atStartBoundsHeight = startBottomRight[1] - startTopLeft[1];
+  let scaleX = atStartBoundsWidth / boundsCurrentWidth;
+  let scaleY = atStartBoundsHeight / boundsCurrentHeight;
 
   if (handleDirection.includes("e")) {
-    scaleX = (rotatedPointer[0] - startTopLeft[0]) / latestElement.width;
+    scaleX = (rotatedPointer[0] - startTopLeft[0]) / boundsCurrentWidth;
   }
   if (handleDirection.includes("s")) {
-    scaleY = (rotatedPointer[1] - startTopLeft[1]) / latestElement.height;
+    scaleY = (rotatedPointer[1] - startTopLeft[1]) / boundsCurrentHeight;
   }
   if (handleDirection.includes("w")) {
-    scaleX = (startBottomRight[0] - rotatedPointer[0]) / latestElement.width;
+    scaleX = (startBottomRight[0] - rotatedPointer[0]) / boundsCurrentWidth;
   }
   if (handleDirection.includes("n")) {
-    scaleY = (startBottomRight[1] - rotatedPointer[1]) / latestElement.height;
+    scaleY = (startBottomRight[1] - rotatedPointer[1]) / boundsCurrentHeight;
   }
 
+  // We have to use dimensions of element on screen, otherwise the scaling of the
+  // dimensions won't match the cursor for linear elements.
   let nextWidth = latestElement.width * scaleX;
   let nextHeight = latestElement.height * scaleY;
 
