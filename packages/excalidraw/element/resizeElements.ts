@@ -148,6 +148,7 @@ export const transformElements = (
         originalElements,
         selectedElements,
         elementsMap,
+        scene,
         pointerX,
         pointerY,
         shouldRotateWithDiscreteAngle,
@@ -501,6 +502,7 @@ const rotateMultipleElements = (
   originalElements: PointerDownState["originalElements"],
   elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: SceneElementsMap,
+  scene: Scene,
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
@@ -514,9 +516,8 @@ const rotateMultipleElements = (
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
 
-  elements
-    .filter((element) => !isFrameLikeElement(element))
-    .forEach((element) => {
+  for (const element of elements) {
+    if (!isFrameLikeElement(element)) {
       const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
       const cx = (x1 + x2) / 2;
       const cy = (y1 + y2) / 2;
@@ -559,9 +560,10 @@ const rotateMultipleElements = (
           false,
         );
       }
-    });
+    }
+  }
 
-  Scene.getScene(elements[0])?.triggerUpdate();
+  scene.triggerUpdate();
 };
 
 export const getResizeOffsetXY = (
