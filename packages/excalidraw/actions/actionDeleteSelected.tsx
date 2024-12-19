@@ -161,6 +161,7 @@ export const actionDeleteSelected = register({
         element,
         selectedPointsIndices,
         elementsMap,
+        appState.zoom,
       );
 
       return {

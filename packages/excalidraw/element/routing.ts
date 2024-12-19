@@ -14,6 +14,7 @@ import {
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
+import type { AppState } from "../types";
 import { isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import {
   bindPointToSnapToElementOutline,
@@ -79,6 +80,7 @@ export const mutateElbowArrow = (
   options?: {
     isDragging?: boolean;
     informMutation?: boolean;
+    zoom?: AppState["zoom"];
   },
 ) => {
   const update = updateElbowArrow(
@@ -112,6 +114,7 @@ export const updateElbowArrow = (
     isDragging?: boolean;
     disableBinding?: boolean;
     informMutation?: boolean;
+    zoom?: AppState["zoom"];
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> | null => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate(
@@ -136,7 +139,12 @@ export const updateElbowArrow = (
     arrow.endBinding &&
     getBindableElementForId(arrow.endBinding.elementId, elementsMap);
   const [hoveredStartElement, hoveredEndElement] = options?.isDragging
-    ? getHoveredElements(origStartGlobalPoint, origEndGlobalPoint, elementsMap)
+    ? getHoveredElements(
+        origStartGlobalPoint,
+        origEndGlobalPoint,
+        elementsMap,
+        options?.zoom,
+      )
     : [startElement, endElement];
   const startGlobalPoint = getGlobalPoint(
     arrow.startBinding?.fixedPoint,
@@ -1072,6 +1080,7 @@ const getHoveredElements = (
   origStartGlobalPoint: GlobalPoint,
   origEndGlobalPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  zoom?: AppState["zoom"],
 ) => {
   // TODO: Might be a performance bottleneck and the Map type
   // remembers the insertion order anyway...
@@ -1084,12 +1093,14 @@ const getHoveredElements = (
       tupleToCoors(origStartGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
+      zoom,
       true,
     ),
     getHoveredElementForBinding(
       tupleToCoors(origEndGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
+      zoom,
       true,
     ),
   ];

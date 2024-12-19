@@ -300,6 +300,7 @@ export const updateBindings = (
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
+    zoom?: AppState["zoom"];
   },
 ) => {
   if (isLinearElement(latestElement)) {
@@ -310,6 +311,7 @@ export const updateBindings = (
       scene,
       true,
       [],
+      options?.zoom,
     );
   } else {
     updateBoundElements(latestElement, elementsMap, options);
