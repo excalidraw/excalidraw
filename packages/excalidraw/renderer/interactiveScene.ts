@@ -227,7 +227,7 @@ const renderBindingHighlightForBindableElement = (
   const width = x2 - x1;
   const height = y2 - y1;
 
-  context.strokeStyle = "rgba(0,0,0,.5)";
+  context.strokeStyle = "rgba(0,0,0,.05)";
   // When zooming out, make line width greater for visibility
   const zoomValue = zoom.value < 1 ? zoom.value : 1;
   context.lineWidth = BINDING_HIGHLIGHT_THICKNESS / zoomValue;
