@@ -104,5 +104,17 @@ module.exports = {
       commonjs: "react-dom",
       amd: "react-dom",
     },
+    "react-dom/client": {
+      root: "ReactDOMClient",
+      commonjs2: "react-dom/client",
+      commonjs: "react-dom/client",
+      amd: "react-dom/client",
+    },
+    "react/jsx-runtime": {
+      root: "ReactJSXRuntime",
+      commonjs2: "react/jsx-runtime",
+      commonjs: "react/jsx-runtime",
+      amd: "react/jsx-runtime",
+    },
   },
 };
