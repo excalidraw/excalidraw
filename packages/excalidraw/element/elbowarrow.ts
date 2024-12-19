@@ -181,8 +181,8 @@ export const updateElbowArrowPoints = (
   const simplifiedPoints: GlobalPoint[] = [startGlobalPoint];
   let prevIsHorizontal = headingIsHorizontal(startHeading);
   let prevPoint = startGlobalPoint;
-  //console.log(nextFixedSegments.map((s) => s.index));
-  {
+
+  if (nextFixedSegments[0].index > 1) {
     const secondPoint = pointFrom<GlobalPoint>(
       arrow.x + arrow.points[1][0],
       arrow.y + arrow.points[1][1],
@@ -204,26 +204,35 @@ export const updateElbowArrowPoints = (
             !firstIsHorizontal ? secondPoint[0] : prevPoint[0],
             firstIsHorizontal ? secondPoint[1] : prevPoint[1],
           );
-    prevIsHorizontal = !headingIsHorizontal(
+    prevIsHorizontal = headingIsHorizontal(
       vectorToHeading(vectorFromPoint(p, prevPoint)),
     );
     prevPoint = p;
     simplifiedPoints.push(p);
-    //debugDrawPoint(p, { permanent: true, color: "blue" });
+    //debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
+  } else {
+    simplifiedPoints.push(startGlobalPoint);
   }
 
+  // Add points from the old arrow state until the first segment
   while (simplifiedPoints.length < nextFixedSegments[0].index - 1) {
     const p = pointFrom<GlobalPoint>(
       arrow.x + arrow.points[simplifiedPoints.length][0],
       arrow.y + arrow.points[simplifiedPoints.length][1],
     );
-    prevIsHorizontal = !headingIsHorizontal(
+
+    if (pointsEqual(p, prevPoint)) {
+      break;
+    }
+
+    prevIsHorizontal = headingIsHorizontal(
       vectorToHeading(vectorFromPoint(p, prevPoint)),
     );
     prevPoint = p;
     simplifiedPoints.push(p);
-    //debugDrawPoint(p, { permanent: true, color: "red" });
-    // if (
+
+    //debugDrawPoint(p, { permanent: true, color: "red", fuzzy: true });
+    // while (
     //   simplifiedPoints.length > 3 &&
     //   !shouldKeepPreviousPoint(simplifiedPoints)
     // ) {
@@ -232,7 +241,6 @@ export const updateElbowArrowPoints = (
   }
 
   nextFixedSegments.forEach((segment, segmentIdx) => {
-    // Extend the point up to the next segment start
     const startConnectorPoint = pointFrom<GlobalPoint>(
       prevIsHorizontal ? arrow.x + segment.start[0] : prevPoint[0],
       !prevIsHorizontal ? arrow.y + segment.start[1] : prevPoint[1],
@@ -241,9 +249,21 @@ export const updateElbowArrowPoints = (
       arrow.x + segment.start[0],
       arrow.y + segment.start[1],
     );
+    const segmentIsHorizontal = headingIsHorizontal(
+      vectorToHeading(vectorFromPoint(segment.start, segment.end)),
+    );
 
-    if (!pointsEqual(globalStartPoint, startConnectorPoint)) {
-      simplifiedPoints.push(startConnectorPoint);
+    // Extend the point so it levels with the next segment start if needed
+    if (
+      prevPoint[segmentIsHorizontal ? 0 : 1] !==
+      globalStartPoint[segmentIsHorizontal ? 0 : 1]
+    ) {
+      debugDrawPoint(startConnectorPoint, {
+        permanent: true,
+        color: "blue",
+        fuzzy: true,
+      });
+      simplifiedPoints[simplifiedPoints.length - 1] = startConnectorPoint;
     }
 
     simplifiedPoints.push(
@@ -264,19 +284,10 @@ export const updateElbowArrowPoints = (
       arrow.x + segment.end[0],
       arrow.y + segment.end[1],
     );
-
-    prevIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(segment.start, segment.end)),
-    );
+    prevIsHorizontal = segmentIsHorizontal;
 
     simplifiedPoints.push(prevPoint);
 
-    // while (
-    //   simplifiedPoints.length > 2 &&
-    //   !shouldKeepPreviousPoint(simplifiedPoints)
-    // ) {
-    //   simplifiedPoints.splice(-2, 1);
-    // }
     // debugDrawPoint(simplifiedPoints[2], { permanent: true, color: "red" });
     // debugDrawPoint(simplifiedPoints[1], { permanent: true, color: "green" });
     nextFixedSegments[segmentIdx].index = simplifiedPoints.length - 1;
@@ -295,6 +306,11 @@ export const updateElbowArrowPoints = (
       arrow.x + arrow.points[simplifiedPoints.length][0],
       arrow.y + arrow.points[simplifiedPoints.length][1],
     );
+
+    if (pointsEqual(p, prevPoint)) {
+      break;
+    }
+
     prevIsHorizontal = headingIsHorizontal(
       vectorToHeading(vectorFromPoint(p, prevPoint)),
     );
@@ -318,7 +334,9 @@ export const updateElbowArrowPoints = (
   // }
 
   simplifiedPoints.push(endGlobalPoint);
-
+  simplifiedPoints.forEach((p) =>
+    debugDrawPoint(p, { permanent: true, color: "red", fuzzy: true }),
+  );
   return normalizeArrowElementUpdate(simplifiedPoints, nextFixedSegments);
 };
 
