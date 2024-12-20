@@ -440,6 +440,21 @@ export const maybeBindLinearElement = (
   }
 };
 
+const normalizePointBinding = (
+  binding: { focus: number; gap: number },
+  hoveredElement: ExcalidrawBindableElement,
+) => {
+  const gap = Math.min(
+    maxBindingGap(hoveredElement, hoveredElement.width, hoveredElement.height),
+    binding.gap,
+  );
+
+  return {
+    ...binding,
+    gap,
+  };
+};
+
 export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
@@ -451,11 +466,14 @@ export const bindLinearElement = (
   }
   const binding: PointBinding = {
     elementId: hoveredElement.id,
-    ...calculateFocusAndGap(
-      linearElement,
+    ...normalizePointBinding(
+      calculateFocusAndGap(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
       hoveredElement,
-      startOrEnd,
-      elementsMap,
     ),
     ...(isElbowArrow(linearElement)
       ? calculateFixedPointForElbowArrowBinding(
@@ -479,6 +497,12 @@ export const bindLinearElement = (
         type: "arrow",
       }),
     });
+  }
+
+  // update bound elements to make sure the binding tips are in sync with
+  // the normalized gap from above
+  if (!isElbowArrow(linearElement)) {
+    updateBoundElements(hoveredElement, elementsMap);
   }
 };
 
