@@ -2,8 +2,6 @@ import dynamic from "next/dynamic";
 import Script from "next/script";
 import "../common.scss";
 
-// Since client components get prerenderd on server as well hence importing the excalidraw stuff dynamically
-// with ssr false
 const ExcalidrawWithClientOnly = dynamic(
   async () => (await import("../excalidrawWrapper")).default,
   {
@@ -14,8 +12,7 @@ const ExcalidrawWithClientOnly = dynamic(
 export default function Page() {
   return (
     <>
-      <a href="/excalidraw-in-pages">Switch to Pages router</a>
-      <h1 className="page-title">App Router</h1>
+      <h1 className="page-title">WELCOME</h1>
       <Script id="load-env-variables" strategy="beforeInteractive">
         {`window["EXCALIDRAW_ASSET_PATH"] = window.origin;`}
       </Script>
