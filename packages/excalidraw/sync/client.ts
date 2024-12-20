@@ -1,7 +1,16 @@
 /* eslint-disable no-console */
-import throttle from "lodash.throttle";
 import debounce from "lodash.debounce";
+import throttle from "lodash.throttle";
+import ReconnectingWebSocket, {
+  type Event,
+  type CloseEvent,
+} from "reconnecting-websocket";
 import { Utils } from "./utils";
+import {
+  SyncQueue,
+  type MetadataRepository,
+  type IncrementsRepository,
+} from "./queue";
 import { StoreIncrement } from "../store";
 import type { ExcalidrawImperativeAPI } from "../types";
 import type { SceneElementsMap } from "../element/types";
@@ -11,78 +20,8 @@ import type {
   SERVER_INCREMENT,
 } from "./protocol";
 
-interface IncrementsRepository {
-  loadIncrements(): Promise<{ increments: Array<StoreIncrement> } | null>;
-  saveIncrements(params: { increments: Array<StoreIncrement> }): Promise<void>;
-}
-
-interface MetadataRepository {
-  loadMetadata(): Promise<{ lastAcknowledgedVersion: number } | null>;
-  saveMetadata(metadata: { lastAcknowledgedVersion: number }): Promise<void>;
-}
-
-// CFDO: make sure the increments are always acknowledged (deleted from the repository)
-export class SyncQueue {
-  private readonly queue: Map<string, StoreIncrement>;
-  private readonly repository: IncrementsRepository;
-
-  private constructor(
-    queue: Map<string, StoreIncrement> = new Map(),
-    repository: IncrementsRepository,
-  ) {
-    this.queue = queue;
-    this.repository = repository;
-  }
-
-  public static async create(repository: IncrementsRepository) {
-    const data = await repository.loadIncrements();
-
-    return new SyncQueue(
-      new Map(data?.increments?.map((increment) => [increment.id, increment])),
-      repository,
-    );
-  }
-
-  public getAll() {
-    return Array.from(this.queue.values());
-  }
-
-  public get(id: StoreIncrement["id"]) {
-    return this.queue.get(id);
-  }
-
-  public has(id: StoreIncrement["id"]) {
-    return this.queue.has(id);
-  }
-
-  public add(...increments: StoreIncrement[]) {
-    for (const increment of increments) {
-      this.queue.set(increment.id, increment);
-    }
-
-    this.persist();
-  }
-
-  public remove(...ids: StoreIncrement["id"][]) {
-    for (const id of ids) {
-      this.queue.delete(id);
-    }
-
-    this.persist();
-  }
-
-  public persist = throttle(
-    async () => {
-      try {
-        await this.repository.saveIncrements({ increments: this.getAll() });
-      } catch (e) {
-        console.error("Failed to persist the sync queue:", e);
-      }
-    },
-    1000,
-    { leading: false, trailing: true },
-  );
-}
+const NO_STATUS_RECEIVED_ERROR_CODE = 1005;
+const ABNORMAL_CLOSURE_ERROR_CODE = 1006;
 
 export class SyncClient {
   private static readonly HOST_URL = import.meta.env.DEV
@@ -93,8 +32,7 @@ export class SyncClient {
     ? "test_room_x"
     : "test_room_prod";
 
-  private static readonly RECONNECT_INTERVAL = 10_000;
-
+  private server: ReconnectingWebSocket | null = null;
   private readonly api: ExcalidrawImperativeAPI;
   private readonly queue: SyncQueue;
   private readonly repository: MetadataRepository;
@@ -119,13 +57,6 @@ export class SyncClient {
     this._lastAcknowledgedVersion = version;
     this.repository.saveMetadata({ lastAcknowledgedVersion: version });
   }
-
-  private server: WebSocket | null = null;
-  private get isConnected() {
-    return this.server?.readyState === WebSocket.OPEN;
-  }
-
-  private isConnecting: { done: (error?: Error) => void } | null = null;
 
   private constructor(
     api: ExcalidrawImperativeAPI,
@@ -156,117 +87,83 @@ export class SyncClient {
     });
   }
 
-  // CFDO: throttle does not work that well here (after some period it tries to reconnect too often)
-  public reconnect = throttle(
-    async () => {
-      try {
-        if (this.isConnected) {
-          console.debug("Already connected to the sync server.");
-          return;
-        }
-
-        if (this.isConnecting !== null) {
-          console.debug("Already reconnecting to the sync server...");
-          return;
-        }
-
-        console.info("Reconnecting to the sync server...");
-
-        const isConnecting = {
-          done: () => {},
-        };
-
-        // ensure there won't be multiple reconnection attempts
-        this.isConnecting = isConnecting;
-
-        return await new Promise<void>((resolve, reject) => {
-          this.server = new WebSocket(
-            `${SyncClient.HOST_URL}/connect?roomId=${this.roomId}`,
-          );
-
-          // wait for 10 seconds before timing out
-          const timeoutId = setTimeout(() => {
-            reject("Connecting the sync server timed out");
-          }, 10_000);
-
-          // resolved when opened, rejected on error
-          isConnecting.done = (error?: Error) => {
-            clearTimeout(timeoutId);
-
-            if (error) {
-              reject(error);
-            } else {
-              resolve();
-            }
-          };
-
-          this.server.addEventListener("message", this.onMessage);
-          this.server.addEventListener("close", this.onClose);
-          this.server.addEventListener("error", this.onError);
-          this.server.addEventListener("open", this.onOpen);
-        });
-      } catch (e) {
-        console.error("Failed to connect to sync server:", e);
-        this.disconnect(e as Error);
+  // CFDO I: throttle does not work that well here (after some period it tries to reconnect too often)
+  public connect = throttle(
+    () => {
+      if (this.server && this.server.readyState !== this.server.CLOSED) {
+        return;
       }
+
+      console.log("Connecting to the sync server...");
+      this.server = new ReconnectingWebSocket(
+        `${SyncClient.HOST_URL}/connect?roomId=${this.roomId}`,
+        [],
+        {
+          WebSocket: undefined, // WebSocket constructor, if none provided, defaults to global WebSocket
+          maxReconnectionDelay: 10000, // max delay in ms between reconnections
+          minReconnectionDelay: 1000, // min delay in ms between reconnections
+          reconnectionDelayGrowFactor: 1.3, // how fast the reconnection delay grows
+          minUptime: 5000, // min time in ms to consider connection as stable
+          connectionTimeout: 4000, // retry connect if not connected after this time, in ms
+          maxRetries: Infinity, // maximum number of retries
+          maxEnqueuedMessages: Infinity, // maximum number of messages to buffer until reconnection
+          startClosed: false, // start websocket in CLOSED state, call `.reconnect()` to connect
+          debug: false, // enables debug output,
+        },
+      );
+      this.server.addEventListener("message", this.onMessage);
+      this.server.addEventListener("open", this.onOpen);
+      this.server.addEventListener("close", this.onClose);
+      this.server.addEventListener("error", this.onError);
     },
-    SyncClient.RECONNECT_INTERVAL,
-    { leading: true },
+    1000,
+    { leading: true, trailing: false },
   );
 
   public disconnect = throttle(
-    (error?: Error) => {
-      try {
-        this.server?.removeEventListener("message", this.onMessage);
-        this.server?.removeEventListener("close", this.onClose);
-        this.server?.removeEventListener("error", this.onError);
-        this.server?.removeEventListener("open", this.onOpen);
-        this.server?.close();
-
-        if (error) {
-          this.isConnecting?.done(error);
-        }
-      } finally {
-        this.isConnecting = null;
-        this.server = null;
-        this.reconnect();
+    (code?: number, reason?: string) => {
+      if (!this.server) {
+        return;
       }
+
+      if (
+        this.server.readyState === this.server.CLOSED ||
+        this.server.readyState === this.server.CLOSING
+      ) {
+        return;
+      }
+
+      console.log(
+        `Disconnecting from the sync server with code "${code}" and reason "${reason}"...`,
+      );
+      this.server.removeEventListener("message", this.onMessage);
+      this.server.removeEventListener("open", this.onOpen);
+      this.server.removeEventListener("close", this.onClose);
+      this.server.removeEventListener("error", this.onError);
+      this.server.close(code, reason);
     },
-    SyncClient.RECONNECT_INTERVAL,
-    { leading: true },
+    1000,
+    { leading: true, trailing: false },
   );
 
-  private onOpen = async () => {
-    if (!this.isConnected) {
-      throw new Error(
-        "Received open event, but the connection is still not ready.",
-      );
-    }
-
-    if (!this.isConnecting) {
-      throw new Error(
-        "Can't resolve connection without `isConnecting` callback.",
-      );
-    }
-
-    // resolve the current connection
-    this.isConnecting.done();
-
+  private onOpen = (event: Event) => {
     // CFDO: hack to pull everything for on init
     this.pull(0);
   };
 
   private onClose = (event: CloseEvent) => {
-    console.log("close", event);
     this.disconnect(
-      new Error(`Received "${event.type}" event on the sync connection`),
+      event.code || NO_STATUS_RECEIVED_ERROR_CODE,
+      event.reason || "Connection closed without a reason",
     );
   };
 
   private onError = (event: Event) => {
-    console.log("error", event);
     this.disconnect(
-      new Error(`Received "${event.type}" on the sync connection`),
+      event.type === "error"
+        ? ABNORMAL_CLOSURE_ERROR_CODE
+        : NO_STATUS_RECEIVED_ERROR_CODE,
+      `Received "${event.type}" on the sync connection`,
     );
   };
 
@@ -331,10 +228,10 @@ export class SyncClient {
   }
 
   // CFDO: should be flushed once regular push / pull goes through
-  private debouncedPush = (ms: number = 1000) =>
+  private schedulePush = (ms: number = 1000) =>
     debounce(this.push, ms, { leading: true, trailing: false });
 
-  private debouncedPull = (ms: number = 1000) =>
+  private schedulePull = (ms: number = 1000) =>
     debounce(this.pull, ms, { leading: true, trailing: false });
 
   // CFDO: refactor by applying all operations to store, not to the elements
@@ -404,11 +301,11 @@ export class SyncClient {
       this.lastAcknowledgedVersion = nextAcknowledgedVersion;
     } catch (e) {
       console.error("Failed to apply acknowledged increments:", e);
-      this.debouncedPull().call(this);
+      this.schedulePull().call(this);
       return;
     }
 
-    this.debouncedPush().call(this);
+    this.schedulePush().call(this);
   }
 
   private handleRejected(payload: { ids: Array<string>; message: string }) {
@@ -422,10 +319,12 @@ export class SyncClient {
   }
 
   private send(message: { type: string; payload: any }): void {
-    if (!this.isConnected) {
-      throw new Error("Can't send a message without an active connection!");
+    if (!this.server) {
+      throw new Error(
+        "Can't send a message without an established connection!",
+      );
     }
 
-    this.server?.send(JSON.stringify(message));
+    this.server.send(JSON.stringify(message));
   }
 }

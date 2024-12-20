@@ -26,6 +26,7 @@ import {
   TTDDialogTrigger,
   StoreAction,
   reconcileElements,
+  newElementWith,
 } from "../packages/excalidraw";
 import type {
   AppState,
@@ -384,7 +385,7 @@ const ExcalidrawWrapper = () => {
       setAcknowledgedIncrements([...(syncAPI?.acknowledgedIncrements ?? [])]);
     }, 250);
 
-    syncAPI?.reconnect();
+    syncAPI?.connect();
 
     return () => {
       syncAPI?.disconnect();
@@ -647,36 +648,35 @@ const ExcalidrawWrapper = () => {
 
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
-    // CFDO: temporary
-    // if (!LocalData.isSavePaused()) {
-    //   LocalData.save(elements, appState, files, () => {
-    //     if (excalidrawAPI) {
-    //       let didChange = false;
+    if (!LocalData.isSavePaused()) {
+      LocalData.save(elements, appState, files, () => {
+        if (excalidrawAPI) {
+          let didChange = false;
 
-    //       const elements = excalidrawAPI
-    //         .getSceneElementsIncludingDeleted()
-    //         .map((element) => {
-    //           if (
-    //             LocalData.fileStorage.shouldUpdateImageElementStatus(element)
-    //           ) {
-    //             const newElement = newElementWith(element, { status: "saved" });
-    //             if (newElement !== element) {
-    //               didChange = true;
-    //             }
-    //             return newElement;
-    //           }
-    //           return element;
-    //         });
+          const elements = excalidrawAPI
+            .getSceneElementsIncludingDeleted()
+            .map((element) => {
+              if (
+                LocalData.fileStorage.shouldUpdateImageElementStatus(element)
+              ) {
+                const newElement = newElementWith(element, { status: "saved" });
+                if (newElement !== element) {
+                  didChange = true;
+                }
+                return newElement;
+              }
+              return element;
+            });
 
-    //       if (didChange) {
-    //         excalidrawAPI.updateScene({
-    //           elements,
-    //           storeAction: StoreAction.UPDATE,
-    //         });
-    //       }
-    //     }
-    //   });
-    // }
+          if (didChange) {
+            excalidrawAPI.updateScene({
+              elements,
+              storeAction: StoreAction.UPDATE,
+            });
+          }
+        }
+      });
+    }
 
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
@@ -885,6 +885,14 @@ const ExcalidrawWrapper = () => {
         max={acknowledgedIncrements.length}
         value={nextVersion === -1 ? acknowledgedIncrements.length : nextVersion}
         onChange={(value) => {
+          if (value !== acknowledgedIncrements.length - 1) {
+            // don't listen to updates in the detached mode
+            syncAPI?.disconnect();
+          } else {
+            // reconnect once we're back to the latest version
+            syncAPI?.connect();
+          }
+
           setNextVersion(value as number);
           debouncedTimeTravel(value as number);
         }}

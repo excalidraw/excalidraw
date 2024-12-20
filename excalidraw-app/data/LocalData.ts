@@ -69,35 +69,34 @@ class LocalFileManager extends FileManager {
   };
 }
 
-// CFDO: temporary
-// const saveDataStateToLocalStorage = (
-//   elements: readonly ExcalidrawElement[],
-//   appState: AppState,
-// ) => {
-//   try {
-//     const _appState = clearAppStateForLocalStorage(appState);
+const saveDataStateToLocalStorage = (
+  elements: readonly ExcalidrawElement[],
+  appState: AppState,
+) => {
+  try {
+    const _appState = clearAppStateForLocalStorage(appState);
 
-//     if (
-//       _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
-//       _appState.openSidebar.tab === CANVAS_SEARCH_TAB
-//     ) {
-//       _appState.openSidebar = null;
-//     }
+    if (
+      _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+      _appState.openSidebar.tab === CANVAS_SEARCH_TAB
+    ) {
+      _appState.openSidebar = null;
+    }
 
-//     localStorage.setItem(
-//       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-//       JSON.stringify(clearElementsForLocalStorage(elements)),
-//     );
-//     localStorage.setItem(
-//       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-//       JSON.stringify(_appState),
-//     );
-//     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
-//   } catch (error: any) {
-//     // Unable to access window.localStorage
-//     console.error(error);
-//   }
-// };
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+      JSON.stringify(clearElementsForLocalStorage(elements)),
+    );
+    localStorage.setItem(
+      STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
+      JSON.stringify(_appState),
+    );
+    updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+  } catch (error: any) {
+    // Unable to access window.localStorage
+    console.error(error);
+  }
+};
 
 type SavingLockTypes = "collaboration";
 
@@ -109,12 +108,12 @@ export class LocalData {
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      // saveDataStateToLocalStorage(elements, appState);
-      // await this.fileStorage.saveFiles({
-      //   elements,
-      //   files,
-      // });
-      // onFilesSaved();
+      saveDataStateToLocalStorage(elements, appState);
+      await this.fileStorage.saveFiles({
+        elements,
+        files,
+      });
+      onFilesSaved();
     },
     SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   );

@@ -86,6 +86,7 @@
     "png-chunks-extract": "1.0.0",
     "points-on-curve": "1.0.1",
     "pwacompat": "2.0.17",
+    "reconnecting-websocket": "4.4.0",
     "roughjs": "4.6.4",
     "sass": "1.51.0",
     "tunnel-rat": "0.1.2"
