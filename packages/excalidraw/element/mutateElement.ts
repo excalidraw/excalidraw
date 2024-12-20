@@ -57,10 +57,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           mergedElementsMap,
           {
             fixedSegments,
-            points: points ?? [
-              element.points[0],
-              element.points[element.points.length - 1],
-            ],
+            points,
           },
           {
             isDragging,

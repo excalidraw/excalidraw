@@ -90,22 +90,11 @@ type ElbowArrowData = {
   endGlobalPoint: GlobalPoint;
   endHeading: Heading;
   commonBounds: Bounds;
+  hoveredStartElement: ExcalidrawBindableElement | null;
   hoveredEndElement: ExcalidrawBindableElement | null;
 };
 
 const BASE_PADDING = 40;
-
-const isElbow = (simplifiedPoints: readonly GlobalPoint[]) => {
-  const [a, b, c] = simplifiedPoints.slice(-3);
-  const prevIsHorizontal = Math.abs(a[1] - b[1]) < Math.abs(a[0] - b[0]);
-  const nextIsHorizontal = Math.abs(b[1] - c[1]) < Math.abs(b[0] - c[0]);
-
-  if (prevIsHorizontal !== nextIsHorizontal) {
-    return true;
-  }
-
-  return false;
-};
 
 /**
  *
@@ -114,7 +103,7 @@ export const updateElbowArrowPoints = (
   arrow: Readonly<ExcalidrawElbowArrowElement>,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   updates: {
-    points: readonly LocalPoint[];
+    points?: readonly LocalPoint[];
     fixedSegments?: FixedSegment[] | null;
   },
   options?: {
@@ -122,7 +111,7 @@ export const updateElbowArrowPoints = (
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
-    return { points: updates.points };
+    return { points: updates.points ?? arrow.points };
   }
 
   invariant(
@@ -134,38 +123,28 @@ export const updateElbowArrowPoints = (
       "you can't add new points between start and end manually to elbow arrows)",
   );
 
-  const updatedPoints: LocalPoint[] = updates.points
-    ? updates.points.length === 2
+  const updatedPoints: readonly LocalPoint[] = updates.points
+    ? updates.points && updates.points.length === 2
       ? arrow.points.map((p, idx) =>
           idx === 0
-            ? updates.points[0]
+            ? updates.points![0]
             : idx === arrow.points.length - 1
-            ? updates.points[1]
+            ? updates.points![1]
             : p,
         )
-      : Array.from(updates.points)
-    : Array.from(arrow.points);
+      : structuredClone(updates.points)
+    : structuredClone(arrow.points);
 
-  const nextFixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
-
-  if (nextFixedSegments.length === 0) {
-    const elbowArrowData = getElbowArrowData(
-      arrow,
-      elementsMap,
-      updatedPoints,
-      options,
-    );
-
-    const simplifiedPoints = getElbowArrowCornerPoints(
-      removeElbowArrowShortSegments(
-        routeElbowArrow(arrow, elbowArrowData) ?? [],
-      ),
-    );
-
-    return normalizeArrowElementUpdate(simplifiedPoints, nextFixedSegments);
-  }
-
-  debugClear();
+  const globalUpdatedPoints = updatedPoints.map((p, i) =>
+    i === 0
+      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
+      : i === updatedPoints.length - 1
+      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
+      : pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[i][0],
+          arrow.x + arrow.points[i][1],
+        ),
+  );
 
   const {
     startHeading,
@@ -174,38 +153,165 @@ export const updateElbowArrowPoints = (
     endGlobalPoint,
     hoveredStartElement,
     hoveredEndElement,
-  } = getElbowArrowData(arrow, elementsMap, updates.points, options);
+    ...rest
+  } = getElbowArrowData(arrow, elementsMap, updatedPoints, options);
 
-  nextFixedSegments.forEach((segment, segmentIdx) => {
-    nextFixedSegments[segmentIdx].start = pointFrom<LocalPoint>(
-      arrow.x + segment.start[0] - startGlobalPoint[0],
-      arrow.y + segment.start[1] - startGlobalPoint[1],
+  const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
+
+  ////
+  // 1. Just normal elbow arrow things
+  ////
+  if (fixedSegments.length === 0) {
+    const simplifiedPoints = getElbowArrowCornerPoints(
+      removeElbowArrowShortSegments(
+        routeElbowArrow(arrow, {
+          startHeading,
+          endHeading,
+          startGlobalPoint,
+          endGlobalPoint,
+          hoveredStartElement,
+          hoveredEndElement,
+          ...rest,
+        }) ?? [],
+      ),
     );
-    nextFixedSegments[segmentIdx].end = pointFrom<LocalPoint>(
-      arrow.x + segment.end[0] - startGlobalPoint[0],
-      arrow.y + segment.end[1] - startGlobalPoint[1],
+
+    return normalizeArrowElementUpdate(simplifiedPoints, fixedSegments);
+  }
+
+  debugClear();
+
+  ////
+  // 2. Handle manual segment move
+  ////
+  if (!updates.points) {
+    const activelyModifiedSegmentIdx = fixedSegments
+      .map((segment, i) => {
+        if (
+          arrow.fixedSegments == null ||
+          arrow.fixedSegments[i] === undefined ||
+          arrow.fixedSegments[i].index !== segment.index
+        ) {
+          return i;
+        }
+
+        return (segment.start[0] !== arrow.fixedSegments![i].start[0] &&
+          segment.end[0] !== arrow.fixedSegments![i].end[0]) !==
+          (segment.start[1] !== arrow.fixedSegments![i].start[1] &&
+            segment.end[1] !== arrow.fixedSegments![i].end[1])
+          ? i
+          : null;
+      })
+      .filter((idx) => idx !== null)
+      .shift();
+
+    if (activelyModifiedSegmentIdx == null) {
+      return { points: updates.points ?? arrow.points };
+    }
+
+    const nextFixedSegments = fixedSegments.map((segment) => ({
+      ...segment,
+      start: pointFrom<GlobalPoint>(
+        arrow.x + segment.start[0],
+        arrow.y + segment.start[1],
+      ),
+      end: pointFrom<GlobalPoint>(
+        arrow.x + segment.end[0],
+        arrow.y + segment.end[1],
+      ),
+    }));
+
+    debugDrawPoint(nextFixedSegments[activelyModifiedSegmentIdx].start, {
+      color: "green",
+      permanent: true,
+    });
+    debugDrawPoint(nextFixedSegments[activelyModifiedSegmentIdx].end, {
+      color: "red",
+      permanent: true,
+    });
+
+    // For start, clone old arrow points
+    const newPoints: GlobalPoint[] = arrow.points.map((p, i) =>
+      pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
     );
-    updatedPoints.splice(
-      segment.index + 2 * segmentIdx,
-      0,
-      nextFixedSegments[segmentIdx].start,
-      nextFixedSegments[segmentIdx].end,
+    // Override the segment points with the actively moved fixed segment
+    newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index - 1] =
+      nextFixedSegments[activelyModifiedSegmentIdx].start;
+    newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index] =
+      nextFixedSegments[activelyModifiedSegmentIdx].end;
+
+    // First segment move needs an additional segment
+    if (nextFixedSegments[0].index === 1) {
+      newPoints.unshift(
+        pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[0][0],
+          arrow.y + arrow.points[0][1],
+        ),
+      );
+      for (const segment of nextFixedSegments) {
+        segment.index += 1;
+      }
+    }
+
+    if (
+      nextFixedSegments[nextFixedSegments.length - 1].index ===
+      newPoints.length - 1
+    ) {
+      // Last segment move needs an additional segment
+      newPoints.push(
+        pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[arrow.points.length - 1][0],
+          arrow.y + arrow.points[arrow.points.length - 1][1],
+        ),
+      );
+    }
+
+    // newPoints.forEach((p, i) => {
+    //   debugDrawPoint(p, { permanent: true, color: "red", fuzzy: true });
+    // });
+
+    return normalizeArrowElementUpdate(
+      newPoints,
+      nextFixedSegments.map((segment) => ({
+        ...segment,
+        start: pointFrom<LocalPoint>(
+          segment.start[0] - arrow.x,
+          segment.start[1] - arrow.y,
+        ),
+        end: pointFrom<LocalPoint>(
+          segment.end[0] - arrow.x,
+          segment.end[1] - arrow.y,
+        ),
+      })),
     );
-  });
-  // console.log("nextFixedSegments", JSON.stringify(nextFixedSegments));
-  // console.log("updatedPoints", JSON.stringify(updatedPoints));
+  }
+
+  ////
+  // 3. One or more segments are fixed and endpoints are moved
+  //
+  // The key insights are:
+  // - When segments are fixed, the arrow will keep the exact amount of segments
+  // - Fixed segments are "replacements" for exactly one segment in the old arrow
+  ////
+
+  const nextFixedSegments = fixedSegments.map((segment) => ({
+    ...segment,
+    start: pointFrom<GlobalPoint>(
+      arrow.x + (segment.start[0] - updatedPoints[0][0]),
+      arrow.y + (segment.start[1] - updatedPoints[0][1]),
+    ),
+    end: pointFrom<GlobalPoint>(
+      arrow.x + (segment.end[0] - updatedPoints[0][0]),
+      arrow.y + (segment.end[1] - updatedPoints[0][1]),
+    ),
+  }));
 
   const newPoints: GlobalPoint[] = [startGlobalPoint];
 
+  // Calculate the moving second point connection
   {
-    const secondPoint = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[1][0],
-      arrow.y + arrow.points[1][1],
-    );
-    const thirdPoint = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[2][0],
-      arrow.y + arrow.points[2][1],
-    );
+    const secondPoint = globalUpdatedPoints[1];
+    const thirdPoint = globalUpdatedPoints[2];
     const startIsHorizontal = headingIsHorizontal(startHeading);
     const secondIsHorizontal = headingIsHorizontal(
       vectorToHeading(vectorFromPoint(secondPoint, thirdPoint)),
@@ -221,27 +327,37 @@ export const updateElbowArrowPoints = (
             secondIsHorizontal ? secondPoint[1] : startGlobalPoint[1],
           );
     newPoints.push(p);
-    //debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
+    debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
   }
 
-  while (newPoints.length < updatedPoints.length - 2) {
-    //console.log(newPoints.length, updatedPoints.length);
-    newPoints.push(
-      pointFrom<GlobalPoint>(
-        startGlobalPoint[0] + updatedPoints[newPoints.length][0],
-        startGlobalPoint[1] + updatedPoints[newPoints.length][1],
-      ),
+  if (nextFixedSegments[0].index === 2) {
+    console.log(
+      "Spec start override",
+      nextFixedSegments[0].start,
+      newPoints[1],
     );
+    nextFixedSegments[0].start = newPoints[1];
   }
 
+  // Add the inside points
+  while (newPoints.length < globalUpdatedPoints.length - 2) {
+    newPoints.push(globalUpdatedPoints[newPoints.length]);
+    debugDrawPoint(globalUpdatedPoints[newPoints.length], {
+      permanent: true,
+      color: "red",
+      fuzzy: true,
+    });
+  }
+
+  // Calculated the moving second to last point
   {
     const secondToLastPoint = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[arrow.points.length - 2][0],
-      arrow.y + arrow.points[arrow.points.length - 2][1],
+      globalUpdatedPoints[globalUpdatedPoints.length - 2][0],
+      globalUpdatedPoints[globalUpdatedPoints.length - 2][1],
     );
     const thirdToLastPoint = pointFrom<GlobalPoint>(
-      arrow.x + arrow.points[arrow.points.length - 3][0],
-      arrow.y + arrow.points[arrow.points.length - 3][1],
+      globalUpdatedPoints[globalUpdatedPoints.length - 3][0],
+      globalUpdatedPoints[globalUpdatedPoints.length - 3][1],
     );
     const endIsHorizontal = headingIsHorizontal(endHeading);
     const secondIsHorizontal = headingIsHorizontal(
@@ -261,114 +377,34 @@ export const updateElbowArrowPoints = (
     //debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
   }
 
+  if (
+    nextFixedSegments[nextFixedSegments.length - 1].index === newPoints.length
+  ) {
+    console.log(
+      "Spec end override",
+      nextFixedSegments[nextFixedSegments.length - 1].end,
+      newPoints[newPoints.length - 1],
+    );
+    nextFixedSegments[nextFixedSegments.length - 1].end =
+      newPoints[newPoints.length - 1];
+  }
+
   newPoints.push(endGlobalPoint);
 
-  // Clean up the points
-  const simplifiedPoints: GlobalPoint[] = [];
-  newPoints.forEach((p, idx) => {
-    if (idx < 2) {
-      simplifiedPoints.push(p);
-      return;
-    }
-
-    const a = newPoints[idx - 2];
-    const b = newPoints[idx - 1];
-    const prevIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(a, b)),
-    );
-    const nextIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(b, p)),
-    );
-
-    if (prevIsHorizontal === nextIsHorizontal) {
-      // We're cutting out a point, so let's check and update
-      // the fixed segment which has this point as either start or end
-      const segmentIdx = nextFixedSegments.findIndex(
-        (segment) =>
-          pointsEqual(
-            pointFrom<GlobalPoint>(
-              arrow.x + segment.start[0],
-              arrow.y + segment.start[1],
-            ),
-            b,
-          ) ||
-          pointsEqual(
-            pointFrom<GlobalPoint>(
-              arrow.x + segment.end[0],
-              arrow.y + segment.end[1],
-            ),
-            b,
-          ),
-      );
-      if (segmentIdx !== -1) {
-        const start = pointFrom<GlobalPoint>(
-          arrow.x + nextFixedSegments[segmentIdx].start[0],
-          arrow.y + nextFixedSegments[segmentIdx].start[1],
-        );
-        const end = pointFrom<GlobalPoint>(
-          arrow.x + nextFixedSegments[segmentIdx].end[0],
-          arrow.y + nextFixedSegments[segmentIdx].end[1],
-        );
-        // NOTE: Both start and end points can be the same
-        if (pointsEqual(b, start)) {
-          nextFixedSegments[segmentIdx].start = pointFrom<LocalPoint>(
-            p[0] - startGlobalPoint[0],
-            p[1] - startGlobalPoint[1],
-          );
-        }
-        if (pointsEqual(b, end)) {
-          nextFixedSegments[segmentIdx].end = pointFrom<LocalPoint>(
-            p[0] - startGlobalPoint[0],
-            p[1] - startGlobalPoint[1],
-          );
-        }
-      }
-
-      simplifiedPoints[simplifiedPoints.length - 1] = p;
-    } else {
-      simplifiedPoints.push(p);
-    }
-  });
-
-  // Find the new indices for the fixed segments
-  const nextNextFixedSegments: FixedSegment[] = [];
-  simplifiedPoints.forEach((p, idx) => {
-    if (idx < 1) {
-      return;
-    }
-
-    const segmentIdx = nextFixedSegments.findIndex(
-      (segment) =>
-        pointsEqual(
-          segment.start,
-          pointFrom<LocalPoint>(
-            simplifiedPoints[idx - 1][0] - startGlobalPoint[0],
-            simplifiedPoints[idx - 1][1] - startGlobalPoint[1],
-          ),
-        ) &&
-        pointsEqual(
-          segment.end,
-          pointFrom<LocalPoint>(
-            p[0] - startGlobalPoint[0],
-            p[1] - startGlobalPoint[1],
-          ),
-        ),
-    );
-    if (segmentIdx !== -1) {
-      nextNextFixedSegments.push({
-        ...nextFixedSegments[segmentIdx],
-        index: idx,
-      });
-    }
-  });
-
-  nextNextFixedSegments.length !== nextFixedSegments.length &&
-    console.error("Fixed segments mismatch");
-
-  simplifiedPoints.forEach((p) =>
-    debugDrawPoint(p, { permanent: true, color: "red", fuzzy: true }),
+  return normalizeArrowElementUpdate(
+    newPoints,
+    nextFixedSegments.map((segment) => ({
+      ...segment,
+      start: pointFrom<LocalPoint>(
+        segment.start[0] - startGlobalPoint[0],
+        segment.start[1] - startGlobalPoint[1],
+      ),
+      end: pointFrom<LocalPoint>(
+        segment.end[0] - startGlobalPoint[0],
+        segment.end[1] - startGlobalPoint[1],
+      ),
+    })),
   );
-  return normalizeArrowElementUpdate(simplifiedPoints, nextNextFixedSegments);
 };
 
 /**

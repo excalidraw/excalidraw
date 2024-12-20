@@ -97,7 +97,6 @@ export class LinearElementEditor {
   }>;
 
   public readonly elbowMidPointState: Readonly<{
-    midPoint: GlobalPoint | null;
     midPointIndex: number;
   }>;
 
@@ -140,7 +139,6 @@ export class LinearElementEditor {
       },
     };
     this.elbowMidPointState = {
-      midPoint: null,
       midPointIndex: -1,
     };
     this.hoverPointIndex = -1;
@@ -1785,6 +1783,7 @@ export class LinearElementEditor {
           vectorFromPoint(element.points[index], element.points[index - 1]),
         ),
       );
+
       const fixedSegments = (element.fixedSegments ?? []).reduce(
         (segments, s) => {
           segments[s.index] = s;
@@ -1795,68 +1794,46 @@ export class LinearElementEditor {
       fixedSegments[index] = {
         index,
         start: pointFrom<LocalPoint>(
-          !isHorizontal
-            ? x - element.x
-            : fixedSegments[index]
-            ? fixedSegments[index].start[0]
-            : element.points[index - 1][0],
-          isHorizontal
-            ? y - element.y
-            : fixedSegments[index]
-            ? fixedSegments[index].start[1]
-            : element.points[index - 1][1],
+          !isHorizontal ? x - element.x : element.points[index - 1][0],
+          isHorizontal ? y - element.y : element.points[index - 1][1],
         ),
         end: pointFrom<LocalPoint>(
-          !isHorizontal
-            ? x - element.x
-            : fixedSegments[index]
-            ? fixedSegments[index].end[0]
-            : element.points[index][0],
-          isHorizontal
-            ? y - element.y
-            : fixedSegments[index]
-            ? fixedSegments[index].end[1]
-            : element.points[index][1],
+          !isHorizontal ? x - element.x : element.points[index][0],
+          isHorizontal ? y - element.y : element.points[index][1],
         ),
       };
       const nextFixedSegments = Object.values(fixedSegments).sort(
         (a, b) => a.index - b.index,
       );
+
       const offset = nextFixedSegments
         .map((segment) => segment.index)
         .reduce((count, idx) => (idx < index ? count + 1 : count), 0);
-
-      // console.log(index, offset);
-      // console.log(JSON.stringify(nextFixedSegments, null, 2));
 
       mutateElement(element, {
         fixedSegments: nextFixedSegments,
       });
 
-      // console.log(
-      //   "Post update",
-      //   JSON.stringify(element.fixedSegments, null, 2),
-      // );
-
       return {
         ...linearElement,
         elbowMidPointState: {
-          midPoint: pointFrom<GlobalPoint>(
-            element.x +
-              (element.fixedSegments![offset].start[0] +
-                element.fixedSegments![offset].end[0]) /
-                2,
-            element.y +
-              (element.fixedSegments![offset].start[1] +
-                element.fixedSegments![offset].end[1]) /
-                2,
-          ),
           midPointIndex: element.fixedSegments![offset].index,
         },
       };
     }
 
     return linearElement;
+  }
+
+  static deleteFixedSegment(
+    element: ExcalidrawElbowArrowElement,
+    index: number,
+  ): void {
+    mutateElement(element, {
+      fixedSegments: element.fixedSegments?.filter(
+        (segment) => segment.index !== index,
+      ),
+    });
   }
 
   static getElbowArrowMidPoints(
