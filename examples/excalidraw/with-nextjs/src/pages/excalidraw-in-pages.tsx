@@ -13,7 +13,6 @@ const Excalidraw = dynamic(
 export default function Page() {
   return (
     <>
-      <a href="/">Switch to App router</a>
       <h1 className="page-title">Pages Router</h1>
       {/* @ts-expect-error - https://github.com/vercel/next.js/issues/42292 */}
       <Excalidraw />
