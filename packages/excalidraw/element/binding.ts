@@ -444,11 +444,16 @@ const normalizePointBinding = (
   binding: { focus: number; gap: number },
   hoveredElement: ExcalidrawBindableElement,
 ) => {
-  const gap = Math.min(
-    maxBindingGap(hoveredElement, hoveredElement.width, hoveredElement.height),
-    binding.gap,
+  let gap = binding.gap;
+  const maxGap = maxBindingGap(
+    hoveredElement,
+    hoveredElement.width,
+    hoveredElement.height,
   );
 
+  if (gap > maxGap) {
+    gap = BINDING_HIGHLIGHT_THICKNESS + BINDING_HIGHLIGHT_OFFSET;
+  }
   return {
     ...binding,
     gap,

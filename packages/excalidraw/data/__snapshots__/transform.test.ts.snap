@@ -340,7 +340,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
     "elementId": "text-2",
     "fixedPoint": null,
     "focus": 1.625925925925924,
-    "gap": 16,
+    "gap": 14,
   },
   "fillStyle": "solid",
   "frameId": null,
