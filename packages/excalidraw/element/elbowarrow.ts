@@ -232,17 +232,6 @@ export const updateElbowArrowPoints = (
       : structuredClone(updates.points)
     : structuredClone(arrow.points);
 
-  const globalUpdatedPoints = updatedPoints.map((p, i) =>
-    i === 0
-      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
-      : i === updatedPoints.length - 1
-      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
-      : pointFrom<GlobalPoint>(
-          arrow.x + arrow.points[i][0],
-          arrow.x + arrow.points[i][1],
-        ),
-  );
-
   const {
     startHeading,
     endHeading,
@@ -291,6 +280,16 @@ export const updateElbowArrowPoints = (
   // - Fixed segments are "replacements" for exactly one segment in the old arrow
   ////
 
+  const globalUpdatedPoints = updatedPoints.map((p, i) =>
+    i === 0
+      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
+      : i === updatedPoints.length - 1
+      ? pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])
+      : pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[i][0],
+          arrow.y + arrow.points[i][1],
+        ),
+  );
   const nextFixedSegments = fixedSegments.map((segment) => ({
     ...segment,
     start: pointFrom<GlobalPoint>(
@@ -302,7 +301,6 @@ export const updateElbowArrowPoints = (
       arrow.y + (segment.end[1] - updatedPoints[0][1]),
     ),
   }));
-
   const newPoints: GlobalPoint[] = [startGlobalPoint];
 
   // Calculate the moving second point connection
@@ -328,11 +326,6 @@ export const updateElbowArrowPoints = (
   }
 
   if (nextFixedSegments[0].index === 2) {
-    console.log(
-      "Spec start override",
-      nextFixedSegments[0].start,
-      newPoints[1],
-    );
     nextFixedSegments[0].start = newPoints[1];
   }
 
@@ -346,19 +339,15 @@ export const updateElbowArrowPoints = (
     });
   }
 
-  // Calculated the moving second to last point
+  // Calculate the moving second to last point connection
   {
-    const secondToLastPoint = pointFrom<GlobalPoint>(
-      globalUpdatedPoints[globalUpdatedPoints.length - 2][0],
-      globalUpdatedPoints[globalUpdatedPoints.length - 2][1],
-    );
-    const thirdToLastPoint = pointFrom<GlobalPoint>(
-      globalUpdatedPoints[globalUpdatedPoints.length - 3][0],
-      globalUpdatedPoints[globalUpdatedPoints.length - 3][1],
-    );
+    const secondToLastPoint =
+      globalUpdatedPoints[globalUpdatedPoints.length - 2];
+    const thirdToLastPoint =
+      globalUpdatedPoints[globalUpdatedPoints.length - 3];
     const endIsHorizontal = headingIsHorizontal(endHeading);
     const secondIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(secondToLastPoint, thirdToLastPoint)),
+      vectorToHeading(vectorFromPoint(thirdToLastPoint, secondToLastPoint)),
     );
     const p =
       hoveredEndElement && endIsHorizontal === secondIsHorizontal
@@ -371,7 +360,7 @@ export const updateElbowArrowPoints = (
             secondIsHorizontal ? secondToLastPoint[1] : endGlobalPoint[1],
           );
     newPoints.push(p);
-    //debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
+    debugDrawPoint(p, { permanent: true, color: "green", fuzzy: true });
   }
 
   if (
