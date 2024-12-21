@@ -322,21 +322,11 @@ export const updateElbowArrowPoints = (
             secondIsHorizontal ? secondPoint[1] : startGlobalPoint[1],
           );
     newPoints.push(p);
-    debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
-  }
-
-  if (nextFixedSegments[0].index === 2) {
-    nextFixedSegments[0].start = newPoints[1];
   }
 
   // Add the inside points
   while (newPoints.length < globalUpdatedPoints.length - 2) {
     newPoints.push(globalUpdatedPoints[newPoints.length]);
-    debugDrawPoint(globalUpdatedPoints[newPoints.length], {
-      permanent: true,
-      color: "red",
-      fuzzy: true,
-    });
   }
 
   // Calculate the moving second to last point connection
@@ -360,22 +350,30 @@ export const updateElbowArrowPoints = (
             secondIsHorizontal ? secondToLastPoint[1] : endGlobalPoint[1],
           );
     newPoints.push(p);
-    debugDrawPoint(p, { permanent: true, color: "green", fuzzy: true });
+    debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
+  }
+
+  newPoints.push(endGlobalPoint);
+
+  if (nextFixedSegments[0].index === 2) {
+    nextFixedSegments[0].start = newPoints[1];
+    debugDrawPoint(newPoints[2], {
+      color: "green",
+      permanent: true,
+      fuzzy: true,
+    });
   }
 
   if (
     nextFixedSegments[nextFixedSegments.length - 1].index === newPoints.length
   ) {
-    console.log(
-      "Spec end override",
-      nextFixedSegments[nextFixedSegments.length - 1].end,
-      newPoints[newPoints.length - 1],
-    );
     nextFixedSegments[nextFixedSegments.length - 1].end =
       newPoints[newPoints.length - 1];
   }
 
-  newPoints.push(endGlobalPoint);
+  newPoints.forEach((p) =>
+    debugDrawPoint(p, { color: "red", permanent: true }),
+  );
 
   return normalizeArrowElementUpdate(
     newPoints,
