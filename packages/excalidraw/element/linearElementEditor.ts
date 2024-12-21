@@ -28,7 +28,7 @@ import type {
   NullableGridSize,
   Zoom,
 } from "../types";
-import { mutateElement } from "./mutateElement";
+import { ElementUpdate, mutateElement } from "./mutateElement";
 
 import {
   bindOrUnbindLinearElement,
@@ -69,7 +69,13 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
-import { headingIsHorizontal, vectorToHeading } from "./heading";
+import {
+  compareHeading,
+  flipHeading,
+  headingForPoint,
+  headingIsHorizontal,
+  vectorToHeading,
+} from "./heading";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1007,7 +1013,11 @@ export class LinearElementEditor {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const cx = (x1 + x2) / 2;
     const cy = (y1 + y2) / 2;
-    return element.points.map((p) => {
+    return (
+      isElbowArrow(element)
+        ? LinearElementEditor.getElbowArrowLocalPoints(element.points)
+        : element.points
+    ).map((p) => {
       const { x, y } = element;
       return pointRotateRads(
         pointFrom(x + p[0], y + p[1]),
@@ -1833,6 +1843,22 @@ export class LinearElementEditor {
       fixedSegments: element.fixedSegments?.filter(
         (segment) => segment.index !== index,
       ),
+    });
+  }
+
+  static getElbowArrowLocalPoints(
+    points: readonly LocalPoint[],
+  ): readonly LocalPoint[] {
+    return points.filter((point, i) => {
+      if (i === 0 || i === points.length - 1) {
+        return true;
+      }
+
+      const prev = points[i - 1];
+      const next = points[i + 1];
+      const prevHeading = headingForPoint(point, prev);
+      const nextHeading = headingForPoint(next, point);
+      return !compareHeading(prevHeading, flipHeading(nextHeading));
     });
   }
 

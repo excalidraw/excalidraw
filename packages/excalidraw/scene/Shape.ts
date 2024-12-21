@@ -25,6 +25,8 @@ import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
 import { pointFrom, pointDistance, type LocalPoint } from "../../math";
 import { getCornerRadius, isPathALoop } from "../shapes";
+import { headingForPointIsHorizontal } from "../element/heading";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -500,22 +502,23 @@ export const _generateElementShape = (
 };
 
 const generateElbowArrowShape = (
-  points: readonly LocalPoint[],
+  data: readonly LocalPoint[],
   radius: number,
 ) => {
+  const points = LinearElementEditor.getElbowArrowLocalPoints(data);
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
     const next = points[i + 1];
     const point = points[i];
+    const prevIsHorizontal = headingForPointIsHorizontal(point, prev);
+    const nextIsHorizontal = headingForPointIsHorizontal(next, point);
     const corner = Math.min(
       radius,
       pointDistance(points[i], next) / 2,
       pointDistance(points[i], prev) / 2,
     );
 
-    const prevIsHorizontal =
-      Math.abs(prev[1] - point[1]) < Math.abs(prev[0] - point[0]);
     if (prevIsHorizontal) {
       if (prev[0] < point[0]) {
         // LEFT
@@ -533,8 +536,6 @@ const generateElbowArrowShape = (
 
     subpoints.push(points[i] as [number, number]);
 
-    const nextIsHorizontal =
-      Math.abs(point[1] - next[1]) < Math.abs(point[0] - next[0]);
     if (nextIsHorizontal) {
       if (next[0] < point[0]) {
         // LEFT

@@ -2,7 +2,6 @@ import {
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
-  pointsEqual,
   pointTranslate,
   vector,
   vectorCross,
@@ -35,6 +34,7 @@ import {
   HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
+  headingForPointIsHorizontal,
   headingIsHorizontal,
   vectorToHeading,
 } from "./heading";
@@ -336,8 +336,9 @@ export const updateElbowArrowPoints = (
     const thirdToLastPoint =
       globalUpdatedPoints[globalUpdatedPoints.length - 3];
     const endIsHorizontal = headingIsHorizontal(endHeading);
-    const secondIsHorizontal = headingIsHorizontal(
-      vectorToHeading(vectorFromPoint(thirdToLastPoint, secondToLastPoint)),
+    const secondIsHorizontal = headingForPointIsHorizontal(
+      thirdToLastPoint,
+      secondToLastPoint,
     );
     const p =
       hoveredEndElement && endIsHorizontal === secondIsHorizontal
@@ -350,30 +351,22 @@ export const updateElbowArrowPoints = (
             secondIsHorizontal ? secondToLastPoint[1] : endGlobalPoint[1],
           );
     newPoints.push(p);
-    debugDrawPoint(p, { permanent: true, color: "blue", fuzzy: true });
   }
 
   newPoints.push(endGlobalPoint);
 
+  // First fixed segment in the 2nd segment position needs to be updated
   if (nextFixedSegments[0].index === 2) {
     nextFixedSegments[0].start = newPoints[1];
-    debugDrawPoint(newPoints[2], {
-      color: "green",
-      permanent: true,
-      fuzzy: true,
-    });
   }
 
+  // Last fixed segment in the second to last position needs to be updated
   if (
     nextFixedSegments[nextFixedSegments.length - 1].index === newPoints.length
   ) {
     nextFixedSegments[nextFixedSegments.length - 1].end =
       newPoints[newPoints.length - 1];
   }
-
-  newPoints.forEach((p) =>
-    debugDrawPoint(p, { color: "red", permanent: true }),
-  );
 
   return normalizeArrowElementUpdate(
     newPoints,

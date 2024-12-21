@@ -11,6 +11,7 @@ import {
   pointScaleFromOrigin,
   radiansToDegrees,
   triangleIncludesPoint,
+  vectorFromPoint,
 } from "../../math";
 import { getCenterForBounds, type Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
@@ -51,6 +52,16 @@ export const vectorToHeading = (vec: Vector): Heading => {
   }
   return HEADING_UP;
 };
+
+export const headingForPoint = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  o: P,
+) => vectorToHeading(vectorFromPoint<P>(p, o));
+
+export const headingForPointIsHorizontal = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  o: P,
+) => headingIsHorizontal(headingForPoint<P>(p, o));
 
 export const compareHeading = (a: Heading, b: Heading) =>
   a[0] === b[0] && a[1] === b[1];
