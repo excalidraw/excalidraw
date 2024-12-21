@@ -14,7 +14,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugClear, debugDrawPoint } from "../visualdebug";
+import { debugClear } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -143,11 +143,12 @@ const handleManualSegmentMove = (
   const newPoints: GlobalPoint[] = arrow.points.map((p, i) =>
     pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
   );
+
+  const start = nextFixedSegments[activelyModifiedSegmentIdx].start;
+  const end = nextFixedSegments[activelyModifiedSegmentIdx].end;
   // Override the segment points with the actively moved fixed segment
-  newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index - 1] =
-    nextFixedSegments[activelyModifiedSegmentIdx].start;
-  newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index] =
-    nextFixedSegments[activelyModifiedSegmentIdx].end;
+  newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index - 1] = start;
+  newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index] = end;
 
   // First segment move needs an additional segment
   if (nextFixedSegments[0].index === 1) {

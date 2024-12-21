@@ -26,7 +26,6 @@ import type { EmbedsValidationStatus } from "../types";
 import { pointFrom, pointDistance, type LocalPoint } from "../../math";
 import { getCornerRadius, isPathALoop } from "../shapes";
 import { headingForPointIsHorizontal } from "../element/heading";
-import { LinearElementEditor } from "../element/linearElementEditor";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -502,10 +501,9 @@ export const _generateElementShape = (
 };
 
 const generateElbowArrowShape = (
-  data: readonly LocalPoint[],
+  points: readonly LocalPoint[],
   radius: number,
 ) => {
-  const points = LinearElementEditor.getElbowArrowLocalPoints(data);
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
