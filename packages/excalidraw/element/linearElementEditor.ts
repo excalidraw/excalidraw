@@ -71,6 +71,8 @@ import {
 import { getGridPoint } from "../snapping";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 
+/* MERGE */
+
 const editorMidPointsCache: {
   version: number | null;
   points: (GlobalPoint | null)[];

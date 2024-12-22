@@ -53,6 +53,8 @@ import type {
   FixedSegment,
 } from "./types";
 
+/* MERGE */
+
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
 type Node = {

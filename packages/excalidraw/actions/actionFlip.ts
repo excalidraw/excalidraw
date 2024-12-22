@@ -27,6 +27,8 @@ import {
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
+/* MERGE */
+
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   label: "labels.flipHorizontal",

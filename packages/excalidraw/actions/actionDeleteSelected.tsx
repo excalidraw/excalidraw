@@ -19,6 +19,8 @@ import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
 import { StoreAction } from "../store";
 
+/* MERGE */
+
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,

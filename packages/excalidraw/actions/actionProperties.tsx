@@ -117,6 +117,8 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
 
+/* MERGE */
+
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
 export const changeProperty = (
