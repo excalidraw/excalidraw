@@ -153,6 +153,7 @@ const flipElements = (
     app.scene,
     isBindingEnabled(appState),
     [],
+    appState.zoom,
   );
 
   // ---------------------------------------------------------------------------

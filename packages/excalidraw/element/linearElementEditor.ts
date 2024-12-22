@@ -448,6 +448,7 @@ export class LinearElementEditor {
                 ),
                 elements,
                 elementsMap,
+                appState.zoom,
               )
             : null;
 
@@ -787,6 +788,7 @@ export class LinearElementEditor {
           scenePointer,
           elements,
           elementsMap,
+          app.state.zoom,
         ),
       };
 
@@ -911,6 +913,7 @@ export class LinearElementEditor {
           element,
           [points.length - 1],
           elementsMap,
+          app.state.zoom,
         );
       }
       return {
@@ -964,6 +967,7 @@ export class LinearElementEditor {
         element,
         [{ point: newPoint }],
         elementsMap,
+        app.state.zoom,
       );
     }
     return {
@@ -1218,6 +1222,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     pointIndices: readonly number[],
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+    zoom: AppState["zoom"],
   ) {
     let offsetX = 0;
     let offsetY = 0;
@@ -1260,6 +1265,7 @@ export class LinearElementEditor {
     element: NonDeleted<ExcalidrawLinearElement>,
     targetPoints: { point: LocalPoint }[],
     elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+    zoom: AppState["zoom"],
   ) {
     const offsetX = 0;
     const offsetY = 0;
@@ -1285,6 +1291,7 @@ export class LinearElementEditor {
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
       isDragging?: boolean;
+      zoom?: AppState["zoom"];
     },
   ) {
     const { points } = element;
@@ -1337,6 +1344,7 @@ export class LinearElementEditor {
           false,
         ),
         changedElements: options?.changedElements,
+        zoom: options?.zoom,
       },
     );
   }
@@ -1451,6 +1459,7 @@ export class LinearElementEditor {
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
       isDragging?: boolean;
+      zoom?: AppState["zoom"];
     },
   ) {
     if (isElbowArrow(element)) {
@@ -1487,6 +1496,7 @@ export class LinearElementEditor {
         bindings,
         {
           isDragging: options?.isDragging,
+          zoom: options?.zoom,
         },
       );
     } else {

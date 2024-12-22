@@ -3215,6 +3215,10 @@ class App extends React.Component<AppProps, AppState> {
               ),
             ),
             [el.points[0], el.points[el.points.length - 1]],
+            undefined,
+            {
+              zoom: this.state.zoom,
+            },
           ),
         };
       }
@@ -4372,6 +4376,7 @@ class App extends React.Component<AppProps, AppState> {
 
           updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
             simultaneouslyUpdated: selectedElements,
+            zoom: this.state.zoom,
           });
         });
 
@@ -4381,6 +4386,7 @@ class App extends React.Component<AppProps, AppState> {
               (element) => element.id !== elbowArrow?.id || step !== 0,
             ),
             this.scene.getNonDeletedElementsMap(),
+            this.state.zoom,
           ),
         });
 
@@ -4596,6 +4602,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+        this.state.zoom,
       );
       this.setState({ suggestedBindings: [] });
     }
@@ -5854,6 +5861,7 @@ class App extends React.Component<AppProps, AppState> {
             {
               isDragging: true,
               informMutation: false,
+              zoom: this.state.zoom,
             },
           );
         } else {
@@ -7401,6 +7409,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
     );
 
     this.setState({
@@ -7698,6 +7707,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
         isElbowArrow(element),
       );
 
@@ -8276,6 +8286,7 @@ class App extends React.Component<AppProps, AppState> {
               suggestedBindings: getSuggestedBindingsForArrows(
                 selectedElements,
                 this.scene.getNonDeletedElementsMap(),
+                this.state.zoom,
               ),
             });
           }
@@ -8444,6 +8455,7 @@ class App extends React.Component<AppProps, AppState> {
               {
                 isDragging: true,
                 informMutation: false,
+                zoom: this.state.zoom,
               },
             );
           } else if (points.length === 2) {
@@ -9408,6 +9420,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+          this.state.zoom,
         );
       }
 
@@ -9900,6 +9913,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerCoords,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
     );
     this.setState({
       suggestedBindings:
@@ -9928,6 +9942,7 @@ class App extends React.Component<AppProps, AppState> {
           coords,
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
+          this.state.zoom,
           isArrowElement(linearElement) && isElbowArrow(linearElement),
         );
         if (
@@ -10569,6 +10584,7 @@ class App extends React.Component<AppProps, AppState> {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
         this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
       );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();

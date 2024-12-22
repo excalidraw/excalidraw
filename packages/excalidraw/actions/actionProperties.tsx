@@ -1591,6 +1591,7 @@ export const actionChangeArrowType = register({
               tupleToCoors(startGlobalPoint),
               elements,
               elementsMap,
+              appState.zoom,
               true,
             );
           const endHoveredElement =
@@ -1599,6 +1600,7 @@ export const actionChangeArrowType = register({
               tupleToCoors(endGlobalPoint),
               elements,
               elementsMap,
+              appState.zoom,
               true,
             );
           const startElement = startHoveredElement
