@@ -2338,17 +2338,6 @@ class App extends React.Component<AppProps, AppState> {
       this.fonts.onLoaded(fontFaces);
     });
 
-    // Elbow arrow segment midpoint cache needs to be updated after the scene (re)load
-    scene.elements.forEach((element) => {
-      if (isElbowArrow(element)) {
-        LinearElementEditor.updateEditorMidPointsCache(
-          element,
-          this.scene.getElementsMapIncludingDeleted(),
-          this.state,
-        );
-      }
-    });
-
     if (isElementLink(window.location.href)) {
       this.scrollToContent(window.location.href, { animate: false });
     }
@@ -3183,44 +3172,6 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    // let elements = opts.elements.map((el, _, elements) => {
-    //   if (isElbowArrow(el)) {
-    //     const startEndElements = [
-    //       el.startBinding &&
-    //         elements.find((l) => l.id === el.startBinding?.elementId),
-    //       el.endBinding &&
-    //         elements.find((l) => l.id === el.endBinding?.elementId),
-    //     ];
-    //     const startBinding = startEndElements[0] ? el.startBinding : null;
-    //     const endBinding = startEndElements[1] ? el.endBinding : null;
-    //     return {
-    //       ...el,
-    //       ...updateElbowArrowPoints(
-    //         {
-    //           ...el,
-    //           startBinding,
-    //           endBinding,
-    //         },
-    //         toBrandedType<NonDeletedSceneElementsMap>(
-    //           new Map(
-    //             startEndElements
-    //               .filter((x) => x != null)
-    //               .map(
-    //                 (el) =>
-    //                   [el!.id, el] as [
-    //                     string,
-    //                     Ordered<NonDeletedExcalidrawElement>,
-    //                   ],
-    //               ),
-    //           ),
-    //         ),
-    //         { points: el.points },
-    //       ),
-    //     };
-    //   }
-
-    //   return el;
-    // });
     const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
@@ -6249,6 +6200,20 @@ class App extends React.Component<AppProps, AppState> {
           },
         });
       }
+
+      if (
+        !LinearElementEditor.arePointsEqual(
+          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
+          segmentMidPointHoveredCoords,
+        )
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            segmentMidPointHoveredCoords,
+          },
+        });
+      }
     } else {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
     }
@@ -8042,6 +8007,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
       const elementsMap = this.scene.getNonDeletedElementsMap();
+
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
@@ -8592,17 +8558,6 @@ class App extends React.Component<AppProps, AppState> {
                 this.scene.getNonDeletedElementsMap(),
               )
             : [];
-
-          if (
-            elementsWithinSelection.length === 1 &&
-            isLinearElement(elementsWithinSelection[0])
-          ) {
-            LinearElementEditor.updateEditorMidPointsCache(
-              elementsWithinSelection[0],
-              elementsMap,
-              this.state,
-            );
-          }
 
           this.setState((prevState) => {
             const nextSelectedElementIds = {
@@ -10633,36 +10588,23 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    const transformed = transformElements(
-      pointerDownState.originalElements,
-      transformHandleType,
-      selectedElements,
-      this.scene.getElementsMapIncludingDeleted(),
-      shouldRotateWithDiscreteAngle(event),
-      shouldResizeFromCenter(event),
-      selectedElements.some((element) => isImageElement(element))
-        ? !shouldMaintainAspectRatio(event)
-        : shouldMaintainAspectRatio(event),
-      resizeX,
-      resizeY,
-      pointerDownState.resize.center.x,
-      pointerDownState.resize.center.y,
-      this.state.flippedFixedPointBindings,
-      (flippedFixedPointBindings) =>
-        this.setState({ flippedFixedPointBindings }),
-    );
-
-    selectedElements
-      .filter(isElbowArrow)
-      .forEach((element) =>
-        LinearElementEditor.updateEditorMidPointsCache(
-          element,
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-        ),
-      );
-
-    if (transformed) {
+    if (
+      transformElements(
+        pointerDownState.originalElements,
+        transformHandleType,
+        selectedElements,
+        this.scene.getElementsMapIncludingDeleted(),
+        shouldRotateWithDiscreteAngle(event),
+        shouldResizeFromCenter(event),
+        selectedElements.some((element) => isImageElement(element))
+          ? !shouldMaintainAspectRatio(event)
+          : shouldMaintainAspectRatio(event),
+        resizeX,
+        resizeY,
+        pointerDownState.resize.center.x,
+        pointerDownState.resize.center.y,
+      )
+    ) {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
         this.scene.getNonDeletedElementsMap(),
