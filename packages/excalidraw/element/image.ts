@@ -124,7 +124,9 @@ export const normalizeSVG = (SVGString: string) => {
       height = height || "50";
 
       if (viewBox) {
-        const match = viewBox.match(/\d+ +\d+ +(\d+) +(\d+)/);
+        const match = viewBox.match(
+          /\d+ +\d+ +(\d+(?:\.\d+)?) +(\d+(?:\.\d+)?)/,
+        );
         if (match) {
           [, width, height] = match;
         }
