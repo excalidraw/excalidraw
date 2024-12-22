@@ -214,9 +214,9 @@ export const IMAGE_MIME_TYPES = {
   jfif: "image/jfif",
 } as const;
 
-export const ALLOWED_PASTE_MIME_TYPES = ["text/plain", "text/html"] as const;
-
 export const MIME_TYPES = {
+  text: "text/plain",
+  html: "text/html",
   json: "application/json",
   // excalidraw data
   excalidraw: "application/vnd.excalidraw+json",
@@ -229,6 +229,12 @@ export const MIME_TYPES = {
   // image
   ...IMAGE_MIME_TYPES,
 } as const;
+
+export const ALLOWED_PASTE_MIME_TYPES = [
+  MIME_TYPES.text,
+  MIME_TYPES.html,
+  ...Object.values(IMAGE_MIME_TYPES),
+] as const;
 
 export const EXPORT_IMAGE_TYPES = {
   png: "png",
@@ -449,3 +455,6 @@ export const ARROW_TYPE: { [T in AppState["currentItemArrowType"]]: T } = {
   round: "round",
   elbow: "elbow",
 };
+
+export const DEFAULT_REDUCED_GLOBAL_ALPHA = 0.3;
+export const ELEMENT_LINK_KEY = "element";

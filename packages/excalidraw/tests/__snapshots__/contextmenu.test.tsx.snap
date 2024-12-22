@@ -728,6 +728,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -762,6 +763,42 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -880,6 +917,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1088,6 +1126,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1306,6 +1345,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1639,6 +1679,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1972,6 +2013,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2190,6 +2232,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2432,6 +2475,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2735,6 +2779,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3106,6 +3151,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3583,6 +3629,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3908,6 +3955,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4233,6 +4281,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5313,6 +5362,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5347,6 +5397,42 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5465,6 +5551,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -6486,6 +6573,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6520,6 +6608,42 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6638,6 +6762,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7575,6 +7700,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8381,6 +8507,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8415,6 +8542,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8533,6 +8696,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9321,6 +9485,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9355,6 +9520,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9473,6 +9674,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
