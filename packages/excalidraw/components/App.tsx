@@ -5085,7 +5085,11 @@ class App extends React.Component<AppProps, AppState> {
         isImageElement(element) ? 0 : this.getElementHitThreshold(),
       );
 
-      return isPointInShape(pointFrom(x, y), selectionShape);
+      // if hitting the bounding box, return early
+      // but if not, we should check for other cases as well (e.g. frame name)
+      if (isPointInShape(pointFrom(x, y), selectionShape)) {
+        return true;
+      }
     }
 
     // take bound text element into consideration for hit collision as well
