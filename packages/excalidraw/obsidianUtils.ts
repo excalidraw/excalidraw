@@ -1,12 +1,12 @@
 import { FreedrawIcon } from "./components/icons";
-import { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
+import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { FONT_FAMILY } from "./constants";
-import { NonDeletedExcalidrawElement } from "./element/types";
+import type { NonDeletedExcalidrawElement } from "./element/types";
 import { Fonts } from "./fonts";
 import type { FontMetadata } from "./fonts/FontMetadata";
 import { FONT_METADATA } from "./fonts/FontMetadata";
-import { AppState } from "./types";
+import type { AppState } from "./types";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
@@ -21,7 +21,9 @@ export function initializeObsidianUtils() {
 }
 
 function getHostPlugin() {
-  if(!hostPlugin) initializeObsidianUtils();
+  if (!hostPlugin) {
+    initializeObsidianUtils();
+  }
   return hostPlugin;
 }
 
@@ -140,35 +142,49 @@ export async function getCSSFontDefinition(
   return `@font-face {font-family: ${fontFaces[0].fontFace.family}; src: url(${content});}`;
 }
 
-export async function loadSceneFonts(elements: NonDeletedExcalidrawElement[]): Promise<FontFace[]> {
+export async function loadSceneFonts(
+  elements: NonDeletedExcalidrawElement[],
+): Promise<FontFace[]> {
   return await Fonts.loadElementsFonts(elements);
 }
 
-export async function fetchFontFromVault(url: string | URL): Promise<ArrayBuffer|undefined> {
+export async function fetchFontFromVault(
+  url: string | URL,
+): Promise<ArrayBuffer | undefined> {
   url = typeof url === "string" ? url : url.toString();
-  if(typeof url === "string" && !url.startsWith("data") && url.endsWith(".woff2")) {
-    const filename = decodeURIComponent(url.substring(url.lastIndexOf("/")+1));
-    const arrayBuffer = await getHostPlugin().loadFontFromFile(filename)
-    if(arrayBuffer) {
+  if (
+    typeof url === "string" &&
+    !url.startsWith("data") &&
+    url.endsWith(".woff2")
+  ) {
+    const filename = decodeURIComponent(
+      url.substring(url.lastIndexOf("/") + 1),
+    );
+    const arrayBuffer = await getHostPlugin().loadFontFromFile(filename);
+    if (arrayBuffer) {
       return arrayBuffer;
     }
   }
-  return;
 }
 
 //zsviczian (single finger panning in pen mode)
-export function isTouchInPenMode(appState: AppState, event: React.PointerEvent<HTMLElement> | MouseEvent) {
-  if(!getHostPlugin().settings.penModeSingleFingerPanning) {
+export function isTouchInPenMode(
+  appState: AppState,
+  event: React.PointerEvent<HTMLElement> | MouseEvent,
+) {
+  if (!getHostPlugin().settings.penModeSingleFingerPanning) {
     return false;
   }
   //isReactPointerEvent typecheck is here only to please typescript, else event.pointerType === "touch" should be enough
-  const isReactPointerEvent = 'nativeEvent' in event;
-  return appState.penMode &&
-    (!isReactPointerEvent || (event.pointerType === "touch")) &&
-    ![ "text" ].includes(appState.activeTool.type);
+  const isReactPointerEvent = "nativeEvent" in event;
+  return (
+    appState.penMode &&
+    (!isReactPointerEvent || event.pointerType === "touch") &&
+    !["text"].includes(appState.activeTool.type)
+  );
 }
 
-export async function getSharedMermaidInstance():Promise<MermaidToExcalidrawLibProps> {
+export async function getSharedMermaidInstance(): Promise<MermaidToExcalidrawLibProps> {
   return await getHostPlugin().getMermaid();
 }
 

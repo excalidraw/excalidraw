@@ -64,7 +64,7 @@ export const actionCopyElementLink = register({
     };
   },
   predicate: (elements, appState) => false, //zsviczian - this action should not be visible in Obsidian
-    //canCreateLinkFromElements(getSelectedElements(elements, appState)),
+  //canCreateLinkFromElements(getSelectedElements(elements, appState)),
 });
 
 export const actionLinkToElement = register({

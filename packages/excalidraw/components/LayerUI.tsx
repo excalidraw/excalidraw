@@ -269,44 +269,44 @@ const LayerUI = ({
                             "zen-mode": appState.zenModeEnabled,
                           })}
                         >
-                        <HintViewer
-                          appState={appState}
-                          isMobile={
-                            device.editor.isMobile ||
-                            (!(
-                              appState.viewModeEnabled ||
-                              appState.zenModeEnabled
-                            ) &&
-                              appState.trayModeEnabled)
-                          } //zsviczian
-                          device={device}
-                          app={app}
-                        />
-                        {heading}
-                        <Stack.Row gap={1}>
-                          <PenModeButton
-                            zenModeEnabled={appState.zenModeEnabled}
-                            checked={appState.penMode}
-                            onChange={() => onPenModeToggle(null)}
-                            title={t("toolBar.penMode")}
-                            penDetected={appState.penDetected}
+                          <HintViewer
+                            appState={appState}
+                            isMobile={
+                              device.editor.isMobile ||
+                              (!(
+                                appState.viewModeEnabled ||
+                                appState.zenModeEnabled
+                              ) &&
+                                appState.trayModeEnabled)
+                            } //zsviczian
+                            device={device}
+                            app={app}
                           />
-                          <LockButton
-                            checked={appState.activeTool.locked}
-                            onChange={onLockToggle}
-                            title={t("toolBar.lock")}
-                          />
+                          {heading}
+                          <Stack.Row gap={1}>
+                            <PenModeButton
+                              zenModeEnabled={appState.zenModeEnabled}
+                              checked={appState.penMode}
+                              onChange={() => onPenModeToggle(null)}
+                              title={t("toolBar.penMode")}
+                              penDetected={appState.penDetected}
+                            />
+                            <LockButton
+                              checked={appState.activeTool.locked}
+                              onChange={onLockToggle}
+                              title={t("toolBar.lock")}
+                            />
 
-                          <div className="App-toolbar__divider" />
+                            <div className="App-toolbar__divider" />
 
-                          <HandButton
-                            checked={isHandToolActive(appState)}
-                            onChange={() => onHandToolToggle()}
-                            title={t("toolBar.hand")}
-                            isMobile
-                          />
+                            <HandButton
+                              checked={isHandToolActive(appState)}
+                              onChange={() => onHandToolToggle()}
+                              title={t("toolBar.hand")}
+                              isMobile
+                            />
 
-                          <ShapesSwitcher
+                            <ShapesSwitcher
                               appState={appState}
                               activeTool={appState.activeTool}
                               UIOptions={UIOptions}

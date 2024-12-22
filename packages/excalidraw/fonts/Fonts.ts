@@ -99,12 +99,14 @@ export class Fonts {
 
     //zsviczian - Obsidian adds Excalidraw irrelevant fonts
     const registeredFontFamilies = new Set<string>();
-    Fonts.registered.forEach((x:{ metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }) => 
-      registeredFontFamilies.add(x.fontFaces[0].fontFace.family));
+    Fonts.registered.forEach(
+      (x: { metadata: FontMetadata; fontFaces: ExcalidrawFontFace[] }) =>
+        registeredFontFamilies.add(x.fontFaces[0].fontFace.family),
+    );
 
     for (const fontFace of fontFaces) {
       //zsviczian
-      if(!registeredFontFamilies.has(fontFace.family)) {
+      if (!registeredFontFamilies.has(fontFace.family)) {
         continue;
       }
       const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}-${fontFace.unicodeRange}`;
@@ -271,10 +273,9 @@ export class Fonts {
 
       // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
       // for Safari on init, we rather check with the "text" param, even though it's less efficient, as otherwise fonts might remain unloaded
-      const text =
-        charsPerFamily //zsviczian && isSafari
-          ? Fonts.getCharacters(charsPerFamily, fontFamily)
-          : "";
+      const text = charsPerFamily //zsviczian && isSafari
+        ? Fonts.getCharacters(charsPerFamily, fontFamily)
+        : "";
 
       if (
         !window.document.fonts.check(font, text) &&
@@ -355,7 +356,8 @@ export class Fonts {
    * @param metadata font metadata
    * @param fontFacesDecriptors font faces descriptors
    */
-  public static register( //zsviczian made public
+  public static register(
+    //zsviczian made public
     this:
       | Fonts
       | {

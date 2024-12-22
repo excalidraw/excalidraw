@@ -107,8 +107,8 @@ export const MobileMenu = ({
                     renderTopRightUI?.(true, appState)}
                   {!appState.viewModeEnabled &&
                     appState.openDialog?.name !== "elementLinkSelector" && (
-                    <DefaultSidebarTriggerTunnel.Out />
-                  )}
+                      <DefaultSidebarTriggerTunnel.Out />
+                    )}
                   <PenModeButton
                     checked={appState.penMode}
                     onChange={() => onPenModeToggle(null)}
@@ -166,7 +166,8 @@ export const MobileMenu = ({
       return; //zsviczian
     }
     if (appState.openDialog?.name === "elementLinkSelector") {
-      return ( //zsviczian (see original below)
+      return (
+        //zsviczian (see original below)
         <div className="App-toolbar-content">
           <MainMenuTunnel.Out />
         </div>

@@ -3463,7 +3463,8 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    if (true) { //zsviczian - isSafari 
+    if (true) {
+      //zsviczian - isSafari
       Fonts.loadElementsFonts(newElements).then((fontFaces) => {
         this.fonts.onLoaded(fontFaces);
       });
@@ -4015,34 +4016,43 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-
   //zsviczian
-  getColorAtScenePoint = ({ sceneX, sceneY }: { sceneX: number; sceneY: number }): string | null =>
-  {
+  getColorAtScenePoint = ({
+    sceneX,
+    sceneY,
+  }: {
+    sceneX: number;
+    sceneY: number;
+  }): string | null => {
     if (!this.canvas) {
       console.error("Canvas not available");
       return null;
     }
-  
-    const { x,y } = sceneCoordsToViewportCoords({ sceneX, sceneY }, this.state);
+
+    const { x, y } = sceneCoordsToViewportCoords(
+      { sceneX, sceneY },
+      this.state,
+    );
     const context = this.canvas.getContext("2d");
     if (!context) {
       console.error("2D context not available");
       return null;
     }
-  
+
     // Get pixel data directly from the given scene coordinates
     const pixelData = context.getImageData(x, y, 1, 1).data;
     const [r, g, b, a] = pixelData;
-  
+
     // Check for transparency
     if (a === 0) {
-      return this.state.theme === "light" ? "rgba(255,255,255,1)" : "rgba(0,0,0,1)";
+      return this.state.theme === "light"
+        ? "rgba(255,255,255,1)"
+        : "rgba(0,0,0,1)";
     }
-  
+
     // Return the color in rgba format
     return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-  }
+  };
 
   //zsviczian
   startLineEditor = (
@@ -4226,7 +4236,7 @@ class App extends React.Component<AppProps, AppState> {
       ),
     );
   };
-  
+
   private addMissingFiles = (
     files: BinaryFiles | BinaryFileData[],
     replace = false,
@@ -4238,7 +4248,8 @@ class App extends React.Component<AppProps, AppState> {
     const _files = Array.isArray(files) ? files : Object.values(files);
 
     for (const fileData of _files) {
-      if (!force && nextFiles[fileData.id]) { //zsviczian
+      if (!force && nextFiles[fileData.id]) {
+        //zsviczian
         continue;
       }
 
@@ -4396,7 +4407,8 @@ class App extends React.Component<AppProps, AppState> {
       ?.getBoundingClientRect();
     const PADDING = 16;
 
-    const adjustRectValueForOffset = ( //zsviczian https://github.com/excalidraw/excalidraw/issues/8561
+    const adjustRectValueForOffset = (
+      //zsviczian https://github.com/excalidraw/excalidraw/issues/8561
       value: number | undefined,
       fallback: number,
     ) => (value ?? fallback + this.state.offsetLeft) - this.state.offsetLeft;
@@ -4407,14 +4419,16 @@ class App extends React.Component<AppProps, AppState> {
           right:
             Math.max(
               this.state.width -
-                adjustRectValueForOffset( //zsivczian
+                adjustRectValueForOffset(
+                  //zsivczian
                   propertiesPanelRect?.left,
                   this.state.width,
                 ),
               0,
             ) + PADDING,
           bottom: PADDING,
-          left: //zsivczian
+          //zsivczian
+          left:
             Math.max(adjustRectValueForOffset(sidebarRect?.right, 0), 0) +
             PADDING,
         }
@@ -4427,7 +4441,8 @@ class App extends React.Component<AppProps, AppState> {
             0,
           ),
           bottom: PADDING,
-          left: //zsivczian
+          //zsivczian
+          left:
             Math.max(
               adjustRectValueForOffset(propertiesPanelRect?.right, 0),
               0,
@@ -10145,9 +10160,10 @@ class App extends React.Component<AppProps, AppState> {
               created: Date.now(),
               lastRetrieved: Date.now(),
               //@ts-ignore
-              name: (imageFile?.name && imageFile.name !== "image.png")
-              ? imageFile.name
-              : undefined, // zsviczian
+              name:
+                imageFile?.name && imageFile.name !== "image.png"
+                  ? imageFile.name
+                  : undefined, // zsviczian
             },
           ]);
           const cachedImageData = this.imageCache.get(fileId);

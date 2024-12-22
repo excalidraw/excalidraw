@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 import type { BinaryFiles } from "../../types";
 import { useApp } from "../App";
-import type {
-  NonDeletedExcalidrawElement,
-} from "../../element/types";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { ArrowRightIcon } from "../icons";
 import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";

@@ -43,10 +43,15 @@ export class ExcalidrawFontFace {
     }
 
     //zsviczian - only woffs are chopped into glyphs other fonts are returned as is
-    if(typeof this.urls[0] === "string" && !this.urls[0].startsWith("data:font/woff2")) {
-      return Promise.resolve(`@font-face { font-family: ${this.fontFace.family}; src: url(${this.urls[0]}); }`);
+    if (
+      typeof this.urls[0] === "string" &&
+      !this.urls[0].startsWith("data:font/woff2")
+    ) {
+      return Promise.resolve(
+        `@font-face { font-family: ${this.fontFace.family}; src: url(${this.urls[0]}); }`,
+      );
     }
-    
+
     const codepoints = Array.from(characters).map(
       (char) => char.codePointAt(0)!,
     );
@@ -221,7 +226,7 @@ export class ExcalidrawFontFace {
   /**
    * zsviczian https://github.com/zsviczian/excalidraw/commit/b4cfaaa4b4f46ca01f94e27fb7bf651a9da99daa
    */
-   public async getContentLegacy(): Promise<string> {
+  public async getContentLegacy(): Promise<string> {
     let i = 0;
     const errorMessages = [];
 
@@ -235,7 +240,7 @@ export class ExcalidrawFontFace {
 
       try {
         const result = await fetchFontFromVault(url); //zsviczian
-        if(result) {
+        if (result) {
           return `data:font/woff2;base64,${await stringToBase64(
             await toByteString(result),
             true,

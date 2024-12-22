@@ -1,31 +1,33 @@
-import { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
 import { convertToExcalidrawElements } from "../../data/transform";
-import { ExcalidrawElement } from "../../element/types";
-import { MermaidToExcalidrawLibProps } from "./common";
+import type { ExcalidrawElement } from "../../element/types";
+import type { MermaidToExcalidrawLibProps } from "./common";
 import { getSharedMermaidInstance } from "../../obsidianUtils";
 
 let mermaidToExcalidrawLib: MermaidToExcalidrawLibProps | null = null;
 let queue: Promise<any> = Promise.resolve();
 
-export const loadMermaidToExcalidrawLib = async (): Promise<MermaidToExcalidrawLibProps> => {
-  if (!mermaidToExcalidrawLib) {
-    mermaidToExcalidrawLib = await getSharedMermaidInstance();
-  }
-  return mermaidToExcalidrawLib;
-};
+export const loadMermaidToExcalidrawLib =
+  async (): Promise<MermaidToExcalidrawLibProps> => {
+    if (!mermaidToExcalidrawLib) {
+      mermaidToExcalidrawLib = await getSharedMermaidInstance();
+    }
+    return mermaidToExcalidrawLib;
+  };
 
-export const loadMermaidLib = async (): Promise<MermaidToExcalidrawLibProps> => {
-  if (!mermaidToExcalidrawLib) {
-    const api = import("@zsviczian/mermaid-to-excalidraw").then(module => ({
-      parseMermaidToExcalidraw: module.parseMermaidToExcalidraw,
-    }));
-    mermaidToExcalidrawLib = {
-      loaded: true,
-      api,
-    };
-  }
-  return mermaidToExcalidrawLib;
-};
+export const loadMermaidLib =
+  async (): Promise<MermaidToExcalidrawLibProps> => {
+    if (!mermaidToExcalidrawLib) {
+      const api = import("@zsviczian/mermaid-to-excalidraw").then((module) => ({
+        parseMermaidToExcalidraw: module.parseMermaidToExcalidraw,
+      }));
+      mermaidToExcalidrawLib = {
+        loaded: true,
+        api,
+      };
+    }
+    return mermaidToExcalidrawLib;
+  };
 
 //zsviczian
 export const mermaidToExcalidraw = async (
@@ -40,7 +42,7 @@ export const mermaidToExcalidraw = async (
     }
   | undefined
 > => {
-  return queue = queue.then(async () => {
+  return (queue = queue.then(async () => {
     try {
       const { api } = await loadMermaidToExcalidrawLib();
       const { parseMermaidToExcalidraw } = await api;
@@ -69,5 +71,5 @@ export const mermaidToExcalidraw = async (
         error: e.message,
       };
     }
-  });
+  }));
 };

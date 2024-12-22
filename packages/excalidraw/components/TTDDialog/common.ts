@@ -1,9 +1,6 @@
 import type { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
 import type { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
-import {
-  DEFAULT_EXPORT_PADDING,
-  EDITOR_LS_KEYS,
-} from "../../constants";
+import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "../../constants";
 import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import type { AppClassProperties, BinaryFiles } from "../../types";

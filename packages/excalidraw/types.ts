@@ -569,7 +569,10 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
-  onBeforeTextEdit?: (textElement: ExcalidrawTextElement, isExistingElement: boolean) => string; //zsviczian
+  onBeforeTextEdit?: (
+    textElement: ExcalidrawTextElement,
+    isExistingElement: boolean,
+  ) => string; //zsviczian
   onBeforeTextSubmit?: (
     textElement: ExcalidrawTextElement,
     nextText: string, //wrapped
