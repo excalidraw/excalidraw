@@ -615,8 +615,15 @@ export class LinearElementEditor {
       LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
 
     let index = 0;
-    const midPoints: typeof editorMidPointsCache["points"] =
-      LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
+    const midPoints: typeof editorMidPointsCache["points"] = isElbowArrow(
+      element,
+    )
+      ? LinearElementEditor.getElbowArrowMidPoints(
+          element,
+          elementsMap,
+          appState,
+        )
+      : LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
         const distance = pointDistance(
