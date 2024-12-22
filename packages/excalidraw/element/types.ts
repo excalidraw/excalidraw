@@ -336,6 +336,8 @@ export type ExcalidrawElbowArrowElement = Merge<
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
     fixedSegments: FixedSegment[] | null;
+    startIsSpecial: boolean | null;
+    endIsSpecial: boolean | null;
   }
 >;
 
