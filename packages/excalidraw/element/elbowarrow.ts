@@ -119,6 +119,7 @@ const handleSegmentDelete = (
 
   const deletedIdx = arrow.fixedSegments[deletedSegmentIdx].index;
 
+  // We need to non-fixed arrow path to restore deleted segments
   const {
     startHeading,
     endHeading,
@@ -148,23 +149,63 @@ const handleSegmentDelete = (
     null,
   );
 
+  let start = points[deletedIdx - 1];
+  let end = points[deletedIdx];
+  let nextPoints = arrow.points;
+  let nextFixedSegments = fixedSegments;
+
+  if (points.length === arrow.points.length) {
+    nextFixedSegments = fixedSegments.map((segment) => {
+      const isHorizontal = headingForPointIsHorizontal(
+        segment.start,
+        segment.end,
+      );
+      let segmentEnd = segment.end;
+      let segmentStart = segment.start;
+
+      if (segment.index === deletedIdx - 1) {
+        start = pointFrom<LocalPoint>(
+          isHorizontal ? points[deletedIdx - 1][0] : segment.end[0],
+          !isHorizontal ? points[deletedIdx - 1][1] : segment.end[1],
+        );
+        segmentEnd = start;
+      }
+
+      if (segment.index === deletedIdx + 1) {
+        end = pointFrom<LocalPoint>(
+          isHorizontal ? points[deletedIdx][0] : segment.start[0],
+          !isHorizontal ? points[deletedIdx][1] : segment.start[1],
+        );
+        segmentStart = end;
+      }
+
+      return {
+        ...segment,
+        start: segmentStart,
+        end: segmentEnd,
+      };
+    });
+
+    nextPoints = arrow.points.map((p, i) => {
+      if (
+        !arrow.startIsSpecial &&
+        !arrow.endIsSpecial &&
+        i === deletedIdx - 1
+      ) {
+        return start;
+      }
+      if (!arrow.startIsSpecial && !arrow.endIsSpecial && i === deletedIdx) {
+        return end;
+      }
+      return p;
+    });
+  }
+
   return normalizeArrowElementUpdate(
-    arrow.points
-      .map((p, i) => {
-        if (
-          !arrow.startIsSpecial &&
-          !arrow.endIsSpecial &&
-          i === deletedIdx - 1
-        ) {
-          return points[deletedIdx - 1];
-        }
-        if (!arrow.startIsSpecial && !arrow.endIsSpecial && i === deletedIdx) {
-          return points[deletedIdx];
-        }
-        return p;
-      })
-      .map((p) => pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1])),
-    fixedSegments,
+    nextPoints.map((p) =>
+      pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
+    ),
+    nextFixedSegments,
     false,
     false,
   );
@@ -182,6 +223,16 @@ const handleSegmentMove = (
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  if ((arrow.fixedSegments?.length ?? 0) > fixedSegments.length) {
+    return handleSegmentDelete(
+      arrow,
+      fixedSegments,
+      elementsMap,
+      updatedPoints,
+      options,
+    );
+  }
+
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
       if (
@@ -203,13 +254,7 @@ const handleSegmentMove = (
     .shift();
 
   if (activelyModifiedSegmentIdx == null) {
-    return handleSegmentDelete(
-      arrow,
-      fixedSegments,
-      elementsMap,
-      updatedPoints,
-      options,
-    );
+    return { points: arrow.points };
   }
 
   const nextFixedSegments = fixedSegments.map((segment) => ({
@@ -229,11 +274,32 @@ const handleSegmentMove = (
     pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
   );
 
-  const start = nextFixedSegments[activelyModifiedSegmentIdx].start;
-  const end = nextFixedSegments[activelyModifiedSegmentIdx].end;
+  const startIdx = nextFixedSegments[activelyModifiedSegmentIdx].index - 1;
+  const endIdx = nextFixedSegments[activelyModifiedSegmentIdx].index;
+  const start = structuredClone(
+    nextFixedSegments[activelyModifiedSegmentIdx].start,
+  );
+  const end = structuredClone(
+    nextFixedSegments[activelyModifiedSegmentIdx].end,
+  );
+
   // Override the segment points with the actively moved fixed segment
-  newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index - 1] = start;
-  newPoints[nextFixedSegments[activelyModifiedSegmentIdx].index] = end;
+  newPoints[startIdx] = start;
+  newPoints[endIdx] = end;
+
+  // Override neighboring fixedSegment start/end points, if any
+  const prevSegmentIdx = nextFixedSegments.findIndex(
+    (segment) => segment.index === startIdx,
+  );
+  if (prevSegmentIdx !== -1) {
+    nextFixedSegments[prevSegmentIdx].end = start;
+  }
+  const nextSegmentIdx = nextFixedSegments.findIndex(
+    (segment) => segment.index === endIdx + 1,
+  );
+  if (nextSegmentIdx !== -1) {
+    nextFixedSegments[nextSegmentIdx].start = end;
+  }
 
   // First segment move needs an additional segment
   if (nextFixedSegments[0].index === 1) {
@@ -243,6 +309,7 @@ const handleSegmentMove = (
         arrow.y + arrow.points[0][1],
       ),
     );
+
     for (const segment of nextFixedSegments) {
       segment.index += 1;
     }
@@ -293,6 +360,25 @@ export const updateElbowArrowPoints = (
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  // debugClear();
+  // arrow.fixedSegments?.forEach((segment) => {
+  //   debugDrawPoint(
+  //     pointFrom<GlobalPoint>(
+  //       arrow.x + segment.start[0],
+  //       arrow.y + segment.start[1],
+  //     ),
+  //     { color: "green", permanent: true, fuzzy: true },
+  //   );
+  //   debugDrawPoint(
+  //     pointFrom<GlobalPoint>(
+  //       arrow.x + segment.end[0],
+  //       arrow.y + segment.end[1],
+  //     ),
+  //     { color: "red", permanent: true, fuzzy: true },
+  //   );
+  // });
+  // console.log();
+
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
   }
@@ -522,32 +608,25 @@ export const updateElbowArrowPoints = (
 
   newPoints.push(endGlobalPoint);
 
-  // First fixed segment in the 2nd segment position needs to be updated
-  if (nextFixedSegments[0].index === 2) {
-    nextFixedSegments[0].start = newPoints[1];
-  }
-
-  // Last fixed segment in the second to last position needs to be updated
-  if (
-    nextFixedSegments[nextFixedSegments.length - 1].index === newPoints.length
-  ) {
-    nextFixedSegments[nextFixedSegments.length - 1].end =
-      newPoints[newPoints.length - 1];
-  }
-
   return normalizeArrowElementUpdate(
     newPoints,
-    nextFixedSegments.map((segment) => ({
-      ...segment,
-      start: pointFrom<LocalPoint>(
-        segment.start[0] - startGlobalPoint[0],
-        segment.start[1] - startGlobalPoint[1],
-      ),
-      end: pointFrom<LocalPoint>(
-        segment.end[0] - startGlobalPoint[0],
-        segment.end[1] - startGlobalPoint[1],
-      ),
-    })),
+    nextFixedSegments
+      .map(({ index }) => ({
+        index,
+        start: newPoints[index - 1],
+        end: newPoints[index],
+      }))
+      .map((segment) => ({
+        ...segment,
+        start: pointFrom<LocalPoint>(
+          segment.start[0] - startGlobalPoint[0],
+          segment.start[1] - startGlobalPoint[1],
+        ),
+        end: pointFrom<LocalPoint>(
+          segment.end[0] - startGlobalPoint[0],
+          segment.end[1] - startGlobalPoint[1],
+        ),
+      })),
     startIsSpecial,
     endIsSpecial,
   );
