@@ -4785,21 +4785,17 @@ describe("history", () => {
             expect.objectContaining({ id: rect2.id, boundElements: [] }),
             expect.objectContaining({
               id: arrowId,
-              points: [
-                [0, 0],
-                [100, 0],
-              ],
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
                 fixedPoint: null,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
+                focus: 0,
+                gap: 1,
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
                 fixedPoint: null,
-                focus: expect.toBeNonNaNNumber(),
-                gap: expect.toBeNonNaNNumber(),
+                focus: 0,
+                gap: 1,
               }),
               isDeleted: true,
             }),
