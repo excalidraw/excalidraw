@@ -255,6 +255,7 @@ const getArrowheadShapes = (
         ),
       ];
     }
+    case "crowfoot_many":
     case "bar":
     case "arrow":
     default: {
