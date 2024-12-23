@@ -18,6 +18,8 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
 import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
+import { resizeSingleElement } from "../element/resizeElements";
+import { getSizeFromPoints } from "../points";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -235,7 +237,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   };
 
   it("resizes", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "ne", [30, -60]);
@@ -249,7 +251,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 
   it("flips while resizing", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "sw", [140, -80]);
@@ -263,7 +265,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 
   it("resizes with locked aspect ratio", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "ne", [30, -60], { shift: true });
@@ -280,7 +282,7 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
   });
 
   it("resizes from center", async () => {
-    const element = UI.createElement(type, { points: points[type] });
+    const element = UI.createElement("freedraw", { points: points.freedraw });
     const bounds = getBoundsFromPoints(element);
 
     UI.resize(element, "nw", [-20, -30], { alt: true });
@@ -291,6 +293,147 @@ describe.each(["line", "freedraw"] as const)("%s element", (type) => {
     expect(newBounds[2]).toBeCloseTo(bounds[2] + 20);
     expect(newBounds[3]).toBeCloseTo(bounds[3] + 30);
     expect(element.angle).toBeCloseTo(0);
+  });
+});
+
+describe("line element", () => {
+  const points: LocalPoint[] = [
+    pointFrom(0, 0),
+    pointFrom(60, -20),
+    pointFrom(20, 40),
+    pointFrom(-40, 0),
+  ];
+
+  it("resizes", async () => {
+    UI.createElement("line", { points });
+
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const {
+      x: prevX,
+      y: prevY,
+      width: prevWidth,
+      height: prevHeight,
+    } = element;
+
+    const nextWidth = prevWidth + 30;
+    const nextHeight = prevHeight + 30;
+
+    resizeSingleElement(
+      nextWidth,
+      nextHeight,
+      element,
+      element,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene.getNonDeletedElementsMap(),
+      "ne",
+    );
+
+    expect(element.x).not.toBe(prevX);
+    expect(element.y).not.toBe(prevY);
+
+    expect(element.width).toBe(nextWidth);
+    expect(element.height).toBe(nextHeight);
+
+    expect(element.points[0]).toEqual([0, 0]);
+
+    const { width, height } = getSizeFromPoints(element.points);
+    expect(width).toBe(element.width);
+    expect(height).toBe(element.height);
+  });
+
+  it("flips while resizing", async () => {
+    UI.createElement("line", { points });
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const {
+      width: prevWidth,
+      height: prevHeight,
+      points: prevPoints,
+    } = element;
+
+    const nextWidth = prevWidth * -1;
+    const nextHeight = prevHeight * -1;
+
+    resizeSingleElement(
+      nextWidth,
+      nextHeight,
+      element,
+      element,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene.getNonDeletedElementsMap(),
+      "se",
+    );
+
+    expect(element.width).toBe(prevWidth);
+    expect(element.height).toBe(prevHeight);
+
+    element.points.forEach((point, idx) => {
+      expect(point[0]).toBeCloseTo(prevPoints[idx][0] * -1);
+      expect(point[1]).toBeCloseTo(prevPoints[idx][1] * -1);
+    });
+  });
+
+  it("resizes with locked aspect ratio", async () => {
+    UI.createElement("line", { points });
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const { width: prevWidth, height: prevHeight } = element;
+
+    UI.resize(element, "ne", [30, -60], { shift: true });
+
+    const scaleHeight = element.width / prevWidth;
+    const scaleWidth = element.height / prevHeight;
+
+    expect(scaleHeight).toBeCloseTo(scaleWidth);
+  });
+
+  it("resizes from center", async () => {
+    UI.createElement("line", {
+      points: [
+        pointFrom(0, 0),
+        pointFrom(338.05644048727373, -180.4761618151104),
+        pointFrom(338.05644048727373, 180.4761618151104),
+        pointFrom(-338.05644048727373, 180.4761618151104),
+        pointFrom(-338.05644048727373, -180.4761618151104),
+      ],
+    });
+    const element = h.elements[0] as ExcalidrawLinearElement;
+
+    const {
+      x: prevX,
+      y: prevY,
+      width: prevWidth,
+      height: prevHeight,
+    } = element;
+
+    const prevSmallestX = Math.min(...element.points.map((p) => p[0]));
+    const prevBiggestX = Math.max(...element.points.map((p) => p[0]));
+
+    resizeSingleElement(
+      prevWidth + 20,
+      prevHeight,
+      element,
+      element,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app.scene.getNonDeletedElementsMap(),
+      "e",
+      {
+        shouldResizeFromCenter: true,
+      },
+    );
+
+    expect(element.width).toBeCloseTo(prevWidth + 20);
+    expect(element.height).toBeCloseTo(prevHeight);
+
+    expect(element.x).toBeCloseTo(prevX);
+    expect(element.y).toBeCloseTo(prevY);
+
+    const smallestX = Math.min(...element.points.map((p) => p[0]));
+    const biggestX = Math.max(...element.points.map((p) => p[0]));
+
+    expect(prevSmallestX - smallestX).toBeCloseTo(10);
+    expect(biggestX - prevBiggestX).toBeCloseTo(10);
   });
 });
 

@@ -1,8 +1,9 @@
 import type { ExcalidrawElement } from "../../element/types";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable, resizeElement } from "./utils";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
+import { resizeSingleElement } from "../../element/resizeElements";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 import { isImageElement } from "../../element/typeChecks";
@@ -30,6 +31,7 @@ const handleDimensionChange: DragInputCallbackType<
 > = ({
   accumulatedChange,
   originalElements,
+  originalElementsMap,
   shouldKeepAspectRatio,
   shouldChangeByStepSize,
   nextValue,
@@ -39,9 +41,9 @@ const handleDimensionChange: DragInputCallbackType<
   scene,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
-  if (origElement) {
+  const latestElement = elementsMap.get(origElement.id);
+  if (origElement && latestElement) {
     const keepAspectRatio =
       shouldKeepAspectRatio || _shouldKeepAspectRatio(origElement);
     const aspectRatio = origElement.width / origElement.height;
@@ -165,14 +167,17 @@ const handleDimensionChange: DragInputCallbackType<
         MIN_WIDTH_OR_HEIGHT,
       );
 
-      resizeElement(
+      resizeSingleElement(
         nextWidth,
         nextHeight,
-        keepAspectRatio,
+        latestElement,
         origElement,
         elementsMap,
-        elements,
-        scene,
+        originalElementsMap,
+        property === "width" ? "e" : "s",
+        {
+          shouldMaintainAspectRatio: keepAspectRatio,
+        },
       );
 
       return;
@@ -209,14 +214,17 @@ const handleDimensionChange: DragInputCallbackType<
     nextHeight = Math.max(MIN_WIDTH_OR_HEIGHT, nextHeight);
     nextWidth = Math.max(MIN_WIDTH_OR_HEIGHT, nextWidth);
 
-    resizeElement(
+    resizeSingleElement(
       nextWidth,
       nextHeight,
-      keepAspectRatio,
+      latestElement,
       origElement,
       elementsMap,
-      elements,
-      scene,
+      originalElementsMap,
+      property === "width" ? "e" : "s",
+      {
+        shouldMaintainAspectRatio: keepAspectRatio,
+      },
     );
   }
 };
