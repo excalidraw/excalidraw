@@ -23,13 +23,15 @@ import Collapsible from "./Collapsible";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
-import { isElbowArrow } from "../../element/typeChecks";
+import { isElbowArrow, isImageElement } from "../../element/typeChecks";
 import CanvasGrid from "./CanvasGrid";
 import clsx from "clsx";
 
 import "./Stats.scss";
 import { isGridModeEnabled } from "../../snapping";
 import CanvasGridSize from "./CanvasGridSize";
+import { getUncroppedWidthAndHeight } from "../../element/cropElement";
+import { round } from "../../../math";
 
 interface StatsProps {
   app: AppClassProperties;
@@ -128,6 +130,13 @@ export const StatsInner = memo(
 
     const multipleElements =
       selectedElements.length > 1 ? selectedElements : null;
+
+    const cropMode =
+      appState.croppingElementId && isImageElement(singleElement);
+
+    const unCroppedDimension = cropMode
+      ? getUncroppedWidthAndHeight(singleElement)
+      : null;
 
     const [sceneDimension, setSceneDimension] = useState<{
       width: number;
@@ -253,8 +262,34 @@ export const StatsInner = memo(
                 <StatsRows>
                   {singleElement && (
                     <>
+                      {cropMode && (
+                        <StatsRow heading>
+                          {t("labels.unCroppedDimension")}
+                        </StatsRow>
+                      )}
+
+                      {appState.croppingElementId &&
+                        isImageElement(singleElement) &&
+                        unCroppedDimension && (
+                          <StatsRow columns={2}>
+                            <div>{t("stats.width")}</div>
+                            <div>{round(unCroppedDimension.width, 2)}</div>
+                          </StatsRow>
+                        )}
+
+                      {appState.croppingElementId &&
+                        isImageElement(singleElement) &&
+                        unCroppedDimension && (
+                          <StatsRow columns={2}>
+                            <div>{t("stats.height")}</div>
+                            <div>{round(unCroppedDimension.height, 2)}</div>
+                          </StatsRow>
+                        )}
+
                       <StatsRow heading data-testid="stats-element-type">
-                        {t(`element.${singleElement.type}`)}
+                        {appState.croppingElementId
+                          ? t("labels.imageCropping")
+                          : t(`element.${singleElement.type}`)}
                       </StatsRow>
 
                       <StatsRow>
@@ -396,7 +431,8 @@ export const StatsInner = memo(
       prev.selectedElements === next.selectedElements &&
       prev.appState.stats.panels === next.appState.stats.panels &&
       prev.gridModeEnabled === next.gridModeEnabled &&
-      prev.appState.gridStep === next.appState.gridStep
+      prev.appState.gridStep === next.appState.gridStep &&
+      prev.appState.croppingElementId === next.appState.croppingElementId
     );
   },
 );

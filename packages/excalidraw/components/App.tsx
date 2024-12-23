@@ -1408,8 +1408,18 @@ class App extends React.Component<AppProps, AppState> {
     _cache: new Map(),
   };
 
+  private resetEditingFrame = (frame: ExcalidrawFrameLikeElement | null) => {
+    if (frame) {
+      mutateElement(frame, { name: frame.name?.trim() || null });
+    }
+    this.setState({ editingFrame: null });
+  };
+
   private renderFrameNames = () => {
     if (!this.state.frameRendering.enabled || !this.state.frameRendering.name) {
+      if (this.state.editingFrame) {
+        this.resetEditingFrame(null);
+      }
       return null;
     }
 
@@ -1431,6 +1441,9 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElementsMap(),
         )
       ) {
+        if (this.state.editingFrame === f.id) {
+          this.resetEditingFrame(f);
+        }
         // if frame not visible, don't render its name
         return null;
       }
@@ -1441,11 +1454,6 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       const FRAME_NAME_EDIT_PADDING = 6;
-
-      const reset = () => {
-        mutateElement(f, { name: f.name?.trim() || null });
-        this.setState({ editingFrame: null });
-      };
 
       let frameNameJSX;
 
@@ -1464,13 +1472,13 @@ class App extends React.Component<AppProps, AppState> {
               });
             }}
             onFocus={(e) => e.target.select()}
-            onBlur={() => reset()}
+            onBlur={() => this.resetEditingFrame(f)}
             onKeyDown={(event) => {
               // for some inexplicable reason, `onBlur` triggered on ESC
               // does not reset `state.editingFrame` despite being called,
               // and we need to reset it here as well
               if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
-                reset();
+                this.resetEditingFrame(f);
               }
             }}
             style={{
@@ -3384,6 +3392,10 @@ class App extends React.Component<AppProps, AppState> {
               ),
             ),
             [el.points[0], el.points[el.points.length - 1]],
+            undefined,
+            {
+              zoom: this.state.zoom,
+            },
           ),
         };
       }
@@ -4799,6 +4811,7 @@ class App extends React.Component<AppProps, AppState> {
 
           updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
             simultaneouslyUpdated: selectedElements,
+            zoom: this.state.zoom,
           });
         });
 
@@ -4808,6 +4821,7 @@ class App extends React.Component<AppProps, AppState> {
               (element) => element.id !== elbowArrow?.id || step !== 0,
             ),
             this.scene.getNonDeletedElementsMap(),
+            this.state.zoom,
           ),
         });
 
@@ -5028,6 +5042,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene,
         isBindingEnabled(this.state),
         this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+        this.state.zoom,
       );
       this.setState({ suggestedBindings: [] });
     }
@@ -5595,7 +5610,11 @@ class App extends React.Component<AppProps, AppState> {
         isImageElement(element) ? 0 : this.getElementHitThreshold(),
       );
 
-      return isPointInShape(pointFrom(x, y), selectionShape);
+      // if hitting the bounding box, return early
+      // but if not, we should check for other cases as well (e.g. frame name)
+      if (isPointInShape(pointFrom(x, y), selectionShape)) {
+        return true;
+      }
     }
 
     // take bound text element into consideration for hit collision as well
@@ -6398,6 +6417,7 @@ class App extends React.Component<AppProps, AppState> {
             {
               isDragging: true,
               informMutation: false,
+              zoom: this.state.zoom,
             },
           );
         } else {
@@ -7969,6 +7989,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
     );
     this.setState({
       newElement: element,
@@ -8265,6 +8286,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.origin,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
         isElbowArrow(element),
       );
 
@@ -8855,6 +8877,7 @@ class App extends React.Component<AppProps, AppState> {
               suggestedBindings: getSuggestedBindingsForArrows(
                 selectedElements,
                 this.scene.getNonDeletedElementsMap(),
+                this.state.zoom,
               ),
             });
           }
@@ -9028,6 +9051,7 @@ class App extends React.Component<AppProps, AppState> {
               {
                 isDragging: true,
                 informMutation: false,
+                zoom: this.state.zoom,
               },
             );
           } else if (points.length === 2) {
@@ -9992,6 +10016,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene,
           isBindingEnabled(this.state),
           this.state.selectedLinearElement?.selectedPointsIndices ?? [],
+          this.state.zoom,
         );
       }
 
@@ -10489,6 +10514,7 @@ class App extends React.Component<AppProps, AppState> {
       pointerCoords,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
     );
     this.setState({
       suggestedBindings:
@@ -10517,6 +10543,7 @@ class App extends React.Component<AppProps, AppState> {
           coords,
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
+          this.state.zoom,
           isArrowElement(linearElement) && isElbowArrow(linearElement),
         );
         if (
@@ -11180,6 +11207,7 @@ class App extends React.Component<AppProps, AppState> {
         transformHandleType,
         selectedElements,
         this.scene.getElementsMapIncludingDeleted(),
+        this.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
         selectedElements.some((element) => isImageElement(element))
@@ -11194,6 +11222,7 @@ class App extends React.Component<AppProps, AppState> {
       const suggestedBindings = getSuggestedBindingsForArrows(
         selectedElements,
         this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
       );
 
       const elementsToHighlight = new Set<ExcalidrawElement>();
