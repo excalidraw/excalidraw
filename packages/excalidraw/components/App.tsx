@@ -457,9 +457,9 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { resizeSingleElement } from "../element/resizeElements"; //zsviczian
+import { getNextSingleWidthAndHeightFromPointer, resizeSingleElement } from "../element/resizeElements"; //zsviczian
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
-import { getVisibleSceneBounds } from "../element/bounds";
+import { getResizedElementAbsoluteCoords, getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { getTooltipDiv } from "./Tooltip";
 import NewElementCanvas from "./canvases/NewElementCanvas";
@@ -4087,21 +4087,44 @@ class App extends React.Component<AppProps, AppState> {
   //zsviczian
   updateContainerSize = withBatchedUpdates(
     (containers: NonDeletedExcalidrawElement[]) => {
-      containers.forEach((el: ExcalidrawElement) => {
-        const [x, y] = pointRotateRads(
-          pointFrom(el.x + el.width, el.y + el.height),
-          pointFrom(el.x + el.width / 2, el.y + el.height / 2),
-          el.angle,
+      containers.forEach((element: ExcalidrawElement) => {
+        // Get absolute coordinates for the bottom-right corner
+        const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
+          element,
+          element.width,
+          element.height,
+          true,
         );
-        resizeSingleElement(
-          new Map().set(el.id, el),
-          false,
-          el,
+
+        // Get rotated pointer position at bottom-right corner
+        const [pointerX, pointerY] = pointRotateRads(
+          pointFrom(x2, y2),
+          pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
+          element.angle,
+        );
+
+        const { nextWidth, nextHeight } = getNextSingleWidthAndHeightFromPointer(
+          element,
+          element,
+          this.scene.getElementsMapIncludingDeleted(),
           this.scene.getElementsMapIncludingDeleted(),
           "se",
-          true,
-          x,
-          y,
+          pointerX,
+          pointerY,
+        );
+
+        resizeSingleElement(
+          nextWidth,
+          nextHeight,
+          element,
+          element,
+          this.scene.getElementsMapIncludingDeleted(),
+          this.scene.getElementsMapIncludingDeleted(),
+          "se",
+          {
+            shouldMaintainAspectRatio: true,
+            shouldResizeFromCenter: false,
+          },
         );
       });
     },

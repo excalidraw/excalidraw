@@ -994,7 +994,8 @@ export const resizeSingleElement = (
   }
 };
 
-const getNextSingleWidthAndHeightFromPointer = (
+//zsviczian export for use in updateContainerSize
+export const getNextSingleWidthAndHeightFromPointer = (
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
   elementsMap: ElementsMap,
