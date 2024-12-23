@@ -106,7 +106,6 @@
     "@testing-library/jest-dom": "5.16.2",
     "@testing-library/react": "16.0.0",
     "@types/async-lock": "^1.4.2",
-    "@types/lodash.debounce": "4.0.9",
     "@types/pako": "1.0.3",
     "@types/pica": "5.1.3",
     "@types/resize-observer-browser": "0.1.7",

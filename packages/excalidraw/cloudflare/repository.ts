@@ -8,7 +8,7 @@ import type {
 export class DurableIncrementsRepository implements IncrementsRepository {
   constructor(private storage: DurableObjectStorage) {
     // #region DEV ONLY
-    this.storage.sql.exec(`DROP TABLE IF EXISTS increments;`);
+    // this.storage.sql.exec(`DROP TABLE IF EXISTS increments;`);
     // #endregion
 
     this.storage.sql.exec(`CREATE TABLE IF NOT EXISTS increments(

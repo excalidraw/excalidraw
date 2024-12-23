@@ -139,6 +139,7 @@ import type { ElementsChange } from "../packages/excalidraw/change";
 
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { SyncClient } from "../packages/excalidraw/sync/client";
 
 polyfill();
 
@@ -388,7 +389,7 @@ const ExcalidrawWrapper = () => {
     syncAPI?.connect();
 
     return () => {
-      syncAPI?.disconnect();
+      syncAPI?.disconnect(SyncClient.NORMAL_CLOSURE);
       clearInterval(interval);
     };
   }, [syncAPI]);
@@ -885,9 +886,11 @@ const ExcalidrawWrapper = () => {
         max={acknowledgedIncrements.length}
         value={nextVersion === -1 ? acknowledgedIncrements.length : nextVersion}
         onChange={(value) => {
-          if (value !== acknowledgedIncrements.length - 1) {
+          // CFDO: should be disabled when offline! (later we could have speculative changes in the versioning log as well)
+          // CFDO: in safari the whole canvas gets selected when dragging
+          if (value !== acknowledgedIncrements.length) {
             // don't listen to updates in the detached mode
-            syncAPI?.disconnect();
+            syncAPI?.disconnect(SyncClient.NORMAL_CLOSURE);
           } else {
             // reconnect once we're back to the latest version
             syncAPI?.connect();
