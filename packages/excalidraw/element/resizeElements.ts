@@ -64,6 +64,8 @@ import {
   type LocalPoint,
 } from "../../math";
 
+/* MERGE */
+
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
   originalElements: PointerDownState["originalElements"],
