@@ -558,6 +558,7 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
       return 12;
     case "crowfoot_many":
     case "crowfoot_one":
+    case "crowfoot_one_or_many":
       return 20;
     default:
       return 15;
@@ -672,7 +673,7 @@ export const getArrowheadPoints = (
 
   const angle = getArrowheadAngle(arrowhead);
 
-  if (arrowhead === "crowfoot_many") {
+  if (arrowhead === "crowfoot_many" || arrowhead === "crowfoot_one_or_many") {
     // swap (xs, ys) with (x2, y2)
     const [x3, y3] = pointRotateRads(
       pointFrom(x2, y2),
