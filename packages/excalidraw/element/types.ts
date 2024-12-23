@@ -304,6 +304,7 @@ export type Arrowhead =
   | "triangle_outline"
   | "diamond"
   | "diamond_outline"
+  | "crowfoot_one"
   | "crowfoot_many";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &

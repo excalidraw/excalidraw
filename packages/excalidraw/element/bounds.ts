@@ -557,6 +557,7 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
     case "diamond_outline":
       return 12;
     case "crowfoot_many":
+    case "crowfoot_one":
       return 20;
     default:
       return 15;

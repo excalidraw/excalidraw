@@ -177,6 +177,19 @@ const getArrowheadShapes = (
     return [];
   }
 
+  const generateCrowfootOne = (
+    arrowheadPoints: number[] | null,
+    options: Options,
+  ) => {
+    if (arrowheadPoints === null) {
+      return [];
+    }
+
+    const [, , x3, y3, x4, y4] = arrowheadPoints;
+
+    return [generator.line(x3, y3, x4, y4, options)];
+  };
+
   switch (arrowhead) {
     case "dot":
     case "circle":
@@ -255,6 +268,8 @@ const getArrowheadShapes = (
         ),
       ];
     }
+    case "crowfoot_one":
+      return generateCrowfootOne(arrowheadPoints, options);
     case "crowfoot_many":
     case "bar":
     case "arrow":
