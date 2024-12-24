@@ -14,6 +14,7 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
+import { debugClear, debugDrawPoint } from "../visualdebug";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -95,7 +96,7 @@ type ElbowArrowData = {
 
 const BASE_PADDING = 40;
 
-const handleSegmentDelete = (
+const handleSegmentRelease = (
   arrow: ExcalidrawElbowArrowElement,
   fixedSegments: FixedSegment[],
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
@@ -223,16 +224,6 @@ const handleSegmentMove = (
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  if ((arrow.fixedSegments?.length ?? 0) > fixedSegments.length) {
-    return handleSegmentDelete(
-      arrow,
-      fixedSegments,
-      elementsMap,
-      updatedPoints,
-      options,
-    );
-  }
-
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
       if (
@@ -346,123 +337,17 @@ const handleSegmentMove = (
   );
 };
 
-/**
- *
- */
-export const updateElbowArrowPoints = (
-  arrow: Readonly<ExcalidrawElbowArrowElement>,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  updates: {
-    points?: readonly LocalPoint[];
-    fixedSegments?: FixedSegment[] | null;
-  },
-  options?: {
-    isDragging?: boolean;
-  },
-): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  // debugClear();
-  // arrow.fixedSegments?.forEach((segment) => {
-  //   debugDrawPoint(
-  //     pointFrom<GlobalPoint>(
-  //       arrow.x + segment.start[0],
-  //       arrow.y + segment.start[1],
-  //     ),
-  //     { color: "green", permanent: true, fuzzy: true },
-  //   );
-  //   debugDrawPoint(
-  //     pointFrom<GlobalPoint>(
-  //       arrow.x + segment.end[0],
-  //       arrow.y + segment.end[1],
-  //     ),
-  //     { color: "red", permanent: true, fuzzy: true },
-  //   );
-  // });
-  // console.log();
-
-  if (arrow.points.length < 2) {
-    return { points: updates.points ?? arrow.points };
-  }
-
-  invariant(
-    !updates.points ||
-      arrow.points.length === updates.points.length ||
-      updates.points.length === 2,
-    "Updated point array length must match the arrow point length, contain " +
-      "exactly the new start and end points or not be specified at all (i.e. " +
-      "you can't add new points between start and end manually to elbow arrows)",
-  );
-
-  const updatedPoints: readonly LocalPoint[] = updates.points
-    ? updates.points && updates.points.length === 2
-      ? arrow.points.map((p, idx) =>
-          idx === 0
-            ? updates.points![0]
-            : idx === arrow.points.length - 1
-            ? updates.points![1]
-            : p,
-        )
-      : structuredClone(updates.points)
-    : structuredClone(arrow.points);
-
-  const {
-    startHeading,
-    endHeading,
-    startGlobalPoint,
-    endGlobalPoint,
-    hoveredStartElement,
-    hoveredEndElement,
-    ...rest
-  } = getElbowArrowData(arrow, elementsMap, updatedPoints, options);
-
-  const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
-
-  ////
-  // 1. Just normal elbow arrow things
-  ////
-  if (fixedSegments.length === 0) {
-    const simplifiedPoints = getElbowArrowCornerPoints(
-      removeElbowArrowShortSegments(
-        routeElbowArrow(arrow, {
-          startHeading,
-          endHeading,
-          startGlobalPoint,
-          endGlobalPoint,
-          hoveredStartElement,
-          hoveredEndElement,
-          ...rest,
-        }) ?? [],
-      ),
-    );
-
-    return normalizeArrowElementUpdate(
-      simplifiedPoints,
-      fixedSegments,
-      null,
-      null,
-    );
-  }
-
-  ////
-  // 2. Handle manual segment move
-  ////
-  if (!updates.points) {
-    return handleSegmentMove(
-      arrow,
-      fixedSegments,
-      elementsMap,
-      updatedPoints,
-      options,
-    );
-  }
-
-  ////
-  // 3. One or more segments are fixed and endpoints are moved
-  //
-  // The key insights are:
-  // - When segments are fixed, the arrow will keep the exact amount of segments
-  // - Fixed segments are "replacements" for exactly one segment in the old arrow
-  ////
-
+const handleEndpointMove = (
+  arrow: ExcalidrawElbowArrowElement,
+  updatedPoints: readonly LocalPoint[],
+  fixedSegments: FixedSegment[],
+  startHeading: Heading,
+  endHeading: Heading,
+  startGlobalPoint: GlobalPoint,
+  endGlobalPoint: GlobalPoint,
+  hoveredStartElement: ExcalidrawBindableElement | null,
+  hoveredEndElement: ExcalidrawBindableElement | null,
+) => {
   let startIsSpecial = arrow.startIsSpecial ?? null;
   let endIsSpecial = arrow.endIsSpecial ?? null;
   const globalUpdatedPoints = updatedPoints.map((p, i) =>
@@ -629,6 +514,147 @@ export const updateElbowArrowPoints = (
       })),
     startIsSpecial,
     endIsSpecial,
+  );
+};
+
+/**
+ *
+ */
+export const updateElbowArrowPoints = (
+  arrow: Readonly<ExcalidrawElbowArrowElement>,
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  updates: {
+    points?: readonly LocalPoint[];
+    fixedSegments?: FixedSegment[] | null;
+  },
+  options?: {
+    isDragging?: boolean;
+  },
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  debugClear();
+  arrow.fixedSegments?.forEach((segment) => {
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        arrow.x + segment.start[0],
+        arrow.y + segment.start[1],
+      ),
+      { color: "green", permanent: true, fuzzy: true },
+    );
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        arrow.x + segment.end[0],
+        arrow.y + segment.end[1],
+      ),
+      { color: "red", permanent: true, fuzzy: true },
+    );
+  });
+  console.log();
+
+  if (arrow.points.length < 2) {
+    return { points: updates.points ?? arrow.points };
+  }
+
+  invariant(
+    !updates.points ||
+      arrow.points.length === updates.points.length ||
+      updates.points.length === 2,
+    "Updated point array length must match the arrow point length, contain " +
+      "exactly the new start and end points or not be specified at all (i.e. " +
+      "you can't add new points between start and end manually to elbow arrows)",
+  );
+
+  const updatedPoints: readonly LocalPoint[] = updates.points
+    ? updates.points && updates.points.length === 2
+      ? arrow.points.map((p, idx) =>
+          idx === 0
+            ? updates.points![0]
+            : idx === arrow.points.length - 1
+            ? updates.points![1]
+            : p,
+        )
+      : structuredClone(updates.points)
+    : structuredClone(arrow.points);
+
+  const {
+    startHeading,
+    endHeading,
+    startGlobalPoint,
+    endGlobalPoint,
+    hoveredStartElement,
+    hoveredEndElement,
+    ...rest
+  } = getElbowArrowData(arrow, elementsMap, updatedPoints, options);
+
+  const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
+
+  ////
+  // 1. Just normal elbow arrow things
+  ////
+  if (fixedSegments.length === 0) {
+    const simplifiedPoints = getElbowArrowCornerPoints(
+      removeElbowArrowShortSegments(
+        routeElbowArrow(arrow, {
+          startHeading,
+          endHeading,
+          startGlobalPoint,
+          endGlobalPoint,
+          hoveredStartElement,
+          hoveredEndElement,
+          ...rest,
+        }) ?? [],
+      ),
+    );
+
+    return normalizeArrowElementUpdate(
+      simplifiedPoints,
+      fixedSegments,
+      null,
+      null,
+    );
+  }
+
+  ////
+  // 2. Handle releasing a fixed segment
+  if ((arrow.fixedSegments?.length ?? 0) > fixedSegments.length) {
+    return handleSegmentRelease(
+      arrow,
+      fixedSegments,
+      elementsMap,
+      updatedPoints,
+      options,
+    );
+  }
+
+  ////
+  // 3. Handle manual segment move
+  ////
+  if (!updates.points) {
+    return handleSegmentMove(
+      arrow,
+      fixedSegments,
+      elementsMap,
+      updatedPoints,
+      options,
+    );
+  }
+
+  ////
+  // 4. One or more segments are fixed and endpoints are moved
+  //
+  // The key insights are:
+  // - When segments are fixed, the arrow will keep the exact amount of segments
+  // - Fixed segments are "replacements" for exactly one segment in the old arrow
+  ////
+  return handleEndpointMove(
+    arrow,
+    updatedPoints,
+    fixedSegments,
+    startHeading,
+    endHeading,
+    startGlobalPoint,
+    endGlobalPoint,
+    hoveredStartElement,
+    hoveredEndElement,
   );
 };
 
