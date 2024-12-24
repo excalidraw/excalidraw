@@ -218,11 +218,10 @@ const handleSegmentRelease = (
 const handleSegmentMove = (
   arrow: ExcalidrawElbowArrowElement,
   fixedSegments: FixedSegment[],
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  updatedPoints: readonly LocalPoint[],
-  options?: {
-    isDragging?: boolean;
-  },
+  startHeading: Heading,
+  endHeading: Heading,
+  hoveredStartElement: ExcalidrawBindableElement | null,
+  hoveredEndElement: ExcalidrawBindableElement | null,
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
@@ -248,6 +247,56 @@ const handleSegmentMove = (
     return { points: arrow.points };
   }
 
+  const firstSegmentIdx =
+    arrow.fixedSegments?.findIndex((segment) => segment.index === 1) ?? -1;
+  const lastSegmentIdx =
+    arrow.fixedSegments?.findIndex(
+      (segment) => segment.index === arrow.points.length - 1,
+    ) ?? -1;
+
+  if (
+    firstSegmentIdx === -1 &&
+    fixedSegments[activelyModifiedSegmentIdx].index === 1 &&
+    hoveredStartElement
+  ) {
+    const startIsHorizontal = headingIsHorizontal(startHeading);
+    const startIsPositive = startIsHorizontal
+      ? compareHeading(startHeading, HEADING_RIGHT)
+      : compareHeading(startHeading, HEADING_DOWN);
+    fixedSegments[activelyModifiedSegmentIdx].start = pointFrom<LocalPoint>(
+      fixedSegments[activelyModifiedSegmentIdx].start[0] +
+        (startIsHorizontal
+          ? startIsPositive
+            ? BASE_PADDING
+            : -BASE_PADDING
+          : 0),
+      fixedSegments[activelyModifiedSegmentIdx].start[1] +
+        (!startIsHorizontal
+          ? startIsPositive
+            ? BASE_PADDING
+            : -BASE_PADDING
+          : 0),
+    );
+  }
+
+  if (
+    lastSegmentIdx === -1 &&
+    fixedSegments[activelyModifiedSegmentIdx].index ===
+      arrow.points.length - 1 &&
+    hoveredEndElement
+  ) {
+    const endIsHorizontal = headingIsHorizontal(endHeading);
+    const endIsPositive = endIsHorizontal
+      ? compareHeading(endHeading, HEADING_RIGHT)
+      : compareHeading(endHeading, HEADING_DOWN);
+    fixedSegments[activelyModifiedSegmentIdx].end = pointFrom<LocalPoint>(
+      fixedSegments[activelyModifiedSegmentIdx].end[0] +
+        (endIsHorizontal ? (endIsPositive ? BASE_PADDING : -BASE_PADDING) : 0),
+      fixedSegments[activelyModifiedSegmentIdx].end[1] +
+        (!endIsHorizontal ? (endIsPositive ? BASE_PADDING : -BASE_PADDING) : 0),
+    );
+  }
+
   const nextFixedSegments = fixedSegments.map((segment) => ({
     ...segment,
     start: pointFrom<GlobalPoint>(
@@ -267,12 +316,8 @@ const handleSegmentMove = (
 
   const startIdx = nextFixedSegments[activelyModifiedSegmentIdx].index - 1;
   const endIdx = nextFixedSegments[activelyModifiedSegmentIdx].index;
-  const start = structuredClone(
-    nextFixedSegments[activelyModifiedSegmentIdx].start,
-  );
-  const end = structuredClone(
-    nextFixedSegments[activelyModifiedSegmentIdx].end,
-  );
+  const start = nextFixedSegments[activelyModifiedSegmentIdx].start;
+  const end = nextFixedSegments[activelyModifiedSegmentIdx].end;
 
   // Override the segment points with the actively moved fixed segment
   newPoints[startIdx] = start;
@@ -293,7 +338,8 @@ const handleSegmentMove = (
   }
 
   // First segment move needs an additional segment
-  if (nextFixedSegments[0].index === 1) {
+  if (firstSegmentIdx === -1 && startIdx === 0) {
+    newPoints.unshift(start);
     newPoints.unshift(
       pointFrom<GlobalPoint>(
         arrow.x + arrow.points[0][0],
@@ -302,15 +348,13 @@ const handleSegmentMove = (
     );
 
     for (const segment of nextFixedSegments) {
-      segment.index += 1;
+      segment.index += 2;
     }
   }
 
-  if (
-    nextFixedSegments[nextFixedSegments.length - 1].index ===
-    newPoints.length - 1
-  ) {
-    // Last segment move needs an additional segment
+  // Last segment move needs an additional segment
+  if (lastSegmentIdx === -1 && endIdx === arrow.points.length - 1) {
+    newPoints.push(end);
     newPoints.push(
       pointFrom<GlobalPoint>(
         arrow.x + arrow.points[arrow.points.length - 1][0],
@@ -337,7 +381,7 @@ const handleSegmentMove = (
   );
 };
 
-const handleEndpointMove = (
+const handleEndpointDrag = (
   arrow: ExcalidrawElbowArrowElement,
   updatedPoints: readonly LocalPoint[],
   fixedSegments: FixedSegment[],
@@ -548,7 +592,6 @@ export const updateElbowArrowPoints = (
       { color: "red", permanent: true, fuzzy: true },
     );
   });
-  console.log();
 
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
@@ -632,9 +675,10 @@ export const updateElbowArrowPoints = (
     return handleSegmentMove(
       arrow,
       fixedSegments,
-      elementsMap,
-      updatedPoints,
-      options,
+      startHeading,
+      endHeading,
+      hoveredStartElement,
+      hoveredEndElement,
     );
   }
 
@@ -645,7 +689,7 @@ export const updateElbowArrowPoints = (
   // - When segments are fixed, the arrow will keep the exact amount of segments
   // - Fixed segments are "replacements" for exactly one segment in the old arrow
   ////
-  return handleEndpointMove(
+  return handleEndpointDrag(
     arrow,
     updatedPoints,
     fixedSegments,
