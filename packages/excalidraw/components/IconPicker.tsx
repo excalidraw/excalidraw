@@ -1,10 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Popover } from "./Popover";
 
 import "./IconPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
-import { getLanguage } from "../i18n";
+import { getLanguage, t } from "../i18n";
 import clsx from "clsx";
+import Collapsible from "./Stats/Collapsible";
+import { atom, useAtom } from "jotai";
+import { jotaiScope } from "../jotai";
+
+const moreOptionsAtom = atom(false);
+
+type Option<T> = {
+  value: T;
+  text: string;
+  icon: JSX.Element;
+  keyBinding: string | null;
+};
 
 function Picker<T>({
   options,
@@ -12,17 +24,14 @@ function Picker<T>({
   label,
   onChange,
   onClose,
+  numberOfOptionsToAlwaysShow = options.length,
 }: {
   label: string;
   value: T;
-  options: {
-    value: T;
-    text: string;
-    icon: JSX.Element;
-    keyBinding: string | null;
-  }[];
+  options: Option<T>[];
   onChange: (value: T) => void;
   onClose: () => void;
+  numberOfOptionsToAlwaysShow?: number;
 }) {
   const rFirstItem = React.useRef<HTMLButtonElement>();
   const rActiveItem = React.useRef<HTMLButtonElement>();
@@ -97,14 +106,28 @@ function Picker<T>({
     event.stopPropagation();
   };
 
-  return (
-    <div
-      className={`picker`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={label}
-      onKeyDown={handleKeyDown}
-    >
+  const [showMoreOptions, setShowMoreOptions] = useAtom(
+    moreOptionsAtom,
+    jotaiScope,
+  );
+
+  const alwaysVisibleOptions = React.useMemo(
+    () => options.slice(0, numberOfOptionsToAlwaysShow),
+    [options, numberOfOptionsToAlwaysShow],
+  );
+  const moreOptions = React.useMemo(
+    () => options.slice(numberOfOptionsToAlwaysShow),
+    [options, numberOfOptionsToAlwaysShow],
+  );
+
+  useEffect(() => {
+    if (!alwaysVisibleOptions.some((option) => option.value === value)) {
+      setShowMoreOptions(true);
+    }
+  }, [value, alwaysVisibleOptions, setShowMoreOptions]);
+
+  const renderOptions = (options: Option<T>[]) => {
+    return (
       <div className="picker-content" ref={rGallery}>
         {options.map((option, i) => (
           <button
@@ -141,6 +164,31 @@ function Picker<T>({
           </button>
         ))}
       </div>
+    );
+  };
+
+  return (
+    <div
+      className={`picker`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      onKeyDown={handleKeyDown}
+    >
+      {renderOptions(alwaysVisibleOptions)}
+
+      {moreOptions.length > 0 && (
+        <Collapsible
+          label={t("labels.more_options")}
+          open={showMoreOptions}
+          openTrigger={() => {
+            setShowMoreOptions((value) => !value);
+          }}
+          className="picker-collapsible"
+        >
+          {renderOptions(moreOptions)}
+        </Collapsible>
+      )}
     </div>
   );
 }
@@ -151,6 +199,7 @@ export function IconPicker<T>({
   options,
   onChange,
   group = "",
+  numberOfOptionsToAlwaysShow,
 }: {
   label: string;
   value: T;
@@ -162,6 +211,7 @@ export function IconPicker<T>({
     showInPicker?: boolean;
   }[];
   onChange: (value: T) => void;
+  numberOfOptionsToAlwaysShow?: number;
   group?: string;
 }) {
   const [isActive, setActive] = React.useState(false);
@@ -198,6 +248,7 @@ export function IconPicker<T>({
                   setActive(false);
                   rPickerButton.current?.focus();
                 }}
+                numberOfOptionsToAlwaysShow={numberOfOptionsToAlwaysShow}
               />
             </Popover>
             <div className="picker-triangle" />

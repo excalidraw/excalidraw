@@ -1538,6 +1538,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
+            numberOfOptionsToAlwaysShow={3}
           />
           <IconPicker
             label="arrowhead_end"
@@ -1554,6 +1555,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
+            numberOfOptionsToAlwaysShow={3}
           />
         </div>
       </fieldset>
