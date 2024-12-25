@@ -1589,7 +1589,7 @@ export const actionChangeArrowType = register({
             tupleToCoors(startGlobalPoint),
             elements,
             elementsMap,
-            true,
+            appState.zoom,
           );
         const endHoveredElement =
           !newElement.endBinding &&
@@ -1597,7 +1597,7 @@ export const actionChangeArrowType = register({
             tupleToCoors(endGlobalPoint),
             elements,
             elementsMap,
-            true,
+            appState.zoom,
           );
         const startElement = startHoveredElement
           ? startHoveredElement

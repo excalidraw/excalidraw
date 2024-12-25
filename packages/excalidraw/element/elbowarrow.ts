@@ -15,6 +15,7 @@ import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import { debugClear, debugDrawPoint } from "../visualdebug";
+import type { AppState } from "../types";
 import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
@@ -100,10 +101,6 @@ const handleSegmentRelease = (
   arrow: ExcalidrawElbowArrowElement,
   fixedSegments: FixedSegment[],
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  updatedPoints: readonly LocalPoint[],
-  options?: {
-    isDragging?: boolean;
-  },
 ) => {
   const newFixedSegmentIndices = fixedSegments.map((segment) => segment.index);
   const oldFixedSegmentIndices =
@@ -611,26 +608,9 @@ export const updateElbowArrowPoints = (
   },
   options?: {
     isDragging?: boolean;
+    zoom?: AppState["zoom"];
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  // debugClear();
-  // arrow.fixedSegments?.forEach((segment) => {
-  //   debugDrawPoint(
-  //     pointFrom<GlobalPoint>(
-  //       arrow.x + segment.start[0],
-  //       arrow.y + segment.start[1],
-  //     ),
-  //     { color: "green", permanent: true, fuzzy: true },
-  //   );
-  //   debugDrawPoint(
-  //     pointFrom<GlobalPoint>(
-  //       arrow.x + segment.end[0],
-  //       arrow.y + segment.end[1],
-  //     ),
-  //     { color: "red", permanent: true, fuzzy: true },
-  //   );
-  // });
-
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
   }
@@ -697,13 +677,7 @@ export const updateElbowArrowPoints = (
   ////
   // 2. Handle releasing a fixed segment
   if ((arrow.fixedSegments?.length ?? 0) > fixedSegments.length) {
-    return handleSegmentRelease(
-      arrow,
-      fixedSegments,
-      elementsMap,
-      updatedPoints,
-      options,
-    );
+    return handleSegmentRelease(arrow, fixedSegments, elementsMap);
   }
 
   ////
@@ -776,10 +750,7 @@ const getElbowArrowData = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    startMidPointHeading?: Heading;
-    endMidPointHeading?: Heading;
-    forcedStartHeading?: Heading;
-    forcedEndHeading?: Heading;
+    zoom?: AppState["zoom"];
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -797,7 +768,12 @@ const getElbowArrowData = (
     arrow.endBinding &&
     getBindableElementForId(arrow.endBinding.elementId, elementsMap);
   const [hoveredStartElement, hoveredEndElement] = options?.isDragging
-    ? getHoveredElements(origStartGlobalPoint, origEndGlobalPoint, elementsMap)
+    ? getHoveredElements(
+        origStartGlobalPoint,
+        origEndGlobalPoint,
+        elementsMap,
+        options?.zoom,
+      )
     : [startElement, endElement];
   const startGlobalPoint = getGlobalPoint(
     arrow.startBinding?.fixedPoint,
@@ -817,24 +793,20 @@ const getElbowArrowData = (
     hoveredEndElement,
     options?.isDragging,
   );
-  const startHeading = options?.forcedStartHeading
-    ? options.forcedStartHeading
-    : getBindPointHeading(
-        startGlobalPoint,
-        endGlobalPoint,
-        elementsMap,
-        hoveredStartElement,
-        origStartGlobalPoint,
-      );
-  const endHeading = options?.forcedEndHeading
-    ? options.forcedEndHeading
-    : getBindPointHeading(
-        endGlobalPoint,
-        startGlobalPoint,
-        elementsMap,
-        hoveredEndElement,
-        origEndGlobalPoint,
-      );
+  const startHeading = getBindPointHeading(
+    startGlobalPoint,
+    endGlobalPoint,
+    elementsMap,
+    hoveredStartElement,
+    origStartGlobalPoint,
+  );
+  const endHeading = getBindPointHeading(
+    endGlobalPoint,
+    startGlobalPoint,
+    elementsMap,
+    hoveredEndElement,
+    origEndGlobalPoint,
+  );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
     startGlobalPoint[1] - 2,
@@ -893,22 +865,13 @@ const getElbowArrowData = (
   const commonBounds = commonAABB(
     boundsOverlap
       ? [startPointBounds, endPointBounds]
-      : [
-          options?.endMidPointHeading ? startPointBounds : startElementBounds,
-          options?.startMidPointHeading ? endPointBounds : endElementBounds,
-        ],
+      : [startElementBounds, endElementBounds],
   );
-  const dynamicAABBCandidates = generateDynamicAABBs(
-    options?.endMidPointHeading || boundsOverlap
-      ? startPointBounds
-      : startElementBounds,
-    options?.startMidPointHeading || boundsOverlap
-      ? endPointBounds
-      : endElementBounds,
+  const dynamicAABBs = generateDynamicAABBs(
+    boundsOverlap ? startPointBounds : startElementBounds,
+    boundsOverlap ? endPointBounds : endElementBounds,
     commonBounds,
-    options?.endMidPointHeading
-      ? [0, 0, 0, 0]
-      : boundsOverlap
+    boundsOverlap
       ? offsetFromHeading(
           startHeading,
           !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
@@ -924,9 +887,7 @@ const getElbowArrowData = (
                   : FIXED_BINDING_DISTANCE * 2),
           BASE_PADDING,
         ),
-    options?.startMidPointHeading
-      ? [0, 0, 0, 0]
-      : boundsOverlap
+    boundsOverlap
       ? offsetFromHeading(
           endHeading,
           !hoveredStartElement && !hoveredEndElement ? 0 : BASE_PADDING,
@@ -946,16 +907,6 @@ const getElbowArrowData = (
     hoveredStartElement && aabbForElement(hoveredStartElement),
     hoveredEndElement && aabbForElement(hoveredEndElement),
   );
-  const dynamicAABBs = [
-    (!options?.endMidPointHeading && !options?.startMidPointHeading) ||
-    (options?.endMidPointHeading && !options?.startMidPointHeading)
-      ? dynamicAABBCandidates[0]
-      : startPointBounds,
-    (!options?.startMidPointHeading && !options?.endMidPointHeading) ||
-    (options?.startMidPointHeading && !options?.endMidPointHeading)
-      ? dynamicAABBCandidates[1]
-      : endPointBounds,
-  ];
   const startDonglePosition = getDonglePosition(
     dynamicAABBs[0],
     startHeading,
@@ -1836,6 +1787,7 @@ const getHoveredElements = (
   origStartGlobalPoint: GlobalPoint,
   origEndGlobalPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  zoom?: AppState["zoom"],
 ) => {
   // TODO: Might be a performance bottleneck and the Map type
   // remembers the insertion order anyway...
@@ -1848,12 +1800,14 @@ const getHoveredElements = (
       tupleToCoors(origStartGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
+      zoom,
       true,
     ),
     getHoveredElementForBinding(
       tupleToCoors(origEndGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
+      zoom,
       true,
     ),
   ];

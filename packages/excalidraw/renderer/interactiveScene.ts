@@ -43,7 +43,11 @@ import type {
   SuggestedBinding,
   SuggestedPointBinding,
 } from "../element/binding";
-import { maxBindingGap } from "../element/binding";
+import {
+  BINDING_HIGHLIGHT_OFFSET,
+  BINDING_HIGHLIGHT_THICKNESS,
+  maxBindingGap,
+} from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   bootstrapCanvas,
@@ -222,17 +226,18 @@ const renderBindingHighlightForBindableElement = (
   context: CanvasRenderingContext2D,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
+  zoom: InteractiveCanvasAppState["zoom"],
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
   const width = x2 - x1;
   const height = y2 - y1;
-  const thickness = 10;
 
-  // So that we don't overlap the element itself
-  const strokeOffset = 4;
   context.strokeStyle = "rgba(0,0,0,.05)";
-  context.lineWidth = thickness - strokeOffset;
-  const padding = strokeOffset / 2 + thickness / 2;
+  // When zooming out, make line width greater for visibility
+  const zoomValue = zoom.value < 1 ? zoom.value : 1;
+  context.lineWidth = BINDING_HIGHLIGHT_THICKNESS / zoomValue;
+  // To ensure the binding highlight doesn't overlap the element itself
+  const padding = context.lineWidth / 2 + BINDING_HIGHLIGHT_OFFSET;
 
   const radius = getCornerRadius(
     Math.min(element.width, element.height),
@@ -290,6 +295,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
   context: CanvasRenderingContext2D,
   suggestedBinding: SuggestedPointBinding,
   elementsMap: ElementsMap,
+  zoom: InteractiveCanvasAppState["zoom"],
 ) => {
   const [element, startOrEnd, bindableElement] = suggestedBinding;
 
@@ -297,6 +303,7 @@ const renderBindingHighlightForSuggestedPointBinding = (
     bindableElement,
     bindableElement.width,
     bindableElement.height,
+    zoom,
   );
 
   context.strokeStyle = "rgba(0,0,0,0)";
@@ -395,7 +402,7 @@ const renderBindingHighlight = (
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  renderHighlight(context, suggestedBinding as any, elementsMap);
+  renderHighlight(context, suggestedBinding as any, elementsMap, appState.zoom);
 
   context.restore();
 };

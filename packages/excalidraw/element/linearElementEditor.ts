@@ -451,6 +451,7 @@ export class LinearElementEditor {
                 ),
                 elements,
                 elementsMap,
+                appState.zoom,
               )
             : null;
 
@@ -799,6 +800,7 @@ export class LinearElementEditor {
           scenePointer,
           elements,
           elementsMap,
+          app.state.zoom,
         ),
       };
 
@@ -919,11 +921,7 @@ export class LinearElementEditor {
 
     if (!event.altKey) {
       if (lastPoint === lastUncommittedPoint) {
-        LinearElementEditor.deletePoints(
-          element,
-          [points.length - 1],
-          elementsMap,
-        );
+        LinearElementEditor.deletePoints(element, [points.length - 1]);
       }
       return {
         ...appState.editingLinearElement,
@@ -1217,7 +1215,6 @@ export class LinearElementEditor {
   static deletePoints(
     element: NonDeleted<ExcalidrawLinearElement>,
     pointIndices: readonly number[],
-    elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   ) {
     let offsetX = 0;
     let offsetY = 0;
@@ -1270,6 +1267,8 @@ export class LinearElementEditor {
     },
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
+      isDragging?: boolean;
+      zoom?: AppState["zoom"];
     },
   ) {
     const { points } = element;
@@ -1321,6 +1320,7 @@ export class LinearElementEditor {
           false,
         ),
         changedElements: options?.changedElements,
+        zoom: options?.zoom,
       },
     );
   }
@@ -1434,6 +1434,7 @@ export class LinearElementEditor {
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
       isDragging?: boolean;
+      zoom?: AppState["zoom"];
     },
   ) {
     if (isElbowArrow(element)) {
@@ -1467,13 +1468,11 @@ export class LinearElementEditor {
         vector(offsetX, offsetY),
       );
 
-      mutateElement(
-        element,
-        updates,
-        true,
-        options?.isDragging,
-        options?.changedElements,
-      );
+      mutateElement(element, updates, true, {
+        isDragging: options?.isDragging,
+        changedElements: options?.changedElements,
+        zoom: options?.zoom,
+      });
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
       const prevCoords = getElementPointsCoords(element, element.points);
