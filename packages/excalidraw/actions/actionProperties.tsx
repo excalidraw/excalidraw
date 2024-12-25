@@ -1409,16 +1409,16 @@ const getArrowheadOptions = (flip: boolean) => {
       icon: <ArrowheadArrowIcon flip={flip} />,
     },
     {
-      value: "bar",
-      text: t("labels.arrowhead_bar"),
-      keyBinding: "3",
-      icon: <ArrowheadBarIcon flip={flip} />,
-    },
-    {
       value: "triangle",
       text: t("labels.arrowhead_triangle"),
       icon: <ArrowheadTriangleIcon flip={flip} />,
+      keyBinding: "3",
+    },
+    {
+      value: "bar",
+      text: t("labels.arrowhead_bar"),
       keyBinding: "q",
+      icon: <ArrowheadBarIcon flip={flip} />,
     },
     {
       value: "diamond",
