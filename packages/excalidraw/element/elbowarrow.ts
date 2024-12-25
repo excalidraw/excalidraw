@@ -120,7 +120,11 @@ const handleSegmentRelease = (
 
   const deletedIdx = arrow.fixedSegments[deletedSegmentIdx].index;
 
-  // We need to non-fixed arrow path to restore deleted segments
+  // Find prev and next fixed segments
+  const prevSegment = arrow.fixedSegments[deletedSegmentIdx - 1];
+  const nextSegment = arrow.fixedSegments[deletedSegmentIdx + 1];
+
+  // We need to render a sub-arrow path to restore deleted segments
   const {
     startHeading,
     endHeading,
@@ -129,9 +133,33 @@ const handleSegmentRelease = (
     hoveredStartElement,
     hoveredEndElement,
     ...rest
-  } = getElbowArrowData(arrow, elementsMap, updatedPoints, options);
+  } = getElbowArrowData(
+    {
+      x: arrow.x + (prevSegment ? prevSegment.end[0] : 0),
+      y: arrow.y + (prevSegment ? prevSegment.end[1] : 0),
+      startBinding: prevSegment ? null : arrow.startBinding,
+      endBinding: nextSegment ? null : arrow.endBinding,
+      startArrowhead: null,
+      endArrowhead: null,
+    },
+    elementsMap,
+    [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(
+        (nextSegment
+          ? nextSegment.start[0]
+          : arrow.points[arrow.points.length - 1][0]) -
+          (prevSegment ? prevSegment.end[0] : 0),
+        (nextSegment
+          ? nextSegment.start[1]
+          : arrow.points[arrow.points.length - 1][1]) -
+          (prevSegment ? prevSegment.end[1] : 0),
+      ),
+    ],
+    { isDragging: false },
+  );
 
-  const { points } = normalizeArrowElementUpdate(
+  const { points: restoredPoints } = normalizeArrowElementUpdate(
     getElbowArrowCornerPoints(
       removeElbowArrowShortSegments(
         routeElbowArrow(arrow, {
@@ -150,62 +178,72 @@ const handleSegmentRelease = (
     null,
   );
 
-  let start = points[deletedIdx - 1];
-  let end = points[deletedIdx];
-  let nextPoints = arrow.points;
-  let nextFixedSegments = fixedSegments;
+  debugClear();
+  restoredPoints.forEach((p) => {
+    debugDrawPoint(
+      pointFrom<GlobalPoint>(
+        startGlobalPoint[0] + p[0],
+        startGlobalPoint[1] + p[1],
+      ),
+      {
+        color: "blue",
+        permanent: true,
+        fuzzy: true,
+      },
+    );
+  });
 
-  if (points.length === arrow.points.length) {
-    nextFixedSegments = fixedSegments.map((segment) => {
-      const isHorizontal = headingForPointIsHorizontal(
-        segment.start,
-        segment.end,
+  const nextPoints: GlobalPoint[] = [];
+
+  // First part of the arrow are the old points
+  if (prevSegment) {
+    for (let i = 0; i < prevSegment.index; i++) {
+      nextPoints.push(
+        pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[i][0],
+          arrow.y + arrow.points[i][1],
+        ),
       );
-      let segmentEnd = segment.end;
-      let segmentStart = segment.start;
-
-      if (segment.index === deletedIdx - 1) {
-        start = pointFrom<LocalPoint>(
-          isHorizontal ? points[deletedIdx - 1][0] : segment.end[0],
-          !isHorizontal ? points[deletedIdx - 1][1] : segment.end[1],
-        );
-        segmentEnd = start;
-      }
-
-      if (segment.index === deletedIdx + 1) {
-        end = pointFrom<LocalPoint>(
-          isHorizontal ? points[deletedIdx][0] : segment.start[0],
-          !isHorizontal ? points[deletedIdx][1] : segment.start[1],
-        );
-        segmentStart = end;
-      }
-
-      return {
-        ...segment,
-        start: segmentStart,
-        end: segmentEnd,
-      };
-    });
-
-    nextPoints = arrow.points.map((p, i) => {
-      if (
-        !arrow.startIsSpecial &&
-        !arrow.endIsSpecial &&
-        i === deletedIdx - 1
-      ) {
-        return start;
-      }
-      if (!arrow.startIsSpecial && !arrow.endIsSpecial && i === deletedIdx) {
-        return end;
-      }
-      return p;
-    });
+    }
   }
 
+  for (const p of restoredPoints) {
+    nextPoints.push(
+      pointFrom<GlobalPoint>(
+        arrow.x + (prevSegment ? prevSegment.end[0] : 0) + p[0],
+        arrow.y + (prevSegment ? prevSegment.end[1] : 0) + p[1],
+      ),
+    );
+  }
+
+  // Last part of the arrow are the old points too
+  if (nextSegment) {
+    for (let i = nextSegment.index; i < arrow.points.length; i++) {
+      nextPoints.push(
+        pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[i][0],
+          arrow.y + arrow.points[i][1],
+        ),
+      );
+    }
+  }
+
+  // Update nextFixedSegments
+  const originalSegmentCountDiff =
+    (nextSegment?.index ?? arrow.points.length) - (prevSegment?.index ?? 0);
+  const nextFixedSegments = fixedSegments.map((segment) => {
+    if (segment.index > deletedIdx) {
+      return {
+        ...segment,
+        index: segment.index - originalSegmentCountDiff + restoredPoints.length,
+      };
+    }
+
+    return segment;
+  });
+
   return normalizeArrowElementUpdate(
-    nextPoints.map((p) =>
-      pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
-    ),
+    nextPoints,
     nextFixedSegments,
     false,
     false,
@@ -575,23 +613,23 @@ export const updateElbowArrowPoints = (
     isDragging?: boolean;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  debugClear();
-  arrow.fixedSegments?.forEach((segment) => {
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        arrow.x + segment.start[0],
-        arrow.y + segment.start[1],
-      ),
-      { color: "green", permanent: true, fuzzy: true },
-    );
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        arrow.x + segment.end[0],
-        arrow.y + segment.end[1],
-      ),
-      { color: "red", permanent: true, fuzzy: true },
-    );
-  });
+  // debugClear();
+  // arrow.fixedSegments?.forEach((segment) => {
+  //   debugDrawPoint(
+  //     pointFrom<GlobalPoint>(
+  //       arrow.x + segment.start[0],
+  //       arrow.y + segment.start[1],
+  //     ),
+  //     { color: "green", permanent: true, fuzzy: true },
+  //   );
+  //   debugDrawPoint(
+  //     pointFrom<GlobalPoint>(
+  //       arrow.x + segment.end[0],
+  //       arrow.y + segment.end[1],
+  //     ),
+  //     { color: "red", permanent: true, fuzzy: true },
+  //   );
+  // });
 
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
