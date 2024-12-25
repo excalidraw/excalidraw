@@ -1338,8 +1338,18 @@ class App extends React.Component<AppProps, AppState> {
     _cache: new Map(),
   };
 
+  private resetEditingFrame = (frame: ExcalidrawFrameLikeElement | null) => {
+    if (frame) {
+      mutateElement(frame, { name: frame.name?.trim() || null });
+    }
+    this.setState({ editingFrame: null });
+  };
+
   private renderFrameNames = () => {
     if (!this.state.frameRendering.enabled || !this.state.frameRendering.name) {
+      if (this.state.editingFrame) {
+        this.resetEditingFrame(null);
+      }
       return null;
     }
 
@@ -1361,6 +1371,9 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElementsMap(),
         )
       ) {
+        if (this.state.editingFrame === f.id) {
+          this.resetEditingFrame(f);
+        }
         // if frame not visible, don't render its name
         return null;
       }
@@ -1371,11 +1384,6 @@ class App extends React.Component<AppProps, AppState> {
       );
 
       const FRAME_NAME_EDIT_PADDING = 6;
-
-      const reset = () => {
-        mutateElement(f, { name: f.name?.trim() || null });
-        this.setState({ editingFrame: null });
-      };
 
       let frameNameJSX;
 
@@ -1394,13 +1402,13 @@ class App extends React.Component<AppProps, AppState> {
               });
             }}
             onFocus={(e) => e.target.select()}
-            onBlur={() => reset()}
+            onBlur={() => this.resetEditingFrame(f)}
             onKeyDown={(event) => {
               // for some inexplicable reason, `onBlur` triggered on ESC
               // does not reset `state.editingFrame` despite being called,
               // and we need to reset it here as well
               if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
-                reset();
+                this.resetEditingFrame(f);
               }
             }}
             style={{
