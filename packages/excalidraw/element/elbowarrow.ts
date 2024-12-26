@@ -14,7 +14,6 @@ import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
-import { debugClear, debugDrawPoint } from "../visualdebug";
 import type { AppState } from "../types";
 import {
   bindPointToSnapToElementOutline,
@@ -174,21 +173,6 @@ const handleSegmentRelease = (
     null,
     null,
   );
-
-  debugClear();
-  restoredPoints.forEach((p) => {
-    debugDrawPoint(
-      pointFrom<GlobalPoint>(
-        startGlobalPoint[0] + p[0],
-        startGlobalPoint[1] + p[1],
-      ),
-      {
-        color: "blue",
-        permanent: true,
-        fuzzy: true,
-      },
-    );
-  });
 
   const nextPoints: GlobalPoint[] = [];
 
