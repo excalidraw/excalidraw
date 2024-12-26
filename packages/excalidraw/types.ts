@@ -409,7 +409,6 @@ export interface AppState {
   croppingElementId: ExcalidrawElement["id"] | null;
 
   searchMatches: readonly SearchMatch[];
-  flippedFixedPointBindings: boolean;
 }
 
 type SearchMatch = {

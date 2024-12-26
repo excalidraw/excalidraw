@@ -25,7 +25,6 @@ import {
   isLinearElement,
 } from "../element/typeChecks";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { LinearElementEditor } from "../element/linearElementEditor";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -163,11 +162,6 @@ const flipElements = (
 
   elbowArrows.forEach((elbowArrow) => {
     mutateElement(elbowArrow, { points: elbowArrow.points });
-    LinearElementEditor.updateEditorMidPointsCache(
-      elbowArrow,
-      elementsMap,
-      app.state,
-    );
   });
 
   return selectedElements;

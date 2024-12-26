@@ -6424,7 +6424,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({
       selectedElementsAreBeingDragged: false,
-      flippedFixedPointBindings: false,
     });
 
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
@@ -6662,13 +6661,6 @@ class App extends React.Component<AppProps, AppState> {
 
     // Up event means that an operation is over. Update midpoints cache for
     // elbow arrows so we can react to new operations properly.
-    // if (hitElement && isElbowArrow(hitElement)) {
-    //   LinearElementEditor.updateEditorMidPointsCache(
-    //     hitElement,
-    //     this.scene.getNonDeletedElementsMap(),
-    //     this.state,
-    //   );
-    // }
     if (this.state.elbowLinearElement) {
       this.setState({
         elbowLinearElement: null,
