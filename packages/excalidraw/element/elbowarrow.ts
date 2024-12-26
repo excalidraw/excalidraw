@@ -358,7 +358,13 @@ const handleSegmentMove = (
 
   // First segment move needs an additional segment
   if (firstSegmentIdx === -1 && startIdx === 0) {
-    newPoints.unshift(start);
+    const startIsHorizontal = headingIsHorizontal(startHeading);
+    newPoints.unshift(
+      pointFrom<GlobalPoint>(
+        startIsHorizontal ? start[0] : arrow.x + arrow.points[0][0],
+        !startIsHorizontal ? start[1] : arrow.y + arrow.points[0][1],
+      ),
+    );
     newPoints.unshift(
       pointFrom<GlobalPoint>(
         arrow.x + arrow.points[0][0],
@@ -373,7 +379,17 @@ const handleSegmentMove = (
 
   // Last segment move needs an additional segment
   if (lastSegmentIdx === -1 && endIdx === arrow.points.length - 1) {
-    newPoints.push(end);
+    const endIsHorizontal = headingIsHorizontal(endHeading);
+    newPoints.push(
+      pointFrom<GlobalPoint>(
+        endIsHorizontal
+          ? end[0]
+          : arrow.x + arrow.points[arrow.points.length - 1][0],
+        !endIsHorizontal
+          ? end[1]
+          : arrow.y + arrow.points[arrow.points.length - 1][1],
+      ),
+    );
     newPoints.push(
       pointFrom<GlobalPoint>(
         arrow.x + arrow.points[arrow.points.length - 1][0],
