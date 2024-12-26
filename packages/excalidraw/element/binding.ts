@@ -2326,22 +2326,13 @@ export const getGlobalFixedPoints = (
 export const getArrowLocalFixedPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
-): LocalPoint[] => {
+) => {
   const [startPoint, endPoint] = getGlobalFixedPoints(arrow, elementsMap);
-  const points = Array.from(arrow.points);
 
-  points[0] = LinearElementEditor.pointFromAbsoluteCoords(
-    arrow,
-    startPoint,
-    elementsMap,
-  );
-  points[points.length - 1] = LinearElementEditor.pointFromAbsoluteCoords(
-    arrow,
-    endPoint,
-    elementsMap,
-  );
-
-  return points;
+  return [
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, startPoint, elementsMap),
+    LinearElementEditor.pointFromAbsoluteCoords(arrow, endPoint, elementsMap),
+  ];
 };
 
 export const normalizeFixedPoint = <T extends FixedPoint | null>(
