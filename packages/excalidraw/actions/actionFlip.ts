@@ -12,7 +12,6 @@ import { resizeMultipleElements } from "../element/resizeElements";
 import type { AppClassProperties, AppState } from "../types";
 import { arrayToMap } from "../utils";
 import { CODES, KEYS } from "../keys";
-import { getCommonBoundingBox } from "../element/bounds";
 import {
   bindOrUnbindLinearElements,
   isBindingEnabled,
@@ -146,19 +145,12 @@ const flipElements = (
     { elbowArrows: [], otherElements: [] },
   );
 
-  const { minX, minY, maxX, maxY } = getCommonBoundingBox(otherElements);
-
-  resizeMultipleElements(
-    elementsMap,
-    otherElements,
-    elementsMap,
-    "nw",
-    true,
-    true,
-    flipDirection === "horizontal" ? maxX : minX,
-    flipDirection === "horizontal" ? minY : maxY,
-    true,
-  );
+  resizeMultipleElements(otherElements, elementsMap, "nw", app.scene, {
+    flipByX: flipDirection === "horizontal",
+    flipByY: flipDirection === "vertical",
+    shouldResizeFromCenter: true,
+    shouldMaintainAspectRatio: true,
+  });
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
