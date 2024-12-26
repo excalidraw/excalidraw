@@ -460,7 +460,6 @@ const createBindingArrow = (
         point: bindingArrow.points[1],
       },
     ],
-    elementsMap as NonDeletedSceneElementsMap,
     undefined,
     {
       changedElements,

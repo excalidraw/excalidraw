@@ -1,10 +1,18 @@
-import type { ExcalidrawElement } from "./types";
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+  SceneElementsMap,
+} from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { isElbowArrow } from "./typeChecks";
+import { updateElbowArrowPoints } from "./elbowarrow";
+import type { Radians } from "../../math";
+import type { AppState } from "../types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -19,6 +27,11 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
+  options?: {
+    isDragging?: boolean;
+    changedElements?: Map<string, OrderedExcalidrawElement>;
+    zoom?: AppState["zoom"];
+  },
 ): TElement => {
   let didChange = false;
 
@@ -26,7 +39,37 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   // (see https://github.com/microsoft/TypeScript/issues/21732)
   const { points, fileId } = updates as any;
 
-  if (typeof points !== "undefined") {
+  if (isElbowArrow(element)) {
+    const { fixedSegments } = updates as any;
+    const mergedElementsMap = toBrandedType<SceneElementsMap>(
+      new Map([
+        ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
+        ...(options?.changedElements ?? []),
+      ]),
+    );
+
+    updates = {
+      ...updates,
+      angle: 0 as Radians,
+      ...((points || fixedSegments) &&
+        updateElbowArrowPoints(
+          {
+            ...element,
+            x: updates.x || element.x,
+            y: updates.y || element.y,
+          },
+          mergedElementsMap,
+          {
+            fixedSegments,
+            points,
+          },
+          {
+            isDragging: options?.isDragging,
+            zoom: options?.zoom,
+          },
+        )),
+    };
+  } else if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 

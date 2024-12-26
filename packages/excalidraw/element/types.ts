@@ -316,10 +316,17 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endArrowhead: Arrowhead | null;
   }>;
 
+export type FixedSegment = {
+  start: LocalPoint;
+  end: LocalPoint;
+  index: number;
+};
+
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
+    fixedSegments: FixedSegment[] | null;
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<
@@ -328,6 +335,9 @@ export type ExcalidrawElbowArrowElement = Merge<
     elbowed: true;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
+    fixedSegments: FixedSegment[] | null;
+    startIsSpecial: boolean | null;
+    endIsSpecial: boolean | null;
   }
 >;
 

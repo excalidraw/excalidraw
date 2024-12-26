@@ -18,6 +18,7 @@ import type {
   Zoom,
 } from "./types";
 import type { MaybePromise, ResolutionType } from "./utility-types";
+import deepEql from "deep-eql";
 
 let mockDateTime: string | null = null;
 
@@ -984,6 +985,32 @@ export const memoize = <T extends Record<string, any>, R extends any>(
   return ret as typeof func & { clear: () => void };
 };
 
+export const memo = <P extends Array<unknown>, R>(
+  func: (...args: P) => R,
+): ((...args: P) => R) => {
+  let lastArgs: P | undefined;
+  let lastResult: R | "__empty__placeholder__excalidraw__" =
+    "__empty__placeholder__excalidraw__";
+
+  return (...args: P): R => {
+    if (
+      lastArgs &&
+      lastArgs.length === args.length &&
+      deepEql(lastArgs, args) &&
+      lastResult !== "__empty__placeholder__excalidraw__"
+    ) {
+      return lastResult;
+    }
+
+    const result = func(...args);
+
+    lastArgs = args;
+    lastResult = result;
+
+    return result;
+  };
+};
+
 /** Checks if value is inside given collection. Useful for type-safety. */
 export const isMemberOf = <T extends string>(
   /** Set/Map/Array/Object */
@@ -1225,3 +1252,41 @@ export class PromisePool<T> {
     });
   }
 }
+
+export const multiDimensionalArrayDeepFilter = <T>(
+  matrix: T[][],
+  f: (item: T, index: number) => boolean,
+) => {
+  let pointer = 0;
+  return matrix
+    .map((group) => group.filter((item) => f(item, pointer++)))
+    .filter((group) => group.length > 0);
+};
+
+export const multiDimensionalArrayDeepMapper = <T, U>(
+  matrix: T[][],
+  f: (
+    item: T,
+    index: [rowIdx: number, colIdx: number],
+    arr: T[],
+    idx: number,
+  ) => U,
+) => {
+  let pointer = 0;
+  const flatArray = matrix.flat();
+  return matrix
+    .map((group, groupIdx) =>
+      group.map((item, idx) => f(item, [groupIdx, idx], flatArray, pointer++)),
+    )
+    .filter((group) => group.length > 0);
+};
+
+export const multiDimensionalArrayDeepFlatMapper = <T, U>(
+  matrix: T[][],
+  f: (
+    item: T,
+    index: [rowIdx: number, colIdx: number],
+    arr: T[],
+    idx: number,
+  ) => U,
+) => multiDimensionalArrayDeepMapper(matrix, f).flat();

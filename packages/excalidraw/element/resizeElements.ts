@@ -53,7 +53,6 @@ import {
 import { wrapText } from "./textWrapping";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
-import { mutateElbowArrow } from "./routing";
 import type { GlobalPoint } from "../../math";
 import {
   pointCenter,
@@ -531,8 +530,10 @@ const rotateMultipleElements = (
       );
 
       if (isElbowArrow(element)) {
-        const points = getArrowLocalFixedPoints(element, elementsMap);
-        mutateElbowArrow(element, elementsMap, points);
+        // Needed to re-route the arrow
+        mutateElement(element, {
+          points: getArrowLocalFixedPoints(element, elementsMap),
+        });
       } else {
         mutateElement(
           element,
@@ -1387,6 +1388,8 @@ export const resizeMultipleElements = (
         fontSize?: ExcalidrawTextElement["fontSize"];
         scale?: ExcalidrawImageElement["scale"];
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
+        startBinding?: ExcalidrawLinearElement["startBinding"];
+        endBinding?: ExcalidrawLinearElement["endBinding"];
       };
     }[] = [];
 

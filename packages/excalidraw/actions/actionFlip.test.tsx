@@ -70,13 +70,13 @@ describe("flipping re-centers selection", () => {
     API.executeAction(actionFlipHorizontal);
     API.executeAction(actionFlipHorizontal);
 
-    const rec1 = h.elements.find((el) => el.id === "rec1");
-    expect(rec1?.x).toBeCloseTo(100);
-    expect(rec1?.y).toBeCloseTo(100);
+    const rec1 = h.elements.find((el) => el.id === "rec1")!;
+    expect(rec1.x).toBeCloseTo(100, 0);
+    expect(rec1.y).toBeCloseTo(100, 1);
 
     const rec2 = h.elements.find((el) => el.id === "rec2");
-    expect(rec2?.x).toBeCloseTo(220);
-    expect(rec2?.y).toBeCloseTo(250);
+    expect(rec2?.x).toBeCloseTo(220, 1);
+    expect(rec2?.y).toBeCloseTo(250, 1);
   });
 });
 

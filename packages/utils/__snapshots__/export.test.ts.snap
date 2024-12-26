@@ -34,6 +34,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "editingGroupId": null,
   "editingLinearElement": null,
   "editingTextElement": null,
+  "elbowLinearElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
   "exportBackground": true,
@@ -42,6 +43,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "flippedFixedPointBindings": false,
   "followedBy": Set {},
   "frameRendering": {
     "clip": true,
