@@ -8377,12 +8377,6 @@ class App extends React.Component<AppProps, AppState> {
                   x: origElement.x,
                   y: origElement.y,
                 });
-                if (isElbowArrow(element)) {
-                  mutateElement(element, {
-                    startBinding: null,
-                    endBinding: null,
-                  });
-                }
 
                 // put duplicated element to pointerDownState.originalElements
                 // so that we can snap to the duplicated element without releasing
