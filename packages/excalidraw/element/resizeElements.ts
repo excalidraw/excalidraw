@@ -1388,8 +1388,6 @@ export const resizeMultipleElements = (
         fontSize?: ExcalidrawTextElement["fontSize"];
         scale?: ExcalidrawImageElement["scale"];
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
-        startBinding?: ExcalidrawLinearElement["startBinding"];
-        endBinding?: ExcalidrawLinearElement["endBinding"];
       };
     }[] = [];
 
