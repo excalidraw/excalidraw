@@ -3,7 +3,6 @@ import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
   ExcalidrawArrowElement,
-  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -19,12 +18,9 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
-import {
-  isArrowElement,
-  isElbowArrow,
-  isLinearElement,
-} from "../element/typeChecks";
-import { mutateElement, newElementWith } from "../element/mutateElement";
+import { isArrowElement, isLinearElement } from "../element/typeChecks";
+import { newElementWith } from "../element/mutateElement";
+import { deepCopyElement } from "../element/newElement";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -130,26 +126,24 @@ const flipElements = (
     });
   }
 
-  const { elbowArrows, otherElements } = selectedElements.reduce(
-    (
-      acc: {
-        elbowArrows: ExcalidrawElbowArrowElement[];
-        otherElements: ExcalidrawElement[];
-      },
-      element,
-    ) =>
-      isElbowArrow(element)
-        ? { ...acc, elbowArrows: acc.elbowArrows.concat(element) }
-        : { ...acc, otherElements: acc.otherElements.concat(element) },
-    { elbowArrows: [], otherElements: [] },
+  resizeMultipleElements(
+    selectedElements,
+    elementsMap,
+    "nw",
+    app.scene,
+    new Map(
+      Array.from(elementsMap.values()).map((element) => [
+        element.id,
+        deepCopyElement(element),
+      ]),
+    ),
+    {
+      flipByX: flipDirection === "horizontal",
+      flipByY: flipDirection === "vertical",
+      shouldResizeFromCenter: true,
+      shouldMaintainAspectRatio: true,
+    },
   );
-
-  resizeMultipleElements(otherElements, elementsMap, "nw", app.scene, {
-    flipByX: flipDirection === "horizontal",
-    flipByY: flipDirection === "vertical",
-    shouldResizeFromCenter: true,
-    shouldMaintainAspectRatio: true,
-  });
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
@@ -159,10 +153,6 @@ const flipElements = (
     isBindingEnabled(appState),
     [],
   );
-
-  elbowArrows.forEach((elbowArrow) => {
-    mutateElement(elbowArrow, { points: elbowArrow.points });
-  });
 
   return selectedElements;
 };

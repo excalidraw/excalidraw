@@ -10,6 +10,7 @@ import type {
   ExcalidrawImageElement,
   ElementsMap,
   SceneElementsMap,
+  ExcalidrawElbowArrowElement,
 } from "./types";
 import type { Mutable } from "../utility-types";
 import {
@@ -176,10 +177,10 @@ export const transformElements = (
         elementsMap,
         transformHandleType,
         scene,
+        originalElements,
         {
           shouldResizeFromCenter,
           shouldMaintainAspectRatio,
-          originalElementsMap: originalElements,
           flipByX,
           flipByY,
           nextWidth,
@@ -1202,6 +1203,7 @@ export const resizeMultipleElements = (
   elementsMap: ElementsMap,
   handleDirection: TransformHandleDirection,
   scene: Scene,
+  originalElementsMap: ElementsMap,
   {
     shouldMaintainAspectRatio = false,
     shouldResizeFromCenter = false,
@@ -1209,7 +1211,6 @@ export const resizeMultipleElements = (
     flipByY = false,
     nextHeight,
     nextWidth,
-    originalElementsMap,
     originalBoundingBox,
   }: {
     nextWidth?: number;
@@ -1218,7 +1219,6 @@ export const resizeMultipleElements = (
     shouldResizeFromCenter?: boolean;
     flipByX?: boolean;
     flipByY?: boolean;
-    originalElementsMap?: ElementsMap;
     // added to improve performance
     originalBoundingBox?: BoundingBox;
   } = {},
@@ -1388,6 +1388,8 @@ export const resizeMultipleElements = (
         fontSize?: ExcalidrawTextElement["fontSize"];
         scale?: ExcalidrawImageElement["scale"];
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
+        startBinding?: ExcalidrawElbowArrowElement["startBinding"];
+        endBinding?: ExcalidrawElbowArrowElement["endBinding"];
       };
     }[] = [];
 
@@ -1427,6 +1429,37 @@ export const resizeMultipleElements = (
         angle,
         ...rescaledPoints,
       };
+
+      if (isElbowArrow(orig)) {
+        // Mirror fixed point binding for elbow arrows
+        // when resize goes into the negative direction
+        if (orig.startBinding) {
+          update.startBinding = {
+            ...orig.startBinding,
+            fixedPoint: [
+              flipByX
+                ? -orig.startBinding.fixedPoint[0] + 1
+                : orig.startBinding.fixedPoint[0],
+              flipByY
+                ? -orig.startBinding.fixedPoint[1] + 1
+                : orig.startBinding.fixedPoint[1],
+            ],
+          };
+        }
+        if (orig.endBinding) {
+          update.endBinding = {
+            ...orig.endBinding,
+            fixedPoint: [
+              flipByX
+                ? -orig.endBinding.fixedPoint[0] + 1
+                : orig.endBinding.fixedPoint[0],
+              flipByY
+                ? -orig.endBinding.fixedPoint[1] + 1
+                : orig.endBinding.fixedPoint[1],
+            ],
+          };
+        }
+      }
 
       if (isImageElement(orig)) {
         update.scale = [
@@ -1473,7 +1506,10 @@ export const resizeMultipleElements = (
     } of elementsAndUpdates) {
       const { width, height, angle } = update;
 
-      mutateElement(element, update, false);
+      mutateElement(element, update, false, {
+        // needed for the fixed binding point udpate to take effect
+        isDragging: true,
+      });
 
       updateBoundElements(element, elementsMap as SceneElementsMap, {
         simultaneouslyUpdated: elementsToUpdate,
