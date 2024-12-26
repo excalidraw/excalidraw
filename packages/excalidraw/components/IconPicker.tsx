@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Popover } from "./Popover";
+import * as Popover from "@radix-ui/react-popover";
 
 import "./IconPicker.scss";
 import { isArrowKey, KEYS } from "../keys";
@@ -8,6 +8,7 @@ import clsx from "clsx";
 import Collapsible from "./Stats/Collapsible";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
+import { useDevice } from "..";
 
 const moreOptionsAtom = atom(false);
 
@@ -33,18 +34,7 @@ function Picker<T>({
   onClose: () => void;
   numberOfOptionsToAlwaysShow?: number;
 }) {
-  const rFirstItem = React.useRef<HTMLButtonElement>();
-  const rActiveItem = React.useRef<HTMLButtonElement>();
-  const rGallery = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    // After the component is first mounted focus on first input
-    if (rActiveItem.current) {
-      rActiveItem.current.focus();
-    } else if (rGallery.current) {
-      rGallery.current.focus();
-    }
-  }, []);
+  const device = useDevice();
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const pressedOption = options.find(
@@ -53,28 +43,17 @@ function Picker<T>({
 
     if (!(event.metaKey || event.altKey || event.ctrlKey) && pressedOption) {
       // Keybinding navigation
-      const index = options.indexOf(pressedOption);
-      (rGallery!.current!.children![index] as any).focus();
+      onChange(pressedOption.value);
+
       event.preventDefault();
     } else if (event.key === KEYS.TAB) {
-      // Tab navigation cycle through options. If the user tabs
-      // away from the picker, close the picker. We need to use
-      // a timeout here to let the stack clear before checking.
-      setTimeout(() => {
-        const active = rActiveItem.current;
-        const docActive = document.activeElement;
-        if (active !== docActive) {
-          onClose();
-        }
-      }, 0);
+      const index = options.findIndex((option) => option.value === value);
+      const nextIndex = (index + 1) % options.length;
+      onChange(options[nextIndex].value);
     } else if (isArrowKey(event.key)) {
       // Arrow navigation
-      const { activeElement } = document;
       const isRTL = getLanguage().rtl;
-      const index = Array.prototype.indexOf.call(
-        rGallery!.current!.children,
-        activeElement,
-      );
+      const index = options.findIndex((option) => option.value === value);
       if (index !== -1) {
         const length = options.length;
         let nextIndex = index;
@@ -82,19 +61,26 @@ function Picker<T>({
         switch (event.key) {
           // Select the next option
           case isRTL ? KEYS.ARROW_LEFT : KEYS.ARROW_RIGHT:
-          case KEYS.ARROW_DOWN: {
             nextIndex = (index + 1) % length;
             break;
-          }
           // Select the previous option
           case isRTL ? KEYS.ARROW_RIGHT : KEYS.ARROW_LEFT:
-          case KEYS.ARROW_UP: {
             nextIndex = (length + index - 1) % length;
+            break;
+          // Go the next row
+          case KEYS.ARROW_DOWN: {
+            nextIndex = (index + (numberOfOptionsToAlwaysShow ?? 1)) % length;
+            break;
+          }
+          // Go the previous row
+          case KEYS.ARROW_UP: {
+            nextIndex =
+              (length + index - (numberOfOptionsToAlwaysShow ?? 1)) % length;
             break;
           }
         }
 
-        (rGallery.current!.children![nextIndex] as any).focus();
+        onChange(options[nextIndex].value);
       }
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
@@ -128,7 +114,7 @@ function Picker<T>({
 
   const renderOptions = (options: Option<T>[]) => {
     return (
-      <div className="picker-content" ref={rGallery}>
+      <div className="picker-content">
         {options.map((option, i) => (
           <button
             type="button"
@@ -136,7 +122,6 @@ function Picker<T>({
               active: value === option.value,
             })}
             onClick={(event) => {
-              (event.currentTarget as HTMLButtonElement).focus();
               onChange(option.value);
             }}
             title={`${option.text} ${
@@ -145,16 +130,13 @@ function Picker<T>({
             aria-label={option.text || "none"}
             aria-keyshortcuts={option.keyBinding || undefined}
             key={option.text}
-            ref={(el) => {
-              if (el && i === 0) {
-                rFirstItem.current = el;
+            ref={(ref) => {
+              if (value === option.value) {
+                // Use a timeout here to render focus properly
+                setTimeout(() => {
+                  ref?.focus();
+                }, 0);
               }
-              if (el && option.value === value) {
-                rActiveItem.current = el;
-              }
-            }}
-            onFocus={() => {
-              onChange(option.value);
             }}
           >
             {option.icon}
@@ -168,28 +150,39 @@ function Picker<T>({
   };
 
   return (
-    <div
-      className={`picker`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={label}
+    <Popover.Content
+      side={
+        device.editor.isMobile && !device.viewport.isLandscape
+          ? "top"
+          : "bottom"
+      }
+      align="start"
+      sideOffset={12}
+      style={{ zIndex: "var(--zIndex-popup)" }}
       onKeyDown={handleKeyDown}
     >
-      {renderOptions(alwaysVisibleOptions)}
+      <div
+        className={`picker`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+      >
+        {renderOptions(alwaysVisibleOptions)}
 
-      {moreOptions.length > 0 && (
-        <Collapsible
-          label={t("labels.more_options")}
-          open={showMoreOptions}
-          openTrigger={() => {
-            setShowMoreOptions((value) => !value);
-          }}
-          className="picker-collapsible"
-        >
-          {renderOptions(moreOptions)}
-        </Collapsible>
-      )}
-    </div>
+        {moreOptions.length > 0 && (
+          <Collapsible
+            label={t("labels.more_options")}
+            open={showMoreOptions}
+            openTrigger={() => {
+              setShowMoreOptions((value) => !value);
+            }}
+            className="picker-collapsible"
+          >
+            {renderOptions(moreOptions)}
+          </Collapsible>
+        )}
+      </div>
+    </Popover.Content>
   );
 }
 
@@ -216,45 +209,36 @@ export function IconPicker<T>({
 }) {
   const [isActive, setActive] = React.useState(false);
   const rPickerButton = React.useRef<any>(null);
-  const isRTL = getLanguage().rtl;
 
   return (
     <div>
-      <button
-        name={group}
-        type="button"
-        className={isActive ? "active" : ""}
-        aria-label={label}
-        onClick={() => setActive(!isActive)}
-        ref={rPickerButton}
-      >
-        {options.find((option) => option.value === value)?.icon}
-      </button>
-      <React.Suspense fallback="">
-        {isActive ? (
-          <>
-            <Popover
-              onCloseRequest={(event) =>
-                event.target !== rPickerButton.current && setActive(false)
-              }
-              {...(isRTL ? { right: 5.5 } : { left: -5.5 })}
-            >
-              <Picker
-                options={options.filter((opt) => opt.showInPicker !== false)}
-                value={value}
-                label={label}
-                onChange={onChange}
-                onClose={() => {
-                  setActive(false);
-                  rPickerButton.current?.focus();
-                }}
-                numberOfOptionsToAlwaysShow={numberOfOptionsToAlwaysShow}
-              />
-            </Popover>
-            <div className="picker-triangle" />
-          </>
-        ) : null}
-      </React.Suspense>
+      <Popover.Root open={isActive} onOpenChange={(open) => setActive(open)}>
+        <Popover.Trigger
+          name={group}
+          type="button"
+          aria-label={label}
+          onClick={() => setActive(!isActive)}
+          ref={rPickerButton}
+          className={isActive ? "active" : ""}
+          style={{
+            border: "none",
+          }}
+        >
+          {options.find((option) => option.value === value)?.icon}
+        </Popover.Trigger>
+        {isActive && (
+          <Picker
+            options={options.filter((opt) => opt.showInPicker !== false)}
+            value={value}
+            label={label}
+            onChange={onChange}
+            onClose={() => {
+              setActive(false);
+            }}
+            numberOfOptionsToAlwaysShow={numberOfOptionsToAlwaysShow}
+          />
+        )}
+      </Popover.Root>
     </div>
   );
 }

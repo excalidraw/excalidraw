@@ -1399,38 +1399,32 @@ const getArrowheadOptions = (flip: boolean) => {
     {
       value: null,
       text: t("labels.arrowhead_none"),
-      keyBinding: "1",
+      keyBinding: "q",
       icon: ArrowheadNoneIcon,
     },
     {
       value: "arrow",
       text: t("labels.arrowhead_arrow"),
-      keyBinding: "2",
+      keyBinding: "w",
       icon: <ArrowheadArrowIcon flip={flip} />,
     },
     {
       value: "triangle",
       text: t("labels.arrowhead_triangle"),
       icon: <ArrowheadTriangleIcon flip={flip} />,
-      keyBinding: "3",
-    },
-    {
-      value: "bar",
-      text: t("labels.arrowhead_bar"),
-      keyBinding: "q",
-      icon: <ArrowheadBarIcon flip={flip} />,
+      keyBinding: "e",
     },
     {
       value: "diamond",
       text: t("labels.arrowhead_diamond"),
       icon: <ArrowheadDiamondIcon flip={flip} />,
-      keyBinding: "w",
+      keyBinding: "r",
       showInPicker: true,
     },
     {
       value: "circle",
       text: t("labels.arrowhead_circle"),
-      keyBinding: "e",
+      keyBinding: "a",
       icon: <ArrowheadCircleIcon flip={flip} />,
       showInPicker: true,
     },
@@ -1438,42 +1432,48 @@ const getArrowheadOptions = (flip: boolean) => {
       value: "triangle_outline",
       text: t("labels.arrowhead_triangle_outline"),
       icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
-      keyBinding: "a",
+      keyBinding: "s",
       showInPicker: true,
     },
     {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
-      keyBinding: "s",
+      keyBinding: "d",
       showInPicker: true,
     },
     {
       value: "circle_outline",
       text: t("labels.arrowhead_circle_outline"),
-      keyBinding: "d",
+      keyBinding: "f",
       icon: <ArrowheadCircleOutlineIcon flip={flip} />,
       showInPicker: true,
+    },
+    {
+      value: "bar",
+      text: t("labels.arrowhead_bar"),
+      keyBinding: "z",
+      icon: <ArrowheadBarIcon flip={flip} />,
     },
     {
       value: "crowfoot_many",
       text: t("labels.arrowhead_crowfoot_many"),
       icon: <ArrowheadCrowfootIcon flip={flip} />,
-      keyBinding: "z",
+      keyBinding: "x",
       showInPicker: true,
     },
     {
       value: "crowfoot_one",
       text: t("labels.arrowhead_crowfoot_one"),
       icon: <ArrowheadCrowfootOneIcon flip={flip} />,
-      keyBinding: "x",
+      keyBinding: "c",
       showInPicker: true,
     },
     {
       value: "crowfoot_one_or_many",
       text: t("labels.arrowhead_crowfoot_one_or_many"),
       icon: <ArrowheadCrowfootOneOrManyIcon flip={flip} />,
-      keyBinding: "c",
+      keyBinding: "v",
       showInPicker: true,
     },
   ] as const;
@@ -1538,7 +1538,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
-            numberOfOptionsToAlwaysShow={3}
+            numberOfOptionsToAlwaysShow={4}
           />
           <IconPicker
             label="arrowhead_end"
@@ -1555,7 +1555,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
-            numberOfOptionsToAlwaysShow={3}
+            numberOfOptionsToAlwaysShow={4}
           />
         </div>
       </fieldset>
