@@ -3,6 +3,7 @@ import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -18,9 +19,14 @@ import {
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
 import { StoreAction } from "../store";
-import { isArrowElement, isLinearElement } from "../element/typeChecks";
-import { newElementWith } from "../element/mutateElement";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isLinearElement,
+} from "../element/typeChecks";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import { deepCopyElement } from "../element/newElement";
+import { getCommonBoundingBox } from "../element/bounds";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
@@ -126,6 +132,8 @@ const flipElements = (
     });
   }
 
+  const { midX, midY } = getCommonBoundingBox(selectedElements);
+
   resizeMultipleElements(
     selectedElements,
     elementsMap,
@@ -152,7 +160,45 @@ const flipElements = (
     app.scene,
     isBindingEnabled(appState),
     [],
+    appState.zoom,
   );
+
+  // ---------------------------------------------------------------------------
+  // flipping arrow elements (and potentially other) makes the selection group
+  // "move" across the canvas because of how arrows can bump against the "wall"
+  // of the selection, so we need to center the group back to the original
+  // position so that repeated flips don't accumulate the offset
+
+  const { elbowArrows, otherElements } = selectedElements.reduce(
+    (
+      acc: {
+        elbowArrows: ExcalidrawElbowArrowElement[];
+        otherElements: ExcalidrawElement[];
+      },
+      element,
+    ) =>
+      isElbowArrow(element)
+        ? { ...acc, elbowArrows: acc.elbowArrows.concat(element) }
+        : { ...acc, otherElements: acc.otherElements.concat(element) },
+    { elbowArrows: [], otherElements: [] },
+  );
+
+  const { midX: newMidX, midY: newMidY } =
+    getCommonBoundingBox(selectedElements);
+  const [diffX, diffY] = [midX - newMidX, midY - newMidY];
+  otherElements.forEach((element) =>
+    mutateElement(element, {
+      x: element.x + diffX,
+      y: element.y + diffY,
+    }),
+  );
+  elbowArrows.forEach((element) =>
+    mutateElement(element, {
+      x: element.x + diffX,
+      y: element.y + diffY,
+    }),
+  );
+  // ---------------------------------------------------------------------------
 
   return selectedElements;
 };
