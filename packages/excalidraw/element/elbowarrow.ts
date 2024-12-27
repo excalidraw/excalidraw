@@ -38,7 +38,7 @@ import {
   headingIsHorizontal,
   vectorToHeading,
 } from "./heading";
-import type { ElementUpdate } from "./mutateElement";
+import { type ElementUpdate } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
@@ -95,6 +95,88 @@ type ElbowArrowData = {
 };
 
 const BASE_PADDING = 40;
+
+const handleSegmentRenormalization = (
+  arrow: ExcalidrawElbowArrowElement,
+  zoom?: AppState["zoom"],
+) => {
+  const nextFixedSegments: FixedSegment[] | null = arrow.fixedSegments
+    ? structuredClone(arrow.fixedSegments)
+    : null;
+  const nextPoints: GlobalPoint[] = [];
+
+  if (nextFixedSegments) {
+    arrow.points
+      .map((p) => pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]))
+      .forEach((p, i, points) => {
+        if (i < 3) {
+          return nextPoints.push(p);
+        }
+
+        if (
+          pointDistance(points[i - 2], points[i - 1]) <
+          1 + (zoom?.value ?? 0)
+        ) {
+          // Remove this as this was a fixed segment
+          const segmentIdx =
+            nextFixedSegments?.findIndex((segment) => segment.index === i) ??
+            -1;
+          if (segmentIdx !== -1) {
+            nextFixedSegments.splice(segmentIdx, 1);
+          }
+          // Remove the previous fixed segment as well if it exists
+          const prevSegmentIdx =
+            nextFixedSegments?.findIndex(
+              (segment) => segment.index === i - 1,
+            ) ?? -1;
+          if (prevSegmentIdx !== -1) {
+            nextFixedSegments.splice(prevSegmentIdx, 1);
+          }
+
+          // Update any additional fixed segments
+          nextFixedSegments.forEach((segment) => {
+            if (segment.index > i) {
+              segment.index -= 2;
+            }
+          });
+
+          // Remove aligned segment points
+          const isHorizontal = headingForPointIsHorizontal(
+            points[i - 2],
+            points[i - 1],
+          );
+          nextPoints.splice(-2, 2);
+          return nextPoints.push(
+            pointFrom<GlobalPoint>(
+              isHorizontal ? points[i - 2][0] : p[0],
+              !isHorizontal ? points[i - 2][1] : p[1],
+            ),
+          );
+        }
+
+        nextPoints.push(p);
+      });
+
+    return normalizeArrowElementUpdate(
+      nextPoints,
+      nextFixedSegments.filter(
+        (segment) =>
+          segment.index !== 1 && segment.index !== nextPoints.length - 1,
+      ),
+      arrow.startIsSpecial,
+      arrow.endIsSpecial,
+    );
+  }
+
+  return {
+    x: arrow.x,
+    y: arrow.y,
+    points: arrow.points,
+    fixedSegments: arrow.fixedSegments,
+    startIsSpecial: arrow.startIsSpecial,
+    endIsSpecial: arrow.endIsSpecial,
+  };
+};
 
 const handleSegmentRelease = (
   arrow: ExcalidrawElbowArrowElement,
@@ -649,7 +731,14 @@ export const updateElbowArrowPoints = (
   const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
 
   ////
-  // 1. Just normal elbow arrow things
+  // 1. Renormalize the arrow
+  ////
+  if (!updates.points && !updates.fixedSegments) {
+    return handleSegmentRenormalization(arrow, options?.zoom);
+  }
+
+  ////
+  // 2. Just normal elbow arrow things
   ////
   if (fixedSegments.length === 0) {
     const simplifiedPoints = getElbowArrowCornerPoints(
@@ -675,13 +764,13 @@ export const updateElbowArrowPoints = (
   }
 
   ////
-  // 2. Handle releasing a fixed segment
+  // 3. Handle releasing a fixed segment
   if ((arrow.fixedSegments?.length ?? 0) > fixedSegments.length) {
     return handleSegmentRelease(arrow, fixedSegments, elementsMap);
   }
 
   ////
-  // 3. Handle manual segment move
+  // 4. Handle manual segment move
   ////
   if (!updates.points) {
     return handleSegmentMove(
@@ -695,7 +784,7 @@ export const updateElbowArrowPoints = (
   }
 
   ////
-  // 4. One or more segments are fixed and endpoints are moved
+  // 5. One or more segments are fixed and endpoints are moved
   //
   // The key insights are:
   // - When segments are fixed, the arrow will keep the exact amount of segments

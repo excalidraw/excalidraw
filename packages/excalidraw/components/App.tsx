@@ -8715,6 +8715,17 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
       } else if (this.state.selectedLinearElement) {
+        // Normalize elbow arrow points, remove close parallel segments
+        if (this.state.selectedLinearElement.elbowed) {
+          const element = LinearElementEditor.getElement(
+            this.state.selectedLinearElement.elementId,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          if (element) {
+            mutateElement(element, {}, true, { zoom: this.state.zoom });
+          }
+        }
+
         if (
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
