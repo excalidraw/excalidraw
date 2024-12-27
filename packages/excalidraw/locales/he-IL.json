@@ -31,7 +31,7 @@
     "strokeStyle_dashed": "מקווקו",
     "strokeStyle_dotted": "מנוקד",
     "sloppiness": "רישול",
-    "opacity": "אטימות",
+    "opacity": "שקיפות",
     "textAlign": "יישור טקסט",
     "edges": "קצוות",
     "sharp": "חד",
@@ -125,13 +125,13 @@
     "createContainerFromText": "ארוז טקסט במיכל",
     "link": {
       "edit": "עריכת קישור",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "עריכת קישור מוטמע",
+      "create": "הוספת קישור",
       "label": "קישור",
       "labelEmbed": "קשר ושבץ",
       "empty": "לא נקבע קישור",
-      "hint": "",
-      "goToElement": ""
+      "hint": "יש להקליד או להדביק את הקישור שלך כאן",
+      "goToElement": "העברה לפריט הנבחר"
     },
     "lineEditor": {
       "edit": "ערוך קו",
@@ -157,15 +157,15 @@
     "zoomToFit": "להציג את כל האלמנטים",
     "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
     "autoResize": "לאפשר התאמה אוטומטית של גודל הטקסט",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": ""
+    "imageCropping": "חתיכת תמונה",
+    "unCroppedDimension": "מימדים לא חתוכים",
+    "copyElementLink": "העתקת קישור לפריט",
+    "linkToElement": "קישור לפריט"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "קישור לפריט",
+    "desc": "יש ללחוץ על צורה בקנבס או להדביק קישור.",
+    "notFound": "פריט מקושר לא נמצא בקנבס."
   },
   "library": {
     "noItems": "עוד לא הוספת דברים...",
@@ -320,7 +320,7 @@
     "arrowTool": "לחצו כדי ליצור מספר נקודות, משכו כדי ליצור קו בודד. לחצו על {{arrowShortcut}} שוב כדי לשנות את סוג החץ.",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
-    "embeddable": "הקליקו וגררו כדי ליצור הטמעת אתר",
+    "embeddable": "לחצו וגררו כדי ליצור הטמעת אתר",
     "text_selected": "לחץ לחיצה כפולה או הקש על אנטר לעריכת הטקסט",
     "text_editing": "כדי לסיים את העריכה לחץ על מקש Escape או על Ctrl (Cmd במחשבי אפל) ומקש Enter",
     "linearElementMulti": "הקלק על הנקודה האחרונה או הקש Escape או Enter לסיום",
@@ -339,8 +339,8 @@
     "eraserRevert": "החזק Alt להחזרת רכיבים מסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
     "disableSnapping": "החזיקו את מקש Ctrl או Cmd כדי להשבית את ההצמדה",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "אפשר ללחוץ כפול על התמונה או ללחוץ Enter כדי לחתוך את התמונה",
+    "leaveCropEditor": "אפשר ללחוץ מחוץ לתמונה או ללחוץ Enter או Escape כדי לסיים לחתוך"
   },
   "canvasError": {
     "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
@@ -412,8 +412,8 @@
     "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
     "movePageUpDown": "זוז עמוד למעלה/למטה",
     "movePageLeftRight": "זוז עמוד שמאלה/ימינה",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "חיתוך תמונה",
+    "cropFinish": "סיים לחתוך תמונה"
   },
   "clearCanvasDialog": {
     "title": "ניקוי הקנבס"
@@ -504,7 +504,7 @@
     "copyStyles": "סגנונות הועתקו.",
     "copyToClipboard": "הועתק ללוח.",
     "copyToClipboardAsPng": "{{exportSelection}} הועתקה ללוח כ-PNG\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} הועתקה ללוח כ-SVG\n({{exportColorScheme}})",
     "fileSaved": "קובץ נשמר.",
     "fileSavedToFilename": "נשמר לקובץ {filename}",
     "canvas": "קנבאס",
@@ -512,7 +512,7 @@
     "pasteAsSingleElement": "השתמש ב- {{shortcut}} כדי להדביק כפריט יחיד,\nאו הדבק לתוך עורך טקסט קיים",
     "unableToEmbed": "הטמעת כתובת הרשת הזו אינה מותרת לעת עתה. העלו סוגיה ב-GitHub כדי לבקש שכתובת זו תכנס לרשימה המותרת",
     "unrecognizedLinkFormat": "הקישור שהוטמע אינו בפורמט המצופה. אנא נסו להדביק מחדש את מחרוזת ההטמעה מהאתר המבוקש",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "קישור הועתק ללוח"
   },
   "colors": {
     "transparent": "שקוף",
