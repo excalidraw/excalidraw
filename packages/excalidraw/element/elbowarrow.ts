@@ -302,12 +302,16 @@ const handleSegmentRelease = (
 
   // Update nextFixedSegments
   const originalSegmentCountDiff =
-    (nextSegment?.index ?? arrow.points.length) - (prevSegment?.index ?? 0);
+    (nextSegment?.index ?? arrow.points.length - 1) - (prevSegment?.index ?? 1);
+
   const nextFixedSegments = fixedSegments.map((segment) => {
     if (segment.index > deletedIdx) {
       return {
         ...segment,
-        index: segment.index - originalSegmentCountDiff + restoredPoints.length,
+        index:
+          segment.index -
+          originalSegmentCountDiff +
+          (restoredPoints.length - 1),
       };
     }
 
@@ -325,7 +329,7 @@ const handleSegmentRelease = (
       if (compareHeading(prevHeading, nextHeading)) {
         // Are we removing a fixed segment?
         const fixedSegmentIdxToRemove = nextFixedSegments.findIndex(
-          (segment) => segment.index === i + 1,
+          (segment) => segment.index === i,
         );
         if (fixedSegmentIdxToRemove > -1) {
           nextFixedSegments.splice(fixedSegmentIdxToRemove, 1);
