@@ -12,7 +12,7 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 
 Throughout the documentation we use live, editable Excalidraw examples like the one shown below.
 
-While we aim for the examples to closely reflect what you'd get if you rendered it yourself, we actually initialize it with some props behind the scenes.  
+While we aim for the examples to closely reflect what you'd get if you rendered it yourself, we actually initialize it with some props behind the scenes.
 For example, we're passing a `theme` prop to it based on the current color theme of the docs you're just reading.
 
 :::
@@ -70,9 +70,9 @@ If you are using `pages router` then importing the wrapper dynamically would wor
       height: 141.9765625,
     },]));
     return (
-      <div style={{height:"500px", width:"500px"}}>  
+      <div style={{height:"500px", width:"500px"}}>
         <Excalidraw />
-      </div> 
+      </div>
     );
   };
   export default ExcalidrawWrapper;
@@ -84,8 +84,8 @@ If you are using `pages router` then importing the wrapper dynamically would wor
 
   ```jsx showLineNumbers
   import dynamic from "next/dynamic";
-  
-  // Since client components get prerenderd on server as well hence importing 
+
+  // Since client components get prerenderd on server as well hence importing
   // the excalidraw stuff dynamically with ssr false
 
   const ExcalidrawWrapper = dynamic(
@@ -97,7 +97,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
 
   export default function Page() {
     return (
-      <ExcalidrawWrapper />      
+      <ExcalidrawWrapper />
     );
   }
   ```
@@ -108,7 +108,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
   ```jsx showLineNumbers
   import dynamic from "next/dynamic";
 
-  // Since client components get prerenderd on server as well hence importing 
+  // Since client components get prerenderd on server as well hence importing
   // the excalidraw stuff dynamically with ssr false
 
   const ExcalidrawWrapper = dynamic(
@@ -153,7 +153,7 @@ Since Vite removes env variables by default, you can update the vite config to e
     "process.env.IS_PREACT": JSON.stringify("true"),
   },
 ```
-::: 
+:::
 
 ## Browser
 
@@ -235,3 +235,5 @@ root.render(React.createElement(App));
 
 </TabItem>
 </Tabs>
+
+You can try it out [here](https://codesandbox.io/p/sandbox/excalidraw-in-browser-tlqom?file=%2Findex.html%3A1%2C10).
