@@ -521,6 +521,12 @@ const renderLinearPointHandles = (
       element.fixedSegments?.map((segment) => segment.index) || [];
     points.slice(0, -1).forEach((p, idx) => {
       if (
+        !LinearElementEditor.isElbowSegmentTooShort(
+          idx,
+          p,
+          points[idx + 1],
+          points,
+        ) &&
         !LinearElementEditor.isSegmentTooShort(
           element,
           p,

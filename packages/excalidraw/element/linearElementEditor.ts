@@ -70,6 +70,7 @@ import {
 } from "../shapes";
 import { getGridPoint } from "../snapping";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
+import { BASE_PADDING } from "./elbowarrow";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -636,16 +637,26 @@ export class LinearElementEditor {
     return null;
   };
 
-  static isSegmentTooShort(
+  static isElbowSegmentTooShort<P extends GlobalPoint | LocalPoint>(
+    index: number,
+    startPoint: P,
+    endPoint: P,
+    points: readonly P[],
+  ): boolean {
+    if (index === 0 || index === points.length - 2) {
+      return pointDistance(startPoint, endPoint) <= BASE_PADDING;
+    }
+
+    return false;
+  }
+
+  static isSegmentTooShort<P extends GlobalPoint | LocalPoint>(
     element: NonDeleted<ExcalidrawLinearElement>,
-    startPoint: GlobalPoint | LocalPoint,
-    endPoint: GlobalPoint | LocalPoint,
+    startPoint: P,
+    endPoint: P,
     zoom: Zoom,
   ) {
-    let distance = pointDistance(
-      pointFrom(startPoint[0], startPoint[1]),
-      pointFrom(endPoint[0], endPoint[1]),
-    );
+    let distance = pointDistance(startPoint, endPoint);
     if (element.points.length > 2 && element.roundness) {
       distance = getBezierCurveLength(element, endPoint);
     }
@@ -1837,6 +1848,12 @@ export class LinearElementEditor {
     const midpoints: (GlobalPoint | null)[] = [];
     while (index < points.length) {
       if (
+        LinearElementEditor.isElbowSegmentTooShort(
+          index - 1,
+          element.points[index - 1],
+          element.points[index],
+          element.points,
+        ) ||
         LinearElementEditor.isSegmentTooShort(
           element,
           element.points[index - 1],
