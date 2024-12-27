@@ -115,8 +115,11 @@ const handleSegmentRenormalization = (
         }
 
         if (
-          pointDistance(points[i - 2], points[i - 1]) <
-          1 + (zoom?.value ?? 0)
+          compareHeading(
+            headingForPoint(p, points[i - 1]),
+            headingForPoint(points[i - 2], points[i - 3]),
+          ) &&
+          pointDistance(points[i - 2], points[i - 1]) < 1 + (zoom?.value ?? 0)
         ) {
           // Remove this as this was a fixed segment
           const segmentIdx =
@@ -302,7 +305,9 @@ const handleSegmentRelease = (
 
   // Update nextFixedSegments
   const originalSegmentCountDiff =
-    (nextSegment?.index ?? arrow.points.length - 1) - (prevSegment?.index ?? 1);
+    (nextSegment?.index ?? arrow.points.length - 1) -
+    (prevSegment?.index ?? 0) -
+    1;
 
   const nextFixedSegments = fixedSegments.map((segment) => {
     if (segment.index > deletedIdx) {
@@ -374,8 +379,6 @@ const handleSegmentMove = (
   fixedSegments: FixedSegment[],
   startHeading: Heading,
   endHeading: Heading,
-  hoveredStartElement: ExcalidrawBindableElement | null,
-  hoveredEndElement: ExcalidrawBindableElement | null,
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
@@ -407,49 +410,6 @@ const handleSegmentMove = (
     arrow.fixedSegments?.findIndex(
       (segment) => segment.index === arrow.points.length - 1,
     ) ?? -1;
-
-  if (
-    firstSegmentIdx === -1 &&
-    fixedSegments[activelyModifiedSegmentIdx].index === 1 &&
-    hoveredStartElement
-  ) {
-    const startIsHorizontal = headingIsHorizontal(startHeading);
-    const startIsPositive = startIsHorizontal
-      ? compareHeading(startHeading, HEADING_RIGHT)
-      : compareHeading(startHeading, HEADING_DOWN);
-    fixedSegments[activelyModifiedSegmentIdx].start = pointFrom<LocalPoint>(
-      fixedSegments[activelyModifiedSegmentIdx].start[0] +
-        (startIsHorizontal
-          ? startIsPositive
-            ? BASE_PADDING
-            : -BASE_PADDING
-          : 0),
-      fixedSegments[activelyModifiedSegmentIdx].start[1] +
-        (!startIsHorizontal
-          ? startIsPositive
-            ? BASE_PADDING
-            : -BASE_PADDING
-          : 0),
-    );
-  }
-
-  if (
-    lastSegmentIdx === -1 &&
-    fixedSegments[activelyModifiedSegmentIdx].index ===
-      arrow.points.length - 1 &&
-    hoveredEndElement
-  ) {
-    const endIsHorizontal = headingIsHorizontal(endHeading);
-    const endIsPositive = endIsHorizontal
-      ? compareHeading(endHeading, HEADING_RIGHT)
-      : compareHeading(endHeading, HEADING_DOWN);
-    fixedSegments[activelyModifiedSegmentIdx].end = pointFrom<LocalPoint>(
-      fixedSegments[activelyModifiedSegmentIdx].end[0] +
-        (endIsHorizontal ? (endIsPositive ? BASE_PADDING : -BASE_PADDING) : 0),
-      fixedSegments[activelyModifiedSegmentIdx].end[1] +
-        (!endIsHorizontal ? (endIsPositive ? BASE_PADDING : -BASE_PADDING) : 0),
-    );
-  }
 
   const nextFixedSegments = fixedSegments.map((segment) => ({
     ...segment,
@@ -826,14 +786,7 @@ export const updateElbowArrowPoints = (
   // 4. Handle manual segment move
   ////
   if (!updates.points) {
-    return handleSegmentMove(
-      arrow,
-      fixedSegments,
-      startHeading,
-      endHeading,
-      hoveredStartElement,
-      hoveredEndElement,
-    );
+    return handleSegmentMove(arrow, fixedSegments, startHeading, endHeading);
   }
 
   ////
