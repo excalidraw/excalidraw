@@ -314,38 +314,45 @@ const handleSegmentRelease = (
     return segment;
   });
 
-  const simplifiedPoints = nextPoints
-    .map((p, i) => {
-      const prev = nextPoints[i - 1];
-      const next = nextPoints[i + 1];
+  const simplifiedPoints = nextPoints.flatMap((p, i) => {
+    const prev = nextPoints[i - 1];
+    const next = nextPoints[i + 1];
 
-      if (prev && next) {
-        const prevHeading = headingForPoint(p, prev);
-        const nextHeading = headingForPoint(next, p);
+    if (prev && next) {
+      const prevHeading = headingForPoint(p, prev);
+      const nextHeading = headingForPoint(next, p);
 
-        if (compareHeading(prevHeading, nextHeading)) {
-          // Are we removing a fixed segment?
-          const fixedSegmentIdxToRemove = nextFixedSegments.findIndex(
-            (segment) => segment.index === i + 1,
-          );
-          if (fixedSegmentIdxToRemove > -1) {
-            nextFixedSegments.splice(fixedSegmentIdxToRemove, 1);
-          }
-
-          // Update subsequent fixed segment indices
-          nextFixedSegments.forEach((segment) => {
-            if (segment.index > i) {
-              segment.index -= 1;
-            }
-          });
-
-          return null;
+      if (compareHeading(prevHeading, nextHeading)) {
+        // Are we removing a fixed segment?
+        const fixedSegmentIdxToRemove = nextFixedSegments.findIndex(
+          (segment) => segment.index === i + 1,
+        );
+        if (fixedSegmentIdxToRemove > -1) {
+          nextFixedSegments.splice(fixedSegmentIdxToRemove, 1);
         }
-      }
 
-      return p;
-    })
-    .filter((p): p is GlobalPoint => p !== null);
+        // Update subsequent fixed segment indices
+        nextFixedSegments.forEach((segment) => {
+          if (segment.index > i) {
+            segment.index -= 1;
+          }
+        });
+
+        return [];
+      } else if (compareHeading(prevHeading, flipHeading(nextHeading))) {
+        // Update subsequent fixed segment indices
+        nextFixedSegments.forEach((segment) => {
+          if (segment.index > i) {
+            segment.index += 1;
+          }
+        });
+
+        return [p, p];
+      }
+    }
+
+    return [p];
+  });
 
   return normalizeArrowElementUpdate(
     simplifiedPoints,
