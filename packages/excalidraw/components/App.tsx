@@ -6437,6 +6437,9 @@ class App extends React.Component<AppProps, AppState> {
       const hitElement = this.getElementAtPosition(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
+        {
+          preferSelected: true,
+        },
       );
       const linearElementEditor =
         hitElement && isElbowArrow(hitElement)
