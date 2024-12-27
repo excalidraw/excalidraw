@@ -151,10 +151,20 @@ const handleSegmentRenormalization = (
             points[i - 1],
           );
           nextPoints.splice(-2, 2);
+
+          if (i === 3) {
+            return nextPoints.push(
+              pointFrom<GlobalPoint>(
+                isHorizontal ? points[i - 2][0] : p[0],
+                !isHorizontal ? points[i - 2][1] : p[1],
+              ),
+            );
+          }
+
           return nextPoints.push(
             pointFrom<GlobalPoint>(
-              isHorizontal ? points[i - 2][0] : p[0],
-              !isHorizontal ? points[i - 2][1] : p[1],
+              isHorizontal ? points[i - 1][0] : p[0],
+              !isHorizontal ? points[i - 1][1] : p[1],
             ),
           );
         }
