@@ -220,9 +220,6 @@ export function IconPicker<T>({
           onClick={() => setActive(!isActive)}
           ref={rPickerButton}
           className={isActive ? "active" : ""}
-          style={{
-            border: "none",
-          }}
         >
           {options.find((option) => option.value === value)?.icon}
         </Popover.Trigger>
