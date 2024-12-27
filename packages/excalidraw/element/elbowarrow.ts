@@ -37,6 +37,7 @@ import {
   headingForPointIsHorizontal,
   headingIsHorizontal,
   vectorToHeading,
+  headingForPoint,
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
 import { isBindableElement, isRectanguloidElement } from "./typeChecks";
@@ -213,8 +214,12 @@ const handleSegmentRelease = (
     ...rest
   } = getElbowArrowData(
     {
-      x: arrow.x + (prevSegment ? prevSegment.end[0] : 0),
-      y: arrow.y + (prevSegment ? prevSegment.end[1] : 0),
+      x:
+        arrow.x +
+        (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0),
+      y:
+        arrow.y +
+        (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0),
       startBinding: prevSegment ? null : arrow.startBinding,
       endBinding: nextSegment ? null : arrow.endBinding,
       startArrowhead: null,
@@ -225,13 +230,13 @@ const handleSegmentRelease = (
       pointFrom<LocalPoint>(0, 0),
       pointFrom<LocalPoint>(
         (nextSegment
-          ? nextSegment.start[0]
+          ? (nextSegment.start[0] + nextSegment.end[0]) / 2
           : arrow.points[arrow.points.length - 1][0]) -
-          (prevSegment ? prevSegment.end[0] : 0),
+          (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0),
         (nextSegment
-          ? nextSegment.start[1]
+          ? (nextSegment.start[1] + nextSegment.end[1]) / 2
           : arrow.points[arrow.points.length - 1][1]) -
-          (prevSegment ? prevSegment.end[1] : 0),
+          (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0),
       ),
     ],
     { isDragging: false },
@@ -270,14 +275,38 @@ const handleSegmentRelease = (
     }
   }
 
-  for (const p of restoredPoints) {
+  restoredPoints.forEach((p, i) => {
+    // if (
+    //   i === 0 &&
+    //   compareHeading(
+    //     headingForPoint(
+    //       nextPoints[nextPoints.length - 1],
+    //       nextPoints[nextPoints.length - 2],
+    //     ),
+    //     headingForPoint(restoredPoints[1], restoredPoints[0]),
+    //   )
+    // ) {
+    //   nextPoints[nextPoints.length - 1] = pointFrom<GlobalPoint>(
+    //     arrow.x +
+    //       (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0) +
+    //       p[0],
+    //     arrow.y +
+    //       (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0) +
+    //       p[1],
+    //   );
+    // }
+
     nextPoints.push(
       pointFrom<GlobalPoint>(
-        arrow.x + (prevSegment ? prevSegment.end[0] : 0) + p[0],
-        arrow.y + (prevSegment ? prevSegment.end[1] : 0) + p[1],
+        arrow.x +
+          (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0) +
+          p[0],
+        arrow.y +
+          (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0) +
+          p[1],
       ),
     );
-  }
+  });
 
   // Last part of the arrow are the old points too
   if (nextSegment) {

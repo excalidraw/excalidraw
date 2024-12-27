@@ -11211,7 +11211,7 @@ History {
                 "gap": "3.53708",
               },
               "fillStyle": "solid",
-              "fixedSegments": [],
+              "fixedSegments": null,
               "frameId": null,
               "groupIds": [],
               "height": "236.10000",
