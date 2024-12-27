@@ -275,27 +275,7 @@ const handleSegmentRelease = (
     }
   }
 
-  restoredPoints.forEach((p, i) => {
-    // if (
-    //   i === 0 &&
-    //   compareHeading(
-    //     headingForPoint(
-    //       nextPoints[nextPoints.length - 1],
-    //       nextPoints[nextPoints.length - 2],
-    //     ),
-    //     headingForPoint(restoredPoints[1], restoredPoints[0]),
-    //   )
-    // ) {
-    //   nextPoints[nextPoints.length - 1] = pointFrom<GlobalPoint>(
-    //     arrow.x +
-    //       (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0) +
-    //       p[0],
-    //     arrow.y +
-    //       (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0) +
-    //       p[1],
-    //   );
-    // }
-
+  restoredPoints.forEach((p) => {
     nextPoints.push(
       pointFrom<GlobalPoint>(
         arrow.x +
@@ -334,8 +314,41 @@ const handleSegmentRelease = (
     return segment;
   });
 
+  const simplifiedPoints = nextPoints
+    .map((p, i) => {
+      const prev = nextPoints[i - 1];
+      const next = nextPoints[i + 1];
+
+      if (prev && next) {
+        const prevHeading = headingForPoint(p, prev);
+        const nextHeading = headingForPoint(next, p);
+
+        if (compareHeading(prevHeading, nextHeading)) {
+          // Are we removing a fixed segment?
+          const fixedSegmentIdxToRemove = nextFixedSegments.findIndex(
+            (segment) => segment.index === i + 1,
+          );
+          if (fixedSegmentIdxToRemove > -1) {
+            nextFixedSegments.splice(fixedSegmentIdxToRemove, 1);
+          }
+
+          // Update subsequent fixed segment indices
+          nextFixedSegments.forEach((segment) => {
+            if (segment.index > i) {
+              segment.index -= 1;
+            }
+          });
+
+          return null;
+        }
+      }
+
+      return p;
+    })
+    .filter((p): p is GlobalPoint => p !== null);
+
   return normalizeArrowElementUpdate(
-    nextPoints,
+    simplifiedPoints,
     nextFixedSegments,
     false,
     false,
