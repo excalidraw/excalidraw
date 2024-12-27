@@ -53,7 +53,6 @@ import type {
   FixedPointBinding,
   FixedSegment,
 } from "./types";
-import { debugDrawPoint } from "../visualdebug";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
