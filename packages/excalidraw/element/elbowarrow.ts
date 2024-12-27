@@ -53,6 +53,7 @@ import type {
   FixedPointBinding,
   FixedSegment,
 } from "./types";
+import { debugDrawPoint } from "../visualdebug";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
@@ -305,9 +306,7 @@ const handleSegmentRelease = (
 
   // Update nextFixedSegments
   const originalSegmentCountDiff =
-    (nextSegment?.index ?? arrow.points.length - 1) -
-    (prevSegment?.index ?? 0) -
-    1;
+    (nextSegment?.index ?? arrow.points.length) - (prevSegment?.index ?? 0) - 1;
 
   const nextFixedSegments = fixedSegments.map((segment) => {
     if (segment.index > deletedIdx) {
@@ -332,14 +331,6 @@ const handleSegmentRelease = (
       const nextHeading = headingForPoint(next, p);
 
       if (compareHeading(prevHeading, nextHeading)) {
-        // Are we removing a fixed segment?
-        const fixedSegmentIdxToRemove = nextFixedSegments.findIndex(
-          (segment) => segment.index === i,
-        );
-        if (fixedSegmentIdxToRemove > -1) {
-          nextFixedSegments.splice(fixedSegmentIdxToRemove, 1);
-        }
-
         // Update subsequent fixed segment indices
         nextFixedSegments.forEach((segment) => {
           if (segment.index > i) {
