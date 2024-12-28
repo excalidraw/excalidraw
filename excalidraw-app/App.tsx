@@ -128,6 +128,7 @@ import DebugCanvas, {
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import { isElementLink } from "../packages/excalidraw/element/elementLink";
+import { ActionDraw } from "./components/ActionDraw";
 
 polyfill();
 
@@ -385,6 +386,10 @@ const ExcalidrawWrapper = () => {
         delete window.visualDebug;
       }
       forceRefresh((prev) => !prev);
+
+      if (excalidrawAPI) {
+        ActionDraw(excalidrawAPI);
+      }
     }
   }, [excalidrawAPI]);
 
