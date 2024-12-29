@@ -15,10 +15,213 @@ import type { ExcalidrawImperativeAPI } from "../types";
 import type { SceneElementsMap } from "../element/types";
 import type {
   CLIENT_INCREMENT,
+  CLIENT_MESSAGE_RAW,
   PUSH_PAYLOAD,
   SERVER_INCREMENT,
 } from "./protocol";
 import { debounce } from "../utils";
+import { randomId } from "../random";
+
+class SocketMessage implements CLIENT_MESSAGE_RAW {
+  constructor(
+    public readonly type: "relay" | "pull" | "push",
+    public readonly payload: string,
+    public readonly chunkInfo: {
+      id: string;
+      order: number;
+      count: number;
+    } = {
+      id: "",
+      order: 0,
+      count: 1,
+    },
+  ) {}
+}
+
+class SocketClient {
+  // Max size for outgoing messages is 1MiB (due to CFDO limits),
+  // thus working with a slighter smaller limit of 800 kB (leaving 224kB for metadata)
+  private static readonly MAX_MESSAGE_SIZE = 800_000;
+
+  private static readonly NORMAL_CLOSURE_CODE = 1000;
+  // Chrome throws "Uncaught InvalidAccessError" with message:
+  //   "The close code must be either 1000, or between 3000 and 4999. 1009 is neither."
+  // therefore using custom codes instead.
+  private static readonly NO_STATUS_RECEIVED_ERROR_CODE = 3005;
+  private static readonly ABNORMAL_CLOSURE_ERROR_CODE = 3006;
+  private static readonly MESSAGE_IS_TOO_LARGE_ERROR_CODE = 3009;
+
+  private isOffline = true;
+  private socket: ReconnectingWebSocket | null = null;
+
+  private get isDisconnected() {
+    return !this.socket;
+  }
+
+  constructor(
+    private readonly host: string,
+    private readonly roomId: String,
+    private readonly handlers: {
+      onOpen: (event: Event) => void;
+      onOnline: () => void;
+      onMessage: (event: MessageEvent) => void;
+    },
+  ) {}
+
+  private onOnline = () => {
+    this.isOffline = false;
+    this.handlers.onOnline();
+  };
+
+  private onOffline = () => {
+    this.isOffline = true;
+  };
+
+  public connect = throttle(
+    () => {
+      if (!this.isDisconnected && !this.isOffline) {
+        return;
+      }
+
+      window.addEventListener("online", this.onOnline);
+      window.addEventListener("offline", this.onOffline);
+
+      console.debug("Connecting to the sync server...");
+      this.socket = new ReconnectingWebSocket(
+        `${this.host}/connect?roomId=${this.roomId}`,
+        [],
+        {
+          WebSocket: undefined, // WebSocket constructor, if none provided, defaults to global WebSocket
+          maxReconnectionDelay: 10000, // max delay in ms between reconnections
+          minReconnectionDelay: 1000, // min delay in ms between reconnections
+          reconnectionDelayGrowFactor: 1.3, // how fast the reconnection delay grows
+          minUptime: 5000, // min time in ms to consider connection as stable
+          connectionTimeout: 4000, // retry connect if not connected after this time, in ms
+          maxRetries: Infinity, // maximum number of retries
+          maxEnqueuedMessages: 0, // maximum number of messages to buffer until reconnection
+          startClosed: false, // start websocket in CLOSED state, call `.reconnect()` to connect
+          debug: true, // enables debug output,
+        },
+      );
+      this.socket.addEventListener("message", this.onMessage);
+      this.socket.addEventListener("open", this.onOpen);
+      this.socket.addEventListener("close", this.onClose);
+      this.socket.addEventListener("error", this.onError);
+    },
+    1000,
+    { leading: true, trailing: false },
+  );
+
+  // CFDO: the connections seem to keep hanging for some reason
+  public disconnect(
+    code: number = SocketClient.NORMAL_CLOSURE_CODE,
+    reason?: string,
+  ) {
+    if (this.isDisconnected) {
+      return;
+    }
+
+    try {
+      window.removeEventListener("online", this.onOnline);
+      window.removeEventListener("offline", this.onOffline);
+
+      console.debug(
+        `Disconnecting from the sync server with code "${code}"${
+          reason ? ` and reason "${reason}".` : "."
+        }`,
+      );
+      this.socket?.removeEventListener("message", this.onMessage);
+      this.socket?.removeEventListener("open", this.onOpen);
+      this.socket?.removeEventListener("close", this.onClose);
+      this.socket?.removeEventListener("error", this.onError);
+
+      let remappedCode = code;
+
+      switch (code) {
+        case 1009: {
+          // remapping the code, otherwise getting "The close code must be either 1000, or between 3000 and 4999. 1009 is neither."
+          remappedCode = SocketClient.MESSAGE_IS_TOO_LARGE_ERROR_CODE;
+          break;
+        }
+      }
+
+      this.socket?.close(remappedCode, reason);
+    } finally {
+      this.socket = null;
+    }
+  }
+
+  public send(message: {
+    type: "relay" | "pull" | "push";
+    payload: any;
+  }): void {
+    if (this.isOffline) {
+      // connection opened, don't let the WS buffer the messages,
+      // as we do explicitly buffer unacknowledged increments
+      return;
+    }
+
+    // CFDO: could be closed / closing / connecting
+    if (this.isDisconnected) {
+      this.connect();
+      return;
+    }
+
+    const { type, payload } = message;
+
+    const stringifiedPayload = JSON.stringify(payload);
+    const payloadSize = new TextEncoder().encode(stringifiedPayload).byteLength;
+
+    if (payloadSize < SocketClient.MAX_MESSAGE_SIZE) {
+      const message = new SocketMessage(type, stringifiedPayload);
+      return this.socket?.send(JSON.stringify(message));
+    }
+
+    const chunkId = randomId();
+    const chunkSize = SocketClient.MAX_MESSAGE_SIZE;
+    const chunksCount = Math.ceil(payloadSize / chunkSize);
+
+    for (let i = 0; i < chunksCount; i++) {
+      const start = i * chunkSize;
+      const end = start + chunkSize;
+      const chunkedPayload = stringifiedPayload.slice(start, end);
+      const message = new SocketMessage(type, chunkedPayload, {
+        id: chunkId,
+        order: i,
+        count: chunksCount,
+      });
+
+      this.socket?.send(JSON.stringify(message));
+    }
+  }
+
+  private onMessage = (event: MessageEvent) => {
+    this.handlers.onMessage(event);
+  };
+
+  private onOpen = (event: Event) => {
+    this.isOffline = false;
+    this.handlers.onOpen(event);
+  };
+
+  private onClose = (event: CloseEvent) => {
+    this.disconnect(
+      event.code || SocketClient.NO_STATUS_RECEIVED_ERROR_CODE,
+      event.reason || "Connection closed without a reason",
+    );
+    this.connect();
+  };
+
+  private onError = (event: Event) => {
+    this.disconnect(
+      event.type === "error"
+        ? SocketClient.ABNORMAL_CLOSURE_ERROR_CODE
+        : SocketClient.NO_STATUS_RECEIVED_ERROR_CODE,
+      `Received "${event.type}" on the sync connection`,
+    );
+    this.connect();
+  };
+}
 
 interface AcknowledgedIncrement {
   increment: StoreIncrement;
@@ -26,10 +229,6 @@ interface AcknowledgedIncrement {
 }
 
 export class SyncClient {
-  public static readonly NORMAL_CLOSURE = 1000;
-  public static readonly NO_STATUS_RECEIVED_ERROR_CODE = 1005;
-  public static readonly ABNORMAL_CLOSURE_ERROR_CODE = 1006;
-
   private static readonly HOST_URL = import.meta.env.DEV
     ? "ws://localhost:8787"
     : "https://excalidraw-sync.marcel-529.workers.dev";
@@ -38,11 +237,12 @@ export class SyncClient {
     ? "test_room_x"
     : "test_room_prod";
 
-  private server: ReconnectingWebSocket | null = null;
   private readonly api: ExcalidrawImperativeAPI;
   private readonly queue: SyncQueue;
-  private readonly repository: MetadataRepository;
+  private readonly metadata: MetadataRepository;
+  private readonly client: SocketClient;
 
+  // #region ACKNOWLEDGED INCREMENTS & METADATA
   // CFDO: shouldn't be stateful, only request / response
   private readonly acknowledgedIncrementsMap: Map<
     string,
@@ -55,8 +255,6 @@ export class SyncClient {
       .map((x) => x.increment);
   }
 
-  private readonly roomId: string;
-
   private _lastAcknowledgedVersion = 0;
 
   private get lastAcknowledgedVersion() {
@@ -65,26 +263,31 @@ export class SyncClient {
 
   private set lastAcknowledgedVersion(version: number) {
     this._lastAcknowledgedVersion = version;
-    this.repository.saveMetadata({ lastAcknowledgedVersion: version });
+    this.metadata.saveMetadata({ lastAcknowledgedVersion: version });
   }
+  // #endregion
 
   private constructor(
     api: ExcalidrawImperativeAPI,
     repository: MetadataRepository,
     queue: SyncQueue,
-    options: { roomId: string; lastAcknowledgedVersion: number },
+    options: { host: string; roomId: string; lastAcknowledgedVersion: number },
   ) {
     this.api = api;
-    this.repository = repository;
+    this.metadata = repository;
     this.queue = queue;
-    this.roomId = options.roomId;
     this.lastAcknowledgedVersion = options.lastAcknowledgedVersion;
+    this.client = new SocketClient(options.host, options.roomId, {
+      onOpen: this.onOpen,
+      onOnline: this.onOnline,
+      onMessage: this.onMessage,
+    });
   }
 
+  // #region SYNC_CLIENT FACTORY
   public static async create(
     api: ExcalidrawImperativeAPI,
     repository: IncrementsRepository & MetadataRepository,
-    roomId: string = SyncClient.ROOM_ID,
   ) {
     const [queue, metadata] = await Promise.all([
       SyncQueue.create(repository),
@@ -92,116 +295,24 @@ export class SyncClient {
     ]);
 
     return new SyncClient(api, repository, queue, {
-      roomId,
+      host: SyncClient.HOST_URL,
+      roomId: SyncClient.ROOM_ID,
       lastAcknowledgedVersion: metadata?.lastAcknowledgedVersion ?? 0,
     });
   }
+  // #endregion
 
-  public connect = throttle(
-    () => {
-      if (this.server && this.server.readyState !== this.server.CLOSED) {
-        return;
-      }
+  // #region PUBLIC API METHODS
+  public connect() {
+    return this.client.connect();
+  }
 
-      console.log("Connecting to the sync server...");
-      this.server = new ReconnectingWebSocket(
-        `${SyncClient.HOST_URL}/connect?roomId=${this.roomId}`,
-        [],
-        {
-          WebSocket: undefined, // WebSocket constructor, if none provided, defaults to global WebSocket
-          maxReconnectionDelay: 10000, // max delay in ms between reconnections
-          minReconnectionDelay: 1000, // min delay in ms between reconnections
-          reconnectionDelayGrowFactor: 1.3, // how fast the reconnection delay grows
-          minUptime: 5000, // min time in ms to consider connection as stable
-          connectionTimeout: 4000, // retry connect if not connected after this time, in ms
-          maxRetries: Infinity, // maximum number of retries
-          maxEnqueuedMessages: Infinity, // maximum number of messages to buffer until reconnection
-          startClosed: false, // start websocket in CLOSED state, call `.reconnect()` to connect
-          debug: false, // enables debug output,
-        },
-      );
-      this.server.addEventListener("message", this.onMessage);
-      this.server.addEventListener("open", this.onOpen);
-      this.server.addEventListener("close", this.onClose);
-      this.server.addEventListener("error", this.onError);
-    },
-    1000,
-    { leading: true, trailing: false },
-  );
+  public disconnect() {
+    return this.client.disconnect();
+  }
 
-  public disconnect = throttle(
-    (code: number, reason?: string) => {
-      if (!this.server) {
-        return;
-      }
-
-      if (
-        this.server.readyState === this.server.CLOSED ||
-        this.server.readyState === this.server.CLOSING
-      ) {
-        return;
-      }
-
-      console.log(
-        `Disconnecting from the sync server with code "${code}"${
-          reason ? ` and reason "${reason}".` : "."
-        }`,
-      );
-      this.server.removeEventListener("message", this.onMessage);
-      this.server.removeEventListener("open", this.onOpen);
-      this.server.removeEventListener("close", this.onClose);
-      this.server.removeEventListener("error", this.onError);
-      this.server.close(code, reason);
-    },
-    1000,
-    { leading: true, trailing: false },
-  );
-
-  private onOpen = (event: Event) => {
-    // CFDO: hack to pull everything for on init
-    this.pull(0);
-  };
-
-  private onClose = (event: CloseEvent) => {
-    this.disconnect(
-      event.code || SyncClient.NO_STATUS_RECEIVED_ERROR_CODE,
-      event.reason || "Connection closed without a reason",
-    );
-  };
-
-  private onError = (event: Event) => {
-    this.disconnect(
-      event.type === "error"
-        ? SyncClient.ABNORMAL_CLOSURE_ERROR_CODE
-        : SyncClient.NO_STATUS_RECEIVED_ERROR_CODE,
-      `Received "${event.type}" on the sync connection`,
-    );
-  };
-
-  // CFDO: could be an array buffer
-  private onMessage = (event: MessageEvent) => {
-    const [result, error] = Utils.try(() => JSON.parse(event.data as string));
-
-    if (error) {
-      console.error("Failed to parse message:", event.data);
-      return;
-    }
-
-    const { type, payload } = result;
-    switch (type) {
-      case "relayed":
-        return this.handleRelayed(payload);
-      case "acknowledged":
-        return this.handleAcknowledged(payload);
-      case "rejected":
-        return this.handleRejected(payload);
-      default:
-        console.error("Unknown message type:", type);
-    }
-  };
-
-  private pull(sinceVersion?: number): void {
-    this.send({
+  public pull(sinceVersion?: number): void {
+    this.client.send({
       type: "pull",
       payload: {
         lastAcknowledgedVersion: sinceVersion ?? this.lastAcknowledgedVersion,
@@ -224,26 +335,57 @@ export class SyncClient {
     }
 
     if (payload.increments.length > 0) {
-      this.send({
-        type: "push",
-        payload,
-      });
+      this.client.send({ type: "push", payload });
     }
   }
 
   public relay(buffer: ArrayBuffer): void {
-    this.send({
+    this.client.send({
       type: "relay",
       payload: { buffer },
     });
   }
+  // #endregion
 
-  // CFDO: could be flushed once regular push / pull goes through
-  private schedulePush = debounce(() => this.push(), 1000);
-  private schedulePull = debounce(() => this.pull(), 1000);
+  // #region PRIVATE SOCKET MESSAGE HANDLERS
+  private onOpen = (event: Event) => {
+    // CFDO: hack to pull everything for on init
+    this.pull(0);
+    this.push();
+  };
+
+  private onOnline = () => {
+    // perform incremental sync
+    this.pull();
+    this.push();
+  };
+
+  private onMessage = (event: MessageEvent) => {
+    // CFDO: could be an array buffer
+    const [result, error] = Utils.try(() => JSON.parse(event.data as string));
+
+    if (error) {
+      console.error("Failed to parse message:", event.data);
+      return;
+    }
+
+    const { type, payload } = result;
+    switch (type) {
+      case "relayed":
+        return this.handleRelayed(payload);
+      case "acknowledged":
+        return this.handleAcknowledged(payload);
+      case "rejected":
+        return this.handleRejected(payload);
+      default:
+        console.error("Unknown message type:", type);
+    }
+  };
 
   // CFDO: refactor by applying all operations to store, not to the elements
-  private handleAcknowledged(payload: { increments: Array<SERVER_INCREMENT> }) {
+  private handleAcknowledged = (payload: {
+    increments: Array<SERVER_INCREMENT>;
+  }) => {
     let nextAcknowledgedVersion = this.lastAcknowledgedVersion;
     let elements = new Map(
       // CFDO: retrieve the map already
@@ -310,30 +452,26 @@ export class SyncClient {
       this.lastAcknowledgedVersion = nextAcknowledgedVersion;
     } catch (e) {
       console.error("Failed to apply acknowledged increments:", e);
+      // CFDO: might just be on error
       this.schedulePull();
-      return;
     }
+  };
 
-    this.schedulePush();
-  }
-
-  private handleRejected(payload: { ids: Array<string>; message: string }) {
+  private handleRejected = (payload: {
+    ids: Array<string>;
+    message: string;
+  }) => {
     // handle rejected increments
     console.error("Rejected message received:", payload);
-  }
+  };
 
-  private handleRelayed(payload: { increments: Array<CLIENT_INCREMENT> }) {
+  private handleRelayed = (payload: {
+    increments: Array<CLIENT_INCREMENT>;
+  }) => {
     // apply relayed increments / buffer
     console.log("Relayed message received:", payload);
-  }
+  };
 
-  private send(message: { type: string; payload: any }): void {
-    if (!this.server) {
-      throw new Error(
-        "Can't send a message without an established connection!",
-      );
-    }
-
-    this.server.send(JSON.stringify(message));
-  }
+  private schedulePull = debounce(() => this.pull(), 1000);
+  // #endregion
 }

@@ -11,6 +11,7 @@ export class DurableIncrementsRepository implements IncrementsRepository {
     // this.storage.sql.exec(`DROP TABLE IF EXISTS increments;`);
     // #endregion
 
+    // CFDO: payload has just 2MB limit, which might not be enough
     this.storage.sql.exec(`CREATE TABLE IF NOT EXISTS increments(
 			version		    INTEGER PRIMARY KEY AUTOINCREMENT,
 			id            TEXT NOT NULL UNIQUE,

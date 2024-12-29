@@ -9,6 +9,18 @@ export type PUSH_PAYLOAD = {
 
 export type CLIENT_INCREMENT = StoreIncrement;
 
+export type CLIENT_MESSAGE_METADATA = {
+  id: string;
+  order: number;
+  count: number;
+};
+
+export type CLIENT_MESSAGE_RAW = {
+  type: "relay" | "pull" | "push";
+  payload: string;
+  chunkInfo: CLIENT_MESSAGE_METADATA;
+};
+
 export type CLIENT_MESSAGE =
   | { type: "relay"; payload: RELAY_PAYLOAD }
   | { type: "pull"; payload: PULL_PAYLOAD }
