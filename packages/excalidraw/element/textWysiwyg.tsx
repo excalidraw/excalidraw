@@ -289,6 +289,8 @@ export const textWysiwyg = ({
   editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
+  // set &nbsp; placeholder fix for Safari not showing caret for empty textarea
+  editable.placeholder = "\u00A0";
   editable.classList.add("excalidraw-wysiwyg");
 
   let whiteSpace = "pre";
