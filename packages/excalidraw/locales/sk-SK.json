@@ -157,7 +157,7 @@
     "zoomToFit": "Priblížiť aby boli zahrnuté všetky prvky",
     "installPWA": "Inštalovať Excalidraw lokálne (PWA)",
     "autoResize": "Zapnúť automatickú zmenu veľkosti textu",
-    "imageCropping": "",
+    "imageCropping": "Orezanie obrázka",
     "unCroppedDimension": "",
     "copyElementLink": "Kopírovať odkaz na objekt",
     "linkToElement": "Odkaz na objekt"
