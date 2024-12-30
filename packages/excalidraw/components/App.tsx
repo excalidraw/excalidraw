@@ -5347,6 +5347,7 @@ class App extends React.Component<AppProps, AppState> {
           return LinearElementEditor.deleteFixedSegment(
             selectedElements[0],
             midPoint[0],
+            this.state,
           );
         }
       }

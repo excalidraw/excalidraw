@@ -1826,12 +1826,14 @@ export class LinearElementEditor {
   static deleteFixedSegment(
     element: ExcalidrawElbowArrowElement,
     index: number,
+    appState: AppState,
   ): void {
     mutateElement(element, {
       fixedSegments: element.fixedSegments?.filter(
         (segment) => segment.index !== index,
       ),
     });
+    mutateElement(element, {}, true, { zoom: appState.zoom });
   }
 
   static getElbowArrowMidPoints(
