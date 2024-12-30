@@ -104,73 +104,119 @@ const handleSegmentRenormalization = (
   const nextFixedSegments: FixedSegment[] | null = arrow.fixedSegments
     ? structuredClone(arrow.fixedSegments)
     : null;
-  const nextPoints: GlobalPoint[] = [];
 
   if (nextFixedSegments) {
+    const _nextPoints: GlobalPoint[] = [];
+
     arrow.points
       .map((p) => pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]))
       .forEach((p, i, points) => {
-        if (i < 3) {
-          return nextPoints.push(p);
+        if (i < 2) {
+          return _nextPoints.push(p);
         }
 
+        const currentSegmentIsHorizontal = headingForPoint(p, points[i - 1]);
+        const prevSegmentIsHorizontal = headingForPoint(
+          points[i - 1],
+          points[i - 2],
+        );
+
         if (
-          pointDistance(points[i - 2], points[i - 1]) <
-            1 + (zoom?.value ?? 0) ||
-          compareHeading(
-            headingForPoint(p, points[i - 1]),
-            headingForPoint(points[i - 1], points[i - 2]),
-          )
+          // Check if previous two points are on the same line
+          compareHeading(currentSegmentIsHorizontal, prevSegmentIsHorizontal)
         ) {
-          // Remove this as this was a fixed segment
-          const segmentIdx =
-            nextFixedSegments?.findIndex((segment) => segment.index === i) ??
-            -1;
-          if (segmentIdx !== -1) {
-            nextFixedSegments.splice(segmentIdx, 1);
-          }
-          // Remove the previous fixed segment as well if it exists
           const prevSegmentIdx =
             nextFixedSegments?.findIndex(
               (segment) => segment.index === i - 1,
             ) ?? -1;
+          const segmentIdx =
+            nextFixedSegments?.findIndex((segment) => segment.index === i) ??
+            -1;
+
+          // If the current segment is a fixed segment, update its start point
+          if (segmentIdx !== -1) {
+            nextFixedSegments[segmentIdx].start = pointFrom<LocalPoint>(
+              points[i - 2][0] - arrow.x,
+              points[i - 2][1] - arrow.y,
+            );
+          }
+
+          // Remove the fixed segment status from the previous segment if it is
+          // a fixed segment, because we are going to unify that segment with
+          // the current one
           if (prevSegmentIdx !== -1) {
             nextFixedSegments.splice(prevSegmentIdx, 1);
           }
 
-          // Update any additional fixed segments
+          // Remove the duplicate point
+          _nextPoints.splice(-1, 1);
+
+          // Update fixed point indices
           nextFixedSegments.forEach((segment) => {
-            if (segment.index > i) {
-              segment.index -= 2;
+            if (segment.index > i - 1) {
+              segment.index -= 1;
             }
           });
-
-          // Remove aligned segment points
-          const isHorizontal = headingForPointIsHorizontal(
-            points[i - 2],
-            points[i - 1],
-          );
-          nextPoints.splice(-2, 2);
-
-          if (i === 3) {
-            return nextPoints.push(
-              pointFrom<GlobalPoint>(
-                isHorizontal ? points[i - 2][0] : p[0],
-                !isHorizontal ? points[i - 2][1] : p[1],
-              ),
-            );
-          }
-
-          return nextPoints.push(
-            pointFrom<GlobalPoint>(
-              isHorizontal ? points[i - 1][0] : p[0],
-              !isHorizontal ? points[i - 1][1] : p[1],
-            ),
-          );
         }
 
-        nextPoints.push(p);
+        return _nextPoints.push(p);
       });
+
+    const threshold = 30 - (zoom?.value ?? 30);
+    const nextPoints: GlobalPoint[] = [];
+
+    _nextPoints.forEach((p, i, points) => {
+      if (i < 2) {
+        return nextPoints.push(p);
+      }
+
+      if (
+        // Remove segments that are too short
+        pointDistance(points[i - 2], points[i - 1]) <
+        1 + threshold / 7
+      ) {
+        const prevPrevSegmentIdx =
+          nextFixedSegments?.findIndex((segment) => segment.index === i - 2) ??
+          -1;
+        const prevSegmentIdx =
+          nextFixedSegments?.findIndex((segment) => segment.index === i - 1) ??
+          -1;
+
+        // Remove the previous fixed segment if it exists (i.e. the segment
+        // which will be removed due to being parallel or too short)
+        if (prevSegmentIdx !== -1) {
+          nextFixedSegments.splice(prevSegmentIdx, 1);
+        }
+
+        // Remove the fixed segment status from the segment 2 steps back
+        // if it is a fixed segment, because we are going to unify that
+        // segment with the current one
+        if (prevPrevSegmentIdx !== -1) {
+          nextFixedSegments.splice(prevPrevSegmentIdx, 1);
+        }
+
+        nextPoints.splice(-2, 2);
+
+        // Since we have to remove two segments, update any fixed segment
+        nextFixedSegments.forEach((segment) => {
+          if (segment.index > i - 2) {
+            segment.index -= 2;
+          }
+        });
+
+        // Remove aligned segment points
+        const isHorizontal = headingForPointIsHorizontal(p, points[i - 1]);
+
+        return nextPoints.push(
+          pointFrom<GlobalPoint>(
+            !isHorizontal ? points[i - 2][0] : p[0],
+            isHorizontal ? points[i - 2][1] : p[1],
+          ),
+        );
+      }
+
+      nextPoints.push(p);
+    });
 
     return normalizeArrowElementUpdate(
       nextPoints,
@@ -415,6 +461,11 @@ const handleSegmentMove = (
     ) ?? -1;
 
   // Handle special case for first segment move
+  const segmentLength = pointDistance(
+    fixedSegments[activelyModifiedSegmentIdx].start,
+    fixedSegments[activelyModifiedSegmentIdx].end,
+  );
+  const segmentIsTooShort = segmentLength < BASE_PADDING + 5;
   if (
     firstSegmentIdx === -1 &&
     fixedSegments[activelyModifiedSegmentIdx].index === 1 &&
@@ -424,19 +475,18 @@ const handleSegmentMove = (
     const startIsPositive = startIsHorizontal
       ? compareHeading(startHeading, HEADING_RIGHT)
       : compareHeading(startHeading, HEADING_DOWN);
+    const padding = startIsPositive
+      ? segmentIsTooShort
+        ? segmentLength / 2
+        : BASE_PADDING
+      : segmentIsTooShort
+      ? -segmentLength / 2
+      : -BASE_PADDING;
     fixedSegments[activelyModifiedSegmentIdx].start = pointFrom<LocalPoint>(
       fixedSegments[activelyModifiedSegmentIdx].start[0] +
-        (startIsHorizontal
-          ? startIsPositive
-            ? BASE_PADDING
-            : -BASE_PADDING
-          : 0),
+        (startIsHorizontal ? padding : 0),
       fixedSegments[activelyModifiedSegmentIdx].start[1] +
-        (!startIsHorizontal
-          ? startIsPositive
-            ? BASE_PADDING
-            : -BASE_PADDING
-          : 0),
+        (!startIsHorizontal ? padding : 0),
     );
   }
 
@@ -451,11 +501,18 @@ const handleSegmentMove = (
     const endIsPositive = endIsHorizontal
       ? compareHeading(endHeading, HEADING_RIGHT)
       : compareHeading(endHeading, HEADING_DOWN);
+    const padding = endIsPositive
+      ? segmentIsTooShort
+        ? segmentLength / 2
+        : BASE_PADDING
+      : segmentIsTooShort
+      ? -segmentLength / 2
+      : -BASE_PADDING;
     fixedSegments[activelyModifiedSegmentIdx].end = pointFrom<LocalPoint>(
       fixedSegments[activelyModifiedSegmentIdx].end[0] +
-        (endIsHorizontal ? (endIsPositive ? BASE_PADDING : -BASE_PADDING) : 0),
+        (endIsHorizontal ? padding : 0),
       fixedSegments[activelyModifiedSegmentIdx].end[1] +
-        (!endIsHorizontal ? (endIsPositive ? BASE_PADDING : -BASE_PADDING) : 0),
+        (!endIsHorizontal ? padding : 0),
     );
   }
 
