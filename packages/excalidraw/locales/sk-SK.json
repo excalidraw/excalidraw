@@ -158,7 +158,7 @@
     "installPWA": "Inštalovať Excalidraw lokálne (PWA)",
     "autoResize": "Zapnúť automatickú zmenu veľkosti textu",
     "imageCropping": "Orezanie obrázka",
-    "unCroppedDimension": "",
+    "unCroppedDimension": "Pôvodné rozmery",
     "copyElementLink": "Kopírovať odkaz na objekt",
     "linkToElement": "Odkaz na objekt"
   },
