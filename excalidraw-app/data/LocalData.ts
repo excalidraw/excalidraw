@@ -108,12 +108,12 @@ export class LocalData {
       files: BinaryFiles,
       onFilesSaved: () => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
-      await this.fileStorage.saveFiles({
-        elements,
-        files,
-      });
-      onFilesSaved();
+      // saveDataStateToLocalStorage(elements, appState);
+      // await this.fileStorage.saveFiles({
+      //   elements,
+      //   files,
+      // });
+      // onFilesSaved();
     },
     SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   );
@@ -260,13 +260,11 @@ export class LibraryLocalStorageMigrationAdapter {
   }
 }
 
-interface SyncIncrementPersistedData {
-  increments: DTO<StoreIncrement>[];
-}
+type SyncIncrementPersistedData = DTO<StoreIncrement>[];
 
-interface SyncMetaPersistedData {
+type SyncMetaPersistedData = {
   lastAcknowledgedVersion: number;
-}
+};
 
 export class SyncIndexedDBAdapter {
   /** IndexedDB database and store name */
@@ -281,17 +279,15 @@ export class SyncIndexedDBAdapter {
   );
 
   static async loadIncrements() {
-    const IDBData = await get<SyncIncrementPersistedData>(
+    const increments = await get<SyncIncrementPersistedData>(
       SyncIndexedDBAdapter.incrementsKey,
       SyncIndexedDBAdapter.store,
     );
 
-    if (IDBData?.increments?.length) {
-      return {
-        increments: IDBData.increments.map((storeIncrementDTO) =>
-          StoreIncrement.restore(storeIncrementDTO),
-        ),
-      };
+    if (increments?.length) {
+      return increments.map((storeIncrementDTO) =>
+        StoreIncrement.restore(storeIncrementDTO),
+      );
     }
 
     return null;
@@ -306,12 +302,12 @@ export class SyncIndexedDBAdapter {
   }
 
   static async loadMetadata() {
-    const IDBData = await get<SyncMetaPersistedData>(
+    const metadata = await get<SyncMetaPersistedData>(
       SyncIndexedDBAdapter.metadataKey,
       SyncIndexedDBAdapter.store,
     );
 
-    return IDBData || null;
+    return metadata || null;
   }
 
   static async saveMetadata(data: SyncMetaPersistedData): Promise<void> {

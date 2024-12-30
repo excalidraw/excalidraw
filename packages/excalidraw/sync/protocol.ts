@@ -1,36 +1,36 @@
 import type { StoreIncrement } from "../store";
+import type { DTO } from "../utility-types";
+
+export type CLIENT_INCREMENT = DTO<StoreIncrement>;
 
 export type RELAY_PAYLOAD = { buffer: ArrayBuffer };
 export type PULL_PAYLOAD = { lastAcknowledgedVersion: number };
-export type PUSH_PAYLOAD = {
-  type: "durable" | "ephemeral";
-  increments: Array<CLIENT_INCREMENT>;
-};
+export type PUSH_PAYLOAD = CLIENT_INCREMENT;
 
-export type CLIENT_INCREMENT = StoreIncrement;
-
-export type CLIENT_MESSAGE_METADATA = {
+export type CHUNK_INFO = {
   id: string;
-  order: number;
+  position: number;
   count: number;
 };
 
 export type CLIENT_MESSAGE_RAW = {
   type: "relay" | "pull" | "push";
   payload: string;
-  chunkInfo: CLIENT_MESSAGE_METADATA;
+  chunkInfo?: CHUNK_INFO;
 };
 
-export type CLIENT_MESSAGE =
+export type CLIENT_MESSAGE = { chunkInfo: CHUNK_INFO } & (
   | { type: "relay"; payload: RELAY_PAYLOAD }
   | { type: "pull"; payload: PULL_PAYLOAD }
-  | { type: "push"; payload: PUSH_PAYLOAD };
+  | { type: "push"; payload: PUSH_PAYLOAD }
+);
 
 export type SERVER_INCREMENT = { id: string; version: number; payload: string };
 export type SERVER_MESSAGE =
   | {
       type: "relayed";
-      payload: { increments: Array<CLIENT_INCREMENT> } | RELAY_PAYLOAD;
+      // CFDO: should likely be just elements
+      // payload: { increments: Array<CLIENT_INCREMENT> } | RELAY_PAYLOAD;
     }
   | { type: "acknowledged"; payload: { increments: Array<SERVER_INCREMENT> } }
   | {
@@ -39,8 +39,8 @@ export type SERVER_MESSAGE =
     };
 
 export interface IncrementsRepository {
-  saveAll(increments: Array<CLIENT_INCREMENT>): Array<SERVER_INCREMENT>;
-  getSinceVersion(version: number): Array<SERVER_INCREMENT>;
+  save(increment: CLIENT_INCREMENT): SERVER_INCREMENT | null;
+  getAllSinceVersion(version: number): Array<SERVER_INCREMENT>;
   getLastVersion(): number;
 }
 

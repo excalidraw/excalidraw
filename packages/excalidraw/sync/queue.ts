@@ -2,8 +2,8 @@ import throttle from "lodash.throttle";
 import type { StoreIncrement } from "../store";
 
 export interface IncrementsRepository {
-  loadIncrements(): Promise<{ increments: Array<StoreIncrement> } | null>;
-  saveIncrements(params: { increments: Array<StoreIncrement> }): Promise<void>;
+  loadIncrements(): Promise<Array<StoreIncrement> | null>;
+  saveIncrements(params: StoreIncrement[]): Promise<void>;
 }
 
 export interface MetadataRepository {
@@ -25,10 +25,10 @@ export class SyncQueue {
   }
 
   public static async create(repository: IncrementsRepository) {
-    const data = await repository.loadIncrements();
+    const increments = await repository.loadIncrements();
 
     return new SyncQueue(
-      new Map(data?.increments?.map((increment) => [increment.id, increment])),
+      new Map(increments?.map((increment) => [increment.id, increment])),
       repository,
     );
   }
@@ -64,7 +64,7 @@ export class SyncQueue {
   public persist = throttle(
     async () => {
       try {
-        await this.repository.saveIncrements({ increments: this.getAll() });
+        await this.repository.saveIncrements(this.getAll());
       } catch (e) {
         console.error("Failed to persist the sync queue:", e);
       }

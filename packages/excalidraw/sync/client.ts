@@ -16,7 +16,6 @@ import type { SceneElementsMap } from "../element/types";
 import type {
   CLIENT_INCREMENT,
   CLIENT_MESSAGE_RAW,
-  PUSH_PAYLOAD,
   SERVER_INCREMENT,
 } from "./protocol";
 import { debounce } from "../utils";
@@ -26,14 +25,10 @@ class SocketMessage implements CLIENT_MESSAGE_RAW {
   constructor(
     public readonly type: "relay" | "pull" | "push",
     public readonly payload: string,
-    public readonly chunkInfo: {
+    public readonly chunkInfo?: {
       id: string;
-      order: number;
+      position: number;
       count: number;
-    } = {
-      id: "",
-      order: 0,
-      count: 1,
     },
   ) {}
 }
@@ -100,7 +95,7 @@ class SocketClient {
           maxRetries: Infinity, // maximum number of retries
           maxEnqueuedMessages: 0, // maximum number of messages to buffer until reconnection
           startClosed: false, // start websocket in CLOSED state, call `.reconnect()` to connect
-          debug: true, // enables debug output,
+          debug: false, // enables debug output,
         },
       );
       this.socket.addEventListener("message", this.onMessage);
@@ -181,13 +176,13 @@ class SocketClient {
     const chunkSize = SocketClient.MAX_MESSAGE_SIZE;
     const chunksCount = Math.ceil(payloadSize / chunkSize);
 
-    for (let i = 0; i < chunksCount; i++) {
-      const start = i * chunkSize;
+    for (let position = 0; position < chunksCount; position++) {
+      const start = position * chunkSize;
       const end = start + chunkSize;
       const chunkedPayload = stringifiedPayload.slice(start, end);
       const message = new SocketMessage(type, chunkedPayload, {
         id: chunkId,
-        order: i,
+        position,
         count: chunksCount,
       });
 
@@ -289,15 +284,11 @@ export class SyncClient {
     api: ExcalidrawImperativeAPI,
     repository: IncrementsRepository & MetadataRepository,
   ) {
-    const [queue, metadata] = await Promise.all([
-      SyncQueue.create(repository),
-      repository.loadMetadata(),
-    ]);
-
+    const queue = await SyncQueue.create(repository);
     return new SyncClient(api, repository, queue, {
       host: SyncClient.HOST_URL,
       roomId: SyncClient.ROOM_ID,
-      lastAcknowledgedVersion: metadata?.lastAcknowledgedVersion ?? 0,
+      lastAcknowledgedVersion: 0,
     });
   }
   // #endregion
@@ -320,22 +311,19 @@ export class SyncClient {
     });
   }
 
-  public push(
-    type: "durable" | "ephemeral" = "durable",
-    ...increments: Array<CLIENT_INCREMENT>
-  ): void {
-    const payload: PUSH_PAYLOAD = { type, increments: [] };
-
-    if (type === "durable") {
-      this.queue.add(...increments);
-      // batch all (already) queued increments
-      payload.increments = this.queue.getAll();
-    } else {
-      payload.increments = increments;
+  public push(increment?: StoreIncrement): void {
+    if (increment) {
+      this.queue.add(increment);
     }
 
-    if (payload.increments.length > 0) {
-      this.client.send({ type: "push", payload });
+    // re-send all already queued increments
+    for (const queuedIncrement of this.queue.getAll()) {
+      this.client.send({
+        type: "push",
+        payload: {
+          ...queuedIncrement,
+        },
+      });
     }
   }
 
@@ -403,12 +391,6 @@ export class SyncClient {
           version,
         });
 
-        // local increment shall not have to be applied again
-        if (this.queue.has(id)) {
-          this.queue.remove(id);
-          continue;
-        }
-
         // we've already applied this increment
         if (version <= nextAcknowledgedVersion) {
           continue;
@@ -419,7 +401,7 @@ export class SyncClient {
         } else {
           // it's fine to apply increments our of order,
           // as they are idempontent, so that we can re-apply them again,
-          // as long as we don't mark them as acknowledged
+          // as long as we don't mark their version as acknowledged
           console.debug(
             `Received out of order increment, expected "${
               nextAcknowledgedVersion + 1
@@ -427,27 +409,32 @@ export class SyncClient {
           );
         }
 
-        // apply remote increment with higher version than the last acknowledged one
-        const remoteIncrement = StoreIncrement.load(payload);
-        [elements] = remoteIncrement.elementsChange.applyTo(
-          elements,
-          this.api.store.snapshot.elements,
-        );
-      }
+        // local increment shall not have to be applied again
+        if (this.queue.has(id)) {
+          this.queue.remove(id);
+        } else {
+          // apply remote increment with higher version than the last acknowledged one
+          const remoteIncrement = StoreIncrement.load(payload);
+          [elements] = remoteIncrement.elementsChange.applyTo(
+            elements,
+            this.api.store.snapshot.elements,
+          );
+        }
 
-      // apply local increments
-      for (const localIncrement of this.queue.getAll()) {
-        // CFDO: in theory only necessary when remote increments modified same element properties!
-        [elements] = localIncrement.elementsChange.applyTo(
-          elements,
-          this.api.store.snapshot.elements,
-        );
-      }
+        // apply local increments
+        for (const localIncrement of this.queue.getAll()) {
+          // CFDO: in theory only necessary when remote increments modified same element properties!
+          [elements] = localIncrement.elementsChange.applyTo(
+            elements,
+            this.api.store.snapshot.elements,
+          );
+        }
 
-      this.api.updateScene({
-        elements: Array.from(elements.values()),
-        storeAction: "update",
-      });
+        this.api.updateScene({
+          elements: Array.from(elements.values()),
+          storeAction: "update",
+        });
+      }
 
       this.lastAcknowledgedVersion = nextAcknowledgedVersion;
     } catch (e) {

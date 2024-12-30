@@ -3,14 +3,13 @@ import { Utils } from "./utils";
 
 import type {
   IncrementsRepository,
-  CLIENT_INCREMENT,
   CLIENT_MESSAGE,
   PULL_PAYLOAD,
   PUSH_PAYLOAD,
-  RELAY_PAYLOAD,
   SERVER_MESSAGE,
   SERVER_INCREMENT,
   CLIENT_MESSAGE_RAW,
+  CHUNK_INFO,
 } from "./protocol";
 
 // CFDO: message could be binary (cbor, protobuf, etc.)
@@ -22,12 +21,13 @@ export class ExcalidrawSyncServer {
   private readonly lock: AsyncLock = new AsyncLock();
   private readonly sessions: Set<WebSocket> = new Set();
   private readonly chunks = new Map<
-    CLIENT_MESSAGE_RAW["chunkInfo"]["id"],
-    Map<CLIENT_MESSAGE_RAW["chunkInfo"]["order"], CLIENT_MESSAGE_RAW["payload"]>
+    CHUNK_INFO["id"],
+    Map<CHUNK_INFO["position"], CLIENT_MESSAGE_RAW["payload"]>
   >();
 
   constructor(private readonly incrementsRepository: IncrementsRepository) {}
 
+  // CFDO: should send a message about collaborators (no collaborators => no need to send ephemerals)
   public onConnect(client: WebSocket) {
     this.sessions.add(client);
   }
@@ -50,9 +50,9 @@ export class ExcalidrawSyncServer {
 
     const { type, payload, chunkInfo } = parsedMessage;
 
-    // if there are more than 1 chunks, process them first
-    if (chunkInfo.count > 1) {
-      return this.processChunks(client, parsedMessage);
+    // if there is chunkInfo, there are more than 1 chunks => process them first
+    if (chunkInfo) {
+      return this.processChunks(client, { type, payload, chunkInfo });
     }
 
     const [parsedPayload, parsePayloadError] = Utils.try<
@@ -65,8 +65,8 @@ export class ExcalidrawSyncServer {
     }
 
     switch (type) {
-      case "relay":
-        return this.relay(client, parsedPayload as RELAY_PAYLOAD);
+      // case "relay":
+      //   return this.relay(client, parsedPayload as RELAY_PAYLOAD);
       case "pull":
         return this.pull(client, parsedPayload as PULL_PAYLOAD);
       case "push":
@@ -83,12 +83,15 @@ export class ExcalidrawSyncServer {
   /**
    * Process chunks in case the client-side payload would overflow the 1MiB durable object WS message limit.
    */
-  private processChunks(client: WebSocket, message: CLIENT_MESSAGE_RAW) {
+  private processChunks(
+    client: WebSocket,
+    message: CLIENT_MESSAGE_RAW & { chunkInfo: CHUNK_INFO },
+  ) {
     let shouldCleanupchunks = true;
     const {
       type,
       payload,
-      chunkInfo: { id, order, count },
+      chunkInfo: { id, position, count },
     } = message;
 
     try {
@@ -104,7 +107,7 @@ export class ExcalidrawSyncServer {
       }
 
       // set the buffer by order
-      chunks.set(order, payload);
+      chunks.set(position, payload);
 
       if (chunks.size !== count) {
         // we don't have all the chunks, don't cleanup just yet!
@@ -120,8 +123,6 @@ export class ExcalidrawSyncServer {
       const rawMessage = JSON.stringify({
         type,
         payload: restoredPayload,
-        // id is irrelevant if we are sending just one chunk
-        chunkInfo: { id: "", order: 0, count: 1 },
       } as CLIENT_MESSAGE_RAW);
 
       // process the message
@@ -136,18 +137,18 @@ export class ExcalidrawSyncServer {
     }
   }
 
-  private relay(
-    client: WebSocket,
-    payload: { increments: Array<CLIENT_INCREMENT> } | RELAY_PAYLOAD,
-  ) {
-    return this.broadcast(
-      {
-        type: "relayed",
-        payload,
-      },
-      client,
-    );
-  }
+  // private relay(
+  //   client: WebSocket,
+  //   payload: { increments: Array<CLIENT_INCREMENT> } | RELAY_PAYLOAD,
+  // ) {
+  //   return this.broadcast(
+  //     {
+  //       type: "relayed",
+  //       payload,
+  //     },
+  //     client,
+  //   );
+  // }
 
   private pull(client: WebSocket, payload: PULL_PAYLOAD) {
     // CFDO: test for invalid payload
@@ -170,7 +171,7 @@ export class ExcalidrawSyncServer {
 
     if (versionΔ > 0) {
       increments.push(
-        ...this.incrementsRepository.getSinceVersion(
+        ...this.incrementsRepository.getAllSinceVersion(
           lastAcknowledgedClientVersion,
         ),
       );
@@ -184,38 +185,29 @@ export class ExcalidrawSyncServer {
     });
   }
 
-  private push(client: WebSocket, payload: PUSH_PAYLOAD) {
-    const { type, increments } = payload;
+  private push(client: WebSocket, increment: PUSH_PAYLOAD) {
+    // CFDO: try to apply the increments to the snapshot
+    const [acknowledged, error] = Utils.try(() =>
+      this.incrementsRepository.save(increment),
+    );
 
-    switch (type) {
-      case "ephemeral":
-        return this.relay(client, { increments });
-      case "durable":
-        // CFDO: try to apply the increments to the snapshot
-        const [acknowledged, error] = Utils.try(() =>
-          this.incrementsRepository.saveAll(increments),
-        );
-
-        if (error) {
-          // everything should be automatically rolled-back -> double-check
-          return this.send(client, {
-            type: "rejected",
-            payload: {
-              message: error.message,
-              increments,
-            },
-          });
-        }
-
-        return this.broadcast({
-          type: "acknowledged",
-          payload: {
-            increments: acknowledged,
-          },
-        });
-      default:
-        console.error(`Unknown push message type: ${type}`);
+    if (error || !acknowledged) {
+      // everything should be automatically rolled-back -> double-check
+      return this.send(client, {
+        type: "rejected",
+        payload: {
+          message: error ? error.message : "Coudn't persist the increment",
+          increments: [increment],
+        },
+      });
     }
+
+    return this.broadcast({
+      type: "acknowledged",
+      payload: {
+        increments: [acknowledged],
+      },
+    });
   }
 
   private send(client: WebSocket, message: SERVER_MESSAGE) {
