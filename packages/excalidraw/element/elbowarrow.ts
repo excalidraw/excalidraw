@@ -413,6 +413,7 @@ const handleSegmentMove = (
       (segment) => segment.index === arrow.points.length - 1,
     ) ?? -1;
 
+  // Handle special case for first segment move
   if (
     firstSegmentIdx === -1 &&
     fixedSegments[activelyModifiedSegmentIdx].index === 1 &&
@@ -438,6 +439,7 @@ const handleSegmentMove = (
     );
   }
 
+  // Handle special case for last segment move
   if (
     lastSegmentIdx === -1 &&
     fixedSegments[activelyModifiedSegmentIdx].index ===
@@ -456,6 +458,7 @@ const handleSegmentMove = (
     );
   }
 
+  // Translate all fixed segments to global coordinates
   const nextFixedSegments = fixedSegments.map((segment) => ({
     ...segment,
     start: pointFrom<GlobalPoint>(
@@ -477,22 +480,53 @@ const handleSegmentMove = (
   const endIdx = nextFixedSegments[activelyModifiedSegmentIdx].index;
   const start = nextFixedSegments[activelyModifiedSegmentIdx].start;
   const end = nextFixedSegments[activelyModifiedSegmentIdx].end;
+  const prevSegmentIsHorizontal = newPoints[startIdx - 1]
+    ? headingForPointIsHorizontal(newPoints[startIdx - 1], newPoints[startIdx])
+    : undefined;
+  const nextSegmentIsHorizontal = newPoints[endIdx + 1]
+    ? headingForPointIsHorizontal(newPoints[endIdx + 1], newPoints[endIdx])
+    : undefined;
 
   // Override the segment points with the actively moved fixed segment
+  if (prevSegmentIsHorizontal !== undefined) {
+    const dir = prevSegmentIsHorizontal ? 1 : 0;
+    newPoints[startIdx - 1][dir] = start[dir];
+  }
   newPoints[startIdx] = start;
   newPoints[endIdx] = end;
+  if (nextSegmentIsHorizontal !== undefined) {
+    const dir = nextSegmentIsHorizontal ? 1 : 0;
+    newPoints[endIdx + 1][dir] = end[dir];
+  }
 
   // Override neighboring fixedSegment start/end points, if any
   const prevSegmentIdx = nextFixedSegments.findIndex(
     (segment) => segment.index === startIdx,
   );
   if (prevSegmentIdx !== -1) {
+    // Align the next segment points with the moved segment
+    const dir = headingForPointIsHorizontal(
+      nextFixedSegments[prevSegmentIdx].end,
+      nextFixedSegments[prevSegmentIdx].start,
+    )
+      ? 1
+      : 0;
+    nextFixedSegments[prevSegmentIdx].start[dir] = start[dir];
     nextFixedSegments[prevSegmentIdx].end = start;
   }
+
   const nextSegmentIdx = nextFixedSegments.findIndex(
     (segment) => segment.index === endIdx + 1,
   );
   if (nextSegmentIdx !== -1) {
+    // Align the next segment points with the moved segment
+    const dir = headingForPointIsHorizontal(
+      nextFixedSegments[nextSegmentIdx].end,
+      nextFixedSegments[nextSegmentIdx].start,
+    )
+      ? 1
+      : 0;
+    nextFixedSegments[nextSegmentIdx].end[dir] = end[dir];
     nextFixedSegments[nextSegmentIdx].start = end;
   }
 
@@ -762,6 +796,31 @@ export const updateElbowArrowPoints = (
     "Updated point array length must match the arrow point length, contain " +
       "exactly the new start and end points or not be specified at all (i.e. " +
       "you can't add new points between start and end manually to elbow arrows)",
+  );
+
+  invariant(
+    !arrow.fixedSegments ||
+      arrow.fixedSegments
+        .map((s) => s.start[0] === s.end[0] || s.start[1] === s.end[1])
+        .every(Boolean),
+    "Fixed segments must be either horizontal or vertical",
+  );
+
+  invariant(
+    !updates.fixedSegments ||
+      updates.fixedSegments
+        .map((s) => s.start[0] === s.end[0] || s.start[1] === s.end[1])
+        .every(Boolean),
+    "Updates to fixed segments must be either horizontal or vertical",
+  );
+
+  invariant(
+    arrow.points
+      .slice(1)
+      .map(
+        (p, i) => p[0] === arrow.points[i][0] || p[1] === arrow.points[i][1],
+      ),
+    "Elbow arrow segments must be either horizontal or vertical",
   );
 
   const updatedPoints: readonly LocalPoint[] = updates.points
