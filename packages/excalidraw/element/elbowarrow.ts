@@ -115,11 +115,12 @@ const handleSegmentRenormalization = (
         }
 
         if (
+          pointDistance(points[i - 2], points[i - 1]) <
+            1 + (zoom?.value ?? 0) ||
           compareHeading(
             headingForPoint(p, points[i - 1]),
-            headingForPoint(points[i - 2], points[i - 3]),
-          ) &&
-          pointDistance(points[i - 2], points[i - 1]) < 1 + (zoom?.value ?? 0)
+            headingForPoint(points[i - 1], points[i - 2]),
+          )
         ) {
           // Remove this as this was a fixed segment
           const segmentIdx =
