@@ -165,6 +165,7 @@ import {
   isTextBindableContainer,
   isElbowArrow,
   isFlowchartNodeElement,
+  isBindableElement,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -8694,6 +8695,24 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementsAreBeingDragged: false,
       });
       const elementsMap = this.scene.getNonDeletedElementsMap();
+
+      if (
+        pointerDownState.drag.hasOccurred &&
+        pointerDownState.hit?.element?.id
+      ) {
+        const element = elementsMap.get(pointerDownState.hit.element.id);
+        if (isBindableElement(element)) {
+          // Renormalize elbow arrows when they are changed via indirect move
+          element.boundElements
+            ?.filter((e) => e.type === "arrow")
+            .map((e) => elementsMap.get(e.id))
+            .filter((e) => isElbowArrow(e))
+            .forEach((e) => {
+              !!e && mutateElement(e, {}, true, { zoom: this.state.zoom });
+            });
+        }
+      }
+
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
