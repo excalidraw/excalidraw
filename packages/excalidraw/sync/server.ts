@@ -196,7 +196,7 @@ export class ExcalidrawSyncServer {
       return this.send(client, {
         type: "rejected",
         payload: {
-          message: error ? error.message : "Coudn't persist the increment",
+          message: error ? error.message : "Coudn't persist the increment.",
           increments: [increment],
         },
       });

@@ -865,6 +865,8 @@ const ExcalidrawWrapper = () => {
     currentVersion.current = value;
   }, 0);
 
+  const latestVersion = acknowledgedIncrements.length - 1;
+
   return (
     <div
       style={{ height: "100%" }}
@@ -882,8 +884,12 @@ const ExcalidrawWrapper = () => {
         }}
         step={1}
         min={0}
-        max={acknowledgedIncrements.length}
-        value={nextVersion === -1 ? acknowledgedIncrements.length : nextVersion}
+        max={latestVersion}
+        value={
+          nextVersion === -1 || nextVersion === latestVersion
+            ? latestVersion
+            : nextVersion
+        }
         onChange={(value) => {
           // CFDO: should be disabled when offline! (later we could have speculative changes in the versioning log as well)
           // CFDO: in safari the whole canvas gets selected when dragging

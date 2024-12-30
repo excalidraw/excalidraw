@@ -37,7 +37,7 @@ export class DurableIncrementsRepository implements IncrementsRepository {
       try {
         const payload = JSON.stringify(increment);
         const payloadSize = new TextEncoder().encode(payload).byteLength;
-        const chunkVersion = this.getLastVersion() + 1;
+        const nextVersion = this.getLastVersion() + 1;
         const chunksCount = Math.ceil(
           payloadSize / DurableIncrementsRepository.MAX_PAYLOAD_SIZE,
         );
@@ -51,7 +51,7 @@ export class DurableIncrementsRepository implements IncrementsRepository {
           this.storage.sql.exec(
             `INSERT INTO increments (id, version, position, payload) VALUES (?, ?, ?, ?);`,
             increment.id,
-            chunkVersion,
+            nextVersion,
             position,
             chunkedPayload,
           );

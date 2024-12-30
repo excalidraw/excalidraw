@@ -1,9 +1,6 @@
 /* eslint-disable no-console */
 import throttle from "lodash.throttle";
-import ReconnectingWebSocket, {
-  type Event,
-  type CloseEvent,
-} from "reconnecting-websocket";
+import ReconnectingWebSocket, { type Event } from "reconnecting-websocket";
 import { Utils } from "./utils";
 import {
   SyncQueue,
@@ -42,8 +39,6 @@ class SocketClient {
   // Chrome throws "Uncaught InvalidAccessError" with message:
   //   "The close code must be either 1000, or between 3000 and 4999. 1009 is neither."
   // therefore using custom codes instead.
-  private static readonly NO_STATUS_RECEIVED_ERROR_CODE = 3005;
-  private static readonly ABNORMAL_CLOSURE_ERROR_CODE = 3006;
   private static readonly MESSAGE_IS_TOO_LARGE_ERROR_CODE = 3009;
 
   private isOffline = true;
@@ -100,8 +95,6 @@ class SocketClient {
       );
       this.socket.addEventListener("message", this.onMessage);
       this.socket.addEventListener("open", this.onOpen);
-      this.socket.addEventListener("close", this.onClose);
-      this.socket.addEventListener("error", this.onError);
     },
     1000,
     { leading: true, trailing: false },
@@ -127,8 +120,6 @@ class SocketClient {
       );
       this.socket?.removeEventListener("message", this.onMessage);
       this.socket?.removeEventListener("open", this.onOpen);
-      this.socket?.removeEventListener("close", this.onClose);
-      this.socket?.removeEventListener("error", this.onError);
 
       let remappedCode = code;
 
@@ -197,24 +188,6 @@ class SocketClient {
   private onOpen = (event: Event) => {
     this.isOffline = false;
     this.handlers.onOpen(event);
-  };
-
-  private onClose = (event: CloseEvent) => {
-    this.disconnect(
-      event.code || SocketClient.NO_STATUS_RECEIVED_ERROR_CODE,
-      event.reason || "Connection closed without a reason",
-    );
-    this.connect();
-  };
-
-  private onError = (event: Event) => {
-    this.disconnect(
-      event.type === "error"
-        ? SocketClient.ABNORMAL_CLOSURE_ERROR_CODE
-        : SocketClient.NO_STATUS_RECEIVED_ERROR_CODE,
-      `Received "${event.type}" on the sync connection`,
-    );
-    this.connect();
   };
 }
 
@@ -288,6 +261,7 @@ export class SyncClient {
     return new SyncClient(api, repository, queue, {
       host: SyncClient.HOST_URL,
       roomId: SyncClient.ROOM_ID,
+      // CFDO: temporary, so that all increments are loaded and applied on init
       lastAcknowledgedVersion: 0,
     });
   }
