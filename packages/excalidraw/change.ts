@@ -804,10 +804,8 @@ export class AppStateChange implements Change<AppState> {
 }
 
 // CFDO: consider adding here (nonnullable) version & versionNonce & updated & seed (so that we have correct versions when recunstructing from remote)
-type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
-  ElementUpdate<Ordered<T>>,
-  "seed"
->;
+type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> =
+  ElementUpdate<Ordered<T>>;
 
 type ElementsChangeOptions = {
   shouldRedistribute: boolean;
@@ -1605,8 +1603,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
   private static stripIrrelevantProps(
     partial: Partial<OrderedExcalidrawElement>,
   ): ElementPartial {
-    const { id, updated, version, versionNonce, seed, ...strippedPartial } =
-      partial;
+    const { id, updated, version, versionNonce, ...strippedPartial } = partial;
 
     return strippedPartial;
   }

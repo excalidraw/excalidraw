@@ -64,8 +64,45 @@ const checkpoint = (name: string) => {
     ...strippedAppState
   } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history.undoStack).toMatchSnapshot(`[${name}] undo stack`);
-  expect(h.history.redoStack).toMatchSnapshot(`[${name}] redo stack`);
+
+  const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
+    Object.entries(deltas).reduce((acc, curr) => {
+      const { inserted, deleted, ...rest } = curr[1];
+
+      delete inserted.seed;
+      delete deleted.seed;
+
+      acc[curr[0]] = {
+        inserted,
+        deleted,
+        ...rest,
+      };
+
+      return acc;
+    }, {} as Record<string, any>);
+
+  expect(
+    h.history.undoStack.map((x) => ({
+      ...x,
+      elementsChange: {
+        ...x.elementsChange,
+        added: stripSeed(x.elementsChange.added),
+        removed: stripSeed(x.elementsChange.updated),
+        updated: stripSeed(x.elementsChange.removed),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] undo stack`);
+  expect(
+    h.history.redoStack.map((x) => ({
+      ...x,
+      elementsChange: {
+        ...x.elementsChange,
+        added: stripSeed(x.elementsChange.added),
+        removed: stripSeed(x.elementsChange.updated),
+        updated: stripSeed(x.elementsChange.removed),
+      },
+    })),
+  ).toMatchSnapshot(`[${name}] redo stack`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements
     .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
