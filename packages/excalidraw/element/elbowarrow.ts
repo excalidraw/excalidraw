@@ -162,6 +162,17 @@ const handleSegmentRenormalization = (
         return _nextPoints.push(p);
       });
 
+    invariant(
+      _nextPoints
+        .slice(1)
+        .map(
+          (p, i) => p[0] === _nextPoints[i][0] || p[1] === _nextPoints[i][1],
+        ),
+      `Renormalization of parallel segments failed. Original points: ${JSON.stringify(
+        arrow.points,
+      )}. New points: ${JSON.stringify(_nextPoints)}`,
+    );
+
     const threshold = 30 - (zoom?.value ?? 30);
     const nextPoints: GlobalPoint[] = [];
 
@@ -217,6 +228,17 @@ const handleSegmentRenormalization = (
 
       nextPoints.push(p);
     });
+
+    invariant(
+      nextPoints
+        .slice(1)
+        .map((p, i) => p[0] === nextPoints[i][0] || p[1] === nextPoints[i][1]),
+      `Renormalization of short segments failed. Original points: ${JSON.stringify(
+        arrow.points,
+      )}. In-between points: ${JSON.stringify(
+        _nextPoints,
+      )} New points: ${JSON.stringify(nextPoints)}`,
+    );
 
     return normalizeArrowElementUpdate(
       nextPoints,

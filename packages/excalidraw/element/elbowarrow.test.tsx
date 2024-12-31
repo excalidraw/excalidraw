@@ -23,18 +23,6 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-// const expectPointsToBeCloseTo = (
-//   received: readonly LocalPoint[],
-//   expected: number[][],
-//   precision?: number,
-// ) => {
-//   expect(received.length).toBe(expected.length);
-//   received.forEach((point, index) => {
-//     expect(point[0]).toBeCloseTo(expected[index][0], precision);
-//     expect(point[1]).toBeCloseTo(expected[index][1], precision);
-//   });
-// };
-
 describe("elbow arrow routing", () => {
   it("can properly generate orthogonal arrow points", () => {
     const scene = new Scene();
@@ -227,13 +215,13 @@ describe("elbow arrow segment move", () => {
     mouse.reset();
     mouse.moveTo(0, 0);
     mouse.click();
-    mouse.moveTo(200, 200);
+    mouse.moveTo(250, 200);
     mouse.click();
 
     mouse.reset();
-    mouse.moveTo(100, 100);
+    mouse.moveTo(125, 100);
     mouse.down();
-    mouse.moveTo(105, 100);
+    mouse.moveTo(130, 100);
     mouse.up();
 
     const arrow = h.scene.getSelectedElements(
@@ -242,22 +230,20 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [0, -2],
-      [105, -2],
-      [105, 200],
-      [200, 200],
+      [130, 0],
+      [130, 200],
+      [250, 200],
     ]);
 
     mouse.reset();
-    mouse.moveTo(105, 74.275);
+    mouse.moveTo(130, 100);
     mouse.doubleClick();
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [0, -2],
-      [105, -2],
-      [105, 200],
-      [200, 200],
+      [125, 0],
+      [125, 200],
+      [250, 200],
     ]);
   });
 
