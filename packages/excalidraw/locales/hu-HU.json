@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Beillesztés",
-    "pasteAsPlaintext": "",
+    "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
     "selectAll": "Összes kijelölése",
     "multiSelect": "Elem hozzáadása a kijelöléshez",
@@ -10,7 +10,7 @@
     "copy": "Másolás",
     "copyAsPng": "Vágólapra másolás mint PNG",
     "copyAsSvg": "Vágólapra másolás mint SVG",
-    "copyText": "",
+    "copyText": "Vágólapra másolás szövegként",
     "copySource": "",
     "convertToCode": "",
     "bringForward": "Előrébb hozás",
