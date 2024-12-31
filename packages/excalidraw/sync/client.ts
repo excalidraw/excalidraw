@@ -1,6 +1,9 @@
 /* eslint-disable no-console */
 import throttle from "lodash.throttle";
-import ReconnectingWebSocket, { type Event } from "reconnecting-websocket";
+import ReconnectingWebSocket, {
+  type Event,
+  type CloseEvent,
+} from "reconnecting-websocket";
 import { Utils } from "./utils";
 import {
   SyncQueue,
@@ -76,7 +79,7 @@ class SocketClient {
       window.addEventListener("online", this.onOnline);
       window.addEventListener("offline", this.onOffline);
 
-      console.debug("Connecting to the sync server...");
+      console.debug(`Connecting to the room "${this.roomId}"...`);
       this.socket = new ReconnectingWebSocket(
         `${this.host}/connect?roomId=${this.roomId}`,
         [],
@@ -95,16 +98,15 @@ class SocketClient {
       );
       this.socket.addEventListener("message", this.onMessage);
       this.socket.addEventListener("open", this.onOpen);
+      this.socket.addEventListener("close", this.onClose);
+      this.socket.addEventListener("error", this.onError);
     },
     1000,
     { leading: true, trailing: false },
   );
 
   // CFDO: the connections seem to keep hanging for some reason
-  public disconnect(
-    code: number = SocketClient.NORMAL_CLOSURE_CODE,
-    reason?: string,
-  ) {
+  public disconnect() {
     if (this.isDisconnected) {
       return;
     }
@@ -113,25 +115,13 @@ class SocketClient {
       window.removeEventListener("online", this.onOnline);
       window.removeEventListener("offline", this.onOffline);
 
-      console.debug(
-        `Disconnecting from the sync server with code "${code}"${
-          reason ? ` and reason "${reason}".` : "."
-        }`,
-      );
       this.socket?.removeEventListener("message", this.onMessage);
       this.socket?.removeEventListener("open", this.onOpen);
+      this.socket?.removeEventListener("close", this.onClose);
+      this.socket?.removeEventListener("error", this.onError);
+      this.socket?.close();
 
-      let remappedCode = code;
-
-      switch (code) {
-        case 1009: {
-          // remapping the code, otherwise getting "The close code must be either 1000, or between 3000 and 4999. 1009 is neither."
-          remappedCode = SocketClient.MESSAGE_IS_TOO_LARGE_ERROR_CODE;
-          break;
-        }
-      }
-
-      this.socket?.close(remappedCode, reason);
+      console.debug(`Disconnected from the room "${this.roomId}".`);
     } finally {
       this.socket = null;
     }
@@ -186,8 +176,20 @@ class SocketClient {
   };
 
   private onOpen = (event: Event) => {
+    console.debug(`Connection to the room "${this.roomId}" opened.`);
     this.isOffline = false;
     this.handlers.onOpen(event);
+  };
+
+  private onClose = (event: CloseEvent) => {
+    console.debug(`Connection to the room "${this.roomId}" closed.`, event);
+  };
+
+  private onError = (event: Event) => {
+    console.debug(
+      `Connection to the room "${this.roomId}" returned an error.`,
+      event,
+    );
   };
 }
 
@@ -258,9 +260,12 @@ export class SyncClient {
     repository: IncrementsRepository & MetadataRepository,
   ) {
     const queue = await SyncQueue.create(repository);
+    // CFDO: temporary for custom roomId (though E+ will be similar)
+    const roomId = window.location.pathname.split("/").at(-1);
+
     return new SyncClient(api, repository, queue, {
       host: SyncClient.HOST_URL,
-      roomId: SyncClient.ROOM_ID,
+      roomId: roomId ?? SyncClient.ROOM_ID,
       // CFDO: temporary, so that all increments are loaded and applied on init
       lastAcknowledgedVersion: 0,
     });

@@ -856,7 +856,7 @@ const ExcalidrawWrapper = () => {
     excalidrawAPI?.updateScene({
       appState: {
         ...excalidrawAPI?.getAppState(),
-        viewModeEnabled: value !== acknowledgedIncrements.length,
+        viewModeEnabled: value !== -1,
       },
       elements: Array.from(elements.values()),
       storeAction: StoreAction.UPDATE,
@@ -865,7 +865,7 @@ const ExcalidrawWrapper = () => {
     currentVersion.current = value;
   }, 0);
 
-  const latestVersion = acknowledgedIncrements.length - 1;
+  const latestVersion = acknowledgedIncrements.length;
 
   return (
     <div
@@ -885,24 +885,24 @@ const ExcalidrawWrapper = () => {
         step={1}
         min={0}
         max={latestVersion}
-        value={
-          nextVersion === -1 || nextVersion === latestVersion
-            ? latestVersion
-            : nextVersion
-        }
+        value={nextVersion === -1 ? latestVersion : nextVersion}
         onChange={(value) => {
+          let nextValue: number;
+
           // CFDO: should be disabled when offline! (later we could have speculative changes in the versioning log as well)
           // CFDO: in safari the whole canvas gets selected when dragging
           if (value !== acknowledgedIncrements.length) {
             // don't listen to updates in the detached mode
             syncAPI?.disconnect();
+            nextValue = value as number;
           } else {
             // reconnect once we're back to the latest version
             syncAPI?.connect();
+            nextValue = -1;
           }
 
-          setNextVersion(value as number);
-          debouncedTimeTravel(value as number);
+          setNextVersion(nextValue);
+          debouncedTimeTravel(nextValue);
         }}
       />
       <Excalidraw

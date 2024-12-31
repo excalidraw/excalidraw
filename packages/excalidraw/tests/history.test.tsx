@@ -64,6 +64,12 @@ const checkpoint = (name: string) => {
     ...strippedAppState
   } = h.state;
   expect(strippedAppState).toMatchSnapshot(`[${name}] appState`);
+  expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
+  h.elements
+    .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
+    .forEach((element, i) =>
+      expect(element).toMatchSnapshot(`[${name}] element ${i}`),
+    );
 
   const stripSeed = (deltas: Record<string, { deleted: any; inserted: any }>) =>
     Object.entries(deltas).reduce((acc, curr) => {
@@ -92,6 +98,7 @@ const checkpoint = (name: string) => {
       },
     })),
   ).toMatchSnapshot(`[${name}] undo stack`);
+
   expect(
     h.history.redoStack.map((x) => ({
       ...x,
@@ -103,12 +110,6 @@ const checkpoint = (name: string) => {
       },
     })),
   ).toMatchSnapshot(`[${name}] redo stack`);
-  expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
-  h.elements
-    .map(({ seed, versionNonce, ...strippedElement }) => strippedElement)
-    .forEach((element, i) =>
-      expect(element).toMatchSnapshot(`[${name}] element ${i}`),
-    );
 };
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
