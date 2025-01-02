@@ -19,6 +19,7 @@ import { jotaiScope } from "../../jotai";
 import { ColorInput } from "./ColorInput";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
+import { CLASSES } from "../../constants";
 
 import "./ColorPicker.scss";
 
@@ -186,9 +187,13 @@ const ColorPickerTrigger = ({
   return (
     <Popover.Trigger
       type="button"
-      className={clsx("color-picker__button active-color properties-trigger", {
-        "is-transparent": color === "transparent" || !color,
-      })}
+      className={clsx(
+        "color-picker__button active-color",
+        CLASSES.PROPERTIES_POPOVER_TRIGGER,
+        {
+          "is-transparent": color === "transparent" || !color,
+        },
+      )}
       aria-label={label}
       style={color ? { "--swatch-color": color } : undefined}
       title={

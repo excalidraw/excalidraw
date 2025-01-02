@@ -4845,6 +4845,12 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
+    // flushSync(() => {
+    //   this.setState({
+    //     editingTextElement: element,
+    //   });
+    // });
+
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
@@ -6278,6 +6284,11 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    console.log("(1)", document.activeElement);
+    console.time();
+    this.focusContainer();
+    console.timeEnd();
+    console.log("(2)", document.activeElement);
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
@@ -6722,17 +6733,16 @@ class App extends React.Component<AppProps, AppState> {
     }
     isPanning = true;
 
-    // due to event.preventDefault below, container wouldn't get focus
-    // automatically
-    this.focusContainer();
-
     // preventing defualt while text editing messes with cursor/focus
     if (!this.state.editingTextElement) {
       // necessary to prevent browser from scrolling the page if excalidraw
       // not full-page #4489
       //
-      // as such, the above is broken when panning canvas while in wysiwyg
+      // note, this fix won't work when panning canvas while in wysiwyg since
+      // we don't execute it while in wysiwyg
       event.preventDefault();
+      // focus explicitly due to the event.preventDefault above
+      this.focusContainer();
     }
 
     let nextPastePrevented = false;
