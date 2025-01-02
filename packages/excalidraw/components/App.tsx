@@ -2583,6 +2583,21 @@ class App extends React.Component<AppProps, AppState> {
         this.handleWheel,
         { passive: false },
       ),
+      addEventListener(window, "focusin", (event) => {
+        console.log("%c@@@@@@ focusin:", "color:lime", event.target);
+        const target = event.target;
+        if (
+          event.target instanceof HTMLElement &&
+          this.state.editingTextElement
+        ) {
+          if (event.target.tagName !== "TEXTAREA") {
+            this.focusContainer();
+          }
+        }
+      }),
+      addEventListener(window, "focusout", (event) => {
+        console.log("%c@@@@@@ focusout:", "color:red", event.target);
+      }),
       addEventListener(window, EVENT.MESSAGE, this.onWindowMessage, false),
       addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
         passive: false,
