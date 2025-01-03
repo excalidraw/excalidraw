@@ -998,7 +998,13 @@ export const updateElbowArrowPoints = (
   }
 
   ////
-  // 5. One or more segments are fixed and endpoints are moved
+  // 5. Handle resize
+  if (updates.points && updates.fixedSegments) {
+    return updates;
+  }
+
+  ////
+  // 6. One or more segments are fixed and endpoints are moved
   //
   // The key insights are:
   // - When segments are fixed, the arrow will keep the exact amount of segments

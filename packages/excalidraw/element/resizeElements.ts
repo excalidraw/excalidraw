@@ -1390,6 +1390,7 @@ export const resizeMultipleElements = (
         boundTextFontSize?: ExcalidrawTextElement["fontSize"];
         startBinding?: ExcalidrawElbowArrowElement["startBinding"];
         endBinding?: ExcalidrawElbowArrowElement["endBinding"];
+        fixedSegments?: ExcalidrawElbowArrowElement["fixedSegments"];
       };
     }[] = [];
 
@@ -1458,6 +1459,13 @@ export const resizeMultipleElements = (
                 : orig.endBinding.fixedPoint[1],
             ],
           };
+        }
+        if (orig.fixedSegments && rescaledPoints.points) {
+          update.fixedSegments = orig.fixedSegments.map((segment) => ({
+            ...segment,
+            start: rescaledPoints.points[segment.index - 1],
+            end: rescaledPoints.points[segment.index],
+          }));
         }
       }
 

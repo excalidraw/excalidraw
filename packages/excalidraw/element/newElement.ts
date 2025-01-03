@@ -471,6 +471,8 @@ export const newArrowElement = (
     endArrowhead: opts.endArrowhead || null,
     elbowed: opts.elbowed || false,
     fixedSegments: opts.fixedSegments || [],
+    startIsSpecial: false,
+    endIsSpecial: false,
   };
 };
 
