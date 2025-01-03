@@ -100,6 +100,7 @@ export const BASE_PADDING = 40;
 
 const handleSegmentRenormalization = (
   arrow: ExcalidrawElbowArrowElement,
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   zoom?: AppState["zoom"],
 ) => {
   const nextFixedSegments: FixedSegment[] | null = arrow.fixedSegments
@@ -218,12 +219,37 @@ const handleSegmentRenormalization = (
       nextPoints.push(p);
     });
 
+    const filteredNextFixedSegments = nextFixedSegments.filter(
+      (segment) =>
+        segment.index !== 1 && segment.index !== nextPoints.length - 1,
+    );
+    if (filteredNextFixedSegments.length === 0) {
+      return normalizeArrowElementUpdate(
+        getElbowArrowCornerPoints(
+          removeElbowArrowShortSegments(
+            routeElbowArrow(
+              arrow,
+              getElbowArrowData(
+                arrow,
+                elementsMap,
+                nextPoints.map((p) =>
+                  pointFrom<LocalPoint>(p[0] - arrow.x, p[1] - arrow.y),
+                ),
+                { zoom },
+              ),
+            ) ?? [],
+            zoom,
+          ),
+        ),
+        filteredNextFixedSegments,
+        null,
+        null,
+      );
+    }
+
     return normalizeArrowElementUpdate(
       nextPoints,
-      nextFixedSegments.filter(
-        (segment) =>
-          segment.index !== 1 && segment.index !== nextPoints.length - 1,
-      ),
+      filteredNextFixedSegments,
       arrow.startIsSpecial,
       arrow.endIsSpecial,
     );
@@ -918,30 +944,28 @@ export const updateElbowArrowPoints = (
   // 1. Renormalize the arrow
   ////
   if (!updates.points && !updates.fixedSegments) {
-    return handleSegmentRenormalization(arrow, options?.zoom);
+    return handleSegmentRenormalization(arrow, elementsMap, options?.zoom);
   }
 
   ////
   // 2. Just normal elbow arrow things
   ////
   if (fixedSegments.length === 0) {
-    const simplifiedPoints = getElbowArrowCornerPoints(
-      removeElbowArrowShortSegments(
-        routeElbowArrow(arrow, {
-          startHeading,
-          endHeading,
-          startGlobalPoint,
-          endGlobalPoint,
-          hoveredStartElement,
-          hoveredEndElement,
-          ...rest,
-        }) ?? [],
-        options?.zoom,
-      ),
-    );
-
     return normalizeArrowElementUpdate(
-      simplifiedPoints,
+      getElbowArrowCornerPoints(
+        removeElbowArrowShortSegments(
+          routeElbowArrow(arrow, {
+            startHeading,
+            endHeading,
+            startGlobalPoint,
+            endGlobalPoint,
+            hoveredStartElement,
+            hoveredEndElement,
+            ...rest,
+          }) ?? [],
+          options?.zoom,
+        ),
+      ),
       fixedSegments,
       null,
       null,
