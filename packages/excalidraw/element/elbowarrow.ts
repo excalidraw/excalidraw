@@ -2,6 +2,7 @@ import {
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
+  pointsEqual,
   pointTranslate,
   vector,
   vectorCross,
@@ -560,12 +561,19 @@ const handleSegmentMove = (
   const endIdx = nextFixedSegments[activelyModifiedSegmentIdx].index;
   const start = nextFixedSegments[activelyModifiedSegmentIdx].start;
   const end = nextFixedSegments[activelyModifiedSegmentIdx].end;
-  const prevSegmentIsHorizontal = newPoints[startIdx - 1]
-    ? headingForPointIsHorizontal(newPoints[startIdx - 1], newPoints[startIdx])
-    : undefined;
-  const nextSegmentIsHorizontal = newPoints[endIdx + 1]
-    ? headingForPointIsHorizontal(newPoints[endIdx + 1], newPoints[endIdx])
-    : undefined;
+  const prevSegmentIsHorizontal =
+    newPoints[startIdx - 1] &&
+    !pointsEqual(newPoints[startIdx], newPoints[startIdx - 1])
+      ? headingForPointIsHorizontal(
+          newPoints[startIdx - 1],
+          newPoints[startIdx],
+        )
+      : undefined;
+  const nextSegmentIsHorizontal =
+    newPoints[endIdx + 1] &&
+    !pointsEqual(newPoints[endIdx], newPoints[endIdx + 1])
+      ? headingForPointIsHorizontal(newPoints[endIdx + 1], newPoints[endIdx])
+      : undefined;
 
   // Override the segment points with the actively moved fixed segment
   if (prevSegmentIsHorizontal !== undefined) {
