@@ -163,18 +163,7 @@ const handleSegmentRenormalization = (
         return _nextPoints.push(p);
       });
 
-    invariant(
-      _nextPoints
-        .slice(1)
-        .map(
-          (p, i) => p[0] === _nextPoints[i][0] || p[1] === _nextPoints[i][1],
-        ),
-      `Renormalization of parallel segments failed. Original points: ${JSON.stringify(
-        arrow.points,
-      )}. New points: ${JSON.stringify(_nextPoints)}`,
-    );
-
-    const threshold = 30 - (zoom?.value ?? 30);
+    const threshold = 1 + (30 - (zoom?.value ?? 30)) / 7;
     const nextPoints: GlobalPoint[] = [];
 
     _nextPoints.forEach((p, i, points) => {
@@ -184,8 +173,7 @@ const handleSegmentRenormalization = (
 
       if (
         // Remove segments that are too short
-        pointDistance(points[i - 2], points[i - 1]) <
-        1 + threshold / 7
+        pointDistance(points[i - 2], points[i - 1]) < threshold
       ) {
         const prevPrevSegmentIdx =
           nextFixedSegments?.findIndex((segment) => segment.index === i - 2) ??
@@ -230,17 +218,6 @@ const handleSegmentRenormalization = (
       nextPoints.push(p);
     });
 
-    invariant(
-      nextPoints
-        .slice(1)
-        .map((p, i) => p[0] === nextPoints[i][0] || p[1] === nextPoints[i][1]),
-      `Renormalization of short segments failed. Original points: ${JSON.stringify(
-        arrow.points,
-      )}. In-between points: ${JSON.stringify(
-        _nextPoints,
-      )} New points: ${JSON.stringify(nextPoints)}`,
-    );
-
     return normalizeArrowElementUpdate(
       nextPoints,
       nextFixedSegments.filter(
@@ -266,6 +243,7 @@ const handleSegmentRelease = (
   arrow: ExcalidrawElbowArrowElement,
   fixedSegments: FixedSegment[],
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
+  zoom?: AppState["zoom"],
 ) => {
   const newFixedSegmentIndices = fixedSegments.map((segment) => segment.index);
   const oldFixedSegmentIndices =
@@ -337,6 +315,7 @@ const handleSegmentRelease = (
           hoveredEndElement,
           ...rest,
         }) ?? [],
+        zoom,
       ),
     ),
     fixedSegments,
@@ -957,6 +936,7 @@ export const updateElbowArrowPoints = (
           hoveredEndElement,
           ...rest,
         }) ?? [],
+        options?.zoom,
       ),
     );
 
@@ -971,7 +951,12 @@ export const updateElbowArrowPoints = (
   ////
   // 3. Handle releasing a fixed segment
   if ((arrow.fixedSegments?.length ?? 0) > fixedSegments.length) {
-    return handleSegmentRelease(arrow, fixedSegments, elementsMap);
+    return handleSegmentRelease(
+      arrow,
+      fixedSegments,
+      elementsMap,
+      options?.zoom,
+    );
   }
 
   ////
@@ -1970,8 +1955,11 @@ const getElbowArrowCornerPoints = (points: GlobalPoint[]): GlobalPoint[] => {
 
 const removeElbowArrowShortSegments = (
   points: GlobalPoint[],
+  zoom?: AppState["zoom"],
 ): GlobalPoint[] => {
   if (points.length >= 4) {
+    const threshold = Math.min((30 - (zoom?.value ?? 30)) / 30, 0.3);
+
     return points.filter((p, idx) => {
       if (idx === 0 || idx === points.length - 1) {
         return true;
@@ -1979,7 +1967,7 @@ const removeElbowArrowShortSegments = (
 
       const prev = points[idx - 1];
       const prevDist = pointDistance(prev, p);
-      return prevDist > 0.3;
+      return prevDist > threshold;
     });
   }
 
