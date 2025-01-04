@@ -11241,7 +11241,7 @@ History {
               "fixedSegments": null,
               "frameId": null,
               "groupIds": [],
-              "height": "236.10000",
+              "height": "236.10100",
               "index": "a2",
               "isDeleted": false,
               "lastCommittedPoint": null,
@@ -11254,16 +11254,12 @@ History {
                   0,
                 ],
                 [
+                  "178.90000",
                   0,
-                  "118.05000",
                 ],
                 [
                   "178.90000",
-                  "118.05000",
-                ],
-                [
-                  "178.90000",
-                  "236.10000",
+                  "236.10100",
                 ],
               ],
               "roughness": 1,
