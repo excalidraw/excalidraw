@@ -12,7 +12,6 @@ import { ShapeCache } from "../scene/ShapeCache";
 import { isElbowArrow } from "./typeChecks";
 import { updateElbowArrowPoints } from "./elbowarrow";
 import type { Radians } from "../../math";
-import type { AppState } from "../types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -30,7 +29,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   options?: {
     isDragging?: boolean;
     changedElements?: Map<string, OrderedExcalidrawElement>;
-    zoom?: AppState["zoom"];
   },
 ): TElement => {
   let didChange = false;
@@ -64,7 +62,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
         },
         {
           isDragging: options?.isDragging,
-          zoom: options?.zoom,
         },
       ),
     };

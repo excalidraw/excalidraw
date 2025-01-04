@@ -186,8 +186,6 @@ describe("elbow arrow ui", () => {
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
       [35, 0],
-      [35, 90],
-      [35, 90],
       [35, 165],
       [103, 165],
     ]);

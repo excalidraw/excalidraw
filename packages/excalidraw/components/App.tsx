@@ -4332,7 +4332,6 @@ class App extends React.Component<AppProps, AppState> {
 
           updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
             simultaneouslyUpdated: selectedElements,
-            zoom: this.state.zoom,
           });
         });
 
@@ -5347,7 +5346,6 @@ class App extends React.Component<AppProps, AppState> {
           return LinearElementEditor.deleteFixedSegment(
             selectedElements[0],
             midPoint[0],
-            this.state,
           );
         }
       }
@@ -5831,7 +5829,6 @@ class App extends React.Component<AppProps, AppState> {
           false,
           {
             isDragging: true,
-            zoom: this.state.zoom,
           },
         );
 
@@ -8314,7 +8311,6 @@ class App extends React.Component<AppProps, AppState> {
               this.scene,
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-              this.state.zoom,
             );
           }
 
@@ -8502,7 +8498,7 @@ class App extends React.Component<AppProps, AppState> {
                 points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
               false,
-              { isDragging: true, zoom: this.state.zoom },
+              { isDragging: true },
             );
           }
 
@@ -8710,7 +8706,7 @@ class App extends React.Component<AppProps, AppState> {
             .map((e) => elementsMap.get(e.id))
             .filter((e) => isElbowArrow(e))
             .forEach((e) => {
-              !!e && mutateElement(e, {}, true, { zoom: this.state.zoom });
+              !!e && mutateElement(e, {}, true);
             });
         }
       }
@@ -8746,7 +8742,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
           if (element) {
-            mutateElement(element, {}, true, { zoom: this.state.zoom });
+            mutateElement(element, {}, true);
           }
         }
 

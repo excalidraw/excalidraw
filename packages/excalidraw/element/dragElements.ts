@@ -33,7 +33,6 @@ export const dragSelectedElements = (
     y: number;
   },
   gridSize: NullableGridSize,
-  zoom: AppState["zoom"],
 ) => {
   if (
     _selectedElements.length === 1 &&
@@ -88,7 +87,6 @@ export const dragSelectedElements = (
       }
       updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
-        zoom,
       });
     }
   });

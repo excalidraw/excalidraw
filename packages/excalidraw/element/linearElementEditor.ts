@@ -1279,7 +1279,6 @@ export class LinearElementEditor {
     options?: {
       changedElements?: Map<string, OrderedExcalidrawElement>;
       isDragging?: boolean;
-      zoom?: AppState["zoom"];
     },
   ) {
     const { points } = element;
@@ -1331,7 +1330,6 @@ export class LinearElementEditor {
           false,
         ),
         changedElements: options?.changedElements,
-        zoom: options?.zoom,
       },
     );
   }
@@ -1482,7 +1480,6 @@ export class LinearElementEditor {
       mutateElement(element, updates, true, {
         isDragging: options?.isDragging,
         changedElements: options?.changedElements,
-        zoom: options?.zoom,
       });
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
@@ -1826,14 +1823,13 @@ export class LinearElementEditor {
   static deleteFixedSegment(
     element: ExcalidrawElbowArrowElement,
     index: number,
-    appState: AppState,
   ): void {
     mutateElement(element, {
       fixedSegments: element.fixedSegments?.filter(
         (segment) => segment.index !== index,
       ),
     });
-    mutateElement(element, {}, true, { zoom: appState.zoom });
+    mutateElement(element, {}, true);
   }
 
   static getElbowArrowMidPoints(

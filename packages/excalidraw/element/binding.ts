@@ -628,11 +628,9 @@ export const updateBoundElements = (
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
-    zoom?: AppState["zoom"];
   },
 ) => {
-  const { newSize, simultaneouslyUpdated, changedElements, zoom } =
-    options ?? {};
+  const { newSize, simultaneouslyUpdated, changedElements } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -666,7 +664,7 @@ export const updateBoundElements = (
 
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
-      mutateElement(element, bindings, true, { zoom: options?.zoom });
+      mutateElement(element, bindings, true);
       return;
     }
 
@@ -721,7 +719,6 @@ export const updateBoundElements = (
       },
       {
         changedElements,
-        zoom,
       },
     );
 
