@@ -48,7 +48,9 @@ function Picker<T>({
       event.preventDefault();
     } else if (event.key === KEYS.TAB) {
       const index = options.findIndex((option) => option.value === value);
-      const nextIndex = (index + 1) % options.length;
+      const nextIndex = event.shiftKey
+        ? (options.length + index - 1) % options.length
+        : (index + 1) % options.length;
       onChange(options[nextIndex].value);
     } else if (isArrowKey(event.key)) {
       // Arrow navigation
