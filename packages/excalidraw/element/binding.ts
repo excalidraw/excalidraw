@@ -40,6 +40,7 @@ import {
   isBoundToContainer,
   isElbowArrow,
   isFixedPointBinding,
+  isFrameLikeElement,
   isLinearElement,
   isRectangularElement,
   isTextElement,
@@ -575,7 +576,7 @@ export const getHoveredElementForBinding = (
         zoom,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
-        fullShape,
+        fullShape && !isFrameLikeElement(element),
       ),
   );
 
