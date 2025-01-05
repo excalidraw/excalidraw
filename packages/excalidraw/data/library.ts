@@ -35,6 +35,9 @@ import type { MaybePromise } from "../utility-types";
 import { Emitter } from "../emitter";
 import { Queue } from "../queue";
 import { hashElementsVersion, hashString } from "../element";
+import { toValidURL } from "./url";
+
+const ALLOWED_LIBRARY_HOSTNAMES = ["excalidraw.com"];
 
 type LibraryUpdate = {
   /** deleted library items since last onLibraryChange event */
@@ -467,6 +470,28 @@ export const distributeLibraryItemsOnSquareGrid = (
   return resElements;
 };
 
+const validateLibraryUrl = (
+  libraryUrl: string,
+  /**
+   * If supplied, takes precedence over the default whitelist.
+   * Return `true` if the URL is valid.
+   */
+  validator?: (libraryUrl: string) => boolean,
+): boolean => {
+  if (
+    validator
+      ? validator(libraryUrl)
+      : ALLOWED_LIBRARY_HOSTNAMES.includes(
+          new URL(libraryUrl).hostname.split(".").slice(-2).join("."),
+        )
+  ) {
+    return true;
+  }
+
+  console.error(`Invalid or disallowed library URL: "${libraryUrl}"`);
+  throw new Error("Invalid or disallowed library URL");
+};
+
 export const parseLibraryTokensFromUrl = () => {
   const libraryUrl =
     // current
@@ -608,6 +633,11 @@ const persistLibraryUpdate = async (
 export const useHandleLibrary = (
   opts: {
     excalidrawAPI: ExcalidrawImperativeAPI | null;
+    /**
+     * Return `true` if the library install url should be allowed.
+     * If not supplied, only the excalidraw.com base domain is allowed.
+     */
+    validateLibraryUrl?: (libraryUrl: string) => boolean;
   } & (
     | {
         /** @deprecated we recommend using `opts.adapter` instead */
@@ -650,7 +680,13 @@ export const useHandleLibrary = (
     }) => {
       const libraryPromise = new Promise<Blob>(async (resolve, reject) => {
         try {
-          const request = await fetch(decodeURIComponent(libraryUrl));
+          libraryUrl = decodeURIComponent(libraryUrl);
+
+          libraryUrl = toValidURL(libraryUrl);
+
+          validateLibraryUrl(libraryUrl, optsRef.current.validateLibraryUrl);
+
+          const request = await fetch(libraryUrl);
           const blob = await request.blob();
           resolve(blob);
         } catch (error: any) {
@@ -678,7 +714,12 @@ export const useHandleLibrary = (
           defaultStatus: "published",
           openLibraryMenu: true,
         });
-      } catch (error) {
+      } catch (error: any) {
+        excalidrawAPI.updateScene({
+          appState: {
+            errorMessage: error.message,
+          },
+        });
         throw error;
       } finally {
         if (window.location.hash.includes(URL_HASH_KEYS.addLibrary)) {
