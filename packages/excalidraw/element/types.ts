@@ -303,7 +303,10 @@ export type Arrowhead =
   | "triangle"
   | "triangle_outline"
   | "diamond"
-  | "diamond_outline";
+  | "diamond_outline"
+  | "crowfoot_one"
+  | "crowfoot_many"
+  | "crowfoot_one_or_many";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{

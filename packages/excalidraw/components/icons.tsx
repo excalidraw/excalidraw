@@ -1352,6 +1352,54 @@ export const ArrowheadDiamondOutlineIcon = React.memo(
     ),
 );
 
+export const ArrowheadCrowfootIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M34,10 H6 M15,10 L7,5 M15,10 L7,15" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadCrowfootOneIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M34,10 H6 M15,10 L15,15 L15,5" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
+export const ArrowheadCrowfootOneOrManyIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M34,10 H6 M15,10 L15,16 L15,4 M15,10 L7,5 M15,10 L7,15" />
+      </g>,
+      { width: 40, height: 20 },
+    ),
+);
+
 export const FontSizeSmallIcon = createIcon(
   <>
     <g clipPath="url(#a)">

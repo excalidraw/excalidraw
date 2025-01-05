@@ -177,6 +177,19 @@ const getArrowheadShapes = (
     return [];
   }
 
+  const generateCrowfootOne = (
+    arrowheadPoints: number[] | null,
+    options: Options,
+  ) => {
+    if (arrowheadPoints === null) {
+      return [];
+    }
+
+    const [, , x3, y3, x4, y4] = arrowheadPoints;
+
+    return [generator.line(x3, y3, x4, y4, options)];
+  };
+
   switch (arrowhead) {
     case "dot":
     case "circle":
@@ -255,8 +268,12 @@ const getArrowheadShapes = (
         ),
       ];
     }
+    case "crowfoot_one":
+      return generateCrowfootOne(arrowheadPoints, options);
     case "bar":
     case "arrow":
+    case "crowfoot_many":
+    case "crowfoot_one_or_many":
     default: {
       const [x2, y2, x3, y3, x4, y4] = arrowheadPoints;
 
@@ -272,6 +289,12 @@ const getArrowheadShapes = (
       return [
         generator.line(x3, y3, x2, y2, options),
         generator.line(x4, y4, x2, y2, options),
+        ...(arrowhead === "crowfoot_one_or_many"
+          ? generateCrowfootOne(
+              getArrowheadPoints(element, shape, position, "crowfoot_one"),
+              options,
+            )
+          : []),
       ];
     }
   }
