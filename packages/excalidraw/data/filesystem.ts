@@ -82,6 +82,7 @@ export const fileSave = (
     name: string;
     /** file extension */
     extension: FILE_EXTENSION;
+    mimeTypes?: string[];
     description: string;
     /** existing FileSystemHandle */
     fileHandle?: FileSystemHandle | null;
@@ -93,10 +94,11 @@ export const fileSave = (
       fileName: `${opts.name}.${opts.extension}`,
       description: opts.description,
       extensions: [`.${opts.extension}`],
+      mimeTypes: opts.mimeTypes,
     },
     opts.fileHandle,
   );
 };
 
-export type { FileSystemHandle };
 export { nativeFileSystemSupported };
+export type { FileSystemHandle };
