@@ -1,19 +1,16 @@
 @import "../css/variables.module.scss";
 
 .excalidraw {
-  .picker-container {
-    display: inline-block;
-    box-sizing: border-box;
-    margin-right: 0.25rem;
-  }
-
   .picker {
+    padding: 0.5rem;
     background: var(--popup-bg-color);
     border: 0 solid transparentize($oc-white, 0.75);
-    // ˇˇ yeah, i dunno, open to suggestions here :D
-    box-shadow: rgb(0 0 0 / 25%) 2px 2px 4px 2px;
+    box-shadow: var(--shadow-island);
     border-radius: 4px;
     position: absolute;
+    :root[dir="rtl"] & {
+      padding: 0.4rem;
+    }
   }
 
   .picker-container button,
@@ -55,47 +52,16 @@
     padding: 0.25rem 0.28rem 0.35rem 0.25rem;
   }
 
-  .picker-triangle {
-    width: 0;
-    height: 0;
-    position: relative;
-    top: -10px;
-    :root[dir="ltr"] & {
-      left: 12px;
-    }
-
-    :root[dir="rtl"] & {
-      right: 12px;
-    }
-    z-index: 10;
-
-    &:before {
-      content: "";
-      position: absolute;
-      border-style: solid;
-      border-width: 0 9px 10px;
-      border-color: transparent transparent transparentize($oc-black, 0.9);
-      top: -1px;
-    }
-
-    &:after {
-      content: "";
-      position: absolute;
-      border-style: solid;
-      border-width: 0 9px 10px;
-      border-color: transparent transparent var(--popup-bg-color);
-    }
-  }
-
   .picker-content {
-    padding: 0.5rem;
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(4, auto);
     grid-gap: 0.5rem;
     border-radius: 4px;
-    :root[dir="rtl"] & {
-      padding: 0.4rem;
-    }
+  }
+
+  .picker-collapsible {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
   }
 
   .picker-keybinding {
