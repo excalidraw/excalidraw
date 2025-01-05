@@ -5,6 +5,7 @@ import { clearElementsForExport } from "../element";
 import type { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
+import { decodeSvgBase64Payload } from "../scene/export";
 import type { AppState, DataURL, LibraryItem } from "../types";
 import type { ValueOf } from "../utility-types";
 import { bytesToHexString, isPromiseLike } from "../utils";
@@ -47,7 +48,7 @@ const parseFileContents = async (blob: Blob | File): Promise<string> => {
     }
     if (blob.type === MIME_TYPES.svg) {
       try {
-        return (await import("./image")).decodeSvgMetadata({
+        return decodeSvgBase64Payload({
           svg: contents,
         });
       } catch (error: any) {

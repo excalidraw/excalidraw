@@ -1,7 +1,7 @@
 import decodePng from "png-chunks-extract";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
-import { stringToBase64, encode, decode, base64ToString } from "./encode";
+import { encode, decode } from "./encode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
 import { blobToArrayBuffer } from "./blob";
 
@@ -56,59 +56,6 @@ export const decodePngMetadata = async (blob: Blob) => {
           encodedData.type === EXPORT_DATA_TYPES.excalidraw
         ) {
           return metadata.text;
-        }
-        throw new Error("FAILED");
-      }
-      return decode(encodedData);
-    } catch (error: any) {
-      console.error(error);
-      throw new Error("FAILED");
-    }
-  }
-  throw new Error("INVALID");
-};
-
-// -----------------------------------------------------------------------------
-// SVG
-// -----------------------------------------------------------------------------
-
-export const encodeSvgMetadata = ({ text }: { text: string }) => {
-  const base64 = stringToBase64(
-    JSON.stringify(encode({ text })),
-    true /* is already byte string */,
-  );
-
-  let metadata = "";
-  metadata += `<!-- payload-type:${MIME_TYPES.excalidraw} -->`;
-  metadata += `<!-- payload-version:2 -->`;
-  metadata += "<!-- payload-start -->";
-  metadata += base64;
-  metadata += "<!-- payload-end -->";
-  return metadata;
-};
-
-export const decodeSvgMetadata = ({ svg }: { svg: string }) => {
-  if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
-    const match = svg.match(
-      /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
-    );
-    if (!match) {
-      throw new Error("INVALID");
-    }
-    const versionMatch = svg.match(/<!-- payload-version:(\d+) -->/);
-    const version = versionMatch?.[1] || "1";
-    const isByteString = version !== "1";
-
-    try {
-      const json = base64ToString(match[1], isByteString);
-      const encodedData = JSON.parse(json);
-      if (!("encoded" in encodedData)) {
-        // legacy, un-encoded scene JSON
-        if (
-          "type" in encodedData &&
-          encodedData.type === EXPORT_DATA_TYPES.excalidraw
-        ) {
-          return json;
         }
         throw new Error("FAILED");
       }
