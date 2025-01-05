@@ -93,6 +93,7 @@ export const fileSave = (
       fileName: `${opts.name}.${opts.extension}`,
       description: opts.description,
       extensions: [`.${opts.extension}`],
+      mimeTypes: [MIME_TYPES[opts.extension]],
     },
     opts.fileHandle,
   );
