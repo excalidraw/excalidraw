@@ -1419,35 +1419,30 @@ const getArrowheadOptions = (flip: boolean) => {
       text: t("labels.arrowhead_triangle_outline"),
       icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
       keyBinding: "r",
-      showInPicker: true,
     },
     {
       value: "circle",
       text: t("labels.arrowhead_circle"),
       keyBinding: "a",
       icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: true,
     },
     {
       value: "circle_outline",
       text: t("labels.arrowhead_circle_outline"),
       keyBinding: "s",
       icon: <ArrowheadCircleOutlineIcon flip={flip} />,
-      showInPicker: true,
     },
     {
       value: "diamond",
       text: t("labels.arrowhead_diamond"),
       icon: <ArrowheadDiamondIcon flip={flip} />,
       keyBinding: "d",
-      showInPicker: true,
     },
     {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
       keyBinding: "f",
-      showInPicker: true,
     },
     {
       value: "bar",
@@ -1460,21 +1455,18 @@ const getArrowheadOptions = (flip: boolean) => {
       text: t("labels.arrowhead_crowfoot_many"),
       icon: <ArrowheadCrowfootIcon flip={flip} />,
       keyBinding: "x",
-      showInPicker: true,
     },
     {
       value: "crowfoot_one",
       text: t("labels.arrowhead_crowfoot_one"),
       icon: <ArrowheadCrowfootOneIcon flip={flip} />,
       keyBinding: "c",
-      showInPicker: true,
     },
     {
       value: "crowfoot_one_or_many",
       text: t("labels.arrowhead_crowfoot_one_or_many"),
       icon: <ArrowheadCrowfootOneOrManyIcon flip={flip} />,
       keyBinding: "v",
-      showInPicker: true,
     },
   ] as const;
 };

@@ -29,7 +29,7 @@ function Picker<T>({
 }: {
   label: string;
   value: T;
-  options: Option<T>[];
+  options: readonly Option<T>[];
   onChange: (value: T) => void;
   onClose: () => void;
   numberOfOptionsToAlwaysShow?: number;
@@ -201,7 +201,6 @@ export function IconPicker<T>({
     text: string;
     icon: JSX.Element;
     keyBinding: string | null;
-    showInPicker?: boolean;
   }[];
   onChange: (value: T) => void;
   numberOfOptionsToAlwaysShow?: number;
@@ -225,7 +224,7 @@ export function IconPicker<T>({
         </Popover.Trigger>
         {isActive && (
           <Picker
-            options={options.filter((opt) => opt.showInPicker !== false)}
+            options={options}
             value={value}
             label={label}
             onChange={onChange}
