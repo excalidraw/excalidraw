@@ -735,7 +735,7 @@ export const isElementInFrame = (
 
   for (const gid of _element.groupIds) {
     if (opts?.checkedGroups?.has(gid)) {
-      return opts.checkedGroups.get(gid);
+      return opts.checkedGroups.get(gid)!!;
     }
   }
 
@@ -779,6 +779,8 @@ export const isElementInFrame = (
       return true;
     }
   }
+
+  return false;
 };
 
 export const shouldApplyFrameClip = (
@@ -796,7 +798,6 @@ export const shouldApplyFrameClip = (
   // a. overlapping with the frame, or
   // b. containing the frame, for example when an element is used as a background
   //    and is therefore bigger than the frame and completely contains the frame
-
   const shouldClipElementItself =
     isElementIntersectingFrame(element, frame, elementsMap) ||
     isElementContainingFrame(element, frame, elementsMap);
@@ -816,10 +817,27 @@ export const shouldApplyFrameClip = (
     element.groupIds.length > 0 &&
     !elementsAreInFrameBounds([element], frame, elementsMap)
   ) {
-    return isElementInFrame(element, elementsMap, appState, {
-      targetFrame: frame,
-      checkedGroups,
-    });
+    let shouldClip = false;
+
+    // if no elements are being dragged, we can skip the geometry check
+    // because we know if the element is in the given frame or not
+    if (!appState.selectedElementsAreBeingDragged) {
+      shouldClip = element.frameId === frame.id;
+      for (const groupId of element.groupIds) {
+        checkedGroups?.set(groupId, shouldClip);
+      }
+    } else {
+      shouldClip = isElementInFrame(element, elementsMap, appState, {
+        targetFrame: frame,
+        checkedGroups,
+      });
+    }
+
+    for (const groupId of element.groupIds) {
+      checkedGroups?.set(groupId, shouldClip);
+    }
+
+    return shouldClip;
   }
 
   return false;
