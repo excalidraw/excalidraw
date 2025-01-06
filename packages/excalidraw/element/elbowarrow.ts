@@ -621,22 +621,27 @@ const handleSegmentMove = (
 
   // First segment move needs an additional segment
   if (firstSegmentIdx === -1 && startIdx === 0) {
-    const startIsHorizontal = headingIsHorizontal(startHeading);
+    const startIsHorizontal = hoveredStartElement
+      ? headingIsHorizontal(startHeading)
+      : headingForPointIsHorizontal(newPoints[1], newPoints[0]);
     newPoints.unshift(
       pointFrom<GlobalPoint>(
         startIsHorizontal ? start[0] : arrow.x + arrow.points[0][0],
         !startIsHorizontal ? start[1] : arrow.y + arrow.points[0][1],
       ),
     );
-    newPoints.unshift(
-      pointFrom<GlobalPoint>(
-        arrow.x + arrow.points[0][0],
-        arrow.y + arrow.points[0][1],
-      ),
-    );
+
+    if (hoveredStartElement) {
+      newPoints.unshift(
+        pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[0][0],
+          arrow.y + arrow.points[0][1],
+        ),
+      );
+    }
 
     for (const segment of nextFixedSegments) {
-      segment.index += 2;
+      segment.index += hoveredStartElement ? 2 : 1;
     }
   }
 
@@ -653,12 +658,14 @@ const handleSegmentMove = (
           : arrow.y + arrow.points[arrow.points.length - 1][1],
       ),
     );
-    newPoints.push(
-      pointFrom<GlobalPoint>(
-        arrow.x + arrow.points[arrow.points.length - 1][0],
-        arrow.y + arrow.points[arrow.points.length - 1][1],
-      ),
-    );
+    if (hoveredEndElement) {
+      newPoints.push(
+        pointFrom<GlobalPoint>(
+          arrow.x + arrow.points[arrow.points.length - 1][0],
+          arrow.y + arrow.points[arrow.points.length - 1][1],
+        ),
+      );
+    }
   }
 
   return normalizeArrowElementUpdate(
