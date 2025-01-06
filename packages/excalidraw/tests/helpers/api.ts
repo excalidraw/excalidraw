@@ -222,7 +222,6 @@ export class API {
       | "width"
       | "height"
       | "type"
-      | "seed"
       | "version"
       | "versionNonce"
       | "isDeleted"
@@ -230,6 +229,7 @@ export class API {
       | "link"
       | "updated"
     > = {
+      seed: 1,
       x,
       y,
       frameId: rest.frameId ?? null,
