@@ -526,11 +526,6 @@ const renderLinearPointHandles = (
           p,
           points[idx + 1],
           points,
-        ) &&
-        !LinearElementEditor.isSegmentTooShort(
-          element,
-          p,
-          points[idx + 1],
           appState.zoom,
         )
       ) {

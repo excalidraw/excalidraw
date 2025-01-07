@@ -6176,13 +6176,19 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        segmentMidPointHoveredCoords =
-          LinearElementEditor.getSegmentMidpointHitCoords(
-            linearElementEditor,
-            { x: scenePointerX, y: scenePointerY },
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          );
+        segmentMidPointHoveredCoords = isElbowArrow(element)
+          ? LinearElementEditor.getElbowArrowHitMidPointCoords(
+              element,
+              { x: scenePointerX, y: scenePointerY },
+              elementsMap,
+              this.state,
+            )
+          : LinearElementEditor.getSegmentMidpointHitCoords(
+              linearElementEditor,
+              { x: scenePointerX, y: scenePointerY },
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
 
         if (
           (!elementIsElbowArrow && hoverPointIndex >= 0) ||

@@ -70,7 +70,6 @@ import {
 } from "../shapes";
 import { getGridPoint } from "../snapping";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
-import { BASE_PADDING } from "./elbowarrow";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -642,9 +641,13 @@ export class LinearElementEditor {
     startPoint: P,
     endPoint: P,
     points: readonly P[],
+    zoom: Zoom,
   ): boolean {
     if (index === 0 || index === points.length - 2) {
-      return pointDistance(startPoint, endPoint) <= BASE_PADDING;
+      return (
+        pointDistance(startPoint, endPoint) * zoom.value <
+        LinearElementEditor.POINT_HANDLE_SIZE * 4
+      );
     }
 
     return false;
@@ -1851,11 +1854,6 @@ export class LinearElementEditor {
           element.points[index - 1],
           element.points[index],
           element.points,
-        ) ||
-        LinearElementEditor.isSegmentTooShort(
-          element,
-          element.points[index - 1],
-          element.points[index],
           appState.zoom,
         )
       ) {
@@ -1871,6 +1869,26 @@ export class LinearElementEditor {
     }
 
     return midpoints;
+  }
+
+  static getElbowArrowHitMidPointCoords(
+    element: ExcalidrawElbowArrowElement,
+    scenePointer: { x: number; y: number },
+    elementsMap: ElementsMap,
+    appState: AppState,
+  ): GlobalPoint | null {
+    const result = LinearElementEditor.getElbowArrowHitMidPointIndex(
+      element,
+      scenePointer,
+      elementsMap,
+      appState,
+    );
+
+    if (result) {
+      return result[1];
+    }
+
+    return null;
   }
 
   static getElbowArrowHitMidPointIndex(
