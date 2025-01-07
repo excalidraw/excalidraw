@@ -167,7 +167,7 @@ const handleSegmentRenormalization = (
     const nextPoints: GlobalPoint[] = [];
 
     _nextPoints.forEach((p, i, points) => {
-      if (i < 2) {
+      if (i < 3) {
         return nextPoints.push(p);
       }
 
