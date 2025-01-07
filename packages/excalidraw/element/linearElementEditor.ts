@@ -643,10 +643,10 @@ export class LinearElementEditor {
     points: readonly P[],
     zoom: Zoom,
   ): boolean {
-    if (index === 0 || index === points.length - 2) {
+    if (index >= 0 && index < points.length) {
       return (
         pointDistance(startPoint, endPoint) * zoom.value <
-        LinearElementEditor.POINT_HANDLE_SIZE * 4
+        LinearElementEditor.POINT_HANDLE_SIZE / 2
       );
     }
 
