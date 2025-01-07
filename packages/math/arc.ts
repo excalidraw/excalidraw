@@ -25,7 +25,10 @@ export function arc<Point extends GenericPoint>(
   startAngle: Radians,
   endAngle: Radians,
 ) {
-  return { center, radius, startAngle, endAngle } as Arc<Point>;
+  const start = normalizeRadians(startAngle);
+  const end = normalizeRadians(endAngle);
+
+  return { center, radius, startAngle: start, endAngle: end } as Arc<Point>;
 }
 
 /**
@@ -100,11 +103,10 @@ export function arcSegmentInterceptPoints<Point extends GenericPoint>(
       pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
 
-    return a.startAngle < a.endAngle
-      ? Math.abs(a.radius - candidateRadius) < PRECISION &&
-          a.startAngle <= candidateAngle &&
-          a.endAngle >= candidateAngle
-      : a.startAngle <= candidateAngle || a.endAngle >= candidateAngle;
+    return Math.abs(a.radius - candidateRadius) < PRECISION &&
+      a.startAngle > a.endAngle
+      ? a.startAngle <= candidateAngle || a.endAngle >= candidateAngle
+      : a.startAngle <= candidateAngle && a.endAngle >= candidateAngle;
   });
 }
 
@@ -128,11 +130,10 @@ export function arcLineInterceptPoints<Point extends GenericPoint>(
       pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
 
-    return a.startAngle < a.endAngle
-      ? Math.abs(a.radius - candidateRadius) < PRECISION &&
-          a.startAngle <= candidateAngle &&
-          a.endAngle >= candidateAngle
-      : a.startAngle <= candidateAngle || a.endAngle >= candidateAngle;
+    return Math.abs(a.radius - candidateRadius) < PRECISION &&
+      a.startAngle > a.endAngle
+      ? a.startAngle <= candidateAngle || a.endAngle >= candidateAngle
+      : a.startAngle <= candidateAngle && a.endAngle >= candidateAngle;
   });
 }
 
