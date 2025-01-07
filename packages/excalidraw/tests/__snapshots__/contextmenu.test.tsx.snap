@@ -117,6 +117,50 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -684,6 +728,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -718,6 +763,42 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -794,6 +875,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "left": 30,
     "top": 40,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -835,7 +917,9 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -922,14 +1006,14 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "roundness": {
     "type": 3,
   },
-  "seed": 1278240551,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 1278240551,
   "width": 100,
   "x": 0,
   "y": 0,
@@ -958,14 +1042,14 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 401146281,
+  "versionNonce": 449462985,
   "width": 100,
   "x": 0,
   "y": 0,
@@ -1000,6 +1084,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1041,7 +1126,9 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1216,6 +1303,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1257,7 +1345,9 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1547,6 +1637,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1588,7 +1679,9 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -1878,6 +1971,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1919,7 +2013,9 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -2094,6 +2190,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2135,7 +2232,9 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -2334,6 +2433,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2375,7 +2475,9 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -2635,6 +2737,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2676,7 +2779,9 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -3004,6 +3109,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3045,7 +3151,9 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -3479,6 +3587,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3520,7 +3629,9 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -3802,6 +3913,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3843,7 +3955,9 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -4125,6 +4239,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -4166,7 +4281,9 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -4634,6 +4751,50 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -5201,6 +5362,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5235,6 +5397,42 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5311,6 +5509,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -5352,7 +5551,9 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -5761,6 +5962,50 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -6328,6 +6573,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6362,6 +6608,42 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6438,6 +6720,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -6479,7 +6762,9 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -7373,6 +7658,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "left": -19,
     "top": -9,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -7414,7 +7700,9 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -7608,6 +7896,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -8175,6 +8507,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8209,6 +8542,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8285,6 +8654,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -8326,7 +8696,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -8502,6 +8874,50 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
       },
       "separator",
       {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
+      },
+      "separator",
+      {
         "icon": <svg
           aria-hidden="true"
           className=""
@@ -9069,6 +9485,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9103,6 +9520,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9179,6 +9632,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "left": 80,
     "top": 90,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -9220,7 +9674,9 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
@@ -9336,14 +9792,14 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "roundness": {
     "type": 3,
   },
-  "seed": 1278240551,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 1278240551,
   "width": 200,
   "x": 0,
   "y": 0,
@@ -9370,14 +9826,14 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 401146281,
+  "versionNonce": 449462985,
   "width": 200,
   "x": 0,
   "y": 0,

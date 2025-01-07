@@ -1,17 +1,20 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import type { ExcalidrawProps } from "../types";
-import { getFontString, updateActiveTool } from "../utils";
+import {
+  getFontString,
+  sanitizeHTMLAttribute,
+  updateActiveTool,
+} from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { wrapText } from "./textElement";
+import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 import type {
   ExcalidrawElement,
   ExcalidrawIframeLikeElement,
   IframeData,
 } from "./types";
-import { sanitizeHTMLAttribute } from "../data/url";
 import type { MarkRequired } from "../utility-types";
 import { StoreAction } from "../store";
 

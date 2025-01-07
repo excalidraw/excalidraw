@@ -135,16 +135,12 @@ const flipElements = (
   const midX = (minX + maxX) / 2;
   const midY = (minY + maxY) / 2;
 
-  resizeMultipleElements(
-    elementsMap,
-    selectedElements,
-    elementsMap,
-    "nw",
-    true,
-    true,
-    flipDirection === "horizontal" ? maxX : minX,
-    flipDirection === "horizontal" ? minY : maxY,
-  );
+  resizeMultipleElements(selectedElements, elementsMap, "nw", app.scene, {
+    flipByX: flipDirection === "horizontal",
+    flipByY: flipDirection === "vertical",
+    shouldResizeFromCenter: true,
+    shouldMaintainAspectRatio: true,
+  });
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
@@ -153,6 +149,7 @@ const flipElements = (
     app.scene,
     isBindingEnabled(appState),
     [],
+    appState.zoom,
   );
 
   // ---------------------------------------------------------------------------

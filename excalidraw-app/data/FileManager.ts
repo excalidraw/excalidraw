@@ -16,14 +16,26 @@ import type {
   BinaryFiles,
 } from "../../packages/excalidraw/types";
 
+type FileVersion = Required<BinaryFileData>["version"];
+
 export class FileManager {
   /** files being fetched */
   private fetchingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
+  private erroredFiles_fetch = new Map<
+    ExcalidrawImageElement["fileId"],
+    true
+  >();
   /** files being saved */
-  private savingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
+  private savingFiles = new Map<
+    ExcalidrawImageElement["fileId"],
+    FileVersion
+  >();
   /* files already saved to persistent storage */
-  private savedFiles = new Map<ExcalidrawImageElement["fileId"], true>();
-  private erroredFiles = new Map<ExcalidrawImageElement["fileId"], true>();
+  private savedFiles = new Map<ExcalidrawImageElement["fileId"], FileVersion>();
+  private erroredFiles_save = new Map<
+    ExcalidrawImageElement["fileId"],
+    FileVersion
+  >();
 
   private _getFiles;
   private _saveFiles;
@@ -37,8 +49,8 @@ export class FileManager {
       erroredFiles: Map<FileId, true>;
     }>;
     saveFiles: (data: { addedFiles: Map<FileId, BinaryFileData> }) => Promise<{
-      savedFiles: Map<FileId, true>;
-      erroredFiles: Map<FileId, true>;
+      savedFiles: Map<FileId, BinaryFileData>;
+      erroredFiles: Map<FileId, BinaryFileData>;
     }>;
   }) {
     this._getFiles = getFiles;
@@ -46,19 +58,28 @@ export class FileManager {
   }
 
   /**
-   * returns whether file is already saved or being processed
+   * returns whether file is saved/errored, or being processed
    */
-  isFileHandled = (id: FileId) => {
+  isFileTracked = (id: FileId) => {
     return (
       this.savedFiles.has(id) ||
-      this.fetchingFiles.has(id) ||
       this.savingFiles.has(id) ||
-      this.erroredFiles.has(id)
+      this.fetchingFiles.has(id) ||
+      this.erroredFiles_fetch.has(id) ||
+      this.erroredFiles_save.has(id)
     );
   };
 
-  isFileSaved = (id: FileId) => {
-    return this.savedFiles.has(id);
+  isFileSavedOrBeingSaved = (file: BinaryFileData) => {
+    const fileVersion = this.getFileVersion(file);
+    return (
+      this.savedFiles.get(file.id) === fileVersion ||
+      this.savingFiles.get(file.id) === fileVersion
+    );
+  };
+
+  getFileVersion = (file: BinaryFileData) => {
+    return file.version ?? 1;
   };
 
   saveFiles = async ({
@@ -71,13 +92,16 @@ export class FileManager {
     const addedFiles: Map<FileId, BinaryFileData> = new Map();
 
     for (const element of elements) {
+      const fileData =
+        isInitializedImageElement(element) && files[element.fileId];
+
       if (
-        isInitializedImageElement(element) &&
-        files[element.fileId] &&
-        !this.isFileHandled(element.fileId)
+        fileData &&
+        // NOTE if errored during save, won't retry due to this check
+        !this.isFileSavedOrBeingSaved(fileData)
       ) {
         addedFiles.set(element.fileId, files[element.fileId]);
-        this.savingFiles.set(element.fileId, true);
+        this.savingFiles.set(element.fileId, this.getFileVersion(fileData));
       }
     }
 
@@ -86,8 +110,12 @@ export class FileManager {
         addedFiles,
       });
 
-      for (const [fileId] of savedFiles) {
-        this.savedFiles.set(fileId, true);
+      for (const [fileId, fileData] of savedFiles) {
+        this.savedFiles.set(fileId, this.getFileVersion(fileData));
+      }
+
+      for (const [fileId, fileData] of erroredFiles) {
+        this.erroredFiles_save.set(fileId, this.getFileVersion(fileData));
       }
 
       return {
@@ -121,10 +149,10 @@ export class FileManager {
       const { loadedFiles, erroredFiles } = await this._getFiles(ids);
 
       for (const file of loadedFiles) {
-        this.savedFiles.set(file.id, true);
+        this.savedFiles.set(file.id, this.getFileVersion(file));
       }
       for (const [fileId] of erroredFiles) {
-        this.erroredFiles.set(fileId, true);
+        this.erroredFiles_fetch.set(fileId, true);
       }
 
       return { loadedFiles, erroredFiles };
@@ -160,7 +188,7 @@ export class FileManager {
   ): element is InitializedExcalidrawImageElement => {
     return (
       isInitializedImageElement(element) &&
-      this.isFileSaved(element.fileId) &&
+      this.savedFiles.has(element.fileId) &&
       element.status === "pending"
     );
   };
@@ -169,7 +197,8 @@ export class FileManager {
     this.fetchingFiles.clear();
     this.savingFiles.clear();
     this.savedFiles.clear();
-    this.erroredFiles.clear();
+    this.erroredFiles_fetch.clear();
+    this.erroredFiles_save.clear();
   }
 }
 

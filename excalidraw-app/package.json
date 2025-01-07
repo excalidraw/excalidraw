@@ -23,20 +23,20 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.0.0 - 22.x.x"
   },
   "dependencies": {
+    "@excalidraw/random-username": "1.0.0",
+    "@sentry/browser": "6.2.5",
+    "@sentry/integrations": "6.2.5",
     "firebase": "8.3.3",
+    "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "1.13.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "vite-plugin-html": "3.2.2",
-    "@excalidraw/random-username": "1.0.0",
-    "@sentry/browser": "6.2.5",
-    "@sentry/integrations": "6.2.5",
-    "i18next-browser-languagedetector": "6.1.4",
-    "socket.io-client": "4.7.2"
+    "socket.io-client": "4.7.2",
+    "vite-plugin-html": "3.2.2"
   },
   "prettier": "@excalidraw/prettier-config",
   "scripts": {
@@ -49,5 +49,8 @@
     "start:production": "yarn build && yarn serve",
     "serve": "npx http-server build -a localhost -p 5001 -o",
     "build:preview": "yarn build && vite preview --port 5000"
+  },
+  "devDependencies": {
+    "vite-plugin-sitemap": "0.7.1"
   }
 }

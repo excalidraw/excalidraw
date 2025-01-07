@@ -92,6 +92,8 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  openDialog: appState.openDialog,
+  hoveredElementIds: appState.hoveredElementIds,
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,
@@ -107,6 +109,7 @@ const getRelevantAppStateProps = (
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
   currentHoveredFontFamily: appState.currentHoveredFontFamily,
+  croppingElementId: appState.croppingElementId,
 });
 
 const areEqual = (

@@ -71,7 +71,6 @@ import {
 import { distanceToBindableElement } from "./distance";
 
 import { intersectElementWithLine } from "./collision";
-import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -94,6 +93,8 @@ export const isBindingEnabled = (appState: AppState): boolean => {
 };
 
 export const FIXED_BINDING_DISTANCE = 5;
+export const BINDING_HIGHLIGHT_THICKNESS = 10;
+export const BINDING_HIGHLIGHT_OFFSET = 4;
 
 const getNonDeletedElements = (
   scene: Scene,
@@ -210,6 +211,7 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   edge: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
 ): NonDeleted<ExcalidrawElement> | null => {
   const coors = getLinearElementEdgeCoors(linearElement, edge, elementsMap);
   const elementId =
@@ -220,7 +222,7 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
     const element = elementsMap.get(elementId);
     if (
       isBindableElement(element) &&
-      bindingBorderTest(element, coors, elementsMap)
+      bindingBorderTest(element, coors, elementsMap, zoom)
     ) {
       return element;
     }
@@ -232,12 +234,14 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
 const getOriginalBindingsIfStillCloseToArrowEnds = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawElement> | null)[] =>
   ["start", "end"].map((edge) =>
     getOriginalBindingIfStillCloseOfLinearElementEdge(
       linearElement,
       edge as "start" | "end",
       elementsMap,
+      zoom,
     ),
   );
 
@@ -247,6 +251,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
   draggingPoints: readonly number[],
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
+  zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
   const startIdx = 0;
   const endIdx = selectedElement.points.length - 1;
@@ -259,6 +264,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           "start",
           elementsMap,
           elements,
+          zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
     : // We have to update the focus and gap of the binding, so let's rebind
@@ -267,6 +273,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
         "start",
         elementsMap,
         elements,
+        zoom,
       );
   const end = endDragged
     ? isBindingEnabled
@@ -275,6 +282,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           "end",
           elementsMap,
           elements,
+          zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
     : // We have to update the focus and gap of the binding, so let's rebind
@@ -283,6 +291,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
         "end",
         elementsMap,
         elements,
+        zoom,
       );
 
   return [start, end];
@@ -293,10 +302,12 @@ const getBindingStrategyForDraggingArrowOrJoints = (
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
   isBindingEnabled: boolean,
+  zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
   const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
     selectedElement,
     elementsMap,
+    zoom,
   );
   const start = startIsClose
     ? isBindingEnabled
@@ -305,6 +316,7 @@ const getBindingStrategyForDraggingArrowOrJoints = (
           "start",
           elementsMap,
           elements,
+          zoom,
         )
       : null
     : null;
@@ -315,6 +327,7 @@ const getBindingStrategyForDraggingArrowOrJoints = (
           "end",
           elementsMap,
           elements,
+          zoom,
         )
       : null
     : null;
@@ -329,6 +342,7 @@ export const bindOrUnbindLinearElements = (
   scene: Scene,
   isBindingEnabled: boolean,
   draggingPoints: readonly number[] | null,
+  zoom?: AppState["zoom"],
 ): void => {
   selectedElements.forEach((selectedElement) => {
     const [start, end] = draggingPoints?.length
@@ -339,6 +353,7 @@ export const bindOrUnbindLinearElements = (
           draggingPoints ?? [],
           elementsMap,
           elements,
+          zoom,
         )
       : // The arrow itself (the shaft) or the inner joins are dragged
         getBindingStrategyForDraggingArrowOrJoints(
@@ -346,6 +361,7 @@ export const bindOrUnbindLinearElements = (
           elementsMap,
           elements,
           isBindingEnabled,
+          zoom,
         );
 
     bindOrUnbindLinearElement(selectedElement, start, end, elementsMap, scene);
@@ -355,6 +371,7 @@ export const bindOrUnbindLinearElements = (
 export const getSuggestedBindingsForArrows = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
 ): SuggestedBinding[] => {
   // HOT PATH: Bail out if selected elements list is too large
   if (selectedElements.length > 50) {
@@ -365,7 +382,7 @@ export const getSuggestedBindingsForArrows = (
     selectedElements
       .filter(isLinearElement)
       .flatMap((element) =>
-        getOriginalBindingsIfStillCloseToArrowEnds(element, elementsMap),
+        getOriginalBindingsIfStillCloseToArrowEnds(element, elementsMap, zoom),
       )
       .filter(
         (element): element is NonDeleted<ExcalidrawBindableElement> =>
@@ -403,6 +420,7 @@ export const maybeBindLinearElement = (
     pointerCoords,
     elements,
     elementsMap,
+    appState.zoom,
     isElbowArrow(linearElement) && isElbowArrow(linearElement),
   );
 
@@ -419,6 +437,26 @@ export const maybeBindLinearElement = (
   }
 };
 
+const normalizePointBinding = (
+  binding: { focus: number; gap: number },
+  hoveredElement: ExcalidrawBindableElement,
+) => {
+  let gap = binding.gap;
+  const maxGap = maxBindingGap(
+    hoveredElement,
+    hoveredElement.width,
+    hoveredElement.height,
+  );
+
+  if (gap > maxGap) {
+    gap = BINDING_HIGHLIGHT_THICKNESS + BINDING_HIGHLIGHT_OFFSET;
+  }
+  return {
+    ...binding,
+    gap,
+  };
+};
+
 export const bindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   hoveredElement: ExcalidrawBindableElement,
@@ -430,11 +468,14 @@ export const bindLinearElement = (
   }
   const binding: PointBinding = {
     elementId: hoveredElement.id,
-    ...calculateFocusAndGap(
-      linearElement,
+    ...normalizePointBinding(
+      calculateFocusAndGap(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
       hoveredElement,
-      startOrEnd,
-      elementsMap,
     ),
     ...(isElbowArrow(linearElement)
       ? calculateFixedPointForElbowArrowBinding(
@@ -458,6 +499,12 @@ export const bindLinearElement = (
         type: "arrow",
       }),
     });
+  }
+
+  // update bound elements to make sure the binding tips are in sync with
+  // the normalized gap from above
+  if (!isElbowArrow(linearElement)) {
+    updateBoundElements(hoveredElement, elementsMap);
   }
 };
 
@@ -508,6 +555,7 @@ export const getHoveredElementForBinding = (
   pointer: GlobalPoint,
   elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   const hoveredElement = getElementAtPosition(
@@ -518,11 +566,13 @@ export const getHoveredElementForBinding = (
         element,
         pointer,
         elementsMap,
+        zoom,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
         fullShape && !isFrameLikeElement(element),
       ),
   );
+
   return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
 
@@ -562,11 +612,13 @@ export const updateBoundElements = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    oldSize?: { width: number; height: number };
+    newSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
+    zoom?: AppState["zoom"];
   },
 ) => {
-  const { oldSize, simultaneouslyUpdated, changedElements } = options ?? {};
+  const { newSize, simultaneouslyUpdated, changedElements, zoom } =
+    options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -589,12 +641,12 @@ export const updateBoundElements = (
       startBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
         element.startBinding,
-        oldSize,
+        newSize,
       ),
       endBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
         element.endBinding,
-        oldSize,
+        newSize,
       ),
     };
 
@@ -656,6 +708,7 @@ export const updateBoundElements = (
       },
       {
         changedElements,
+        zoom,
       },
     );
 
@@ -689,6 +742,7 @@ export const getHeadingForElbowArrowSnap = (
   aabb: Bounds | undefined | null,
   elementsMap: ElementsMap,
   origPoint: GlobalPoint,
+  zoom?: AppState["zoom"],
 ): Heading => {
   const otherPointHeading = vectorToHeading(vectorFromPoint(otherPoint, p));
 
@@ -696,7 +750,7 @@ export const getHeadingForElbowArrowSnap = (
     return otherPointHeading;
   }
 
-  const distance = getDistanceForBinding(origPoint, bindableElement);
+  const distance = getDistanceForBinding(origPoint, bindableElement, zoom);
 
   if (!distance) {
     return vectorToHeading(
@@ -718,12 +772,14 @@ export const getHeadingForElbowArrowSnap = (
 const getDistanceForBinding = (
   point: Readonly<GlobalPoint>,
   bindableElement: ExcalidrawBindableElement,
+  zoom?: AppState["zoom"],
 ) => {
   const distance = distanceToBindableElement(bindableElement, point);
   const bindDistance = maxBindingGap(
     bindableElement,
     bindableElement.width,
     bindableElement.height,
+    zoom,
   );
 
   return distance > bindDistance ? null : distance;
@@ -1143,11 +1199,13 @@ const getElligibleElementForBindingElement = (
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
+  zoom?: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   return getHoveredElementForBinding(
     getLinearElementEdgeCoors(linearElement, startOrEnd, elementsMap),
     elements,
     elementsMap,
+    zoom,
   );
 };
 
@@ -1308,9 +1366,11 @@ export const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   [x, y]: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): boolean => {
-  const threshold = maxBindingGap(element, element.width, element.height);
+  const threshold = maxBindingGap(element, element.width, element.height, zoom);
+
   const shape = getElementShape(element, elementsMap);
   return (
     isPointOnShape(pointFrom(x, y), shape, threshold) ||
@@ -1323,12 +1383,21 @@ export const maxBindingGap = (
   element: ExcalidrawElement,
   elementWidth: number,
   elementHeight: number,
+  zoom?: AppState["zoom"],
 ): number => {
+  const zoomValue = zoom?.value && zoom.value < 1 ? zoom.value : 1;
+
   // Aligns diamonds with rectangles
   const shapeRatio = element.type === "diamond" ? 1 / Math.sqrt(2) : 1;
   const smallerDimension = shapeRatio * Math.min(elementWidth, elementHeight);
-  // We make the bindable boundary bigger for bigger elements
-  return Math.max(16, Math.min(0.25 * smallerDimension, 32));
+
+  return Math.max(
+    16,
+    // bigger bindable boundary for bigger elements
+    Math.min(0.25 * smallerDimension, 32),
+    // keep in sync with the zoomed highlight
+    BINDING_HIGHLIGHT_THICKNESS / zoomValue + BINDING_HIGHLIGHT_OFFSET,
+  );
 };
 
 // The focus distance is the oriented ratio between the size of

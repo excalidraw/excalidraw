@@ -36,4 +36,4 @@ yarn-error.log*
 next-env.d.ts
 
 # copied assets
-public/*.woff2
+public/**/*.woff2

@@ -152,3 +152,10 @@ export const vectorRotate = (v: Vector, a: Radians): Vector => {
 
   return vector(v[0] * cos - v[1] * sin, v[0] * sin + v[1] * cos);
 };
+
+/**
+ * Project the first vector onto the second vector
+ */
+export const vectorProjection = (a: Vector, b: Vector) => {
+  return vectorScale(b, vectorDot(a, b) / vectorDot(b, b));
+};

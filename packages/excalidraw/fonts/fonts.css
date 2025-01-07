@@ -1,0 +1,35 @@
+/* Only UI fonts here, which are needed before the editor initializes. */
+/* These cannot be dynamically prepended with `EXCALIDRAW_ASSET_PATH`. */
+/* WARN: The following content is replaced during excalidraw-app build  */
+
+@font-face {
+  font-family: "Assistant";
+  src: url(../fonts/Assistant/Assistant-Regular.woff2) format("woff2");
+  font-weight: 400;
+  style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url(../fonts/Assistant/Assistant-Medium.woff2) format("woff2");
+  font-weight: 500;
+  style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url(../fonts/Assistant/Assistant-SemiBold.woff2) format("woff2");
+  font-weight: 600;
+  style: normal;
+  display: swap;
+}
+
+@font-face {
+  font-family: "Assistant";
+  src: url(../fonts/Assistant/Assistant-Bold.woff2) format("woff2");
+  font-weight: 700;
+  style: normal;
+  display: swap;
+}

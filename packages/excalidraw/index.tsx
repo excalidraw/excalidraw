@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { InitializeApp } from "./components/InitializeApp";
 import App from "./components/App";
 import { isShallowEqual } from "./utils";
+import polyfill from "./polyfill";
 
 import "./css/app.scss";
 import "./css/styles.scss";
-import "./fonts/assets/fonts.css";
-import polyfill from "./polyfill";
+import "./fonts/fonts.css";
 
 import type { AppProps, ExcalidrawProps } from "./types";
 import { defaultLang } from "./i18n";
@@ -43,6 +43,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     autoFocus = false,
     generateIdForFile,
     onLinkOpen,
+    generateLinkForSelection,
     onPointerDown,
     onPointerUp,
     onScrollChange,
@@ -132,6 +133,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           autoFocus={autoFocus}
           generateIdForFile={generateIdForFile}
           onLinkOpen={onLinkOpen}
+          generateLinkForSelection={generateLinkForSelection}
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
@@ -291,3 +293,4 @@ export {
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
+export { isElementLink } from "./element/elementLink";

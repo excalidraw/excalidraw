@@ -20,7 +20,6 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import {
   getBoundTextElementPosition,
-  wrapText,
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
@@ -29,6 +28,7 @@ import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 import type { GlobalPoint } from "../../math";
 import { pointCenter, pointFrom } from "../../math";
+import { wrapText } from "../element/textWrapping";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -1235,8 +1235,7 @@ describe("Test Linear Elements", () => {
       mouse.downAt(rect.x, rect.y);
       mouse.moveTo(200, 0);
       mouse.upAt(200, 0);
-
-      expect(arrow.width).toBe(205);
+      expect(arrow.width).toBe(200);
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(

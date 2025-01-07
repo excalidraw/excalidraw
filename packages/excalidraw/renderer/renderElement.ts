@@ -17,6 +17,7 @@ import {
   isArrowElement,
   hasBoundTextElement,
   isMagicFrameElement,
+  isImageElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -39,6 +40,7 @@ import type {
 import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
   MIME_TYPES,
@@ -61,6 +63,7 @@ import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
 import { isRightAngleRads, rangeExtent, rangeInclusive } from "../../math";
 import { getCornerRadius } from "../shapes";
+import { getUncroppedImageElement } from "../element/cropElement";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -107,10 +110,13 @@ export const getRenderOpacity = (
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
   pendingNodes: Readonly<PendingExcalidrawElements> | null,
+  globalAlpha: number = 1,
 ) => {
   // multiplying frame opacity with element opacity to combine them
   // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
-  let opacity = ((containingFrame?.opacity ?? 100) * element.opacity) / 10000;
+  let opacity =
+    (((containingFrame?.opacity ?? 100) * element.opacity) / 10000) *
+    globalAlpha;
 
   // if pending erasure, multiply again to combine further
   // (so that erasing always results in lower opacity than original)
@@ -135,6 +141,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetX: number;
   canvasOffsetY: number;
   boundTextElementVersion: number | null;
+  imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
 }
@@ -339,6 +346,7 @@ const generateElementCanvas = (
       getContainingFrame(element, elementsMap)?.opacity || 100,
     boundTextCanvas,
     angle: element.angle,
+    imageCrop: isImageElement(element) ? element.crop : null,
   };
 };
 
@@ -441,8 +449,22 @@ const drawElementOnCanvas = (
           );
           context.clip();
         }
+
+        const { x, y, width, height } = element.crop
+          ? element.crop
+          : {
+              x: 0,
+              y: 0,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+            };
+
         context.drawImage(
           img,
+          x,
+          y,
+          width,
+          height,
           0 /* hardcoded for the selection box*/,
           0,
           element.width,
@@ -526,6 +548,7 @@ const generateElementWithCanvas = (
     !appState?.shouldCacheIgnoreZoom;
   const boundTextElement = getBoundTextElement(element, elementsMap);
   const boundTextElementVersion = boundTextElement?.version || null;
+  const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
@@ -535,6 +558,7 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
+    prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
     // since we rotate the canvas when copying from cached canvas, we don't
     // regenerate the cached canvas. But we need to in case of labels which are
@@ -687,11 +711,17 @@ export const renderElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
+  const reduceAlphaForSelection =
+    appState.openDialog?.name === "elementLinkSelector" &&
+    !appState.selectedElementIds[element.id] &&
+    !appState.hoveredElementIds[element.id];
+
   context.globalAlpha = getRenderOpacity(
     element,
     getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
     renderConfig.pendingFlowchartNodes,
+    reduceAlphaForSelection ? DEFAULT_REDUCED_GLOBAL_ALPHA : 1,
   );
 
   switch (element.type) {
@@ -929,6 +959,35 @@ export const renderElement = (
           // zero effect.
           //
           context.imageSmoothingEnabled = false;
+        }
+
+        if (
+          element.id === appState.croppingElementId &&
+          isImageElement(elementWithCanvas.element) &&
+          elementWithCanvas.element.crop !== null
+        ) {
+          context.save();
+          context.globalAlpha = 0.1;
+
+          const uncroppedElementCanvas = generateElementCanvas(
+            getUncroppedImageElement(elementWithCanvas.element, elementsMap),
+            allElementsMap,
+            appState.zoom,
+            renderConfig,
+            appState,
+          );
+
+          if (uncroppedElementCanvas) {
+            drawElementFromCanvas(
+              uncroppedElementCanvas,
+              context,
+              renderConfig,
+              appState,
+              allElementsMap,
+            );
+          }
+
+          context.restore();
         }
 
         drawElementFromCanvas(

@@ -25,6 +25,7 @@ import {
 import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
 import { ENV } from "../constants";
+import { getElementsInGroup } from "../groups";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -436,6 +437,18 @@ class Scene {
       return this.getElement(element.containerId) || null;
     }
     return null;
+  };
+
+  getElementsFromId = (id: string): ExcalidrawElement[] => {
+    const elementsMap = this.getNonDeletedElementsMap();
+    // first check if the id is an element
+    const el = elementsMap.get(id);
+    if (el) {
+      return [el];
+    }
+
+    // then, check if the id is a group
+    return getElementsInGroup(elementsMap, id);
   };
 }
 

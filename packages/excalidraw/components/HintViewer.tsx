@@ -100,6 +100,14 @@ const getHints = ({
     return t("hints.text_editing");
   }
 
+  if (appState.croppingElementId) {
+    return t("hints.leaveCropEditor");
+  }
+
+  if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
+    return t("hints.enterCropEditor");
+  }
+
   if (activeTool.type === "selection") {
     if (
       appState.selectionElement &&

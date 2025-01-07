@@ -10,7 +10,6 @@ import type {
   BinaryFiles,
   UIAppState,
 } from "../types";
-import type { MarkOptional } from "../utility-types";
 import type { StoreActionType } from "../store";
 
 export type ActionSource =
@@ -24,10 +23,7 @@ export type ActionSource =
 export type ActionResult =
   | {
       elements?: readonly ExcalidrawElement[] | null;
-      appState?: MarkOptional<
-        AppState,
-        "offsetTop" | "offsetLeft" | "width" | "height"
-      > | null;
+      appState?: Partial<AppState> | null;
       files?: BinaryFiles | null;
       storeAction: StoreActionType;
       replaceFiles?: boolean;
@@ -138,7 +134,10 @@ export type ActionName =
   | "commandPalette"
   | "autoResize"
   | "elementStats"
-  | "searchMenu";
+  | "searchMenu"
+  | "copyElementLink"
+  | "linkToElement"
+  | "cropEditor";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

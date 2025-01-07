@@ -46,6 +46,10 @@
     "arrowhead_triangle_outline": "Triangle (outline)",
     "arrowhead_diamond": "Diamond",
     "arrowhead_diamond_outline": "Diamond (outline)",
+    "arrowhead_crowfoot_many": "Crow's foot (many)",
+    "arrowhead_crowfoot_one": "Crow's foot (one)",
+    "arrowhead_crowfoot_one_or_many": "Crow's foot (one or many)",
+    "more_options": "More options",
     "arrowtypes": "Arrow type",
     "arrowtype_sharp": "Sharp arrow",
     "arrowtype_round": "Curved arrow",
@@ -125,12 +129,13 @@
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
-      "editEmbed": "Edit link & embed",
-      "create": "Create link",
-      "createEmbed": "Create link & embed",
+      "editEmbed": "Edit embeddable link",
+      "create": "Add link",
       "label": "Link",
       "labelEmbed": "Link & embed",
-      "empty": "No link is set"
+      "empty": "No link is set",
+      "hint": "Type or paste your link here",
+      "goToElement": "Go to target element"
     },
     "lineEditor": {
       "edit": "Edit line",
@@ -155,7 +160,16 @@
     "zoomToFitSelection": "Zoom to fit selection",
     "zoomToFit": "Zoom to fit all elements",
     "installPWA": "Install Excalidraw locally (PWA)",
-    "autoResize": "Enable text auto-resizing"
+    "autoResize": "Enable text auto-resizing",
+    "imageCropping": "Image cropping",
+    "unCroppedDimension": "Uncropped dimension",
+    "copyElementLink": "Copy link to object",
+    "linkToElement": "Link to object"
+  },
+  "elementLink": {
+    "title": "Link to object",
+    "desc": "Click on a shape on canvas or paste a link.",
+    "notFound": "Linked object wasn't found on canvas."
   },
   "library": {
     "noItems": "No items added yet...",
@@ -328,7 +342,9 @@
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
-    "disableSnapping": "Hold CtrlOrCmd to disable snapping"
+    "disableSnapping": "Hold CtrlOrCmd to disable snapping",
+    "enterCropEditor": "Double click the image or press ENTER to crop the image",
+    "leaveCropEditor": "Click outside the image or press ENTER or ESCAPE to finish cropping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -399,7 +415,9 @@
     "zoomToSelection": "Zoom to selection",
     "toggleElementLock": "Lock/unlock selection",
     "movePageUpDown": "Move page up/down",
-    "movePageLeftRight": "Move page left/right"
+    "movePageLeftRight": "Move page left/right",
+    "cropStart": "Crop image",
+    "cropFinish": "Finish image cropping"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
@@ -490,13 +508,15 @@
     "copyStyles": "Copied styles.",
     "copyToClipboard": "Copied to clipboard.",
     "copyToClipboardAsPng": "Copied {{exportSelection}} to clipboard as PNG\n({{exportColorScheme}})",
+    "copyToClipboardAsSvg": "Copied {{exportSelection}} to clipboard as SVG\n({{exportColorScheme}})",
     "fileSaved": "File saved.",
     "fileSavedToFilename": "Saved to {filename}",
     "canvas": "canvas",
     "selection": "selection",
     "pasteAsSingleElement": "Use {{shortcut}} to paste as a single element,\nor paste into an existing text editor",
     "unableToEmbed": "Embedding this url is currently not allowed. Raise an issue on GitHub to request the url whitelisted",
-    "unrecognizedLinkFormat": "The link you embedded does not match the expected format. Please try to paste the 'embed' string provided by the source site"
+    "unrecognizedLinkFormat": "The link you embedded does not match the expected format. Please try to paste the 'embed' string provided by the source site",
+    "elementLinkCopied": "Link copied to clipboard"
   },
   "colors": {
     "transparent": "Transparent",

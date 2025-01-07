@@ -5,16 +5,18 @@ import { clearElementsForExport } from "../element";
 import type { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
+import { decodeSvgBase64Payload } from "../scene/export";
 import type { AppState, DataURL, LibraryItem } from "../types";
 import type { ValueOf } from "../utility-types";
 import { bytesToHexString, isPromiseLike } from "../utils";
+import { base64ToString, stringToBase64, toByteString } from "./encode";
 import type { FileSystemHandle } from "./filesystem";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
 import type { ImportedLibraryData } from "./types";
 
-const parseFileContents = async (blob: Blob | File) => {
+const parseFileContents = async (blob: Blob | File): Promise<string> => {
   let contents: string;
 
   if (blob.type === MIME_TYPES.png) {
@@ -46,9 +48,7 @@ const parseFileContents = async (blob: Blob | File) => {
     }
     if (blob.type === MIME_TYPES.svg) {
       try {
-        return await (
-          await import("./image")
-        ).decodeSvgMetadata({
+        return decodeSvgBase64Payload({
           svg: contents,
         });
       } catch (error: any) {
@@ -107,11 +107,15 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+export const isSupportedImageFileType = (type: string | null | undefined) => {
+  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+};
+
 export const isSupportedImageFile = (
   blob: Blob | null | undefined,
 ): blob is Blob & { type: ValueOf<typeof IMAGE_MIME_TYPES> } => {
   const { type } = blob || {};
-  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+  return isSupportedImageFileType(type);
 };
 
 export const loadSceneOrLibraryFromBlob = async (
@@ -249,6 +253,7 @@ export const generateIdFromFile = async (file: File): Promise<FileId> => {
   }
 };
 
+/** async. For sync variant, use getDataURL_sync */
 export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -259,6 +264,16 @@ export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
+};
+
+export const getDataURL_sync = (
+  data: string | Uint8Array | ArrayBuffer,
+  mimeType: ValueOf<typeof MIME_TYPES>,
+): DataURL => {
+  return `data:${mimeType};base64,${stringToBase64(
+    toByteString(data),
+    true,
+  )}` as DataURL;
 };
 
 export const dataURLToFile = (dataURL: DataURL, filename = "") => {
@@ -272,6 +287,10 @@ export const dataURLToFile = (dataURL: DataURL, filename = "") => {
     ia[i] = byteString.charCodeAt(i);
   }
   return new File([ab], filename, { type: mimeType });
+};
+
+export const dataURLToString = (dataURL: DataURL) => {
+  return base64ToString(dataURL.slice(dataURL.indexOf(",") + 1));
 };
 
 export const resizeImageFile = async (
@@ -315,7 +334,7 @@ export const resizeImageFile = async (
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight, alpha: true })],
     file.name,
     {
       type: opts.outputType || file.type,

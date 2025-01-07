@@ -1,4 +1,3 @@
-import type { ToolType } from "../../types";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -9,6 +8,7 @@ import type {
   ExcalidrawDiamondElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
+  ExcalidrawImageElement,
 } from "../../element/types";
 import type { TransformHandleType } from "../../element/transformHandles";
 import {
@@ -35,6 +35,8 @@ import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
 import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
 import { pointFrom, pointRotateRads } from "../../../math";
+import { cropElement } from "../../element/cropElement";
+import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();
@@ -559,6 +561,38 @@ export class UI {
     keyboardModifiers: KeyboardModifiers = {},
   ) {
     return transform(element, handle, mouseMove, keyboardModifiers);
+  }
+
+  static crop(
+    element: ExcalidrawImageElement,
+    handle: TransformHandleDirection,
+    naturalWidth: number,
+    naturalHeight: number,
+    mouseMove: [deltaX: number, deltaY: number],
+    keepAspectRatio = false,
+  ) {
+    const handleCoords = getTransformHandles(
+      element,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+      {},
+    )[handle]!;
+
+    const clientX = handleCoords[0] + handleCoords[2] / 2;
+    const clientY = handleCoords[1] + handleCoords[3] / 2;
+
+    const mutations = cropElement(
+      element,
+      handle,
+      naturalWidth,
+      naturalHeight,
+      clientX + mouseMove[0],
+      clientY + mouseMove[1],
+      keepAspectRatio ? element.width / element.height : undefined,
+    );
+
+    API.updateElement(element, mutations);
   }
 
   static rotate(

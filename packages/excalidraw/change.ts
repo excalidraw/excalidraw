@@ -17,13 +17,16 @@ import {
   hasBoundTextElement,
   isBindableElement,
   isBoundToContainer,
+  isImageElement,
   isTextElement,
 } from "./element/typeChecks";
 import type {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   NonDeleted,
+  Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./element/types";
@@ -626,6 +629,18 @@ export class AppStateChange implements Change<AppState> {
             );
 
             break;
+          case "croppingElementId": {
+            const croppingElementId = nextAppState[key];
+            const element =
+              croppingElementId && nextElements.get(croppingElementId);
+
+            if (element && !element.isDeleted) {
+              visibleDifferenceFlag.value = true;
+            } else {
+              nextAppState[key] = null;
+            }
+            break;
+          }
           case "editingGroupId":
             const editingGroupId = nextAppState[key];
 
@@ -756,6 +771,7 @@ export class AppStateChange implements Change<AppState> {
       selectedElementIds,
       editingLinearElementId,
       selectedLinearElementId,
+      croppingElementId,
       ...standaloneProps
     } = delta as ObservedAppState;
 
@@ -779,7 +795,10 @@ export class AppStateChange implements Change<AppState> {
   }
 }
 
-type ElementPartial = Omit<ElementUpdate<OrderedExcalidrawElement>, "seed">;
+type ElementPartial<T extends ExcalidrawElement = ExcalidrawElement> = Omit<
+  ElementUpdate<Ordered<T>>,
+  "seed"
+>;
 
 /**
  * Elements change is a low level primitive to capture a change between two sets of elements.
@@ -1214,6 +1233,18 @@ export class ElementsChange implements Change<SceneElementsMap> {
       Object.assign(directlyApplicablePartial, {
         boundElements: mergedBoundElements,
       });
+    }
+
+    if (isImageElement(element)) {
+      const _delta = delta as Delta<ElementPartial<ExcalidrawImageElement>>;
+      // we want to override `crop` only if modified so that we don't reset
+      // when undoing/redoing unrelated change
+      if (_delta.deleted.crop || _delta.inserted.crop) {
+        Object.assign(directlyApplicablePartial, {
+          // apply change verbatim
+          crop: _delta.inserted.crop ?? null,
+        });
+      }
     }
 
     if (!flags.containsVisibleDifference) {
