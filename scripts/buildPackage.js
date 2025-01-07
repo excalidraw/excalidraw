@@ -158,5 +158,8 @@ const createESMRawBuild = async () => {
   await buildProd(rawConfigChunks);
 };
 
-createESMRawBuild();
-createESMBrowserBuild();
+// otherwise throws "ERROR: Could not resolve "./subset-worker.chunk"
+(async () => {
+  await createESMRawBuild();
+  await createESMBrowserBuild();
+})();
