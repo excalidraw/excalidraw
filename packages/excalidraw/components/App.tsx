@@ -6289,8 +6289,6 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
 
-    this.lastPointerDownEvent = event;
-
     this.maybeUnfollowRemoteUser();
 
     if (this.state.searchMatches) {
@@ -6389,6 +6387,8 @@ class App extends React.Component<AppProps, AppState> {
     if (isPanning) {
       return;
     }
+
+    this.lastPointerDownEvent = event;
 
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
