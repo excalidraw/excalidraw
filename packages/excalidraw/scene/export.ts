@@ -384,8 +384,6 @@ const configExportDimension = async ({
       ? "contain"
       : "none");
 
-  const containPadding = cfg.fit === "contain";
-
   cfg.padding = cfg.padding ?? 0;
   cfg.scale = cfg.scale ?? 1;
 
@@ -502,25 +500,13 @@ const configExportDimension = async ({
     width = ret.width;
     height = ret.height;
     cfg.scale = ret.scale ?? cfg.scale;
-  } else if (containPadding) {
-    // const whRatio = width / height;
-
-    // console.log("cfg.padding", cfg.padding);
-
-    // const wRatio = (width - cfg.padding * 2) / width;
-    // const hRatio = (height - cfg.padding * 2) / height;
-    // exportScale = Math.min(wRatio, hRatio);
-
-    // width -= cfg.padding * 2;
-    // height -= (cfg.padding * 2) / whRatio;
-
-    const whRatio = width / height;
+  } else if (cfg.fit === "contain") {
     width -= cfg.padding * 2;
-    height -= (cfg.padding * 2) / whRatio;
+    height -= cfg.padding * 2;
 
     const wRatio = width / origWidth;
     const hRatio = height / origHeight;
-    // scale the orig canvas to fit in the target frame
+    // scale the orig canvas to fit in the target region
     exportScale = Math.min(wRatio, hRatio);
   }
 
