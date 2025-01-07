@@ -17,9 +17,8 @@ import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
 import type { LocalPoint } from "../../math";
-import { pointFrom } from "../../math";
+import { pointExtent, pointFrom } from "../../math";
 import { resizeSingleElement } from "../element/resizeElements";
-import { getSizeFromPoints } from "../points";
 
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
 
@@ -337,7 +336,7 @@ describe("line element", () => {
 
     expect(element.points[0]).toEqual([0, 0]);
 
-    const { width, height } = getSizeFromPoints(element.points);
+    const { width, height } = pointExtent(element.points);
     expect(width).toBe(element.width);
     expect(height).toBe(element.height);
   });
