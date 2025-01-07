@@ -7038,6 +7038,22 @@ class App extends React.Component<AppProps, AppState> {
           this.finishImageCropping();
         }
 
+        this.hitLinkElement = this.getElementLinkAtPosition(
+          pointerDownState.origin,
+          pointerDownState.hit.element,
+        );
+
+        if (this.hitLinkElement) {
+          return true;
+        }
+
+        if (
+          this.state.croppingElementId &&
+          pointerDownState.hit.element?.id !== this.state.croppingElementId
+        ) {
+          this.finishImageCropping();
+        }
+
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
           const hitLinkElement = this.getElementLinkAtPosition(
