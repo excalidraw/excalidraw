@@ -940,13 +940,12 @@ History {
               "startBinding": null,
               "width": 100,
               "x": 150,
-              "y": 0,
             },
             "inserted": {
               "endBinding": {
                 "elementId": "id160",
                 "fixedPoint": null,
-                "focus": "-0.00000",
+                "focus": 0,
                 "gap": 1,
               },
               "points": [
@@ -962,12 +961,11 @@ History {
               "startBinding": {
                 "elementId": "id159",
                 "fixedPoint": null,
-                "focus": "0.00000",
+                "focus": 0,
                 "gap": 1,
               },
               "width": 0,
               "x": 149,
-              "y": "0.00000",
             },
           },
         },
