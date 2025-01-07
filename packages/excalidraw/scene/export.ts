@@ -386,10 +386,6 @@ const configExportDimension = async ({
 
   const containPadding = cfg.fit === "contain";
 
-  if (cfg.x != null || cfg.x != null) {
-    cfg.fit = "none";
-  }
-
   cfg.padding = cfg.padding ?? 0;
   cfg.scale = cfg.scale ?? 1;
 
@@ -441,20 +437,20 @@ const configExportDimension = async ({
   // variables for target bounding box
   let [x, y, width, height] = origCanvasSize;
 
-  if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
-    if (cfg.width != null) {
-      cfg.padding = Math.min(
-        cfg.padding,
-        (cfg.width - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-      );
-    }
+  x = cfg.x ?? x;
+  y = cfg.y ?? y;
+  width = cfg.width ?? width;
+  height = cfg.height ?? height;
 
-    if (cfg.height != null) {
-      cfg.padding = Math.min(
-        cfg.padding,
-        (cfg.height - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-      );
-    }
+  if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
+    cfg.padding =
+      cfg.padding && cfg.padding > 0
+        ? Math.min(
+            cfg.padding,
+            (width - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+            (height - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
+          )
+        : 0;
 
     if (cfg.getDimensions != null) {
       const ret = cfg.getDimensions(width, height);
@@ -478,34 +474,6 @@ const configExportDimension = async ({
         (cfg.maxWidthOrHeight - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
       );
     }
-  }
-
-  if (cfg.width != null) {
-    width = cfg.width;
-
-    if (cfg.padding && containPadding) {
-      width -= cfg.padding * 2;
-    }
-
-    if (cfg.height) {
-      height = cfg.height;
-      if (cfg.padding && containPadding) {
-        height -= cfg.padding * 2;
-      }
-    } else {
-      // if height not specified, scale the original height to match the new
-      // width while maintaining aspect ratio
-      height *= width / origWidth;
-    }
-  } else if (cfg.height != null) {
-    height = cfg.height;
-
-    if (cfg.padding && containPadding) {
-      height -= cfg.padding * 2;
-    }
-    // width not specified, so scale the original width to match the new
-    // height while maintaining aspect ratio
-    width *= height / origHeight;
   }
 
   if (cfg.maxWidthOrHeight != null || cfg.widthOrHeight != null) {
@@ -534,31 +502,26 @@ const configExportDimension = async ({
     width = ret.width;
     height = ret.height;
     cfg.scale = ret.scale ?? cfg.scale;
-  } else if (
-    containPadding &&
-    cfg.padding &&
-    cfg.width == null &&
-    cfg.height == null
-  ) {
+  } else if (containPadding) {
+    // const whRatio = width / height;
+
+    // console.log("cfg.padding", cfg.padding);
+
+    // const wRatio = (width - cfg.padding * 2) / width;
+    // const hRatio = (height - cfg.padding * 2) / height;
+    // exportScale = Math.min(wRatio, hRatio);
+
+    // width -= cfg.padding * 2;
+    // height -= (cfg.padding * 2) / whRatio;
+
     const whRatio = width / height;
     width -= cfg.padding * 2;
     height -= (cfg.padding * 2) / whRatio;
-  }
 
-  if (
-    (cfg.fit === "contain" && !cfg.maxWidthOrHeight) ||
-    (containPadding && cfg.padding)
-  ) {
-    if (cfg.fit === "contain") {
-      const wRatio = width / origWidth;
-      const hRatio = height / origHeight;
-      // scale the orig canvas to fit in the target frame
-      exportScale = Math.min(wRatio, hRatio);
-    } else {
-      const wRatio = (width - cfg.padding * 2) / width;
-      const hRatio = (height - cfg.padding * 2) / height;
-      exportScale = Math.min(wRatio, hRatio);
-    }
+    const wRatio = width / origWidth;
+    const hRatio = height / origHeight;
+    // scale the orig canvas to fit in the target frame
+    exportScale = Math.min(wRatio, hRatio);
   }
 
   x = cfg.x ?? origX;
