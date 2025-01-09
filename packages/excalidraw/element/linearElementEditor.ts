@@ -578,7 +578,7 @@ export class LinearElementEditor {
       scenePointer.x,
       scenePointer.y,
     );
-    if (clickedPointIndex >= 0) {
+    if (!isElbowArrow(element) && clickedPointIndex >= 0) {
       return null;
     }
     const points = LinearElementEditor.getPointsGlobalCoordinates(
@@ -593,6 +593,9 @@ export class LinearElementEditor {
       return null;
     }
 
+    const threshold =
+      (LinearElementEditor.POINT_HANDLE_SIZE + 1) / appState.zoom.value;
+
     const existingSegmentMidpointHitCoords =
       linearElementEditor.segmentMidPointHoveredCoords;
     if (existingSegmentMidpointHitCoords) {
@@ -603,7 +606,7 @@ export class LinearElementEditor {
         ),
         pointFrom(scenePointer.x, scenePointer.y),
       );
-      if (distance <= LinearElementEditor.POINT_HANDLE_SIZE) {
+      if (distance <= threshold) {
         return existingSegmentMidpointHitCoords;
       }
     }
@@ -623,7 +626,7 @@ export class LinearElementEditor {
           midPoints[index]!,
           pointFrom(scenePointer.x, scenePointer.y),
         );
-        if (distance <= LinearElementEditor.POINT_HANDLE_SIZE) {
+        if (distance <= threshold) {
           return midPoints[index];
         }
       }
