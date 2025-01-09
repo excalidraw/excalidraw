@@ -29,7 +29,7 @@ import {
   getOmitSidesForDevice,
   shouldShowBoundingBox,
 } from "../element/transformHandles";
-import { arrayToMap, throttleRAF } from "../utils";
+import { arrayToMap, invariant, throttleRAF } from "../utils";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
@@ -85,6 +85,24 @@ import {
   type Radians,
 } from "../../math";
 import { getCornerRadius } from "../shapes";
+
+const renderElbowArrowMidPointHighlight = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+) => {
+  invariant(appState.selectedLinearElement, "selectedLinearElement is null");
+
+  const { segmentMidPointHoveredCoords } = appState.selectedLinearElement;
+
+  invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  highlightPoint(segmentMidPointHoveredCoords, context, appState);
+
+  context.restore();
+};
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -882,6 +900,15 @@ const _renderInteractiveScene = ({
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
   }
+
+  if (
+    isElbowArrow(selectedElements[0]) &&
+    appState.selectedLinearElement &&
+    appState.selectedLinearElement.segmentMidPointHoveredCoords
+  ) {
+    renderElbowArrowMidPointHighlight(context, appState);
+  }
+
   // Paint selected elements
   if (!appState.multiElement && !appState.editingLinearElement) {
     const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);

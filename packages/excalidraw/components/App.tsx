@@ -7942,10 +7942,18 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         flushSync(() => {
-          if (this.state.elbowLinearElement) {
+          if (
+            this.state.elbowLinearElement &&
+            this.state.selectedLinearElement
+          ) {
             this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
+              },
               elbowLinearElement: {
                 ...this.state.elbowLinearElement,
+                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
                 pointerDownState: ret.pointerDownState,
                 elbowMidPointState: ret.elbowMidPointState,
               },

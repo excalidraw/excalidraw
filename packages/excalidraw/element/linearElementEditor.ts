@@ -1814,6 +1814,16 @@ export class LinearElementEditor {
 
       return {
         ...linearElement,
+        segmentMidPointHoveredCoords: pointFrom<GlobalPoint>(
+          element.x +
+            (element.fixedSegments![offset].start[0] +
+              element.fixedSegments![offset].end[0]) /
+              2,
+          element.y +
+            (element.fixedSegments![offset].start[1] +
+              element.fixedSegments![offset].end[1]) /
+              2,
+        ),
         elbowMidPointState: {
           midPointIndex: element.fixedSegments![offset].index,
         },
