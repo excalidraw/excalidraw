@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import React from "react";
 import type {
   Action,
@@ -14,6 +15,7 @@ import type {
 import type { AppClassProperties, AppState } from "../types";
 import { trackEvent } from "../analytics";
 import { isPromiseLike } from "../utils";
+import { ToolButton } from "../components/ToolButton";
 
 const trackAction = (
   action: Action,
@@ -141,15 +143,7 @@ export class ActionManager {
    */
   renderAction = (name: ActionName, data?: PanelComponentProps["data"]) => {
     const canvasActions = this.app.props.UIOptions.canvasActions;
-
-    if (
-      this.actions[name] &&
-      "PanelComponent" in this.actions[name] &&
-      (name in canvasActions
-        ? canvasActions[name as keyof typeof canvasActions]
-        : true)
-    ) {
-      const action = this.actions[name];
+    const renderPanel = (action: Action) => {
       const PanelComponent = action.PanelComponent!;
       PanelComponent.displayName = "PanelComponent";
       const elements = this.getElementsIncludingDeleted();
@@ -169,6 +163,7 @@ export class ActionManager {
 
       return (
         <PanelComponent
+          key={action.name}
           elements={this.getElementsIncludingDeleted()}
           appState={this.getAppState()}
           updateData={updateData}
@@ -177,6 +172,42 @@ export class ActionManager {
           data={data}
         />
       );
+    };
+
+    if (
+      this.actions[name] &&
+      "PanelComponent" in this.actions[name] &&
+      (name in canvasActions
+        ? canvasActions[name as keyof typeof canvasActions]
+        : true)
+    ) {
+      return renderPanel(this.actions[name]);
+    }
+
+    if (name === "_custom") {
+      return Object.keys(this.actions)
+        .filter((key) => this.actions[key].custom)
+        .map((key) => {
+          const action = this.actions[key];
+          if (!action.PanelComponent) {
+            action.PanelComponent = ({ elements, appState, updateData }) => (
+              <ToolButton
+                key={action.name}
+                type="button"
+                icon={action.icon as ReactNode}
+                title={action.name}
+                aria-label={action.label as string}
+                onClick={() => updateData(null)}
+                visible={
+                  typeof action.visible == "function"
+                    ? action.visible(elements, appState)
+                    : action.visible
+                }
+              />
+            );
+          }
+          return renderPanel(action);
+        });
     }
 
     return null;

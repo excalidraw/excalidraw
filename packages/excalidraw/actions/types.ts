@@ -137,7 +137,8 @@ export type ActionName =
   | "searchMenu"
   | "copyElementLink"
   | "linkToElement"
-  | "cropEditor";
+  | "cropEditor"
+  | string;
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -180,7 +181,7 @@ export interface Action {
     app: AppClassProperties,
   ) => boolean;
   checked?: (appState: Readonly<AppState>) => boolean;
-  trackEvent:
+  trackEvent?:
     | false
     | {
         category:
@@ -203,4 +204,13 @@ export interface Action {
   /** if set to `true`, allow action to be performed in viewMode.
    *  Defaults to `false` */
   viewMode?: boolean;
+
+  // extend fields for custom actions button
+  custom?: boolean;
+  visible?:
+    | boolean
+    | ((
+        elements: readonly ExcalidrawElement[],
+        appState: UIAppState,
+      ) => boolean);
 }
