@@ -889,6 +889,12 @@ const _renderInteractiveScene = ({
   }
 
   if (
+    isElbowArrow(selectedElements[0]) &&
+    appState.selectedLinearElement &&
+    appState.selectedLinearElement.segmentMidPointHoveredCoords
+  ) {
+    renderElbowArrowMidPointHighlight(context, appState);
+  } else if (
     appState.selectedLinearElement &&
     appState.selectedLinearElement.hoverPointIndex >= 0 &&
     !(
@@ -899,14 +905,6 @@ const _renderInteractiveScene = ({
     )
   ) {
     renderLinearElementPointHighlight(context, appState, elementsMap);
-  }
-
-  if (
-    isElbowArrow(selectedElements[0]) &&
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.segmentMidPointHoveredCoords
-  ) {
-    renderElbowArrowMidPointHighlight(context, appState);
   }
 
   // Paint selected elements
