@@ -6185,7 +6185,10 @@ class App extends React.Component<AppProps, AppState> {
           );
 
         if (
-          (!elementIsElbowArrow && hoverPointIndex >= 0) ||
+          (elementIsElbowArrow
+            ? hoverPointIndex === 0 ||
+              hoverPointIndex === element.points.length - 1
+            : hoverPointIndex >= 0) ||
           segmentMidPointHoveredCoords
         ) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
