@@ -593,9 +593,6 @@ export class LinearElementEditor {
       return null;
     }
 
-    const threshold =
-      LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
-
     const existingSegmentMidpointHitCoords =
       linearElementEditor.segmentMidPointHoveredCoords;
     if (existingSegmentMidpointHitCoords) {
@@ -606,7 +603,7 @@ export class LinearElementEditor {
         ),
         pointFrom(scenePointer.x, scenePointer.y),
       );
-      if (distance <= threshold) {
+      if (distance <= LinearElementEditor.POINT_HANDLE_SIZE) {
         return existingSegmentMidpointHitCoords;
       }
     }
@@ -626,7 +623,7 @@ export class LinearElementEditor {
           midPoints[index]!,
           pointFrom(scenePointer.x, scenePointer.y),
         );
-        if (distance <= threshold) {
+        if (distance <= LinearElementEditor.POINT_HANDLE_SIZE) {
           return midPoints[index];
         }
       }
