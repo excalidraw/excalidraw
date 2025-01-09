@@ -4695,7 +4695,10 @@ class App extends React.Component<AppProps, AppState> {
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
-      setCursorForShape(this.interactiveCanvas, this.state);
+      setCursorForShape(this.interactiveCanvas, {
+        ...this.state,
+        activeTool: nextActiveTool,
+      });
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
