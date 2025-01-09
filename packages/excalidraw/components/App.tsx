@@ -6159,58 +6159,34 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       const elementIsElbowArrow = isElbowArrow(element);
-      let hoverPointIndex = -1;
-      let segmentMidPointHoveredCoords = null;
-      if (
-        hitElementItself({
-          x: scenePointerX,
-          y: scenePointerY,
-          element,
-          shape: getElementShape(
-            element,
-            this.scene.getNonDeletedElementsMap(),
-          ),
-        })
-      ) {
-        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-          element,
-          elementsMap,
-          this.state.zoom,
-          scenePointerX,
-          scenePointerY,
+      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+        element,
+        elementsMap,
+        this.state.zoom,
+        scenePointerX,
+        scenePointerY,
+      );
+      const segmentMidPointHoveredCoords =
+        LinearElementEditor.getSegmentMidpointHitCoords(
+          linearElementEditor,
+          { x: scenePointerX, y: scenePointerY },
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
         );
-        segmentMidPointHoveredCoords =
-          LinearElementEditor.getSegmentMidpointHitCoords(
-            linearElementEditor,
-            { x: scenePointerX, y: scenePointerY },
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          );
+      const isHoveringAPointHandle =
+        (elementIsElbowArrow
+          ? hoverPointIndex === 0 ||
+            hoverPointIndex === element.points.length - 1
+          : hoverPointIndex >= 0) || segmentMidPointHoveredCoords;
 
-        if (
-          (elementIsElbowArrow
-            ? hoverPointIndex === 0 ||
-              hoverPointIndex === element.points.length - 1
-            : hoverPointIndex >= 0) ||
-          segmentMidPointHoveredCoords
-        ) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        } else if (
-          this.hitElement(scenePointerX, scenePointerY, element) &&
-          (!elementIsElbowArrow ||
-            (elementIsElbowArrow &&
-              !element.startBinding &&
-              !element.endBinding))
-        ) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-        }
-      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-        if (
-          !elementIsElbowArrow ||
-          !(element.startBinding || element.endBinding)
-        ) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-        }
+      if (isHoveringAPointHandle) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      } else if (
+        this.hitElement(scenePointerX, scenePointerY, element) &&
+        // Ebow arrows can only be moved when unconnected
+        (!elementIsElbowArrow || !(element.startBinding || element.endBinding))
+      ) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
       }
 
       if (
