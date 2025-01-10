@@ -6386,7 +6386,7 @@ class App extends React.Component<AppProps, AppState> {
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
     // panning
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+    if (this.handleCanvasPanUsingWheelOrSpaceDragOrRightClickHold(event)) {
       return;
     }
 
@@ -6709,7 +6709,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // Returns whether the event is a panning
-  public handleCanvasPanUsingWheelOrSpaceDrag = (
+  public handleCanvasPanUsingWheelOrSpaceDragOrRightClickHold = (
     event: React.PointerEvent<HTMLElement> | MouseEvent,
   ): boolean => {
     const isRightClickDragging = event.button === POINTER_BUTTON.SECONDARY;
