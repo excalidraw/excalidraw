@@ -4,9 +4,10 @@ import { KEYS } from "../keys";
 import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
-import { ExternalLinkIcon } from "./icons";
+import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { isDarwin, isFirefox, isWindows } from "../constants";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 
 const Header = () => (
   <div className="HelpDialog__header">
@@ -16,17 +17,17 @@ const Header = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("helpDialog.documentation")}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+      {t("helpDialog.documentation")}
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://blog.excalidraw.com"
+      href="https://plus.excalidraw.com/blog"
       target="_blank"
       rel="noopener noreferrer"
     >
-      {t("helpDialog.blog")}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+      {t("helpDialog.blog")}
     </a>
     <a
       className="HelpDialog__btn"
@@ -34,8 +35,17 @@ const Header = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
+      <div className="HelpDialog__link-icon">{GithubIcon}</div>
       {t("helpDialog.github")}
-      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+    </a>
+    <a
+      className="HelpDialog__btn"
+      href="https://youtube.com/@excalidraw"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div className="HelpDialog__link-icon">{youtubeIcon}</div>
+      YouTube
     </a>
   </div>
 );
@@ -212,6 +222,16 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               ]}
               isOr={false}
             />
+            <Shortcut
+              label={t("helpDialog.cropStart")}
+              shortcuts={[t("helpDialog.doubleClick"), getShortcutKey("Enter")]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.cropFinish")}
+              shortcuts={[getShortcutKey("Enter"), getShortcutKey("Escape")]}
+              isOr={true}
+            />
             <Shortcut label={t("toolBar.lock")} shortcuts={[KEYS.Q]} />
             <Shortcut
               label={t("helpDialog.preventBinding")}
@@ -263,7 +283,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("Alt+S")]}
             />
             <Shortcut
-              label={t("labels.showGrid")}
+              label={t("labels.toggleGrid")}
               shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
             />
             <Shortcut
@@ -275,14 +295,39 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("Alt+Shift+D")]}
             />
             <Shortcut
-              label={t("stats.title")}
+              label={t("stats.fullTitle")}
               shortcuts={[getShortcutKey("Alt+/")]}
+            />
+            <Shortcut
+              label={t("search.title")}
+              shortcuts={[getShortcutFromShortcutName("searchMenu")]}
+            />
+            <Shortcut
+              label={t("commandPalette.title")}
+              shortcuts={
+                isFirefox
+                  ? [getShortcutFromShortcutName("commandPalette")]
+                  : [
+                      getShortcutFromShortcutName("commandPalette"),
+                      getShortcutFromShortcutName("commandPalette", 1),
+                    ]
+              }
             />
           </ShortcutIsland>
           <ShortcutIsland
             className="HelpDialog__island--editor"
             caption={t("helpDialog.editor")}
           >
+            <Shortcut
+              label={t("helpDialog.createFlowchart")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+Arrow Key`)]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.navigateFlowchart")}
+              shortcuts={[getShortcutKey(`Alt+Arrow Key`)]}
+              isOr={true}
+            />
             <Shortcut
               label={t("labels.moveCanvas")}
               shortcuts={[
@@ -436,6 +481,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             <Shortcut
               label={t("labels.showBackground")}
               shortcuts={[getShortcutKey("G")]}
+            />
+            <Shortcut
+              label={t("labels.showFonts")}
+              shortcuts={[getShortcutKey("Shift+F")]}
             />
             <Shortcut
               label={t("labels.decreaseFontSize")}

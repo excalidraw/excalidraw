@@ -13,15 +13,89 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Features
+
+- Added hand-drawn font for Chinese, Japanese and Korean (CJK) as a fallback for Excalifont. Improved overal text wrapping algorithm, not only accounting for CJK, but covering various edge cases with white spaces and text-align center/right. Added support for multi-codepoint emojis wrapping. Offloaded SVG export to Web Workers, with an automatic fallback to the main thread if not supported or not desired.[#8530](https://github.com/excalidraw/excalidraw/pull/8530)
+
+- Prefer user defined coordinates and dimensions when creating a frame using [`convertToExcalidrawElements`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/excalidraw-element-skeleton#converttoexcalidrawelements) [#8517](https://github.com/excalidraw/excalidraw/pull/8517)
+
+- `props.initialData` can now be a function that returns `ExcalidrawInitialDataState` or `Promise<ExcalidrawInitialDataState>`. [#8107](https://github.com/excalidraw/excalidraw/pull/8135)
+
+- Added support for multiplayer undo/redo, by calculating invertible increments and storing them inside the local-only undo/redo stacks. [#7348](https://github.com/excalidraw/excalidraw/pull/7348)
+
+- Added font picker component to have the ability to choose from a range of different fonts. Also, changed the default fonts to `Excalifont`, `Nunito` and `Comic Shanns` and deprecated `Virgil`, `Helvetica` and `Cascadia`.
+
+- `MainMenu.DefaultItems.ToggleTheme` now supports `onSelect(theme: string)` callback, and optionally `allowSystemTheme: boolean` alongside `theme: string` to indicate you want to allow users to set to system theme (you need to handle this yourself). [#7853](https://github.com/excalidraw/excalidraw/pull/7853)
+
+- Add `useHandleLibrary`'s `opts.adapter` as the new recommended pattern to handle library initialization and persistence on library updates. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
+- Add `useHandleLibrary`'s `opts.migrationAdapter` adapter to handle library migration during init, when migrating from one data store to another (e.g. from LocalStorage to IndexedDB). [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
+- Soft-deprecate `useHandleLibrary`'s `opts.getInitialLibraryItems` in favor of `opts.adapter`. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
+- Add `onPointerUp` prop [#7638](https://github.com/excalidraw/excalidraw/pull/7638).
+
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area. [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
+
+### Fixes
+
+- Keep customData when converting to ExcalidrawElement. [#7656](https://github.com/excalidraw/excalidraw/pull/7656)
 
 ### Breaking Changes
 
+- Stats container CSS changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout.
+
+- `updateScene` API has changed due to the added `Store` component as part of the multiplayer undo / redo initiative. Specifically, `sceneData` property `commitToHistory: boolean` was replaced with `storeAction: StoreActionType`. Make sure to update all instances of `updateScene` according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
+
+|  | Before `commitToHistory` | After `storeAction` | Notes |
+| --- | --- | --- | --- |
+| _Immediately undoable_ | `true` | `"capture"` | As before, use for all updates which should be recorded by the store & history. Should be used for the most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `false` | `"none"` | Similar to before, use for all updates which should not be recorded immediately (likely exceptions which are part of some async multi-step process) or those not meant to be recorded at all (i.e. updates to `collaborators` object, parts of `AppState` which are not observed by the store & history - not `ObservedAppState`).<br/><br/>**IMPORTANT** It's likely you should switch to `"update"` in all the other cases. Otherwise, all such updates would end up being recorded with the next `"capture"` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | n/a | `"update"` | **NEW**: previously there was no equivalent for this value. Now, it's recommended to use `"update"` for all remote updates (from the other clients), scene initialization, or those updates, which should not be locally "undoable". These updates will _never_ make it to the local undo / redo stacks. |
+
+- `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
+
+- `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties.
+
+- Create an `ESM` build for `@excalidraw/excalidraw`. The API is in progress and subject to change before stable release. There are some changes on how the package will be consumed
+
+  #### Bundler
+
+  - CSS needs to be imported so you will need to import the css along with the excalidraw component
+
+  ```js
+  import { Excalidraw } from "@excalidraw/excalidraw";
+  import "@excalidraw/excalidraw/index.css";
+  ```
+
+  - The `types` path is updated
+
+  Instead of importing from `@excalidraw/excalidraw/types/`, you will need to import from `@excalidraw/excalidraw/dist/excalidraw` or `@excalidraw/excalidraw/dist/utils` depending on the types you are using.
+
+  However this we will be fixing before stable release, so in case you want to try it out you will need to update the types for now.
+
+  #### Browser
+
+  - Since its `ESM` so now script type `module` can be used to load it and css needs to be loaded as well.
+
+  ```html
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.css"
+  />
+  <script type="module">
+    import * as ExcalidrawLib from "https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.js";
+    window.ExcalidrawLib = ExcalidrawLib;
+  </script>
+  ```
+
 - `appState.openDialog` type was changed from `null | string` to `null | { name: string }`. [#7336](https://github.com/excalidraw/excalidraw/pull/7336)
 
-## 0.17.1 (2023-11-28)
+## 0.17.3 (2024-02-09)
 
 ### Fixes
+
+- Keep customData when converting to ExcalidrawElement. [#7656](https://github.com/excalidraw/excalidraw/pull/7656)
 
 - Umd build for browser since it was breaking in v0.17.0 [#7349](https://github.com/excalidraw/excalidraw/pull/7349). Also make sure that when using `Vite`, the `process.env.IS_PREACT` is set as `"true"` (string) and not a boolean.
 
@@ -31,13 +105,15 @@ define: {
 }
 ```
 
+- Disable caching bounds for arrow labels [#7343](https://github.com/excalidraw/excalidraw/pull/7343)
+
+- Bounds cached prematurely resulting in incorrectly rendered labels [#7339](https://github.com/excalidraw/excalidraw/pull/7339)
+
 ## Excalidraw Library
 
 ### Fixes
 
 - Disable caching bounds for arrow labels [#7343](https://github.com/excalidraw/excalidraw/pull/7343)
-
----
 
 ## 0.17.0 (2023-11-14)
 
@@ -233,7 +309,7 @@ define: {
 
 - Support creating containers, linear elements, text containers, labelled arrows and arrow bindings programatically [#6546](https://github.com/excalidraw/excalidraw/pull/6546)
 - Introducing Web-Embeds (alias iframe element)[#6691](https://github.com/excalidraw/excalidraw/pull/6691)
-- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateEmbeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
+- Added [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) to customize embeddable src url validation. [#6691](https://github.com/excalidraw/excalidraw/pull/6691)
 - Add support for `opts.fitToViewport` and `opts.viewportZoomFactor` in the [`ExcalidrawAPI.scrollToContent`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#scrolltocontent) API. [#6581](https://github.com/excalidraw/excalidraw/pull/6581).
 - Properly sanitize element `link` urls. [#6728](https://github.com/excalidraw/excalidraw/pull/6728).
 - Sidebar component now supports tabs — for more detailed description of new behavior and breaking changes, see the linked PR. [#6213](https://github.com/excalidraw/excalidraw/pull/6213)

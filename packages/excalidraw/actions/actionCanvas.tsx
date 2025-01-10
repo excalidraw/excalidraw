@@ -1,15 +1,30 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ZoomInIcon, ZoomOutIcon } from "../components/icons";
+import {
+  handIcon,
+  MoonIcon,
+  SunIcon,
+  TrashIcon,
+  zoomAreaIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  ZoomResetIcon,
+} from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { CURSOR_TYPE, MIN_ZOOM, THEME, ZOOM_STEP } from "../constants";
+import {
+  CURSOR_TYPE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  THEME,
+  ZOOM_STEP,
+} from "../constants";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { AppState, NormalizedZoomValue } from "../types";
+import type { AppState, Offsets } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
@@ -20,11 +35,15 @@ import {
   isHandToolActive,
 } from "../appState";
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import { SceneBounds } from "../element/bounds";
+import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
+import { StoreAction } from "../store";
+import { clamp, roundToStep } from "../../math";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
+  label: "labels.canvasBackground",
+  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -35,7 +54,9 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      commitToHistory: !!value.viewBackgroundColor,
+      storeAction: !!value.viewBackgroundColor
+        ? StoreAction.CAPTURE
+        : StoreAction.NONE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => {
@@ -59,11 +80,15 @@ export const actionChangeViewBackgroundColor = register({
 
 export const actionClearCanvas = register({
   name: "clearCanvas",
+  label: "labels.clearCanvas",
+  paletteName: "Clear canvas",
+  icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.clearCanvas &&
-      !appState.viewModeEnabled
+      !appState.viewModeEnabled &&
+      appState.openDialog?.name !== "elementLinkSelector"
     );
   },
   perform: (elements, appState, _, app) => {
@@ -81,21 +106,25 @@ export const actionClearCanvas = register({
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
-        showStats: appState.showStats,
+        gridStep: appState.gridStep,
+        gridModeEnabled: appState.gridModeEnabled,
+        stats: appState.stats,
         pasteDialog: appState.pasteDialog,
         activeTool:
           appState.activeTool.type === "image"
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
 });
 
 export const actionZoomIn = register({
   name: "zoomIn",
+  label: "buttons.zoomIn",
   viewMode: true,
+  icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
     return {
@@ -111,16 +140,17 @@ export const actionZoomIn = register({
         ),
         userToFollow: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       className="zoom-in-button zoom-button"
       icon={ZoomInIcon}
       title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
       aria-label={t("buttons.zoomIn")}
+      disabled={appState.zoom.value >= MAX_ZOOM}
       onClick={() => {
         updateData(null);
       }}
@@ -133,6 +163,8 @@ export const actionZoomIn = register({
 
 export const actionZoomOut = register({
   name: "zoomOut",
+  label: "buttons.zoomOut",
+  icon: ZoomOutIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -149,16 +181,17 @@ export const actionZoomOut = register({
         ),
         userToFollow: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  PanelComponent: ({ updateData }) => (
+  PanelComponent: ({ updateData, appState }) => (
     <ToolButton
       type="button"
       className="zoom-out-button zoom-button"
       icon={ZoomOutIcon}
       title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
       aria-label={t("buttons.zoomOut")}
+      disabled={appState.zoom.value <= MIN_ZOOM}
       onClick={() => {
         updateData(null);
       }}
@@ -171,6 +204,8 @@ export const actionZoomOut = register({
 
 export const actionResetZoom = register({
   name: "resetZoom",
+  label: "buttons.resetZoom",
+  icon: ZoomResetIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_elements, appState, _, app) => {
@@ -187,7 +222,7 @@ export const actionResetZoom = register({
         ),
         userToFollow: null,
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -213,6 +248,7 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
+  viewportZoomFactor: number = 1, // default to 1 if not provided
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -220,118 +256,124 @@ const zoomValueToFitBoundsOnViewport = (
   const commonBoundsHeight = y2 - y1;
   const zoomValueForHeight = viewportDimensions.height / commonBoundsHeight;
   const smallestZoomValue = Math.min(zoomValueForWidth, zoomValueForHeight);
-  const zoomAdjustedToSteps =
-    Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
-  const clampedZoomValueToFitElements = Math.min(
-    Math.max(zoomAdjustedToSteps, MIN_ZOOM),
-    1,
-  );
-  return clampedZoomValueToFitElements as NormalizedZoomValue;
+
+  const adjustedZoomValue =
+    smallestZoomValue * clamp(viewportZoomFactor, 0.1, 1);
+
+  return Math.min(adjustedZoomValue, 1);
 };
 
 export const zoomToFitBounds = ({
   bounds,
   appState,
+  canvasOffsets,
   fitToViewport = false,
-  viewportZoomFactor = 0.7,
+  viewportZoomFactor = 1,
+  minZoom = -Infinity,
+  maxZoom = Infinity,
 }: {
   bounds: SceneBounds;
+  canvasOffsets?: Offsets;
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
 }) => {
+  viewportZoomFactor = clamp(viewportZoomFactor, MIN_ZOOM, MAX_ZOOM);
+
   const [x1, y1, x2, y2] = bounds;
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
-  let newZoomValue;
-  let scrollX;
-  let scrollY;
+  const canvasOffsetLeft = canvasOffsets?.left ?? 0;
+  const canvasOffsetTop = canvasOffsets?.top ?? 0;
+  const canvasOffsetRight = canvasOffsets?.right ?? 0;
+  const canvasOffsetBottom = canvasOffsets?.bottom ?? 0;
+
+  const effectiveCanvasWidth =
+    appState.width - canvasOffsetLeft - canvasOffsetRight;
+  const effectiveCanvasHeight =
+    appState.height - canvasOffsetTop - canvasOffsetBottom;
+
+  let adjustedZoomValue;
 
   if (fitToViewport) {
     const commonBoundsWidth = x2 - x1;
     const commonBoundsHeight = y2 - y1;
 
-    newZoomValue =
+    adjustedZoomValue =
       Math.min(
-        appState.width / commonBoundsWidth,
-        appState.height / commonBoundsHeight,
-      ) * Math.min(1, Math.max(viewportZoomFactor, 0.1));
-
-    // Apply clamping to newZoomValue to be between 10% and 3000%
-    newZoomValue = Math.min(
-      Math.max(newZoomValue, 0.1),
-      30.0,
-    ) as NormalizedZoomValue;
-
-    let appStateWidth = appState.width;
-
-    if (appState.openSidebar) {
-      const sidebarDOMElem = document.querySelector(
-        ".sidebar",
-      ) as HTMLElement | null;
-      const sidebarWidth = sidebarDOMElem?.offsetWidth ?? 0;
-      const isRTL = document.documentElement.getAttribute("dir") === "rtl";
-
-      appStateWidth = !isRTL
-        ? appState.width - sidebarWidth
-        : appState.width + sidebarWidth;
-    }
-
-    scrollX = (appStateWidth / 2) * (1 / newZoomValue) - centerX;
-    scrollY = (appState.height / 2) * (1 / newZoomValue) - centerY;
+        effectiveCanvasWidth / commonBoundsWidth,
+        effectiveCanvasHeight / commonBoundsHeight,
+      ) * viewportZoomFactor;
   } else {
-    newZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
+    adjustedZoomValue = zoomValueToFitBoundsOnViewport(
+      bounds,
+      {
+        width: effectiveCanvasWidth,
+        height: effectiveCanvasHeight,
+      },
+      viewportZoomFactor,
+    );
+  }
+
+  const newZoomValue = getNormalizedZoom(
+    clamp(roundToStep(adjustedZoomValue, ZOOM_STEP, "floor"), minZoom, maxZoom),
+  );
+
+  const centerScroll = centerScrollOn({
+    scenePoint: { x: centerX, y: centerY },
+    viewportDimensions: {
       width: appState.width,
       height: appState.height,
-    });
-
-    const centerScroll = centerScrollOn({
-      scenePoint: { x: centerX, y: centerY },
-      viewportDimensions: {
-        width: appState.width,
-        height: appState.height,
-      },
-      zoom: { value: newZoomValue },
-    });
-
-    scrollX = centerScroll.scrollX;
-    scrollY = centerScroll.scrollY;
-  }
+    },
+    offsets: canvasOffsets,
+    zoom: { value: newZoomValue },
+  });
 
   return {
     appState: {
       ...appState,
-      scrollX,
-      scrollY,
+      scrollX: centerScroll.scrollX,
+      scrollY: centerScroll.scrollY,
       zoom: { value: newZoomValue },
     },
-    commitToHistory: false,
+    storeAction: StoreAction.NONE,
   };
 };
 
 export const zoomToFit = ({
+  canvasOffsets,
   targetElements,
   appState,
   fitToViewport,
   viewportZoomFactor,
+  minZoom,
+  maxZoom,
 }: {
+  canvasOffsets?: Offsets;
   targetElements: readonly ExcalidrawElement[];
   appState: Readonly<AppState>;
   /** whether to fit content to viewport (beyond >100%) */
   fitToViewport: boolean;
   /** zoom content to cover X of the viewport, when fitToViewport=true */
   viewportZoomFactor?: number;
+  minZoom?: number;
+  maxZoom?: number;
 }) => {
   const commonBounds = getCommonBounds(getNonDeletedElements(targetElements));
 
   return zoomToFitBounds({
+    canvasOffsets,
     bounds: commonBounds,
     appState,
     fitToViewport,
     viewportZoomFactor,
+    minZoom,
+    maxZoom,
   });
 };
 
@@ -340,6 +382,8 @@ export const zoomToFit = ({
 // size, it won't be zoomed in.
 export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
+  label: "labels.zoomToFitViewport",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -350,6 +394,7 @@ export const actionZoomToFitSelectionInViewport = register({
         userToFollow: null,
       },
       fitToViewport: false,
+      canvasOffsets: app.getEditorUIOffsets(),
     });
   },
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
@@ -363,6 +408,8 @@ export const actionZoomToFitSelectionInViewport = register({
 
 export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
+  label: "helpDialog.zoomToSelection",
+  icon: zoomAreaIcon,
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
@@ -373,6 +420,7 @@ export const actionZoomToFitSelection = register({
         userToFollow: null,
       },
       fitToViewport: true,
+      canvasOffsets: app.getEditorUIOffsets(),
     });
   },
   // NOTE this action should use shift-2 per figma, alas
@@ -385,9 +433,11 @@ export const actionZoomToFitSelection = register({
 
 export const actionZoomToFit = register({
   name: "zoomToFit",
+  label: "helpDialog.zoomToFit",
+  icon: zoomAreaIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (elements, appState) =>
+  perform: (elements, appState, _, app) =>
     zoomToFit({
       targetElements: elements,
       appState: {
@@ -395,6 +445,7 @@ export const actionZoomToFit = register({
         userToFollow: null,
       },
       fitToViewport: false,
+      canvasOffsets: app.getEditorUIOffsets(),
     }),
   keyTest: (event) =>
     event.code === CODES.ONE &&
@@ -405,6 +456,13 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
+  label: (_, appState) => {
+    return appState.theme === THEME.DARK
+      ? "buttons.lightMode"
+      : "buttons.darkMode";
+  },
+  keywords: ["toggle", "dark", "light", "mode", "theme"],
+  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
@@ -414,7 +472,7 @@ export const actionToggleTheme = register({
         theme:
           value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
@@ -425,6 +483,7 @@ export const actionToggleTheme = register({
 
 export const actionToggleEraserTool = register({
   name: "toggleEraserTool",
+  label: "toolBar.eraser",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState) => {
     let activeTool: AppState["activeTool"];
@@ -451,7 +510,7 @@ export const actionToggleEraserTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) => event.key === KEYS.E,
@@ -459,7 +518,11 @@ export const actionToggleEraserTool = register({
 
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
+  label: "toolBar.hand",
+  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
+  icon: handIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
 
@@ -486,7 +549,7 @@ export const actionToggleHandTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

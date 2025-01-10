@@ -7,8 +7,9 @@ import {
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
-import { ColorPaletteCustom } from "../../colors";
-import { TranslationKeys, t } from "../../i18n";
+import type { ColorPaletteCustom } from "../../colors";
+import type { TranslationKeys } from "../../i18n";
+import { t } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;

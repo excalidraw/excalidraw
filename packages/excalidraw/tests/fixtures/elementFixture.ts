@@ -1,4 +1,6 @@
-import { ExcalidrawElement } from "../../element/types";
+import type { Radians } from "../../../math";
+import { DEFAULT_FONT_FAMILY } from "../../constants";
+import type { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
   id: "vWrqOAfkind2qcm7LDAGZ",
@@ -6,7 +8,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   y: 237,
   width: 214,
   height: 214,
-  angle: 0,
+  angle: 0 as Radians,
   strokeColor: "#000000",
   backgroundColor: "#15aabf",
   fillStyle: "hachure",
@@ -17,6 +19,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   groupIds: [],
   frameId: null,
   roundness: null,
+  index: null,
   seed: 1041657908,
   version: 120,
   versionNonce: 1188004276,
@@ -34,7 +37,6 @@ export const rectangleFixture: ExcalidrawElement = {
 export const embeddableFixture: ExcalidrawElement = {
   ...elementBase,
   type: "embeddable",
-  validated: null,
 };
 export const ellipseFixture: ExcalidrawElement = {
   ...elementBase,
@@ -48,4 +50,18 @@ export const rectangleWithLinkFixture: ExcalidrawElement = {
   ...elementBase,
   type: "rectangle",
   link: "excalidraw.com",
+};
+
+export const textFixture: ExcalidrawElement = {
+  ...elementBase,
+  type: "text",
+  fontSize: 20,
+  fontFamily: DEFAULT_FONT_FAMILY,
+  text: "original text",
+  originalText: "original text",
+  textAlign: "left",
+  verticalAlign: "top",
+  containerId: null,
+  lineHeight: 1.25 as any,
+  autoResize: false,
 };

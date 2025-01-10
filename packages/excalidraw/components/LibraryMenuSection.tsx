@@ -1,8 +1,9 @@
-import React, { memo, ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
-import { LibraryItem } from "../types";
-import { ExcalidrawElement, NonDeleted } from "../element/types";
-import { SvgCache } from "../hooks/useLibraryItemSvg";
+import type { LibraryItem } from "../types";
+import type { ExcalidrawElement, NonDeleted } from "../element/types";
+import type { SvgCache } from "../hooks/useLibraryItemSvg";
 import { useTransition } from "../hooks/useTransition";
 
 type LibraryOrPendingItem = (

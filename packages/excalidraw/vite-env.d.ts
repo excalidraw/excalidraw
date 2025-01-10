@@ -21,8 +21,6 @@ interface ImportMetaEnv {
 
   VITE_APP_FIREBASE_CONFIG: string;
 
-  // whether to enable Service Workers in development
-  VITE_APP_DEV_ENABLE_SW: string;
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;
@@ -43,6 +41,7 @@ interface ImportMetaEnv {
   VITE_APP_COLLAPSE_OVERLAY: string;
   // Enable eslint in dev server
   VITE_APP_ENABLE_ESLINT: string;
+  VITE_APP_ENABLE_TRACKING: string;
 
   VITE_PKG_NAME: string;
   VITE_PKG_VERSION: string;

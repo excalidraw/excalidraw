@@ -6,16 +6,18 @@ const Spinner = ({
   size = "1em",
   circleWidth = 8,
   synchronized = false,
+  className = "",
 }: {
   size?: string | number;
   circleWidth?: number;
   synchronized?: boolean;
+  className?: string;
 }) => {
   const mountTime = React.useRef(Date.now());
   const mountDelay = -(mountTime.current % 1600);
 
   return (
-    <div className="Spinner">
+    <div className={`Spinner ${className}`}>
       <svg
         viewBox="0 0 100 100"
         style={{

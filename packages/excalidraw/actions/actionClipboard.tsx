@@ -10,12 +10,16 @@ import {
 } from "../clipboard";
 import { actionDeleteSelected } from "./actionDeleteSelected";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
-import { isTextElement } from "../element";
+import { getTextFromElements, isTextElement } from "../element";
 import { t } from "../i18n";
 import { isFirefox } from "../constants";
+import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import { StoreAction } from "../store";
 
 export const actionCopy = register({
   name: "copy",
+  label: "labels.copy",
+  icon: DuplicateIcon,
   trackEvent: { category: "element" },
   perform: async (elements, appState, event: ClipboardEvent | null, app) => {
     const elementsToCopy = app.scene.getSelectedElements({
@@ -28,7 +32,7 @@ export const actionCopy = register({
       await copyToClipboard(elementsToCopy, app.files, event);
     } catch (error: any) {
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
         appState: {
           ...appState,
           errorMessage: error.message,
@@ -37,16 +41,16 @@ export const actionCopy = register({
     }
 
     return {
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.copy",
   // don't supply a shortcut since we handle this conditionally via onCopy event
   keyTest: undefined,
 });
 
 export const actionPaste = register({
   name: "paste",
+  label: "labels.paste",
   trackEvent: { category: "element" },
   perform: async (elements, appState, data, app) => {
     let types;
@@ -63,7 +67,7 @@ export const actionPaste = register({
 
       if (isFirefox) {
         return {
-          commitToHistory: false,
+          storeAction: StoreAction.NONE,
           appState: {
             ...appState,
             errorMessage: t("hints.firefox_clipboard_write"),
@@ -72,7 +76,7 @@ export const actionPaste = register({
       }
 
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
         appState: {
           ...appState,
           errorMessage: t("errors.asyncPasteFailedOnRead"),
@@ -85,7 +89,7 @@ export const actionPaste = register({
     } catch (error: any) {
       console.error(error);
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
         appState: {
           ...appState,
           errorMessage: t("errors.asyncPasteFailedOnParse"),
@@ -94,32 +98,34 @@ export const actionPaste = register({
     }
 
     return {
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
-  contextItemLabel: "labels.paste",
   // don't supply a shortcut since we handle this conditionally via onCopy event
   keyTest: undefined,
 });
 
 export const actionCut = register({
   name: "cut",
+  label: "labels.cut",
+  icon: cutIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, event: ClipboardEvent | null, app) => {
     actionCopy.perform(elements, appState, event, app);
-    return actionDeleteSelected.perform(elements, appState);
+    return actionDeleteSelected.perform(elements, appState, null, app);
   },
-  contextItemLabel: "labels.cut",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
 
 export const actionCopyAsSvg = register({
   name: "copyAsSvg",
+  label: "labels.copyAsSvg",
+  icon: svgIcon,
   trackEvent: { category: "element" },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
 
@@ -138,35 +144,56 @@ export const actionCopyAsSvg = register({
         {
           ...appState,
           exportingFrame,
+          name: app.getName(),
         },
       );
+
+      const selectedElements = app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        includeBoundTextElement: true,
+        includeElementsInFrames: true,
+      });
+
       return {
-        commitToHistory: false,
+        appState: {
+          toast: {
+            message: t("toast.copyToClipboardAsSvg", {
+              exportSelection: selectedElements.length
+                ? t("toast.selection")
+                : t("toast.canvas"),
+              exportColorScheme: appState.exportWithDarkMode
+                ? t("buttons.darkMode")
+                : t("buttons.lightMode"),
+            }),
+          },
+        },
+        storeAction: StoreAction.NONE,
       };
     } catch (error: any) {
       console.error(error);
       return {
         appState: {
-          ...appState,
           errorMessage: error.message,
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
   },
   predicate: (elements) => {
     return probablySupportsClipboardWriteText && elements.length > 0;
   },
-  contextItemLabel: "labels.copyAsSvg",
+  keywords: ["svg", "clipboard", "copy"],
 });
 
 export const actionCopyAsPng = register({
   name: "copyAsPng",
+  label: "labels.copyAsPng",
+  icon: pngIcon,
   trackEvent: { category: "element" },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
     const selectedElements = app.scene.getSelectedElements({
@@ -184,6 +211,7 @@ export const actionCopyAsPng = register({
       await exportCanvas("clipboard", exportedElements, appState, app.files, {
         ...appState,
         exportingFrame,
+        name: app.getName(),
       });
       return {
         appState: {
@@ -199,7 +227,7 @@ export const actionCopyAsPng = register({
             }),
           },
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     } catch (error: any) {
       console.error(error);
@@ -208,19 +236,20 @@ export const actionCopyAsPng = register({
           ...appState,
           errorMessage: error.message,
         },
-        commitToHistory: false,
+        storeAction: StoreAction.NONE,
       };
     }
   },
   predicate: (elements) => {
     return probablySupportsClipboardBlob && elements.length > 0;
   },
-  contextItemLabel: "labels.copyAsPng",
   keyTest: (event) => event.code === CODES.C && event.altKey && event.shiftKey,
+  keywords: ["png", "clipboard", "copy"],
 });
 
 export const copyText = register({
   name: "copyText",
+  label: "labels.copyText",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements({
@@ -228,17 +257,13 @@ export const copyText = register({
       includeBoundTextElement: true,
     });
 
-    const text = selectedElements
-      .reduce((acc: string[], element) => {
-        if (isTextElement(element)) {
-          acc.push(element.text);
-        }
-        return acc;
-      }, [])
-      .join("\n\n");
-    copyTextToSystemClipboard(text);
+    try {
+      copyTextToSystemClipboard(getTextFromElements(selectedElements));
+    } catch (e) {
+      throw new Error(t("errors.copyToSystemClipboardFailed"));
+    }
     return {
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   predicate: (elements, appState, _, app) => {
@@ -252,5 +277,5 @@ export const copyText = register({
         .some(isTextElement)
     );
   },
-  contextItemLabel: "labels.copyText",
+  keywords: ["text", "clipboard", "copy"],
 });

@@ -54,3 +54,14 @@ export type Assert<T extends true> = T;
 export type NestedKeyOf<T, K = keyof T> = K extends keyof T & (string | number)
   ? `${K}` | (T[K] extends object ? `${K}.${NestedKeyOf<T[K]>}` : never)
   : never;
+
+export type SetLike<T> = Set<T> | T[];
+export type ReadonlySetLike<T> = ReadonlySet<T> | readonly T[];
+
+export type MakeBrand<T extends string> = {
+  /** @private using ~ to sort last in intellisense */
+  [K in `~brand~${T}`]: T;
+};
+
+/** Maybe just promise or already fulfilled one! */
+export type MaybePromise<T> = T | Promise<T>;

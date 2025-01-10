@@ -1,17 +1,25 @@
 import React, { useEffect, useRef } from "react";
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { renderStaticScene } from "../../renderer/renderScene";
-import { isRenderThrottlingEnabled, isShallowEqual } from "../../utils";
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import { renderStaticScene } from "../../renderer/staticScene";
+import { isShallowEqual } from "../../utils";
 import type { AppState, StaticCanvasAppState } from "../../types";
-import type { StaticCanvasRenderConfig } from "../../scene/types";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  RenderableElementsMap,
+  StaticCanvasRenderConfig,
+} from "../../scene/types";
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../../element/types";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
 
 type StaticCanvasProps = {
   canvas: HTMLCanvasElement;
   rc: RoughCanvas;
-  elements: readonly NonDeletedExcalidrawElement[];
+  elementsMap: RenderableElementsMap;
+  allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
-  versionNonce: number | undefined;
+  sceneNonce: number | undefined;
   selectionNonce: number | undefined;
   scale: number;
   appState: StaticCanvasAppState;
@@ -62,7 +70,8 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         canvas,
         rc: props.rc,
         scale: props.scale,
-        elements: props.elements,
+        elementsMap: props.elementsMap,
+        allElementsMap: props.allElementsMap,
         visibleElements: props.visibleElements,
         appState: props.appState,
         renderConfig: props.renderConfig,
@@ -83,6 +92,8 @@ const getRelevantAppStateProps = (
   width: appState.width,
   height: appState.height,
   viewModeEnabled: appState.viewModeEnabled,
+  openDialog: appState.openDialog,
+  hoveredElementIds: appState.hoveredElementIds,
   offsetLeft: appState.offsetLeft,
   offsetTop: appState.offsetTop,
   theme: appState.theme,
@@ -92,10 +103,13 @@ const getRelevantAppStateProps = (
   exportScale: appState.exportScale,
   selectedElementsAreBeingDragged: appState.selectedElementsAreBeingDragged,
   gridSize: appState.gridSize,
+  gridStep: appState.gridStep,
   frameRendering: appState.frameRendering,
   selectedElementIds: appState.selectedElementIds,
   frameToHighlight: appState.frameToHighlight,
   editingGroupId: appState.editingGroupId,
+  currentHoveredFontFamily: appState.currentHoveredFontFamily,
+  croppingElementId: appState.croppingElementId,
 });
 
 const areEqual = (
@@ -103,12 +117,12 @@ const areEqual = (
   nextProps: StaticCanvasProps,
 ) => {
   if (
-    prevProps.versionNonce !== nextProps.versionNonce ||
+    prevProps.sceneNonce !== nextProps.sceneNonce ||
     prevProps.scale !== nextProps.scale ||
-    // we need to memoize on element arrays because they may have renewed
-    // even if versionNonce didn't change (e.g. we filter elements out based
+    // we need to memoize on elementsMap because they may have renewed
+    // even if sceneNonce didn't change (e.g. we filter elements out based
     // on appState)
-    prevProps.elements !== nextProps.elements ||
+    prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements
   ) {
     return false;

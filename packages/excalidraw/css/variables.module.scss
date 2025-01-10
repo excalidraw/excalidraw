@@ -50,6 +50,15 @@
         color: var(--color-on-primary-container);
       }
     }
+
+    &[aria-disabled="true"] {
+      background: initial;
+      border: none;
+
+      svg {
+        color: var(--color-disabled);
+      }
+    }
   }
 }
 
@@ -68,6 +77,7 @@
   cursor: pointer;
   background-color: var(--button-bg, var(--island-bg-color));
   color: var(--button-color, var(--color-on-surface));
+  font-family: var(--ui-font);
 
   svg {
     width: var(--button-width, var(--lg-icon-size));
@@ -114,9 +124,19 @@
   }
 }
 
+@mixin outlineButtonIconStyles {
+  @include outlineButtonStyles;
+  padding: 0;
+
+  svg {
+    width: var(--default-icon-size);
+    height: var(--default-icon-size);
+  }
+}
+
 @mixin avatarStyles {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: var(--avatar-size, 1.5rem);
+  height: var(--avatar-size, 1.5rem);
   position: relative;
   border-radius: 100%;
   outline-offset: 2px;
@@ -125,10 +145,14 @@
   align-items: center;
   cursor: pointer;
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   color: var(--color-gray-90);
   flex: 0 0 auto;
+
+  &:active {
+    transform: scale(0.94);
+  }
 
   &-img {
     width: 100%;
@@ -143,14 +167,14 @@
     right: -3px;
     bottom: -3px;
     left: -3px;
-    border: 1px solid var(--avatar-border-color);
     border-radius: 100%;
   }
 
-  &--is-followed::before {
+  &.is-followed::before {
     border-color: var(--color-primary-hover);
+    box-shadow: 0 0 0 1px var(--color-primary-hover);
   }
-  &--is-current-user {
+  &.is-current-user {
     cursor: auto;
   }
 }

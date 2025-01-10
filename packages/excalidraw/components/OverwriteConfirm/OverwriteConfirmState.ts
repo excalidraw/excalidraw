@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { jotaiStore } from "../../jotai";
-import React from "react";
+import type React from "react";
 
 export type OverwriteConfirmState =
   | {

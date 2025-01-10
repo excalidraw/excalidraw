@@ -1,10 +1,11 @@
+import React from "react";
 import { render, GlobalTestState } from "./test-utils";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { CURSOR_TYPE } from "../constants";
+import { API } from "./helpers/api";
 
-const { h } = window;
 const mouse = new Pointer("mouse");
 const touch = new Pointer("touch");
 const pen = new Pointer("pen");
@@ -16,14 +17,14 @@ describe("view mode", () => {
   });
 
   it("after switching to view mode – cursor type should be pointer", async () => {
-    h.setState({ viewModeEnabled: true });
+    API.setAppState({ viewModeEnabled: true });
     expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
       CURSOR_TYPE.GRAB,
     );
   });
 
   it("after switching to view mode, moving, clicking, and pressing space key – cursor type should be pointer", async () => {
-    h.setState({ viewModeEnabled: true });
+    API.setAppState({ viewModeEnabled: true });
 
     pointerTypes.forEach((pointerType) => {
       const pointer = pointerType;
@@ -58,7 +59,7 @@ describe("view mode", () => {
         );
       }
 
-      h.setState({ viewModeEnabled: true });
+      API.setAppState({ viewModeEnabled: true });
       expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
         CURSOR_TYPE.GRAB,
       );

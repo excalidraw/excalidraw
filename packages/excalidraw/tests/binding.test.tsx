@@ -1,10 +1,13 @@
+import React from "react";
 import { fireEvent, render } from "./test-utils";
-import { Excalidraw } from "../index";
+import { Excalidraw, isLinearElement } from "../index";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { getTransformHandles } from "../element/transformHandles";
 import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import { arrayToMap } from "../utils";
+import { pointFrom } from "../../math";
 
 const { h } = window;
 
@@ -19,6 +22,7 @@ describe("element binding", () => {
     const rect = API.createElement({
       type: "rectangle",
       x: 0,
+      y: 0,
       width: 50,
       height: 50,
     });
@@ -29,42 +33,57 @@ describe("element binding", () => {
       width: 100,
       height: 1,
       points: [
-        [0, 0],
-        [0, 0],
-        [100, 0],
-        [100, 0],
+        pointFrom(0, 0),
+        pointFrom(0, 0),
+        pointFrom(100, 0),
+        pointFrom(100, 0),
       ],
     });
-    h.elements = [rect, arrow];
+    API.setElements([rect, arrow]);
     expect(arrow.startBinding).toBe(null);
 
-    API.setSelectedElements([arrow]);
+    // select arrow
+    mouse.clickAt(150, 0);
 
-    expect(API.getSelectedElements()).toEqual([arrow]);
+    // move arrow start to potential binding position
     mouse.downAt(100, 0);
     mouse.moveTo(55, 0);
     mouse.up(0, 0);
-    expect(arrow.startBinding).toEqual({
-      elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
-    });
 
-    mouse.downAt(100, 0);
-    mouse.move(-45, 0);
-    mouse.up();
-    expect(arrow.startBinding).toEqual({
-      elementId: rect.id,
-      focus: expect.toBeNonNaNNumber(),
-      gap: expect.toBeNonNaNNumber(),
-    });
-
-    mouse.down();
-    mouse.move(-50, 0);
-    mouse.up();
+    // Point selection is evaluated like the points are rendered,
+    // from right to left. So clicking on the first point should move the joint,
+    // not the start point.
     expect(arrow.startBinding).toBe(null);
+
+    // Now that the start point is free, move it into overlapping position
+    mouse.downAt(100, 0);
+    mouse.moveTo(55, 0);
+    mouse.up(0, 0);
+
+    expect(API.getSelectedElements()).toEqual([arrow]);
+
+    expect(arrow.startBinding).toEqual({
+      elementId: rect.id,
+      fixedPoint: null,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
+
+    // Move the end point to the overlapping binding position
+    mouse.downAt(200, 0);
+    mouse.moveTo(55, 0);
+    mouse.up(0, 0);
+
+    // Both the start and the end points should be bound
+    expect(arrow.startBinding).toEqual({
+      elementId: rect.id,
+      fixedPoint: null,
+      focus: expect.toBeNonNaNNumber(),
+      gap: expect.toBeNonNaNNumber(),
+    });
     expect(arrow.endBinding).toEqual({
       elementId: rect.id,
+      fixedPoint: null,
       focus: expect.toBeNonNaNNumber(),
       gap: expect.toBeNonNaNNumber(),
     });
@@ -91,8 +110,12 @@ describe("element binding", () => {
     expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
     expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
-    const rotation = getTransformHandles(arrow, h.state.zoom, "mouse")
-      .rotation!;
+    const rotation = getTransformHandles(
+      arrow,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+    ).rotation!;
     const rotationHandleX = rotation[0] + rotation[2] / 2;
     const rotationHandleY = rotation[1] + rotation[3] / 2;
     mouse.down(rotationHandleX, rotationHandleY);
@@ -138,7 +161,7 @@ describe("element binding", () => {
     },
   );
 
-  it("should bind/unbind arrow when moving it with keyboard", () => {
+  it("should unbind arrow when moving it with keyboard", () => {
     const rectangle = UI.createElement("rectangle", {
       x: 75,
       y: 0,
@@ -154,11 +177,22 @@ describe("element binding", () => {
 
     expect(arrow.endBinding).toBe(null);
 
+    mouse.downAt(50, 50);
+    mouse.moveTo(51, 0);
+    mouse.up(0, 0);
+
+    // Test sticky connection
     expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
-
     Keyboard.keyPress(KEYS.ARROW_LEFT);
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+
+    // Sever connection
+    expect(API.getSelectedElement().type).toBe("arrow");
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
+    expect(arrow.endBinding).toBe(null);
+    Keyboard.keyPress(KEYS.ARROW_RIGHT);
     expect(arrow.endBinding).toBe(null);
   });
 
@@ -193,7 +227,7 @@ describe("element binding", () => {
       height: 100,
     });
 
-    h.elements = [text];
+    API.setElements([text]);
 
     const arrow = UI.createElement("arrow", {
       x: 0,
@@ -235,7 +269,7 @@ describe("element binding", () => {
       height: 100,
     });
 
-    h.elements = [text];
+    API.setElements([text]);
 
     const arrow = UI.createElement("arrow", {
       x: 0,
@@ -281,38 +315,36 @@ describe("element binding", () => {
     const arrow1 = API.createElement({
       type: "arrow",
       id: "arrow1",
-      points: [
-        [0, 0],
-        [0, -87.45777932247563],
-      ],
+      points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       endBinding: {
         elementId: "text1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [1, 0.5],
       },
     });
 
     const arrow2 = API.createElement({
       type: "arrow",
       id: "arrow2",
-      points: [
-        [0, 0],
-        [0, -87.45777932247563],
-      ],
+      points: [pointFrom(0, 0), pointFrom(0, -87.45777932247563)],
       startBinding: {
         elementId: "text1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [0.5, 1],
       },
       endBinding: {
         elementId: "rectangle1",
         focus: 0.2,
         gap: 7,
+        fixedPoint: [1, 0.5],
       },
     });
 
@@ -326,13 +358,13 @@ describe("element binding", () => {
       ],
     });
 
-    h.elements = [rectangle1, arrow1, arrow2, text1];
+    API.setElements([rectangle1, arrow1, arrow2, text1]);
 
     API.setSelectedElements([text1]);
 
     expect(h.state.selectedElementIds[text1.id]).toBe(true);
 
-    h.app.actionManager.executeAction(actionWrapTextInContainer);
+    API.executeAction(actionWrapTextInContainer);
 
     // new text container will be placed before the text element
     const container = h.elements.at(-2)!;
@@ -363,5 +395,90 @@ describe("element binding", () => {
     expect(arrow1.endBinding?.elementId).toBe(container.id);
     expect(arrow2.startBinding?.elementId).toBe(container.id);
     expect(arrow2.endBinding?.elementId).toBe(rectangle1.id);
+  });
+
+  // #6459
+  it("should unbind arrow only from the latest element", () => {
+    const rectLeft = UI.createElement("rectangle", {
+      x: 0,
+      width: 200,
+      height: 500,
+    });
+    const rectRight = UI.createElement("rectangle", {
+      x: 400,
+      width: 200,
+      height: 500,
+    });
+    const arrow = UI.createElement("arrow", {
+      x: 210,
+      y: 250,
+      width: 180,
+      height: 1,
+    });
+    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+
+    // Drag arrow off of bound rectangle range
+    const handles = getTransformHandles(
+      arrow,
+      h.state.zoom,
+      arrayToMap(h.elements),
+      "mouse",
+    ).se!;
+
+    Keyboard.keyDown(KEYS.CTRL_OR_CMD);
+    const elX = handles[0] + handles[2] / 2;
+    const elY = handles[1] + handles[3] / 2;
+    mouse.downAt(elX, elY);
+    mouse.moveTo(300, 400);
+    mouse.up();
+
+    expect(arrow.startBinding).not.toBe(null);
+    expect(arrow.endBinding).toBe(null);
+  });
+
+  it("should not unbind when duplicating via selection group", () => {
+    const rectLeft = UI.createElement("rectangle", {
+      x: 0,
+      width: 200,
+      height: 500,
+    });
+    const rectRight = UI.createElement("rectangle", {
+      x: 400,
+      y: 200,
+      width: 200,
+      height: 500,
+    });
+    const arrow = UI.createElement("arrow", {
+      x: 210,
+      y: 250,
+      width: 177,
+      height: 1,
+    });
+    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+
+    mouse.downAt(-100, -100);
+    mouse.moveTo(650, 750);
+    mouse.up(0, 0);
+
+    expect(API.getSelectedElements().length).toBe(3);
+
+    mouse.moveTo(5, 5);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(5, 5);
+      mouse.moveTo(1000, 1000);
+      mouse.up(0, 0);
+
+      expect(window.h.elements.length).toBe(6);
+      window.h.elements.forEach((element) => {
+        if (isLinearElement(element)) {
+          expect(element.startBinding).not.toBe(null);
+          expect(element.endBinding).not.toBe(null);
+        } else {
+          expect(element.boundElements).not.toBe(null);
+        }
+      });
+    });
   });
 });

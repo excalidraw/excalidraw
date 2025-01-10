@@ -10,11 +10,8 @@ import React, {
 import { Island } from "../Island";
 import { atom, useSetAtom } from "jotai";
 import { jotaiScope } from "../../jotai";
-import {
-  SidebarPropsContext,
-  SidebarProps,
-  SidebarPropsContextValue,
-} from "./common";
+import type { SidebarProps, SidebarPropsContextValue } from "./common";
+import { SidebarPropsContext } from "./common";
 import { SidebarHeader } from "./SidebarHeader";
 import clsx from "clsx";
 import { useDevice, useExcalidrawSetAppState } from "../App";

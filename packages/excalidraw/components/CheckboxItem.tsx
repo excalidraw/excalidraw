@@ -22,7 +22,12 @@ export const CheckboxItem: React.FC<{
         ).focus();
       }}
     >
-      <button className="Checkbox-box" role="checkbox" aria-checked={checked}>
+      <button
+        type="button"
+        className="Checkbox-box"
+        role="checkbox"
+        aria-checked={checked}
+      >
         {checkIcon}
       </button>
       <div className="Checkbox-label">{children}</div>

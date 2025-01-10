@@ -1,5 +1,5 @@
 import { t } from "../../i18n";
-import { usersIcon } from "../icons";
+import { share } from "../icons";
 import { Button } from "../Button";
 
 import clsx from "clsx";
@@ -17,16 +17,18 @@ const LiveCollaborationTrigger = ({
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   const appState = useUIAppState();
 
+  const showIconOnly = appState.width < 830;
+
   return (
     <Button
       {...rest}
       className={clsx("collab-button", { active: isCollaborating })}
       type="button"
       onSelect={onSelect}
-      style={{ position: "relative" }}
+      style={{ position: "relative", width: showIconOnly ? undefined : "auto" }}
       title={t("labels.liveCollaboration")}
     >
-      {usersIcon}
+      {showIconOnly ? share : t("labels.share")}
       {appState.collaborators.size > 0 && (
         <div className="CollabButton-collaborators">
           {appState.collaborators.size}

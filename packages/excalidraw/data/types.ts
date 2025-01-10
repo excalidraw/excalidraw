@@ -1,12 +1,12 @@
-import { ExcalidrawElement } from "../element/types";
-import {
+import type { ExcalidrawElement } from "../element/types";
+import type {
   AppState,
   BinaryFiles,
   LibraryItems,
   LibraryItems_anyVersion,
 } from "../types";
 import type { cleanAppStateForExport } from "../appState";
-import { VERSIONS } from "../constants";
+import type { VERSIONS } from "../constants";
 
 export interface ExportedDataState {
   type: string;

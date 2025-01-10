@@ -9,38 +9,39 @@ import {
 } from "../../packages/excalidraw/data/encryption";
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
 import { restore } from "../../packages/excalidraw/data/restore";
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
-import { SceneBounds } from "../../packages/excalidraw/element/bounds";
+import type { ImportedDataState } from "../../packages/excalidraw/data/types";
+import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
 import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
+import type {
   ExcalidrawElement,
   FileId,
+  OrderedExcalidrawElement,
 } from "../../packages/excalidraw/element/types";
 import { t } from "../../packages/excalidraw/i18n";
-import {
+import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
   UserIdleState,
 } from "../../packages/excalidraw/types";
+import type { MakeBrand } from "../../packages/excalidraw/utility-types";
 import { bytesToHexString } from "../../packages/excalidraw/utils";
+import type { WS_SUBTYPES } from "../app_constants";
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
-  WS_SUBTYPES,
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
 
-export type SyncableExcalidrawElement = ExcalidrawElement & {
-  _brand: "SyncableExcalidrawElement";
-};
+export type SyncableExcalidrawElement = OrderedExcalidrawElement &
+  MakeBrand<"SyncableExcalidrawElement">;
 
 export const isSyncableElement = (
-  element: ExcalidrawElement,
+  element: OrderedExcalidrawElement,
 ): element is SyncableExcalidrawElement => {
   if (element.isDeleted) {
     if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
@@ -51,7 +52,9 @@ export const isSyncableElement = (
   return !isInvisiblySmallElement(element);
 };
 
-export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+export const getSyncableElements = (
+  elements: readonly OrderedExcalidrawElement[],
+) =>
   elements.filter((element) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
@@ -63,35 +66,6 @@ const generateRoomId = async () => {
   const buffer = new Uint8Array(ROOM_ID_BYTES);
   window.crypto.getRandomValues(buffer);
   return bytesToHexString(buffer);
-};
-
-/**
- * Right now the reason why we resolve connection params (url, polling...)
- * from upstream is to allow changing the params immediately when needed without
- * having to wait for clients to update the SW.
- *
- * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
- */
-export const getCollabServer = async (): Promise<{
-  url: string;
-  polling: boolean;
-}> => {
-  if (import.meta.env.VITE_APP_WS_SERVER_URL) {
-    return {
-      url: import.meta.env.VITE_APP_WS_SERVER_URL,
-      polling: true,
-    };
-  }
-
-  try {
-    const resp = await fetch(
-      `${import.meta.env.VITE_APP_PORTAL_URL}/collab-server`,
-    );
-    return await resp.json();
-  } catch (error) {
-    console.error(error);
-    throw new Error(t("errors.cannotResolveCollabServer"));
-  }
 };
 
 export type EncryptedData = {
@@ -295,7 +269,6 @@ export const loadScene = async (
     // in the scene database/localStorage, and instead fetch them async
     // from a different database
     files: data.files,
-    commitToHistory: false,
   };
 };
 

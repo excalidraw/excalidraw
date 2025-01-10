@@ -1,3 +1,4 @@
+import React from "react";
 import ReactDOM from "react-dom";
 import {
   fireEvent,
@@ -10,7 +11,7 @@ import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { API } from "./helpers/api";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { getElementAbsoluteCoords } from "../element";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
@@ -19,27 +20,27 @@ import {
 } from "../element/types";
 import { newLinearElement } from "../element";
 import { Excalidraw } from "../index";
-import { mutateElement } from "../element/mutateElement";
-import { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../types";
 import { ROUNDNESS } from "../constants";
 import { vi } from "vitest";
-import * as blob from "../data/blob";
 import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
-import { cloneJSON } from "../utils";
+import { arrayToMap, cloneJSON } from "../utils";
+import type { LocalPoint } from "../../math";
+import { pointFrom, type Radians } from "../../math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
-// This needs to fixed in vitest mock, as when importActual used with mock
-// the tests hangs - https://github.com/vitest-dev/vitest/issues/546.
-// But fortunately spying and mocking the return value of spy works :p
 
-const resizeImageFileSpy = vi.spyOn(blob, "resizeImageFile");
-const generateIdFromFileSpy = vi.spyOn(blob, "generateIdFromFile");
-
-resizeImageFileSpy.mockImplementation(async (imageFile: File) => imageFile);
-generateIdFromFileSpy.mockImplementation(async () => "fileId" as FileId);
+vi.mock("../data/blob", async (actual) => {
+  const orig: Object = await actual();
+  return {
+    ...orig,
+    resizeImageFile: (imageFile: File) => imageFile,
+    generateIdFromFile: () => "fileId" as FileId,
+  };
+});
 
 beforeEach(async () => {
   // Unmount ReactDOM from root
@@ -54,7 +55,7 @@ beforeEach(async () => {
     elementFromPoint: () => GlobalTestState.canvas,
   });
   await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
-  h.setState({
+  API.setAppState({
     zoom: {
       value: 1 as NormalizedZoomValue,
     },
@@ -131,7 +132,7 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     y: -2412.5069664197654,
     width: 1750.4888916015625,
     height: 410.51605224609375,
-    angle: 0,
+    angle: 0 as Radians,
     strokeColor: "#000000",
     backgroundColor: "#fa5252",
     fillStyle: "hachure",
@@ -145,12 +146,10 @@ const createLinearElementWithCurveInsideMinMaxPoints = (
     link: null,
     locked: false,
     points: [
-      [0, 0],
-      [-922.4761962890625, 300.3277587890625],
-      [828.0126953125, 410.51605224609375],
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(-922.4761962890625, 300.3277587890625),
+      pointFrom<LocalPoint>(828.0126953125, 410.51605224609375),
     ],
-    startArrowhead: null,
-    endArrowhead: null,
   });
 };
 
@@ -183,8 +182,6 @@ const createLinearElementsWithCurveOutsideMinMaxPoints = (
       [-591.2804897585779, 36.09360810181511],
       [-148.56510566829502, 53.96308359105342],
     ],
-    startArrowhead: null,
-    endArrowhead: null,
     ...extraProps,
   });
 };
@@ -194,9 +191,10 @@ const checkElementsBoundingBox = async (
   element2: ExcalidrawElement,
   toleranceInPx: number = 0,
 ) => {
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1);
+  const elementsMap = arrayToMap([element1, element2]);
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element1, elementsMap);
 
-  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2);
+  const [x12, y12, x22, y22] = getElementAbsoluteCoords(element2, elementsMap);
 
   await waitFor(() => {
     // Check if width and height did not change
@@ -207,14 +205,14 @@ const checkElementsBoundingBox = async (
 
 const checkHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
   const originalElement = cloneJSON(h.elements[0]);
-  h.app.actionManager.executeAction(actionFlipHorizontal);
+  API.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0];
   await checkElementsBoundingBox(originalElement, newElement, toleranceInPx);
 };
 
 const checkTwoPointsLineHorizontalFlip = async () => {
   const originalElement = cloneJSON(h.elements[0]) as ExcalidrawLinearElement;
-  h.app.actionManager.executeAction(actionFlipHorizontal);
+  API.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
     expect(originalElement.points[0][0]).toBeCloseTo(
@@ -238,7 +236,7 @@ const checkTwoPointsLineHorizontalFlip = async () => {
 
 const checkTwoPointsLineVerticalFlip = async () => {
   const originalElement = cloneJSON(h.elements[0]) as ExcalidrawLinearElement;
-  h.app.actionManager.executeAction(actionFlipVertical);
+  API.executeAction(actionFlipVertical);
   const newElement = h.elements[0] as ExcalidrawLinearElement;
   await waitFor(() => {
     expect(originalElement.points[0][0]).toBeCloseTo(
@@ -265,7 +263,7 @@ const checkRotatedHorizontalFlip = async (
   toleranceInPx: number = 0.00001,
 ) => {
   const originalElement = cloneJSON(h.elements[0]);
-  h.app.actionManager.executeAction(actionFlipHorizontal);
+  API.executeAction(actionFlipHorizontal);
   const newElement = h.elements[0];
   await waitFor(() => {
     expect(newElement.angle).toBeCloseTo(expectedAngle);
@@ -278,7 +276,7 @@ const checkRotatedVerticalFlip = async (
   toleranceInPx: number = 0.00001,
 ) => {
   const originalElement = cloneJSON(h.elements[0]);
-  h.app.actionManager.executeAction(actionFlipVertical);
+  API.executeAction(actionFlipVertical);
   const newElement = h.elements[0];
   await waitFor(() => {
     expect(newElement.angle).toBeCloseTo(expectedAngle);
@@ -289,7 +287,7 @@ const checkRotatedVerticalFlip = async (
 const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
   const originalElement = cloneJSON(h.elements[0]);
 
-  h.app.actionManager.executeAction(actionFlipVertical);
+  API.executeAction(actionFlipVertical);
 
   const newElement = h.elements[0];
   await checkElementsBoundingBox(originalElement, newElement, toleranceInPx);
@@ -298,8 +296,8 @@ const checkVerticalFlip = async (toleranceInPx: number = 0.00001) => {
 const checkVerticalHorizontalFlip = async (toleranceInPx: number = 0.00001) => {
   const originalElement = cloneJSON(h.elements[0]);
 
-  h.app.actionManager.executeAction(actionFlipHorizontal);
-  h.app.actionManager.executeAction(actionFlipVertical);
+  API.executeAction(actionFlipHorizontal);
+  API.executeAction(actionFlipVertical);
 
   const newElement = h.elements[0];
   await checkElementsBoundingBox(originalElement, newElement, toleranceInPx);
@@ -312,7 +310,6 @@ const MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS = 20;
 describe("rectangle", () => {
   it("flips an unrotated rectangle horizontally correctly", async () => {
     createAndSelectOneRectangle();
-
     await checkHorizontalFlip();
   });
 
@@ -411,8 +408,8 @@ describe("ellipse", () => {
 describe("arrow", () => {
   it("flips an unrotated arrow horizontally with line inside min/max points bounds", async () => {
     const arrow = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+    API.setElements([arrow]);
+    API.setAppState({ selectedElementIds: { [arrow.id]: true } });
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
     );
@@ -420,22 +417,24 @@ describe("arrow", () => {
 
   it("flips an unrotated arrow vertically with line inside min/max points bounds", async () => {
     const arrow = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+    API.setElements([arrow]);
+    API.setAppState({ selectedElementIds: { [arrow.id]: true } });
 
     await checkVerticalFlip(50);
   });
 
   it("flips a rotated arrow horizontally with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([line]);
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [line.id]: true,
-    };
-    mutateElement(line, {
+    API.setElements([line]);
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [line.id]: true,
+      },
+    });
+    API.updateElement(line, {
       angle: originalAngle,
     });
 
@@ -446,15 +445,17 @@ describe("arrow", () => {
   });
 
   it("flips a rotated arrow vertically with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([line]);
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [line.id]: true,
-    };
-    mutateElement(line, {
+    API.setElements([line]);
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [line.id]: true,
+      },
+    });
+    API.updateElement(line, {
       angle: originalAngle,
     });
 
@@ -467,8 +468,8 @@ describe("arrow", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips an unrotated arrow horizontally with line outside min/max points bounds", async () => {
     const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+    API.setElements([arrow]);
+    API.setAppState({ selectedElementIds: { [arrow.id]: true } });
 
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
@@ -477,12 +478,12 @@ describe("arrow", () => {
 
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips a rotated arrow horizontally with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
-    mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.updateElement(line, { angle: originalAngle });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedVerticalFlip(
       expectedAngle,
@@ -493,20 +494,20 @@ describe("arrow", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips an unrotated arrow vertically with line outside min/max points bounds", async () => {
     const arrow = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
-    h.app.scene.replaceAllElements([arrow]);
-    h.app.setState({ selectedElementIds: { [arrow.id]: true } });
+    API.setElements([arrow]);
+    API.setAppState({ selectedElementIds: { [arrow.id]: true } });
 
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
   });
 
   //TODO: elements with curve outside minMax points have a wrong bounding box!!!
   it.skip("flips a rotated arrow vertically with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("arrow");
-    mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.updateElement(line, { angle: originalAngle });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedVerticalFlip(
       expectedAngle,
@@ -541,8 +542,8 @@ describe("arrow", () => {
 describe("line", () => {
   it("flips an unrotated line horizontally with line inside min/max points bounds", async () => {
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
@@ -551,8 +552,8 @@ describe("line", () => {
 
   it("flips an unrotated line vertically with line inside min/max points bounds", async () => {
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
   });
@@ -566,8 +567,8 @@ describe("line", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips an unrotated line horizontally with line outside min/max points bounds", async () => {
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkHorizontalFlip(
       MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS,
@@ -577,20 +578,20 @@ describe("line", () => {
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips an unrotated line vertically with line outside min/max points bounds", async () => {
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkVerticalFlip(MULTIPOINT_LINEAR_ELEMENT_FLIP_TOLERANCE_IN_PIXELS);
   });
 
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips a rotated line horizontally with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.updateElement(line, { angle: originalAngle });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedHorizontalFlip(
       expectedAngle,
@@ -600,12 +601,12 @@ describe("line", () => {
 
   //TODO: elements with curve outside minMax points have a wrong bounding box
   it.skip("flips a rotated line vertically with line outside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementsWithCurveOutsideMinMaxPoints("line");
-    mutateElement(line, { angle: originalAngle });
-    h.app.scene.replaceAllElements([line]);
-    h.app.setState({ selectedElementIds: { [line.id]: true } });
+    API.updateElement(line, { angle: originalAngle });
+    API.setElements([line]);
+    API.setAppState({ selectedElementIds: { [line.id]: true } });
 
     await checkRotatedVerticalFlip(
       expectedAngle,
@@ -619,15 +620,17 @@ describe("line", () => {
   });
 
   it("flips a rotated line horizontally with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [line.id]: true,
-    };
-    mutateElement(line, {
+    API.setElements([line]);
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [line.id]: true,
+      },
+    });
+    API.updateElement(line, {
       angle: originalAngle,
     });
 
@@ -638,15 +641,17 @@ describe("line", () => {
   });
 
   it("flips a rotated line vertically with line inside min/max points bounds", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     const line = createLinearElementWithCurveInsideMinMaxPoints("line");
-    h.app.scene.replaceAllElements([line]);
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [line.id]: true,
-    };
-    mutateElement(line, {
+    API.setElements([line]);
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [line.id]: true,
+      },
+    });
+    API.updateElement(line, {
       angle: originalAngle,
     });
 
@@ -672,20 +677,24 @@ describe("freedraw", () => {
   it("flips an unrotated drawing horizontally correctly", async () => {
     const draw = createAndReturnOneDraw();
     // select draw, since not done automatically
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [draw.id]: true,
-    };
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [draw.id]: true,
+      },
+    });
     await checkHorizontalFlip();
   });
 
   it("flips an unrotated drawing vertically correctly", async () => {
     const draw = createAndReturnOneDraw();
     // select draw, since not done automatically
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [draw.id]: true,
-    };
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [draw.id]: true,
+      },
+    });
     await checkVerticalFlip();
   });
 
@@ -695,10 +704,12 @@ describe("freedraw", () => {
 
     const draw = createAndReturnOneDraw(originalAngle);
     // select draw, since not done automatically
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [draw.id]: true,
-    };
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [draw.id]: true,
+      },
+    });
 
     await checkRotatedHorizontalFlip(expectedAngle);
   });
@@ -709,10 +720,12 @@ describe("freedraw", () => {
 
     const draw = createAndReturnOneDraw(originalAngle);
     // select draw, since not done automatically
-    h.state.selectedElementIds = {
-      ...h.state.selectedElementIds,
-      [draw.id]: true,
-    };
+    API.setAppState({
+      selectedElementIds: {
+        ...h.state.selectedElementIds,
+        [draw.id]: true,
+      },
+    });
 
     await checkRotatedVerticalFlip(expectedAngle);
   });
@@ -760,8 +773,8 @@ describe("image", () => {
   });
 
   it("flips an rotated image horizontally correctly", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     //paste image
     await createImage();
     await waitFor(() => {
@@ -770,7 +783,7 @@ describe("image", () => {
       expect(API.getSelectedElements()[0].type).toEqual("image");
       expect(h.app.files.fileId).toBeDefined();
     });
-    mutateElement(h.elements[0], {
+    API.updateElement(h.elements[0], {
       angle: originalAngle,
     });
     await checkRotatedHorizontalFlip(expectedAngle);
@@ -778,8 +791,8 @@ describe("image", () => {
   });
 
   it("flips an rotated image vertically correctly", async () => {
-    const originalAngle = Math.PI / 4;
-    const expectedAngle = (7 * Math.PI) / 4;
+    const originalAngle = (Math.PI / 4) as Radians;
+    const expectedAngle = ((7 * Math.PI) / 4) as Radians;
     //paste image
     await createImage();
     await waitFor(() => {
@@ -789,7 +802,7 @@ describe("image", () => {
       expect(API.getSelectedElements()[0].type).toEqual("image");
       expect(h.app.files.fileId).toBeDefined();
     });
-    mutateElement(h.elements[0], {
+    API.updateElement(h.elements[0], {
       angle: originalAngle,
     });
 
@@ -830,8 +843,7 @@ describe("mutliple elements", () => {
       ".excalidraw-textEditorContainer > textarea",
     )!;
     fireEvent.input(editor, { target: { value: "arrow" } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    Keyboard.keyPress(KEYS.ESCAPE);
+    Keyboard.exitTextEditor(editor);
 
     const rectangle = UI.createElement("rectangle", {
       x: 0,
@@ -845,15 +857,18 @@ describe("mutliple elements", () => {
       ".excalidraw-textEditorContainer > textarea",
     )!;
     fireEvent.input(editor, { target: { value: "rect\ntext" } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    Keyboard.keyPress(KEYS.ESCAPE);
+    Keyboard.exitTextEditor(editor);
 
     mouse.select([arrow, rectangle]);
-    h.app.actionManager.executeAction(actionFlipHorizontal);
-    h.app.actionManager.executeAction(actionFlipVertical);
+    API.executeAction(actionFlipHorizontal);
+    API.executeAction(actionFlipVertical);
 
     const arrowText = h.elements[1] as ExcalidrawTextElementWithContainer;
-    const arrowTextPos = getBoundTextElementPosition(arrow.get(), arrowText)!;
+    const arrowTextPos = getBoundTextElementPosition(
+      arrow.get(),
+      arrowText,
+      arrayToMap(h.elements),
+    )!;
     const rectText = h.elements[3] as ExcalidrawTextElementWithContainer;
 
     expect(arrow.x).toBeCloseTo(180);

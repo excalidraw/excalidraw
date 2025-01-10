@@ -3,8 +3,8 @@ import {
   exportToSvg as _exportToSvg,
 } from "../excalidraw/scene/export";
 import { getDefaultAppState } from "../excalidraw/appState";
-import { AppState, BinaryFiles } from "../excalidraw/types";
-import {
+import type { AppState, BinaryFiles } from "../excalidraw/types";
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -166,9 +166,13 @@ export const exportToSvg = async ({
   exportPadding,
   renderEmbeddables,
   exportingFrame,
+  skipInliningFonts,
+  reuseImages,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
+  skipInliningFonts?: true;
+  reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
   const { elements: restoredElements, appState: restoredAppState } = restore(
     { elements, appState },
@@ -184,6 +188,8 @@ export const exportToSvg = async ({
   return _exportToSvg(restoredElements, exportAppState, files, {
     exportingFrame,
     renderEmbeddables,
+    skipInliningFonts,
+    reuseImages,
   });
 };
 
@@ -205,21 +211,3 @@ export const exportToClipboard = async (
     throw new Error("Invalid export type");
   }
 };
-
-export * from "./bbox";
-export {
-  elementsOverlappingBBox,
-  isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
-} from "./withinBounds";
-export {
-  serializeAsJSON,
-  serializeLibraryAsJSON,
-} from "../excalidraw/data/json";
-export {
-  loadFromBlob,
-  loadSceneOrLibraryFromBlob,
-  loadLibraryFromBlob,
-} from "../excalidraw/data/blob";
-export { getFreeDrawSvgPath } from "../excalidraw/renderer/renderElement";
-export { mergeLibraryItems } from "../excalidraw/data/library";

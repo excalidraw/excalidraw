@@ -16,7 +16,7 @@ jobs:
 
       - name: Install and lint
         run: |
-          yarn install:deps
+          yarn install
           yarn test:other
           yarn test:code
           yarn test:typecheck

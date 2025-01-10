@@ -1,35 +1,36 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
-import { updateActiveTool } from "../utils";
+import { arrayToMap, updateActiveTool } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
 import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
-import { isPathALoop } from "../math";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import Scene from "../scene/Scene";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
 } from "../element/binding";
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
+import { StoreAction } from "../store";
+import { pointFrom } from "../../math";
+import { isPathALoop } from "../shapes";
 
 export const actionFinalize = register({
   name: "finalize",
+  label: "",
   trackEvent: false,
-  perform: (
-    elements,
-    appState,
-    _,
-    { interactiveCanvas, focusContainer, scene },
-  ) => {
+  perform: (elements, appState, _, app) => {
+    const { interactiveCanvas, focusContainer, scene } = app;
+
+    const elementsMap = scene.getNonDeletedElementsMap();
+
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
-      const element = LinearElementEditor.getElement(elementId);
+      const element = LinearElementEditor.getElement(elementId, elementsMap);
 
       if (element) {
         if (isBindingElement(element)) {
@@ -37,6 +38,8 @@ export const actionFinalize = register({
             element,
             startBindingElement,
             endBindingElement,
+            elementsMap,
+            scene,
           );
         }
         return {
@@ -49,7 +52,7 @@ export const actionFinalize = register({
             cursorButton: "up",
             editingLinearElement: null,
           },
-          commitToHistory: true,
+          storeAction: StoreAction.CAPTURE,
         };
       }
     }
@@ -70,8 +73,8 @@ export const actionFinalize = register({
 
     const multiPointElement = appState.multiElement
       ? appState.multiElement
-      : appState.editingElement?.type === "freedraw"
-      ? appState.editingElement
+      : appState.newElement?.type === "freedraw"
+      ? appState.newElement
       : null;
 
     if (multiPointElement) {
@@ -90,7 +93,9 @@ export const actionFinalize = register({
           });
         }
       }
+
       if (isInvisiblySmallElement(multiPointElement)) {
+        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
         newElements = newElements.filter(
           (el) => el.id !== multiPointElement.id,
         );
@@ -108,10 +113,10 @@ export const actionFinalize = register({
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
           mutateElement(multiPointElement, {
-            points: linePoints.map((point, index) =>
+            points: linePoints.map((p, index) =>
               index === linePoints.length - 1
-                ? ([firstPoint[0], firstPoint[1]] as const)
-                : point,
+                ? pointFrom(firstPoint[0], firstPoint[1])
+                : p,
             ),
           });
         }
@@ -125,12 +130,14 @@ export const actionFinalize = register({
         const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
           multiPointElement,
           -1,
+          arrayToMap(elements),
         );
         maybeBindLinearElement(
           multiPointElement,
           appState,
-          Scene.getScene(multiPointElement)!,
           { x, y },
+          elementsMap,
+          elements,
         );
       }
     }
@@ -169,9 +176,10 @@ export const actionFinalize = register({
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
-        draggingElement: null,
+        newElement: null,
+        selectionElement: null,
         multiElement: null,
-        editingElement: null,
+        editingTextElement: null,
         startBoundElement: null,
         suggestedBindings: [],
         selectedElementIds:
@@ -186,17 +194,18 @@ export const actionFinalize = register({
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
           multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(multiPointElement, scene)
+            ? new LinearElementEditor(multiPointElement)
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },
-      commitToHistory: appState.activeTool.type === "freedraw",
+      // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event, appState) =>
     (event.key === KEYS.ESCAPE &&
       (appState.editingLinearElement !== null ||
-        (!appState.draggingElement && appState.multiElement === null))) ||
+        (!appState.newElement && appState.multiElement === null))) ||
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
@@ -208,6 +217,7 @@ export const actionFinalize = register({
       onClick={updateData}
       visible={appState.multiElement != null}
       size={data?.size || "medium"}
+      style={{ pointerEvents: "all" }}
     />
   ),
 });

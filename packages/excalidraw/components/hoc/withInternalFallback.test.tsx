@@ -1,3 +1,4 @@
+import React from "react";
 import { render, queryAllByTestId } from "../../tests/test-utils";
 import { Excalidraw, MainMenu } from "../../index";
 

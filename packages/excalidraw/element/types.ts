@@ -1,13 +1,17 @@
-import { Point } from "../types";
-import {
+import type { LocalPoint, Radians } from "../../math";
+import type {
   FONT_FAMILY,
   ROUNDNESS,
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
 } from "../constants";
-import { MarkNonNullable, ValueOf } from "../utility-types";
-import { MagicCacheData } from "../data/magic";
+import type {
+  MakeBrand,
+  MarkNonNullable,
+  Merge,
+  ValueOf,
+} from "../utility-types";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
@@ -24,6 +28,12 @@ export type TextAlign = typeof TEXT_ALIGN[keyof typeof TEXT_ALIGN];
 
 type VerticalAlignKeys = keyof typeof VERTICAL_ALIGN;
 export type VerticalAlign = typeof VERTICAL_ALIGN[VerticalAlignKeys];
+export type FractionalIndex = string & { _brand: "franctionalIndex" };
+
+export type BoundElement = Readonly<{
+  id: ExcalidrawLinearElement["id"];
+  type: "arrow" | "text";
+}>;
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -39,7 +49,7 @@ type _ExcalidrawElementBase = Readonly<{
   opacity: number;
   width: number;
   height: number;
-  angle: number;
+  angle: Radians;
   /** Random integer used to seed shape generation so that the roughjs shape
       doesn't differ across renders. */
   seed: number;
@@ -50,18 +60,18 @@ type _ExcalidrawElementBase = Readonly<{
       Used for deterministic reconciliation of updates during collaboration,
       in case the versions (see above) are identical. */
   versionNonce: number;
+  /** String in a fractional form defined by https://github.com/rocicorp/fractional-indexing.
+      Used for ordering in multiplayer scenarios, such as during reconciliation or undo / redo.
+      Always kept in sync with the array order by `syncMovedIndices` and `syncInvalidIndices`.
+      Could be null, i.e. for new elements which were not yet assigned to the scene. */
+  index: FractionalIndex | null;
   isDeleted: boolean;
   /** List of groups the element belongs to.
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
   frameId: string | null;
   /** other elements that are bound to this element */
-  boundElements:
-    | readonly Readonly<{
-        id: ExcalidrawLinearElement["id"];
-        type: "arrow" | "text";
-      }>[]
-    | null;
+  boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
   link: string | null;
@@ -88,21 +98,24 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
 export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
   Readonly<{
     type: "embeddable";
-    /**
-     * indicates whether the embeddable src (url) has been validated for rendering.
-     * null value indicates that the validation is pending. We reset the
-     * value on each restore (or url change) so that we can guarantee
-     * the validation came from a trusted source (the editor). Also because we
-     * may not have access to host-app supplied url validator during restore.
-     */
-    validated: boolean | null;
   }>;
+
+export type MagicGenerationData =
+  | {
+      status: "pending";
+    }
+  | { status: "done"; html: string }
+  | {
+      status: "error";
+      message?: string;
+      code: "ERR_GENERATION_INTERRUPTED" | string;
+    };
 
 export type ExcalidrawIframeElement = _ExcalidrawElementBase &
   Readonly<{
     type: "iframe";
     // TODO move later to AI-specific frame
-    customData?: { generationData?: MagicCacheData };
+    customData?: { generationData?: MagicGenerationData };
   }>;
 
 export type ExcalidrawIframeLikeElement =
@@ -112,11 +125,21 @@ export type ExcalidrawIframeLikeElement =
 export type IframeData =
   | {
       intrinsicSize: { w: number; h: number };
-      warning?: string;
+      error?: Error;
+      sandbox?: { allowSameOrigin?: boolean };
     } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
     );
+
+export type ImageCrop = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  naturalWidth: number;
+  naturalHeight: number;
+};
 
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
@@ -126,6 +149,8 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
+    /** whether an element is cropped */
+    crop: ImageCrop | null;
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
@@ -156,6 +181,20 @@ export type ExcalidrawGenericElement =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
+export type ExcalidrawFlowchartNodeElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement;
+
+export type ExcalidrawRectanguloidElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawImageElement
+  | ExcalidrawTextElement
+  | ExcalidrawFreeDrawElement
+  | ExcalidrawIframeLikeElement
+  | ExcalidrawFrameLikeElement
+  | ExcalidrawEmbeddableElement;
+
 /**
  * ExcalidrawElement should be JSON serializable and (eventually) contain
  * no computed data. The list of all ExcalidrawElements should be shareable
@@ -165,12 +204,24 @@ export type ExcalidrawElement =
   | ExcalidrawGenericElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
+  | ExcalidrawArrowElement
   | ExcalidrawFreeDrawElement
   | ExcalidrawImageElement
   | ExcalidrawFrameElement
   | ExcalidrawMagicFrameElement
   | ExcalidrawIframeElement
   | ExcalidrawEmbeddableElement;
+
+export type ExcalidrawNonSelectionElement = Exclude<
+  ExcalidrawElement,
+  ExcalidrawSelectionElement
+>;
+
+export type Ordered<TElement extends ExcalidrawElement> = TElement & {
+  index: FractionalIndex;
+};
+
+export type OrderedExcalidrawElement = Ordered<ExcalidrawElement>;
 
 export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
   isDeleted: boolean;
@@ -184,11 +235,17 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontSize: number;
     fontFamily: FontFamilyValues;
     text: string;
-    baseline: number;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;
     originalText: string;
+    /**
+     * If `true` the width will fit the text. If `false`, the text will
+     * wrap to fit the width.
+     *
+     * @default true
+     */
+    autoResize: boolean;
     /**
      * Unitless line height (aligned to W3C). To get line height in px, multiply
      *  with font size (using `getLineHeightInPx` helper).
@@ -217,11 +274,25 @@ export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
 } & ExcalidrawTextElement;
 
+export type FixedPoint = [number, number];
+
 export type PointBinding = {
   elementId: ExcalidrawBindableElement["id"];
   focus: number;
   gap: number;
 };
+
+export type FixedPointBinding = Merge<
+  PointBinding,
+  {
+    // Represents the fixed point binding information in form of a vertical and
+    // horizontal ratio (i.e. a percentage value in the 0.0-1.0 range). This ratio
+    // gives the user selected fixed point by multiplying the bound element width
+    // with fixedPoint[0] and the bound element height with fixedPoint[1] to get the
+    // bound element-local point coordinate.
+    fixedPoint: FixedPoint;
+  }
+>;
 
 export type Arrowhead =
   | "arrow"
@@ -232,13 +303,16 @@ export type Arrowhead =
   | "triangle"
   | "triangle_outline"
   | "diamond"
-  | "diamond_outline";
+  | "diamond_outline"
+  | "crowfoot_one"
+  | "crowfoot_many"
+  | "crowfoot_one_or_many";
 
 export type ExcalidrawLinearElement = _ExcalidrawElementBase &
   Readonly<{
     type: "line" | "arrow";
-    points: readonly Point[];
-    lastCommittedPoint: Point | null;
+    points: readonly LocalPoint[];
+    lastCommittedPoint: LocalPoint | null;
     startBinding: PointBinding | null;
     endBinding: PointBinding | null;
     startArrowhead: Arrowhead | null;
@@ -248,17 +322,68 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
+    elbowed: boolean;
   }>;
+
+export type ExcalidrawElbowArrowElement = Merge<
+  ExcalidrawArrowElement,
+  {
+    elbowed: true;
+    startBinding: FixedPointBinding | null;
+    endBinding: FixedPointBinding | null;
+  }
+>;
 
 export type ExcalidrawFreeDrawElement = _ExcalidrawElementBase &
   Readonly<{
     type: "freedraw";
-    points: readonly Point[];
+    points: readonly LocalPoint[];
     pressures: readonly number[];
     simulatePressure: boolean;
-    lastCommittedPoint: Point | null;
+    lastCommittedPoint: LocalPoint | null;
   }>;
 
 export type FileId = string & { _brand: "FileId" };
 
 export type ExcalidrawElementType = ExcalidrawElement["type"];
+
+/**
+ * Map of excalidraw elements.
+ * Unspecified whether deleted or non-deleted.
+ * Can be a subset of Scene elements.
+ */
+export type ElementsMap = Map<ExcalidrawElement["id"], ExcalidrawElement>;
+
+/**
+ * Map of non-deleted elements.
+ * Can be a subset of Scene elements.
+ */
+export type NonDeletedElementsMap = Map<
+  ExcalidrawElement["id"],
+  NonDeletedExcalidrawElement
+> &
+  MakeBrand<"NonDeletedElementsMap">;
+
+/**
+ * Map of all excalidraw Scene elements, including deleted.
+ * Not a subset. Use this type when you need access to current Scene elements.
+ */
+export type SceneElementsMap = Map<
+  ExcalidrawElement["id"],
+  Ordered<ExcalidrawElement>
+> &
+  MakeBrand<"SceneElementsMap">;
+
+/**
+ * Map of all non-deleted Scene elements.
+ * Not a subset. Use this type when you need access to current Scene elements.
+ */
+export type NonDeletedSceneElementsMap = Map<
+  ExcalidrawElement["id"],
+  Ordered<NonDeletedExcalidrawElement>
+> &
+  MakeBrand<"NonDeletedSceneElementsMap">;
+
+export type ElementsMapOrArray =
+  | readonly ExcalidrawElement[]
+  | Readonly<ElementsMap>;

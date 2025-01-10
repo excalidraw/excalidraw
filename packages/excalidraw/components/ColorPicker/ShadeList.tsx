@@ -7,7 +7,7 @@ import {
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
 import { t } from "../../i18n";
-import { ColorPaletteCustom } from "../../colors";
+import type { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
   hex: string;

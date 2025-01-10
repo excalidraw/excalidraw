@@ -1,49 +1,58 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
-import { t } from "../i18n";
-import { ExcalidrawProps } from "../types";
-import { getFontString, updateActiveTool } from "../utils";
+import type { ExcalidrawProps } from "../types";
+import {
+  getFontString,
+  sanitizeHTMLAttribute,
+  updateActiveTool,
+} from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
-import { getContainerElement, wrapText } from "./textElement";
-import {
-  isFrameLikeElement,
-  isIframeElement,
-  isIframeLikeElement,
-} from "./typeChecks";
-import {
+import { wrapText } from "./textWrapping";
+import { isIframeElement } from "./typeChecks";
+import type {
   ExcalidrawElement,
   ExcalidrawIframeLikeElement,
   IframeData,
-  NonDeletedExcalidrawElement,
 } from "./types";
+import type { MarkRequired } from "../utility-types";
+import { StoreAction } from "../store";
 
-const embeddedLinkCache = new Map<string, IframeData>();
+type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
+
+const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 
 const RE_VIMEO =
-  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
+  /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
 
-const RE_GH_GIST = /^https:\/\/gist\.github\.com/;
+const RE_GH_GIST = /^https:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)/;
 const RE_GH_GIST_EMBED =
-  /^<script[\s\S]*?\ssrc=["'](https:\/\/gist.github.com\/.*?)\.js["']/i;
+  /^<script[\s\S]*?\ssrc=["'](https:\/\/gist\.github\.com\/.*?)\.js["']/i;
 
 // not anchored to start to allow <blockquote> twitter embeds
-const RE_TWITTER = /(?:http(?:s)?:\/\/)?(?:(?:w){3}.)?twitter.com/;
+const RE_TWITTER =
+  /(?:https?:\/\/)?(?:(?:w){3}\.)?(?:twitter|x)\.com\/[^/]+\/status\/(\d+)/;
 const RE_TWITTER_EMBED =
-  /^<blockquote[\s\S]*?\shref=["'](https:\/\/twitter.com\/[^"']*)/i;
+  /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:twitter|x)\.com\/[^"']*)/i;
 
 const RE_VALTOWN =
-  /^https:\/\/(?:www\.)?val.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
+  /^https:\/\/(?:www\.)?val\.town\/(v|embed)\/[a-zA-Z_$][0-9a-zA-Z_$]+\.[a-zA-Z_$][0-9a-zA-Z_$]+/;
 
 const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
 const RE_GIPHY =
   /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
+
+const RE_REDDIT =
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?reddit\.com\/r\/([a-zA-Z0-9_]+)\/comments\/([a-zA-Z0-9_]+)\/([a-zA-Z0-9_]+)\/?(?:\?[^#\s]*)?(?:#[^\s]*)?$/;
+
+const RE_REDDIT_EMBED =
+  /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
@@ -54,11 +63,25 @@ const ALLOWED_DOMAINS = new Set([
   "link.excalidraw.com",
   "gist.github.com",
   "twitter.com",
+  "x.com",
   "*.simplepdf.eu",
   "stackblitz.com",
   "val.town",
   "giphy.com",
-  "dddice.com",
+  "reddit.com",
+]);
+
+const ALLOW_SAME_ORIGIN = new Set([
+  "youtube.com",
+  "youtu.be",
+  "vimeo.com",
+  "player.vimeo.com",
+  "figma.com",
+  "twitter.com",
+  "x.com",
+  "*.simplepdf.eu",
+  "stackblitz.com",
+  "reddit.com",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -67,7 +90,7 @@ export const createSrcDoc = (body: string) => {
 
 export const getEmbedLink = (
   link: string | null | undefined,
-): IframeData | null => {
+): IframeDataWithSandbox | null => {
   if (!link) {
     return null;
   }
@@ -77,6 +100,10 @@ export const getEmbedLink = (
   }
 
   const originalLink = link;
+
+  const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
+    matchHostname(link, ALLOW_SAME_ORIGIN) || "",
+  );
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
@@ -104,15 +131,21 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
     const target = vimeoLink?.[1];
-    const warning = !/^\d+$/.test(target)
-      ? t("toast.unrecognizedLinkFormat")
+    const error = !/^\d+$/.test(target)
+      ? new URIError("Invalid embed link format")
       : undefined;
     type = "video";
     link = `https://player.vimeo.com/video/${target}?api=1`;
@@ -123,8 +156,15 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type, warning };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      error,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -138,8 +178,14 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   const valLink = link.match(RE_VALTOWN);
@@ -150,82 +196,92 @@ export const getEmbedLink = (
       link,
       intrinsicSize: aspectRatio,
       type,
+      sandbox: { allowSameOrigin },
     });
-    return { link, intrinsicSize: aspectRatio, type };
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   if (RE_TWITTER.test(link)) {
-    let ret: IframeData;
-    // assume embed code
-    if (/<blockquote/.test(link)) {
-      const srcDoc = createSrcDoc(link);
-      ret = {
-        type: "document",
-        srcdoc: () => srcDoc,
-        intrinsicSize: { w: 480, h: 480 },
-      };
-      // assume regular tweet url
-    } else {
-      ret = {
-        type: "document",
-        srcdoc: (theme: string) =>
-          createSrcDoc(
-            `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${link}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
-          ),
-        intrinsicSize: { w: 480, h: 480 },
-      };
-    }
+    const postId = link.match(RE_TWITTER)![1];
+    // the embed srcdoc still supports twitter.com domain only.
+    // Note that we don't attempt to parse the username as it can consist of
+    // non-latin1 characters, and the username in the url can be set to anything
+    // without affecting the embed.
+    const safeURL = sanitizeHTMLAttribute(
+      `https://twitter.com/x/status/${postId}`,
+    );
+
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: (theme: string) =>
+        createSrcDoc(
+          `<blockquote class="twitter-tweet" data-dnt="true" data-theme="${theme}"><a href="${safeURL}"></a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
+        ),
+      intrinsicSize: { w: 480, h: 480 },
+      sandbox: { allowSameOrigin },
+    };
+    embeddedLinkCache.set(originalLink, ret);
+    return ret;
+  }
+
+  if (RE_REDDIT.test(link)) {
+    const [, page, postId, title] = link.match(RE_REDDIT)!;
+    const safeURL = sanitizeHTMLAttribute(
+      `https://reddit.com/r/${page}/comments/${postId}/${title}`,
+    );
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: (theme: string) =>
+        createSrcDoc(
+          `<blockquote class="reddit-embed-bq" data-embed-theme="${theme}"><a href="${safeURL}"></a><br></blockquote><script async="" src="https://embed.reddit.com/widgets.js" charset="UTF-8"></script>`,
+        ),
+      intrinsicSize: { w: 480, h: 480 },
+      sandbox: { allowSameOrigin },
+    };
     embeddedLinkCache.set(originalLink, ret);
     return ret;
   }
 
   if (RE_GH_GIST.test(link)) {
-    let ret: IframeData;
-    // assume embed code
-    if (/<script>/.test(link)) {
-      const srcDoc = createSrcDoc(link);
-      ret = {
-        type: "document",
-        srcdoc: () => srcDoc,
-        intrinsicSize: { w: 550, h: 720 },
-      };
-      // assume regular url
-    } else {
-      ret = {
-        type: "document",
-        srcdoc: () =>
-          createSrcDoc(`
-          <script src="${link}.js"></script>
+    const [, user, gistId] = link.match(RE_GH_GIST)!;
+    const safeURL = sanitizeHTMLAttribute(
+      `https://gist.github.com/${user}/${gistId}`,
+    );
+    const ret: IframeDataWithSandbox = {
+      type: "document",
+      srcdoc: () =>
+        createSrcDoc(`
+          <script src="${safeURL}.js"></script>
           <style type="text/css">
             * { margin: 0px; }
             table, .gist { height: 100%; }
             .gist .gist-file { height: calc(100vh - 2px); padding: 0px; display: grid; grid-template-rows: 1fr auto; }
           </style>
         `),
-        intrinsicSize: { w: 550, h: 720 },
-      };
-    }
+      intrinsicSize: { w: 550, h: 720 },
+      sandbox: { allowSameOrigin },
+    };
     embeddedLinkCache.set(link, ret);
     return ret;
   }
 
-  embeddedLinkCache.set(link, { link, intrinsicSize: aspectRatio, type });
-  return { link, intrinsicSize: aspectRatio, type };
-};
-
-export const isIframeLikeOrItsLabel = (
-  element: NonDeletedExcalidrawElement,
-): Boolean => {
-  if (isIframeLikeElement(element)) {
-    return true;
-  }
-  if (element.type === "text") {
-    const container = getContainerElement(element);
-    if (container && isFrameLikeElement(container)) {
-      return true;
-    }
-  }
-  return false;
+  embeddedLinkCache.set(link, {
+    link,
+    intrinsicSize: aspectRatio,
+    type,
+    sandbox: { allowSameOrigin },
+  });
+  return {
+    link,
+    intrinsicSize: aspectRatio,
+    type,
+    sandbox: { allowSameOrigin },
+  };
 };
 
 export const createPlaceholderEmbeddableLabel = (
@@ -268,6 +324,8 @@ export const createPlaceholderEmbeddableLabel = (
 export const actionSetEmbeddableAsActiveTool = register({
   name: "setEmbeddableAsActiveTool",
   trackEvent: { category: "toolbar" },
+  target: "Tool",
+  label: "toolBar.embeddable",
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "embeddable",
@@ -286,61 +344,72 @@ export const actionSetEmbeddableAsActiveTool = register({
           type: "embeddable",
         }),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
 });
 
-const validateHostname = (
+const matchHostname = (
   url: string,
   /** using a Set assumes it already contains normalized bare domains */
   allowedHostnames: Set<string> | string,
-): boolean => {
+): string | null => {
   try {
     const { hostname } = new URL(url);
 
     const bareDomain = hostname.replace(/^www\./, "");
-    const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
-      /^([^.]+)/,
-      "*",
-    );
 
     if (allowedHostnames instanceof Set) {
-      return (
-        ALLOWED_DOMAINS.has(bareDomain) ||
-        ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)
+      if (ALLOWED_DOMAINS.has(bareDomain)) {
+        return bareDomain;
+      }
+
+      const bareDomainWithFirstSubdomainWildcarded = bareDomain.replace(
+        /^([^.]+)/,
+        "*",
       );
+      if (ALLOWED_DOMAINS.has(bareDomainWithFirstSubdomainWildcarded)) {
+        return bareDomainWithFirstSubdomainWildcarded;
+      }
+      return null;
     }
 
-    if (bareDomain === allowedHostnames.replace(/^www\./, "")) {
-      return true;
+    const bareAllowedHostname = allowedHostnames.replace(/^www\./, "");
+    if (bareDomain === bareAllowedHostname) {
+      return bareAllowedHostname;
     }
   } catch (error) {
     // ignore
   }
-  return false;
+  return null;
 };
 
-export const extractSrc = (htmlString: string): string => {
-  const twitterMatch = htmlString.match(RE_TWITTER_EMBED);
+export const maybeParseEmbedSrc = (str: string): string => {
+  const twitterMatch = str.match(RE_TWITTER_EMBED);
   if (twitterMatch && twitterMatch.length === 2) {
     return twitterMatch[1];
   }
 
-  const gistMatch = htmlString.match(RE_GH_GIST_EMBED);
+  const redditMatch = str.match(RE_REDDIT_EMBED);
+  if (redditMatch && redditMatch.length === 2) {
+    return redditMatch[1];
+  }
+
+  const gistMatch = str.match(RE_GH_GIST_EMBED);
   if (gistMatch && gistMatch.length === 2) {
     return gistMatch[1];
   }
 
-  if (RE_GIPHY.test(htmlString)) {
-    return `https://giphy.com/embed/${RE_GIPHY.exec(htmlString)![1]}`;
+  if (RE_GIPHY.test(str)) {
+    return `https://giphy.com/embed/${RE_GIPHY.exec(str)![1]}`;
   }
 
-  const match = htmlString.match(RE_GENERIC_EMBED);
+  const match = str.match(RE_GENERIC_EMBED);
   if (match && match.length === 2) {
     return match[1];
   }
-  return htmlString;
+
+  return str;
 };
 
 export const embeddableURLValidator = (
@@ -367,7 +436,7 @@ export const embeddableURLValidator = (
           if (url.match(domain)) {
             return true;
           }
-        } else if (validateHostname(url, domain)) {
+        } else if (matchHostname(url, domain)) {
           return true;
         }
       }
@@ -375,5 +444,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return validateHostname(url, ALLOWED_DOMAINS);
+  return !!matchHostname(url, ALLOWED_DOMAINS);
 };

@@ -1,15 +1,16 @@
+import React from "react";
 import { vi } from "vitest";
 import { fireEvent, render, waitFor } from "./test-utils";
-import { queryByTestId } from "@testing-library/react";
+import { act, queryByTestId } from "@testing-library/react";
 
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { MIME_TYPES } from "../constants";
-import { LibraryItem, LibraryItems } from "../types";
+import type { LibraryItem, LibraryItems } from "../types";
 import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { ExcalidrawGenericElement } from "../element/types";
+import type { ExcalidrawGenericElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { parseLibraryJSON } from "../data/blob";
 
@@ -43,7 +44,9 @@ vi.mock("../data/filesystem.ts", async (importOriginal) => {
 describe("library", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
-    h.app.library.resetLibrary();
+    await act(() => {
+      return h.app.library.resetLibrary();
+    });
   });
 
   it("import library via drag&drop", async () => {
@@ -95,7 +98,12 @@ describe("library", () => {
     const arrow = API.createElement({
       id: "arrow1",
       type: "arrow",
-      endBinding: { elementId: "rectangle1", focus: -1, gap: 0 },
+      endBinding: {
+        elementId: "rectangle1",
+        focus: -1,
+        gap: 0,
+        fixedPoint: [0.5, 1],
+      },
     });
 
     await API.drop(
@@ -203,7 +211,7 @@ describe("library menu", () => {
         "dropdown-menu-button",
       )!,
     );
-    queryByTestId(container, "lib-dropdown--load")!.click();
+    fireEvent.click(queryByTestId(container, "lib-dropdown--load")!);
 
     const libraryItems = parseLibraryJSON(await libraryJSONPromise);
 
@@ -211,10 +219,11 @@ describe("library menu", () => {
       const latestLibrary = await h.app.library.getLatestLibrary();
       expect(latestLibrary.length).toBeGreaterThan(0);
       expect(latestLibrary.length).toBe(libraryItems.length);
-      expect(latestLibrary[0].elements).toEqual(libraryItems[0].elements);
+      const { versionNonce, ...strippedElement } = libraryItems[0]?.elements[0]; // stripped due to mutations
+      expect(latestLibrary[0].elements).toEqual([
+        expect.objectContaining(strippedElement),
+      ]);
     });
-
-    expect(true).toBe(true);
   });
 });
 

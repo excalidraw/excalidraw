@@ -1,4 +1,4 @@
-@import "../css/variables.module";
+@import "../css/variables.module.scss";
 
 .excalidraw {
   --ImageExportModal-preview-border: #d6d6d6;
@@ -11,6 +11,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+
+    user-select: none;
 
     & h3 {
       font-family: "Assistant";

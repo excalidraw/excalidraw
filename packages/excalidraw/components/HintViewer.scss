@@ -1,4 +1,4 @@
-@import "../css/variables.module";
+@import "../css/variables.module.scss";
 
 // this is loosely based on the longest hint text
 $wide-viewport-width: 1000px;
@@ -9,6 +9,7 @@ $wide-viewport-width: 1000px;
     box-sizing: border-box;
     position: absolute;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     left: 0;
     top: 100%;

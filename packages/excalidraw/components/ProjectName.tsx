@@ -11,7 +11,6 @@ type Props = {
   value: string;
   onChange: (value: string) => void;
   label: string;
-  isNameEditable: boolean;
   ignoreFocus?: boolean;
 };
 
@@ -42,23 +41,17 @@ export const ProjectName = (props: Props) => {
   return (
     <div className="ProjectName">
       <label className="ProjectName-label" htmlFor="filename">
-        {`${props.label}${props.isNameEditable ? "" : ":"}`}
+        {`${props.label}:`}
       </label>
-      {props.isNameEditable ? (
-        <input
-          type="text"
-          className="TextInput"
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          id={`${id}-filename`}
-          value={fileName}
-          onChange={(event) => setFileName(event.target.value)}
-        />
-      ) : (
-        <span className="TextInput TextInput--readonly" id={`${id}-filename`}>
-          {props.value}
-        </span>
-      )}
+      <input
+        type="text"
+        className="TextInput"
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        id={`${id}-filename`}
+        value={fileName}
+        onChange={(event) => setFileName(event.target.value)}
+      />
     </div>
   );
 };

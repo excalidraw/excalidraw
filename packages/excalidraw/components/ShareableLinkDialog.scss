@@ -1,4 +1,4 @@
-@import "../css/variables.module";
+@import "../css/variables.module.scss";
 
 .excalidraw {
   .ShareableLinkDialog {
@@ -22,7 +22,7 @@
     }
 
     &__popover {
-      @keyframes RoomDialog__popover__scaleIn {
+      @keyframes ShareableLinkDialog__popover__scaleIn {
         from {
           opacity: 0;
         }
@@ -52,8 +52,8 @@
       font-size: 0.75rem;
       line-height: 110%;
 
-      background: var(--color-success-lighter);
-      color: var(--color-success);
+      background: var(--color-success);
+      color: var(--color-success-text);
 
       & > svg {
         width: 0.875rem;
@@ -61,7 +61,7 @@
       }
 
       transform-origin: var(--radix-popover-content-transform-origin);
-      animation: RoomDialog__popover__scaleIn 150ms ease-out;
+      animation: ShareableLinkDialog__popover__scaleIn 150ms ease-out;
     }
 
     &__linkRow {

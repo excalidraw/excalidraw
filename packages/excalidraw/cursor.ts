@@ -1,6 +1,6 @@
 import { CURSOR_TYPE, MIME_TYPES, THEME } from "./constants";
 import OpenColor from "open-color";
-import { AppState, DataURL } from "./types";
+import type { AppState, DataURL } from "./types";
 import { isHandToolActive, isEraserActive } from "./appState";
 
 const laserPointerCursorSVG_tag = `<svg viewBox="0 0 24 24" stroke-width="1" width="28" height="28" xmlns="http://www.w3.org/2000/svg">`;

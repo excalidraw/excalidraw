@@ -1,4 +1,4 @@
-@import "../css/variables.module";
+@import "../css/variables.module.scss";
 
 .excalidraw {
   .FixedSideContainer {
@@ -15,7 +15,6 @@
     top: var(--editor-container-padding);
     right: var(--editor-container-padding);
     bottom: var(--editor-container-padding);
-    z-index: 2;
   }
 
   .FixedSideContainer_side_top.zen-mode {

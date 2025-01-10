@@ -1,10 +1,7 @@
-import { ExcalidrawElement } from "../../element/types";
+import type { ExcalidrawElement } from "../../element/types";
 import { atom } from "jotai";
-import {
-  ColorPickerColor,
-  ColorPaletteCustom,
-  MAX_CUSTOM_COLORS_USED_IN_CANVAS,
-} from "../../colors";
+import type { ColorPickerColor, ColorPaletteCustom } from "../../colors";
+import { MAX_CUSTOM_COLORS_USED_IN_CANVAS } from "../../colors";
 
 export const getColorNameAndShadeFromColor = ({
   palette,

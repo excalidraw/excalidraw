@@ -1,5 +1,6 @@
+import React from "react";
 import ReactDOM from "react-dom";
-import { render } from "./test-utils";
+import { act, render } from "./test-utils";
 import { Excalidraw } from "../index";
 import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -14,8 +15,6 @@ import {
   actionAlignLeft,
   actionAlignRight,
 } from "../actions";
-
-const { h } = window;
 
 const mouse = new Pointer("mouse");
 
@@ -59,7 +58,9 @@ describe("aligning", () => {
     ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
     mouse.reset();
 
-    await setLanguage(defaultLang);
+    await act(() => {
+      return setLanguage(defaultLang);
+    });
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
@@ -156,7 +157,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[0].y).toEqual(0);
     expect(API.getSelectedElements()[1].y).toEqual(110);
 
-    h.app.actionManager.executeAction(actionAlignVerticallyCentered);
+    API.executeAction(actionAlignVerticallyCentered);
 
     // Check if x position did not change
     expect(API.getSelectedElements()[0].x).toEqual(0);
@@ -175,7 +176,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[0].y).toEqual(0);
     expect(API.getSelectedElements()[1].y).toEqual(110);
 
-    h.app.actionManager.executeAction(actionAlignHorizontallyCentered);
+    API.executeAction(actionAlignHorizontallyCentered);
 
     expect(API.getSelectedElements()[0].x).toEqual(60);
     expect(API.getSelectedElements()[1].x).toEqual(55);
@@ -201,7 +202,7 @@ describe("aligning", () => {
       mouse.click();
     });
 
-    h.app.actionManager.executeAction(actionGroup);
+    API.executeAction(actionGroup);
 
     mouse.reset();
     UI.clickTool("rectangle");
@@ -222,7 +223,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].y).toEqual(100);
     expect(API.getSelectedElements()[2].y).toEqual(200);
 
-    h.app.actionManager.executeAction(actionAlignTop);
+    API.executeAction(actionAlignTop);
 
     expect(API.getSelectedElements()[0].y).toEqual(0);
     expect(API.getSelectedElements()[1].y).toEqual(100);
@@ -236,7 +237,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].y).toEqual(100);
     expect(API.getSelectedElements()[2].y).toEqual(200);
 
-    h.app.actionManager.executeAction(actionAlignBottom);
+    API.executeAction(actionAlignBottom);
 
     expect(API.getSelectedElements()[0].y).toEqual(100);
     expect(API.getSelectedElements()[1].y).toEqual(200);
@@ -250,7 +251,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].x).toEqual(100);
     expect(API.getSelectedElements()[2].x).toEqual(200);
 
-    h.app.actionManager.executeAction(actionAlignLeft);
+    API.executeAction(actionAlignLeft);
 
     expect(API.getSelectedElements()[0].x).toEqual(0);
     expect(API.getSelectedElements()[1].x).toEqual(100);
@@ -264,7 +265,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].x).toEqual(100);
     expect(API.getSelectedElements()[2].x).toEqual(200);
 
-    h.app.actionManager.executeAction(actionAlignRight);
+    API.executeAction(actionAlignRight);
 
     expect(API.getSelectedElements()[0].x).toEqual(100);
     expect(API.getSelectedElements()[1].x).toEqual(200);
@@ -278,7 +279,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].y).toEqual(100);
     expect(API.getSelectedElements()[2].y).toEqual(200);
 
-    h.app.actionManager.executeAction(actionAlignVerticallyCentered);
+    API.executeAction(actionAlignVerticallyCentered);
 
     expect(API.getSelectedElements()[0].y).toEqual(50);
     expect(API.getSelectedElements()[1].y).toEqual(150);
@@ -292,7 +293,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].x).toEqual(100);
     expect(API.getSelectedElements()[2].x).toEqual(200);
 
-    h.app.actionManager.executeAction(actionAlignHorizontallyCentered);
+    API.executeAction(actionAlignHorizontallyCentered);
 
     expect(API.getSelectedElements()[0].x).toEqual(50);
     expect(API.getSelectedElements()[1].x).toEqual(150);
@@ -315,7 +316,7 @@ describe("aligning", () => {
       mouse.click();
     });
 
-    h.app.actionManager.executeAction(actionGroup);
+    API.executeAction(actionGroup);
 
     mouse.reset();
     UI.clickTool("rectangle");
@@ -331,7 +332,7 @@ describe("aligning", () => {
       mouse.click();
     });
 
-    h.app.actionManager.executeAction(actionGroup);
+    API.executeAction(actionGroup);
 
     // Select the first group.
     // The second group is already selected because it was the last group created
@@ -349,7 +350,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].y).toEqual(200);
     expect(API.getSelectedElements()[3].y).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignTop);
+    API.executeAction(actionAlignTop);
 
     expect(API.getSelectedElements()[0].y).toEqual(0);
     expect(API.getSelectedElements()[1].y).toEqual(100);
@@ -365,7 +366,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].y).toEqual(200);
     expect(API.getSelectedElements()[3].y).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignBottom);
+    API.executeAction(actionAlignBottom);
 
     expect(API.getSelectedElements()[0].y).toEqual(200);
     expect(API.getSelectedElements()[1].y).toEqual(300);
@@ -381,7 +382,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(200);
     expect(API.getSelectedElements()[3].x).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignLeft);
+    API.executeAction(actionAlignLeft);
 
     expect(API.getSelectedElements()[0].x).toEqual(0);
     expect(API.getSelectedElements()[1].x).toEqual(100);
@@ -397,7 +398,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(200);
     expect(API.getSelectedElements()[3].x).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignRight);
+    API.executeAction(actionAlignRight);
 
     expect(API.getSelectedElements()[0].x).toEqual(200);
     expect(API.getSelectedElements()[1].x).toEqual(300);
@@ -413,7 +414,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].y).toEqual(200);
     expect(API.getSelectedElements()[3].y).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignVerticallyCentered);
+    API.executeAction(actionAlignVerticallyCentered);
 
     expect(API.getSelectedElements()[0].y).toEqual(100);
     expect(API.getSelectedElements()[1].y).toEqual(200);
@@ -429,7 +430,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(200);
     expect(API.getSelectedElements()[3].x).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignHorizontallyCentered);
+    API.executeAction(actionAlignHorizontallyCentered);
 
     expect(API.getSelectedElements()[0].x).toEqual(100);
     expect(API.getSelectedElements()[1].x).toEqual(200);
@@ -454,7 +455,7 @@ describe("aligning", () => {
     });
 
     // Create first group of rectangles
-    h.app.actionManager.executeAction(actionGroup);
+    API.executeAction(actionGroup);
 
     mouse.reset();
     UI.clickTool("rectangle");
@@ -468,7 +469,7 @@ describe("aligning", () => {
     });
 
     // Create the nested group
-    h.app.actionManager.executeAction(actionGroup);
+    API.executeAction(actionGroup);
 
     mouse.reset();
     UI.clickTool("rectangle");
@@ -490,7 +491,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].y).toEqual(200);
     expect(API.getSelectedElements()[3].y).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignTop);
+    API.executeAction(actionAlignTop);
 
     expect(API.getSelectedElements()[0].y).toEqual(0);
     expect(API.getSelectedElements()[1].y).toEqual(100);
@@ -506,7 +507,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].y).toEqual(200);
     expect(API.getSelectedElements()[3].y).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignBottom);
+    API.executeAction(actionAlignBottom);
 
     expect(API.getSelectedElements()[0].y).toEqual(100);
     expect(API.getSelectedElements()[1].y).toEqual(200);
@@ -522,7 +523,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(200);
     expect(API.getSelectedElements()[3].x).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignLeft);
+    API.executeAction(actionAlignLeft);
 
     expect(API.getSelectedElements()[0].x).toEqual(0);
     expect(API.getSelectedElements()[1].x).toEqual(100);
@@ -538,7 +539,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(200);
     expect(API.getSelectedElements()[3].x).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignRight);
+    API.executeAction(actionAlignRight);
 
     expect(API.getSelectedElements()[0].x).toEqual(100);
     expect(API.getSelectedElements()[1].x).toEqual(200);
@@ -554,7 +555,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].y).toEqual(200);
     expect(API.getSelectedElements()[3].y).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignVerticallyCentered);
+    API.executeAction(actionAlignVerticallyCentered);
 
     expect(API.getSelectedElements()[0].y).toEqual(50);
     expect(API.getSelectedElements()[1].y).toEqual(150);
@@ -570,7 +571,7 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[2].x).toEqual(200);
     expect(API.getSelectedElements()[3].x).toEqual(300);
 
-    h.app.actionManager.executeAction(actionAlignHorizontallyCentered);
+    API.executeAction(actionAlignHorizontallyCentered);
 
     expect(API.getSelectedElements()[0].x).toEqual(50);
     expect(API.getSelectedElements()[1].x).toEqual(150);

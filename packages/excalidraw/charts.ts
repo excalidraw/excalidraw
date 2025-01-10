@@ -1,3 +1,5 @@
+import type { Radians } from "../math";
+import { pointFrom } from "../math";
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
@@ -9,7 +11,7 @@ import {
   VERTICAL_ALIGN,
 } from "./constants";
 import { newElement, newLinearElement, newTextElement } from "./element";
-import { NonDeletedExcalidrawElement } from "./element/types";
+import type { NonDeletedExcalidrawElement } from "./element/types";
 import { randomId } from "./random";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
@@ -203,7 +205,7 @@ const chartXLabels = (
         x: x + index * (BAR_WIDTH + BAR_GAP) + BAR_GAP * 2,
         y: y + BAR_GAP / 2,
         width: BAR_WIDTH,
-        angle: 5.87,
+        angle: 5.87 as Radians,
         fontSize: 16,
         textAlign: "center",
         verticalAlign: "top",
@@ -257,13 +259,8 @@ const chartLines = (
     type: "line",
     x,
     y,
-    startArrowhead: null,
-    endArrowhead: null,
     width: chartWidth,
-    points: [
-      [0, 0],
-      [chartWidth, 0],
-    ],
+    points: [pointFrom(0, 0), pointFrom(chartWidth, 0)],
   });
 
   const yLine = newLinearElement({
@@ -273,13 +270,8 @@ const chartLines = (
     type: "line",
     x,
     y,
-    startArrowhead: null,
-    endArrowhead: null,
     height: chartHeight,
-    points: [
-      [0, 0],
-      [0, -chartHeight],
-    ],
+    points: [pointFrom(0, 0), pointFrom(0, -chartHeight)],
   });
 
   const maxLine = newLinearElement({
@@ -289,15 +281,10 @@ const chartLines = (
     type: "line",
     x,
     y: y - BAR_HEIGHT - BAR_GAP,
-    startArrowhead: null,
-    endArrowhead: null,
     strokeStyle: "dotted",
     width: chartWidth,
     opacity: GRID_OPACITY,
-    points: [
-      [0, 0],
-      [chartWidth, 0],
-    ],
+    points: [pointFrom(0, 0), pointFrom(chartWidth, 0)],
   });
 
   return [xLine, yLine, maxLine];
@@ -418,8 +405,6 @@ const chartTypeLine = (
     type: "line",
     x: x + BAR_GAP + BAR_WIDTH / 2,
     y: y - BAR_GAP,
-    startArrowhead: null,
-    endArrowhead: null,
     height: maxY - minY,
     width: maxX - minX,
     strokeWidth: 2,
@@ -453,15 +438,10 @@ const chartTypeLine = (
       type: "line",
       x: x + cx + BAR_WIDTH / 2 + BAR_GAP / 2,
       y: y - cy,
-      startArrowhead: null,
-      endArrowhead: null,
       height: cy,
       strokeStyle: "dotted",
       opacity: GRID_OPACITY,
-      points: [
-        [0, 0],
-        [0, cy],
-      ],
+      points: [pointFrom(0, 0), pointFrom(0, cy)],
     });
   });
 

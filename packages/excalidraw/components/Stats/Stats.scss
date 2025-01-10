@@ -1,0 +1,72 @@
+.exc-stats {
+  width: 204px;
+  position: absolute;
+  top: 60px;
+  font-size: 12px;
+  z-index: var(--zIndex-layerUI);
+  pointer-events: var(--ui-pointerEvents);
+
+  :root[dir="rtl"] & {
+    left: 12px;
+    right: initial;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    font-weight: bold;
+  }
+  h3 {
+    white-space: nowrap;
+    font-size: 1.17em;
+    margin: 0;
+    font-weight: bold;
+  }
+
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3125rem;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    display: grid;
+    gap: 4px;
+
+    div + div {
+      text-align: right;
+    }
+  }
+
+  &__row--heading {
+    text-align: center;
+    font-weight: bold;
+    margin: 0.25rem 0;
+  }
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  .close {
+    height: 16px;
+    width: 16px;
+    cursor: pointer;
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}

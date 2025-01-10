@@ -1,6 +1,6 @@
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
-import { NonDeletedExcalidrawElement } from "./types";
+import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
 import { getElementAbsoluteCoords } from ".";
 import { useExcalidrawAppState } from "../components/App";
 
@@ -11,8 +11,9 @@ const CONTAINER_PADDING = 5;
 const getContainerCoords = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
+  elementsMap: ElementsMap,
 ) => {
-  const [x1, y1] = getElementAbsoluteCoords(element);
+  const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
   const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
     { sceneX: x1 + element.width, sceneY: y1 },
     appState,
@@ -25,15 +26,17 @@ const getContainerCoords = (
 export const ElementCanvasButtons = ({
   children,
   element,
+  elementsMap,
 }: {
   children: React.ReactNode;
   element: NonDeletedExcalidrawElement;
+  elementsMap: ElementsMap;
 }) => {
   const appState = useExcalidrawAppState();
 
   if (
     appState.contextMenu ||
-    appState.draggingElement ||
+    appState.newElement ||
     appState.resizingElement ||
     appState.isRotating ||
     appState.openMenu ||
@@ -42,7 +45,7 @@ export const ElementCanvasButtons = ({
     return null;
   }
 
-  const { x, y } = getContainerCoords(element, appState);
+  const { x, y } = getContainerCoords(element, appState, elementsMap);
 
   return (
     <div

@@ -1,0 +1,92 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+
+  .comment-avatar {
+    background: #faa2c1;
+    border-radius: 66px 67px 67px 0px;
+    width: 2rem;
+    height: 2rem;
+    padding: 4px;
+    margin: 4px;
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
+  .app-title {
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+  }
+}
+
+.button-wrapper {
+  input[type="checkbox"] {
+    margin: 5px;
+  }
+  button {
+    z-index: 1;
+    height: 40px;
+    max-width: 200px;
+    margin: 10px;
+    padding: 5px;
+  }
+}
+
+.excalidraw .App-menu_top .buttonList {
+  display: flex;
+}
+
+.excalidraw-wrapper {
+  height: 800px;
+  margin: 50px;
+  position: relative;
+  overflow: hidden;
+}
+
+:root[dir="ltr"]
+  .excalidraw
+  .layer-ui__wrapper
+  .zen-mode-transition.App-menu_bottom--transition-left {
+  transform: none;
+}
+
+.excalidraw .panelColumn {
+  text-align: left;
+}
+
+.export-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 50px;
+
+  &__checkbox {
+    display: flex;
+  }
+}
+
+.excalidraw {
+  --color-primary: #faa2c1;
+  --color-primary-darker: #f783ac;
+  --color-primary-darkest: #e64980;
+  --color-primary-light: #fcc2d7;
+
+  button.custom-element {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .custom-footer,
+  .custom-element {
+    padding: 0.1rem;
+    margin: 0 8px;
+  }
+  .layer-ui__wrapper__footer.App-menu_bottom {
+    align-items: stretch;
+  }
+  // till its merged in OSS
+  .App-toolbar-container .mobile-misc-tools-container {
+    position: absolute;
+  }
+}

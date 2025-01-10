@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { ColorPickerType } from "./colorPickerUtils";
+import type { ColorPickerType } from "./colorPickerUtils";
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,

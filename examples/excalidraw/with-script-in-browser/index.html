@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+
+    <title>React App</title>
+    <script>
+      window.name = "codesandbox";
+      window.EXCALIDRAW_ASSET_PATH = window.origin;
+    </script>
+    <link rel="stylesheet" href="/dist/browser/dev/index.css" />
+  </head>
+
+  <body>
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <div id="root"></div>
+
+    <!-- This is so that we use the bundled excalidraw.development.js file instead
+    of the actual source code -->
+    <script type="module">
+      import * as ExcalidrawLib from "@excalidraw/excalidraw";
+
+      console.log(ExcalidrawLib);
+      window.ExcalidrawLib = ExcalidrawLib;
+    </script>
+    <script type="module" src="index.tsx"></script>
+  </body>
+</html>

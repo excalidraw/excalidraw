@@ -1,8 +1,8 @@
+import type { KeyboardEvent } from "react";
 import {
   forwardRef,
   useRef,
   useImperativeHandle,
-  KeyboardEvent,
   useLayoutEffect,
   useState,
 } from "react";
@@ -13,8 +13,6 @@ import { Button } from "./Button";
 import { eyeIcon, eyeClosedIcon } from "./icons";
 
 type TextFieldProps = {
-  value?: string;
-
   onChange?: (value: string) => void;
   onClick?: () => void;
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -23,15 +21,16 @@ type TextFieldProps = {
   fullWidth?: boolean;
   selectOnRender?: boolean;
 
+  icon?: React.ReactNode;
   label?: string;
+  className?: string;
   placeholder?: string;
   isRedacted?: boolean;
-};
+} & ({ value: string } | { defaultValue: string });
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   (
     {
-      value,
       onChange,
       label,
       fullWidth,
@@ -40,6 +39,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       selectOnRender,
       onKeyDown,
       isRedacted = false,
+      icon,
+      className,
+      ...rest
     },
     ref,
   ) => {
@@ -49,6 +51,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     useLayoutEffect(() => {
       if (selectOnRender) {
+        // focusing first is needed because vitest/jsdom
+        innerRef.current?.focus();
         innerRef.current?.select();
       }
     }, [selectOnRender]);
@@ -58,14 +62,16 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     return (
       <div
-        className={clsx("ExcTextField", {
+        className={clsx("ExcTextField", className, {
           "ExcTextField--fullWidth": fullWidth,
+          "ExcTextField--hasIcon": !!icon,
         })}
         onClick={() => {
           innerRef.current?.focus();
         }}
       >
-        <div className="ExcTextField__label">{label}</div>
+        {icon}
+        {label && <div className="ExcTextField__label">{label}</div>}
         <div
           className={clsx("ExcTextField__input", {
             "ExcTextField__input--readonly": readonly,
@@ -73,10 +79,17 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         >
           <input
             className={clsx({
-              "is-redacted": value && isRedacted && !isTemporarilyUnredacted,
+              "is-redacted":
+                "value" in rest &&
+                rest.value &&
+                isRedacted &&
+                !isTemporarilyUnredacted,
             })}
             readOnly={readonly}
-            value={value}
+            value={"value" in rest ? rest.value : undefined}
+            defaultValue={
+              "defaultValue" in rest ? rest.defaultValue : undefined
+            }
             placeholder={placeholder}
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}

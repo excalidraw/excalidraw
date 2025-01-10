@@ -1,24 +1,25 @@
 import rough from "roughjs/bin/rough";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
   NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
 } from "../element/types";
-import {
-  Bounds,
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "../element/bounds";
-import { renderSceneToSvg, renderStaticScene } from "../renderer/renderScene";
-import { cloneJSON, distance, getFontString } from "../utils";
-import { AppState, BinaryFiles } from "../types";
+import type { Bounds } from "../element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
+import type { AppState, BinaryFiles } from "../types";
 import {
   DEFAULT_EXPORT_PADDING,
-  FONT_FAMILY,
   FRAME_STYLE,
+  FONT_FAMILY,
   SVG_NS,
+  THEME,
   THEME_FILTER,
+  MIME_TYPES,
+  EXPORT_DATA_TYPES,
 } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -26,42 +27,21 @@ import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
-import { elementsOverlappingBBox } from "../../utils/export";
 import {
+  getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
 } from "../frame";
 import { newTextElement } from "../element";
-import { Mutable } from "../utility-types";
+import { type Mutable } from "../utility-types";
 import { newElementWith } from "../element/mutateElement";
-import Scene from "./Scene";
-import { isFrameElement, isFrameLikeElement } from "../element/typeChecks";
-
-const SVG_EXPORT_TAG = `<!-- svg-source:excalidraw -->`;
-
-// getContainerElement and getBoundTextElement and potentially other helpers
-// depend on `Scene` which will not be available when these pure utils are
-// called outside initialized Excalidraw editor instance or even if called
-// from inside Excalidraw if the elements were never cached by Scene (e.g.
-// for library elements).
-//
-// As such, before passing the elements down, we need to initialize a custom
-// Scene instance and assign them to it.
-//
-// FIXME This is a super hacky workaround and we'll need to rewrite this soon.
-const __createSceneForElementsHack__ = (
-  elements: readonly ExcalidrawElement[],
-) => {
-  const scene = new Scene();
-  // we can't duplicate elements to regenerate ids because we need the
-  // orig ids when embedding. So we do another hack of not mapping element
-  // ids to Scene instances so that we don't override the editor elements
-  // mapping.
-  // We still need to clone the objects themselves to regen references.
-  scene.replaceAllElements(cloneJSON(elements), false);
-  return scene;
-};
+import { isFrameLikeElement } from "../element/typeChecks";
+import type { RenderableElementsMap } from "./types";
+import { syncInvalidIndices } from "../fractionalIndex";
+import { renderStaticScene } from "../renderer/staticScene";
+import { Fonts } from "../fonts";
+import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   if (element.width <= maxWidth) {
@@ -105,29 +85,19 @@ const addFrameLabelsAsTextElements = (
   opts: Pick<AppState, "exportWithDarkMode">,
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
-  let frameIndex = 0;
-  let magicFrameIndex = 0;
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      if (isFrameElement(element)) {
-        frameIndex++;
-      } else {
-        magicFrameIndex++;
-      }
       let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
         x: element.x,
         y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: FONT_FAMILY.Assistant,
+        fontFamily: FONT_FAMILY.Helvetica,
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
         strokeColor: opts.exportWithDarkMode
           ? FRAME_STYLE.nameColorDarkTheme
           : FRAME_STYLE.nameColorLightTheme,
-        text: getFrameLikeTitle(
-          element,
-          isFrameElement(element) ? frameIndex : magicFrameIndex,
-        ),
+        text: getFrameLikeTitle(element),
       });
       textElement.y -= textElement.height;
 
@@ -168,11 +138,7 @@ const prepareElementsForRender = ({
   let nextElements: readonly ExcalidrawElement[];
 
   if (exportingFrame) {
-    nextElements = elementsOverlappingBBox({
-      elements,
-      bounds: exportingFrame,
-      type: "overlap",
-    });
+    nextElements = getElementsOverlappingFrame(elements, exportingFrame);
   } else if (frameRendering.enabled && frameRendering.name) {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,
@@ -208,14 +174,22 @@ export const exportToCanvas = async (
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
   },
+  loadFonts: () => Promise<void> = async () => {
+    await Fonts.loadElementsFonts(elements);
+  },
 ) => {
-  const tempScene = __createSceneForElementsHack__(elements);
-  elements = tempScene.getNonDeletedElements();
+  // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
+  await loadFonts();
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
     appState.frameRendering ?? null,
   );
+  // for canvas export, don't clip if exporting a specific frame as it would
+  // clip the corners of the content
+  if (exportingFrame) {
+    frameRendering.clip = false;
+  }
 
   const elementsForRender = prepareElementsForRender({
     elements,
@@ -248,7 +222,12 @@ export const exportToCanvas = async (
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
-    elements: elementsForRender,
+    elementsMap: toBrandedType<RenderableElementsMap>(
+      arrayToMap(elementsForRender),
+    ),
+    allElementsMap: toBrandedType<NonDeletedSceneElementsMap>(
+      arrayToMap(syncInvalidIndices(elements)),
+    ),
     visibleElements: elementsForRender,
     scale,
     appState: {
@@ -259,19 +238,28 @@ export const exportToCanvas = async (
       scrollY: -minY + exportPadding,
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
-      theme: appState.exportWithDarkMode ? "dark" : "light",
+      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
     renderConfig: {
       canvasBackgroundColor: viewBackgroundColor,
       imageCache,
       renderGrid: false,
       isExporting: true,
+      // empty disables embeddable rendering
+      embedsValidationStatus: new Map(),
+      elementsPendingErasure: new Set(),
+      pendingFlowchartNodes: null,
     },
   });
 
-  tempScene.destroy();
-
   return canvas;
+};
+
+const createHTMLComment = (text: string) => {
+  // surrounding with spaces to maintain prettified consistency with previous
+  // iterations
+  // <!-- comment -->
+  return document.createComment(` ${text} `);
 };
 
 export const exportToSvg = async (
@@ -287,13 +275,15 @@ export const exportToSvg = async (
   },
   files: BinaryFiles | null,
   opts?: {
+    /**
+     * if true, all embeddables passed in will be rendered when possible.
+     */
     renderEmbeddables?: boolean;
     exportingFrame?: ExcalidrawFrameLikeElement | null;
+    skipInliningFonts?: true;
+    reuseImages?: boolean;
   },
 ): Promise<SVGSVGElement> => {
-  const tempScene = __createSceneForElementsHack__(elements);
-  elements = tempScene.getNonDeletedElements();
-
   const frameRendering = getFrameRenderingConfig(
     opts?.exportingFrame ?? null,
     appState.frameRendering ?? null,
@@ -320,33 +310,20 @@ export const exportToSvg = async (
     exportPadding = 0;
   }
 
-  let metadata = "";
-
-  // we need to serialize the "original" elements before we put them through
-  // the tempScene hack which duplicates and regenerates ids
-  if (exportEmbedScene) {
-    try {
-      metadata = await (
-        await import(/* webpackChunkName: "image" */ "../data/image")
-      ).encodeSvgMetadata({
-        // when embedding scene, we want to embed the origionally supplied
-        // elements which don't contain the temp frame labels.
-        // But it also requires that the exportToSvg is being supplied with
-        // only the elements that we're exporting, and no extra.
-        text: serializeAsJSON(elements, appState, files || {}, "local"),
-      });
-    } catch (error: any) {
-      console.error(error);
-    }
-  }
-
   const [minX, minY, width, height] = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
     exportPadding,
   );
 
-  // initialize SVG root
+  const offsetX = -minX + exportPadding;
+  const offsetY = -minY + exportPadding;
+
+  // ---------------------------------------------------------------------------
+  // initialize SVG root element
+  // ---------------------------------------------------------------------------
+
   const svgRoot = document.createElementNS(SVG_NS, "svg");
+
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -356,68 +333,105 @@ export const exportToSvg = async (
     svgRoot.setAttribute("filter", THEME_FILTER);
   }
 
-  let assetPath = "https://excalidraw.com/";
-  // Asset path needs to be determined only when using package
-  if (import.meta.env.VITE_IS_EXCALIDRAW_NPM_PACKAGE) {
-    assetPath =
-      window.EXCALIDRAW_ASSET_PATH ||
-      `https://unpkg.com/${import.meta.env.VITE_PKG_NAME}@${
-        import.meta.env.PKG_VERSION
-      }`;
+  const defsElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
 
-    if (assetPath?.startsWith("/")) {
-      assetPath = assetPath.replace("/", `${window.location.origin}/`);
+  const metadataElement = svgRoot.ownerDocument.createElementNS(
+    SVG_NS,
+    "metadata",
+  );
+
+  svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
+  svgRoot.appendChild(metadataElement);
+  svgRoot.appendChild(defsElement);
+
+  // ---------------------------------------------------------------------------
+  // scene embed
+  // ---------------------------------------------------------------------------
+
+  // we need to serialize the "original" elements before we put them through
+  // the tempScene hack which duplicates and regenerates ids
+  if (exportEmbedScene) {
+    try {
+      encodeSvgBase64Payload({
+        metadataElement,
+        // when embedding scene, we want to embed the origionally supplied
+        // elements which don't contain the temp frame labels.
+        // But it also requires that the exportToSvg is being supplied with
+        // only the elements that we're exporting, and no extra.
+        payload: serializeAsJSON(elements, appState, files || {}, "local"),
+      });
+    } catch (error: any) {
+      console.error(error);
     }
-    assetPath = `${assetPath}/dist/excalidraw-assets/`;
   }
 
-  const offsetX = -minX + exportPadding;
-  const offsetY = -minY + exportPadding;
+  // ---------------------------------------------------------------------------
+  // frame clip paths
+  // ---------------------------------------------------------------------------
 
   const frameElements = getFrameLikeElements(elements);
 
-  let exportingFrameClipPath = "";
-  for (const frame of frameElements) {
-    const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame);
-    const cx = (x2 - x1) / 2 - (frame.x - x1);
-    const cy = (y2 - y1) / 2 - (frame.y - y1);
+  if (frameElements.length) {
+    const elementsMap = arrayToMap(elements);
 
-    exportingFrameClipPath += `<clipPath id=${frame.id}>
-            <rect transform="translate(${frame.x + offsetX} ${
-      frame.y + offsetY
-    }) rotate(${frame.angle} ${cx} ${cy})"
-          width="${frame.width}"
-          height="${frame.height}"
-          >
-          </rect>
-        </clipPath>`;
+    for (const frame of frameElements) {
+      const clipPath = svgRoot.ownerDocument.createElementNS(
+        SVG_NS,
+        "clipPath",
+      );
+
+      clipPath.setAttribute("id", frame.id);
+
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(frame, elementsMap);
+      const cx = (x2 - x1) / 2 - (frame.x - x1);
+      const cy = (y2 - y1) / 2 - (frame.y - y1);
+
+      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      rect.setAttribute(
+        "transform",
+        `translate(${frame.x + offsetX} ${frame.y + offsetY}) rotate(${
+          frame.angle
+        } ${cx} ${cy})`,
+      );
+      rect.setAttribute("width", `${frame.width}`);
+      rect.setAttribute("height", `${frame.height}`);
+
+      if (!exportingFrame) {
+        rect.setAttribute("rx", `${FRAME_STYLE.radius}`);
+        rect.setAttribute("ry", `${FRAME_STYLE.radius}`);
+      }
+
+      clipPath.appendChild(rect);
+
+      defsElement.appendChild(clipPath);
+    }
   }
 
-  svgRoot.innerHTML = `
-  ${SVG_EXPORT_TAG}
-  ${metadata}
-  <defs>
-    <style class="style-fonts">
-      @font-face {
-        font-family: "Virgil";
-        src: url("${assetPath}Virgil.woff2");
-      }
-      @font-face {
-        font-family: "Cascadia";
-        src: url("${assetPath}Cascadia.woff2");
-      }
-      @font-face {
-        font-family: "Assistant";
-        src: url("${assetPath}Assistant-Regular.woff2");
-      }
-    </style>
-    ${exportingFrameClipPath}
-  </defs>
-  `;
+  // ---------------------------------------------------------------------------
+  // inline font faces
+  // ---------------------------------------------------------------------------
+
+  const fontFaces = !opts?.skipInliningFonts
+    ? await Fonts.generateFontFaceDeclarations(elements)
+    : [];
+
+  const delimiter = "\n      "; // 6 spaces
+
+  const style = svgRoot.ownerDocument.createElementNS(SVG_NS, "style");
+  style.classList.add("style-fonts");
+  style.appendChild(
+    document.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
+  );
+
+  defsElement.appendChild(style);
+
+  // ---------------------------------------------------------------------------
+  // background
+  // ---------------------------------------------------------------------------
 
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
-    const rect = svgRoot.ownerDocument!.createElementNS(SVG_NS, "rect");
+    const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${width}`);
@@ -426,20 +440,97 @@ export const exportToSvg = async (
     svgRoot.appendChild(rect);
   }
 
-  const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elementsForRender, rsvg, svgRoot, files || {}, {
-    offsetX,
-    offsetY,
-    isExporting: true,
-    exportWithDarkMode,
-    renderEmbeddables: opts?.renderEmbeddables ?? false,
-    frameRendering,
-    canvasBackgroundColor: viewBackgroundColor,
-  });
+  // ---------------------------------------------------------------------------
+  // render elements
+  // ---------------------------------------------------------------------------
 
-  tempScene.destroy();
+  const rsvg = rough.svg(svgRoot);
+
+  const renderEmbeddables = opts?.renderEmbeddables ?? false;
+
+  renderSceneToSvg(
+    elementsForRender,
+    toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
+    rsvg,
+    svgRoot,
+    files || {},
+    {
+      offsetX,
+      offsetY,
+      isExporting: true,
+      exportWithDarkMode,
+      renderEmbeddables,
+      frameRendering,
+      canvasBackgroundColor: viewBackgroundColor,
+      embedsValidationStatus: renderEmbeddables
+        ? new Map(
+            elementsForRender
+              .filter((element) => isFrameLikeElement(element))
+              .map((element) => [element.id, true]),
+          )
+        : new Map(),
+      reuseImages: opts?.reuseImages ?? true,
+    },
+  );
+
+  // ---------------------------------------------------------------------------
 
   return svgRoot;
+};
+
+export const encodeSvgBase64Payload = ({
+  payload,
+  metadataElement,
+}: {
+  payload: string;
+  metadataElement: SVGMetadataElement;
+}) => {
+  const base64 = stringToBase64(
+    JSON.stringify(encode({ text: payload })),
+    true /* is already byte string */,
+  );
+
+  metadataElement.appendChild(
+    createHTMLComment(`payload-type:${MIME_TYPES.excalidraw}`),
+  );
+  metadataElement.appendChild(createHTMLComment("payload-version:2"));
+  metadataElement.appendChild(createHTMLComment("payload-start"));
+  metadataElement.appendChild(document.createTextNode(base64));
+  metadataElement.appendChild(createHTMLComment("payload-end"));
+};
+
+export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
+  if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
+    const match = svg.match(
+      /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
+    );
+    if (!match) {
+      throw new Error("INVALID");
+    }
+    const versionMatch = svg.match(/<!-- payload-version:(\d+) -->/);
+    const version = versionMatch?.[1] || "1";
+    const isByteString = version !== "1";
+
+    try {
+      const json = base64ToString(match[1], isByteString);
+      const encodedData = JSON.parse(json);
+      if (!("encoded" in encodedData)) {
+        // legacy, un-encoded scene JSON
+        if (
+          "type" in encodedData &&
+          encodedData.type === EXPORT_DATA_TYPES.excalidraw
+        ) {
+          return json;
+        }
+        throw new Error("FAILED");
+      }
+      return decode(encodedData);
+    } catch (error: any) {
+      console.error(error);
+      throw new Error("FAILED");
+    }
+  }
+  throw new Error("INVALID");
 };
 
 // calculate smallest area to fit the contents in

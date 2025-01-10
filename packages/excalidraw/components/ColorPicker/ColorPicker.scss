@@ -1,4 +1,4 @@
-@import "../../css/variables.module";
+@import "../../css/variables.module.scss";
 
 .excalidraw {
   .focus-visible-none {
@@ -20,7 +20,7 @@
     align-items: center;
 
     @include isMobile {
-      max-width: 175px;
+      max-width: 11rem;
     }
   }
 

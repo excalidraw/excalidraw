@@ -1,10 +1,17 @@
 import { isElementInViewport } from "../element/sizeHelpers";
 import { isImageElement } from "../element/typeChecks";
-import { NonDeletedExcalidrawElement } from "../element/types";
-import { cancelRender } from "../renderer/renderScene";
-import { AppState } from "../types";
-import { memoize } from "../utils";
-import Scene from "./Scene";
+import type {
+  ExcalidrawElement,
+  NonDeletedElementsMap,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import { renderInteractiveSceneThrottled } from "../renderer/interactiveScene";
+import { renderStaticSceneThrottled } from "../renderer/staticScene";
+
+import type { AppState } from "../types";
+import { memoize, toBrandedType } from "../utils";
+import type Scene from "./Scene";
+import type { RenderableElementsMap } from "./types";
 
 export class Renderer {
   private scene: Scene;
@@ -15,7 +22,7 @@ export class Renderer {
 
   public getRenderableElements = (() => {
     const getVisibleCanvasElements = ({
-      elements,
+      elementsMap,
       zoom,
       offsetLeft,
       offsetTop,
@@ -24,7 +31,7 @@ export class Renderer {
       height,
       width,
     }: {
-      elements: readonly NonDeletedExcalidrawElement[];
+      elementsMap: NonDeletedElementsMap;
       zoom: AppState["zoom"];
       offsetLeft: AppState["offsetLeft"];
       offsetTop: AppState["offsetTop"];
@@ -33,43 +40,67 @@ export class Renderer {
       height: AppState["height"];
       width: AppState["width"];
     }): readonly NonDeletedExcalidrawElement[] => {
-      return elements.filter((element) =>
-        isElementInViewport(element, width, height, {
-          zoom,
-          offsetLeft,
-          offsetTop,
-          scrollX,
-          scrollY,
-        }),
-      );
+      const visibleElements: NonDeletedExcalidrawElement[] = [];
+      for (const element of elementsMap.values()) {
+        if (
+          isElementInViewport(
+            element,
+            width,
+            height,
+            {
+              zoom,
+              offsetLeft,
+              offsetTop,
+              scrollX,
+              scrollY,
+            },
+            elementsMap,
+          )
+        ) {
+          visibleElements.push(element);
+        }
+      }
+      return visibleElements;
     };
 
-    const getCanvasElements = ({
-      editingElement,
+    const getRenderableElements = ({
       elements,
+      editingTextElement,
+      newElementId,
       pendingImageElementId,
     }: {
       elements: readonly NonDeletedExcalidrawElement[];
-      editingElement: AppState["editingElement"];
+      editingTextElement: AppState["editingTextElement"];
+      newElementId: ExcalidrawElement["id"] | undefined;
       pendingImageElementId: AppState["pendingImageElementId"];
     }) => {
-      return elements.filter((element) => {
+      const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
+
+      for (const element of elements) {
         if (isImageElement(element)) {
           if (
             // => not placed on canvas yet (but in elements array)
             pendingImageElementId === element.id
           ) {
-            return false;
+            continue;
           }
         }
+
+        if (newElementId === element.id) {
+          continue;
+        }
+
         // we don't want to render text element that's being currently edited
         // (it's rendered on remote only)
-        return (
-          !editingElement ||
-          editingElement.type !== "text" ||
-          element.id !== editingElement.id
-        );
-      });
+        if (
+          !editingTextElement ||
+          editingTextElement.type !== "text" ||
+          element.id !== editingTextElement.id
+        ) {
+          elementsMap.set(element.id, element);
+        }
+      }
+      return elementsMap;
     };
 
     return memoize(
@@ -81,11 +112,11 @@ export class Renderer {
         scrollY,
         height,
         width,
-        editingElement,
+        editingTextElement,
+        newElementId,
         pendingImageElementId,
-        // unused but serves we cache on it to invalidate elements if they
-        // get mutated
-        versionNonce: _versionNonce,
+        // cache-invalidation nonce
+        sceneNonce: _sceneNonce,
       }: {
         zoom: AppState["zoom"];
         offsetLeft: AppState["offsetLeft"];
@@ -94,20 +125,24 @@ export class Renderer {
         scrollY: AppState["scrollY"];
         height: AppState["height"];
         width: AppState["width"];
-        editingElement: AppState["editingElement"];
+        editingTextElement: AppState["editingTextElement"];
+        /** note: first render of newElement will always bust the cache
+         * (we'd have to prefilter elements outside of this function) */
+        newElementId: ExcalidrawElement["id"] | undefined;
         pendingImageElementId: AppState["pendingImageElementId"];
-        versionNonce: ReturnType<InstanceType<typeof Scene>["getVersionNonce"]>;
+        sceneNonce: ReturnType<InstanceType<typeof Scene>["getSceneNonce"]>;
       }) => {
         const elements = this.scene.getNonDeletedElements();
 
-        const canvasElements = getCanvasElements({
+        const elementsMap = getRenderableElements({
           elements,
-          editingElement,
+          editingTextElement,
+          newElementId,
           pendingImageElementId,
         });
 
         const visibleElements = getVisibleCanvasElements({
-          elements: canvasElements,
+          elementsMap,
           zoom,
           offsetLeft,
           offsetTop,
@@ -117,7 +152,7 @@ export class Renderer {
           width,
         });
 
-        return { canvasElements, visibleElements };
+        return { elementsMap, visibleElements };
       },
     );
   })();
@@ -125,7 +160,8 @@ export class Renderer {
   // NOTE Doesn't destroy everything (scene, rc, etc.) because it may not be
   // safe to break TS contract here (for upstream cases)
   public destroy() {
-    cancelRender();
+    renderInteractiveSceneThrottled.cancel();
+    renderStaticSceneThrottled.cancel();
     this.getRenderableElements.clear();
   }
 }

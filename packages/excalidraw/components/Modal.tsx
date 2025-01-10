@@ -3,8 +3,9 @@ import "./Modal.scss";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { KEYS } from "../keys";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
+import { useRef } from "react";
 
 export const Modal: React.FC<{
   className?: string;
@@ -20,6 +21,10 @@ export const Modal: React.FC<{
     className: "excalidraw-modal-container",
   });
 
+  const animationsDisabledRef = useRef(
+    document.body.classList.contains("excalidraw-animations-disabled"),
+  );
+
   if (!modalRoot) {
     return null;
   }
@@ -34,7 +39,9 @@ export const Modal: React.FC<{
 
   return createPortal(
     <div
-      className={clsx("Modal", props.className)}
+      className={clsx("Modal", props.className, {
+        "animations-disabled": animationsDisabledRef.current,
+      })}
       role="dialog"
       aria-modal="true"
       onKeyDown={handleKeydown}

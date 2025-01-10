@@ -1,9 +1,10 @@
+import React from "react";
 import ReactDOM from "react-dom";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
-import * as Renderer from "../renderer/renderScene";
+import * as StaticScene from "../renderer/staticScene";
 import { setDateTimeForTests } from "../utils";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -19,7 +20,7 @@ import { vi } from "vitest";
 
 const { h } = window;
 
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 const mouse = new Pointer("mouse");
 const finger1 = new Pointer("touch", 1);
@@ -35,7 +36,7 @@ const checkpoint = (name: string) => {
     `[${name}] number of renders`,
   );
   expect(h.state).toMatchSnapshot(`[${name}] appState`);
-  expect(h.history.getSnapshotForTest()).toMatchSnapshot(`[${name}] history`);
+  expect(h.history).toMatchSnapshot(`[${name}] history`);
   expect(h.elements.length).toMatchSnapshot(`[${name}] number of elements`);
   h.elements.forEach((element, i) =>
     expect(element).toMatchSnapshot(`[${name}] element ${i}`),
@@ -55,7 +56,7 @@ beforeEach(async () => {
   finger2.reset();
 
   await render(<Excalidraw handleKeyboardGlobally={true} />);
-  h.setState({ height: 768, width: 1024 });
+  API.setAppState({ height: 768, width: 1024 });
 });
 
 afterEach(() => {
@@ -199,7 +200,6 @@ describe("regression tests", () => {
     expect(
       h.elements.filter((element) => element.type === "rectangle").length,
     ).toBe(1);
-
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(-8, -8);
       mouse.up(10, 10);
@@ -359,6 +359,7 @@ describe("regression tests", () => {
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.Z);
       Keyboard.keyPress(KEYS.Z);
+      Keyboard.keyPress(KEYS.Z);
     });
     expect(h.elements.filter((element) => !element.isDeleted).length).toBe(2);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -372,7 +373,7 @@ describe("regression tests", () => {
   });
 
   it("noop interaction after undo shouldn't create history entry", () => {
-    expect(API.getStateHistory().length).toBe(1);
+    expect(API.getUndoStack().length).toBe(0);
 
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -386,35 +387,35 @@ describe("regression tests", () => {
 
     const secondElementEndPoint = mouse.getPosition();
 
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(2);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.Z);
     });
 
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getUndoStack().length).toBe(1);
 
     // clicking an element shouldn't add to history
     mouse.restorePosition(...firstElementEndPoint);
     mouse.click();
-    expect(API.getStateHistory().length).toBe(2);
+    expect(API.getUndoStack().length).toBe(1);
 
     Keyboard.withModifierKeys({ shift: true, ctrl: true }, () => {
       Keyboard.keyPress(KEYS.Z);
     });
 
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(2);
 
-    // clicking an element shouldn't add to history
+    // clicking an element should add to history
     mouse.click();
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(3);
 
     const firstSelectedElementId = API.getSelectedElement().id;
 
     // same for clicking the element just redo-ed
     mouse.restorePosition(...secondElementEndPoint);
     mouse.click();
-    expect(API.getStateHistory().length).toBe(3);
+    expect(API.getUndoStack().length).toBe(4);
 
     expect(API.getSelectedElement().id).not.toEqual(firstSelectedElementId);
   });
@@ -562,7 +563,7 @@ describe("regression tests", () => {
   });
 
   it("adjusts z order when grouping", () => {
-    const positions = [];
+    const positions: number[][] = [];
 
     UI.clickTool("rectangle");
     mouse.down(10, 10);
@@ -644,9 +645,9 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Virgil);
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Excalifont);
     fireEvent.click(screen.getByTitle(/code/i));
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Cascadia);
+    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY["Comic Shanns"]);
   });
 
   it("deselects selected element, on pointer up, when click hits element bounding box but doesn't hit the element", () => {
@@ -724,7 +725,7 @@ describe("regression tests", () => {
     mouse.up(10, 10);
 
     const { x: prevX, y: prevY } = API.getSelectedElement();
-
+    API.clearSelection();
     // drag element from point on bounding box that doesn't hit element
     mouse.reset();
     mouse.down(8, 8);
@@ -757,7 +758,7 @@ describe("regression tests", () => {
         width: 500,
         height: 500,
       });
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
 
       mouse.select(rect1);
 
@@ -793,7 +794,7 @@ describe("regression tests", () => {
         width: 500,
         height: 500,
       });
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
 
       mouse.select(rect1);
 
@@ -1014,12 +1015,22 @@ describe("regression tests", () => {
   });
 
   it("single-clicking on a subgroup of a selected group should not alter selection", () => {
-    const rect1 = UI.createElement("rectangle", { x: 10 });
-    const rect2 = UI.createElement("rectangle", { x: 50 });
+    const rect1 = UI.createElement("rectangle", {
+      x: 10,
+    });
+    const rect2 = UI.createElement("rectangle", {
+      x: 50,
+    });
     UI.group([rect1, rect2]);
 
-    const rect3 = UI.createElement("rectangle", { x: 10, y: 50 });
-    const rect4 = UI.createElement("rectangle", { x: 50, y: 50 });
+    const rect3 = UI.createElement("rectangle", {
+      x: 10,
+      y: 50,
+    });
+    const rect4 = UI.createElement("rectangle", {
+      x: 50,
+      y: 50,
+    });
     UI.group([rect3, rect4]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -1078,8 +1089,9 @@ describe("regression tests", () => {
     UI.group([rect1, rect3]);
     assertSelectedElements(rect1, rect2, rect3);
 
+    mouse.reset();
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      mouse.clickOn(rect1);
+      mouse.click(10, 5);
     });
     assertSelectedElements(rect1);
 

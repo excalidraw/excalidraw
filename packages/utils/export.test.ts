@@ -32,7 +32,6 @@ describe("exportToCanvas", async () => {
 
 describe("exportToBlob", async () => {
   describe("mime type", () => {
-    // afterEach(vi.restoreAllMocks);
     it("should change image/jpg to image/jpeg", async () => {
       const blob = await utils.exportToBlob({
         ...diagramFactory(),

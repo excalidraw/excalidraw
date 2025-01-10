@@ -12,7 +12,7 @@ export const diagramFixture = {
   elements: [diamondFixture, ellipseFixture, rectangleFixture],
   appState: {
     viewBackgroundColor: "#ffffff",
-    gridSize: null,
+    gridModeEnabled: false,
   },
   files: {},
 };

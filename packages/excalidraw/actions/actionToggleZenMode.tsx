@@ -1,8 +1,13 @@
+import { coffeeIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
+import { StoreAction } from "../store";
 import { register } from "./register";
 
 export const actionToggleZenMode = register({
   name: "zenMode",
+  label: "buttons.zenMode",
+  icon: coffeeIcon,
+  paletteName: "Toggle zen mode",
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -14,14 +19,13 @@ export const actionToggleZenMode = register({
         ...appState,
         zenModeEnabled: !this.checked!(appState),
       },
-      commitToHistory: false,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState) => appState.zenModeEnabled,
   predicate: (elements, appState, appProps) => {
     return typeof appProps.zenModeEnabled === "undefined";
   },
-  contextItemLabel: "buttons.zenMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,
 });

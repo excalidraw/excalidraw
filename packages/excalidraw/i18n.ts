@@ -2,7 +2,7 @@ import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
-import { NestedKeyOf } from "./utility-types";
+import type { NestedKeyOf } from "./utility-types";
 
 const COMPLETION_THRESHOLD = 85;
 
@@ -96,9 +96,7 @@ export const setLanguage = async (lang: Language) => {
     currentLangData = {};
   } else {
     try {
-      currentLangData = await import(
-        /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
-      );
+      currentLangData = await import(`./locales/${currentLang.code}.json`);
     } catch (error: any) {
       console.error(`Failed to load language ${lang.code}:`, error.message);
       currentLangData = fallbackLangData;

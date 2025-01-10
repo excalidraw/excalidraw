@@ -1,6 +1,6 @@
 import { KEYS } from "../keys";
 import { register } from "./register";
-import { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
@@ -12,10 +12,10 @@ import {
   getSelectedGroupForElement,
   getElementsInGroup,
 } from "../groups";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
-import { ActionResult } from "./types";
-import { GRID_SIZE } from "../constants";
+import type { ActionResult } from "./types";
+import { DEFAULT_GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
@@ -31,32 +31,39 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
+import { syncMovedIndices } from "../fractionalIndex";
+import { StoreAction } from "../store";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
+  label: "labels.duplicateSelection",
+  icon: DuplicateIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, formData, app) => {
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
-      const ret = LinearElementEditor.duplicateSelectedPoints(appState);
+      // TODO: Invariants should be checked here instead of duplicateSelectedPoints()
+      try {
+        const newAppState = LinearElementEditor.duplicateSelectedPoints(
+          appState,
+          app.scene.getNonDeletedElementsMap(),
+        );
 
-      if (!ret) {
+        return {
+          elements,
+          appState: newAppState,
+          storeAction: StoreAction.CAPTURE,
+        };
+      } catch {
         return false;
       }
-
-      return {
-        elements,
-        appState: ret.appState,
-        commitToHistory: true,
-      };
     }
 
     return {
       ...duplicateElements(elements, appState),
-      commitToHistory: true,
+      storeAction: StoreAction.CAPTURE,
     };
   },
-  contextItemLabel: "labels.duplicateSelection",
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -85,6 +92,7 @@ const duplicateElements = (
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
+  const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
   const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
     const newElement = duplicateElement(
@@ -92,10 +100,11 @@ const duplicateElements = (
       groupIdMap,
       element,
       {
-        x: element.x + GRID_SIZE / 2,
-        y: element.y + GRID_SIZE / 2,
+        x: element.x + DEFAULT_GRID_SIZE / 2,
+        y: element.y + DEFAULT_GRID_SIZE / 2,
       },
     );
+    duplicatedElementsMap.set(newElement.id, newElement);
     oldIdToDuplicatedId.set(element.id, newElement.id);
     oldElements.push(element);
     newElements.push(newElement);
@@ -139,7 +148,7 @@ const duplicateElements = (
       continue;
     }
 
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, arrayToMap(elements));
     const isElementAFrameLike = isFrameLikeElement(element);
 
     if (idsOfElementsToDuplicate.get(element.id)) {
@@ -233,8 +242,10 @@ const duplicateElements = (
   }
 
   // step (3)
-
-  const finalElements = finalElementsReversed.reverse();
+  const finalElements = syncMovedIndices(
+    finalElementsReversed.reverse(),
+    arrayToMap(newElements),
+  );
 
   // ---------------------------------------------------------------------------
 

@@ -1,22 +1,49 @@
-import { NonDeletedExcalidrawElement } from "../../element/types";
+import type {
+  ExcalidrawTextElement,
+  FractionalIndex,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
   ellipseFixture,
   rectangleWithLinkFixture,
+  textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
 import { exportToCanvas, exportToSvg } from "../../../utils";
-import { FRAME_STYLE } from "../../constants";
+import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 
 describe("exportToSvg", () => {
-  window.EXCALIDRAW_ASSET_PATH = "/";
   const ELEMENT_HEIGHT = 100;
   const ELEMENT_WIDTH = 100;
   const ELEMENTS = [
-    { ...diamondFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
-    { ...ellipseFixture, height: ELEMENT_HEIGHT, width: ELEMENT_WIDTH },
+    {
+      ...diamondFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a0",
+    },
+    {
+      ...ellipseFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a1",
+    },
+    {
+      ...textFixture,
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a2",
+    },
+    {
+      ...textFixture,
+      fontFamily: FONT_FAMILY.Nunito, // test embedding external font
+      height: ELEMENT_HEIGHT,
+      width: ELEMENT_WIDTH,
+      index: "a3",
+    },
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_OPTIONS = {
@@ -34,6 +61,28 @@ describe("exportToSvg", () => {
 
     expect(svgElement).toMatchSnapshot();
   });
+
+  it("with a CJK font", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      [
+        ...ELEMENTS,
+        {
+          ...textFixture,
+          height: ELEMENT_HEIGHT,
+          width: ELEMENT_WIDTH,
+          text: "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
+          originalText:
+            "中国你好！这是一个测试。中国你好！日本こんにちは！これはテストです。한국 안녕하세요! 이것은 테스트입니다.",
+          index: "a4" as FractionalIndex,
+        } as ExcalidrawTextElement,
+      ],
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    expect(svgElement).toMatchSnapshot();
+    // extend the timeout, as it needs to first load the fonts from disk and then perform whole woff2 decode, subset and encode (without workers)
+  }, 30_000);
 
   it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";
@@ -65,7 +114,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      '"_themeFilter_1883f3"',
+      `"_themeFilter_1883f3"`,
     );
   });
 
@@ -405,6 +454,68 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("height")).toBe(
         (frame.height + getFrameNameHeight("svg")).toString(),
       );
+    });
+
+    it("should not export frame-overlapping elements belonging to different frame", async () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+      });
+      const frame2 = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+        x: 200,
+        y: 0,
+      });
+
+      const frame1Child = API.createElement({
+        type: "rectangle",
+        width: 150,
+        height: 100,
+        x: 0,
+        y: 50,
+        frameId: frame1.id,
+      });
+      const frame2Child = API.createElement({
+        type: "rectangle",
+        width: 150,
+        height: 100,
+        x: 50,
+        y: 0,
+        frameId: frame2.id,
+      });
+
+      // low-level exportToSvg api expects elements to be pre-filtered, so let's
+      // use the filter we use in the editor
+      const { exportedElements, exportingFrame } = prepareElementsForExport(
+        [frame1Child, frame1, frame2Child, frame2],
+        {
+          selectedElementIds: { [frame1.id]: true },
+        },
+        true,
+      );
+
+      const svg = await exportToSvg({
+        elements: exportedElements,
+        files: null,
+        exportPadding: 0,
+        exportingFrame,
+      });
+
+      // frame shouldn't be exported
+      expect(svg.querySelector(`[data-id="${frame1.id}"]`)).toBeNull();
+      // frame1 child should be epxorted
+      expect(svg.querySelector(`[data-id="${frame1Child.id}"]`)).not.toBeNull();
+      // frame2 child should not be exported even if it physically overlaps with
+      // frame1
+      expect(svg.querySelector(`[data-id="${frame2Child.id}"]`)).toBeNull();
+
+      expect(svg.getAttribute("width")).toBe(frame1.width.toString());
+      expect(svg.getAttribute("height")).toBe(frame1.height.toString());
     });
   });
 });

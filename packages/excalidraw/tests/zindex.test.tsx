@@ -1,5 +1,6 @@
+import React from "react";
 import ReactDOM from "react-dom";
-import { render } from "./test-utils";
+import { act, render } from "./test-utils";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import {
@@ -9,10 +10,10 @@ import {
   actionSendToBack,
   actionDuplicateSelection,
 } from "../actions";
-import { AppState } from "../types";
+import type { AppState } from "../types";
 import { API } from "./helpers/api";
 import { selectGroupsForSelectedElements } from "../groups";
-import {
+import type {
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawSelectionElement,
@@ -46,6 +47,7 @@ const populateElements = (
     height?: number;
     containerId?: string;
     frameId?: ExcalidrawFrameElement["id"];
+    index?: ExcalidrawElement["index"];
   }[],
   appState?: Partial<AppState>,
 ) => {
@@ -85,31 +87,35 @@ const populateElements = (
   );
 
   // initialize `boundElements` on containers, if applicable
-  h.elements = newElements.map((element, index, elements) => {
-    const nextElement = elements[index + 1];
-    if (
-      nextElement &&
-      "containerId" in nextElement &&
-      element.id === nextElement.containerId
-    ) {
-      return {
-        ...element,
-        boundElements: [{ type: "text", id: nextElement.id }],
-      };
-    }
-    return element;
-  });
+  API.setElements(
+    newElements.map((element, index, elements) => {
+      const nextElement = elements[index + 1];
+      if (
+        nextElement &&
+        "containerId" in nextElement &&
+        element.id === nextElement.containerId
+      ) {
+        return {
+          ...element,
+          boundElements: [{ type: "text", id: nextElement.id }],
+        };
+      }
+      return element;
+    }),
+  );
 
-  h.setState({
-    ...selectGroupsForSelectedElements(
-      { ...h.state, ...appState, selectedElementIds },
-      h.elements,
-      h.state,
-      null,
-    ),
-    ...appState,
-    selectedElementIds,
-  } as AppState);
+  act(() => {
+    h.setState({
+      ...selectGroupsForSelectedElements(
+        { ...h.state, ...appState, selectedElementIds },
+        h.elements,
+        h.state,
+        null,
+      ),
+      ...appState,
+      selectedElementIds,
+    } as AppState);
+  });
 
   return selectedElementIds;
 };
@@ -139,7 +145,7 @@ const assertZindex = ({
 }) => {
   const selectedElementIds = populateElements(elements, appState);
   operations.forEach(([action, expected]) => {
-    h.app.actionManager.executeAction(action);
+    API.executeAction(action);
     expect(h.elements.map((element) => element.id)).toEqual(expected);
     expect(h.state.selectedElementIds).toEqual(selectedElementIds);
   });
@@ -237,6 +243,20 @@ describe("z-index manipulation", () => {
         [actionSendBackward, ["D", "E", "F", "A", "B", "C", "G"]],
         // noop
         [actionSendBackward, ["D", "E", "F", "A", "B", "C", "G"]],
+      ],
+    });
+
+    // elements should not duplicate
+    assertZindex({
+      elements: [
+        { id: "A", containerId: "C" },
+        { id: "B" },
+        { id: "C", isSelected: true },
+      ],
+      operations: [
+        [actionSendBackward, ["A", "C", "B"]],
+        // noop
+        [actionSendBackward, ["A", "C", "B"]],
       ],
     });
 
@@ -893,7 +913,7 @@ describe("z-index manipulation", () => {
       { id: "A", isSelected: true },
       { id: "B", isSelected: true },
     ]);
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements).toMatchObject([
       { id: "A" },
       { id: "A_copy" },
@@ -905,7 +925,7 @@ describe("z-index manipulation", () => {
       { id: "A", groupIds: ["g1"], isSelected: true },
       { id: "B", groupIds: ["g1"], isSelected: true },
     ]);
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements).toMatchObject([
       { id: "A" },
       { id: "B" },
@@ -926,7 +946,7 @@ describe("z-index manipulation", () => {
       { id: "B", groupIds: ["g1"], isSelected: true },
       { id: "C" },
     ]);
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements).toMatchObject([
       { id: "A" },
       { id: "B" },
@@ -948,7 +968,7 @@ describe("z-index manipulation", () => {
       { id: "B", groupIds: ["g1"], isSelected: true },
       { id: "C", isSelected: true },
     ]);
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
@@ -964,7 +984,7 @@ describe("z-index manipulation", () => {
       { id: "C", groupIds: ["g2"], isSelected: true },
       { id: "D", groupIds: ["g2"], isSelected: true },
     ]);
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
@@ -986,7 +1006,7 @@ describe("z-index manipulation", () => {
         selectedGroupIds: { g1: true },
       },
     );
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
@@ -1006,7 +1026,7 @@ describe("z-index manipulation", () => {
         selectedGroupIds: { g2: true },
       },
     );
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
@@ -1029,7 +1049,7 @@ describe("z-index manipulation", () => {
         selectedGroupIds: { g2: true, g4: true },
       },
     );
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
@@ -1053,7 +1073,7 @@ describe("z-index manipulation", () => {
       ],
       { editingGroupId: "g1" },
     );
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "A_copy",
@@ -1069,7 +1089,7 @@ describe("z-index manipulation", () => {
       ],
       { editingGroupId: "g1" },
     );
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
@@ -1085,7 +1105,7 @@ describe("z-index manipulation", () => {
       ],
       { editingGroupId: "g1" },
     );
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "A_copy",
@@ -1101,7 +1121,7 @@ describe("z-index manipulation", () => {
       { id: "B" },
       { id: "C", groupIds: ["g1"], isSelected: true },
     ]);
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "C",
@@ -1119,7 +1139,7 @@ describe("z-index manipulation", () => {
       { id: "D" },
     ]);
     expect(h.state.selectedGroupIds).toEqual({ g1: true });
-    h.app.actionManager.executeAction(actionDuplicateSelection);
+    API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",

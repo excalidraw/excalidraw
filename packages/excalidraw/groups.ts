@@ -1,10 +1,12 @@
-import {
+import type {
   GroupId,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
+  ElementsMapOrArray,
+  ElementsMap,
 } from "./element/types";
-import {
+import type {
   AppClassProperties,
   AppState,
   InteractiveCanvasAppState,
@@ -12,7 +14,7 @@ import {
 import { getSelectedElements } from "./scene";
 import { getBoundTextElement } from "./element/textElement";
 import { makeNextSelectedElementIds } from "./scene/selection";
-import { Mutable } from "./utility-types";
+import type { Mutable } from "./utility-types";
 
 export const selectGroup = (
   groupId: GroupId,
@@ -270,9 +272,17 @@ export const isElementInGroup = (element: ExcalidrawElement, groupId: string) =>
   element.groupIds.includes(groupId);
 
 export const getElementsInGroup = (
-  elements: readonly ExcalidrawElement[],
+  elements: ElementsMapOrArray,
   groupId: string,
-) => elements.filter((element) => isElementInGroup(element, groupId));
+) => {
+  const elementsInGroup: ExcalidrawElement[] = [];
+  for (const element of elements.values()) {
+    if (isElementInGroup(element, groupId)) {
+      elementsInGroup.push(element);
+    }
+  }
+  return elementsInGroup;
+};
 
 export const getSelectedGroupIdForElement = (
   element: ExcalidrawElement,
@@ -320,12 +330,12 @@ export const removeFromSelectedGroups = (
 
 export const getMaximumGroups = (
   elements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ): ExcalidrawElement[][] => {
   const groups: Map<String, ExcalidrawElement[]> = new Map<
     String,
     ExcalidrawElement[]
   >();
-
   elements.forEach((element: ExcalidrawElement) => {
     const groupId =
       element.groupIds.length === 0
@@ -335,7 +345,7 @@ export const getMaximumGroups = (
     const currentGroupMembers = groups.get(groupId) || [];
 
     // Include bound text if present when grouping
-    const boundTextElement = getBoundTextElement(element);
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       currentGroupMembers.push(boundTextElement);
     }
@@ -345,7 +355,27 @@ export const getMaximumGroups = (
   return Array.from(groups.values());
 };
 
-export const elementsAreInSameGroup = (elements: ExcalidrawElement[]) => {
+export const getNonDeletedGroupIds = (elements: ElementsMap) => {
+  const nonDeletedGroupIds = new Set<string>();
+
+  for (const [, element] of elements) {
+    // defensive check
+    if (element.isDeleted) {
+      continue;
+    }
+
+    // defensive fallback
+    for (const groupId of element.groupIds ?? []) {
+      nonDeletedGroupIds.add(groupId);
+    }
+  }
+
+  return nonDeletedGroupIds;
+};
+
+export const elementsAreInSameGroup = (
+  elements: readonly ExcalidrawElement[],
+) => {
   const allGroups = elements.flatMap((element) => element.groupIds);
   const groupCount = new Map<string, number>();
   let maxGroup = 0;
@@ -358,4 +388,8 @@ export const elementsAreInSameGroup = (elements: ExcalidrawElement[]) => {
   }
 
   return maxGroup === elements.length;
+};
+
+export const isInGroup = (element: NonDeletedExcalidrawElement) => {
+  return element.groupIds.length > 0;
 };

@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getColor } from "./ColorPicker";
 import { useAtom } from "jotai";
-import {
-  ColorPickerType,
-  activeColorPickerSectionAtom,
-} from "./colorPickerUtils";
+import type { ColorPickerType } from "./colorPickerUtils";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { eyeDropperIcon } from "../icons";
 import { jotaiScope } from "../../jotai";
 import { KEYS } from "../../keys";
