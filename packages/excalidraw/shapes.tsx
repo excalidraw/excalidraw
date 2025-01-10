@@ -7,6 +7,8 @@ import {
   pointsEqual,
   type GlobalPoint,
   type LocalPoint,
+  polygonFromPoints,
+  pointAdd,
 } from "../math";
 import {
   getClosedCurveShape,
@@ -141,10 +143,10 @@ export const findShapeByKey = (key: string) => {
  * get the pure geometric shape of an excalidraw element
  * which is then used for hit detection
  */
-export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
+export const getElementShapes = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-): GeometricShape<Point> => {
+): GeometricShape<Point>[] => {
   switch (element.type) {
     case "rectangle":
     case "diamond":
@@ -155,40 +157,96 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
     case "iframe":
     case "text":
     case "selection":
-      return getPolygonShape(element);
+      return [getPolygonShape(element)];
     case "arrow":
     case "line": {
-      const roughShape =
-        ShapeCache.get(element)?.[0] ??
-        ShapeCache.generateElementShape(element, null)[0];
+      const [curve, ...arrowheads] =
+        ShapeCache.get(element) ??
+        ShapeCache.generateElementShape(element, null);
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
+      const center = pointFrom<Point>(cx, cy);
+      const startingPoint = pointFrom<Point>(element.x, element.y);
 
-      return shouldTestInside(element)
-        ? getClosedCurveShape<Point>(
+      if (shouldTestInside(element)) {
+        return [
+          getClosedCurveShape<Point>(
             element,
-            roughShape,
-            pointFrom<Point>(element.x, element.y),
+            curve,
+            startingPoint,
             element.angle,
-            pointFrom(cx, cy),
-          )
-        : getCurveShape<Point>(
-            roughShape,
-            pointFrom<Point>(element.x, element.y),
-            element.angle,
-            pointFrom(cx, cy),
+            center,
+          ),
+        ];
+      }
+
+      // otherwise return the curve shape (and also the shape of its arrowheads)
+      const arrowheadShapes: GeometricShape<Point>[] = [];
+
+      for (const arrowhead of arrowheads) {
+        if (arrowhead.shape === "polygon") {
+          const ops = arrowhead.sets[0].ops;
+
+          const otherPoints = ops.slice(1);
+          const arrowheadShape: GeometricShape<Point> = {
+            type: "polygon",
+            data: polygonFromPoints(
+              otherPoints.map((otherPoint) =>
+                pointAdd(
+                  pointFrom<Point>(otherPoint.data[0], otherPoint.data[1]),
+                  pointFrom<Point>(element.x, element.y),
+                ),
+              ),
+            ),
+            isClosed: true,
+          };
+
+          arrowheadShapes.push(arrowheadShape);
+        }
+
+        if (arrowhead.shape === "circle") {
+          // TODO: close curve into polygon / ellipse
+          arrowheadShapes.push({
+            ...getCurveShape<Point>(
+              arrowhead,
+              element.angle,
+              center,
+              startingPoint,
+            ),
+            isClosed: true,
+          });
+        }
+
+        if (arrowhead.shape === "line") {
+          arrowheadShapes.push(
+            getCurveShape<Point>(
+              arrowhead,
+              element.angle,
+              center,
+              startingPoint,
+            ),
           );
+        }
+      }
+
+      return [
+        getCurveShape<Point>(
+          curve,
+          element.angle,
+          pointFrom(cx, cy),
+          startingPoint,
+        ),
+        ...arrowheadShapes,
+      ];
     }
 
     case "ellipse":
-      return getEllipseShape(element);
+      return [getEllipseShape(element)];
 
     case "freedraw": {
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
-      return getFreedrawShape(
-        element,
-        pointFrom(cx, cy),
-        shouldTestInside(element),
-      );
+      return [
+        getFreedrawShape(element, pointFrom(cx, cy), shouldTestInside(element)),
+      ];
     }
   }
 };
@@ -201,21 +259,23 @@ export const getBoundTextShape = <Point extends GlobalPoint | LocalPoint>(
 
   if (boundTextElement) {
     if (element.type === "arrow") {
-      return getElementShape(
-        {
-          ...boundTextElement,
-          // arrow's bound text accurate position is not stored in the element's property
-          // but rather calculated and returned from the following static method
-          ...LinearElementEditor.getBoundTextElementPosition(
-            element,
-            boundTextElement,
-            elementsMap,
-          ),
-        },
-        elementsMap,
+      return (
+        getElementShapes<Point>(
+          {
+            ...boundTextElement,
+            // arrow's bound text accurate position is not stored in the element's property
+            // but rather calculated and returned from the following static method
+            ...LinearElementEditor.getBoundTextElementPosition(
+              element,
+              boundTextElement,
+              elementsMap,
+            ),
+          },
+          elementsMap,
+        )[0] ?? null
       );
     }
-    return getElementShape(boundTextElement, elementsMap);
+    return getElementShapes<Point>(boundTextElement, elementsMap)[0] ?? null;
   }
 
   return null;

@@ -73,7 +73,7 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
   halfHeight: number;
 };
 
-export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
+export type GeometricShape<Point extends GlobalPoint | LocalPoint> = (
   | {
       type: "line";
       data: LineSegment<Point>;
@@ -97,7 +97,10 @@ export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
   | {
       type: "polycurve";
       data: Polycurve<Point>;
-    };
+    }
+) & {
+  isClosed?: boolean;
+};
 
 type RectangularElement =
   | ExcalidrawRectangleElement
@@ -203,9 +206,9 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 // linear
 export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   roughShape: Drawable,
-  startingPoint: Point = pointFrom(0, 0),
   angleInRadian: Radians,
   center: Point,
+  startingPoint: Point = pointFrom(0, 0),
 ): GeometricShape<Point> => {
   const transform = (p: Point): Point =>
     pointRotateRads(

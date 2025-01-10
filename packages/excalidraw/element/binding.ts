@@ -52,7 +52,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { arrayToMap, tupleToCoors } from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
+import { aabbForElement, getElementShapes, pointInsideBounds } from "../shapes";
 import {
   compareHeading,
   HEADING_DOWN,
@@ -1406,9 +1406,9 @@ export const bindingBorderTest = (
 ): boolean => {
   const threshold = maxBindingGap(element, element.width, element.height, zoom);
 
-  const shape = getElementShape(element, elementsMap);
+  const shapes = getElementShapes(element, elementsMap);
   return (
-    isPointOnShape(pointFrom(x, y), shape, threshold) ||
+    shapes.some((shape) => isPointOnShape(pointFrom(x, y), shape, threshold)) ||
     (fullShape === true &&
       pointInsideBounds(pointFrom(x, y), aabbForElement(element)))
   );

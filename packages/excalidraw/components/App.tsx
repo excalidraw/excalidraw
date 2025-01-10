@@ -233,7 +233,7 @@ import {
   findShapeByKey,
   getBoundTextShape,
   getCornerRadius,
-  getElementShape,
+  getElementShapes,
   isPathALoop,
 } from "../shapes";
 import { getSelectionBoxShape } from "../../utils/geometry/shape";
@@ -5009,7 +5009,7 @@ class App extends React.Component<AppProps, AppState> {
         x,
         y,
         element: elementWithHighestZIndex,
-        shape: getElementShape(
+        shapes: getElementShapes(
           elementWithHighestZIndex,
           this.scene.getNonDeletedElementsMap(),
         ),
@@ -5121,7 +5121,7 @@ class App extends React.Component<AppProps, AppState> {
       x,
       y,
       element,
-      shape: getElementShape(element, this.scene.getNonDeletedElementsMap()),
+      shapes: getElementShapes(element, this.scene.getNonDeletedElementsMap()),
       threshold: this.getElementHitThreshold(),
       frameNameBound: isFrameLikeElement(element)
         ? this.frameNameBoundsCache.get(element)
@@ -5153,7 +5153,7 @@ class App extends React.Component<AppProps, AppState> {
           x,
           y,
           element: elements[index],
-          shape: getElementShape(
+          shapes: getElementShapes(
             elements[index],
             this.scene.getNonDeletedElementsMap(),
           ),
@@ -5437,7 +5437,7 @@ class App extends React.Component<AppProps, AppState> {
             x: sceneX,
             y: sceneY,
             element: container,
-            shape: getElementShape(
+            shapes: getElementShapes(
               container,
               this.scene.getNonDeletedElementsMap(),
             ),
@@ -6211,7 +6211,7 @@ class App extends React.Component<AppProps, AppState> {
           x: scenePointerX,
           y: scenePointerY,
           element,
-          shape: getElementShape(
+          shapes: getElementShapes(
             element,
             this.scene.getNonDeletedElementsMap(),
           ),
@@ -9344,7 +9344,7 @@ class App extends React.Component<AppProps, AppState> {
               x: pointerDownState.origin.x,
               y: pointerDownState.origin.y,
               element: hitElement,
-              shape: getElementShape(
+              shapes: getElementShapes(
                 hitElement,
                 this.scene.getNonDeletedElementsMap(),
               ),

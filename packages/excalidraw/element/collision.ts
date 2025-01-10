@@ -45,7 +45,7 @@ export type HitTestArgs<Point extends GlobalPoint | LocalPoint> = {
   x: number;
   y: number;
   element: ExcalidrawElement;
-  shape: GeometricShape<Point>;
+  shapes: GeometricShape<Point>[];
   threshold?: number;
   frameNameBound?: FrameNameBounds | null;
 };
@@ -54,16 +54,18 @@ export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
   x,
   y,
   element,
-  shape,
+  shapes,
   threshold = 10,
   frameNameBound = null,
 }: HitTestArgs<Point>) => {
-  let hit = shouldTestInside(element)
-    ? // Since `inShape` tests STRICTLY againt the insides of a shape
-      // we would need `onShape` as well to include the "borders"
-      isPointInShape(pointFrom(x, y), shape) ||
-      isPointOnShape(pointFrom(x, y), shape, threshold)
-    : isPointOnShape(pointFrom(x, y), shape, threshold);
+  const testInside = shouldTestInside(element);
+
+  let hit = shapes.some((shape) =>
+    testInside || shape.isClosed
+      ? isPointInShape(pointFrom(x, y), shape) ||
+        isPointOnShape(pointFrom(x, y), shape, threshold)
+      : isPointOnShape(pointFrom(x, y), shape, threshold),
+  );
 
   // hit test against a frame's name
   if (!hit && frameNameBound) {
