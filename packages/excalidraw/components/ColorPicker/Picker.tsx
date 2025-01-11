@@ -115,7 +115,7 @@ export const Picker = ({
   const pickerRef = React.useRef<HTMLDivElement>(null);
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")}>
+    <div role="dialog" aria-modal="true" aria-label={t("labels.colorPicker")} style={{maxHeight:"9rem" , overflowY:"scroll"}}>
       <div
         ref={pickerRef}
         onKeyDown={(event) => {
