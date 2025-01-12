@@ -11,6 +11,7 @@
     :root[dir="rtl"] & {
       padding: 0.4rem;
     }
+    transform: translateX(90%) translateY(-100%);
   }
 
   .picker-container button,
