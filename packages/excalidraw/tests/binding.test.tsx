@@ -418,19 +418,12 @@ describe("element binding", () => {
     expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
     expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
-    // Drag arrow off of bound rectangle range
-    const handles = getTransformHandles(
-      arrow,
-      h.state.zoom,
-      arrayToMap(h.elements),
-      "mouse",
-    ).se!;
-
     Keyboard.keyDown(KEYS.CTRL_OR_CMD);
-    const elX = handles[0] + handles[2] / 2;
-    const elY = handles[1] + handles[3] / 2;
-    mouse.downAt(elX, elY);
-    mouse.moveTo(300, 400);
+    mouse.downAt(
+      arrow.x + arrow.points[arrow.points.length - 1][0],
+      arrow.y + arrow.points[arrow.points.length - 1][1],
+    );
+    mouse.moveTo(300, 300);
     mouse.up();
 
     expect(arrow.startBinding).not.toBe(null);
