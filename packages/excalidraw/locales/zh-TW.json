@@ -164,7 +164,8 @@
     "imageCropping": "圖片剪裁",
     "unCroppedDimension": "未剪裁尺寸",
     "copyElementLink": "複製此物件的連結",
-    "linkToElement": "連結至物件"
+    "linkToElement": "連結至物件",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "連結至物件",
