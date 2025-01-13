@@ -164,7 +164,8 @@
     "imageCropping": "Corte de imagem",
     "unCroppedDimension": "Dimensão sem corte",
     "copyElementLink": "Copiar hiperligação para o objeto",
-    "linkToElement": "Hiperligação para o objeto"
+    "linkToElement": "Hiperligação para o objeto",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Hiperligação para o objeto",
