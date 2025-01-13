@@ -164,7 +164,8 @@
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "Copia il link all'oggetto",
-    "linkToElement": "Link all'oggetto"
+    "linkToElement": "Link all'oggetto",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Link all'oggetto",
