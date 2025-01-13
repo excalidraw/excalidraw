@@ -164,7 +164,8 @@
     "imageCropping": "Decupare imagine",
     "unCroppedDimension": "Dimensiune nedecupată",
     "copyElementLink": "Copiere link către obiect",
-    "linkToElement": "Link către obiect"
+    "linkToElement": "Link către obiect",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Link către obiect",
