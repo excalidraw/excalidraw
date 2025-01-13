@@ -164,7 +164,8 @@
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "Kopiera länk till objektet",
-    "linkToElement": "Länk till objektet"
+    "linkToElement": "Länk till objektet",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Länk till objektet",
