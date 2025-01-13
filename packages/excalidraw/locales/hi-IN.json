@@ -164,7 +164,8 @@
     "imageCropping": "प्रतिमा काटना",
     "unCroppedDimension": "कटाई पूर्व आयाम",
     "copyElementLink": "वस्तु की कड़ी कॉपी करें",
-    "linkToElement": "वस्तु की कड़ी"
+    "linkToElement": "वस्तु की कड़ी",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
