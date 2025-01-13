@@ -164,7 +164,8 @@
     "imageCropping": "Bild zuschneiden",
     "unCroppedDimension": "Nicht zugeschnittene Dimension",
     "copyElementLink": "Link zum Objekt kopieren",
-    "linkToElement": "Link zum Objekt"
+    "linkToElement": "Link zum Objekt",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Link zum Objekt",
