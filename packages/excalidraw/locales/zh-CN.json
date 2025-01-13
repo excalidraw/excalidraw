@@ -164,7 +164,8 @@
     "imageCropping": "图片裁剪",
     "unCroppedDimension": "未裁剪的尺寸",
     "copyElementLink": "复制此对象的链接",
-    "linkToElement": "链接到对象"
+    "linkToElement": "链接到对象",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "链接到对象",
