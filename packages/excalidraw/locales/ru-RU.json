@@ -164,7 +164,8 @@
     "imageCropping": "Обрезка изображения",
     "unCroppedDimension": "",
     "copyElementLink": "Скопировать ссылку на объект",
-    "linkToElement": ""
+    "linkToElement": "",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "",
