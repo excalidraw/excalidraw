@@ -97,6 +97,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -113,6 +114,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -4743,6 +4753,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -4759,6 +4770,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -5955,6 +5975,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -5971,6 +5992,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -7891,6 +7921,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -7907,6 +7938,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -8870,6 +8910,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -8886,6 +8927,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
