@@ -227,6 +227,28 @@ const getOffsets = (
   };
 };
 
+const createNode = (
+  node: ExcalidrawFlowchartNodeElement,
+  x: number,
+  y: number
+) => {
+  return newElement({
+    type: node.type,
+    x: x,
+    y: y,
+    width: node.width,
+    height: node.height,
+    roundness: node.roundness,
+    roughness: node.roughness,
+    backgroundColor: node.backgroundColor,
+    strokeColor: node.strokeColor,
+    strokeWidth: node.strokeWidth,
+    strokeStyle: node.strokeStyle,
+    fillStyle: node.fillStyle,
+    opacity: node.opacity,
+  });
+};
+
 const addNewNode = (
   element: ExcalidrawFlowchartNodeElement,
   elementsMap: ElementsMap,
@@ -242,19 +264,7 @@ const addNewNode = (
     direction,
   );
 
-  const nextNode = newElement({
-    type: element.type,
-    x: element.x + offsets.x,
-    y: element.y + offsets.y,
-    // TODO: extract this to a util
-    width: element.width,
-    height: element.height,
-    roundness: element.roundness,
-    roughness: element.roughness,
-    backgroundColor: element.backgroundColor,
-    strokeColor: element.strokeColor,
-    strokeWidth: element.strokeWidth,
-  });
+  const nextNode = createNode(element, element.x + offsets.x, element.y + offsets.y);
 
   invariant(
     isFlowchartNodeElement(nextNode),
@@ -317,19 +327,7 @@ export const addNewNodes = (
       nextX = startX + offsetX;
     }
 
-    const nextNode = newElement({
-      type: startNode.type,
-      x: nextX,
-      y: nextY,
-      // TODO: extract this to a util
-      width: startNode.width,
-      height: startNode.height,
-      roundness: startNode.roundness,
-      roughness: startNode.roughness,
-      backgroundColor: startNode.backgroundColor,
-      strokeColor: startNode.strokeColor,
-      strokeWidth: startNode.strokeWidth,
-    });
+    const nextNode = createNode(startNode, nextX, nextY);
 
     invariant(
       isFlowchartNodeElement(nextNode),
