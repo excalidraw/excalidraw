@@ -164,7 +164,8 @@
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "کپی لینک به آیتم",
-    "linkToElement": "لینک به آیتم"
+    "linkToElement": "لینک به آیتم",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
