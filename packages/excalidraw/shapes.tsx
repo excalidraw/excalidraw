@@ -181,6 +181,12 @@ export const getElementShapes = <Point extends GlobalPoint | LocalPoint>(
 
       // otherwise return the curve shape (and also the shape of its arrowheads)
       const arrowheadShapes: GeometricShape<Point>[] = [];
+      const transform = (p: Point): Point =>
+        pointRotateRads(
+          pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
+          center,
+          element.angle,
+        );
 
       for (const arrowhead of arrowheads) {
         if (arrowhead.shape === "polygon") {
@@ -191,9 +197,8 @@ export const getElementShapes = <Point extends GlobalPoint | LocalPoint>(
             type: "polygon",
             data: polygonFromPoints(
               otherPoints.map((otherPoint) =>
-                pointAdd(
+                transform(
                   pointFrom<Point>(otherPoint.data[0], otherPoint.data[1]),
-                  pointFrom<Point>(element.x, element.y),
                 ),
               ),
             ),
