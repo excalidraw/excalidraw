@@ -1,6 +1,6 @@
-import { getNonDeletedElements } from "../element";
+import { getCommonBounds, getNonDeletedElements } from "../element";
 import type { ExcalidrawElement } from "../element/types";
-import { removeAllElementsFromFrame } from "../frame";
+import { addElementsToFrame, removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
 import { KEYS } from "../keys";
 import type { AppClassProperties, AppState, UIAppState } from "../types";
@@ -10,6 +10,8 @@ import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
 import { StoreAction } from "../store";
+import { getSelectedElements } from "../scene";
+import { newFrameElement } from "../element/newElement";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -143,4 +145,47 @@ export const actionSetFrameAsActiveTool = register({
     !event.shiftKey &&
     !event.altKey &&
     event.key.toLocaleLowerCase() === KEYS.F,
+});
+
+export const actionWrapSelectionInFrame = register({
+  name: "wrapSelectionInFrame",
+  label: "labels.wrapSelectionInFrame",
+  trackEvent: { category: "element" },
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    return (
+      selectedElements.length > 0 &&
+      !selectedElements.some((element) => isFrameLikeElement(element))
+    );
+  },
+  perform: (elements, appState, _, app) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    const [x1, y1, x2, y2] = getCommonBounds(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+    );
+    const PADDING = 16;
+    const frame = newFrameElement({
+      x: x1 - PADDING,
+      y: y1 - PADDING,
+      width: x2 - x1 + PADDING * 2,
+      height: y2 - y1 + PADDING * 2,
+    });
+
+    const nextElements = addElementsToFrame(
+      [...app.scene.getElementsIncludingDeleted(), frame],
+      selectedElements,
+      frame,
+    );
+
+    return {
+      elements: nextElements,
+      appState: {
+        selectedElementIds: { [frame.id]: true },
+      },
+      storeAction: StoreAction.CAPTURE,
+    };
+  },
 });
