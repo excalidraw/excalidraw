@@ -174,17 +174,17 @@ export const actionWrapSelectionInFrame = register({
       height: y2 - y1 + PADDING * 2,
     });
 
-    app.scene.insertElement(frame);
-
     const nextElements = addElementsToFrame(
-      app.scene.getElementsMapIncludingDeleted(),
+      [...app.scene.getElementsIncludingDeleted(), frame],
       selectedElements,
       frame,
     );
 
     return {
-      nextElements,
-      appState,
+      elements: nextElements,
+      appState: {
+        selectedElementIds: { [frame.id]: true },
+      },
       storeAction: StoreAction.CAPTURE,
     };
   },
