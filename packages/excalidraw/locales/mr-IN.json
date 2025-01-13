@@ -164,7 +164,8 @@
     "imageCropping": "प्रतिमा कापणे",
     "unCroppedDimension": "कापण्या पूर्विचे परिमाण",
     "copyElementLink": "वस्तू ह्याचा दुवा कॉपी करावे",
-    "linkToElement": "वस्तू ह्याचा दुवा"
+    "linkToElement": "वस्तू ह्याचा दुवा",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
