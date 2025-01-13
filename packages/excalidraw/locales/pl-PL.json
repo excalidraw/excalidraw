@@ -164,7 +164,8 @@
     "imageCropping": "Przycinanie obrazu",
     "unCroppedDimension": "Nieprzycięty wymiar",
     "copyElementLink": "",
-    "linkToElement": ""
+    "linkToElement": "",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "",
