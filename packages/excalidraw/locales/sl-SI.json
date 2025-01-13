@@ -164,7 +164,8 @@
     "imageCropping": "Obrezovanje slike",
     "unCroppedDimension": "Neobrezana dimenzija",
     "copyElementLink": "Kopiraj povezavo do objekta",
-    "linkToElement": "Povezava do objekta"
+    "linkToElement": "Povezava do objekta",
+    "wrapSelectionInFrame": "Zavij izbor v okvir"
   },
   "elementLink": {
     "title": "Povezava do objekta",
