@@ -1,3 +1,4 @@
+import { pointsOnBezierCurves } from "points-on-curve";
 import {
   isPoint,
   pointFrom,
@@ -8,7 +9,6 @@ import {
   type GlobalPoint,
   type LocalPoint,
   polygonFromPoints,
-  pointAdd,
 } from "../math";
 import {
   getClosedCurveShape,
@@ -16,6 +16,7 @@ import {
   getCurveShape,
   getEllipseShape,
   getFreedrawShape,
+  getPointsOnRoughCurve,
   getPolygonShape,
   type GeometricShape,
 } from "../utils/geometry/shape";
@@ -209,14 +210,15 @@ export const getElementShapes = <Point extends GlobalPoint | LocalPoint>(
         }
 
         if (arrowhead.shape === "circle") {
-          // TODO: close curve into polygon / ellipse
+          const polygonPoints = pointsOnBezierCurves(
+            getPointsOnRoughCurve(arrowhead),
+            15,
+            2,
+          ).map((p) => transform(p as Point)) as Point[];
+
           arrowheadShapes.push({
-            ...getCurveShape<Point>(
-              arrowhead,
-              element.angle,
-              center,
-              startingPoint,
-            ),
+            type: "polygon",
+            data: polygonFromPoints(polygonPoints),
             isClosed: true,
           });
         }
