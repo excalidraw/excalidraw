@@ -11,7 +11,7 @@
     "copyAsPng": "Скопировать в буфер обмена как PNG",
     "copyAsSvg": "Скопировать в буфер обмена как SVG",
     "copyText": "Скопировать в буфер обмена как текст",
-    "copySource": "",
+    "copySource": "Скопировать источник в буфер обмена",
     "convertToCode": "Преобразовать в код",
     "bringForward": "Переместить вперед",
     "sendToBack": "На задний план",
@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Треугольник (контур)",
     "arrowhead_diamond": "Ромб",
     "arrowhead_diamond_outline": "Ромб (контур)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Crow's foot (много)",
+    "arrowhead_crowfoot_one": "Crow's foot (один)",
+    "arrowhead_crowfoot_one_or_many": "Crow's foot (один или много)",
+    "more_options": "Больше опций",
     "arrowtypes": "Тип стрелки",
     "arrowtype_sharp": "Острая стрелка",
     "arrowtype_round": "Изогнутая стрелка",
@@ -95,7 +95,7 @@
     "group": "Сгруппировать выделение",
     "ungroup": "Разделить выделение",
     "collaborators": "Участники",
-    "toggleGrid": "",
+    "toggleGrid": "Переключить сетку",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
     "libraryLoadingMessage": "Загрузка библиотеки…",
@@ -132,8 +132,8 @@
       "editEmbed": "Редактировать встраиваемую ссылку",
       "create": "Добавить ссылку",
       "label": "Ссылка",
-      "labelEmbed": "",
-      "empty": "",
+      "labelEmbed": "Ссылка и встраивание",
+      "empty": "Ссылка не установлена",
       "hint": "Введите или вставьте ссылку здесь",
       "goToElement": "Перейти к элементу"
     },
@@ -150,27 +150,27 @@
     "statusPublished": "Опубликовано",
     "sidebarLock": "Держать боковую панель открытой",
     "selectAllElementsInFrame": "Выбрать все элементы фрейма",
-    "removeAllElementsFromFrame": "",
+    "removeAllElementsFromFrame": "Убрать все элементы из фрейма",
     "eyeDropper": "Взять образец цвета с холста",
-    "textToDiagram": "",
-    "prompt": "",
+    "textToDiagram": "Текст в диаграмму",
+    "prompt": "Промпт",
     "followUs": "Подписаться",
     "discordChat": "Чат в Discord",
-    "zoomToFitViewport": "",
+    "zoomToFitViewport": "Приблизьте в viewport",
     "zoomToFitSelection": "Увеличить до выделенного",
-    "zoomToFit": "",
+    "zoomToFit": "Приблизьте все элементы",
     "installPWA": "Установить Excalidraw локально (PWA)",
-    "autoResize": "",
+    "autoResize": "Включить автоизменение размера текста",
     "imageCropping": "Обрезка изображения",
-    "unCroppedDimension": "",
+    "unCroppedDimension": "Необрезанный размер",
     "copyElementLink": "Скопировать ссылку на объект",
-    "linkToElement": "",
-    "wrapSelectionInFrame": ""
+    "linkToElement": "Ссылка на объект",
+    "wrapSelectionInFrame": "Поместить выделенное в фрейм"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Ссылка на объект",
+    "desc": "Нажмите на фигуру на холсте или вставьте ссылку.",
+    "notFound": "Связанный объект не найден на холсте."
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -211,7 +211,7 @@
     "fullScreen": "Полный экран",
     "darkMode": "Темная тема",
     "lightMode": "Светлая тема",
-    "systemMode": "",
+    "systemMode": "Системный режим",
     "zenMode": "Режим Дзен",
     "objectsSnapMode": "Привязка к объектам",
     "exitZenMode": "Выключить режим концентрации внимания",
@@ -266,13 +266,13 @@
       "line4": "Если отключение этой настройки не исправит отображение текстовых объектов, создайте <issueLink>issue</issueLink> на нашем GitHub или напишите нам в <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
-      "iframe": "",
-      "image": ""
+      "embeddable": "Встраиваемые элементы не могут быть добавлены в библиотеку.",
+      "iframe": "Элементы IFrame не могут быть добавлены в библиотеку.",
+      "image": "Поддержка добавления изображений в библиотеку скоро будет доступна!"
     },
-    "asyncPasteFailedOnRead": "",
-    "asyncPasteFailedOnParse": "",
-    "copyToSystemClipboardFailed": ""
+    "asyncPasteFailedOnRead": "Не удалось вставить (невозможно прочитать из системного буфера обмена).",
+    "asyncPasteFailedOnParse": "Не удалось вставить.",
+    "copyToSystemClipboardFailed": "Не удалось скопировать в буфер обмена."
   },
   "toolBar": {
     "selection": "Выделение области",
@@ -287,27 +287,27 @@
     "library": "Библиотека",
     "lock": "Сохранять выбранный инструмент активным после рисования",
     "penMode": "Режим пера - предотвращение касания",
-    "link": "",
+    "link": "Добавить / Обновить ссылку для выбранной фигуры",
     "eraser": "Ластик",
-    "frame": "",
-    "magicframe": "",
+    "frame": "Фреймовый инструмент",
+    "magicframe": "Каркас для кода",
     "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
-    "extraTools": "",
-    "mermaidToExcalidraw": ""
+    "extraTools": "Дополнительные инструменты",
+    "mermaidToExcalidraw": "Mermaid в Excalidraw"
   },
   "element": {
     "rectangle": "Прямоугольник",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
+    "diamond": "Алмаз",
+    "ellipse": "Эллипс",
+    "arrow": "Стрелка",
+    "line": "Линия",
+    "freedraw": "Свободное рисование",
     "text": "Текст",
     "image": "Изображение",
     "group": "Группа",
-    "frame": "",
+    "frame": "Фрейм",
     "magicframe": "Каркас для кода",
     "embeddable": "Встроенная страница",
     "selection": "Выделение",
@@ -322,7 +322,7 @@
     "dismissSearch": "Отменить поиск",
     "canvasPanning": "Чтобы двигать холст, удерживайте колесо мыши или пробел во время перетаскивания, или используйте инструмент \"Рука\"",
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
-    "arrowTool": "",
+    "arrowTool": "Нажмите, чтобы запустить несколько точек, перетащите для одной линии. Нажмите {{arrowShortcut}} еще раз, чтобы изменить тип стрелки.",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
     "embeddable": "Перетащите для встраивания веб-сайта",
@@ -344,8 +344,8 @@
     "eraserRevert": "Удерживайте Alt, чтобы вернуть элементы, отмеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага \"dom.events.asyncClipboard.clipboardItem\" на \"true\". Чтобы изменить флаги браузера в Firefox, посетите страницу \"about:config\".",
     "disableSnapping": "Удерживайте CtrlOrCmd, чтобы отключить привязку",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Дважды нажмите на изображение или нажмите ENTER, чтобы обрезать изображение",
+    "leaveCropEditor": "Нажмите на изображение снаружи или нажмите ENTER или ESCAPE для завершения обрезки"
   },
   "canvasError": {
     "cannotShowPreview": "Не удается отобразить предпросмотр",
@@ -417,8 +417,8 @@
     "toggleElementLock": "Заблокировать/разблокировать выделение",
     "movePageUpDown": "Сдвинуть страницу вверх/вниз",
     "movePageLeftRight": "Сдвинуть страницу вправо/влево",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Обрезать изображение",
+    "cropFinish": "Закончить обрезку изображения"
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
@@ -516,8 +516,8 @@
     "selection": "выделение",
     "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор",
     "unableToEmbed": "Встраивание этого url в данный момент не разрешено. Сделать запрос на GitHub для добавления url в белый список",
-    "unrecognizedLinkFormat": "",
-    "elementLinkCopied": ""
+    "unrecognizedLinkFormat": "Ссылка, которую вы ввели не соответствует ожидаемому формату. Пожалуйста, попробуйте вставить строку 'встраивание', предоставленную исходным сайтом",
+    "elementLinkCopied": "Ссылка скопирована в буфер обмена"
   },
   "colors": {
     "transparent": "Прозрачный",
@@ -561,12 +561,12 @@
       "exportToImage": {
         "title": "Экспортировать как изображение",
         "button": "Экспортировать как изображение",
-        "description": ""
+        "description": "Экспортируйте данные сцены как изображение, из которого вы сможете импортировать позже."
       },
       "saveToDisk": {
         "title": "Сохранить на диск",
         "button": "Сохранить на диск",
-        "description": ""
+        "description": "Экспортировать данные сцены в файл, из которого можно импортировать позже."
       },
       "excalidrawPlus": {
         "title": "Excalidraw+",
@@ -578,19 +578,19 @@
       "loadFromFile": {
         "title": "Загрузить из файла",
         "button": "Загрузить из файла",
-        "description": ""
+        "description": "Загрузка из файла <bold> заменит существующий контент</bold>.<br></br>Вы можете сначала создать резервную копию своего рисунка, используя один из приведенных ниже вариантов."
       },
       "shareableLink": {
         "title": "Загрузить по ссылке",
         "button": "Заменить содержимое",
-        "description": ""
+        "description": "Загрузка внешнего рисунка <bold> заменит существующее содержимое</bold>.<br></br>Вы можете сначала создать резервную копию своего рисунка, воспользовавшись одним из приведенных ниже вариантов."
       }
     }
   },
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "",
+    "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>,<sequenceLink> диаграммы последовательности, </sequenceLink> и <classLink>диаграммы классов </classLink>. Другие типы будут отображаться в виде изображения в Excalidraw.",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр"
   },
@@ -610,7 +610,7 @@
     "hint": {
       "text": "Нажмите на пользователя, чтобы подписаться",
       "followStatus": "Вы подписаны на этого пользователя",
-      "inCall": "",
+      "inCall": "Пользователь находится в голосовом звонке",
       "micMuted": "Микрофон пользователя заглушен",
       "isSpeaking": "Пользователь говорит"
     }
