@@ -237,6 +237,7 @@ const MultiPosition = ({
           const [x1, y1] = getCommonBounds(elementsInUnit);
           return Math.round((property === "x" ? x1 : y1) * 100) / 100;
         }
+
         const [el] = elementsInUnit;
         const [cx, cy] = [el.x + el.width / 2, el.y + el.height / 2];
 

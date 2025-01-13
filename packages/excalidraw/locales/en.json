@@ -164,7 +164,8 @@
     "imageCropping": "Image cropping",
     "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
-    "linkToElement": "Link to object"
+    "linkToElement": "Link to object",
+    "wrapSelectionInFrame": "Wrap selection in frame"
   },
   "elementLink": {
     "title": "Link to object",
