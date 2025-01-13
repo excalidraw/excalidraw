@@ -164,7 +164,8 @@
     "imageCropping": "",
     "unCroppedDimension": "",
     "copyElementLink": "Kopírovat odkaz na objekt",
-    "linkToElement": "Odkaz na objekt"
+    "linkToElement": "Odkaz na objekt",
+    "wrapSelectionInFrame": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
