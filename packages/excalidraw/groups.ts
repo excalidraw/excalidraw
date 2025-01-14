@@ -105,6 +105,10 @@ export const selectGroupsForSelectedElements = (function () {
     const groupElementsIndex: Record<GroupId, string[]> = {};
     const selectedElementIdsInGroups = elements.reduce(
       (acc: Record<string, true>, element) => {
+        if (element.isDeleted) {
+          return acc;
+        }
+
         const groupId = element.groupIds.find((id) => selectedGroupIds[id]);
 
         if (groupId) {
