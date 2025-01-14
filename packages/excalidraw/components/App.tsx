@@ -6387,7 +6387,7 @@ class App extends React.Component<AppProps, AppState> {
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
     // panning
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+    if (this.handleCanvasPanUsingWheelOrSpaceDragOrRightClickHold(event)) {
       return;
     }
 
@@ -6710,14 +6710,16 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // Returns whether the event is a panning
-  public handleCanvasPanUsingWheelOrSpaceDrag = (
+  public handleCanvasPanUsingWheelOrSpaceDragOrRightClickHold = (
     event: React.PointerEvent<HTMLElement> | MouseEvent,
   ): boolean => {
+    const isRightClickDragging = event.button === POINTER_BUTTON.SECONDARY;
     if (
       !(
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
+          isRightClickDragging ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       )
@@ -6745,9 +6747,16 @@ class App extends React.Component<AppProps, AppState> {
         ? false
         : /Linux/.test(window.navigator.platform);
 
-    setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+    if (!isRightClickDragging) {
+      setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+    }
     let { clientX: lastX, clientY: lastY } = event;
+    let hasDragged = false;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      if (isRightClickDragging && !hasDragged) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+      }
+      hasDragged = true;
       const deltaX = lastX - event.clientX;
       const deltaY = lastY - event.clientY;
       lastX = event.clientX;
@@ -6808,6 +6817,11 @@ class App extends React.Component<AppProps, AppState> {
         });
         this.savePointer(event.clientX, event.clientY, "up");
         window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        if (!hasDragged && isRightClickDragging) {
+          this.handleCanvasContextMenu(
+            event as React.MouseEvent<HTMLElement | HTMLCanvasElement>,
+          );
+        }
         window.removeEventListener(EVENT.POINTER_UP, teardown);
         window.removeEventListener(EVENT.BLUR, teardown);
         onPointerMove.flush();
@@ -9836,7 +9850,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /** updates image cache, refreshing updated elements and/or setting status
-      to error for images that fail during <img> element creation */
+   to error for images that fail during <img> element creation */
   private updateImageCache = async (
     elements: readonly InitializedExcalidrawImageElement[],
     files = this.files,
@@ -10209,6 +10223,10 @@ class App extends React.Component<AppProps, AppState> {
           event.button !== POINTER_BUTTON.SECONDARY)) &&
       this.state.activeTool.type !== "selection"
     ) {
+      return;
+    }
+
+    if (isPanning) {
       return;
     }
 
