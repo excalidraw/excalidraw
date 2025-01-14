@@ -329,9 +329,6 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
-    fixedSegments: FixedSegment[] | null;
-    startIsSpecial?: boolean | null;
-    endIsSpecial?: boolean | null;
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<
