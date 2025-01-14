@@ -4321,14 +4321,20 @@ History {
       "appStateChange": AppStateChange {
         "delta": Delta {
           "deleted": {
+            "editingGroupId": null,
             "selectedElementIds": {
               "id1": true,
             },
+            "selectedGroupIds": {
+              "id4": false,
+            },
           },
           "inserted": {
+            "editingGroupId": "id4",
             "selectedElementIds": {
               "id0": true,
             },
+            "selectedGroupIds": {},
           },
         },
       },
@@ -4351,13 +4357,15 @@ History {
       "appStateChange": AppStateChange {
         "delta": Delta {
           "deleted": {
-            "editingGroupId": null,
             "selectedElementIds": {},
+            "selectedGroupIds": {},
           },
           "inserted": {
-            "editingGroupId": "id4",
             "selectedElementIds": {
               "id1": true,
+            },
+            "selectedGroupIds": {
+              "id4": false,
             },
           },
         },
