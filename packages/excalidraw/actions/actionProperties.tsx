@@ -54,6 +54,9 @@ import {
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
+  ArrowheadCrowfootIcon,
+  ArrowheadCrowfootOneIcon,
+  ArrowheadCrowfootOneOrManyIcon,
 } from "../components/icons";
 import {
   ARROW_TYPE,
@@ -1628,58 +1631,64 @@ const getArrowheadOptions = (flip: boolean) => {
       icon: <ArrowheadArrowIcon flip={flip} />,
     },
     {
-      value: "bar",
-      text: t("labels.arrowhead_bar"),
-      keyBinding: "e",
-      icon: <ArrowheadBarIcon flip={flip} />,
-    },
-    {
-      value: "dot",
-      text: t("labels.arrowhead_dot"),
-      keyBinding: "a", //zsviczian was null
-      icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: true, //zsviczian
-    },
-    {
-      value: "circle",
-      text: t("labels.arrowhead_circle"),
-      keyBinding: "s", //zsivczian was "r"
-      icon: <ArrowheadCircleIcon flip={flip} />,
-      showInPicker: true, //zsviczian
-    },
-    {
-      value: "circle_outline",
-      text: t("labels.arrowhead_circle_outline"),
-      keyBinding: "d", //zsviczian was null
-      icon: <ArrowheadCircleOutlineIcon flip={flip} />,
-      showInPicker: true, //zsviczian
-    },
-    {
       value: "triangle",
       text: t("labels.arrowhead_triangle"),
       icon: <ArrowheadTriangleIcon flip={flip} />,
-      keyBinding: "z", //zsviczian was t
+      keyBinding: "e",
     },
     {
       value: "triangle_outline",
       text: t("labels.arrowhead_triangle_outline"),
       icon: <ArrowheadTriangleOutlineIcon flip={flip} />,
-      keyBinding: "x", //zsviczian was null
-      showInPicker: true, //zsviczian
+      keyBinding: "r",
+    },
+    {
+      value: "circle",
+      text: t("labels.arrowhead_circle"),
+      keyBinding: "a",
+      icon: <ArrowheadCircleIcon flip={flip} />,
+    },
+    {
+      value: "circle_outline",
+      text: t("labels.arrowhead_circle_outline"),
+      keyBinding: "s",
+      icon: <ArrowheadCircleOutlineIcon flip={flip} />,
     },
     {
       value: "diamond",
       text: t("labels.arrowhead_diamond"),
       icon: <ArrowheadDiamondIcon flip={flip} />,
-      keyBinding: "c", //zsviczian was null
-      showInPicker: true, //zsviczian
+      keyBinding: "d",
     },
     {
       value: "diamond_outline",
       text: t("labels.arrowhead_diamond_outline"),
       icon: <ArrowheadDiamondOutlineIcon flip={flip} />,
-      keyBinding: "v", //zsviczian was null
-      showInPicker: true, //zsviczian
+      keyBinding: "f",
+    },
+    {
+      value: "bar",
+      text: t("labels.arrowhead_bar"),
+      keyBinding: "z",
+      icon: <ArrowheadBarIcon flip={flip} />,
+    },
+    {
+      value: "crowfoot_one",
+      text: t("labels.arrowhead_crowfoot_one"),
+      icon: <ArrowheadCrowfootOneIcon flip={flip} />,
+      keyBinding: "c",
+    },
+    {
+      value: "crowfoot_many",
+      text: t("labels.arrowhead_crowfoot_many"),
+      icon: <ArrowheadCrowfootIcon flip={flip} />,
+      keyBinding: "x",
+    },
+    {
+      value: "crowfoot_one_or_many",
+      text: t("labels.arrowhead_crowfoot_one_or_many"),
+      icon: <ArrowheadCrowfootOneOrManyIcon flip={flip} />,
+      keyBinding: "v",
     },
   ] as const;
 };
@@ -1743,6 +1752,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
+            numberOfOptionsToAlwaysShow={4}
           />
           <IconPicker
             label="arrowhead_end"
@@ -1759,6 +1769,7 @@ export const actionChangeArrowhead = register({
               appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
+            numberOfOptionsToAlwaysShow={4}
           />
         </div>
       </fieldset>

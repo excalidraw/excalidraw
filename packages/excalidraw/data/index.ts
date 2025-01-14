@@ -5,6 +5,7 @@ import {
 import {
   DEFAULT_EXPORT_PADDING,
   DEFAULT_FILENAME,
+  IMAGE_MIME_TYPES,
   isFirefox,
   MIME_TYPES,
 } from "../constants";
@@ -15,8 +16,9 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
+import { getElementsOverlappingFrame } from "../frame";
 import { t } from "../i18n";
-import { isSomeElementSelected, getSelectedElements } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
@@ -25,7 +27,6 @@ import { canvasToBlob } from "./blob";
 import type { FileSystemHandle } from "./filesystem";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
-import { getElementsOverlappingFrame } from "../frame";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
@@ -130,6 +131,7 @@ export const exportCanvas = async (
           description: "Export to SVG",
           name,
           extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
+          mimeTypes: [IMAGE_MIME_TYPES.svg],
           fileHandle,
         },
       );
@@ -168,9 +170,8 @@ export const exportCanvas = async (
     return fileSave(blob, {
       description: "Export to PNG",
       name,
-      // FIXME reintroduce `excalidraw.png` when most people upgrade away
-      // from 111.0.5563.64 (arm64), see #6349
-      extension: /* appState.exportEmbedScene ? "excalidraw.png" : */ "png",
+      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
+      mimeTypes: [IMAGE_MIME_TYPES.png],
       fileHandle,
     });
   } else if (type === "clipboard") {

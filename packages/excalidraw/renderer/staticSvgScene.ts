@@ -468,7 +468,7 @@ const renderElementToSvg = (
 
           symbol.appendChild(image);
 
-          root.prepend(symbol);
+          (root.querySelector("defs") || root).prepend(symbol);
         }
 
         const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");

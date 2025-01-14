@@ -380,6 +380,7 @@ import { actionPaste } from "../actions/actionClipboard";
 import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
+  actionWrapSelectionInFrame,
 } from "../actions/actionFrame";
 import {
   actionToggleHandTool,
@@ -5158,7 +5159,10 @@ class App extends React.Component<AppProps, AppState> {
     if (nextActiveTool.type === "hand") {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
     } else if (!isHoldingSpace) {
-      setCursorForShape(this.interactiveCanvas, this.state);
+      setCursorForShape(this.interactiveCanvas, {
+        ...this.state,
+        activeTool: nextActiveTool,
+      });
     }
     if (isToolIcon(document.activeElement)) {
       this.focusContainer();
@@ -11322,8 +11326,10 @@ class App extends React.Component<AppProps, AppState> {
       actionCut,
       actionCopy,
       actionPaste,
+      CONTEXT_MENU_SEPARATOR,
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
+      actionWrapSelectionInFrame,
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,

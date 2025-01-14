@@ -97,6 +97,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -113,6 +114,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -1006,14 +1016,14 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "roundness": {
     "type": 3,
   },
-  "seed": 1278240551,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 1278240551,
   "width": 100,
   "x": 0,
   "y": 0,
@@ -1042,14 +1052,14 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 401146281,
+  "versionNonce": 449462985,
   "width": 100,
   "x": 0,
   "y": 0,
@@ -4731,6 +4741,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -4747,6 +4758,15 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -5942,6 +5962,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -5958,6 +5979,15 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -7876,6 +7906,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -7892,6 +7923,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -8854,6 +8894,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -8870,6 +8911,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "predicate": [Function],
         "trackEvent": {
           "category": "history",
+        },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
         },
       },
       "separator",
@@ -9792,14 +9842,14 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "roundness": {
     "type": 3,
   },
-  "seed": 1278240551,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 1278240551,
   "width": 200,
   "x": 0,
   "y": 0,
@@ -9826,14 +9876,14 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "roundness": {
     "type": 3,
   },
-  "seed": 449462985,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 401146281,
+  "versionNonce": 449462985,
   "width": 200,
   "x": 0,
   "y": 0,
