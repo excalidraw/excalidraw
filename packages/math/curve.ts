@@ -1,5 +1,5 @@
-import { pointFrom, pointRotateRads } from "./point";
-import type { Curve, GenericPoint, Radians } from "./types";
+import { isPoint, pointFrom, pointRotateRads } from "./point";
+import type { CubicBezier, Curve, GenericPoint, Radians } from "./types";
 
 /**
  *
@@ -220,4 +220,21 @@ const findClosestParameter = <Point extends GenericPoint>(
   }
 
   return closestT;
+};
+
+export const isBezier = <Point extends GenericPoint>(
+  c: unknown,
+): c is CubicBezier<Point> => {
+  return (
+    c != null &&
+    typeof c === "object" &&
+    Object.hasOwn(c, "start") &&
+    Object.hasOwn(c, "end") &&
+    Object.hasOwn(c, "control1") &&
+    Object.hasOwn(c, "control2") &&
+    isPoint((c as CubicBezier<Point>).start) &&
+    isPoint((c as CubicBezier<Point>).end) &&
+    isPoint((c as CubicBezier<Point>).control1) &&
+    isPoint((c as CubicBezier<Point>).control2)
+  );
 };

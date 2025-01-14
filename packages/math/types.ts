@@ -132,13 +132,26 @@ export type Extent = {
   _brand: "excalimath_extent";
 };
 
-// an ellipse is specified by its center, angle, and its major and minor axes
-// but for the sake of simplicity, we've used halfWidth and halfHeight instead
-// in replace of semi major and semi minor axes
+/**
+  An ellipse is specified by its center, angle, and its major and minor axes
+  but for the sake of simplicity, we've used halfWidth and halfHeight instead
+  in replace of semi major and semi minor axes
+ */
 export type Ellipse<Point extends GenericPoint> = {
   center: Point;
   halfWidth: number;
   halfHeight: number;
 } & {
   _brand: "excalimath_ellipse";
+};
+
+/**
+ * Represents a cubic bezier with 2 control points on the point space of your
+ * choosing.
+ */
+export type CubicBezier<P extends GenericPoint> = {
+  start: P;
+  end: P;
+  control1: P;
+  control2: P;
 };

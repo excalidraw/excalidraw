@@ -12,9 +12,10 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import type { Arc } from "../../packages/math";
+import type { Arc, CubicBezier } from "../../packages/math";
 import {
   isArc,
+  isBezier,
   isSegment,
   type GlobalPoint,
   type Segment,
@@ -31,6 +32,28 @@ const renderLine = (
   context.beginPath();
   context.moveTo(segment[0][0] * zoom, segment[0][1] * zoom);
   context.lineTo(segment[1][0] * zoom, segment[1][1] * zoom);
+  context.stroke();
+  context.restore();
+};
+
+const renderCubicBezier = (
+  context: CanvasRenderingContext2D,
+  zoom: number,
+  { start, control1, control2, end }: CubicBezier<GlobalPoint>,
+  color: string,
+) => {
+  context.save();
+  context.strokeStyle = color;
+  context.beginPath();
+  context.moveTo(start[0] * zoom, start[1] * zoom);
+  context.bezierCurveTo(
+    control1[0] * zoom,
+    control1[1] * zoom,
+    control2[0] * zoom,
+    control2[1] * zoom,
+    end[0] * zoom,
+    end[1] * zoom,
+  );
   context.stroke();
   context.restore();
 };
@@ -90,6 +113,16 @@ const render = (
           el.color,
         );
         break;
+      case isBezier(el.data):
+        renderCubicBezier(
+          context,
+          appState.zoom.value,
+          el.data as CubicBezier<GlobalPoint>,
+          el.color,
+        );
+        break;
+      default:
+        throw new Error("Unknown element type");
     }
   });
 };
