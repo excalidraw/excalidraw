@@ -8,7 +8,7 @@ import clsx from "clsx";
 import Collapsible from "./Stats/Collapsible";
 import { atom, useAtom } from "jotai";
 import { jotaiScope } from "../jotai";
-import { useDevice } from "..";
+import { useDevice } from "./App";
 
 const moreOptionsAtom = atom(false);
 
