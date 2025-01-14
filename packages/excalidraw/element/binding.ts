@@ -578,7 +578,7 @@ export const getHoveredElementForBinding = (
         zoom,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
-        fullShape && !isFrameLikeElement(element), //zsviczian
+        fullShape && !isFrameLikeElement(element),
       ),
   );
 
