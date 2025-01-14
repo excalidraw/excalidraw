@@ -197,7 +197,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 125,
+  "height": 99,
   "id": "id166",
   "index": "a2",
   "isDeleted": false,
@@ -211,8 +211,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      125,
-      125,
+      "98.20800",
+      99,
     ],
   ],
   "roughness": 1,
@@ -226,9 +226,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 47,
-  "width": 125,
-  "x": 0,
+  "version": 40,
+  "width": "98.20800",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -298,7 +298,7 @@ History {
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": "0.98000",
+              "height": "0.98017",
               "points": [
                 [
                   0,
@@ -306,7 +306,7 @@ History {
                 ],
                 [
                   98,
-                  "-0.98000",
+                  "-0.98017",
                 ],
               ],
               "startBinding": {
@@ -320,10 +320,10 @@ History {
               "endBinding": {
                 "elementId": "id165",
                 "fixedPoint": null,
-                "focus": "-0.02040",
+                "focus": "-0.02000",
                 "gap": 1,
               },
-              "height": "0.02000",
+              "height": "0.00169",
               "points": [
                 [
                   0,
@@ -331,13 +331,13 @@ History {
                 ],
                 [
                   98,
-                  "0.02000",
+                  "0.00169",
                 ],
               ],
               "startBinding": {
                 "elementId": "id164",
                 "fixedPoint": null,
-                "focus": "0.01959",
+                "focus": "0.02000",
                 "gap": 1,
               },
             },
@@ -393,20 +393,18 @@ History {
                 "focus": 0,
                 "gap": 1,
               },
-              "height": 125,
+              "height": 99,
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  125,
-                  125,
+                  "98.20800",
+                  99,
                 ],
               ],
               "startBinding": null,
-              "width": 125,
-              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -416,7 +414,7 @@ History {
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": "0.98000",
+              "height": "0.98161",
               "points": [
                 [
                   0,
@@ -424,7 +422,7 @@ History {
                 ],
                 [
                   98,
-                  "-0.98000",
+                  "-0.98161",
                 ],
               ],
               "startBinding": {
@@ -433,9 +431,7 @@ History {
                 "focus": "0.02970",
                 "gap": 1,
               },
-              "width": 98,
-              "x": 1,
-              "y": "0.99000",
+              "y": "0.99245",
             },
           },
           "id169" => Delta {
@@ -827,9 +823,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 37,
-  "width": 100,
-  "x": 150,
+  "version": 30,
+  "width": 0,
+  "x": 200,
   "y": 0,
 }
 `;
@@ -866,8 +862,6 @@ History {
                   0,
                 ],
               ],
-              "width": 0,
-              "x": 149,
             },
             "inserted": {
               "points": [
@@ -876,12 +870,10 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
-              "width": "98.00000",
-              "x": "1.00000",
             },
           },
         },
@@ -938,8 +930,6 @@ History {
                 ],
               ],
               "startBinding": null,
-              "width": 100,
-              "x": 150,
             },
             "inserted": {
               "endBinding": {
@@ -964,8 +954,6 @@ History {
                 "focus": 0,
                 "gap": 1,
               },
-              "width": 0,
-              "x": 149,
             },
           },
         },
@@ -2375,9 +2363,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": 498,
-  "x": "1.00000",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -2516,7 +2504,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -2535,8 +2523,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
+              "width": 100,
+              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -15179,9 +15167,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": "98.00000",
-  "x": "1.00000",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -15220,7 +15208,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -15233,7 +15221,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -15529,7 +15517,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -15548,8 +15536,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
+              "width": 100,
+              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -15878,9 +15866,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": "98.00000",
-  "x": "1.00000",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -16152,7 +16140,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -16171,8 +16159,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
+              "width": 100,
+              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -16501,9 +16489,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": "98.00000",
-  "x": "1.00000",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -16775,7 +16763,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -16794,8 +16782,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
+              "width": 100,
+              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -17122,9 +17110,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 12,
+  "version": 10,
   "width": "98.00000",
-  "x": "1.00000",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -17180,7 +17168,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -17198,7 +17186,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -17467,7 +17455,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -17486,8 +17474,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
+              "width": 100,
+              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -17840,9 +17828,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 13,
+  "version": 11,
   "width": "98.00000",
-  "x": "1.00000",
+  "x": 1,
   "y": 0,
 }
 `;
@@ -17913,7 +17901,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -17932,7 +17920,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -18201,7 +18189,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  100,
                   0,
                 ],
               ],
@@ -18220,8 +18208,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
+              "width": 100,
+              "x": 0,
               "y": 0,
             },
             "inserted": {

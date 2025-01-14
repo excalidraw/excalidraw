@@ -504,12 +504,6 @@ export const bindLinearElement = (
       }),
     });
   }
-
-  // update bound elements to make sure the binding tips are in sync with
-  // the normalized gap from above
-  if (!isElbowArrow(linearElement)) {
-    updateBoundElements(hoveredElement, elementsMap);
-  }
 };
 
 // Don't bind both ends of a simple segment
