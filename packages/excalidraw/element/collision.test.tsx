@@ -1,6 +1,7 @@
 import { intersectElementWithLine } from "./collision";
 import { newElement } from "./newElement";
-import { pointFrom } from "../../math";
+import type { GlobalPoint } from "../../math";
+import { lineFromPointPair, pointFrom } from "../../math";
 import { ROUNDNESS } from "..";
 
 describe("intersection with element", () => {
@@ -150,8 +151,7 @@ describe("intersection with element", () => {
             type: ROUNDNESS.PROPORTIONAL_RADIUS,
           },
         }),
-        pointFrom(0, -30),
-        pointFrom(0, -25),
+        lineFromPointPair<GlobalPoint>([pointFrom(0, -30), pointFrom(0, -25)]),
       ).map((p) =>
         pointFrom(Math.round(p[0] * 100) / 100, Math.round(p[1] * 100) / 100),
       ),
@@ -169,8 +169,7 @@ describe("intersection with element", () => {
             type: ROUNDNESS.PROPORTIONAL_RADIUS,
           },
         }),
-        pointFrom(-30, 0),
-        pointFrom(-25, 0),
+        lineFromPointPair<GlobalPoint>([pointFrom(-30, 0), pointFrom(-25, 0)]),
       ).map((p) =>
         pointFrom(Math.round(p[0] * 100) / 100, Math.round(p[1] * 100) / 100),
       ),

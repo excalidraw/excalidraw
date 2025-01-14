@@ -798,14 +798,18 @@ export const bindPointToSnapToElementOutline = (
     const intersections: GlobalPoint[] = [
       ...(intersectElementWithLine(
         bindableElement,
-        pointFrom(p[0], p[1] - 2 * bindableElement.height),
-        pointFrom(p[0], p[1] + 2 * bindableElement.height),
+        line(
+          pointFrom(p[0], p[1] - 2 * bindableElement.height),
+          pointFrom(p[0], p[1] + 2 * bindableElement.height),
+        ),
         FIXED_BINDING_DISTANCE,
       ) ?? []),
       ...(intersectElementWithLine(
         bindableElement,
-        pointFrom(p[0] - 2 * bindableElement.width, p[1]),
-        pointFrom(p[0] + 2 * bindableElement.width, p[1]),
+        line(
+          pointFrom(p[0] - 2 * bindableElement.width, p[1]),
+          pointFrom(p[0] + 2 * bindableElement.width, p[1]),
+        ),
         FIXED_BINDING_DISTANCE,
       ) ?? []),
     ].filter((p) => p != null);
@@ -1102,8 +1106,7 @@ const updateBoundPoint = (
   } else {
     const intersections = intersectElementWithLine(
       bindableElement,
-      adjacentPoint,
-      focusPointAbsolute,
+      line<GlobalPoint>(adjacentPoint, focusPointAbsolute),
       binding.gap,
     );
     if (!intersections || intersections.length === 0) {
