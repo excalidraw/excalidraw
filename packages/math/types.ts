@@ -101,9 +101,22 @@ export type Polygon<Point extends GenericPoint> = Point[] & {
 };
 
 /**
- * Cubic bezier curve with four control points
+ * Cubic bezier curve where the start and end points are at the 0 and 3 index
+ * respectively, and the control points are at the 1 and 2 index respectively.
+ *
+ * It conveniently maps into the following code:
+ *
+ * ```javascript
+ *  canvasCtx.moveTo(start);
+ *  canvasCtx.bezierCurveTo(control1, control2, end);
+ * ```
  */
-export type Curve<Point extends GenericPoint> = [Point, Point, Point, Point] & {
+export type Curve<Point extends GenericPoint> = [
+  start: Point,
+  control1: Point,
+  control2: Point,
+  end: Point,
+] & {
   _brand: "excalimath_curve";
 };
 
@@ -143,15 +156,4 @@ export type Ellipse<Point extends GenericPoint> = {
   halfHeight: number;
 } & {
   _brand: "excalimath_ellipse";
-};
-
-/**
- * Represents a cubic bezier with 2 control points on the point space of your
- * choosing.
- */
-export type CubicBezier<P extends GenericPoint> = {
-  start: P;
-  end: P;
-  control1: P;
-  control2: P;
 };

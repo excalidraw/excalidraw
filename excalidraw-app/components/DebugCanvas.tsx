@@ -12,10 +12,10 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import type { Arc, CubicBezier } from "../../packages/math";
+import type { Arc, Curve } from "../../packages/math";
 import {
   isArc,
-  isBezier,
+  isCurve,
   isSegment,
   type GlobalPoint,
   type Segment,
@@ -39,7 +39,7 @@ const renderLine = (
 const renderCubicBezier = (
   context: CanvasRenderingContext2D,
   zoom: number,
-  { start, control1, control2, end }: CubicBezier<GlobalPoint>,
+  [start, control1, control2, end]: Curve<GlobalPoint>,
   color: string,
 ) => {
   context.save();
@@ -113,11 +113,11 @@ const render = (
           el.color,
         );
         break;
-      case isBezier(el.data):
+      case isCurve(el.data):
         renderCubicBezier(
           context,
           appState.zoom.value,
-          el.data as CubicBezier<GlobalPoint>,
+          el.data as Curve<GlobalPoint>,
           el.color,
         );
         break;

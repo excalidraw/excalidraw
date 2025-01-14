@@ -197,13 +197,13 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 };
 
 // linear
-export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
+export const getCurveShape = (
   roughShape: Drawable,
-  startingPoint: Point = pointFrom(0, 0),
+  startingPoint: GlobalPoint,
   angleInRadian: Radians,
-  center: Point,
-): GeometricShape<Point> => {
-  const transform = (p: Point): Point =>
+  center: GlobalPoint,
+): GeometricShape<GlobalPoint> => {
+  const transform = (p: GlobalPoint): GlobalPoint =>
     pointRotateRads(
       pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
@@ -211,20 +211,20 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
     );
 
   const ops = getCurvePathOps(roughShape);
-  const polycurve: Polycurve<Point> = [];
-  let p0 = pointFrom<Point>(0, 0);
+  const polycurve: Polycurve<GlobalPoint> = [];
+  let p0 = pointFrom<GlobalPoint>(0, 0);
 
   for (const op of ops) {
     if (op.op === "move") {
-      const p = pointFromArray<Point>(op.data);
+      const p = pointFromArray<GlobalPoint>(op.data);
       invariant(p != null, "Ops data is not a point");
       p0 = transform(p);
     }
     if (op.op === "bcurveTo") {
-      const p1 = transform(pointFrom<Point>(op.data[0], op.data[1]));
-      const p2 = transform(pointFrom<Point>(op.data[2], op.data[3]));
-      const p3 = transform(pointFrom<Point>(op.data[4], op.data[5]));
-      polycurve.push(curve<Point>(p0, p1, p2, p3));
+      const p1 = transform(pointFrom(op.data[0], op.data[1]));
+      const p2 = transform(pointFrom(op.data[2], op.data[3]));
+      const p3 = transform(pointFrom(op.data[4], op.data[5]));
+      polycurve.push(curve(p0, p1, p2, p3));
       p0 = p3;
     }
   }
@@ -281,16 +281,16 @@ export const getFreedrawShape = (
   ) as GeometricShape<GlobalPoint>;
 };
 
-export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
+export const getClosedCurveShape = (
   element: ExcalidrawLinearElement,
   roughShape: Drawable,
-  startingPoint: Point = pointFrom<Point>(0, 0),
+  startingPoint: GlobalPoint,
   angleInRadian: Radians,
-  center: Point,
-): GeometricShape<Point> => {
-  const transform = (p: Point) =>
+  center: GlobalPoint,
+): GeometricShape<GlobalPoint> => {
+  const transform = (p: LocalPoint) =>
     pointRotateRads(
-      pointFrom(p[0] + startingPoint[0], p[1] + startingPoint[1]),
+      pointFrom<GlobalPoint>(p[0] + startingPoint[0], p[1] + startingPoint[1]),
       center,
       angleInRadian,
     );
@@ -298,15 +298,13 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   if (element.roundness === null) {
     return {
       type: "polygon",
-      data: polygonFromPoints(
-        element.points.map((p) => transform(p as Point)) as Point[],
-      ),
+      data: polygonFromPoints(element.points.map((p) => transform(p))),
     };
   }
 
   const ops = getCurvePathOps(roughShape);
 
-  const points: Point[] = [];
+  const points: GlobalPoint[] = [];
   let odd = false;
   for (const operation of ops) {
     if (operation.op === "move") {
@@ -328,12 +326,12 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   }
 
   const polygonPoints = pointsOnBezierCurves(points, 10, 5).map((p) =>
-    transform(p as Point),
-  ) as Point[];
+    transform(p as LocalPoint),
+  );
 
   return {
     type: "polygon",
-    data: polygonFromPoints<Point>(polygonPoints),
+    data: polygonFromPoints(polygonPoints),
   };
 };
 

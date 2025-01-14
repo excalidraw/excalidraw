@@ -1,4 +1,4 @@
-import type { Arc, CubicBezier, Segment } from "../math";
+import type { Arc, Curve, Segment } from "../math";
 import { isSegment, segment, pointFrom, type GlobalPoint } from "../math";
 import { isBounds } from "./element/typeChecks";
 import type { Bounds } from "./element/types";
@@ -15,12 +15,12 @@ declare global {
 
 export type DebugElement = {
   color: string;
-  data: Segment<GlobalPoint> | Arc<GlobalPoint> | CubicBezier<GlobalPoint>;
+  data: Segment<GlobalPoint> | Arc<GlobalPoint> | Curve<GlobalPoint>;
   permanent: boolean;
 };
 
 export const debugDrawCubicBezier = (
-  c: CubicBezier<GlobalPoint>,
+  c: Curve<GlobalPoint>,
   opts?: {
     color?: string;
     permanent?: boolean;

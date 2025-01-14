@@ -164,14 +164,14 @@ export const getElementShape = (
       const [, , , , cx, cy] = getElementAbsoluteCoords(element, elementsMap);
 
       return shouldTestInside(element)
-        ? getClosedCurveShape<GlobalPoint>(
+        ? getClosedCurveShape(
             element,
             roughShape,
             pointFrom<GlobalPoint>(element.x, element.y),
             element.angle,
             pointFrom(cx, cy),
           )
-        : getCurveShape<GlobalPoint>(
+        : getCurveShape(
             roughShape,
             pointFrom<GlobalPoint>(element.x, element.y),
             element.angle,
