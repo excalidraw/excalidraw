@@ -6462,6 +6462,7 @@ class App extends React.Component<AppProps, AppState> {
           p,
           this.scene.getNonDeletedElementsMap(),
         );
+        console.log("IIII", value, midPoint);
 
         if (midPoint) {
           this.setState({
