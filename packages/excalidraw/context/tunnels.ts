@@ -1,5 +1,6 @@
 import React from "react";
 import tunnel from "tunnel-rat";
+import { createIsolation } from "jotai-scope";
 
 export type Tunnel = ReturnType<typeof tunnel>;
 
@@ -14,12 +15,14 @@ type TunnelsContextValue = {
   DefaultSidebarTabTriggersTunnel: Tunnel;
   OverwriteConfirmDialogTunnel: Tunnel;
   TTDDialogTriggerTunnel: Tunnel;
-  jotaiScope: symbol;
+  jotai: ReturnType<typeof createIsolation>;
 };
 
 export const TunnelsContext = React.createContext<TunnelsContextValue>(null!);
 
 export const useTunnels = () => React.useContext(TunnelsContext);
+
+const isolatedJotai = createIsolation();
 
 export const useInitializeTunnels = () => {
   return React.useMemo((): TunnelsContextValue => {
@@ -34,7 +37,7 @@ export const useInitializeTunnels = () => {
       DefaultSidebarTabTriggersTunnel: tunnel(),
       OverwriteConfirmDialogTunnel: tunnel(),
       TTDDialogTriggerTunnel: tunnel(),
-      jotaiScope: Symbol(),
+      jotai: isolatedJotai,
     };
   }, []);
 };

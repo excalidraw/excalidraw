@@ -1,7 +1,7 @@
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
 import { useEffect, useState } from "react";
 import { COLOR_PALETTE } from "../colors";
-import { jotaiScope } from "../jotai";
+import { useAtom } from "../jotai";
 import { exportToSvg } from "../../utils/export";
 import type { LibraryItem } from "../types";
 
@@ -64,7 +64,7 @@ export const useLibraryItemSvg = (
 };
 
 export const useLibraryCache = () => {
-  const [svgCache] = useAtom(libraryItemSvgsCache, jotaiScope);
+  const [svgCache] = useAtom(libraryItemSvgsCache);
 
   const clearLibraryCache = () => svgCache.clear();
 

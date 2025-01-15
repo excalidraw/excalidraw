@@ -1,9 +1,14 @@
-import type { PrimitiveAtom } from "jotai";
-import { unstable_createStore, useAtom } from "jotai";
+import { createStore, useAtom as _useAtom, type PrimitiveAtom } from "jotai";
+import { createIsolation } from "jotai-scope";
 import { useLayoutEffect } from "react";
 
-export const jotaiScope = Symbol();
-export const jotaiStore = unstable_createStore();
+const jotai = createIsolation();
+
+export const { useAtom, useSetAtom, useAtomValue, useStore } = jotai;
+export const Provider: ReturnType<typeof createIsolation>["Provider"] =
+  jotai.Provider;
+
+export const jotaiStore: ReturnType<typeof createStore> = createStore();
 
 export const useAtomWithInitialValue = <
   T extends unknown,
@@ -12,7 +17,7 @@ export const useAtomWithInitialValue = <
   atom: A,
   initialValue: T | (() => T),
 ) => {
-  const [value, setValue] = useAtom(atom);
+  const [value, setValue] = _useAtom(atom);
 
   useLayoutEffect(() => {
     if (typeof initialValue === "function") {

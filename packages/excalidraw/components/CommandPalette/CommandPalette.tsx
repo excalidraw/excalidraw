@@ -36,7 +36,8 @@ import {
   getShortcutKey,
   isWritableElement,
 } from "../../utils";
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
+import { useAtom } from "../../jotai";
 import { deburr } from "../../deburr";
 import type { MarkRequired } from "../../utility-types";
 import { InlineIcon } from "../InlineIcon";
