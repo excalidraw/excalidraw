@@ -271,7 +271,7 @@ describe("elbow arrow segment move", () => {
     mouse.reset();
     mouse.moveTo(100, 100);
     mouse.down();
-    mouse.moveTo(105, 100);
+    mouse.moveTo(115, 100);
     mouse.up();
 
     const arrow = h.scene.getSelectedElements(
@@ -280,8 +280,8 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [100, 0],
-      [100, 200],
+      [110, 0],
+      [110, 200],
       [190, 200],
     ]);
 
@@ -291,8 +291,8 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [100, 0],
-      [100, 200],
+      [110, 0],
+      [110, 200],
       [190, 200],
     ]);
   });
