@@ -1141,7 +1141,7 @@ const ExcalidrawApp = () => {
 
   return (
     <TopErrorBoundary>
-      <Provider unstable_createStore={() => appJotaiStore}>
+      <Provider store={appJotaiStore}>
         <ExcalidrawWrapper />
       </Provider>
     </TopErrorBoundary>

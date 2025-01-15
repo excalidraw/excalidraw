@@ -1,3 +1,3 @@
-import { unstable_createStore } from "jotai";
+import { createStore } from "jotai";
 
-export const appJotaiStore = unstable_createStore();
+export const appJotaiStore = createStore();
