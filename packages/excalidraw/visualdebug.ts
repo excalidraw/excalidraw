@@ -3,6 +3,7 @@ import {
   lineSegment,
   pointFrom,
   type GlobalPoint,
+  type LocalPoint,
 } from "../math";
 import type { LineSegment } from "../utils";
 import type { BoundingBox, Bounds } from "./element/bounds";
@@ -15,6 +16,8 @@ declare global {
       data: DebugElement[][];
       currentFrame?: number;
     };
+    debugDrawPoint: typeof debugDrawPoint;
+    debugDrawLine: typeof debugDrawLine;
   }
 }
 
@@ -144,6 +147,23 @@ export const debugDrawBounds = (
         permanent: !!opts?.permanent,
       },
     ),
+  );
+};
+
+export const debugDrawPoints = (
+  {
+    x,
+    y,
+    points,
+  }: {
+    x: number;
+    y: number;
+    points: LocalPoint[];
+  },
+  options?: any,
+) => {
+  points.forEach((p) =>
+    debugDrawPoint(pointFrom<GlobalPoint>(x + p[0], y + p[1]), options),
   );
 };
 
