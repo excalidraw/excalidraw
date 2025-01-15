@@ -49,7 +49,7 @@ const deleteSelectedElements = (
               endBinding:
                 el.id === bound.endBinding?.elementId ? null : bound.endBinding,
             });
-            mutateElbowArrow(bound, elementsMap, bound.points);
+            mutateElement(bound, { points: bound.points });
           }
         });
       }
