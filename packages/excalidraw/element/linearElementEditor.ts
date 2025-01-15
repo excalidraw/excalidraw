@@ -604,15 +604,8 @@ export class LinearElementEditor {
       }
     }
     let index = 0;
-    const midPoints: typeof editorMidPointsCache["points"] = isElbowArrow(
-      element,
-    )
-      ? LinearElementEditor.getElbowArrowMidPoints(
-          element,
-          elementsMap,
-          appState,
-        )
-      : LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
+    const midPoints: typeof editorMidPointsCache["points"] =
+      LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {
         const distance = pointDistance(
@@ -1838,96 +1831,6 @@ export class LinearElementEditor {
       ),
     });
     mutateElement(element, {}, true);
-  }
-
-  static getElbowArrowMidPoints(
-    element: ExcalidrawElbowArrowElement,
-    elementsMap: ElementsMap,
-    appState: AppState,
-  ): (GlobalPoint | null)[] {
-    const points = LinearElementEditor.getPointsGlobalCoordinates(
-      element,
-      elementsMap,
-    );
-
-    let index = 1;
-    const midpoints: (GlobalPoint | null)[] = [];
-    while (index < points.length) {
-      if (
-        LinearElementEditor.isSegmentTooShort(
-          element,
-          element.points[index - 1],
-          element.points[index],
-          index - 1,
-          appState.zoom,
-        )
-      ) {
-        midpoints.push(null);
-      } else {
-        const segmentMidPoint = pointFrom<GlobalPoint>(
-          (points[index - 1][0] + points[index][0]) / 2,
-          (points[index - 1][1] + points[index][1]) / 2,
-        );
-        midpoints.push(segmentMidPoint);
-      }
-      index++;
-    }
-
-    return midpoints;
-  }
-
-  static getElbowArrowHitMidPointCoords(
-    element: ExcalidrawElbowArrowElement,
-    scenePointer: { x: number; y: number },
-    elementsMap: ElementsMap,
-    appState: AppState,
-  ): GlobalPoint | null {
-    const result = LinearElementEditor.getElbowArrowHitMidPointIndex(
-      element,
-      scenePointer,
-      elementsMap,
-      appState,
-    );
-
-    if (result) {
-      return result[1];
-    }
-
-    return null;
-  }
-
-  static getElbowArrowHitMidPointIndex(
-    element: ExcalidrawElbowArrowElement,
-    scenePointer: { x: number; y: number },
-    elementsMap: ElementsMap,
-    appState: AppState,
-  ): [number, GlobalPoint] | null {
-    const threshold =
-      LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value;
-
-    let index = 0;
-    const midPoints: (GlobalPoint | null)[] =
-      LinearElementEditor.getElbowArrowMidPoints(
-        element,
-        elementsMap,
-        appState,
-      );
-    while (index < midPoints.length) {
-      if (midPoints[index] !== null) {
-        const distance = pointDistance(
-          midPoints[index]!,
-          pointFrom(scenePointer.x, scenePointer.y),
-        );
-
-        if (distance <= threshold) {
-          return [index + 1, midPoints[index]!];
-        }
-      }
-
-      index++;
-    }
-
-    return null;
   }
 }
 

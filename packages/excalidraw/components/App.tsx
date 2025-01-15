@@ -448,7 +448,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
-import type { LocalPoint, Radians } from "../../math";
+import type { GlobalPoint, LocalPoint, Radians } from "../../math";
 import {
   clamp,
   pointFrom,
@@ -460,6 +460,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
+  pointFromCoords,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
@@ -5338,28 +5339,35 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
-      } else if (isElbowArrow(selectedElements[0])) {
-        const midPoint = LinearElementEditor.getElbowArrowHitMidPointIndex(
-          selectedElements[0],
+      } else if (
+        this.state.selectedLinearElement &&
+        isElbowArrow(selectedElements[0])
+      ) {
+        const hitCoords = LinearElementEditor.getSegmentMidpointHitCoords(
+          this.state.selectedLinearElement,
           { x: sceneX, y: sceneY },
-          this.scene.getNonDeletedElementsMap(),
           this.state,
+          this.scene.getNonDeletedElementsMap(),
         );
-        if (midPoint && midPoint[0] > -1) {
-          this.store.shouldCaptureIncrement();
-          LinearElementEditor.deleteFixedSegment(
-            selectedElements[0],
-            midPoint[0],
-          );
+        const midPoint = hitCoords
+          ? LinearElementEditor.getSegmentMidPointIndex(
+              this.state.selectedLinearElement,
+              this.state,
+              hitCoords,
+              this.scene.getNonDeletedElementsMap(),
+            )
+          : -1;
 
-          if (this.state.selectedLinearElement) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                segmentMidPointHoveredCoords: null,
-              },
-            });
-          }
+        if (midPoint && midPoint > -1) {
+          this.store.shouldCaptureIncrement();
+          LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
+
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              segmentMidPointHoveredCoords: null,
+            },
+          });
 
           return;
         }
@@ -6439,24 +6447,33 @@ class App extends React.Component<AppProps, AppState> {
           ? new LinearElementEditor(hitElement)
           : null;
       if (hitElement && isElbowArrow(hitElement) && linearElementEditor) {
-        const midPoint = LinearElementEditor.getElbowArrowHitMidPointIndex(
-          hitElement,
+        const p = pointFromCoords<GlobalPoint>(
           viewportCoordsToSceneCoords(event, this.state),
-          this.scene.getNonDeletedElementsMap(),
+        );
+        const value = LinearElementEditor.getSegmentMidpointHitCoords(
+          linearElementEditor,
+          { x: p[0], y: p[1] },
           this.state,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        const midPoint = LinearElementEditor.getSegmentMidPointIndex(
+          linearElementEditor,
+          this.state,
+          p,
+          this.scene.getNonDeletedElementsMap(),
         );
 
         if (midPoint) {
           this.setState({
             selectedLinearElement: {
               ...linearElementEditor,
-              segmentMidPointHoveredCoords: midPoint[1],
+              segmentMidPointHoveredCoords: value,
               pointerDownState: {
                 ...linearElementEditor.pointerDownState,
                 segmentMidpoint: {
                   added: false,
-                  index: midPoint[0],
-                  value: midPoint[1],
+                  index: midPoint,
+                  value,
                 },
               },
             },
