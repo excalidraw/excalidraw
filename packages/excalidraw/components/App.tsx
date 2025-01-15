@@ -6436,16 +6436,19 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (midPoint) {
-          this.setState((prev) => {
-            return {
-              elbowLinearElement: {
-                ...(prev.elbowLinearElement || linearElementEditor),
-                elbowMidPointState: {
-                  midPoint: midPoint[1],
-                  midPointIndex: midPoint[0],
+          this.setState({
+            selectedLinearElement: {
+              ...linearElementEditor,
+              segmentMidPointHoveredCoords: midPoint[1],
+              pointerDownState: {
+                ...linearElementEditor.pointerDownState,
+                segmentMidpoint: {
+                  added: false,
+                  index: midPoint[0],
+                  value: midPoint[1],
                 },
               },
-            };
+            },
           });
         }
       }
@@ -6646,9 +6649,22 @@ class App extends React.Component<AppProps, AppState> {
 
     // Up event means that an operation is over. Update midpoints cache for
     // elbow arrows so we can react to new operations properly.
-    if (this.state.elbowLinearElement) {
+    if (
+      this.state.selectedLinearElement &&
+      this.state.selectedLinearElement.elbowed
+    ) {
       this.setState({
-        elbowLinearElement: null,
+        selectedLinearElement: {
+          ...this.state.selectedLinearElement,
+          pointerDownState: {
+            ...this.state.selectedLinearElement.pointerDownState,
+            segmentMidpoint: {
+              added: false,
+              index: null,
+              value: null,
+            },
+          },
+        },
       });
     }
   };
@@ -7907,8 +7923,9 @@ class App extends React.Component<AppProps, AppState> {
       this.lastPointerMoveCoords = pointerCoords;
 
       if (
-        this.state.elbowLinearElement &&
-        this.state.elbowLinearElement.elbowMidPointState.midPointIndex !== -1
+        this.state.selectedLinearElement &&
+        this.state.selectedLinearElement.elbowed &&
+        this.state.selectedLinearElement.pointerDownState.segmentMidpoint.index
       ) {
         const [gridX, gridY] = getGridPoint(
           pointerCoords.x,
@@ -7917,28 +7934,21 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         const ret = LinearElementEditor.moveFixedSegment(
-          this.state.elbowLinearElement,
-          this.state.elbowLinearElement.elbowMidPointState.midPointIndex,
+          this.state.selectedLinearElement,
+          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+            .index,
           gridX,
           gridY,
           this.scene.getNonDeletedElementsMap(),
         );
 
         flushSync(() => {
-          if (
-            this.state.elbowLinearElement &&
-            this.state.selectedLinearElement
-          ) {
+          if (this.state.selectedLinearElement) {
             this.setState({
               selectedLinearElement: {
                 ...this.state.selectedLinearElement,
                 segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
-              },
-              elbowLinearElement: {
-                ...this.state.elbowLinearElement,
-                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
                 pointerDownState: ret.pointerDownState,
-                elbowMidPointState: ret.elbowMidPointState,
               },
             });
           }

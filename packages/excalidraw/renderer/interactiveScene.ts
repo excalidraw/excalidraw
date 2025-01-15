@@ -539,11 +539,11 @@ const renderLinearPointHandles = (
       element.fixedSegments?.map((segment) => segment.index) || [];
     points.slice(0, -1).forEach((p, idx) => {
       if (
-        !LinearElementEditor.isElbowSegmentTooShort(
-          idx,
-          p,
+        !LinearElementEditor.isSegmentTooShort(
+          element,
           points[idx + 1],
-          points,
+          points[idx],
+          idx,
           appState.zoom,
         )
       ) {

@@ -96,10 +96,6 @@ export class LinearElementEditor {
     };
   }>;
 
-  public readonly elbowMidPointState: Readonly<{
-    midPointIndex: number;
-  }>;
-
   /** whether you're dragging a point */
   public readonly isDragging: boolean;
   public readonly lastUncommittedPoint: LocalPoint | null;
@@ -138,9 +134,6 @@ export class LinearElementEditor {
         index: null,
         added: false,
       },
-    };
-    this.elbowMidPointState = {
-      midPointIndex: -1,
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
@@ -533,11 +526,11 @@ export class LinearElementEditor {
     const midpoints: (GlobalPoint | null)[] = [];
     while (index < points.length - 1) {
       if (
-        isElbowArrow(element) ||
         LinearElementEditor.isSegmentTooShort(
           element,
           element.points[index],
           element.points[index + 1],
+          index,
           appState.zoom,
         )
       ) {
@@ -636,29 +629,24 @@ export class LinearElementEditor {
     return null;
   };
 
-  static isElbowSegmentTooShort<P extends GlobalPoint | LocalPoint>(
-    index: number,
-    startPoint: P,
-    endPoint: P,
-    points: readonly P[],
-    zoom: Zoom,
-  ): boolean {
-    if (index >= 0 && index < points.length) {
-      return (
-        pointDistance(startPoint, endPoint) * zoom.value <
-        LinearElementEditor.POINT_HANDLE_SIZE / 2
-      );
-    }
-
-    return false;
-  }
-
   static isSegmentTooShort<P extends GlobalPoint | LocalPoint>(
     element: NonDeleted<ExcalidrawLinearElement>,
     startPoint: P,
     endPoint: P,
+    index: number,
     zoom: Zoom,
   ) {
+    if (isElbowArrow(element)) {
+      if (index >= 0 && index < element.points.length) {
+        return (
+          pointDistance(startPoint, endPoint) * zoom.value <
+          LinearElementEditor.POINT_HANDLE_SIZE / 2
+        );
+      }
+
+      return false;
+    }
+
     let distance = pointDistance(startPoint, endPoint);
     if (element.points.length > 2 && element.roundness) {
       distance = getBezierCurveLength(element, endPoint);
@@ -1812,20 +1800,27 @@ export class LinearElementEditor {
         fixedSegments: nextFixedSegments,
       });
 
+      const point = pointFrom<GlobalPoint>(
+        element.x +
+          (element.fixedSegments![offset].start[0] +
+            element.fixedSegments![offset].end[0]) /
+            2,
+        element.y +
+          (element.fixedSegments![offset].start[1] +
+            element.fixedSegments![offset].end[1]) /
+            2,
+      );
+
       return {
         ...linearElement,
-        segmentMidPointHoveredCoords: pointFrom<GlobalPoint>(
-          element.x +
-            (element.fixedSegments![offset].start[0] +
-              element.fixedSegments![offset].end[0]) /
-              2,
-          element.y +
-            (element.fixedSegments![offset].start[1] +
-              element.fixedSegments![offset].end[1]) /
-              2,
-        ),
-        elbowMidPointState: {
-          midPointIndex: element.fixedSegments![offset].index,
+        segmentMidPointHoveredCoords: point,
+        pointerDownState: {
+          ...linearElement.pointerDownState,
+          segmentMidpoint: {
+            added: false,
+            index: element.fixedSegments![offset].index,
+            value: point,
+          },
         },
       };
     }
@@ -1859,11 +1854,11 @@ export class LinearElementEditor {
     const midpoints: (GlobalPoint | null)[] = [];
     while (index < points.length) {
       if (
-        LinearElementEditor.isElbowSegmentTooShort(
-          index - 1,
+        LinearElementEditor.isSegmentTooShort(
+          element,
           element.points[index - 1],
           element.points[index],
-          element.points,
+          index - 1,
           appState.zoom,
         )
       ) {
