@@ -5347,10 +5347,21 @@ class App extends React.Component<AppProps, AppState> {
         );
         if (midPoint && midPoint[0] > -1) {
           this.store.shouldCaptureIncrement();
-          return LinearElementEditor.deleteFixedSegment(
+          LinearElementEditor.deleteFixedSegment(
             selectedElements[0],
             midPoint[0],
           );
+
+          if (this.state.selectedLinearElement) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                segmentMidPointHoveredCoords: null,
+              },
+            });
+          }
+
+          return;
         }
       }
     }
