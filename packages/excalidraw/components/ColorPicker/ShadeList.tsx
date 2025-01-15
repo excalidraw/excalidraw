@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
+import { useAtom } from "../../jotai";
 import { useEffect, useRef } from "react";
 import {
   activeColorPickerSectionAtom,

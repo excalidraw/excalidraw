@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
+import { useAtom } from "../jotai";
 import throttle from "lodash.throttle";
 
 const scrollPositionAtom = atom<number>(0);
