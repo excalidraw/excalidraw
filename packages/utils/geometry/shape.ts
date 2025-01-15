@@ -73,7 +73,7 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
   halfHeight: number;
 };
 
-export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
+export type GeometricShape<Point extends GlobalPoint | LocalPoint> = (
   | {
       type: "line";
       data: LineSegment<Point>;
@@ -97,7 +97,10 @@ export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
   | {
       type: "polycurve";
       data: Polycurve<Point>;
-    };
+    }
+) & {
+  isClosed?: boolean;
+};
 
 type RectangularElement =
   | ExcalidrawRectangleElement
@@ -203,9 +206,9 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 // linear
 export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   roughShape: Drawable,
-  startingPoint: Point = pointFrom(0, 0),
   angleInRadian: Radians,
   center: Point,
+  startingPoint: Point = pointFrom(0, 0),
 ): GeometricShape<Point> => {
   const transform = (p: Point): Point =>
     pointRotateRads(
@@ -285,6 +288,35 @@ export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
   ) as GeometricShape<Point>;
 };
 
+export const getPointsOnRoughCurve = <Point extends GlobalPoint | LocalPoint>(
+  roughCurve: Drawable,
+) => {
+  const ops = getCurvePathOps(roughCurve);
+
+  const points: Point[] = [];
+  let odd = false;
+  for (const operation of ops) {
+    if (operation.op === "move") {
+      odd = !odd;
+      if (odd) {
+        points.push(pointFrom(operation.data[0], operation.data[1]));
+      }
+    } else if (operation.op === "bcurveTo") {
+      if (odd) {
+        points.push(pointFrom(operation.data[0], operation.data[1]));
+        points.push(pointFrom(operation.data[2], operation.data[3]));
+        points.push(pointFrom(operation.data[4], operation.data[5]));
+      }
+    } else if (operation.op === "lineTo") {
+      if (odd) {
+        points.push(pointFrom(operation.data[0], operation.data[1]));
+      }
+    }
+  }
+
+  return points;
+};
+
 export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawLinearElement,
   roughShape: Drawable,
@@ -308,31 +340,10 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
     };
   }
 
-  const ops = getCurvePathOps(roughShape);
-
-  const points: Point[] = [];
-  let odd = false;
-  for (const operation of ops) {
-    if (operation.op === "move") {
-      odd = !odd;
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-      }
-    } else if (operation.op === "bcurveTo") {
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-        points.push(pointFrom(operation.data[2], operation.data[3]));
-        points.push(pointFrom(operation.data[4], operation.data[5]));
-      }
-    } else if (operation.op === "lineTo") {
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-      }
-    }
-  }
-
-  const polygonPoints = pointsOnBezierCurves(points, 10, 5).map((p) =>
-    transform(p as Point),
+  const polygonPoints = pointsOnBezierCurves(
+    getPointsOnRoughCurve(roughShape),
+    10,
+    5,
   ) as Point[];
 
   return {

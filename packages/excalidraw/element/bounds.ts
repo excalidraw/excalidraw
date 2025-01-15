@@ -8,7 +8,6 @@ import type {
   ElementsMap,
 } from "./types";
 import rough from "roughjs/bin/rough";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { AppState } from "../types";
 import { generateRoughOptions } from "../scene/Shape";
@@ -24,13 +23,7 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import { ShapeCache } from "../scene/ShapeCache";
 import { arrayToMap, invariant } from "../utils";
-import type {
-  Degrees,
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Radians,
-} from "../../math";
+import type { Degrees, GlobalPoint, LineSegment, Radians } from "../../math";
 import {
   degreesToRadians,
   lineSegment,
@@ -39,7 +32,6 @@ import {
   pointFromArray,
   pointRotateRads,
 } from "../../math";
-import type { Mutable } from "../utility-types";
 
 export type RectangleBox = {
   x: number;
@@ -732,36 +724,12 @@ export const getArrowheadPoints = (
   return [x2, y2, x3, y3, x4, y4];
 };
 
-const generateLinearElementShape = (
-  element: ExcalidrawLinearElement,
-): Drawable => {
-  const generator = rough.generator();
-  const options = generateRoughOptions(element);
-
-  const method = (() => {
-    if (element.roundness) {
-      return "curve";
-    }
-    if (options.fill) {
-      return "polygon";
-    }
-    return "linearPath";
-  })();
-
-  return generator[method](
-    element.points as Mutable<LocalPoint>[] as RoughPoint[],
-    options,
-  );
-};
-
 const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
   cy: number,
   elementsMap: ElementsMap,
 ): Bounds => {
-  const boundTextElement = getBoundTextElement(element, elementsMap);
-
   if (element.points.length < 2) {
     const [pointX, pointY] = element.points[0];
     const [x, y] = pointRotateRads(
@@ -771,6 +739,7 @@ const getLinearElementRotatedBounds = (
     );
 
     let coords: Bounds = [x, y, x, y];
+    const boundTextElement = getBoundTextElement(element, elementsMap);
     if (boundTextElement) {
       const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
         element,
@@ -788,18 +757,48 @@ const getLinearElementRotatedBounds = (
     return coords;
   }
 
-  // first element is always the curve
-  const cachedShape = ShapeCache.get(element)?.[0];
-  const shape = cachedShape ?? generateLinearElementShape(element);
-  const ops = getCurvePathOps(shape);
+  const cachedShape =
+    ShapeCache.get(element) ?? ShapeCache.generateElementShape(element, null);
+
+  const [arrowCurve, ...arrowhead] = cachedShape;
+
   const transformXY = ([x, y]: GlobalPoint) =>
     pointRotateRads<GlobalPoint>(
       pointFrom(element.x + x, element.y + y),
       pointFrom(cx, cy),
       element.angle,
     );
-  const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
-  let coords: Bounds = [res[0], res[1], res[2], res[3]];
+
+  let coords = getMinMaxXYFromCurvePathOps(
+    getCurvePathOps(arrowCurve),
+    transformXY,
+  );
+
+  for (const shape of arrowhead) {
+    let [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(
+      getCurvePathOps(shape),
+    );
+
+    [minX, minY] = pointRotateRads<GlobalPoint>(
+      pointFrom(minX + element.x, minY + element.y),
+      pointFrom(cx, cy),
+      element.angle,
+    );
+    [maxX, maxY] = pointRotateRads<GlobalPoint>(
+      pointFrom(maxX + element.x, maxY + element.y),
+      pointFrom(cx, cy),
+      element.angle,
+    );
+
+    coords = [
+      Math.min(minX, coords[0]),
+      Math.min(minY, coords[1]),
+      Math.max(maxX, coords[2]),
+      Math.max(maxY, coords[3]),
+    ];
+  }
+
+  const boundTextElement = getBoundTextElement(element, elementsMap);
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
       element,
@@ -814,6 +813,7 @@ const getLinearElementRotatedBounds = (
       coordsWithBoundText[3],
     ];
   }
+
   return coords;
 };
 
