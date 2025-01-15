@@ -1,4 +1,4 @@
-import { atom, useAtom } from "jotai";
+import { atom } from "jotai";
 import React, { useLayoutEffect, useRef } from "react";
 import { useTunnels } from "../../context/tunnels";
 
@@ -13,9 +13,11 @@ export const withInternalFallback = <P,>(
       __fallback?: boolean;
     }
   > = (props) => {
-    const { jotaiScope } = useTunnels();
+    const {
+      jotai: { useAtom },
+    } = useTunnels();
     // for rerenders
-    const [, setCounter] = useAtom(renderAtom, jotaiScope);
+    const [, setCounter] = useAtom(renderAtom);
     // for initial & subsequent renders. Tracked as component state
     // due to excalidraw multi-instance scanerios.
     const metaRef = useRef({

@@ -1,7 +1,7 @@
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
-import { jotaiScope, jotaiStore } from "./jotai";
-import { atom, useAtomValue } from "jotai";
+import { useAtomValue, jotaiStore } from "./jotai";
+import { atom } from "jotai";
 import type { NestedKeyOf } from "./utility-types";
 
 const COMPLETION_THRESHOLD = 85;
@@ -165,6 +165,6 @@ const editorLangCodeAtom = atom(defaultLang.code);
 // - component is rendered internally by <Excalidraw>, but the component
 //   is memoized w/o being updated on `langCode`, `AppState`, or `UIAppState`
 export const useI18n = () => {
-  const langCode = useAtomValue(editorLangCodeAtom, jotaiScope);
+  const langCode = useAtomValue(editorLangCodeAtom);
   return { t, langCode };
 };

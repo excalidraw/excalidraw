@@ -1,9 +1,11 @@
-import type { PrimitiveAtom } from "jotai";
-import { unstable_createStore, useAtom } from "jotai";
+import { createStore, type PrimitiveAtom } from "jotai";
+import { createIsolation } from "jotai-scope";
 import { useLayoutEffect } from "react";
 
-export const jotaiScope = Symbol();
-export const jotaiStore = unstable_createStore();
+export const { Provider, useAtom, useAtomValue, useSetAtom, useStore } =
+  createIsolation();
+
+export const jotaiStore: ReturnType<typeof createStore> = createStore();
 
 export const useAtomWithInitialValue = <
   T extends unknown,

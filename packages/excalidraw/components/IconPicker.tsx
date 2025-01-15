@@ -6,8 +6,8 @@ import { isArrowKey, KEYS } from "../keys";
 import { getLanguage, t } from "../i18n";
 import clsx from "clsx";
 import Collapsible from "./Stats/Collapsible";
-import { atom, useAtom } from "jotai";
-import { jotaiScope } from "../jotai";
+import { atom } from "jotai";
+import { useAtom } from "../jotai";
 import { useDevice } from "..";
 
 const moreOptionsAtom = atom(false);
@@ -94,10 +94,7 @@ function Picker<T>({
     event.stopPropagation();
   };
 
-  const [showMoreOptions, setShowMoreOptions] = useAtom(
-    moreOptionsAtom,
-    jotaiScope,
-  );
+  const [showMoreOptions, setShowMoreOptions] = useAtom(moreOptionsAtom);
 
   const alwaysVisibleOptions = React.useMemo(
     () => options.slice(0, numberOfOptionsToAlwaysShow),
