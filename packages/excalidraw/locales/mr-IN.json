@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "त्रिभुज (बाह्यरेखा)",
     "arrowhead_diamond": "चौकट",
     "arrowhead_diamond_outline": "चौकट (बाह्यरेखा)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "चिमणि पाय (अनेक)",
+    "arrowhead_crowfoot_one": "चिमणि पाय (एक)",
+    "arrowhead_crowfoot_one_or_many": "चिमणि पाय (एक अथवा अनेक)",
+    "more_options": "आणिक विकल्प",
     "arrowtypes": "बाणाचे प्रकार",
     "arrowtype_sharp": "तीक्ष्ण तीर",
     "arrowtype_round": "वक्राकार तीर",
@@ -165,7 +165,7 @@
     "unCroppedDimension": "कापण्या पूर्विचे परिमाण",
     "copyElementLink": "वस्तू ह्याचा दुवा कॉपी करावे",
     "linkToElement": "वस्तू ह्याचा दुवा",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "चौकटित निवडलेले गुंडाळा"
   },
   "elementLink": {
     "title": "वस्तू ह्याचा दुवा",
