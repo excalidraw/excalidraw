@@ -6442,45 +6442,46 @@ class App extends React.Component<AppProps, AppState> {
           preferSelected: true,
         },
       );
-      const linearElementEditor =
-        hitElement && isElbowArrow(hitElement)
-          ? new LinearElementEditor(hitElement)
-          : null;
-      if (hitElement && isElbowArrow(hitElement) && linearElementEditor) {
-        const p = pointFromCoords<GlobalPoint>(
-          viewportCoordsToSceneCoords(event, this.state),
-        );
-        const value = LinearElementEditor.getSegmentMidpointHitCoords(
-          linearElementEditor,
-          { x: p[0], y: p[1] },
-          this.state,
-          this.scene.getNonDeletedElementsMap(),
-        );
-        const midPoint = LinearElementEditor.getSegmentMidPointIndex(
-          linearElementEditor,
-          this.state,
-          p,
-          this.scene.getNonDeletedElementsMap(),
-        );
-        console.log("IIII", value, midPoint);
+      // console.log("hitElement", !!hitElement);
+      // const linearElementEditor =
+      //   hitElement && isElbowArrow(hitElement)
+      //     ? new LinearElementEditor(hitElement)
+      //     : null;
+      // if (hitElement && isElbowArrow(hitElement) && linearElementEditor) {
+      //   const p = pointFromCoords<GlobalPoint>(
+      //     viewportCoordsToSceneCoords(event, this.state),
+      //   );
+      //   const value = LinearElementEditor.getSegmentMidpointHitCoords(
+      //     linearElementEditor,
+      //     { x: p[0], y: p[1] },
+      //     this.state,
+      //     this.scene.getNonDeletedElementsMap(),
+      //   );
+      //   const midPoint = LinearElementEditor.getSegmentMidPointIndex(
+      //     linearElementEditor,
+      //     this.state,
+      //     p,
+      //     this.scene.getNonDeletedElementsMap(),
+      //   );
+      //   console.log("IIII", value, midPoint);
 
-        if (midPoint) {
-          this.setState({
-            selectedLinearElement: {
-              ...linearElementEditor,
-              segmentMidPointHoveredCoords: value,
-              pointerDownState: {
-                ...linearElementEditor.pointerDownState,
-                segmentMidpoint: {
-                  added: false,
-                  index: midPoint,
-                  value,
-                },
-              },
-            },
-          });
-        }
-      }
+      //   if (midPoint) {
+      //     this.setState({
+      //       selectedLinearElement: {
+      //         ...linearElementEditor,
+      //         segmentMidPointHoveredCoords: value,
+      //         pointerDownState: {
+      //           ...linearElementEditor.pointerDownState,
+      //           segmentMidpoint: {
+      //             added: false,
+      //             index: midPoint,
+      //             value,
+      //           },
+      //         },
+      //       },
+      //     });
+      //   }
+      // }
     }
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
@@ -6678,24 +6679,24 @@ class App extends React.Component<AppProps, AppState> {
 
     // Up event means that an operation is over. Update midpoints cache for
     // elbow arrows so we can react to new operations properly.
-    if (
-      this.state.selectedLinearElement &&
-      this.state.selectedLinearElement.elbowed
-    ) {
-      this.setState({
-        selectedLinearElement: {
-          ...this.state.selectedLinearElement,
-          pointerDownState: {
-            ...this.state.selectedLinearElement.pointerDownState,
-            segmentMidpoint: {
-              added: false,
-              index: null,
-              value: null,
-            },
-          },
-        },
-      });
-    }
+    // if (
+    //   this.state.selectedLinearElement &&
+    //   this.state.selectedLinearElement.elbowed
+    // ) {
+    //   this.setState({
+    //     selectedLinearElement: {
+    //       ...this.state.selectedLinearElement,
+    //       pointerDownState: {
+    //         ...this.state.selectedLinearElement.pointerDownState,
+    //         segmentMidpoint: {
+    //           added: false,
+    //           index: null,
+    //           value: null,
+    //         },
+    //       },
+    //     },
+    //   });
+    // }
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
@@ -7947,9 +7948,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
-      const lastPointerCoords =
-        this.lastPointerMoveCoords ?? pointerDownState.origin;
-      this.lastPointerMoveCoords = pointerCoords;
 
       if (
         this.state.selectedLinearElement &&
@@ -7984,6 +7982,10 @@ class App extends React.Component<AppProps, AppState> {
         });
         return;
       }
+
+      const lastPointerCoords =
+        this.lastPointerMoveCoords ?? pointerDownState.origin;
+      this.lastPointerMoveCoords = pointerCoords;
 
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
