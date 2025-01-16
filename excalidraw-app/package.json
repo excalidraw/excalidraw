@@ -33,7 +33,6 @@
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
     "jotai": "2.11.0",
-    "jotai-scope": "0.7.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "socket.io-client": "4.7.2",
