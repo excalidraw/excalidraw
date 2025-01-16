@@ -266,7 +266,6 @@ const handleSegmentRelease = (
   arrow: ExcalidrawElbowArrowElement,
   fixedSegments: FixedSegment[],
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
-  zoom?: AppState["zoom"],
 ) => {
   const newFixedSegmentIndices = fixedSegments.map((segment) => segment.index);
   const oldFixedSegmentIndices =
@@ -288,6 +287,8 @@ const handleSegmentRelease = (
   const nextSegment = arrow.fixedSegments[deletedSegmentIdx + 1];
 
   // We need to render a sub-arrow path to restore deleted segments
+  const x = arrow.x + (prevSegment ? prevSegment.end[0] : 0);
+  const y = arrow.y + (prevSegment ? prevSegment.end[1] : 0);
   const {
     startHeading,
     endHeading,
@@ -298,12 +299,8 @@ const handleSegmentRelease = (
     ...rest
   } = getElbowArrowData(
     {
-      x:
-        arrow.x +
-        (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0),
-      y:
-        arrow.y +
-        (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0),
+      x,
+      y,
       startBinding: prevSegment ? null : arrow.startBinding,
       endBinding: nextSegment ? null : arrow.endBinding,
       startArrowhead: null,
@@ -313,14 +310,12 @@ const handleSegmentRelease = (
     [
       pointFrom<LocalPoint>(0, 0),
       pointFrom<LocalPoint>(
-        (nextSegment
-          ? (nextSegment.start[0] + nextSegment.end[0]) / 2
-          : arrow.points[arrow.points.length - 1][0]) -
-          (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0),
-        (nextSegment
-          ? (nextSegment.start[1] + nextSegment.end[1]) / 2
-          : arrow.points[arrow.points.length - 1][1]) -
-          (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0),
+        arrow.x +
+          (nextSegment?.start[0] ?? arrow.points[arrow.points.length - 1][0]) -
+          x,
+        arrow.y +
+          (nextSegment?.start[1] ?? arrow.points[arrow.points.length - 1][1]) -
+          y,
       ),
     ],
     { isDragging: false },
@@ -362,12 +357,8 @@ const handleSegmentRelease = (
   restoredPoints.forEach((p) => {
     nextPoints.push(
       pointFrom<GlobalPoint>(
-        arrow.x +
-          (prevSegment ? (prevSegment.start[0] + prevSegment.end[0]) / 2 : 0) +
-          p[0],
-        arrow.y +
-          (prevSegment ? (prevSegment.start[1] + prevSegment.end[1]) / 2 : 0) +
-          p[1],
+        arrow.x + (prevSegment ? prevSegment.end[0] : 0) + p[0],
+        arrow.y + (prevSegment ? prevSegment.end[1] : 0) + p[1],
       ),
     );
   });
