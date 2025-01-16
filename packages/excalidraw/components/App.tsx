@@ -5361,37 +5361,42 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
           LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
 
-          const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
-            {
-              ...this.state.selectedLinearElement,
-              segmentMidPointHoveredCoords: null,
-            },
-            { x: sceneX, y: sceneY },
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          );
-          const nextIndex = nextCoords
-            ? LinearElementEditor.getSegmentMidPointIndex(
-                this.state.selectedLinearElement,
-                this.state,
-                nextCoords,
-                this.scene.getNonDeletedElementsMap(),
-              )
-            : null;
+          flushSync(() => {
+            if (this.state.selectedLinearElement) {
+              const nextCoords =
+                LinearElementEditor.getSegmentMidpointHitCoords(
+                  {
+                    ...this.state.selectedLinearElement,
+                    segmentMidPointHoveredCoords: null,
+                  },
+                  { x: sceneX, y: sceneY },
+                  this.state,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+              const nextIndex = nextCoords
+                ? LinearElementEditor.getSegmentMidPointIndex(
+                    this.state.selectedLinearElement,
+                    this.state,
+                    nextCoords,
+                    this.scene.getNonDeletedElementsMap(),
+                  )
+                : null;
 
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              pointerDownState: {
-                ...this.state.selectedLinearElement.pointerDownState,
-                segmentMidpoint: {
-                  index: nextIndex,
-                  value: hitCoords,
-                  added: false,
+              this.setState({
+                selectedLinearElement: {
+                  ...this.state.selectedLinearElement,
+                  pointerDownState: {
+                    ...this.state.selectedLinearElement.pointerDownState,
+                    segmentMidpoint: {
+                      index: nextIndex,
+                      value: hitCoords,
+                      added: false,
+                    },
+                  },
+                  segmentMidPointHoveredCoords: nextCoords,
                 },
-              },
-              segmentMidPointHoveredCoords: nextCoords,
-            },
+              });
+            }
           });
 
           return;
