@@ -6434,56 +6434,6 @@ class App extends React.Component<AppProps, AppState> {
     this.clearSelectionIfNotUsingSelection();
     this.updateBindingEnabledOnPointerMove(event);
 
-    {
-      const hitElement = this.getElementAtPosition(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-        {
-          preferSelected: true,
-        },
-      );
-      // console.log("hitElement", !!hitElement);
-      // const linearElementEditor =
-      //   hitElement && isElbowArrow(hitElement)
-      //     ? new LinearElementEditor(hitElement)
-      //     : null;
-      // if (hitElement && isElbowArrow(hitElement) && linearElementEditor) {
-      //   const p = pointFromCoords<GlobalPoint>(
-      //     viewportCoordsToSceneCoords(event, this.state),
-      //   );
-      //   const value = LinearElementEditor.getSegmentMidpointHitCoords(
-      //     linearElementEditor,
-      //     { x: p[0], y: p[1] },
-      //     this.state,
-      //     this.scene.getNonDeletedElementsMap(),
-      //   );
-      //   const midPoint = LinearElementEditor.getSegmentMidPointIndex(
-      //     linearElementEditor,
-      //     this.state,
-      //     p,
-      //     this.scene.getNonDeletedElementsMap(),
-      //   );
-      //   console.log("IIII", value, midPoint);
-
-      //   if (midPoint) {
-      //     this.setState({
-      //       selectedLinearElement: {
-      //         ...linearElementEditor,
-      //         segmentMidPointHoveredCoords: value,
-      //         pointerDownState: {
-      //           ...linearElementEditor.pointerDownState,
-      //           segmentMidpoint: {
-      //             added: false,
-      //             index: midPoint,
-      //             value,
-      //           },
-      //         },
-      //       },
-      //     });
-      //   }
-      // }
-    }
-
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
     }
@@ -6676,27 +6626,6 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
       });
     }
-
-    // Up event means that an operation is over. Update midpoints cache for
-    // elbow arrows so we can react to new operations properly.
-    // if (
-    //   this.state.selectedLinearElement &&
-    //   this.state.selectedLinearElement.elbowed
-    // ) {
-    //   this.setState({
-    //     selectedLinearElement: {
-    //       ...this.state.selectedLinearElement,
-    //       pointerDownState: {
-    //         ...this.state.selectedLinearElement.pointerDownState,
-    //         segmentMidpoint: {
-    //           added: false,
-    //           index: null,
-    //           value: null,
-    //         },
-    //       },
-    //     },
-    //   });
-    // }
   };
 
   private maybeOpenContextMenuAfterPointerDownOnTouchDevices = (
