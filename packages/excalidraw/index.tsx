@@ -11,8 +11,7 @@ import "./fonts/fonts.css";
 import type { AppProps, ExcalidrawProps } from "./types";
 import { defaultLang } from "./i18n";
 import { DEFAULT_UI_OPTIONS } from "./constants";
-import { Provider } from "jotai";
-import { jotaiScope, jotaiStore } from "./jotai";
+import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import Footer from "./components/footer/FooterCenter";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
@@ -108,7 +107,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   }, []);
 
   return (
-    <Provider unstable_createStore={() => jotaiStore} scope={jotaiScope}>
+    <EditorJotaiProvider store={editorJotaiStore}>
       <InitializeApp langCode={langCode} theme={theme}>
         <App
           onChange={onChange}
@@ -145,7 +144,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           {children}
         </App>
       </InitializeApp>
-    </Provider>
+    </EditorJotaiProvider>
   );
 };
 

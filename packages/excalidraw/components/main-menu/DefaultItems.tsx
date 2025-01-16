@@ -32,9 +32,8 @@ import {
   actionToggleTheme,
 } from "../../actions";
 import clsx from "clsx";
-import { useSetAtom } from "jotai";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import { jotaiScope } from "../../jotai";
+import { useSetAtom } from "../../editor-jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";
@@ -189,10 +188,7 @@ Help.displayName = "Help";
 export const ClearCanvas = () => {
   const { t } = useI18n();
 
-  const setActiveConfirmDialog = useSetAtom(
-    activeConfirmDialogAtom,
-    jotaiScope,
-  );
+  const setActiveConfirmDialog = useSetAtom(activeConfirmDialogAtom);
   const actionManager = useExcalidrawActionManager();
 
   if (!actionManager.isActionEnabled(actionClearCanvas)) {

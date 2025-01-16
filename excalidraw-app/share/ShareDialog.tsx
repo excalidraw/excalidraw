@@ -18,11 +18,11 @@ import { TextField } from "../../packages/excalidraw/components/TextField";
 import { FilledButton } from "../../packages/excalidraw/components/FilledButton";
 import type { CollabAPI } from "../collab/Collab";
 import { activeRoomLinkAtom } from "../collab/Collab";
-import { atom, useAtom, useAtomValue } from "jotai";
-
-import "./ShareDialog.scss";
 import { useUIAppState } from "../../packages/excalidraw/context/ui-appState";
 import { useCopyStatus } from "../../packages/excalidraw/hooks/useCopiedIndicator";
+import { atom, useAtom, useAtomValue } from "../app-jotai";
+
+import "./ShareDialog.scss";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";
