@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { t } from "../i18n";
 import Trans from "./Trans";
-import { jotaiScope } from "../jotai";
+import { useAtom } from "../editor-jotai";
 import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { saveLibraryAsJSON } from "../data/json";
@@ -17,7 +17,6 @@ import {
 import { ToolButton } from "./ToolButton";
 import { fileOpen } from "../data/filesystem";
 import { muteFSAbortError } from "../utils";
-import { useAtom } from "jotai";
 import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
@@ -51,10 +50,9 @@ export const LibraryDropdownMenuButton: React.FC<{
   appState,
   className,
 }) => {
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const [libraryItemsData] = useAtom(libraryItemsAtom);
   const [isLibraryMenuOpen, setIsLibraryMenuOpen] = useAtom(
     isLibraryMenuOpenAtom,
-    jotaiScope,
   );
 
   const renderRemoveLibAlert = () => {
@@ -286,7 +284,7 @@ export const LibraryDropdownMenu = ({
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
 
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const [libraryItemsData] = useAtom(libraryItemsAtom);
 
   const removeFromLibrary = async (libraryItems: LibraryItems) => {
     const nextItems = libraryItems.filter(

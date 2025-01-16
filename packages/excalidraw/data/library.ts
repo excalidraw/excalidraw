@@ -8,8 +8,7 @@ import type {
 } from "../types";
 import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
-import { atom } from "jotai";
-import { jotaiStore } from "../jotai";
+import { atom, editorJotaiStore } from "../editor-jotai";
 import type { ExcalidrawElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { AbortError } from "../errors";
@@ -191,13 +190,13 @@ class Library {
 
   private notifyListeners = () => {
     if (this.updateQueue.length > 0) {
-      jotaiStore.set(libraryItemsAtom, (s) => ({
+      editorJotaiStore.set(libraryItemsAtom, (s) => ({
         status: "loading",
         libraryItems: this.currLibraryItems,
         isInitialized: s.isInitialized,
       }));
     } else {
-      jotaiStore.set(libraryItemsAtom, {
+      editorJotaiStore.set(libraryItemsAtom, {
         status: "loaded",
         libraryItems: this.currLibraryItems,
         isInitialized: true,
@@ -225,7 +224,7 @@ class Library {
   destroy = () => {
     this.updateQueue = [];
     this.currLibraryItems = [];
-    jotaiStore.set(libraryItemSvgsCache, new Map());
+    editorJotaiStore.set(libraryItemSvgsCache, new Map());
     // TODO uncomment after/if we make jotai store scoped to each excal instance
     // jotaiStore.set(libraryItemsAtom, {
     //   status: "loading",

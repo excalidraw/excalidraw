@@ -14,8 +14,7 @@ import type {
 } from "../types";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { trackEvent } from "../analytics";
-import { atom, useAtom } from "jotai";
-import { jotaiScope } from "../jotai";
+import { atom, useAtom } from "../editor-jotai";
 import Spinner from "./Spinner";
 import {
   useApp,
@@ -61,7 +60,7 @@ export const LibraryMenuContent = ({
   selectedItems: LibraryItem["id"][];
   onSelectItems: (id: LibraryItem["id"][]) => void;
 }) => {
-  const [libraryItemsData] = useAtom(libraryItemsAtom, jotaiScope);
+  const [libraryItemsData] = useAtom(libraryItemsAtom);
 
   const _onAddToLibrary = useCallback(
     (elements: LibraryItem["elements"]) => {

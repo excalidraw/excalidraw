@@ -32,7 +32,7 @@
     "firebase": "8.3.3",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
-    "jotai": "1.13.1",
+    "jotai": "2.11.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "socket.io-client": "4.7.2",
