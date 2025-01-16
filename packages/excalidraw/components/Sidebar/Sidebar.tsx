@@ -8,8 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import { Island } from "../Island";
-import { atom } from "jotai";
-import { useSetAtom } from "../../jotai";
+import { atom, useSetAtom } from "../../editor-jotai";
 import type { SidebarProps, SidebarPropsContextValue } from "./common";
 import { SidebarPropsContext } from "./common";
 import { SidebarHeader } from "./SidebarHeader";

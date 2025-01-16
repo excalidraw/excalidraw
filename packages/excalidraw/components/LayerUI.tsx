@@ -41,7 +41,7 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "./App";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { useAtom, useAtomValue } from "../jotai";
+import { useAtom, useAtomValue } from "../editor-jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
@@ -147,7 +147,7 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
-  const TunnelsProvider = tunnels.jotai.Provider;
+  const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
@@ -564,11 +564,11 @@ const LayerUI = ({
 
   return (
     <UIAppStateContext.Provider value={appState}>
-      <TunnelsProvider>
+      <TunnelsJotaiProvider>
         <TunnelsContext.Provider value={tunnels}>
           {layerUIJSX}
         </TunnelsContext.Provider>
-      </TunnelsProvider>
+      </TunnelsJotaiProvider>
     </UIAppStateContext.Provider>
   );
 };

@@ -33,7 +33,7 @@ import {
 } from "../../actions";
 import clsx from "clsx";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import { useSetAtom } from "../../jotai";
+import { useSetAtom } from "../../editor-jotai";
 import { useUIAppState } from "../../context/ui-appState";
 import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
 import Trans from "../Trans";

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useTunnels } from "../../context/tunnels";
-import { useAtom } from "../../jotai";
+import { useAtom } from "../../editor-jotai";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { overwriteConfirmStateAtom } from "./OverwriteConfirmState";

@@ -1,6 +1,6 @@
-import { atom } from "jotai";
 import React, { useLayoutEffect, useRef } from "react";
 import { useTunnels } from "../../context/tunnels";
+import { atom } from "../../editor-jotai";
 
 export const withInternalFallback = <P,>(
   componentName: string,
@@ -14,7 +14,7 @@ export const withInternalFallback = <P,>(
     }
   > = (props) => {
     const {
-      jotai: { useAtom },
+      tunnelsJotai: { useAtom },
     } = useTunnels();
     // for rerenders
     const [, setCounter] = useAtom(renderAtom);

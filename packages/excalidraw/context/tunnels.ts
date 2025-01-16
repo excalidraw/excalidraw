@@ -15,14 +15,16 @@ type TunnelsContextValue = {
   DefaultSidebarTabTriggersTunnel: Tunnel;
   OverwriteConfirmDialogTunnel: Tunnel;
   TTDDialogTriggerTunnel: Tunnel;
-  jotai: ReturnType<typeof createIsolation>;
+  // this can be removed once we create jotai stores per each editor
+  // instance
+  tunnelsJotai: ReturnType<typeof createIsolation>;
 };
 
 export const TunnelsContext = React.createContext<TunnelsContextValue>(null!);
 
 export const useTunnels = () => React.useContext(TunnelsContext);
 
-const isolatedJotai = createIsolation();
+const tunnelsJotai = createIsolation();
 
 export const useInitializeTunnels = () => {
   return React.useMemo((): TunnelsContextValue => {
@@ -37,7 +39,7 @@ export const useInitializeTunnels = () => {
       DefaultSidebarTabTriggersTunnel: tunnel(),
       OverwriteConfirmDialogTunnel: tunnel(),
       TTDDialogTriggerTunnel: tunnel(),
-      jotai: isolatedJotai,
+      tunnelsJotai,
     };
   }, []);
 };

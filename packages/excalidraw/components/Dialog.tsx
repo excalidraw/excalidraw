@@ -12,7 +12,7 @@ import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { queryFocusableElements } from "../utils";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { useSetAtom } from "../jotai";
+import { useSetAtom } from "../editor-jotai";
 import { t } from "../i18n";
 import { CloseIcon } from "./icons";
 

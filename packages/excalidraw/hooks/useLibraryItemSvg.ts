@@ -1,7 +1,6 @@
-import { atom } from "jotai";
 import { useEffect, useState } from "react";
 import { COLOR_PALETTE } from "../colors";
-import { useAtom } from "../jotai";
+import { atom, useAtom } from "../editor-jotai";
 import { exportToSvg } from "../../utils/export";
 import type { LibraryItem } from "../types";
 

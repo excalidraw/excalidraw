@@ -7,7 +7,7 @@ import "./ConfirmDialog.scss";
 import DialogActionButton from "./DialogActionButton";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
-import { useSetAtom } from "../jotai";
+import { useSetAtom } from "../editor-jotai";
 
 interface Props extends Omit<DialogProps, "onCloseRequest"> {
   onConfirm: () => void;

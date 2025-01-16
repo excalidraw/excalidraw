@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { t } from "../i18n";
 import Trans from "./Trans";
-import { useAtom } from "../jotai";
+import { useAtom } from "../editor-jotai";
 import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { saveLibraryAsJSON } from "../data/json";

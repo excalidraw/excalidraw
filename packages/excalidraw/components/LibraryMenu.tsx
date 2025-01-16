@@ -14,8 +14,7 @@ import type {
 } from "../types";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { trackEvent } from "../analytics";
-import { atom } from "jotai";
-import { useAtom } from "../jotai";
+import { atom, useAtom } from "../editor-jotai";
 import Spinner from "./Spinner";
 import {
   useApp,

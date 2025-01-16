@@ -14,7 +14,7 @@ import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
 import clsx from "clsx";
 import { useRef } from "react";
-import { useAtom } from "../../jotai";
+import { useAtom } from "../../editor-jotai";
 import { ColorInput } from "./ColorInput";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";

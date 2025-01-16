@@ -25,8 +25,7 @@ import type { BinaryFiles } from "../../types";
 import { ArrowRightIcon } from "../icons";
 
 import "./TTDDialog.scss";
-import { atom } from "jotai";
-import { useAtom } from "../../jotai";
+import { atom, useAtom } from "../../editor-jotai";
 import { trackEvent } from "../../analytics";
 import { InlineIcon } from "../InlineIcon";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";

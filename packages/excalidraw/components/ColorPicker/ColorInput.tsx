@@ -3,7 +3,7 @@ import { getColor } from "./ColorPicker";
 import type { ColorPickerType } from "./colorPickerUtils";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { eyeDropperIcon } from "../icons";
-import { useAtom } from "../../jotai";
+import { useAtom } from "../../editor-jotai";
 import { KEYS } from "../../keys";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import clsx from "clsx";
