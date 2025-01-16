@@ -70,7 +70,6 @@ import {
 } from "../shapes";
 import { getGridPoint } from "../snapping";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
-import { debugClear, debugDrawPoint } from "../visualdebug";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -607,15 +606,6 @@ export class LinearElementEditor {
     let index = 0;
     const midPoints: typeof editorMidPointsCache["points"] =
       LinearElementEditor.getEditorMidPoints(element, elementsMap, appState);
-
-    debugClear();
-    midPoints.forEach((point, index) => {
-      point && debugDrawPoint(point, { permanent: true });
-    });
-    debugDrawPoint(pointFrom(scenePointer.x, scenePointer.y), {
-      permanent: true,
-      color: "red",
-    });
 
     while (index < midPoints.length) {
       if (midPoints[index] !== null) {

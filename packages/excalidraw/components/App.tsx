@@ -6177,35 +6177,50 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     if (this.state.selectedLinearElement) {
-      const elementIsElbowArrow = isElbowArrow(element);
-      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-        element,
-        elementsMap,
-        this.state.zoom,
-        scenePointerX,
-        scenePointerY,
-      );
-      const segmentMidPointHoveredCoords =
-        LinearElementEditor.getSegmentMidpointHitCoords(
-          linearElementEditor,
-          { x: scenePointerX, y: scenePointerY },
-          this.state,
-          this.scene.getNonDeletedElementsMap(),
+      let hoverPointIndex = -1;
+      let segmentMidPointHoveredCoords = null;
+      if (
+        hitElementItself({
+          x: scenePointerX,
+          y: scenePointerY,
+          element,
+          shape: getElementShape(
+            element,
+            this.scene.getNonDeletedElementsMap(),
+          ),
+        })
+      ) {
+        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+          element,
+          elementsMap,
+          this.state.zoom,
+          scenePointerX,
+          scenePointerY,
         );
-      const isHoveringAPointHandle =
-        (elementIsElbowArrow
+        segmentMidPointHoveredCoords =
+          LinearElementEditor.getSegmentMidpointHitCoords(
+            linearElementEditor,
+            { x: scenePointerX, y: scenePointerY },
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+        const isHoveringAPointHandle = isElbowArrow(element)
           ? hoverPointIndex === 0 ||
             hoverPointIndex === element.points.length - 1
-          : hoverPointIndex >= 0) || segmentMidPointHoveredCoords;
-
-      if (isHoveringAPointHandle) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-      } else if (
-        this.hitElement(scenePointerX, scenePointerY, element) &&
-        // Ebow arrows can only be moved when unconnected
-        (!elementIsElbowArrow || !(element.startBinding || element.endBinding))
-      ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          : hoverPointIndex >= 0;
+        if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+        }
+      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
+        if (
+          // Ebow arrows can only be moved when unconnected
+          !isElbowArrow(element) ||
+          !(element.startBinding || element.endBinding)
+        ) {
+          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+        }
       }
 
       if (
@@ -6589,12 +6604,11 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const hitElement = this.getElementAtPosition(
-      scenePointer.x,
-      scenePointer.y,
-    );
-
     if (this.device.isTouchScreen) {
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+      );
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
         hitElement,
@@ -6931,6 +6945,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         selectedElements.length === 1 &&
         !this.state.editingLinearElement &&
+        !isElbowArrow(selectedElements[0]) &&
         !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
@@ -6999,9 +7014,9 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        const linearElementEditor =
-          this.state.editingLinearElement || this.state.selectedLinearElement;
-        if (linearElementEditor) {
+        if (this.state.selectedLinearElement) {
+          const linearElementEditor =
+            this.state.editingLinearElement || this.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this,
@@ -7233,7 +7248,7 @@ class App extends React.Component<AppProps, AppState> {
                     this,
                   ),
                   showHyperlinkPopup:
-                    hitElement!.link || isEmbeddableElement(hitElement)
+                    hitElement.link || isEmbeddableElement(hitElement)
                       ? "info"
                       : false,
                 };
