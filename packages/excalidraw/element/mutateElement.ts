@@ -35,10 +35,14 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fileId } = updates as any;
+  const { points, fixedSegments, fileId } = updates as any;
 
-  if (isElbowArrow(element)) {
-    const { fixedSegments } = updates as any;
+  if (
+    isElbowArrow(element) &&
+    (Object.keys(updates).length === 0 || // normalization case
+      typeof points !== "undefined" || // repositioning
+      typeof fixedSegments !== "undefined") // segment fixing
+  ) {
     const mergedElementsMap = toBrandedType<SceneElementsMap>(
       new Map([
         ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
