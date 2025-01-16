@@ -5361,10 +5361,36 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
           LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
 
+          const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
+            {
+              ...this.state.selectedLinearElement,
+              segmentMidPointHoveredCoords: null,
+            },
+            { x: sceneX, y: sceneY },
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          const nextIndex = nextCoords
+            ? LinearElementEditor.getSegmentMidPointIndex(
+                this.state.selectedLinearElement,
+                this.state,
+                nextCoords,
+                this.scene.getNonDeletedElementsMap(),
+              )
+            : null;
+
           this.setState({
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
-              segmentMidPointHoveredCoords: null,
+              pointerDownState: {
+                ...this.state.selectedLinearElement.pointerDownState,
+                segmentMidpoint: {
+                  index: nextIndex,
+                  value: hitCoords,
+                  added: false,
+                },
+              },
+              segmentMidPointHoveredCoords: nextCoords,
             },
           });
 
@@ -7903,10 +7929,32 @@ class App extends React.Component<AppProps, AppState> {
           event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
         );
 
+        let index =
+          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+            .index;
+        if (index < 0) {
+          const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
+            {
+              ...this.state.selectedLinearElement,
+              segmentMidPointHoveredCoords: null,
+            },
+            { x: gridX, y: gridY },
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          index = nextCoords
+            ? LinearElementEditor.getSegmentMidPointIndex(
+                this.state.selectedLinearElement,
+                this.state,
+                nextCoords,
+                this.scene.getNonDeletedElementsMap(),
+              )
+            : -1;
+        }
+
         const ret = LinearElementEditor.moveFixedSegment(
           this.state.selectedLinearElement,
-          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
-            .index,
+          index,
           gridX,
           gridY,
           this.scene.getNonDeletedElementsMap(),
