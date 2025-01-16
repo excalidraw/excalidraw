@@ -381,10 +381,6 @@ const ExcalidrawWrapper = () => {
         window.visualDebug = {
           data: [],
         };
-        import("../packages/excalidraw/visualdebug").then((module) => {
-          window.debugDrawPoint = module.debugDrawPoint;
-          window.debugDrawLine = module.debugDrawLine;
-        });
       } else {
         delete window.visualDebug;
       }
