@@ -448,7 +448,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
-import type { GlobalPoint, LocalPoint, Radians } from "../../math";
+import type { LocalPoint, Radians } from "../../math";
 import {
   clamp,
   pointFrom,
@@ -460,7 +460,6 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-  pointFromCoords,
 } from "../../math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
