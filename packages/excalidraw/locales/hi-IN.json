@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "त्रिभुज (बाह्यरेखा)",
     "arrowhead_diamond": "ईंट",
     "arrowhead_diamond_outline": "ईंट (बाह्यरेखा)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "चिड़िया पैर (अनेक)",
+    "arrowhead_crowfoot_one": "चिड़िया पैर (एक)",
+    "arrowhead_crowfoot_one_or_many": "चिड़िया पैर (एक या अनेक)",
+    "more_options": "और विकल्प",
     "arrowtypes": "तीर प्रकार",
     "arrowtype_sharp": "नुकीला तीर",
     "arrowtype_round": "गोलाकार तीर",
@@ -165,12 +165,12 @@
     "unCroppedDimension": "कटाई पूर्व आयाम",
     "copyElementLink": "वस्तु की कड़ी कॉपी करें",
     "linkToElement": "वस्तु की कड़ी",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे"
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
     "desc": "चित्र-पटल पर किसी आकार पर क्लिक करें अथवा कड़ी को चिपकाये",
-    "notFound": "चित्रपटल पर कड़ी वाली वस्तु नहीं मिली"
+    "notFound": "चित्र-पटल पर कड़ी वाली वस्तु नहीं मिली"
   },
   "library": {
     "noItems": "अभी तक कोई अवयव जोडा नहीं गया.",
