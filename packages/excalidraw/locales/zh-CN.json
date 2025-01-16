@@ -165,7 +165,7 @@
     "unCroppedDimension": "未裁剪的尺寸",
     "copyElementLink": "复制此对象的链接",
     "linkToElement": "链接到对象",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "用选中的元素创建画框"
   },
   "elementLink": {
     "title": "链接到对象",
