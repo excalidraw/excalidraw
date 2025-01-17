@@ -1,8 +1,7 @@
 import React from "react";
-import { useAtom } from "jotai";
 
 import { useTunnels } from "../../context/tunnels";
-import { jotaiScope } from "../../jotai";
+import { useAtom } from "../../editor-jotai";
 import { Dialog } from "../Dialog";
 import { withInternalFallback } from "../hoc/withInternalFallback";
 import { overwriteConfirmStateAtom } from "./OverwriteConfirmState";
@@ -23,7 +22,6 @@ const OverwriteConfirmDialog = Object.assign(
       const { OverwriteConfirmDialogTunnel } = useTunnels();
       const [overwriteConfirmState, setState] = useAtom(
         overwriteConfirmStateAtom,
-        jotaiScope,
       );
 
       if (!overwriteConfirmState.active) {

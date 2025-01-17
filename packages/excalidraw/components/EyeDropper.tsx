@@ -1,4 +1,3 @@
-import { atom } from "jotai";
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { rgbToHex } from "../colors";
@@ -14,6 +13,7 @@ import { useStable } from "../hooks/useStable";
 import "./EyeDropper.scss";
 import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
 import type { ExcalidrawElement } from "../element/types";
+import { atom } from "../editor-jotai";
 
 export type EyeDropperProperties = {
   keepOpenOnAlt: boolean;

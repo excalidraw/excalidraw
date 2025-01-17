@@ -11,8 +11,7 @@ import { measureText } from "../element/textElement";
 import { addEventListener, getFontString } from "../utils";
 import { KEYS } from "../keys";
 import clsx from "clsx";
-import { atom, useAtom } from "jotai";
-import { jotaiScope } from "../jotai";
+import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 import { isElementCompletelyInViewport } from "../element/sizeHelpers";
 import { randomInteger } from "../random";
@@ -58,7 +57,7 @@ export const SearchMenu = () => {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const [inputValue, setInputValue] = useAtom(searchQueryAtom, jotaiScope);
+  const [inputValue, setInputValue] = useAtom(searchQueryAtom);
   const searchQuery = inputValue.trim() as SearchQuery;
 
   const [isSearching, setIsSearching] = useState(false);
@@ -70,10 +69,7 @@ export const SearchMenu = () => {
   const searchedQueryRef = useRef<SearchQuery | null>(null);
   const lastSceneNonceRef = useRef<number | undefined>(undefined);
 
-  const [focusIndex, setFocusIndex] = useAtom(
-    searchItemInFocusAtom,
-    jotaiScope,
-  );
+  const [focusIndex, setFocusIndex] = useAtom(searchItemInFocusAtom);
   const elementsMap = app.scene.getNonDeletedElementsMap();
 
   useEffect(() => {

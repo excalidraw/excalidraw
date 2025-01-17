@@ -5,7 +5,7 @@ import type { ExcalidrawElement } from "../../element/types";
 import { ShadeList } from "./ShadeList";
 
 import PickerColorList from "./PickerColorList";
-import { useAtom } from "jotai";
+import { useAtom } from "../../editor-jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
