@@ -9,19 +9,120 @@ import {
   render,
 } from "../tests/test-utils";
 import { bindLinearElement } from "./binding";
-import { Excalidraw } from "../index";
-import { mutateElbowArrow } from "./routing";
+import { Excalidraw, mutateElement } from "../index";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
 } from "./types";
 import { ARROW_TYPE } from "../constants";
+import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
 
 const { h } = window;
 
 const mouse = new Pointer("mouse");
+
+describe("elbow arrow segment move", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("can move the second segment of a fully connected elbow arrow", () => {
+    UI.createElement("rectangle", {
+      x: -100,
+      y: -50,
+      width: 100,
+      height: 100,
+    });
+    UI.createElement("rectangle", {
+      x: 200,
+      y: 150,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 0);
+    mouse.click();
+    mouse.moveTo(200, 200);
+    mouse.click();
+
+    mouse.reset();
+    mouse.moveTo(100, 100);
+    mouse.down();
+    mouse.moveTo(115, 100);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawElbowArrowElement;
+
+    expect(h.state.selectedElementIds).toEqual({ [arrow.id]: true });
+    expect(arrow.fixedSegments?.length).toBe(1);
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [110, 0],
+      [110, 200],
+      [190, 200],
+    ]);
+
+    mouse.reset();
+    mouse.moveTo(105, 74.275);
+    mouse.doubleClick();
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [110, 0],
+      [110, 200],
+      [190, 200],
+    ]);
+  });
+
+  it("can move the second segment of an unconnected elbow arrow", () => {
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(0, 0);
+    mouse.click();
+    mouse.moveTo(250, 200);
+    mouse.click();
+
+    mouse.reset();
+    mouse.moveTo(125, 100);
+    mouse.down();
+    mouse.moveTo(130, 100);
+    mouse.up();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [130, 0],
+      [130, 200],
+      [250, 200],
+    ]);
+
+    mouse.reset();
+    mouse.moveTo(130, 100);
+    mouse.doubleClick();
+
+    expect(arrow.points).toCloselyEqualPoints([
+      [0, 0],
+      [125, 0],
+      [125, 200],
+      [250, 200],
+    ]);
+  });
+});
 
 describe("elbow arrow routing", () => {
   it("can properly generate orthogonal arrow points", () => {
@@ -31,10 +132,12 @@ describe("elbow arrow routing", () => {
       elbowed: true,
     }) as ExcalidrawElbowArrowElement;
     scene.insertElement(arrow);
-    mutateElbowArrow(arrow, scene.getNonDeletedElementsMap(), [
-      pointFrom(-45 - arrow.x, -100.1 - arrow.y),
-      pointFrom(45 - arrow.x, 99.9 - arrow.y),
-    ]);
+    mutateElement(arrow, {
+      points: [
+        pointFrom<LocalPoint>(-45 - arrow.x, -100.1 - arrow.y),
+        pointFrom<LocalPoint>(45 - arrow.x, 99.9 - arrow.y),
+      ],
+    });
     expect(arrow.points).toEqual([
       [0, 0],
       [0, 100],
@@ -81,7 +184,9 @@ describe("elbow arrow routing", () => {
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
 
-    mutateElbowArrow(arrow, elementsMap, [pointFrom(0, 0), pointFrom(90, 200)]);
+    mutateElement(arrow, {
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
+    });
 
     expect(arrow.points).toEqual([
       [0, 0],
@@ -182,8 +287,6 @@ describe("elbow arrow ui", () => {
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
       [35, 0],
-      [35, 90],
-      [35, 90], // Note that coordinates are rounded above!
       [35, 165],
       [103, 165],
     ]);

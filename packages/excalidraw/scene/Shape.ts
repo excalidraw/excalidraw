@@ -23,13 +23,9 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
-import {
-  pointFrom,
-  pointDistance,
-  type GlobalPoint,
-  type LocalPoint,
-} from "../../math";
+import { pointFrom, pointDistance, type LocalPoint } from "../../math";
 import { getCornerRadius, isPathALoop } from "../shapes";
+import { headingForPointIsHorizontal } from "../element/heading";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -527,45 +523,53 @@ export const _generateElementShape = (
   }
 };
 
-const generateElbowArrowShape = <Point extends GlobalPoint | LocalPoint>(
-  points: readonly Point[],
+const generateElbowArrowShape = (
+  points: readonly LocalPoint[],
   radius: number,
 ) => {
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
     const next = points[i + 1];
+    const point = points[i];
+    const prevIsHorizontal = headingForPointIsHorizontal(point, prev);
+    const nextIsHorizontal = headingForPointIsHorizontal(next, point);
     const corner = Math.min(
       radius,
       pointDistance(points[i], next) / 2,
       pointDistance(points[i], prev) / 2,
     );
 
-    if (prev[0] < points[i][0] && prev[1] === points[i][1]) {
-      // LEFT
-      subpoints.push([points[i][0] - corner, points[i][1]]);
-    } else if (prev[0] === points[i][0] && prev[1] < points[i][1]) {
+    if (prevIsHorizontal) {
+      if (prev[0] < point[0]) {
+        // LEFT
+        subpoints.push([points[i][0] - corner, points[i][1]]);
+      } else {
+        // RIGHT
+        subpoints.push([points[i][0] + corner, points[i][1]]);
+      }
+    } else if (prev[1] < point[1]) {
       // UP
       subpoints.push([points[i][0], points[i][1] - corner]);
-    } else if (prev[0] > points[i][0] && prev[1] === points[i][1]) {
-      // RIGHT
-      subpoints.push([points[i][0] + corner, points[i][1]]);
     } else {
       subpoints.push([points[i][0], points[i][1] + corner]);
     }
 
     subpoints.push(points[i] as [number, number]);
 
-    if (next[0] < points[i][0] && next[1] === points[i][1]) {
-      // LEFT
-      subpoints.push([points[i][0] - corner, points[i][1]]);
-    } else if (next[0] === points[i][0] && next[1] < points[i][1]) {
+    if (nextIsHorizontal) {
+      if (next[0] < point[0]) {
+        // LEFT
+        subpoints.push([points[i][0] - corner, points[i][1]]);
+      } else {
+        // RIGHT
+        subpoints.push([points[i][0] + corner, points[i][1]]);
+      }
+    } else if (next[1] < point[1]) {
       // UP
       subpoints.push([points[i][0], points[i][1] - corner]);
-    } else if (next[0] > points[i][0] && next[1] === points[i][1]) {
-      // RIGHT
-      subpoints.push([points[i][0] + corner, points[i][1]]);
     } else {
+      // DOWN
       subpoints.push([points[i][0], points[i][1] + corner]);
     }
   }
