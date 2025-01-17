@@ -6,7 +6,7 @@ import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import { isElbowArrow } from "./typeChecks";
-import { updateElbowArrowPoints } from "./elbowarrow";
+import { updateElbowArrowPoints } from "./elbowArrow";
 import type { Radians } from "../../math";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
