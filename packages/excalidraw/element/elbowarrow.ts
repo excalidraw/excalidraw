@@ -875,37 +875,39 @@ export const updateElbowArrowPoints = (
     return { points: updates.points ?? arrow.points };
   }
 
-  invariant(
-    !updates.points || updates.points.length >= 2,
-    "Updated point array length must match the arrow point length, contain " +
-      "exactly the new start and end points or not be specified at all (i.e. " +
-      "you can't add new points between start and end manually to elbow arrows)",
-  );
+  if (import.meta.env.DEV) {
+    invariant(
+      !updates.points || updates.points.length >= 2,
+      "Updated point array length must match the arrow point length, contain " +
+        "exactly the new start and end points or not be specified at all (i.e. " +
+        "you can't add new points between start and end manually to elbow arrows)",
+    );
 
-  invariant(
-    !arrow.fixedSegments ||
-      arrow.fixedSegments
-        .map((s) => s.start[0] === s.end[0] || s.start[1] === s.end[1])
-        .every(Boolean),
-    "Fixed segments must be either horizontal or vertical",
-  );
+    invariant(
+      !arrow.fixedSegments ||
+        arrow.fixedSegments
+          .map((s) => s.start[0] === s.end[0] || s.start[1] === s.end[1])
+          .every(Boolean),
+      "Fixed segments must be either horizontal or vertical",
+    );
 
-  invariant(
-    !updates.fixedSegments ||
-      updates.fixedSegments
-        .map((s) => s.start[0] === s.end[0] || s.start[1] === s.end[1])
-        .every(Boolean),
-    "Updates to fixed segments must be either horizontal or vertical",
-  );
+    invariant(
+      !updates.fixedSegments ||
+        updates.fixedSegments
+          .map((s) => s.start[0] === s.end[0] || s.start[1] === s.end[1])
+          .every(Boolean),
+      "Updates to fixed segments must be either horizontal or vertical",
+    );
 
-  invariant(
-    arrow.points
-      .slice(1)
-      .map(
-        (p, i) => p[0] === arrow.points[i][0] || p[1] === arrow.points[i][1],
-      ),
-    "Elbow arrow segments must be either horizontal or vertical",
-  );
+    invariant(
+      arrow.points
+        .slice(1)
+        .map(
+          (p, i) => p[0] === arrow.points[i][0] || p[1] === arrow.points[i][1],
+        ),
+      "Elbow arrow segments must be either horizontal or vertical",
+    );
+  }
 
   const updatedPoints: readonly LocalPoint[] = updates.points
     ? updates.points && updates.points.length === 2
