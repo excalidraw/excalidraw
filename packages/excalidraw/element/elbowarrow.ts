@@ -1908,8 +1908,8 @@ const getBindableElementForId = (
 const normalizeArrowElementUpdate = (
   global: GlobalPoint[],
   nextFixedSegments: FixedSegment[] | null,
-  startIsSpecial?: boolean | null,
-  endIsSpecial?: boolean | null,
+  startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
+  endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
 ): {
   points: LocalPoint[];
   x: number;
@@ -1917,8 +1917,8 @@ const normalizeArrowElementUpdate = (
   width: number;
   height: number;
   fixedSegments: FixedSegment[] | null;
-  startIsSpecial?: boolean | null;
-  endIsSpecial?: boolean | null;
+  startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
+  endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
 } => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
