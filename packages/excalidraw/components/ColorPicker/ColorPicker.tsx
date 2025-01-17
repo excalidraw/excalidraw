@@ -5,7 +5,6 @@ import { TopPicks } from "./TopPicks";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { Picker } from "./Picker";
 import * as Popover from "@radix-ui/react-popover";
-import { useAtom } from "jotai";
 import type { ColorPickerType } from "./colorPickerUtils";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { useExcalidrawContainer } from "../App";
@@ -15,7 +14,7 @@ import PickerHeading from "./PickerHeading";
 import { t } from "../../i18n";
 import clsx from "clsx";
 import { useRef } from "react";
-import { jotaiScope } from "../../jotai";
+import { useAtom } from "../../editor-jotai";
 import { ColorInput } from "./ColorInput";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
@@ -76,10 +75,7 @@ const ColorPickerPopupContent = ({
   const { container } = useExcalidrawContainer();
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
-  const [eyeDropperState, setEyeDropperState] = useAtom(
-    activeEyeDropperAtom,
-    jotaiScope,
-  );
+  const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   const colorInputJSX = (
     <div>

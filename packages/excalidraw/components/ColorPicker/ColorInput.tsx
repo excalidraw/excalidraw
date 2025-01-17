@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getColor } from "./ColorPicker";
-import { useAtom } from "jotai";
 import type { ColorPickerType } from "./colorPickerUtils";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { eyeDropperIcon } from "../icons";
-import { jotaiScope } from "../../jotai";
+import { useAtom } from "../../editor-jotai";
 import { KEYS } from "../../keys";
 import { COLOR_NAMES } from "../../constants"; //zsviczian
 import { activeEyeDropperAtom } from "../EyeDropper";
@@ -88,10 +87,7 @@ export const ColorInput = ({
     }
     return "#000000";
   };
-  const [eyeDropperState, setEyeDropperState] = useAtom(
-    activeEyeDropperAtom,
-    jotaiScope,
-  );
+  const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   useEffect(() => {
     return () => {
