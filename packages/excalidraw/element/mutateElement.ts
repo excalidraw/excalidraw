@@ -27,7 +27,14 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   updates: ElementUpdate<TElement>,
   informMutation = true,
   options?: {
+    // Currently only for elbow arrows.
+    // If true, the elbow arrow tries to bind to the nearest element. If false
+    // it tries to keep the same bound element, if any.
     isDragging?: boolean;
+    // Currently only for elbow arrows.
+    // Any element you provide here will be added to the scene elements map
+    // used by updateElbowArrow() to calculate the new points. The provided
+    // elements with the same id will override any existing elements in the map.
     changedElements?: Map<string, OrderedExcalidrawElement>;
   },
 ): TElement => {
