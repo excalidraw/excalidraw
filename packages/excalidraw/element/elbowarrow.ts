@@ -876,9 +876,7 @@ export const updateElbowArrowPoints = (
   }
 
   invariant(
-    !updates.points ||
-      arrow.points.length === updates.points.length ||
-      updates.points.length === 2,
+    !updates.points || updates.points.length >= 2,
     "Updated point array length must match the arrow point length, contain " +
       "exactly the new start and end points or not be specified at all (i.e. " +
       "you can't add new points between start and end manually to elbow arrows)",
