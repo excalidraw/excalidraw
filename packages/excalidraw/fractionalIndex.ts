@@ -190,7 +190,6 @@ export const syncInvalidIndices = (
 ): OrderedExcalidrawElement[] => {
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
-
   for (const [element, update] of elementsUpdates) {
     mutateElement(element, update, false);
   }

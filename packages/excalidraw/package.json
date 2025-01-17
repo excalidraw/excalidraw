@@ -117,6 +117,7 @@
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
     "import-meta-loader": "1.1.0",
+    "jest-diff": "29.7.0",
     "mini-css-extract-plugin": "2.6.1",
     "postcss-loader": "7.0.1",
     "sass-loader": "13.0.2",

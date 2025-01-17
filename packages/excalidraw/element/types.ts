@@ -319,6 +319,12 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endArrowhead: Arrowhead | null;
   }>;
 
+export type FixedSegment = {
+  start: LocalPoint;
+  end: LocalPoint;
+  index: number;
+};
+
 export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
@@ -331,6 +337,23 @@ export type ExcalidrawElbowArrowElement = Merge<
     elbowed: true;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
+    fixedSegments: FixedSegment[] | null;
+    /**
+     * Marks that the 3rd point should be used as the 2nd point of the arrow in
+     * order to temporarily hide the first segment of the arrow without losing
+     * the data from the points array. It allows creating the expected arrow
+     * path when the arrow with fixed segments is bound on a horizontal side and
+     * moved to a vertical and vica versa.
+     */
+    startIsSpecial: boolean | null;
+    /**
+     * Marks that the 3rd point backwards from the end should be used as the 2nd
+     * point of the arrow in order to temporarily hide the last segment of the
+     * arrow without losing the data from the points array. It allows creating
+     * the expected arrow path when the arrow with fixed segments is bound on a
+     * horizontal side and moved to a vertical and vica versa.
+     */
+    endIsSpecial: boolean | null;
   }
 >;
 
