@@ -40,24 +40,26 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     legacySetup: (resolve, reject, input) => {
       let isResolved = false;
       let checkInterval: number | null = null;
-      
+
       // Increased delay for iOS to ensure file selection is complete
       const CHECK_INTERVAL = 100; // 100ms
       const MAX_CHECKS = 50; // 5 seconds total
       let checkCount = 0;
 
       const scheduleRejection = debounce(reject, INPUT_CHANGE_INTERVAL_MS);
-      
+
       const checkForFile = () => {
-        if (isResolved) return;
-        
+        if (isResolved) {
+          return;
+        }
+
         if (input.files?.length) {
           isResolved = true;
           const ret = opts.multiple ? [...input.files] : input.files[0];
           resolve(ret as RetType);
           return true;
         }
-        
+
         checkCount++;
         if (checkCount >= MAX_CHECKS) {
           scheduleRejection();
@@ -73,7 +75,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
             clearInterval(checkInterval!);
           }
         }, CHECK_INTERVAL);
-        
+
         document.addEventListener(EVENT.KEYUP, scheduleRejection);
         document.addEventListener(EVENT.POINTER_UP, scheduleRejection);
       };
@@ -90,7 +92,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
         window.removeEventListener(EVENT.FOCUS, focusHandler);
         document.removeEventListener(EVENT.KEYUP, scheduleRejection);
         document.removeEventListener(EVENT.POINTER_UP, scheduleRejection);
-        
+
         if (rejectPromise && !isResolved) {
           console.warn("Opening the file was canceled (legacy-fs).");
           rejectPromise(new AbortError());
