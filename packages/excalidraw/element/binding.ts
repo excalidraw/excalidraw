@@ -623,11 +623,9 @@ export const updateBoundElements = (
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
-    zoom?: AppState["zoom"];
   },
 ) => {
-  const { newSize, simultaneouslyUpdated, changedElements, zoom } =
-    options ?? {};
+  const { newSize, simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -661,7 +659,7 @@ export const updateBoundElements = (
 
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
-      mutateElement(element, bindings);
+      mutateElement(element, bindings, true);
       return;
     }
 
@@ -703,23 +701,14 @@ export const updateBoundElements = (
       }> => update !== null,
     );
 
-    LinearElementEditor.movePoints(
-      element,
-      updates,
-      elementsMap,
-      {
-        ...(changedElement.id === element.startBinding?.elementId
-          ? { startBinding: bindings.startBinding }
-          : {}),
-        ...(changedElement.id === element.endBinding?.elementId
-          ? { endBinding: bindings.endBinding }
-          : {}),
-      },
-      {
-        changedElements,
-        zoom,
-      },
-    );
+    LinearElementEditor.movePoints(element, updates, {
+      ...(changedElement.id === element.startBinding?.elementId
+        ? { startBinding: bindings.startBinding }
+        : {}),
+      ...(changedElement.id === element.endBinding?.elementId
+        ? { endBinding: bindings.endBinding }
+        : {}),
+    });
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
@@ -778,9 +767,7 @@ export const getHeadingForElbowArrowSnap = (
     );
   }
 
-  const pointHeading = headingForPointFromElement(bindableElement, aabb, p);
-
-  return pointHeading;
+  return headingForPointFromElement(bindableElement, aabb, p);
 };
 
 const getDistanceForBinding = (
@@ -2283,7 +2270,7 @@ export const getGlobalFixedPointForBindableElement = (
   );
 };
 
-const getGlobalFixedPoints = (
+export const getGlobalFixedPoints = (
   arrow: ExcalidrawElbowArrowElement,
   elementsMap: ElementsMap,
 ): [GlobalPoint, GlobalPoint] => {

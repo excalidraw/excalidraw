@@ -62,6 +62,22 @@ export function pointFromVector<P extends GlobalPoint | LocalPoint>(
 }
 
 /**
+ * Convert the coordiante object to a point.
+ *
+ * @param coords The coordinate object with x and y properties
+ * @returns
+ */
+export function pointFromCoords<Point extends GlobalPoint | LocalPoint>({
+  x,
+  y,
+}: {
+  x: number;
+  y: number;
+}) {
+  return [x, y] as Point;
+}
+
+/**
  * Checks if the provided value has the shape of a Point.
  *
  * @param p The value to attempt verification on
@@ -217,7 +233,10 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
   a: P,
   b: P,
 ): number {
-  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const xDiff = b[0] - a[0];
+  const yDiff = b[1] - a[1];
+
+  return xDiff * xDiff + yDiff * yDiff;
 }
 
 /**

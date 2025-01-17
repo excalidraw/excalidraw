@@ -11,6 +11,7 @@ import {
   pointScaleFromOrigin,
   radiansToDegrees,
   triangleIncludesPoint,
+  vectorFromPoint,
 } from "../../math";
 import { getCenterForBounds, type Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
@@ -52,8 +53,23 @@ export const vectorToHeading = (vec: Vector): Heading => {
   return HEADING_UP;
 };
 
+export const headingForPoint = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  o: P,
+) => vectorToHeading(vectorFromPoint<P>(p, o));
+
+export const headingForPointIsHorizontal = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  o: P,
+) => headingIsHorizontal(headingForPoint<P>(p, o));
+
 export const compareHeading = (a: Heading, b: Heading) =>
   a[0] === b[0] && a[1] === b[1];
+
+export const headingIsHorizontal = (a: Heading) =>
+  compareHeading(a, HEADING_RIGHT) || compareHeading(a, HEADING_LEFT);
+
+export const headingIsVertical = (a: Heading) => !headingIsHorizontal(a);
 
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
@@ -63,7 +79,7 @@ export const headingForPointFromElement = <
 >(
   element: Readonly<ExcalidrawBindableElement>,
   aabb: Readonly<Bounds>,
-  p: Readonly<LocalPoint | GlobalPoint>,
+  p: Readonly<Point>,
 ): Heading => {
   const SEARCH_CONE_MULTIPLIER = 2;
 
@@ -117,14 +133,22 @@ export const headingForPointFromElement = <
       element.angle,
     );
 
-    if (triangleIncludesPoint([top, right, midPoint] as Triangle<Point>, p)) {
+    if (
+      triangleIncludesPoint<Point>([top, right, midPoint] as Triangle<Point>, p)
+    ) {
       return headingForDiamond(top, right);
     } else if (
-      triangleIncludesPoint([right, bottom, midPoint] as Triangle<Point>, p)
+      triangleIncludesPoint<Point>(
+        [right, bottom, midPoint] as Triangle<Point>,
+        p,
+      )
     ) {
       return headingForDiamond(right, bottom);
     } else if (
-      triangleIncludesPoint([bottom, left, midPoint] as Triangle<Point>, p)
+      triangleIncludesPoint<Point>(
+        [bottom, left, midPoint] as Triangle<Point>,
+        p,
+      )
     ) {
       return headingForDiamond(bottom, left);
     }
@@ -153,17 +177,17 @@ export const headingForPointFromElement = <
     SEARCH_CONE_MULTIPLIER,
   ) as Point;
 
-  return triangleIncludesPoint(
+  return triangleIncludesPoint<Point>(
     [topLeft, topRight, midPoint] as Triangle<Point>,
     p,
   )
     ? HEADING_UP
-    : triangleIncludesPoint(
+    : triangleIncludesPoint<Point>(
         [topRight, bottomRight, midPoint] as Triangle<Point>,
         p,
       )
     ? HEADING_RIGHT
-    : triangleIncludesPoint(
+    : triangleIncludesPoint<Point>(
         [bottomRight, bottomLeft, midPoint] as Triangle<Point>,
         p,
       )

@@ -24,8 +24,8 @@ import {
   isElbowArrow,
   isLinearElement,
 } from "../element/typeChecks";
-import { mutateElbowArrow } from "../element/routing";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { deepCopyElement } from "../element/newElement";
 import { getCommonBoundingBox } from "../element/bounds";
 
 export const actionFlipHorizontal = register({
@@ -134,12 +134,24 @@ const flipElements = (
 
   const { midX, midY } = getCommonBoundingBox(selectedElements);
 
-  resizeMultipleElements(selectedElements, elementsMap, "nw", app.scene, {
-    flipByX: flipDirection === "horizontal",
-    flipByY: flipDirection === "vertical",
-    shouldResizeFromCenter: true,
-    shouldMaintainAspectRatio: true,
-  });
+  resizeMultipleElements(
+    selectedElements,
+    elementsMap,
+    "nw",
+    app.scene,
+    new Map(
+      Array.from(elementsMap.values()).map((element) => [
+        element.id,
+        deepCopyElement(element),
+      ]),
+    ),
+    {
+      flipByX: flipDirection === "horizontal",
+      flipByY: flipDirection === "vertical",
+      shouldResizeFromCenter: true,
+      shouldMaintainAspectRatio: true,
+    },
+  );
 
   bindOrUnbindLinearElements(
     selectedElements.filter(isLinearElement),
@@ -181,16 +193,10 @@ const flipElements = (
     }),
   );
   elbowArrows.forEach((element) =>
-    mutateElbowArrow(
-      element,
-      elementsMap,
-      element.points,
-      undefined,
-      undefined,
-      {
-        informMutation: false,
-      },
-    ),
+    mutateElement(element, {
+      x: element.x + diffX,
+      y: element.y + diffY,
+    }),
   );
   // ---------------------------------------------------------------------------
 

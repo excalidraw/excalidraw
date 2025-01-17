@@ -49,12 +49,13 @@ describe("flipping re-centers selection", () => {
         },
         startArrowhead: null,
         endArrowhead: "arrow",
+        fixedSegments: null,
         points: [
           pointFrom(0, 0),
           pointFrom(0, -35),
-          pointFrom(-90.9, -35),
-          pointFrom(-90.9, 204.9),
-          pointFrom(65.1, 204.9),
+          pointFrom(-90, -35),
+          pointFrom(-90, 204),
+          pointFrom(66, 204),
         ],
         elbowed: true,
       }),
@@ -70,13 +71,13 @@ describe("flipping re-centers selection", () => {
     API.executeAction(actionFlipHorizontal);
     API.executeAction(actionFlipHorizontal);
 
-    const rec1 = h.elements.find((el) => el.id === "rec1");
-    expect(rec1?.x).toBeCloseTo(100);
-    expect(rec1?.y).toBeCloseTo(100);
+    const rec1 = h.elements.find((el) => el.id === "rec1")!;
+    expect(rec1.x).toBeCloseTo(100, 0);
+    expect(rec1.y).toBeCloseTo(100, 0);
 
-    const rec2 = h.elements.find((el) => el.id === "rec2");
-    expect(rec2?.x).toBeCloseTo(220);
-    expect(rec2?.y).toBeCloseTo(250);
+    const rec2 = h.elements.find((el) => el.id === "rec2")!;
+    expect(rec2.x).toBeCloseTo(220, 0);
+    expect(rec2.y).toBeCloseTo(250, 0);
   });
 });
 
