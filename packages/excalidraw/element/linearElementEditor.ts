@@ -7,7 +7,6 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
   NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
   FixedPointBinding,
   SceneElementsMap,
   FixedSegment,
@@ -1261,10 +1260,6 @@ export class LinearElementEditor {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
     },
-    options?: {
-      changedElements?: Map<string, OrderedExcalidrawElement>;
-      isDragging?: boolean;
-    },
   ) {
     const { points } = element;
 
@@ -1314,7 +1309,6 @@ export class LinearElementEditor {
             dragging || targetPoint.isDragging === true,
           false,
         ),
-        changedElements: options?.changedElements,
       },
     );
   }
@@ -1426,7 +1420,6 @@ export class LinearElementEditor {
       endBinding?: PointBinding | null;
     },
     options?: {
-      changedElements?: Map<string, OrderedExcalidrawElement>;
       isDragging?: boolean;
       zoom?: AppState["zoom"];
     },
@@ -1464,7 +1457,6 @@ export class LinearElementEditor {
 
       mutateElement(element, updates, true, {
         isDragging: options?.isDragging,
-        changedElements: options?.changedElements,
       });
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);

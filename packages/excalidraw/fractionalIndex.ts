@@ -156,11 +156,6 @@ export const syncMovedIndices = (
     const elementsCandidates = elements.map((x) =>
       elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
     );
-    const changedElements = new Map(
-      elementsCandidates
-        .filter((x): x is OrderedExcalidrawElement => x.index !== null)
-        .map((x) => [x.id, x]),
-    );
 
     // ensure next indices are valid before mutation, throws on invalid ones
     validateFractionalIndices(
@@ -175,7 +170,7 @@ export const syncMovedIndices = (
 
     // split mutation so we don't end up in an incosistent state
     for (const [element, update] of elementsUpdates) {
-      mutateElement(element, update, false, { changedElements });
+      mutateElement(element, update, false);
     }
   } catch (e) {
     // fallback to default sync
@@ -195,17 +190,8 @@ export const syncInvalidIndices = (
 ): OrderedExcalidrawElement[] => {
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
-  const changedElements = new Map(
-    elements
-      .map((x) =>
-        elementsUpdates.has(x) ? { ...x, ...elementsUpdates.get(x) } : x,
-      )
-      .filter((x): x is OrderedExcalidrawElement => x.index !== null)
-      .map((x) => [x.id, x]),
-  );
-
   for (const [element, update] of elementsUpdates) {
-    mutateElement(element, update, false, { changedElements });
+    mutateElement(element, update, false);
   }
 
   return elements as OrderedExcalidrawElement[];

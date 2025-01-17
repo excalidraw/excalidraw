@@ -11002,8 +11002,12 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
       0,
     ],
     [
-      "451.90000",
+      "225.95000",
       0,
+    ],
+    [
+      "225.95000",
+      "448.10100",
     ],
     [
       "451.90000",

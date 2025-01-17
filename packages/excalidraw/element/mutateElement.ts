@@ -1,8 +1,4 @@
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-  SceneElementsMap,
-} from "./types";
+import type { ExcalidrawElement, SceneElementsMap } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
@@ -31,11 +27,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     // If true, the elbow arrow tries to bind to the nearest element. If false
     // it tries to keep the same bound element, if any.
     isDragging?: boolean;
-    // Currently only for elbow arrows.
-    // Any element you provide here will be added to the scene elements map
-    // used by updateElbowArrow() to calculate the new points. The provided
-    // elements with the same id will override any existing elements in the map.
-    changedElements?: Map<string, OrderedExcalidrawElement>;
   },
 ): TElement => {
   let didChange = false;
@@ -50,11 +41,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       typeof points !== "undefined" || // repositioning
       typeof fixedSegments !== "undefined") // segment fixing
   ) {
-    const mergedElementsMap = toBrandedType<SceneElementsMap>(
-      new Map([
-        ...(Scene.getScene(element)?.getNonDeletedElementsMap() ?? []),
-        ...(options?.changedElements ?? []),
-      ]),
+    const elementsMap = toBrandedType<SceneElementsMap>(
+      Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
     );
 
     updates = {
@@ -66,7 +54,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
           x: updates.x || element.x,
           y: updates.y || element.y,
         },
-        mergedElementsMap,
+        elementsMap,
         {
           fixedSegments,
           points,

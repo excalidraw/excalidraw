@@ -452,19 +452,12 @@ const createBindingArrow = (
     bindingArrow as OrderedExcalidrawElement,
   );
 
-  LinearElementEditor.movePoints(
-    bindingArrow,
-    [
-      {
-        index: 1,
-        point: bindingArrow.points[1],
-      },
-    ],
-    undefined,
+  LinearElementEditor.movePoints(bindingArrow, [
     {
-      changedElements,
+      index: 1,
+      point: bindingArrow.points[1],
     },
-  );
+  ]);
 
   return bindingArrow;
 };
