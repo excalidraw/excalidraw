@@ -167,6 +167,7 @@ import {
   isTextBindableContainer,
   isElbowArrow,
   isFlowchartNodeElement,
+  isBindableElement,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -191,7 +192,6 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
-  NonDeletedSceneElementsMap,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -294,7 +294,6 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
-  toBrandedType,
 } from "../utils";
 import {
   createSrcDoc,
@@ -464,7 +463,6 @@ import { getResizedElementAbsoluteCoords, getVisibleSceneBounds } from "../eleme
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { getTooltipDiv } from "./Tooltip";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { mutateElbowArrow, updateElbowArrow } from "../element/routing";
 import {
   FlowChartCreator,
   FlowChartNavigator,
@@ -3361,49 +3359,7 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fitToContent?: boolean;
   }) => {
-    let elements = opts.elements.map((el, _, elements) => {
-      if (isElbowArrow(el)) {
-        const startEndElements = [
-          el.startBinding &&
-            elements.find((l) => l.id === el.startBinding?.elementId),
-          el.endBinding &&
-            elements.find((l) => l.id === el.endBinding?.elementId),
-        ];
-        const startBinding = startEndElements[0] ? el.startBinding : null;
-        const endBinding = startEndElements[1] ? el.endBinding : null;
-        return {
-          ...el,
-          ...updateElbowArrow(
-            {
-              ...el,
-              startBinding,
-              endBinding,
-            },
-            toBrandedType<NonDeletedSceneElementsMap>(
-              new Map(
-                startEndElements
-                  .filter((x) => x != null)
-                  .map(
-                    (el) =>
-                      [el!.id, el] as [
-                        string,
-                        Ordered<NonDeletedExcalidrawElement>,
-                      ],
-                  ),
-              ),
-            ),
-            [el.points[0], el.points[el.points.length - 1]],
-            undefined,
-            {
-              zoom: this.state.zoom,
-            },
-          ),
-        };
-      }
-
-      return el;
-    });
-    elements = restoreElements(elements, null, undefined);
+    const elements = restoreElements(opts.elements, null, undefined);
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
     const elementsCenterX = distance(minX, maxX) / 2;
@@ -4835,7 +4791,6 @@ class App extends React.Component<AppProps, AppState> {
 
           updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
             simultaneouslyUpdated: selectedElements,
-            zoom: this.state.zoom,
           });
         });
 
@@ -5933,6 +5888,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const selectedElements = this.scene.getSelectedElements(this.state);
 
+    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
+
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       if (
         event[KEYS.CTRL_OR_CMD] &&
@@ -5946,6 +5906,64 @@ class App extends React.Component<AppProps, AppState> {
           editingLinearElement: new LinearElementEditor(selectedElements[0]),
         });
         return;
+      } else if (
+        this.state.selectedLinearElement &&
+        isElbowArrow(selectedElements[0])
+      ) {
+        const hitCoords = LinearElementEditor.getSegmentMidpointHitCoords(
+          this.state.selectedLinearElement,
+          { x: sceneX, y: sceneY },
+          this.state,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        const midPoint = hitCoords
+          ? LinearElementEditor.getSegmentMidPointIndex(
+              this.state.selectedLinearElement,
+              this.state,
+              hitCoords,
+              this.scene.getNonDeletedElementsMap(),
+            )
+          : -1;
+
+        if (midPoint && midPoint > -1) {
+          this.store.shouldCaptureIncrement();
+          LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
+
+          const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
+            {
+              ...this.state.selectedLinearElement,
+              segmentMidPointHoveredCoords: null,
+            },
+            { x: sceneX, y: sceneY },
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          const nextIndex = nextCoords
+            ? LinearElementEditor.getSegmentMidPointIndex(
+                this.state.selectedLinearElement,
+                this.state,
+                nextCoords,
+                this.scene.getNonDeletedElementsMap(),
+              )
+            : null;
+
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              pointerDownState: {
+                ...this.state.selectedLinearElement.pointerDownState,
+                segmentMidpoint: {
+                  index: nextIndex,
+                  value: hitCoords,
+                  added: false,
+                },
+              },
+              segmentMidPointHoveredCoords: nextCoords,
+            },
+          });
+
+          return;
+        }
       }
     }
 
@@ -5955,11 +5973,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     resetCursor(this.interactiveCanvas);
-
-    let { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-      event,
-      this.state,
-    );
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
@@ -6428,41 +6441,23 @@ class App extends React.Component<AppProps, AppState> {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
-        if (isElbowArrow(multiElement)) {
-          mutateElbowArrow(
-            multiElement,
-            this.scene.getNonDeletedElementsMap(),
-            [
+        // update last uncommitted point
+        mutateElement(
+          multiElement,
+          {
+            points: [
               ...points.slice(0, -1),
               pointFrom<LocalPoint>(
                 lastCommittedX + dxFromLastCommitted,
                 lastCommittedY + dyFromLastCommitted,
               ),
             ],
-            undefined,
-            undefined,
-            {
-              isDragging: true,
-              informMutation: false,
-              zoom: this.state.zoom,
-            },
-          );
-        } else {
-          // update last uncommitted point
-          mutateElement(
-            multiElement,
-            {
-              points: [
-                ...points.slice(0, -1),
-                pointFrom<LocalPoint>(
-                  lastCommittedX + dxFromLastCommitted,
-                  lastCommittedY + dyFromLastCommitted,
-                ),
-              ],
-            },
-            false,
-          );
-        }
+          },
+          false,
+          {
+            isDragging: true,
+          },
+        );
 
         // in this path, we're mutating multiElement to reflect
         // how it will be after adding pointer position as the next point
@@ -6631,7 +6626,7 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               activeEmbeddable: { element: hitElement, state: "hover" },
             });
-          } else {
+          } else if (!hitElement || !isElbowArrow(hitElement)) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
@@ -6817,14 +6812,18 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.scene.getNonDeletedElementsMap(),
           );
-
-        if (hoverPointIndex >= 0 || segmentMidPointHoveredCoords) {
+        const isHoveringAPointHandle = isElbowArrow(element)
+          ? hoverPointIndex === 0 ||
+            hoverPointIndex === element.points.length - 1
+          : hoverPointIndex >= 0;
+        if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
+          // Ebow arrows can only be moved when unconnected
           !isElbowArrow(element) ||
           !(element.startBinding || element.endBinding)
         ) {
@@ -7563,6 +7562,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         selectedElements.length === 1 &&
         !this.state.editingLinearElement &&
+        !isElbowArrow(selectedElements[0]) &&
         !(
           this.state.selectedLinearElement &&
           this.state.selectedLinearElement.hoverPointIndex !== -1
@@ -8275,6 +8275,10 @@ class App extends React.Component<AppProps, AppState> {
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
               elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+              fixedSegments:
+                this.state.currentItemArrowType === ARROW_TYPE.elbow
+                  ? []
+                  : null,
             })
           : newLinearElement({
               type: elementType,
@@ -8527,6 +8531,63 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
       const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+
+      if (
+        this.state.selectedLinearElement &&
+        this.state.selectedLinearElement.elbowed &&
+        this.state.selectedLinearElement.pointerDownState.segmentMidpoint.index
+      ) {
+        const [gridX, gridY] = getGridPoint(
+          pointerCoords.x,
+          pointerCoords.y,
+          event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+        );
+
+        let index =
+          this.state.selectedLinearElement.pointerDownState.segmentMidpoint
+            .index;
+        if (index < 0) {
+          const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
+            {
+              ...this.state.selectedLinearElement,
+              segmentMidPointHoveredCoords: null,
+            },
+            { x: gridX, y: gridY },
+            this.state,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          index = nextCoords
+            ? LinearElementEditor.getSegmentMidPointIndex(
+                this.state.selectedLinearElement,
+                this.state,
+                nextCoords,
+                this.scene.getNonDeletedElementsMap(),
+              )
+            : -1;
+        }
+
+        const ret = LinearElementEditor.moveFixedSegment(
+          this.state.selectedLinearElement,
+          index,
+          gridX,
+          gridY,
+          this.scene.getNonDeletedElementsMap(),
+        );
+
+        flushSync(() => {
+          if (this.state.selectedLinearElement) {
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                segmentMidPointHoveredCoords: ret.segmentMidPointHoveredCoords,
+                pointerDownState: ret.pointerDownState,
+              },
+            });
+          }
+        });
+        return;
+      }
+
       const lastPointerCoords =
         this.lastPointerMoveCoords ?? pointerDownState.origin;
       this.lastPointerMoveCoords = pointerCoords;
@@ -8879,7 +8940,7 @@ class App extends React.Component<AppProps, AppState> {
 
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
-          !this.state.editingFrame &&
+          if (!this.state.editingFrame) {
             dragSelectedElements(
               pointerDownState,
               selectedElements,
@@ -8888,6 +8949,7 @@ class App extends React.Component<AppProps, AppState> {
               snapOffset,
               event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
             );
+          }
 
           this.setState({
             selectedElementsAreBeingDragged: true,
@@ -9068,26 +9130,17 @@ class App extends React.Component<AppProps, AppState> {
               },
               false,
             );
-          } else if (points.length > 1 && isElbowArrow(newElement)) {
-            mutateElbowArrow(
-              newElement,
-              elementsMap,
-              [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
-              vector(0, 0),
-              undefined,
-              {
-                isDragging: true,
-                informMutation: false,
-                zoom: this.state.zoom,
-              },
-            );
-          } else if (points.length === 2) {
+          } else if (
+            points.length === 2 ||
+            (points.length > 1 && isElbowArrow(newElement))
+          ) {
             mutateElement(
               newElement,
               {
                 points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
               false,
+              { isDragging: true },
             );
           }
 
@@ -9282,6 +9335,24 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementsAreBeingDragged: false,
       });
       const elementsMap = this.scene.getNonDeletedElementsMap();
+
+      if (
+        pointerDownState.drag.hasOccurred &&
+        pointerDownState.hit?.element?.id
+      ) {
+        const element = elementsMap.get(pointerDownState.hit.element.id);
+        if (isBindableElement(element)) {
+          // Renormalize elbow arrows when they are changed via indirect move
+          element.boundElements
+            ?.filter((e) => e.type === "arrow")
+            .map((e) => elementsMap.get(e.id))
+            .filter((e) => isElbowArrow(e))
+            .forEach((e) => {
+              !!e && mutateElement(e, {}, true);
+            });
+        }
+      }
+
       // Handle end of dragging a point of a linear element, might close a loop
       // and sets binding element
       if (this.state.editingLinearElement) {
@@ -9306,6 +9377,17 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
       } else if (this.state.selectedLinearElement) {
+        // Normalize elbow arrow points, remove close parallel segments
+        if (this.state.selectedLinearElement.elbowed) {
+          const element = LinearElementEditor.getElement(
+            this.state.selectedLinearElement.elementId,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          if (element) {
+            mutateElement(element, {}, true);
+          }
+        }
+
         if (
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
@@ -9745,10 +9827,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.elementId !== hitElement?.id &&
         isLinearElement(hitElement)
       ) {
-        const selectedELements = this.scene.getSelectedElements(this.state);
+        const selectedElements = this.scene.getSelectedElements(this.state);
         // set selectedLinearElement when no other element selected except
         // the one we've hit
-        if (selectedELements.length === 1) {
+        if (selectedElements.length === 1) {
           this.setState({
             selectedLinearElement: new LinearElementEditor(hitElement),
           });
@@ -9956,6 +10038,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // not elbow midpoint dragged
+        !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
         !pointerDownState.drag.hasOccurred &&
         // not resized

@@ -18,6 +18,8 @@ import type {
   ExcalidrawIframeElement,
   ElementsMap,
   ExcalidrawArrowElement,
+  FixedSegment,
+  ExcalidrawElbowArrowElement,
 } from "./types";
 import {
   arrayToMap,
@@ -459,15 +461,34 @@ export const newLinearElement = (
   };
 };
 
-export const newArrowElement = (
+export const newArrowElement = <T extends boolean>(
   opts: {
     type: ExcalidrawArrowElement["type"];
     startArrowhead?: Arrowhead | null;
     endArrowhead?: Arrowhead | null;
     points?: ExcalidrawArrowElement["points"];
-    elbowed?: boolean;
+    elbowed?: T;
+    fixedSegments?: FixedSegment[] | null;
   } & ElementConstructorOpts,
-): NonDeleted<ExcalidrawArrowElement> => {
+): T extends true
+  ? NonDeleted<ExcalidrawElbowArrowElement>
+  : NonDeleted<ExcalidrawArrowElement> => {
+  if (opts.elbowed) {
+    return {
+      ..._newElementBase<ExcalidrawElbowArrowElement>(opts.type, opts),
+      points: opts.points || [],
+      lastCommittedPoint: null,
+      startBinding: null,
+      endBinding: null,
+      startArrowhead: opts.startArrowhead || null,
+      endArrowhead: opts.endArrowhead || null,
+      elbowed: true,
+      fixedSegments: opts.fixedSegments || [],
+      startIsSpecial: false,
+      endIsSpecial: false,
+    } as NonDeleted<ExcalidrawElbowArrowElement>;
+  }
+
   return {
     ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
     points: opts.points || [],
@@ -476,8 +497,10 @@ export const newArrowElement = (
     endBinding: null,
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
-    elbowed: opts.elbowed || false,
-  };
+    elbowed: false,
+  } as T extends true
+    ? NonDeleted<ExcalidrawElbowArrowElement>
+    : NonDeleted<ExcalidrawArrowElement>;
 };
 
 export const newImageElement = (

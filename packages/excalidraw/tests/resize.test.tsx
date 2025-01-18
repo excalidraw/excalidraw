@@ -535,7 +535,7 @@ describe("arrow element", () => {
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.144, 2);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.144);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
