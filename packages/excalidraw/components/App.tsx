@@ -3279,7 +3279,12 @@ class App extends React.Component<AppProps, AppState> {
         newElements,
         topLayerFrame,
       );
-      addElementsToFrame(nextElements, eligibleElements, topLayerFrame);
+      addElementsToFrame(
+        nextElements,
+        eligibleElements,
+        topLayerFrame,
+        this.state,
+      );
     }
 
     this.scene.replaceAllElements(nextElements);
@@ -8941,6 +8946,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getElementsMapIncludingDeleted(),
             elementsInsideFrame,
             newElement,
+            this.state,
           ),
         );
       }
@@ -9058,6 +9064,7 @@ class App extends React.Component<AppProps, AppState> {
               nextElements,
               elementsToAdd,
               topLayerFrame,
+              this.state,
             );
           } else if (!topLayerFrame) {
             if (this.state.editingGroupId) {
