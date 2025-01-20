@@ -41,8 +41,8 @@ import {
 } from "../actions";
 import { vi } from "vitest";
 import { queryByText } from "@testing-library/react";
-import { AppStateChange, ElementsChange } from "../change";
-import { StoreAction, StoreIncrement } from "../store";
+import { AppStateDelta, ElementsDelta } from "../delta";
+import { SnapshotAction, StoreDelta } from "../store";
 import type { LocalPoint, Radians } from "../../math";
 import { pointFrom } from "../../math";
 import type { AppState } from "../types.js";
@@ -91,10 +91,10 @@ const checkpoint = (name: string) => {
     h.history.undoStack.map((x) => ({
       ...x,
       elementsChange: {
-        ...x.elementsChange,
-        added: stripSeed(x.elementsChange.added),
-        removed: stripSeed(x.elementsChange.updated),
-        updated: stripSeed(x.elementsChange.removed),
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.updated),
+        updated: stripSeed(x.elements.removed),
       },
     })),
   ).toMatchSnapshot(`[${name}] undo stack`);
@@ -103,10 +103,10 @@ const checkpoint = (name: string) => {
     h.history.redoStack.map((x) => ({
       ...x,
       elementsChange: {
-        ...x.elementsChange,
-        added: stripSeed(x.elementsChange.added),
-        removed: stripSeed(x.elementsChange.updated),
-        updated: stripSeed(x.elementsChange.removed),
+        ...x.elements,
+        added: stripSeed(x.elements.added),
+        removed: stripSeed(x.elements.updated),
+        updated: stripSeed(x.elements.removed),
       },
     })),
   ).toMatchSnapshot(`[${name}] redo stack`);
@@ -137,16 +137,14 @@ describe("history", () => {
 
       API.setElements([rect]);
 
-      const corrupedEntry = StoreIncrement.create(
-        ElementsChange.empty(),
-        AppStateChange.empty(),
+      const corrupedEntry = StoreDelta.create(
+        ElementsDelta.empty(),
+        AppStateDelta.empty(),
       );
 
-      vi.spyOn(corrupedEntry.elementsChange, "applyTo").mockImplementation(
-        () => {
-          throw new Error("Oh no, I am corrupted!");
-        },
-      );
+      vi.spyOn(corrupedEntry.elements, "applyTo").mockImplementation(() => {
+        throw new Error("Oh no, I am corrupted!");
+      });
 
       (h.history as any).undoStack.push(corrupedEntry);
 
@@ -218,7 +216,7 @@ describe("history", () => {
 
       API.updateScene({
         elements: [rect1, rect2],
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
 
       expect(API.getUndoStack().length).toBe(1);
@@ -230,7 +228,7 @@ describe("history", () => {
 
       API.updateScene({
         elements: [rect1, rect2],
-        storeAction: StoreAction.CAPTURE, // even though the flag is on, same elements are passed, nothing to commit
+        snapshotAction: SnapshotAction.CAPTURE, // even though the flag is on, same elements are passed, nothing to commit
       });
       expect(API.getUndoStack().length).toBe(1);
       expect(API.getRedoStack().length).toBe(0);
@@ -598,7 +596,7 @@ describe("history", () => {
         appState: {
           name: "New name",
         },
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
 
       expect(API.getUndoStack().length).toBe(1);
@@ -609,7 +607,7 @@ describe("history", () => {
         appState: {
           viewBackgroundColor: "#000",
         },
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -622,7 +620,7 @@ describe("history", () => {
           name: "New name",
           viewBackgroundColor: "#000",
         },
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
       expect(API.getUndoStack().length).toBe(2);
       expect(API.getRedoStack().length).toBe(0);
@@ -1329,7 +1327,7 @@ describe("history", () => {
 
         API.updateScene({
           elements: [rect1, text, rect2],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // bind text1 to rect1
@@ -1901,7 +1899,7 @@ describe("history", () => {
             strokeColor: blue,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -1939,7 +1937,7 @@ describe("history", () => {
             strokeColor: yellow,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -1987,7 +1985,7 @@ describe("history", () => {
             backgroundColor: yellow,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       // At this point our entry gets updated from `red` -> `blue` into `red` -> `yellow`
@@ -2003,7 +2001,7 @@ describe("history", () => {
             backgroundColor: violet,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       // At this point our (inversed) entry gets updated from `red` -> `yellow` into `violet` -> `yellow`
@@ -2048,7 +2046,7 @@ describe("history", () => {
 
       API.updateScene({
         elements: [rect, diamond],
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
 
       // Connect the arrow
@@ -2097,7 +2095,7 @@ describe("history", () => {
             } as FixedPointBinding,
           },
         ],
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
 
       Keyboard.undo();
@@ -2112,7 +2110,7 @@ describe("history", () => {
               }
             : el,
         ),
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2136,7 +2134,7 @@ describe("history", () => {
       // Initialize scene
       API.updateScene({
         elements: [rect1, rect2],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       // Simulate local update
@@ -2145,7 +2143,7 @@ describe("history", () => {
           newElementWith(h.elements[0], { groupIds: ["A"] }),
           newElementWith(h.elements[1], { groupIds: ["A"] }),
         ],
-        storeAction: StoreAction.CAPTURE,
+        snapshotAction: SnapshotAction.CAPTURE,
       });
 
       const rect3 = API.createElement({ type: "rectangle", groupIds: ["B"] });
@@ -2159,7 +2157,7 @@ describe("history", () => {
           rect3,
           rect4,
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2205,7 +2203,7 @@ describe("history", () => {
             ] as LocalPoint[],
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo(); // undo `actionFinalize`
@@ -2300,7 +2298,7 @@ describe("history", () => {
             isDeleted: false, // undeletion might happen due to concurrency between clients
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       expect(API.getSelectedElements()).toEqual([]);
@@ -2377,7 +2375,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       expect(h.elements).toEqual([
@@ -2439,7 +2437,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2515,7 +2513,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2554,7 +2552,7 @@ describe("history", () => {
             isDeleted: false,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.redo();
@@ -2600,7 +2598,7 @@ describe("history", () => {
       // Simulate remote update
       API.updateScene({
         elements: [rect1, rect2],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -2610,7 +2608,7 @@ describe("history", () => {
       // Simulate remote update
       API.updateScene({
         elements: [h.elements[0], h.elements[1], rect3, rect4],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
@@ -2631,7 +2629,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2656,7 +2654,7 @@ describe("history", () => {
             isDeleted: false,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.redo();
@@ -2667,7 +2665,7 @@ describe("history", () => {
       // Simulate remote update
       API.updateScene({
         elements: [h.elements[0], h.elements[1], rect3, rect4],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.redo();
@@ -2713,7 +2711,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2734,7 +2732,7 @@ describe("history", () => {
           }),
           h.elements[1],
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2777,7 +2775,7 @@ describe("history", () => {
             isDeleted: true,
           }),
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2820,7 +2818,7 @@ describe("history", () => {
           h.elements[0],
           h.elements[1],
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       expect(API.getUndoStack().length).toBe(2);
@@ -2859,7 +2857,7 @@ describe("history", () => {
           h.elements[0],
           h.elements[1],
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       expect(API.getUndoStack().length).toBe(2);
@@ -2910,7 +2908,7 @@ describe("history", () => {
           h.elements[0], // rect2
           h.elements[1], // rect1
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2940,7 +2938,7 @@ describe("history", () => {
           h.elements[0], // rect3
           h.elements[2], // rect1
         ],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       Keyboard.undo();
@@ -2970,7 +2968,7 @@ describe("history", () => {
       // Simulate remote update
       API.updateScene({
         elements: [...h.elements, rect],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       mouse.moveTo(60, 60);
@@ -3022,7 +3020,7 @@ describe("history", () => {
       // // Simulate remote update
       API.updateScene({
         elements: [...h.elements, rect3],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       mouse.moveTo(100, 100);
@@ -3112,7 +3110,7 @@ describe("history", () => {
       // Simulate remote update
       API.updateScene({
         elements: [...h.elements, rect3],
-        storeAction: StoreAction.UPDATE,
+        snapshotAction: SnapshotAction.UPDATE,
       });
 
       mouse.moveTo(100, 100);
@@ -3289,7 +3287,7 @@ describe("history", () => {
         // Initialize the scene
         API.updateScene({
           elements: [container, text],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         // Simulate local update
@@ -3302,7 +3300,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3333,7 +3331,7 @@ describe("history", () => {
               x: h.elements[1].x + 10,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3376,7 +3374,7 @@ describe("history", () => {
         // Initialize the scene
         API.updateScene({
           elements: [container, text],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         // Simulate local update
@@ -3389,7 +3387,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3423,7 +3421,7 @@ describe("history", () => {
             remoteText,
             h.elements[1],
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3479,7 +3477,7 @@ describe("history", () => {
         // Initialize the scene
         API.updateScene({
           elements: [container, text],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         // Simulate local update
@@ -3492,7 +3490,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -3529,7 +3527,7 @@ describe("history", () => {
               containerId: remoteContainer.id,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3539,7 +3537,7 @@ describe("history", () => {
           expect(h.elements).toEqual([
             expect.objectContaining({
               id: container.id,
-              // rebound the text as we captured the full bidirectional binding in history!
+              // rebound the text as we recorded the full bidirectional binding in history!
               boundElements: [{ id: text.id, type: "text" }],
               isDeleted: false,
             }),
@@ -3587,7 +3585,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [container],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3598,7 +3596,7 @@ describe("history", () => {
             }),
             newElementWith(text, { containerId: container.id }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3648,7 +3646,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [text],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3659,7 +3657,7 @@ describe("history", () => {
             }),
             newElementWith(text, { containerId: container.id }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3708,7 +3706,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [container],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3721,7 +3719,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         Keyboard.undo();
@@ -3758,7 +3756,7 @@ describe("history", () => {
             // rebinding the container with a new text element!
             remoteText,
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3815,7 +3813,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [text],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3828,7 +3826,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         Keyboard.undo();
@@ -3865,7 +3863,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3921,7 +3919,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [container],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3935,7 +3933,7 @@ describe("history", () => {
               isDeleted: true,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -3978,7 +3976,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [text],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -3992,7 +3990,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4035,7 +4033,7 @@ describe("history", () => {
         // Initialize the scene
         API.updateScene({
           elements: [container],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         // Simulate local update
@@ -4047,7 +4045,7 @@ describe("history", () => {
               angle: 90 as Radians,
             }),
           ],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -4060,7 +4058,7 @@ describe("history", () => {
             }),
             newElementWith(text, { containerId: container.id }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         expect(h.elements).toEqual([
@@ -4153,7 +4151,7 @@ describe("history", () => {
         // Initialize the scene
         API.updateScene({
           elements: [text],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         // Simulate local update
@@ -4165,7 +4163,7 @@ describe("history", () => {
               angle: 90 as Radians,
             }),
           ],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -4180,7 +4178,7 @@ describe("history", () => {
               containerId: container.id,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         expect(API.getUndoStack().length).toBe(0);
@@ -4271,7 +4269,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [rect1, rect2],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         mouse.reset();
@@ -4360,7 +4358,7 @@ describe("history", () => {
               x: h.elements[1].x + 50,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4504,7 +4502,7 @@ describe("history", () => {
             }),
             remoteContainer,
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4611,7 +4609,7 @@ describe("history", () => {
               boundElements: [{ id: arrow.id, type: "arrow" }],
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4688,7 +4686,7 @@ describe("history", () => {
         // Simulate local update
         API.updateScene({
           elements: [arrow],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate remote update
@@ -4715,7 +4713,7 @@ describe("history", () => {
               boundElements: [{ id: arrow.id, type: "arrow" }],
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         runTwice(() => {
@@ -4847,7 +4845,7 @@ describe("history", () => {
             newElementWith(h.elements[1], { x: 500, y: -500 }),
             h.elements[2],
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         Keyboard.redo();
@@ -4919,13 +4917,13 @@ describe("history", () => {
         // Initialize the scene
         API.updateScene({
           elements: [frame],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         // Simulate local update
         API.updateScene({
           elements: [rect, h.elements[0]],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         // Simulate local update
@@ -4936,7 +4934,7 @@ describe("history", () => {
             }),
             h.elements[1],
           ],
-          storeAction: StoreAction.CAPTURE,
+          snapshotAction: SnapshotAction.CAPTURE,
         });
 
         Keyboard.undo();
@@ -4980,7 +4978,7 @@ describe("history", () => {
               isDeleted: true,
             }),
           ],
-          storeAction: StoreAction.UPDATE,
+          snapshotAction: SnapshotAction.UPDATE,
         });
 
         Keyboard.redo();

@@ -9,11 +9,11 @@ import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
-import { StoreAction } from "../store";
 import { getSelectedElements } from "../scene";
 import { newFrameElement } from "../element/newElement";
 import { getElementsInGroup } from "../groups";
 import { mutateElement } from "../element/mutateElement";
+import { SnapshotAction } from "../store";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -49,14 +49,14 @@ export const actionSelectAllElementsInFrame = register({
             return acc;
           }, {} as Record<ExcalidrawElement["id"], true>),
         },
-        storeAction: StoreAction.CAPTURE,
+        storeAction: SnapshotAction.CAPTURE,
       };
     }
 
     return {
       elements,
       appState,
-      storeAction: StoreAction.NONE,
+      storeAction: SnapshotAction.NONE,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -80,14 +80,14 @@ export const actionRemoveAllElementsFromFrame = register({
             [selectedElement.id]: true,
           },
         },
-        storeAction: StoreAction.CAPTURE,
+        storeAction: SnapshotAction.CAPTURE,
       };
     }
 
     return {
       elements,
       appState,
-      storeAction: StoreAction.NONE,
+      storeAction: SnapshotAction.NONE,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -109,7 +109,7 @@ export const actionupdateFrameRendering = register({
           enabled: !appState.frameRendering.enabled,
         },
       },
-      storeAction: StoreAction.NONE,
+      storeAction: SnapshotAction.NONE,
     };
   },
   checked: (appState: AppState) => appState.frameRendering.enabled,
@@ -139,7 +139,7 @@ export const actionSetFrameAsActiveTool = register({
           type: "frame",
         }),
       },
-      storeAction: StoreAction.NONE,
+      storeAction: SnapshotAction.NONE,
     };
   },
   keyTest: (event) =>

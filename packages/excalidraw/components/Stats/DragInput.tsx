@@ -8,7 +8,7 @@ import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 import type { StatsInputProperty } from "./utils";
 import { SMALLEST_DELTA } from "./utils";
-import { StoreAction } from "../../store";
+import { SnapshotAction } from "../../store";
 import type Scene from "../../scene/Scene";
 
 import "./DragInput.scss";
@@ -132,7 +132,7 @@ const StatsDragInput = <
         originalAppState: appState,
         setInputValue: (value) => setInputValue(String(value)),
       });
-      app.syncActionResult({ storeAction: StoreAction.CAPTURE });
+      app.syncActionResult({ storeAction: SnapshotAction.CAPTURE });
     }
   };
 
@@ -276,7 +276,7 @@ const StatsDragInput = <
                 false,
               );
 
-              app.syncActionResult({ storeAction: StoreAction.CAPTURE });
+              app.syncActionResult({ storeAction: SnapshotAction.CAPTURE });
 
               lastPointer = null;
               accumulatedChange = 0;

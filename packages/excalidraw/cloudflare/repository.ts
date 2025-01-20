@@ -1,21 +1,17 @@
-import type {
-  IncrementsRepository,
-  CLIENT_INCREMENT,
-  SERVER_INCREMENT,
-} from "../sync/protocol";
+import type { DeltasRepository, DELTA, SERVER_DELTA } from "../sync/protocol";
 
 // CFDO: add senderId, possibly roomId as well
-export class DurableIncrementsRepository implements IncrementsRepository {
+export class DurableDeltasRepository implements DeltasRepository {
   // there is a 2MB row limit, hence working max row size of 1.5 MB
   // and leaving a buffer for other row metadata
   private static readonly MAX_PAYLOAD_SIZE = 1_500_000;
 
   constructor(private storage: DurableObjectStorage) {
     // #region DEV ONLY
-    // this.storage.sql.exec(`DROP TABLE IF EXISTS increments;`);
+    // this.storage.sql.exec(`DROP TABLE IF EXISTS deltas;`);
     // #endregion
 
-    this.storage.sql.exec(`CREATE TABLE IF NOT EXISTS increments(
+    this.storage.sql.exec(`CREATE TABLE IF NOT EXISTS deltas(
 			id            TEXT NOT NULL,
 			version		    INTEGER NOT NULL,
       position      INTEGER NOT NULL,
@@ -25,41 +21,41 @@ export class DurableIncrementsRepository implements IncrementsRepository {
 		);`);
   }
 
-  public save(increment: CLIENT_INCREMENT): SERVER_INCREMENT | null {
+  public save(delta: DELTA): SERVER_DELTA | null {
     return this.storage.transactionSync(() => {
-      const existingIncrement = this.getById(increment.id);
+      const existingDelta = this.getById(delta.id);
 
-      // don't perist the same increment twice
-      if (existingIncrement) {
-        return existingIncrement;
+      // don't perist the same delta twice
+      if (existingDelta) {
+        return existingDelta;
       }
 
       try {
-        const payload = JSON.stringify(increment);
+        const payload = JSON.stringify(delta);
         const payloadSize = new TextEncoder().encode(payload).byteLength;
         const nextVersion = this.getLastVersion() + 1;
         const chunksCount = Math.ceil(
-          payloadSize / DurableIncrementsRepository.MAX_PAYLOAD_SIZE,
+          payloadSize / DurableDeltasRepository.MAX_PAYLOAD_SIZE,
         );
 
         for (let position = 0; position < chunksCount; position++) {
-          const start = position * DurableIncrementsRepository.MAX_PAYLOAD_SIZE;
-          const end = start + DurableIncrementsRepository.MAX_PAYLOAD_SIZE;
+          const start = position * DurableDeltasRepository.MAX_PAYLOAD_SIZE;
+          const end = start + DurableDeltasRepository.MAX_PAYLOAD_SIZE;
           // slicing the chunk payload
           const chunkedPayload = payload.slice(start, end);
 
           this.storage.sql.exec(
-            `INSERT INTO increments (id, version, position, payload) VALUES (?, ?, ?, ?);`,
-            increment.id,
+            `INSERT INTO deltas (id, version, position, payload) VALUES (?, ?, ?, ?);`,
+            delta.id,
             nextVersion,
             position,
             chunkedPayload,
           );
         }
       } catch (e) {
-        // check if the increment has been already acknowledged
+        // check if the delta has been already acknowledged
         // in case client for some reason did not receive acknowledgement
-        // and reconnected while the we still have the increment in the worker
+        // and reconnected while the we still have the delta in the worker
         // otherwise the client is doomed to full a restore
         if (e instanceof Error && e.message.includes("SQLITE_CONSTRAINT")) {
           // continue;
@@ -68,68 +64,66 @@ export class DurableIncrementsRepository implements IncrementsRepository {
         }
       }
 
-      const acknowledged = this.getById(increment.id);
+      const acknowledged = this.getById(delta.id);
       return acknowledged;
     });
   }
 
   // CFDO: for versioning we need deletions, but not for the "snapshot" update;
-  public getAllSinceVersion(version: number): Array<SERVER_INCREMENT> {
-    const increments = this.storage.sql
-      .exec<SERVER_INCREMENT>(
-        `SELECT id, payload, version FROM increments WHERE version > (?) ORDER BY version, position, createdAt ASC;`,
+  public getAllSinceVersion(version: number): Array<SERVER_DELTA> {
+    const deltas = this.storage.sql
+      .exec<SERVER_DELTA>(
+        `SELECT id, payload, version FROM deltas WHERE version > (?) ORDER BY version, position, createdAt ASC;`,
         version,
       )
       .toArray();
 
-    return this.restoreServerIncrements(increments);
+    return this.restoreServerDeltas(deltas);
   }
 
   public getLastVersion(): number {
     // CFDO: might be in memory to reduce number of rows read (or position on version at least, if btree affect rows read)
     const result = this.storage.sql
-      .exec(`SELECT MAX(version) FROM increments;`)
+      .exec(`SELECT MAX(version) FROM deltas;`)
       .one();
 
     return result ? Number(result["MAX(version)"]) : 0;
   }
 
-  public getById(id: string): SERVER_INCREMENT | null {
-    const increments = this.storage.sql
-      .exec<SERVER_INCREMENT>(
-        `SELECT id, payload, version FROM increments WHERE id = (?) ORDER BY position ASC`,
+  public getById(id: string): SERVER_DELTA | null {
+    const deltas = this.storage.sql
+      .exec<SERVER_DELTA>(
+        `SELECT id, payload, version FROM deltas WHERE id = (?) ORDER BY position ASC`,
         id,
       )
       .toArray();
 
-    if (!increments.length) {
+    if (!deltas.length) {
       return null;
     }
 
-    const restoredIncrements = this.restoreServerIncrements(increments);
+    const restoredDeltas = this.restoreServerDeltas(deltas);
 
-    if (restoredIncrements.length !== 1) {
+    if (restoredDeltas.length !== 1) {
       throw new Error(
-        `Expected exactly one restored increment, but received "${restoredIncrements.length}".`,
+        `Expected exactly one restored delta, but received "${restoredDeltas.length}".`,
       );
     }
 
-    return restoredIncrements[0];
+    return restoredDeltas[0];
   }
 
-  private restoreServerIncrements(
-    increments: SERVER_INCREMENT[],
-  ): SERVER_INCREMENT[] {
+  private restoreServerDeltas(deltas: SERVER_DELTA[]): SERVER_DELTA[] {
     return Array.from(
-      increments
+      deltas
         .reduce((acc, curr) => {
-          const increment = acc.get(curr.version);
+          const delta = acc.get(curr.version);
 
-          if (increment) {
+          if (delta) {
             acc.set(curr.version, {
-              ...increment,
+              ...delta,
               // glueing the chunks payload back
-              payload: increment.payload + curr.payload,
+              payload: delta.payload + curr.payload,
             });
           } else {
             // let's not unnecessarily expose more props than these
@@ -141,7 +135,7 @@ export class DurableIncrementsRepository implements IncrementsRepository {
           }
 
           return acc;
-        }, new Map<number, SERVER_INCREMENT>())
+        }, new Map<number, SERVER_DELTA>())
         .values(),
     );
   }

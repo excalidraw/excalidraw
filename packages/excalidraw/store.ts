@@ -1,9 +1,8 @@
 import { ENV } from "./constants";
 import { Emitter } from "./emitter";
 import { randomId } from "./random";
-import { isShallowEqual } from "./utils";
 import { getDefaultAppState } from "./appState";
-import { AppStateChange, ElementsChange } from "./change";
+import { AppStateDelta, Delta, ElementsDelta } from "./delta";
 import { newElementWith } from "./element/mutateElement";
 import { deepCopyElement } from "./element/newElement";
 import type { AppState, ObservedAppState } from "./types";
@@ -12,6 +11,8 @@ import type {
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./element/types";
+import { hashElementsVersion } from "./element";
+import { assertNever } from "./utils";
 
 // hidden non-enumerable property for runtime checks
 const hiddenObservedAppStateProp = "__observedAppState";
@@ -41,48 +42,52 @@ const isObservedAppState = (
 ): appState is ObservedAppState =>
   !!Reflect.get(appState, hiddenObservedAppStateProp);
 
-export const StoreAction = {
+// CFDO: consider adding a "remote" action, which should perform update but never be emitted (so that it we don't have to filter it when pushing it into sync api)
+export const SnapshotAction = {
   /**
    * Immediately undoable.
    *
-   * Use for updates which should be captured.
-   * Should be used for most of the local updates.
+   * Use for updates which should be captured as durable deltas.
+   * Should be used for most of the local updates (except ephemerals such as dragging or resizing).
    *
    * These updates will _immediately_ make it to the local undo / redo stacks.
    */
-  CAPTURE: "capture",
+  CAPTURE: "CAPTURE_DELTA",
   /**
    * Never undoable.
    *
-   * Use for updates which should never be recorded, such as remote updates
+   * Use for updates which should never be captured as deltas, such as remote updates
    * or scene initialization.
    *
    * These updates will _never_ make it to the local undo / redo stacks.
    */
-  UPDATE: "update",
+  UPDATE: "UPDATE_SNAPSHOT",
   /**
    * Eventually undoable.
    *
-   * Use for updates which should not be captured immediately - likely
-   * exceptions which are part of some async multi-step process. Otherwise, all
-   * such updates would end up being captured with the next
-   * `StoreAction.CAPTURE` - triggered either by the next `updateScene`
-   * or internally by the editor.
+   * Use for updates which should not be captured as deltas immediately, such as
+   * exceptions which are part of some async multi-step proces.
+   *
+   * These updates will be captured with the next `SnapshotAction.CAPTURE`,
+   * triggered either by the next `updateScene` or internally by the editor.
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
    */
-  NONE: "none",
+  // CFDO I: none is not really "none" anymore, as it at very least emits an ephemeral increment
+  // we should likely rename these somehow and keep "none" only for real "no action" cases
+  NONE: "NONE",
 } as const;
 
-export type StoreActionType = ValueOf<typeof StoreAction>;
+export type SnapshotActionType = ValueOf<typeof SnapshotAction>;
 
 /**
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
  */
 export class Store {
-  public readonly onStoreIncrementEmitter = new Emitter<[StoreIncrement]>();
+  public readonly onStoreIncrementEmitter = new Emitter<
+    [DurableStoreIncrement | EphemeralStoreIncrement]
+  >();
 
-  private scheduledActions: Set<StoreActionType> = new Set();
   private _snapshot = StoreSnapshot.empty();
 
   public get snapshot() {
@@ -93,41 +98,61 @@ export class Store {
     this._snapshot = snapshot;
   }
 
-  /**
-   * Use to schedule calculation of a store increment.
-   */
-  // TODO: Suspicious that this is called so many places. Seems error-prone.
-  public shouldCaptureIncrement() {
-    this.scheduleAction(StoreAction.CAPTURE);
-  }
+  private scheduledActions: Set<SnapshotActionType> = new Set();
 
-  /**
-   * Use to schedule update of the snapshot, useful on updates for which we don't need to calculate increments (i.e. remote updates).
-   */
-  public shouldUpdateSnapshot() {
-    this.scheduleAction(StoreAction.UPDATE);
-  }
-
-  private scheduleAction(action: StoreActionType) {
+  public scheduleAction(action: SnapshotActionType) {
     this.scheduledActions.add(action);
     this.satisfiesScheduledActionsInvariant();
   }
 
   /**
-   * Based on the scheduled operation, either only updates store snapshot or also calculates increment and emits the result as a `StoreIncrement`.
+   * Use to schedule a delta calculation, which will consquentially be emitted as `DurableStoreIncrement` and pushed in the undo stack.
+   */
+  // TODO: Suspicious that this is called so many places. Seems error-prone.
+  public scheduleCapture() {
+    this.scheduleAction(SnapshotAction.CAPTURE);
+  }
+
+  private get scheduledAction() {
+    // Capture has a precedence over update, since it also performs snapshot update
+    if (this.scheduledActions.has(SnapshotAction.CAPTURE)) {
+      return SnapshotAction.CAPTURE;
+    }
+
+    // Update has a precedence over none, since it also emits an (ephemeral) increment
+    if (this.scheduledActions.has(SnapshotAction.UPDATE)) {
+      return SnapshotAction.UPDATE;
+    }
+
+    // Emit ephemeral increment, don't update the snapshot
+    return SnapshotAction.NONE;
+  }
+
+  /**
+   * Performs the incoming `SnapshotAction` and emits the corresponding `StoreIncrement`.
+   * Emits `DurableStoreIncrement` when action is "capture", emits `EphemeralStoreIncrement` otherwise.
    *
-   * @emits StoreIncrement when increment is calculated.
+   * @emits StoreIncrement
    */
   public commit(
     elements: Map<string, OrderedExcalidrawElement> | undefined,
     appState: AppState | ObservedAppState | undefined,
   ): void {
     try {
-      // Capture has precedence since it also performs update
-      if (this.scheduledActions.has(StoreAction.CAPTURE)) {
-        this.captureIncrement(elements, appState);
-      } else if (this.scheduledActions.has(StoreAction.UPDATE)) {
-        this.updateSnapshot(elements, appState);
+      const { scheduledAction } = this;
+
+      switch (scheduledAction) {
+        case SnapshotAction.CAPTURE:
+          this.snapshot = this.captureDurableIncrement(elements, appState);
+          break;
+        case SnapshotAction.UPDATE:
+          this.snapshot = this.emitEphemeralIncrement(elements);
+          break;
+        case SnapshotAction.NONE:
+          this.emitEphemeralIncrement(elements);
+          return;
+        default:
+          assertNever(scheduledAction, `Unknown store action`);
       }
     } finally {
       this.satisfiesScheduledActionsInvariant();
@@ -137,11 +162,11 @@ export class Store {
   }
 
   /**
-   * Performs diff calculation, calculates and emits the increment.
+   * Performs delta calculation and emits the increment.
    *
-   * @emits StoreIncrement when increment is calculated.
+   * @emits StoreIncrement.
    */
-  public captureIncrement(
+  private captureDurableIncrement(
     elements: Map<string, OrderedExcalidrawElement> | undefined,
     appState: AppState | ObservedAppState | undefined,
   ) {
@@ -149,41 +174,53 @@ export class Store {
     const nextSnapshot = this.snapshot.maybeClone(elements, appState);
 
     // Optimisation, don't continue if nothing has changed
-    if (prevSnapshot !== nextSnapshot) {
-      // Calculate and record the changes based on the previous and next snapshot
-      const elementsChange = nextSnapshot.metadata.didElementsChange
-        ? ElementsChange.calculate(prevSnapshot.elements, nextSnapshot.elements)
-        : ElementsChange.empty();
-
-      const appStateChange = nextSnapshot.metadata.didAppStateChange
-        ? AppStateChange.calculate(prevSnapshot.appState, nextSnapshot.appState)
-        : AppStateChange.empty();
-
-      if (!elementsChange.isEmpty() || !appStateChange.isEmpty()) {
-        // Notify listeners with the increment
-        this.onStoreIncrementEmitter.trigger(
-          StoreIncrement.create(elementsChange, appStateChange),
-        );
-      }
-
-      // Update snapshot
-      this.snapshot = nextSnapshot;
+    if (prevSnapshot === nextSnapshot) {
+      return prevSnapshot;
     }
+    // Calculate the deltas based on the previous and next snapshot
+    const elementsDelta = nextSnapshot.metadata.didElementsChange
+      ? ElementsDelta.calculate(prevSnapshot.elements, nextSnapshot.elements)
+      : ElementsDelta.empty();
+
+    const appStateDelta = nextSnapshot.metadata.didAppStateChange
+      ? AppStateDelta.calculate(prevSnapshot.appState, nextSnapshot.appState)
+      : AppStateDelta.empty();
+
+    if (!elementsDelta.isEmpty() || !appStateDelta.isEmpty()) {
+      const delta = StoreDelta.create(elementsDelta, appStateDelta);
+      const change = StoreChange.create(prevSnapshot, nextSnapshot);
+      const increment = new DurableStoreIncrement(change, delta);
+
+      // Notify listeners with the increment
+      this.onStoreIncrementEmitter.trigger(increment);
+    }
+
+    return nextSnapshot;
   }
 
   /**
-   * Updates the snapshot without performing any diff calculation.
+   * When change is detected, emits an ephemeral increment and returns the next snapshot.
+   *
+   * @emits EphemeralStoreIncrement
    */
-  public updateSnapshot(
+  private emitEphemeralIncrement(
     elements: Map<string, OrderedExcalidrawElement> | undefined,
-    appState: AppState | ObservedAppState | undefined,
   ) {
-    const nextSnapshot = this.snapshot.maybeClone(elements, appState);
+    const prevSnapshot = this.snapshot;
+    const nextSnapshot = this.snapshot.maybeClone(elements, undefined);
 
-    if (this.snapshot !== nextSnapshot) {
-      // Update snapshot
-      this.snapshot = nextSnapshot;
+    if (prevSnapshot === nextSnapshot) {
+      // nothing has changed
+      return prevSnapshot;
     }
+
+    const change = StoreChange.create(prevSnapshot, nextSnapshot);
+    const increment = new EphemeralStoreIncrement(change);
+
+    // Notify listeners with the increment
+    this.onStoreIncrementEmitter.trigger(increment);
+
+    return nextSnapshot;
   }
 
   /**
@@ -210,7 +247,7 @@ export class Store {
         // Detected yet uncomitted local element
         nextElements.delete(id);
       } else if (elementSnapshot.version < prevElement.version) {
-        // Element was already commited, but the snapshot version is lower than current current local version
+        // Element was already commited, but the snapshot version is lower than current local version
         nextElements.set(id, elementSnapshot);
       }
     }
@@ -223,21 +260,37 @@ export class Store {
    *
    * @emits StoreIncrement when increment is applied.
    */
-  public applyIncrementTo(
-    increment: StoreIncrement,
+  public applyDeltaTo(
+    delta: StoreDelta,
     elements: SceneElementsMap,
     appState: AppState,
+    options: {
+      triggerIncrement: boolean;
+    } = {
+      triggerIncrement: false,
+    },
   ): [SceneElementsMap, AppState, boolean] {
-    const [nextElements, elementsContainVisibleChange] =
-      increment.elementsChange.applyTo(elements, this.snapshot.elements);
+    const [nextElements, elementsContainVisibleChange] = delta.elements.applyTo(
+      elements,
+      this.snapshot.elements,
+    );
 
     const [nextAppState, appStateContainsVisibleChange] =
-      increment.appStateChange.applyTo(appState, nextElements);
+      delta.appState.applyTo(appState, nextElements);
 
     const appliedVisibleChanges =
       elementsContainVisibleChange || appStateContainsVisibleChange;
 
-    this.onStoreIncrementEmitter.trigger(increment);
+    const prevSnapshot = this.snapshot;
+    const nextSnapshot = this.snapshot.maybeClone(nextElements, nextAppState);
+
+    if (options.triggerIncrement) {
+      const change = StoreChange.create(prevSnapshot, nextSnapshot);
+      const increment = new DurableStoreIncrement(change, delta);
+      this.onStoreIncrementEmitter.trigger(increment);
+    }
+
+    this.snapshot = nextSnapshot;
 
     return [nextElements, nextAppState, appliedVisibleChanges];
   }
@@ -251,7 +304,12 @@ export class Store {
   }
 
   private satisfiesScheduledActionsInvariant() {
-    if (!(this.scheduledActions.size >= 0 && this.scheduledActions.size <= 3)) {
+    if (
+      !(
+        this.scheduledActions.size >= 0 &&
+        this.scheduledActions.size <= Object.keys(SnapshotAction).length
+      )
+    ) {
       const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledActions.size}".`;
       console.error(message, this.scheduledActions.values());
 
@@ -263,90 +321,161 @@ export class Store {
 }
 
 /**
- * Represent an increment to the Store.
+ * Repsents a change to the store containg changed elements and appState.
  */
-export class StoreIncrement {
+export class StoreChange {
+  // CFDO: consider adding (observed & syncable) appState, though bare in mind that it's processed on every component update,
+  // so figuring out what has changed should ideally be just quick reference checks
   private constructor(
+    public readonly elements: Record<string, OrderedExcalidrawElement>,
+  ) {}
+
+  public static create(
+    prevSnapshot: StoreSnapshot,
+    nextSnapshot: StoreSnapshot,
+  ) {
+    const changedElements = nextSnapshot.getChangedElements(prevSnapshot);
+    return new StoreChange(changedElements);
+  }
+}
+
+/**
+ * Encpasulates any change to the store (durable or ephemeral).
+ */
+export abstract class StoreIncrement {
+  protected constructor(
+    public readonly type: "durable" | "ephemeral",
+    public readonly change: StoreChange,
+  ) {}
+
+  public static isDurable(
+    increment: StoreIncrement,
+  ): increment is DurableStoreIncrement {
+    return increment.type === "durable";
+  }
+
+  public static isEphemeral(
+    increment: StoreIncrement,
+  ): increment is EphemeralStoreIncrement {
+    return increment.type === "ephemeral";
+  }
+}
+
+/**
+ * Represents a durable change to the store.
+ */
+export class DurableStoreIncrement extends StoreIncrement {
+  constructor(
+    public readonly change: StoreChange,
+    public readonly delta: StoreDelta,
+  ) {
+    super("durable", change);
+  }
+}
+
+/**
+ * Represents an ephemeral change to the store.
+ */
+export class EphemeralStoreIncrement extends StoreIncrement {
+  constructor(public readonly change: StoreChange) {
+    super("ephemeral", change);
+  }
+}
+
+/**
+ * Represents a captured delta by the Store.
+ */
+export class StoreDelta {
+  protected constructor(
     public readonly id: string,
-    public readonly elementsChange: ElementsChange,
-    public readonly appStateChange: AppStateChange,
+    public readonly elements: ElementsDelta,
+    public readonly appState: AppStateDelta,
   ) {}
 
   /**
-   * Create a new instance of `StoreIncrement`.
+   * Create a new instance of `StoreDelta`.
    */
   public static create(
-    elementsChange: ElementsChange,
-    appStateChange: AppStateChange,
+    elements: ElementsDelta,
+    appState: AppStateDelta,
     opts: {
       id: string;
     } = {
       id: randomId(),
     },
   ) {
-    return new StoreIncrement(opts.id, elementsChange, appStateChange);
+    return new this(opts.id, elements, appState);
   }
 
   /**
-   * Restore a store increment instance from a DTO.
+   * Restore a store delta instance from a DTO.
    */
-  public static restore(storeIncrementDTO: DTO<StoreIncrement>) {
-    const { id, elementsChange, appStateChange } = storeIncrementDTO;
-    return new StoreIncrement(
+  public static restore(storeDeltaDTO: DTO<StoreDelta>) {
+    const { id, elements, appState } = storeDeltaDTO;
+    return new this(
       id,
-      ElementsChange.restore(elementsChange),
-      AppStateChange.restore(appStateChange),
+      ElementsDelta.restore(elements),
+      AppStateDelta.restore(appState),
     );
   }
 
-  // CFDO: why it would be a string if it can be a DTO?
   /**
-   * Parse and load the increment from the remote payload.
+   * Parse and load the delta from the remote payload.
    */
+  // CFDO: why it would be a string if it can be a DTO?
   public static load(payload: string) {
     // CFDO: ensure typesafety
     const {
       id,
-      elementsChange: { added, removed, updated },
+      elements: { added, removed, updated },
     } = JSON.parse(payload);
 
-    const elementsChange = ElementsChange.create(added, removed, updated, {
+    const elements = ElementsDelta.create(added, removed, updated, {
       shouldRedistribute: false,
     });
 
-    return new StoreIncrement(id, elementsChange, AppStateChange.empty());
+    return new this(id, elements, AppStateDelta.empty());
   }
 
   /**
-   * Inverse store increment, creates new instance of `StoreIncrement`.
+   * Inverse store delta, creates new instance of `StoreDelta`.
    */
-  public inverse(): StoreIncrement {
-    return new StoreIncrement(
-      randomId(),
-      this.elementsChange.inverse(),
-      this.appStateChange.inverse(),
-    );
+  public static inverse(delta: StoreDelta): StoreDelta {
+    return this.create(delta.elements.inverse(), delta.appState.inverse(), {
+      id: delta.id,
+    });
   }
 
   /**
-   * Apply latest (remote) changes to the increment, creates new instance of `StoreIncrement`.
+   * Apply latest (remote) changes to the delta, creates new instance of `StoreDelta`.
    */
-  public applyLatestChanges(elements: SceneElementsMap): StoreIncrement {
-    const inversedIncrement = this.inverse();
+  public static applyLatestChanges(
+    delta: StoreDelta,
+    elements: SceneElementsMap,
+  ): StoreDelta {
+    const inversedDelta = this.inverse(delta);
 
-    return new StoreIncrement(
-      inversedIncrement.id,
-      inversedIncrement.elementsChange.applyLatestChanges(elements),
-      inversedIncrement.appStateChange,
+    return this.create(
+      inversedDelta.elements.applyLatestChanges(elements),
+      inversedDelta.appState,
+      {
+        id: inversedDelta.id,
+      },
     );
   }
 
   public isEmpty() {
-    return this.elementsChange.isEmpty() && this.appStateChange.isEmpty();
+    return this.elements.isEmpty() && this.appState.isEmpty();
   }
 }
 
+/**
+ * Represents a snapshot of the captured or updated changes in the store,
+ * used for producing deltas and emitting `DurableStoreIncrement`s.
+ */
 export class StoreSnapshot {
+  private _lastChangedElementsHash: number = 0;
+
   private constructor(
     public readonly elements: Map<string, OrderedExcalidrawElement>,
     public readonly appState: ObservedAppState,
@@ -366,6 +495,34 @@ export class StoreSnapshot {
       new Map(),
       getObservedAppState(getDefaultAppState() as AppState),
       { didElementsChange: false, didAppStateChange: false, isEmpty: true },
+    );
+  }
+
+  public getChangedElements(prevSnapshot: StoreSnapshot) {
+    const changedElements: Record<string, OrderedExcalidrawElement> = {};
+
+    for (const [id, nextElement] of this.elements.entries()) {
+      // Due to the structural clone inside `maybeClone`, we can perform just these reference checks
+      if (prevSnapshot.elements.get(id) !== nextElement) {
+        changedElements[id] = nextElement;
+      }
+    }
+
+    return changedElements;
+  }
+
+  public getChangedAppState(
+    prevSnapshot: StoreSnapshot,
+  ): Partial<ObservedAppState> {
+    return Delta.getRightDifferences(
+      prevSnapshot.appState,
+      this.appState,
+    ).reduce(
+      (acc, key) =>
+        Object.assign(acc, {
+          [key]: this.appState[key as keyof ObservedAppState],
+        }),
+      {} as Partial<ObservedAppState>,
     );
   }
 
@@ -434,10 +591,8 @@ export class StoreSnapshot {
   }
 
   private detectChangedAppState(nextObservedAppState: ObservedAppState) {
-    return !isShallowEqual(this.appState, nextObservedAppState, {
-      selectedElementIds: isShallowEqual,
-      selectedGroupIds: isShallowEqual,
-    });
+    // CFDO: could we optimize by checking only reference changes? (i.e. selectedElementIds should be stable now)
+    return Delta.isRightDifferent(this.appState, nextObservedAppState);
   }
 
   private maybeCreateElementsSnapshot(
@@ -447,13 +602,13 @@ export class StoreSnapshot {
       return this.elements;
     }
 
-    const didElementsChange = this.detectChangedElements(elements);
+    const changedElements = this.detectChangedElements(elements);
 
-    if (!didElementsChange) {
+    if (!changedElements?.size) {
       return this.elements;
     }
 
-    const elementsSnapshot = this.createElementsSnapshot(elements);
+    const elementsSnapshot = this.createElementsSnapshot(changedElements);
     return elementsSnapshot;
   }
 
@@ -466,65 +621,70 @@ export class StoreSnapshot {
     nextElements: Map<string, OrderedExcalidrawElement>,
   ) {
     if (this.elements === nextElements) {
-      return false;
+      return;
     }
 
-    if (this.elements.size !== nextElements.size) {
-      return true;
-    }
+    const changedElements: Map<string, OrderedExcalidrawElement> = new Map();
 
-    // loop from right to left as changes are likelier to happen on new elements
-    const keys = Array.from(nextElements.keys());
+    for (const [id, prevElement] of this.elements) {
+      const nextElement = nextElements.get(id);
 
-    for (let i = keys.length - 1; i >= 0; i--) {
-      const prev = this.elements.get(keys[i]);
-      const next = nextElements.get(keys[i]);
-      if (
-        !prev ||
-        !next ||
-        prev.id !== next.id ||
-        prev.version !== next.version ||
-        prev.versionNonce !== next.versionNonce
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Perform structural clone, cloning only elements that changed.
-   */
-  private createElementsSnapshot(
-    nextElements: Map<string, OrderedExcalidrawElement>,
-  ) {
-    const clonedElements = new Map();
-
-    for (const [id, prevElement] of this.elements.entries()) {
-      // Clone previous elements, never delete, in case nextElements would be just a subset of previous elements
-      // i.e. during collab, persist or whenenever isDeleted elements get cleared
-      if (!nextElements.get(id)) {
-        // When we cannot find the prev element in the next elements, we mark it as deleted
-        clonedElements.set(
+      if (!nextElement) {
+        // element was deleted
+        changedElements.set(
           id,
           newElementWith(prevElement, { isDeleted: true }),
         );
-      } else {
-        clonedElements.set(id, prevElement);
       }
     }
 
-    for (const [id, nextElement] of nextElements.entries()) {
-      const prevElement = clonedElements.get(id);
+    for (const [id, nextElement] of nextElements) {
+      const prevElement = this.elements.get(id);
 
-      // At this point our elements are reconcilled already, meaning the next element is always newer
       if (
         !prevElement || // element was added
-        (prevElement && prevElement.versionNonce !== nextElement.versionNonce) // element was updated
+        prevElement.version < nextElement.version // element was updated
       ) {
-        clonedElements.set(id, deepCopyElement(nextElement));
+        changedElements.set(id, nextElement);
       }
+    }
+
+    if (!changedElements.size) {
+      return;
+    }
+
+    // due to snapshot containing only durable changes,
+    // we might have already processed these elements in a previous run,
+    // hence additionally check whether the hash of the elements has changed
+    // since if it didn't, we don't need to process them again
+    const changedElementsHash = hashElementsVersion(
+      Array.from(changedElements.values()),
+    );
+
+    if (this._lastChangedElementsHash === changedElementsHash) {
+      return;
+    }
+
+    this._lastChangedElementsHash = changedElementsHash;
+    return changedElements;
+  }
+
+  /**
+   * Perform structural clone, deep cloning only elements that changed.
+   */
+  private createElementsSnapshot(
+    changedElements: Map<string, OrderedExcalidrawElement>,
+  ) {
+    const clonedElements = new Map();
+
+    for (const [id, prevElement] of this.elements) {
+      // Clone previous elements, never delete, in case nextElements would be just a subset of previous elements
+      // i.e. during collab, persist or whenenever isDeleted elements get cleared
+      clonedElements.set(id, prevElement);
+    }
+
+    for (const [id, changedElement] of changedElements) {
+      clonedElements.set(id, deepCopyElement(changedElement));
     }
 
     return clonedElements;

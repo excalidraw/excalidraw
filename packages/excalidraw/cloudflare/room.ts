@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { DurableIncrementsRepository } from "./repository";
+import { DurableDeltasRepository } from "./repository";
 import { ExcalidrawSyncServer } from "../sync/server";
 
 import type { ExcalidrawElement } from "../element/types";
@@ -34,9 +34,8 @@ export class DurableRoom extends DurableObject {
       this.roomId = (await this.ctx.storage.get("roomId")) || null;
     });
 
-    this.sync = new ExcalidrawSyncServer(
-      new DurableIncrementsRepository(ctx.storage),
-    );
+    const repository = new DurableDeltasRepository(ctx.storage);
+    this.sync = new ExcalidrawSyncServer(repository);
 
     // in case it hibernates, let's get take active connections
     for (const ws of this.ctx.getWebSockets()) {

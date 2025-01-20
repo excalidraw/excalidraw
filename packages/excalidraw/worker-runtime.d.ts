@@ -1,4 +1,4 @@
-// Runtime types generated with workerd@1.20241106.1 2024-11-12 
+// Runtime types generated with workerd@1.20241106.1 2024-11-12
 /*! *****************************************************************************
 Copyright (c) Cloudflare. All rights reserved.
 Copyright (c) Microsoft Corporation. All rights reserved.

@@ -1,9 +1,9 @@
 import throttle from "lodash.throttle";
-import type { StoreIncrement } from "../store";
+import type { StoreDelta } from "../store";
 
-export interface IncrementsRepository {
-  loadIncrements(): Promise<Array<StoreIncrement> | null>;
-  saveIncrements(params: StoreIncrement[]): Promise<void>;
+export interface DeltasRepository {
+  loadDeltas(): Promise<Array<StoreDelta> | null>;
+  saveDeltas(params: StoreDelta[]): Promise<void>;
 }
 
 export interface MetadataRepository {
@@ -11,24 +11,24 @@ export interface MetadataRepository {
   saveMetadata(metadata: { lastAcknowledgedVersion: number }): Promise<void>;
 }
 
-// CFDO: make sure the increments are always acknowledged (deleted from the repository)
-export class SyncQueue {
-  private readonly queue: Map<string, StoreIncrement>;
-  private readonly repository: IncrementsRepository;
+// CFDO: make sure the deltas are always acknowledged (deleted from the repository)
+export class LocalDeltasQueue {
+  private readonly queue: Map<string, StoreDelta>;
+  private readonly repository: DeltasRepository;
 
   private constructor(
-    queue: Map<string, StoreIncrement> = new Map(),
-    repository: IncrementsRepository,
+    queue: Map<string, StoreDelta> = new Map(),
+    repository: DeltasRepository,
   ) {
     this.queue = queue;
     this.repository = repository;
   }
 
-  public static async create(repository: IncrementsRepository) {
-    const increments = await repository.loadIncrements();
+  public static async create(repository: DeltasRepository) {
+    const deltas = await repository.loadDeltas();
 
-    return new SyncQueue(
-      new Map(increments?.map((increment) => [increment.id, increment])),
+    return new LocalDeltasQueue(
+      new Map(deltas?.map((delta) => [delta.id, delta])),
       repository,
     );
   }
@@ -37,23 +37,23 @@ export class SyncQueue {
     return Array.from(this.queue.values());
   }
 
-  public get(id: StoreIncrement["id"]) {
+  public get(id: StoreDelta["id"]) {
     return this.queue.get(id);
   }
 
-  public has(id: StoreIncrement["id"]) {
+  public has(id: StoreDelta["id"]) {
     return this.queue.has(id);
   }
 
-  public add(...increments: StoreIncrement[]) {
-    for (const increment of increments) {
-      this.queue.set(increment.id, increment);
+  public add(...deltas: StoreDelta[]) {
+    for (const delta of deltas) {
+      this.queue.set(delta.id, delta);
     }
 
     this.persist();
   }
 
-  public remove(...ids: StoreIncrement["id"][]) {
+  public remove(...ids: StoreDelta["id"][]) {
     for (const id of ids) {
       this.queue.delete(id);
     }
@@ -64,7 +64,7 @@ export class SyncQueue {
   public persist = throttle(
     async () => {
       try {
-        await this.repository.saveIncrements(this.getAll());
+        await this.repository.saveDeltas(this.getAll());
       } catch (e) {
         console.error("Failed to persist the sync queue:", e);
       }

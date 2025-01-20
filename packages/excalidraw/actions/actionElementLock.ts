@@ -4,7 +4,7 @@ import { isFrameLikeElement } from "../element/typeChecks";
 import type { ExcalidrawElement } from "../element/types";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
-import { StoreAction } from "../store";
+import { SnapshotAction } from "../store";
 import { arrayToMap } from "../utils";
 import { register } from "./register";
 
@@ -67,7 +67,7 @@ export const actionToggleElementLock = register({
           ? null
           : appState.selectedLinearElement,
       },
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
   keyTest: (event, appState, elements, app) => {
@@ -112,7 +112,7 @@ export const actionUnlockAllElements = register({
           lockedElements.map((el) => [el.id, true]),
         ),
       },
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
   label: "labels.elementLock.unlockAll",

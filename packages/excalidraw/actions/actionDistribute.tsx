@@ -12,7 +12,7 @@ import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
-import { StoreAction } from "../store";
+import { SnapshotAction } from "../store";
 import type { AppClassProperties, AppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -60,7 +60,7 @@ export const distributeHorizontally = register({
         space: "between",
         axis: "x",
       }),
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -91,7 +91,7 @@ export const distributeVertically = register({
         space: "between",
         axis: "y",
       }),
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
   keyTest: (event) =>

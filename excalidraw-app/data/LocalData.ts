@@ -45,7 +45,7 @@ import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
-import { StoreIncrement } from "../../packages/excalidraw/store";
+import { StoreDelta } from "../../packages/excalidraw/store";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -260,7 +260,7 @@ export class LibraryLocalStorageMigrationAdapter {
   }
 }
 
-type SyncIncrementPersistedData = DTO<StoreIncrement>[];
+type SyncDeltaPersistedData = DTO<StoreDelta>[];
 
 type SyncMetaPersistedData = {
   lastAcknowledgedVersion: number;
@@ -270,7 +270,7 @@ export class SyncIndexedDBAdapter {
   /** IndexedDB database and store name */
   private static idb_name = STORAGE_KEYS.IDB_SYNC;
   /** library data store keys */
-  private static incrementsKey = "increments";
+  private static deltasKey = "deltas";
   private static metadataKey = "metadata";
 
   private static store = createStore(
@@ -278,24 +278,22 @@ export class SyncIndexedDBAdapter {
     `${SyncIndexedDBAdapter.idb_name}-store`,
   );
 
-  static async loadIncrements() {
-    const increments = await get<SyncIncrementPersistedData>(
-      SyncIndexedDBAdapter.incrementsKey,
+  static async loadDeltas() {
+    const deltas = await get<SyncDeltaPersistedData>(
+      SyncIndexedDBAdapter.deltasKey,
       SyncIndexedDBAdapter.store,
     );
 
-    if (increments?.length) {
-      return increments.map((storeIncrementDTO) =>
-        StoreIncrement.restore(storeIncrementDTO),
-      );
+    if (deltas?.length) {
+      return deltas.map((storeDeltaDTO) => StoreDelta.restore(storeDeltaDTO));
     }
 
     return null;
   }
 
-  static async saveIncrements(data: SyncIncrementPersistedData): Promise<void> {
+  static async saveDeltas(data: SyncDeltaPersistedData): Promise<void> {
     return set(
-      SyncIndexedDBAdapter.incrementsKey,
+      SyncIndexedDBAdapter.deltasKey,
       data,
       SyncIndexedDBAdapter.store,
     );

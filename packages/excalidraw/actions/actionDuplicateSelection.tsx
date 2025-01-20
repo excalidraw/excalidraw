@@ -32,7 +32,7 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "../store";
+import { SnapshotAction } from "../store";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -52,7 +52,7 @@ export const actionDuplicateSelection = register({
         return {
           elements,
           appState: newAppState,
-          storeAction: StoreAction.CAPTURE,
+          storeAction: SnapshotAction.CAPTURE,
         };
       } catch {
         return false;
@@ -61,7 +61,7 @@ export const actionDuplicateSelection = register({
 
     return {
       ...duplicateElements(elements, appState),
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,

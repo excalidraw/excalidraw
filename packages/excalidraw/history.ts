@@ -1,11 +1,9 @@
 import { Emitter } from "./emitter";
+import { type Store, StoreDelta, StoreIncrement } from "./store";
 import type { SceneElementsMap } from "./element/types";
-import type { Store, StoreIncrement } from "./store";
 import type { AppState } from "./types";
 
-type HistoryEntry = StoreIncrement & {
-  skipRecording?: true;
-};
+export class HistoryEntry extends StoreDelta {}
 
 type HistoryStack = HistoryEntry[];
 
@@ -42,12 +40,18 @@ export class History {
   /**
    * Record a local change which will go into the history
    */
-  public record(entry: HistoryEntry) {
-    if (!entry.skipRecording && !entry.isEmpty()) {
-      // we have the latest changes, no need to `applyLatest`, which is done within `History.push`
-      this.undoStack.push(entry.inverse());
+  public record(increment: StoreIncrement) {
+    if (
+      StoreIncrement.isDurable(increment) &&
+      !increment.delta.isEmpty() &&
+      !(increment.delta instanceof HistoryEntry)
+    ) {
+      // construct history entry, so once it's emitted, it's not recorded again
+      const entry = HistoryEntry.inverse(increment.delta);
 
-      if (!entry.elementsChange.isEmpty()) {
+      this.undoStack.push(entry);
+
+      if (!entry.elements.isEmpty()) {
         // don't reset redo stack on local appState changes,
         // as a simple click (unselect) could lead to losing all the redo entries
         // only reset on non empty elements changes!
@@ -91,6 +95,7 @@ export class History {
         return;
       }
 
+      let prevSnapshot = this.store.snapshot;
       let nextElements = elements;
       let nextAppState = appState;
       let containsVisibleChange = false;
@@ -98,17 +103,18 @@ export class History {
       // iterate through the history entries in case they result in no visible changes
       while (historyEntry) {
         try {
-          // skip re-recording the history entry, as it gets emitted and is manually pushed to the undo / redo stack
-          Object.assign(historyEntry, { skipRecording: true });
-          // CFDO: consider encapsulating element & appState update inside applyIncrement
           [nextElements, nextAppState, containsVisibleChange] =
-            this.store.applyIncrementTo(
-              historyEntry,
-              nextElements,
-              nextAppState,
-            );
+            this.store.applyDeltaTo(historyEntry, nextElements, nextAppState, {
+              triggerIncrement: true,
+            });
+
+          prevSnapshot = this.store.snapshot;
+        } catch (e) {
+          console.error("Failed to apply history entry:", e);
+          // rollback to the previous snapshot, so that we don't end up in an incosistent state
+          this.store.snapshot = prevSnapshot;
         } finally {
-          // make sure to always push, even if the increment is corrupted
+          // make sure to always push, even if the delta is corrupted
           push(historyEntry);
         }
 
@@ -152,7 +158,7 @@ export class History {
     entry: HistoryEntry,
     prevElements: SceneElementsMap,
   ) {
-    const updatedEntry = entry.applyLatestChanges(prevElements);
+    const updatedEntry = HistoryEntry.applyLatestChanges(entry, prevElements);
     return stack.push(updatedEntry);
   }
 }

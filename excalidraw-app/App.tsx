@@ -24,7 +24,7 @@ import {
   Excalidraw,
   LiveCollaborationTrigger,
   TTDDialogTrigger,
-  StoreAction,
+  SnapshotAction,
   reconcileElements,
   newElementWith,
 } from "../packages/excalidraw";
@@ -44,6 +44,7 @@ import {
   preventUnload,
   resolvablePromise,
   isRunningInIframe,
+  assertNever,
 } from "../packages/excalidraw/utils";
 import {
   FIREBASE_STORAGE_PREFIXES,
@@ -109,7 +110,11 @@ import Trans from "../packages/excalidraw/components/Trans";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import type { RemoteExcalidrawElement } from "../packages/excalidraw/data/reconcile";
-import type { StoreIncrement } from "../packages/excalidraw/store";
+import type {
+  DurableStoreIncrement,
+  EphemeralStoreIncrement,
+} from "../packages/excalidraw/store";
+import { StoreDelta, StoreIncrement } from "../packages/excalidraw/store";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
@@ -370,20 +375,30 @@ const ExcalidrawWrapper = () => {
   const [, setShareDialogState] = useAtom(shareDialogStateAtom);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [syncAPI] = useAtom(syncApiAtom);
-  const [nextVersion, setNextVersion] = useState(-1);
-  const currentVersion = useRef(-1);
-  const [acknowledgedIncrements, setAcknowledgedIncrements] = useState<
-    StoreIncrement[]
-  >([]);
+  const [sliderVersion, setSliderVersion] = useState(0);
+  const [acknowledgedDeltas, setAcknowledgedDeltas] = useState<StoreDelta[]>(
+    [],
+  );
+  const acknowledgedDeltasRef = useRef<StoreDelta[]>(acknowledgedDeltas);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
   useEffect(() => {
+    acknowledgedDeltasRef.current = acknowledgedDeltas;
+  }, [acknowledgedDeltas]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      setAcknowledgedIncrements([...(syncAPI?.acknowledgedIncrements ?? [])]);
-    }, 250);
+      const deltas = syncAPI?.acknowledgedDeltas ?? [];
+
+      // CFDO: buffer local deltas as well, not only acknowledged ones
+      if (deltas.length > acknowledgedDeltasRef.current.length) {
+        setAcknowledgedDeltas([...deltas]);
+        setSliderVersion(deltas.length);
+      }
+    }, 1000);
 
     syncAPI?.connect();
 
@@ -512,7 +527,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               ...restore(data.scene, null, null, { repairBindings: true }),
-              storeAction: StoreAction.CAPTURE,
+              snapshotAction: SnapshotAction.CAPTURE,
             });
           }
         });
@@ -539,7 +554,7 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
-            storeAction: StoreAction.UPDATE,
+            snapshotAction: SnapshotAction.UPDATE,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
@@ -671,7 +686,7 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
-              storeAction: StoreAction.UPDATE,
+              snapshotAction: SnapshotAction.UPDATE,
             });
           }
         }
@@ -689,18 +704,31 @@ const ExcalidrawWrapper = () => {
     }
   };
 
-  const onIncrement = (increment: StoreIncrement) => {
-    // ephemerals are not part of this (which is alright)
-    // - wysiwyg, dragging elements / points, mouse movements, etc.
-    const { elementsChange } = increment;
-
-    // CFDO: some appState like selections should also be transfered (we could even persist it)
-    if (!elementsChange.isEmpty()) {
-      try {
-        syncAPI?.push(increment);
-      } catch (e) {
-        console.error(e);
+  const onIncrement = (
+    increment: DurableStoreIncrement | EphemeralStoreIncrement,
+  ) => {
+    try {
+      if (!syncAPI) {
+        return;
       }
+
+      if (StoreIncrement.isDurable(increment)) {
+        // push only if there are element changes
+        if (!increment.delta.elements.isEmpty()) {
+          syncAPI.push(increment.delta);
+        }
+
+        return;
+      }
+
+      if (StoreIncrement.isEphemeral(increment)) {
+        syncAPI.relay(increment.change);
+        return;
+      }
+
+      assertNever(increment, `Unknown increment type`);
+    } catch (e) {
+      console.error("Error during onIncrement handler", e);
     }
   };
 
@@ -826,46 +854,48 @@ const ExcalidrawWrapper = () => {
     },
   };
 
-  const debouncedTimeTravel = debounce((value: number) => {
-    let elements = new Map(
-      excalidrawAPI?.getSceneElements().map((x) => [x.id, x]),
-    );
-
-    let increments: StoreIncrement[] = [];
-
-    const goingLeft =
-      currentVersion.current === -1 || value - currentVersion.current <= 0;
-
-    if (goingLeft) {
-      increments = acknowledgedIncrements
-        .slice(value)
-        .reverse()
-        .map((x) => x.inverse());
-    } else {
-      increments =
-        acknowledgedIncrements.slice(currentVersion.current, value) ?? [];
-    }
-
-    for (const increment of increments) {
-      [elements] = increment.elementsChange.applyTo(
-        elements as SceneElementsMap,
-        excalidrawAPI?.store.snapshot.elements!,
+  const debouncedTimeTravel = debounce(
+    (value: number, direction: "forward" | "backward") => {
+      let elements = new Map(
+        excalidrawAPI?.getSceneElements().map((x) => [x.id, x]),
       );
-    }
 
-    excalidrawAPI?.updateScene({
-      appState: {
-        ...excalidrawAPI?.getAppState(),
-        viewModeEnabled: value !== -1,
-      },
-      elements: Array.from(elements.values()),
-      storeAction: StoreAction.UPDATE,
-    });
+      let deltas: StoreDelta[] = [];
 
-    currentVersion.current = value;
-  }, 0);
+      switch (direction) {
+        case "forward": {
+          deltas = acknowledgedDeltas.slice(sliderVersion, value) ?? [];
+          break;
+        }
+        case "backward": {
+          deltas = acknowledgedDeltas
+            .slice(value)
+            .reverse()
+            .map((x) => StoreDelta.inverse(x));
+          break;
+        }
+        default:
+          assertNever(direction, `Unknown direction: ${direction}`);
+      }
 
-  const latestVersion = acknowledgedIncrements.length;
+      for (const delta of deltas) {
+        [elements] = delta.elements.applyTo(
+          elements as SceneElementsMap,
+          excalidrawAPI?.store.snapshot.elements!,
+        );
+      }
+
+      excalidrawAPI?.updateScene({
+        appState: {
+          ...excalidrawAPI?.getAppState(),
+          viewModeEnabled: value !== acknowledgedDeltas.length,
+        },
+        elements: Array.from(elements.values()),
+        snapshotAction: SnapshotAction.NONE,
+      });
+    },
+    0,
+  );
 
   return (
     <div
@@ -884,25 +914,30 @@ const ExcalidrawWrapper = () => {
         }}
         step={1}
         min={0}
-        max={latestVersion}
-        value={nextVersion === -1 ? latestVersion : nextVersion}
+        max={acknowledgedDeltas.length}
+        value={sliderVersion}
         onChange={(value) => {
-          let nextValue: number;
-
-          // CFDO: should be disabled when offline! (later we could have speculative changes in the versioning log as well)
+          const nextSliderVersion = value as number;
+          // CFDO II: should be disabled when offline! (later we could have speculative changes in the versioning log as well)
           // CFDO: in safari the whole canvas gets selected when dragging
-          if (value !== acknowledgedIncrements.length) {
+          if (nextSliderVersion !== acknowledgedDeltas.length) {
             // don't listen to updates in the detached mode
             syncAPI?.disconnect();
-            nextValue = value as number;
           } else {
             // reconnect once we're back to the latest version
             syncAPI?.connect();
-            nextValue = -1;
           }
 
-          setNextVersion(nextValue);
-          debouncedTimeTravel(nextValue);
+          if (nextSliderVersion === sliderVersion) {
+            return;
+          }
+
+          debouncedTimeTravel(
+            nextSliderVersion,
+            nextSliderVersion < sliderVersion ? "backward" : "forward",
+          );
+
+          setSliderVersion(nextSliderVersion);
         }}
       />
       <Excalidraw

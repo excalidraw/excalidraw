@@ -9,8 +9,7 @@ import { KEYS, matchKey } from "../keys";
 import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import type { SceneElementsMap } from "../element/types";
-import type { Store } from "../store";
-import { StoreAction } from "../store";
+import { SnapshotAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
 const executeHistoryAction = (
@@ -30,7 +29,7 @@ const executeHistoryAction = (
     const result = updater();
 
     if (!result) {
-      return { storeAction: StoreAction.NONE };
+      return { storeAction: SnapshotAction.NONE };
     }
 
     const [nextElementsMap, nextAppState] = result;
@@ -39,11 +38,11 @@ const executeHistoryAction = (
     return {
       appState: nextAppState,
       elements: nextElements,
-      storeAction: StoreAction.UPDATE,
+      storeAction: SnapshotAction.UPDATE,
     };
   }
 
-  return { storeAction: StoreAction.NONE };
+  return { storeAction: SnapshotAction.NONE };
 };
 
 type ActionCreator = (history: History) => Action;

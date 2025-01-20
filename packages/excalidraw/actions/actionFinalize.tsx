@@ -14,7 +14,7 @@ import {
 import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
-import { StoreAction } from "../store";
+import { SnapshotAction } from "../store";
 import { pointFrom } from "../../math";
 import { isPathALoop } from "../shapes";
 
@@ -52,7 +52,7 @@ export const actionFinalize = register({
             cursorButton: "up",
             editingLinearElement: null,
           },
-          storeAction: StoreAction.CAPTURE,
+          storeAction: SnapshotAction.CAPTURE,
         };
       }
     }
@@ -199,7 +199,7 @@ export const actionFinalize = register({
         pendingImageElementId: null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
   keyTest: (event, appState) =>

@@ -2,7 +2,7 @@ import { isTextElement } from "../element";
 import { newElementWith } from "../element/mutateElement";
 import { measureText } from "../element/textElement";
 import { getSelectedElements } from "../scene";
-import { StoreAction } from "../store";
+import { SnapshotAction } from "../store";
 import type { AppClassProperties } from "../types";
 import { getFontString } from "../utils";
 import { register } from "./register";
@@ -42,7 +42,7 @@ export const actionTextAutoResize = register({
         }
         return element;
       }),
-      storeAction: StoreAction.CAPTURE,
+      storeAction: SnapshotAction.CAPTURE,
     };
   },
 });

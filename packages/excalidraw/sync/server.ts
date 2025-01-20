@@ -2,14 +2,15 @@ import AsyncLock from "async-lock";
 import { Utils } from "./utils";
 
 import type {
-  IncrementsRepository,
+  DeltasRepository,
   CLIENT_MESSAGE,
   PULL_PAYLOAD,
   PUSH_PAYLOAD,
   SERVER_MESSAGE,
-  SERVER_INCREMENT,
+  SERVER_DELTA,
   CLIENT_MESSAGE_RAW,
   CHUNK_INFO,
+  RELAY_PAYLOAD,
 } from "./protocol";
 
 // CFDO: message could be binary (cbor, protobuf, etc.)
@@ -25,7 +26,7 @@ export class ExcalidrawSyncServer {
     Map<CHUNK_INFO["position"], CLIENT_MESSAGE_RAW["payload"]>
   >();
 
-  constructor(private readonly incrementsRepository: IncrementsRepository) {}
+  constructor(private readonly repository: DeltasRepository) {}
 
   // CFDO: should send a message about collaborators (no collaborators => no need to send ephemerals)
   public onConnect(client: WebSocket) {
@@ -65,8 +66,8 @@ export class ExcalidrawSyncServer {
     }
 
     switch (type) {
-      // case "relay":
-      //   return this.relay(client, parsedPayload as RELAY_PAYLOAD);
+      case "relay":
+        return this.relay(client, parsedPayload as RELAY_PAYLOAD);
       case "pull":
         return this.pull(client, parsedPayload as PULL_PAYLOAD);
       case "push":
@@ -137,24 +138,21 @@ export class ExcalidrawSyncServer {
     }
   }
 
-  // private relay(
-  //   client: WebSocket,
-  //   payload: { increments: Array<CLIENT_INCREMENT> } | RELAY_PAYLOAD,
-  // ) {
-  //   return this.broadcast(
-  //     {
-  //       type: "relayed",
-  //       payload,
-  //     },
-  //     client,
-  //   );
-  // }
+  private relay(client: WebSocket, payload: RELAY_PAYLOAD) {
+    // CFDO: we should likely apply these to the snapshot
+    return this.broadcast(
+      {
+        type: "relayed",
+        payload,
+      },
+      client,
+    );
+  }
 
   private pull(client: WebSocket, payload: PULL_PAYLOAD) {
     // CFDO: test for invalid payload
     const lastAcknowledgedClientVersion = payload.lastAcknowledgedVersion;
-    const lastAcknowledgedServerVersion =
-      this.incrementsRepository.getLastVersion();
+    const lastAcknowledgedServerVersion = this.repository.getLastVersion();
 
     const versionΔ =
       lastAcknowledgedServerVersion - lastAcknowledgedClientVersion;
@@ -167,37 +165,33 @@ export class ExcalidrawSyncServer {
       return;
     }
 
-    const increments: SERVER_INCREMENT[] = [];
+    const deltas: SERVER_DELTA[] = [];
 
     if (versionΔ > 0) {
-      increments.push(
-        ...this.incrementsRepository.getAllSinceVersion(
-          lastAcknowledgedClientVersion,
-        ),
+      deltas.push(
+        ...this.repository.getAllSinceVersion(lastAcknowledgedClientVersion),
       );
     }
 
     this.send(client, {
       type: "acknowledged",
       payload: {
-        increments,
+        deltas,
       },
     });
   }
 
-  private push(client: WebSocket, increment: PUSH_PAYLOAD) {
-    // CFDO: try to apply the increments to the snapshot
-    const [acknowledged, error] = Utils.try(() =>
-      this.incrementsRepository.save(increment),
-    );
+  private push(client: WebSocket, delta: PUSH_PAYLOAD) {
+    // CFDO: try to apply the deltas to the snapshot
+    const [acknowledged, error] = Utils.try(() => this.repository.save(delta));
 
     if (error || !acknowledged) {
       // everything should be automatically rolled-back -> double-check
       return this.send(client, {
         type: "rejected",
         payload: {
-          message: error ? error.message : "Coudn't persist the increment.",
-          increments: [increment],
+          message: error ? error.message : "Coudn't persist the delta.",
+          deltas: [delta],
         },
       });
     }
@@ -205,7 +199,7 @@ export class ExcalidrawSyncServer {
     return this.broadcast({
       type: "acknowledged",
       payload: {
-        increments: [acknowledged],
+        deltas: [acknowledged],
       },
     });
   }

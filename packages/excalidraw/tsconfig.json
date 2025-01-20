@@ -10,6 +10,6 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
+    "jsx": "react-jsx"
   }
 }
