@@ -8535,6 +8535,7 @@ class App extends React.Component<AppProps, AppState> {
                 elements,
                 this.state.selectionElement,
                 this.scene.getNonDeletedElementsMap(),
+                false,
               )
             : [];
 
