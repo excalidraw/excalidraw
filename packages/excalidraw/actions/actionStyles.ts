@@ -23,7 +23,7 @@ import {
 import { getSelectedElements } from "../scene";
 import type { ExcalidrawTextElement } from "../element/types";
 import { paintIcon } from "../components/icons";
-import { SnapshotAction } from "../store";
+import { StoreAction } from "../store";
 import { getLineHeight } from "../fonts";
 
 // `copiedStyles` is exported only for tests.
@@ -53,7 +53,7 @@ export const actionCopyStyles = register({
         ...appState,
         toast: { message: t("toast.copyStyles") },
       },
-      storeAction: SnapshotAction.NONE,
+      storeAction: StoreAction.NONE,
     };
   },
   keyTest: (event) =>
@@ -70,7 +70,7 @@ export const actionPasteStyles = register({
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];
     if (!isExcalidrawElement(pastedElement)) {
-      return { elements, storeAction: SnapshotAction.NONE };
+      return { elements, storeAction: StoreAction.NONE };
     }
 
     const selectedElements = getSelectedElements(elements, appState, {
@@ -159,7 +159,7 @@ export const actionPasteStyles = register({
         }
         return element;
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>

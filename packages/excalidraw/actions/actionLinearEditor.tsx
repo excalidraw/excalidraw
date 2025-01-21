@@ -2,7 +2,7 @@ import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette"
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isElbowArrow, isLinearElement } from "../element/typeChecks";
 import type { ExcalidrawLinearElement } from "../element/types";
-import { SnapshotAction } from "../store";
+import { StoreAction } from "../store";
 import { register } from "./register";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
@@ -51,7 +51,7 @@ export const actionToggleLinearEditor = register({
         ...appState,
         editingLinearElement,
       },
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ appState, updateData, app }) => {

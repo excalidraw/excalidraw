@@ -106,6 +106,7 @@ export class History {
           [nextElements, nextAppState, containsVisibleChange] =
             this.store.applyDeltaTo(historyEntry, nextElements, nextAppState, {
               triggerIncrement: true,
+              updateSnapshot: true,
             });
 
           prevSnapshot = this.store.snapshot;

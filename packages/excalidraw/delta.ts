@@ -1271,7 +1271,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       });
     }
 
-    // CFDO II: this looks wrong
+    // CFDO: this looks wrong
     if (isImageElement(element)) {
       const _delta = delta as Delta<ElementPartial<ExcalidrawImageElement>>;
       // we want to override `crop` only if modified so that we don't reset

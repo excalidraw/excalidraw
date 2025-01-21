@@ -24,7 +24,7 @@ import {
   Excalidraw,
   LiveCollaborationTrigger,
   TTDDialogTrigger,
-  SnapshotAction,
+  StoreAction,
   reconcileElements,
   newElementWith,
 } from "../packages/excalidraw";
@@ -527,7 +527,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               ...restore(data.scene, null, null, { repairBindings: true }),
-              snapshotAction: SnapshotAction.CAPTURE,
+              storeAction: StoreAction.CAPTURE,
             });
           }
         });
@@ -554,7 +554,7 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
-            snapshotAction: SnapshotAction.UPDATE,
+            storeAction: StoreAction.UPDATE,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
@@ -686,7 +686,7 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
-              snapshotAction: SnapshotAction.UPDATE,
+              storeAction: StoreAction.UPDATE,
             });
           }
         }
@@ -856,9 +856,15 @@ const ExcalidrawWrapper = () => {
 
   const debouncedTimeTravel = debounce(
     (value: number, direction: "forward" | "backward") => {
-      let elements = new Map(
-        excalidrawAPI?.getSceneElements().map((x) => [x.id, x]),
-      );
+      if (!excalidrawAPI) {
+        return;
+      }
+
+      let nextAppState = excalidrawAPI.getAppState();
+      // CFDO: retrieve the scene map already
+      let nextElements = new Map(
+        excalidrawAPI.getSceneElements().map((x) => [x.id, x]),
+      ) as SceneElementsMap;
 
       let deltas: StoreDelta[] = [];
 
@@ -879,19 +885,20 @@ const ExcalidrawWrapper = () => {
       }
 
       for (const delta of deltas) {
-        [elements] = delta.elements.applyTo(
-          elements as SceneElementsMap,
-          excalidrawAPI?.store.snapshot.elements!,
+        [nextElements, nextAppState] = excalidrawAPI.store.applyDeltaTo(
+          delta,
+          nextElements,
+          nextAppState,
         );
       }
 
       excalidrawAPI?.updateScene({
         appState: {
-          ...excalidrawAPI?.getAppState(),
+          ...nextAppState,
           viewModeEnabled: value !== acknowledgedDeltas.length,
         },
-        elements: Array.from(elements.values()),
-        snapshotAction: SnapshotAction.NONE,
+        elements: Array.from(nextElements.values()),
+        storeAction: StoreAction.UPDATE,
       });
     },
     0,
@@ -918,7 +925,6 @@ const ExcalidrawWrapper = () => {
         value={sliderVersion}
         onChange={(value) => {
           const nextSliderVersion = value as number;
-          // CFDO II: should be disabled when offline! (later we could have speculative changes in the versioning log as well)
           // CFDO: in safari the whole canvas gets selected when dragging
           if (nextSliderVersion !== acknowledgedDeltas.length) {
             // don't listen to updates in the detached mode

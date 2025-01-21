@@ -65,7 +65,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
 | `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
-| `SnapshotAction` | `SnapshotAction` | Implies if the change should be captured by the `store`. Captured changes are emmitted and listened to by other components, such as `History` for undo / redo purposes. Defaults to `SnapshotAction.CAPTURE`. |
+| `storeAction` | `StoreAction` | Implies if the change should be captured by the `store`. Captured changes are emmitted and listened to by other components, such as `History` for undo / redo purposes. Defaults to `StoreAction.CAPTURE`. |
 
 ```jsx live
 function App() {

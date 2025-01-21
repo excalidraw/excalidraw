@@ -16,7 +16,7 @@ import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
-import { SnapshotAction } from "../store";
+import { StoreAction } from "../store";
 import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
@@ -72,7 +72,7 @@ export const actionAlignTop = register({
         position: "start",
         axis: "y",
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -106,7 +106,7 @@ export const actionAlignBottom = register({
         position: "end",
         axis: "y",
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -140,7 +140,7 @@ export const actionAlignLeft = register({
         position: "start",
         axis: "x",
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -174,7 +174,7 @@ export const actionAlignRight = register({
         position: "end",
         axis: "x",
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   keyTest: (event) =>
@@ -208,7 +208,7 @@ export const actionAlignVerticallyCentered = register({
         position: "center",
         axis: "y",
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (
@@ -238,7 +238,7 @@ export const actionAlignHorizontallyCentered = register({
         position: "center",
         axis: "x",
       }),
-      storeAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (

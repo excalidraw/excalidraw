@@ -43,7 +43,7 @@ import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type {
   DurableStoreIncrement,
   EphemeralStoreIncrement,
-  SnapshotActionType,
+  StoreActionType as StoreActionType,
 } from "./store";
 
 export type SocketId = string & { _brand: "SocketId" };
@@ -578,7 +578,7 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  snapshotAction?: SnapshotActionType;
+  storeAction?: StoreActionType;
 };
 
 export enum UserIdleState {

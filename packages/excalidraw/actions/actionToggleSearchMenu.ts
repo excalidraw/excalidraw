@@ -2,7 +2,7 @@ import { KEYS } from "../keys";
 import { register } from "./register";
 import type { AppState } from "../types";
 import { searchIcon } from "../components/icons";
-import { SnapshotAction } from "../store";
+import { StoreAction } from "../store";
 import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
 
 export const actionToggleSearchMenu = register({
@@ -29,7 +29,7 @@ export const actionToggleSearchMenu = register({
       if (searchInput?.matches(":focus")) {
         return {
           appState: { ...appState, openSidebar: null },
-          storeAction: SnapshotAction.NONE,
+          storeAction: StoreAction.NONE,
         };
       }
 
@@ -44,7 +44,7 @@ export const actionToggleSearchMenu = register({
         openSidebar: { name: DEFAULT_SIDEBAR.name, tab: CANVAS_SEARCH_TAB },
         openDialog: null,
       },
-      storeAction: SnapshotAction.NONE,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState: AppState) => appState.gridModeEnabled,

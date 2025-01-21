@@ -1,6 +1,6 @@
 import React from "react";
 import { vi } from "vitest";
-import { Excalidraw, SnapshotAction } from "../../index";
+import { Excalidraw, StoreAction } from "../../index";
 import type { ExcalidrawImperativeAPI } from "../../types";
 import { resolvablePromise } from "../../utils";
 import { render } from "../test-utils";
@@ -31,7 +31,7 @@ describe("event callbacks", () => {
     excalidrawAPI.onChange(onChange);
     API.updateScene({
       appState: { viewBackgroundColor: "red" },
-      snapshotAction: SnapshotAction.CAPTURE,
+      storeAction: StoreAction.CAPTURE,
     });
     expect(onChange).toHaveBeenCalledWith(
       // elements

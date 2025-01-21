@@ -419,7 +419,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import FollowMode from "./FollowMode/FollowMode";
-import { Store, SnapshotAction } from "../store";
+import { Store, StoreAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -2093,12 +2093,12 @@ class App extends React.Component<AppProps, AppState> {
           if (shouldUpdateStrokeColor) {
             this.syncActionResult({
               appState: { ...this.state, currentItemStrokeColor: color },
-              storeAction: SnapshotAction.CAPTURE,
+              storeAction: StoreAction.CAPTURE,
             });
           } else {
             this.syncActionResult({
               appState: { ...this.state, currentItemBackgroundColor: color },
-              storeAction: SnapshotAction.CAPTURE,
+              storeAction: StoreAction.CAPTURE,
             });
           }
         } else {
@@ -2112,7 +2112,7 @@ class App extends React.Component<AppProps, AppState> {
               }
               return el;
             }),
-            snapshotAction: SnapshotAction.CAPTURE,
+            storeAction: StoreAction.CAPTURE,
           });
         }
       },
@@ -2334,7 +2334,7 @@ class App extends React.Component<AppProps, AppState> {
     this.resetHistory();
     this.syncActionResult({
       ...scene,
-      storeAction: SnapshotAction.UPDATE,
+      storeAction: StoreAction.UPDATE,
     });
 
     // clear the shape and image cache so that any images in initialData
@@ -3869,45 +3869,48 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      /** @default SnapshotAction.NONE */
-      snapshotAction?: SceneData["snapshotAction"];
+      /** @default StoreAction.NONE */
+      storeAction?: SceneData["storeAction"];
     }) => {
-      // flush all pending updates (if any) most of the time it's no-op
+      // flush all pending updates (if any), most of the time it should be a no-op
       flushSync(() => {});
 
       // flush all incoming updates immediately, so that they couldn't be batched with other updates, having different `storeAction`
       flushSync(() => {
-        const nextElements = syncInvalidIndices(sceneData.elements ?? []);
+        const { elements, appState, collaborators, storeAction } = sceneData;
+        const nextElements = elements
+          ? syncInvalidIndices(elements)
+          : undefined;
 
-        if (sceneData.snapshotAction) {
+        if (storeAction) {
           const prevCommittedAppState = this.store.snapshot.appState;
           const prevCommittedElements = this.store.snapshot.elements;
 
-          const nextCommittedAppState = sceneData.appState
-            ? Object.assign({}, prevCommittedAppState, sceneData.appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
+          const nextCommittedAppState = appState
+            ? Object.assign({}, prevCommittedAppState, appState) // new instance, with partial appstate applied to previously captured one, including hidden prop inside `prevCommittedAppState`
             : prevCommittedAppState;
 
-          const nextCommittedElements = sceneData.elements
+          const nextCommittedElements = elements
             ? this.store.filterUncomittedElements(
                 this.scene.getElementsMapIncludingDeleted(), // Only used to detect uncomitted local elements
-                arrayToMap(nextElements), // We expect all (already reconciled) elements
+                arrayToMap(nextElements ?? []), // We expect all (already reconciled) elements
               )
             : prevCommittedElements;
 
-          this.store.scheduleAction(sceneData.snapshotAction);
+          this.store.scheduleAction(storeAction);
           this.store.commit(nextCommittedElements, nextCommittedAppState);
         }
 
-        if (sceneData.appState) {
-          this.setState(sceneData.appState);
+        if (appState) {
+          this.setState(appState);
         }
 
-        if (sceneData.elements) {
+        if (nextElements) {
           this.scene.replaceAllElements(nextElements);
         }
 
-        if (sceneData.collaborators) {
-          this.setState({ collaborators: sceneData.collaborators });
+        if (collaborators) {
+          this.setState({ collaborators });
         }
       });
     },
@@ -4571,7 +4574,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!event.altKey) {
       if (this.flowChartNavigator.isExploring) {
         this.flowChartNavigator.clear();
-        this.syncActionResult({ storeAction: SnapshotAction.CAPTURE });
+        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
       }
     }
 
@@ -4618,7 +4621,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         this.flowChartCreator.clear();
-        this.syncActionResult({ storeAction: SnapshotAction.CAPTURE });
+        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
       }
     }
   });
@@ -6347,10 +6350,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        snapshotAction:
+        storeAction:
           this.state.openDialog?.name === "elementLinkSelector"
-            ? SnapshotAction.NONE
-            : SnapshotAction.UPDATE,
+            ? StoreAction.NONE
+            : StoreAction.UPDATE,
       });
       return;
     }
@@ -9002,7 +9005,7 @@ class App extends React.Component<AppProps, AppState> {
           appState: {
             newElement: null,
           },
-          snapshotAction: SnapshotAction.UPDATE,
+          storeAction: StoreAction.UPDATE,
         });
 
         return;
@@ -9172,7 +9175,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
-          snapshotAction: SnapshotAction.UPDATE,
+          storeAction: StoreAction.UPDATE,
         });
       }
 
@@ -10137,7 +10140,7 @@ class App extends React.Component<AppProps, AppState> {
                 isLoading: false,
               },
               replaceFiles: true,
-              storeAction: SnapshotAction.CAPTURE,
+              storeAction: StoreAction.CAPTURE,
             });
             return;
           } catch (error: any) {
@@ -10255,7 +10258,7 @@ class App extends React.Component<AppProps, AppState> {
         // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
         // update the store snapshot for old elements, otherwise we would end up with duplicated fractional indices on undo
-        this.store.scheduleAction(SnapshotAction.UPDATE);
+        this.store.scheduleAction(StoreAction.UPDATE);
         this.store.commit(arrayToMap(elements), this.state);
 
         this.setState({ isLoading: true });
@@ -10266,7 +10269,7 @@ class App extends React.Component<AppProps, AppState> {
             isLoading: false,
           },
           replaceFiles: true,
-          storeAction: SnapshotAction.CAPTURE,
+          storeAction: StoreAction.CAPTURE,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

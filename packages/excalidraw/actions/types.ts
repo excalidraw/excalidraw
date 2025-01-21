@@ -10,7 +10,7 @@ import type {
   BinaryFiles,
   UIAppState,
 } from "../types";
-import type { SnapshotActionType } from "../store";
+import type { StoreActionType } from "../store";
 
 export type ActionSource =
   | "ui"
@@ -25,7 +25,7 @@ export type ActionResult =
       elements?: readonly ExcalidrawElement[] | null;
       appState?: Partial<AppState> | null;
       files?: BinaryFiles | null;
-      storeAction: SnapshotActionType;
+      storeAction: StoreActionType;
       replaceFiles?: boolean;
     }
   | false;

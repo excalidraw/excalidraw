@@ -2,7 +2,7 @@ import { CODES, KEYS } from "../keys";
 import { register } from "./register";
 import type { AppState } from "../types";
 import { gridIcon } from "../components/icons";
-import { SnapshotAction } from "../store";
+import { StoreAction } from "../store";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
@@ -21,7 +21,7 @@ export const actionToggleGridMode = register({
         gridModeEnabled: !this.checked!(appState),
         objectsSnapModeEnabled: false,
       },
-      storeAction: SnapshotAction.NONE,
+      storeAction: StoreAction.NONE,
     };
   },
   checked: (appState: AppState) => appState.gridModeEnabled,

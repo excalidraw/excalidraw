@@ -259,7 +259,7 @@ export {
   bumpVersion,
 } from "./element/mutateElement";
 
-export { SnapshotAction } from "./store";
+export { StoreAction } from "./store";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 

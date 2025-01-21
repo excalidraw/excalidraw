@@ -296,6 +296,7 @@ class Scene {
 
     validateIndicesThrottled(_nextElements);
 
+    // CFDO: if technically this leads to modifying the indices, it should update the snapshot immediately (as it shall be an non-undoable change)
     this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
