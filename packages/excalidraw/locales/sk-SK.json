@@ -165,7 +165,7 @@
     "unCroppedDimension": "Pôvodné rozmery",
     "copyElementLink": "Kopírovať odkaz na objekt",
     "linkToElement": "Odkaz na objekt",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "Zabaliť výber do rámu"
   },
   "elementLink": {
     "title": "Odkaz na objekt",
