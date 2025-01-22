@@ -171,15 +171,17 @@ export const Hyperlink = ({
   }, [handleSubmit]);
 
   useEffect(() => {
-    let timeoutId: number | null = null;
-
     if (
-      inputRef &&
-      inputRef.current &&
+      isEditing &&
+      inputRef?.current &&
       !(device.viewport.isMobile || device.isTouchScreen)
     ) {
       inputRef.current.select();
     }
+  }, [isEditing, device.viewport.isMobile, device.isTouchScreen]);
+
+  useEffect(() => {
+    let timeoutId: number | null = null;
 
     const handlePointerMove = (event: PointerEvent) => {
       if (isEditing) {
@@ -207,15 +209,7 @@ export const Hyperlink = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [
-    appState,
-    element,
-    isEditing,
-    setAppState,
-    elementsMap,
-    device.viewport.isMobile,
-    device.isTouchScreen,
-  ]);
+  }, [appState, element, isEditing, setAppState, elementsMap]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
