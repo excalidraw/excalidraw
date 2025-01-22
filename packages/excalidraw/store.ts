@@ -224,6 +224,8 @@ export class Store {
     const increment = new EphemeralStoreIncrement(change);
 
     // Notify listeners with the increment
+    // CFDO: consider having this async instead, possibly should also happen after the component updates;
+    // or get rid of filtering local in progress elements, switch to unidirectional store flow and keep it synchronous
     this.onStoreIncrementEmitter.trigger(increment);
 
     return nextSnapshot;

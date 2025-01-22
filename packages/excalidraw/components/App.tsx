@@ -3878,6 +3878,7 @@ class App extends React.Component<AppProps, AppState> {
       // flush all incoming updates immediately, so that they couldn't be batched with other updates, having different `storeAction`
       flushSync(() => {
         const { elements, appState, collaborators, storeAction } = sceneData;
+
         const nextElements = elements
           ? syncInvalidIndices(elements)
           : undefined;
@@ -3892,8 +3893,8 @@ class App extends React.Component<AppProps, AppState> {
 
           const nextCommittedElements = elements
             ? this.store.filterUncomittedElements(
-                this.scene.getElementsMapIncludingDeleted(), // Only used to detect uncomitted local elements
-                arrayToMap(nextElements ?? []), // We expect all (already reconciled) elements
+                this.scene.getElementsMapIncludingDeleted(), // only used to detect uncomitted local elements
+                arrayToMap(nextElements ?? []), // we expect all (already reconciled) elements
               )
             : prevCommittedElements;
 

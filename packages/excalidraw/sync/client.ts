@@ -17,6 +17,7 @@ import type { ExcalidrawElement, SceneElementsMap } from "../element/types";
 import type { CLIENT_MESSAGE_RAW, SERVER_DELTA, CHANGE } from "./protocol";
 import { debounce } from "../utils";
 import { randomId } from "../random";
+import { orderByFractionalIndex } from "../fractionalIndex";
 
 class SocketMessage implements CLIENT_MESSAGE_RAW {
   constructor(
@@ -388,13 +389,18 @@ export class SyncClient {
           !existingElement || // new element
           existingElement.version < relayedElement.version // updated element
         ) {
+          // CFDO: in theory could make the yet unsynced element (due to a bug) to move to the top
           nextElements.set(id, relayedElement);
           this.relayedElementsVersionsCache.set(id, relayedElement.version);
         }
       }
 
+      const orderedElements = orderByFractionalIndex(
+        Array.from(nextElements.values()),
+      );
+
       this.api.updateScene({
-        elements: Array.from(nextElements.values()),
+        elements: orderedElements,
         storeAction: StoreAction.UPDATE,
       });
     } catch (e) {
@@ -468,9 +474,13 @@ export class SyncClient {
         prevSnapshot = this.api.store.snapshot;
       }
 
+      const orderedElements = orderByFractionalIndex(
+        Array.from(nextElements.values()),
+      );
+
       // CFDO: might need to restore first due to potentially stale delta versions
       this.api.updateScene({
-        elements: Array.from(nextElements.values()),
+        elements: orderedElements,
         // even though the snapshot should be up-to-date already,
         // still some more updates might be triggered,
         // i.e. as a result from syncing invalid indices
