@@ -1,7 +1,7 @@
 {
   "labels": {
     "paste": "Einfügen",
-    "pasteAsPlaintext": "Als reinen Text einfügen",
+    "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
@@ -122,8 +122,8 @@
     "theme": "Design",
     "personalLib": "Persönliche Bibliothek",
     "excalidrawLib": "Excalidraw Bibliothek",
-    "decreaseFontSize": "Schriftgröße verkleinern",
-    "increaseFontSize": "Schrift vergrößern",
+    "decreaseFontSize": "Schriftgröße verringern",
+    "increaseFontSize": "Schriftgröße erhöhen",
     "unbindText": "Text lösen",
     "bindText": "Text an Container binden",
     "createContainerFromText": "Text in Container einbetten",
