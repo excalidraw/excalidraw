@@ -23,11 +23,7 @@ import Collapsible from "./Collapsible";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
 import { STATS_PANELS } from "../../constants";
-import {
-  isElbowArrow,
-  isFrameLikeElement,
-  isImageElement,
-} from "../../element/typeChecks";
+import { isElbowArrow, isImageElement } from "../../element/typeChecks";
 import CanvasGrid from "./CanvasGrid";
 import clsx from "clsx";
 
@@ -35,7 +31,7 @@ import "./Stats.scss";
 import { isGridModeEnabled } from "../../snapping";
 import { getUncroppedWidthAndHeight } from "../../element/cropElement";
 import { round } from "../../../math";
-import { arrayToMap } from "../../utils";
+import { frameAndChildrenSelectedTogether } from "../../frame";
 
 interface StatsProps {
   app: AppClassProperties;
@@ -175,14 +171,8 @@ export const StatsInner = memo(
       return getAtomicUnits(selectedElements, appState);
     }, [selectedElements, appState]);
 
-    const frameAndChildrenSelectedTogether = useMemo(() => {
-      const selectedMap = arrayToMap(selectedElements);
-      return selectedElements.some(
-        (element) =>
-          !isFrameLikeElement(element) &&
-          element.frameId &&
-          selectedMap.has(element.frameId),
-      );
+    const _frameAndChildrenSelectedTogether = useMemo(() => {
+      return frameAndChildrenSelectedTogether(selectedElements);
     }, [selectedElements]);
 
     return (
@@ -241,7 +231,7 @@ export const StatsInner = memo(
             {renderCustomStats?.(elements, appState)}
           </Collapsible>
 
-          {!frameAndChildrenSelectedTogether && selectedElements.length > 0 && (
+          {!_frameAndChildrenSelectedTogether && selectedElements.length > 0 && (
             <div
               id="elementStats"
               style={{

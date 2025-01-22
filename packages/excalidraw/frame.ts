@@ -490,7 +490,9 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
       continue;
     }
 
-    // if the element is already in another frame (inside elements to add), don't add it
+    // if the element is already in another frame (which is also in elementsToAdd),
+    // it means that frame and children are selected at the same time
+    // => keep original frame membership, do not add to the target frame
     if (
       element.frameId &&
       appState.selectedElementIds[element.id] &&
@@ -799,5 +801,18 @@ export const getElementsOverlappingFrame = (
       // removes elements who are overlapping, but are in a different frame,
       // and thus invisible in target frame
       .filter((el) => !el.frameId || el.frameId === frame.id)
+  );
+};
+
+export const frameAndChildrenSelectedTogether = (
+  selectedElements: readonly ExcalidrawElement[],
+) => {
+  const selectedElementsMap = arrayToMap(selectedElements);
+
+  return (
+    selectedElements.length > 1 &&
+    selectedElements.some(
+      (element) => element.frameId && selectedElementsMap.has(element.frameId),
+    )
   );
 };

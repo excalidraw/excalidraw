@@ -25,6 +25,7 @@ import type {
 import type { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
+  frameAndChildrenSelectedTogether,
   getElementsInResizingFrame,
   getFrameLikeElements,
   getRootElements,
@@ -62,14 +63,10 @@ const enableActionGroup = (
     includeBoundTextElement: true,
   });
 
-  const elementsMap = arrayToMap(selectedElements);
-
   return (
     selectedElements.length >= 2 &&
     !allElementsInSameGroup(selectedElements) &&
-    !selectedElements.some(
-      (element) => element.frameId && elementsMap.has(element.frameId),
-    )
+    !frameAndChildrenSelectedTogether(selectedElements)
   );
 };
 
