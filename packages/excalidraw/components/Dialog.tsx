@@ -11,9 +11,8 @@ import "./Dialog.scss";
 import { Island } from "./Island";
 import { Modal } from "./Modal";
 import { queryFocusableElements } from "../utils";
-import { useSetAtom } from "jotai";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { jotaiScope } from "../jotai";
+import { useSetAtom } from "../editor-jotai";
 import { t } from "../i18n";
 import { CloseIcon } from "./icons";
 
@@ -92,7 +91,7 @@ export const Dialog = (props: DialogProps) => {
   }, [islandNode, props.autofocus]);
 
   const setAppState = useExcalidrawSetAppState();
-  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom, jotaiScope);
+  const setIsLibraryMenuOpen = useSetAtom(isLibraryMenuOpenAtom);
 
   const onClose = () => {
     setAppState({ openMenu: null });
