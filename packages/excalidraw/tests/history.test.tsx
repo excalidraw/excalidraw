@@ -9,6 +9,7 @@ import {
   togglePopover,
   getCloneByOrigId,
 } from "./test-utils";
+import "../utils/test-utils";
 import { Excalidraw } from "../index";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { API } from "./helpers/api";
