@@ -1,5 +1,12 @@
 import { pointCenter, pointFrom, pointRotateRads } from "./point";
-import type { GlobalPoint, Line, LocalPoint, Radians } from "./types";
+import { pointOnLineSegment } from "./segment";
+import type {
+  GlobalPoint,
+  Line,
+  LineSegment,
+  LocalPoint,
+  Radians,
+} from "./types";
 
 /**
  * Create a line from two points.
@@ -84,3 +91,21 @@ export const linesIntersectAt = <Point extends GlobalPoint | LocalPoint>(
 
   return null;
 };
+
+/**
+ * Returns the intersection point of a segment and a line
+ *
+ * @param l
+ * @param s
+ * @returns
+ */
+export function lineSegmentIntersectionPoints<
+  Point extends GlobalPoint | LocalPoint,
+>(l: Line<Point>, s: LineSegment<Point>): Point | null {
+  const candidate = linesIntersectAt(l, line(s[0], s[1]));
+  if (!candidate || !pointOnLineSegment(candidate, s)) {
+    return null;
+  }
+
+  return candidate;
+}

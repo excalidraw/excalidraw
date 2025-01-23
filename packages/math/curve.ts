@@ -56,11 +56,9 @@ export function curveIntersectLine<Point extends GlobalPoint | LocalPoint>(
   /*verify the roots are in bounds of the linear segment*/
   return r
     .map((t) => {
-      const t3 = Math.pow(t, 3);
-      const t2 = Math.pow(t, 2);
       const x = pointFrom<Point>(
-        bx[0] * t3 + bx[1] * t2 + bx[2] * t + bx[3],
-        by[0] * t3 + by[1] * t2 + by[2] * t + by[3],
+        bx[0] * t ** 3 + bx[1] * t ** 2 + bx[2] * t + bx[3],
+        by[0] * t ** 3 + by[1] * t ** 2 + by[2] * t + by[3],
       );
 
       /*above is intersection point assuming infinitely long line segment,
