@@ -31,6 +31,7 @@ export class DurableDeltasRepository implements DeltasRepository {
       }
 
       try {
+        // CFDO: could be also a buffer
         const payload = JSON.stringify(delta);
         const payloadSize = new TextEncoder().encode(payload).byteLength;
         const nextVersion = this.getLastVersion() + 1;
@@ -113,6 +114,7 @@ export class DurableDeltasRepository implements DeltasRepository {
     return restoredDeltas[0];
   }
 
+  // CFDO: fix types (should be buffer in the first place)
   private restoreServerDeltas(deltas: SERVER_DELTA[]): SERVER_DELTA[] {
     return Array.from(
       deltas
@@ -137,6 +139,10 @@ export class DurableDeltasRepository implements DeltasRepository {
           return acc;
         }, new Map<number, SERVER_DELTA>())
         .values(),
-    );
+    // CFDO: temporary
+    ).map((delta) => ({
+      ...delta,
+      payload: JSON.parse(delta.payload),
+    }));
   }
 }

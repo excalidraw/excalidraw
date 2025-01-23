@@ -16,7 +16,7 @@ export type CHUNK_INFO = {
 
 export type CLIENT_MESSAGE_RAW = {
   type: "relay" | "pull" | "push";
-  payload: string;
+  payload: Uint8Array;
   chunkInfo?: CHUNK_INFO;
 };
 
@@ -26,7 +26,12 @@ export type CLIENT_MESSAGE = { chunkInfo: CHUNK_INFO } & (
   | { type: "push"; payload: PUSH_PAYLOAD }
 );
 
-export type SERVER_DELTA = { id: string; version: number; payload: string };
+export type SERVER_DELTA = {
+  id: string;
+  version: number;
+  // CFDO: should be type-safe
+  payload: Record<string, any>;
+};
 export type SERVER_MESSAGE =
   | {
       type: "relayed";

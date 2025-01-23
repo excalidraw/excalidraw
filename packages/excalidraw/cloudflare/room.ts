@@ -46,7 +46,7 @@ export class DurableRoom extends DurableObject {
   public fetch = async (request: Request): Promise<Response> =>
     this.connect(request);
 
-  public webSocketMessage = (client: WebSocket, message: string) =>
+  public webSocketMessage = (client: WebSocket, message: ArrayBuffer) =>
     this.sync.onMessage(client, message);
 
   public webSocketClose = (ws: WebSocket) => this.sync.onDisconnect(ws);

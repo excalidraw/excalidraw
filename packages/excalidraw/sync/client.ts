@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import throttle from "lodash.throttle";
+import msgpack from "msgpack-lite";
 import ReconnectingWebSocket, {
   type Event,
   type CloseEvent,
@@ -14,7 +15,12 @@ import { StoreAction, StoreDelta } from "../store";
 import type { StoreChange } from "../store";
 import type { ExcalidrawImperativeAPI } from "../types";
 import type { ExcalidrawElement, SceneElementsMap } from "../element/types";
-import type { CLIENT_MESSAGE_RAW, SERVER_DELTA, CHANGE } from "./protocol";
+import type {
+  CLIENT_MESSAGE_RAW,
+  SERVER_DELTA,
+  CHANGE,
+  SERVER_MESSAGE,
+} from "./protocol";
 import { debounce } from "../utils";
 import { randomId } from "../random";
 import { orderByFractionalIndex } from "../fractionalIndex";
@@ -22,7 +28,7 @@ import { orderByFractionalIndex } from "../fractionalIndex";
 class SocketMessage implements CLIENT_MESSAGE_RAW {
   constructor(
     public readonly type: "relay" | "pull" | "push",
-    public readonly payload: string,
+    public readonly payload: Uint8Array,
     public readonly chunkInfo?: {
       id: string;
       position: number;
@@ -49,7 +55,7 @@ class SocketClient {
     private readonly handlers: {
       onOpen: (event: Event) => void;
       onOnline: () => void;
-      onMessage: (event: MessageEvent) => void;
+      onMessage: (message: SERVER_MESSAGE) => void;
     },
   ) {}
 
@@ -138,12 +144,12 @@ class SocketClient {
     const { type, payload } = message;
 
     // CFDO II: could be slowish for large payloads, thing about a better solution (i.e. msgpack 10x faster, 2x smaller)
-    const stringifiedPayload = JSON.stringify(payload);
-    const payloadSize = new TextEncoder().encode(stringifiedPayload).byteLength;
+    const payloadBuffer = msgpack.encode(payload) as Uint8Array;
+    const payloadSize = payloadBuffer.byteLength;
 
     if (payloadSize < SocketClient.MAX_MESSAGE_SIZE) {
-      const message = new SocketMessage(type, stringifiedPayload);
-      return this.socket?.send(JSON.stringify(message));
+      const message = new SocketMessage(type, payloadBuffer);
+      return this.sendMessage(message);
     }
 
     const chunkId = randomId();
@@ -153,19 +159,25 @@ class SocketClient {
     for (let position = 0; position < chunksCount; position++) {
       const start = position * chunkSize;
       const end = start + chunkSize;
-      const chunkedPayload = stringifiedPayload.slice(start, end);
+      const chunkedPayload = payloadBuffer.subarray(start, end);
       const message = new SocketMessage(type, chunkedPayload, {
         id: chunkId,
         position,
         count: chunksCount,
       });
 
-      this.socket?.send(JSON.stringify(message));
+      this.sendMessage(message);
     }
   }
 
   private onMessage = (event: MessageEvent) => {
-    this.handlers.onMessage(event);
+    this.receiveMessage(event.data).then((message) => {
+      if (!message) {
+        return;
+      }
+
+      this.handlers.onMessage(message);
+    });
   };
 
   private onOpen = (event: Event) => {
@@ -184,6 +196,68 @@ class SocketClient {
       event,
     );
   };
+
+  private sendMessage = ({ payload, ...metadata }: CLIENT_MESSAGE_RAW) => {
+    const metadataBuffer = msgpack.encode(metadata) as Uint8Array;
+
+    // contains the length of the rest of the message, so that we could decode it server side
+    const headerBuffer = new ArrayBuffer(4);
+    new DataView(headerBuffer).setUint32(0, metadataBuffer.byteLength);
+
+    // concatenate into [header(4 bytes)][metadata][payload]
+    const message = Uint8Array.from([
+      ...new Uint8Array(headerBuffer),
+      ...metadataBuffer,
+      ...payload,
+    ]);
+
+    // CFDO: add dev-level logging
+    {
+      const headerLength = 4;
+      const header = new Uint8Array(message.buffer, 0, headerLength);
+      const metadataLength = new DataView(
+        header.buffer,
+        header.byteOffset,
+      ).getUint32(0);
+
+      const metadata = new Uint8Array(
+        message.buffer,
+        headerLength,
+        headerLength + metadataLength,
+      );
+
+      const payload = new Uint8Array(
+        message.buffer,
+        headerLength + metadataLength,
+      );
+
+      console.log({
+        ...msgpack.decode(metadata),
+        payload,
+      });
+    }
+
+    this.socket?.send(message);
+  };
+
+  private async receiveMessage(
+    message: Blob,
+  ): Promise<SERVER_MESSAGE | undefined> {
+    const arrayBuffer = await message.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    const [decodedMessage, decodeError] = Utils.try<SERVER_MESSAGE>(() =>
+      msgpack.decode(uint8Array),
+    );
+
+    if (decodeError) {
+      console.error("Failed to decode message:", message);
+      return;
+    }
+
+    // CFDO: should be type-safe
+    return decodedMessage;
+  }
 }
 
 interface AcknowledgedDelta {
@@ -351,23 +425,17 @@ export class SyncClient {
     this.push();
   };
 
-  private onMessage = (event: MessageEvent) => {
-    // CFDO: could be an array buffer
-    const [result, error] = Utils.try(() => JSON.parse(event.data as string));
+  private onMessage = ({ type, payload }: SERVER_MESSAGE) => {
+    // CFDO: add dev-level logging
+    console.log({ type, payload });
 
-    if (error) {
-      console.error("Failed to parse message:", event.data);
-      return;
-    }
-
-    const { type, payload } = result;
     switch (type) {
       case "relayed":
         return this.handleRelayed(payload);
       case "acknowledged":
         return this.handleAcknowledged(payload);
-      case "rejected":
-        return this.handleRejected(payload);
+      // case "rejected":
+      //   return this.handleRejected(payload);
       default:
         console.error("Unknown message type:", type);
     }
@@ -499,7 +567,7 @@ export class SyncClient {
 
   private handleRejected = (payload: {
     ids: Array<string>;
-    message: string;
+    message: Uint8Array;
   }) => {
     // handle rejected deltas
     console.error("Rejected message received:", payload);

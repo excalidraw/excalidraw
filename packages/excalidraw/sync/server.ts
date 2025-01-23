@@ -1,4 +1,5 @@
 import AsyncLock from "async-lock";
+import msgpack from "msgpack-lite";
 import { Utils } from "./utils";
 
 import type {
@@ -37,10 +38,35 @@ export class ExcalidrawSyncServer {
     this.sessions.delete(client);
   }
 
-  public onMessage(client: WebSocket, message: string): Promise<void> | void {
+  public onMessage(
+    client: WebSocket,
+    message: ArrayBuffer,
+  ): Promise<void> | void {
     const [parsedMessage, parseMessageError] = Utils.try<CLIENT_MESSAGE_RAW>(
       () => {
-        return JSON.parse(message);
+        const headerLength = 4;
+        const header = new Uint8Array(message, 0, headerLength);
+        const metadataLength = new DataView(
+          header.buffer,
+          header.byteOffset,
+        ).getUint32(0);
+
+        const metadata = new Uint8Array(
+          message,
+          headerLength,
+          headerLength + metadataLength,
+        );
+
+        const payload = new Uint8Array(message, headerLength + metadataLength);
+        const parsed = {
+          ...msgpack.decode(metadata),
+          payload,
+        };
+
+        // CFDO: add dev-level logging
+        console.log({ parsed });
+
+        return parsed;
       },
     );
 
@@ -56,29 +82,7 @@ export class ExcalidrawSyncServer {
       return this.processChunks(client, { type, payload, chunkInfo });
     }
 
-    const [parsedPayload, parsePayloadError] = Utils.try<
-      CLIENT_MESSAGE["payload"]
-    >(() => JSON.parse(payload));
-
-    if (parsePayloadError) {
-      console.error(parsePayloadError);
-      return;
-    }
-
-    switch (type) {
-      case "relay":
-        return this.relay(client, parsedPayload as RELAY_PAYLOAD);
-      case "pull":
-        return this.pull(client, parsedPayload as PULL_PAYLOAD);
-      case "push":
-        // apply each one-by-one to avoid race conditions
-        // CFDO: in theory we do not need to block ephemeral appState changes
-        return this.lock.acquire("push", () =>
-          this.push(client, parsedPayload as PUSH_PAYLOAD),
-        );
-      default:
-        console.error(`Unknown message type: ${type}`);
-    }
+    return this.processMessage(client, parsedMessage);
   }
 
   /**
@@ -118,16 +122,18 @@ export class ExcalidrawSyncServer {
 
       // hopefully we can fit into the 128 MiB memory limit
       const restoredPayload = Array.from(chunks)
-        .sort((a, b) => (a <= b ? -1 : 1))
-        .reduce((acc, [_, payload]) => (acc += payload), "");
+        .sort(([positionA], [positionB]) => (positionA <= positionB ? -1 : 1))
+        .reduce(
+          (acc, [_, payload]) => Uint8Array.from([...acc, ...payload]),
+          new Uint8Array(),
+        );
 
-      const rawMessage = JSON.stringify({
+      const rawMessage = {
         type,
         payload: restoredPayload,
-      } as CLIENT_MESSAGE_RAW);
+      };
 
-      // process the message
-      return this.onMessage(client, rawMessage);
+      return this.processMessage(client, rawMessage);
     } catch (error) {
       console.error(`Error while processing chunk "${id}"`, error);
     } finally {
@@ -135,6 +141,35 @@ export class ExcalidrawSyncServer {
       if (shouldCleanupchunks) {
         this.chunks.delete(id);
       }
+    }
+  }
+
+  private processMessage(
+    client: WebSocket,
+    { type, payload }: Omit<CLIENT_MESSAGE_RAW, "chunkInfo">,
+  ) {
+    const [parsedPayload, parsePayloadError] = Utils.try<
+      CLIENT_MESSAGE["payload"]
+    >(() => msgpack.decode(payload));
+
+    if (parsePayloadError) {
+      console.error(parsePayloadError);
+      return;
+    }
+
+    switch (type) {
+      case "relay":
+        return this.relay(client, parsedPayload as RELAY_PAYLOAD);
+      case "pull":
+        return this.pull(client, parsedPayload as PULL_PAYLOAD);
+      case "push":
+        // apply each one-by-one to avoid race conditions
+        // CFDO: in theory we do not need to block ephemeral appState changes
+        return this.lock.acquire("push", () =>
+          this.push(client, parsedPayload as PUSH_PAYLOAD),
+        );
+      default:
+        console.error(`Unknown message type: ${type}`);
     }
   }
 
@@ -205,19 +240,34 @@ export class ExcalidrawSyncServer {
   }
 
   private send(client: WebSocket, message: SERVER_MESSAGE) {
-    const msg = JSON.stringify(message);
-    client.send(msg);
+    const [encodedMessage, encodeError] = Utils.try<Uint8Array>(() =>
+      msgpack.encode(message),
+    );
+
+    if (encodeError) {
+      console.error(encodeError);
+      return;
+    }
+
+    client.send(encodedMessage);
   }
 
   private broadcast(message: SERVER_MESSAGE, exclude?: WebSocket) {
-    const msg = JSON.stringify(message);
+    const [encodedMessage, encodeError] = Utils.try<Uint8Array>(() =>
+      msgpack.encode(message),
+    );
+
+    if (encodeError) {
+      console.error(encodeError);
+      return;
+    }
 
     for (const ws of this.sessions) {
       if (ws === exclude) {
         continue;
       }
 
-      ws.send(msg);
+      ws.send(encodedMessage);
     }
   }
 }

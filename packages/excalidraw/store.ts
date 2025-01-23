@@ -12,6 +12,7 @@ import type {
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./element/types";
+import type { SERVER_DELTA } from "./sync/protocol";
 import { arrayToMap, assertNever } from "./utils";
 import { hashElementsVersion } from "./element";
 import { syncMovedIndices } from "./fractionalIndex";
@@ -449,14 +450,11 @@ export class StoreDelta {
   /**
    * Parse and load the delta from the remote payload.
    */
-  // CFDO: why it would be a string if it can be a DTO?
-  public static load(payload: string) {
+  public static load({
+    id,
+    elements: { added, removed, updated },
+  }: SERVER_DELTA["payload"]) {
     // CFDO: ensure typesafety
-    const {
-      id,
-      elements: { added, removed, updated },
-    } = JSON.parse(payload);
-
     const elements = ElementsDelta.create(added, removed, updated, {
       shouldRedistribute: false,
     });
