@@ -4,7 +4,7 @@ import { getElementAbsoluteCoords } from "../element";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
-  isElementInFrame,
+  shouldApplyFrameClip,
 } from "../frame";
 import {
   isEmbeddableElement,
@@ -282,6 +282,8 @@ const _renderStaticScene = ({
     }
   });
 
+  const inFrameGroupsMap = new Map<string, boolean>();
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
@@ -306,9 +308,16 @@ const _renderStaticScene = ({
           appState.frameRendering.clip
         ) {
           const frame = getTargetFrame(element, elementsMap, appState);
-
-          // TODO do we need to check isElementInFrame here?
-          if (frame && isElementInFrame(element, elementsMap, appState)) {
+          if (
+            frame &&
+            shouldApplyFrameClip(
+              element,
+              frame,
+              appState,
+              elementsMap,
+              inFrameGroupsMap,
+            )
+          ) {
             frameClip(frame, context, renderConfig, appState);
           }
           renderElement(
@@ -409,7 +418,16 @@ const _renderStaticScene = ({
 
           const frame = getTargetFrame(element, elementsMap, appState);
 
-          if (frame && isElementInFrame(element, elementsMap, appState)) {
+          if (
+            frame &&
+            shouldApplyFrameClip(
+              element,
+              frame,
+              appState,
+              elementsMap,
+              inFrameGroupsMap,
+            )
+          ) {
             frameClip(frame, context, renderConfig, appState);
           }
           render();
