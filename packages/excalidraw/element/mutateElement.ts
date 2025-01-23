@@ -1,10 +1,13 @@
-import type { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement, SceneElementsMap } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { getUpdatedTimestamp } from "../utils";
+import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import { isElbowArrow } from "./typeChecks";
+import { updateElbowArrowPoints } from "./elbowArrow";
+import type { Radians } from "../../math";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -19,14 +22,49 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
+  options?: {
+    // Currently only for elbow arrows.
+    // If true, the elbow arrow tries to bind to the nearest element. If false
+    // it tries to keep the same bound element, if any.
+    isDragging?: boolean;
+  },
 ): TElement => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fileId } = updates as any;
+  const { points, fixedSegments, fileId } = updates as any;
 
-  if (typeof points !== "undefined") {
+  if (
+    isElbowArrow(element) &&
+    (Object.keys(updates).length === 0 || // normalization case
+      typeof points !== "undefined" || // repositioning
+      typeof fixedSegments !== "undefined") // segment fixing
+  ) {
+    const elementsMap = toBrandedType<SceneElementsMap>(
+      Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
+    );
+
+    updates = {
+      ...updates,
+      angle: 0 as Radians,
+      ...updateElbowArrowPoints(
+        {
+          ...element,
+          x: updates.x || element.x,
+          y: updates.y || element.y,
+        },
+        elementsMap,
+        {
+          fixedSegments,
+          points,
+        },
+        {
+          isDragging: options?.isDragging,
+        },
+      ),
+    };
+  } else if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 

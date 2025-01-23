@@ -1,5 +1,6 @@
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawElementType,
   ExcalidrawLinearElement,
@@ -101,23 +102,38 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
-const repairBinding = (
-  element: ExcalidrawLinearElement,
+const repairBinding = <T extends ExcalidrawLinearElement>(
+  element: T,
   binding: PointBinding | FixedPointBinding | null,
-): PointBinding | FixedPointBinding | null => {
+): T extends ExcalidrawElbowArrowElement
+  ? FixedPointBinding | null
+  : PointBinding | FixedPointBinding | null => {
   if (!binding) {
     return null;
   }
 
-  return {
-    ...binding,
-    focus: binding.focus || 0,
-    ...(isElbowArrow(element) && isFixedPointBinding(binding)
+  const focus = binding.focus || 0;
+
+  if (isElbowArrow(element)) {
+    const fixedPointBinding:
+      | ExcalidrawElbowArrowElement["startBinding"]
+      | ExcalidrawElbowArrowElement["endBinding"] = isFixedPointBinding(binding)
       ? {
+          ...binding,
+          focus,
           fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
         }
-      : {}),
-  };
+      : null;
+
+    return fixedPointBinding;
+  }
+
+  return {
+    ...binding,
+    focus,
+  } as T extends ExcalidrawElbowArrowElement
+    ? FixedPointBinding | null
+    : PointBinding | FixedPointBinding | null;
 };
 
 const restoreElementWithProperties = <
@@ -308,8 +324,7 @@ const restoreElement = (
         ({ points, x, y } = LinearElementEditor.getNormalizedPoints(element));
       }
 
-      // TODO: Separate arrow from linear element
-      return restoreElementWithProperties(element as ExcalidrawArrowElement, {
+      const base = {
         type: element.type,
         startBinding: repairBinding(element, element.startBinding),
         endBinding: repairBinding(element, element.endBinding),
@@ -321,7 +336,20 @@ const restoreElement = (
         y,
         elbowed: (element as ExcalidrawArrowElement).elbowed,
         ...getSizeFromPoints(points),
-      });
+      } as const;
+
+      // TODO: Separate arrow from linear element
+      return isElbowArrow(element)
+        ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
+            ...base,
+            elbowed: true,
+            startBinding: repairBinding(element, element.startBinding),
+            endBinding: repairBinding(element, element.endBinding),
+            fixedSegments: element.fixedSegments,
+            startIsSpecial: element.startIsSpecial,
+            endIsSpecial: element.endIsSpecial,
+          })
+        : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
     }
 
     // generic elements
