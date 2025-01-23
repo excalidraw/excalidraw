@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ActionManager } from "../actions/manager";
 import type {
   ExcalidrawElement,
@@ -51,6 +51,7 @@ import {
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
 import { CLASSES } from "../constants";
+import { alignActionsPredicate } from "../actions/actionAlign";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
@@ -90,10 +91,12 @@ export const SelectedShapeActions = ({
   appState,
   elementsMap,
   renderAction,
+  app,
 }: {
   appState: UIAppState;
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
 
@@ -132,6 +135,17 @@ export const SelectedShapeActions = ({
     !appState.croppingElementId &&
     targetElements.length === 1 &&
     isImageElement(targetElements[0]);
+
+  const showAlignActions = useMemo(() => {
+    return (
+      alignActionsPredicate(
+        Array.from(elementsMap.values()),
+        appState,
+        null,
+        app,
+      ) && !isSingleElementBoundContainer
+    );
+  }, [elementsMap, appState, app, isSingleElementBoundContainer]);
 
   return (
     <div className="panelColumn">
@@ -200,7 +214,7 @@ export const SelectedShapeActions = ({
         </div>
       </fieldset>
 
-      {targetElements.length > 1 && !isSingleElementBoundContainer && (
+      {showAlignActions && !isSingleElementBoundContainer && (
         <fieldset>
           <legend>{t("labels.align")}</legend>
           <div className="buttonList">

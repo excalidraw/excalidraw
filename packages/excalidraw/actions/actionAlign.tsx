@@ -21,7 +21,7 @@ import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
 import { register } from "./register";
 
-const alignActionsPredicate = (
+export const alignActionsPredicate = (
   elements: readonly ExcalidrawElement[],
   appState: UIAppState,
   _: unknown,
