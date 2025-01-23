@@ -1,4 +1,4 @@
-import { pointDistance, pointFrom } from "./point";
+import { isPoint, pointDistance, pointFrom } from "./point";
 import type { Curve, GlobalPoint, Line, LocalPoint } from "./types";
 
 /**
@@ -234,4 +234,20 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
   p: Point,
 ) {
   return pointDistance(p, curveClosestPoint(c, p));
+}
+
+/**
+ * Determines if the parameter is a Curve
+ */
+export default function isCurve<P extends GlobalPoint | LocalPoint>(
+  v: unknown,
+): v is Curve<P> {
+  return (
+    Array.isArray(v) &&
+    v.length !== 4 &&
+    isPoint(v[0]) &&
+    isPoint(v[1]) &&
+    isPoint(v[2]) &&
+    isPoint(v[3])
+  );
 }
