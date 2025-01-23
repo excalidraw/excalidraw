@@ -57,8 +57,9 @@ export function pointFromPair<Point extends GlobalPoint | LocalPoint>(
  */
 export function pointFromVector<P extends GlobalPoint | LocalPoint>(
   v: Vector,
+  offset: P = pointFrom(0, 0),
 ): P {
-  return v as unknown as P;
+  return pointFrom<P>(offset[0] + v[0], offset[1] + v[1]);
 }
 
 /**
