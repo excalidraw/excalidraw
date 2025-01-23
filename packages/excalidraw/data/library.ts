@@ -36,7 +36,18 @@ import { Queue } from "../queue";
 import { hashElementsVersion, hashString } from "../element";
 import { toValidURL } from "./url";
 
-const ALLOWED_LIBRARY_HOSTNAMES = ["excalidraw.com"];
+/**
+ * format: hostname or hostname/pathname
+ *
+ * Both hostname and pathname are matched partially,
+ * hostname from the end, pathname from the start, with subdomain/path
+ * boundaries
+ **/
+const ALLOWED_LIBRARY_URLS = [
+  "excalidraw.com",
+  // when installing from github PRs
+  "raw.githubusercontent.com/excalidraw/excalidraw-libraries",
+];
 
 type LibraryUpdate = {
   /** deleted library items since last onLibraryChange event */
@@ -469,26 +480,37 @@ export const distributeLibraryItemsOnSquareGrid = (
   return resElements;
 };
 
-const validateLibraryUrl = (
+export const validateLibraryUrl = (
   libraryUrl: string,
   /**
-   * If supplied, takes precedence over the default whitelist.
-   * Return `true` if the URL is valid.
+   * @returns `true` if the URL is valid, throws otherwise.
    */
-  validator?: (libraryUrl: string) => boolean,
-): boolean => {
+  validator:
+    | ((libraryUrl: string) => boolean)
+    | string[] = ALLOWED_LIBRARY_URLS,
+): true => {
   if (
-    validator
+    typeof validator === "function"
       ? validator(libraryUrl)
-      : ALLOWED_LIBRARY_HOSTNAMES.includes(
-          new URL(libraryUrl).hostname.split(".").slice(-2).join("."),
-        )
+      : validator.some((allowedUrlDef) => {
+          const allowedUrl = new URL(
+            `https://${allowedUrlDef.replace(/^https?:\/\//, "")}`,
+          );
+
+          const { hostname, pathname } = new URL(libraryUrl);
+
+          return (
+            new RegExp(`(^|\\.)${allowedUrl.hostname}$`).test(hostname) &&
+            new RegExp(
+              `^${allowedUrl.pathname.replace(/\/+$/, "")}(/+|$)`,
+            ).test(pathname)
+          );
+        })
   ) {
     return true;
   }
 
-  console.error(`Invalid or disallowed library URL: "${libraryUrl}"`);
-  throw new Error("Invalid or disallowed library URL");
+  throw new Error(`Invalid or disallowed library URL: "${libraryUrl}"`);
 };
 
 export const parseLibraryTokensFromUrl = () => {
