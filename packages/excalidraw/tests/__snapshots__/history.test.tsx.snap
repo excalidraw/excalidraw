@@ -10896,12 +10896,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "6Rm4g567UQM4WjLwej2Vc",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -10909,7 +10904,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "height": 126,
   "id": "KPrBI4g_v9qUB1XxYLgSz",
   "index": "a0",
-  "isDeleted": false,
+  "isDeleted": true,
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -10922,7 +10917,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "width": 157,
   "x": 600,
   "y": 0,
@@ -10933,12 +10928,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
 {
   "angle": 0,
   "backgroundColor": "transparent",
-  "boundElements": [
-    {
-      "id": "6Rm4g567UQM4WjLwej2Vc",
-      "type": "arrow",
-    },
-  ],
+  "boundElements": [],
   "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
@@ -10946,7 +10936,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "height": 129,
   "id": "u2JGnnmoJ0VATV4vCNJE5",
   "index": "a1",
-  "isDeleted": false,
+  "isDeleted": true,
   "link": null,
   "locked": false,
   "opacity": 100,
@@ -10959,7 +10949,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "strokeWidth": 2,
   "type": "diamond",
   "updated": 1,
-  "version": 6,
+  "version": 4,
   "width": 124,
   "x": 1152,
   "y": 516,
@@ -10983,15 +10973,15 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
     "focus": "-0.00161",
     "gap": "3.53708",
   },
-  "endIsSpecial": null,
+  "endIsSpecial": false,
   "fillStyle": "solid",
-  "fixedSegments": null,
+  "fixedSegments": [],
   "frameId": null,
   "groupIds": [],
-  "height": "448.10100",
+  "height": "236.10000",
   "id": "6Rm4g567UQM4WjLwej2Vc",
   "index": "a2",
-  "isDeleted": false,
+  "isDeleted": true,
   "lastCommittedPoint": null,
   "link": null,
   "locked": false,
@@ -11002,16 +10992,12 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
       0,
     ],
     [
-      "225.95000",
+      "178.90000",
       0,
     ],
     [
-      "225.95000",
-      "448.10100",
-    ],
-    [
-      "451.90000",
-      "448.10100",
+      "178.90000",
+      "236.10000",
     ],
   ],
   "roughness": 1,
@@ -11028,16 +11014,16 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
     "focus": "-0.00159",
     "gap": 5,
   },
-  "startIsSpecial": null,
+  "startIsSpecial": false,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 6,
-  "width": "451.90000",
-  "x": 762,
-  "y": "62.90000",
+  "version": 3,
+  "width": "178.90000",
+  "x": 1035,
+  "y": "274.90000",
 }
 `;
 
@@ -11049,8 +11035,7 @@ History {
       [Function],
     ],
   },
-  "redoStack": [],
-  "undoStack": [
+  "redoStack": [
     HistoryEntry {
       "appStateChange": AppStateChange {
         "delta": Delta {
@@ -11059,86 +11044,12 @@ History {
         },
       },
       "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "KPrBI4g_v9qUB1XxYLgSz" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 126,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 157,
-              "x": 873,
-              "y": 212,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-          "u2JGnnmoJ0VATV4vCNJE5" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 129,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "diamond",
-              "width": 124,
-              "x": 1152,
-              "y": 516,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
+        "added": Map {
           "6Rm4g567UQM4WjLwej2Vc" => Delta {
             "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
               "angle": 0,
               "backgroundColor": "transparent",
               "boundElements": null,
@@ -11203,42 +11114,117 @@ History {
               "x": 1035,
               "y": "274.90000",
             },
-            "inserted": {
-              "isDeleted": true,
-            },
           },
         },
+        "removed": Map {},
         "updated": Map {
           "KPrBI4g_v9qUB1XxYLgSz" => Delta {
             "deleted": {
+              "boundElements": [],
+            },
+            "inserted": {
               "boundElements": [
                 {
                   "id": "6Rm4g567UQM4WjLwej2Vc",
                   "type": "arrow",
                 },
               ],
-            },
-            "inserted": {
-              "boundElements": [],
             },
           },
           "u2JGnnmoJ0VATV4vCNJE5" => Delta {
             "deleted": {
+              "boundElements": [],
+            },
+            "inserted": {
               "boundElements": [
                 {
                   "id": "6Rm4g567UQM4WjLwej2Vc",
                   "type": "arrow",
                 },
               ],
-            },
-            "inserted": {
-              "boundElements": [],
             },
           },
         },
       },
     },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {
+          "KPrBI4g_v9qUB1XxYLgSz" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 126,
+              "index": "a0",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "rectangle",
+              "width": 157,
+              "x": 600,
+              "y": 0,
+            },
+          },
+          "u2JGnnmoJ0VATV4vCNJE5" => Delta {
+            "deleted": {
+              "isDeleted": true,
+            },
+            "inserted": {
+              "angle": 0,
+              "backgroundColor": "transparent",
+              "boundElements": null,
+              "customData": undefined,
+              "fillStyle": "solid",
+              "frameId": null,
+              "groupIds": [],
+              "height": 129,
+              "index": "a1",
+              "isDeleted": false,
+              "link": null,
+              "locked": false,
+              "opacity": 100,
+              "roughness": 1,
+              "roundness": {
+                "type": 3,
+              },
+              "strokeColor": "#1e1e1e",
+              "strokeStyle": "solid",
+              "strokeWidth": 2,
+              "type": "diamond",
+              "width": 124,
+              "x": 1152,
+              "y": 516,
+            },
+          },
+        },
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
   ],
+  "undoStack": [],
 }
 `;
 
