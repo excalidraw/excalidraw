@@ -911,6 +911,7 @@ export const updateElbowArrowPoints = (
 
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
+  // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
   if (elementsMap.size === 0 && updates.points) {
     return normalizeArrowElementUpdate(
       updates.points.map((p) =>

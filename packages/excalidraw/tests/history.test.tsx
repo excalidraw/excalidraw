@@ -2082,10 +2082,10 @@ describe("history", () => {
       const modifiedArrow = h.elements.filter(
         (el) => el.type === "arrow",
       )[0] as ExcalidrawElbowArrowElement;
-      expect(modifiedArrow.points).toEqual([
+      expect(modifiedArrow.points).toCloselyEqualPoints([
         [0, 0],
-        [178.9000000000001, 0],
-        [178.9000000000001, 236.10000000000002],
+        [178.9, 0],
+        [178.9, 236.1],
       ]);
     });
 
