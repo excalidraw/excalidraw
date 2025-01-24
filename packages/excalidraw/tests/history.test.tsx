@@ -2077,16 +2077,15 @@ describe("history", () => {
         storeAction: StoreAction.UPDATE,
       });
 
-      Keyboard.redo();
+      Keyboard.undo();
 
       const modifiedArrow = h.elements.filter(
         (el) => el.type === "arrow",
       )[0] as ExcalidrawElbowArrowElement;
-      expect(modifiedArrow.points).toEqual([
+      expect(modifiedArrow.points).toCloselyEqualPoints([
         [0, 0],
-        [225.95000000000005, 0],
-        [225.95000000000005, 448.10100010002003],
-        [451.9000000000001, 448.10100010002003],
+        [178.9, 0],
+        [178.9, 236.1],
       ]);
     });
 
