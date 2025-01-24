@@ -6,7 +6,7 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
-import { getElementBounds } from "./bounds";
+import { getDiamondPoints, getElementBounds } from "./bounds";
 import type { FrameNameBounds } from "../types";
 import type { GeometricShape } from "../../utils/geometry/shape";
 import { getPolygonShape } from "../../utils/geometry/shape";
@@ -20,7 +20,6 @@ import {
 } from "./typeChecks";
 import { getBoundTextShape, getCornerRadius, isPathALoop } from "../shapes";
 import type {
-  Arc,
   GlobalPoint,
   Line,
   LocalPoint,
@@ -30,6 +29,8 @@ import type {
 import {
   arc,
   arcLineInterceptPoints,
+  curve,
+  curveIntersectLine,
   isPointWithinBounds,
   line,
   lineSegment,
@@ -41,6 +42,12 @@ import {
   rectangle,
 } from "../../math";
 import { ellipse, ellipseLineIntersectionPoints } from "../../math/ellipse";
+import {
+  debugClear,
+  debugDrawArc,
+  debugDrawCubicBezier,
+  debugDrawLine,
+} from "../visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -209,7 +216,7 @@ const intersectRectanguloidWithLine = (
     element,
   );
 
-  const sideIntersections: GlobalPoint[] = [
+  const sides = [
     lineSegment<GlobalPoint>(
       pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
       pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
@@ -226,25 +233,20 @@ const intersectRectanguloidWithLine = (
       pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
       pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
     ),
-  ]
-    .map((s) =>
-      lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
-    )
-    .filter((x) => x != null)
-    .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle));
-  const cornerIntersections: GlobalPoint[] =
+  ];
+  const corners =
     roundness > 0
       ? [
           arc<GlobalPoint>(
             pointFrom(r[0][0] + roundness, r[0][1] + roundness),
             roundness,
-            ((3 / 4) * Math.PI) as Radians,
-            0 as Radians,
+            Math.PI as Radians,
+            ((3 / 2) * Math.PI) as Radians,
           ),
           arc<GlobalPoint>(
             pointFrom(r[1][0] - roundness, r[0][1] + roundness),
             roundness,
-            ((3 / 4) * Math.PI) as Radians,
+            ((3 / 2) * Math.PI) as Radians,
             0 as Radians,
           ),
           arc<GlobalPoint>(
@@ -260,10 +262,23 @@ const intersectRectanguloidWithLine = (
             Math.PI as Radians,
           ),
         ]
-          .flatMap((t) => arcLineInterceptPoints(t, line(rotatedA, rotatedB)))
-          .filter((i) => i != null)
-          .map((j) => pointRotateRads(j, center, element.angle))
       : [];
+
+  debugClear();
+  sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
+  corners.forEach((s) => debugDrawArc(s, { color: "green", permanent: true }));
+
+  const sideIntersections: GlobalPoint[] = sides
+    .map((s) =>
+      lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
+    )
+    .filter((x) => x != null)
+    .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle));
+
+  const cornerIntersections: GlobalPoint[] = corners
+    .flatMap((t) => arcLineInterceptPoints(t, line(rotatedA, rotatedB)))
+    .filter((i) => i != null)
+    .map((j) => pointRotateRads(j, center, element.angle));
 
   return (
     [...sideIntersections, ...cornerIntersections]
@@ -287,105 +302,73 @@ const intersectDiamondWithLine = (
   l: Line<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const top = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y - offset,
-  );
-  const right = pointFrom<GlobalPoint>(
-    element.x + element.width + offset,
-    element.y + element.height / 2,
-  );
-  const bottom = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height + offset,
-  );
-  const left = pointFrom<GlobalPoint>(
-    element.x - offset,
-    element.y + element.height / 2,
-  );
+  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+    getDiamondPoints(element);
   const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
+    (topX + bottomX) / 2,
+    (topY + bottomY) / 2,
   );
-  const verticalRadius = getCornerRadius(Math.abs(top[0] - left[0]), element);
-  const horizontalRadius = getCornerRadius(
-    Math.abs(right[1] - top[1]),
-    element,
-  );
+  const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
+  const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
+  const [top, right, bottom, left]: GlobalPoint[] = [
+    pointFrom(element.x + topX, element.y + topY),
+    pointFrom(element.x + rightX, element.y + rightY),
+    pointFrom(element.x + bottomX, element.y + bottomY),
+    pointFrom(element.x + leftX, element.y + leftY),
+  ];
+
+  // Create the line segment parts of the diamond
+  // NOTE: Horizontal and vertical seems to be flipped here
   const topRight = lineSegment<GlobalPoint>(
-    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
-    pointFrom(right[0] - verticalRadius, right[1] - horizontalRadius),
+    pointFrom(top[0] + horizontalRadius, top[1] + verticalRadius),
+    pointFrom(right[0] - horizontalRadius, right[1] - verticalRadius),
   );
   const bottomRight = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] + verticalRadius, bottom[1] - horizontalRadius),
-    pointFrom(right[0] - verticalRadius, right[1] + horizontalRadius),
+    pointFrom(bottom[0] + horizontalRadius, bottom[1] - verticalRadius),
+    pointFrom(right[0] - horizontalRadius, right[1] + verticalRadius),
   );
   const bottomLeft = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] - verticalRadius, bottom[1] - horizontalRadius),
-    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
+    pointFrom(bottom[0] - horizontalRadius, bottom[1] - verticalRadius),
+    pointFrom(left[0] + horizontalRadius, left[1] + verticalRadius),
   );
   const topLeft = lineSegment<GlobalPoint>(
-    pointFrom(top[0] - verticalRadius, top[1] + horizontalRadius),
-    pointFrom(left[0] + verticalRadius, left[1] - horizontalRadius),
+    pointFrom(top[0] - horizontalRadius, top[1] + verticalRadius),
+    pointFrom(left[0] + horizontalRadius, left[1] - verticalRadius),
   );
 
-  const arcs: Arc<GlobalPoint>[] = element.roundness
+  const curves = element.roundness
     ? [
-        createDiamondArc(
-          topLeft[0],
-          topRight[0],
-          pointFrom(
-            top[0],
-            top[1] + Math.sqrt(2 * Math.pow(verticalRadius, 2)) - offset,
-          ),
-          verticalRadius,
-        ), // TOP
-        createDiamondArc(
-          topRight[1],
-          bottomRight[1],
-          pointFrom(
-            right[0] - Math.sqrt(2 * Math.pow(horizontalRadius, 2)) + offset,
-            right[1],
-          ),
-          horizontalRadius,
-        ), // RIGHT
-        createDiamondArc(
-          bottomRight[0],
-          bottomLeft[0],
-          pointFrom(
-            bottom[0],
-            bottom[1] - Math.sqrt(2 * Math.pow(verticalRadius, 2)) + offset,
-          ),
-          verticalRadius,
-        ), // BOTTOM
-        createDiamondArc(
-          bottomLeft[1],
-          topLeft[1],
-          pointFrom(
-            left[0] + Math.sqrt(2 * Math.pow(horizontalRadius, 2)) - offset,
-            left[1],
-          ),
-          horizontalRadius,
-        ), // LEFT
+        curve(topRight[1], right, right, bottomRight[1]), // RIGHT
+        curve(bottomRight[0], bottom, bottom, bottomLeft[0]), // BOTTOM
+        curve(bottomLeft[1], left, left, topLeft[1]), // LEFT
+        curve(topLeft[0], top, top, topRight[0]), // LEFT
       ]
     : [];
+
+  debugClear();
+  [topRight, bottomRight, bottomLeft, topLeft].forEach((s) => {
+    debugDrawLine(s, { color: "red", permanent: true });
+  });
+  curves.forEach((s) => {
+    debugDrawCubicBezier(s, { color: "green", permanent: true });
+  });
 
   const sides: GlobalPoint[] = [topRight, bottomRight, bottomLeft, topLeft]
     .map((s) =>
       lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
     )
-    .filter((x) => x != null)
+    .filter((p): p is GlobalPoint => p != null)
     // Rotate back intersection points
     .map((p) => pointRotateRads<GlobalPoint>(p!, center, element.angle));
-  const corners = arcs
-    .flatMap((x) => arcLineInterceptPoints(x, line(rotatedA, rotatedB)))
-    .filter((x) => x != null)
+  const corners = curves
+    .flatMap((p) => curveIntersectLine(p, line(rotatedA, rotatedB)))
+    .filter((p) => p != null)
     // Rotate back intersection points
     .map((p) => pointRotateRads(p, center, element.angle));
 

@@ -2,6 +2,8 @@ import type { GlobalPoint, Radians } from "../../math";
 import {
   arc,
   arcDistanceFromPoint,
+  curve,
+  curvePointDistance,
   distanceToLineSegment,
   lineSegment,
   pointFrom,
@@ -10,7 +12,7 @@ import {
 } from "../../math";
 import { ellipse, ellipseDistanceFromPoint } from "../../math/ellipse";
 import { getCornerRadius } from "../shapes";
-import { createDiamondArc, createDiamondSide } from "./bounds";
+import { getDiamondPoints } from "./bounds";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
@@ -147,53 +149,31 @@ export const distanceToDiamondElement = (
     pointFrom(element.x + leftX, element.y + leftY),
   ];
 
-  const topRight = createDiamondSide(
-    lineSegment(top, right),
-    verticalRadius,
-    horizontalRadius,
+  // Create the line segment parts of the diamond
+  // NOTE: Horizontal and vertical seems to be flipped here
+  const topRight = lineSegment<GlobalPoint>(
+    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
+    pointFrom(right[0] + verticalRadius, right[1] + horizontalRadius),
   );
-  const bottomRight = createDiamondSide(
-    lineSegment(bottom, right),
-    verticalRadius,
-    horizontalRadius,
+  const bottomRight = lineSegment<GlobalPoint>(
+    pointFrom(bottom[0] + verticalRadius, bottom[1] + horizontalRadius),
+    pointFrom(right[0] + verticalRadius, right[1] + horizontalRadius),
   );
-  const bottomLeft = createDiamondSide(
-    lineSegment(bottom, left),
-    verticalRadius,
-    horizontalRadius,
+  const bottomLeft = lineSegment<GlobalPoint>(
+    pointFrom(bottom[0] + verticalRadius, bottom[1] + horizontalRadius),
+    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
   );
-  const topLeft = createDiamondSide(
-    lineSegment(top, left),
-    verticalRadius,
-    horizontalRadius,
+  const topLeft = lineSegment<GlobalPoint>(
+    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
+    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
   );
 
-  const arcs = element.roundness
+  const curves = element.roundness
     ? [
-        createDiamondArc(
-          topLeft[0],
-          topRight[0],
-          pointFrom(top[0], top[1] + verticalRadius),
-          verticalRadius,
-        ), // TOP
-        createDiamondArc(
-          topRight[1],
-          bottomRight[1],
-          pointFrom(right[0] - horizontalRadius, right[1]),
-          horizontalRadius,
-        ), // RIGHT
-        createDiamondArc(
-          bottomRight[0],
-          bottomLeft[0],
-          pointFrom(bottom[0], bottom[1] - verticalRadius),
-          verticalRadius,
-        ), // BOTTOM
-        createDiamondArc(
-          bottomLeft[1],
-          topLeft[1],
-          pointFrom(right[0] + horizontalRadius, right[1]),
-          horizontalRadius,
-        ), // LEFT
+        curve(topRight[1], right, right, bottomRight[1]), // RIGHT
+        curve(bottomRight[0], bottom, bottom, bottomLeft[0]), // BOTTOM
+        curve(bottomLeft[1], left, left, topLeft[1]), // LEFT
+        curve(topLeft[0], top, top, topRight[0]), // LEFT
       ]
     : [];
 
@@ -202,7 +182,7 @@ export const distanceToDiamondElement = (
       ...[topRight, bottomRight, bottomLeft, topLeft].map((s) =>
         distanceToLineSegment(rotatedPoint, s),
       ),
-      ...arcs.map((a) => arcDistanceFromPoint(a, rotatedPoint)),
+      ...curves.map((a) => curvePointDistance(a, rotatedPoint)),
     ],
   );
 };

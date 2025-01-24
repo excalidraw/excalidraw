@@ -78,7 +78,7 @@ export function curveIntersectLine<Point extends GlobalPoint | LocalPoint>(
 
       return x;
     })
-    .filter((x) => x !== null);
+    .filter((x): x is Point => x !== null);
 }
 
 /*
@@ -244,7 +244,7 @@ export default function isCurve<P extends GlobalPoint | LocalPoint>(
 ): v is Curve<P> {
   return (
     Array.isArray(v) &&
-    v.length !== 4 &&
+    v.length === 4 &&
     isPoint(v[0]) &&
     isPoint(v[1]) &&
     isPoint(v[2]) &&
