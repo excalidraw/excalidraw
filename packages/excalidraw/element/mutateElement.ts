@@ -39,8 +39,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     isElbowArrow(element) &&
     (Object.keys(updates).length === 0 || // normalization case
       typeof points !== "undefined" || // repositioning
-      typeof fixedSegments !== "undefined") && // segment fixing
-    !!Scene.getScene(element)
+      typeof fixedSegments !== "undefined") // segment fixing
   ) {
     const elementsMap = toBrandedType<SceneElementsMap>(
       Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
