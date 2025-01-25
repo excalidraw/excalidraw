@@ -427,6 +427,8 @@ const createBindingArrow = (
     strokeColor: startBindingElement.strokeColor,
     strokeStyle: startBindingElement.strokeStyle,
     strokeWidth: startBindingElement.strokeWidth,
+    opacity: startBindingElement.opacity,
+    roughness: startBindingElement.roughness,
     points: [pointFrom(0, 0), pointFrom(endX, endY)],
     elbowed: true,
   });
