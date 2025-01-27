@@ -108,7 +108,6 @@ export function arcSegmentInterceptPoints<
     const [candidateRadius, candidateAngle] = cartesian2Polar(
       pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
-
     return Math.abs(a.radius - candidateRadius) < PRECISION &&
       a.startAngle > a.endAngle
       ? a.startAngle <= candidateAngle || a.endAngle >= candidateAngle

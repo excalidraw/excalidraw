@@ -64,6 +64,17 @@ describe("intersection", () => {
         lineSegment(pointFrom(2, 1), pointFrom(0, 0)),
       ),
     ).toEqual([pointFrom(0.894427190999916, 0.447213595499958)]);
+    expect(
+      arcSegmentInterceptPoints(
+        arc(
+          pointFrom(0, 0),
+          1,
+          Math.PI as Radians,
+          ((3 / 2) * Math.PI) as Radians,
+        ),
+        lineSegment(pointFrom(-10, -10), pointFrom(0, 0)),
+      ),
+    ).toEqual([pointFrom(-0.7071067811865479, -0.7071067811865479)]);
   });
 
   it("should report both interception points when present for segment", () => {

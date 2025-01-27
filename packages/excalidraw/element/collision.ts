@@ -47,6 +47,7 @@ import {
   debugDrawArc,
   debugDrawCubicBezier,
   debugDrawLine,
+  debugDrawPoint,
 } from "../visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -220,19 +221,19 @@ const intersectRectanguloidWithLine = (
     lineSegment<GlobalPoint>(
       pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
       pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
-    ),
+    ), // TOP
     lineSegment<GlobalPoint>(
       pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
       pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
-    ),
+    ), // RIGHT
     lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
       pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
-    ),
+      pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
+    ), // BOTTOM
     lineSegment<GlobalPoint>(
       pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
       pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
-    ),
+    ), // LEFT
   ];
   const corners =
     roundness > 0
@@ -242,24 +243,24 @@ const intersectRectanguloidWithLine = (
             roundness,
             Math.PI as Radians,
             ((3 / 2) * Math.PI) as Radians,
-          ),
+          ), // TOP LEFT
           arc<GlobalPoint>(
             pointFrom(r[1][0] - roundness, r[0][1] + roundness),
             roundness,
             ((3 / 2) * Math.PI) as Radians,
             0 as Radians,
-          ),
+          ), // TOP RIGHT
           arc<GlobalPoint>(
             pointFrom(r[1][0] - roundness, r[1][1] - roundness),
             roundness,
             0 as Radians,
             ((1 / 2) * Math.PI) as Radians,
-          ),
+          ), // BOTTOM RIGHT
           arc<GlobalPoint>(
             pointFrom(r[0][0] + roundness, r[1][1] - roundness),
             roundness,
             ((1 / 2) * Math.PI) as Radians,
-            Math.PI as Radians,
+            Math.PI as Radians, // BOTTOM LEFT
           ),
         ]
       : [];
@@ -267,6 +268,7 @@ const intersectRectanguloidWithLine = (
   debugClear();
   sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
   corners.forEach((s) => debugDrawArc(s, { color: "green", permanent: true }));
+  debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
 
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
@@ -279,6 +281,10 @@ const intersectRectanguloidWithLine = (
     .flatMap((t) => arcLineInterceptPoints(t, line(rotatedA, rotatedB)))
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
+
+  [...sideIntersections, ...cornerIntersections].forEach((p) =>
+    debugDrawPoint(p, { color: "purple", permanent: true }),
+  );
 
   return (
     [...sideIntersections, ...cornerIntersections]
@@ -347,7 +353,7 @@ const intersectDiamondWithLine = (
         curve(topRight[1], right, right, bottomRight[1]), // RIGHT
         curve(bottomRight[0], bottom, bottom, bottomLeft[0]), // BOTTOM
         curve(bottomLeft[1], left, left, topLeft[1]), // LEFT
-        curve(topLeft[0], top, top, topRight[0]), // LEFT
+        curve(topLeft[0], top, top, topRight[0]), // TOP
       ]
     : [];
 

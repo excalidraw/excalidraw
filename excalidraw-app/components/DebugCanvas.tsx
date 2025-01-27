@@ -19,7 +19,7 @@ import {
   type GlobalPoint,
   type LineSegment,
 } from "../../packages/math";
-import isCurve from "../../packages/math/curve";
+import { isCurve } from "../../packages/math/curve";
 
 const renderLine = (
   context: CanvasRenderingContext2D,

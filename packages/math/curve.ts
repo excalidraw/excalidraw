@@ -239,7 +239,7 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
 /**
  * Determines if the parameter is a Curve
  */
-export default function isCurve<P extends GlobalPoint | LocalPoint>(
+export function isCurve<P extends GlobalPoint | LocalPoint>(
   v: unknown,
 ): v is Curve<P> {
   return (
