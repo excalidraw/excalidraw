@@ -254,6 +254,9 @@ const addNewNode = (
     backgroundColor: element.backgroundColor,
     strokeColor: element.strokeColor,
     strokeWidth: element.strokeWidth,
+    opacity: element.opacity,
+    fillStyle: element.fillStyle,
+    strokeStyle: element.strokeStyle,
   });
 
   invariant(
@@ -329,6 +332,9 @@ export const addNewNodes = (
       backgroundColor: startNode.backgroundColor,
       strokeColor: startNode.strokeColor,
       strokeWidth: startNode.strokeWidth,
+      opacity: startNode.opacity,
+      fillStyle: startNode.fillStyle,
+      strokeStyle: startNode.strokeStyle,
     });
 
     invariant(
@@ -416,11 +422,13 @@ const createBindingArrow = (
     type: "arrow",
     x: startX,
     y: startY,
-    startArrowhead: appState.currentItemStartArrowhead,
+    startArrowhead: null,
     endArrowhead: appState.currentItemEndArrowhead,
-    strokeColor: appState.currentItemStrokeColor,
-    strokeStyle: appState.currentItemStrokeStyle,
-    strokeWidth: appState.currentItemStrokeWidth,
+    strokeColor: startBindingElement.strokeColor,
+    strokeStyle: startBindingElement.strokeStyle,
+    strokeWidth: startBindingElement.strokeWidth,
+    opacity: startBindingElement.opacity,
+    roughness: startBindingElement.roughness,
     points: [pointFrom(0, 0), pointFrom(endX, endY)],
     elbowed: true,
   });
