@@ -21,8 +21,8 @@ export class DurableRoom extends DurableObject {
     super(ctx, env);
 
     this.ctx.blockConcurrencyWhile(async () => {
-      // CFDO: snapshot should likely be a transient store
-      // CFDO: loaded the latest state from the db
+      // CFDO I: snapshot should likely be a transient store
+      // CFDO II: loaded the latest state from the db
       this.snapshot = {
         // CFDO: start persisting acknowledged version (not a scene version!)
         // CFDO: we don't persist appState, should we?

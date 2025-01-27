@@ -868,6 +868,7 @@ const ExcalidrawWrapper = () => {
 
       let deltas: StoreDelta[] = [];
 
+      // CFDO I: going both in collaborative setting means the (acknowledge) deltas need to have applied latest changes
       switch (direction) {
         case "forward": {
           deltas = acknowledgedDeltas.slice(sliderVersion, value) ?? [];

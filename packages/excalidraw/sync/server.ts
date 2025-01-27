@@ -1,6 +1,5 @@
 import AsyncLock from "async-lock";
-import msgpack from "msgpack-lite";
-import { Utils } from "./utils";
+import { Network, Utils } from "./utils";
 
 import type {
   DeltasRepository,
@@ -9,12 +8,10 @@ import type {
   PUSH_PAYLOAD,
   SERVER_MESSAGE,
   SERVER_DELTA,
-  CLIENT_MESSAGE_RAW,
   CHUNK_INFO,
   RELAY_PAYLOAD,
+  CLIENT_MESSAGE_BINARY,
 } from "./protocol";
-
-// CFDO: message could be binary (cbor, protobuf, etc.)
 
 /**
  * Core excalidraw sync logic.
@@ -24,12 +21,12 @@ export class ExcalidrawSyncServer {
   private readonly sessions: Set<WebSocket> = new Set();
   private readonly chunks = new Map<
     CHUNK_INFO["id"],
-    Map<CHUNK_INFO["position"], CLIENT_MESSAGE_RAW["payload"]>
+    Map<CHUNK_INFO["position"], CLIENT_MESSAGE_BINARY["payload"]>
   >();
 
   constructor(private readonly repository: DeltasRepository) {}
 
-  // CFDO: should send a message about collaborators (no collaborators => no need to send ephemerals)
+  // CFDO: optimize, should send a message about collaborators (no collaborators => no need to send ephemerals)
   public onConnect(client: WebSocket) {
     this.sessions.add(client);
   }
@@ -42,47 +39,23 @@ export class ExcalidrawSyncServer {
     client: WebSocket,
     message: ArrayBuffer,
   ): Promise<void> | void {
-    const [parsedMessage, parseMessageError] = Utils.try<CLIENT_MESSAGE_RAW>(
-      () => {
-        const headerLength = 4;
-        const header = new Uint8Array(message, 0, headerLength);
-        const metadataLength = new DataView(
-          header.buffer,
-          header.byteOffset,
-        ).getUint32(0);
-
-        const metadata = new Uint8Array(
-          message,
-          headerLength,
-          headerLength + metadataLength,
-        );
-
-        const payload = new Uint8Array(message, headerLength + metadataLength);
-        const parsed = {
-          ...msgpack.decode(metadata),
-          payload,
-        };
-
-        // CFDO: add dev-level logging
-        console.log({ parsed });
-
-        return parsed;
-      },
+    const [rawMessage, parsingError] = Utils.try<CLIENT_MESSAGE_BINARY>(() =>
+      Network.decodeClientMessage(message),
     );
 
-    if (parseMessageError) {
-      console.error(parseMessageError);
+    if (parsingError) {
+      console.error(parsingError);
       return;
     }
 
-    const { type, payload, chunkInfo } = parsedMessage;
+    const { type, payload, chunkInfo } = rawMessage;
 
     // if there is chunkInfo, there are more than 1 chunks => process them first
     if (chunkInfo) {
       return this.processChunks(client, { type, payload, chunkInfo });
     }
 
-    return this.processMessage(client, parsedMessage);
+    return this.processMessage(client, rawMessage);
   }
 
   /**
@@ -90,7 +63,8 @@ export class ExcalidrawSyncServer {
    */
   private processChunks(
     client: WebSocket,
-    message: CLIENT_MESSAGE_RAW & { chunkInfo: CHUNK_INFO },
+    message: CLIENT_MESSAGE_BINARY &
+      Required<Pick<CLIENT_MESSAGE_BINARY, "chunkInfo">>,
   ) {
     let shouldCleanupchunks = true;
     const {
@@ -131,7 +105,7 @@ export class ExcalidrawSyncServer {
       const rawMessage = {
         type,
         payload: restoredPayload,
-      };
+      } as Omit<CLIENT_MESSAGE_BINARY, "chunkInfo">;
 
       return this.processMessage(client, rawMessage);
     } catch (error) {
@@ -146,14 +120,14 @@ export class ExcalidrawSyncServer {
 
   private processMessage(
     client: WebSocket,
-    { type, payload }: Omit<CLIENT_MESSAGE_RAW, "chunkInfo">,
+    { type, payload }: Omit<CLIENT_MESSAGE_BINARY, "chunkInfo">,
   ) {
-    const [parsedPayload, parsePayloadError] = Utils.try<
-      CLIENT_MESSAGE["payload"]
-    >(() => msgpack.decode(payload));
+    const [parsedPayload, parsingError] = Utils.try<CLIENT_MESSAGE["payload"]>(
+      () => Network.fromBinary(payload),
+    );
 
-    if (parsePayloadError) {
-      console.error(parsePayloadError);
+    if (parsingError) {
+      console.error(parsingError);
       return;
     }
 
@@ -164,7 +138,7 @@ export class ExcalidrawSyncServer {
         return this.pull(client, parsedPayload as PULL_PAYLOAD);
       case "push":
         // apply each one-by-one to avoid race conditions
-        // CFDO: in theory we do not need to block ephemeral appState changes
+        // CFDO: in theory we do not need to block ephemeral appState (for now we are not even using them)
         return this.lock.acquire("push", () =>
           this.push(client, parsedPayload as PUSH_PAYLOAD),
         );
@@ -174,7 +148,7 @@ export class ExcalidrawSyncServer {
   }
 
   private relay(client: WebSocket, payload: RELAY_PAYLOAD) {
-    // CFDO: we should likely apply these to the snapshot
+    // CFDO I: we should likely apply these to the snapshot
     return this.broadcast(
       {
         type: "relayed",
@@ -193,7 +167,7 @@ export class ExcalidrawSyncServer {
       lastAcknowledgedServerVersion - lastAcknowledgedClientVersion;
 
     if (versionΔ < 0) {
-      // CFDO: restore the client from the snapshot / deltas?
+      // CFDO II: restore the client from the snapshot / deltas?
       console.error(
         `Panic! Client claims to have higher acknowledged version than the latest one on the server!`,
       );
@@ -217,15 +191,19 @@ export class ExcalidrawSyncServer {
   }
 
   private push(client: WebSocket, delta: PUSH_PAYLOAD) {
-    // CFDO: try to apply the deltas to the snapshot
-    const [acknowledged, error] = Utils.try(() => this.repository.save(delta));
+    // CFDO I: apply latest changes to delt & apply the deltas to the snapshot
+    const [acknowledged, savingError] = Utils.try(() =>
+      this.repository.save(delta),
+    );
 
-    if (error || !acknowledged) {
-      // everything should be automatically rolled-back -> double-check
+    if (savingError || !acknowledged) {
+      // CFDO: everything should be automatically rolled-back in the db -> double-check
       return this.send(client, {
         type: "rejected",
         payload: {
-          message: error ? error.message : "Coudn't persist the delta.",
+          message: savingError
+            ? savingError.message
+            : "Coudn't persist the delta.",
           deltas: [delta],
         },
       });
@@ -239,26 +217,26 @@ export class ExcalidrawSyncServer {
     });
   }
 
-  private send(client: WebSocket, message: SERVER_MESSAGE) {
-    const [encodedMessage, encodeError] = Utils.try<Uint8Array>(() =>
-      msgpack.encode(message),
+  private send(ws: WebSocket, message: SERVER_MESSAGE) {
+    const [encodedMessage, encodingError] = Utils.try(() =>
+      Network.toBinary(message),
     );
 
-    if (encodeError) {
-      console.error(encodeError);
+    if (encodingError) {
+      console.error(encodingError);
       return;
     }
 
-    client.send(encodedMessage);
+    ws.send(encodedMessage);
   }
 
   private broadcast(message: SERVER_MESSAGE, exclude?: WebSocket) {
-    const [encodedMessage, encodeError] = Utils.try<Uint8Array>(() =>
-      msgpack.encode(message),
+    const [encodedMessage, encodingError] = Utils.try(() =>
+      Network.toBinary(message),
     );
 
-    if (encodeError) {
-      console.error(encodeError);
+    if (encodingError) {
+      console.error(encodingError);
       return;
     }
 

@@ -11,7 +11,6 @@ export interface MetadataRepository {
   saveMetadata(metadata: { lastAcknowledgedVersion: number }): Promise<void>;
 }
 
-// CFDO: make sure the deltas are always acknowledged (deleted from the repository)
 export class LocalDeltasQueue {
   private readonly queue: Map<string, StoreDelta>;
   private readonly repository: DeltasRepository;

@@ -1,11 +1,11 @@
 import type { StoreChange, StoreDelta } from "../store";
 import type { DTO } from "../utility-types";
 
-export type DELTA = DTO<StoreDelta>;
-export type CHANGE = DTO<StoreChange>;
+export type CLIENT_DELTA = DTO<StoreDelta>;
+export type CLIENT_CHANGE = DTO<StoreChange>;
 
-export type RELAY_PAYLOAD = CHANGE;
-export type PUSH_PAYLOAD = DELTA;
+export type RELAY_PAYLOAD = CLIENT_CHANGE;
+export type PUSH_PAYLOAD = CLIENT_DELTA;
 export type PULL_PAYLOAD = { lastAcknowledgedVersion: number };
 
 export type CHUNK_INFO = {
@@ -14,24 +14,31 @@ export type CHUNK_INFO = {
   count: number;
 };
 
-export type CLIENT_MESSAGE_RAW = {
-  type: "relay" | "pull" | "push";
+export type CLIENT_MESSAGE = (
+  | { type: "relay"; payload: RELAY_PAYLOAD }
+  | { type: "pull"; payload: PULL_PAYLOAD }
+  | { type: "push"; payload: PUSH_PAYLOAD }
+) & { chunkInfo?: CHUNK_INFO };
+
+export type CLIENT_MESSAGE_BINARY = {
+  type: CLIENT_MESSAGE["type"];
   payload: Uint8Array;
   chunkInfo?: CHUNK_INFO;
 };
 
-export type CLIENT_MESSAGE = { chunkInfo: CHUNK_INFO } & (
-  | { type: "relay"; payload: RELAY_PAYLOAD }
-  | { type: "pull"; payload: PULL_PAYLOAD }
-  | { type: "push"; payload: PUSH_PAYLOAD }
-);
-
 export type SERVER_DELTA = {
-  id: string;
+  id: CLIENT_DELTA["id"];
   version: number;
-  // CFDO: should be type-safe
-  payload: Record<string, any>;
+  payload: CLIENT_DELTA;
 };
+
+export type SERVER_DELTA_STORAGE = {
+  id: SERVER_DELTA["id"];
+  version: SERVER_DELTA["version"];
+  position: number;
+  payload: ArrayBuffer;
+};
+
 export type SERVER_MESSAGE =
   | {
       type: "relayed";
@@ -40,16 +47,16 @@ export type SERVER_MESSAGE =
   | { type: "acknowledged"; payload: { deltas: Array<SERVER_DELTA> } }
   | {
       type: "rejected";
-      payload: { deltas: Array<DELTA>; message: string };
+      payload: { deltas: Array<CLIENT_DELTA>; message: string };
     };
 
 export interface DeltasRepository {
-  save(delta: DELTA): SERVER_DELTA | null;
+  save(delta: CLIENT_DELTA): SERVER_DELTA | null;
   getAllSinceVersion(version: number): Array<SERVER_DELTA>;
   getLastVersion(): number;
 }
 
-// CFDO: should come from the shared types package
+// CFDO: should come from the shared types package (might need a bigger refactor)
 export type ExcalidrawElement = {
   id: string;
   type: any;

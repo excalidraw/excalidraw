@@ -76,7 +76,7 @@ export const StoreAction = {
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
    */
-  // CFDO I: none is not really "none" anymore, as it at very least emits an ephemeral increment
+  // CFDO: none is not really "none" anymore, as it at very least emits an ephemeral increment
   // we should likely rename these somehow and keep "none" only for real "no action" cases
   NONE: "NONE",
 } as const;
@@ -313,7 +313,7 @@ export class Store {
       this.onStoreIncrementEmitter.trigger(increment);
     }
 
-    // CFDO: maybe I should not update the snapshot here so that it always syncs ephemeral change after durable change,
+    // CFDO II: maybe I should not update the snapshot here so that it always syncs ephemeral change after durable change,
     // so that clients exchange the latest element versions between each other,
     // meaning if it will be ignored on other clients, other clients would initiate a relay with current version instead of doing nothing
     if (options.updateSnapshot) {
@@ -454,7 +454,6 @@ export class StoreDelta {
     id,
     elements: { added, removed, updated },
   }: SERVER_DELTA["payload"]) {
-    // CFDO: ensure typesafety
     const elements = ElementsDelta.create(added, removed, updated, {
       shouldRedistribute: false,
     });
@@ -622,7 +621,7 @@ export class StoreSnapshot {
   }
 
   private detectChangedAppState(nextObservedAppState: ObservedAppState) {
-    // CFDO: could we optimize by checking only reference changes? (i.e. selectedElementIds should be stable now)
+    // CFDO: could we optimize by checking only reference changes? (i.e. selectedElementIds should be stable now); this is not used for now
     return Delta.isRightDifferent(this.appState, nextObservedAppState);
   }
 

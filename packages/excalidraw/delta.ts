@@ -1228,7 +1228,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
           }
         } else if (type === "added") {
           // for additions the element does not have to exist (i.e. remote update)
-          // CFDO: the version itself might be different!
+          // CFDO II: the version itself might be different!
           element = newElementWith(
             { id, version: 1 } as OrderedExcalidrawElement,
             {
