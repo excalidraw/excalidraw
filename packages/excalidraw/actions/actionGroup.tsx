@@ -25,8 +25,10 @@ import type {
 import type { AppClassProperties, AppState } from "../types";
 import { isBoundToContainer } from "../element/typeChecks";
 import {
+  frameAndChildrenSelectedTogether,
   getElementsInResizingFrame,
   getFrameLikeElements,
+  getRootElements,
   groupByFrameLikes,
   removeElementsFromFrame,
   replaceAllElementsInFrame,
@@ -60,8 +62,11 @@ const enableActionGroup = (
     selectedElementIds: appState.selectedElementIds,
     includeBoundTextElement: true,
   });
+
   return (
-    selectedElements.length >= 2 && !allElementsInSameGroup(selectedElements)
+    selectedElements.length >= 2 &&
+    !allElementsInSameGroup(selectedElements) &&
+    !frameAndChildrenSelectedTogether(selectedElements)
   );
 };
 
@@ -71,10 +76,12 @@ export const actionGroup = register({
   icon: (appState) => <GroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
-    const selectedElements = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeBoundTextElement: true,
-    });
+    const selectedElements = getRootElements(
+      app.scene.getSelectedElements({
+        selectedElementIds: appState.selectedElementIds,
+        includeBoundTextElement: true,
+      }),
+    );
     if (selectedElements.length < 2) {
       // nothing to group
       return { appState, elements, storeAction: StoreAction.NONE };

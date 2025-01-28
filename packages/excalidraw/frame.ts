@@ -498,6 +498,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  appState: AppState,
 ): T => {
   const elementsMap = arrayToMap(allElements);
   const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
@@ -529,6 +530,17 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
     if (
       isFrameLikeElement(element) ||
       (element.frameId && otherFrames.has(element.frameId))
+    ) {
+      continue;
+    }
+
+    // if the element is already in another frame (which is also in elementsToAdd),
+    // it means that frame and children are selected at the same time
+    // => keep original frame membership, do not add to the target frame
+    if (
+      element.frameId &&
+      appState.selectedElementIds[element.id] &&
+      appState.selectedElementIds[element.frameId]
     ) {
       continue;
     }
@@ -621,6 +633,7 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
     removeAllElementsFromFrame(allElements, frame),
     nextElementsInFrame,
     frame,
+    app.state,
   ).slice();
 };
 
@@ -727,6 +740,16 @@ export const getTargetFrame = (
     ? getContainerElement(element, elementsMap) || element
     : element;
 
+  // if the element and its containing frame are both selected, then
+  // the containing frame is the target frame
+  if (
+    _element.frameId &&
+    appState.selectedElementIds[_element.id] &&
+    appState.selectedElementIds[_element.frameId]
+  ) {
+    return getContainingFrame(_element, elementsMap);
+  }
+
   return appState.selectedElementIds[_element.id] &&
     appState.selectedElementsAreBeingDragged
     ? appState.frameToHighlight
@@ -763,13 +786,14 @@ export const isElementInFrame = (
     }
   };
 
-  // Perf improvement:
-  // For an element that's already in a frame, if it's not being dragged
-  // then there is no need to refer to geometry (which, yes, is slow) to check if it's in a frame.
-  // It has to be in its containing frame.
   if (
-    !appState.selectedElementIds[element.id] ||
-    !appState.selectedElementsAreBeingDragged
+    // if the element is not selected, or it is selected but not being dragged,
+    // frame membership won't update, so return true
+    !appState.selectedElementIds[_element.id] ||
+    !appState.selectedElementsAreBeingDragged ||
+    // if both frame and element are selected, won't update membership, so return true
+    (appState.selectedElementIds[_element.id] &&
+      appState.selectedElementIds[frame.id])
   ) {
     return true;
   }
@@ -910,5 +934,18 @@ export const getElementsOverlappingFrame = (
       // removes elements who are overlapping, but are in a different frame,
       // and thus invisible in target frame
       .filter((el) => !el.frameId || el.frameId === frame.id)
+  );
+};
+
+export const frameAndChildrenSelectedTogether = (
+  selectedElements: readonly ExcalidrawElement[],
+) => {
+  const selectedElementsMap = arrayToMap(selectedElements);
+
+  return (
+    selectedElements.length > 1 &&
+    selectedElements.some(
+      (element) => element.frameId && selectedElementsMap.has(element.frameId),
+    )
   );
 };
