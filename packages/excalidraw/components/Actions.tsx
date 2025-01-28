@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { ActionManager } from "../actions/manager";
 import type {
   ExcalidrawElement,
@@ -136,16 +136,8 @@ export const SelectedShapeActions = ({
     targetElements.length === 1 &&
     isImageElement(targetElements[0]);
 
-  const showAlignActions = useMemo(() => {
-    return (
-      alignActionsPredicate(
-        Array.from(elementsMap.values()),
-        appState,
-        null,
-        app,
-      ) && !isSingleElementBoundContainer
-    );
-  }, [elementsMap, appState, app, isSingleElementBoundContainer]);
+  const showAlignActions =
+    !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
 
   return (
     <div className="panelColumn">
