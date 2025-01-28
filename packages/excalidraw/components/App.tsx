@@ -6712,13 +6712,13 @@ class App extends React.Component<AppProps, AppState> {
   public handleCanvasPan = (
     event: React.PointerEvent<HTMLElement> | MouseEvent,
   ): boolean => {
-    const isRightClickDragging = event.button === POINTER_BUTTON.SECONDARY;
+    const isRightClicked = event.button === POINTER_BUTTON.SECONDARY;
     if (
       !(
         gesture.pointers.size <= 1 &&
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          isRightClickDragging ||
+          isRightClicked ||
           isHandToolActive(this.state) ||
           this.state.viewModeEnabled)
       )
@@ -6746,13 +6746,13 @@ class App extends React.Component<AppProps, AppState> {
         ? false
         : /Linux/.test(window.navigator.platform);
 
-    if (!isRightClickDragging) {
+    if (!isRightClicked) {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
     }
     let { clientX: lastX, clientY: lastY } = event;
     let hasDragged = false;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
-      if (isRightClickDragging && !hasDragged) {
+      if (isRightClicked && !hasDragged) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
       }
       hasDragged = true;
@@ -6819,7 +6819,7 @@ class App extends React.Component<AppProps, AppState> {
         window.removeEventListener(EVENT.POINTER_UP, teardown);
         window.removeEventListener(EVENT.BLUR, teardown);
         onPointerMove.flush();
-        if (!hasDragged && isRightClickDragging) {
+        if (!hasDragged && isRightClicked) {
           this.handleCanvasContextMenu(
             event as React.MouseEvent<HTMLElement | HTMLCanvasElement>,
           );
