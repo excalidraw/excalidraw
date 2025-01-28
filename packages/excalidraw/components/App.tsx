@@ -8320,9 +8320,7 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          flushSync(() => {
-            this.setState({ snapLines });
-          });
+          this.setState({ snapLines });
 
           // when we're editing the name of a frame, we want the user to be
           // able to select and interact with the text input
