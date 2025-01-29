@@ -338,7 +338,7 @@ describe("contextMenu element", () => {
     // Roughness
     fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
+    fireEvent.change(screen.getByTestId("opacity"), {
       target: { value: "60" },
     });
 
