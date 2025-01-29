@@ -32,7 +32,7 @@ export const distanceToBindableElement = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      return distanceToRectangleElement(element, p);
+      return distanceToRectanguloidElement(element, p);
     case "diamond":
       return distanceToDiamondElement(element, p);
     case "ellipse":
@@ -48,7 +48,7 @@ export const distanceToBindableElement = (
  * @param p The point to consider
  * @returns The eucledian distance to the outline of the rectanguloid element
  */
-export const distanceToRectangleElement = (
+export const distanceToRectanguloidElement = (
   element: ExcalidrawRectanguloidElement,
   p: GlobalPoint,
 ) => {

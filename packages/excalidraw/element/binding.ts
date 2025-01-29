@@ -76,7 +76,7 @@ import { intersectElementWithLine } from "./collision";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { _generateElementShape } from "../scene/Shape";
 import { COLOR_PALETTE } from "../colors";
-import { debugDrawPoint } from "../visualdebug";
+import { debugClear, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -1313,6 +1313,7 @@ const updateBoundPoint = (
           pointDistanceSq(g!, edgePointAbsolute) -
           pointDistanceSq(h!, edgePointAbsolute),
       );
+      debugClear();
       debugDrawPoint(focusPointAbsolute, { color: "red", permanent: true });
       newEdgePoint = intersections[0];
     }

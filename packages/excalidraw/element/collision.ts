@@ -212,7 +212,7 @@ const intersectRectanguloidWithLine = (
     -element.angle as Radians,
   );
   const roundness = getCornerRadius(
-    Math.min(element.width + 2 * offset, element.height + 2 * offset),
+    Math.min(element.width * offset, element.height * offset),
     element,
   );
 
@@ -264,10 +264,10 @@ const intersectRectanguloidWithLine = (
         ]
       : [];
 
-  debugClear();
-  sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
-  corners.forEach((s) => debugDrawArc(s, { color: "green", permanent: true }));
-  debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
+  // debugClear();
+  // sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
+  // corners.forEach((s) => debugDrawArc(s, { color: "green", permanent: true }));
+  // debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
 
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
