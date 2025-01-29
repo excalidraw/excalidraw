@@ -1,12 +1,12 @@
 import { sanitizeUrl } from "@braintree/sanitize-url";
-import { sanitizeHTMLAttribute } from "../utils";
+import { escapeDoubleQuotes } from "../utils";
 
 export const normalizeLink = (link: string) => {
   link = link.trim();
   if (!link) {
     return link;
   }
-  return sanitizeUrl(sanitizeHTMLAttribute(link));
+  return sanitizeUrl(escapeDoubleQuotes(link));
 };
 
 export const isLocalLink = (link: string | null) => {
