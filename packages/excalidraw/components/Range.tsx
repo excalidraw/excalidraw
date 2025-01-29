@@ -2,14 +2,12 @@ import React, { useEffect } from "react";
 import { getFormValue } from "../actions/actionProperties";
 import { t } from "../i18n";
 import "./Range.scss";
-
 export type RangeProps = {
   updateData: (value: number) => void;
   appState: any;
   elements: any;
   testId?: string;
 };
-
 export const Range = ({
   updateData,
   appState,
@@ -34,10 +32,9 @@ export const Range = ({
       const position =
         (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
       valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
     }
   }, [value]);
-
   return (
     <label className="control-label">
       {t("labels.opacity")}
