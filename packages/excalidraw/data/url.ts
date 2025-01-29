@@ -6,7 +6,7 @@ export const normalizeLink = (link: string) => {
   if (!link) {
     return link;
   }
-  return sanitizeUrl(sanitizeHTMLAttribute(link));
+  return sanitizeUrl(link);
 };
 
 export const isLocalLink = (link: string | null) => {
