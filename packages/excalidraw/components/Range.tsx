@@ -7,9 +7,10 @@ export type RangeProps = {
   updateData: (value: number) => void;
   appState: any;
   elements: any;
+  testId?: string
 };
 
-export const Range = ({ updateData, appState, elements }: RangeProps) => {
+export const Range = ({ updateData, appState, elements, testId }: RangeProps) => {
   const rangeRef = React.useRef<HTMLInputElement>(null);
   const valueRef = React.useRef<HTMLDivElement>(null);
   const value = getFormValue(
@@ -30,7 +31,7 @@ export const Range = ({ updateData, appState, elements }: RangeProps) => {
       rangeElement.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${value}%, var(--button-bg, var(--island-bg-color)) ${value}%, var(--button-bg, var(--island-bg-color)) 100%)`;
     }
   }, [value]);
-  
+
   return (
     <label className="control-label">
       {t('labels.opacity')}
@@ -46,6 +47,7 @@ export const Range = ({ updateData, appState, elements }: RangeProps) => {
           }}
           value={value}
           className="range-input"
+          data-testid={testId}
         />
         <div className="value-bubble" ref={valueRef}>{value !== 0 ? value : null}</div>
         <div className="zero-label">0</div>

@@ -654,7 +654,12 @@ export const actionChangeOpacity = register({
     //   <div className="zero-lebel">0</div>
     //   </div>
     // </label>
-    <Range updateData={updateData} elements={elements} appState={appState} />
+    <Range
+      updateData={updateData}
+      elements={elements}
+      appState={appState}
+      testId="opacity"
+    />
   ),
 });
 

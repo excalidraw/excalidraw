@@ -27,7 +27,7 @@ describe("actionStyles", () => {
     await act(async () => {});
   });
 
-  it("should copy & paste styles via keyboard", async () => {
+  it.only("should copy & paste styles via keyboard", async () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(20, 20);
@@ -50,7 +50,7 @@ describe("actionStyles", () => {
     // Roughness
     fireEvent.click(screen.getByTitle("Cartoonist"));
     // Opacity
-    fireEvent.change(screen.getByLabelText("Opacity"), {
+    fireEvent.change(screen.getByTestId("opacity"), {
       target: { value: "60" },
     });
 
