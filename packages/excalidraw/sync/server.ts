@@ -3,7 +3,6 @@ import { Network, Utils } from "./utils";
 
 import type {
   DeltasRepository,
-  CLIENT_MESSAGE,
   PULL_PAYLOAD,
   PUSH_PAYLOAD,
   SERVER_MESSAGE,
@@ -11,7 +10,10 @@ import type {
   CHUNK_INFO,
   RELAY_PAYLOAD,
   CLIENT_MESSAGE_BINARY,
+  CLIENT_MESSAGE,
+  ExcalidrawElement,
 } from "./protocol";
+import { StoreDelta } from "../store";
 
 /**
  * Core excalidraw sync logic.
@@ -24,7 +26,22 @@ export class ExcalidrawSyncServer {
     Map<CHUNK_INFO["position"], CLIENT_MESSAGE_BINARY["payload"]>
   >();
 
-  constructor(private readonly repository: DeltasRepository) {}
+  // CFDO II: load from the db
+  private elements = new Map<string, ExcalidrawElement>();
+
+  constructor(private readonly repository: DeltasRepository) {
+    // CFDO II: load from the db
+    const deltas = this.repository.getAllSinceVersion(0);
+
+    for (const delta of deltas) {
+      const storeDelta = StoreDelta.load(delta.payload);
+
+      // CFDO II: fix types (everywhere)
+      const [nextElements] = storeDelta.elements.applyTo(this.elements as any);
+
+      this.elements = nextElements;
+    }
+  }
 
   // CFDO: optimize, should send a message about collaborators (no collaborators => no need to send ephemerals)
   public onConnect(client: WebSocket) {
@@ -48,11 +65,12 @@ export class ExcalidrawSyncServer {
       return;
     }
 
-    const { type, payload, chunkInfo } = rawMessage;
-
     // if there is chunkInfo, there are more than 1 chunks => process them first
-    if (chunkInfo) {
-      return this.processChunks(client, { type, payload, chunkInfo });
+    if (rawMessage.chunkInfo) {
+      return this.processChunks(client, {
+        ...rawMessage,
+        chunkInfo: rawMessage.chunkInfo,
+      });
     }
 
     return this.processMessage(client, rawMessage);
@@ -132,6 +150,8 @@ export class ExcalidrawSyncServer {
     }
 
     switch (type) {
+      case "restore":
+        return this.restore(client);
       case "relay":
         return this.relay(client, parsedPayload as RELAY_PAYLOAD);
       case "pull":
@@ -145,6 +165,15 @@ export class ExcalidrawSyncServer {
       default:
         console.error(`Unknown message type: ${type}`);
     }
+  }
+
+  private restore(client: WebSocket) {
+    return this.send(client, {
+      type: "restored",
+      payload: {
+        elements: Array.from(this.elements.values()),
+      },
+    });
   }
 
   private relay(client: WebSocket, payload: RELAY_PAYLOAD) {
@@ -191,10 +220,38 @@ export class ExcalidrawSyncServer {
   }
 
   private push(client: WebSocket, delta: PUSH_PAYLOAD) {
-    // CFDO I: apply latest changes to delt & apply the deltas to the snapshot
-    const [acknowledged, savingError] = Utils.try(() =>
-      this.repository.save(delta),
-    );
+    const [storeDelta, applyingError] = Utils.try(() => {
+      // update the "deleted" delta according to the latest changes (in case of concurrent changes)
+      const storeDelta = StoreDelta.applyLatestChanges(
+        StoreDelta.load(delta),
+        this.elements as any,
+        "deleted",
+      );
+
+      // apply the delta to the elements snapshot
+      const [nextElements] = storeDelta.elements.applyTo(this.elements as any);
+
+      this.elements = nextElements;
+
+      return storeDelta;
+    });
+
+    if (applyingError) {
+      // CFDO: everything should be automatically rolled-back in the db -> double-check
+      return this.send(client, {
+        type: "rejected",
+        payload: {
+          message: applyingError
+            ? applyingError.message
+            : "Couldn't apply the delta.",
+          deltas: [delta],
+        },
+      });
+    }
+
+    const [acknowledged, savingError] = Utils.try(() => {
+      return this.repository.save(storeDelta);
+    });
 
     if (savingError || !acknowledged) {
       // CFDO: everything should be automatically rolled-back in the db -> double-check
@@ -204,7 +261,7 @@ export class ExcalidrawSyncServer {
           message: savingError
             ? savingError.message
             : "Coudn't persist the delta.",
-          deltas: [delta],
+          deltas: [storeDelta],
         },
       });
     }

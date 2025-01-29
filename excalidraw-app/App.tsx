@@ -140,7 +140,6 @@ import DebugCanvas, {
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import { isElementLink } from "../packages/excalidraw/element/elementLink";
-import type { ElementsChange } from "../packages/excalidraw/change";
 
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";

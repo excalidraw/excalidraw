@@ -159,7 +159,13 @@ export class History {
     entry: HistoryEntry,
     prevElements: SceneElementsMap,
   ) {
-    const updatedEntry = HistoryEntry.applyLatestChanges(entry, prevElements);
+    const inversedEntry = HistoryEntry.inverse(entry);
+    const updatedEntry = HistoryEntry.applyLatestChanges(
+      inversedEntry,
+      prevElements,
+      "inserted",
+    );
+
     return stack.push(updatedEntry);
   }
 }

@@ -9,7 +9,7 @@ import { Network } from "../sync/utils";
 // CFDO II: add senderId, possibly roomId as well
 export class DurableDeltasRepository implements DeltasRepository {
   // there is a 2MB row limit, hence working with max payload size of 1.5 MB
-  // and leaving a buffer for other row metadata
+  // and leaving a ~500kB buffer for other row metadata
   private static readonly MAX_PAYLOAD_SIZE = 1_500_000;
 
   constructor(private storage: DurableObjectStorage) {

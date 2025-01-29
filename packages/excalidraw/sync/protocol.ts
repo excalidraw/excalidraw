@@ -4,6 +4,7 @@ import type { DTO } from "../utility-types";
 export type CLIENT_DELTA = DTO<StoreDelta>;
 export type CLIENT_CHANGE = DTO<StoreChange>;
 
+export type RESTORE_PAYLOAD = {};
 export type RELAY_PAYLOAD = CLIENT_CHANGE;
 export type PUSH_PAYLOAD = CLIENT_DELTA;
 export type PULL_PAYLOAD = { lastAcknowledgedVersion: number };
@@ -15,6 +16,7 @@ export type CHUNK_INFO = {
 };
 
 export type CLIENT_MESSAGE = (
+  | { type: "restore"; payload: RESTORE_PAYLOAD }
   | { type: "relay"; payload: RELAY_PAYLOAD }
   | { type: "pull"; payload: PULL_PAYLOAD }
   | { type: "push"; payload: PUSH_PAYLOAD }
@@ -48,7 +50,8 @@ export type SERVER_MESSAGE =
   | {
       type: "rejected";
       payload: { deltas: Array<CLIENT_DELTA>; message: string };
-    };
+    }
+  | { type: "restored"; payload: { elements: Array<ExcalidrawElement> } };
 
 export interface DeltasRepository {
   save(delta: CLIENT_DELTA): SERVER_DELTA | null;

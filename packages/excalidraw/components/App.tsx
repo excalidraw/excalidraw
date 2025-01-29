@@ -5367,7 +5367,7 @@ class App extends React.Component<AppProps, AppState> {
           : -1;
 
         if (midPoint && midPoint > -1) {
-          this.store.shouldCaptureIncrement();
+          this.store.scheduleCapture();
           LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
 
           const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(

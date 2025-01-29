@@ -32,7 +32,7 @@ import type {
 } from "./element/types";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
-import { getObservedAppState } from "./store";
+import { getObservedAppState, StoreSnapshot } from "./store";
 import type {
   AppState,
   ObservedAppState,
@@ -1036,7 +1036,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
    * @param modifierOptions defines which of the delta (`deleted` or `inserted`) will be updated
    * @returns new instance with modified delta/s
    */
-  public applyLatestChanges(elements: SceneElementsMap): ElementsDelta {
+  public applyLatestChanges(
+    elements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted",
+  ): ElementsDelta {
     const modifier =
       (element: OrderedExcalidrawElement) => (partial: ElementPartial) => {
         const latestPartial: { [key: string]: unknown } = {};
@@ -1069,7 +1072,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
             delta.deleted,
             delta.inserted,
             modifier(existingElement),
-            "inserted",
+            modifierOptions,
           );
 
           modifiedDeltas[id] = modifiedDelta;
@@ -1092,7 +1095,10 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
   public applyTo(
     elements: SceneElementsMap,
-    snapshot: Map<string, OrderedExcalidrawElement>,
+    elementsSnapshot: Map<
+      string,
+      OrderedExcalidrawElement
+    > = StoreSnapshot.empty().elements,
   ): [SceneElementsMap, boolean] {
     let nextElements = toBrandedType<SceneElementsMap>(new Map(elements));
     let changedElements: Map<string, OrderedExcalidrawElement>;
@@ -1106,7 +1112,7 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     try {
       const applyDeltas = ElementsDelta.createApplier(
         nextElements,
-        snapshot,
+        elementsSnapshot,
         flags,
       );
 

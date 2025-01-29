@@ -474,14 +474,13 @@ export class StoreDelta {
   public static applyLatestChanges(
     delta: StoreDelta,
     elements: SceneElementsMap,
+    modifierOptions: "deleted" | "inserted",
   ): StoreDelta {
-    const inversedDelta = this.inverse(delta);
-
     return this.create(
-      inversedDelta.elements.applyLatestChanges(elements),
-      inversedDelta.appState,
+      delta.elements.applyLatestChanges(elements, modifierOptions),
+      delta.appState,
       {
-        id: inversedDelta.id,
+        id: delta.id,
       },
     );
   }

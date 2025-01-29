@@ -2,8 +2,6 @@ import { DurableObject } from "cloudflare:workers";
 import { DurableDeltasRepository } from "./repository";
 import { ExcalidrawSyncServer } from "../sync/server";
 
-import type { ExcalidrawElement } from "../element/types";
-
 /**
  * Durable Object impl. of Excalidraw room.
  */
@@ -11,26 +9,10 @@ export class DurableRoom extends DurableObject {
   private roomId: string | null = null;
   private sync: ExcalidrawSyncServer;
 
-  private snapshot!: {
-    appState: Record<string, any>;
-    elements: Map<string, ExcalidrawElement>;
-    version: number;
-  };
-
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
 
     this.ctx.blockConcurrencyWhile(async () => {
-      // CFDO I: snapshot should likely be a transient store
-      // CFDO II: loaded the latest state from the db
-      this.snapshot = {
-        // CFDO: start persisting acknowledged version (not a scene version!)
-        // CFDO: we don't persist appState, should we?
-        appState: {},
-        elements: new Map(),
-        version: 0,
-      };
-
       this.roomId = (await this.ctx.storage.get("roomId")) || null;
     });
 
