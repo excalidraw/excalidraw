@@ -1226,15 +1226,10 @@ export class PromisePool<T> {
   }
 }
 
-export const sanitizeHTMLAttribute = (html: string) => {
-  return (
-    html
-      // note, if we're not doing stupid things, escaping " is enough,
-      // but we might end up doing stupid things
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;")
-      .replace(/>/g, "&gt;")
-      .replace(/</g, "&lt;")
-  );
+/**
+ * use when you need to render unsafe string as HTML attribute, but MAKE SURE
+ * the attribute is double-quoted when constructing the HTML string
+ */
+export const escapeDoubleQuotes = (str: string) => {
+  return str.replace(/"/g, "&quot;");
 };

@@ -1,11 +1,7 @@
 import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import type { ExcalidrawProps } from "../types";
-import {
-  getFontString,
-  sanitizeHTMLAttribute,
-  updateActiveTool,
-} from "../utils";
+import { escapeDoubleQuotes, getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
 import { newTextElement } from "./newElement";
 import { wrapText } from "./textWrapping";
@@ -212,7 +208,7 @@ export const getEmbedLink = (
     // Note that we don't attempt to parse the username as it can consist of
     // non-latin1 characters, and the username in the url can be set to anything
     // without affecting the embed.
-    const safeURL = sanitizeHTMLAttribute(
+    const safeURL = escapeDoubleQuotes(
       `https://twitter.com/x/status/${postId}`,
     );
 
@@ -231,7 +227,7 @@ export const getEmbedLink = (
 
   if (RE_REDDIT.test(link)) {
     const [, page, postId, title] = link.match(RE_REDDIT)!;
-    const safeURL = sanitizeHTMLAttribute(
+    const safeURL = escapeDoubleQuotes(
       `https://reddit.com/r/${page}/comments/${postId}/${title}`,
     );
     const ret: IframeDataWithSandbox = {
@@ -249,7 +245,7 @@ export const getEmbedLink = (
 
   if (RE_GH_GIST.test(link)) {
     const [, user, gistId] = link.match(RE_GH_GIST)!;
-    const safeURL = sanitizeHTMLAttribute(
+    const safeURL = escapeDoubleQuotes(
       `https://gist.github.com/${user}/${gistId}`,
     );
     const ret: IframeDataWithSandbox = {
