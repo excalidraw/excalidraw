@@ -1,5 +1,5 @@
-import { atom, useAtom } from "jotai";
 import { useEffect } from "react";
+import { atom, useAtom } from "../app-jotai";
 import { getPreferredLanguage, languageDetector } from "./language-detector";
 
 export const appLangCodeAtom = atom(getPreferredLanguage());

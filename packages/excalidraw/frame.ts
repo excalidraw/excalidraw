@@ -95,12 +95,11 @@ export const getElementsCompletelyInFrame = (
   );
 
 export const isElementContainingFrame = (
-  elements: readonly ExcalidrawElement[],
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  return getElementsWithinSelection(elements, element, elementsMap).some(
+  return getElementsWithinSelection([frame], element, elementsMap).some(
     (e) => e.id === frame.id,
   );
 };
@@ -144,7 +143,7 @@ export const elementOverlapsWithFrame = (
   return (
     elementsAreInFrameBounds([element], frame, elementsMap) ||
     isElementIntersectingFrame(element, frame, elementsMap) ||
-    isElementContainingFrame([frame], element, frame, elementsMap)
+    isElementContainingFrame(element, frame, elementsMap)
   );
 };
 
@@ -283,7 +282,7 @@ export const getElementsInResizingFrame = (
   const elementsCompletelyInFrame = new Set([
     ...getElementsCompletelyInFrame(allElements, frame, elementsMap),
     ...prevElementsInFrame.filter((element) =>
-      isElementContainingFrame(allElements, element, frame, elementsMap),
+      isElementContainingFrame(element, frame, elementsMap),
     ),
   ]);
 
@@ -370,10 +369,55 @@ export const getElementsInNewFrame = (
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  return omitGroupsContainingFrameLikes(
-    elements,
-    getElementsCompletelyInFrame(elements, frame, elementsMap),
+  return omitPartialGroups(
+    omitGroupsContainingFrameLikes(
+      elements,
+      getElementsCompletelyInFrame(elements, frame, elementsMap),
+    ),
+    frame,
+    elementsMap,
   );
+};
+
+export const omitPartialGroups = (
+  elements: ExcalidrawElement[],
+  frame: ExcalidrawFrameLikeElement,
+  allElementsMap: ElementsMap,
+) => {
+  const elementsToReturn = [];
+  const checkedGroups = new Map<string, boolean>();
+
+  for (const element of elements) {
+    let shouldOmit = false;
+    if (element.groupIds.length > 0) {
+      // if some partial group should be omitted, then all elements in that group should be omitted
+      if (element.groupIds.some((gid) => checkedGroups.get(gid))) {
+        shouldOmit = true;
+      } else {
+        const allElementsInGroup = new Set(
+          element.groupIds.flatMap((gid) =>
+            getElementsInGroup(allElementsMap, gid),
+          ),
+        );
+
+        shouldOmit = !elementsAreInFrameBounds(
+          Array.from(allElementsInGroup),
+          frame,
+          allElementsMap,
+        );
+      }
+
+      element.groupIds.forEach((gid) => {
+        checkedGroups.set(gid, shouldOmit);
+      });
+    }
+
+    if (!shouldOmit) {
+      elementsToReturn.push(element);
+    }
+  }
+
+  return elementsToReturn;
 };
 
 export const getContainingFrame = (
@@ -454,6 +498,7 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   allElements: T,
   elementsToAdd: NonDeletedExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
+  appState: AppState,
 ): T => {
   const elementsMap = arrayToMap(allElements);
   const currTargetFrameChildrenMap = new Map<ExcalidrawElement["id"], true>();
@@ -485,6 +530,17 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
     if (
       isFrameLikeElement(element) ||
       (element.frameId && otherFrames.has(element.frameId))
+    ) {
+      continue;
+    }
+
+    // if the element is already in another frame (which is also in elementsToAdd),
+    // it means that frame and children are selected at the same time
+    // => keep original frame membership, do not add to the target frame
+    if (
+      element.frameId &&
+      appState.selectedElementIds[element.id] &&
+      appState.selectedElementIds[element.frameId]
     ) {
       continue;
     }
@@ -577,6 +633,7 @@ export const replaceAllElementsInFrame = <T extends ExcalidrawElement>(
     removeAllElementsFromFrame(allElements, frame),
     nextElementsInFrame,
     frame,
+    app.state,
   ).slice();
 };
 
@@ -683,6 +740,16 @@ export const getTargetFrame = (
     ? getContainerElement(element, elementsMap) || element
     : element;
 
+  // if the element and its containing frame are both selected, then
+  // the containing frame is the target frame
+  if (
+    _element.frameId &&
+    appState.selectedElementIds[_element.id] &&
+    appState.selectedElementIds[_element.frameId]
+  ) {
+    return getContainingFrame(_element, elementsMap);
+  }
+
   return appState.selectedElementIds[_element.id] &&
     appState.selectedElementsAreBeingDragged
     ? appState.frameToHighlight
@@ -695,61 +762,151 @@ export const isElementInFrame = (
   element: ExcalidrawElement,
   allElementsMap: ElementsMap,
   appState: StaticCanvasAppState,
+  opts?: {
+    targetFrame?: ExcalidrawFrameLikeElement;
+    checkedGroups?: Map<string, boolean>;
+  },
 ) => {
-  const frame = getTargetFrame(element, allElementsMap, appState);
+  const frame =
+    opts?.targetFrame ?? getTargetFrame(element, allElementsMap, appState);
+
+  if (!frame) {
+    return false;
+  }
+
   const _element = isTextElement(element)
     ? getContainerElement(element, allElementsMap) || element
     : element;
 
-  if (frame) {
-    // Perf improvement:
-    // For an element that's already in a frame, if it's not being dragged
-    // then there is no need to refer to geometry (which, yes, is slow) to check if it's in a frame.
-    // It has to be in its containing frame.
-    if (
-      !appState.selectedElementIds[element.id] ||
-      !appState.selectedElementsAreBeingDragged
-    ) {
+  const setGroupsInFrame = (isInFrame: boolean) => {
+    if (opts?.checkedGroups) {
+      _element.groupIds.forEach((groupId) => {
+        opts.checkedGroups?.set(groupId, isInFrame);
+      });
+    }
+  };
+
+  if (
+    // if the element is not selected, or it is selected but not being dragged,
+    // frame membership won't update, so return true
+    !appState.selectedElementIds[_element.id] ||
+    !appState.selectedElementsAreBeingDragged ||
+    // if both frame and element are selected, won't update membership, so return true
+    (appState.selectedElementIds[_element.id] &&
+      appState.selectedElementIds[frame.id])
+  ) {
+    return true;
+  }
+
+  if (_element.groupIds.length === 0) {
+    return elementOverlapsWithFrame(_element, frame, allElementsMap);
+  }
+
+  for (const gid of _element.groupIds) {
+    if (opts?.checkedGroups?.has(gid)) {
+      return opts.checkedGroups.get(gid)!!;
+    }
+  }
+
+  const allElementsInGroup = new Set(
+    _element.groupIds
+      .filter((gid) => {
+        if (opts?.checkedGroups) {
+          return !opts.checkedGroups.has(gid);
+        }
+        return true;
+      })
+      .flatMap((gid) => getElementsInGroup(allElementsMap, gid)),
+  );
+
+  if (appState.editingGroupId && appState.selectedElementsAreBeingDragged) {
+    const selectedElements = new Set(
+      getSelectedElements(allElementsMap, appState),
+    );
+
+    const editingGroupOverlapsFrame = appState.frameToHighlight !== null;
+
+    if (editingGroupOverlapsFrame) {
       return true;
     }
 
-    if (_element.groupIds.length === 0) {
-      return elementOverlapsWithFrame(_element, frame, allElementsMap);
+    selectedElements.forEach((selectedElement) => {
+      allElementsInGroup.delete(selectedElement);
+    });
+  }
+
+  for (const elementInGroup of allElementsInGroup) {
+    if (isFrameLikeElement(elementInGroup)) {
+      setGroupsInFrame(false);
+      return false;
+    }
+  }
+
+  for (const elementInGroup of allElementsInGroup) {
+    if (elementOverlapsWithFrame(elementInGroup, frame, allElementsMap)) {
+      setGroupsInFrame(true);
+      return true;
+    }
+  }
+
+  return false;
+};
+
+export const shouldApplyFrameClip = (
+  element: ExcalidrawElement,
+  frame: ExcalidrawFrameLikeElement,
+  appState: StaticCanvasAppState,
+  elementsMap: ElementsMap,
+  checkedGroups?: Map<string, boolean>,
+) => {
+  if (!appState.frameRendering || !appState.frameRendering.clip) {
+    return false;
+  }
+
+  // for individual elements, only clip when the element is
+  // a. overlapping with the frame, or
+  // b. containing the frame, for example when an element is used as a background
+  //    and is therefore bigger than the frame and completely contains the frame
+  const shouldClipElementItself =
+    isElementIntersectingFrame(element, frame, elementsMap) ||
+    isElementContainingFrame(element, frame, elementsMap);
+
+  if (shouldClipElementItself) {
+    for (const groupId of element.groupIds) {
+      checkedGroups?.set(groupId, true);
     }
 
-    const allElementsInGroup = new Set(
-      _element.groupIds.flatMap((gid) =>
-        getElementsInGroup(allElementsMap, gid),
-      ),
-    );
+    return true;
+  }
 
-    if (appState.editingGroupId && appState.selectedElementsAreBeingDragged) {
-      const selectedElements = new Set(
-        getSelectedElements(allElementsMap, appState),
-      );
+  // if an element is outside the frame, but is part of a group that has some elements
+  // "in" the frame, we should clip the element
+  if (
+    !shouldClipElementItself &&
+    element.groupIds.length > 0 &&
+    !elementsAreInFrameBounds([element], frame, elementsMap)
+  ) {
+    let shouldClip = false;
 
-      const editingGroupOverlapsFrame = appState.frameToHighlight !== null;
-
-      if (editingGroupOverlapsFrame) {
-        return true;
+    // if no elements are being dragged, we can skip the geometry check
+    // because we know if the element is in the given frame or not
+    if (!appState.selectedElementsAreBeingDragged) {
+      shouldClip = element.frameId === frame.id;
+      for (const groupId of element.groupIds) {
+        checkedGroups?.set(groupId, shouldClip);
       }
-
-      selectedElements.forEach((selectedElement) => {
-        allElementsInGroup.delete(selectedElement);
+    } else {
+      shouldClip = isElementInFrame(element, elementsMap, appState, {
+        targetFrame: frame,
+        checkedGroups,
       });
     }
 
-    for (const elementInGroup of allElementsInGroup) {
-      if (isFrameLikeElement(elementInGroup)) {
-        return false;
-      }
+    for (const groupId of element.groupIds) {
+      checkedGroups?.set(groupId, shouldClip);
     }
 
-    for (const elementInGroup of allElementsInGroup) {
-      if (elementOverlapsWithFrame(elementInGroup, frame, allElementsMap)) {
-        return true;
-      }
-    }
+    return shouldClip;
   }
 
   return false;
@@ -777,5 +934,18 @@ export const getElementsOverlappingFrame = (
       // removes elements who are overlapping, but are in a different frame,
       // and thus invisible in target frame
       .filter((el) => !el.frameId || el.frameId === frame.id)
+  );
+};
+
+export const frameAndChildrenSelectedTogether = (
+  selectedElements: readonly ExcalidrawElement[],
+) => {
+  const selectedElementsMap = arrayToMap(selectedElements);
+
+  return (
+    selectedElements.length > 1 &&
+    selectedElements.some(
+      (element) => element.frameId && selectedElementsMap.has(element.frameId),
+    )
   );
 };

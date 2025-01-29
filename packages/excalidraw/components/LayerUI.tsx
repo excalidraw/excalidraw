@@ -41,8 +41,7 @@ import { trackEvent } from "../analytics";
 import { useDevice } from "./App";
 import Footer from "./footer/Footer";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { jotaiScope } from "../jotai";
-import { Provider, useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "../editor-jotai";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
@@ -148,10 +147,9 @@ const LayerUI = ({
   const device = useDevice();
   const tunnels = useInitializeTunnels();
 
-  const [eyeDropperState, setEyeDropperState] = useAtom(
-    activeEyeDropperAtom,
-    jotaiScope,
-  );
+  const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
+
+  const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   const renderJSONExportDialog = () => {
     if (!UIOptions.canvasActions.export) {
@@ -221,6 +219,7 @@ const LayerUI = ({
           appState={appState}
           elementsMap={app.scene.getNonDeletedElementsMap()}
           renderAction={actionManager.renderAction}
+          app={app}
         />
       </Island>
     </Section>
@@ -382,7 +381,7 @@ const LayerUI = ({
     );
   };
 
-  const isSidebarDocked = useAtomValue(isSidebarDockedAtom, jotaiScope);
+  const isSidebarDocked = useAtomValue(isSidebarDockedAtom);
 
   const layerUIJSX = (
     <>
@@ -566,11 +565,11 @@ const LayerUI = ({
 
   return (
     <UIAppStateContext.Provider value={appState}>
-      <Provider scope={tunnels.jotaiScope}>
+      <TunnelsJotaiProvider>
         <TunnelsContext.Provider value={tunnels}>
           {layerUIJSX}
         </TunnelsContext.Provider>
-      </Provider>
+      </TunnelsJotaiProvider>
     </UIAppStateContext.Provider>
   );
 };
