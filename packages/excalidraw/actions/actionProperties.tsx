@@ -121,6 +121,7 @@ import {
 import { LinearElementEditor } from "../element/linearElementEditor";
 import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
+import { Range } from "../components/Range";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -630,25 +631,12 @@ export const actionChangeOpacity = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
-    <label className="control-label">
-      {t("labels.opacity")}
-      <input
-        type="range"
-        min="0"
-        max="100"
-        step="10"
-        onChange={(event) => updateData(+event.target.value)}
-        value={
-          getFormValue(
-            elements,
-            appState,
-            (element) => element.opacity,
-            true,
-            appState.currentItemOpacity,
-          ) ?? undefined
-        }
-      />
-    </label>
+    <Range
+      updateData={updateData}
+      elements={elements}
+      appState={appState}
+      testId="opacity"
+    />
   ),
 });
 
