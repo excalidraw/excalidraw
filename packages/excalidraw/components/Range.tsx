@@ -34,7 +34,7 @@ export const Range = ({
       const position =
         (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
       valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${value}%, var(--button-bg, var(--island-bg-color)) ${value}%, var(--button-bg, var(--island-bg-color)) 100%)`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
     }
   }, [value]);
 
