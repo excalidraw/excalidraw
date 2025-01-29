@@ -27,7 +27,7 @@ export const Range = ({ updateData, appState, elements }: RangeProps) => {
       const thumbWidth = 15; // 15 is the width of the thumb
       const position = (value / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
       valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${value}%, var(--button-bg) ${value}%, var(--button-bg) 100%)`;
+      rangeElement.style.background = `linear-gradient(to right, var(--color-primary) 0%, var(--color-primary) ${value}%, var(--button-bg, var(--island-bg-color)) ${value}%, var(--button-bg, var(--island-bg-color)) 100%)`;
     }
   }, [value]);
   
