@@ -27,7 +27,7 @@ describe("actionStyles", () => {
     await act(async () => {});
   });
 
-  it.only("should copy & paste styles via keyboard", async () => {
+  it("should copy & paste styles via keyboard", async () => {
     UI.clickTool("rectangle");
     mouse.down(10, 10);
     mouse.up(20, 20);
