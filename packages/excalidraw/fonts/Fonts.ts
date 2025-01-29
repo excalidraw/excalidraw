@@ -3,7 +3,6 @@ import {
   FONT_FAMILY_FALLBACKS,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
-  isSafari,
   getFontFamilyFallbacks,
 } from "../constants";
 import { isTextElement } from "../element";
@@ -137,48 +136,26 @@ export class Fonts {
 
   /**
    * Load font faces for a given scene and trigger scene update.
-   *
-   * FontFaceSet loadingdone event we listen on may not always
-   * fire (looking at you Safari), so on init we manually load all
-   * fonts and rerender scene text elements once done.
-   *
-   * For Safari we make sure to check against each loaded font face
-   * with the unique characters per family in the scene,
-   * otherwise fonts might remain unloaded.
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const charsPerFamily = isSafari
-      ? Fonts.getCharsPerFamily(this.scene.getNonDeletedElements())
-      : undefined;
+    const charsPerFamily = Fonts.getCharsPerFamily(
+      this.scene.getNonDeletedElements(),
+    );
 
     return Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
   };
 
   /**
    * Load font faces for passed elements - use when the scene is unavailable (i.e. export).
-   *
-   * For Safari we make sure to check against each loaded font face,
-   * with the unique characters per family in the elements
-   * otherwise fonts might remain unloaded.
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
   ): Promise<FontFace[]> => {
     const fontFamilies = Fonts.getUniqueFamilies(elements);
-    const charsPerFamily = isSafari
-      ? Fonts.getCharsPerFamily(elements)
-      : undefined;
+    const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
     return Fonts.loadFontFaces(fontFamilies, charsPerFamily);
-  };
-
-  /**
-   * Load all registered font faces.
-   */
-  public static loadAllFonts = async (): Promise<FontFace[]> => {
-    const allFamilies = Fonts.getAllFamilies();
-    return Fonts.loadFontFaces(allFamilies);
   };
 
   /**
@@ -223,7 +200,7 @@ export class Fonts {
 
   private static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
-    charsPerFamily?: Record<number, Set<string>>,
+    charsPerFamily: Record<number, Set<string>>,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
     for (const { fontFaces, metadata } of Fonts.registered.values()) {
@@ -248,7 +225,7 @@ export class Fonts {
 
   private static *fontFacesLoader(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
-    charsPerFamily?: Record<number, Set<string>>,
+    charsPerFamily: Record<number, Set<string>>,
   ): Generator<Promise<void | readonly [number, FontFace[]]>> {
     for (const [index, fontFamily] of fontFamilies.entries()) {
       const font = getFontString({
@@ -256,12 +233,9 @@ export class Fonts {
         fontSize: 16,
       });
 
-      // WARN: without "text" param it does not have to mean that all font faces are loaded, instead it could be just one!
-      // for Safari on init, we rather check with the "text" param, even though it's less efficient, as otherwise fonts might remain unloaded
-      const text =
-        isSafari && charsPerFamily
-          ? Fonts.getCharacters(charsPerFamily, fontFamily)
-          : "";
+      // WARN: without "text" param it does not have to mean that all font faces are loaded as it could be just one irrelevant font face!
+      // instead, we are always checking chars used in the family, so that no required font faces remain unloaded
+      const text = Fonts.getCharacters(charsPerFamily, fontFamily);
 
       if (!window.document.fonts.check(font, text)) {
         yield promiseTry(async () => {
