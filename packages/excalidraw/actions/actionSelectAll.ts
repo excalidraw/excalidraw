@@ -5,7 +5,6 @@ import { getNonDeletedElements, isTextElement } from "../element";
 import type { ExcalidrawElement } from "../element/types";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { excludeElementsInFramesFromSelection } from "../scene/selection";
 import { selectAllIcon } from "../components/icons";
 import { StoreAction } from "../store";
 
@@ -20,17 +19,17 @@ export const actionSelectAll = register({
       return false;
     }
 
-    const selectedElementIds = excludeElementsInFramesFromSelection(
-      elements.filter(
+    const selectedElementIds = elements
+      .filter(
         (element) =>
           !element.isDeleted &&
           !(isTextElement(element) && element.containerId) &&
           !element.locked,
-      ),
-    ).reduce((map: Record<ExcalidrawElement["id"], true>, element) => {
-      map[element.id] = true;
-      return map;
-    }, {});
+      )
+      .reduce((map: Record<ExcalidrawElement["id"], true>, element) => {
+        map[element.id] = true;
+        return map;
+      }, {});
 
     return {
       appState: {
