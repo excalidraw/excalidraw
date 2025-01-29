@@ -58,6 +58,14 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
+    
+    filter: var(--theme-filter);
+  }
+
+  .library-unit__dragger > svg {
+    flex-grow: 1;
+    max-height: 100%;
+    max-width: 100%;
   }
 
   .library-unit__checkbox-container,
