@@ -24,7 +24,7 @@ import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { useUIAppState } from "../context/ui-appState";
 import clsx from "clsx";
-import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+import { useLibraryCache } from "../hooks/useLibraryItemPng";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,

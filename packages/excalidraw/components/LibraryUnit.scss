@@ -54,13 +54,10 @@
     justify-content: center;
     height: 100%;
     width: 100%;
-  }
 
-  .library-unit__dragger > svg {
-    filter: var(--theme-filter);
-    flex-grow: 1;
-    max-height: 100%;
-    max-width: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
   }
 
   .library-unit__checkbox-container,

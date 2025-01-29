@@ -5,8 +5,7 @@ import type { LibraryItem } from "../types";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
-import type { SvgCache } from "../hooks/useLibraryItemSvg";
-import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
+import { PngCache, useLibraryItemPng } from "../hooks/useLibraryItemPng";
 
 export const LibraryUnit = memo(
   ({
@@ -17,7 +16,7 @@ export const LibraryUnit = memo(
     selected,
     onToggle,
     onDrag,
-    svgCache,
+    cache,
   }: {
     id: LibraryItem["id"] | /** for pending item */ null;
     elements?: LibraryItem["elements"];
@@ -26,10 +25,10 @@ export const LibraryUnit = memo(
     selected: boolean;
     onToggle: (id: string, event: React.MouseEvent) => void;
     onDrag: (id: string, event: React.DragEvent) => void;
-    svgCache: SvgCache;
+    cache: PngCache;
   }) => {
     const ref = useRef<HTMLDivElement | null>(null);
-    const svg = useLibraryItemSvg(id, elements, svgCache);
+    const cachedItem = useLibraryItemPng(id, elements, cache);
 
     useEffect(() => {
       const node = ref.current;
@@ -38,14 +37,14 @@ export const LibraryUnit = memo(
         return;
       }
 
-      if (svg) {
-        node.innerHTML = svg.outerHTML;
+      if (cachedItem) {
+        node.style.backgroundImage = `url(${cachedItem.url})`;
       }
 
       return () => {
         node.innerHTML = "";
       };
-    }, [svg]);
+    }, [cachedItem]);
 
     const [isHovered, setIsHovered] = useState(false);
     const isMobile = useDevice().editor.isMobile;
@@ -59,7 +58,7 @@ export const LibraryUnit = memo(
           "library-unit__active": elements,
           "library-unit--hover": elements && isHovered,
           "library-unit--selected": selected,
-          "library-unit--skeleton": !svg,
+          "library-unit--skeleton": !cachedItem,
         })}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
