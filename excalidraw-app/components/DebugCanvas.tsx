@@ -122,7 +122,7 @@ const render = (
         );
         break;
       default:
-        throw new Error("Unknown element type");
+        throw new Error(`Unknown element type ${JSON.stringify(el)}`);
     }
   });
 };

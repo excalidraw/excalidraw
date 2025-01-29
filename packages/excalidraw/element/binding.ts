@@ -70,13 +70,19 @@ import {
   vectorScale,
   vectorNormalize,
   vectorRotate,
+  curve,
 } from "../../math";
 import { distanceToBindableElement } from "./distance";
 import { intersectElementWithLine } from "./collision";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { _generateElementShape } from "../scene/Shape";
 import { COLOR_PALETTE } from "../colors";
-import { debugClear, debugDrawPoint } from "../visualdebug";
+import {
+  debugClear,
+  debugDrawCubicBezier,
+  debugDrawLine,
+  debugDrawPoint,
+} from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -704,7 +710,7 @@ const calculateFocusAndGap = (
   );
   return {
     focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
-    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
+    gap: FIXED_BINDING_DISTANCE,
   };
 };
 
@@ -1199,20 +1205,93 @@ const getLinearElementTangentVectorAtStartOrEnd = (
         shapes[0].sets[0].type === "path",
       "shape must be an array of Drawable with at least one shape",
     );
-
   // @ts-ignore
   const ops = shapes[0].sets[0].ops;
   const bcurve = ops[startOrEnd === "start" ? 1 : ops.length - 1];
 
-  invariant(bcurve.op === "bcurveTo", "selected op must be a bcurve");
+  import.meta.env.DEV &&
+    invariant(bcurve.op === "bcurveTo", "selected op must be a bcurve");
 
-  return vectorFromPoint(
-    pointFrom<LocalPoint>(
-      bcurve.data[startOrEnd === "start" ? 0 : 4],
-      bcurve.data[startOrEnd === "start" ? 1 : 5],
+  debugClear();
+  debugDrawCubicBezier(
+    curve(
+      pointFrom<GlobalPoint>(
+        linearElement.x +
+          ops[startOrEnd === "start" ? 2 : ops.length - 2].data[4],
+        linearElement.y +
+          ops[startOrEnd === "start" ? 2 : ops.length - 2].data[5],
+      ),
+      pointFrom<GlobalPoint>(
+        linearElement.x + bcurve.data[1],
+        linearElement.y + bcurve.data[2],
+      ),
+      pointFrom<GlobalPoint>(
+        linearElement.x + bcurve.data[2],
+        linearElement.y + bcurve.data[3],
+      ),
+      pointFrom<GlobalPoint>(
+        linearElement.x + bcurve.data[4],
+        linearElement.y + bcurve.data[5],
+      ),
     ),
-    pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
+    { color: "red", permanent: true },
   );
+  // debugDrawPoint(
+  //   pointFrom<GlobalPoint>(
+  //     linearElement.x + bcurve.data[1],
+  //     linearElement.y + bcurve.data[2],
+  //   ),
+  //   { color: "red", permanent: true },
+  // );
+  // debugDrawPoint(
+  //   pointFrom<GlobalPoint>(
+  //     linearElement.x + bcurve.data[2],
+  //     linearElement.y + bcurve.data[3],
+  //   ),
+  //   { color: "red", permanent: true },
+  // );
+  // debugDrawPoint(
+  //   pointFrom<GlobalPoint>(
+  //     linearElement.x + bcurve.data[4],
+  //     linearElement.y + bcurve.data[5],
+  //   ),
+  //   { color: "green", permanent: true },
+  // );
+  // debugDrawLine(
+  //   line(
+  //     pointFrom<GlobalPoint>(
+  //       linearElement.x + bcurve.data[2],
+  //       linearElement.y + bcurve.data[3],
+  //     ),
+  //     pointFrom<GlobalPoint>(
+  //       linearElement.x + bcurve.data[4],
+  //       linearElement.y + bcurve.data[5],
+  //     ),
+  //   ),
+  //   { color: "red", permanent: true },
+  // );
+  // debugDrawLine(
+  //   line(
+  //     pointFrom<GlobalPoint>(
+  //       linearElement.x + bcurve.data[1],
+  //       linearElement.y + bcurve.data[2],
+  //     ),
+  //     pointFrom<GlobalPoint>(
+  //       linearElement.x + ops[ops.length - 2][4],
+  //       linearElement.y + ops[ops.length - 2][5],
+  //     ),
+  //   ),
+  //   { color: "green", permanent: true },
+  // );
+  return startOrEnd === "start"
+    ? vectorFromPoint(
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
+      )
+    : vectorFromPoint(
+        pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
+        pointFrom<LocalPoint>(bcurve.data[4], bcurve.data[5]),
+      );
 };
 
 const updateBoundPoint = (
@@ -1287,12 +1366,16 @@ const updateBoundPoint = (
       linearElement,
       startOrEnd === "startBinding" ? "start" : "end",
     );
+    const edgePointAbsolute =
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        linearElement,
+        edgePointIndex,
+        elementsMap,
+      );
+
     const intersections = intersectElementWithLine(
       bindableElement,
-      line(
-        pointFromVector(tangentVector, focusPointAbsolute),
-        focusPointAbsolute,
-      ),
+      line(adjacentPoint, focusPointAbsolute),
       binding.gap,
     );
     if (!intersections || intersections.length === 0) {
@@ -1301,20 +1384,32 @@ const updateBoundPoint = (
       newEdgePoint = focusPointAbsolute;
     } else {
       // Guaranteed to intersect because focusPoint is always inside the shape
-      const edgePointAbsolute =
-        LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          linearElement,
-          edgePointIndex,
-          elementsMap,
-        );
 
       intersections.sort(
         (g, h) =>
           pointDistanceSq(g!, edgePointAbsolute) -
           pointDistanceSq(h!, edgePointAbsolute),
       );
-      debugClear();
-      debugDrawPoint(focusPointAbsolute, { color: "red", permanent: true });
+      // debugClear();
+      // debugDrawPoint(edgePointAbsolute, { color: "blue", permanent: true });
+      // debugDrawPoint(focusPointAbsolute, { color: "red", permanent: true });
+      // debugDrawPoint(
+      //   pointFrom<GlobalPoint>(
+      //     bindableElement.x + bindableElement.width / 2,
+      //     bindableElement.y + bindableElement.height / 2,
+      //   ),
+      //   { color: "gray", permanent: true },
+      // );
+      // debugDrawLine(
+      //   line(
+      //     edgePointAbsolute,
+      //     pointFromVector(vectorScale(tangentVector, 10), edgePointAbsolute),
+      //   ),
+      //   {
+      //     color: "gray",
+      //     permanent: true,
+      //   },
+      // );
       newEdgePoint = intersections[0];
     }
   }

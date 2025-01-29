@@ -281,9 +281,9 @@ const intersectRectanguloidWithLine = (
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
 
-  [...sideIntersections, ...cornerIntersections].forEach((p) =>
-    debugDrawPoint(p, { color: "purple", permanent: true }),
-  );
+  // [...sideIntersections, ...cornerIntersections].forEach((p) =>
+  //   debugDrawPoint(p, { color: "purple", permanent: true }),
+  // );
 
   return (
     [...sideIntersections, ...cornerIntersections]
