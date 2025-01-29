@@ -76,6 +76,7 @@ import { intersectElementWithLine } from "./collision";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { _generateElementShape } from "../scene/Shape";
 import { COLOR_PALETTE } from "../colors";
+import { debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -1136,7 +1137,16 @@ export const snapToMid = (
   return p;
 };
 
-const getTangentVector = (
+/**
+ * In order to precisely determine the binding point even for rough rounded linear elements,
+ * we need to calculate the tangent vector at the start or end of the linear element from the
+ * render shape itself (not the start/end points).
+ *
+ * @param linearElement The linear element to determine the endpoint tangent vector for
+ * @param startOrEnd Specify 'start' or 'end' to determine which endpoint tangent you need
+ * @returns The tangent vector
+ */
+const getLinearElementTangentVectorAtStartOrEnd = (
   linearElement: ExcalidrawLinearElement,
   startOrEnd: "start" | "end",
 ) => {
@@ -1157,12 +1167,14 @@ const getTangentVector = (
     );
   }
 
+  // NOTE: Using _generateElementShape to not pollute the shape cache with fake
+  // shapes that are only used for determining the tangent vector
   const shapes =
     linearElement.roughness > 0
       ? _generateElementShape(
           {
             ...linearElement,
-            roughness: 0,
+            roughness: 0, // We need the exact linear shape, not a rough shape
           },
           new RoughGenerator(),
           {
@@ -1263,12 +1275,6 @@ const updateBoundPoint = (
     binding.focus,
     adjacentPoint,
   );
-  const edgePointAbsolute =
-    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      linearElement,
-      edgePointIndex,
-      elementsMap,
-    );
 
   let newEdgePoint: GlobalPoint;
 
@@ -1277,15 +1283,15 @@ const updateBoundPoint = (
   if (binding.gap === 0) {
     newEdgePoint = focusPointAbsolute;
   } else {
-    const tangentVector = getTangentVector(
+    const tangentVector = getLinearElementTangentVectorAtStartOrEnd(
       linearElement,
       startOrEnd === "startBinding" ? "start" : "end",
     );
     const intersections = intersectElementWithLine(
       bindableElement,
       line(
-        pointFromVector(tangentVector, edgePointAbsolute),
-        edgePointAbsolute,
+        pointFromVector(tangentVector, focusPointAbsolute),
+        focusPointAbsolute,
       ),
       binding.gap,
     );
@@ -1295,11 +1301,19 @@ const updateBoundPoint = (
       newEdgePoint = focusPointAbsolute;
     } else {
       // Guaranteed to intersect because focusPoint is always inside the shape
+      const edgePointAbsolute =
+        LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          linearElement,
+          edgePointIndex,
+          elementsMap,
+        );
+
       intersections.sort(
         (g, h) =>
           pointDistanceSq(g!, edgePointAbsolute) -
           pointDistanceSq(h!, edgePointAbsolute),
       );
+      debugDrawPoint(focusPointAbsolute, { color: "red", permanent: true });
       newEdgePoint = intersections[0];
     }
   }
