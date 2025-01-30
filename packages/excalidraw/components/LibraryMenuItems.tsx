@@ -25,7 +25,7 @@ import {
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
 import { useScrollPosition } from "../hooks/useScrollPosition";
-import { useLibraryCache } from "../hooks/useLibraryItemPng";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
 
@@ -69,7 +69,7 @@ export default function LibraryMenuItems({
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { cache } = useLibraryCache();
+  const { svgCache } = useLibraryCache();
   const unpublishedItems = useMemo(
     () => libraryItems.filter((item) => item.status !== "published"),
     [libraryItems],
@@ -199,7 +199,7 @@ export default function LibraryMenuItems({
   );
 
   const itemsRenderedPerBatch =
-    cache.size >= libraryItems.length
+    svgCache.size >= libraryItems.length
       ? CACHED_ITEMS_RENDERED_PER_BATCH
       : ITEMS_RENDERED_PER_BATCH;
 
@@ -270,7 +270,7 @@ export default function LibraryMenuItems({
                   onItemDrag={onItemDrag}
                   onClick={onAddToLibraryClick}
                   isItemSelected={isItemSelected}
-                  cache={cache}
+                  svgCache={svgCache}
                 />
               )}
               <LibraryMenuSection
@@ -280,7 +280,7 @@ export default function LibraryMenuItems({
                 onItemDrag={onItemDrag}
                 onClick={onItemClick}
                 isItemSelected={isItemSelected}
-                cache={cache}
+                svgCache={svgCache}
               />
             </LibraryMenuSectionGrid>
           )}
@@ -303,7 +303,7 @@ export default function LibraryMenuItems({
                 onItemDrag={onItemDrag}
                 onClick={onItemClick}
                 isItemSelected={isItemSelected}
-                cache={cache}
+                svgCache={svgCache}
               />
             </LibraryMenuSectionGrid>
           ) : unpublishedItems.length > 0 ? (

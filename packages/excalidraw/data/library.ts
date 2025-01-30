@@ -22,7 +22,7 @@ import {
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
 } from "../constants";
-import { libraryItemPngsCache } from "../hooks/useLibraryItemPng";
+import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import {
   arrayToMap,
   cloneJSON,
@@ -235,7 +235,7 @@ class Library {
   destroy = () => {
     this.updateQueue = [];
     this.currLibraryItems = [];
-    editorJotaiStore.set(libraryItemPngsCache, new Map());
+    editorJotaiStore.set(libraryItemSvgsCache, new Map());
     // TODO uncomment after/if we make jotai store scoped to each excal instance
     // jotaiStore.set(libraryItemsAtom, {
     //   status: "loading",

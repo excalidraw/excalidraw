@@ -3,7 +3,7 @@ import React, { memo, useEffect, useState } from "react";
 import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
 import type { LibraryItem } from "../types";
 import type { ExcalidrawElement, NonDeleted } from "../element/types";
-import type { PngCache } from "../hooks/useLibraryItemPng";
+import type { SvgCache } from "../hooks/useLibraryItemSvg";
 import { useTransition } from "../hooks/useTransition";
 
 type LibraryOrPendingItem = (
@@ -20,7 +20,7 @@ interface Props {
   onItemSelectToggle: (id: LibraryItem["id"], event: React.MouseEvent) => void;
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
-  cache: PngCache;
+  svgCache: SvgCache;
   itemsRenderedPerBatch: number;
 }
 
@@ -39,7 +39,7 @@ export const LibraryMenuSection = memo(
     onItemDrag,
     isItemSelected,
     onClick,
-    cache,
+    svgCache,
     itemsRenderedPerBatch,
   }: Props) => {
     const [, startTransition] = useTransition();
@@ -61,7 +61,7 @@ export const LibraryMenuSection = memo(
               elements={item?.elements}
               isPending={!item?.id && !!item?.elements}
               onClick={onClick}
-              cache={cache}
+              svgCache={svgCache}
               id={item?.id}
               selected={isItemSelected(item.id)}
               onToggle={onItemSelectToggle}
