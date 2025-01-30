@@ -63,27 +63,6 @@
     max-width: 100%;
   }
 
-  .library-unit__checkbox-container,
-  .library-unit__checkbox-container:hover,
-  .library-unit__checkbox-container:active {
-    align-items: center;
-    background: none;
-    border: none;
-    color: var(--icon-fill-color);
-    display: flex;
-    justify-content: center;
-    margin: 0;
-    padding: 0.5rem;
-    position: absolute;
-    left: 2rem;
-    bottom: 2rem;
-    cursor: pointer;
-
-    input {
-      cursor: pointer;
-    }
-  }
-
   .library-unit__checkbox {
     position: absolute;
     top: 0.125rem;
@@ -91,7 +70,7 @@
     margin: 0;
 
     .Checkbox-box {
-      margin: 0;
+      margin: 0 !important;
       width: 1rem;
       height: 1rem;
       border-radius: 4px;
