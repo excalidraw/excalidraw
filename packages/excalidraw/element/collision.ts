@@ -27,8 +27,6 @@ import type {
   Radians,
 } from "../../math";
 import {
-  arc,
-  arcLineInterceptPoints,
   curve,
   curveIntersectLine,
   isPointWithinBounds,
@@ -43,10 +41,8 @@ import {
 import { ellipse, ellipseLineIntersectionPoints } from "../../math/ellipse";
 import {
   debugClear,
-  debugDrawArc,
   debugDrawCubicBezier,
   debugDrawLine,
-  debugDrawPoint,
 } from "../visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
