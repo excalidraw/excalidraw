@@ -36,7 +36,6 @@ import type Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
   arrayToMap,
-  invariant,
   isBindingFallthroughEnabled,
   tupleToCoors,
 } from "../utils";
@@ -70,19 +69,9 @@ import {
   vectorScale,
   vectorNormalize,
   vectorRotate,
-  curve,
 } from "../../math";
 import { distanceToBindableElement } from "./distance";
 import { intersectElementWithLine } from "./collision";
-import { RoughGenerator } from "roughjs/bin/generator";
-import { _generateElementShape } from "../scene/Shape";
-import { COLOR_PALETTE } from "../colors";
-import {
-  debugClear,
-  debugDrawCubicBezier,
-  debugDrawLine,
-  debugDrawPoint,
-} from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -1143,157 +1132,6 @@ export const snapToMid = (
   return p;
 };
 
-/**
- * In order to precisely determine the binding point even for rough rounded linear elements,
- * we need to calculate the tangent vector at the start or end of the linear element from the
- * render shape itself (not the start/end points).
- *
- * @param linearElement The linear element to determine the endpoint tangent vector for
- * @param startOrEnd Specify 'start' or 'end' to determine which endpoint tangent you need
- * @returns The tangent vector
- */
-const getLinearElementTangentVectorAtStartOrEnd = (
-  linearElement: ExcalidrawLinearElement,
-  startOrEnd: "start" | "end",
-) => {
-  import.meta.env.DEV &&
-    invariant(
-      linearElement.points.length > 1,
-      "line must have at least 2 points to determine tangent vector",
-    );
-
-  if (linearElement.roundness == null || isElbowArrow(linearElement)) {
-    return vectorFromPoint(
-      linearElement.points[
-        startOrEnd === "start" ? 0 : linearElement.points.length - 1
-      ],
-      linearElement.points[
-        startOrEnd === "start" ? 1 : linearElement.points.length - 2
-      ],
-    );
-  }
-
-  // NOTE: Using _generateElementShape to not pollute the shape cache with fake
-  // shapes that are only used for determining the tangent vector
-  const shapes =
-    linearElement.roughness > 0
-      ? _generateElementShape(
-          {
-            ...linearElement,
-            roughness: 0, // We need the exact linear shape, not a rough shape
-          },
-          new RoughGenerator(),
-          {
-            isExporting: false,
-            canvasBackgroundColor: COLOR_PALETTE.white,
-            embedsValidationStatus: null,
-          },
-        )
-      : _generateElementShape(linearElement, new RoughGenerator(), {
-          isExporting: false,
-          canvasBackgroundColor: COLOR_PALETTE.white,
-          embedsValidationStatus: null,
-        });
-
-  import.meta.env.DEV &&
-    invariant(
-      shapes != null &&
-        Array.isArray(shapes) &&
-        shapes.length > 0 &&
-        shapes[0].shape === "curve" &&
-        shapes[0].sets[0] &&
-        shapes[0].sets[0].type === "path",
-      "shape must be an array of Drawable with at least one shape",
-    );
-  // @ts-ignore
-  const ops = shapes[0].sets[0].ops;
-  const bcurve = ops[startOrEnd === "start" ? 1 : ops.length - 1];
-
-  import.meta.env.DEV &&
-    invariant(bcurve.op === "bcurveTo", "selected op must be a bcurve");
-
-  debugClear();
-  debugDrawCubicBezier(
-    curve(
-      pointFrom<GlobalPoint>(
-        linearElement.x +
-          ops[startOrEnd === "start" ? 2 : ops.length - 2].data[4],
-        linearElement.y +
-          ops[startOrEnd === "start" ? 2 : ops.length - 2].data[5],
-      ),
-      pointFrom<GlobalPoint>(
-        linearElement.x + bcurve.data[1],
-        linearElement.y + bcurve.data[2],
-      ),
-      pointFrom<GlobalPoint>(
-        linearElement.x + bcurve.data[2],
-        linearElement.y + bcurve.data[3],
-      ),
-      pointFrom<GlobalPoint>(
-        linearElement.x + bcurve.data[4],
-        linearElement.y + bcurve.data[5],
-      ),
-    ),
-    { color: "red", permanent: true },
-  );
-  // debugDrawPoint(
-  //   pointFrom<GlobalPoint>(
-  //     linearElement.x + bcurve.data[1],
-  //     linearElement.y + bcurve.data[2],
-  //   ),
-  //   { color: "red", permanent: true },
-  // );
-  // debugDrawPoint(
-  //   pointFrom<GlobalPoint>(
-  //     linearElement.x + bcurve.data[2],
-  //     linearElement.y + bcurve.data[3],
-  //   ),
-  //   { color: "red", permanent: true },
-  // );
-  // debugDrawPoint(
-  //   pointFrom<GlobalPoint>(
-  //     linearElement.x + bcurve.data[4],
-  //     linearElement.y + bcurve.data[5],
-  //   ),
-  //   { color: "green", permanent: true },
-  // );
-  // debugDrawLine(
-  //   line(
-  //     pointFrom<GlobalPoint>(
-  //       linearElement.x + bcurve.data[2],
-  //       linearElement.y + bcurve.data[3],
-  //     ),
-  //     pointFrom<GlobalPoint>(
-  //       linearElement.x + bcurve.data[4],
-  //       linearElement.y + bcurve.data[5],
-  //     ),
-  //   ),
-  //   { color: "red", permanent: true },
-  // );
-  // debugDrawLine(
-  //   line(
-  //     pointFrom<GlobalPoint>(
-  //       linearElement.x + bcurve.data[1],
-  //       linearElement.y + bcurve.data[2],
-  //     ),
-  //     pointFrom<GlobalPoint>(
-  //       linearElement.x + ops[ops.length - 2][4],
-  //       linearElement.y + ops[ops.length - 2][5],
-  //     ),
-  //   ),
-  //   { color: "green", permanent: true },
-  // );
-  return startOrEnd === "start"
-    ? vectorFromPoint(
-        pointFrom<LocalPoint>(0, 0),
-        pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
-      )
-    : vectorFromPoint(
-        pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
-        pointFrom<LocalPoint>(bcurve.data[4], bcurve.data[5]),
-      );
-};
-
 const updateBoundPoint = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "startBinding" | "endBinding",
@@ -1362,10 +1200,6 @@ const updateBoundPoint = (
   if (binding.gap === 0) {
     newEdgePoint = focusPointAbsolute;
   } else {
-    const tangentVector = getLinearElementTangentVectorAtStartOrEnd(
-      linearElement,
-      startOrEnd === "startBinding" ? "start" : "end",
-    );
     const edgePointAbsolute =
       LinearElementEditor.getPointAtIndexGlobalCoordinates(
         linearElement,

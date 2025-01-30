@@ -1,6 +1,6 @@
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Options } from "roughjs/bin/core";
-import type { RoughGenerator } from "roughjs/bin/generator";
+import { RoughGenerator } from "roughjs/bin/generator";
 import { getDiamondPoints, getArrowheadPoints } from "../element";
 import type { ElementShapes } from "./types";
 import type {
@@ -11,7 +11,7 @@ import type {
   Arrowhead,
 } from "../element/types";
 import { generateFreeDrawShape } from "../renderer/renderElement";
-import { isTransparent, assertNever } from "../utils";
+import { isTransparent, assertNever, invariant } from "../utils";
 import { simplify } from "points-on-curve";
 import { ROUGHNESS } from "../constants";
 import {
@@ -23,9 +23,15 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
-import { pointFrom, pointDistance, type LocalPoint } from "../../math";
+import {
+  pointFrom,
+  pointDistance,
+  type LocalPoint,
+  vectorFromPoint,
+} from "../../math";
 import { getCornerRadius, isPathALoop } from "../shapes";
 import { headingForPointIsHorizontal } from "../element/heading";
+import { COLOR_PALETTE } from "../colors";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -586,4 +592,84 @@ const generateElbowArrowShape = (
   d.push(`L ${points[points.length - 1][0]} ${points[points.length - 1][1]}`);
 
   return d.join(" ");
+};
+
+/**
+ * In order to precisely determine the binding point even for rough rounded linear elements,
+ * we need to calculate the tangent vector at the start or end of the linear element from the
+ * render shape itself (not the start/end points).
+ *
+ * @param linearElement The linear element to determine the endpoint tangent vector for
+ * @param startOrEnd Specify 'start' or 'end' to determine which endpoint tangent you need
+ * @returns The tangent vector
+ */
+export const getLinearElementTangentVectorAtStartOrEnd = (
+  linearElement: ExcalidrawLinearElement,
+  startOrEnd: "start" | "end",
+) => {
+  import.meta.env.DEV &&
+    invariant(
+      linearElement.points.length > 1,
+      "line must have at least 2 points to determine tangent vector",
+    );
+
+  if (linearElement.roundness == null || isElbowArrow(linearElement)) {
+    return vectorFromPoint(
+      linearElement.points[
+        startOrEnd === "start" ? 0 : linearElement.points.length - 1
+      ],
+      linearElement.points[
+        startOrEnd === "start" ? 1 : linearElement.points.length - 2
+      ],
+    );
+  }
+
+  // NOTE: Using _generateElementShape to not pollute the shape cache with fake
+  // shapes that are only used for determining the tangent vector
+  const shapes =
+    linearElement.roughness > 0
+      ? _generateElementShape(
+          {
+            ...linearElement,
+            roughness: 0, // We need the exact linear shape, not a rough shape
+          },
+          new RoughGenerator(),
+          {
+            isExporting: false,
+            canvasBackgroundColor: COLOR_PALETTE.white,
+            embedsValidationStatus: null,
+          },
+        )
+      : _generateElementShape(linearElement, new RoughGenerator(), {
+          isExporting: false,
+          canvasBackgroundColor: COLOR_PALETTE.white,
+          embedsValidationStatus: null,
+        });
+
+  import.meta.env.DEV &&
+    invariant(
+      shapes != null &&
+        Array.isArray(shapes) &&
+        shapes.length > 0 &&
+        shapes[0].shape === "curve" &&
+        shapes[0].sets[0] &&
+        shapes[0].sets[0].type === "path",
+      "shape must be an array of Drawable with at least one shape",
+    );
+  // @ts-ignore
+  const ops = shapes[0].sets[0].ops;
+  const bcurve = ops[startOrEnd === "start" ? 1 : ops.length - 1];
+
+  import.meta.env.DEV &&
+    invariant(bcurve.op === "bcurveTo", "selected op must be a bcurve");
+
+  return startOrEnd === "start"
+    ? vectorFromPoint(
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
+      )
+    : vectorFromPoint(
+        pointFrom<LocalPoint>(bcurve.data[2], bcurve.data[3]),
+        pointFrom<LocalPoint>(bcurve.data[4], bcurve.data[5]),
+      );
 };
