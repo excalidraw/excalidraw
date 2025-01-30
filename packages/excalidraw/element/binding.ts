@@ -699,7 +699,7 @@ const calculateFocusAndGap = (
   );
   return {
     focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
-    gap: FIXED_BINDING_DISTANCE,
+    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
   };
 };
 

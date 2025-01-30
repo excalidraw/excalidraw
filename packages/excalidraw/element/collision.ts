@@ -212,62 +212,88 @@ const intersectRectanguloidWithLine = (
     -element.angle as Radians,
   );
   const roundness = getCornerRadius(
-    Math.min(element.width * offset, element.height * offset),
+    Math.min(element.width, element.height),
     element,
   );
 
-  const sides = [
-    lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
-      pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
-    ), // TOP
-    lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
-      pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
-    ), // RIGHT
-    lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
-      pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
-    ), // BOTTOM
-    lineSegment<GlobalPoint>(
-      pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
-      pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
-    ), // LEFT
-  ];
+  const top = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
+    pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
+  );
+  const right = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
+    pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
+  );
+  const bottom = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
+    pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
+  );
+  const left = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
+    pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
+  );
+  const sides = [top, right, bottom, left];
   const corners =
     roundness > 0
       ? [
-          arc<GlobalPoint>(
-            pointFrom(r[0][0] + roundness, r[0][1] + roundness),
-            roundness,
-            Math.PI as Radians,
-            ((3 / 2) * Math.PI) as Radians,
+          curve(
+            left[1],
+            pointFrom(
+              left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
+              left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
+            ),
+            pointFrom(
+              top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
+              top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
+            ),
+            top[0],
           ), // TOP LEFT
-          arc<GlobalPoint>(
-            pointFrom(r[1][0] - roundness, r[0][1] + roundness),
-            roundness,
-            ((3 / 2) * Math.PI) as Radians,
-            0 as Radians,
+          curve(
+            top[1],
+            pointFrom(
+              top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
+              top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
+            ),
+            pointFrom(
+              right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
+              right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
+            ),
+            right[0],
           ), // TOP RIGHT
-          arc<GlobalPoint>(
-            pointFrom(r[1][0] - roundness, r[1][1] - roundness),
-            roundness,
-            0 as Radians,
-            ((1 / 2) * Math.PI) as Radians,
+          curve(
+            right[1],
+            pointFrom(
+              right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
+              right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
+            ),
+            pointFrom(
+              bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
+              bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
+            ),
+            bottom[1],
           ), // BOTTOM RIGHT
-          arc<GlobalPoint>(
-            pointFrom(r[0][0] + roundness, r[1][1] - roundness),
-            roundness,
-            ((1 / 2) * Math.PI) as Radians,
-            Math.PI as Radians, // BOTTOM LEFT
-          ),
+          curve(
+            bottom[0],
+            pointFrom(
+              bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
+              bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
+            ),
+            pointFrom(
+              left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
+              left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
+            ),
+            left[0],
+          ), // BOTTOM LEFT
         ]
       : [];
 
-  // debugClear();
-  // sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
-  // corners.forEach((s) => debugDrawArc(s, { color: "green", permanent: true }));
-  // debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
+  debugClear();
+  sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
+  corners.forEach((s) =>
+    debugDrawCubicBezier(s, { color: "green", permanent: true }),
+  );
+  debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
+  //debugDrawPoint(bottom[0], { color: "white", permanent: true });
 
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
@@ -277,7 +303,7 @@ const intersectRectanguloidWithLine = (
     .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle));
 
   const cornerIntersections: GlobalPoint[] = corners
-    .flatMap((t) => arcLineInterceptPoints(t, line(rotatedA, rotatedB)))
+    .flatMap((t) => curveIntersectLine(t, line(rotatedA, rotatedB)))
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
 
