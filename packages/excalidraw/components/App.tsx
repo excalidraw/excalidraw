@@ -133,6 +133,7 @@ import {
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
+  getHoveredElementsForBinding,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
@@ -10038,13 +10039,21 @@ class App extends React.Component<AppProps, AppState> {
 
     const suggestedBindings = pointerCoords.reduce(
       (acc: NonDeleted<ExcalidrawBindableElement>[], coords) => {
-        const hoveredBindableElement = getHoveredElementForBinding(
-          coords,
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-          this.state.zoom,
-          isArrowElement(linearElement) && isElbowArrow(linearElement),
-        );
+        const hoveredBindableElement = isElbowArrow(linearElement)
+          ? getHoveredElementsForBinding(
+              coords,
+              this.scene.getNonDeletedElements(),
+              this.scene.getNonDeletedElementsMap(),
+              this.state.zoom,
+              true,
+            )
+          : getHoveredElementForBinding(
+              coords,
+              this.scene.getNonDeletedElements(),
+              this.scene.getNonDeletedElementsMap(),
+              this.state.zoom,
+              isArrowElement(linearElement),
+            );
         if (
           hoveredBindableElement != null &&
           !isLinearElementSimpleAndAlreadyBound(
