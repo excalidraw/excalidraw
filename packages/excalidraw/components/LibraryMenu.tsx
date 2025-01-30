@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import type Library from "../data/library";
 import {
   distributeLibraryItemsOnSquareGrid,
@@ -150,27 +156,40 @@ const usePendingElementsMemo = (
   appState: UIAppState,
   elements: readonly NonDeletedExcalidrawElement[],
 ) => {
-  const create = () =>
-    getSelectedElements(elements, appState, {
-      includeBoundTextElement: true,
-      includeElementsInFrames: true,
-    });
-  const val = useRef(create());
+  const create = useCallback(
+    (appState: UIAppState, elements: readonly NonDeletedExcalidrawElement[]) =>
+      getSelectedElements(elements, appState, {
+        includeBoundTextElement: true,
+        includeElementsInFrames: true,
+      }),
+    [],
+  );
+
+  const val = useRef(create(appState, elements));
   const prevAppState = useRef<UIAppState>(appState);
   const prevElements = useRef(elements);
 
-  if (
-    !isShallowEqual(
-      appState.selectedElementIds,
-      prevAppState.current.selectedElementIds,
-    ) ||
-    !isShallowEqual(elements, prevElements.current)
-  ) {
-    val.current = create();
-    prevAppState.current = appState;
-    prevElements.current = elements;
-  }
-  return val.current;
+  const update = useCallback(() => {
+    if (
+      !isShallowEqual(
+        appState.selectedElementIds,
+        prevAppState.current.selectedElementIds,
+      ) ||
+      !isShallowEqual(elements, prevElements.current)
+    ) {
+      val.current = create(appState, elements);
+      prevAppState.current = appState;
+      prevElements.current = elements;
+    }
+  }, [create, appState, elements]);
+
+  return useMemo(
+    () => ({
+      update,
+      value: val.current,
+    }),
+    [update, val],
+  );
 };
 
 /**
@@ -181,6 +200,7 @@ export const LibraryMenu = () => {
   const { library, id, onInsertElements } = useApp();
   const appProps = useAppProps();
   const appState = useUIAppState();
+  const app = useApp();
   const setAppState = useExcalidrawSetAppState();
   const elements = useExcalidrawElements();
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
@@ -203,9 +223,13 @@ export const LibraryMenu = () => {
     });
   }, [setAppState]);
 
+  useEffect(() => {
+    return app.onPointerUpEmitter.on(() => pendingElements.update());
+  }, [app, pendingElements]);
+
   return (
     <LibraryMenuContent
-      pendingElements={pendingElements}
+      pendingElements={pendingElements.value}
       onInsertLibraryItems={onInsertLibraryItems}
       onAddToLibrary={deselectItems}
       setAppState={setAppState}

@@ -681,6 +681,8 @@ export type AppClassProperties = {
   getEditorUIOffsets: App["getEditorUIOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
+
+  onPointerUpEmitter: App["onPointerUpEmitter"];
 };
 
 export type PointerDownState = Readonly<{
