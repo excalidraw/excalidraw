@@ -20,11 +20,11 @@ import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   avoidRectangularCorner,
-  getHoveredElementForBinding,
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
   snapToMid,
+  getHoveredElementsForBinding,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -2114,17 +2114,19 @@ const getHoveredElements = (
   );
   const elements = Array.from(elementsMap.values());
   return [
-    getHoveredElementForBinding(
+    getHoveredElementsForBinding(
       tupleToCoors(origStartGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
       zoom,
+      true,
     ),
-    getHoveredElementForBinding(
+    getHoveredElementsForBinding(
       tupleToCoors(origEndGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
       zoom,
+      true,
     ),
   ];
 };
