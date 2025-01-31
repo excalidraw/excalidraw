@@ -79,7 +79,6 @@ import {
   clamp,
 } from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
-import type { Mutable } from "../utility-types";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
