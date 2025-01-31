@@ -1113,7 +1113,7 @@ const getElbowArrowData = (
   const endElement =
     arrow.endBinding &&
     getBindableElementForId(arrow.endBinding.elementId, elementsMap);
-  let [hoveredStartElement, hoveredEndElement] = options?.isDragging
+  const [hoveredStartElement, hoveredEndElement] = options?.isDragging
     ? getHoveredElements(
         origStartGlobalPoint,
         origEndGlobalPoint,
@@ -1121,7 +1121,7 @@ const getElbowArrowData = (
         options?.zoom,
       )
     : [startElement, endElement];
-  let startGlobalPoint = getGlobalPoint(
+  const startGlobalPoint = getGlobalPoint(
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
     origEndGlobalPoint,
@@ -1130,7 +1130,7 @@ const getElbowArrowData = (
     hoveredStartElement,
     options?.isDragging,
   );
-  let endGlobalPoint = getGlobalPoint(
+  const endGlobalPoint = getGlobalPoint(
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
     origStartGlobalPoint,
@@ -1139,47 +1139,47 @@ const getElbowArrowData = (
     hoveredEndElement,
     options?.isDragging,
   );
-  if (options?.isDragging) {
-    let oldHoveredStartElement = hoveredStartElement;
-    let oldHoveredEndElement = hoveredEndElement;
-    for (let i = 0; i < 10; i++) {
-      // Hovering over an element almost at the midpoint, while another bindable
-      // element's binding area just overlaps the midpoint can cause the arrow
-      // to jump to midpoint, while the binding happens to the other object.
-      [hoveredStartElement, hoveredEndElement] = getHoveredElements(
-        startGlobalPoint,
-        endGlobalPoint,
-        elementsMap,
-        options?.zoom,
-      );
-      startGlobalPoint = getGlobalPoint(
-        arrow.startBinding?.fixedPoint,
-        origStartGlobalPoint,
-        origEndGlobalPoint,
-        elementsMap,
-        startElement,
-        hoveredStartElement,
-        options?.isDragging,
-      );
-      endGlobalPoint = getGlobalPoint(
-        arrow.endBinding?.fixedPoint,
-        origEndGlobalPoint,
-        origStartGlobalPoint,
-        elementsMap,
-        endElement,
-        hoveredEndElement,
-        options?.isDragging,
-      );
-      if (
-        hoveredStartElement === oldHoveredStartElement &&
-        hoveredEndElement === oldHoveredEndElement
-      ) {
-        break;
-      }
-      oldHoveredStartElement = hoveredStartElement;
-      oldHoveredEndElement = hoveredEndElement;
-    }
-  }
+  // if (options?.isDragging) {
+  //   let oldHoveredStartElement = hoveredStartElement;
+  //   let oldHoveredEndElement = hoveredEndElement;
+  //   for (let i = 0; i < 10; i++) {
+  //     // Hovering over an element almost at the midpoint, while another bindable
+  //     // element's binding area just overlaps the midpoint can cause the arrow
+  //     // to jump to midpoint, while the binding happens to the other object.
+  //     [hoveredStartElement, hoveredEndElement] = getHoveredElements(
+  //       startGlobalPoint,
+  //       endGlobalPoint,
+  //       elementsMap,
+  //       options?.zoom,
+  //     );
+  //     startGlobalPoint = getGlobalPoint(
+  //       arrow.startBinding?.fixedPoint,
+  //       origStartGlobalPoint,
+  //       origEndGlobalPoint,
+  //       elementsMap,
+  //       startElement,
+  //       hoveredStartElement,
+  //       options?.isDragging,
+  //     );
+  //     endGlobalPoint = getGlobalPoint(
+  //       arrow.endBinding?.fixedPoint,
+  //       origEndGlobalPoint,
+  //       origStartGlobalPoint,
+  //       elementsMap,
+  //       endElement,
+  //       hoveredEndElement,
+  //       options?.isDragging,
+  //     );
+  //     if (
+  //       hoveredStartElement === oldHoveredStartElement &&
+  //       hoveredEndElement === oldHoveredEndElement
+  //     ) {
+  //       break;
+  //     }
+  //     oldHoveredStartElement = hoveredStartElement;
+  //     oldHoveredEndElement = hoveredEndElement;
+  //   }
+  // }
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
