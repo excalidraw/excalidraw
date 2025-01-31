@@ -1,6 +1,8 @@
 @import "../css/variables.module.scss";
 
 .excalidraw {
+  --slider-thumb-size: 16px;
+
   .range-wrapper {
     position: relative;
     padding-top: 10px;
@@ -16,13 +18,11 @@
     outline: none;
   }
 
-  --Range-thumb-size: 18px;
-
   .range-input::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: var(--Range-thumb-size);
-    height: var(--Range-thumb-size);
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
     background: var(--color-slider-thumb);
     border-radius: 50%;
     cursor: pointer;
@@ -30,8 +30,8 @@
   }
 
   .range-input::-moz-range-thumb {
-    width: var(--Range-thumb-size);
-    height: var(--Range-thumb-size);
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
     background: var(--color-slider-thumb);
     border-radius: 50%;
     cursor: pointer;
