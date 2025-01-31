@@ -32,7 +32,7 @@ import type { Bounds } from "./bounds";
 import { getCenterForBounds, getElementAbsoluteCoords } from "./bounds";
 import type { AppState } from "../types";
 import { isPointOnShape } from "../../utils/collision";
-import { getElementAtPosition, getElementsAtPosition } from "../scene";
+import { getElementsAtPosition } from "../scene";
 import {
   isArrowElement,
   isBindableElement,
@@ -425,7 +425,7 @@ export const maybeBindLinearElement = (
     elements,
     elementsMap,
     appState.zoom,
-    isElbowArrow(linearElement) && isElbowArrow(linearElement),
+    isElbowArrow(linearElement),
   );
 
   if (hoveredElement !== null) {
@@ -559,34 +559,6 @@ export const getHoveredElementForBinding = (
   zoom?: AppState["zoom"],
   fullShape?: boolean,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const hoveredElement = getElementAtPosition(
-    elements,
-    (element) =>
-      isBindableElement(element, false) &&
-      bindingBorderTest(
-        element,
-        pointerCoords,
-        elementsMap,
-        zoom,
-        // disable fullshape snapping for frame elements so we
-        // can bind to frame children
-        fullShape && !isFrameLikeElement(element),
-      ),
-  );
-
-  return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
-};
-
-export const getHoveredElementsForBinding = (
-  pointerCoords: {
-    x: number;
-    y: number;
-  },
-  elements: readonly NonDeletedExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
-  fullShape?: boolean,
-): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidateElements = getElementsAtPosition(
     elements,
     (element) =>
@@ -603,8 +575,12 @@ export const getHoveredElementsForBinding = (
   ) as NonDeleted<ExcalidrawBindableElement>[] | null;
 
   // Return early if there are no candidates or just one candidate
-  if (!candidateElements || candidateElements.length === 1) {
-    return candidateElements?.[0] as NonDeleted<ExcalidrawBindableElement> | null;
+  if (!candidateElements || candidateElements.length === 0) {
+    return null;
+  }
+
+  if (candidateElements.length === 1) {
+    return candidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
   }
 
   // Prefer the shape with the border being tested (if any)
@@ -1266,6 +1242,7 @@ const getElligibleElementForBindingElement = (
     elements,
     elementsMap,
     zoom,
+    isElbowArrow(linearElement),
   );
 };
 

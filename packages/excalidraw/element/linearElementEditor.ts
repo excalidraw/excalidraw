@@ -444,6 +444,7 @@ export class LinearElementEditor {
                 elements,
                 elementsMap,
                 appState.zoom,
+                isElbowArrow(element),
               )
             : null;
 
