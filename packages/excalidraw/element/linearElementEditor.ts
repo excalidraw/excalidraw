@@ -1260,7 +1260,6 @@ export class LinearElementEditor {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
     },
-    elementsMap?: ElementsMap,
   ) {
     const { points } = element;
 
