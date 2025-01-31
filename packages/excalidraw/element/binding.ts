@@ -49,7 +49,11 @@ import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
 import type Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
-import { arrayToMap, tupleToCoors } from "../utils";
+import {
+  arrayToMap,
+  isBindingFallthroughEnabled,
+  tupleToCoors,
+} from "../utils";
 import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
@@ -562,8 +566,9 @@ export const getHoveredElementForBinding = (
   considerAllElements?: boolean,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   if (considerAllElements) {
+    let cullRest = false;
     const candidateElements = getElementsAtPosition(
-      elements,
+      elements.toReversed(),
       (element) =>
         isBindableElement(element, false) &&
         bindingBorderTest(
@@ -573,9 +578,23 @@ export const getHoveredElementForBinding = (
           zoom,
           // disable fullshape snapping for frame elements so we
           // can bind to frame children
-          fullShape && !isFrameLikeElement(element),
+          (fullShape ||
+            !isBindingFallthroughEnabled(
+              element as ExcalidrawBindableElement,
+            )) &&
+            !isFrameLikeElement(element),
         ),
-    ) as NonDeleted<ExcalidrawBindableElement>[] | null;
+    ).filter((element) => {
+      if (cullRest) {
+        return false;
+      }
+
+      if (!isBindingFallthroughEnabled(element as ExcalidrawBindableElement)) {
+        cullRest = true;
+      }
+
+      return true;
+    }) as NonDeleted<ExcalidrawBindableElement>[] | null;
 
     // Return early if there are no candidates or just one candidate
     if (!candidateElements || candidateElements.length === 0) {
@@ -613,7 +632,8 @@ export const getHoveredElementForBinding = (
         zoom,
         // disable fullshape snapping for frame elements so we
         // can bind to frame children
-        fullShape && !isFrameLikeElement(element),
+        (fullShape || !isBindingFallthroughEnabled(element)) &&
+          !isFrameLikeElement(element),
       ),
   );
 
