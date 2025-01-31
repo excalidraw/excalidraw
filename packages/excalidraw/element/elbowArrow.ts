@@ -244,6 +244,12 @@ const handleSegmentRenormalization = (
       );
     }
 
+    import.meta.env.DEV &&
+      invariant(
+        validateElbowPoints(nextPoints),
+        "Invalid elbow points with fixed segments",
+      );
+
     return normalizeArrowElementUpdate(
       nextPoints,
       filteredNextFixedSegments,
@@ -912,7 +918,11 @@ export const updateElbowArrowPoints = (
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
   // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
-  if (elementsMap.size === 0 && updates.points) {
+  if (
+    elementsMap.size === 0 &&
+    updates.points &&
+    validateElbowPoints(updates.points)
+  ) {
     return normalizeArrowElementUpdate(
       updates.points.map((p) =>
         pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
@@ -2123,3 +2133,16 @@ const getHoveredElements = (
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
+
+const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
+  points: readonly P[],
+  tolerance: number = DEDUP_TRESHOLD,
+) =>
+  points
+    .slice(1)
+    .map(
+      (p, i) =>
+        Math.abs(p[0] - points[i][0]) < tolerance ||
+        Math.abs(p[1] - points[i][1]) < tolerance,
+    )
+    .every(Boolean);
