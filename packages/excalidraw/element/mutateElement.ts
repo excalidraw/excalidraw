@@ -1,4 +1,4 @@
-import type { ElementsMap, ExcalidrawElement, SceneElementsMap } from "./types";
+import type { ExcalidrawElement, SceneElementsMap } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
@@ -28,7 +28,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     // it tries to keep the same bound element, if any.
     isDragging?: boolean;
   },
-  nextElementsMap?: ElementsMap,
 ): TElement => {
   let didChange = false;
 
@@ -43,9 +42,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       typeof fixedSegments !== "undefined") // segment fixing
   ) {
     const elementsMap = toBrandedType<SceneElementsMap>(
-      nextElementsMap ??
-        Scene.getScene(element)?.getNonDeletedElementsMap() ??
-        new Map(),
+      Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
     );
 
     updates = {

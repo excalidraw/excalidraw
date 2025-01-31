@@ -1311,7 +1311,6 @@ export class LinearElementEditor {
           false,
         ),
       },
-      elementsMap,
     );
   }
 
@@ -1425,7 +1424,6 @@ export class LinearElementEditor {
       isDragging?: boolean;
       zoom?: AppState["zoom"];
     },
-    elementsMap?: ElementsMap,
   ) {
     if (isElbowArrow(element)) {
       const updates: {
@@ -1458,15 +1456,9 @@ export class LinearElementEditor {
         vector(offsetX, offsetY),
       );
 
-      mutateElement(
-        element,
-        updates,
-        true,
-        {
-          isDragging: options?.isDragging,
-        },
-        elementsMap,
-      );
+      mutateElement(element, updates, true, {
+        isDragging: options?.isDragging,
+      });
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
       const prevCoords = getElementPointsCoords(element, element.points);

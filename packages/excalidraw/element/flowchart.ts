@@ -10,13 +10,15 @@ import {
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
-import type {
-  ElementsMap,
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawFlowchartNodeElement,
-  NonDeletedSceneElementsMap,
-  OrderedExcalidrawElement,
+import type { SceneElementsMap } from "./types";
+import {
+  type ElementsMap,
+  type ExcalidrawBindableElement,
+  type ExcalidrawElement,
+  type ExcalidrawFlowchartNodeElement,
+  type NonDeletedSceneElementsMap,
+  type Ordered,
+  type OrderedExcalidrawElement,
 } from "./types";
 import { KEYS } from "../keys";
 import type { AppState, PendingExcalidrawElements } from "../types";
@@ -28,9 +30,10 @@ import {
   isFrameElement,
   isFlowchartNodeElement,
 } from "./typeChecks";
-import { invariant } from "../utils";
+import { invariant, toBrandedType } from "../utils";
 import { pointFrom, type LocalPoint } from "../../math";
 import { aabbForElement } from "../shapes";
+import { updateElbowArrowPoints } from "./elbowArrow";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -460,24 +463,30 @@ const createBindingArrow = (
     bindingArrow as OrderedExcalidrawElement,
   );
 
-  LinearElementEditor.movePoints(
+  LinearElementEditor.movePoints(bindingArrow, [
+    {
+      index: 1,
+      point: bindingArrow.points[1],
+    },
+  ]);
+
+  const update = updateElbowArrowPoints(
     bindingArrow,
-    [
-      {
-        index: 1,
-        point: bindingArrow.points[1],
-      },
-    ],
-    undefined,
-    new Map([
-      ...elementsMap.entries(),
-      [startBindingElement.id, startBindingElement],
-      [endBindingElement.id, endBindingElement],
-      [bindingArrow.id, bindingArrow],
-    ] as [string, ExcalidrawElement][]),
+    toBrandedType<SceneElementsMap>(
+      new Map([
+        ...elementsMap.entries(),
+        [startBindingElement.id, startBindingElement],
+        [endBindingElement.id, endBindingElement],
+        [bindingArrow.id, bindingArrow],
+      ] as [string, Ordered<ExcalidrawElement>][]),
+    ),
+    { points: bindingArrow.points },
   );
 
-  return bindingArrow;
+  return {
+    ...bindingArrow,
+    ...update,
+  };
 };
 
 export class FlowChartNavigator {
