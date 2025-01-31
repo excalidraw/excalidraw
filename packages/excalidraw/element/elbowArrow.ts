@@ -872,6 +872,8 @@ export const updateElbowArrowPoints = (
   updates: {
     points?: readonly LocalPoint[];
     fixedSegments?: FixedSegment[] | null;
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
   },
   options?: {
     isDragging?: boolean;
@@ -953,14 +955,37 @@ export const updateElbowArrowPoints = (
     hoveredStartElement,
     hoveredEndElement,
     ...rest
-  } = getElbowArrowData(arrow, elementsMap, updatedPoints, options);
+  } = getElbowArrowData(
+    {
+      x: arrow.x,
+      y: arrow.y,
+      startBinding:
+        typeof updates.startBinding !== "undefined"
+          ? updates.startBinding
+          : arrow.startBinding,
+      endBinding:
+        typeof updates.endBinding !== "undefined"
+          ? updates.endBinding
+          : arrow.endBinding,
+      startArrowhead: arrow.startArrowhead,
+      endArrowhead: arrow.endArrowhead,
+    },
+    elementsMap,
+    updatedPoints,
+    options,
+  );
 
   const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
 
   ////
   // 1. Renormalize the arrow
   ////
-  if (!updates.points && !updates.fixedSegments) {
+  if (
+    !updates.points &&
+    !updates.fixedSegments &&
+    !updates.startBinding &&
+    !updates.endBinding
+  ) {
     return handleSegmentRenormalization(arrow, elementsMap);
   }
 
@@ -1010,6 +1035,7 @@ export const updateElbowArrowPoints = (
 
   ////
   // 5. Handle resize
+  ////
   if (updates.points && updates.fixedSegments) {
     return updates;
   }
