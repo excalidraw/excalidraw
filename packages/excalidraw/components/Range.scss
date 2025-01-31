@@ -1,10 +1,7 @@
 @import "../css/variables.module.scss";
 
 .excalidraw {
-  --Range-track-background: var(--button-bg);
-  --Range-track-background-active: var(--color-primary);
-  --Range-thumb-background: var(--color-on-surface);
-  --Range-legend-color: var(--text-primary-color);
+  --slider-thumb-size: 16px;
 
   .range-wrapper {
     position: relative;
@@ -16,7 +13,7 @@
     width: 100%;
     height: 4px;
     -webkit-appearance: none;
-    background: var(--Range-track-background);
+    background: var(--color-slider-track);
     border-radius: 2px;
     outline: none;
   }
@@ -24,18 +21,18 @@
   .range-input::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    background: var(--Range-thumb-background);
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    background: var(--color-slider-thumb);
     border-radius: 50%;
     cursor: pointer;
     border: none;
   }
 
   .range-input::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: var(--Range-thumb-background);
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    background: var(--color-slider-thumb);
     border-radius: 50%;
     cursor: pointer;
     border: none;
@@ -46,7 +43,7 @@
     bottom: 0;
     transform: translateX(-50%);
     font-size: 12px;
-    color: var(--Range-legend-color);
+    color: var(--text-primary-color);
   }
 
   .zero-label {
@@ -54,6 +51,6 @@
     bottom: 0;
     left: 4px;
     font-size: 12px;
-    color: var(--Range-legend-color);
+    color: var(--text-primary-color);
   }
 }
