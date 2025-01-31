@@ -32,7 +32,7 @@ import type { Bounds } from "./bounds";
 import { getCenterForBounds, getElementAbsoluteCoords } from "./bounds";
 import type { AppState } from "../types";
 import { isPointOnShape } from "../../utils/collision";
-import { getElementsAtPosition } from "../scene";
+import { getElementAtPosition, getElementsAtPosition } from "../scene";
 import {
   isArrowElement,
   isBindableElement,
@@ -426,6 +426,7 @@ export const maybeBindLinearElement = (
     elementsMap,
     appState.zoom,
     isElbowArrow(linearElement),
+    isElbowArrow(linearElement),
   );
 
   if (hoveredElement !== null) {
@@ -558,8 +559,50 @@ export const getHoveredElementForBinding = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
   fullShape?: boolean,
+  considerAllElements?: boolean,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidateElements = getElementsAtPosition(
+  if (considerAllElements) {
+    const candidateElements = getElementsAtPosition(
+      elements,
+      (element) =>
+        isBindableElement(element, false) &&
+        bindingBorderTest(
+          element,
+          pointerCoords,
+          elementsMap,
+          zoom,
+          // disable fullshape snapping for frame elements so we
+          // can bind to frame children
+          fullShape && !isFrameLikeElement(element),
+        ),
+    ) as NonDeleted<ExcalidrawBindableElement>[] | null;
+
+    // Return early if there are no candidates or just one candidate
+    if (!candidateElements || candidateElements.length === 0) {
+      return null;
+    }
+
+    if (candidateElements.length === 1) {
+      return candidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
+    }
+
+    // Prefer the shape with the border being tested (if any)
+    const borderTestElements = candidateElements.filter((element) =>
+      bindingBorderTest(element, pointerCoords, elementsMap, zoom, false),
+    );
+    if (borderTestElements.length === 1) {
+      return borderTestElements[0];
+    }
+
+    // Prefer smaller shapes
+    return candidateElements
+      .sort(
+        (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
+      )
+      .pop() as NonDeleted<ExcalidrawBindableElement>;
+  }
+
+  const hoveredElement = getElementAtPosition(
     elements,
     (element) =>
       isBindableElement(element, false) &&
@@ -572,31 +615,9 @@ export const getHoveredElementForBinding = (
         // can bind to frame children
         fullShape && !isFrameLikeElement(element),
       ),
-  ) as NonDeleted<ExcalidrawBindableElement>[] | null;
-
-  // Return early if there are no candidates or just one candidate
-  if (!candidateElements || candidateElements.length === 0) {
-    return null;
-  }
-
-  if (candidateElements.length === 1) {
-    return candidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
-  }
-
-  // Prefer the shape with the border being tested (if any)
-  const borderTestElements = candidateElements.filter((element) =>
-    bindingBorderTest(element, pointerCoords, elementsMap, zoom, false),
   );
-  if (borderTestElements.length === 1) {
-    return borderTestElements[0];
-  }
 
-  // Prefer smaller shapes
-  return candidateElements
-    .sort(
-      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
-    )
-    .pop() as NonDeleted<ExcalidrawBindableElement>;
+  return hoveredElement as NonDeleted<ExcalidrawBindableElement> | null;
 };
 
 const calculateFocusAndGap = (
@@ -1242,6 +1263,7 @@ const getElligibleElementForBindingElement = (
     elements,
     elementsMap,
     zoom,
+    isElbowArrow(linearElement),
     isElbowArrow(linearElement),
   );
 };

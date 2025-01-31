@@ -2187,12 +2187,14 @@ const getHoveredElements = (
       nonDeletedSceneElementsMap,
       zoom,
       true,
+      true,
     ),
     getHoveredElementForBinding(
       tupleToCoors(origEndGlobalPoint),
       elements,
       nonDeletedSceneElementsMap,
       zoom,
+      true,
       true,
     ),
   ];
