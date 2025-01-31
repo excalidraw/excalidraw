@@ -460,12 +460,22 @@ const createBindingArrow = (
     bindingArrow as OrderedExcalidrawElement,
   );
 
-  LinearElementEditor.movePoints(bindingArrow, [
-    {
-      index: 1,
-      point: bindingArrow.points[1],
-    },
-  ]);
+  LinearElementEditor.movePoints(
+    bindingArrow,
+    [
+      {
+        index: 1,
+        point: bindingArrow.points[1],
+      },
+    ],
+    undefined,
+    new Map([
+      ...elementsMap.entries(),
+      [startBindingElement.id, startBindingElement],
+      [endBindingElement.id, endBindingElement],
+      [bindingArrow.id, bindingArrow],
+    ] as [string, ExcalidrawElement][]),
+  );
 
   return bindingArrow;
 };
