@@ -32,7 +32,6 @@
     0px 0px 3.1270833015441895px 0px rgba(0, 0, 0, 0.08),
     0px 7px 14px 0px rgba(0, 0, 0, 0.05);
 
-  --button-bg: var(--color-surface-mid);
   --button-hover-bg: var(--color-surface-high);
   --button-active-bg: var(--color-surface-high);
   --button-active-border: var(--color-brand-active);
@@ -171,8 +170,6 @@
     --theme-filter: #{$theme-filter};
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
-
-    --button-bg: var(--color-surface-high);
 
     --button-gray-1: #363636;
     --button-gray-2: #272727;
