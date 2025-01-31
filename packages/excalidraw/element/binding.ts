@@ -79,6 +79,7 @@ import {
   clamp,
 } from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
+import type { Mutable } from "../utility-types";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -568,7 +569,7 @@ export const getHoveredElementForBinding = (
   if (considerAllElements) {
     let cullRest = false;
     const candidateElements = getElementsAtPosition(
-      elements.toReversed(),
+      (elements as Mutable<NonDeletedExcalidrawElement[]>).reverse(),
       (element) =>
         isBindableElement(element, false) &&
         bindingBorderTest(
