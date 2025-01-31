@@ -10043,7 +10043,7 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
           this.state.zoom,
-          isArrowElement(linearElement),
+          isElbowArrow(linearElement),
         );
         if (
           hoveredBindableElement != null &&
