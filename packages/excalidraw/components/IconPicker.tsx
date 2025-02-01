@@ -5,7 +5,7 @@ import { getLanguage, t } from "../i18n";
 import clsx from "clsx";
 import Collapsible from "./Stats/Collapsible";
 import { atom, useAtom } from "../editor-jotai";
-import { useDevice } from "..";
+import { useDevice } from "./App";
 
 import "./IconPicker.scss";
 
