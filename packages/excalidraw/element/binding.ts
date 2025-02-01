@@ -567,41 +567,35 @@ export const getHoveredElementForBinding = (
 ): NonDeleted<ExcalidrawBindableElement> | null => {
   if (considerAllElements) {
     let cullRest = false;
-    const candidateElements = structuredClone(
-      getElementsAtPosition(
-        //(elements as Mutable<NonDeletedExcalidrawElement[]>).reverse(),
-        elements,
-        (element) =>
-          isBindableElement(element, false) &&
-          bindingBorderTest(
-            element,
-            pointerCoords,
-            elementsMap,
-            zoom,
-            // disable fullshape snapping for frame elements so we
-            // can bind to frame children
-            (fullShape ||
-              !isBindingFallthroughEnabled(
-                element as ExcalidrawBindableElement,
-              )) &&
-              !isFrameLikeElement(element),
-          ),
-      ),
-    )
-      .reverse()
-      .filter((element) => {
-        if (cullRest) {
-          return false;
-        }
+    const candidateElements = getElementsAtPosition(
+      elements,
+      (element) =>
+        isBindableElement(element, false) &&
+        bindingBorderTest(
+          element,
+          pointerCoords,
+          elementsMap,
+          zoom,
+          // disable fullshape snapping for frame elements so we
+          // can bind to frame children
+          (fullShape ||
+            !isBindingFallthroughEnabled(
+              element as ExcalidrawBindableElement,
+            )) &&
+            !isFrameLikeElement(element),
+        ),
+      "front",
+    ).filter((element) => {
+      if (cullRest) {
+        return false;
+      }
 
-        if (
-          !isBindingFallthroughEnabled(element as ExcalidrawBindableElement)
-        ) {
-          cullRest = true;
-        }
+      if (!isBindingFallthroughEnabled(element as ExcalidrawBindableElement)) {
+        cullRest = true;
+      }
 
-        return true;
-      }) as NonDeleted<ExcalidrawBindableElement>[] | null;
+      return true;
+    }) as NonDeleted<ExcalidrawBindableElement>[] | null;
 
     // Return early if there are no candidates or just one candidate
     if (!candidateElements || candidateElements.length === 0) {

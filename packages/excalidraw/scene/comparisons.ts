@@ -73,22 +73,31 @@ export const getElementAtPosition = (
 export const getElementsAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
   isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
+  zDirection: "front" | "back" = "back",
 ) => {
   const iframeLikes: ExcalidrawIframeElement[] = [];
   // The parameter elements comes ordered from lower z-index to higher.
   // We want to preserve that order on the returned array.
   // Exception being embeddables which should be on top of everything else in
   // terms of hit testing.
-  const elsAtPos = elements.filter((element) => {
-    const hit = !element.isDeleted && isAtPositionFn(element);
-    if (hit) {
+  const elsAtPos: NonDeletedExcalidrawElement[] = [];
+  for (
+    let index = zDirection === "front" ? elements.length - 1 : 0;
+    zDirection === "front" ? index >= 0 : index < elements.length;
+    zDirection === "front" ? --index : ++index
+  ) {
+    const element = elements[index];
+    if (element.isDeleted) {
+      continue;
+    }
+    if (isAtPositionFn(element)) {
       if (isIframeElement(element)) {
         iframeLikes.push(element);
-        return false;
+      } else {
+        elsAtPos.push(element);
       }
-      return true;
     }
-    return false;
-  });
+  }
+
   return elsAtPos.concat(iframeLikes);
 };
