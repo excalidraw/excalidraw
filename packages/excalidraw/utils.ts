@@ -9,7 +9,11 @@ import {
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
-import type { FontFamilyValues, FontString } from "./element/types";
+import type {
+  ExcalidrawBindableElement,
+  FontFamilyValues,
+  FontString,
+} from "./element/types";
 import type {
   ActiveTool,
   AppState,
@@ -542,6 +546,9 @@ export const isTransparent = (color: string) => {
     color === COLOR_PALETTE.transparent
   );
 };
+
+export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
+  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]

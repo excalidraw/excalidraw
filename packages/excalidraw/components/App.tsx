@@ -5770,7 +5770,10 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
       if (editingLinearElement?.lastUncommittedPoint != null) {
-        this.maybeSuggestBindingAtCursor(scenePointer);
+        this.maybeSuggestBindingAtCursor(
+          scenePointer,
+          editingLinearElement.elbowed,
+        );
       } else {
         // causes stack overflow if not sync
         flushSync(() => {
@@ -5790,7 +5793,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.startBoundElement,
         );
       } else {
-        this.maybeSuggestBindingAtCursor(scenePointer);
+        this.maybeSuggestBindingAtCursor(scenePointer, false);
       }
     }
 
@@ -7727,6 +7730,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
         this.state.zoom,
+        isElbowArrow(element),
         isElbowArrow(element),
       );
 
@@ -10005,15 +10009,20 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private maybeSuggestBindingAtCursor = (pointerCoords: {
-    x: number;
-    y: number;
-  }): void => {
+  private maybeSuggestBindingAtCursor = (
+    pointerCoords: {
+      x: number;
+      y: number;
+    },
+    considerAll: boolean,
+  ): void => {
     const hoveredBindableElement = getHoveredElementForBinding(
       pointerCoords,
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
       this.state.zoom,
+      false,
+      considerAll,
     );
     this.setState({
       suggestedBindings:
@@ -10043,7 +10052,8 @@ class App extends React.Component<AppProps, AppState> {
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
           this.state.zoom,
-          isArrowElement(linearElement) && isElbowArrow(linearElement),
+          isElbowArrow(linearElement),
+          isElbowArrow(linearElement),
         );
         if (
           hoveredBindableElement != null &&

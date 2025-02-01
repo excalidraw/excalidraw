@@ -75,20 +75,23 @@ export const getElementsAtPosition = (
   isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
 ) => {
   const iframeLikes: ExcalidrawIframeElement[] = [];
-  // The parameter elements comes ordered from lower z-index to higher.
-  // We want to preserve that order on the returned array.
-  // Exception being embeddables which should be on top of everything else in
-  // terms of hit testing.
-  const elsAtPos = elements.filter((element) => {
-    const hit = !element.isDeleted && isAtPositionFn(element);
-    if (hit) {
-      if (isIframeElement(element)) {
-        iframeLikes.push(element);
-        return false;
-      }
-      return true;
+  const elementsAtPosition: NonDeletedExcalidrawElement[] = [];
+  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  // because array is ordered from lower z-index to highest and we want element z-index
+  // with higher z-index
+  for (let index = elements.length - 1; index >= 0; --index) {
+    const element = elements[index];
+    if (element.isDeleted) {
+      continue;
     }
-    return false;
-  });
-  return elsAtPos.concat(iframeLikes);
+    if (isIframeElement(element)) {
+      iframeLikes.push(element);
+      continue;
+    }
+    if (isAtPositionFn(element)) {
+      elementsAtPosition.push(element);
+    }
+  }
+
+  return elementsAtPosition.concat(iframeLikes);
 };
