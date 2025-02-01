@@ -1605,6 +1605,8 @@ export const actionChangeArrowType = register({
             elements,
             elementsMap,
             appState.zoom,
+            false,
+            true,
           );
         const endHoveredElement =
           !newElement.endBinding &&
@@ -1613,6 +1615,8 @@ export const actionChangeArrowType = register({
             elements,
             elementsMap,
             appState.zoom,
+            false,
+            true,
           );
         const startElement = startHoveredElement
           ? startHoveredElement
