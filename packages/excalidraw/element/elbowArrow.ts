@@ -989,6 +989,14 @@ export const updateElbowArrowPoints = (
     return handleSegmentRenormalization(arrow, elementsMap);
   }
 
+  // Short circuit on no-op to avoid huge performance hit
+  if (
+    updates.startBinding === arrow.startBinding &&
+    updates.endBinding === arrow.endBinding
+  ) {
+    return {};
+  }
+
   ////
   // 2. Just normal elbow arrow things
   ////
