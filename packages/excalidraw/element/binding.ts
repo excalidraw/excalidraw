@@ -32,7 +32,7 @@ import type { Bounds } from "./bounds";
 import { getCenterForBounds, getElementAbsoluteCoords } from "./bounds";
 import type { AppState } from "../types";
 import { isPointOnShape } from "../../utils/collision";
-import { getElementAtPosition, getElementsAtPosition } from "../scene";
+import { getElementAtPosition } from "../scene";
 import {
   isArrowElement,
   isBindableElement,
@@ -79,6 +79,7 @@ import {
   clamp,
 } from "../../math";
 import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
+import { getElementsAtPosition } from "../scene/comparisons";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -576,15 +577,14 @@ export const getHoveredElementForBinding = (
           pointerCoords,
           elementsMap,
           zoom,
-          // disable fullshape snapping for frame elements so we
-          // can bind to frame children
           (fullShape ||
             !isBindingFallthroughEnabled(
               element as ExcalidrawBindableElement,
             )) &&
+            // disable fullshape snapping for frame elements so we
+            // can bind to frame children
             !isFrameLikeElement(element),
         ),
-      "front",
     ).filter((element) => {
       if (cullRest) {
         return false;
