@@ -20,11 +20,11 @@ import {
   bindPointToSnapToElementOutline,
   distanceToBindableElement,
   avoidRectangularCorner,
-  getHoveredElementForBinding,
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
   snapToMid,
+  getHoveredElementForBinding,
 } from "./binding";
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -243,6 +243,12 @@ const handleSegmentRenormalization = (
         null,
       );
     }
+
+    import.meta.env.DEV &&
+      invariant(
+        validateElbowPoints(nextPoints),
+        "Invalid elbow points with fixed segments",
+      );
 
     return normalizeArrowElementUpdate(
       nextPoints,
@@ -866,6 +872,8 @@ export const updateElbowArrowPoints = (
   updates: {
     points?: readonly LocalPoint[];
     fixedSegments?: FixedSegment[] | null;
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
   },
   options?: {
     isDragging?: boolean;
@@ -912,7 +920,11 @@ export const updateElbowArrowPoints = (
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
   // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
-  if (elementsMap.size === 0 && updates.points) {
+  if (
+    elementsMap.size === 0 &&
+    updates.points &&
+    validateElbowPoints(updates.points)
+  ) {
     return normalizeArrowElementUpdate(
       updates.points.map((p) =>
         pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
@@ -943,15 +955,46 @@ export const updateElbowArrowPoints = (
     hoveredStartElement,
     hoveredEndElement,
     ...rest
-  } = getElbowArrowData(arrow, elementsMap, updatedPoints, options);
+  } = getElbowArrowData(
+    {
+      x: arrow.x,
+      y: arrow.y,
+      startBinding:
+        typeof updates.startBinding !== "undefined"
+          ? updates.startBinding
+          : arrow.startBinding,
+      endBinding:
+        typeof updates.endBinding !== "undefined"
+          ? updates.endBinding
+          : arrow.endBinding,
+      startArrowhead: arrow.startArrowhead,
+      endArrowhead: arrow.endArrowhead,
+    },
+    elementsMap,
+    updatedPoints,
+    options,
+  );
 
   const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
 
   ////
   // 1. Renormalize the arrow
   ////
-  if (!updates.points && !updates.fixedSegments) {
+  if (
+    !updates.points &&
+    !updates.fixedSegments &&
+    !updates.startBinding &&
+    !updates.endBinding
+  ) {
     return handleSegmentRenormalization(arrow, elementsMap);
+  }
+
+  // Short circuit on no-op to avoid huge performance hit
+  if (
+    updates.startBinding === arrow.startBinding &&
+    updates.endBinding === arrow.endBinding
+  ) {
+    return {};
   }
 
   ////
@@ -1000,6 +1043,7 @@ export const updateElbowArrowPoints = (
 
   ////
   // 5. Handle resize
+  ////
   if (updates.points && updates.fixedSegments) {
     return updates;
   }
@@ -2110,6 +2154,7 @@ const getHoveredElements = (
       nonDeletedSceneElementsMap,
       zoom,
       true,
+      true,
     ),
     getHoveredElementForBinding(
       tupleToCoors(origEndGlobalPoint),
@@ -2117,9 +2162,23 @@ const getHoveredElements = (
       nonDeletedSceneElementsMap,
       zoom,
       true,
+      true,
     ),
   ];
 };
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
+
+const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
+  points: readonly P[],
+  tolerance: number = DEDUP_TRESHOLD,
+) =>
+  points
+    .slice(1)
+    .map(
+      (p, i) =>
+        Math.abs(p[0] - points[i][0]) < tolerance ||
+        Math.abs(p[1] - points[i][1]) < tolerance,
+    )
+    .every(Boolean);

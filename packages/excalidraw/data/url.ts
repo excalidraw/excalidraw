@@ -1,5 +1,5 @@
 import { sanitizeUrl } from "@braintree/sanitize-url";
-import { sanitizeHTMLAttribute } from "../utils";
+import { escapeDoubleQuotes } from "../utils";
 
 export const normalizeLink = (link: string) => {
   if (!link) {
@@ -10,7 +10,7 @@ export const normalizeLink = (link: string) => {
     //zsviczian
     return link;
   }
-  return sanitizeUrl(sanitizeHTMLAttribute(link));
+  return sanitizeUrl(escapeDoubleQuotes(link));
 };
 
 export const isLocalLink = (link: string | null) => {
