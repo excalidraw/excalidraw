@@ -207,6 +207,7 @@ export const actionWrapSelectionInFrame = register({
       elements: nextElements,
       appState: {
         selectedElementIds: { [frame.id]: true },
+        theme: appState.theme, //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/2240
       },
       storeAction: StoreAction.CAPTURE,
     };
