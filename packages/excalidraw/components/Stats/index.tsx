@@ -32,6 +32,7 @@ import { isGridModeEnabled } from "../../snapping";
 import CanvasGridSize from "./CanvasGridSize";
 import { getUncroppedWidthAndHeight } from "../../element/cropElement";
 import { round } from "../../../math";
+import { frameAndChildrenSelectedTogether } from "../../frame";
 
 interface StatsProps {
   app: AppClassProperties;
@@ -171,6 +172,10 @@ export const StatsInner = memo(
       return getAtomicUnits(selectedElements, appState);
     }, [selectedElements, appState]);
 
+    const _frameAndChildrenSelectedTogether = useMemo(() => {
+      return frameAndChildrenSelectedTogether(selectedElements);
+    }, [selectedElements]);
+
     return (
       <div className="exc-stats">
         <Island padding={3}>
@@ -235,7 +240,7 @@ export const StatsInner = memo(
             {renderCustomStats?.(elements, appState)}
           </Collapsible>
 
-          {selectedElements.length > 0 && (
+          {!_frameAndChildrenSelectedTogether && selectedElements.length > 0 && (
             <div
               id="elementStats"
               style={{
