@@ -85,5 +85,9 @@
   "resolutions": {
     "@types/react": "18.2.0",
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "react-router-dom": "^6.22.0",
+    "casdoor-js-sdk": "^0.10.0"
   }
 }

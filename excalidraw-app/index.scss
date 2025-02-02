@@ -115,3 +115,30 @@
     }
   }
 }
+
+.excalidraw-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.casdoor-auth-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  font-family: var(--ui-font);
+  
+  &:hover {
+    background-color: var(--color-primary-darker);
+  }
+}
