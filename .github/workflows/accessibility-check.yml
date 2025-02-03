@@ -1,0 +1,71 @@
+name: Accessibility Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - master
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Install Dependencies
+        run: |
+          yarn install
+
+      - name: Cache Playwright Browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: Install Playwright Browsers (if needed)
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Start Excalidraw Server
+        run: yarn start &
+
+      - name: Wait for Server
+        run: npx wait-on http://localhost:3000
+
+      - name: Run Accessibility Tests
+        id: axe-test
+        run: |
+          node scripts/accessibility-test.js > result.json || true
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-report
+          path: reports/
+
+      - name: Comment on PR if accessibility issues found
+        if: failure()
+        run: |
+          REPORT_PATH=reports/accessibility-report.json
+          if [[ -f "$REPORT_PATH" ]]; then
+            REPORT=$(cat $REPORT_PATH)
+            COMMENT_BODY="Accessibility issues detected:\n\`\`\`json\n$REPORT\n\`\`\`"
+            curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"body\": \"$COMMENT_BODY\"}" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+          else
+            echo "Accessibility report not found."
+          fi
