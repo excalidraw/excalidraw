@@ -1521,6 +1521,19 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
+    const shouldBlockPointerEvents =
+      // default back to `--ui-pointerEvents` flow if setPointerCapture
+      // not supported
+      "setPointerCapture" in HTMLElement.prototype.setPointerCapture
+        ? false
+        : this.state.selectionElement ||
+          this.state.newElement ||
+          this.state.selectedElementsAreBeingDragged ||
+          this.state.resizingElement ||
+          (this.state.activeTool.type === "laser" &&
+            // technically we can just test on this once we make it more safe
+            this.state.cursorButton === "down");
+
     const firstSelectedElement = selectedElements[0];
 
     return (
@@ -1532,7 +1545,9 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--mobile": this.device.editor.isMobile,
         })}
         style={{
-          ["--ui-pointerEvents" as any]: POINTER_EVENTS.enabled,
+          ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
+            ? POINTER_EVENTS.disabled
+            : POINTER_EVENTS.enabled,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -6284,10 +6299,12 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    const target = event.target as HTMLElement;
     // capture subsequent pointer events to the canvas
     // this makes other elements non-interactive until pointer up
-    const target = event.target as HTMLElement;
-    target.setPointerCapture(event.pointerId);
+    if (target.setPointerCapture) {
+      target.setPointerCapture(event.pointerId);
+    }
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
