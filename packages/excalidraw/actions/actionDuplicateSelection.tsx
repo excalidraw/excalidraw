@@ -151,8 +151,6 @@ const duplicateElements = (
       : ExcalidrawElement | null;
   };
 
-  // step (1)
-
   elements = normalizeElementOrder(elements);
 
   const idsOfElementsToDuplicate = arrayToMap(
