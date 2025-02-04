@@ -2517,7 +2517,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "scrolledOutside": false,
   "searchMatches": [],
   "selectedElementIds": {
-    "id0_copy": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2590,7 +2590,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id0_copy",
+  "id": "id1",
   "index": "a1",
   "isDeleted": false,
   "link": null,
@@ -2680,7 +2680,7 @@ History {
         "delta": Delta {
           "deleted": {
             "selectedElementIds": {
-              "id0_copy": true,
+              "id1": true,
             },
           },
           "inserted": {
@@ -2693,7 +2693,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id0_copy" => Delta {
+          "id1" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",

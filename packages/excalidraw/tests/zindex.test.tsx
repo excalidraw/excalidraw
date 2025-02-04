@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { act, render } from "./test-utils";
+import { act, getCloneByOrigId, render } from "./test-utils";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import {
@@ -916,9 +916,9 @@ describe("z-index manipulation", () => {
     API.executeAction(actionDuplicateSelection);
     expect(h.elements).toMatchObject([
       { id: "A" },
-      { id: "A_copy" },
+      { id: getCloneByOrigId("A").id },
       { id: "B" },
-      { id: "B_copy" },
+      { id: getCloneByOrigId("B").id },
     ]);
 
     populateElements([
@@ -930,12 +930,12 @@ describe("z-index manipulation", () => {
       { id: "A" },
       { id: "B" },
       {
-        id: "A_copy",
+        id: getCloneByOrigId("A").id,
 
         groupIds: [expect.stringMatching(/.{3,}/)],
       },
       {
-        id: "B_copy",
+        id: getCloneByOrigId("B").id,
 
         groupIds: [expect.stringMatching(/.{3,}/)],
       },
@@ -951,12 +951,12 @@ describe("z-index manipulation", () => {
       { id: "A" },
       { id: "B" },
       {
-        id: "A_copy",
+        id: getCloneByOrigId("A").id,
 
         groupIds: [expect.stringMatching(/.{3,}/)],
       },
       {
-        id: "B_copy",
+        id: getCloneByOrigId("B").id,
 
         groupIds: [expect.stringMatching(/.{3,}/)],
       },
@@ -972,10 +972,10 @@ describe("z-index manipulation", () => {
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
-      "A_copy",
-      "B_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("B").id,
       "C",
-      "C_copy",
+      getCloneByOrigId("C").id,
     ]);
 
     populateElements([
@@ -988,12 +988,12 @@ describe("z-index manipulation", () => {
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
-      "A_copy",
-      "B_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("B").id,
       "C",
       "D",
-      "C_copy",
-      "D_copy",
+      getCloneByOrigId("C").id,
+      getCloneByOrigId("D").id,
     ]);
 
     populateElements(
@@ -1010,10 +1010,10 @@ describe("z-index manipulation", () => {
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
-      "A_copy",
-      "B_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("B").id,
       "C",
-      "C_copy",
+      getCloneByOrigId("C").id,
     ]);
 
     populateElements(
@@ -1031,9 +1031,9 @@ describe("z-index manipulation", () => {
       "A",
       "B",
       "C",
-      "A_copy",
-      "B_copy",
-      "C_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("B").id,
+      getCloneByOrigId("C").id,
     ]);
 
     populateElements(
@@ -1054,15 +1054,15 @@ describe("z-index manipulation", () => {
       "A",
       "B",
       "C",
-      "A_copy",
-      "B_copy",
-      "C_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("B").id,
+      getCloneByOrigId("C").id,
       "D",
       "E",
       "F",
-      "D_copy",
-      "E_copy",
-      "F_copy",
+      getCloneByOrigId("D").id,
+      getCloneByOrigId("E").id,
+      getCloneByOrigId("F").id,
     ]);
 
     populateElements(
@@ -1076,7 +1076,7 @@ describe("z-index manipulation", () => {
     API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
-      "A_copy",
+      getCloneByOrigId("A").id,
       "B",
       "C",
     ]);
@@ -1093,7 +1093,7 @@ describe("z-index manipulation", () => {
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "B",
-      "B_copy",
+      getCloneByOrigId("B").id,
       "C",
     ]);
 
@@ -1108,9 +1108,9 @@ describe("z-index manipulation", () => {
     API.executeAction(actionDuplicateSelection);
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
-      "A_copy",
+      getCloneByOrigId("A").id,
       "B",
-      "B_copy",
+      getCloneByOrigId("B").id,
       "C",
     ]);
   });
@@ -1125,8 +1125,8 @@ describe("z-index manipulation", () => {
     expect(h.elements.map((element) => element.id)).toEqual([
       "A",
       "C",
-      "A_copy",
-      "C_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("C").id,
       "B",
     ]);
   });
@@ -1144,9 +1144,9 @@ describe("z-index manipulation", () => {
       "A",
       "B",
       "C",
-      "A_copy",
-      "B_copy",
-      "C_copy",
+      getCloneByOrigId("A").id,
+      getCloneByOrigId("B").id,
+      getCloneByOrigId("C").id,
       "D",
     ]);
   });

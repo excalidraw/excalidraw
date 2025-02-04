@@ -45,6 +45,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  ORIG_ID,
   VERTICAL_ALIGN,
 } from "../constants";
 import type { MarkOptional, Merge, Mutable } from "../utility-types";
@@ -601,26 +602,18 @@ export const deepCopyElement = <T extends ExcalidrawElement>(
   return _deepCopyElement(val);
 };
 
+const __test__defineOrigId = (clonedObj: object, origId: string) => {
+  Object.defineProperty(clonedObj, ORIG_ID, {
+    value: origId,
+    writable: false,
+    enumerable: false,
+  });
+};
+
 /**
- * utility wrapper to generate new id. In test env it reuses the old + postfix
- * for test assertions.
+ * utility wrapper to generate new id.
  */
-export const regenerateId = (
-  /** supply null if no previous id exists */
-  previousId: string | null,
-) => {
-  if (isTestEnv() && previousId) {
-    let nextId = `${previousId}_copy`;
-    // `window.h` may not be defined in some unit tests
-    if (
-      window.h?.app
-        ?.getSceneElementsIncludingDeleted()
-        .find((el: ExcalidrawElement) => el.id === nextId)
-    ) {
-      nextId += "_copy";
-    }
-    return nextId;
-  }
+const regenerateId = () => {
   return randomId();
 };
 
@@ -646,7 +639,11 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 ): Readonly<TElement> => {
   let copy = deepCopyElement(element);
 
-  copy.id = copy.type === "text" ? obsidianId() : regenerateId(copy.id); //zsviczian
+  if (isTestEnv()) {
+    __test__defineOrigId(copy, element.id);
+  }
+
+  copy.id = copy.type === "text" ? obsidianId() : regenerateId(); //zsviczian
   copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();
@@ -655,7 +652,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
     editingGroupId,
     (groupId) => {
       if (!groupIdMapForOperation.has(groupId)) {
-        groupIdMapForOperation.set(groupId, regenerateId(groupId));
+        groupIdMapForOperation.set(groupId, regenerateId());
       }
       return groupIdMapForOperation.get(groupId)!;
     },
@@ -701,7 +698,7 @@ export const duplicateElements = (
     // if we haven't migrated the element id, but an old element with the same
     // id exists, generate a new id for it and return it
     if (origElementsMap.has(id)) {
-      const newId = regenerateId(id);
+      const newId = regenerateId();
       elementNewIdsMap.set(id, newId);
       return newId;
     }
@@ -715,6 +712,9 @@ export const duplicateElements = (
     const clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
 
     clonedElement.id = maybeGetNewId(element.id)!;
+    if (isTestEnv()) {
+      __test__defineOrigId(clonedElement, element.id);
+    }
 
     if (opts?.randomizeSeed) {
       clonedElement.seed = randomInteger();
@@ -724,7 +724,7 @@ export const duplicateElements = (
     if (clonedElement.groupIds) {
       clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
         if (!groupNewIdsMap.has(groupId)) {
-          groupNewIdsMap.set(groupId, regenerateId(groupId));
+          groupNewIdsMap.set(groupId, regenerateId());
         }
         return groupNewIdsMap.get(groupId)!;
       });

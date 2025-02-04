@@ -10,7 +10,7 @@ exports[`duplicate element on move when ALT is clicked > rectangle 5`] = `
   "frameId": null,
   "groupIds": [],
   "height": 50,
-  "id": "id0_copy",
+  "id": "id2",
   "index": "a0",
   "isDeleted": false,
   "link": null,
