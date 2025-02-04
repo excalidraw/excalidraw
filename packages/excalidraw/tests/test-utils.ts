@@ -316,8 +316,6 @@ export const getCloneByOrigId = <T extends boolean = false>(
   return null as T extends true ? ExcalidrawElement | null : ExcalidrawElement;
 };
 
-// getCloneByOrigId("as");
-
 /**
  * Assertion helper that strips the actual elements of extra attributes
  * so that diffs are easier to read in case of failure.
@@ -412,12 +410,28 @@ export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
 
           return `${
             id === err.expected[index] ? ansi.green(id) : ansi.red(id)
-          } (${act.type}${
-            ORIG_ID in act ? ` | orig ${(act as any)[ORIG_ID]}` : ""
+          } (${act.type.slice(0, 4)}${
+            ORIG_ID in act ? ` ↳ ${(act as any)[ORIG_ID]}` : ""
           })`;
         })
         .join(", ")}]`,
-    )}\n${ansi.lightGray(`expected: [${err.expected.join(", ")}]\n`)}`;
+    )}\n${ansi.lightGray(
+      `expected: [${err.expected
+        .map((exp: string, index: number) => {
+          const expEl = actualElements.find((el) => el.id === exp);
+          const origEl =
+            expEl &&
+            actualElements.find((el) => el.id === (expEl as any)[ORIG_ID]);
+          return expEl
+            ? `${
+                exp === err.actual[index]
+                  ? ansi.green(expEl.id)
+                  : ansi.red(expEl.id)
+              } (${expEl.type.slice(0, 4)}${origEl ? ` ↳ ${origEl.id}` : ""})`
+            : exp;
+        })
+        .join(", ")}]\n`,
+    )}`;
 
     const error = new Error(errStr);
     const stack = err.stack.split("\n");
