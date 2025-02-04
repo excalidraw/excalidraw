@@ -46,10 +46,10 @@
     "arrowhead_triangle_outline": "Triângulo (contorno)",
     "arrowhead_diamond": "Losango",
     "arrowhead_diamond_outline": "Losango (contorno)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "more_options": "",
+    "arrowhead_crowfoot_many": "Pé de coroa (muitos)",
+    "arrowhead_crowfoot_one": "Pé de coroa (um)",
+    "arrowhead_crowfoot_one_or_many": "Pé de coroa (um ou muitos)",
+    "more_options": "Mais opções",
     "arrowtypes": "Tipo de seta",
     "arrowtype_sharp": "Seta retilínea",
     "arrowtype_round": "Seta curva",
@@ -165,7 +165,7 @@
     "unCroppedDimension": "Dimensão sem corte",
     "copyElementLink": "Copiar hiperligação para o objeto",
     "linkToElement": "Hiperligação para o objeto",
-    "wrapSelectionInFrame": ""
+    "wrapSelectionInFrame": "Ajustar seleção no quadro"
   },
   "elementLink": {
     "title": "Hiperligação para o objeto",
