@@ -5,7 +5,7 @@ import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { arrayToMap, getShortcutKey } from "../utils";
+import { arrayToMap, castArray, getShortcutKey } from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   selectGroupsForSelectedElements,
@@ -94,21 +94,37 @@ const duplicateElements = (
   const oldIdToDuplicatedId = new Map();
   const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
-  const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
-    const newElement = duplicateElement(
-      appState.editingGroupId,
-      groupIdMap,
-      element,
-      {
-        x: element.x + DEFAULT_GRID_SIZE / 2,
-        y: element.y + DEFAULT_GRID_SIZE / 2,
-      },
-    );
-    duplicatedElementsMap.set(newElement.id, newElement);
-    oldIdToDuplicatedId.set(element.id, newElement.id);
-    oldElements.push(element);
-    newElements.push(newElement);
-    return newElement;
+  const duplicateAndOffsetElement = <
+    T extends ExcalidrawElement | ExcalidrawElement[],
+  >(
+    element: T,
+  ): T extends ExcalidrawElement[]
+    ? ExcalidrawElement[]
+    : ExcalidrawElement => {
+    const elements = castArray(element);
+
+    const _newElements = elements.map((element) => {
+      const newElement = duplicateElement(
+        appState.editingGroupId,
+        groupIdMap,
+        element,
+        {
+          x: element.x + DEFAULT_GRID_SIZE / 2,
+          y: element.y + DEFAULT_GRID_SIZE / 2,
+        },
+      );
+      duplicatedElementsMap.set(newElement.id, newElement);
+      oldIdToDuplicatedId.set(element.id, newElement.id);
+      oldElements.push(element);
+      newElements.push(newElement);
+      return newElement;
+    });
+
+    return (
+      Array.isArray(element) ? _newElements : _newElements[0]
+    ) as T extends ExcalidrawElement[]
+      ? ExcalidrawElement[]
+      : ExcalidrawElement;
   };
 
   const idsOfElementsToDuplicate = arrayToMap(
@@ -136,6 +152,9 @@ const duplicateElements = (
     }
     return elements;
   };
+
+  const filterProcessedElements = (elements: ExcalidrawElement[]) =>
+    elements.filter((element) => !processedIds.get(element.id));
 
   const elementsWithClones: ExcalidrawElement[] = [];
 
@@ -194,10 +213,10 @@ const duplicateElements = (
 
           elementsWithClones.push(
             ...markAsProcessed([
-              ...elementsInFrame,
-              element,
-              ...elementsInFrame.map((e) => duplicateAndOffsetElement(e)),
-              duplicateAndOffsetElement(element),
+              ...filterProcessedElements([...elementsInFrame, element]),
+              ...duplicateAndOffsetElement(
+                filterProcessedElements([...elementsInFrame, element]),
+              ),
             ]),
           );
 

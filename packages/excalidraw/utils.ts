@@ -1233,3 +1233,6 @@ export class PromisePool<T> {
 export const escapeDoubleQuotes = (str: string) => {
   return str.replace(/"/g, "&quot;");
 };
+
+export const castArray = <T>(value: T | T[]): T[] =>
+  Array.isArray(value) ? value : [value];
