@@ -9817,12 +9817,22 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const imageFile = await fileOpen({
+      let imageFile = await fileOpen({
         description: "Image",
         extensions: Object.keys(
           IMAGE_MIME_TYPES,
         ) as (keyof typeof IMAGE_MIME_TYPES)[],
       });
+
+      //maybe temporary fix: https://github.com/excalidraw/excalidraw/issues/9091
+      if (imageFile && !imageFile.type) {
+        const extension = imageFile.name.split(".").pop()?.toLowerCase();
+        const mimeType =
+          IMAGE_MIME_TYPES[extension as keyof typeof IMAGE_MIME_TYPES];
+        if (mimeType) {
+          imageFile = new File([imageFile], imageFile.name, { type: mimeType });
+        }
+      }
 
       const imageElement = this.createImageElement({
         sceneX: x,
