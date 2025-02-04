@@ -1522,13 +1522,17 @@ class App extends React.Component<AppProps, AppState> {
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
     const shouldBlockPointerEvents =
-      this.state.selectionElement ||
-      this.state.newElement ||
-      this.state.selectedElementsAreBeingDragged ||
-      this.state.resizingElement ||
-      (this.state.activeTool.type === "laser" &&
-        // technically we can just test on this once we make it more safe
-        this.state.cursorButton === "down");
+      // default back to `--ui-pointerEvents` flow if setPointerCapture
+      // not supported
+      "setPointerCapture" in HTMLElement.prototype
+        ? false
+        : this.state.selectionElement ||
+          this.state.newElement ||
+          this.state.selectedElementsAreBeingDragged ||
+          this.state.resizingElement ||
+          (this.state.activeTool.type === "laser" &&
+            // technically we can just test on this once we make it more safe
+            this.state.cursorButton === "down");
 
     const firstSelectedElement = selectedElements[0];
 
@@ -6295,6 +6299,13 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    const target = event.target as HTMLElement;
+    // capture subsequent pointer events to the canvas
+    // this makes other elements non-interactive until pointer up
+    if (target.setPointerCapture) {
+      target.setPointerCapture(event.pointerId);
+    }
+
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
