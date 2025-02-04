@@ -1,4 +1,11 @@
-import React, { useState, useCallback, useMemo, useEffect, memo } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  memo,
+  useRef,
+} from "react";
 import type Library from "../data/library";
 import {
   distributeLibraryItemsOnSquareGrid,
@@ -28,8 +35,12 @@ import { useUIAppState } from "../context/ui-appState";
 
 import "./LibraryMenu.scss";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import type { NonDeletedExcalidrawElement } from "../element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { LIBRARY_DISABLED_TYPES } from "../constants";
+import { isShallowEqual } from "../utils";
 
 export const isLibraryMenuOpenAtom = atom(false);
 
@@ -173,6 +184,16 @@ const usePendingElementsMemo = (
     getPendingElements(elements, appState.selectedElementIds),
   );
 
+  const selectedElementVersions = useRef(
+    new Map<ExcalidrawElement["id"], ExcalidrawElement["version"]>(),
+  );
+
+  useEffect(() => {
+    for (const element of state.pending) {
+      selectedElementVersions.current.set(element.id, element.version);
+    }
+  }, [state.pending]);
+
   useEffect(() => {
     if (
       // Only update once pointer is released.
@@ -181,11 +202,39 @@ const usePendingElementsMemo = (
       app.state.cursorButton === "up" &&
       app.state.activeTool.type === "selection"
     ) {
-      setState((prev) =>
-        getPendingElements(elements, appState.selectedElementIds),
-      );
+      setState((prev) => {
+        // if selectedElementIds changed, we don't have to compare versions
+        // ---------------------------------------------------------------------
+        if (
+          !isShallowEqual(prev.selectedElementIds, appState.selectedElementIds)
+        ) {
+          selectedElementVersions.current.clear();
+          return getPendingElements(elements, appState.selectedElementIds);
+        }
+        // otherwise we need to check whether selected elements changed
+        // ---------------------------------------------------------------------
+        const elementsMap = app.scene.getNonDeletedElementsMap();
+        for (const id of Object.keys(appState.selectedElementIds)) {
+          const currVersion = elementsMap.get(id)?.version;
+          if (
+            currVersion &&
+            currVersion !== selectedElementVersions.current.get(id)
+          ) {
+            // we can't update the selectedElementVersions in here
+            // because of double render in StrictMode which would overwrite
+            // the state in the second pass with the old `prev` state.
+            // Thus, we update versions in a separate effect. May create
+            // a race condition since current effect is not fully reactive.
+            return getPendingElements(elements, appState.selectedElementIds);
+          }
+        }
+        // nothing changed
+        // ---------------------------------------------------------------------
+        return prev;
+      });
     }
   }, [
+    app,
     app.state.cursorButton,
     app.state.activeTool.type,
     appState.selectedElementIds,
