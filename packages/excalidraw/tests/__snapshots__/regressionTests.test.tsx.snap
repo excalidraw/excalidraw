@@ -2129,7 +2129,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id0_copy" => Delta {
+          "id2" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10619,7 +10619,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id0_copy" => Delta {
+          "id6" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10628,7 +10628,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [
-                "id4_copy",
+                "id7",
               ],
               "height": 10,
               "index": "a0",
@@ -10652,7 +10652,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id1_copy" => Delta {
+          "id8" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10661,7 +10661,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [
-                "id4_copy",
+                "id7",
               ],
               "height": 10,
               "index": "a1",
@@ -10685,7 +10685,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id2_copy" => Delta {
+          "id9" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10694,7 +10694,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [
-                "id4_copy",
+                "id7",
               ],
               "height": 10,
               "index": "a2",

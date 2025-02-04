@@ -65,3 +65,6 @@ export type MakeBrand<T extends string> = {
 
 /** Maybe just promise or already fulfilled one! */
 export type MaybePromise<T> = T | Promise<T>;
+
+// get union of all keys from the union of types
+export type AllPossibleKeys<T> = T extends any ? keyof T : never;

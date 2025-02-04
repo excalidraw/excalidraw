@@ -3916,6 +3916,11 @@ ansi-styles@^6.0.0, ansi-styles@^6.1.0:
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-6.2.1.tgz#0e62320cf99c21afff3b3012192546aacbfb05c5"
   integrity sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==
 
+ansicolor@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/ansicolor/-/ansicolor-2.0.3.tgz#ec4448ae5baf8c2d62bf2dad52eac06ba0b5ea21"
+  integrity sha512-pzusTqk9VHrjgMCcTPDTTvfJfx6Q3+L5tQ6yKC8Diexmoit4YROTFIkxFvRTNL9y5s0Q8HrSrgerCD5bIC+Kiw==
+
 anymatch@~3.1.2:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/anymatch/-/anymatch-3.1.3.tgz#790c58b19ba1720a84205b57c618d5ad8524973e"

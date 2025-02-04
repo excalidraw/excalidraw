@@ -1,9 +1,8 @@
-import React from "react";
 import type { ExcalidrawElement } from "./element/types";
 import { convertToExcalidrawElements, Excalidraw } from "./index";
 import { API } from "./tests/helpers/api";
 import { Keyboard, Pointer } from "./tests/helpers/ui";
-import { render } from "./tests/test-utils";
+import { getCloneByOrigId, render } from "./tests/test-utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -413,9 +412,9 @@ describe("adding elements to frames", () => {
 
       dragElementIntoFrame(frame, rect2);
 
-      const rect2_copy = { ...rect2, id: `${rect2.id}_copy` };
-
       selectElementAndDuplicate(rect2);
+
+      const rect2_copy = getCloneByOrigId(rect2.id);
 
       expect(rect2_copy.frameId).toBe(frame.id);
       expect(rect2.frameId).toBe(frame.id);
@@ -427,10 +426,10 @@ describe("adding elements to frames", () => {
 
       dragElementIntoFrame(frame, rect2);
 
-      const rect2_copy = { ...rect2, id: `${rect2.id}_copy` };
-
       // move the rect2 outside the frame
       selectElementAndDuplicate(rect2, [-1000, -1000]);
+
+      const rect2_copy = getCloneByOrigId(rect2.id);
 
       expect(rect2_copy.frameId).toBe(frame.id);
       expect(rect2.frameId).toBe(null);

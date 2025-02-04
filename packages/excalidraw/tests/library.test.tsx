@@ -1,11 +1,11 @@
 import React from "react";
 import { vi } from "vitest";
-import { fireEvent, render, waitFor } from "./test-utils";
+import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
 import { act, queryByTestId } from "@testing-library/react";
 
 import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
-import { MIME_TYPES } from "../constants";
+import { MIME_TYPES, ORIG_ID } from "../constants";
 import type { LibraryItem, LibraryItems } from "../types";
 import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
@@ -76,7 +76,7 @@ describe("library", () => {
       }),
     );
     await waitFor(() => {
-      expect(h.elements).toEqual([expect.objectContaining({ id: "A_copy" })]);
+      expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
     });
   });
 
@@ -125,23 +125,27 @@ describe("library", () => {
     );
 
     await waitFor(() => {
-      expect(h.elements).toEqual([
-        expect.objectContaining({
-          id: "rectangle1_copy",
-          boundElements: expect.arrayContaining([
-            { type: "text", id: "text1_copy" },
-            { type: "arrow", id: "arrow1_copy" },
-          ]),
-        }),
-        expect.objectContaining({
-          id: "text1_copy",
-          containerId: "rectangle1_copy",
-        }),
-        expect.objectContaining({
-          id: "arrow1_copy",
-          endBinding: expect.objectContaining({ elementId: "rectangle1_copy" }),
-        }),
-      ]);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            [ORIG_ID]: "rectangle1",
+            boundElements: expect.arrayContaining([
+              { type: "text", id: getCloneByOrigId("text1").id },
+              { type: "arrow", id: getCloneByOrigId("arrow1").id },
+            ]),
+          }),
+          expect.objectContaining({
+            [ORIG_ID]: "text1",
+            containerId: getCloneByOrigId("rectangle1").id,
+          }),
+          expect.objectContaining({
+            [ORIG_ID]: "arrow1",
+            endBinding: expect.objectContaining({
+              elementId: getCloneByOrigId("rectangle1").id,
+            }),
+          }),
+        ]),
+      );
     });
   });
 
@@ -170,10 +174,11 @@ describe("library", () => {
     await waitFor(() => {
       expect(h.elements).toEqual([
         expect.objectContaining({
-          id: "elem1_copy",
+          [ORIG_ID]: "elem1",
         }),
         expect.objectContaining({
-          id: expect.not.stringMatching(/^(elem1_copy|elem1)$/),
+          id: expect.not.stringMatching(/^elem1$/),
+          [ORIG_ID]: expect.not.stringMatching(/^\w+$/),
         }),
       ]);
     });
@@ -189,7 +194,7 @@ describe("library", () => {
       }),
     );
     await waitFor(() => {
-      expect(h.elements).toEqual([expect.objectContaining({ id: "A_copy" })]);
+      expect(h.elements).toEqual([expect.objectContaining({ [ORIG_ID]: "A" })]);
     });
     expect(h.state.activeTool.type).toBe("selection");
   });

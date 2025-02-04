@@ -103,6 +103,7 @@
     "@types/pako": "1.0.3",
     "@types/pica": "5.1.3",
     "@types/resize-observer-browser": "0.1.7",
+    "ansicolor": "2.0.3",
     "autoprefixer": "10.4.7",
     "babel-loader": "8.2.5",
     "babel-plugin-transform-class-properties": "6.24.1",
