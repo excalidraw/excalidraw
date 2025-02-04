@@ -1,11 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-  memo,
-} from "react";
+import React, { useState, useCallback, useMemo, useEffect, memo } from "react";
 import type Library from "../data/library";
 import {
   distributeLibraryItemsOnSquareGrid,
@@ -18,7 +11,7 @@ import type {
   LibraryItem,
   ExcalidrawProps,
   UIAppState,
-  AppState,
+  AppClassProperties,
 } from "../types";
 import LibraryMenuItems from "./LibraryMenuItems";
 import { trackEvent } from "../analytics";
@@ -35,7 +28,6 @@ import { useUIAppState } from "../context/ui-appState";
 
 import "./LibraryMenu.scss";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import { isShallowEqual } from "../utils";
 import type { NonDeletedExcalidrawElement } from "../element/types";
 import { LIBRARY_DISABLED_TYPES } from "../constants";
 
@@ -172,48 +164,32 @@ const getPendingElements = (
   selectedElementIds,
 });
 
-const usePendingElementsMemo = (appState: UIAppState) => {
+const usePendingElementsMemo = (
+  appState: UIAppState,
+  app: AppClassProperties,
+) => {
   const elements = useExcalidrawElements();
-  const hasSelectedChangedRef = useRef(false);
-
   const [state, setState] = useState(() =>
     getPendingElements(elements, appState.selectedElementIds),
   );
 
-  const cursorButton =
-    "cursorButton" in appState
-      ? (appState.cursorButton as AppState["cursorButton"])
-      : "up";
-  const activeToolType = appState.activeTool.type;
-  const edititingTextElement = appState.editingTextElement;
-
   useEffect(() => {
-    if (cursorButton === "up" && activeToolType === "selection") {
-      if (edititingTextElement) {
-        setState({
-          pending: [],
-          elements,
-          selectedElementIds: appState.selectedElementIds,
-        });
-        return;
-      }
-      const hasChanged = hasSelectedChangedRef.current;
+    if (
+      // Only update once pointer is released.
+      // Reading directly from app.state to make it clear it's not reactive
+      // (hence, there's potential for stale state)
+      app.state.cursorButton === "up" &&
+      app.state.activeTool.type === "selection"
+    ) {
       setState((prev) =>
-        !hasChanged &&
-        isShallowEqual(prev.selectedElementIds, appState.selectedElementIds)
-          ? prev
-          : getPendingElements(elements, appState.selectedElementIds),
+        getPendingElements(elements, appState.selectedElementIds),
       );
     }
-    hasSelectedChangedRef.current = appState.isRotating || appState.isResizing;
   }, [
+    app.state.cursorButton,
+    app.state.activeTool.type,
     appState.selectedElementIds,
     elements,
-    cursorButton,
-    activeToolType,
-    appState.isRotating,
-    appState.isResizing,
-    edititingTextElement,
   ]);
 
   return state.pending;
@@ -224,14 +200,14 @@ const usePendingElementsMemo = (appState: UIAppState) => {
  * <DefaultSidebar/> or host apps Sidebar components.
  */
 export const LibraryMenu = memo(() => {
-  const { library, id, onInsertElements } = useApp();
+  const app = useApp();
+  const { onInsertElements } = app;
   const appProps = useAppProps();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
   const [selectedItems, setSelectedItems] = useState<LibraryItem["id"][]>([]);
-  const memoizedLibrary = useMemo(() => library, [library]);
-  // BUG: pendingElements are still causing some unnecessary rerenders because clicking into canvas returns some ids even when no element is selected.
-  const pendingElements = usePendingElementsMemo(appState);
+  const memoizedLibrary = useMemo(() => app.library, [app.library]);
+  const pendingElements = usePendingElementsMemo(appState, app);
 
   const onInsertLibraryItems = useCallback(
     (libraryItems: LibraryItems) => {
@@ -256,7 +232,7 @@ export const LibraryMenu = memo(() => {
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
       library={memoizedLibrary}
-      id={id}
+      id={app.id}
       theme={appState.theme}
       selectedItems={selectedItems}
       onSelectItems={setSelectedItems}
