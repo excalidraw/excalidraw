@@ -12,7 +12,6 @@ import type {
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./element/types";
-import type { SERVER_DELTA } from "./sync/protocol";
 import { arrayToMap, assertNever } from "./utils";
 import { hashElementsVersion } from "./element";
 import { syncMovedIndices } from "./fractionalIndex";
@@ -453,7 +452,7 @@ export class StoreDelta {
   public static load({
     id,
     elements: { added, removed, updated },
-  }: SERVER_DELTA["payload"]) {
+  }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated, {
       shouldRedistribute: false,
     });
