@@ -40,7 +40,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
     mimeTypes,
     multiple: opts.multiple ?? false,
     legacySetup: (resolve, reject, input) => {
-      let isResolved = false; 
+      let isResolved = false;
       let checkInterval: number | null = null;
 
       // Increased delay for iOS to ensure file selection is complete

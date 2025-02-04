@@ -927,14 +927,8 @@ export const resizeSingleElement = (
     if (isIframeLikeElement(latestElement)) {
       if (shouldMaintainAspectRatio) {
         const scale: [number, number] = [
-          Math.abs(
-            nextWidth /
-              (origElement.width / origElement.scale[0]),
-          ),
-          Math.abs(
-            nextHeight /
-              (origElement.height / origElement.scale[1]),
-          ),
+          Math.abs(nextWidth / (origElement.width / origElement.scale[0])),
+          Math.abs(nextHeight / (origElement.height / origElement.scale[1])),
         ];
         mutateElement(latestElement, { scale });
       }
@@ -943,7 +937,8 @@ export const resizeSingleElement = (
         scale: [
           // defaulting because scaleX/Y can be 0/-0
           (Math.sign(nextWidth) || origElement.scale[0]) * origElement.scale[0],
-          (Math.sign(nextHeight) || origElement.scale[1]) * origElement.scale[1],
+          (Math.sign(nextHeight) || origElement.scale[1]) *
+            origElement.scale[1],
         ],
       });
     }

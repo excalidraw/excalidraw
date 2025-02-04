@@ -428,7 +428,7 @@ const renderBindingHighlight = (
     suggestedBinding as any,
     elementsMap,
     appState.zoom,
-    `${appState.gridColor.Bold}`
+    `${appState.gridColor.Bold}`,
   ); //zsviczian
 
   context.restore();

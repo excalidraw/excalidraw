@@ -457,9 +457,15 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { getNextSingleWidthAndHeightFromPointer, resizeSingleElement } from "../element/resizeElements"; //zsviczian
+import {
+  getNextSingleWidthAndHeightFromPointer,
+  resizeSingleElement,
+} from "../element/resizeElements"; //zsviczian
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
-import { getResizedElementAbsoluteCoords, getVisibleSceneBounds } from "../element/bounds";
+import {
+  getResizedElementAbsoluteCoords,
+  getVisibleSceneBounds,
+} from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
 import { getTooltipDiv } from "./Tooltip";
 import NewElementCanvas from "./canvases/NewElementCanvas";
@@ -4065,15 +4071,16 @@ class App extends React.Component<AppProps, AppState> {
           element.angle,
         );
 
-        const { nextWidth, nextHeight } = getNextSingleWidthAndHeightFromPointer(
-          element,
-          element,
-          this.scene.getElementsMapIncludingDeleted(),
-          this.scene.getElementsMapIncludingDeleted(),
-          "se",
-          pointerX,
-          pointerY,
-        );
+        const { nextWidth, nextHeight } =
+          getNextSingleWidthAndHeightFromPointer(
+            element,
+            element,
+            this.scene.getElementsMapIncludingDeleted(),
+            this.scene.getElementsMapIncludingDeleted(),
+            "se",
+            pointerX,
+            pointerY,
+          );
 
         resizeSingleElement(
           nextWidth,
