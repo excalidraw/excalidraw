@@ -1524,7 +1524,7 @@ class App extends React.Component<AppProps, AppState> {
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
       // not supported
-      "setPointerCapture" in HTMLElement.prototype.setPointerCapture
+      "setPointerCapture" in HTMLElement.prototype
         ? false
         : this.state.selectionElement ||
           this.state.newElement ||
