@@ -7,6 +7,9 @@ import polyfill from "./packages/excalidraw/polyfill";
 import { testPolyfills } from "./packages/excalidraw/tests/helpers/polyfills";
 import { yellow } from "./packages/excalidraw/tests/helpers/colorize";
 
+// mock for pep.js not working with setPointerCapture()
+HTMLElement.prototype.setPointerCapture = vi.fn();
+
 Object.assign(globalThis, testPolyfills);
 
 require("fake-indexeddb/auto");
