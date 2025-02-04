@@ -108,8 +108,10 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
 };
 
 const getExtensionFromFilename = (filename?: string): string | null => {
-  if (!filename) return null;
-  const ext = filename.split('.').pop()?.toLowerCase();
+  if (!filename) {
+    return null;
+  }
+  const ext = filename.split(".").pop()?.toLowerCase();
   return ext || null;
 };
 
