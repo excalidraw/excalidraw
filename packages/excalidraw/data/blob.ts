@@ -107,6 +107,17 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+const getExtensionFromFilename = (filename?: string): string | null => {
+  if (!filename) return null;
+  const ext = filename.split('.').pop()?.toLowerCase();
+  return ext || null;
+};
+
+const isSupportedExtension = (filename?: string) => {
+  const extension = getExtensionFromFilename(filename);
+  return !!extension && extension in IMAGE_MIME_TYPES;
+};
+
 export const isSupportedImageFileType = (type: string | null | undefined) => {
   return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
 };
@@ -115,7 +126,11 @@ export const isSupportedImageFile = (
   blob: Blob | null | undefined,
 ): blob is Blob & { type: ValueOf<typeof IMAGE_MIME_TYPES> } => {
   const { type } = blob || {};
-  return isSupportedImageFileType(type);
+  if (type) {
+    return isSupportedImageFileType(type);
+  }
+  const { name } = blob || {};
+  return isSupportedExtension(name);
 };
 
 export const loadSceneOrLibraryFromBlob = async (
