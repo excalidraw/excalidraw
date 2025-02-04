@@ -5,7 +5,13 @@ import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { arrayToMap, getShortcutKey } from "../utils";
+import {
+  arrayToMap,
+  castArray,
+  findLastIndex,
+  getShortcutKey,
+  invariant,
+} from "../utils";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   selectGroupsForSelectedElements,
@@ -19,8 +25,13 @@ import { DEFAULT_GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
+  getContainerElement,
 } from "../element/textElement";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
+import {
+  hasBoundTextElement,
+  isBoundToContainer,
+  isFrameLikeElement,
+} from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
 import { DuplicateIcon } from "../components/icons";
 import {
@@ -31,7 +42,6 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
-import { syncMovedIndices } from "../fractionalIndex";
 import { StoreAction } from "../store";
 
 export const actionDuplicateSelection = register({
@@ -85,34 +95,66 @@ const duplicateElements = (
 ): Partial<ActionResult> => {
   // ---------------------------------------------------------------------------
 
-  // step (1)
-
-  const sortedElements = normalizeElementOrder(elements);
   const groupIdMap = new Map();
   const newElements: ExcalidrawElement[] = [];
   const oldElements: ExcalidrawElement[] = [];
   const oldIdToDuplicatedId = new Map();
   const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
 
-  const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
-    const newElement = duplicateElement(
-      appState.editingGroupId,
-      groupIdMap,
-      element,
-      {
-        x: element.x + DEFAULT_GRID_SIZE / 2,
-        y: element.y + DEFAULT_GRID_SIZE / 2,
+  const elementsMap = arrayToMap(elements);
+
+  const duplicateAndOffsetElement = <
+    T extends ExcalidrawElement | ExcalidrawElement[],
+  >(
+    element: T,
+  ): T extends ExcalidrawElement[]
+    ? ExcalidrawElement[]
+    : ExcalidrawElement | null => {
+    const elements = castArray(element);
+
+    const _newElements = elements.reduce(
+      (acc: ExcalidrawElement[], element) => {
+        if (processedIds.has(element.id)) {
+          return acc;
+        }
+
+        processedIds.set(element.id, true);
+
+        const newElement = duplicateElement(
+          appState.editingGroupId,
+          groupIdMap,
+          element,
+          {
+            x: element.x + DEFAULT_GRID_SIZE / 2,
+            y: element.y + DEFAULT_GRID_SIZE / 2,
+          },
+        );
+
+        processedIds.set(newElement.id, true);
+
+        duplicatedElementsMap.set(newElement.id, newElement);
+        oldIdToDuplicatedId.set(element.id, newElement.id);
+
+        oldElements.push(element);
+        newElements.push(newElement);
+
+        acc.push(newElement);
+        return acc;
       },
+      [],
     );
-    duplicatedElementsMap.set(newElement.id, newElement);
-    oldIdToDuplicatedId.set(element.id, newElement.id);
-    oldElements.push(element);
-    newElements.push(newElement);
-    return newElement;
+
+    return (
+      Array.isArray(element) ? _newElements : _newElements[0] || null
+    ) as T extends ExcalidrawElement[]
+      ? ExcalidrawElement[]
+      : ExcalidrawElement | null;
   };
 
+  elements = normalizeElementOrder(elements);
+
   const idsOfElementsToDuplicate = arrayToMap(
-    getSelectedElements(sortedElements, appState, {
+    getSelectedElements(elements, appState, {
       includeBoundTextElement: true,
       includeElementsInFrames: true,
     }),
@@ -130,122 +172,133 @@ const duplicateElements = (
   // loop over them.
   const processedIds = new Map<ExcalidrawElement["id"], true>();
 
-  const markAsProcessed = (elements: ExcalidrawElement[]) => {
-    for (const element of elements) {
-      processedIds.set(element.id, true);
+  const elementsWithClones: ExcalidrawElement[] = elements.slice();
+
+  const insertAfterIndex = (
+    index: number,
+    elements: ExcalidrawElement | null | ExcalidrawElement[],
+  ) => {
+    invariant(index !== -1, "targetIndex === -1 ");
+
+    if (!Array.isArray(elements) && !elements) {
+      return;
     }
-    return elements;
+
+    elementsWithClones.splice(index + 1, 0, ...castArray(elements));
   };
 
-  const elementsWithClones: ExcalidrawElement[] = [];
+  const frameIdsToDuplicate = new Set(
+    elements
+      .filter(
+        (el) => idsOfElementsToDuplicate.has(el.id) && isFrameLikeElement(el),
+      )
+      .map((el) => el.id),
+  );
 
-  let index = -1;
-
-  while (++index < sortedElements.length) {
-    const element = sortedElements[index];
-
-    if (processedIds.get(element.id)) {
+  for (const element of elements) {
+    if (processedIds.has(element.id)) {
       continue;
     }
 
-    const boundTextElement = getBoundTextElement(element, arrayToMap(elements));
-    const isElementAFrameLike = isFrameLikeElement(element);
+    if (!idsOfElementsToDuplicate.has(element.id)) {
+      continue;
+    }
 
-    if (idsOfElementsToDuplicate.get(element.id)) {
-      // if a group or a container/bound-text or frame, duplicate atomically
-      if (element.groupIds.length || boundTextElement || isElementAFrameLike) {
-        const groupId = getSelectedGroupForElement(appState, element);
-        if (groupId) {
-          // TODO:
-          // remove `.flatMap...`
-          // if the elements in a frame are grouped when the frame is grouped
-          const groupElements = getElementsInGroup(
-            sortedElements,
-            groupId,
-          ).flatMap((element) =>
-            isFrameLikeElement(element)
-              ? [...getFrameChildren(elements, element.id), element]
-              : [element],
-          );
+    // groups
+    // -------------------------------------------------------------------------
 
-          elementsWithClones.push(
-            ...markAsProcessed([
-              ...groupElements,
-              ...groupElements.map((element) =>
-                duplicateAndOffsetElement(element),
-              ),
-            ]),
-          );
-          continue;
-        }
-        if (boundTextElement) {
-          elementsWithClones.push(
-            ...markAsProcessed([
-              element,
-              boundTextElement,
-              duplicateAndOffsetElement(element),
-              duplicateAndOffsetElement(boundTextElement),
-            ]),
-          );
-          continue;
-        }
-        if (isElementAFrameLike) {
-          const elementsInFrame = getFrameChildren(sortedElements, element.id);
+    const groupId = getSelectedGroupForElement(appState, element);
+    if (groupId) {
+      const groupElements = getElementsInGroup(elements, groupId).flatMap(
+        (element) =>
+          isFrameLikeElement(element)
+            ? [...getFrameChildren(elements, element.id), element]
+            : [element],
+      );
 
-          elementsWithClones.push(
-            ...markAsProcessed([
-              ...elementsInFrame,
-              element,
-              ...elementsInFrame.map((e) => duplicateAndOffsetElement(e)),
-              duplicateAndOffsetElement(element),
-            ]),
-          );
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return el.groupIds?.includes(groupId);
+      });
 
-          continue;
-        }
-      }
-      // since elements in frames have a lower z-index than the frame itself,
-      // they will be looped first and if their frames are selected as well,
-      // they will have been copied along with the frame atomically in the
-      // above branch, so we must skip those elements here
-      //
-      // now, for elements do not belong any frames or elements whose frames
-      // are selected (or elements that are left out from the above
-      // steps for whatever reason) we (should at least) duplicate them here
-      if (!element.frameId || !idsOfElementsToDuplicate.has(element.frameId)) {
-        elementsWithClones.push(
-          ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
+      insertAfterIndex(targetIndex, duplicateAndOffsetElement(groupElements));
+      continue;
+    }
+
+    // frame duplication
+    // -------------------------------------------------------------------------
+
+    if (element.frameId && frameIdsToDuplicate.has(element.frameId)) {
+      continue;
+    }
+
+    if (isFrameLikeElement(element)) {
+      const frameId = element.id;
+
+      const frameChildren = getFrameChildren(elements, frameId);
+
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return el.frameId === frameId || el.id === frameId;
+      });
+
+      insertAfterIndex(
+        targetIndex,
+        duplicateAndOffsetElement([...frameChildren, element]),
+      );
+      continue;
+    }
+
+    // text container
+    // -------------------------------------------------------------------------
+
+    if (hasBoundTextElement(element)) {
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return (
+          el.id === element.id ||
+          ("containerId" in el && el.containerId === element.id)
         );
+      });
+
+      if (boundTextElement) {
+        insertAfterIndex(
+          targetIndex,
+          duplicateAndOffsetElement([element, boundTextElement]),
+        );
+      } else {
+        insertAfterIndex(targetIndex, duplicateAndOffsetElement(element));
       }
-    } else {
-      elementsWithClones.push(...markAsProcessed([element]));
+
+      continue;
     }
-  }
 
-  // step (2)
+    if (isBoundToContainer(element)) {
+      const container = getContainerElement(element, elementsMap);
 
-  // second pass to remove duplicates. We loop from the end as it's likelier
-  // that the last elements are in the correct order (contiguous or otherwise).
-  // Thus we need to reverse as the last step (3).
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return el.id === element.id || el.id === container?.id;
+      });
 
-  const finalElementsReversed: ExcalidrawElement[] = [];
+      if (container) {
+        insertAfterIndex(
+          targetIndex,
+          duplicateAndOffsetElement([container, element]),
+        );
+      } else {
+        insertAfterIndex(targetIndex, duplicateAndOffsetElement(element));
+      }
 
-  const finalElementIds = new Map<ExcalidrawElement["id"], true>();
-  index = elementsWithClones.length;
-
-  while (--index >= 0) {
-    const element = elementsWithClones[index];
-    if (!finalElementIds.get(element.id)) {
-      finalElementIds.set(element.id, true);
-      finalElementsReversed.push(element);
+      continue;
     }
-  }
 
-  // step (3)
-  const finalElements = syncMovedIndices(
-    finalElementsReversed.reverse(),
-    arrayToMap(newElements),
-  );
+    // default duplication (regular elements)
+    // -------------------------------------------------------------------------
+
+    insertAfterIndex(
+      findLastIndex(elementsWithClones, (el) => el.id === element.id),
+      duplicateAndOffsetElement(element),
+    );
+  }
 
   // ---------------------------------------------------------------------------
 
@@ -260,7 +313,7 @@ const duplicateElements = (
     oldIdToDuplicatedId,
   );
   bindElementsToFramesAfterDuplication(
-    finalElements,
+    elementsWithClones,
     oldElements,
     oldIdToDuplicatedId,
   );
@@ -269,7 +322,7 @@ const duplicateElements = (
     excludeElementsInFramesFromSelection(newElements);
 
   return {
-    elements: finalElements,
+    elements: elementsWithClones,
     appState: {
       ...appState,
       ...selectGroupsForSelectedElements(
@@ -285,7 +338,7 @@ const duplicateElements = (
             {},
           ),
         },
-        getNonDeletedElements(finalElements),
+        getNonDeletedElements(elementsWithClones),
         appState,
         null,
       ),

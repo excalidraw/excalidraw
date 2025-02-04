@@ -116,8 +116,5 @@ const normalizeBoundElementsOrder = (
 export const normalizeElementOrder = (
   elements: readonly ExcalidrawElement[],
 ) => {
-  // console.time();
-  const ret = normalizeBoundElementsOrder(normalizeGroupElementOrder(elements));
-  // console.timeEnd();
-  return ret;
+  return normalizeBoundElementsOrder(normalizeGroupElementOrder(elements));
 };
