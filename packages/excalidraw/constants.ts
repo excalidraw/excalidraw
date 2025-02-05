@@ -417,7 +417,7 @@ export const LIBRARY_DISABLED_TYPES = new Set([
 // use these constants to easily identify reference sites
 export const TOOL_TYPE = {
   selection: "selection",
-  LassoSelection: "lassoSelection",
+  lassoSelection: "lassoSelection",
   rectangle: "rectangle",
   diamond: "diamond",
   ellipse: "ellipse",
