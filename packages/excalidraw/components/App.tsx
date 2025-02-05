@@ -465,6 +465,7 @@ import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
+import { LassoTrail } from "../lasso";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -634,6 +635,8 @@ class App extends React.Component<AppProps, AppState> {
         ? "rgba(0, 0, 0, 0.2)"
         : "rgba(255, 255, 255, 0.2)",
   });
+
+  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
   onChangeEmitter = new Emitter<
     [
@@ -1607,7 +1610,11 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
                         <SVGLayer
-                          trails={[this.laserTrails, this.eraserTrail]}
+                          trails={[
+                            this.laserTrails,
+                            this.eraserTrail,
+                            this.lassoTrail,
+                          ]}
                         />
                         {selectedElements.length === 1 &&
                           this.state.openDialog?.name !==
@@ -4515,6 +4522,14 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS[1] && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (this.state.activeTool.type === "selection") {
+          this.setActiveTool({ type: "lassoSelection" });
+        } else {
+          this.setActiveTool({ type: "selection" });
+        }
+      }
+
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
@@ -6545,6 +6560,15 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "lassoSelection") {
+      // Begin a mark capture. This does not have to update state yet.
+      const [gridX, gridY] = getGridPoint(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        null,
+      );
+
+      this.lassoTrail.startPath(gridX, gridY);
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
@@ -8461,6 +8485,63 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         this.maybeDragNewGenericElement(pointerDownState, event);
+      } else if (this.state.activeTool.type === "lassoSelection") {
+        const { intersectedElementIds, enclosedElementIds } =
+          this.lassoTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+
+        this.setState((prevState) => {
+          const elements = [...intersectedElementIds, ...enclosedElementIds];
+
+          const nextSelectedElementIds = elements.reduce((acc, id) => {
+            acc[id] = true;
+            return acc;
+          }, {} as Record<ExcalidrawElement["id"], true>);
+
+          const nextSelectedGroupIds = selectGroupsForSelectedElements(
+            {
+              selectedElementIds: nextSelectedElementIds,
+              editingGroupId: prevState.editingGroupId,
+            },
+            this.scene.getNonDeletedElements(),
+            prevState,
+            this,
+          );
+
+          // TODO: not entirely correct (need to select all elements in group instead)
+          for (const [id, selected] of Object.entries(nextSelectedElementIds)) {
+            if (selected) {
+              const element = this.scene.getNonDeletedElement(id);
+              if (element && element.groupIds.length > 0) {
+                delete nextSelectedElementIds[id];
+              }
+            }
+          }
+
+          // TODO: make elegant and decide if all children are selected, do we keep?
+          for (const [id, selected] of Object.entries(nextSelectedElementIds)) {
+            if (selected) {
+              const element = this.scene.getNonDeletedElement(id);
+
+              if (element && isFrameLikeElement(element)) {
+                const elementsInFrame = getFrameChildren(
+                  elementsMap,
+                  element.id,
+                );
+                for (const child of elementsInFrame) {
+                  delete nextSelectedElementIds[child.id];
+                }
+              }
+            }
+          }
+
+          return {
+            selectedElementIds: makeNextSelectedElementIds(
+              nextSelectedElementIds,
+              prevState,
+            ),
+            selectedGroupIds: nextSelectedGroupIds.selectedGroupIds,
+          };
+        });
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -8715,6 +8796,8 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
       }));
 
+      this.lassoTrail.endPath();
+
       this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
@@ -8881,6 +8964,7 @@ class App extends React.Component<AppProps, AppState> {
 
         return;
       }
+
       if (isImageElement(newElement)) {
         const imageElement = newElement;
         try {

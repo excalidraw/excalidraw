@@ -85,6 +85,7 @@ import {
   type Radians,
 } from "../../math";
 import { getCornerRadius } from "../shapes";
+import { renderLassoSelection } from "../lasso";
 
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,

@@ -15,6 +15,7 @@ import { generateRoughOptions } from "../scene/Shape";
 import {
   isArrowElement,
   isBoundToContainer,
+  isFrameLikeElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
@@ -321,6 +322,15 @@ export const getElementLineSegments = (
       lineSegment(n, e),
       lineSegment(s, w),
       lineSegment(s, e),
+    ];
+  }
+
+  if (isFrameLikeElement(element)) {
+    return [
+      lineSegment(nw, ne),
+      lineSegment(ne, se),
+      lineSegment(se, sw),
+      lineSegment(sw, nw),
     ];
   }
 

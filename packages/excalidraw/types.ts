@@ -119,6 +119,7 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type ToolType =
   | "selection"
+  | "lassoSelection"
   | "rectangle"
   | "diamond"
   | "ellipse"
@@ -408,6 +409,8 @@ export interface AppState {
   croppingElementId: ExcalidrawElement["id"] | null;
 
   searchMatches: readonly SearchMatch[];
+
+  lassoSelectionEnabled: boolean;
 }
 
 type SearchMatch = {

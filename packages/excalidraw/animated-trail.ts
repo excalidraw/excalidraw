@@ -20,7 +20,7 @@ export interface AnimatedTrailOptions {
 }
 
 export class AnimatedTrail implements Trail {
-  private currentTrail?: LaserPointer;
+  currentTrail?: LaserPointer;
   private pastTrails: LaserPointer[] = [];
 
   private container?: SVGSVGElement;
@@ -28,7 +28,7 @@ export class AnimatedTrail implements Trail {
 
   constructor(
     private animationFrameHandler: AnimationFrameHandler,
-    private app: App,
+    protected app: App,
     private options: Partial<LaserPointerOptions> &
       Partial<AnimatedTrailOptions>,
   ) {
@@ -96,6 +96,16 @@ export class AnimatedTrail implements Trail {
       this.currentTrail = undefined;
       this.update();
     }
+  }
+
+  getCurrentTrail() {
+    return this.currentTrail;
+  }
+
+  clearTrails() {
+    this.pastTrails = [];
+    this.currentTrail = undefined;
+    this.update();
   }
 
   private update() {

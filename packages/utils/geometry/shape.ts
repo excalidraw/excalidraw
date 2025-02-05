@@ -239,7 +239,7 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
-const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
+export const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
   points: Point[],
 ): Polyline<Point> => {
   let previousPoint: Point = points[0];
