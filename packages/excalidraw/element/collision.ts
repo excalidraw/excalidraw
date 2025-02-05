@@ -43,6 +43,7 @@ import {
   debugClear,
   debugDrawCubicBezier,
   debugDrawLine,
+  debugDrawPoint,
 } from "../visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -284,12 +285,46 @@ const intersectRectanguloidWithLine = (
       : [];
 
   debugClear();
+  debugDrawLine(
+    lineSegment(
+      right[1],
+      pointFrom(
+        right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
+        right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
+      ),
+    ),
+    { color: "red", permanent: true },
+  );
+  debugDrawLine(
+    lineSegment(
+      bottom[1],
+      pointFrom(
+        bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
+        bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
+      ),
+    ),
+    { color: "green", permanent: true },
+  );
   sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
   corners.forEach((s) =>
     debugDrawCubicBezier(s, { color: "green", permanent: true }),
   );
   debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
-  //debugDrawPoint(bottom[0], { color: "white", permanent: true });
+  // console.log(
+  //   curve(
+  //     right[1],
+  //     pointFrom(
+  //       right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
+  //       right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
+  //     ),
+  //     pointFrom(
+  //       bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
+  //       bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
+  //     ),
+  //     bottom[1],
+  //   ),
+  //   line<GlobalPoint>(rotatedA, rotatedB),
+  // );
 
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
@@ -303,9 +338,12 @@ const intersectRectanguloidWithLine = (
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
 
-  // [...sideIntersections, ...cornerIntersections].forEach((p) =>
-  //   debugDrawPoint(p, { color: "purple", permanent: true }),
-  // );
+  [
+    //...sideIntersections,
+    ...cornerIntersections,
+  ].forEach((p) => {
+    debugDrawPoint(p, { color: "purple", permanent: true });
+  });
 
   return (
     [...sideIntersections, ...cornerIntersections]

@@ -153,3 +153,7 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
 } & {
   _brand: "excalimath_ellipse";
 };
+
+export type Complex = [real: number, imag: number] & {
+  _brand: "excalimath_complex";
+};

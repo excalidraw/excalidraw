@@ -49,6 +49,21 @@ describe("Math curve", () => {
         [10.970762294018797, 98.78654713247653],
       ]);
     });
+
+    it("regression 1", () => {
+      const c = curve(
+        pointFrom(41.028864759926016, 12.226249068355052),
+        pointFrom(41.028864759926016, 33.55958240168839),
+        pointFrom(30.362198093259348, 44.22624906835505),
+        pointFrom(9.028864759926016, 44.22624906835505),
+      );
+      const l = line(
+        pointFrom(188.2149592542487, 134.75505940984908),
+        pointFrom(-82.30963544324186, -41.19949363038283),
+      );
+
+      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([[8.5, 87.5]]);
+    });
   });
 
   describe("point closest to other", () => {
