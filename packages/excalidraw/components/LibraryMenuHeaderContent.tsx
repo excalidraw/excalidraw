@@ -16,7 +16,7 @@ import {
 } from "./icons";
 import { ToolButton } from "./ToolButton";
 import { fileOpen } from "../data/filesystem";
-import { muteFSAbortError } from "../utils";
+import { muteFSAbortError, isIosSafari } from "../utils";
 import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
@@ -158,9 +158,7 @@ export const LibraryDropdownMenuButton: React.FC<{
           description: "Excalidraw library files",
           // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
           // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-          /*
-            extensions: [".json", ".excalidrawlib"],
-            */
+          extensions: isIosSafari ? undefined : ["json", "excalidrawlib"],
         }),
         merge: true,
         openLibraryMenu: true,

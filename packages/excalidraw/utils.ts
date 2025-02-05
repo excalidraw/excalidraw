@@ -1243,3 +1243,8 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+export const isIosSafari =
+  /iP(hone|ad|od)/.test(navigator.userAgent) &&
+  /Safari/.test(navigator.userAgent) &&
+  !/Chrome|CriOS/.test(navigator.userAgent);

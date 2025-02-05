@@ -18,6 +18,7 @@ import type {
   ExportedLibraryData,
   ImportedLibraryData,
 } from "./types";
+import { isIosSafari } from "../utils";
 
 /**
  * Strips out files which are only referenced by deleted elements
@@ -99,7 +100,7 @@ export const loadFromJSON = async (
     description: "Excalidraw files",
     // ToDo: Be over-permissive until https://bugs.webkit.org/show_bug.cgi?id=34442
     // gets resolved. Else, iOS users cannot open `.excalidraw` files.
-    // extensions: ["json", "excalidraw", "png", "svg"],
+    extensions: isIosSafari ? undefined : ["json", "excalidraw", "png", "svg"],
   });
   return loadFromBlob(
     await normalizeFile(file),
