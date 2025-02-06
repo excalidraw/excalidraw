@@ -12,8 +12,6 @@ export {
   hasStrokeStyle,
   canHaveArrowheads,
   canChangeRoundness,
-  getElementAtPosition,
-  getElementsAtPosition,
 } from "./comparisons";
 export {
   getNormalizedZoom,
