@@ -284,12 +284,12 @@ const intersectRectanguloidWithLine = (
         ]
       : [];
 
-  debugClear();
-  sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
-  corners.forEach((s) =>
-    debugDrawCubicBezier(s, { color: "green", permanent: true }),
-  );
-  debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
+  // debugClear();
+  // sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
+  // corners.forEach((s) =>
+  //   debugDrawCubicBezier(s, { color: "green", permanent: true }),
+  // );
+  // debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
 
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
@@ -303,12 +303,9 @@ const intersectRectanguloidWithLine = (
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
 
-  [
-    //...sideIntersections,
-    ...cornerIntersections,
-  ].forEach((p) => {
-    debugDrawPoint(p, { color: "purple", permanent: true });
-  });
+  // [...sideIntersections, ...cornerIntersections].forEach((p) => {
+  //   debugDrawPoint(p, { color: "purple", permanent: true });
+  // });
 
   return (
     [...sideIntersections, ...cornerIntersections]
@@ -355,28 +352,72 @@ const intersectDiamondWithLine = (
   // Create the line segment parts of the diamond
   // NOTE: Horizontal and vertical seems to be flipped here
   const topRight = lineSegment<GlobalPoint>(
-    pointFrom(top[0] + horizontalRadius, top[1] + verticalRadius),
-    pointFrom(right[0] - horizontalRadius, right[1] - verticalRadius),
+    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
+    pointFrom(right[0] - verticalRadius, right[1] - horizontalRadius),
   );
   const bottomRight = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] + horizontalRadius, bottom[1] - verticalRadius),
-    pointFrom(right[0] - horizontalRadius, right[1] + verticalRadius),
+    pointFrom(right[0] - verticalRadius, right[1] + horizontalRadius),
+    pointFrom(bottom[0] + verticalRadius, bottom[1] - horizontalRadius),
   );
   const bottomLeft = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] - horizontalRadius, bottom[1] - verticalRadius),
-    pointFrom(left[0] + horizontalRadius, left[1] + verticalRadius),
+    pointFrom(bottom[0] - verticalRadius, bottom[1] - horizontalRadius),
+    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
   );
   const topLeft = lineSegment<GlobalPoint>(
-    pointFrom(top[0] - horizontalRadius, top[1] + verticalRadius),
-    pointFrom(left[0] + horizontalRadius, left[1] - verticalRadius),
+    pointFrom(left[0] + verticalRadius, left[1] - horizontalRadius),
+    pointFrom(top[0] - verticalRadius, top[1] + horizontalRadius),
   );
 
   const curves = element.roundness
     ? [
-        curve(topRight[1], right, right, bottomRight[1]), // RIGHT
-        curve(bottomRight[0], bottom, bottom, bottomLeft[0]), // BOTTOM
-        curve(bottomLeft[1], left, left, topLeft[1]), // LEFT
-        curve(topLeft[0], top, top, topRight[0]), // TOP
+        curve(
+          pointFrom<GlobalPoint>(
+            right[0] - verticalRadius,
+            right[1] - horizontalRadius,
+          ),
+          right,
+          right,
+          pointFrom<GlobalPoint>(
+            right[0] - verticalRadius,
+            right[1] + horizontalRadius,
+          ),
+        ), // RIGHT
+        curve(
+          pointFrom<GlobalPoint>(
+            bottom[0] + verticalRadius,
+            bottom[1] - horizontalRadius,
+          ),
+          bottom,
+          bottom,
+          pointFrom<GlobalPoint>(
+            bottom[0] - verticalRadius,
+            bottom[1] - horizontalRadius,
+          ),
+        ), // BOTTOM
+        curve(
+          pointFrom<GlobalPoint>(
+            left[0] + verticalRadius,
+            left[1] + horizontalRadius,
+          ),
+          left,
+          left,
+          pointFrom<GlobalPoint>(
+            left[0] + verticalRadius,
+            left[1] - horizontalRadius,
+          ),
+        ), // LEFT
+        curve(
+          pointFrom<GlobalPoint>(
+            top[0] - verticalRadius,
+            top[1] + horizontalRadius,
+          ),
+          top,
+          top,
+          pointFrom<GlobalPoint>(
+            top[0] + verticalRadius,
+            top[1] + horizontalRadius,
+          ),
+        ), // TOP
       ]
     : [];
 
