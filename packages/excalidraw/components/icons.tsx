@@ -1216,11 +1216,12 @@ export const EdgeRoundIcon = createIcon(
 );
 
 export const ArrowheadNoneIcon = createIcon(
-  <path d="M6 10H34" stroke="currentColor" strokeWidth={2} fill="none" />,
-  {
-    width: 40,
-    height: 20,
-  },
+  <g stroke="currentColor" opacity={0.3} strokeWidth={2}>
+    <path d="M12 12l9 0" />
+    <path d="M3 9l6 6" />
+    <path d="M3 15l6 -6" />
+  </g>,
+  tablerIconProps,
 );
 
 export const ArrowheadArrowIcon = React.memo(
