@@ -39,12 +39,6 @@ import {
   rectangle,
 } from "../../math";
 import { ellipse, ellipseLineIntersectionPoints } from "../../math/ellipse";
-import {
-  debugClear,
-  debugDrawCubicBezier,
-  debugDrawLine,
-  debugDrawPoint,
-} from "../visualdebug";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -420,14 +414,6 @@ const intersectDiamondWithLine = (
         ), // TOP
       ]
     : [];
-
-  debugClear();
-  [topRight, bottomRight, bottomLeft, topLeft].forEach((s) => {
-    debugDrawLine(s, { color: "red", permanent: true });
-  });
-  curves.forEach((s) => {
-    debugDrawCubicBezier(s, { color: "green", permanent: true });
-  });
 
   const sides: GlobalPoint[] = [topRight, bottomRight, bottomLeft, topLeft]
     .map((s) =>
