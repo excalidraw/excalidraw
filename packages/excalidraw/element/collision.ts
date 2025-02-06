@@ -278,13 +278,6 @@ const intersectRectanguloidWithLine = (
         ]
       : [];
 
-  // debugClear();
-  // sides.forEach((s) => debugDrawLine(s, { color: "red", permanent: true }));
-  // corners.forEach((s) =>
-  //   debugDrawCubicBezier(s, { color: "green", permanent: true }),
-  // );
-  // debugDrawLine(line(rotatedA, rotatedB), { color: "blue", permanent: true });
-
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
       lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
@@ -296,10 +289,6 @@ const intersectRectanguloidWithLine = (
     .flatMap((t) => curveIntersectLine(t, line(rotatedA, rotatedB)))
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
-
-  // [...sideIntersections, ...cornerIntersections].forEach((p) => {
-  //   debugDrawPoint(p, { color: "purple", permanent: true });
-  // });
 
   return (
     [...sideIntersections, ...cornerIntersections]

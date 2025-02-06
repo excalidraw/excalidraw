@@ -1,7 +1,5 @@
 import type { GlobalPoint, Radians } from "../../math";
 import {
-  arc,
-  arcDistanceFromPoint,
   curve,
   curvePointDistance,
   distanceToLineSegment,
@@ -67,52 +65,77 @@ export const distanceToRectanguloidElement = (
     Math.min(element.width, element.height),
     element,
   );
-  const sideDistances = [
-    lineSegment(
-      pointFrom(r[0][0] + roundness, r[0][1]),
-      pointFrom(r[1][0] - roundness, r[0][1]),
-    ),
-    lineSegment(
-      pointFrom(r[1][0], r[0][1] + roundness),
-      pointFrom(r[1][0], r[1][1] - roundness),
-    ),
-    lineSegment(
-      pointFrom(r[1][0] - roundness, r[1][1]),
-      pointFrom(r[0][0] + roundness, r[1][1]),
-    ),
-    lineSegment(
-      pointFrom(r[0][0], r[1][1] - roundness),
-      pointFrom(r[0][0], r[0][1] + roundness),
-    ),
-  ].map((s) => distanceToLineSegment(rotatedPoint, s));
+  const top = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
+    pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
+  );
+  const right = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
+    pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
+  );
+  const bottom = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
+    pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
+  );
+  const left = lineSegment<GlobalPoint>(
+    pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
+    pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
+  );
+  const sideDistances = [top, right, bottom, left].map((s) =>
+    distanceToLineSegment(rotatedPoint, s),
+  );
   const cornerDistances =
     roundness > 0
       ? [
-          arc(
-            pointFrom(r[0][0] + roundness, r[0][1] + roundness),
-            roundness,
-            Math.PI as Radians,
-            ((3 / 4) * Math.PI) as Radians,
-          ),
-          arc(
-            pointFrom(r[1][0] - roundness, r[0][1] + roundness),
-            roundness,
-            ((3 / 4) * Math.PI) as Radians,
-            0 as Radians,
-          ),
-          arc(
-            pointFrom(r[1][0] - roundness, r[1][1] - roundness),
-            roundness,
-            0 as Radians,
-            ((1 / 2) * Math.PI) as Radians,
-          ),
-          arc(
-            pointFrom(r[0][0] + roundness, r[1][1] - roundness),
-            roundness,
-            ((1 / 2) * Math.PI) as Radians,
-            Math.PI as Radians,
-          ),
-        ].map((a) => arcDistanceFromPoint(a, rotatedPoint))
+          curve(
+            left[1],
+            pointFrom(
+              left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
+              left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
+            ),
+            pointFrom(
+              top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
+              top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
+            ),
+            top[0],
+          ), // TOP LEFT
+          curve(
+            top[1],
+            pointFrom(
+              top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
+              top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
+            ),
+            pointFrom(
+              right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
+              right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
+            ),
+            right[0],
+          ), // TOP RIGHT
+          curve(
+            right[1],
+            pointFrom(
+              right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
+              right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
+            ),
+            pointFrom(
+              bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
+              bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
+            ),
+            bottom[1],
+          ), // BOTTOM RIGHT
+          curve(
+            bottom[0],
+            pointFrom(
+              bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
+              bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
+            ),
+            pointFrom(
+              left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
+              left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
+            ),
+            left[0],
+          ), // BOTTOM LEFT
+        ].map((a) => curvePointDistance(a, rotatedPoint))
       : [];
 
   return Math.min(...[...sideDistances, ...cornerDistances]);

@@ -34,28 +34,28 @@ export function curveIntersectLine<Point extends GlobalPoint | LocalPoint>(
   l: Line<Point>,
 ): Point[] {
   const C1 = pointFrom<Point>(
-    Math.round(c[0][0] * 1e6) / 1e6,
-    Math.round(c[0][1] * 1e6) / 1e6,
+    Math.round(c[0][0] * 1e4) / 1e4,
+    Math.round(c[0][1] * 1e4) / 1e4,
   );
   const C2 = pointFrom<Point>(
-    Math.round(c[1][0] * 1e6) / 1e6,
-    Math.round(c[1][1] * 1e6) / 1e6,
+    Math.round(c[1][0] * 1e4) / 1e4,
+    Math.round(c[1][1] * 1e4) / 1e4,
   );
   const C3 = pointFrom<Point>(
-    Math.round(c[2][0] * 1e6) / 1e6,
-    Math.round(c[2][1] * 1e6) / 1e6,
+    Math.round(c[2][0] * 1e4) / 1e4,
+    Math.round(c[2][1] * 1e4) / 1e4,
   );
   const C4 = pointFrom<Point>(
-    Math.round(c[3][0] * 1e6) / 1e6,
-    Math.round(c[3][1] * 1e6) / 1e6,
+    Math.round(c[3][0] * 1e4) / 1e4,
+    Math.round(c[3][1] * 1e4) / 1e4,
   );
   const L1 = pointFrom<Point>(
-    Math.round(l[0][0] * 1e6) / 1e6,
-    Math.round(l[0][1] * 1e6) / 1e6,
+    Math.round(l[0][0] * 1e4) / 1e4,
+    Math.round(l[0][1] * 1e4) / 1e4,
   );
   const L2 = pointFrom<Point>(
-    Math.round(l[1][0] * 1e6) / 1e6,
-    Math.round(l[1][1] * 1e6) / 1e6,
+    Math.round(l[1][0] * 1e4) / 1e4,
+    Math.round(l[1][1] * 1e4) / 1e4,
   );
   const [px, py] = [
     [C1[0], C2[0], C3[0], C4[0]],
