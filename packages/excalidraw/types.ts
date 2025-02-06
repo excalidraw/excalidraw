@@ -43,7 +43,7 @@ import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type {
   DurableStoreIncrement,
   EphemeralStoreIncrement,
-  StoreActionType as StoreActionType,
+  StoreActionType,
 } from "./store";
 
 export type SocketId = string & { _brand: "SocketId" };
