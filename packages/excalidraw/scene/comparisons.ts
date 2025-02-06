@@ -84,12 +84,13 @@ export const getElementsAtPosition = (
     if (element.isDeleted) {
       continue;
     }
-    if (isIframeElement(element)) {
-      iframeLikes.push(element);
-      continue;
-    }
+
     if (isAtPositionFn(element)) {
-      elementsAtPosition.push(element);
+      if (isIframeElement(element)) {
+        iframeLikes.push(element);
+      } else {
+        elementsAtPosition.push(element);
+      }
     }
   }
 
