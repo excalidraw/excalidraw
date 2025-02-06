@@ -44,22 +44,16 @@ describe("Math curve", () => {
       const l = line(pointFrom(0, 112.5), pointFrom(90, 0));
 
       expect(curveIntersectLine(c, l)).toCloselyEqualPoints([
-        [49.99999999999996, 49.99999999999997],
-        [70.47732960327718, 24.403337995903534],
-        [10.970762294018797, 98.78654713247653],
+        [49.99999999999996, 50],
       ]);
     });
 
-    it("regression 1", () => {
+    it("can be detected where the determinant is overly precise", () => {
       const c = curve(
-        // pointFrom(41.028864759926016, 12.226249068355052),
-        // pointFrom(41.028864759926016, 33.55958240168839),
-        // pointFrom(30.362198093259348, 44.22624906835505),
-        // pointFrom(9.028864759926016, 44.22624906835505),
-        pointFrom(41.02886475, 12.22624906),
-        pointFrom(41.02886475, 33.5595824),
-        pointFrom(30.362198093, 44.226249),
-        pointFrom(9.02886475, 44.226249),
+        pointFrom(41.028864759926016, 12.226249068355052),
+        pointFrom(41.028864759926016, 33.55958240168839),
+        pointFrom(30.362198093259348, 44.22624906835505),
+        pointFrom(9.028864759926016, 44.22624906835505),
       );
       const l = line(
         pointFrom(-82.30963544324186, -41.19949363038283),
@@ -67,7 +61,9 @@ describe("Math curve", () => {
         pointFrom(188.2149592542487, 134.75505940984908),
       );
 
-      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([[8.5, 87.5]]);
+      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([
+        [34.4078, 34.7168],
+      ]);
     });
   });
 

@@ -1,5 +1,3 @@
-import { P } from "vitest/dist/chunks/environment.0M5R1SX_";
-import { add, complex, conjugate, mul, pow, sqrt, sub } from "./complex";
 import { isPoint, pointDistance, pointFrom } from "./point";
 import type { Curve, GlobalPoint, Line, LocalPoint } from "./types";
 
@@ -35,13 +33,37 @@ export function curveIntersectLine<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   l: Line<Point>,
 ): Point[] {
+  const C1 = pointFrom<Point>(
+    Math.round(c[0][0] * 1e6) / 1e6,
+    Math.round(c[0][1] * 1e6) / 1e6,
+  );
+  const C2 = pointFrom<Point>(
+    Math.round(c[1][0] * 1e6) / 1e6,
+    Math.round(c[1][1] * 1e6) / 1e6,
+  );
+  const C3 = pointFrom<Point>(
+    Math.round(c[2][0] * 1e6) / 1e6,
+    Math.round(c[2][1] * 1e6) / 1e6,
+  );
+  const C4 = pointFrom<Point>(
+    Math.round(c[3][0] * 1e6) / 1e6,
+    Math.round(c[3][1] * 1e6) / 1e6,
+  );
+  const L1 = pointFrom<Point>(
+    Math.round(l[0][0] * 1e6) / 1e6,
+    Math.round(l[0][1] * 1e6) / 1e6,
+  );
+  const L2 = pointFrom<Point>(
+    Math.round(l[1][0] * 1e6) / 1e6,
+    Math.round(l[1][1] * 1e6) / 1e6,
+  );
   const [px, py] = [
-    [c[0][0], c[1][0], c[2][0], c[3][0]],
-    [c[0][1], c[1][1], c[2][1], c[3][1]],
+    [C1[0], C2[0], C3[0], C4[0]],
+    [C1[1], C2[1], C3[1], C4[1]],
   ];
   const [lx, ly] = [
-    [l[0][0], l[1][0]],
-    [l[0][1], l[1][1]],
+    [L1[0], L2[0]],
+    [L1[1], L2[1]],
   ];
   const X = [];
 
@@ -78,12 +100,17 @@ export function curveIntersectLine<Point extends GlobalPoint | LocalPoint>(
     //   s = (X[1] - ly[0]) / (ly[1] - ly[0]);
     // }
 
-    // /*in bounds?*/
-    // if (t < 0 || t > 1.0 || s < 0 || s > 1.0) {
-    //   X[0] = -100; /*move off screen*/
-    //   X[1] = -100;
-    // }
-    console.log(X[0] + " " + X[1]);
+    /*in bounds?*/
+    if (
+      t < 0 ||
+      t > 1.0 //||
+      // s < 0 ||
+      // s > 1.0
+    ) {
+      X[0] = -100; /*move off screen*/
+      X[1] = -100;
+    }
+
     if (!isNaN(X[0]) && !isNaN(X[1])) {
       intersections.push(pointFrom(X[0], X[1]));
     }
@@ -120,7 +147,6 @@ function cubicRoots([a, b, c, d]: number[]): number[] {
 
     /*discard complex roots*/
     if (Im !== 0) {
-      console.log(t);
       t[1] = -1;
       t[2] = -1;
     }
@@ -141,9 +167,6 @@ function cubicRoots([a, b, c, d]: number[]): number[] {
     }
   }
 
-  /*sort but place -1 at the end*/
-
-  console.log(t[0] + " " + t[1] + " " + t[2]);
   return t.filter((t) => t !== -1);
 }
 
