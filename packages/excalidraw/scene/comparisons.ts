@@ -1,6 +1,6 @@
-import { isIframeElement } from "../element/typeChecks";
+import { isIframeLikeElement } from "../element/typeChecks";
 import type {
-  ExcalidrawIframeElement,
+  ExcalidrawIframeLikeElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import type { ElementOrToolType } from "../types";
@@ -74,7 +74,7 @@ export const getElementsAtPosition = (
   elements: readonly NonDeletedExcalidrawElement[],
   isAtPositionFn: (element: NonDeletedExcalidrawElement) => boolean,
 ) => {
-  const iframeLikes: ExcalidrawIframeElement[] = [];
+  const iframeLikes: ExcalidrawIframeLikeElement[] = [];
   const elementsAtPosition: NonDeletedExcalidrawElement[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
@@ -86,7 +86,7 @@ export const getElementsAtPosition = (
     }
 
     if (isAtPositionFn(element)) {
-      if (isIframeElement(element)) {
+      if (isIframeLikeElement(element)) {
         iframeLikes.push(element);
       } else {
         elementsAtPosition.push(element);
