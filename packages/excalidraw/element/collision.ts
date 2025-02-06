@@ -343,10 +343,10 @@ const intersectDiamondWithLine = (
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
   const [top, right, bottom, left]: GlobalPoint[] = [
-    pointFrom(element.x + topX, element.y + topY),
-    pointFrom(element.x + rightX, element.y + rightY),
-    pointFrom(element.x + bottomX, element.y + bottomY),
-    pointFrom(element.x + leftX, element.y + leftY),
+    pointFrom(element.x + topX, element.y + topY - offset),
+    pointFrom(element.x + rightX + offset, element.y + rightY),
+    pointFrom(element.x + bottomX, element.y + bottomY + offset),
+    pointFrom(element.x + leftX - offset, element.y + leftY),
   ];
 
   // Create the line segment parts of the diamond
