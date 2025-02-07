@@ -1,0 +1,67 @@
+.excalidraw {
+    .excalidraw-colorwheel-trigger {
+        width: 1.25rem;
+        height: 1.25rem;
+        cursor: pointer;
+        border-radius: 0.5rem;
+        padding: 4px 8px 8px 4px;
+        margin-left: 4px;
+        color: var(--icon-fill-color);
+        &:hover {
+            background: var(--button-hover-bg);
+          }
+          &.selected {
+            color: var(--color-primary);
+            background: var(--color-primary-light);
+          }
+      
+        svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+      
+      .excalidraw-color-picker-popup {
+        width: 270px;
+        height: 300px;
+        background: #ffffff;
+        border: 1px solid #ccc;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+      
+        .excalidraw-color-picker-popup-header {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #ccc;
+          margin-bottom: 8px;
+          cursor: grab;
+      
+          .excalidraw-color-picker-popup-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s;
+      
+            &:hover {
+              color: #000;
+            }
+          }
+        }
+      
+        canvas {
+          width: 100%;
+          height: auto;
+          cursor: crosshair;
+        }
+      }    
+}

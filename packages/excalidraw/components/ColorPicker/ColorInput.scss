@@ -5,7 +5,8 @@
     width: fit-content;
     border: 1px solid var(--default-border-color);
     border-radius: 4px;
-    padding: 5px 5px 5px 5px;
+    padding: 5px 10px 5px 10px;
+    margin-top: 5px;
   }
   
   .color-picker-input-hash {
@@ -24,15 +25,3 @@
     gap: 4px;
     border: none;
   }
-  
-  .excalidraw-eye-dropper-trigger,
-  .excalidraw-colorwheel-trigger {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    background-color: var(--button-background);
-  }
-  
