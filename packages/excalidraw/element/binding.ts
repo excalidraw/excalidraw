@@ -28,6 +28,7 @@ import {
   isFixedPointBinding,
   isFrameLikeElement,
   isLinearElement,
+  isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
 import type { ElementUpdate } from "./mutateElement";
@@ -49,6 +50,7 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   headingForPointFromElement,
+  headingIsHorizontal,
   vectorToHeading,
   type Heading,
 } from "./heading";
@@ -880,36 +882,50 @@ const getDistanceForBinding = (
 };
 
 export const bindPointToSnapToElementOutline = (
-  p: Readonly<GlobalPoint>,
-  otherPoint: Readonly<GlobalPoint>,
+  arrow: ExcalidrawElbowArrowElement,
   bindableElement: ExcalidrawBindableElement | undefined,
+  startOrEnd: "start" | "end",
 ): GlobalPoint => {
   const aabb = bindableElement && aabbForElement(bindableElement);
+  const localP =
+    arrow.points[startOrEnd === "start" ? 0 : arrow.points.length - 1];
+  const globalP = pointFrom<GlobalPoint>(
+    arrow.x + localP[0],
+    arrow.y + localP[1],
+  );
+  const p = isRectanguloidElement(bindableElement)
+    ? avoidRectangularCorner(bindableElement, globalP)
+    : globalP;
+  const localOtherPoint =
+    arrow.points[startOrEnd === "start" ? arrow.points.length - 1 : 0];
+  const otherPoint = pointFrom<GlobalPoint>(
+    arrow.x + localOtherPoint[0],
+    arrow.y + localOtherPoint[1],
+  );
+  const prev =
+    arrow.points[startOrEnd === "start" ? 1 : arrow.points.length - 2];
+  const isHorizontal = headingIsHorizontal(
+    vectorToHeading(vectorFromPoint(localP, prev)),
+  );
 
   if (bindableElement && aabb) {
-    // TODO: Dirty hacks until tangents are properly calculated
     const heading = headingForPointFromElement(bindableElement, aabb, p);
-    const intersections = [
-      ...(intersectElementWithLineSegment(
+    const center = getCenterForBounds(aabb);
+    const intersections = (
+      intersectElementWithLineSegment(
         bindableElement,
         lineSegment(
-          pointFrom(p[0], p[1] - 2 * bindableElement.height),
-          pointFrom(p[0], p[1] + 2 * bindableElement.height),
+          p,
+          pointFrom(
+            isHorizontal ? center[0] : p[0],
+            !isHorizontal ? center[1] : p[1],
+          ),
         ),
         FIXED_BINDING_DISTANCE,
-      ) ?? []),
-      ...(intersectElementWithLineSegment(
-        bindableElement,
-        lineSegment(
-          pointFrom(p[0] - 2 * bindableElement.width, p[1]),
-          pointFrom(p[0] + 2 * bindableElement.width, p[1]),
-        ),
-        FIXED_BINDING_DISTANCE,
-      ) ?? []),
-    ]
+      ) ?? []
+    )
       .filter((p) => p != null)
       .sort((g, h) => pointDistanceSq(g!, p) - pointDistanceSq(h!, p));
-
     const isVertical =
       compareHeading(heading, HEADING_LEFT) ||
       compareHeading(heading, HEADING_RIGHT);
@@ -1247,22 +1263,10 @@ export const calculateFixedPointForElbowArrowBinding = (
     hoveredElement.x + hoveredElement.width,
     hoveredElement.y + hoveredElement.height,
   ] as Bounds;
-  const edgePointIndex =
-    startOrEnd === "start" ? 0 : linearElement.points.length - 1;
-  const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    edgePointIndex,
-    elementsMap,
-  );
-  const otherGlobalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    edgePointIndex,
-    elementsMap,
-  );
   const snappedPoint = bindPointToSnapToElementOutline(
-    globalPoint,
-    otherGlobalPoint,
+    linearElement,
     hoveredElement,
+    startOrEnd,
   );
   const globalMidPoint = pointFrom(
     bounds[0] + (bounds[2] - bounds[0]) / 2,

@@ -1633,16 +1633,16 @@ export const actionChangeArrowType = register({
 
         const finalStartPoint = startHoveredElement
           ? bindPointToSnapToElementOutline(
-              startGlobalPoint,
-              endGlobalPoint,
+              newElement,
               startHoveredElement,
+              "start",
             )
           : startGlobalPoint;
         const finalEndPoint = endHoveredElement
           ? bindPointToSnapToElementOutline(
-              endGlobalPoint,
-              startGlobalPoint,
+              newElement,
               endHoveredElement,
+              "end",
             )
           : endGlobalPoint;
 
