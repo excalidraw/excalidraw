@@ -152,6 +152,7 @@
     "selectAllElementsInFrame": "Select all elements in frame",
     "removeAllElementsFromFrame": "Remove all elements from frame",
     "eyeDropper": "Pick color from canvas",
+    "colorWheel": "Pick color from color wheel",
     "textToDiagram": "Text to diagram",
     "prompt": "Prompt",
     "followUs": "Follow us",
