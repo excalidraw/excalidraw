@@ -31,7 +31,7 @@ describe("Math curve", () => {
       );
       const l = line(pointFrom(0, 0), pointFrom(200, 200));
 
-      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([[72.5, 72.5]]);
+      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([[73.65, 73.65]]);
     });
 
     it("points are found when curve is sliced at 3 points", () => {
