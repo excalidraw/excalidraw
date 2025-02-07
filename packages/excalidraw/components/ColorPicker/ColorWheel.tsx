@@ -2,231 +2,142 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { colorWheelIcon } from "../icons";
 import clsx from "clsx";
 import { t } from "../../i18n";
+import './ColorWheel.scss';
 
 interface ColorWheelProps {
   color: string;
   onChange: (color: string) => void;
 }
 
+const CANVAS_SIZE = 150;
+
 const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const colorWheelRef = useRef<HTMLDivElement>(null);
-  const colorWheelTriggerRef = useRef<HTMLDivElement>(null);
-  const dragHeaderRef = useRef<HTMLDivElement>(null);
-
-  const [isColorWheelOpen, setIsColorWheelOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  // Draw the color wheel when it becomes visible
-  useEffect(() => {
-    if (!isColorWheelOpen || !canvasRef.current) return;
-
+  // Draw the color wheel
+  const drawWheel = useCallback(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = canvas.width;
-    const height = canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = Math.min(width, height) / 2;
+    const centerX = CANVAS_SIZE / 2;
+    const centerY = CANVAS_SIZE / 2;
+    const radius = (CANVAS_SIZE / 2) - 5;
 
     // Clear canvas
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // Draw color wheel with improved color distribution
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        // Calculate distance from center
-        const dx = x - centerX;
-        const dy = y - centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
+    // Draw main color wheel
+    for (let angle = 0; angle < 360; angle++) {
+      const startAngle = (angle - 1) * Math.PI / 180;
+      const endAngle = (angle + 1) * Math.PI / 180;
 
-        // Only draw within the circle
-        if (distance <= radius) {
-          // Calculate hue and saturation based on position
-          const angle = Math.atan2(dy, dx);
-          const hue = ((angle * 180 / Math.PI) + 360) % 360;
-          const saturation = Math.min(distance / radius, 1);
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+      ctx.closePath();
 
-          // Convert HSL to RGB
-          const [r, g, b] = hslToRgb(hue, saturation, 0.5);
-          ctx.fillStyle = `rgb(${r},${g},${b})`;
-          ctx.fillRect(x, y, 1, 1);
-        }
-      }
+      const gradient = ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, radius
+      );
+
+      // Convert angle to hue
+      const hue = angle;
+      gradient.addColorStop(0, `hsl(${hue}, 0%, 100%)`);
+      gradient.addColorStop(1, `hsl(${hue}, 100%, 50%)`);
+
+      ctx.fillStyle = gradient;
+      ctx.fill();
     }
+  }, []);
 
-    // Add white center
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 0.1, 0, Math.PI * 2);
-    ctx.fillStyle = "white";
-    ctx.fill();
-  }, [isColorWheelOpen]);
+  // Handle canvas click
+  const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  // Position the color wheel in the center of the screen when opened
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const imageData = ctx.getImageData(x, y, 1, 1).data;
+    const color = `rgb(${imageData[0]}, ${imageData[1]}, ${imageData[2]})`;
+    onChange(color);
+  }, [onChange]);
+
+  // Position the color wheel when opened
   useEffect(() => {
-    if (isColorWheelOpen) {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
       setPosition({
-        x: window.innerWidth / 2 - 75,
-        y: window.innerHeight / 2 - 100,
+        x: Math.min(window.innerWidth - CANVAS_SIZE - 20, rect.right + 10),
+        y: Math.min(window.innerHeight - CANVAS_SIZE - 20, rect.bottom + 10)
       });
     }
-  }, [isColorWheelOpen]);
+  }, [isOpen]);
 
-  // Convert HSL to RGB with improved accuracy
-  const hslToRgb = (h: number, s: number, l: number): [number, number, number] => {
-    h = h % 360;
-    s = Math.max(0, Math.min(1, s));
-    l = Math.max(0, Math.min(1, l));
-
-    const c = (1 - Math.abs(2 * l - 1)) * s;
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = l - c / 2;
-
-    let r = 0, g = 0, b = 0;
-
-    if (h >= 0 && h < 60) {
-      [r, g, b] = [c, x, 0];
-    } else if (h >= 60 && h < 120) {
-      [r, g, b] = [x, c, 0];
-    } else if (h >= 120 && h < 180) {
-      [r, g, b] = [0, c, x];
-    } else if (h >= 180 && h < 240) {
-      [r, g, b] = [0, x, c];
-    } else if (h >= 240 && h < 300) {
-      [r, g, b] = [x, 0, c];
-    } else {
-      [r, g, b] = [c, 0, x];
-    }
-
-    return [
-      Math.round((r + m) * 255),
-      Math.round((g + m) * 255),
-      Math.round((b + m) * 255)
-    ];
-  };
-
-  // Improved click handling with bounds checking
-  const handleCanvasClick = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = Math.floor(e.clientX - rect.left);
-      const y = Math.floor(e.clientY - rect.top);
-
-      // Check if click is within canvas bounds
-      if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) return;
-
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      if (!ctx) return;
-
-      // Get color at clicked position
-      const pixelData = ctx.getImageData(x, y, 1, 1).data;
-      const hex = `#${[pixelData[0], pixelData[1], pixelData[2]]
-        .map(n => n.toString(16).padStart(2, '0'))
-        .join('')}`;
-
-      onChange(hex);
-    },
-    [onChange]
-  );
-
-  // Drag handling logic
-  const handleDragStart = useCallback((e: React.MouseEvent) => {
-    if (colorWheelRef.current && dragHeaderRef.current?.contains(e.target as Node)) {
-      setIsDragging(true);
-      const rect = colorWheelRef.current.getBoundingClientRect();
-      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    }
-  }, []);
-
-  const handleDrag = useCallback(
-    (e: MouseEvent) => {
-      if (isDragging) {
-        const newX = Math.max(0, Math.min(window.innerWidth - 150, e.clientX - dragOffset.x));
-        const newY = Math.max(0, Math.min(window.innerHeight - 150, e.clientY - dragOffset.y));
-        setPosition({ x: newX, y: newY });
-      }
-    },
-    [isDragging, dragOffset]
-  );
-
-  const handleDragEnd = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  // Click outside handling
+  // Draw the wheel when opened
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        colorWheelRef.current &&
-        !colorWheelRef.current.contains(event.target as Node) &&
-        !colorWheelTriggerRef.current?.contains(event.target as Node)
-      ) {
-        setIsColorWheelOpen(false);
+    if (isOpen) {
+      drawWheel();
+    }
+  }, [isOpen, drawWheel]);
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isOpen && containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
       }
     };
 
-    if (isColorWheelOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      window.addEventListener("mousemove", handleDrag);
-      window.addEventListener("mouseup", handleDragEnd);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("mousemove", handleDrag);
-      window.removeEventListener("mouseup", handleDragEnd);
-    };
-  }, [isColorWheelOpen, handleDrag, handleDragEnd]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   return (
-    <>
+    <div ref={containerRef} className="color-wheel-container">
       <div
-        ref={colorWheelTriggerRef}
-        className={clsx("excalidraw-colorwheel-trigger", { selected: isColorWheelOpen })}
-        onClick={() => setIsColorWheelOpen(!isColorWheelOpen)}
+        className={clsx("excalidraw-colorwheel-trigger", { selected: isOpen })}
+        onClick={() => setIsOpen(!isOpen)}
         title={t("labels.colorWheel")}
       >
         {colorWheelIcon}
       </div>
-      {isColorWheelOpen && (
+      
+      {isOpen && (
         <div
-          ref={colorWheelRef}
-          className="excalidraw-color-picker-popup"
+          className="color-wheel-popup"
           style={{
-            position: "fixed",
-            left: `${position.x}px`,
-            top: `${position.y}px`,
-            userSelect: "none"
+            position: 'fixed',
+            left: position.x,
+            top: position.y,
+            backgroundColor: 'white',
+            padding: '10px',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            zIndex: 1000
           }}
         >
-          <div
-            ref={dragHeaderRef}
-            className="excalidraw-color-picker-popup-header"
-            onMouseDown={handleDragStart}
-          >
-            <button
-              className="excalidraw-color-picker-popup-close"
-              onClick={() => setIsColorWheelOpen(false)}
-            >
-              ×
-            </button>
-          </div>
           <canvas
             ref={canvasRef}
-            width={150}
-            height={150}
-            onClick={handleCanvasClick}
+            width={CANVAS_SIZE}
+            height={CANVAS_SIZE}
+            onClick={handleClick}
+            style={{ cursor: 'pointer' }}
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 
