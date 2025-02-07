@@ -1,9 +1,8 @@
-.color-wheel-container {
+.excalidraw-color-wheel-container {
     position: relative;
-    display: inline-block;
   }
   
-  .color-wheel-popup {
+  .excalidraw-color-wheel-popup {
     canvas {
       display: block;
     }
@@ -11,14 +10,20 @@
   
   .excalidraw-colorwheel-trigger {
     cursor: pointer;
+    width: 24px;
+    height: 24px;
     padding: 4px;
-    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 0.5rem;
   
     &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
+      background: var(--button-hover-bg);
     }
-  
     &.selected {
-      background-color: rgba(0, 0, 0, 0.1);
+      color: var(--color-primary);
+      background: var(--color-primary-light);
     }
   }

@@ -15,9 +15,10 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 100, y: 100 }); // Initial position
+  const [dragging, setDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  // Draw the color wheel
   const drawWheel = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -29,10 +30,8 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
     const centerY = CANVAS_SIZE / 2;
     const radius = (CANVAS_SIZE / 2) - 5;
 
-    // Clear canvas
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // Draw main color wheel
     for (let angle = 0; angle < 360; angle++) {
       const startAngle = (angle - 1) * Math.PI / 180;
       const endAngle = (angle + 1) * Math.PI / 180;
@@ -42,12 +41,7 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
       ctx.arc(centerX, centerY, radius, startAngle, endAngle);
       ctx.closePath();
 
-      const gradient = ctx.createRadialGradient(
-        centerX, centerY, 0,
-        centerX, centerY, radius
-      );
-
-      // Convert angle to hue
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
       const hue = angle;
       gradient.addColorStop(0, `hsl(${hue}, 0%, 100%)`);
       gradient.addColorStop(1, `hsl(${hue}, 100%, 50%)`);
@@ -57,7 +51,6 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
     }
   }, []);
 
-  // Handle canvas click
   const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -74,25 +67,12 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
     onChange(color);
   }, [onChange]);
 
-  // Position the color wheel when opened
-  useEffect(() => {
-    if (isOpen && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      setPosition({
-        x: Math.min(window.innerWidth - CANVAS_SIZE - 20, rect.right + 10),
-        y: Math.min(window.innerHeight - CANVAS_SIZE - 20, rect.bottom + 10)
-      });
-    }
-  }, [isOpen]);
-
-  // Draw the wheel when opened
   useEffect(() => {
     if (isOpen) {
       drawWheel();
     }
   }, [isOpen, drawWheel]);
 
-  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (isOpen && containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -105,28 +85,30 @@ const ColorWheel: React.FC<ColorWheelProps> = ({ color, onChange }) => {
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className="color-wheel-container">
-      <div
-        className={clsx("excalidraw-colorwheel-trigger", { selected: isOpen })}
-        onClick={() => setIsOpen(!isOpen)}
-        title={t("labels.colorWheel")}
-      >
-        {colorWheelIcon}
-      </div>
+    <div ref={containerRef} className="excalidraw-color-wheel-container">
+        <div
+          className={clsx("excalidraw-colorwheel-trigger", { selected: isOpen })}
+          onClick={() => setIsOpen((prev) => !prev)}
+          title={t("labels.colorWheel")}
+        >
+          {colorWheelIcon}
+        </div>
       
       {isOpen && (
         <div
-          className="color-wheel-popup"
-          style={{
-            position: 'fixed',
-            left: position.x,
-            top: position.y,
-            backgroundColor: 'white',
-            padding: '10px',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            zIndex: 1000
-          }}
+        className="excalidraw-color-wheel-popup"
+        style={{
+          position: "fixed", 
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "white",
+          padding: "10px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+          zIndex: 1000,
+          cursor: "grab",
+        }}
         >
           <canvas
             ref={canvasRef}
