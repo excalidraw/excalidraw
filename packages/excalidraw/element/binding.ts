@@ -1207,18 +1207,11 @@ const updateBoundPoint = (
         elementsMap,
       );
 
-    let intersections = intersectElementWithLineSegment(
+    const intersections = intersectElementWithLineSegment(
       bindableElement,
       lineSegment(adjacentPoint, focusPointAbsolute),
       binding.gap,
     );
-    if (!intersections || intersections.length === 0) {
-      intersections = intersectElementWithLineSegment(
-        bindableElement,
-        lineSegment(adjacentPoint, focusPointAbsolute),
-        binding.gap,
-      );
-    }
     if (!intersections || intersections.length === 0) {
       // This should never happen, since focusPoint should always be
       // inside the element, but just in case, bail out
