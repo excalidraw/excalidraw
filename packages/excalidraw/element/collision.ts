@@ -21,7 +21,7 @@ import {
 import { getBoundTextShape, getCornerRadius, isPathALoop } from "../shapes";
 import type {
   GlobalPoint,
-  Line,
+  LineSegment,
   LocalPoint,
   Polygon,
   Radians,
@@ -29,6 +29,7 @@ import type {
 import {
   curve,
   curveIntersectLine,
+  curveIntersectLineSegment,
   isPointWithinBounds,
   line,
   lineSegment,
@@ -151,9 +152,9 @@ export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
  * @param offset
  * @returns
  */
-export const intersectElementWithLine = (
+export const intersectElementWithLineSegment = (
   element: ExcalidrawElement,
-  line: Line<GlobalPoint>,
+  line: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
   switch (element.type) {
@@ -164,19 +165,19 @@ export const intersectElementWithLine = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      return intersectRectanguloidWithLine(element, line, offset);
+      return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
-      return intersectDiamondWithLine(element, line, offset);
+      return intersectDiamondWithLineSegment(element, line, offset);
     case "ellipse":
-      return intersectEllipseWithLine(element, line, offset);
+      return intersectEllipseWithLineSegment(element, line, offset);
     default:
       throw new Error(`Unimplemented element type '${element.type}'`);
   }
 };
 
-const intersectRectanguloidWithLine = (
+const intersectRectanguloidWithLineSegment = (
   element: ExcalidrawRectanguloidElement,
-  l: Line<GlobalPoint>,
+  l: LineSegment<GlobalPoint>,
   offset: number,
 ): GlobalPoint[] => {
   const r = rectangle(
@@ -280,13 +281,18 @@ const intersectRectanguloidWithLine = (
 
   const sideIntersections: GlobalPoint[] = sides
     .map((s) =>
-      lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
+      lineSegmentIntersectionPoints(
+        lineSegment<GlobalPoint>(rotatedA, rotatedB),
+        s,
+      ),
     )
     .filter((x) => x != null)
     .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle));
 
   const cornerIntersections: GlobalPoint[] = corners
-    .flatMap((t) => curveIntersectLine(t, line(rotatedA, rotatedB)))
+    .flatMap((t) =>
+      curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB)),
+    )
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
 
@@ -306,9 +312,9 @@ const intersectRectanguloidWithLine = (
  * @param b
  * @returns
  */
-const intersectDiamondWithLine = (
+const intersectDiamondWithLineSegment = (
   element: ExcalidrawDiamondElement,
-  l: Line<GlobalPoint>,
+  l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
   const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
@@ -406,7 +412,10 @@ const intersectDiamondWithLine = (
 
   const sides: GlobalPoint[] = [topRight, bottomRight, bottomLeft, topLeft]
     .map((s) =>
-      lineSegmentIntersectionPoints(line<GlobalPoint>(rotatedA, rotatedB), s),
+      lineSegmentIntersectionPoints(
+        lineSegment<GlobalPoint>(rotatedA, rotatedB),
+        s,
+      ),
     )
     .filter((p): p is GlobalPoint => p != null)
     // Rotate back intersection points
@@ -433,9 +442,9 @@ const intersectDiamondWithLine = (
  * @param b
  * @returns
  */
-const intersectEllipseWithLine = (
+const intersectEllipseWithLineSegment = (
   element: ExcalidrawEllipseElement,
-  l: Line<GlobalPoint>,
+  l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
   const center = pointFrom<GlobalPoint>(

@@ -71,7 +71,7 @@ import {
   vectorRotate,
 } from "../../math";
 import { distanceToBindableElement } from "./distance";
-import { intersectElementWithLine } from "./collision";
+import { intersectElementWithLineSegment } from "./collision";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -890,17 +890,17 @@ export const bindPointToSnapToElementOutline = (
     // TODO: Dirty hacks until tangents are properly calculated
     const heading = headingForPointFromElement(bindableElement, aabb, p);
     const intersections = [
-      ...(intersectElementWithLine(
+      ...(intersectElementWithLineSegment(
         bindableElement,
-        line(
+        lineSegment(
           pointFrom(p[0], p[1] - 2 * bindableElement.height),
           pointFrom(p[0], p[1] + 2 * bindableElement.height),
         ),
         FIXED_BINDING_DISTANCE,
       ) ?? []),
-      ...(intersectElementWithLine(
+      ...(intersectElementWithLineSegment(
         bindableElement,
-        line(
+        lineSegment(
           pointFrom(p[0] - 2 * bindableElement.width, p[1]),
           pointFrom(p[0] + 2 * bindableElement.width, p[1]),
         ),
@@ -1207,43 +1207,30 @@ const updateBoundPoint = (
         elementsMap,
       );
 
-    const intersections = intersectElementWithLine(
+    let intersections = intersectElementWithLineSegment(
       bindableElement,
-      line(adjacentPoint, focusPointAbsolute),
+      lineSegment(adjacentPoint, focusPointAbsolute),
       binding.gap,
     );
     if (!intersections || intersections.length === 0) {
+      intersections = intersectElementWithLineSegment(
+        bindableElement,
+        lineSegment(adjacentPoint, focusPointAbsolute),
+        binding.gap,
+      );
+    }
+    if (!intersections || intersections.length === 0) {
       // This should never happen, since focusPoint should always be
       // inside the element, but just in case, bail out
-      newEdgePoint = focusPointAbsolute;
+      // Note: Might happen with rounded elements due to FP imprecision
+      newEdgePoint = edgePointAbsolute;
     } else {
       // Guaranteed to intersect because focusPoint is always inside the shape
-
       intersections.sort(
         (g, h) =>
           pointDistanceSq(g!, edgePointAbsolute) -
           pointDistanceSq(h!, edgePointAbsolute),
       );
-      // debugClear();
-      // debugDrawPoint(edgePointAbsolute, { color: "blue", permanent: true });
-      // debugDrawPoint(focusPointAbsolute, { color: "red", permanent: true });
-      // debugDrawPoint(
-      //   pointFrom<GlobalPoint>(
-      //     bindableElement.x + bindableElement.width / 2,
-      //     bindableElement.y + bindableElement.height / 2,
-      //   ),
-      //   { color: "gray", permanent: true },
-      // );
-      // debugDrawLine(
-      //   line(
-      //     edgePointAbsolute,
-      //     pointFromVector(vectorScale(tangentVector, 10), edgePointAbsolute),
-      //   ),
-      //   {
-      //     color: "gray",
-      //     permanent: true,
-      //   },
-      // );
       newEdgePoint = intersections[0];
     }
   }
