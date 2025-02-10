@@ -513,12 +513,13 @@ export interface ExcalidrawProps {
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
   /**
-   * Call when element(s) are duplicated so you can listen or modify as needed.
+   * Called when element(s) are duplicated so you can listen or modify as
+   * needed.
    *
    * Called when duplicating via mouse-drag, keyboard, paste, library insert
    * etc.
    *
-   * returned elements will be used in place of the next elements
+   * Returned elements will be used in place of the next elements
    * (you should return all elements, including deleted, and not mutate
    * the element if changes are made)
    */
