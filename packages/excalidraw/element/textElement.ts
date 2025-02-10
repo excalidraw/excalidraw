@@ -1,4 +1,4 @@
-import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
+import { getFontString, arrayToMap } from "../utils";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -6,7 +6,6 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
-  FontString,
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
@@ -14,7 +13,6 @@ import {
   ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
   ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
-  DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
@@ -30,18 +28,7 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import type { ExtractSetType } from "../utility-types";
-
-export const normalizeText = (text: string) => {
-  return (
-    normalizeEOL(text)
-      // replace tabs with spaces so they render and measure correctly
-      .replace(/\t/g, "        ")
-  );
-};
-
-const splitIntoLines = (text: string) => {
-  return normalizeText(text).split("\n");
-};
+import { measureText } from "./textMeasurements";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
@@ -281,201 +268,6 @@ export const computeBoundTextPosition = (
   return { x, y };
 };
 
-export const measureText = (
-  text: string,
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-  forceAdvanceWidth?: true,
-) => {
-  const _text = text
-    .split("\n")
-    // replace empty lines with single space because leading/trailing empty
-    // lines would be stripped from computation
-    .map((x) => x || " ")
-    .join("\n");
-  const fontSize = parseFloat(font);
-  const height = getTextHeight(_text, fontSize, lineHeight);
-  const width = getTextWidth(_text, font, forceAdvanceWidth);
-  return { width, height };
-};
-
-/**
- * To get unitless line-height (if unknown) we can calculate it by dividing
- * height-per-line by fontSize.
- */
-export const detectLineHeight = (textElement: ExcalidrawTextElement) => {
-  const lineCount = splitIntoLines(textElement.text).length;
-  return (textElement.height /
-    lineCount /
-    textElement.fontSize) as ExcalidrawTextElement["lineHeight"];
-};
-
-/**
- * We calculate the line height from the font size and the unitless line height,
- * aligning with the W3C spec.
- */
-export const getLineHeightInPx = (
-  fontSize: ExcalidrawTextElement["fontSize"],
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-) => {
-  return fontSize * lineHeight;
-};
-
-// FIXME rename to getApproxMinContainerHeight
-export const getApproxMinLineHeight = (
-  fontSize: ExcalidrawTextElement["fontSize"],
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-) => {
-  return getLineHeightInPx(fontSize, lineHeight) + BOUND_TEXT_PADDING * 2;
-};
-
-let canvas: HTMLCanvasElement | undefined;
-
-/**
- * @param forceAdvanceWidth use to force retrieve the "advance width" ~ `metrics.width`, instead of the actual boundind box width.
- *
- * > The advance width is the distance between the glyph's initial pen position and the next glyph's initial pen position.
- *
- * We need to use the advance width as that's the closest thing to the browser wrapping algo, hence using it for:
- * - text wrapping
- * - wysiwyg editor (+padding)
- *
- * Everything else should be based on the actual bounding box width.
- *
- * `Math.ceil` of the final width adds additional buffer which stabilizes slight wrapping incosistencies.
- */
-export const getLineWidth = (
-  text: string,
-  font: FontString,
-  forceAdvanceWidth?: true,
-) => {
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-  }
-  const canvas2dContext = canvas.getContext("2d")!;
-  canvas2dContext.font = font;
-  const metrics = canvas2dContext.measureText(text);
-
-  const advanceWidth = metrics.width;
-
-  // retrieve the actual bounding box width if these metrics are available (as of now > 95% coverage)
-  if (
-    !forceAdvanceWidth &&
-    window.TextMetrics &&
-    "actualBoundingBoxLeft" in window.TextMetrics.prototype &&
-    "actualBoundingBoxRight" in window.TextMetrics.prototype
-  ) {
-    // could be negative, therefore getting the absolute value
-    const actualWidth =
-      Math.abs(metrics.actualBoundingBoxLeft) +
-      Math.abs(metrics.actualBoundingBoxRight);
-
-    // fallback to advance width if the actual width is zero, i.e. on text editing start
-    // or when actual width does not respect whitespace chars, i.e. spaces
-    // otherwise actual width should always be bigger
-    return Math.max(actualWidth, advanceWidth);
-  }
-
-  // since in test env the canvas measureText algo
-  // doesn't measure text and instead just returns number of
-  // characters hence we assume that each letteris 10px
-  if (isTestEnv()) {
-    return advanceWidth * 10;
-  }
-
-  return advanceWidth;
-};
-
-export const getTextWidth = (
-  text: string,
-  font: FontString,
-  forceAdvanceWidth?: true,
-) => {
-  const lines = splitIntoLines(text);
-  let width = 0;
-  lines.forEach((line) => {
-    width = Math.max(width, getLineWidth(line, font, forceAdvanceWidth));
-  });
-
-  return width;
-};
-
-export const getTextHeight = (
-  text: string,
-  fontSize: number,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-) => {
-  const lineCount = splitIntoLines(text).length;
-  return getLineHeightInPx(fontSize, lineHeight) * lineCount;
-};
-
-export const charWidth = (() => {
-  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
-
-  const calculate = (char: string, font: FontString) => {
-    const unicode = char.charCodeAt(0);
-    if (!cachedCharWidth[font]) {
-      cachedCharWidth[font] = [];
-    }
-    if (!cachedCharWidth[font][unicode]) {
-      const width = getLineWidth(char, font, true);
-      cachedCharWidth[font][unicode] = width;
-    }
-
-    return cachedCharWidth[font][unicode];
-  };
-
-  const getCache = (font: FontString) => {
-    return cachedCharWidth[font];
-  };
-
-  const clearCache = (font: FontString) => {
-    cachedCharWidth[font] = [];
-  };
-
-  return {
-    calculate,
-    getCache,
-    clearCache,
-  };
-})();
-
-const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
-
-// FIXME rename to getApproxMinContainerWidth
-export const getApproxMinLineWidth = (
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-) => {
-  const maxCharWidth = getMaxCharWidth(font);
-  if (maxCharWidth === 0) {
-    return (
-      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight).width +
-      BOUND_TEXT_PADDING * 2
-    );
-  }
-  return maxCharWidth + BOUND_TEXT_PADDING * 2;
-};
-
-export const getMinCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
-  if (!cache) {
-    return 0;
-  }
-  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
-
-  return Math.min(...cacheWithOutEmpty);
-};
-
-export const getMaxCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
-  if (!cache) {
-    return 0;
-  }
-  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
-  return Math.max(...cacheWithOutEmpty);
-};
-
 export const getBoundTextElementId = (container: ExcalidrawElement | null) => {
   return container?.boundElements?.length
     ? container?.boundElements?.find((ele) => ele.type === "text")?.id || null
@@ -710,24 +502,6 @@ export const getBoundTextMaxHeight = (
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
   return height - BOUND_TEXT_PADDING * 2;
-};
-
-export const isMeasureTextSupported = () => {
-  const width = getTextWidth(
-    DUMMY_TEXT,
-    getFontString({
-      fontSize: DEFAULT_FONT_SIZE,
-      fontFamily: DEFAULT_FONT_FAMILY,
-    }),
-  );
-  return width > 0;
-};
-
-export const getMinTextElementWidth = (
-  font: FontString,
-  lineHeight: ExcalidrawTextElement["lineHeight"],
-) => {
-  return measureText("", font, lineHeight).width + BOUND_TEXT_PADDING * 2;
 };
 
 /** retrieves text from text elements and concatenates to a single string */

@@ -6,9 +6,8 @@ import {
   getContainerCoords,
   getBoundTextMaxWidth,
   getBoundTextMaxHeight,
-  detectLineHeight,
-  getLineHeightInPx,
 } from "./textElement";
+import { detectLineHeight, getLineHeightInPx } from "./textMeasurements";
 import type { ExcalidrawTextElementWithContainer } from "./types";
 
 describe("Test measureText", () => {
