@@ -1,27 +1,27 @@
 .color-picker-input-label {
-    display: flex;
-    align-items: center;
-    gap: 8px; 
-    width: fit-content;
-    border: 1px solid var(--default-border-color);
-    border-radius: 4px;
-    padding: 5px 10px 5px 10px;
-    margin-top: 5px;
-  }
-  
-  .color-picker-input-hash {
-    font-size: 1rem;
-    font-weight: bold;
-  }
-  
-  .color-picker-input {
-    text-align: center;
-    border:none;
-  }
-  
-  .color-picker-icons {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    border: none;
-  }
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  border: 1px solid var(--default-border-color);
+  border-radius: 4px;
+  padding: 5px 10px 5px 10px;
+  margin-top: 5px;
+}
+
+.color-picker-input-hash {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.color-picker-input {
+  text-align: center;
+  border: none;
+}
+
+.color-picker-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+}

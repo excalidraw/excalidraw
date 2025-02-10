@@ -1,29 +1,29 @@
 .excalidraw-color-wheel-container {
-    position: relative;
+  position: relative;
+}
+
+.excalidraw-color-wheel-popup {
+  canvas {
+    display: block;
   }
-  
-  .excalidraw-color-wheel-popup {
-    canvas {
-      display: block;
-    }
+}
+
+.excalidraw-colorwheel-trigger {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-radius: 0.5rem;
+
+  &:hover {
+    background: var(--button-hover-bg);
   }
-  
-  .excalidraw-colorwheel-trigger {
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    border-radius: 0.5rem;
-  
-    &:hover {
-      background: var(--button-hover-bg);
-    }
-    &.selected {
-      color: var(--color-primary);
-      background: var(--color-primary-light);
-    }
+  &.selected {
+    color: var(--color-primary);
+    background: var(--color-primary-light);
   }
+}
