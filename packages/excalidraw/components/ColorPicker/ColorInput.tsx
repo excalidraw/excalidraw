@@ -20,10 +20,17 @@ interface ColorInputProps {
   colorPickerType: ColorPickerType;
 }
 
-export const ColorInput = ({ color, onChange, label, colorPickerType }: ColorInputProps) => {
+export const ColorInput = ({
+  color,
+  onChange,
+  label,
+  colorPickerType,
+}: ColorInputProps) => {
   const device = useDevice();
   const [innerValue, setInnerValue] = useState(color);
-  const [activeSection, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
+  const [activeSection, setActiveColorPickerSection] = useAtom(
+    activeColorPickerSectionAtom,
+  );
 
   useEffect(() => {
     setInnerValue(color);
@@ -35,13 +42,11 @@ export const ColorInput = ({ color, onChange, label, colorPickerType }: ColorInp
       const newColor = getColor(value);
       if (newColor) {
         onChange(newColor);
-      } 
-      else 
-      {
-      setInnerValue(value);
+      } else {
+        setInnerValue(value);
       }
     },
-    [onChange]
+    [onChange],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -67,14 +72,12 @@ export const ColorInput = ({ color, onChange, label, colorPickerType }: ColorInp
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
         onKeyDown={(event) => {
-          if (event.key === KEYS.TAB) 
-            {
-              return;
-            }
-          if (event.key === KEYS.ESCAPE) 
-            {
-              eyeDropperTriggerRef.current?.focus();
-            }
+          if (event.key === KEYS.TAB) {
+            return;
+          }
+          if (event.key === KEYS.ESCAPE) {
+            eyeDropperTriggerRef.current?.focus();
+          }
           event.stopPropagation();
         }}
       />
@@ -100,21 +103,24 @@ export const ColorInput = ({ color, onChange, label, colorPickerType }: ColorInp
                       keepOpenOnAlt: false,
                       onSelect: (color) => onChange(color),
                       colorPickerType,
-                    }
+                    },
               )
             }
-            title={`${t("labels.eyeDropper")} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")}`}>
+            title={`${t(
+              "labels.eyeDropper",
+            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")}`}
+          >
             {eyeDropperIcon}
           </div>
         </div>
       )}
       <div
-            style={{
-              width: "1px",
-              height: "1.25rem",
-              backgroundColor: "var(--default-border-color)",
-            }}
-          />
+        style={{
+          width: "1px",
+          height: "1.25rem",
+          backgroundColor: "var(--default-border-color)",
+        }}
+      />
       <ColorWheel color={innerValue} onChange={changeColor} />
     </div>
   );
