@@ -771,8 +771,8 @@ const getResizedOrigin = (
         x: x + ((prevWidth - newWidth) / 2) * (Math.cos(angle) + 1),
         y:
           y +
-          (newHeight - prevHeight) / 2 +
-          ((prevWidth - newWidth) / 2) * Math.sin(angle),
+          ((prevWidth - newWidth) / 2) * Math.sin(angle) +
+          (prevHeight - newHeight) / 2,
       };
     case "west-side":
       return {
