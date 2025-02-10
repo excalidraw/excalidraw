@@ -3228,7 +3228,14 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    const nextElements = [...prevElements, ...newElements];
+    let nextElements = [...prevElements, ...newElements];
+
+    const mappedNewSceneElements = this.props.onDuplicate?.(
+      nextElements,
+      prevElements,
+    );
+
+    nextElements = mappedNewSceneElements || nextElements;
 
     syncMovedIndices(nextElements, arrayToMap(newElements));
 
@@ -8442,7 +8449,17 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
 
-            const nextSceneElements = [...nextElements, ...elementsToAppend];
+            let nextSceneElements: ExcalidrawElement[] = [
+              ...nextElements,
+              ...elementsToAppend,
+            ];
+
+            const mappedNewSceneElements = this.props.onDuplicate?.(
+              nextSceneElements,
+              elements,
+            );
+
+            nextSceneElements = mappedNewSceneElements || nextSceneElements;
 
             syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
 
