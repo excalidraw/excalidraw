@@ -67,8 +67,14 @@ export const ColorInput = ({ color, onChange, label, colorPickerType }: ColorInp
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
         onKeyDown={(event) => {
-          if (event.key === KEYS.TAB) return;
-          if (event.key === KEYS.ESCAPE) eyeDropperTriggerRef.current?.focus();
+          if (event.key === KEYS.TAB) 
+            {
+              return;
+            }
+          if (event.key === KEYS.ESCAPE) 
+            {
+              eyeDropperTriggerRef.current?.focus();
+            }
           event.stopPropagation();
         }}
       />
@@ -97,13 +103,10 @@ export const ColorInput = ({ color, onChange, label, colorPickerType }: ColorInp
                     }
               )
             }
-            title={`${t("labels.eyeDropper")} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")}`}
-          >
+            title={`${t("labels.eyeDropper")} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")}`}>
             {eyeDropperIcon}
           </div>
         </div>
-
-
       )}
       <div
             style={{
