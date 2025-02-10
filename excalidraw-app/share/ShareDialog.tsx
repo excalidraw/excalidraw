@@ -165,9 +165,7 @@ const ActiveRoomDialog = ({
           onClick={() => {
             trackEvent("share", "room closed");
             collabAPI.stopCollaboration().then(() => {
-              if (!collabAPI.isCollaborating()) {
-                handleClose();
-              }
+              handleClose();
             });
           }}
         />
