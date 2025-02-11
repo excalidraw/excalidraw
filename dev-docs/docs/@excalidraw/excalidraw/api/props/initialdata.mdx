@@ -1,7 +1,15 @@
 # initialData
 
 <pre>
-&#123; elements?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>, appState?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a> &#125;
+  &#123; elements?:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+    ExcalidrawElement[]
+  </a>
+  , appState?:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
+    AppState
+  </a>{" "}
+  &#125;
 </pre>
 
 This helps to load Excalidraw with `initialData`. It must be an object or a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise) which resolves to an object containing the below optional fields.
@@ -46,7 +54,7 @@ function App() {
             },
           ],
           appState: { zenModeEnabled: true, viewBackgroundColor: "#a5d8ff" },
-          scrollToContent: true
+          scrollToContent: true,
         }}
       />
     </div>

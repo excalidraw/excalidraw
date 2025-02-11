@@ -33,8 +33,6 @@ import {
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
   StrokeWidthBaseIcon,
-  StrokeWidthBoldIcon,
-  StrokeWidthExtraBoldIcon,
   FontSizeSmallIcon,
   FontSizeMediumIcon,
   FontSizeLargeIcon,
@@ -472,38 +470,38 @@ export const actionChangeStrokeWidth = register({
   PanelComponent: ({ elements, appState, updateData }) => (
     <fieldset>
       <legend>{t("labels.strokeWidth")}</legend>
-      <ButtonIconSelect
-        group="stroke-width"
-        options={[
-          {
-            value: STROKE_WIDTH.thin,
-            text: t("labels.thin"),
-            icon: StrokeWidthBaseIcon,
-            testId: "strokeWidth-thin",
-          },
-          {
-            value: STROKE_WIDTH.bold,
-            text: t("labels.bold"),
-            icon: StrokeWidthBoldIcon,
-            testId: "strokeWidth-bold",
-          },
-          {
-            value: STROKE_WIDTH.extraBold,
-            text: t("labels.extraBold"),
-            icon: StrokeWidthExtraBoldIcon,
-            testId: "strokeWidth-extraBold",
-          },
-        ]}
-        value={getFormValue(
-          elements,
-          appState,
-          (element) => element.strokeWidth,
-          (element) => element.hasOwnProperty("strokeWidth"),
-          (hasSelection) =>
-            hasSelection ? null : appState.currentItemStrokeWidth,
-        )}
-        onChange={(value) => updateData(value)}
-      />
+      <label className="control-label">
+        <div className="range-wrapper">
+          <input
+            type="range"
+            min={STROKE_WIDTH.thin}
+            max={STROKE_WIDTH.extraBold}
+            step="1"
+            value={getFormValue(
+              elements,
+              appState,
+              (element) => element.strokeWidth,
+              (element) => element.hasOwnProperty("strokeWidth"),
+              (hasSelection) =>
+                hasSelection ? undefined : appState.currentItemStrokeWidth,
+            )}
+            onChange={(event) => updateData(+event.target.value)}
+            className="range-input"
+            data-testid="strokeWidth-range"
+          />
+          <div className="value-bubble">
+            {getFormValue(
+              elements,
+              appState,
+              (element) => element.strokeWidth,
+              (element) => element.hasOwnProperty("strokeWidth"),
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemStrokeWidth,
+            )}
+          </div>
+          <div className="zero-label">{STROKE_WIDTH.thin}</div>
+        </div>
+      </label>
     </fieldset>
   ),
 });
