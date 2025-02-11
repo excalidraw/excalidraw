@@ -2,14 +2,14 @@ import "../utils/test-utils";
 import {
   curve,
   curveClosestPoint,
-  curveIntersectLine,
+  curveIntersectLineSegment,
   curvePointDistance,
 } from "./curve";
-import { line } from "./line";
 import { pointFrom } from "./point";
+import { lineSegment } from "./segment";
 
 describe("Math curve", () => {
-  describe("line intersection", () => {
+  describe("line segment intersection", () => {
     it("point is found when control points are the same", () => {
       const c = curve(
         pointFrom(100, 0),
@@ -17,9 +17,11 @@ describe("Math curve", () => {
         pointFrom(100, 100),
         pointFrom(0, 100),
       );
-      const l = line(pointFrom(0, 0), pointFrom(200, 200));
+      const l = lineSegment(pointFrom(0, 0), pointFrom(200, 200));
 
-      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([[87.5, 87.5]]);
+      expect(curveIntersectLineSegment(c, l)).toCloselyEqualPoints([
+        [87.5, 87.5],
+      ]);
     });
 
     it("point is found when control points aren't the same", () => {
@@ -29,9 +31,11 @@ describe("Math curve", () => {
         pointFrom(60, 100),
         pointFrom(0, 100),
       );
-      const l = line(pointFrom(0, 0), pointFrom(200, 200));
+      const l = lineSegment(pointFrom(0, 0), pointFrom(200, 200));
 
-      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([[73.65, 73.65]]);
+      expect(curveIntersectLineSegment(c, l)).toCloselyEqualPoints([
+        [72.5, 72.5],
+      ]);
     });
 
     it("points are found when curve is sliced at 3 points", () => {
@@ -41,11 +45,9 @@ describe("Math curve", () => {
         pointFrom(10, 50),
         pointFrom(50, 50),
       );
-      const l = line(pointFrom(0, 112.5), pointFrom(90, 0));
+      const l = lineSegment(pointFrom(0, 112.5), pointFrom(90, 0));
 
-      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([
-        [49.99999999999996, 50],
-      ]);
+      expect(curveIntersectLineSegment(c, l)).toCloselyEqualPoints([[50, 50]]);
     });
 
     it("can be detected where the determinant is overly precise", () => {
@@ -55,14 +57,14 @@ describe("Math curve", () => {
         pointFrom(30.362198093259348, 44.22624906835505),
         pointFrom(9.028864759926016, 44.22624906835505),
       );
-      const l = line(
+      const l = lineSegment(
         pointFrom(-82.30963544324186, -41.19949363038283),
 
         pointFrom(188.2149592542487, 134.75505940984908),
       );
 
-      expect(curveIntersectLine(c, l)).toCloselyEqualPoints([
-        [34.4078, 34.7168],
+      expect(curveIntersectLineSegment(c, l)).toCloselyEqualPoints([
+        [34.4, 34.71],
       ]);
     });
   });

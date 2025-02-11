@@ -1,18 +1,7 @@
 import type { Bounds } from "../excalidraw/element/bounds";
-import { isPointOnLineSegment } from "./line";
 import { isPoint, pointDistance, pointFrom } from "./point";
-import {
-  rectangle,
-  rectangleIntersectLine,
-  rectangleIntersectLineSegment,
-} from "./rectangle";
-import type {
-  Curve,
-  GlobalPoint,
-  Line,
-  LineSegment,
-  LocalPoint,
-} from "./types";
+import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
+import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
 /**
  *
@@ -31,67 +20,73 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   return [a, b, c, d] as Curve<Point>;
 }
 
-/*computes intersection between a cubic spline and a line segment*/
-export function curveIntersectLine<Point extends GlobalPoint | LocalPoint>(
-  c: Curve<Point>,
-  l: Line<Point>,
-): Point[] {
-  const bounds = curveBounds(c);
-  if (
-    rectangleIntersectLine(
-      rectangle(
-        pointFrom(bounds[0], bounds[1]),
-        pointFrom(bounds[2], bounds[3]),
-      ),
-      l,
-    ).length === 0
-  ) {
-    return [];
-  }
-
-  const C1 = pointFrom<Point>(
-    Math.round(c[0][0] * 1e4) / 1e4,
-    Math.round(c[0][1] * 1e4) / 1e4,
-  );
-  const C2 = pointFrom<Point>(
-    Math.round(c[1][0] * 1e4) / 1e4,
-    Math.round(c[1][1] * 1e4) / 1e4,
-  );
-  const C3 = pointFrom<Point>(
-    Math.round(c[2][0] * 1e4) / 1e4,
-    Math.round(c[2][1] * 1e4) / 1e4,
-  );
-  const C4 = pointFrom<Point>(
-    Math.round(c[3][0] * 1e4) / 1e4,
-    Math.round(c[3][1] * 1e4) / 1e4,
-  );
-  const [px, py] = [
-    [C1[0], C2[0], C3[0], C4[0]],
-    [C1[1], C2[1], C3[1], C4[1]],
+function gradient(
+  f: (t: number, s: number) => number,
+  t0: number,
+  s0: number,
+  delta: number = 1e-6,
+): number[] {
+  return [
+    (f(t0 + delta, s0) - f(t0 - delta, s0)) / (2 * delta),
+    (f(t0, s0 + delta) - f(t0, s0 - delta)) / (2 * delta),
   ];
-  const bx = bezierCoeffs(px[0], px[1], px[2], px[3]);
-  const by = bezierCoeffs(py[0], py[1], py[2], py[3]);
-  const r = curveCubicRoots([bx, by], l);
-  const X = [];
-  const intersections = [];
-  // verify the roots are in bounds of the linear segment
-  for (let i = 0; i < 3; i++) {
-    const t = r[i];
-
-    X[0] = bx[0] * t * t * t + bx[1] * t * t + bx[2] * t + bx[3];
-    X[1] = by[0] * t * t * t + by[1] * t * t + by[2] * t + by[3];
-
-    if (!isNaN(X[0]) && !isNaN(X[1])) {
-      intersections.push(pointFrom(X[0], X[1]));
-    }
-  }
-
-  return intersections;
 }
 
+function solve(
+  f: (t: number, s: number) => [number, number],
+  t0: number,
+  s0: number,
+  tolerance: number = 1e-3,
+  iterLimit: number = 10,
+): number[] | null {
+  let error = Infinity;
+  let iter = 0;
+
+  while (error >= tolerance) {
+    if (iter >= iterLimit) {
+      return null;
+    }
+
+    const y0 = f(t0, s0);
+    const jacobian = [
+      gradient((t, s) => f(t, s)[0], t0, s0),
+      gradient((t, s) => f(t, s)[1], t0, s0),
+    ];
+    const b = [[-y0[0]], [-y0[1]]];
+    const det =
+      jacobian[0][0] * jacobian[1][1] - jacobian[0][1] * jacobian[1][0];
+
+    if (det === 0) {
+      return null;
+    }
+
+    const iJ = [
+      [jacobian[1][1] / det, -jacobian[0][1] / det],
+      [-jacobian[1][0] / det, jacobian[0][0] / det],
+    ];
+    const h = [
+      [iJ[0][0] * b[0][0] + iJ[0][1] * b[1][0]],
+      [iJ[1][0] * b[0][0] + iJ[1][1] * b[1][0]],
+    ];
+
+    t0 = t0 + h[0][0];
+    s0 = s0 + h[1][0];
+
+    const [tErr, sErr] = f(t0, s0);
+    error = Math.max(Math.abs(tErr), Math.abs(sErr));
+    iter += 1;
+  }
+
+  return [t0, s0];
+}
+
+/**
+ * Computes the intersection between a cubic spline and a line segment.
+ */
 export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
+  // Optimize by doing a cheap bounding box check first
   const bounds = curveBounds(c);
   if (
     rectangleIntersectLineSegment(
@@ -105,52 +100,73 @@ export function curveIntersectLineSegment<
     return [];
   }
 
-  const C1 = pointFrom<Point>(
-    Math.round(c[0][0] * 1e4) / 1e4,
-    Math.round(c[0][1] * 1e4) / 1e4,
-  );
-  const C2 = pointFrom<Point>(
-    Math.round(c[1][0] * 1e4) / 1e4,
-    Math.round(c[1][1] * 1e4) / 1e4,
-  );
-  const C3 = pointFrom<Point>(
-    Math.round(c[2][0] * 1e4) / 1e4,
-    Math.round(c[2][1] * 1e4) / 1e4,
-  );
-  const C4 = pointFrom<Point>(
-    Math.round(c[3][0] * 1e4) / 1e4,
-    Math.round(c[3][1] * 1e4) / 1e4,
-  );
-  const [px, py] = [
-    [C1[0], C2[0], C3[0], C4[0]],
-    [C1[1], C2[1], C3[1], C4[1]],
+  const bezier = (t: number) =>
+    pointFrom<Point>(
+      (1 - t) ** 3 * c[0][0] +
+        3 * (1 - t) ** 2 * t * c[1][0] +
+        3 * (1 - t) * t ** 2 * c[2][0] +
+        t ** 3 * c[3][0],
+      (1 - t) ** 3 * c[0][1] +
+        3 * (1 - t) ** 2 * t * c[1][1] +
+        3 * (1 - t) * t ** 2 * c[2][1] +
+        t ** 3 * c[3][1],
+    );
+  const line = (s: number) =>
+    pointFrom<Point>(
+      l[0][0] + s * (l[1][0] - l[0][0]),
+      l[0][1] + s * (l[1][1] - l[0][1]),
+    );
+
+  const initial_guesses: [number, number][] = [
+    [0.5, 0],
+    [0.2, 0],
+    [0.8, 0],
   ];
-  const bx = bezierCoeffs(px[0], px[1], px[2], px[3]);
-  const by = bezierCoeffs(py[0], py[1], py[2], py[3]);
 
-  const r = curveCubicRoots([bx, by], l);
-  const X = [];
-  const intersections: Point[] = [];
-  // verify the roots are in bounds of the linear segment
-  for (let i = 0; i < 3; i++) {
-    const t = r[i];
+  const calculate = ([t0, s0]: [number, number]) => {
+    const solution = solve(
+      (t: number, s: number) => {
+        const bezier_point = bezier(t);
+        const line_point = line(s);
 
-    X[0] = bx[0] * t * t * t + bx[1] * t * t + bx[2] * t + bx[3];
-    X[1] = by[0] * t * t * t + by[1] * t * t + by[2] * t + by[3];
+        return [
+          bezier_point[0] - line_point[0],
+          bezier_point[1] - line_point[1],
+        ];
+      },
+      t0,
+      s0,
+    );
 
-    // Above is intersection point assuming infinitely long line segment,
-    // make sure we are also in bounds of the line
-    const candidate = pointFrom<Point>(X[0], X[1]);
-    if (
-      !isNaN(X[0]) &&
-      !isNaN(X[1]) &&
-      isPointOnLineSegment(l, candidate, 1e-2)
-    ) {
-      intersections.push(candidate);
+    if (!solution) {
+      return null;
     }
+
+    const [t, s] = solution;
+
+    if (t < 0 || t > 1 || s < 0 || s > 1) {
+      return null;
+    }
+
+    return bezier(t);
+  };
+
+  let solution = calculate(initial_guesses[0]);
+  if (solution) {
+    return [solution];
   }
 
-  return intersections;
+  solution = calculate(initial_guesses[1]);
+  if (solution) {
+    return [solution];
+  }
+
+  solution = calculate(initial_guesses[2]);
+  if (solution) {
+    return [solution];
+  }
+
+  return [];
 }
 
 /**
@@ -263,88 +279,6 @@ export function isCurve<P extends GlobalPoint | LocalPoint>(
   );
 }
 
-function curveCubicRoots<Point extends GlobalPoint | LocalPoint>(
-  [bx, by]: [number[], number[]],
-  l: [Point, Point],
-) {
-  const L1 = pointFrom<Point>(
-    Math.round(l[0][0] * 1e4) / 1e4,
-    Math.round(l[0][1] * 1e4) / 1e4,
-  );
-  const L2 = pointFrom<Point>(
-    Math.round(l[1][0] * 1e4) / 1e4,
-    Math.round(l[1][1] * 1e4) / 1e4,
-  );
-
-  const [lx, ly] = [
-    [L1[0], L2[0]],
-    [L1[1], L2[1]],
-  ];
-
-  const A = ly[1] - ly[0]; //A=y2-y1
-  const B = lx[0] - lx[1]; //B=x1-x2
-  const C = lx[0] * (ly[0] - ly[1]) + ly[0] * (lx[1] - lx[0]); //C=x1*(y1-y2)+y1*(x2-x1)
-
-  const P = [];
-  P[0] = A * bx[0] + B * by[0]; /*t^3*/
-  P[1] = A * bx[1] + B * by[1]; /*t^2*/
-  P[2] = A * bx[2] + B * by[2]; /*t*/
-  P[3] = A * bx[3] + B * by[3] + C; /*1*/
-
-  return cubicRoots(P);
-}
-
-function cubicRoots([a, b, c, d]: number[]): number[] {
-  const A = b / Math.max(a, 1e-10);
-  const B = c / Math.max(a, 1e-10);
-  const C = d / Math.max(a, 1e-10);
-
-  //var Q, R, D, S, T, Im;
-
-  const Q = (3 * B - Math.pow(A, 2)) / 9;
-  const R = (9 * A * B - 27 * C - 2 * Math.pow(A, 3)) / 54;
-  const D = Math.pow(Q, 3) + Math.pow(R, 2); // polynomial discriminant
-
-  const t = [];
-  let Im = 0.0;
-
-  if (D >= 0) {
-    // complex or duplicate roots
-    const S =
-      Math.sign(R + Math.sqrt(D)) * Math.pow(Math.abs(R + Math.sqrt(D)), 1 / 3);
-    const T =
-      Math.sign(R - Math.sqrt(D)) * Math.pow(Math.abs(R - Math.sqrt(D)), 1 / 3);
-
-    t[0] = -A / 3 + (S + T); // real root
-    t[1] = -A / 3 - (S + T) / 2; // real part of complex root
-    t[2] = -A / 3 - (S + T) / 2; // real part of complex root
-    Im = Math.abs((Math.sqrt(3) * (S - T)) / 2); // complex part of root pair
-
-    /*discard complex roots*/
-    if (Im !== 0) {
-      t[1] = -1;
-      t[2] = -1;
-    }
-  } // distinct real roots
-  else {
-    const th = Math.acos(R / Math.sqrt(-Math.pow(Q, 3)));
-
-    t[0] = 2 * Math.sqrt(-Q) * Math.cos(th / 3) - A / 3;
-    t[1] = 2 * Math.sqrt(-Q) * Math.cos((th + 2 * Math.PI) / 3) - A / 3;
-    t[2] = 2 * Math.sqrt(-Q) * Math.cos((th + 4 * Math.PI) / 3) - A / 3;
-    Im = 0.0;
-  }
-
-  /*discard out of spec roots*/
-  for (let i = 0; i < 3; i++) {
-    if (t[i] < 0 || t[i] > 1.0) {
-      t[i] = -1;
-    }
-  }
-
-  return t.filter((t) => t !== -1);
-}
-
 function curveBounds<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
 ): Bounds {
@@ -352,13 +286,4 @@ function curveBounds<Point extends GlobalPoint | LocalPoint>(
   const x = [P0[0], P1[0], P2[0], P3[0]];
   const y = [P0[1], P1[1], P2[1], P3[1]];
   return [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
-}
-
-function bezierCoeffs(P0: number, P1: number, P2: number, P3: number) {
-  return [
-    Math.max(-P0 + 3 * P1 + -3 * P2 + P3, 1e-4),
-    3 * P0 - 6 * P1 + 3 * P2,
-    -3 * P0 + 3 * P1,
-    P0,
-  ];
 }

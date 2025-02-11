@@ -28,7 +28,6 @@ import type {
 } from "../../math";
 import {
   curve,
-  curveIntersectLine,
   curveIntersectLineSegment,
   isPointWithinBounds,
   line,
@@ -295,6 +294,12 @@ const intersectRectanguloidWithLineSegment = (
     )
     .filter((i) => i != null)
     .map((j) => pointRotateRads(j, center, element.angle));
+  // const cornerIntersections2: GlobalPoint[] = corners
+  //   .flatMap((t) =>
+  //     curveIntersectLineSegment2(t, lineSegment(rotatedA, rotatedB)),
+  //   )
+  //   .filter((i) => i != null)
+  //   .map((j) => pointRotateRads(j, center, element.angle));
 
   return (
     [...sideIntersections, ...cornerIntersections]
@@ -421,7 +426,9 @@ const intersectDiamondWithLineSegment = (
     // Rotate back intersection points
     .map((p) => pointRotateRads<GlobalPoint>(p!, center, element.angle));
   const corners = curves
-    .flatMap((p) => curveIntersectLine(p, line(rotatedA, rotatedB)))
+    .flatMap((p) =>
+      curveIntersectLineSegment(p, lineSegment(rotatedA, rotatedB)),
+    )
     .filter((p) => p != null)
     // Rotate back intersection points
     .map((p) => pointRotateRads(p, center, element.angle));
