@@ -16,13 +16,25 @@ or via `yarn`
 yarn add react react-dom @excalidraw/excalidraw
 ```
 
-After installation you will see a folder `excalidraw-assets` and `excalidraw-assets-dev` in `dist` directory which contains the assets needed for this app in prod and dev mode respectively.
+After installation you will see a folder `excalidraw-assets` in `node_modules/@excalidraw/excalidraw/dist/browser/prod` directory which contains the necessary assets, including fonts and translation files.
 
-Move the folder `excalidraw-assets` and `excalidraw-assets-dev` to the path where your assets are served.
+By default, excalidraw will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/prod/`](https://unpkg.com/@excalidraw/excalidraw/dist)
 
-By default it will try to load the files from [`https://unpkg.com/@excalidraw/excalidraw/dist/`](https://unpkg.com/@excalidraw/excalidraw/dist)
+For self-hosting purposes, copy the content of the folder `excalidraw-assets` to the path where your assets should be server from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
-If you want to load assets from a different path you can set a variable `window.EXCALIDRAW_ASSET_PATH` depending on environment (for example if you have different URL's for dev and prod) to the url from where you want to load the assets.
+```js
+<script>
+    window.EXCALIDRAW_ASSET_PATH = "/";
+</script>
+```
+
+or 
+
+```js
+<script>
+    window.EXCALIDRAW_ASSET_PATH = window.origin;
+</script>
+```
 
 #### Note
 
