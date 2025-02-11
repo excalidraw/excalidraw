@@ -10,7 +10,7 @@ import type {
   NullableGridSize,
   PointerDownState,
 } from "../types";
-import { getBoundTextElement, getMinTextElementWidth } from "./textElement";
+import { getBoundTextElement } from "./textElement";
 import type Scene from "../scene/Scene";
 import {
   isArrowElement,
@@ -22,6 +22,7 @@ import {
 import { getFontString } from "../utils";
 import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 import { getGridPoint } from "../snapping";
+import { getMinTextElementWidth } from "./textMeasurements";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
