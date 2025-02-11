@@ -127,21 +127,6 @@ export type PolarCoords = [
 ];
 
 /**
- * Represents a symmetric arc, a segment of a circular path
- *
- * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
- * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right"
- */
-export type Arc<Point extends GlobalPoint | LocalPoint> = {
-  center: Point;
-  radius: number;
-  startAngle: Radians;
-  endAngle: Radians;
-} & {
-  _brand: "excalimath_symmetricarc";
-};
-
-/**
   An ellipse is specified by its center, angle, and its major and minor axes
   but for the sake of simplicity, we've used halfWidth and halfHeight instead
   in replace of semi major and semi minor axes
@@ -152,8 +137,4 @@ export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
   halfHeight: number;
 } & {
   _brand: "excalimath_ellipse";
-};
-
-export type Complex = [real: number, imag: number] & {
-  _brand: "excalimath_complex";
 };
