@@ -331,17 +331,10 @@ import type { FileSystemHandle } from "../data/filesystem";
 import { fileOpen } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
-  getLineHeightInPx,
-  getMinTextElementWidth,
-  isMeasureTextSupported,
   isValidTextContainer,
-  measureText,
-  normalizeText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -465,6 +458,15 @@ import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
+import {
+  isMeasureTextSupported,
+  normalizeText,
+  measureText,
+  getLineHeightInPx,
+  getApproxMinLineWidth,
+  getApproxMinLineHeight,
+  getMinTextElementWidth,
+} from "../element/textMeasurements";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

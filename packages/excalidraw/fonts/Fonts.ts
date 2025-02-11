@@ -6,7 +6,7 @@ import {
   getFontFamilyFallbacks,
 } from "../constants";
 import { isTextElement } from "../element";
-import { charWidth, getContainerElement } from "../element/textElement";
+import { getContainerElement } from "../element/textElement";
 import { containsCJK } from "../element/textWrapping";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getFontString, PromisePool, promiseTry } from "../utils";
@@ -31,6 +31,7 @@ import type {
 } from "../element/types";
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
+import { charWidth } from "../element/textMeasurements";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use

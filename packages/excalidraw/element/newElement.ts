@@ -33,11 +33,7 @@ import { getNewGroupIdsForDuplication } from "../groups";
 import type { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import {
-  measureText,
-  normalizeText,
-  getBoundTextMaxWidth,
-} from "./textElement";
+import { getBoundTextMaxWidth } from "./textElement";
 import { wrapText } from "./textWrapping";
 import {
   DEFAULT_ELEMENT_PROPS,
@@ -51,6 +47,7 @@ import {
 import type { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getLineHeight } from "../fonts";
 import type { Radians } from "../../math";
+import { normalizeText, measureText } from "./textMeasurements";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,

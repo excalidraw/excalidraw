@@ -1,5 +1,5 @@
 import { ENV } from "../constants";
-import { charWidth, getLineWidth } from "./textElement";
+import { charWidth, getLineWidth } from "./textMeasurements";
 import type { FontString } from "./types";
 
 let cachedCjkRegex: RegExp | undefined;
@@ -385,7 +385,7 @@ export const wrapText = (
   const originalLines = text.split("\n");
 
   for (const originalLine of originalLines) {
-    const currentLineWidth = getLineWidth(originalLine, font, true);
+    const currentLineWidth = getLineWidth(originalLine, font);
 
     if (currentLineWidth <= maxWidth) {
       lines.push(originalLine);
@@ -423,7 +423,7 @@ const wrapLine = (
     // cache single codepoint whitespace, CJK or emoji width calc. as kerning should not apply here
     const testLineWidth = isSingleCharacter(token)
       ? currentLineWidth + charWidth.calculate(token, font)
-      : getLineWidth(testLine, font, true);
+      : getLineWidth(testLine, font);
 
     // build up the current line, skipping length check for possibly trailing whitespaces
     if (/\s/.test(token) || testLineWidth <= maxWidth) {
@@ -443,7 +443,7 @@ const wrapLine = (
 
       // trailing line of the wrapped word might still be joined with next token/s
       currentLine = trailingLine;
-      currentLineWidth = getLineWidth(trailingLine, font, true);
+      currentLineWidth = getLineWidth(trailingLine, font);
       iterator = tokenIterator.next();
     } else {
       // push & reset, but don't iterate on the next token, as we didn't use it yet!
@@ -514,7 +514,7 @@ const wrapWord = (
  * Similarly to browsers, does not trim all trailing whitespaces, but only those exceeding the `maxWidth`.
  */
 const trimLine = (line: string, font: FontString, maxWidth: number) => {
-  const shouldTrimWhitespaces = getLineWidth(line, font, true) > maxWidth;
+  const shouldTrimWhitespaces = getLineWidth(line, font) > maxWidth;
 
   if (!shouldTrimWhitespaces) {
     return line;
@@ -527,7 +527,7 @@ const trimLine = (line: string, font: FontString, maxWidth: number) => {
     "",
   ];
 
-  let trimmedLineWidth = getLineWidth(trimmedLine, font, true);
+  let trimmedLineWidth = getLineWidth(trimmedLine, font);
 
   for (const whitespace of Array.from(whitespaces)) {
     const _charWidth = charWidth.calculate(whitespace, font);
