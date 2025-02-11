@@ -1,4 +1,5 @@
 name: Test Coverage PR
+
 on:
   pull_request:
 
@@ -8,19 +9,25 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-
+    
     steps:
       - uses: actions/checkout@v2
+      
       - name: "Install Node"
         uses: actions/setup-node@v2
         with:
           node-version: "18.x"
+          
       - name: "Install Deps"
         run: yarn install
+        
       - name: "Test Coverage"
-        run: yarn test:coverage
+        run: yarn test:coverage --coverage.reporter=json-summary --coverage.reporter=json
+        
       - name: "Report Coverage"
         if: always() # Also generate the report if tests are failing
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          json-summary-path: './coverage/coverage-summary.json'
+          json-final-path: './coverage/coverage-final.json'
