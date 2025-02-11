@@ -1,5 +1,6 @@
 export * from "./arc";
 export * from "./angle";
+export * from "./complex";
 export * from "./curve";
 export * from "./ellipse";
 export * from "./line";

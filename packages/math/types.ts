@@ -157,3 +157,7 @@ export type Ellipse<Point extends GenericPoint> = {
 } & {
   _brand: "excalimath_ellipse";
 };
+
+export type Complex = [real: number, imag: number] & {
+  _brand: "excalimath_complex";
+};
