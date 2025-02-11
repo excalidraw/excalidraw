@@ -1,4 +1,4 @@
-import type { Arc, Curve } from "../math";
+import type { Curve } from "../math";
 import {
   isLineSegment,
   lineSegment,
@@ -22,7 +22,7 @@ declare global {
 
 export type DebugElement = {
   color: string;
-  data: LineSegment<GlobalPoint> | Curve<GlobalPoint> | Arc<GlobalPoint>;
+  data: LineSegment<GlobalPoint> | Curve<GlobalPoint>;
   permanent: boolean;
 };
 
@@ -37,20 +37,6 @@ export const debugDrawCubicBezier = (
     color: opts?.color ?? "purple",
     permanent: !!opts?.permanent,
     data: c,
-  });
-};
-
-export const debugDrawArc = (
-  a: Arc<GlobalPoint>,
-  opts?: {
-    color?: string;
-    permanent?: boolean;
-  },
-) => {
-  addToCurrentFrame({
-    color: opts?.color ?? "blue",
-    permanent: !!opts?.permanent,
-    data: a,
   });
 };
 

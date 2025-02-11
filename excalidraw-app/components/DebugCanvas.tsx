@@ -12,9 +12,8 @@ import {
   TrashIcon,
 } from "../../packages/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import type { Arc, Curve } from "../../packages/math";
+import type { Curve } from "../../packages/math";
 import {
-  isArc,
   isLineSegment,
   type GlobalPoint,
   type LineSegment,
@@ -58,26 +57,6 @@ const renderCubicBezier = (
   context.restore();
 };
 
-const renderArc = (
-  context: CanvasRenderingContext2D,
-  zoom: number,
-  a: Arc<GlobalPoint>,
-  color: string,
-) => {
-  context.save();
-  context.strokeStyle = color;
-  context.beginPath();
-  context.arc(
-    a.center[0] * zoom,
-    a.center[1] * zoom,
-    a.radius * zoom,
-    a.startAngle,
-    a.endAngle,
-  );
-  context.stroke();
-  context.restore();
-};
-
 const renderOrigin = (context: CanvasRenderingContext2D, zoom: number) => {
   context.strokeStyle = "#888";
   context.save();
@@ -102,14 +81,6 @@ const render = (
           context,
           appState.zoom.value,
           el.data as LineSegment<GlobalPoint>,
-          el.color,
-        );
-        break;
-      case isArc(el.data):
-        renderArc(
-          context,
-          appState.zoom.value,
-          el.data as Arc<GlobalPoint>,
           el.color,
         );
         break;
