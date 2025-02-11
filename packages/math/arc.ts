@@ -1,4 +1,4 @@
-import { cartesian2Polar, normalizeRadians, radians } from "./angle";
+import { cartesian2Polar, normalizeRadians } from "./angle";
 import {
   ellipse,
   ellipseDistanceFromPoint,
@@ -6,7 +6,15 @@ import {
   ellipseSegmentInterceptPoints,
 } from "./ellipse";
 import { pointFrom, pointDistance, isPoint } from "./point";
-import type { GenericPoint, Segment, Radians, Arc, Line } from "./types";
+import type {
+  GlobalPoint,
+  LocalPoint,
+  Radians,
+  Arc,
+  Line,
+  GenericPoint,
+  Segment,
+} from "./types";
 import { PRECISION } from "./utils";
 
 /**
@@ -60,7 +68,7 @@ export function arcDistanceFromPoint<Point extends GenericPoint>(
   p: Point,
 ) {
   const theta = normalizeRadians(
-    radians(Math.atan2(p[0] - a.center[0], p[1] - a.center[1])),
+    Math.atan2(p[0] - a.center[0], p[1] - a.center[1]) as Radians,
   );
 
   if (a.startAngle <= theta && a.endAngle >= theta) {
@@ -98,11 +106,10 @@ export function arcSegmentInterceptPoints<Point extends GenericPoint>(
   return ellipseSegmentInterceptPoints(
     ellipse(a.center, a.radius, a.radius),
     s,
-  ).filter((candidate) => {
+  ).filter((candidate: Point) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(
       pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
-
     return Math.abs(a.radius - candidateRadius) < PRECISION &&
       a.startAngle > a.endAngle
       ? a.startAngle <= candidateAngle || a.endAngle >= candidateAngle
@@ -118,14 +125,14 @@ export function arcSegmentInterceptPoints<Point extends GenericPoint>(
  * @param l
  * @returns
  */
-export function arcLineInterceptPoints<Point extends GenericPoint>(
+export function arcLineInterceptPoints<Point extends GlobalPoint>(
   a: Readonly<Arc<Point>>,
   l: Readonly<Line<Point>>,
 ): Point[] {
   return ellipseLineIntersectionPoints(
     ellipse(a.center, a.radius, a.radius),
     l,
-  ).filter((candidate) => {
+  ).filter((candidate: Point) => {
     const [candidateRadius, candidateAngle] = cartesian2Polar(
       pointFrom(candidate[0] - a.center[0], candidate[1] - a.center[1]),
     );
@@ -137,7 +144,9 @@ export function arcLineInterceptPoints<Point extends GenericPoint>(
   });
 }
 
-export function isArc<Point extends GenericPoint>(v: unknown): v is Arc<Point> {
+export function isArc<Point extends GlobalPoint | LocalPoint>(
+  v: unknown,
+): v is Arc<Point> {
   return (
     v != null &&
     typeof v === "object" &&
