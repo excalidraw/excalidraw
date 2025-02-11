@@ -13,9 +13,14 @@ id: "restore"
     ImportedDataState["appState"]
   </a>
   ,<br />
-  &nbsp; localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
+  &nbsp; localAppState: Partial&lt;
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
     AppState
-  </a>> | null): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>
+  </a>
+  > | null):{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
+    AppState
+  </a>
 </pre>
 
 **_How to use_**
@@ -39,11 +44,15 @@ Use this as a way to not override user's defaults if you persist them. You can p
     ImportedDataState["elements"]
   </a>
   ,<br />
-  &nbsp; localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+  &nbsp; localElements:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
     ExcalidrawElement[]
-  </a> | null | undefined): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+  </a>{" "}
+  | null | undefined):{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
     ExcalidrawElement[]
-  </a>,<br />
+  </a>
+  ,<br />
   &nbsp; opts: &#123; refreshDimensions?: boolean, repairBindings?: boolean }
   <br />)
 </pre>
@@ -88,15 +97,20 @@ Parameter `refreshDimensions` indicates whether we should also `recalculate` tex
     ImportedDataState
   </a>
   ,<br />
-  &nbsp; localAppState: Partial&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
+  &nbsp; localAppState: Partial&lt;
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">
     AppState
-  </a>> | null | undefined,
+  </a>
+  > | null | undefined,
   <br />
-  &nbsp; localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+  &nbsp; localElements:{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
     ExcalidrawElement[]
-  </a> | null | undefined
+  </a>{" "}
+  | null | undefined
   <br />
-  ): <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L4">
+  ):{" "}
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L4">
     DataState
   </a>
   <br />
