@@ -46,7 +46,7 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
-import { detectLineHeight, getContainerElement } from "../element/textElement";
+import { getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
@@ -59,6 +59,7 @@ import {
 } from "../scene";
 import type { LocalPoint, Radians } from "../../math";
 import { isFiniteNumber, pointFrom } from "../../math";
+import { detectLineHeight } from "../element/textMeasurements";
 
 type RestoredAppState = Omit<
   AppState,
