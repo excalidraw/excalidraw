@@ -1765,6 +1765,17 @@ export const eyeDropperIcon = createIcon(
   tablerIconProps,
 );
 
+export const colorWheelIcon = createIcon(
+  <g stroke="currentColor" fill="none" strokeWidth={1.5}>
+    <circle cx="12" cy="12" r="9" />
+    <line x1="12" y1="3" x2="12" y2="21" />
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <line x1="5.8" y1="5.8" x2="18.2" y2="18.2" />
+    <line x1="5.8" y1="18.2" x2="18.2" y2="5.8" />
+  </g>,
+  tablerIconProps,
+);
+
 export const extraToolsIcon = createIcon(
   <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { getColor } from "./ColorPicker";
 import type { ColorPickerType } from "./colorPickerUtils";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
@@ -10,6 +10,8 @@ import clsx from "clsx";
 import { t } from "../../i18n";
 import { useDevice } from "../App";
 import { getShortcutKey } from "../../utils";
+import ColorWheel from "./ColorWheel";
+import "./ColorInput.scss";
 
 interface ColorInputProps {
   color: string;
@@ -37,63 +39,50 @@ export const ColorInput = ({
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = getColor(value);
-
-      if (color) {
-        onChange(color);
+      const newColor = getColor(value);
+      if (newColor) {
+        onChange(newColor);
+      } else {
+        setInnerValue(value);
       }
-      setInnerValue(value);
     },
     [onChange],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [activeSection]);
-
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
   useEffect(() => {
-    return () => {
-      setEyeDropperState(null);
-    };
+    return () => setEyeDropperState(null);
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
-      <div className="color-picker__input-hash">#</div>
+    <div className="color-picker-input-label">
+      <div className="color-picker-input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
         style={{ border: 0, padding: 0 }}
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
-        onChange={(event) => {
-          changeColor(event.target.value);
-        }}
+        onChange={(event) => changeColor(event.target.value)}
         value={(innerValue || "").replace(/^#/, "")}
-        onBlur={() => {
-          setInnerValue(color);
-        }}
+        onBlur={() => setInnerValue(color)}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
         onKeyDown={(event) => {
           if (event.key === KEYS.TAB) {
             return;
-          } else if (event.key === KEYS.ESCAPE) {
+          }
+          if (event.key === KEYS.ESCAPE) {
             eyeDropperTriggerRef.current?.focus();
           }
           event.stopPropagation();
         }}
       />
-      {/* TODO reenable on mobile with a better UX */}
       {!device.editor.isMobile && (
-        <>
+        <div className="color-picker-icons">
           <div
             style={{
               width: "1px",
@@ -119,12 +108,20 @@ export const ColorInput = ({
             }
             title={`${t(
               "labels.eyeDropper",
-            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
+            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")}`}
           >
             {eyeDropperIcon}
           </div>
-        </>
+        </div>
       )}
+      <div
+        style={{
+          width: "1px",
+          height: "1.25rem",
+          backgroundColor: "var(--default-border-color)",
+        }}
+      />
+      <ColorWheel color={innerValue} onChange={changeColor} />
     </div>
   );
 };

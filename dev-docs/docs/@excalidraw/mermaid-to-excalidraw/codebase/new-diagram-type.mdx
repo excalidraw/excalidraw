@@ -10,7 +10,7 @@ lets run the playground server in local :point_down:
 yarn start
 ```
 
-This will start the playground server in port `1234` and open it in browser so  you start playing with the playground.
+This will start the playground server in port `1234` and open it in browser so you start playing with the playground.
 
 ## Update Supported Diagram Types
 
@@ -26,13 +26,13 @@ For this create a file named `{{diagramType}}.ts` in [`src/parser`](https://gith
 
 The main aim of the parser is :point_down:
 
-1. Determine how elements are connected in the diagram and thus finding arrow and text bindings. 
+1. Determine how elements are connected in the diagram and thus finding arrow and text bindings.
 
 For this you might have to dig in to the parser `diagram.parser.yy` and which attributes to parse for the new diagram.
 
 2. Determine the position and dimensions of each element, for this would be using the `svg`
 
-Once the parser is ready, lets start using it. 
+Once the parser is ready, lets start using it.
 
 Add the diagram type in switch case in [`parseMermaid`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L97) and call the parser for the same.
 
@@ -51,4 +51,3 @@ Thats it, you have added the new diagram type 🥳, now lets test it out!
 2. Incase the new diagram type added is present in [`unsupported.ts`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/playground/testcases/unsupported.ts) then remove it from there.
 
 3. Verify if the test cases are running fine in playground.
-
