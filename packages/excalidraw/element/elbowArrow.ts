@@ -104,7 +104,7 @@ const handleSegmentRenormalization = (
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
 ) => {
   const nextFixedSegments: FixedSegment[] | null = arrow.fixedSegments
-    ? structuredClone(arrow.fixedSegments)
+    ? arrow.fixedSegments.slice()
     : null;
 
   if (nextFixedSegments) {
@@ -270,7 +270,7 @@ const handleSegmentRenormalization = (
 
 const handleSegmentRelease = (
   arrow: ExcalidrawElbowArrowElement,
-  fixedSegments: FixedSegment[],
+  fixedSegments: readonly FixedSegment[],
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
 ) => {
   const newFixedSegmentIndices = fixedSegments.map((segment) => segment.index);
@@ -444,7 +444,7 @@ const handleSegmentRelease = (
  */
 const handleSegmentMove = (
   arrow: ExcalidrawElbowArrowElement,
-  fixedSegments: FixedSegment[],
+  fixedSegments: readonly FixedSegment[],
   startHeading: Heading,
   endHeading: Heading,
   hoveredStartElement: ExcalidrawBindableElement | null,
@@ -686,7 +686,7 @@ const handleSegmentMove = (
 const handleEndpointDrag = (
   arrow: ExcalidrawElbowArrowElement,
   updatedPoints: readonly LocalPoint[],
-  fixedSegments: FixedSegment[],
+  fixedSegments: readonly FixedSegment[],
   startHeading: Heading,
   endHeading: Heading,
   startGlobalPoint: GlobalPoint,
@@ -944,8 +944,8 @@ export const updateElbowArrowPoints = (
             ? updates.points![1]
             : p,
         )
-      : structuredClone(updates.points)
-    : structuredClone(arrow.points);
+      : updates.points.slice()
+    : arrow.points.slice();
 
   const {
     startHeading,
@@ -1965,7 +1965,7 @@ const getBindableElementForId = (
 
 const normalizeArrowElementUpdate = (
   global: GlobalPoint[],
-  nextFixedSegments: FixedSegment[] | null,
+  nextFixedSegments: readonly FixedSegment[] | null,
   startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
   endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"],
 ): {
@@ -1974,7 +1974,7 @@ const normalizeArrowElementUpdate = (
   y: number;
   width: number;
   height: number;
-  fixedSegments: FixedSegment[] | null;
+  fixedSegments: readonly FixedSegment[] | null;
   startIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
   endIsSpecial?: ExcalidrawElbowArrowElement["startIsSpecial"];
 } => {
