@@ -769,12 +769,30 @@ const getResizedOrigin = (
         y: y - (newHeight - prevHeight) / 2,
       };
     case "east-side":
+      // NOTE (mtolmacs): Reverting this for a short period to test if it is
+      // the cause of the megasized elbow arrows showing up.
+      if (
+        Math.abs(
+          y +
+            ((prevWidth - newWidth) / 2) * Math.sin(angle) +
+            (prevHeight - newHeight) / 2,
+        ) > 1e6
+      ) {
+        console.error(
+          `getResizedOrigin() new calculation creates extremely large (> 1e6) y value where the old calculation resulted in ${
+            y +
+            (newHeight - prevHeight) / 2 +
+            ((prevWidth - newWidth) / 2) * Math.sin(angle)
+          }`,
+        );
+      }
+
       return {
         x: x + ((prevWidth - newWidth) / 2) * (Math.cos(angle) + 1),
         y:
           y +
-          ((prevWidth - newWidth) / 2) * Math.sin(angle) +
-          (prevHeight - newHeight) / 2,
+          (newHeight - prevHeight) / 2 +
+          ((prevWidth - newWidth) / 2) * Math.sin(angle),
       };
     case "west-side":
       return {

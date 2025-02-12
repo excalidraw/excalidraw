@@ -99,6 +99,30 @@ const _newElementBase = <T extends ExcalidrawElement>(
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
+  // NOTE (mtolmacs): This is a temporary check to detect extremely large
+  // element position or sizing
+  if (
+    x < -1e6 ||
+    x > 1e6 ||
+    y < -1e6 ||
+    y > 1e6 ||
+    width < -1e6 ||
+    width > 1e6 ||
+    height < -1e6 ||
+    height > 1e6
+  ) {
+    console.error(
+      `New element size or position is too large ${JSON.stringify({
+        x,
+        y,
+        width,
+        height,
+        // @ts-ignore
+        points: rest.points,
+      })}`,
+    );
+  }
+
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
     id: rest.id || randomId(),
