@@ -1,4 +1,5 @@
 import {
+  clamp,
   pointDistance,
   pointFrom,
   pointScaleFromOrigin,
@@ -915,14 +916,14 @@ export const updateElbowArrowPoints = (
     );
   }
   // @ts-ignore See above note
-  arrow.x = Math.min(MAX_POS, Math.max(arrow.x, -MAX_POS));
+  arrow.x = clamp(arrow.x, -MAX_POS, MAX_POS);
   // @ts-ignore See above note
-  arrow.y = Math.min(MAX_POS, Math.max(arrow.y, -MAX_POS));
+  arrow.y = clamp(arrow.y, -MAX_POS, MAX_POS);
   if (updates.points) {
     updates.points = updates.points.map(([x, y]) =>
       pointFrom<LocalPoint>(
-        Math.min(MAX_POS, Math.max(x, -MAX_POS)),
-        Math.min(MAX_POS, Math.max(y, -MAX_POS)),
+        clamp(x, -MAX_POS, MAX_POS),
+        clamp(y, -MAX_POS, MAX_POS),
       ),
     );
   }
@@ -2039,10 +2040,10 @@ const normalizeArrowElementUpdate = (
     offsetX > MAX_POS ||
     offsetY < -MAX_POS ||
     offsetY > MAX_POS ||
-    (points && offsetX + points[points.length - 1][0] < -MAX_POS) ||
-    (points && offsetY + points[points.length - 1][0] > MAX_POS) ||
-    (points && offsetX + points[points.length - 1][1] < -MAX_POS) ||
-    (points && offsetY + points[points.length - 1][1] > MAX_POS)
+    offsetX + points[points.length - 1][0] < -MAX_POS ||
+    offsetY + points[points.length - 1][0] > MAX_POS ||
+    offsetX + points[points.length - 1][1] < -MAX_POS ||
+    offsetY + points[points.length - 1][1] > MAX_POS
   ) {
     console.error(
       `Elbow arrow normalization is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
@@ -2057,16 +2058,13 @@ const normalizeArrowElementUpdate = (
   }
 
   points = points.map(([x, y]) =>
-    pointFrom<LocalPoint>(
-      Math.min(MAX_POS, Math.max(x, -MAX_POS)),
-      Math.min(MAX_POS, Math.max(y, -MAX_POS)),
-    ),
+    pointFrom<LocalPoint>(clamp(x, -1e6, 1e6), clamp(y, -1e6, 1e6)),
   );
 
   return {
     points,
-    x: Math.min(MAX_POS, Math.max(offsetX, -MAX_POS)),
-    y: Math.min(MAX_POS, Math.max(offsetY, -MAX_POS)),
+    x: clamp(offsetX, -1e6, 1e6),
+    y: clamp(offsetY, -1e6, 1e6),
     fixedSegments:
       (nextFixedSegments?.length ?? 0) > 0 ? nextFixedSegments : null,
     ...getSizeFromPoints(points),
