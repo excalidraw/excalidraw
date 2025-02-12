@@ -863,6 +863,8 @@ const handleEndpointDrag = (
   );
 };
 
+const MAX_POS = 1e6;
+
 /**
  *
  */
@@ -881,6 +883,48 @@ export const updateElbowArrowPoints = (
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
     return { points: updates.points ?? arrow.points };
+  }
+
+  // NOTE (mtolmacs): This is a temporary check to ensure that the incoming elbow
+  // arrow size is valid. This check will be removed once the issue is identified
+  if (
+    arrow.x < -MAX_POS ||
+    arrow.x > MAX_POS ||
+    arrow.y < -MAX_POS ||
+    arrow.y > MAX_POS ||
+    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) <
+      -MAX_POS ||
+    arrow.x + (updates?.points?.[updates?.points?.length - 1]?.[0] ?? 0) >
+      MAX_POS ||
+    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) <
+      -MAX_POS ||
+    arrow.y + (updates?.points?.[updates?.points?.length - 1]?.[1] ?? 0) >
+      MAX_POS ||
+    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) <
+      -MAX_POS ||
+    arrow.x + (arrow?.points?.[arrow?.points?.length - 1]?.[0] ?? 0) >
+      MAX_POS ||
+    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) <
+      -MAX_POS ||
+    arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) > MAX_POS
+  ) {
+    console.error(
+      `Elbow arrow (or update) is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
+        arrow,
+      )} updates: ${JSON.stringify(updates)}`,
+    );
+  }
+  // @ts-ignore See above note
+  arrow.x = Math.min(MAX_POS, Math.max(arrow.x, -MAX_POS));
+  // @ts-ignore See above note
+  arrow.y = Math.min(MAX_POS, Math.max(arrow.y, -MAX_POS));
+  if (updates.points) {
+    updates.points = updates.points.map(([x, y]) =>
+      pointFrom<LocalPoint>(
+        Math.min(MAX_POS, Math.max(x, -MAX_POS)),
+        Math.min(MAX_POS, Math.max(y, -MAX_POS)),
+      ),
+    );
   }
 
   if (!import.meta.env.PROD) {
@@ -1981,17 +2025,48 @@ const normalizeArrowElementUpdate = (
   const offsetX = global[0][0];
   const offsetY = global[0][1];
 
-  const points = global.map((p) =>
+  let points = global.map((p) =>
     pointTranslate<GlobalPoint, LocalPoint>(
       p,
       vectorScale(vectorFromPoint(global[0]), -1),
     ),
   );
 
+  // NOTE (mtolmacs): This is a temporary check to see if the normalization
+  // creates an overly large arrow. This should be removed once we have an answer.
+  if (
+    offsetX < -MAX_POS ||
+    offsetX > MAX_POS ||
+    offsetY < -MAX_POS ||
+    offsetY > MAX_POS ||
+    (points && offsetX + points[points.length - 1][0] < -MAX_POS) ||
+    (points && offsetY + points[points.length - 1][0] > MAX_POS) ||
+    (points && offsetX + points[points.length - 1][1] < -MAX_POS) ||
+    (points && offsetY + points[points.length - 1][1] > MAX_POS)
+  ) {
+    console.error(
+      `Elbow arrow normalization is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
+        {
+          x: offsetX,
+          y: offsetY,
+          points,
+          ...getSizeFromPoints(points),
+        },
+      )}`,
+    );
+  }
+
+  points = points.map(([x, y]) =>
+    pointFrom<LocalPoint>(
+      Math.min(MAX_POS, Math.max(x, -MAX_POS)),
+      Math.min(MAX_POS, Math.max(y, -MAX_POS)),
+    ),
+  );
+
   return {
     points,
-    x: offsetX,
-    y: offsetY,
+    x: Math.min(MAX_POS, Math.max(offsetX, -MAX_POS)),
+    y: Math.min(MAX_POS, Math.max(offsetY, -MAX_POS)),
     fixedSegments:
       (nextFixedSegments?.length ?? 0) > 0 ? nextFixedSegments : null,
     ...getSizeFromPoints(points),
