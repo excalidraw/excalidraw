@@ -337,7 +337,7 @@ export type ExcalidrawElbowArrowElement = Merge<
     elbowed: true;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;
-    fixedSegments: FixedSegment[] | null;
+    fixedSegments: readonly FixedSegment[] | null;
     /**
      * Marks that the 3rd point should be used as the 2nd point of the arrow in
      * order to temporarily hide the first segment of the arrow without losing

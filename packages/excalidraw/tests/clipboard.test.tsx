@@ -5,7 +5,7 @@ import { render, waitFor, GlobalTestState } from "./test-utils";
 import { Pointer, Keyboard } from "./helpers/ui";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
-import { getLineHeightInPx } from "../element/textElement";
+import { getLineHeightInPx } from "../element/textMeasurements";
 import { getElementBounds } from "../element";
 import type { NormalizedZoomValue } from "../types";
 import { API } from "./helpers/api";

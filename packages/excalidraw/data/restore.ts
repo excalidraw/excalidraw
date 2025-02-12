@@ -46,7 +46,7 @@ import { bumpVersion } from "../element/mutateElement";
 import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
-import { detectLineHeight, getContainerElement } from "../element/textElement";
+import { getContainerElement } from "../element/textElement";
 import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
@@ -59,6 +59,7 @@ import {
 } from "../scene";
 import type { LocalPoint, Radians } from "../../math";
 import { isFiniteNumber, pointFrom } from "../../math";
+import { detectLineHeight } from "../element/textMeasurements";
 
 type RestoredAppState = Omit<
   AppState,
@@ -205,6 +206,25 @@ const restoreElementWithProperties = <
       "customData" in extra ? extra.customData : element.customData;
   }
 
+  // NOTE (mtolmacs): This is a temporary check to detect extremely large
+  // element position or sizing
+  if (
+    element.x < -1e6 ||
+    element.x > 1e6 ||
+    element.y < -1e6 ||
+    element.y > 1e6 ||
+    element.width < -1e6 ||
+    element.width > 1e6 ||
+    element.height < -1e6 ||
+    element.height > 1e6
+  ) {
+    console.error(
+      `Restore element with properties size or position is too large ${JSON.stringify(
+        element,
+      )}`,
+    );
+  }
+
   return {
     // spread the original element properties to not lose unknown ones
     // for forward-compatibility
@@ -219,6 +239,25 @@ const restoreElementWithProperties = <
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element | null => {
+  // NOTE (mtolmacs): This is a temporary check to detect extremely large
+  // element position or sizing
+  if (
+    element.x < -1e6 ||
+    element.x > 1e6 ||
+    element.y < -1e6 ||
+    element.y > 1e6 ||
+    element.width < -1e6 ||
+    element.width > 1e6 ||
+    element.height < -1e6 ||
+    element.height > 1e6
+  ) {
+    console.error(
+      `Restore element size or position is too large ${JSON.stringify(
+        element,
+      )}`,
+    );
+  }
+
   switch (element.type) {
     case "text":
       let fontSize = element.fontSize;
