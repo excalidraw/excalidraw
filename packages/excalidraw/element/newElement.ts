@@ -111,16 +111,14 @@ const _newElementBase = <T extends ExcalidrawElement>(
     height < -1e6 ||
     height > 1e6
   ) {
-    console.error(
-      `New element size or position is too large ${JSON.stringify({
-        x,
-        y,
-        width,
-        height,
-        // @ts-ignore
-        points: rest.points,
-      })}`,
-    );
+    console.error("New element size or position is too large", {
+      x,
+      y,
+      width,
+      height,
+      // @ts-ignore
+      points: rest.points,
+    });
   }
 
   // assign type to guard against excess properties
