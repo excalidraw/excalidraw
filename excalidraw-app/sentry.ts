@@ -24,8 +24,7 @@ Sentry.init({
   ignoreErrors: [
     "undefined is not an object (evaluating 'window.__pad.performLoop')", // Only happens on Safari, but spams our servers. Doesn't break anything
     "InvalidStateError: Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.", // Not much we can do about the IndexedDB closing error
-    /^TypeError: Failed to fetch dynamically imported module: https:\/\/excalidraw\.com\/assets\/index\.esm.*$/i, // This is happening when a service worker tries to load an old asset
-    /^TypeError: error loading dynamically imported module: https:\/\/excalidraw\.com\/assets\/index\.esm.*$/i, // This is happening when a service worker tries to load an old asset
+    /^.+(Failed to fetch|(fetch|loading) dynamically imported module).+$/i, // This is happening when a service worker tries to load an old asset
     "QuotaExceededError: Failed to execute 'setItem' on 'Storage': Setting the value of 'excalidraw' exceeded the quota.", // This should be handled by the user
     "Internal error opening backing store for indexedDB.open", // Private mode and disabled indexedDB
   ],
