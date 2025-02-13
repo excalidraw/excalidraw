@@ -219,9 +219,8 @@ const restoreElementWithProperties = <
     element.height > 1e6
   ) {
     console.error(
-      `Restore element with properties size or position is too large ${JSON.stringify(
-        element,
-      )}`,
+      "Restore element with properties size or position is too large",
+      { element },
     );
   }
 
@@ -251,11 +250,7 @@ const restoreElement = (
     element.height < -1e6 ||
     element.height > 1e6
   ) {
-    console.error(
-      `Restore element size or position is too large ${JSON.stringify(
-        element,
-      )}`,
-    );
+    console.error("Restore element size or position is too large", { element });
   }
 
   switch (element.type) {
