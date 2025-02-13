@@ -910,11 +910,9 @@ export const updateElbowArrowPoints = (
     arrow.y + (arrow?.points?.[arrow?.points?.length - 1]?.[1] ?? 0) > MAX_POS
   ) {
     console.error(
-      new Error(
-        `[DEBUG] Elbow arrow (or update) is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
-          arrow,
-        )} updates: ${JSON.stringify(updates)}`,
-      ),
+      `[DEBUG] Elbow arrow (or update) is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
+        arrow,
+      )} updates: ${JSON.stringify(updates)}`,
     );
   }
   // @ts-ignore See above note
@@ -2048,16 +2046,14 @@ const normalizeArrowElementUpdate = (
     offsetY + points[points.length - 1][1] > MAX_POS
   ) {
     console.error(
-      new Error(
-        `[DEBUG] Elbow arrow normalization is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
-          {
-            x: offsetX,
-            y: offsetY,
-            points,
-            ...getSizeFromPoints(points),
-          },
-        )}`,
-      ),
+      `[DEBUG] Elbow arrow normalization is outside reasonable bounds (> 1e6) arrow: ${JSON.stringify(
+        {
+          x: offsetX,
+          y: offsetY,
+          points,
+          ...getSizeFromPoints(points),
+        },
+      )}`,
     );
   }
 

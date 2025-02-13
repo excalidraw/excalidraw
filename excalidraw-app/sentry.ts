@@ -1,6 +1,8 @@
 import * as Sentry from "@sentry/browser";
+import callsites from "callsites";
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
+  localhost: "production",
   "excalidraw.com": "production",
   "staging.excalidraw.com": "staging",
   "vercel.app": "staging",
@@ -37,6 +39,44 @@ Sentry.init({
     if (event.request?.url) {
       event.request.url = event.request.url.replace(/#.*$/, "");
     }
+
+    if (!event.exception) {
+      event.exception = {
+        values: [
+          {
+            type: "ConsoleError",
+            value: event.message ?? "Unknown error",
+            stacktrace: {
+              frames: callsites()
+                .slice(1)
+                .filter(
+                  (frame) =>
+                    frame.getFileName() &&
+                    !frame.getFileName()?.includes("@sentry_browser.js"),
+                )
+                .map((frame) => ({
+                  filename: frame.getFileName() ?? undefined,
+                  function: frame.getFunctionName() ?? undefined,
+                  in_app: !(
+                    frame.getFileName()?.includes("node_modules") ?? false
+                  ),
+                  lineno: frame.getLineNumber() ?? undefined,
+                  colno: frame.getColumnNumber() ?? undefined,
+                })),
+            },
+            mechanism: {
+              type: "instrument",
+              handled: true,
+              data: {
+                function: "console.error",
+                handler: "Sentry.beforeSend",
+              },
+            },
+          },
+        ],
+      };
+    }
+
     return event;
   },
 });
