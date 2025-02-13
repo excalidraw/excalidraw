@@ -779,11 +779,13 @@ const getResizedOrigin = (
         ) > 1e6
       ) {
         console.error(
-          `getResizedOrigin() new calculation creates extremely large (> 1e6) y value where the old calculation resulted in ${
-            y +
-            (newHeight - prevHeight) / 2 +
-            ((prevWidth - newWidth) / 2) * Math.sin(angle)
-          }`,
+          new Error(
+            `[DEBUG] getResizedOrigin() new calculation creates extremely large (> 1e6) y value where the old calculation resulted in ${
+              y +
+              (newHeight - prevHeight) / 2 +
+              ((prevWidth - newWidth) / 2) * Math.sin(angle)
+            }`,
+          ),
         );
       }
 
