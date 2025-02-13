@@ -2,7 +2,6 @@ import * as Sentry from "@sentry/browser";
 import callsites from "callsites";
 
 const SentryEnvHostnameMap: { [key: string]: string } = {
-  localhost: "production",
   "excalidraw.com": "production",
   "staging.excalidraw.com": "staging",
   "vercel.app": "staging",
