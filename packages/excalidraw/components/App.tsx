@@ -11060,6 +11060,7 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
+    // @ts-ignore
     h: {
       scene: Scene;
       elements: readonly ExcalidrawElement[];

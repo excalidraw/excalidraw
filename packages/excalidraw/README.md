@@ -23,17 +23,13 @@ By default, excalidraw will try to load the files from [`https://unpkg.com/@exca
 For self-hosting purposes, copy the content of the folder `excalidraw-assets` to the path where your assets should be server from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
 ```js
-<script>
-    window.EXCALIDRAW_ASSET_PATH = "/";
-</script>
+<script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
 ```
 
-or 
+or
 
 ```js
-<script>
-    window.EXCALIDRAW_ASSET_PATH = window.origin;
-</script>
+<script>window.EXCALIDRAW_ASSET_PATH = window.origin;</script>
 ```
 
 #### Note

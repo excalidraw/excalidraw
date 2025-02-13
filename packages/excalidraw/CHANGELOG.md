@@ -43,14 +43,15 @@ Please add the latest change on the top under the correct section.
 
 ### Breaking changes
 
-- We've moved away from `UMD` bundle to using `ESM`, which comes with the following changes:
+- We've transitioned from `UMD` to `ESM` module format, which comes with the following changes:
 
-  - Changed import of the styles inside the React environment:
+  - Changed import of the styles inside `.js` or `.jsx` files:
     ```js
     import { Excalidraw } from "@excalidraw/excalidraw";
     import "@excalidraw/excalidraw/index.css";
     ```
-  - Changed import of the styles and the library in non-React environment:
+  - Changed import of the styles and the library in `html` files:
+
     ```html
     <link
       rel="stylesheet"
@@ -67,26 +68,38 @@ Please add the latest change on the top under the correct section.
 - We've added new fonts and we strongly recommend to self-host them, in order to avoid issues with the fonts not being loaded. For self-hosting purposes, copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be server from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
   ```js
-  <script>
-      window.EXCALIDRAW_ASSET_PATH = "/";
-  </script>
+  <script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
   ```
 
-  or 
+  or, if you serve your assets from the root of your CDN, you would do:
 
   ```js
-  <script>
-      window.EXCALIDRAW_ASSET_PATH = window.origin;
-  </script>
+  // Vanilla
+  <head>
+    <script>
+      window.EXCALIDRAW_ASSET_PATH = "https://my.cdn.com/assets/";
+    </script>
+  </head>
   ```
 
-- The `updateScene` API has changed due to the added `Store` component. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `storeAction: StoreActionType` parameter. Make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
+  or, if you prefer the path to be dynamicly set based on the `location.origin`, you could do the following:
+
+  ```jsx
+  // Next.js
+  <Script id="load-env-variables" strategy="beforeInteractive">
+    {`window["EXCALIDRAW_ASSET_PATH"] = location.origin;`} // or use just "/"!
+  </Script>
+  ```
+
+- The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `storeAction: StoreActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
 
   | Undo behaviour | `commitToHistory` (before) | `storeAction` (after) | Notes |
   | --- | --- | --- | --- |
   | _Immediately undoable_ | `true` | `"capture"` | As before, use for all updates which should be recorded by the store & history. Should be used for the most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
-  | _Eventually undoable_ | `false` (default) | `"none"` (default)  | Similar to before, use for all updates which should not be recorded immediately or those not meant to be recorded at all (i.e. updates to `collaborators` object, parts of `AppState` which are not observed by the store & history - not in `ObservedAppState`).<br/><br/>**IMPORTANT** It's likely you should switch to `"update"` in all the other cases, as all such updates will end up being recorded with the next `"capture"` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+  | _Eventually undoable_ | `false` (default) | `"none"` (default) | Similar to before, use for all updates which should not be recorded immediately or those not meant to be recorded at all (i.e. updates to `collaborators` object, parts of `AppState` which are not observed by the store & history - not in `ObservedAppState`).<br/><br/>**IMPORTANT** It's likely you should switch to `"update"` in all the other cases, as all such updates will end up being recorded with the next `"capture"` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
   | _Never undoable_ | n/a | `"update"` | **NEW**: previously there was no equivalent for this value. Now, it's recommended to use `"update"` for all remote updates (from the other clients), scene initialization, or those updates, which should not be locally "undoable". These updates will _never_ make it to the local undo / redo stacks. |
+
+  > **NOTE**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `storeAction` value.> **NOTE**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `storeAction` value.
 
 - `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties.
 
@@ -111,6 +124,8 @@ Please add the latest change on the top under the correct section.
 - Expose `getVisibleSceneBounds` helper to get scene bounds of visible canvas area [#7450](https://github.com/excalidraw/excalidraw/pull/7450)
 
 - Soft-deprecate `useHandleLibrary`'s `opts.getInitialLibraryItems` in favor of `opts.adapter`. [#7655](https://github.com/excalidraw/excalidraw/pull/7655)
+
+- Extended `window.EXCALIDRAW_ASSET_PATH` to accept array of paths `string[]` as a value, allowing to specify multiple base `URL` fallbacks. [#8286](https://github.com/excalidraw/excalidraw/pull/8286)
 
 - Custom text metrics provider [#9121](https://github.com/excalidraw/excalidraw/pull/9121)
 
@@ -189,8 +204,6 @@ Please add the latest change on the top under the correct section.
 - Stats popup style tweaks [#8361](https://github.com/excalidraw/excalidraw/pull/8361)
 
 - Remove automatic frame naming [#8302](https://github.com/excalidraw/excalidraw/pull/8302)
-
-- Multiple fonts fallbacks [#8286](https://github.com/excalidraw/excalidraw/pull/8286)
 
 - Ability to debug the state of fractional indices [#8235](https://github.com/excalidraw/excalidraw/pull/8235)
 
@@ -294,7 +307,7 @@ Please add the latest change on the top under the correct section.
 
 - Change cursor by tool change immediately [#8212](https://github.com/excalidraw/excalidraw/pull/8212)
 
-- Package build fails on worker chunks  [#8990](https://github.com/excalidraw/excalidraw/pull/8990)
+- Package build fails on worker chunks [#8990](https://github.com/excalidraw/excalidraw/pull/8990)
 
 - Z-index clash in mobile UI [#8985](https://github.com/excalidraw/excalidraw/pull/8985)
 
@@ -607,7 +620,6 @@ Please add the latest change on the top under the correct section.
 - Export types for @excalidraw/utils [#7736](https://github.com/excalidraw/excalidraw/pull/7736)
 
 - Create ESM build for utils package 🥳 [#7500](https://github.com/excalidraw/excalidraw/pull/7500)
-
 
 ## 0.17.3 (2024-02-09)
 

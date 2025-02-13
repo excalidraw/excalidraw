@@ -1,15 +1,16 @@
 {
-  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"],
   "compilerOptions": {
     "target": "ESNext",
     "strict": true,
-    "outDir": "dist",
+    "outDir": "dist/types",
     "skipLibCheck": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx"
-  }
+    "jsx": "react-jsx",
+    "emitDeclarationOnly": true,
+  },
+  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }
