@@ -138,7 +138,7 @@ export const distanceToRectanguloidElement = (
         ].map((a) => curvePointDistance(a, rotatedPoint))
       : [];
 
-  return Math.min(...[...sideDistances, ...cornerDistances]);
+  return Math.min(...sideDistances, ...cornerDistances);
 };
 
 /**
