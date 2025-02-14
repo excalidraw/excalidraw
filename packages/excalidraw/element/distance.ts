@@ -1,22 +1,22 @@
 import type { GlobalPoint, Radians } from "../../math";
 import {
-  curve,
   curvePointDistance,
   distanceToLineSegment,
-  lineSegment,
   pointFrom,
   pointRotateRads,
-  rectangle,
 } from "../../math";
 import { ellipse, ellipseDistanceFromPoint } from "../../math/ellipse";
-import { getCornerRadius } from "../shapes";
-import { getDiamondPoints } from "./bounds";
+import { debugClear } from "../visualdebug";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawEllipseElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+} from "./utils";
 
 export const distanceToBindableElement = (
   element: ExcalidrawBindableElement,
@@ -50,95 +50,23 @@ export const distanceToRectanguloidElement = (
   element: ExcalidrawRectanguloidElement,
   p: GlobalPoint,
 ) => {
-  const r = rectangle(
-    pointFrom(element.x, element.y),
-    pointFrom(element.x + element.width, element.y + element.height),
+  const center = pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
   );
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
-  const rotatedPoint = pointRotateRads(
-    p,
-    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
-    -element.angle as Radians,
-  );
-  const roundness = getCornerRadius(
-    Math.min(element.width, element.height),
-    element,
-  );
-  const top = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
-    pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
-  );
-  const right = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
-    pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
-  );
-  const bottom = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
-    pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
-  );
-  const left = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
-    pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
-  );
-  const sideDistances = [top, right, bottom, left].map((s) =>
-    distanceToLineSegment(rotatedPoint, s),
-  );
-  const cornerDistances =
-    roundness > 0
-      ? [
-          curve(
-            left[1],
-            pointFrom(
-              left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
-              left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
-            ),
-            pointFrom(
-              top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
-              top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
-            ),
-            top[0],
-          ), // TOP LEFT
-          curve(
-            top[1],
-            pointFrom(
-              top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
-              top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
-            ),
-            pointFrom(
-              right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
-              right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
-            ),
-            right[0],
-          ), // TOP RIGHT
-          curve(
-            right[1],
-            pointFrom(
-              right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
-              right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
-            ),
-            pointFrom(
-              bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
-              bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
-            ),
-            bottom[1],
-          ), // BOTTOM RIGHT
-          curve(
-            bottom[0],
-            pointFrom(
-              bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
-              bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
-            ),
-            pointFrom(
-              left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
-              left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
-            ),
-            left[0],
-          ), // BOTTOM LEFT
-        ].map((a) => curvePointDistance(a, rotatedPoint))
-      : [];
+  const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
-  return Math.min(...sideDistances, ...cornerDistances);
+  // Get the element's building components we can test against
+  const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(element);
+  debugClear();
+  return Math.min(
+    ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
+    ...corners
+      .map((a) => curvePointDistance(a, rotatedPoint))
+      .filter((d): d is number => d !== null),
+  );
 };
 
 /**
@@ -153,60 +81,22 @@ export const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
   p: GlobalPoint,
 ): number => {
-  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-    getDiamondPoints(element);
   const center = pointFrom<GlobalPoint>(
-    (topX + bottomX) / 2,
-    (topY + bottomY) / 2,
+    element.x + element.width / 2,
+    element.y + element.height / 2,
   );
-  const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-  const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
-  const [top, right, bottom, left]: GlobalPoint[] = [
-    pointFrom(element.x + topX, element.y + topY),
-    pointFrom(element.x + rightX, element.y + rightY),
-    pointFrom(element.x + bottomX, element.y + bottomY),
-    pointFrom(element.x + leftX, element.y + leftY),
-  ];
 
-  // Create the line segment parts of the diamond
-  // NOTE: Horizontal and vertical seems to be flipped here
-  const topRight = lineSegment<GlobalPoint>(
-    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
-    pointFrom(right[0] + verticalRadius, right[1] + horizontalRadius),
-  );
-  const bottomRight = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] + verticalRadius, bottom[1] + horizontalRadius),
-    pointFrom(right[0] + verticalRadius, right[1] + horizontalRadius),
-  );
-  const bottomLeft = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] + verticalRadius, bottom[1] + horizontalRadius),
-    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
-  );
-  const topLeft = lineSegment<GlobalPoint>(
-    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
-    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
-  );
-
-  const curves = element.roundness
-    ? [
-        curve(topRight[1], right, right, bottomRight[1]), // RIGHT
-        curve(bottomRight[0], bottom, bottom, bottomLeft[0]), // BOTTOM
-        curve(bottomLeft[1], left, left, topLeft[1]), // LEFT
-        curve(topLeft[0], top, top, topRight[0]), // LEFT
-      ]
-    : [];
+  const [sides, curves] = deconstructDiamondElement(element);
 
   return Math.min(
-    ...[
-      ...[topRight, bottomRight, bottomLeft, topLeft].map((s) =>
-        distanceToLineSegment(rotatedPoint, s),
-      ),
-      ...curves.map((a) => curvePointDistance(a, rotatedPoint)),
-    ],
+    ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
+    ...curves
+      .map((a) => curvePointDistance(a, rotatedPoint))
+      .filter((d): d is number => d !== null),
   );
 };
 

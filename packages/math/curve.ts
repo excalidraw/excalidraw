@@ -80,6 +80,21 @@ function solve(
   return [t0, s0];
 }
 
+const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
+  c: Curve<Point>,
+  t: number,
+) =>
+  pointFrom<Point>(
+    (1 - t) ** 3 * c[0][0] +
+      3 * (1 - t) ** 2 * t * c[1][0] +
+      3 * (1 - t) * t ** 2 * c[2][0] +
+      t ** 3 * c[3][0],
+    (1 - t) ** 3 * c[0][1] +
+      3 * (1 - t) ** 2 * t * c[1][1] +
+      3 * (1 - t) * t ** 2 * c[2][1] +
+      t ** 3 * c[3][1],
+  );
+
 /**
  * Computes the intersection between a cubic spline and a line segment.
  */
@@ -100,17 +115,6 @@ export function curveIntersectLineSegment<
     return [];
   }
 
-  const bezier = (t: number) =>
-    pointFrom<Point>(
-      (1 - t) ** 3 * c[0][0] +
-        3 * (1 - t) ** 2 * t * c[1][0] +
-        3 * (1 - t) * t ** 2 * c[2][0] +
-        t ** 3 * c[3][0],
-      (1 - t) ** 3 * c[0][1] +
-        3 * (1 - t) ** 2 * t * c[1][1] +
-        3 * (1 - t) * t ** 2 * c[2][1] +
-        t ** 3 * c[3][1],
-    );
   const line = (s: number) =>
     pointFrom<Point>(
       l[0][0] + s * (l[1][0] - l[0][0]),
@@ -126,7 +130,7 @@ export function curveIntersectLineSegment<
   const calculate = ([t0, s0]: [number, number]) => {
     const solution = solve(
       (t: number, s: number) => {
-        const bezier_point = bezier(t);
+        const bezier_point = bezierEquation(c, t);
         const line_point = line(s);
 
         return [
@@ -148,7 +152,7 @@ export function curveIntersectLineSegment<
       return null;
     }
 
-    return bezier(t);
+    return bezierEquation(c, t);
   };
 
   let solution = calculate(initial_guesses[0]);

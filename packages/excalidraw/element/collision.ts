@@ -6,7 +6,7 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
-import { getDiamondPoints, getElementBounds } from "./bounds";
+import { getElementBounds } from "./bounds";
 import type { FrameNameBounds } from "../types";
 import type { GeometricShape } from "../../utils/geometry/shape";
 import { getPolygonShape } from "../../utils/geometry/shape";
@@ -18,7 +18,7 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getBoundTextShape, getCornerRadius, isPathALoop } from "../shapes";
+import { getBoundTextShape, isPathALoop } from "../shapes";
 import type {
   GlobalPoint,
   LineSegment,
@@ -27,7 +27,6 @@ import type {
   Radians,
 } from "../../math";
 import {
-  curve,
   curveIntersectLineSegment,
   isPointWithinBounds,
   line,
@@ -36,9 +35,12 @@ import {
   pointFrom,
   pointRotateRads,
   pointsEqual,
-  rectangle,
 } from "../../math";
 import { ellipse, ellipseLineIntersectionPoints } from "../../math/ellipse";
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+} from "./utils";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
@@ -179,13 +181,6 @@ const intersectRectanguloidWithLineSegment = (
   l: LineSegment<GlobalPoint>,
   offset: number,
 ): GlobalPoint[] => {
-  const r = rectangle(
-    pointFrom(element.x - offset, element.y - offset),
-    pointFrom(
-      element.x + element.width + offset,
-      element.y + element.height + offset,
-    ),
-  );
   const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
     element.y + element.height / 2,
@@ -202,107 +197,36 @@ const intersectRectanguloidWithLineSegment = (
     center,
     -element.angle as Radians,
   );
-  const roundness = getCornerRadius(
-    Math.min(element.width, element.height),
+
+  // Get the element's building components we can test against
+  const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(
     element,
+    offset,
   );
-
-  const top = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + roundness, r[0][1]),
-    pointFrom<GlobalPoint>(r[1][0] - roundness, r[0][1]),
-  );
-  const right = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[1][0], r[0][1] + roundness),
-    pointFrom<GlobalPoint>(r[1][0], r[1][1] - roundness),
-  );
-  const bottom = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0] + roundness, r[1][1]),
-    pointFrom<GlobalPoint>(r[1][0] - roundness, r[1][1]),
-  );
-  const left = lineSegment<GlobalPoint>(
-    pointFrom<GlobalPoint>(r[0][0], r[1][1] - roundness),
-    pointFrom<GlobalPoint>(r[0][0], r[0][1] + roundness),
-  );
-  const sides = [top, right, bottom, left];
-  const corners =
-    roundness > 0
-      ? [
-          curve(
-            left[1],
-            pointFrom(
-              left[1][0] + (2 / 3) * (r[0][0] - left[1][0]),
-              left[1][1] + (2 / 3) * (r[0][1] - left[1][1]),
-            ),
-            pointFrom(
-              top[0][0] + (2 / 3) * (r[0][0] - top[0][0]),
-              top[0][1] + (2 / 3) * (r[0][1] - top[0][1]),
-            ),
-            top[0],
-          ), // TOP LEFT
-          curve(
-            top[1],
-            pointFrom(
-              top[1][0] + (2 / 3) * (r[1][0] - top[1][0]),
-              top[1][1] + (2 / 3) * (r[0][1] - top[1][1]),
-            ),
-            pointFrom(
-              right[0][0] + (2 / 3) * (r[1][0] - right[0][0]),
-              right[0][1] + (2 / 3) * (r[0][1] - right[0][1]),
-            ),
-            right[0],
-          ), // TOP RIGHT
-          curve(
-            right[1],
-            pointFrom(
-              right[1][0] + (2 / 3) * (r[1][0] - right[1][0]),
-              right[1][1] + (2 / 3) * (r[1][1] - right[1][1]),
-            ),
-            pointFrom(
-              bottom[1][0] + (2 / 3) * (r[1][0] - bottom[1][0]),
-              bottom[1][1] + (2 / 3) * (r[1][1] - bottom[1][1]),
-            ),
-            bottom[1],
-          ), // BOTTOM RIGHT
-          curve(
-            bottom[0],
-            pointFrom(
-              bottom[0][0] + (2 / 3) * (r[0][0] - bottom[0][0]),
-              bottom[0][1] + (2 / 3) * (r[1][1] - bottom[0][1]),
-            ),
-            pointFrom(
-              left[0][0] + (2 / 3) * (r[0][0] - left[0][0]),
-              left[0][1] + (2 / 3) * (r[1][1] - left[0][1]),
-            ),
-            left[0],
-          ), // BOTTOM LEFT
-        ]
-      : [];
-
-  const sideIntersections: GlobalPoint[] = sides
-    .map((s) =>
-      lineSegmentIntersectionPoints(
-        lineSegment<GlobalPoint>(rotatedA, rotatedB),
-        s,
-      ),
-    )
-    .filter((x) => x != null)
-    .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle));
-
-  const cornerIntersections: GlobalPoint[] = corners
-    .flatMap((t) =>
-      curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB)),
-    )
-    .filter((i) => i != null)
-    .map((j) => pointRotateRads(j, center, element.angle));
-  // const cornerIntersections2: GlobalPoint[] = corners
-  //   .flatMap((t) =>
-  //     curveIntersectLineSegment2(t, lineSegment(rotatedA, rotatedB)),
-  //   )
-  //   .filter((i) => i != null)
-  //   .map((j) => pointRotateRads(j, center, element.angle));
 
   return (
-    [...sideIntersections, ...cornerIntersections]
+    [
+      // Test intersection against the sides, keep only the valid
+      // intersection points and rotate them back to scene space
+      ...sides
+        .map((s) =>
+          lineSegmentIntersectionPoints(
+            lineSegment<GlobalPoint>(rotatedA, rotatedB),
+            s,
+          ),
+        )
+        .filter((x) => x != null)
+        .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle)),
+      // Test intersection against the corners which are cubic bezier curves,
+      // keep only the valid intersection points and rotate them back to scene
+      // space
+      ...corners
+        .flatMap((t) =>
+          curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB)),
+        )
+        .filter((i) => i != null)
+        .map((j) => pointRotateRads(j, center, element.angle)),
+    ]
       // Remove duplicates
       .filter(
         (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
@@ -322,119 +246,38 @@ const intersectDiamondWithLineSegment = (
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-    getDiamondPoints(element);
   const center = pointFrom<GlobalPoint>(
-    (topX + bottomX) / 2,
-    (topY + bottomY) / 2,
+    element.x + element.width / 2,
+    element.y + element.height / 2,
   );
-  const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
-  const horizontalRadius = getCornerRadius(Math.abs(rightY - topY), element);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
-  const [top, right, bottom, left]: GlobalPoint[] = [
-    pointFrom(element.x + topX, element.y + topY - offset),
-    pointFrom(element.x + rightX + offset, element.y + rightY),
-    pointFrom(element.x + bottomX, element.y + bottomY + offset),
-    pointFrom(element.x + leftX - offset, element.y + leftY),
-  ];
-
-  // Create the line segment parts of the diamond
-  // NOTE: Horizontal and vertical seems to be flipped here
-  const topRight = lineSegment<GlobalPoint>(
-    pointFrom(top[0] + verticalRadius, top[1] + horizontalRadius),
-    pointFrom(right[0] - verticalRadius, right[1] - horizontalRadius),
-  );
-  const bottomRight = lineSegment<GlobalPoint>(
-    pointFrom(right[0] - verticalRadius, right[1] + horizontalRadius),
-    pointFrom(bottom[0] + verticalRadius, bottom[1] - horizontalRadius),
-  );
-  const bottomLeft = lineSegment<GlobalPoint>(
-    pointFrom(bottom[0] - verticalRadius, bottom[1] - horizontalRadius),
-    pointFrom(left[0] + verticalRadius, left[1] + horizontalRadius),
-  );
-  const topLeft = lineSegment<GlobalPoint>(
-    pointFrom(left[0] + verticalRadius, left[1] - horizontalRadius),
-    pointFrom(top[0] - verticalRadius, top[1] + horizontalRadius),
-  );
-
-  const curves = element.roundness
-    ? [
-        curve(
-          pointFrom<GlobalPoint>(
-            right[0] - verticalRadius,
-            right[1] - horizontalRadius,
-          ),
-          right,
-          right,
-          pointFrom<GlobalPoint>(
-            right[0] - verticalRadius,
-            right[1] + horizontalRadius,
-          ),
-        ), // RIGHT
-        curve(
-          pointFrom<GlobalPoint>(
-            bottom[0] + verticalRadius,
-            bottom[1] - horizontalRadius,
-          ),
-          bottom,
-          bottom,
-          pointFrom<GlobalPoint>(
-            bottom[0] - verticalRadius,
-            bottom[1] - horizontalRadius,
-          ),
-        ), // BOTTOM
-        curve(
-          pointFrom<GlobalPoint>(
-            left[0] + verticalRadius,
-            left[1] + horizontalRadius,
-          ),
-          left,
-          left,
-          pointFrom<GlobalPoint>(
-            left[0] + verticalRadius,
-            left[1] - horizontalRadius,
-          ),
-        ), // LEFT
-        curve(
-          pointFrom<GlobalPoint>(
-            top[0] - verticalRadius,
-            top[1] + horizontalRadius,
-          ),
-          top,
-          top,
-          pointFrom<GlobalPoint>(
-            top[0] + verticalRadius,
-            top[1] + horizontalRadius,
-          ),
-        ), // TOP
-      ]
-    : [];
-
-  const sides: GlobalPoint[] = [topRight, bottomRight, bottomLeft, topLeft]
-    .map((s) =>
-      lineSegmentIntersectionPoints(
-        lineSegment<GlobalPoint>(rotatedA, rotatedB),
-        s,
-      ),
-    )
-    .filter((p): p is GlobalPoint => p != null)
-    // Rotate back intersection points
-    .map((p) => pointRotateRads<GlobalPoint>(p!, center, element.angle));
-  const corners = curves
-    .flatMap((p) =>
-      curveIntersectLineSegment(p, lineSegment(rotatedA, rotatedB)),
-    )
-    .filter((p) => p != null)
-    // Rotate back intersection points
-    .map((p) => pointRotateRads(p, center, element.angle));
+  const [sides, curves] = deconstructDiamondElement(element, offset);
 
   return (
-    [...sides, ...corners]
+    [
+      ...sides
+        .map((s) =>
+          lineSegmentIntersectionPoints(
+            lineSegment<GlobalPoint>(rotatedA, rotatedB),
+            s,
+          ),
+        )
+        .filter((p): p is GlobalPoint => p != null)
+        // Rotate back intersection points
+        .map((p) => pointRotateRads<GlobalPoint>(p!, center, element.angle)),
+      ...curves
+        .flatMap((p) =>
+          curveIntersectLineSegment(p, lineSegment(rotatedA, rotatedB)),
+        )
+        .filter((p) => p != null)
+        // Rotate back intersection points
+        .map((p) => pointRotateRads(p, center, element.angle)),
+    ]
       // Remove duplicates
       .filter(
         (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
