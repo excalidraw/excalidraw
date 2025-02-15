@@ -69,8 +69,20 @@ export const actionDuplicateSelection = register({
       }
     }
 
+    const nextState = duplicateElements(elements, appState);
+
+    if (app.props.onDuplicate && nextState.elements) {
+      const mappedElements = app.props.onDuplicate(
+        nextState.elements,
+        elements,
+      );
+      if (mappedElements) {
+        nextState.elements = mappedElements;
+      }
+    }
+
     return {
-      ...duplicateElements(elements, appState),
+      ...nextState,
       storeAction: StoreAction.CAPTURE,
     };
   },
@@ -92,7 +104,7 @@ export const actionDuplicateSelection = register({
 const duplicateElements = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
-): Partial<ActionResult> => {
+): Partial<Exclude<ActionResult, false>> => {
   // ---------------------------------------------------------------------------
 
   const groupIdMap = new Map();

@@ -204,8 +204,6 @@ export const MobileMenu = ({
         ) : (
           <div className="ToolIcon__icon" aria-hidden="true" />
         )}
-        {actionManager.renderAction("undo")}
-        {actionManager.renderAction("redo")}
         {showElAction || appState.multiElement ? ( //zsviczian
           actionManager.renderAction(
             appState.multiElement ? "finalize" : "duplicateSelection",
@@ -218,6 +216,10 @@ export const MobileMenu = ({
         ) : (
           <div className="ToolIcon__icon" aria-hidden="true" />
         )}
+        <div>
+          {actionManager.renderAction("undo")}
+          {actionManager.renderAction("redo")}
+        </div>
       </div>
     );
   };
