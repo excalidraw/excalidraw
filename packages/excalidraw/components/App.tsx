@@ -333,17 +333,10 @@ import type { FileSystemHandle } from "../data/filesystem";
 import { fileOpen } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
-  getApproxMinLineHeight,
-  getApproxMinLineWidth,
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
-  getLineHeightInPx,
-  getMinTextElementWidth,
-  isMeasureTextSupported,
   isValidTextContainer,
-  measureText,
-  normalizeText,
 } from "../element/textElement";
 import {
   showHyperlinkTooltip,
@@ -492,6 +485,15 @@ import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
+import {
+  isMeasureTextSupported,
+  normalizeText,
+  measureText,
+  getLineHeightInPx,
+  getApproxMinLineWidth,
+  getApproxMinLineHeight,
+  getMinTextElementWidth,
+} from "../element/textMeasurements";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -1599,13 +1601,17 @@ class App extends React.Component<AppProps, AppState> {
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
     const shouldBlockPointerEvents =
-      this.state.selectionElement ||
-      this.state.newElement ||
-      this.state.selectedElementsAreBeingDragged ||
-      this.state.resizingElement ||
-      (this.state.activeTool.type === "laser" &&
-        // technically we can just test on this once we make it more safe
-        this.state.cursorButton === "down");
+      // default back to `--ui-pointerEvents` flow if setPointerCapture
+      // not supported
+      "setPointerCapture" in HTMLElement.prototype
+        ? false
+        : this.state.selectionElement ||
+          this.state.newElement ||
+          this.state.selectedElementsAreBeingDragged ||
+          this.state.resizingElement ||
+          (this.state.activeTool.type === "laser" &&
+            // technically we can just test on this once we make it more safe
+            this.state.cursorButton === "down");
 
     const firstSelectedElement = selectedElements[0];
 
@@ -3407,7 +3413,14 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    const nextElements = [...prevElements, ...newElements];
+    let nextElements = [...prevElements, ...newElements];
+
+    const mappedNewSceneElements = this.props.onDuplicate?.(
+      nextElements,
+      prevElements,
+    );
+
+    nextElements = mappedNewSceneElements || nextElements;
 
     syncMovedIndices(nextElements, arrayToMap(newElements));
 
@@ -6885,6 +6898,13 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
   ) => {
     this.focusContainer(); //zsviczian
+    const target = event.target as HTMLElement;
+    // capture subsequent pointer events to the canvas
+    // this makes other elements non-interactive until pointer up
+    if (target.setPointerCapture) {
+      target.setPointerCapture(event.pointerId);
+    }
+
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
@@ -9052,7 +9072,17 @@ class App extends React.Component<AppProps, AppState> {
               }
             }
 
-            const nextSceneElements = [...nextElements, ...elementsToAppend];
+            let nextSceneElements: ExcalidrawElement[] = [
+              ...nextElements,
+              ...elementsToAppend,
+            ];
+
+            const mappedNewSceneElements = this.props.onDuplicate?.(
+              nextSceneElements,
+              elements,
+            );
+
+            nextSceneElements = mappedNewSceneElements || nextSceneElements;
 
             syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
 

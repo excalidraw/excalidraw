@@ -24,8 +24,6 @@ import {
   getBoundTextElementId,
   getContainerElement,
   getTextElementAngle,
-  getTextWidth,
-  normalizeText,
   redrawTextBoundingBox,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
@@ -50,6 +48,8 @@ import {
   originalContainerCache,
   updateOriginalContainerCache,
 } from "./containerCache";
+import { getTextWidth } from "./textMeasurements";
+import { normalizeText } from "./textMeasurements";
 
 const getTransform = (
   width: number,
@@ -354,7 +354,7 @@ export const textWysiwyg = ({
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );
-        const width = getTextWidth(wrappedText, font, true);
+        const width = getTextWidth(wrappedText, font);
         editable.style.width = `${Math.ceil(width)}px`; //zsviczian Obsidian app zoom !== 100% issue
       }
     };

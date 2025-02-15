@@ -10,7 +10,6 @@ import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
-  measureText,
   redrawTextBoundingBox,
 } from "../element/textElement";
 import {
@@ -35,6 +34,7 @@ import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
 import { StoreAction } from "../store";
+import { measureText } from "../element/textMeasurements";
 
 export const actionUnbindText = register({
   name: "unbindText",

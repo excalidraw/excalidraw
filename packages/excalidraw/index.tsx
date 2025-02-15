@@ -53,6 +53,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onPointerUp,
     onScrollChange,
+    onDuplicate,
     children,
     validateEmbeddable,
     renderEmbeddable,
@@ -155,6 +156,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
+          onDuplicate={onDuplicate}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
           renderWebview={renderWebview} //zsviczian
@@ -341,3 +343,5 @@ export {
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "./element/elementLink";
+
+export { setCustomTextMetricsProvider } from "./element/textMeasurements";

@@ -1,6 +1,6 @@
 import { isTextElement } from "../element";
 import { newElementWith } from "../element/mutateElement";
-import { measureText } from "../element/textElement";
+import { measureText } from "../element/textMeasurements";
 import { getSelectedElements } from "../scene";
 import { StoreAction } from "../store";
 import type { AppClassProperties } from "../types";
