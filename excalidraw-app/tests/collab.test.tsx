@@ -1,17 +1,13 @@
 import { vi } from "vitest";
-import {
-  act,
-  render,
-  waitFor,
-} from "../../packages/excalidraw/tests/test-utils";
+import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import ExcalidrawApp from "../App";
-import { API } from "../../packages/excalidraw/tests/helpers/api";
-import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { syncInvalidIndices } from "@excalidraw/excalidraw/fractionalIndex";
 import {
   createRedoAction,
   createUndoAction,
-} from "../../packages/excalidraw/actions/actionHistory";
-import { StoreAction, newElementWith } from "../../packages/excalidraw";
+} from "@excalidraw/excalidraw/actions/actionHistory";
+import { StoreAction, newElementWith } from "@excalidraw/excalidraw";
 
 const { h } = window;
 

@@ -251,6 +251,7 @@ export {
   MIME_TYPES,
   ROUNDNESS,
   DEFAULT_LASER_COLOR,
+  UserIdleState,
 } from "./constants";
 
 export {

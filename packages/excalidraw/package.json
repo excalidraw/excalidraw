@@ -5,14 +5,25 @@
   "type": "module",
   "module": "./dist/prod/index.js",
   "exports": {
-    ".": {
-      "development": "./dist/dev/index.js",
-      "types": "./dist/types/excalidraw/index.d.ts",
-      "default": "./dist/prod/index.js"
+    "./types": {
+      "types": "./dist/types/excalidraw/types.d.ts"
+    },
+    "./types/*": {
+      "types": "./dist/types/excalidraw/*"
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
-      "default": "./dist/prod/index.css"
+      "production": "./dist/prod/index.css"
+    },
+    ".": {
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "types": "./dist/types/excalidraw/index.d.ts"
+    },
+    "./*": {
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "types": "./dist/types/excalidraw/*"
     }
   },
   "types": "./dist/types/excalidraw/index.d.ts",

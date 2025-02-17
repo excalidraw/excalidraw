@@ -10,7 +10,7 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": true
   },
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }

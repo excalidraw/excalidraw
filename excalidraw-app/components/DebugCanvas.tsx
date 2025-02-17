@@ -1,16 +1,16 @@
 import { useCallback, useImperativeHandle, useRef } from "react";
-import { type AppState } from "../../packages/excalidraw/types";
-import { throttleRAF } from "../../packages/excalidraw/utils";
+import { type AppState } from "@excalidraw/excalidraw/types";
+import { throttleRAF } from "@excalidraw/excalidraw/utils";
 import {
   bootstrapCanvas,
   getNormalizedCanvasDimensions,
-} from "../../packages/excalidraw/renderer/helpers";
-import type { DebugElement } from "../../packages/excalidraw/visualdebug";
+} from "@excalidraw/excalidraw/renderer/helpers";
+import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
 import {
   ArrowheadArrowIcon,
   CloseIcon,
   TrashIcon,
-} from "../../packages/excalidraw/components/icons";
+} from "@excalidraw/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
 import type { Curve } from "../../packages/math";
 import {
