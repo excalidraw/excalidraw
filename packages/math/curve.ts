@@ -183,74 +183,57 @@ export function curveIntersectLineSegment<
  * @param P2
  * @param P3
  * @param tolerance
- * @param maxIterations
+ * @param maxLevel
  * @returns
  */
 export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   p: Point,
-  tolerance: number = 1e-6,
-  maxIterations: number = 100,
-): Point {
-  const [P0, P1, P2, P3] = c;
-  let t = 0.5; // Initial guess for t
-  for (let i = 0; i < maxIterations; i++) {
-    const B = [
-      (1 - t) ** 3 * P0[0] +
-        3 * (1 - t) ** 2 * t * P1[0] +
-        3 * (1 - t) * t ** 2 * P2[0] +
-        t ** 3 * P3[0],
-      (1 - t) ** 3 * P0[1] +
-        3 * (1 - t) ** 2 * t * P1[1] +
-        3 * (1 - t) * t ** 2 * P2[1] +
-        t ** 3 * P3[1],
-    ]; // Current point on the curve
-    const dB = [
-      3 * (1 - t) ** 2 * (P1[0] - P0[0]) +
-        6 * (1 - t) * t * (P2[0] - P1[0]) +
-        3 * t ** 2 * (P3[0] - P2[0]),
-      3 * (1 - t) ** 2 * (P1[1] - P0[1]) +
-        6 * (1 - t) * t * (P2[1] - P1[1]) +
-        3 * t ** 2 * (P3[1] - P2[1]),
-    ]; // Derivative at t
+  tolerance: number = 1e-3,
+): Point | null {
+  const localMinimum = (
+    min: number,
+    max: number,
+    f: (t: number) => number,
+    e: number = tolerance,
+  ) => {
+    let m = min;
+    let n = max;
+    let k;
 
-    // Compute f(t) and f'(t)
-    const f = (p[0] - B[0]) * dB[0] + (p[1] - B[1]) * dB[1];
-    const df =
-      (-1 * dB[0]) ** 2 -
-      dB[1] ** 2 +
-      (p[0] - B[0]) *
-        (-6 * (1 - t) * (P1[0] - P0[0]) +
-          6 * (1 - 2 * t) * (P2[0] - P1[0]) +
-          6 * t * (P3[0] - P2[0])) +
-      (p[1] - B[1]) *
-        (-6 * (1 - t) * (P1[1] - P0[1]) +
-          6 * (1 - 2 * t) * (P2[1] - P1[1]) +
-          6 * t * (P3[1] - P2[1]));
-
-    // Check for convergence
-    if (Math.abs(f) < tolerance) {
-      break;
+    while (n - m > e) {
+      k = (n + m) / 2;
+      if (f(k - e) < f(k + e)) {
+        n = k;
+      } else {
+        m = k;
+      }
     }
 
-    // Update t using Newton-Raphson
-    t = t - f / df;
+    return k;
+  };
 
-    // Clamp t to [0, 1] to stay within the curve segment
-    t = Math.max(0, Math.min(1, t));
+  const maxSteps = 30;
+  let closestStep = 0;
+  for (let min = Infinity, step = 0; step < maxSteps; step++) {
+    const d = pointDistance(p, bezierEquation(c, step / maxSteps));
+    if (d < min) {
+      min = d;
+      closestStep = step;
+    }
   }
 
-  // Return the closest point on the curve
-  return pointFrom(
-    (1 - t) ** 3 * P0[0] +
-      3 * (1 - t) ** 2 * t * P1[0] +
-      3 * (1 - t) * t ** 2 * P2[0] +
-      t ** 3 * P3[0],
-    (1 - t) ** 3 * P0[1] +
-      3 * (1 - t) ** 2 * t * P1[1] +
-      3 * (1 - t) * t ** 2 * P2[1] +
-      t ** 3 * P3[1],
+  const t0 = Math.max((closestStep - 1) / maxSteps, 0);
+  const t1 = Math.min((closestStep + 1) / maxSteps, 1);
+  const solution = localMinimum(t0, t1, (t) =>
+    pointDistance(p, bezierEquation(c, t)),
   );
+
+  if (!solution) {
+    return null;
+  }
+
+  return bezierEquation(c, solution);
 }
 
 /**
@@ -264,7 +247,13 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   p: Point,
 ) {
-  return pointDistance(p, curveClosestPoint(c, p));
+  const closest = curveClosestPoint(c, p);
+
+  if (!closest) {
+    return 0;
+  }
+
+  return pointDistance(p, closest);
 }
 
 /**

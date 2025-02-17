@@ -6,7 +6,6 @@ import {
   pointRotateRads,
 } from "../../math";
 import { ellipse, ellipseDistanceFromPoint } from "../../math/ellipse";
-import { debugClear } from "../visualdebug";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
@@ -60,7 +59,7 @@ export const distanceToRectanguloidElement = (
 
   // Get the element's building components we can test against
   const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(element);
-  debugClear();
+
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
     ...corners
