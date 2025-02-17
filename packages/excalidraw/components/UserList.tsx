@@ -15,6 +15,7 @@ import { isShallowEqual } from "../utils";
 import { supportsResizeObserver } from "../constants";
 import type { MarkRequired } from "../utility-types";
 import { ScrollableList } from "./ScrollableList";
+import { Avatar } from "./Avatar";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

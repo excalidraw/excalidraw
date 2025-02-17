@@ -585,6 +585,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             );
             break;
           case WS_SUBTYPES.MOUSE_LOCATION: {
+            const appState = this.excalidrawAPI.getAppState();
+
+            if (appState.collaboratorsCursorsHidden) return;
+
             const { pointer, button, username, selectedElementIds } =
               decryptedData.payload;
 

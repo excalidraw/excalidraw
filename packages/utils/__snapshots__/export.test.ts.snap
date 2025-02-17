@@ -10,6 +10,7 @@ exports[`exportToSvg > with default arguments 1`] = `
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",

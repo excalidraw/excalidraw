@@ -1159,13 +1159,15 @@ const _renderInteractiveScene = ({
 
   context.restore();
 
-  renderRemoteCursors({
-    context,
-    renderConfig,
-    appState,
-    normalizedWidth,
-    normalizedHeight,
-  });
+  if (!appState.collaboratorsCursorsHidden) {
+    renderRemoteCursors({
+      context,
+      renderConfig,
+      appState,
+      normalizedWidth,
+      normalizedHeight,
+    });
+  }
 
   // Paint scrollbars
   let scrollBars;
