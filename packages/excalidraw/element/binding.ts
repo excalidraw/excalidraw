@@ -69,9 +69,13 @@ import {
   vectorScale,
   vectorNormalize,
   vectorRotate,
+  lineClosestPoint,
+  vectorDot,
 } from "../../math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
+import { debugClear, debugDrawPoint } from "../visualdebug";
+import { ellipse } from "../../math/ellipse";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -1575,17 +1579,55 @@ const determineFocusDistance = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
-  const p = pointRotateRads(b, center, (Math.PI / 2) as Radians);
-  const intersection = linesIntersectAt(line(a, b), line(p, center));
-  if (!intersection) {
-    return 0;
-  }
-
-  return (
-    ((pointOnLineSegment(intersection, lineSegment(center, p)) ? 1 : -1) *
-      pointDistance(center, intersection!)) /
-    pointDistance(center, b)
+  const linear = vectorFromPoint(b, a);
+  const dot1 = Math.abs(
+    vectorDot(
+      linear,
+      // One of the diagonals
+      vectorFromPoint(
+        pointFrom<GlobalPoint>(element.x, element.y),
+        pointFrom<GlobalPoint>(
+          element.x + element.width,
+          element.y + element.height,
+        ),
+      ),
+    ),
   );
+  const dot2 = Math.abs(
+    vectorDot(
+      linear,
+      // The other diagonal
+      vectorFromPoint(
+        pointFrom<GlobalPoint>(element.x + element.width, element.y),
+        pointFrom<GlobalPoint>(element.x, element.y + element.height),
+      ),
+    ),
+  );
+  const intersect =
+    linesIntersectAt(
+      // The bigger inclination of the diagonal and the linear element is the one
+      // that determines the intersection point
+      dot1 > dot2
+        ? line(
+            pointFrom<GlobalPoint>(element.x + element.width, element.y),
+            pointFrom<GlobalPoint>(element.x, element.y + element.height),
+          )
+        : line(
+            pointFrom<GlobalPoint>(element.x, element.y),
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height,
+            ),
+          ),
+      line(a, b),
+    ) || center;
+  const sign =
+    vectorDot(vectorFromPoint(center, a), vectorFromPoint(a, b)) < 0 ? -1 : 1;
+  const signedDist = sign * pointDistance(center, intersect);
+  const sdRatio =
+    signedDist / (Math.sqrt(element.width ** 2 + element.height ** 2) / 2);
+
+  return sdRatio;
 };
 
 const determineFocusPoint = (

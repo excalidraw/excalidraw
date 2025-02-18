@@ -1,5 +1,11 @@
 import { EPSILON } from "../excalidraw/constants";
-import { pointCenter, pointFrom, pointRotateRads } from "./point";
+import {
+  pointCenter,
+  pointDistanceSq,
+  pointFrom,
+  pointRotateRads,
+  pointsEqual,
+} from "./point";
 import { pointOnLineSegment } from "./segment";
 import type {
   GlobalPoint,
@@ -57,16 +63,16 @@ export function lineFromPointArray<P extends GlobalPoint | LocalPoint>(
  * @param origin
  * @returns
  */
-export const lineRotate = <Point extends LocalPoint | GlobalPoint>(
+export function lineRotate<Point extends LocalPoint | GlobalPoint>(
   l: Line<Point>,
   angle: Radians,
   origin?: Point,
-): Line<Point> => {
+): Line<Point> {
   return line(
     pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
     pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
   );
-};
+}
 
 /**
  * Determines the intersection point (unless the lines are parallel) of two
@@ -76,10 +82,10 @@ export const lineRotate = <Point extends LocalPoint | GlobalPoint>(
  * @param b
  * @returns
  */
-export const linesIntersectAt = <Point extends GlobalPoint | LocalPoint>(
+export function linesIntersectAt<Point extends GlobalPoint | LocalPoint>(
   a: Line<Point>,
   b: Line<Point>,
-): Point | null => {
+): Point | null {
   const A1 = a[1][1] - a[0][1];
   const B1 = a[0][0] - a[1][0];
   const A2 = b[1][1] - b[0][1];
@@ -92,7 +98,7 @@ export const linesIntersectAt = <Point extends GlobalPoint | LocalPoint>(
   }
 
   return null;
-};
+}
 
 /**
  * Returns the intersection point of a segment and a line
@@ -116,23 +122,6 @@ export function lineSegmentIntersectionPoints<
   return candidate;
 }
 
-export function isPointOnLineSegment<P extends GlobalPoint | LocalPoint>(
-  l: LineSegment<P>,
-  p: P,
-  epsilon: number = EPSILON,
-) {
-  if (!isPointOnLine(line(l[0], l[1]), p, epsilon)) {
-    return false;
-  }
-
-  const minX = Math.min(l[0][0], l[1][0]);
-  const minY = Math.min(l[0][1], l[1][1]);
-  const maxX = Math.max(l[0][0], l[1][0]);
-  const maxY = Math.max(l[0][1], l[1][1]);
-
-  return p[0] >= minX && p[0] <= maxX && p[1] >= minY && p[1] <= maxY;
-}
-
 export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
   l: Line<P>,
   p: P,
@@ -143,4 +132,23 @@ export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
 
   const r = vectorCross(p1, p2);
   return Math.abs(r) < epsilon;
+}
+
+export function lineClosestPoint<P extends GlobalPoint | LocalPoint>(
+  l: Line<P>,
+  p: P,
+): P {
+  if (pointsEqual(l[0], l[1])) {
+    return l[0];
+  }
+
+  const t =
+    ((p[0] - l[0][0]) * (l[1][0] - l[0][0]) +
+      (p[1] - l[0][1]) * (l[1][1] - l[0][1])) /
+    pointDistanceSq(l[0], l[1]);
+
+  return pointFrom(
+    l[0][0] + t * (l[1][0] - l[0][0]),
+    l[0][1] + t * (l[1][1] - l[0][1]),
+  );
 }
