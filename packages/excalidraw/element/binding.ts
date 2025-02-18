@@ -74,6 +74,7 @@ import {
 } from "../../math";
 import { distanceToBindableElement } from "./distance";
 import { intersectElementWithLineSegment } from "./collision";
+import { debugClear, debugDrawLine } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -119,6 +120,7 @@ export const bindOrUnbindLinearElement = (
   endBindingElement: ExcalidrawBindableElement | null | "keep",
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
+  zoom?: AppState["zoom"],
 ): void => {
   const boundToElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
   const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
@@ -130,6 +132,7 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
+    zoom,
   );
   bindOrUnbindLinearElementEdge(
     linearElement,
@@ -139,6 +142,7 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
+    zoom,
   );
 
   const onlyUnbound = Array.from(unboundFromElementIds).filter(
@@ -165,6 +169,7 @@ const bindOrUnbindLinearElementEdge = (
   // Is mutated
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
 ): void => {
   // "keep" is for method chaining convenience, a "no-op", so just bail out
   if (bindableElement === "keep") {
@@ -201,11 +206,18 @@ const bindOrUnbindLinearElementEdge = (
         bindableElement,
         startOrEnd,
         elementsMap,
+        zoom,
       );
       boundToElementIds.add(bindableElement.id);
     }
   } else {
-    bindLinearElement(linearElement, bindableElement, startOrEnd, elementsMap);
+    bindLinearElement(
+      linearElement,
+      bindableElement,
+      startOrEnd,
+      elementsMap,
+      zoom,
+    );
     boundToElementIds.add(bindableElement.id);
   }
 };
@@ -367,7 +379,14 @@ export const bindOrUnbindLinearElements = (
           zoom,
         );
 
-    bindOrUnbindLinearElement(selectedElement, start, end, elementsMap, scene);
+    bindOrUnbindLinearElement(
+      selectedElement,
+      start,
+      end,
+      elementsMap,
+      scene,
+      zoom,
+    );
   });
 };
 
@@ -416,6 +435,7 @@ export const maybeBindLinearElement = (
       appState.startBoundElement,
       "start",
       elementsMap,
+      appState.zoom,
     );
   }
 
@@ -436,7 +456,13 @@ export const maybeBindLinearElement = (
         "end",
       )
     ) {
-      bindLinearElement(linearElement, hoveredElement, "end", elementsMap);
+      bindLinearElement(
+        linearElement,
+        hoveredElement,
+        "end",
+        elementsMap,
+        appState.zoom,
+      );
     }
   }
 };
@@ -466,6 +492,7 @@ export const bindLinearElement = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
 ): void => {
   if (!isArrowElement(linearElement)) {
     return;
@@ -478,6 +505,7 @@ export const bindLinearElement = (
         hoveredElement,
         startOrEnd,
         elementsMap,
+        zoom,
       ),
       hoveredElement,
     ),
@@ -684,6 +712,7 @@ const calculateFocusAndGap = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
+  zoom?: AppState["zoom"],
 ): { focus: number; gap: number } => {
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
@@ -701,7 +730,10 @@ const calculateFocusAndGap = (
   );
   return {
     focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
-    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
+    gap: Math.max(
+      1,
+      determineGapSize(edgePoint, adjacentPoint, hoveredElement, zoom),
+    ),
   };
 };
 
@@ -1547,6 +1579,42 @@ const determineFocusDistance = (
       pointDistance(center, intersection!)) /
     pointDistance(center, b)
   );
+};
+
+/**
+ * Determines gap size between element and edgePoint by intersecting the element
+ * in the direction of adjacentPoint -> edgePoint, then measuring the length of
+ * the intersection point and edgePoint.
+ *
+ * NOTE: This is not always the same as distance from edgePoint to the closest
+ * point on the element outline!
+ */
+const determineGapSize = (
+  edgePoint: GlobalPoint,
+  adjacentPoint: GlobalPoint,
+  element: ExcalidrawBindableElement,
+  zoom?: AppState["zoom"],
+): number => {
+  const s = lineSegment(
+    edgePoint,
+    pointFromVector(
+      // Create a vector from the adjacent point to the edge point
+      // scale it to cross the maximum gap distance + 1 to ensure intersection
+      vectorScale(
+        vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
+        maxBindingGap(element, element.width, element.height, zoom) + 1,
+      ),
+      edgePoint,
+    ),
+  );
+  debugClear();
+  debugDrawLine(s, { color: "red", permanent: true });
+  const distances = intersectElementWithLineSegment(element, s)
+    .map((p) => pointDistance(edgePoint, p))
+    .sort((a, b) => b - a);
+  const distance = distances.pop();
+  console.log(distance);
+  return distance ?? 0;
 };
 
 const determineFocusPoint = (
