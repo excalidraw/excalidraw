@@ -46,11 +46,9 @@ import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import {
   compareHeading,
   HEADING_DOWN,
-  HEADING_LEFT,
   HEADING_RIGHT,
   HEADING_UP,
   headingForPointFromElement,
-  headingIsHorizontal,
   vectorToHeading,
   type Heading,
 } from "./heading";
@@ -72,9 +70,8 @@ import {
   vectorNormalize,
   vectorRotate,
 } from "../../math";
-import { distanceToBindableElement } from "./distance";
 import { intersectElementWithLineSegment } from "./collision";
-import { debugClear, debugDrawLine } from "../visualdebug";
+import { distanceToBindableElement } from "./distance";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -728,12 +725,29 @@ const calculateFocusAndGap = (
     adjacentPointIndex,
     elementsMap,
   );
+
+  const focus = determineFocusDistance(
+    hoveredElement,
+    adjacentPoint,
+    edgePoint,
+  );
+  const focusPointAbsolute = determineFocusPoint(
+    hoveredElement,
+    focus,
+    adjacentPoint,
+  );
+  const intersection =
+    intersectElementWithLineSegment(
+      hoveredElement,
+      lineSegment(adjacentPoint, focusPointAbsolute),
+    ).sort(
+      (g, h) => pointDistanceSq(g, edgePoint) - pointDistanceSq(h, edgePoint),
+    )[0] ?? edgePoint;
+  const gap = Math.max(1, pointDistance(intersection, edgePoint));
+
   return {
-    focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
-    gap: Math.max(
-      1,
-      determineGapSize(edgePoint, adjacentPoint, hoveredElement, zoom),
-    ),
+    focus,
+    gap,
   };
 };
 
@@ -928,53 +942,44 @@ export const bindPointToSnapToElementOutline = (
   const p = isRectanguloidElement(bindableElement)
     ? avoidRectangularCorner(bindableElement, globalP)
     : globalP;
-  const localOtherPoint =
-    arrow.points[startOrEnd === "start" ? arrow.points.length - 1 : 0];
-  const otherPoint = pointFrom<GlobalPoint>(
-    arrow.x + localOtherPoint[0],
-    arrow.y + localOtherPoint[1],
-  );
-  const prev =
-    arrow.points[startOrEnd === "start" ? 1 : arrow.points.length - 2];
-  const isHorizontal = headingIsHorizontal(
-    vectorToHeading(vectorFromPoint(localP, prev)),
-  );
 
   if (bindableElement && aabb) {
-    const heading = headingForPointFromElement(bindableElement, aabb, p);
     const center = getCenterForBounds(aabb);
-    const intersections = (
-      intersectElementWithLineSegment(
-        bindableElement,
-        lineSegment(
-          p,
-          pointFrom(
-            isHorizontal ? center[0] : p[0],
-            !isHorizontal ? center[1] : p[1],
+
+    const intersection = intersectElementWithLineSegment(
+      bindableElement,
+      lineSegment(
+        center,
+        pointFromVector(
+          vectorScale(
+            vectorNormalize(vectorFromPoint(p, center)),
+            Math.max(bindableElement.width, bindableElement.height),
           ),
+          center,
         ),
-        FIXED_BINDING_DISTANCE,
-      ) ?? []
-    )
-      .filter((p) => p != null)
-      .sort((g, h) => pointDistanceSq(g!, p) - pointDistanceSq(h!, p));
-    const isVertical =
-      compareHeading(heading, HEADING_LEFT) ||
-      compareHeading(heading, HEADING_RIGHT);
-    const dist = Math.abs(distanceToBindableElement(bindableElement, p));
-    const isInner = isVertical
-      ? dist < bindableElement.width * -0.1
-      : dist < bindableElement.height * -0.1;
+      ),
+    )[0];
+    const currentDistance = pointDistance(p, center);
+    const fullDistance = pointDistance(intersection, center);
+    const ratio = currentDistance / fullDistance;
 
-    intersections.sort((a, b) => pointDistanceSq(a, p) - pointDistanceSq(b, p));
+    switch (true) {
+      case ratio > 0.9:
+        if (currentDistance - fullDistance > FIXED_BINDING_DISTANCE) {
+          return p;
+        }
 
-    return isInner
-      ? headingToMidBindPoint(otherPoint, bindableElement, aabb)
-      : intersections.filter((i) =>
-          isVertical
-            ? Math.abs(p[1] - i[1]) < 0.1
-            : Math.abs(p[0] - i[0]) < 0.1,
-        )[0] ?? p;
+        return pointFromVector(
+          vectorScale(
+            vectorNormalize(vectorFromPoint(p, intersection)),
+            ratio > 1 ? FIXED_BINDING_DISTANCE : -FIXED_BINDING_DISTANCE,
+          ),
+          intersection,
+        );
+
+      default:
+        return headingToMidBindPoint(p, bindableElement, aabb);
+    }
   }
 
   return p;
@@ -1255,25 +1260,27 @@ const updateBoundPoint = (
         elementsMap,
       );
 
-    const intersections = intersectElementWithLineSegment(
-      bindableElement,
-      lineSegment(adjacentPoint, focusPointAbsolute),
-      binding.gap,
-    );
-    if (!intersections || intersections.length === 0) {
-      // This should never happen, since focusPoint should always be
-      // inside the element, but just in case, bail out
-      // Note: Might happen with rounded elements due to FP imprecision
-      newEdgePoint = edgePointAbsolute;
-    } else {
-      // Guaranteed to intersect because focusPoint is always inside the shape
-      intersections.sort(
+    const intersection =
+      intersectElementWithLineSegment(
+        bindableElement,
+        lineSegment<GlobalPoint>(adjacentPoint, focusPointAbsolute),
+      ).sort(
         (g, h) =>
           pointDistanceSq(g!, edgePointAbsolute) -
           pointDistanceSq(h!, edgePointAbsolute),
-      );
-      newEdgePoint = intersections[0];
-    }
+      )[0] ?? edgePointAbsolute;
+
+    const gapOffsetPoint = intersection
+      ? pointFromVector(
+          vectorScale(
+            vectorNormalize(vectorFromPoint(adjacentPoint, intersection)),
+            binding.gap,
+          ),
+          intersection,
+        )
+      : edgePointAbsolute;
+
+    newEdgePoint = gapOffsetPoint;
   }
 
   return LinearElementEditor.pointFromAbsoluteCoords(
@@ -1579,42 +1586,6 @@ const determineFocusDistance = (
       pointDistance(center, intersection!)) /
     pointDistance(center, b)
   );
-};
-
-/**
- * Determines gap size between element and edgePoint by intersecting the element
- * in the direction of adjacentPoint -> edgePoint, then measuring the length of
- * the intersection point and edgePoint.
- *
- * NOTE: This is not always the same as distance from edgePoint to the closest
- * point on the element outline!
- */
-const determineGapSize = (
-  edgePoint: GlobalPoint,
-  adjacentPoint: GlobalPoint,
-  element: ExcalidrawBindableElement,
-  zoom?: AppState["zoom"],
-): number => {
-  const s = lineSegment(
-    edgePoint,
-    pointFromVector(
-      // Create a vector from the adjacent point to the edge point
-      // scale it to cross the maximum gap distance + 1 to ensure intersection
-      vectorScale(
-        vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
-        maxBindingGap(element, element.width, element.height, zoom) + 1,
-      ),
-      edgePoint,
-    ),
-  );
-  debugClear();
-  debugDrawLine(s, { color: "red", permanent: true });
-  const distances = intersectElementWithLineSegment(element, s)
-    .map((p) => pointDistance(edgePoint, p))
-    .sort((a, b) => b - a);
-  const distance = distances.pop();
-  console.log(distance);
-  return distance ?? 0;
 };
 
 const determineFocusPoint = (

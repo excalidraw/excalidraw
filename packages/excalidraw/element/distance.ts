@@ -45,7 +45,7 @@ export const distanceToBindableElement = (
  * @param p The point to consider
  * @returns The eucledian distance to the outline of the rectanguloid element
  */
-export const distanceToRectanguloidElement = (
+const distanceToRectanguloidElement = (
   element: ExcalidrawRectanguloidElement,
   p: GlobalPoint,
 ) => {
@@ -76,7 +76,7 @@ export const distanceToRectanguloidElement = (
  * @param p The point to consider
  * @returns The eucledian distance to the outline of the diamond
  */
-export const distanceToDiamondElement = (
+const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
   p: GlobalPoint,
 ): number => {
@@ -107,7 +107,7 @@ export const distanceToDiamondElement = (
  * @param p The point to consider
  * @returns The eucledian distance to the outline of the ellipse
  */
-export const distanceToEllipseElement = (
+const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
   p: GlobalPoint,
 ): number => {
