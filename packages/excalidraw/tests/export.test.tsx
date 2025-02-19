@@ -1,7 +1,5 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
 import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 import {
@@ -13,6 +11,8 @@ import type { FileId } from "../element/types";
 import { getDataURL } from "../data/blob";
 import { getDefaultAppState } from "../appState";
 import { SVG_NS } from "../constants";
+import { API } from "./helpers/api";
+import { render, waitFor } from "./test-utils";
 
 const { h } = window;
 

@@ -13,7 +13,6 @@ import type {
 import { isNonDeletedElement } from "../element";
 import type { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameLikeElement } from "../element/typeChecks";
-import { getSelectedElements } from "./selection";
 import type { AppState } from "../types";
 import type { Assert, SameType } from "../utility-types";
 import { randomInteger } from "../random";
@@ -26,6 +25,7 @@ import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
 import { ENV } from "../constants";
 import { getElementsInGroup } from "../groups";
+import { getSelectedElements } from "./selection";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;

@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { act, queryByTestId, queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -11,23 +13,21 @@ import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
 import { API } from "../tests/helpers/api";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { act, queryByTestId, queryByText } from "@testing-library/react";
 import {
   getBoundTextElementPosition,
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
-import { vi } from "vitest";
 import { arrayToMap } from "../utils";
 import type { GlobalPoint } from "../../math";
 import { pointCenter, pointFrom } from "../../math";
 import { wrapText } from "../element/textWrapping";
+import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

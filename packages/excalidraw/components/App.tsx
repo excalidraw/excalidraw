@@ -5,6 +5,7 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
 import { nanoid } from "nanoid";
+import throttle from "lodash.throttle";
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -299,10 +300,6 @@ import {
   maybeParseEmbedSrc,
   getEmbedLink,
 } from "../element/embeddable";
-import type { ContextMenuItems } from "./ContextMenu";
-import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
-import LayerUI from "./LayerUI";
-import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
@@ -326,7 +323,6 @@ import {
   normalizeSVG,
   updateImageCache as _updateImageCache,
 } from "../element/image";
-import throttle from "lodash.throttle";
 import type { FileSystemHandle } from "../data/filesystem";
 import { fileOpen } from "../data/filesystem";
 import {
@@ -374,7 +370,6 @@ import {
 } from "../actions/actionFrame";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { editorJotaiStore } from "../editor-jotai";
-import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { ImageSceneDataError } from "../errors";
 import {
   getSnapLinesAtPointer,
@@ -390,13 +385,9 @@ import {
   getGridPoint,
 } from "../snapping";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import BraveMeasureTextError from "./BraveMeasureTextError";
-import { activeEyeDropperAtom } from "./EyeDropper";
 import type { ExcalidrawElementSkeleton } from "../data/transform";
 import { convertToExcalidrawElements } from "../data/transform";
 import type { ValueOf } from "../utility-types";
-import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
 import { SVGLayer } from "./SVGLayer";
@@ -467,6 +458,15 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
 } from "../element/textMeasurements";
+import { StaticCanvas, InteractiveCanvas } from "./canvases";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+import { activeEyeDropperAtom } from "./EyeDropper";
+import BraveMeasureTextError from "./BraveMeasureTextError";
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { Toast } from "./Toast";
+import LayerUI from "./LayerUI";
+import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
+import type { ContextMenuItems } from "./ContextMenu";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

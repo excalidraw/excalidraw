@@ -1,5 +1,4 @@
 import { KEYS } from "../keys";
-import { register } from "./register";
 import type { ExcalidrawElement } from "../element/types";
 import { duplicateElement, getNonDeletedElements } from "../element";
 import { isSomeElementSelected } from "../scene";
@@ -20,7 +19,6 @@ import {
 } from "../groups";
 import type { AppState } from "../types";
 import { fixBindingsAfterDuplication } from "../element/binding";
-import type { ActionResult } from "./types";
 import { DEFAULT_GRID_SIZE } from "../constants";
 import {
   bindTextToShapeAfterDuplication,
@@ -43,6 +41,8 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 import { StoreAction } from "../store";
+import type { ActionResult } from "./types";
+import { register } from "./register";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",

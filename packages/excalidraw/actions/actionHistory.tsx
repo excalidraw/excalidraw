@@ -1,4 +1,3 @@
-import type { Action, ActionResult } from "./types";
 import { UndoIcon, RedoIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
@@ -12,6 +11,7 @@ import type { SceneElementsMap } from "../element/types";
 import type { Store } from "../store";
 import { StoreAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
+import type { Action, ActionResult } from "./types";
 
 const executeHistoryAction = (
   app: AppClassProperties,

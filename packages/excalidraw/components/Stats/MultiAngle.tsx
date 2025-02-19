@@ -5,12 +5,12 @@ import type { ExcalidrawElement } from "../../element/types";
 import { isInGroup } from "../../groups";
 import type Scene from "../../scene/Scene";
 import { angleIcon } from "../icons";
-import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
 import type { AppState } from "../../types";
 import type { Degrees } from "../../../math";
 import { degreesToRadians, radiansToDegrees } from "../../../math";
+import DragInput from "./DragInput";
+import type { DragInputCallbackType } from "./DragInput";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 interface MultiAngleProps {
   elements: readonly ExcalidrawElement[];

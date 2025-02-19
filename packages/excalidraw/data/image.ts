@@ -1,8 +1,8 @@
 import decodePng from "png-chunks-extract";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
-import { encode, decode } from "./encode";
 import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import { encode, decode } from "./encode";
 import { blobToArrayBuffer } from "./blob";
 
 // -----------------------------------------------------------------------------

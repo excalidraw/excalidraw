@@ -1,4 +1,6 @@
 import React from "react";
+import { nanoid } from "nanoid";
+import { uploadBytes, ref } from "firebase/storage";
 import { Card } from "../../packages/excalidraw/components/Card";
 import { ToolButton } from "../../packages/excalidraw/components/ToolButton";
 import { serializeAsJSON } from "../../packages/excalidraw/data/json";
@@ -12,7 +14,6 @@ import type {
   BinaryFileData,
   BinaryFiles,
 } from "../../packages/excalidraw/types";
-import { nanoid } from "nanoid";
 import { useI18n } from "../../packages/excalidraw/i18n";
 import {
   encryptData,
@@ -25,7 +26,6 @@ import { MIME_TYPES } from "../../packages/excalidraw/constants";
 import { trackEvent } from "../../packages/excalidraw/analytics";
 import { getFrame } from "../../packages/excalidraw/utils";
 import { ExcalidrawLogo } from "../../packages/excalidraw/components/ExcalidrawLogo";
-import { uploadBytes, ref } from "firebase/storage";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],

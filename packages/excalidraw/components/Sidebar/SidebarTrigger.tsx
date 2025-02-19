@@ -1,7 +1,7 @@
-import { useExcalidrawSetAppState } from "../App";
-import type { SidebarTriggerProps } from "./common";
-import { useUIAppState } from "../../context/ui-appState";
 import clsx from "clsx";
+import { useExcalidrawSetAppState } from "../App";
+import { useUIAppState } from "../../context/ui-appState";
+import type { SidebarTriggerProps } from "./common";
 
 import "./SidebarTrigger.scss";
 

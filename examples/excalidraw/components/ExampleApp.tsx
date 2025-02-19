@@ -6,24 +6,10 @@ import React, {
   Children,
   cloneElement,
 } from "react";
-import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import type * as TExcalidraw from "@excalidraw/excalidraw";
 
 import { nanoid } from "nanoid";
-
-import type { ResolvablePromise } from "../utils";
-import {
-  resolvablePromise,
-  distance2d,
-  fileOpen,
-  withBatchedUpdates,
-  withBatchedUpdatesThrottled,
-} from "../utils";
-
-import CustomFooter from "./CustomFooter";
-import MobileFooter from "./MobileFooter";
-import initialData from "../initialData";
 
 import type {
   AppState,
@@ -39,6 +25,20 @@ import type {
   Theme,
 } from "@excalidraw/excalidraw/dist/excalidraw/element/types";
 import type { ImportedLibraryData } from "@excalidraw/excalidraw/dist/excalidraw/data/types";
+import type { ResolvablePromise } from "../utils";
+import {
+  resolvablePromise,
+  distance2d,
+  fileOpen,
+  withBatchedUpdates,
+  withBatchedUpdatesThrottled,
+} from "../utils";
+
+import initialData from "../initialData";
+import CustomFooter from "./CustomFooter";
+import MobileFooter from "./MobileFooter";
+
+import ExampleSidebar from "./sidebar/ExampleSidebar";
 
 import "./ExampleApp.scss";
 

@@ -1,3 +1,28 @@
+import {
+  arrayToMap,
+  getFontString,
+  getUpdatedTimestamp,
+  isTestEnv,
+} from "../utils";
+import { randomInteger, randomId } from "../random";
+import { getNewGroupIdsForDuplication } from "../groups";
+import type { AppState } from "../types";
+import {
+  DEFAULT_ELEMENT_PROPS,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_TEXT_ALIGN,
+  DEFAULT_VERTICAL_ALIGN,
+  ORIG_ID,
+  VERTICAL_ALIGN,
+} from "../constants";
+import type { MarkOptional, Merge, Mutable } from "../utility-types";
+import { getLineHeight } from "../fonts";
+import type { Radians } from "../../math";
+import { wrapText } from "./textWrapping";
+import { getBoundTextMaxWidth } from "./textElement";
+import { getResizedElementAbsoluteCoords } from "./bounds";
+import { bumpVersion, newElementWith } from "./mutateElement";
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -21,33 +46,8 @@ import type {
   FixedSegment,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import {
-  arrayToMap,
-  getFontString,
-  getUpdatedTimestamp,
-  isTestEnv,
-} from "../utils";
-import { randomInteger, randomId } from "../random";
-import { bumpVersion, newElementWith } from "./mutateElement";
-import { getNewGroupIdsForDuplication } from "../groups";
-import type { AppState } from "../types";
-import { getElementAbsoluteCoords } from ".";
-import { getResizedElementAbsoluteCoords } from "./bounds";
-import { getBoundTextMaxWidth } from "./textElement";
-import { wrapText } from "./textWrapping";
-import {
-  DEFAULT_ELEMENT_PROPS,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SIZE,
-  DEFAULT_TEXT_ALIGN,
-  DEFAULT_VERTICAL_ALIGN,
-  ORIG_ID,
-  VERTICAL_ALIGN,
-} from "../constants";
-import type { MarkOptional, Merge, Mutable } from "../utility-types";
-import { getLineHeight } from "../fonts";
-import type { Radians } from "../../math";
 import { normalizeText, measureText } from "./textMeasurements";
+import { getElementAbsoluteCoords } from ".";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,

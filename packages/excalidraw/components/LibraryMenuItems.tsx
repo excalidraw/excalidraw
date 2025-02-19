@@ -14,18 +14,18 @@ import type {
   UIAppState,
 } from "../types";
 import { arrayToMap } from "../utils";
-import Stack from "./Stack";
 import { MIME_TYPES } from "../constants";
-import Spinner from "./Spinner";
 import { duplicateElements } from "../element/newElement";
+import { useScrollPosition } from "../hooks/useScrollPosition";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+import Stack from "./Stack";
+import Spinner from "./Spinner";
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
 import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
-import { useScrollPosition } from "../hooks/useScrollPosition";
-import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 import "./LibraryMenuItems.scss";
 

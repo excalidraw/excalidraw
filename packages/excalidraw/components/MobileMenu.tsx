@@ -9,21 +9,21 @@ import type {
 } from "../types";
 import type { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
-import Stack from "./Stack";
 import { showSelectedShapeActions } from "../element";
 import type { NonDeletedExcalidrawElement } from "../element/types";
+import { calculateScrollCenter } from "../scene";
+import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+import { isHandToolActive } from "../appState";
+import { useTunnels } from "../context/tunnels";
+import Stack from "./Stack";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { Section } from "./Section";
-import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
 import { HandButton } from "./HandButton";
-import { isHandToolActive } from "../appState";
-import { useTunnels } from "../context/tunnels";
 
 type MobileMenuProps = {
   appState: UIAppState;

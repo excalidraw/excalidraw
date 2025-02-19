@@ -33,11 +33,11 @@ import { ShapeCache } from "../scene/ShapeCache";
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
-import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 import { getVerticalOffset } from "../fonts";
 import { getCornerRadius, isPathALoop } from "../shapes";
 import { getUncroppedWidthAndHeight } from "../element/cropElement";
 import { getLineHeightInPx } from "../element/textMeasurements";
+import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,

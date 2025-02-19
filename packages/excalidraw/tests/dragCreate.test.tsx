@@ -1,18 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { vi } from "vitest";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveScene from "../renderer/interactiveScene";
 import { KEYS } from "../keys";
+import type { ExcalidrawLinearElement } from "../element/types";
+import { reseed } from "../random";
 import {
   render,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "./test-utils";
-import type { ExcalidrawLinearElement } from "../element/types";
-import { reseed } from "../random";
-import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);

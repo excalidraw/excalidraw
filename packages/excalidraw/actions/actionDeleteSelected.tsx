@@ -2,7 +2,6 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
-import { register } from "./register";
 import { getNonDeletedElements } from "../element";
 import type { ExcalidrawElement } from "../element/types";
 import type { AppClassProperties, AppState } from "../types";
@@ -20,6 +19,7 @@ import { TrashIcon } from "../components/icons";
 import { StoreAction } from "../store";
 import { getContainerElement } from "../element/textElement";
 import { getFrameChildren } from "../frame";
+import { register } from "./register";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],

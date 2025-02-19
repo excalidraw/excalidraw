@@ -1,8 +1,8 @@
 import "./Avatar.scss";
 
 import React, { useState } from "react";
-import { getNameInitial } from "../clients";
 import clsx from "clsx";
+import { getNameInitial } from "../clients";
 
 type AvatarProps = {
   onClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;

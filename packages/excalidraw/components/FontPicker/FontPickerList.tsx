@@ -18,10 +18,10 @@ import DropdownMenuItem, {
 import { type FontFamilyValues } from "../../element/types";
 import { arrayToList, debounce, getFontFamilyString } from "../../utils";
 import { t } from "../../i18n";
-import { fontPickerKeyHandler } from "./keyboardNavHandlers";
 import { Fonts } from "../../fonts";
 import type { ValueOf } from "../../utility-types";
 import { FontFamilyNormalIcon } from "../icons";
+import { fontPickerKeyHandler } from "./keyboardNavHandlers";
 
 export interface FontDescriptor {
   value: number;

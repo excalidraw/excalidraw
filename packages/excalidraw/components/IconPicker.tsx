@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import clsx from "clsx";
 import { isArrowKey, KEYS } from "../keys";
 import { getLanguage, t } from "../i18n";
-import clsx from "clsx";
-import Collapsible from "./Stats/Collapsible";
 import { atom, useAtom } from "../editor-jotai";
+import Collapsible from "./Stats/Collapsible";
 import { useDevice } from "./App";
 
 import "./IconPicker.scss";

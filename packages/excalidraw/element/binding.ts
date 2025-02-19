@@ -4,6 +4,28 @@ import * as GADirection from "../../math/ga/gadirections";
 import * as GALine from "../../math/ga/galines";
 import * as GATransform from "../../math/ga/gatransforms";
 
+import type { AppState } from "../types";
+import { isPointOnShape } from "../../utils/collision";
+import type Scene from "../scene/Scene";
+import {
+  arrayToMap,
+  isBindingFallthroughEnabled,
+  tupleToCoors,
+} from "../utils";
+import { KEYS } from "../keys";
+import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
+import type { LocalPoint, Radians } from "../../math";
+import {
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+  vectorFromPoint,
+  pointFromPair,
+  pointDistanceSq,
+  clamp,
+} from "../../math";
+import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -30,8 +52,6 @@ import type {
 
 import type { Bounds } from "./bounds";
 import { getCenterForBounds, getElementAbsoluteCoords } from "./bounds";
-import type { AppState } from "../types";
-import { isPointOnShape } from "../../utils/collision";
 import {
   isArrowElement,
   isBindableElement,
@@ -46,16 +66,8 @@ import {
 } from "./typeChecks";
 import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
-import type Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
-import {
-  arrayToMap,
-  isBindingFallthroughEnabled,
-  tupleToCoors,
-} from "../utils";
-import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import {
   compareHeading,
   HEADING_DOWN,
@@ -66,18 +78,6 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import type { LocalPoint, Radians } from "../../math";
-import {
-  lineSegment,
-  pointFrom,
-  pointRotateRads,
-  type GlobalPoint,
-  vectorFromPoint,
-  pointFromPair,
-  pointDistanceSq,
-  clamp,
-} from "../../math";
-import { segmentIntersectRectangleElement } from "../../utils/geometry/shape";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

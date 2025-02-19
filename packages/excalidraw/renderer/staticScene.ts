@@ -28,10 +28,10 @@ import {
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { throttleRAF } from "../utils";
 import { getBoundTextElement } from "../element/textElement";
 import { isElementLink } from "../element/elementLink";
+import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
 const GridLineColor = {
   Bold: "#dddddd",

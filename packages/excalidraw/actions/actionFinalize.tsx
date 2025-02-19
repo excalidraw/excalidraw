@@ -4,7 +4,6 @@ import { arrayToMap, updateActiveTool } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
-import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -17,6 +16,7 @@ import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
 import { pointFrom } from "../../math";
 import { isPathALoop } from "../shapes";
+import { register } from "./register";
 
 export const actionFinalize = register({
   name: "finalize",

@@ -2,18 +2,18 @@ import "./UserList.scss";
 
 import React, { useLayoutEffect } from "react";
 import clsx from "clsx";
+import * as Popover from "@radix-ui/react-popover";
 import type { Collaborator, SocketId } from "../types";
-import { Tooltip } from "./Tooltip";
-import { useExcalidrawActionManager } from "./App";
 import type { ActionManager } from "../actions/manager";
 
-import * as Popover from "@radix-ui/react-popover";
-import { Island } from "./Island";
-import { QuickSearch } from "./QuickSearch";
 import { t } from "../i18n";
 import { isShallowEqual } from "../utils";
 import { supportsResizeObserver } from "../constants";
 import type { MarkRequired } from "../utility-types";
+import { QuickSearch } from "./QuickSearch";
+import { Island } from "./Island";
+import { useExcalidrawActionManager } from "./App";
+import { Tooltip } from "./Tooltip";
 import { ScrollableList } from "./ScrollableList";
 
 export type GoToCollaboratorComponentProps = {

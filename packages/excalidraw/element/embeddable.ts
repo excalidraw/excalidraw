@@ -3,6 +3,8 @@ import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
 import type { ExcalidrawProps } from "../types";
 import { escapeDoubleQuotes, getFontString, updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
+import type { MarkRequired } from "../utility-types";
+import { StoreAction } from "../store";
 import { newTextElement } from "./newElement";
 import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
@@ -11,8 +13,6 @@ import type {
   ExcalidrawIframeLikeElement,
   IframeData,
 } from "./types";
-import type { MarkRequired } from "../utility-types";
-import { StoreAction } from "../store";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 

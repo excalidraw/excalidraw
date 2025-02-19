@@ -1,12 +1,17 @@
 import { useCallback, useState } from "react";
+import clsx from "clsx";
 import { t } from "../i18n";
-import Trans from "./Trans";
 import { useAtom } from "../editor-jotai";
 import type { LibraryItem, LibraryItems, UIAppState } from "../types";
-import { useApp, useExcalidrawSetAppState } from "./App";
 import { saveLibraryAsJSON } from "../data/json";
 import type Library from "../data/library";
 import { libraryItemsAtom } from "../data/library";
+import { fileOpen } from "../data/filesystem";
+import { muteFSAbortError } from "../utils";
+import { useUIAppState } from "../context/ui-appState";
+import { useLibraryCache } from "../hooks/useLibraryItemSvg";
+import Trans from "./Trans";
+import { useApp, useExcalidrawSetAppState } from "./App";
 import {
   DotsIcon,
   ExportIcon,
@@ -15,16 +20,11 @@ import {
   TrashIcon,
 } from "./icons";
 import { ToolButton } from "./ToolButton";
-import { fileOpen } from "../data/filesystem";
-import { muteFSAbortError } from "../utils";
 import ConfirmDialog from "./ConfirmDialog";
 import PublishLibrary from "./PublishLibrary";
 import { Dialog } from "./Dialog";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
-import { useUIAppState } from "../context/ui-appState";
-import clsx from "clsx";
-import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,

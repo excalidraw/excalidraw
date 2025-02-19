@@ -5,7 +5,6 @@ import {
 } from "../element";
 import { CODES, KEYS } from "../keys";
 import { t } from "../i18n";
-import { register } from "./register";
 import { newElementWith } from "../element/mutateElement";
 import {
   DEFAULT_FONT_SIZE,
@@ -25,6 +24,7 @@ import type { ExcalidrawTextElement } from "../element/types";
 import { paintIcon } from "../components/icons";
 import { StoreAction } from "../store";
 import { getLineHeight } from "../fonts";
+import { register } from "./register";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";

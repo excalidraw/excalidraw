@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { vi } from "vitest";
 import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
 import { setDateTimeForTests } from "../utils";
+import { FONT_FAMILY } from "../constants";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -15,8 +17,6 @@ import {
   screen,
   togglePopover,
 } from "./test-utils";
-import { FONT_FAMILY } from "../constants";
-import { vi } from "vitest";
 
 const { h } = window;
 

@@ -1,5 +1,20 @@
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
 import { rescalePoints } from "../points";
+import type { Mutable } from "../utility-types";
+import { getFontString } from "../utils";
+import type { PointerDownState } from "../types";
+import type Scene from "../scene/Scene";
+import { isInGroup } from "../groups";
+import type { GlobalPoint } from "../../math";
+import {
+  pointCenter,
+  normalizeRadians,
+  pointFrom,
+  pointFromPair,
+  pointRotateRads,
+  type Radians,
+  type LocalPoint,
+} from "../../math";
 import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -12,7 +27,6 @@ import type {
   SceneElementsMap,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import type { Mutable } from "../utility-types";
 import {
   getElementAbsoluteCoords,
   getCommonBounds,
@@ -32,14 +46,11 @@ import {
   isTextElement,
 } from "./typeChecks";
 import { mutateElement } from "./mutateElement";
-import { getFontString } from "../utils";
 import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
 import type {
   MaybeTransformHandleType,
   TransformHandleDirection,
 } from "./transformHandles";
-import type { PointerDownState } from "../types";
-import type Scene from "../scene/Scene";
 import {
   getBoundTextElement,
   getBoundTextElementId,
@@ -49,17 +60,6 @@ import {
 } from "./textElement";
 import { wrapText } from "./textWrapping";
 import { LinearElementEditor } from "./linearElementEditor";
-import { isInGroup } from "../groups";
-import type { GlobalPoint } from "../../math";
-import {
-  pointCenter,
-  normalizeRadians,
-  pointFrom,
-  pointFromPair,
-  pointRotateRads,
-  type Radians,
-  type LocalPoint,
-} from "../../math";
 import {
   getMinTextElementWidth,
   measureText,

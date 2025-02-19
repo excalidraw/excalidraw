@@ -7,13 +7,13 @@ import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
-import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
 import { useStable } from "../hooks/useStable";
 
 import "./EyeDropper.scss";
-import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
 import type { ExcalidrawElement } from "../element/types";
 import { atom } from "../editor-jotai";
+import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
+import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
 
 export type EyeDropperProperties = {
   keepOpenOnAlt: boolean;

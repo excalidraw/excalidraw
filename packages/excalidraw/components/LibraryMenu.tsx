@@ -20,27 +20,27 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-import LibraryMenuItems from "./LibraryMenuItems";
 import { trackEvent } from "../analytics";
 import { atom, useAtom } from "../editor-jotai";
-import Spinner from "./Spinner";
-import {
-  useApp,
-  useAppProps,
-  useExcalidrawElements,
-  useExcalidrawSetAppState,
-} from "./App";
 import { getSelectedElements } from "../scene";
 import { useUIAppState } from "../context/ui-appState";
 
 import "./LibraryMenu.scss";
-import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { LIBRARY_DISABLED_TYPES } from "../constants";
 import { isShallowEqual } from "../utils";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import {
+  useApp,
+  useAppProps,
+  useExcalidrawElements,
+  useExcalidrawSetAppState,
+} from "./App";
+import Spinner from "./Spinner";
+import LibraryMenuItems from "./LibraryMenuItems";
 
 export const isLibraryMenuOpenAtom = atom(false);
 

@@ -1,5 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { vi } from "vitest";
+import { Excalidraw } from "../index";
+import * as StaticScene from "../renderer/staticScene";
+import { reseed } from "../random";
+import { KEYS } from "../keys";
+import type { ShortcutName } from "../actions/shortcuts";
+import { copiedStyles } from "../actions/actionStyles";
+import { setDateTimeForTests } from "../utils";
+import type { ActionName } from "../actions/types";
+import { API } from "./helpers/api";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
   render,
   fireEvent,
@@ -12,17 +23,6 @@ import {
   waitFor,
   togglePopover,
 } from "./test-utils";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import { reseed } from "../random";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { KEYS } from "../keys";
-import type { ShortcutName } from "../actions/shortcuts";
-import { copiedStyles } from "../actions/actionStyles";
-import { API } from "./helpers/api";
-import { setDateTimeForTests } from "../utils";
-import { vi } from "vitest";
-import type { ActionName } from "../actions/types";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(

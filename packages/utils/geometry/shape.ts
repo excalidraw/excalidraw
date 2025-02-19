@@ -12,6 +12,8 @@
  * to pure shapes
  */
 
+import { pointsOnBezierCurves } from "points-on-curve";
+import type { Drawable, Op } from "roughjs/bin/core";
 import type { Curve, LineSegment, Polygon, Radians } from "../../math";
 import {
   curve,
@@ -49,8 +51,6 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "../../excalidraw/element/types";
-import { pointsOnBezierCurves } from "points-on-curve";
-import type { Drawable, Op } from "roughjs/bin/core";
 import { invariant } from "../../excalidraw/utils";
 
 // a polyline (made up term here) is a line consisting of other line segments

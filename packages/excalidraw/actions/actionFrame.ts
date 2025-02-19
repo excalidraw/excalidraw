@@ -6,7 +6,6 @@ import { KEYS } from "../keys";
 import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { updateActiveTool } from "../utils";
 import { setCursorForShape } from "../cursor";
-import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
 import { StoreAction } from "../store";
@@ -14,6 +13,7 @@ import { getSelectedElements } from "../scene";
 import { newFrameElement } from "../element/newElement";
 import { getElementsInGroup } from "../groups";
 import { mutateElement } from "../element/mutateElement";
+import { register } from "./register";
 
 const isSingleFrameSelected = (
   appState: UIAppState,

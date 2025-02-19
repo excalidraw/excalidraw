@@ -1,7 +1,4 @@
 import type { ExcalidrawElement } from "../../element/types";
-import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
 import { resizeSingleElement } from "../../element/resizeElements";
 import type Scene from "../../scene/Scene";
@@ -13,6 +10,9 @@ import {
 } from "../../element/cropElement";
 import { mutateElement } from "../../element/mutateElement";
 import { clamp, round } from "../../../math";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
+import type { DragInputCallbackType } from "./DragInput";
+import DragInput from "./DragInput";
 
 interface DimensionDragInputProps {
   property: "width" | "height";

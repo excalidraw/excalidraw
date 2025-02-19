@@ -1,3 +1,11 @@
+import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
+import {
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
+  isAndroid,
+  isIOS,
+} from "../constants";
+import type { Radians } from "../../math";
+import { pointFrom, pointRotateRads } from "../../math";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -7,20 +15,12 @@ import type {
 
 import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
-import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
 } from "./typeChecks";
-import {
-  DEFAULT_TRANSFORM_HANDLE_SPACING,
-  isAndroid,
-  isIOS,
-} from "../constants";
-import type { Radians } from "../../math";
-import { pointFrom, pointRotateRads } from "../../math";
 
 export type TransformHandleDirection =
   | "n"

@@ -1,9 +1,9 @@
-import * as utils from ".";
-import { diagramFactory } from "../excalidraw/tests/fixtures/diagramFixture";
 import { vi } from "vitest";
+import { diagramFactory } from "../excalidraw/tests/fixtures/diagramFixture";
 import * as mockedSceneExportUtils from "../excalidraw/scene/export";
 
 import { MIME_TYPES } from "../excalidraw/constants";
+import * as utils from ".";
 
 const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
 

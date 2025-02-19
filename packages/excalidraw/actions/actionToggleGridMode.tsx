@@ -1,8 +1,8 @@
 import { CODES, KEYS } from "../keys";
-import { register } from "./register";
 import type { AppState } from "../types";
 import { gridIcon } from "../components/icons";
 import { StoreAction } from "../store";
+import { register } from "./register";
 
 export const actionToggleGridMode = register({
   name: "gridMode",

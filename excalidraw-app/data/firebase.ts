@@ -1,3 +1,13 @@
+import type { Socket } from "socket.io-client";
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  runTransaction,
+  Bytes,
+} from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { reconcileElements } from "../../packages/excalidraw";
 import type {
   ExcalidrawElement,
@@ -20,19 +30,9 @@ import {
   decryptData,
 } from "../../packages/excalidraw/data/encryption";
 import { MIME_TYPES } from "../../packages/excalidraw/constants";
+import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
 import type { SyncableExcalidrawElement } from ".";
 import { getSyncableElements } from ".";
-import type { Socket } from "socket.io-client";
-import type { RemoteExcalidrawElement } from "../../packages/excalidraw/data/reconcile";
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  runTransaction,
-  Bytes,
-} from "firebase/firestore";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 // private
 // -----------------------------------------------------------------------------

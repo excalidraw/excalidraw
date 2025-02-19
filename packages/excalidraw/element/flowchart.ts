@@ -1,3 +1,9 @@
+import { KEYS } from "../keys";
+import type { AppState, PendingExcalidrawElements } from "../types";
+import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
+import { invariant, toBrandedType } from "../utils";
+import { pointFrom, type LocalPoint } from "../../math";
+import { aabbForElement } from "../shapes";
 import {
   HEADING_DOWN,
   HEADING_LEFT,
@@ -20,19 +26,13 @@ import {
   type Ordered,
   type OrderedExcalidrawElement,
 } from "./types";
-import { KEYS } from "../keys";
-import type { AppState, PendingExcalidrawElements } from "../types";
 import { mutateElement } from "./mutateElement";
-import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
 import {
   isBindableElement,
   isElbowArrow,
   isFrameElement,
   isFlowchartNodeElement,
 } from "./typeChecks";
-import { invariant, toBrandedType } from "../utils";
-import { pointFrom, type LocalPoint } from "../../math";
-import { aabbForElement } from "../shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
 
 type LinkDirection = "up" | "right" | "down" | "left";

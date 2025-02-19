@@ -1,4 +1,14 @@
 import { getFontString, arrayToMap } from "../utils";
+import {
+  ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
+  ARROW_LABEL_WIDTH_FRACTION,
+  BOUND_TEXT_PADDING,
+  DEFAULT_FONT_SIZE,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "../constants";
+import type { AppState } from "../types";
+import type { ExtractSetType } from "../utility-types";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -9,26 +19,16 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 import { mutateElement } from "./mutateElement";
-import {
-  ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
-  ARROW_LABEL_WIDTH_FRACTION,
-  BOUND_TEXT_PADDING,
-  DEFAULT_FONT_SIZE,
-  TEXT_ALIGN,
-  VERTICAL_ALIGN,
-} from "../constants";
 import type { MaybeTransformHandleType } from "./transformHandles";
-import { isTextElement } from ".";
 import { wrapText } from "./textWrapping";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
-import type { AppState } from "../types";
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
 } from "./containerCache";
-import type { ExtractSetType } from "../utility-types";
 import { measureText } from "./textMeasurements";
+import { isTextElement } from ".";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,

@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { act, getCloneByOrigId, render } from "./test-utils";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import {
@@ -11,13 +10,14 @@ import {
   actionDuplicateSelection,
 } from "../actions";
 import type { AppState } from "../types";
-import { API } from "./helpers/api";
 import { selectGroupsForSelectedElements } from "../groups";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawSelectionElement,
 } from "../element/types";
+import { API } from "./helpers/api";
+import { act, getCloneByOrigId, render } from "./test-utils";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);

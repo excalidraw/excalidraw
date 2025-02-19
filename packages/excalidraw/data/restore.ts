@@ -13,7 +13,6 @@ import type {
   StrokeRoundness,
 } from "../element/types";
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
-import type { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
@@ -47,7 +46,6 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
 import { getContainerElement } from "../element/textElement";
-import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
@@ -60,6 +58,8 @@ import {
 import type { LocalPoint, Radians } from "../../math";
 import { isFiniteNumber, pointFrom } from "../../math";
 import { detectLineHeight } from "../element/textMeasurements";
+import { normalizeLink } from "./url";
+import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
   AppState,

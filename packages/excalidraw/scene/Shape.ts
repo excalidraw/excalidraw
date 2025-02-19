@@ -1,8 +1,7 @@
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { RoughGenerator } from "roughjs/bin/generator";
-import { getDiamondPoints, getArrowheadPoints } from "../element";
-import type { ElementShapes } from "./types";
+import { simplify } from "points-on-curve";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -12,7 +11,7 @@ import type {
 } from "../element/types";
 import { generateFreeDrawShape } from "../renderer/renderElement";
 import { isTransparent, assertNever } from "../utils";
-import { simplify } from "points-on-curve";
+import { getDiamondPoints, getArrowheadPoints } from "../element";
 import { ROUGHNESS } from "../constants";
 import {
   isElbowArrow,
@@ -21,11 +20,12 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
-import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
 import { pointFrom, pointDistance, type LocalPoint } from "../../math";
 import { getCornerRadius, isPathALoop } from "../shapes";
 import { headingForPointIsHorizontal } from "../element/heading";
+import type { ElementShapes } from "./types";
+import { canChangeRoundness } from "./comparisons";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { act, fireEvent, queryByTestId } from "@testing-library/react";
-import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
-import { getStepSizedValue } from "./utils";
+import { vi } from "vitest";
 import {
   GlobalTestState,
   mockBoundingClientRect,
@@ -9,7 +8,7 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
 import * as StaticScene from "../../renderer/staticScene";
-import { vi } from "vitest";
+import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { reseed } from "../../random";
 import { setDateTimeForTests } from "../../utils";
 import { Excalidraw, mutateElement } from "../..";
@@ -26,6 +25,7 @@ import { actionGroup } from "../../actions";
 import { isInGroup } from "../../groups";
 import type { Degrees } from "../../../math";
 import { degreesToRadians, pointFrom, pointRotateRads } from "../../../math";
+import { getStepSizedValue } from "./utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

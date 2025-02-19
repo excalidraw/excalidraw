@@ -1,18 +1,18 @@
 import React from "react";
 import { vi } from "vitest";
-import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
 import { act, queryByTestId } from "@testing-library/react";
 
 import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
 import { MIME_TYPES, ORIG_ID } from "../constants";
 import type { LibraryItem, LibraryItems } from "../types";
-import { UI } from "./helpers/ui";
 import { serializeLibraryAsJSON } from "../data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import type { ExcalidrawGenericElement } from "../element/types";
 import { getCommonBoundingBox } from "../element/bounds";
 import { parseLibraryJSON } from "../data/blob";
+import { UI } from "./helpers/ui";
+import { API } from "./helpers/api";
+import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
 
 const { h } = window;
 

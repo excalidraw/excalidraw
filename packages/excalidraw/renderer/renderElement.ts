@@ -1,3 +1,7 @@
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import rough from "roughjs/bin/rough";
+import type { StrokeOptions } from "perfect-freehand";
+import { getStroke } from "perfect-freehand";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -20,7 +24,6 @@ import {
   isImageElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
-import type { RoughCanvas } from "roughjs/bin/canvas";
 
 import type {
   StaticCanvasRenderConfig,
@@ -28,7 +31,6 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "../scene/types";
 import { distance, getFontString, isRTL } from "../utils";
-import rough from "roughjs/bin/rough";
 import type {
   AppState,
   StaticCanvasAppState,
@@ -46,8 +48,6 @@ import {
   MIME_TYPES,
   THEME,
 } from "../constants";
-import type { StrokeOptions } from "perfect-freehand";
-import { getStroke } from "perfect-freehand";
 import {
   getBoundTextElement,
   getContainerCoords,

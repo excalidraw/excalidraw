@@ -1,4 +1,3 @@
-import { fileOpen, fileSave } from "./filesystem";
 import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import {
   DEFAULT_FILENAME,
@@ -10,6 +9,7 @@ import {
 import { clearElementsForDatabase, clearElementsForExport } from "../element";
 import type { ExcalidrawElement } from "../element/types";
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
+import { fileOpen, fileSave } from "./filesystem";
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 
 import type {

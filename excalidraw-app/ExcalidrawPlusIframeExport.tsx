@@ -1,6 +1,4 @@
 import { useLayoutEffect, useRef } from "react";
-import { STORAGE_KEYS } from "./app_constants";
-import { LocalData } from "./data/LocalData";
 import type {
   FileId,
   OrderedExcalidrawElement,
@@ -8,6 +6,8 @@ import type {
 import type { AppState, BinaryFileData } from "../packages/excalidraw/types";
 import { ExcalidrawError } from "../packages/excalidraw/errors";
 import { base64urlToString } from "../packages/excalidraw/data/encode";
+import { LocalData } from "./data/LocalData";
+import { STORAGE_KEYS } from "./app_constants";
 
 const EVENT_REQUEST_SCENE = "REQUEST_SCENE";
 

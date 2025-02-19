@@ -1,5 +1,5 @@
-import { atom, editorJotaiStore } from "../../editor-jotai";
 import type React from "react";
+import { atom, editorJotaiStore } from "../../editor-jotai";
 
 export type OverwriteConfirmState =
   | {

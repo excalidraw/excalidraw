@@ -108,7 +108,6 @@ import {
   getShortcutKey,
   tupleToCoors,
 } from "../utils";
-import { register } from "./register";
 import { StoreAction } from "../store";
 import { Fonts, getLineHeight } from "../fonts";
 import {
@@ -122,6 +121,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
 import { Range } from "../components/Range";
+import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

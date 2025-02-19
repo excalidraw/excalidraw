@@ -1,13 +1,13 @@
-import type { ExcalidrawElement, SceneElementsMap } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
 import { getUpdatedTimestamp, toBrandedType } from "../utils";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
+import type { Radians } from "../../math";
 import { isElbowArrow } from "./typeChecks";
 import { updateElbowArrowPoints } from "./elbowArrow";
-import type { Radians } from "../../math";
+import type { ExcalidrawElement, SceneElementsMap } from "./types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,

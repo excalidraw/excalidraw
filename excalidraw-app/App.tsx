@@ -1,9 +1,9 @@
-import polyfill from "../packages/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import polyfill from "../packages/excalidraw/polyfill";
 import { trackEvent } from "../packages/excalidraw/analytics";
 import { getDefaultAppState } from "../packages/excalidraw/appState";
 import { ErrorDialog } from "../packages/excalidraw/components/ErrorDialog";
-import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import {
   APP_NAME,
   EVENT,
@@ -43,6 +43,7 @@ import {
   resolvablePromise,
   isRunningInIframe,
 } from "../packages/excalidraw/utils";
+import { TopErrorBoundary } from "./components/TopErrorBoundary";
 import {
   FIREBASE_STORAGE_PREFIXES,
   isExcalidrawPlusSignedUser,
@@ -82,7 +83,6 @@ import {
   LocalData,
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
-import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,

@@ -1,3 +1,6 @@
+import fs from "fs";
+import util from "util";
+import path from "path";
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -17,9 +20,6 @@ import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
-import fs from "fs";
-import util from "util";
-import path from "path";
 import { getMimeType } from "../../data/blob";
 import {
   newArrowElement,

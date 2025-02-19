@@ -1,10 +1,10 @@
-import { register } from "./register";
 import { cropIcon } from "../components/icons";
 import { StoreAction } from "../store";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { isImageElement } from "../element/typeChecks";
 import type { ExcalidrawImageElement } from "../element/types";
+import { register } from "./register";
 
 export const actionToggleCropEditor = register({
   name: "cropEditor",

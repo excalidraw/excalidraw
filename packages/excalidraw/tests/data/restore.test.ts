@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import * as restore from "../../data/restore";
 import type {
   ExcalidrawElement,
@@ -12,7 +13,6 @@ import type { ImportedDataState } from "../../data/types";
 import type { NormalizedZoomValue } from "../../types";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "../../constants";
 import { newElementWith } from "../../element/mutateElement";
-import { vi } from "vitest";
 
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");

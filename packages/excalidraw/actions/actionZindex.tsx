@@ -7,7 +7,6 @@ import {
 import { KEYS, CODES } from "../keys";
 import { t } from "../i18n";
 import { getShortcutKey } from "../utils";
-import { register } from "./register";
 import {
   BringForwardIcon,
   BringToFrontIcon,
@@ -16,6 +15,7 @@ import {
 } from "../components/icons";
 import { isDarwin } from "../constants";
 import { StoreAction } from "../store";
+import { register } from "./register";
 
 export const actionSendBackward = register({
   name: "sendBackward",

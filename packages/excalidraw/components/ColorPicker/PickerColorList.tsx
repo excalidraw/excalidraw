@@ -1,15 +1,15 @@
 import clsx from "clsx";
-import { useAtom } from "../../editor-jotai";
 import { useEffect, useRef } from "react";
+import { useAtom } from "../../editor-jotai";
+import type { ColorPaletteCustom } from "../../colors";
+import type { TranslationKeys } from "../../i18n";
+import { t } from "../../i18n";
 import {
   activeColorPickerSectionAtom,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 import HotkeyLabel from "./HotkeyLabel";
-import type { ColorPaletteCustom } from "../../colors";
-import type { TranslationKeys } from "../../i18n";
-import { t } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;

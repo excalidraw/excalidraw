@@ -1,23 +1,23 @@
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  ExcalidrawRectangleElement,
-} from "./types";
-import { getElementBounds } from "./bounds";
 import type { FrameNameBounds } from "../types";
 import type { GeometricShape } from "../../utils/geometry/shape";
 import { getPolygonShape } from "../../utils/geometry/shape";
 import { isPointInShape, isPointOnShape } from "../../utils/collision";
 import { isTransparent } from "../utils";
+import { getBoundTextShape, isPathALoop } from "../shapes";
+import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
+import { isPointWithinBounds, pointFrom } from "../../math";
 import {
   hasBoundTextElement,
   isIframeLikeElement,
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getBoundTextShape, isPathALoop } from "../shapes";
-import type { GlobalPoint, LocalPoint, Polygon } from "../../math";
-import { isPointWithinBounds, pointFrom } from "../../math";
+import { getElementBounds } from "./bounds";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawRectangleElement,
+} from "./types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {

@@ -1,7 +1,4 @@
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import StatsDragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 import { clamp, pointFrom, pointRotateRads, round } from "../../../math";
@@ -11,6 +8,9 @@ import {
   getUncroppedWidthAndHeight,
 } from "../../element/cropElement";
 import { mutateElement } from "../../element/mutateElement";
+import { getStepSizedValue, moveElement } from "./utils";
+import type { DragInputCallbackType } from "./DragInput";
+import StatsDragInput from "./DragInput";
 
 interface PositionProps {
   property: "x" | "y";

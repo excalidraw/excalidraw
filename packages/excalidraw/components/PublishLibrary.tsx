@@ -2,9 +2,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import OpenColor from "open-color";
 
-import { Dialog } from "./Dialog";
 import { t } from "../i18n";
-import Trans from "./Trans";
 
 import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 import { exportToCanvas, exportToSvg } from "../../utils/export";
@@ -18,10 +16,12 @@ import {
 import type { ExportedLibraryData } from "../data/types";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { chunk } from "../utils";
+import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import DialogActionButton from "./DialogActionButton";
 import { CloseIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
-import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import Trans from "./Trans";
+import { Dialog } from "./Dialog";
 
 import "./PublishLibrary.scss";
 

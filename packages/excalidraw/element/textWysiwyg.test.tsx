@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { queryByText } from "@testing-library/react";
 import { Excalidraw } from "../index";
 import { GlobalTestState, render, screen } from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
@@ -9,17 +10,16 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
-import { queryByText } from "@testing-library/react";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import { API } from "../tests/helpers/api";
+import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
+import { pointFrom } from "../../math";
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
-import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import { pointFrom } from "../../math";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);

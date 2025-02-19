@@ -1,6 +1,6 @@
 import { promiseTry } from "../utils";
-import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
 import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
+import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
 
 type DataURL = string;
 

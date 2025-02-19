@@ -8,16 +8,16 @@ import {
   queryByTestId,
   render,
 } from "../tests/test-utils";
-import { bindLinearElement } from "./binding";
 import { Excalidraw, mutateElement } from "../index";
+import { ARROW_TYPE } from "../constants";
+import type { LocalPoint } from "../../math";
+import { pointFrom } from "../../math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import { ARROW_TYPE } from "../constants";
-import type { LocalPoint } from "../../math";
-import { pointFrom } from "../../math";
+import { bindLinearElement } from "./binding";
 
 const { h } = window;
 

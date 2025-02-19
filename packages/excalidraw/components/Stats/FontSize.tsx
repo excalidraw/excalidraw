@@ -2,16 +2,16 @@ import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
 } from "../../element/types";
-import StatsDragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
 import { mutateElement } from "../../element/mutateElement";
-import { getStepSizedValue } from "./utils";
 import { fontSizeIcon } from "../icons";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 import { isTextElement, redrawTextBoundingBox } from "../../element";
 import { hasBoundTextElement } from "../../element/typeChecks";
 import { getBoundTextElement } from "../../element/textElement";
+import { getStepSizedValue } from "./utils";
+import type { DragInputCallbackType } from "./DragInput";
+import StatsDragInput from "./DragInput";
 
 interface FontSizeProps {
   element: ExcalidrawElement;

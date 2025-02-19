@@ -31,10 +31,10 @@ import type {
 import type { AppState } from "../types";
 import type { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
-import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
 import { StoreAction } from "../store";
 import { measureText } from "../element/textMeasurements";
+import { register } from "./register";
 
 export const actionUnbindText = register({
   name: "unbindText",

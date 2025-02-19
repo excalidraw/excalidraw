@@ -26,7 +26,6 @@ import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import type { AppState, Offsets } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
-import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
 import {
@@ -39,6 +38,7 @@ import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
 import { clamp, roundToStep } from "../../math";
+import { register } from "./register";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

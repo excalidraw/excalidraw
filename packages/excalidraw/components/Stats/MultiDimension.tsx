@@ -17,13 +17,13 @@ import type {
 } from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
+import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
+import { pointFrom, type GlobalPoint } from "../../../math";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit } from "./utils";
 import type { AtomicUnit } from "./utils";
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { pointFrom, type GlobalPoint } from "../../../math";
 
 interface MultiDimensionProps {
   property: "width" | "height";

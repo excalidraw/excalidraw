@@ -1,5 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { vi } from "vitest";
+import { Excalidraw } from "../index";
+import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import { KEYS } from "../keys";
+import { reseed } from "../random";
+import { SHAPES } from "../shapes";
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   render,
   fireEvent,
@@ -7,15 +16,6 @@ import {
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
 } from "./test-utils";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import { KEYS } from "../keys";
-import { reseed } from "../random";
-import { API } from "./helpers/api";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { SHAPES } from "../shapes";
-import { vi } from "vitest";
 
 // Unmount ReactDOM from root
 ReactDOM.unmountComponentAtNode(document.getElementById("root")!);

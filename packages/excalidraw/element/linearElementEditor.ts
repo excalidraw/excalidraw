@@ -1,25 +1,4 @@
 import type {
-  NonDeleted,
-  ExcalidrawLinearElement,
-  ExcalidrawElement,
-  PointBinding,
-  ExcalidrawBindableElement,
-  ExcalidrawTextElementWithContainer,
-  ElementsMap,
-  NonDeletedSceneElementsMap,
-  FixedPointBinding,
-  SceneElementsMap,
-  FixedSegment,
-  ExcalidrawElbowArrowElement,
-} from "./types";
-import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
-import type { Bounds } from "./bounds";
-import {
-  getCurvePathOps,
-  getElementPointsCoords,
-  getMinMaxXYFromCurvePathOps,
-} from "./bounds";
-import type {
   AppState,
   PointerCoords,
   InteractiveCanvasAppState,
@@ -27,21 +6,9 @@ import type {
   NullableGridSize,
   Zoom,
 } from "../types";
-import { mutateElement } from "./mutateElement";
 
-import {
-  bindOrUnbindLinearElement,
-  getHoveredElementForBinding,
-  isBindingEnabled,
-} from "./binding";
 import { invariant, tupleToCoors } from "../utils";
-import {
-  isBindingElement,
-  isElbowArrow,
-  isFixedPointBinding,
-} from "./typeChecks";
 import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { DRAGGING_THRESHOLD } from "../constants";
 import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
@@ -68,7 +35,40 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  isBindingElement,
+  isElbowArrow,
+  isFixedPointBinding,
+} from "./typeChecks";
+import {
+  bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
+  isBindingEnabled,
+} from "./binding";
+import { mutateElement } from "./mutateElement";
+import {
+  getCurvePathOps,
+  getElementPointsCoords,
+  getMinMaxXYFromCurvePathOps,
+} from "./bounds";
+import type { Bounds } from "./bounds";
+import type {
+  NonDeleted,
+  ExcalidrawLinearElement,
+  ExcalidrawElement,
+  PointBinding,
+  ExcalidrawBindableElement,
+  ExcalidrawTextElementWithContainer,
+  ElementsMap,
+  NonDeletedSceneElementsMap,
+  FixedPointBinding,
+  SceneElementsMap,
+  FixedSegment,
+  ExcalidrawElbowArrowElement,
+} from "./types";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
+import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 
 const editorMidPointsCache: {
   version: number | null;

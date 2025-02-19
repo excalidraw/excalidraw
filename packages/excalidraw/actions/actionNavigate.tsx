@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
 import type { GoToCollaboratorComponentProps } from "../components/UserList";
@@ -10,7 +11,6 @@ import { t } from "../i18n";
 import { StoreAction } from "../store";
 import type { Collaborator } from "../types";
 import { register } from "./register";
-import clsx from "clsx";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",

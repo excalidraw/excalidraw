@@ -1,5 +1,5 @@
-import { CURSOR_TYPE, MIME_TYPES, THEME } from "./constants";
 import OpenColor from "open-color";
+import { CURSOR_TYPE, MIME_TYPES, THEME } from "./constants";
 import type { AppState, DataURL } from "./types";
 import { isHandToolActive, isEraserActive } from "./appState";
 

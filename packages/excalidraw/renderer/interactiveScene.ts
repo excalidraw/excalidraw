@@ -1,3 +1,4 @@
+import oc from "open-color";
 import {
   getElementAbsoluteCoords,
   getTransformHandlesFromCoords,
@@ -50,12 +51,6 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
-  bootstrapCanvas,
-  fillCircle,
-  getNormalizedCanvasDimensions,
-} from "./helpers";
-import oc from "open-color";
-import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -85,6 +80,11 @@ import {
   type Radians,
 } from "../../math";
 import { getCornerRadius } from "../shapes";
+import {
+  bootstrapCanvas,
+  fillCircle,
+  getNormalizedCanvasDimensions,
+} from "./helpers";
 
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,

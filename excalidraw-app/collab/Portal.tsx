@@ -1,11 +1,11 @@
+import throttle from "lodash.throttle";
+import type { Socket } from "socket.io-client";
 import type {
   SocketUpdateData,
   SocketUpdateDataSource,
   SyncableExcalidrawElement,
 } from "../data";
 import { isSyncableElement } from "../data";
-
-import type { TCollabClass } from "./Collab";
 
 import type { OrderedExcalidrawElement } from "../../packages/excalidraw/element/types";
 import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
@@ -15,11 +15,10 @@ import type {
   UserIdleState,
 } from "../../packages/excalidraw/types";
 import { trackEvent } from "../../packages/excalidraw/analytics";
-import throttle from "lodash.throttle";
 import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
 import { encryptData } from "../../packages/excalidraw/data/encryption";
-import type { Socket } from "socket.io-client";
 import { StoreAction } from "../../packages/excalidraw";
+import type { TCollabClass } from "./Collab";
 
 class Portal {
   collab: TCollabClass;

@@ -1,7 +1,6 @@
 import { KEYS } from "../keys";
 import { t } from "../i18n";
 import { arrayToMap, getShortcutKey } from "../utils";
-import { register } from "./register";
 import { UngroupIcon, GroupIcon } from "../components/icons";
 import { newElementWith } from "../element/mutateElement";
 import { isSomeElementSelected } from "../scene";
@@ -35,6 +34,7 @@ import {
 } from "../frame";
 import { syncMovedIndices } from "../fractionalIndex";
 import { StoreAction } from "../store";
+import { register } from "./register";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {

@@ -58,7 +58,6 @@ import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
-import Portal from "./Portal";
 import { t } from "../../packages/excalidraw/i18n";
 import { UserIdleState } from "../../packages/excalidraw/types";
 import {
@@ -83,11 +82,12 @@ import { appJotaiStore, atom } from "../app-jotai";
 import type { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
 import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
 import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
-import { collabErrorIndicatorAtom } from "./CollabError";
 import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
 } from "../../packages/excalidraw/data/reconcile";
+import { collabErrorIndicatorAtom } from "./CollabError";
+import Portal from "./Portal";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
