@@ -1322,13 +1322,11 @@ describe("history", () => {
         expect(API.getUndoStack().length).toBe(5);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1347,13 +1345,11 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1372,13 +1368,11 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1405,13 +1399,11 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(0);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1430,13 +1422,11 @@ describe("history", () => {
         expect(API.getRedoStack().length).toBe(1);
         expect(arrow.startBinding).toEqual({
           elementId: rect1.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
         expect(arrow.endBinding).toEqual({
           elementId: rect2.id,
-          fixedPoint: null,
           focus: expect.toBeNonNaNNumber(),
           gap: expect.toBeNonNaNNumber(),
         });
@@ -1487,13 +1477,11 @@ describe("history", () => {
               id: arrow.id,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
@@ -1534,13 +1522,11 @@ describe("history", () => {
               id: arrow.id,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
@@ -1615,13 +1601,11 @@ describe("history", () => {
               id: arrow.id,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
@@ -1690,13 +1674,11 @@ describe("history", () => {
               id: arrow.id,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
@@ -4277,13 +4259,11 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
@@ -4348,13 +4328,11 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: null,
                   focus: expect.toBeNonNaNNumber(),
                   gap: expect.toBeNonNaNNumber(),
                 }),
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: null,
                   focus: expect.toBeNonNaNNumber(),
                   gap: expect.toBeNonNaNNumber(),
                 }),
@@ -4415,13 +4393,11 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
@@ -4490,14 +4466,12 @@ describe("history", () => {
                 id: arrowId,
                 startBinding: expect.objectContaining({
                   elementId: rect1.id,
-                  fixedPoint: null,
                   focus: expect.toBeNonNaNNumber(),
                   gap: expect.toBeNonNaNNumber(),
                 }),
                 // rebound with previous rectangle
                 endBinding: expect.objectContaining({
                   elementId: rect2.id,
-                  fixedPoint: null,
                   focus: expect.toBeNonNaNNumber(),
                   gap: expect.toBeNonNaNNumber(),
                 }),
@@ -4789,13 +4763,11 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
-                focus: -0,
+                focus: 0,
                 gap: 1,
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: -0,
                 gap: 1,
               }),
@@ -4839,13 +4811,11 @@ describe("history", () => {
               id: arrowId,
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: null,
                 focus: expect.toBeNonNaNNumber(),
                 gap: expect.toBeNonNaNNumber(),
               }),
