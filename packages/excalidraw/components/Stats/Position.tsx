@@ -4,7 +4,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import { clamp, pointFrom, pointRotateRads, round } from "../../../math";
+import { clamp, pointFrom, pointRotateRads, round } from "@excalidraw/math";
 import { isImageElement } from "../../element/typeChecks";
 import {
   getFlipAdjustedCropPosition,

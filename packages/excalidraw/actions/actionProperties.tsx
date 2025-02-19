@@ -119,8 +119,8 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import type { LocalPoint } from "../../math";
-import { pointFrom } from "../../math";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import { Range } from "../components/Range";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;

@@ -18,7 +18,7 @@ import { CLASSES, EVENT } from "../constants";
 import { useStable } from "../hooks/useStable";
 
 import "./SearchMenu.scss";
-import { round } from "../../math";
+import { round } from "@excalidraw/math";
 import { measureText } from "../element/textMeasurements";
 
 const searchQueryAtom = atom<string>("");

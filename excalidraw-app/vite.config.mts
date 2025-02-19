@@ -31,6 +31,22 @@ export default defineConfig(({ mode }) => {
           find: /^@excalidraw\/excalidraw\/(.*?)/,
           replacement: path.resolve(__dirname, "../packages/excalidraw/$1"),
         },
+        {
+          find: /^@excalidraw\/utils$/,
+          replacement: path.resolve(__dirname, "../packages/utils/index.ts"),
+        },
+        {
+          find: /^@excalidraw\/utils\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/utils/$1"),
+        },
+        {
+          find: /^@excalidraw\/math$/,
+          replacement: path.resolve(__dirname, "../packages/math/index.ts"),
+        },
+        {
+          find: /^@excalidraw\/math\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/math/$1"),
+        },
       ],
     },
     build: {

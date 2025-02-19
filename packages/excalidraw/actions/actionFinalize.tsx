@@ -15,7 +15,7 @@ import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { StoreAction } from "../store";
-import { pointFrom } from "../../math";
+import { pointFrom } from "@excalidraw/math";
 import { isPathALoop } from "../shapes";
 
 export const actionFinalize = register({

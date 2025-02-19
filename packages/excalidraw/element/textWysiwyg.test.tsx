@@ -23,7 +23,7 @@ import type {
 import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import { pointFrom } from "../../math";
+import { pointFrom } from "@excalidraw/math";
 
 unmountComponent();
 

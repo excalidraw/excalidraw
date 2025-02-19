@@ -50,7 +50,7 @@ import {
 import { wrapText } from "./textWrapping";
 import { LinearElementEditor } from "./linearElementEditor";
 import { isInGroup } from "../groups";
-import type { GlobalPoint } from "../../math";
+import type { GlobalPoint } from "@excalidraw/math";
 import {
   pointCenter,
   normalizeRadians,
@@ -59,7 +59,7 @@ import {
   pointRotateRads,
   type Radians,
   type LocalPoint,
-} from "../../math";
+} from "@excalidraw/math";
 import {
   getMinTextElementWidth,
   measureText,

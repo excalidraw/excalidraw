@@ -29,6 +29,11 @@ const getConfig = (outdir) => ({
   packages: "external",
   plugins: [sassPlugin(), localesPlugin(outdir)],
   assetNames: "[dir]/[name]",
+  alias: {
+    "@excalidraw/excalidraw": path.resolve(__dirname, "../packages/excalidraw"),
+    "@excalidraw/utils": path.resolve(__dirname, "../packages/utils"),
+    "@excalidraw/math": path.resolve(__dirname, "../packages/math"),
+  },
   // otherwise esbuild will try to bundle these with the main chunk,
   // even though they are marked as separate entry points
   external: ["*.chunk", "*.json"],

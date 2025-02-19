@@ -29,7 +29,7 @@ import { atom, useAtom } from "../../editor-jotai";
 import { trackEvent } from "../../analytics";
 import { InlineIcon } from "../InlineIcon";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
-import { isFiniteNumber } from "../../../math";
+import { isFiniteNumber } from "@excalidraw/math";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;

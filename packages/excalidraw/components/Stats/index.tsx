@@ -30,7 +30,7 @@ import clsx from "clsx";
 import "./Stats.scss";
 import { isGridModeEnabled } from "../../snapping";
 import { getUncroppedWidthAndHeight } from "../../element/cropElement";
-import { round } from "../../../math";
+import { round } from "@excalidraw/math";
 import { frameAndChildrenSelectedTogether } from "../../frame";
 
 interface StatsProps {

@@ -233,7 +233,7 @@ export {
   exportToBlob,
   exportToSvg,
   exportToClipboard,
-} from "../utils/export";
+} from "@excalidraw/utils/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
@@ -291,7 +291,7 @@ export {
   elementsOverlappingBBox,
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
-} from "../utils/withinBounds";
+} from "@excalidraw/utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";

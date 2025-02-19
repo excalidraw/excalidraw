@@ -1,20 +1,24 @@
 {
   "name": "@excalidraw/utils",
   "version": "0.1.2",
-  "main": "./dist/prod/index.js",
   "type": "module",
+  "types": "./dist/types/utils/index.d.ts",
+  "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
       "development": "./dist/dev/index.js",
-      "default": "./dist/prod/index.js"
+      "production": "./dist/prod/index.js",
+      "types": "./dist/types/utils/index.d.ts"
+    },
+    "./*": {
+      "types": "./../utils/dist/types/utils/*"
     }
   },
-  "types": "./dist/utils/index.d.ts",
   "files": [
     "dist/*"
   ],
-  "description": "Excalidraw utilities functions",
+  "description": "Excalidraw utility functions",
   "publishConfig": {
     "access": "public"
   },
@@ -62,28 +66,17 @@
     "@babel/plugin-transform-typescript": "7.24.5",
     "@babel/preset-env": "7.24.5",
     "@babel/preset-typescript": "7.24.1",
-    "babel-loader": "8.2.5",
     "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "6.7.1",
-    "file-loader": "6.2.0",
     "fonteditor-core": "2.4.0",
-    "sass-loader": "13.0.2",
-    "ts-loader": "9.3.1",
     "typescript": "4.9.4",
     "wawoff2": "2.0.1",
-    "webpack": "5.76.0",
-    "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.10.0",
     "which": "4.0.0"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
-    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
-    "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "yarn build:umd && yarn pack"
+    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types"
   }
 }

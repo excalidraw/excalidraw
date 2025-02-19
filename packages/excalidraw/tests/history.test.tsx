@@ -47,8 +47,8 @@ import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, StoreAction } from "../store";
-import type { LocalPoint, Radians } from "../../math";
-import { pointFrom } from "../../math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 
 const { h } = window;
 

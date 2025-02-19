@@ -236,8 +236,8 @@ import {
   getElementShape,
   isPathALoop,
 } from "../shapes";
-import { getSelectionBoxShape } from "../../utils/geometry/shape";
-import { isPointInShape } from "../../utils/collision";
+import { getSelectionBoxShape } from "@excalidraw/utils/geometry/shape";
+import { isPointInShape } from "@excalidraw/utils/collision";
 import type {
   AppClassProperties,
   AppProps,
@@ -441,7 +441,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
-import type { LocalPoint, Radians } from "../../math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
   clamp,
   pointFrom,
@@ -453,7 +453,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-} from "../../math";
+} from "@excalidraw/math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
 import { actionCopyElementLink } from "../actions/actionElementLink";
@@ -11060,7 +11060,6 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 declare global {
   interface Window {
-    // @ts-ignore
     h: {
       scene: Scene;
       elements: readonly ExcalidrawElement[];
