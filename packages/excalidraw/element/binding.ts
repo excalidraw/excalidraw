@@ -13,6 +13,7 @@ import type {
   ExcalidrawElbowArrowElement,
   FixedPoint,
   SceneElementsMap,
+  FixedPointBinding,
 } from "./types";
 
 import type { Bounds } from "./bounds";
@@ -64,18 +65,13 @@ import {
   line,
   linesIntersectAt,
   pointDistance,
-  pointOnLineSegment,
   pointFromVector,
   vectorScale,
   vectorNormalize,
-  vectorRotate,
-  lineClosestPoint,
-  vectorDot,
+  vectorCross,
 } from "../../math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
-import { debugClear, debugDrawPoint } from "../visualdebug";
-import { ellipse } from "../../math/ellipse";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -121,7 +117,6 @@ export const bindOrUnbindLinearElement = (
   endBindingElement: ExcalidrawBindableElement | null | "keep",
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
-  zoom?: AppState["zoom"],
 ): void => {
   const boundToElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
   const unboundFromElementIds: Set<ExcalidrawBindableElement["id"]> = new Set();
@@ -133,7 +128,6 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
-    zoom,
   );
   bindOrUnbindLinearElementEdge(
     linearElement,
@@ -143,7 +137,6 @@ export const bindOrUnbindLinearElement = (
     boundToElementIds,
     unboundFromElementIds,
     elementsMap,
-    zoom,
   );
 
   const onlyUnbound = Array.from(unboundFromElementIds).filter(
@@ -170,7 +163,6 @@ const bindOrUnbindLinearElementEdge = (
   // Is mutated
   unboundFromElementIds: Set<ExcalidrawBindableElement["id"]>,
   elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
 ): void => {
   // "keep" is for method chaining convenience, a "no-op", so just bail out
   if (bindableElement === "keep") {
@@ -207,18 +199,11 @@ const bindOrUnbindLinearElementEdge = (
         bindableElement,
         startOrEnd,
         elementsMap,
-        zoom,
       );
       boundToElementIds.add(bindableElement.id);
     }
   } else {
-    bindLinearElement(
-      linearElement,
-      bindableElement,
-      startOrEnd,
-      elementsMap,
-      zoom,
-    );
+    bindLinearElement(linearElement, bindableElement, startOrEnd, elementsMap);
     boundToElementIds.add(bindableElement.id);
   }
 };
@@ -380,14 +365,7 @@ export const bindOrUnbindLinearElements = (
           zoom,
         );
 
-    bindOrUnbindLinearElement(
-      selectedElement,
-      start,
-      end,
-      elementsMap,
-      scene,
-      zoom,
-    );
+    bindOrUnbindLinearElement(selectedElement, start, end, elementsMap, scene);
   });
 };
 
@@ -436,7 +414,6 @@ export const maybeBindLinearElement = (
       appState.startBoundElement,
       "start",
       elementsMap,
-      appState.zoom,
     );
   }
 
@@ -457,13 +434,7 @@ export const maybeBindLinearElement = (
         "end",
       )
     ) {
-      bindLinearElement(
-        linearElement,
-        hoveredElement,
-        "end",
-        elementsMap,
-        appState.zoom,
-      );
+      bindLinearElement(linearElement, hoveredElement, "end", elementsMap);
     }
   }
 };
@@ -493,31 +464,35 @@ export const bindLinearElement = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
 ): void => {
   if (!isArrowElement(linearElement)) {
     return;
   }
-  const binding: PointBinding = {
+
+  const binding: PointBinding | FixedPointBinding = {
     elementId: hoveredElement.id,
-    ...normalizePointBinding(
-      calculateFocusAndGap(
-        linearElement,
-        hoveredElement,
-        startOrEnd,
-        elementsMap,
-        zoom,
-      ),
-      hoveredElement,
-    ),
     ...(isElbowArrow(linearElement)
-      ? calculateFixedPointForElbowArrowBinding(
-          linearElement,
-          hoveredElement,
-          startOrEnd,
-          elementsMap,
-        )
-      : { fixedPoint: null }),
+      ? {
+          ...calculateFixedPointForElbowArrowBinding(
+            linearElement,
+            hoveredElement,
+            startOrEnd,
+            elementsMap,
+          ),
+          focus: 0,
+          gap: 0,
+        }
+      : {
+          ...normalizePointBinding(
+            calculateFocusAndGap(
+              linearElement,
+              hoveredElement,
+              startOrEnd,
+              elementsMap,
+            ),
+            hoveredElement,
+          ),
+        }),
   };
 
   mutateElement(linearElement, {
@@ -713,7 +688,6 @@ const calculateFocusAndGap = (
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
 ): { focus: number; gap: number } => {
   const direction = startOrEnd === "start" ? -1 : 1;
   const edgePointIndex = direction === -1 ? 0 : linearElement.points.length - 1;
@@ -730,28 +704,9 @@ const calculateFocusAndGap = (
     elementsMap,
   );
 
-  const focus = determineFocusDistance(
-    hoveredElement,
-    adjacentPoint,
-    edgePoint,
-  );
-  const focusPointAbsolute = determineFocusPoint(
-    hoveredElement,
-    focus,
-    adjacentPoint,
-  );
-  const intersection =
-    intersectElementWithLineSegment(
-      hoveredElement,
-      lineSegment(adjacentPoint, focusPointAbsolute),
-    ).sort(
-      (g, h) => pointDistanceSq(g, edgePoint) - pointDistanceSq(h, edgePoint),
-    )[0] ?? edgePoint;
-  const gap = Math.max(1, pointDistance(intersection, edgePoint));
-
   return {
-    focus,
-    gap,
+    focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
+    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
   };
 };
 
@@ -1264,27 +1219,16 @@ const updateBoundPoint = (
         elementsMap,
       );
 
-    const intersection =
+    newEdgePoint =
       intersectElementWithLineSegment(
         bindableElement,
         lineSegment<GlobalPoint>(adjacentPoint, focusPointAbsolute),
+        binding.gap,
       ).sort(
         (g, h) =>
-          pointDistanceSq(g!, edgePointAbsolute) -
-          pointDistanceSq(h!, edgePointAbsolute),
+          pointDistanceSq(g, edgePointAbsolute) -
+          pointDistanceSq(h, edgePointAbsolute),
       )[0] ?? edgePointAbsolute;
-
-    const gapOffsetPoint = intersection
-      ? pointFromVector(
-          vectorScale(
-            vectorNormalize(vectorFromPoint(adjacentPoint, intersection)),
-            binding.gap,
-          ),
-          intersection,
-        )
-      : edgePointAbsolute;
-
-    newEdgePoint = gapOffsetPoint;
   }
 
   return LinearElementEditor.pointFromAbsoluteCoords(
@@ -1579,12 +1523,10 @@ const determineFocusDistance = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
-  const linear = vectorFromPoint(b, a);
-  const dot1 = Math.abs(
-    vectorDot(
-      linear,
-      // One of the diagonals
-      vectorFromPoint(
+  const intersection = [
+    linesIntersectAt(
+      line(a, b),
+      line(
         pointFrom<GlobalPoint>(element.x, element.y),
         pointFrom<GlobalPoint>(
           element.x + element.width,
@@ -1592,42 +1534,24 @@ const determineFocusDistance = (
         ),
       ),
     ),
-  );
-  const dot2 = Math.abs(
-    vectorDot(
-      linear,
-      // The other diagonal
-      vectorFromPoint(
+    linesIntersectAt(
+      line(a, b),
+      line(
         pointFrom<GlobalPoint>(element.x + element.width, element.y),
         pointFrom<GlobalPoint>(element.x, element.y + element.height),
       ),
     ),
-  );
-  const intersect =
-    linesIntersectAt(
-      // The bigger inclination of the diagonal and the linear element is the one
-      // that determines the intersection point
-      dot1 > dot2
-        ? line(
-            pointFrom<GlobalPoint>(element.x + element.width, element.y),
-            pointFrom<GlobalPoint>(element.x, element.y + element.height),
-          )
-        : line(
-            pointFrom<GlobalPoint>(element.x, element.y),
-            pointFrom<GlobalPoint>(
-              element.x + element.width,
-              element.y + element.height,
-            ),
-          ),
-      line(a, b),
-    ) || center;
+  ]
+    .filter((p): p is GlobalPoint => p !== null)
+    .sort((g, h) => pointDistanceSq(g, b) - pointDistanceSq(h, b))[0];
   const sign =
-    vectorDot(vectorFromPoint(center, a), vectorFromPoint(a, b)) < 0 ? -1 : 1;
-  const signedDist = sign * pointDistance(center, intersect);
-  const sdRatio =
+    Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
+    -1;
+  const signedDist = sign * pointDistance(center, intersection);
+  const signedDistanceRatio =
     signedDist / (Math.sqrt(element.width ** 2 + element.height ** 2) / 2);
 
-  return sdRatio;
+  return signedDistanceRatio;
 };
 
 const determineFocusPoint = (
@@ -1645,22 +1569,55 @@ const determineFocusPoint = (
     return center;
   }
 
-  return pointFromVector(
-    vectorScale(
-      vectorRotate(
-        vectorNormalize(vectorFromPoint(adjacentPoint, center)),
-        (Math.PI / 2) as Radians,
-      ),
-      Math.sign(focus) *
-        Math.min(
-          pointDistance(pointFrom<GlobalPoint>(element.x, element.y), center) *
-            Math.abs(focus),
-          element.width / 2,
-          element.height / 2,
-        ),
+  const candidates = [
+    pointFrom<GlobalPoint>(element.x, element.y),
+    pointFrom<GlobalPoint>(element.x + element.width, element.y),
+    pointFrom<GlobalPoint>(
+      element.x + element.width,
+      element.y + element.height,
     ),
-    center,
+    pointFrom<GlobalPoint>(element.x, element.y + element.height),
+  ].map((p) =>
+    pointFromVector(
+      vectorScale(vectorFromPoint(p, center), Math.abs(focus)),
+      center,
+    ),
   );
+  const selected = [
+    adjacentPoint[1] < candidates[0][1] && // TOP
+      (focus > 0
+        ? adjacentPoint[0] < candidates[1][0]
+        : adjacentPoint[0] > candidates[0][0]),
+    adjacentPoint[0] > candidates[1][0] && // RIGHT
+      (focus > 0
+        ? adjacentPoint[1] < candidates[2][1]
+        : adjacentPoint[1] > candidates[1][1]),
+    adjacentPoint[1] > candidates[2][1] && // BOTTOM
+      (focus > 0
+        ? adjacentPoint[0] > candidates[3][0]
+        : adjacentPoint[0] < candidates[2][0]),
+    adjacentPoint[0] < candidates[3][0] && // LEFT
+      (focus > 0
+        ? adjacentPoint[1] < candidates[3][1]
+        : adjacentPoint[1] > candidates[0][1]),
+  ];
+  const focusPoint = selected[0]
+    ? focus > 0
+      ? candidates[1]
+      : candidates[0]
+    : selected[1]
+    ? focus > 0
+      ? candidates[2]
+      : candidates[1]
+    : selected[2]
+    ? focus > 0
+      ? candidates[3]
+      : candidates[2]
+    : focus > 0
+    ? candidates[0]
+    : candidates[3];
+
+  return focusPoint;
 };
 
 export const bindingProperties: Set<BindableProp | BindingProp> = new Set([

@@ -26,10 +26,14 @@ export function deconstructRectanguloidElement<
   Point extends GlobalPoint | LocalPoint,
 >(
   element: ExcalidrawRectanguloidElement,
+  offset: number = 0,
 ): [LineSegment<Point>[], Curve<Point>[]] {
   const r = rectangle(
-    pointFrom(element.x, element.y),
-    pointFrom(element.x + element.width, element.y + element.height),
+    pointFrom(element.x - offset, element.y - offset),
+    pointFrom(
+      element.x + element.width + offset,
+      element.y + element.height + offset,
+    ),
   );
   const roundness = getCornerRadius(
     Math.min(element.width, element.height),

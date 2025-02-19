@@ -156,6 +156,7 @@ export const hitElementBoundText = <Point extends GlobalPoint | LocalPoint>(
 export const intersectElementWithLineSegment = (
   element: ExcalidrawElement,
   line: LineSegment<GlobalPoint>,
+  offset: number = 0,
 ): GlobalPoint[] => {
   switch (element.type) {
     case "rectangle":
@@ -165,7 +166,7 @@ export const intersectElementWithLineSegment = (
     case "embeddable":
     case "frame":
     case "magicframe":
-      return intersectRectanguloidWithLineSegment(element, line);
+      return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
       return intersectDiamondWithLineSegment(element, line);
     case "ellipse":
@@ -178,6 +179,7 @@ export const intersectElementWithLineSegment = (
 const intersectRectanguloidWithLineSegment = (
   element: ExcalidrawRectanguloidElement,
   l: LineSegment<GlobalPoint>,
+  offset: number = 0,
 ): GlobalPoint[] => {
   const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
@@ -197,7 +199,10 @@ const intersectRectanguloidWithLineSegment = (
   );
 
   // Get the element's building components we can test against
-  const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(element);
+  const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(
+    element,
+    offset,
+  );
 
   return (
     [
