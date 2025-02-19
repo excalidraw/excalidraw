@@ -69,6 +69,7 @@ import {
   vectorScale,
   vectorNormalize,
   vectorCross,
+  pointsEqual,
 } from "../../math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
@@ -1523,6 +1524,11 @@ const determineFocusDistance = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   );
+
+  if (pointsEqual(a, b)) {
+    return 0;
+  }
+
   const intersection = [
     linesIntersectAt(
       line(a, b),
