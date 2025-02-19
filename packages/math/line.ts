@@ -6,14 +6,7 @@ import {
   pointRotateRads,
   pointsEqual,
 } from "./point";
-import { pointOnLineSegment } from "./segment";
-import type {
-  GlobalPoint,
-  Line,
-  LineSegment,
-  LocalPoint,
-  Radians,
-} from "./types";
+import type { GlobalPoint, Line, LocalPoint, Radians } from "./types";
 import { vectorCross, vectorFromPoint } from "./vector";
 
 /**
@@ -98,28 +91,6 @@ export function linesIntersectAt<Point extends GlobalPoint | LocalPoint>(
   }
 
   return null;
-}
-
-/**
- * Returns the intersection point of a segment and a line
- *
- * @param l
- * @param s
- * @returns
- */
-export function lineSegmentIntersectionPoints<
-  Point extends GlobalPoint | LocalPoint,
->(l: LineSegment<Point>, s: LineSegment<Point>): Point | null {
-  const candidate = linesIntersectAt(line(l[0], l[1]), line(s[0], s[1]));
-  if (
-    !candidate ||
-    !pointOnLineSegment(candidate, s) ||
-    !pointOnLineSegment(candidate, l)
-  ) {
-    return null;
-  }
-
-  return candidate;
 }
 
 export function isPointOnLine<P extends GlobalPoint | LocalPoint>(

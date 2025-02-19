@@ -1,7 +1,11 @@
 import { invariant } from "../excalidraw/utils";
-import { line, lineSegmentIntersectionPoints, linesIntersectAt } from "./line";
+import { line, linesIntersectAt } from "./line";
 import { pointFrom } from "./point";
-import { distanceToLineSegment, lineSegment } from "./segment";
+import {
+  distanceToLineSegment,
+  lineSegment,
+  lineSegmentIntersectionPoints,
+} from "./segment";
 import type {
   GlobalPoint,
   Line,

@@ -1,3 +1,4 @@
+import { line, linesIntersectAt } from "./line";
 import {
   isPoint,
   pointCenter,
@@ -156,3 +157,26 @@ export const distanceToLineSegment = <Point extends LocalPoint | GlobalPoint>(
   const dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
 };
+
+/**
+ * Returns the intersection point of a segment and a line
+ *
+ * @param l
+ * @param s
+ * @returns
+ */
+export function lineSegmentIntersectionPoints<
+  Point extends GlobalPoint | LocalPoint,
+>(l: LineSegment<Point>, s: LineSegment<Point>): Point | null {
+  const candidate = linesIntersectAt(line(l[0], l[1]), line(s[0], s[1]));
+
+  if (
+    !candidate ||
+    !pointOnLineSegment(candidate, s) ||
+    !pointOnLineSegment(candidate, l)
+  ) {
+    return null;
+  }
+
+  return candidate;
+}
