@@ -168,9 +168,9 @@ export const intersectElementWithLineSegment = (
     case "magicframe":
       return intersectRectanguloidWithLineSegment(element, line, offset);
     case "diamond":
-      return intersectDiamondWithLineSegment(element, line);
+      return intersectDiamondWithLineSegment(element, line, offset);
     case "ellipse":
-      return intersectEllipseWithLineSegment(element, line);
+      return intersectEllipseWithLineSegment(element, line, offset);
     default:
       throw new Error(`Unimplemented element type '${element.type}'`);
   }
@@ -244,6 +244,7 @@ const intersectRectanguloidWithLineSegment = (
 const intersectDiamondWithLineSegment = (
   element: ExcalidrawDiamondElement,
   l: LineSegment<GlobalPoint>,
+  offset: number = 0,
 ): GlobalPoint[] => {
   const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
@@ -255,7 +256,7 @@ const intersectDiamondWithLineSegment = (
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
-  const [sides, curves] = deconstructDiamondElement(element);
+  const [sides, curves] = deconstructDiamondElement(element, offset);
 
   return (
     [
@@ -294,6 +295,7 @@ const intersectDiamondWithLineSegment = (
 const intersectEllipseWithLineSegment = (
   element: ExcalidrawEllipseElement,
   l: LineSegment<GlobalPoint>,
+  offset: number = 0,
 ): GlobalPoint[] => {
   const center = pointFrom<GlobalPoint>(
     element.x + element.width / 2,
@@ -304,7 +306,7 @@ const intersectEllipseWithLineSegment = (
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);
 
   return ellipseLineIntersectionPoints(
-    ellipse(center, element.width / 2, element.height / 2),
+    ellipse(center, element.width / 2 + offset, element.height / 2 + offset),
     line(rotatedA, rotatedB),
   ).map((p) => pointRotateRads(p, center, element.angle));
 };
