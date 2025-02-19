@@ -137,6 +137,10 @@ export function vectorMagnitude(v: Vector) {
 export const vectorNormalize = (v: Vector): Vector => {
   const m = vectorMagnitude(v);
 
+  if (m === 0) {
+    return vector(0, 0);
+  }
+
   return vector(v[0] / m, v[1] / m);
 };
 
