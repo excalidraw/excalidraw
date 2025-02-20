@@ -170,7 +170,7 @@
   }
 
   &.theme--dark {
-    --theme-filter: #{$theme-filter};
+    --theme-filter: invert(93%) hue-rotate(180deg);
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
 
