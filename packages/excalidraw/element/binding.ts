@@ -1206,8 +1206,6 @@ const updateBoundPoint = (
     adjacentPoint,
   );
 
-  console.log();
-
   let newEdgePoint: GlobalPoint;
 
   // The linear element was not originally pointing inside the bound shape,
@@ -1658,75 +1656,71 @@ const determineFocusPoint = (
           ),
           pointFrom<GlobalPoint>(element.x, element.y + element.height),
         ]
-  ).map((p) =>
-    pointFromVector(
-      vectorScale(vectorFromPoint(p, center), Math.abs(focus)),
-      center,
-    ),
-  );
-
-  const point = pointRotateRads(
-    adjacentPoint,
-    center,
-    -element.angle as Radians,
-  );
+  )
+    .map((p) =>
+      pointFromVector(
+        vectorScale(vectorFromPoint(p, center), Math.abs(focus)),
+        center,
+      ),
+    )
+    .map((p) => pointRotateRads(p, center, element.angle as Radians));
 
   const selected = [
     vectorCross(
-      vectorFromPoint(point, candidates[0]),
+      vectorFromPoint(adjacentPoint, candidates[0]),
       vectorFromPoint(candidates[1], candidates[0]),
     ) > 0 && // TOP
       (focus > 0
         ? vectorCross(
-            vectorFromPoint(point, candidates[1]),
+            vectorFromPoint(adjacentPoint, candidates[1]),
             vectorFromPoint(candidates[2], candidates[1]),
           ) < 0
         : vectorCross(
-            vectorFromPoint(point, candidates[3]),
+            vectorFromPoint(adjacentPoint, candidates[3]),
             vectorFromPoint(candidates[0], candidates[3]),
           ) < 0),
     vectorCross(
-      vectorFromPoint(point, candidates[1]),
+      vectorFromPoint(adjacentPoint, candidates[1]),
       vectorFromPoint(candidates[2], candidates[1]),
     ) > 0 && // RIGHT
       (focus > 0
         ? vectorCross(
-            vectorFromPoint(point, candidates[2]),
+            vectorFromPoint(adjacentPoint, candidates[2]),
             vectorFromPoint(candidates[3], candidates[2]),
           ) < 0
         : vectorCross(
-            vectorFromPoint(point, candidates[0]),
+            vectorFromPoint(adjacentPoint, candidates[0]),
             vectorFromPoint(candidates[1], candidates[0]),
           ) < 0),
     vectorCross(
-      vectorFromPoint(point, candidates[2]),
+      vectorFromPoint(adjacentPoint, candidates[2]),
       vectorFromPoint(candidates[3], candidates[2]),
     ) > 0 && // BOTTOM
       (focus > 0
         ? vectorCross(
-            vectorFromPoint(point, candidates[3]),
+            vectorFromPoint(adjacentPoint, candidates[3]),
             vectorFromPoint(candidates[0], candidates[3]),
           ) < 0
         : vectorCross(
-            vectorFromPoint(point, candidates[1]),
+            vectorFromPoint(adjacentPoint, candidates[1]),
             vectorFromPoint(candidates[2], candidates[1]),
           ) < 0),
     vectorCross(
-      vectorFromPoint(point, candidates[3]),
+      vectorFromPoint(adjacentPoint, candidates[3]),
       vectorFromPoint(candidates[0], candidates[3]),
     ) > 0 && // LEFT
       (focus > 0
         ? vectorCross(
-            vectorFromPoint(point, candidates[0]),
+            vectorFromPoint(adjacentPoint, candidates[0]),
             vectorFromPoint(candidates[1], candidates[0]),
           ) < 0
         : vectorCross(
-            vectorFromPoint(point, candidates[2]),
+            vectorFromPoint(adjacentPoint, candidates[2]),
             vectorFromPoint(candidates[3], candidates[2]),
           ) < 0),
   ];
 
-  const focusPoint = selected[0]
+  return selected[0]
     ? focus > 0
       ? candidates[1]
       : candidates[0]
@@ -1741,8 +1735,6 @@ const determineFocusPoint = (
     : focus > 0
     ? candidates[0]
     : candidates[3];
-
-  return focusPoint;
 };
 
 export const bindingProperties: Set<BindableProp | BindingProp> = new Set([
