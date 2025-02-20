@@ -1,4 +1,3 @@
-import { invariant } from "../excalidraw/utils";
 import { line, linesIntersectAt } from "./line";
 import { pointFrom } from "./point";
 import {
@@ -30,10 +29,13 @@ export function rectangleFromPair<P extends GlobalPoint | LocalPoint>(
 export function rectangleFromArray<P extends GlobalPoint | LocalPoint>(
   pointArray: P[],
 ): Rectangle<P> {
-  invariant(
-    pointArray.length === 4,
-    "Point array contains more or less points to create a rectangle from",
-  );
+  if (!import.meta.env.PROD) {
+    if (pointArray.length !== 4) {
+      throw new Error(
+        "Point array contains more or less points to create a rectangle from",
+      );
+    }
+  }
 
   return pointArray as Rectangle<P>;
 }
