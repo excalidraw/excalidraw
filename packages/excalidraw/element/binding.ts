@@ -70,6 +70,7 @@ import {
   vectorNormalize,
   vectorCross,
   pointsEqual,
+  pointOnLineSegment,
 } from "../../math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
@@ -1533,77 +1534,46 @@ const determineFocusDistance = (
     pointRotateRads(a, center, -element.angle as Radians),
     pointRotateRads(b, center, -element.angle as Radians),
   );
-  // [
-  //   linesIntersectAt(
-  //     rotatedInterceptor,
-  //     line(
-  //       element.type === "diamond"
-  //         ? pointFrom<GlobalPoint>(element.x + element.width / 2, element.y)
-  //         : pointFrom<GlobalPoint>(element.x, element.y),
-  //       element.type === "diamond"
-  //         ? pointFrom<GlobalPoint>(
-  //             element.x + element.width / 2,
-  //             element.y + element.height,
-  //           )
-  //         : pointFrom<GlobalPoint>(
-  //             element.x + element.width,
-  //             element.y + element.height,
-  //           ),
-  //     ),
-  //   ),
-  //   linesIntersectAt(
-  //     rotatedInterceptor,
-  //     line(
-  //       element.type === "diamond"
-  //         ? pointFrom<GlobalPoint>(element.x, element.y + element.height / 2)
-  //         : pointFrom<GlobalPoint>(element.x + element.width, element.y),
-  //       element.type === "diamond"
-  //         ? pointFrom<GlobalPoint>(
-  //             element.x + element.width,
-  //             element.y + element.height / 2,
-  //           )
-  //         : pointFrom<GlobalPoint>(element.x, element.y + element.height),
-  //     ),
-  //   ),
-  // ]
-  //   .filter((p: GlobalPoint | null): p is GlobalPoint => p !== null)
-  //   .sort((g, h) => pointDistanceSq(g, b) - pointDistanceSq(h, b))
-  //   .forEach((p) => debugDrawPoint(p, { color: "red", permanent: true }));
-
-  const axes = [
-    line(
-      element.type === "diamond"
-        ? pointFrom<GlobalPoint>(element.x + element.width / 2, element.y)
-        : pointFrom<GlobalPoint>(element.x, element.y),
-      element.type === "diamond"
-        ? pointFrom<GlobalPoint>(
-            element.x + element.width / 2,
-            element.y + element.height,
-          )
-        : pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height,
+  const axes =
+    element.type === "diamond"
+      ? [
+          line(
+            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+            pointFrom<GlobalPoint>(
+              element.x + element.width / 2,
+              element.y + element.height,
+            ),
           ),
-    ),
-    line(
-      element.type === "diamond"
-        ? pointFrom<GlobalPoint>(element.x, element.y + element.height / 2)
-        : pointFrom<GlobalPoint>(element.x + element.width, element.y),
-      element.type === "diamond"
-        ? pointFrom<GlobalPoint>(
-            element.x + element.width,
-            element.y + element.height / 2,
-          )
-        : pointFrom<GlobalPoint>(element.x, element.y + element.height),
-    ),
-  ];
+          line(
+            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height / 2,
+            ),
+          ),
+        ]
+      : [
+          line(
+            pointFrom<GlobalPoint>(element.x, element.y),
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height,
+            ),
+          ),
+          line(
+            pointFrom<GlobalPoint>(element.x + element.width, element.y),
+            pointFrom<GlobalPoint>(element.x, element.y + element.height),
+          ),
+        ];
   const ordered = [
     linesIntersectAt(rotatedInterceptor, axes[0]),
     linesIntersectAt(rotatedInterceptor, axes[1]),
   ]
     .filter((p): p is GlobalPoint => p !== null)
+    .filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
     .map((p, idx): [GlobalPoint, number] => [p, idx])
     .sort((g, h) => pointDistanceSq(g[0], b) - pointDistanceSq(h[0], b))[0];
+
   const sign =
     Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
     -1;
@@ -1720,7 +1690,7 @@ const determineFocusPoint = (
           ) < 0),
   ];
 
-  return selected[0]
+  const focusPoint = selected[0]
     ? focus > 0
       ? candidates[1]
       : candidates[0]
@@ -1735,6 +1705,8 @@ const determineFocusPoint = (
     : focus > 0
     ? candidates[0]
     : candidates[3];
+
+  return focusPoint;
 };
 
 export const bindingProperties: Set<BindableProp | BindingProp> = new Set([
