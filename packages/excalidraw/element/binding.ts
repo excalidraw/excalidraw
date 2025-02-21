@@ -1565,14 +1565,16 @@ const determineFocusDistance = (
             pointFrom<GlobalPoint>(element.x, element.y + element.height),
           ),
         ];
-  const ordered = [
-    linesIntersectAt(rotatedInterceptor, axes[0]),
-    linesIntersectAt(rotatedInterceptor, axes[1]),
-  ]
-    .filter((p): p is GlobalPoint => p !== null)
-    .filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
-    .map((p, idx): [GlobalPoint, number] => [p, idx])
-    .sort((g, h) => pointDistanceSq(g[0], b) - pointDistanceSq(h[0], b))[0];
+  const ordered =
+    [
+      linesIntersectAt(rotatedInterceptor, axes[0]),
+      linesIntersectAt(rotatedInterceptor, axes[1]),
+    ]
+      .filter((p): p is GlobalPoint => p !== null)
+      .filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
+      .map((p, idx): [GlobalPoint, number] => [p, idx])
+      .sort((g, h) => pointDistanceSq(g[0], b) - pointDistanceSq(h[0], b))[0] ??
+    center;
 
   const sign =
     Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
