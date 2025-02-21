@@ -62,15 +62,13 @@ import {
   vectorFromPoint,
   pointDistanceSq,
   clamp,
-  line,
-  linesIntersectAt,
   pointDistance,
   pointFromVector,
   vectorScale,
   vectorNormalize,
   vectorCross,
   pointsEqual,
-  pointOnLineSegment,
+  lineSegmentIntersectionPoints,
 } from "../../math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
@@ -1221,6 +1219,14 @@ const updateBoundPoint = (
         elementsMap,
       );
 
+    const center = pointFrom<GlobalPoint>(
+      bindableElement.x + bindableElement.width / 2,
+      bindableElement.y + bindableElement.height / 2,
+    );
+    const interceptorLength =
+      pointDistance(adjacentPoint, edgePointAbsolute) +
+      pointDistance(adjacentPoint, center) +
+      Math.max(bindableElement.width, bindableElement.height) * 2;
     const intersections = intersectElementWithLineSegment(
       bindableElement,
       lineSegment<GlobalPoint>(
@@ -1228,15 +1234,7 @@ const updateBoundPoint = (
         pointFromVector(
           vectorScale(
             vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
-            pointDistance(adjacentPoint, edgePointAbsolute) +
-              pointDistance(
-                adjacentPoint,
-                pointFrom(
-                  bindableElement.x + bindableElement.width / 2,
-                  bindableElement.y + bindableElement.height / 2,
-                ),
-              ) +
-              Math.max(bindableElement.width, bindableElement.height) * 2,
+            interceptorLength,
           ),
           adjacentPoint,
         ),
@@ -1246,6 +1244,32 @@ const updateBoundPoint = (
       (g, h) =>
         pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
     );
+
+    // debugClear();
+    // debugDrawPoint(focusPointAbsolute, { color: "blue", permanent: true });
+    // debugDrawLine(
+    //   lineSegment(
+    //     edgePointAbsolute,
+    //     pointFromVector(
+    //       vectorScale(
+    //         vectorNormalize(vectorFromPoint(edgePointAbsolute, adjacentPoint)),
+    //         binding.gap,
+    //       ),
+    //       edgePointAbsolute,
+    //     ),
+    //   ),
+    //   { color: "green", permanent: true },
+    // );
+    // debugDrawPoint(
+    //   pointFromVector(
+    //     vectorScale(
+    //       vectorNormalize(vectorFromPoint(edgePointAbsolute, adjacentPoint)),
+    //       binding.gap,
+    //     ),
+    //     edgePointAbsolute,
+    //   ),
+    //   { color: "red", permanent: true },
+    // );
 
     if (intersections.length > 1) {
       // The adjacent point is outside the shape (+ gap)
@@ -1556,63 +1580,98 @@ const determineFocusDistance = (
     return 0;
   }
 
-  const rotatedInterceptor = line<GlobalPoint>(
-    pointRotateRads(a, center, -element.angle as Radians),
-    pointRotateRads(b, center, -element.angle as Radians),
+  const rotatedA = pointRotateRads(a, center, -element.angle as Radians);
+  const rotatedB = pointRotateRads(b, center, -element.angle as Radians);
+  const sign =
+    Math.sign(
+      vectorCross(
+        vectorFromPoint(rotatedB, a),
+        vectorFromPoint(rotatedB, center),
+      ),
+    ) * -1;
+  const rotatedInterceptor = lineSegment(
+    rotatedB,
+    pointFromVector(
+      vectorScale(
+        vectorNormalize(vectorFromPoint(rotatedB, rotatedA)),
+        Math.max(element.width * 2, element.height * 2),
+      ),
+      rotatedB,
+    ),
   );
   const axes =
     element.type === "diamond"
       ? [
-          line(
-            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+          lineSegment(
             pointFrom<GlobalPoint>(
               element.x + element.width / 2,
-              element.y + element.height,
+              element.y - element.height,
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + element.width / 2,
+              element.y + element.height * 2,
             ),
           ),
-          line(
-            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+          lineSegment(
             pointFrom<GlobalPoint>(
-              element.x + element.width,
+              element.x - element.width,
+              element.y + element.height / 2,
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + element.width * 2,
               element.y + element.height / 2,
             ),
           ),
         ]
       : [
-          line(
-            pointFrom<GlobalPoint>(element.x, element.y),
+          lineSegment(
             pointFrom<GlobalPoint>(
-              element.x + element.width,
-              element.y + element.height,
+              element.x - element.width,
+              element.y - element.height,
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + element.width * 2,
+              element.y + element.height * 2,
             ),
           ),
-          line(
-            pointFrom<GlobalPoint>(element.x + element.width, element.y),
-            pointFrom<GlobalPoint>(element.x, element.y + element.height),
+          lineSegment(
+            pointFrom<GlobalPoint>(
+              element.x + element.width * 2,
+              element.y - element.height,
+            ),
+            pointFrom<GlobalPoint>(
+              element.x - element.width,
+              element.y + element.height * 2,
+            ),
           ),
         ];
-  const ordered =
-    [
-      linesIntersectAt(rotatedInterceptor, axes[0]),
-      linesIntersectAt(rotatedInterceptor, axes[1]),
-    ]
-      .filter((p): p is GlobalPoint => p !== null)
-      .filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
-      .map((p, idx): [GlobalPoint, number] => [p, idx])
-      .sort((g, h) => pointDistanceSq(g[0], b) - pointDistanceSq(h[0], b))[0] ??
-    [];
 
-  const sign =
-    Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
-    -1;
-  const signedDist = sign * pointDistance(center, ordered[0] ?? center);
-  const signedDistanceRatio =
-    ordered[1] != null
-      ? signedDist /
+  const ordered = [
+    lineSegmentIntersectionPoints(rotatedInterceptor, axes[0]),
+    lineSegmentIntersectionPoints(rotatedInterceptor, axes[1]),
+  ]
+    .filter((p): p is GlobalPoint => p !== null)
+    //.filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
+    .sort((g, h) => pointDistanceSq(g, b) - pointDistanceSq(h, b))
+    .map(
+      (p, idx): number =>
+        (sign * pointDistance(center, p)) /
         (element.type === "diamond"
-          ? pointDistance(axes[ordered[1]][0], axes[ordered[1]][1]) / 2
-          : Math.sqrt(element.width ** 2 + element.height ** 2) / 2)
-      : 0;
+          ? pointDistance(axes[idx][0], axes[idx][1]) / 2
+          : Math.sqrt(element.width ** 2 + element.height ** 2) / 2),
+    )
+    .sort((g, h) => Math.abs(g) - Math.abs(h));
+
+  //debugClear();
+  // debugDrawPoint(determineFocusPoint(element, ordered[0] ?? 0, rotatedA), {
+  //   color: "black",
+  //   permanent: true,
+  // });
+  // debugDrawLine(rotatedInterceptor, { color: "green", permanent: true });
+  // debugDrawLine(axes[0], { color: "red", permanent: true });
+  // debugDrawLine(axes[1], { color: "red", permanent: true });
+
+  const signedDistanceRatio = ordered[0] ?? 0;
 
   return signedDistanceRatio;
 };
