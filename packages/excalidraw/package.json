@@ -1,11 +1,14 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.18.0-rc.1",
+  "version": "0.18.0-rc.2",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
+    "./*": {
+      "types": "./dist/types/excalidraw/*.d.ts"
+    },
     "./index.css": {
       "development": "./dist/dev/index.css",
       "production": "./dist/prod/index.css"
@@ -14,9 +17,6 @@
       "types": "./dist/types/excalidraw/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js"
-    },
-    "./*": {
-      "types": "./../excalidraw/dist/types/excalidraw/*"
     }
   },
   "files": [
@@ -124,8 +124,6 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types",
-    "start": "node ../../scripts/buildExample.mjs && vite",
-    "build:example": "node ../../scripts/buildExample.mjs"
+    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types"
   }
 }

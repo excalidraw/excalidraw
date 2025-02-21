@@ -14,6 +14,7 @@
     "build:workspace": "yarn workspace @excalidraw/excalidraw run build:esm && yarn copy:assets",
     "copy:assets": "cp -r ../../../packages/excalidraw/dist/prod/fonts ./public",
     "start": "yarn build:workspace && vite",
+    "start:clean": "vite",
     "build": "yarn build:workspace && vite build",
     "build:preview": "yarn build && vite preview --port 5002"
   }
