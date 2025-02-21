@@ -304,7 +304,7 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
+                  98,
                   "-0.98017",
                 ],
               ],
@@ -327,7 +327,7 @@ History {
                   0,
                 ],
                 [
-                  98,
+                  "98.00000",
                   "0.00169",
                 ],
               ],
@@ -818,8 +818,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 30,
-  "width": 100,
-  "x": 150,
+  "width": 50,
+  "x": 200,
   "y": 0,
 }
 `;
@@ -852,7 +852,7 @@ History {
                   0,
                 ],
                 [
-                  100,
+                  50,
                   0,
                 ],
               ],
@@ -937,7 +937,7 @@ History {
                   0,
                 ],
                 [
-                  100,
+                  50,
                   0,
                 ],
               ],

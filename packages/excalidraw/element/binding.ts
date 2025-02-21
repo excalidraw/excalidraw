@@ -74,6 +74,7 @@ import {
 } from "../../math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
+import { debugClear, debugDrawLine, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -1228,7 +1229,15 @@ const updateBoundPoint = (
         pointFromVector(
           vectorScale(
             vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
-            Math.max(bindableElement.width, bindableElement.height) * 2,
+            pointDistance(adjacentPoint, edgePointAbsolute) +
+              pointDistance(
+                adjacentPoint,
+                pointFrom(
+                  bindableElement.x + bindableElement.width / 2,
+                  bindableElement.y + bindableElement.height / 2,
+                ),
+              ) +
+              Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
           adjacentPoint,
         ),
@@ -1236,8 +1245,6 @@ const updateBoundPoint = (
       binding.gap,
     ).sort(
       (g, h) =>
-        // pointDistanceSq(g, edgePointAbsolute) -
-        // pointDistanceSq(h, edgePointAbsolute),
         pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
     );
 
@@ -1596,21 +1603,17 @@ const determineFocusDistance = (
       .sort((g, h) => pointDistanceSq(g[0], b) - pointDistanceSq(h[0], b))[0] ??
     [];
 
-  // console.log(ordered[0]);
-  // debugClear();
-  // debugDrawPoint(ordered[0], { color: "red", permanent: true });
-
   const sign =
     Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
     -1;
-  const signedDist = sign * pointDistance(center, ordered[0]);
+  const signedDist = sign * pointDistance(center, ordered[0] ?? center);
   const signedDistanceRatio =
     ordered[1] != null
-    ? signedDist /
-      (element.type === "diamond"
-        ? pointDistance(axes[ordered[1]][0], axes[ordered[1]][1]) / 2
-        : Math.sqrt(element.width ** 2 + element.height ** 2) / 2)
-    : 0;
+      ? signedDist /
+        (element.type === "diamond"
+          ? pointDistance(axes[ordered[1]][0], axes[ordered[1]][1]) / 2
+          : Math.sqrt(element.width ** 2 + element.height ** 2) / 2)
+      : 0;
 
   return signedDistanceRatio;
 };
