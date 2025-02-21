@@ -57,7 +57,7 @@ export const TopPicks = ({
           colors,
         });
 
-        if (handled) {
+        if (isColorPickerOpen && handled) {
           event.preventDefault();
           event.stopPropagation();
         }
@@ -65,7 +65,7 @@ export const TopPicks = ({
     >
       {colors.map((color: string, index: number) => (
         <button
-          className={clsx("color-picker__button", {
+          className={clsx("color-picker__button color-picker__button--small", {
             active: color === activeColor,
             "is-transparent": color === "transparent" || !color,
           })}
