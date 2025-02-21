@@ -4768,7 +4768,7 @@ describe("history", () => {
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                focus: -0,
+                focus: 0,
                 gap: 1,
               }),
               isDeleted: true,
