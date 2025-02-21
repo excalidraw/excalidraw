@@ -467,6 +467,7 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
 } from "../element/textMeasurements";
+import { LassoTrail } from "../lasso";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -636,6 +637,7 @@ class App extends React.Component<AppProps, AppState> {
         ? "rgba(0, 0, 0, 0.2)"
         : "rgba(255, 255, 255, 0.2)",
   });
+  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
   onChangeEmitter = new Emitter<
     [
@@ -1613,7 +1615,11 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
                         <SVGLayer
-                          trails={[this.laserTrails, this.eraserTrail]}
+                          trails={[
+                            this.laserTrails,
+                            this.eraserTrail,
+                            this.lassoTrail,
+                          ]}
                         />
                         {selectedElements.length === 1 &&
                           this.state.openDialog?.name !==
@@ -4528,6 +4534,14 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS[1] && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (this.state.activeTool.type === "selection") {
+          this.setActiveTool({ type: "lasso" });
+        } else {
+          this.setActiveTool({ type: "selection" });
+        }
+      }
+
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
@@ -6516,6 +6530,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.penMode ||
       event.pointerType !== "touch" ||
       this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso" ||
       this.state.activeTool.type === "text" ||
       this.state.activeTool.type === "image";
 
@@ -6523,7 +6538,12 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.activeTool.type === "text") {
+    if (this.state.activeTool.type === "lasso") {
+      this.lassoTrail.startPath(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+      );
+    } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
@@ -6587,10 +6607,18 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand"
     ) {
-      this.createGenericElementOnPointerDown(
-        this.state.activeTool.type,
-        pointerDownState,
-      );
+      if (this.state.activeTool.type === "selection" && event.altKey) {
+        this.setActiveTool({ type: "lasso" });
+        this.lassoTrail.startPath(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+      } else {
+        this.createGenericElementOnPointerDown(
+          this.state.activeTool.type,
+          pointerDownState,
+        );
+      }
     }
 
     this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
@@ -8495,6 +8523,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         this.maybeDragNewGenericElement(pointerDownState, event);
+      } else if (this.state.activeTool.type === "lasso") {
+        this.lassoTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -8749,6 +8779,8 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
       }));
 
+      // just in case, tool changes mid drag, always clean up
+      this.lassoTrail.endPath();
       this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);

@@ -13,7 +13,10 @@ import {
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
 
-import { renderSelectionElement } from "../renderer/renderElement";
+import {
+  renderLassoSelection,
+  renderSelectionElement,
+} from "../renderer/renderElement";
 import { getClientColor, renderRemoteCursors } from "../clients";
 import {
   isSelectedViaGroup,
@@ -824,6 +827,15 @@ const _renderInteractiveScene = ({
     } catch (error: any) {
       console.error(error);
     }
+  }
+
+  if (appState.lassoSelection) {
+    renderLassoSelection(
+      appState.lassoSelection,
+      context,
+      appState,
+      renderConfig.selectionColor,
+    );
   }
 
   if (

@@ -60,7 +60,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
-import { isRightAngleRads } from "../../math";
+import { GlobalPoint, isRightAngleRads } from "../../math";
 import { getCornerRadius } from "../shapes";
 import { getUncroppedImageElement } from "../element/cropElement";
 import { getLineHeightInPx } from "../element/textMeasurements";
@@ -691,6 +691,33 @@ export const renderSelectionElement = (
   context.lineWidth = 1 / appState.zoom.value;
   context.strokeStyle = selectionColor;
   context.strokeRect(offset, offset, element.width, element.height);
+
+  context.restore();
+};
+
+export const renderLassoSelection = (
+  lassoPath: AppState["lassoSelection"],
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+) => {
+  if (!lassoPath || lassoPath.points.length < 2) {
+    return;
+  }
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+  context.beginPath();
+
+  for (const point of lassoPath.points) {
+    context.lineTo(point[0], point[1]);
+  }
+
+  context.closePath();
+
+  context.globalAlpha = 0.05;
+  context.fillStyle = selectionColor;
+  context.fill();
 
   context.restore();
 };

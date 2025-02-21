@@ -276,6 +276,7 @@
   },
   "toolBar": {
     "selection": "Selection",
+    "lasso": "Lasso",
     "image": "Insert image",
     "rectangle": "Rectangle",
     "diamond": "Diamond",
@@ -341,6 +342,7 @@
     "bindTextToElement": "Press enter to add text",
     "createFlowchart": "Hold CtrlOrCmd and Arrow key to create a flowchart",
     "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
+    "lassoSelect": "Hold Alt, or click on the selection again, to lasso select",
     "eraserRevert": "Hold Alt to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
     "disableSnapping": "Hold CtrlOrCmd to disable snapping",

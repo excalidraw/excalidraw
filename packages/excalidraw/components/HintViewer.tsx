@@ -115,7 +115,7 @@ const getHints = ({
       !appState.editingTextElement &&
       !appState.editingLinearElement
     ) {
-      return t("hints.deepBoxSelect");
+      return [t("hints.deepBoxSelect")];
     }
 
     if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
@@ -123,7 +123,7 @@ const getHints = ({
     }
 
     if (!selectedElements.length && !isMobile) {
-      return t("hints.canvasPanning");
+      return [t("hints.canvasPanning"), t("hints.lassoSelect")];
     }
 
     if (selectedElements.length === 1) {

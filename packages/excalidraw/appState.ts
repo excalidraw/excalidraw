@@ -88,6 +88,7 @@ export const getDefaultAppState = (): Omit<
     selectedGroupIds: {},
     selectedElementsAreBeingDragged: false,
     selectionElement: null,
+    lassoSelection: null,
     shouldCacheIgnoreZoom: false,
     stats: {
       open: false,
@@ -219,6 +220,7 @@ const APP_STATE_STORAGE_CONF = (<
     server: false,
   },
   selectionElement: { browser: false, export: false, server: false },
+  lassoSelection: { browser: false, export: false, server: false },
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
   stats: { browser: true, export: false, server: false },
   startBoundElement: { browser: false, export: false, server: false },

@@ -47,6 +47,7 @@ import {
   mermaidLogoIcon,
   laserPointerToolIcon,
   MagicIcon,
+  LassoIcon,
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
@@ -69,7 +70,6 @@ export const canChangeStrokeColor = (
 
   return (
     (hasStrokeColor(appState.activeTool.type) &&
-      appState.activeTool.type !== "image" &&
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "magicframe") ||
@@ -285,6 +285,8 @@ export const ShapesSwitcher = ({
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
+  const lasso = appState.activeTool.type === "lasso";
+
   return (
     <>
       {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
@@ -302,13 +304,18 @@ export const ShapesSwitcher = ({
         const shortcut = letter
           ? `${letter} ${t("helpDialog.or")} ${numericKey}`
           : `${numericKey}`;
+
+        const _icon = value === "selection" && lasso ? LassoIcon : icon;
+        const _fillable = value === "selection" && lasso ? false : fillable;
         return (
           <ToolButton
-            className={clsx("Shape", { fillable })}
+            className={clsx("Shape", { fillable: _fillable })}
             key={value}
             type="radio"
-            icon={icon}
-            checked={activeTool.type === value}
+            icon={_icon}
+            checked={
+              activeTool.type === value || (lasso && value === "selection")
+            }
             name="editor-current-shape"
             title={`${capitalizeString(label)} — ${shortcut}`}
             keyBindingLabel={numericKey || letter}
@@ -318,6 +325,14 @@ export const ShapesSwitcher = ({
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
                 app.togglePenMode(true);
+              }
+
+              if (value === "selection") {
+                if (appState.activeTool.type === "selection") {
+                  app.setActiveTool({ type: "lasso" });
+                } else {
+                  app.setActiveTool({ type: "selection" });
+                }
               }
             }}
             onChange={({ pointerType }) => {
