@@ -1604,7 +1604,8 @@ const determineFocusDistance = (
     Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
     -1;
   const signedDist = sign * pointDistance(center, ordered[0]);
-  const signedDistanceRatio = ordered[1]
+  const signedDistanceRatio =
+    ordered[1] != null
     ? signedDist /
       (element.type === "diamond"
         ? pointDistance(axes[ordered[1]][0], axes[ordered[1]][1]) / 2
