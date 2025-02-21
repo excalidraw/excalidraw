@@ -16,9 +16,6 @@ const getConfig = (outdir) => ({
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils"),
     "@excalidraw/math": path.resolve(__dirname, "../packages/math"),
   },
-  loader: {
-    ".woff2": "file",
-  },
 });
 
 function buildDev(config) {
