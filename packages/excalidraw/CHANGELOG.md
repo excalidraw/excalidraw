@@ -13,7 +13,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
-## 18.0.0 (2025-02-13)
+## 18.0.0 (2025-02-28)
 
 ### Highlights
 
@@ -21,91 +21,153 @@ Please add the latest change on the top under the correct section.
 
 - Multiplayer undo / redo [#7348](https://github.com/excalidraw/excalidraw/pull/7348)
 
+- Editable element stats [#6382](https://github.com/excalidraw/excalidraw/pull/6382)
+
+- Text element wrapping [#7999](https://github.com/excalidraw/excalidraw/pull/7999)
+
 - Font picker with more fonts [#8012](https://github.com/excalidraw/excalidraw/pull/8012)
 
 - Font for Chinese, Japanese and Korean [#8530](https://github.com/excalidraw/excalidraw/pull/8530)
 
 - Font subsetting for SVG export [#8384](https://github.com/excalidraw/excalidraw/pull/8384)
 
-- Editable element stats [#6382](https://github.com/excalidraw/excalidraw/pull/6382)
-
-- Text element wrapping [#7999](https://github.com/excalidraw/excalidraw/pull/7999)
-
-- Elbow arrows with editable segments [#8299](https://github.com/excalidraw/excalidraw/pull/8299), [#8952](https://github.com/excalidraw/excalidraw/pull/8952)
+- Elbow arrows [#8299](https://github.com/excalidraw/excalidraw/pull/8299), [#8952](https://github.com/excalidraw/excalidraw/pull/8952)
 
 - Flowcharts [#8329](https://github.com/excalidraw/excalidraw/pull/8329)
 
-- Canvas search [#8438](https://github.com/excalidraw/excalidraw/pull/8438)
+- Scene search [#8438](https://github.com/excalidraw/excalidraw/pull/8438)
 
 - Image cropping [#8613](https://github.com/excalidraw/excalidraw/pull/8613)
 
-- Links between shapes [#8812](https://github.com/excalidraw/excalidraw/pull/8812)
+- Element linking [#8812](https://github.com/excalidraw/excalidraw/pull/8812)
 
 ### Breaking changes
 
-- We've transitioned from `UMD` to `ESM` module format, which comes with the following changes:
+#### Deprecated UMD bundle in favor of ES modules [#7441](https://github.com/excalidraw/excalidraw/pull/7441), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
 
-  - Changed import of the styles inside `.js` or `.jsx` files:
-    ```js
-    import { Excalidraw } from "@excalidraw/excalidraw";
-    import "@excalidraw/excalidraw/index.css";
-    ```
-  - Changed import of the styles and the library in `html` files:
 
-    ```html
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.css"
-    />
-    <script type="module">
-      import * as ExcalidrawLib from "https://unpkg.com/@excalidraw/excalidraw@next/dist/browser/dev/index.js";
-      window.ExcalidrawLib = ExcalidrawLib;
-    </script>
-    ```
+We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles inside `@excalidraw/excalidraw` package now contain only bundled source files, making any dependencies tree-shakable. The npm package now comes with the following structure:
 
-  - Instead of importing from `@excalidraw/excalidraw/types/`, you will need to import from `@excalidraw/excalidraw/dist/excalidraw` or `@excalidraw/excalidraw/dist/utils` depending on the types you are using.
+> **Note**: The structure is simplified for the sake of brevity, omitting lazy-loadable modules, including locales (previously treated as json assets) and source maps in the development bundle.
 
-- We've added new fonts and we strongly recommend to self-host them, in order to avoid issues with the fonts not being loaded. For self-hosting purposes, copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be server from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
+```
+@excalidraw/excalidraw/
+├── dist/
+│   ├── dev/
+│   │   ├── fonts/
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── index.js.map
+│   ├── prod/
+│   │   ├── fonts/
+│   │   ├── index.css
+│   │   ├── index.js
+│   └── types/
+```
 
-  ```js
-  <script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
+Due to the ESM, it's now necessary to define `"type": "module"` in your `package.json` file or as part of the `<script type="module" />` attribute.
+
+Dependening on the environment, this is how imports should look like with the `ESM`:
+
+```ts
+// Environment: vite with react & typescript
+
+// excalidraw library with public API
+import * as excalidrawLib from "@excalidraw/excalidraw";
+// excalidraw react component
+import { Excalidraw } from "@excalidraw/excalidraw";
+// excalidraw styles, usually auto-processed by the build tool (i.e. vite, next, etc.)
+import "@excalidraw/excalidraw/index.css";
+// excalidraw types (optional)
+import type { ExcalidrawImperativeAPI }  from "@excalidraw/excalidraw/types";
+```
+
+or
+
+```html
+<!-- Environment: browser with a script tag and no bundler -->
+
+<!-- excalidraw styles -->
+<link
+  rel="stylesheet"
+  href="https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.css"
+/>
+<!-- import maps used for deduplicating react & react-dom versions -->
+<script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+      "react-dom": "https://esm.sh/react-dom@18.3.1"
+      }
+  }
+</script>
+<script type="module">
+  import React from "https://esm.sh/react@18.3.1";
+  import ReactDOM from "https://esm.sh/react-dom@18.3.1"
+  import * as ExcalidrawLib from 'https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
+</script>
+```
+
+#### Deprecated `excalidraw-assets` and `excalidraw-assets-dev` folders in favor of `fonts` folder [#8012](https://github.com/excalidraw/excalidraw/pull/8012), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
+
+New fonts, which we've added, are automatically loaded from the CDN. For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
+
+```js
+<script>
+  window.EXCALIDRAW_ASSET_PATH = "/";
+</script>
+```
+
+or, if you serve your assets from the root of your CDN, you would do:
+
+```js
+<script>
+  window.EXCALIDRAW_ASSET_PATH = "https://cdn.domain.com/subpath/";
+</script>
+```
+
+or, if you prefer the path to be dynamicly set based on the `location.origin`, you could do the following:
+
+```jsx
+// Next.js
+<Script id="load-env-variables" strategy="beforeInteractive">
+  {`window["EXCALIDRAW_ASSET_PATH"] = location.origin;`} // or use just "/"!
+</Script>
   ```
 
-  or, if you serve your assets from the root of your CDN, you would do:
+> **Note**: Locales are no longer part of static assets (previously `.json` files), but are transpiled dirrectly to the `.js` as ES modules.
 
-  ```js
-  // Vanilla
-  <head>
-    <script>
-      window.EXCALIDRAW_ASSET_PATH = "https://my.cdn.com/assets/";
-    </script>
-  </head>
-  ```
+#### Deprecated `commitToHistory` in favor of `storeAction` in `updateScene` API [#7348](https://github.com/excalidraw/excalidraw/pull/7348), [#7898](https://github.com/excalidraw/excalidraw/pull//7898)
 
-  or, if you prefer the path to be dynamicly set based on the `location.origin`, you could do the following:
+```js
+// before
+updateScene({ elements, appState, commitToHistory: true }) // A
+updateScene({ elements, appState, commitToHistory: false }) // B
 
-  ```jsx
-  // Next.js
-  <Script id="load-env-variables" strategy="beforeInteractive">
-    {`window["EXCALIDRAW_ASSET_PATH"] = location.origin;`} // or use just "/"!
-  </Script>
-  ```
+// after
+import { StoreAction } from "@excalidraw/excalidraw"
+updateScene({ elements, appState, storeAction: StoreAction.CAPTURE }) // A
+updateScene({ elements, appState, storeAction: StoreAction.UPDATE }) // B
+```
 
-- The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `storeAction: StoreActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below. [#7898](https://github.com/excalidraw/excalidraw/pull/7898)
+The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `storeAction: StoreActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below.
 
-  | Undo behaviour | `commitToHistory` (before) | `storeAction` (after) | Notes |
-  | --- | --- | --- | --- |
-  | _Immediately undoable_ | `true` | `"capture"` | As before, use for all updates which should be recorded by the store & history. Should be used for the most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
-  | _Eventually undoable_ | `false` (default) | `"none"` (default) | Similar to before, use for all updates which should not be recorded immediately or those not meant to be recorded at all (i.e. updates to `collaborators` object, parts of `AppState` which are not observed by the store & history - not in `ObservedAppState`).<br/><br/>**IMPORTANT** It's likely you should switch to `"update"` in all the other cases, as all such updates will end up being recorded with the next `"capture"` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
-  | _Never undoable_ | n/a | `"update"` | **NEW**: previously there was no equivalent for this value. Now, it's recommended to use `"update"` for all remote updates (from the other clients), scene initialization, or those updates, which should not be locally "undoable". These updates will _never_ make it to the local undo / redo stacks. |
+> **Note**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `storeAction` value.
 
-  > **NOTE**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `storeAction` value.> **NOTE**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `storeAction` value.
+| Undo behaviour | `commitToHistory` (before) | `storeAction` (after) | Notes |
+| --- | --- | --- | --- |
+| _Immediately undoable_ | `true` | `StoreAction.CAPTURE` | Use for updates which should be captured. Should be used for most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `false` (default) | `StoreAction.NONE` (default) | Use for updates which should not be captured immediately - likely exceptions which are part of some async multi-step process. Otherwise, all such updates would end up being captured with the next `StoreAction.CAPTURE` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | n/a | `StoreAction.UPDATE` | **NEW**: Previously there was no equivalent for this value. Now, it's recommended to use `StoreAction.UPDATE` for updates which should never be recorded, such as remote updates or scene initialization. These updates will _never_ make it to the local undo / redo stacks. |
 
-- `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties.
+#### Other
+
+- `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties. [#7693](https://github.com/excalidraw/excalidraw/pull/7693)
 
 - `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
-- Stats container CSS has changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout.
+- Stats container CSS has changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout. [#8361](https://github.com/excalidraw/excalidraw/pull/8361)
 
 ### Features
 
