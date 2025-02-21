@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { type ColorPickerType } from "./colorPickerUtils";
+import type { ColorTuple } from "../../colors";
 import {
-  ColorTuple,
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
@@ -14,6 +14,7 @@ interface TopPicksProps {
   type: ColorPickerType;
   activeColor: string;
   topPicks?: readonly string[];
+  isColorPickerOpen: boolean;
 }
 
 export const TopPicks = ({
@@ -21,6 +22,7 @@ export const TopPicks = ({
   type,
   activeColor,
   topPicks,
+  isColorPickerOpen,
 }: TopPicksProps) => {
   let colors: ColorTuple | readonly string[] | undefined;
   if (type === "elementStroke") {
@@ -75,7 +77,9 @@ export const TopPicks = ({
           data-testid={`color-top-pick-${color}`}
         >
           <div className="color-picker__button-outline" />
-          <HotkeyLabel color={color} keyLabel={index + 1} />
+          {isColorPickerOpen && (
+            <HotkeyLabel color={color} keyLabel={index + 1} />
+          )}
         </button>
       ))}
     </div>

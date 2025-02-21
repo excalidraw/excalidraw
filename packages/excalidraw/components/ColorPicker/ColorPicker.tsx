@@ -221,6 +221,7 @@ export const ColorPicker = ({
           onChange={onChange}
           type={type}
           topPicks={topPicks}
+          isColorPickerOpen={appState.openPopup === type}
         />
         <ButtonSeparator />
         <Popover.Root
