@@ -1221,16 +1221,36 @@ const updateBoundPoint = (
         elementsMap,
       );
 
-    newEdgePoint =
-      intersectElementWithLineSegment(
-        bindableElement,
-        lineSegment<GlobalPoint>(adjacentPoint, focusPointAbsolute),
-        binding.gap,
-      ).sort(
-        (g, h) =>
-          pointDistanceSq(g, edgePointAbsolute) -
-          pointDistanceSq(h, edgePointAbsolute),
-      )[0] ?? edgePointAbsolute;
+    const intersections = intersectElementWithLineSegment(
+      bindableElement,
+      lineSegment<GlobalPoint>(
+        adjacentPoint,
+        pointFromVector(
+          vectorScale(
+            vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
+            Math.max(bindableElement.width, bindableElement.height) * 2,
+          ),
+          adjacentPoint,
+        ),
+      ),
+      binding.gap,
+    ).sort(
+      (g, h) =>
+        // pointDistanceSq(g, edgePointAbsolute) -
+        // pointDistanceSq(h, edgePointAbsolute),
+        pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
+    );
+
+    if (intersections.length > 1) {
+      // The adjacent point is outside the shape (+ gap)
+      newEdgePoint = intersections[0];
+    } else if (intersections.length === 1) {
+      // The adjacent point is inside the shape (+ gap)
+      newEdgePoint = focusPointAbsolute;
+    } else {
+      // Shouldn't happend, but just in case
+      newEdgePoint = edgePointAbsolute;
+    }
   }
 
   return LinearElementEditor.pointFromAbsoluteCoords(
@@ -1574,17 +1594,22 @@ const determineFocusDistance = (
       .filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
       .map((p, idx): [GlobalPoint, number] => [p, idx])
       .sort((g, h) => pointDistanceSq(g[0], b) - pointDistanceSq(h[0], b))[0] ??
-    center;
+    [];
+
+  // console.log(ordered[0]);
+  // debugClear();
+  // debugDrawPoint(ordered[0], { color: "red", permanent: true });
 
   const sign =
     Math.sign(vectorCross(vectorFromPoint(b, a), vectorFromPoint(b, center))) *
     -1;
   const signedDist = sign * pointDistance(center, ordered[0]);
-  const signedDistanceRatio =
-    signedDist /
-    (element.type === "diamond"
-      ? pointDistance(axes[ordered[1]][0], axes[ordered[1]][1]) / 2
-      : Math.sqrt(element.width ** 2 + element.height ** 2) / 2);
+  const signedDistanceRatio = ordered[1]
+    ? signedDist /
+      (element.type === "diamond"
+        ? pointDistance(axes[ordered[1]][0], axes[ordered[1]][1]) / 2
+        : Math.sqrt(element.width ** 2 + element.height ** 2) / 2)
+    : 0;
 
   return signedDistanceRatio;
 };
