@@ -21,9 +21,7 @@ By default, excalidraw will try to load fonts used by Excalidraw from the [CDN](
 For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
 ```js
-<script>
-  window.EXCALIDRAW_ASSET_PATH = "/";
-</script>
+<script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
 ```
 
 #### Dimensions of Excalidraw

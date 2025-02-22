@@ -6,7 +6,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
-    "module": "ESNext", 
+    "module": "ESNext",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
@@ -17,14 +17,8 @@
       "@excalidraw/math": ["../math/index.ts"],
       "@excalidraw/excalidraw/*": ["../excalidraw/*"],
       "@excalidraw/utils/*": ["../utils/*"],
-      "@excalidraw/math/*": ["../math/*"],
-    },
+      "@excalidraw/math/*": ["../math/*"]
+    }
   },
-  "exclude": [
-    "**/*.test.*",
-    "tests",
-    "types",
-    "examples",
-    "dist"
-  ]
+  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }

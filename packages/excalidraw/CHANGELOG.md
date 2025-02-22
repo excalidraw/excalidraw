@@ -45,7 +45,6 @@ Please add the latest change on the top under the correct section.
 
 #### Deprecated UMD bundle in favor of ES modules [#7441](https://github.com/excalidraw/excalidraw/pull/7441), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
 
-
 We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles inside `@excalidraw/excalidraw` package now contain only bundled source files, making any dependencies tree-shakable. The npm package now comes with the following structure:
 
 > **Note**: The structure is simplified for the sake of brevity, omitting lazy-loadable modules, including locales (previously treated as json assets) and source maps in the development bundle.
@@ -79,7 +78,7 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 // excalidraw styles, usually auto-processed by the build tool (i.e. vite, next, etc.)
 import "@excalidraw/excalidraw/index.css";
 // excalidraw types (optional)
-import type { ExcalidrawImperativeAPI }  from "@excalidraw/excalidraw/types";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 ```
 
 or
@@ -99,13 +98,13 @@ or
       "react": "https://esm.sh/react@18.3.1",
       "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
       "react-dom": "https://esm.sh/react-dom@18.3.1"
-      }
+    }
   }
 </script>
 <script type="module">
   import React from "https://esm.sh/react@18.3.1";
-  import ReactDOM from "https://esm.sh/react-dom@18.3.1"
-  import * as ExcalidrawLib from 'https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
+  import ReactDOM from "https://esm.sh/react-dom@18.3.1";
+  import * as ExcalidrawLib from "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom";
 </script>
 ```
 
@@ -114,9 +113,7 @@ or
 New fonts, which we've added, are automatically loaded from the CDN. For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
 ```js
-<script>
-  window.EXCALIDRAW_ASSET_PATH = "/";
-</script>
+<script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
 ```
 
 or, if you serve your assets from the root of your CDN, you would do:
@@ -134,7 +131,7 @@ or, if you prefer the path to be dynamicly set based on the `location.origin`, y
 <Script id="load-env-variables" strategy="beforeInteractive">
   {`window["EXCALIDRAW_ASSET_PATH"] = location.origin;`} // or use just "/"!
 </Script>
-  ```
+```
 
 > **Note**: Locales are no longer part of static assets (previously `.json` files), but are transpiled dirrectly to the `.js` as ES modules.
 
@@ -142,13 +139,13 @@ or, if you prefer the path to be dynamicly set based on the `location.origin`, y
 
 ```js
 // before
-updateScene({ elements, appState, commitToHistory: true }) // A
-updateScene({ elements, appState, commitToHistory: false }) // B
+updateScene({ elements, appState, commitToHistory: true }); // A
+updateScene({ elements, appState, commitToHistory: false }); // B
 
 // after
-import { StoreAction } from "@excalidraw/excalidraw"
-updateScene({ elements, appState, storeAction: StoreAction.CAPTURE }) // A
-updateScene({ elements, appState, storeAction: StoreAction.UPDATE }) // B
+import { StoreAction } from "@excalidraw/excalidraw";
+updateScene({ elements, appState, storeAction: StoreAction.CAPTURE }); // A
+updateScene({ elements, appState, storeAction: StoreAction.UPDATE }); // B
 ```
 
 The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `storeAction: StoreActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below.
