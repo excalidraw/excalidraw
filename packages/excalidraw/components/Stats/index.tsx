@@ -9,7 +9,7 @@ import type {
 } from "../../types";
 import { CloseIcon } from "../icons";
 import { Island } from "../Island";
-import { throttle } from "lodash";
+import throttle from "lodash.throttle";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
 import FontSize from "./FontSize";

@@ -3,7 +3,7 @@ import { collapseDownIcon, upIcon, searchIcon } from "./icons";
 import { TextField } from "./TextField";
 import { Button } from "./Button";
 import { useApp, useExcalidrawSetAppState } from "./App";
-import { debounce } from "lodash";
+import debounce from "lodash.debounce";
 import type { AppClassProperties } from "../types";
 import { isTextElement, newTextElement } from "../element";
 import type { ExcalidrawTextElement } from "../element/types";
