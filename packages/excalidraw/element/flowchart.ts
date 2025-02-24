@@ -34,6 +34,9 @@ import { invariant, toBrandedType } from "../utils";
 import { pointFrom, type LocalPoint } from "../../math";
 import { aabbForElement } from "../shapes";
 import { updateElbowArrowPoints } from "./elbowArrow";
+import type App from "../components/App";
+import { makeNextSelectedElementIds } from "../scene/selection";
+import { isElementCompletelyInViewport } from "./sizeHelpers";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -491,62 +494,64 @@ const createBindingArrow = (
 
 export class FlowChartNavigator {
   isExploring: boolean = false;
-  // nodes that are ONE link away (successor and predecessor both included)
-  private sameLevelNodes: ExcalidrawElement[] = [];
-  private sameLevelIndex: number = 0;
-  // set it to the opposite of the defalut creation direction
+
+  private app: App;
+  private siblingNodes: ExcalidrawElement[] = [];
+  private siblingIndex: number = 0;
   private direction: LinkDirection | null = null;
-  // for speedier navigation
-  private visitedNodes: Set<ExcalidrawElement["id"]> = new Set();
+
+  constructor(app: App) {
+    this.app = app;
+  }
 
   clear() {
     this.isExploring = false;
-    this.sameLevelNodes = [];
-    this.sameLevelIndex = 0;
+    this.siblingNodes = [];
+    this.siblingIndex = 0;
     this.direction = null;
-    this.visitedNodes.clear();
   }
 
-  exploreByDirection(
-    element: ExcalidrawElement,
-    elementsMap: ElementsMap,
-    direction: LinkDirection,
-  ): ExcalidrawElement["id"] | null {
+  /**
+   * Explore the flowchart by the given direction.
+   *
+   * The exploration follows a (near) breadth-first approach: when there're multiple
+   * nodes at the same level, we allow the user to traverse through them before
+   * moving to the next level.
+   *
+   * Unlike breadth-first search, we return to the first node at the same level.
+   */
+  exploreByDirection(element: ExcalidrawElement, direction: LinkDirection) {
     if (!isBindableElement(element)) {
-      return null;
+      return;
     }
+
+    const elementsMap = this.app.scene.getNonDeletedElementsMap();
 
     // clear if going at a different direction
     if (direction !== this.direction) {
       this.clear();
     }
 
-    // add the current node to the visited
-    if (!this.visitedNodes.has(element.id)) {
-      this.visitedNodes.add(element.id);
-    }
-
     /**
-     * CASE:
-     * - already started exploring, AND
-     * - there are multiple nodes at the same level, AND
-     * - still going at the same direction, AND
-     *
-     * RESULT:
-     * - loop through nodes at the same level
-     *
-     * WHY:
-     * - provides user the capability to loop through nodes at the same level
+     * if we're already exploring (holding the alt key)
+     * and the direction is the same as the previous one
+     * and there're multiple nodes at the same level
+     * then we should traverse through them before moving to the next level
      */
     if (
       this.isExploring &&
       direction === this.direction &&
-      this.sameLevelNodes.length > 1
+      this.siblingNodes.length > 1
     ) {
-      this.sameLevelIndex =
-        (this.sameLevelIndex + 1) % this.sameLevelNodes.length;
+      this.siblingIndex++;
 
-      return this.sameLevelNodes[this.sameLevelIndex].id;
+      // there're more unexplored nodes at the same level
+      if (this.siblingIndex < this.siblingNodes.length) {
+        return this.goToNode(this.siblingNodes[this.siblingIndex].id);
+      }
+
+      this.goToNode(this.siblingNodes[0].id);
+      this.clear();
     }
 
     const nodes = [
@@ -554,70 +559,52 @@ export class FlowChartNavigator {
       ...getPredecessors(element, elementsMap, direction),
     ];
 
-    /**
-     * CASE:
-     * - just started exploring at the given direction
-     *
-     * RESULT:
-     * - go to the first node in the given direction
-     */
     if (nodes.length > 0) {
-      this.sameLevelIndex = 0;
+      this.siblingIndex = 0;
       this.isExploring = true;
-      this.sameLevelNodes = nodes;
+      this.siblingNodes = nodes;
       this.direction = direction;
-      this.visitedNodes.add(nodes[0].id);
 
-      return nodes[0].id;
+      this.goToNode(nodes[0].id);
     }
-
-    /**
-     * CASE:
-     * - (just started exploring or still going at the same direction) OR
-     * - there're no nodes at the given direction
-     *
-     * RESULT:
-     * - go to some other unvisited linked node
-     *
-     * WHY:
-     * - provide a speedier navigation from a given node to some predecessor
-     *   without the user having to change arrow key
-     */
-    if (direction === this.direction || !this.isExploring) {
-      if (!this.isExploring) {
-        // just started and no other nodes at the given direction
-        // so the current node is technically the first visited node
-        // (this is needed so that we don't get stuck between looping through )
-        this.visitedNodes.add(element.id);
-      }
-
-      const otherDirections: LinkDirection[] = [
-        "up",
-        "right",
-        "down",
-        "left",
-      ].filter((dir): dir is LinkDirection => dir !== direction);
-
-      const otherLinkedNodes = otherDirections
-        .map((dir) => [
-          ...getSuccessors(element, elementsMap, dir),
-          ...getPredecessors(element, elementsMap, dir),
-        ])
-        .flat()
-        .filter((linkedNode) => !this.visitedNodes.has(linkedNode.id));
-
-      for (const linkedNode of otherLinkedNodes) {
-        if (!this.visitedNodes.has(linkedNode.id)) {
-          this.visitedNodes.add(linkedNode.id);
-          this.isExploring = true;
-          this.direction = direction;
-          return linkedNode.id;
-        }
-      }
-    }
-
-    return null;
   }
+
+  private goToNode = (nodeId: ExcalidrawElement["id"]) => {
+    this.app.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds(
+        {
+          [nodeId]: true,
+        },
+        prevState,
+      ),
+    }));
+
+    const nextNode = this.app.scene.getNonDeletedElementsMap().get(nodeId);
+
+    if (
+      nextNode &&
+      !isElementCompletelyInViewport(
+        [nextNode],
+        this.app.canvas.width / window.devicePixelRatio,
+        this.app.canvas.height / window.devicePixelRatio,
+        {
+          offsetLeft: this.app.state.offsetLeft,
+          offsetTop: this.app.state.offsetTop,
+          scrollX: this.app.state.scrollX,
+          scrollY: this.app.state.scrollY,
+          zoom: this.app.state.zoom,
+        },
+        this.app.scene.getNonDeletedElementsMap(),
+        this.app.getEditorUIOffsets(),
+      )
+    ) {
+      this.app.scrollToContent(nextNode, {
+        animate: true,
+        duration: 300,
+        canvasOffsets: this.app.getEditorUIOffsets(),
+      });
+    }
+  };
 }
 
 export class FlowChartCreator {
