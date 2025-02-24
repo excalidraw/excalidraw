@@ -45,7 +45,7 @@ Please add the latest change on the top under the correct section.
 
 #### Deprecated UMD bundle in favor of ES modules [#7441](https://github.com/excalidraw/excalidraw/pull/7441), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
 
-We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles inside `@excalidraw/excalidraw` package now contain only bundled source files, making any dependencies tree-shakable. The npm package now comes with the following structure:
+We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles inside `@excalidraw/excalidraw` package now contain only bundled source files, making any dependencies tree-shakable. The npm package comes with the following structure:
 
 > **Note**: The structure is simplified for the sake of brevity, omitting lazy-loadable modules, including locales (previously treated as json assets) and source maps in the development bundle.
 
@@ -108,7 +108,28 @@ or
 </script>
 ```
 
-#### Deprecated `excalidraw-assets` and `excalidraw-assets-dev` folders in favor of `fonts` folder [#8012](https://github.com/excalidraw/excalidraw/pull/8012), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
+#### Deprecated `excalidraw-assets` and `excalidraw-assets-dev` folders [#8012](https://github.com/excalidraw/excalidraw/pull/8012), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
+
+The `excalidraw-assets` and `excalidraw-assets-dev` folders, which contained locales and fonts, are no longer used and have been deprecated.
+
+##### Locales
+
+Locales are no longer treated as static `.json` assets, but are transpiled with `esbuild` dirrectly to the `.js` as ES modules. Note that some build tools (i.e. Vite) may require setting `es2022` as a build target, in order to support "Arbitrary module namespace identifier names", e.g. `export { english as "en-us" } )`.
+
+```js
+// vite.config.js
+optimizeDeps: {
+  esbuildOptions: {
+    // Bumping to 2022 due to "Arbitrary module namespace identifier names" not being
+    // supported in Vite's default browser target https://github.com/vitejs/vite/issues/13556
+    target: "es2022",
+    // Tree shaking is optional, but recommended
+    treeShaking: true,
+  },
+}
+```
+
+##### Fonts
 
 New fonts, which we've added, are automatically loaded from the CDN. For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
@@ -132,8 +153,6 @@ or, if you prefer the path to be dynamicly set based on the `location.origin`, y
   {`window["EXCALIDRAW_ASSET_PATH"] = location.origin;`} // or use just "/"!
 </Script>
 ```
-
-> **Note**: Locales are no longer part of static assets (previously `.json` files), but are transpiled dirrectly to the `.js` as ES modules.
 
 #### Deprecated `commitToHistory` in favor of `storeAction` in `updateScene` API [#7348](https://github.com/excalidraw/excalidraw/pull/7348), [#7898](https://github.com/excalidraw/excalidraw/pull//7898)
 
