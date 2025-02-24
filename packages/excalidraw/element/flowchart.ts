@@ -515,10 +515,7 @@ export class FlowChartNavigator {
    * Explore the flowchart by the given direction.
    *
    * The exploration follows a (near) breadth-first approach: when there're multiple
-   * nodes at the same level, we allow the user to traverse through them before
-   * moving to the next level.
-   *
-   * Unlike breadth-first search, we return to the first node at the same level.
+   * nodes at the same level, we allow the user to traverse through them.
    */
   exploreByDirection(element: ExcalidrawElement, direction: LinkDirection) {
     if (!isBindableElement(element)) {
@@ -543,15 +540,8 @@ export class FlowChartNavigator {
       direction === this.direction &&
       this.siblingNodes.length > 1
     ) {
-      this.siblingIndex++;
-
-      // there're more unexplored nodes at the same level
-      if (this.siblingIndex < this.siblingNodes.length) {
-        return this.goToNode(this.siblingNodes[this.siblingIndex].id);
-      }
-
-      this.goToNode(this.siblingNodes[0].id);
-      this.clear();
+      this.siblingIndex = (this.siblingIndex + 1) % this.siblingNodes.length;
+      return this.goToNode(this.siblingNodes[this.siblingIndex].id);
     }
 
     const nodes = [
