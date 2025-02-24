@@ -1245,6 +1245,22 @@ const updateBoundPoint = (
         pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
     );
 
+    // debugClear();
+    // debugDrawPoint(intersections[0], { color: "red", permanent: true });
+    // debugDrawLine(
+    //   lineSegment<GlobalPoint>(
+    //     adjacentPoint,
+    //     pointFromVector(
+    //       vectorScale(
+    //         vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
+    //         interceptorLength,
+    //       ),
+    //       adjacentPoint,
+    //     ),
+    //   ),
+    //   { permanent: true, color: "green" },
+    // );
+
     if (intersections.length > 1) {
       // The adjacent point is outside the shape (+ gap)
       newEdgePoint = intersections[0];
@@ -1577,6 +1593,37 @@ const determineFocusDistance = (
     element.type === "diamond"
       ? [
           lineSegment(
+            pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+            pointFrom<GlobalPoint>(
+              element.x + element.width / 2,
+              element.y + element.height,
+            ),
+          ),
+          lineSegment(
+            pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height / 2,
+            ),
+          ),
+        ]
+      : [
+          lineSegment(
+            pointFrom<GlobalPoint>(element.x, element.y),
+            pointFrom<GlobalPoint>(
+              element.x + element.width,
+              element.y + element.height,
+            ),
+          ),
+          lineSegment(
+            pointFrom<GlobalPoint>(element.x + element.width, element.y),
+            pointFrom<GlobalPoint>(element.x, element.y + element.height),
+          ),
+        ];
+  const interceptees =
+    element.type === "diamond"
+      ? [
+          lineSegment(
             pointFrom<GlobalPoint>(
               element.x + element.width / 2,
               element.y - element.height,
@@ -1621,11 +1668,10 @@ const determineFocusDistance = (
         ];
 
   const ordered = [
-    lineSegmentIntersectionPoints(rotatedInterceptor, axes[0]),
-    lineSegmentIntersectionPoints(rotatedInterceptor, axes[1]),
+    lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[0]),
+    lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[1]),
   ]
     .filter((p): p is GlobalPoint => p !== null)
-    //.filter((p) => !pointOnLineSegment(p, lineSegment(a, b)))
     .sort((g, h) => pointDistanceSq(g, b) - pointDistanceSq(h, b))
     .map(
       (p, idx): number =>
@@ -1636,14 +1682,20 @@ const determineFocusDistance = (
     )
     .sort((g, h) => Math.abs(g) - Math.abs(h));
 
-  //debugClear();
+  // debugClear();
+  // [
+  //   lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[0]),
+  //   lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[1]),
+  // ]
+  //   .filter((p): p is GlobalPoint => p !== null)
+  //   .forEach((p) => debugDrawPoint(p, { color: "black", permanent: true }));
   // debugDrawPoint(determineFocusPoint(element, ordered[0] ?? 0, rotatedA), {
-  //   color: "black",
+  //   color: "red",
   //   permanent: true,
   // });
   // debugDrawLine(rotatedInterceptor, { color: "green", permanent: true });
-  // debugDrawLine(axes[0], { color: "red", permanent: true });
-  // debugDrawLine(axes[1], { color: "red", permanent: true });
+  // debugDrawLine(interceptees[0], { color: "red", permanent: true });
+  // debugDrawLine(interceptees[1], { color: "red", permanent: true });
 
   const signedDistanceRatio = ordered[0] ?? 0;
 
