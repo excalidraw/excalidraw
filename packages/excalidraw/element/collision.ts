@@ -199,10 +199,7 @@ const intersectRectanguloidWithLineSegment = (
   );
 
   // Get the element's building components we can test against
-  const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(
-    element,
-    offset,
-  );
+  const [sides, corners] = deconstructRectanguloidElement(element, offset);
 
   return (
     [

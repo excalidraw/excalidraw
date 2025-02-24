@@ -58,7 +58,7 @@ const distanceToRectanguloidElement = (
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
   // Get the element's building components we can test against
-  const [sides, corners] = deconstructRectanguloidElement<GlobalPoint>(element);
+  const [sides, corners] = deconstructRectanguloidElement(element);
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
