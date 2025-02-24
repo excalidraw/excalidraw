@@ -817,7 +817,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 28,
+  "version": 30,
   "width": 50,
   "x": 200,
   "y": 0,
