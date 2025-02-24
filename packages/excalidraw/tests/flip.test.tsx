@@ -1,10 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   fireEvent,
   GlobalTestState,
   render,
   screen,
+  unmountComponent,
   waitFor,
 } from "./test-utils";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -43,8 +43,7 @@ vi.mock("../data/blob", async (actual) => {
 });
 
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   mouse.reset();
   localStorage.clear();

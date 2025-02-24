@@ -1,12 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { render } from "./test-utils";
+import { render, unmountComponent } from "./test-utils";
 import { reseed } from "../random";
 import { UI } from "./helpers/ui";
 import { Excalidraw } from "../index";
 import { expect } from "vitest";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 beforeEach(() => {
   localStorage.clear();
