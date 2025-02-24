@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { ToolButton } from "./ToolButton";
 import { handIcon } from "./icons";
 import { KEYS } from "../keys";
+import { useRef } from "react";
 
 type LockIconProps = {
   title?: string;
@@ -14,8 +15,10 @@ type LockIconProps = {
 };
 
 export const HandButton = (props: LockIconProps) => {
+  const compoRef = useRef<HTMLInputElement | HTMLButtonElement>(null);
   return (
     <ToolButton
+      ref={compoRef}
       className={clsx("Shape", { fillable: false })}
       type="radio"
       icon={handIcon}
