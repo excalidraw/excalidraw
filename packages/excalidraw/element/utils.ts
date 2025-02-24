@@ -12,11 +12,6 @@ import {
   type GlobalPoint,
 } from "../../math";
 import { getCornerRadius } from "../shapes";
-import {
-  debugClear,
-  debugDrawCubicBezier,
-  debugDrawLine,
-} from "../visualdebug";
 import type {
   ExcalidrawDiamondElement,
   ExcalidrawRectanguloidElement,
