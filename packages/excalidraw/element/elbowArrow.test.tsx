@@ -18,6 +18,7 @@ import type {
 import { ARROW_TYPE } from "../constants";
 import type { LocalPoint } from "../../math";
 import { pointFrom } from "../../math";
+import "../../utils/test-utils";
 
 const { h } = window;
 

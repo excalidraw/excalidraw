@@ -26,7 +26,10 @@ export const normalizeRadians = (angle: Radians): Radians => {
 export const cartesian2Polar = <P extends GlobalPoint | LocalPoint>([
   x,
   y,
-]: P): PolarCoords => [Math.hypot(x, y), Math.atan2(y, x)];
+]: P): PolarCoords => [
+  Math.hypot(x, y),
+  normalizeRadians(Math.atan2(y, x) as Radians),
+];
 
 export function degreesToRadians(degrees: Degrees): Radians {
   return ((degrees * Math.PI) / 180) as Radians;

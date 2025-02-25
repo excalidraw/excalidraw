@@ -85,6 +85,13 @@ export type Triangle<P extends GlobalPoint | LocalPoint> = [
   _brand: "excalimath__triangle";
 };
 
+/**
+ * A rectangular shape represented by 4 points at its corners
+ */
+export type Rectangle<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
+  _brand: "excalimath__rectangle";
+};
+
 //
 // Polygon
 //
@@ -120,11 +127,14 @@ export type PolarCoords = [
 ];
 
 /**
- * Angles are in radians and centered on 0, 0. Zero radians on a 1 radius circle
- * corresponds to (1, 0) cartesian coordinates (point), i.e. to the "right".
+  An ellipse is specified by its center, angle, and its major and minor axes
+  but for the sake of simplicity, we've used halfWidth and halfHeight instead
+  in replace of semi major and semi minor axes
  */
-export type SymmetricArc = {
-  radius: number;
-  startAngle: number;
-  endAngle: number;
+export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
+  center: Point;
+  halfWidth: number;
+  halfHeight: number;
+} & {
+  _brand: "excalimath_ellipse";
 };
