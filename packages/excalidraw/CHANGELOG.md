@@ -341,7 +341,7 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Grouped together Undo and Redo buttons on mobile [#9109](https://github.com/excalidraw/excalidraw/pull/9109)
 
-- Load old library if migration fails 
+- Load old library if migration fails
 
 - Change LibraryPersistenceAdapter `load()` `source` -> `priority`
 

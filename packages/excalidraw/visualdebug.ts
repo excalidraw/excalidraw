@@ -1,4 +1,4 @@
-import type { Curve } from "../math";
+import type { Curve } from "@excalidraw/math";
 import {
   isLineSegment,
   lineSegment,
