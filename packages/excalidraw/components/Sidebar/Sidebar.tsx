@@ -3,6 +3,7 @@ import React, {
   useLayoutEffect,
   useRef,
   useState,
+  forwardRef,
   useImperativeHandle,
   useCallback,
 } from "react";
@@ -36,115 +37,118 @@ import "./Sidebar.scss";
  */
 export const isSidebarDockedAtom = atom(false);
 
-export const SidebarInner = ({
-  name,
-  children,
-  onDock,
-  docked,
-  className,
-  ref,
-  ...rest
-}: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">) => {
-  if (import.meta.env.DEV && onDock && docked == null) {
-    console.warn(
-      "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be user-dockable. To hide this message, either pass `docked` or remove `onDock`",
-    );
-  }
-
-  const setAppState = useExcalidrawSetAppState();
-
-  const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom);
-
-  useLayoutEffect(() => {
-    setIsSidebarDockedAtom(!!docked);
-    return () => {
-      setIsSidebarDockedAtom(false);
-    };
-  }, [setIsSidebarDockedAtom, docked]);
-
-  const headerPropsRef = useRef<SidebarPropsContextValue>(
-    {} as SidebarPropsContextValue,
-  );
-  headerPropsRef.current.onCloseRequest = () => {
-    setAppState({ openSidebar: null });
-  };
-  headerPropsRef.current.onDock = (isDocked) => onDock?.(isDocked);
-  // renew the ref object if the following props change since we want to
-  // rerender. We can't pass down as component props manually because
-  // the <Sidebar.Header/> can be rendered upstream.
-  headerPropsRef.current = updateObject(headerPropsRef.current, {
-    docked,
-    // explicit prop to rerender on update
-    shouldRenderDockButton: !!onDock && docked != null,
-  });
-
-  const islandRef = useRef<HTMLDivElement>(null);
-
-  useImperativeHandle(ref, () => {
-    return islandRef.current!;
-  });
-
-  const device = useDevice();
-
-  const closeLibrary = useCallback(() => {
-    const isDialogOpen = !!document.querySelector(".Dialog");
-
-    // Prevent closing if any dialog is open
-    if (isDialogOpen) {
-      return;
+export const SidebarInner = forwardRef(
+  (
+    {
+      name,
+      children,
+      onDock,
+      docked,
+      className,
+      ...rest
+    }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
+    ref: React.ForwardedRef<HTMLDivElement>,
+  ) => {
+    if (import.meta.env.DEV && onDock && docked == null) {
+      console.warn(
+        "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be user-dockable. To hide this message, either pass `docked` or remove `onDock`",
+      );
     }
-    setAppState({ openSidebar: null });
-  }, [setAppState]);
 
-  useOutsideClick(
-    islandRef,
-    useCallback(
-      (event) => {
-        // If click on the library icon, do nothing so that LibraryButton
-        // can toggle library menu
-        if ((event.target as Element).closest(".sidebar-trigger")) {
-          return;
-        }
-        if (!docked || !device.editor.canFitSidebar) {
+    const setAppState = useExcalidrawSetAppState();
+
+    const setIsSidebarDockedAtom = useSetAtom(isSidebarDockedAtom);
+
+    useLayoutEffect(() => {
+      setIsSidebarDockedAtom(!!docked);
+      return () => {
+        setIsSidebarDockedAtom(false);
+      };
+    }, [setIsSidebarDockedAtom, docked]);
+
+    const headerPropsRef = useRef<SidebarPropsContextValue>(
+      {} as SidebarPropsContextValue,
+    );
+    headerPropsRef.current.onCloseRequest = () => {
+      setAppState({ openSidebar: null });
+    };
+    headerPropsRef.current.onDock = (isDocked) => onDock?.(isDocked);
+    // renew the ref object if the following props change since we want to
+    // rerender. We can't pass down as component props manually because
+    // the <Sidebar.Header/> can be rendered upstream.
+    headerPropsRef.current = updateObject(headerPropsRef.current, {
+      docked,
+      // explicit prop to rerender on update
+      shouldRenderDockButton: !!onDock && docked != null,
+    });
+
+    const islandRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => {
+      return islandRef.current!;
+    });
+
+    const device = useDevice();
+
+    const closeLibrary = useCallback(() => {
+      const isDialogOpen = !!document.querySelector(".Dialog");
+
+      // Prevent closing if any dialog is open
+      if (isDialogOpen) {
+        return;
+      }
+      setAppState({ openSidebar: null });
+    }, [setAppState]);
+
+    useOutsideClick(
+      islandRef,
+      useCallback(
+        (event) => {
+          // If click on the library icon, do nothing so that LibraryButton
+          // can toggle library menu
+          if ((event.target as Element).closest(".sidebar-trigger")) {
+            return;
+          }
+          if (!docked || !device.editor.canFitSidebar) {
+            closeLibrary();
+          }
+        },
+        [closeLibrary, docked, device.editor.canFitSidebar],
+      ),
+    );
+
+    useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (
+          event.key === KEYS.ESCAPE &&
+          (!docked || !device.editor.canFitSidebar)
+        ) {
           closeLibrary();
         }
-      },
-      [closeLibrary, docked, device.editor.canFitSidebar],
-    ),
-  );
+      };
+      document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
+      return () => {
+        document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
+      };
+    }, [closeLibrary, docked, device.editor.canFitSidebar]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        event.key === KEYS.ESCAPE &&
-        (!docked || !device.editor.canFitSidebar)
-      ) {
-        closeLibrary();
-      }
-    };
-    document.addEventListener(EVENT.KEYDOWN, handleKeyDown);
-    return () => {
-      document.removeEventListener(EVENT.KEYDOWN, handleKeyDown);
-    };
-  }, [closeLibrary, docked, device.editor.canFitSidebar]);
-
-  return (
-    <Island
-      {...rest}
-      className={clsx("sidebar", { "sidebar--docked": docked }, className)}
-      ref={islandRef}
-    >
-      <SidebarPropsContext.Provider value={headerPropsRef.current}>
-        {children}
-      </SidebarPropsContext.Provider>
-    </Island>
-  );
-};
-
+    return (
+      <Island
+        {...rest}
+        className={clsx("sidebar", { "sidebar--docked": docked }, className)}
+        ref={islandRef}
+      >
+        <SidebarPropsContext.Provider value={headerPropsRef.current}>
+          {children}
+        </SidebarPropsContext.Provider>
+      </Island>
+    );
+  },
+);
 SidebarInner.displayName = "SidebarInner";
 
 export const Sidebar = Object.assign(
-  (props: SidebarProps) => {
+  forwardRef((props: SidebarProps, ref: React.ForwardedRef<HTMLDivElement>) => {
     const appState = useUIAppState();
 
     const { onStateChange } = props;
@@ -195,8 +199,8 @@ export const Sidebar = Object.assign(
       return null;
     }
 
-    return <SidebarInner {...props} ref={props.ref} key={props.name} />;
-  },
+    return <SidebarInner {...props} ref={ref} key={props.name} />;
+  }),
   {
     Header: SidebarHeader,
     TabTriggers: SidebarTabTriggers,
@@ -204,6 +208,6 @@ export const Sidebar = Object.assign(
     Tabs: SidebarTabs,
     Tab: SidebarTab,
     Trigger: SidebarTrigger,
-    displayName: "Sidebar",
   },
 );
+Sidebar.displayName = "Sidebar";

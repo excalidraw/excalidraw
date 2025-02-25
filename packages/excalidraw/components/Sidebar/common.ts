@@ -25,7 +25,6 @@ export type SidebarProps<P = {}> = {
   onDock?: (docked: boolean) => void;
   docked?: boolean;
   className?: string;
-  ref?: React.Ref<HTMLDivElement>;
   // NOTE sidebars we use internally inside the editor must have this flag set.
   // It indicates that this sidebar should have lower precedence over host
   // sidebars, if both are open.

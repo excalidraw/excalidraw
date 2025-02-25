@@ -8,21 +8,16 @@ type IslandProps = {
   padding?: number;
   className?: string | boolean;
   style?: object;
-  ref?: React.Ref<HTMLDivElement>;
 };
 
-export const Island = ({
-  children,
-  padding,
-  className,
-  style,
-  ref,
-}: IslandProps) => (
-  <div
-    className={clsx("Island", className)}
-    style={{ "--padding": padding, ...style }}
-    ref={ref}
-  >
-    {children}
-  </div>
+export const Island = React.forwardRef<HTMLDivElement, IslandProps>(
+  ({ children, padding, className, style }, ref) => (
+    <div
+      className={clsx("Island", className)}
+      style={{ "--padding": padding, ...style }}
+      ref={ref}
+    >
+      {children}
+    </div>
+  ),
 );

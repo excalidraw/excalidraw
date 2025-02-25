@@ -39,6 +39,11 @@ export type CallableType<T extends (...args: any[]) => any> = (
 ) => ReturnType<T>;
 // --------------------------------------------------------------------------—
 
+// Type for React.forwardRef --- supply only the first generic argument T
+export type ForwardRef<T, P = any> = Parameters<
+  CallableType<React.ForwardRefRenderFunction<T, P>>
+>[1];
+
 export type ExtractSetType<T extends Set<any>> = T extends Set<infer U>
   ? U
   : never;

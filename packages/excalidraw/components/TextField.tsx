@@ -1,5 +1,11 @@
 import type { KeyboardEvent } from "react";
-import { useRef, useImperativeHandle, useLayoutEffect, useState } from "react";
+import {
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+  useLayoutEffect,
+  useState,
+} from "react";
 import clsx from "clsx";
 
 import "./TextField.scss";
@@ -20,82 +26,87 @@ type TextFieldProps = {
   className?: string;
   placeholder?: string;
   isRedacted?: boolean;
-  ref?: React.Ref<HTMLInputElement>;
 } & ({ value: string } | { defaultValue: string });
 
-export const TextField = ({
-  onChange,
-  label,
-  fullWidth,
-  placeholder,
-  readonly,
-  selectOnRender,
-  onKeyDown,
-  isRedacted = false,
-  icon,
-  className,
-  ref,
-  ...rest
-}: TextFieldProps) => {
-  const innerRef = useRef<HTMLInputElement | null>(null);
+export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
+  (
+    {
+      onChange,
+      label,
+      fullWidth,
+      placeholder,
+      readonly,
+      selectOnRender,
+      onKeyDown,
+      isRedacted = false,
+      icon,
+      className,
+      ...rest
+    },
+    ref,
+  ) => {
+    const innerRef = useRef<HTMLInputElement | null>(null);
 
-  useImperativeHandle(ref, () => innerRef.current!);
+    useImperativeHandle(ref, () => innerRef.current!);
 
-  useLayoutEffect(() => {
-    if (selectOnRender) {
-      // focusing first is needed because vitest/jsdom
-      innerRef.current?.focus();
-      innerRef.current?.select();
-    }
-  }, [selectOnRender]);
-
-  const [isTemporarilyUnredacted, setIsTemporarilyUnredacted] =
-    useState<boolean>(false);
-
-  return (
-    <div
-      className={clsx("ExcTextField", className, {
-        "ExcTextField--fullWidth": fullWidth,
-        "ExcTextField--hasIcon": !!icon,
-      })}
-      onClick={() => {
+    useLayoutEffect(() => {
+      if (selectOnRender) {
+        // focusing first is needed because vitest/jsdom
         innerRef.current?.focus();
-      }}
-    >
-      {icon}
-      {label && <div className="ExcTextField__label">{label}</div>}
+        innerRef.current?.select();
+      }
+    }, [selectOnRender]);
+
+    const [isTemporarilyUnredacted, setIsTemporarilyUnredacted] =
+      useState<boolean>(false);
+
+    return (
       <div
-        className={clsx("ExcTextField__input", {
-          "ExcTextField__input--readonly": readonly,
+        className={clsx("ExcTextField", className, {
+          "ExcTextField--fullWidth": fullWidth,
+          "ExcTextField--hasIcon": !!icon,
         })}
+        onClick={() => {
+          innerRef.current?.focus();
+        }}
       >
-        <input
-          className={clsx({
-            "is-redacted":
-              "value" in rest &&
-              rest.value &&
-              isRedacted &&
-              !isTemporarilyUnredacted,
+        {icon}
+        {label && <div className="ExcTextField__label">{label}</div>}
+        <div
+          className={clsx("ExcTextField__input", {
+            "ExcTextField__input--readonly": readonly,
           })}
-          readOnly={readonly}
-          value={"value" in rest ? rest.value : undefined}
-          defaultValue={"defaultValue" in rest ? rest.defaultValue : undefined}
-          placeholder={placeholder}
-          ref={innerRef}
-          onChange={(event) => onChange?.(event.target.value)}
-          onKeyDown={onKeyDown}
-        />
-        {isRedacted && (
-          <Button
-            onSelect={() =>
-              setIsTemporarilyUnredacted(!isTemporarilyUnredacted)
+        >
+          <input
+            className={clsx({
+              "is-redacted":
+                "value" in rest &&
+                rest.value &&
+                isRedacted &&
+                !isTemporarilyUnredacted,
+            })}
+            readOnly={readonly}
+            value={"value" in rest ? rest.value : undefined}
+            defaultValue={
+              "defaultValue" in rest ? rest.defaultValue : undefined
             }
-            style={{ border: 0, userSelect: "none" }}
-          >
-            {isTemporarilyUnredacted ? eyeClosedIcon : eyeIcon}
-          </Button>
-        )}
+            placeholder={placeholder}
+            ref={innerRef}
+            onChange={(event) => onChange?.(event.target.value)}
+            onKeyDown={onKeyDown}
+          />
+          {isRedacted && (
+            <Button
+              onSelect={() =>
+                setIsTemporarilyUnredacted(!isTemporarilyUnredacted)
+              }
+              style={{ border: 0, userSelect: "none" }}
+            >
+              {isTemporarilyUnredacted ? eyeClosedIcon : eyeIcon}
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);

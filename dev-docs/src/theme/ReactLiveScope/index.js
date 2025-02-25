@@ -7,12 +7,10 @@ let ExcalidrawComp = {};
 if (ExecutionEnvironment.canUseDOM) {
   ExcalidrawComp = require("@excalidraw/excalidraw");
 }
-const Excalidraw = (props) => {
+const Excalidraw = React.forwardRef((props, ref) => {
   const { colorMode } = useColorMode();
-  return (
-    <ExcalidrawComp.Excalidraw theme={colorMode} {...props} ref={props.ref} />
-  );
-};
+  return <ExcalidrawComp.Excalidraw theme={colorMode} {...props} ref={ref} />;
+});
 // Add react-live imports you need here
 const ExcalidrawScope = {
   React,
