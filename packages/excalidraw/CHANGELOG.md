@@ -339,7 +339,9 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Improve collab error notification [#7741](https://github.com/excalidraw/excalidraw/pull/7741)
 
-- Load old library if migration fails
+- Grouped together Undo and Redo buttons on mobile [#9109](https://github.com/excalidraw/excalidraw/pull/9109)
+
+- Load old library if migration fails 
 
 - Change LibraryPersistenceAdapter `load()` `source` -> `priority`
 
@@ -649,6 +651,8 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Remove t from getDefaultAppState and allow name to be nullable [#7666](https://github.com/excalidraw/excalidraw/pull/7666)
 
+- Stop using structuredClone [#9128](https://github.com/excalidraw/excalidraw/pull/9128)
+
 ### Refactor
 
 - Remove `defaultProps` [#9035](https://github.com/excalidraw/excalidraw/pull/9035)
@@ -698,6 +702,8 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 - Export types for @excalidraw/utils [#7736](https://github.com/excalidraw/excalidraw/pull/7736)
 
 - Create ESM build for utils package 🥳 [#7500](https://github.com/excalidraw/excalidraw/pull/7500)
+
+- Upgrade to react@19 [#9182](https://github.com/excalidraw/excalidraw/pull/9182)
 
 ## 0.17.3 (2024-02-09)
 
