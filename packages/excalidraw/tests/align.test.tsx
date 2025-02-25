@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { act, render } from "./test-utils";
+import { act, unmountComponent, render } from "./test-utils";
 import { Excalidraw } from "../index";
 import { defaultLang, setLanguage } from "../i18n";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -54,8 +53,7 @@ const createAndSelectTwoRectanglesWithDifferentSizes = () => {
 
 describe("aligning", () => {
   beforeEach(async () => {
-    // Unmount ReactDOM from root
-    ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+    unmountComponent();
     mouse.reset();
 
     await act(() => {

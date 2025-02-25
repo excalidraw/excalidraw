@@ -189,7 +189,7 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
-    points?: T extends "arrow" | "line" ? readonly LocalPoint[] : never;
+    points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
     locked?: boolean;
     fileId?: T extends "image" ? string : never;
     scale?: T extends "image" ? ExcalidrawImageElement["scale"] : never;
@@ -228,8 +228,6 @@ export class API {
     const base: Omit<
       ExcalidrawGenericElement,
       | "id"
-      | "width"
-      | "height"
       | "type"
       | "version"
       | "versionNonce"
@@ -241,6 +239,8 @@ export class API {
       seed: 1,
       x,
       y,
+      width,
+      height,
       frameId: rest.frameId ?? null,
       index: rest.index ?? null,
       angle: (rest.angle ?? 0) as Radians,
@@ -272,8 +272,6 @@ export class API {
       case "ellipse":
         element = newElement({
           type: type as "rectangle" | "diamond" | "ellipse",
-          width,
-          height,
           ...base,
         });
         break;
@@ -308,6 +306,7 @@ export class API {
         element = newFreeDrawElement({
           type: type as "freedraw",
           simulatePressure: true,
+          points: rest.points,
           ...base,
         });
         break;

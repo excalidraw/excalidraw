@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import type { ReactNode } from "react";
 import { useTunnels } from "../../context/tunnels";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";

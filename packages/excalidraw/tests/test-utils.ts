@@ -2,7 +2,13 @@ import "pepjs";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 import { act } from "@testing-library/react";
-import { render, queries, waitFor, fireEvent } from "@testing-library/react";
+import {
+  render,
+  queries,
+  waitFor,
+  fireEvent,
+  cleanup,
+} from "@testing-library/react";
 
 import * as toolQueries from "./queries/toolQueries";
 import type { ImportedDataState } from "../data/types";
@@ -15,6 +21,8 @@ import ansi from "ansicolor";
 import { ORIG_ID } from "../constants";
 import { arrayToMap } from "../utils";
 import type { AllPossibleKeys } from "../utility-types";
+
+export { cleanup as unmountComponent };
 
 const customQueries = {
   ...queries,

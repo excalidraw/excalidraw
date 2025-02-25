@@ -1,4 +1,5 @@
 import MenuItemContent from "./DropdownMenuItemContent";
+import type { JSX } from "react";
 import React from "react";
 import {
   getDropdownMenuItemClassName,

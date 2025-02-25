@@ -10,7 +10,6 @@ type StackProps = {
   justifyContent?: "center" | "space-around" | "space-between";
   className?: string | boolean;
   style?: React.CSSProperties;
-  ref: React.RefObject<HTMLDivElement>;
 };
 
 const RowStack = forwardRef(

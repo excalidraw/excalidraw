@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { EVENT } from "../constants";
 
 export function useOutsideClick<T extends HTMLElement>(
-  ref: React.RefObject<T>,
+  ref: React.RefObject<T | null>,
   /** if performance is of concern, memoize the callback */
   callback: (event: Event) => void,
   /**

@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import React, { useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { isArrowKey, KEYS } from "../keys";

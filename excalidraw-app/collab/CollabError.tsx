@@ -19,16 +19,16 @@ export const collabErrorIndicatorAtom = atom<ErrorIndicator>({
 
 const CollabError = ({ collabError }: { collabError: ErrorIndicator }) => {
   const [isAnimating, setIsAnimating] = useState(false);
-  const clearAnimationRef = useRef<string | number | NodeJS.Timeout>();
+  const clearAnimationRef = useRef<string | number>(0);
 
   useEffect(() => {
     setIsAnimating(true);
-    clearAnimationRef.current = setTimeout(() => {
+    clearAnimationRef.current = window.setTimeout(() => {
       setIsAnimating(false);
     }, 1000);
 
     return () => {
-      clearTimeout(clearAnimationRef.current);
+      window.clearTimeout(clearAnimationRef.current);
     };
   }, [collabError.message, collabError.nonce]);
 

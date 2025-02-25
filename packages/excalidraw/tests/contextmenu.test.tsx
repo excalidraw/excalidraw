@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   render,
   fireEvent,
@@ -11,6 +10,7 @@ import {
   queryAllByText,
   waitFor,
   togglePopover,
+  unmountComponent,
 } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
@@ -38,8 +38,7 @@ const checkpoint = (name: string) => {
 
 const mouse = new Pointer("mouse");
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 beforeEach(() => {

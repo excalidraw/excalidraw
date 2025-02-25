@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { act, getCloneByOrigId, render } from "./test-utils";
+import { act, getCloneByOrigId, render, unmountComponent } from "./test-utils";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import {
@@ -19,8 +18,7 @@ import type {
   ExcalidrawSelectionElement,
 } from "../element/types";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 beforeEach(() => {
   localStorage.clear();

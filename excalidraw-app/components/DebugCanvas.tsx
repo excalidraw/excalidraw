@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+import { useCallback, useImperativeHandle, useRef } from "react";
 import { type AppState } from "../../packages/excalidraw/types";
 import { throttleRAF } from "../../packages/excalidraw/utils";
 import {
@@ -276,36 +276,35 @@ export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
 interface DebugCanvasProps {
   appState: AppState;
   scale: number;
+  ref?: React.Ref<HTMLCanvasElement>;
 }
 
-const DebugCanvas = forwardRef<HTMLCanvasElement, DebugCanvasProps>(
-  ({ appState, scale }, ref) => {
-    const { width, height } = appState;
+const DebugCanvas = ({ appState, scale, ref }: DebugCanvasProps) => {
+  const { width, height } = appState;
 
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    useImperativeHandle<HTMLCanvasElement | null, HTMLCanvasElement | null>(
-      ref,
-      () => canvasRef.current,
-      [canvasRef],
-    );
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useImperativeHandle<HTMLCanvasElement | null, HTMLCanvasElement | null>(
+    ref,
+    () => canvasRef.current,
+    [canvasRef],
+  );
 
-    return (
-      <canvas
-        style={{
-          width,
-          height,
-          position: "absolute",
-          zIndex: 2,
-          pointerEvents: "none",
-        }}
-        width={width * scale}
-        height={height * scale}
-        ref={canvasRef}
-      >
-        Debug Canvas
-      </canvas>
-    );
-  },
-);
+  return (
+    <canvas
+      style={{
+        width,
+        height,
+        position: "absolute",
+        zIndex: 2,
+        pointerEvents: "none",
+      }}
+      width={width * scale}
+      height={height * scale}
+      ref={canvasRef}
+    >
+      Debug Canvas
+    </canvas>
+  );
+};
 
 export default DebugCanvas;

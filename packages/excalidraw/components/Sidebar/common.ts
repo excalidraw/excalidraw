@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import React from "react";
 import type { AppState, SidebarName, SidebarTabName } from "../../types";
 

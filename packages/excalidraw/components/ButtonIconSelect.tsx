@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import clsx from "clsx";
 import { ButtonIcon } from "./ButtonIcon";
 

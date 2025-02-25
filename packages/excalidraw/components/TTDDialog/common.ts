@@ -12,7 +12,7 @@ const resetPreview = ({
   canvasRef,
   setError,
 }: {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   setError: (error: Error | null) => void;
 }) => {
   const canvasNode = canvasRef.current;
@@ -40,7 +40,7 @@ export interface MermaidToExcalidrawLibProps {
 }
 
 interface ConvertMermaidToExcalidrawFormatProps {
-  canvasRef: React.RefObject<HTMLDivElement>;
+  canvasRef: React.RefObject<HTMLDivElement | null>;
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   mermaidDefinition: string;
   setError: (error: Error | null) => void;
