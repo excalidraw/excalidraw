@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { render } from "./test-utils";
+import { render, unmountComponent } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
@@ -21,7 +20,7 @@ import { pointFrom } from "../../math";
 import { resizeSingleElement } from "../element/resizeElements";
 import { getSizeFromPoints } from "../points";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const { h } = window;
 const mouse = new Pointer("mouse");

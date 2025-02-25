@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -12,7 +11,13 @@ import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 
 import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { screen, render, fireEvent, GlobalTestState } from "./test-utils";
+import {
+  screen,
+  render,
+  fireEvent,
+  GlobalTestState,
+  unmountComponent,
+} from "./test-utils";
 import { API } from "../tests/helpers/api";
 import { KEYS } from "../keys";
 import { LinearElementEditor } from "../element/linearElementEditor";
@@ -43,8 +48,7 @@ describe("Test Linear Elements", () => {
   let interactiveCanvas: HTMLCanvasElement;
 
   beforeEach(async () => {
-    // Unmount ReactDOM from root
-    ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+    unmountComponent();
     localStorage.clear();
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
