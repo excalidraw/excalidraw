@@ -16,7 +16,6 @@ import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 import { getSelectedElements } from "../scene/selection";
 import type { ExcalidrawElement } from "../element/types";
 import { UI } from "./helpers/ui";
-import { diffStringsUnified } from "jest-diff";
 import ansi from "ansicolor";
 import { ORIG_ID } from "../constants";
 import { arrayToMap } from "../utils";
@@ -257,36 +256,6 @@ expect.extend({
     return {
       message: () => `expected ${received} to be a non-NaN number`,
       pass: false,
-    };
-  },
-
-  toCloselyEqualPoints(received, expected, precision) {
-    if (!Array.isArray(received) || !Array.isArray(expected)) {
-      throw new Error("expected and received are not point arrays");
-    }
-
-    const COMPARE = 1 / Math.pow(10, precision || 2);
-    const pass = received.every(
-      (point, idx) =>
-        Math.abs(expected[idx]?.[0] - point[0]) < COMPARE &&
-        Math.abs(expected[idx]?.[1] - point[1]) < COMPARE,
-    );
-
-    if (!pass) {
-      return {
-        message: () => ` The provided array of points are not close enough.
-
-${diffStringsUnified(
-  JSON.stringify(expected, undefined, 2),
-  JSON.stringify(received, undefined, 2),
-)}`,
-        pass: false,
-      };
-    }
-
-    return {
-      message: () => `expected ${received} to not be close to ${expected}`,
-      pass: true,
     };
   },
 });

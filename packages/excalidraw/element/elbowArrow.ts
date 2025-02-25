@@ -19,8 +19,6 @@ import { invariant, isAnyTrue, toBrandedType, tupleToCoors } from "../utils";
 import type { AppState } from "../types";
 import {
   bindPointToSnapToElementOutline,
-  distanceToBindableElement,
-  avoidRectangularCorner,
   FIXED_BINDING_DISTANCE,
   getHeadingForElbowArrowSnap,
   getGlobalFixedPointForBindableElement,
@@ -42,7 +40,7 @@ import {
   headingForPoint,
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
-import { isBindableElement, isRectanguloidElement } from "./typeChecks";
+import { isBindableElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -55,6 +53,7 @@ import type {
   FixedPointBinding,
   FixedSegment,
 } from "./types";
+import { distanceToBindableElement } from "./distance";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
@@ -1177,19 +1176,27 @@ const getElbowArrowData = (
       )
     : [startElement, endElement];
   const startGlobalPoint = getGlobalPoint(
+    {
+      ...arrow,
+      elbowed: true,
+      points: nextPoints,
+    } as ExcalidrawElbowArrowElement,
+    "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
-    origEndGlobalPoint,
-    elementsMap,
     startElement,
     hoveredStartElement,
     options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
+    {
+      ...arrow,
+      elbowed: true,
+      points: nextPoints,
+    } as ExcalidrawElbowArrowElement,
+    "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
-    origStartGlobalPoint,
-    elementsMap,
     endElement,
     hoveredEndElement,
     options?.isDragging,
@@ -2133,21 +2140,20 @@ const neighborIndexToHeading = (idx: number): Heading => {
 };
 
 const getGlobalPoint = (
+  arrow: ExcalidrawElbowArrowElement,
+  startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
-  otherPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   boundElement?: ExcalidrawBindableElement | null,
   hoveredElement?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
 ): GlobalPoint => {
   if (isDragging) {
     if (hoveredElement) {
-      const snapPoint = getSnapPoint(
-        initialPoint,
-        otherPoint,
+      const snapPoint = bindPointToSnapToElementOutline(
+        arrow,
         hoveredElement,
-        elementsMap,
+        startOrEnd,
       );
 
       return snapToMid(hoveredElement, snapPoint);
@@ -2164,28 +2170,15 @@ const getGlobalPoint = (
 
     // NOTE: Resize scales the binding position point too, so we need to update it
     return Math.abs(
-      distanceToBindableElement(boundElement, fixedGlobalPoint, elementsMap) -
+      distanceToBindableElement(boundElement, fixedGlobalPoint) -
         FIXED_BINDING_DISTANCE,
     ) > 0.01
-      ? getSnapPoint(initialPoint, otherPoint, boundElement, elementsMap)
+      ? bindPointToSnapToElementOutline(arrow, boundElement, startOrEnd)
       : fixedGlobalPoint;
   }
 
   return initialPoint;
 };
-
-const getSnapPoint = (
-  p: GlobalPoint,
-  otherPoint: GlobalPoint,
-  element: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-) =>
-  bindPointToSnapToElementOutline(
-    isRectanguloidElement(element) ? avoidRectangularCorner(element, p) : p,
-    otherPoint,
-    element,
-    elementsMap,
-  );
 
 const getBindPointHeading = (
   p: GlobalPoint,
@@ -2201,9 +2194,12 @@ const getBindPointHeading = (
     hoveredElement &&
       aabbForElement(
         hoveredElement,
-        Array(4).fill(
-          distanceToBindableElement(hoveredElement, p, elementsMap),
-        ) as [number, number, number, number],
+        Array(4).fill(distanceToBindableElement(hoveredElement, p)) as [
+          number,
+          number,
+          number,
+          number,
+        ],
       ),
     elementsMap,
     origPoint,
