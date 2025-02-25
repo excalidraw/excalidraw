@@ -28,14 +28,6 @@ export function lineSegment<P extends GlobalPoint | LocalPoint>(
   return [a, b] as LineSegment<P>;
 }
 
-export function lineSegmentFromPointArray<P extends GlobalPoint | LocalPoint>(
-  pointArray: P[],
-): LineSegment<P> | undefined {
-  return pointArray.length === 2
-    ? lineSegment<P>(pointArray[0], pointArray[1])
-    : undefined;
-}
-
 /**
  *
  * @param segment

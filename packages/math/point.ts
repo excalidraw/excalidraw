@@ -63,22 +63,6 @@ export function pointFromVector<P extends GlobalPoint | LocalPoint>(
 }
 
 /**
- * Convert the coordiante object to a point.
- *
- * @param coords The coordinate object with x and y properties
- * @returns
- */
-export function pointFromCoords<Point extends GlobalPoint | LocalPoint>({
-  x,
-  y,
-}: {
-  x: number;
-  y: number;
-}) {
-  return [x, y] as Point;
-}
-
-/**
  * Checks if the provided value has the shape of a Point.
  *
  * @param p The value to attempt verification on
@@ -175,36 +159,6 @@ export function pointTranslate<
  */
 export function pointCenter<P extends LocalPoint | GlobalPoint>(a: P, b: P): P {
   return pointFrom((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
-}
-
-/**
- * Add together two points by their coordinates like you'd apply a translation
- * to a point by a vector.
- *
- * @param a One point to act as a basis
- * @param b The other point to act like the vector to translate by
- * @returns
- */
-export function pointAdd<Point extends LocalPoint | GlobalPoint>(
-  a: Point,
-  b: Point,
-): Point {
-  return pointFrom(a[0] + b[0], a[1] + b[1]);
-}
-
-/**
- * Subtract a point from another point like you'd translate a point by an
- * invese vector.
- *
- * @param a The point to translate
- * @param b The point which will act like a vector
- * @returns The resulting point
- */
-export function pointSubtract<Point extends LocalPoint | GlobalPoint>(
-  a: Point,
-  b: Point,
-): Point {
-  return pointFrom(a[0] - b[0], a[1] - b[1]);
 }
 
 /**

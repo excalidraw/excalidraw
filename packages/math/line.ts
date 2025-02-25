@@ -1,13 +1,5 @@
-import { EPSILON } from "../excalidraw/constants";
-import {
-  pointCenter,
-  pointDistanceSq,
-  pointFrom,
-  pointRotateRads,
-  pointsEqual,
-} from "./point";
-import type { GlobalPoint, Line, LocalPoint, Radians } from "./types";
-import { vectorCross, vectorFromPoint } from "./vector";
+import { pointFrom } from "./point";
+import type { GlobalPoint, Line, LocalPoint } from "./types";
 
 /**
  * Create a line from two points.
@@ -17,54 +9,6 @@ import { vectorCross, vectorFromPoint } from "./vector";
  */
 export function line<P extends GlobalPoint | LocalPoint>(a: P, b: P): Line<P> {
   return [a, b] as Line<P>;
-}
-
-/**
- * Convenient point creation from an array of two points.
- *
- * @param param0 The array with the two points to convert to a line
- * @returns The created line
- */
-export function lineFromPointPair<P extends GlobalPoint | LocalPoint>([a, b]: [
-  P,
-  P,
-]): Line<P> {
-  return line(a, b);
-}
-
-/**
- * TODO
- *
- * @param pointArray
- * @returns
- */
-export function lineFromPointArray<P extends GlobalPoint | LocalPoint>(
-  pointArray: P[],
-): Line<P> | undefined {
-  return pointArray.length === 2
-    ? line<P>(pointArray[0], pointArray[1])
-    : undefined;
-}
-
-/**
- * Return the coordinates resulting from rotating the given line about an
- * origin by an angle in degrees note that when the origin is not given,
- * the midpoint of the given line is used as the origin
- *
- * @param l
- * @param angle
- * @param origin
- * @returns
- */
-export function lineRotate<Point extends LocalPoint | GlobalPoint>(
-  l: Line<Point>,
-  angle: Radians,
-  origin?: Point,
-): Line<Point> {
-  return line(
-    pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
-    pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
-  );
 }
 
 /**
@@ -91,35 +35,4 @@ export function linesIntersectAt<Point extends GlobalPoint | LocalPoint>(
   }
 
   return null;
-}
-
-export function isPointOnLine<P extends GlobalPoint | LocalPoint>(
-  l: Line<P>,
-  p: P,
-  epsilon: number = EPSILON,
-) {
-  const p1 = vectorFromPoint(l[1], l[0]);
-  const p2 = vectorFromPoint(p, l[0]);
-
-  const r = vectorCross(p1, p2);
-  return Math.abs(r) < epsilon;
-}
-
-export function lineClosestPoint<P extends GlobalPoint | LocalPoint>(
-  l: Line<P>,
-  p: P,
-): P {
-  if (pointsEqual(l[0], l[1])) {
-    return l[0];
-  }
-
-  const t =
-    ((p[0] - l[0][0]) * (l[1][0] - l[0][0]) +
-      (p[1] - l[0][1]) * (l[1][1] - l[0][1])) /
-    pointDistanceSq(l[0], l[1]);
-
-  return pointFrom(
-    l[0][0] + t * (l[1][0] - l[0][0]),
-    l[0][1] + t * (l[1][1] - l[0][1]),
-  );
 }

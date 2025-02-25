@@ -1,4 +1,4 @@
-import type { GlobalPoint, LocalPoint, Radians, Vector } from "./types";
+import type { GlobalPoint, LocalPoint, Vector } from "./types";
 
 /**
  * Create a vector from the x and y coordiante elements.
@@ -142,24 +142,4 @@ export const vectorNormalize = (v: Vector): Vector => {
   }
 
   return vector(v[0] / m, v[1] / m);
-};
-
-/**
- * Rotate a vector by the given radians
- * @param v Target vector
- * @param a Angle to rotate in radians
- * @returns The rotated vector
- */
-export const vectorRotate = (v: Vector, a: Radians): Vector => {
-  const cos = Math.cos(a);
-  const sin = Math.sin(a);
-
-  return vector(v[0] * cos - v[1] * sin, v[0] * sin + v[1] * cos);
-};
-
-/**
- * Project the first vector onto the second vector
- */
-export const vectorProjection = (a: Vector, b: Vector) => {
-  return vectorScale(b, vectorDot(a, b) / vectorDot(b, b));
 };
