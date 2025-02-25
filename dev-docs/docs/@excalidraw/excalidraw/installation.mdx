@@ -18,7 +18,7 @@ yarn add react react-dom @excalidraw/excalidraw
 
 #### Self-hosting fonts
 
-By default, excalidraw will try to load fonts used by Excalidraw from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).
+By default, Excalidraw will try to download all the used fonts from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).
 
 For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
@@ -53,4 +53,4 @@ Excalidraw takes _100%_ of `width` and `height` of the containing block so make 
 ### Demo
 
 {/* // TODO_V18: temp */}
-Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/mrazator/release-v18/examples/with-script-in-browser).
+Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/mrazator/release-v18/examples/with-script-in-browser) example.
