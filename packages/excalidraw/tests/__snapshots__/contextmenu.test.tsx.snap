@@ -10,6 +10,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": {
     "items": [
       "separator",
@@ -1093,6 +1094,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -1312,6 +1314,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -1646,6 +1649,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -1980,6 +1984,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -2199,6 +2204,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -2442,6 +2448,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -2746,6 +2753,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -3118,6 +3126,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -3596,6 +3605,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -3922,6 +3932,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -4248,6 +4259,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": null,
   "croppingElementId": null,
   "currentChartType": "bar",
@@ -4654,6 +4666,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": {
     "items": [
       "separator",
@@ -5875,6 +5888,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": {
     "items": [
       "separator",
@@ -7142,6 +7156,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": {
     "items": [
       {
@@ -7819,6 +7834,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": {
     "items": [
       "separator",
@@ -8807,6 +8823,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "type": "selection",
   },
   "collaborators": Map {},
+  "collaboratorsCursorsHidden": false,
   "contextMenu": {
     "items": [
       "separator",

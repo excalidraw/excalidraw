@@ -200,6 +200,7 @@ const getRelevantAppStateProps = (
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions
+  collaboratorsCursorsHidden: appState.collaboratorsCursorsHidden,
   activeEmbeddable: appState.activeEmbeddable,
   snapLines: appState.snapLines,
   zenModeEnabled: appState.zenModeEnabled,
