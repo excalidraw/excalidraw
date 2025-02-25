@@ -1,11 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   render,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
+  unmountComponent,
 } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
@@ -17,8 +17,7 @@ import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { SHAPES } from "../shapes";
 import { vi } from "vitest";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
