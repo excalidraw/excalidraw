@@ -17,7 +17,7 @@ import {
 } from "../element/typeChecks";
 import { updateActiveTool } from "../utils";
 import { TrashIcon } from "../components/icons";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { getContainerElement } from "../element/textElement";
 import { getFrameChildren } from "../frame";
 
@@ -233,7 +233,7 @@ export const actionDeleteSelected = register({
             ...nextAppState,
             editingLinearElement: null,
           },
-          captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
 
@@ -265,7 +265,7 @@ export const actionDeleteSelected = register({
                 : [0],
           },
         },
-        captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
@@ -287,12 +287,12 @@ export const actionDeleteSelected = register({
         multiElement: null,
         activeEmbeddable: null,
       },
-      captureIncrement: isSomeElementSelected(
+      captureUpdate: isSomeElementSelected(
         getNonDeletedElements(elements),
         appState,
       )
-        ? CaptureIncrementAction.IMMEDIATELY
-        : CaptureIncrementAction.EVENTUALLY,
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event, appState, elements) =>

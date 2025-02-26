@@ -42,7 +42,7 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -62,7 +62,7 @@ export const actionDuplicateSelection = register({
         return {
           elements,
           appState: newAppState,
-          captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       } catch {
         return false;
@@ -83,7 +83,7 @@ export const actionDuplicateSelection = register({
 
     return {
       ...nextState,
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,

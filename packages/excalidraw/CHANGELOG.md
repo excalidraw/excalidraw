@@ -154,7 +154,7 @@ or, if you prefer the path to be dynamicly set based on the `location.origin`, y
 </Script>
 ```
 
-#### Deprecated `commitToHistory` in favor of `captureIncrement` in `updateScene` API [#7348](https://github.com/excalidraw/excalidraw/pull/7348), [#7898](https://github.com/excalidraw/excalidraw/pull//7898)
+#### Deprecated `commitToHistory` in favor of `captureUpdate` in `updateScene` API [#7348](https://github.com/excalidraw/excalidraw/pull/7348), [#7898](https://github.com/excalidraw/excalidraw/pull//7898)
 
 ```js
 // before
@@ -162,28 +162,28 @@ updateScene({ elements, appState, commitToHistory: true }); // A
 updateScene({ elements, appState, commitToHistory: false }); // B
 
 // after
-import { CaptureIncrementAction } from "@excalidraw/excalidraw";
+import { CaptureUpdateAction } from "@excalidraw/excalidraw";
 updateScene({
   elements,
   appState,
-  captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+  captureUpdate: CaptureUpdateAction.IMMEDIATELY,
 }); // A
 updateScene({
   elements,
   appState,
-  captureIncrement: CaptureIncrementAction.NEVER,
+  captureUpdate: CaptureUpdateAction.NEVER,
 }); // B
 ```
 
-The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `captureIncrement: CaptureIncrementActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below.
+The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `captureUpdate: CaptureUpdateActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below.
 
-> **Note**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `captureIncrement` value.
+> **Note**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `captureUpdate` value.
 
-| Undo behaviour | `commitToHistory` (before) | `captureIncrement` (after) | Notes |
+| Undo behaviour | `commitToHistory` (before) | `captureUpdate` (after) | Notes |
 | --- | --- | --- | --- |
-| _Immediately undoable_ | `true` | `CaptureIncrementAction.IMMEDIATELY` | Use for updates which should be captured. Should be used for most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
-| _Eventually undoable_ | `false` (default) | `CaptureIncrementAction.EVENTUALLY` (default) | Use for updates which should not be captured immediately - likely exceptions which are part of some async multi-step process. Otherwise, all such updates would end up being captured with the next `CaptureIncrementAction.IMMEDIATELY` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
-| _Never undoable_ | n/a | `CaptureIncrementAction.NEVER` | **NEW**: Previously there was no equivalent for this value. Now, it's recommended to use `CaptureIncrementAction.NEVER` for updates which should never be recorded, such as remote updates or scene initialization. These updates will _never_ make it to the local undo / redo stacks. |
+| _Immediately undoable_ | `true` | `CaptureUpdateAction.IMMEDIATELY` | Use for updates which should be captured. Should be used for most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `false` (default) | `CaptureUpdateAction.EVENTUALLY` (default) | Use for updates which should not be captured immediately - likely exceptions which are part of some async multi-step process. Otherwise, all such updates would end up being captured with the next `CaptureUpdateAction.IMMEDIATELY` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | n/a | `CaptureUpdateAction.NEVER` | **NEW**: Previously there was no equivalent for this value. Now, it's recommended to use `CaptureUpdateAction.NEVER` for updates which should never be recorded, such as remote updates or scene initialization. These updates will _never_ make it to the local undo / redo stacks. |
 
 #### Other
 

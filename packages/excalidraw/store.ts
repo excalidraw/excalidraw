@@ -37,7 +37,7 @@ const isObservedAppState = (
 ): appState is ObservedAppState =>
   !!Reflect.get(appState, hiddenObservedAppStateProp);
 
-export const CaptureIncrementAction = {
+export const CaptureUpdateAction = {
   /**
    * Immediately undoable.
    *
@@ -62,7 +62,7 @@ export const CaptureIncrementAction = {
    * Use for updates which should not be captured immediately - likely
    * exceptions which are part of some async multi-step process. Otherwise, all
    * such updates would end up being captured with the next
-   * `CaptureIncrementAction.IMMEDIATELY` - triggered either by the next `updateScene`
+   * `CaptureUpdateAction.IMMEDIATELY` - triggered either by the next `updateScene`
    * or internally by the editor.
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
@@ -70,7 +70,7 @@ export const CaptureIncrementAction = {
   EVENTUALLY: "EVENTUALLY",
 } as const;
 
-export type CaptureIncrementActionType = ValueOf<typeof CaptureIncrementAction>;
+export type CaptureUpdateActionType = ValueOf<typeof CaptureUpdateAction>;
 
 /**
  * Represent an increment to the Store.
@@ -133,7 +133,7 @@ export class Store implements IStore {
     [StoreIncrementEvent]
   >();
 
-  private scheduledActions: Set<CaptureIncrementActionType> = new Set();
+  private scheduledActions: Set<CaptureUpdateActionType> = new Set();
   private _snapshot = Snapshot.empty();
 
   public get snapshot() {
@@ -146,14 +146,14 @@ export class Store implements IStore {
 
   // TODO: Suspicious that this is called so many places. Seems error-prone.
   public shouldCaptureIncrement = () => {
-    this.scheduleAction(CaptureIncrementAction.IMMEDIATELY);
+    this.scheduleAction(CaptureUpdateAction.IMMEDIATELY);
   };
 
   public shouldUpdateSnapshot = () => {
-    this.scheduleAction(CaptureIncrementAction.NEVER);
+    this.scheduleAction(CaptureUpdateAction.NEVER);
   };
 
-  private scheduleAction = (action: CaptureIncrementActionType) => {
+  private scheduleAction = (action: CaptureUpdateActionType) => {
     this.scheduledActions.add(action);
     this.satisfiesScheduledActionsInvariant();
   };
@@ -164,9 +164,9 @@ export class Store implements IStore {
   ): void => {
     try {
       // Capture has precedence since it also performs update
-      if (this.scheduledActions.has(CaptureIncrementAction.IMMEDIATELY)) {
+      if (this.scheduledActions.has(CaptureUpdateAction.IMMEDIATELY)) {
         this.captureIncrement(elements, appState);
-      } else if (this.scheduledActions.has(CaptureIncrementAction.NEVER)) {
+      } else if (this.scheduledActions.has(CaptureUpdateAction.NEVER)) {
         this.updateSnapshot(elements, appState);
       }
     } finally {

@@ -1,4 +1,4 @@
-import { CaptureIncrementAction } from "@excalidraw/excalidraw";
+import { CaptureUpdateAction } from "@excalidraw/excalidraw";
 import { compressData } from "@excalidraw/excalidraw/data/encode";
 import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
@@ -268,6 +268,6 @@ export const updateStaleImageStatuses = (params: {
         }
         return element;
       }),
-    captureIncrement: CaptureIncrementAction.NEVER,
+    captureUpdate: CaptureUpdateAction.NEVER,
   });
 };

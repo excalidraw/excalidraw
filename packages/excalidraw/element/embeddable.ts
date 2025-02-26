@@ -12,7 +12,7 @@ import type {
   IframeData,
 } from "./types";
 import type { MarkRequired } from "../utility-types";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 
@@ -340,7 +340,7 @@ export const actionSetEmbeddableAsActiveTool = register({
           type: "embeddable",
         }),
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
 });

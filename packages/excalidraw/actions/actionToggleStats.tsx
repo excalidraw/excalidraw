@@ -1,7 +1,7 @@
 import { register } from "./register";
 import { CODES, KEYS } from "../keys";
 import { abacusIcon } from "../components/icons";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 export const actionToggleStats = register({
   name: "stats",
@@ -17,7 +17,7 @@ export const actionToggleStats = register({
         ...appState,
         stats: { ...appState.stats, open: !this.checked!(appState) },
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState) => appState.stats.open,

@@ -412,7 +412,7 @@ import { COLOR_PALETTE } from "../colors";
 import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import FollowMode from "./FollowMode/FollowMode";
-import { Store, CaptureIncrementAction } from "../store";
+import { Store, CaptureUpdateAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -2097,12 +2097,12 @@ class App extends React.Component<AppProps, AppState> {
           if (shouldUpdateStrokeColor) {
             this.syncActionResult({
               appState: { ...this.state, currentItemStrokeColor: color },
-              captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           } else {
             this.syncActionResult({
               appState: { ...this.state, currentItemBackgroundColor: color },
-              captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           }
         } else {
@@ -2116,7 +2116,7 @@ class App extends React.Component<AppProps, AppState> {
               }
               return el;
             }),
-            captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
         }
       },
@@ -2137,11 +2137,9 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (actionResult.captureIncrement === CaptureIncrementAction.NEVER) {
+    if (actionResult.captureUpdate === CaptureUpdateAction.NEVER) {
       this.store.shouldUpdateSnapshot();
-    } else if (
-      actionResult.captureIncrement === CaptureIncrementAction.IMMEDIATELY
-    ) {
+    } else if (actionResult.captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
       this.store.shouldCaptureIncrement();
     }
 
@@ -2218,7 +2216,7 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       !didUpdate &&
-      actionResult.captureIncrement !== CaptureIncrementAction.EVENTUALLY
+      actionResult.captureUpdate !== CaptureUpdateAction.EVENTUALLY
     ) {
       this.scene.triggerUpdate();
     }
@@ -2347,7 +2345,7 @@ class App extends React.Component<AppProps, AppState> {
     this.resetHistory();
     this.syncActionResult({
       ...scene,
-      captureIncrement: CaptureIncrementAction.NEVER,
+      captureUpdate: CaptureUpdateAction.NEVER,
     });
 
     // clear the shape and image cache so that any images in initialData
@@ -2827,7 +2825,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
-      // defer so that the captureIncrement flag isn't reset via current update
+      // defer so that the shouldCaptureIncrement flag isn't reset via current update
       setTimeout(() => {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
@@ -3889,23 +3887,23 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       /**
-       *  Controls which updates should be captured by the `Store`. Captured updates are emmitted as increments and listened to by other components, such as `History` for undo / redo purposes.
+       *  Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes.
        *
-       *  - `CaptureIncrementAction.IMMEDIATELY`: Updates are immediately undoable. Use for most local updates.
-       *  - `CaptureIncrementAction.NEVER`: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
-       *  - `CaptureIncrementAction.EVENTUALLY`: Updates will be eventually be captured as part of a future increment.
+       *  - `CaptureUpdateAction.IMMEDIATELY`: Updates are immediately undoable. Use for most local updates.
+       *  - `CaptureUpdateAction.NEVER`: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
+       *  - `CaptureUpdateAction.EVENTUALLY`: Updates will be eventually be captured as part of a future increment.
        *
-       * Check [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#captureIncrement) for more details.
+       * Check [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#captureUpdate) for more details.
        *
-       * @default CaptureIncrementAction.EVENTUALLY
+       * @default CaptureUpdateAction.EVENTUALLY
        */
-      captureIncrement?: SceneData["captureIncrement"];
+      captureUpdate?: SceneData["captureUpdate"];
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
       if (
-        sceneData.captureIncrement &&
-        sceneData.captureIncrement !== CaptureIncrementAction.EVENTUALLY
+        sceneData.captureUpdate &&
+        sceneData.captureUpdate !== CaptureUpdateAction.EVENTUALLY
       ) {
         const prevCommittedAppState = this.store.snapshot.appState;
         const prevCommittedElements = this.store.snapshot.elements;
@@ -3923,14 +3921,12 @@ class App extends React.Component<AppProps, AppState> {
 
         // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
         // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
-        if (sceneData.captureIncrement === CaptureIncrementAction.IMMEDIATELY) {
+        if (sceneData.captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
           this.store.captureIncrement(
             nextCommittedElements,
             nextCommittedAppState,
           );
-        } else if (
-          sceneData.captureIncrement === CaptureIncrementAction.NEVER
-        ) {
+        } else if (sceneData.captureUpdate === CaptureUpdateAction.NEVER) {
           this.store.updateSnapshot(
             nextCommittedElements,
             nextCommittedAppState,
@@ -4611,7 +4607,7 @@ class App extends React.Component<AppProps, AppState> {
       if (this.flowChartNavigator.isExploring) {
         this.flowChartNavigator.clear();
         this.syncActionResult({
-          captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
       }
     }
@@ -4660,7 +4656,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.flowChartCreator.clear();
         this.syncActionResult({
-          captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
       }
     }
@@ -6400,10 +6396,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        captureIncrement:
+        captureUpdate:
           this.state.openDialog?.name === "elementLinkSelector"
-            ? CaptureIncrementAction.EVENTUALLY
-            : CaptureIncrementAction.NEVER,
+            ? CaptureUpdateAction.EVENTUALLY
+            : CaptureUpdateAction.NEVER,
       });
       return;
     }
@@ -9066,7 +9062,7 @@ class App extends React.Component<AppProps, AppState> {
           appState: {
             newElement: null,
           },
-          captureIncrement: CaptureIncrementAction.NEVER,
+          captureUpdate: CaptureUpdateAction.NEVER,
         });
 
         return;
@@ -9236,7 +9232,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
-          captureIncrement: CaptureIncrementAction.NEVER,
+          captureUpdate: CaptureUpdateAction.NEVER,
         });
       }
 
@@ -10207,7 +10203,7 @@ class App extends React.Component<AppProps, AppState> {
                 isLoading: false,
               },
               replaceFiles: true,
-              captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
             return;
           } catch (error: any) {
@@ -10336,7 +10332,7 @@ class App extends React.Component<AppProps, AppState> {
             isLoading: false,
           },
           replaceFiles: true,
-          captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

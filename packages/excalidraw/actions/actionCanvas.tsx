@@ -37,7 +37,7 @@ import {
 import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { clamp, roundToStep } from "@excalidraw/math";
 
 export const actionChangeViewBackgroundColor = register({
@@ -54,9 +54,9 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      captureIncrement: !!value.viewBackgroundColor
-        ? CaptureIncrementAction.IMMEDIATELY
-        : CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: !!value.viewBackgroundColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => {
@@ -115,7 +115,7 @@ export const actionClearCanvas = register({
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
@@ -140,7 +140,7 @@ export const actionZoomIn = register({
         ),
         userToFollow: null,
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -181,7 +181,7 @@ export const actionZoomOut = register({
         ),
         userToFollow: null,
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -222,7 +222,7 @@ export const actionResetZoom = register({
         ),
         userToFollow: null,
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, appState }) => (
@@ -341,7 +341,7 @@ export const zoomToFitBounds = ({
       scrollY: centerScroll.scrollY,
       zoom: { value: newZoomValue },
     },
-    captureIncrement: CaptureIncrementAction.EVENTUALLY,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   };
 };
 
@@ -472,7 +472,7 @@ export const actionToggleTheme = register({
         theme:
           value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
@@ -510,7 +510,7 @@ export const actionToggleEraserTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) => event.key === KEYS.E,
@@ -549,7 +549,7 @@ export const actionToggleHandTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>

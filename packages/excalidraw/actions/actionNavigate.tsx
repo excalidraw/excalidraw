@@ -7,7 +7,7 @@ import {
   microphoneMutedIcon,
 } from "../components/icons";
 import { t } from "../i18n";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import type { Collaborator } from "../types";
 import { register } from "./register";
 import clsx from "clsx";
@@ -28,7 +28,7 @@ export const actionGoToCollaborator = register({
           ...appState,
           userToFollow: null,
         },
-        captureIncrement: CaptureIncrementAction.EVENTUALLY,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
@@ -42,7 +42,7 @@ export const actionGoToCollaborator = register({
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData, data, appState }) => {

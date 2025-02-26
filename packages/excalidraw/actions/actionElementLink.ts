@@ -7,7 +7,7 @@ import {
 } from "../element/elementLink";
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { register } from "./register";
 
 export const actionCopyElementLink = register({
@@ -42,14 +42,14 @@ export const actionCopyElementLink = register({
                 closable: true,
               },
             },
-            captureIncrement: CaptureIncrementAction.EVENTUALLY,
+            captureUpdate: CaptureUpdateAction.EVENTUALLY,
           };
         }
         return {
           appState,
           elements,
           app,
-          captureIncrement: CaptureIncrementAction.EVENTUALLY,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
         };
       }
     } catch (error: any) {
@@ -60,7 +60,7 @@ export const actionCopyElementLink = register({
       appState,
       elements,
       app,
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   predicate: (elements, appState) =>
@@ -82,7 +82,7 @@ export const actionLinkToElement = register({
         elements,
         appState,
         app,
-        captureIncrement: CaptureIncrementAction.EVENTUALLY,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
@@ -94,7 +94,7 @@ export const actionLinkToElement = register({
           sourceElementId: getSelectedElements(elements, appState)[0].id,
         },
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   predicate: (elements, appState, appProps, app) => {

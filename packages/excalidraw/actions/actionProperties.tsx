@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AppClassProperties, AppState, Primitive } from "../types";
-import type { CaptureIncrementActionType } from "../store";
+import type { CaptureUpdateActionType } from "../store";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
@@ -109,7 +109,7 @@ import {
   tupleToCoors,
 } from "../utils";
 import { register } from "./register";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { Fonts, getLineHeight } from "../fonts";
 import {
   bindLinearElement,
@@ -271,7 +271,7 @@ const changeFontSize = (
           ? [...newFontSizes][0]
           : fallbackValue ?? appState.currentItemFontSize,
     },
-    captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+    captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };
 };
 
@@ -301,9 +301,9 @@ export const actionChangeStrokeColor = register({
         ...appState,
         ...value,
       },
-      captureIncrement: !!value.currentItemStrokeColor
-        ? CaptureIncrementAction.IMMEDIATELY
-        : CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: !!value.currentItemStrokeColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -347,9 +347,9 @@ export const actionChangeBackgroundColor = register({
         ...appState,
         ...value,
       },
-      captureIncrement: !!value.currentItemBackgroundColor
-        ? CaptureIncrementAction.IMMEDIATELY
-        : CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: !!value.currentItemBackgroundColor
+        ? CaptureUpdateAction.IMMEDIATELY
+        : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, appProps }) => (
@@ -393,7 +393,7 @@ export const actionChangeFillStyle = register({
         }),
       ),
       appState: { ...appState, currentItemFillStyle: value },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -466,7 +466,7 @@ export const actionChangeStrokeWidth = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeWidth: value },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -521,7 +521,7 @@ export const actionChangeSloppiness = register({
         }),
       ),
       appState: { ...appState, currentItemRoughness: value },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -572,7 +572,7 @@ export const actionChangeStrokeStyle = register({
         }),
       ),
       appState: { ...appState, currentItemStrokeStyle: value },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -627,7 +627,7 @@ export const actionChangeOpacity = register({
         true,
       ),
       appState: { ...appState, currentItemOpacity: value },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => (
@@ -802,23 +802,23 @@ export const actionChangeFontFamily = register({
           ...appState,
           ...nextAppState,
         },
-        captureIncrement: CaptureIncrementAction.NEVER,
+        captureUpdate: CaptureUpdateAction.NEVER,
       };
     }
 
     const { currentItemFontFamily, currentHoveredFontFamily } = value;
 
-    let nextCaptureIncrementAction: CaptureIncrementActionType =
-      CaptureIncrementAction.EVENTUALLY;
+    let nextCaptureUpdateAction: CaptureUpdateActionType =
+      CaptureUpdateAction.EVENTUALLY;
     let nextFontFamily: FontFamilyValues | undefined;
     let skipOnHoverRender = false;
 
     if (currentItemFontFamily) {
       nextFontFamily = currentItemFontFamily;
-      nextCaptureIncrementAction = CaptureIncrementAction.IMMEDIATELY;
+      nextCaptureUpdateAction = CaptureUpdateAction.IMMEDIATELY;
     } else if (currentHoveredFontFamily) {
       nextFontFamily = currentHoveredFontFamily;
-      nextCaptureIncrementAction = CaptureIncrementAction.EVENTUALLY;
+      nextCaptureUpdateAction = CaptureUpdateAction.EVENTUALLY;
 
       const selectedTextElements = getSelectedElements(elements, appState, {
         includeBoundTextElement: true,
@@ -851,7 +851,7 @@ export const actionChangeFontFamily = register({
         ...appState,
         ...nextAppState,
       },
-      captureIncrement: nextCaptureIncrementAction,
+      captureUpdate: nextCaptureUpdateAction,
     };
 
     if (nextFontFamily && !skipOnHoverRender) {
@@ -1176,7 +1176,7 @@ export const actionChangeTextAlign = register({
         ...appState,
         currentItemTextAlign: value,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -1266,7 +1266,7 @@ export const actionChangeVerticalAlign = register({
       appState: {
         ...appState,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
@@ -1351,7 +1351,7 @@ export const actionChangeRoundness = register({
         ...appState,
         currentItemRoundness: value,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1510,7 +1510,7 @@ export const actionChangeArrowhead = register({
           ? "currentItemStartArrowhead"
           : "currentItemEndArrowhead"]: value.type,
       },
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
@@ -1722,7 +1722,7 @@ export const actionChangeArrowType = register({
     return {
       elements: newElements,
       appState: newState,
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {

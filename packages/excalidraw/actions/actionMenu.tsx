@@ -4,7 +4,7 @@ import { t } from "../i18n";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { register } from "./register";
 import { KEYS } from "../keys";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -15,7 +15,7 @@ export const actionToggleCanvasMenu = register({
       ...appState,
       openMenu: appState.openMenu === "canvas" ? null : "canvas",
     },
-    captureIncrement: CaptureIncrementAction.EVENTUALLY,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
@@ -37,7 +37,7 @@ export const actionToggleEditMenu = register({
       ...appState,
       openMenu: appState.openMenu === "shape" ? null : "shape",
     },
-    captureIncrement: CaptureIncrementAction.EVENTUALLY,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -74,7 +74,7 @@ export const actionShortcuts = register({
                 name: "help",
               },
       },
-      captureIncrement: CaptureIncrementAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,

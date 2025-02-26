@@ -34,7 +34,7 @@ import {
   replaceAllElementsInFrame,
 } from "../frame";
 import { syncMovedIndices } from "../fractionalIndex";
-import { CaptureIncrementAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -87,7 +87,7 @@ export const actionGroup = register({
       return {
         appState,
         elements,
-        captureIncrement: CaptureIncrementAction.EVENTUALLY,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
     // if everything is already grouped into 1 group, there is nothing to do
@@ -111,7 +111,7 @@ export const actionGroup = register({
         return {
           appState,
           elements,
-          captureIncrement: CaptureIncrementAction.EVENTUALLY,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
         };
       }
     }
@@ -178,7 +178,7 @@ export const actionGroup = register({
         ),
       },
       elements: reorderedElements,
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -211,7 +211,7 @@ export const actionUngroup = register({
       return {
         appState,
         elements,
-        captureIncrement: CaptureIncrementAction.EVENTUALLY,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
@@ -285,7 +285,7 @@ export const actionUngroup = register({
     return {
       appState: { ...appState, ...updateAppState },
       elements: nextElements,
-      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>
