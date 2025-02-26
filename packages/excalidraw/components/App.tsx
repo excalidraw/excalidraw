@@ -3889,13 +3889,15 @@ class App extends React.Component<AppProps, AppState> {
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       /**
-       *  Parameter to control which updates should be captured by the `Store`. Captured updates are emmitted as increments and listened to by other components, such as `History` for undo / redo purposes.
+       *  Controls which updates should be captured by the `Store`. Captured updates are emmitted as increments and listened to by other components, such as `History` for undo / redo purposes.
        *
-       *  - CaptureIncrementAction.IMMEDIATELY: Updates are immediately undoable. Use for most local updates.
-       *  - CaptureIncrementAction.NEVER: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
-       *  - CaptureIncrementAction.EVENTUALLY (default): Updates will be eventually be captured as part of a future increment.
+       *  - `CaptureIncrementAction.IMMEDIATELY`: Updates are immediately undoable. Use for most local updates.
+       *  - `CaptureIncrementAction.NEVER`: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
+       *  - `CaptureIncrementAction.EVENTUALLY`: Updates will be eventually be captured as part of a future increment.
        *
        * Check [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#captureIncrement) for more details.
+       *
+       * @default CaptureIncrementAction.EVENTUALLY
        */
       captureIncrement?: SceneData["captureIncrement"];
     }) => {

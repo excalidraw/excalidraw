@@ -95,15 +95,15 @@ or
 <script type="importmap">
   {
     "imports": {
-      "react": "https://esm.sh/react@18.3.1",
-      "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
-      "react-dom": "https://esm.sh/react-dom@18.3.1"
+      "react": "https://esm.sh/react@19.0.0",
+      "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
+      "react-dom": "https://esm.sh/react-dom@19.0.0"
     }
   }
 </script>
 <script type="module">
-  import React from "https://esm.sh/react@18.3.1";
-  import ReactDOM from "https://esm.sh/react-dom@18.3.1";
+  import React from "https://esm.sh/react@19.0.0";
+  import ReactDOM from "https://esm.sh/react-dom@19.0.0";
   import * as ExcalidrawLib from "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom";
 </script>
 ```
@@ -192,6 +192,8 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 - `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
 - Stats container CSS has changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout. [#8361](https://github.com/excalidraw/excalidraw/pull/8361)
+
+- `<DefaultSidebar />` triggers are now always merged with host app triggers, rendered through `<DefaultSidebar.Triggers/>`. `<DefaultSidebar.Triggers/>` no longer accepts any props other than children. [#8498](https://github.com/excalidraw/excalidraw/pull/8498)
 
 ### Features
 
@@ -472,8 +474,6 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 - Aspect ratio of distorted images are not preserved in SVG exports [#8061](https://github.com/excalidraw/excalidraw/pull/8061)
 
 - WYSIWYG editor padding is not normalized with zoom.value [#8481](https://github.com/excalidraw/excalidraw/pull/8481)
-
-- Default sidebar triggers & behavior [#8498](https://github.com/excalidraw/excalidraw/pull/8498)
 
 - Improve canvas search scroll behavior further [#8491](https://github.com/excalidraw/excalidraw/pull/8491)
 
