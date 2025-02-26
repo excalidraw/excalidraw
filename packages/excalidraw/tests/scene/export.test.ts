@@ -114,7 +114,7 @@ describe("exportToSvg", () => {
     );
 
     expect(svgElement.getAttribute("filter")).toMatchInlineSnapshot(
-      `"_themeFilter_1883f3"`,
+      `"invert(93%) hue-rotate(180deg)"`,
     );
   });
 
