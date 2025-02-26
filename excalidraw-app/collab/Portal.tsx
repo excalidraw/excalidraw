@@ -19,7 +19,7 @@ import throttle from "lodash.throttle";
 import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
 import { encryptData } from "@excalidraw/excalidraw/data/encryption";
 import type { Socket } from "socket.io-client";
-import { StoreAction } from "@excalidraw/excalidraw";
+import { CaptureIncrementAction } from "@excalidraw/excalidraw";
 
 class Portal {
   collab: TCollabClass;
@@ -133,7 +133,7 @@ class Portal {
     if (isChanged) {
       this.collab.excalidrawAPI.updateScene({
         elements: newElements,
-        storeAction: StoreAction.UPDATE,
+        captureIncrement: CaptureIncrementAction.NEVER,
       });
     }
   }, FILE_UPLOAD_TIMEOUT);

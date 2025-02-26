@@ -7,7 +7,7 @@ import {
   createRedoAction,
   createUndoAction,
 } from "@excalidraw/excalidraw/actions/actionHistory";
-import { StoreAction, newElementWith } from "@excalidraw/excalidraw";
+import { CaptureIncrementAction, newElementWith } from "@excalidraw/excalidraw";
 
 const { h } = window;
 
@@ -85,7 +85,7 @@ describe("collaboration", () => {
 
     API.updateScene({
       elements: syncInvalidIndices([rect1, rect2]),
-      storeAction: StoreAction.CAPTURE,
+      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
     });
 
     API.updateScene({
@@ -93,7 +93,7 @@ describe("collaboration", () => {
         rect1,
         newElementWith(h.elements[1], { isDeleted: true }),
       ]),
-      storeAction: StoreAction.CAPTURE,
+      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
     });
 
     await waitFor(() => {
@@ -140,7 +140,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     API.updateScene({
       elements: syncInvalidIndices([rect1]),
-      storeAction: StoreAction.UPDATE,
+      captureIncrement: CaptureIncrementAction.NEVER,
     });
 
     await waitFor(() => {
@@ -178,7 +178,7 @@ describe("collaboration", () => {
         h.elements[0],
         newElementWith(h.elements[1], { x: 100 }),
       ]),
-      storeAction: StoreAction.CAPTURE,
+      captureIncrement: CaptureIncrementAction.IMMEDIATELY,
     });
 
     await waitFor(() => {
@@ -213,7 +213,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     API.updateScene({
       elements: syncInvalidIndices([rect1]),
-      storeAction: StoreAction.UPDATE,
+      captureIncrement: CaptureIncrementAction.NEVER,
     });
 
     // snapshot was correctly updated and marked the element as deleted

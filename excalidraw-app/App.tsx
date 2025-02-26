@@ -23,7 +23,7 @@ import {
   Excalidraw,
   LiveCollaborationTrigger,
   TTDDialogTrigger,
-  StoreAction,
+  CaptureIncrementAction,
   reconcileElements,
 } from "@excalidraw/excalidraw";
 import type {
@@ -486,7 +486,7 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               ...data.scene,
               ...restore(data.scene, null, null, { repairBindings: true }),
-              storeAction: StoreAction.CAPTURE,
+              captureIncrement: CaptureIncrementAction.IMMEDIATELY,
             });
           }
         });
@@ -513,7 +513,7 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
-            storeAction: StoreAction.UPDATE,
+            captureIncrement: CaptureIncrementAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
             if (data) {
@@ -645,7 +645,7 @@ const ExcalidrawWrapper = () => {
           if (didChange) {
             excalidrawAPI.updateScene({
               elements,
-              storeAction: StoreAction.UPDATE,
+              captureIncrement: CaptureIncrementAction.NEVER,
             });
           }
         }

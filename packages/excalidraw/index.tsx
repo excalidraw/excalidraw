@@ -260,7 +260,7 @@ export {
   bumpVersion,
 } from "./element/mutateElement";
 
-export { StoreAction } from "./store";
+export { CaptureIncrementAction } from "./store";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
