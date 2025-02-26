@@ -554,6 +554,7 @@ let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: (() => void) | null = null;
+let selectionSwitch = false;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -4534,14 +4535,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event.key === KEYS[1] && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
-        if (this.state.activeTool.type === "selection") {
-          this.setActiveTool({ type: "lasso" });
-        } else {
-          this.setActiveTool({ type: "selection" });
-        }
-      }
-
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
@@ -4572,7 +4565,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else if (this.state.activeTool.type === "selection") {
+      } else if (
+        this.state.activeTool.type === "selection" ||
+        this.state.activeTool.type === "lasso"
+      ) {
         resetCursor(this.interactiveCanvas);
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
@@ -6607,18 +6603,10 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand"
     ) {
-      if (this.state.activeTool.type === "selection" && event.altKey) {
-        this.setActiveTool({ type: "lasso" });
-        this.lassoTrail.startPath(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        );
-      } else {
-        this.createGenericElementOnPointerDown(
-          this.state.activeTool.type,
-          pointerDownState,
-        );
-      }
+      this.createGenericElementOnPointerDown(
+        this.state.activeTool.type,
+        pointerDownState,
+      );
     }
 
     this.props?.onPointerDown?.(this.state.activeTool, pointerDownState);
@@ -8522,9 +8510,28 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectionElement) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        this.maybeDragNewGenericElement(pointerDownState, event);
+        if (event.altKey) {
+          this.setActiveTool({ type: "lasso" });
+          this.lassoTrail.startPath(pointerCoords.x, pointerCoords.y);
+          this.setAppState({
+            selectionElement: null,
+          });
+          selectionSwitch = true;
+        } else {
+          this.maybeDragNewGenericElement(pointerDownState, event);
+        }
       } else if (this.state.activeTool.type === "lasso") {
-        this.lassoTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+        if (!event.altKey && selectionSwitch) {
+          this.setActiveTool({ type: "selection" });
+          this.createGenericElementOnPointerDown("selection", pointerDownState);
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
+          this.maybeDragNewGenericElement(pointerDownState, event);
+          this.lassoTrail.endPath();
+          selectionSwitch = false;
+        } else {
+          this.lassoTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+        }
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -8781,6 +8788,7 @@ class App extends React.Component<AppProps, AppState> {
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
+      selectionSwitch = false;
       this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
@@ -10450,7 +10458,7 @@ class App extends React.Component<AppProps, AppState> {
         width: distance(pointerDownState.origin.x, pointerCoords.x),
         height: distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter: shouldResizeFromCenter(event),
+        shouldResizeFromCenter: false,
         zoom: this.state.zoom.value,
         informMutation,
       });

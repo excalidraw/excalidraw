@@ -42,6 +42,9 @@ export class LassoTrail extends AnimatedTrail {
   }
 
   startPath(x: number, y: number) {
+    // clear any existing trails just in case
+    this.endPath();
+
     super.startPath(x, y);
     this.intersectedElements.clear();
     this.enclosedElements.clear();

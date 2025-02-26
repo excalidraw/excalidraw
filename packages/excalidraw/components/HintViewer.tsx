@@ -123,7 +123,7 @@ const getHints = ({
     }
 
     if (!selectedElements.length && !isMobile) {
-      return [t("hints.canvasPanning"), t("hints.lassoSelect")];
+      return [t("hints.canvasPanning")];
     }
 
     if (selectedElements.length === 1) {
