@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import React, { useEffect, useRef } from "react";
 import {
   getDropdownMenuItemClassName,

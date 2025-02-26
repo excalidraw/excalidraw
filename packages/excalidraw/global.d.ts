@@ -99,8 +99,12 @@ declare module "image-blob-reduce" {
   export = reduce;
 }
 
+interface CustomMatchers {
+  toBeNonNaNNumber(): void;
+  toCloselyEqualPoints(points: readonly [number, number][]): void;
+}
+
 declare namespace jest {
-  interface Expect {
-    toBeNonNaNNumber(): void;
-  }
+  interface Expect extends CustomMatchers {}
+  interface Matchers extends CustomMatchers {}
 }

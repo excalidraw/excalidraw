@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import type { ExcalidrawElement } from "../element/types";
 import { CODES, KEYS } from "../keys";
 import { Excalidraw } from "../index";
@@ -14,6 +13,7 @@ import {
   render,
   screen,
   togglePopover,
+  unmountComponent,
 } from "./test-utils";
 import { FONT_FAMILY } from "../constants";
 import { vi } from "vitest";
@@ -43,8 +43,7 @@ const checkpoint = (name: string) => {
   );
 };
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   localStorage.clear();
   renderStaticScene.mockClear();
