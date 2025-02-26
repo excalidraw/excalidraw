@@ -2,8 +2,13 @@ import { GlobalPoint, pointFrom } from "../../math";
 import { AnimatedTrail } from "../animated-trail";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import App from "../components/App";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { ExcalidrawElement } from "../element/types";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
+import {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "../element/types";
 import { getFrameChildren } from "../frame";
 import { selectGroupsForSelectedElements } from "../groups";
 import { easeOut } from "../utils";
@@ -77,9 +82,24 @@ export class LassoTrail extends AnimatedTrail {
           this.app,
         );
 
+        const selectedIds = [...Object.keys(nextSelection.selectedElementIds)];
+        const selectedGroupIds = [
+          ...Object.keys(nextSelection.selectedGroupIds),
+        ];
+
         return {
           selectedElementIds: nextSelection.selectedElementIds,
           selectedGroupIds: nextSelection.selectedGroupIds,
+          selectedLinearElement:
+            selectedIds.length === 1 &&
+            !selectedGroupIds.length &&
+            isLinearElement(this.app.scene.getNonDeletedElement(selectedIds[0]))
+              ? new LinearElementEditor(
+                  this.app.scene.getNonDeletedElement(
+                    selectedIds[0],
+                  ) as NonDeleted<ExcalidrawLinearElement>,
+                )
+              : null,
         };
       });
     };
