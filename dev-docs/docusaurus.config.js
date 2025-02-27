@@ -149,6 +149,25 @@ const config = {
         systemvars: true,
       },
     ],
+    function () {
+      return {
+        name: "disable-fully-specified-error",
+        configureWebpack() {
+          return {
+            module: {
+              rules: [
+                {
+                  test: /\.m?js$/,
+                  resolve: {
+                    fullySpecified: false,
+                  },
+                },
+              ],
+            },
+          };
+        },
+      };
+    },
   ],
 };
 
