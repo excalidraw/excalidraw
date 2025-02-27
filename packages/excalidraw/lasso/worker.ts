@@ -79,6 +79,7 @@ export type LassoWorkerInput = {
   elementsSegments: ElementsSegments;
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
+  simplifyDistance: number;
 };
 
 export type LassoWorkerOutput = {
@@ -92,9 +93,10 @@ export const updateSelection = (input: LassoWorkerInput): LassoWorkerOutput => {
     elementsSegments,
     intersectedElements,
     enclosedElements,
+    simplifyDistance,
   } = input;
   // simplify the path to reduce the number of points
-  const path = simplify(lassoPath, 2) as GlobalPoint[];
+  let path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
   // close the path to form a polygon for enclosure check
   const closedPath = polygonFromPoints(path);
   // as the path might not enclose a shape anymore, clear before checking
