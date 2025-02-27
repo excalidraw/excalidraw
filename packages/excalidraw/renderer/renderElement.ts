@@ -60,7 +60,7 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
-import { GlobalPoint, isRightAngleRads } from "../../math";
+import { isRightAngleRads } from "../../math";
 import { getCornerRadius } from "../shapes";
 import { getUncroppedImageElement } from "../element/cropElement";
 import { getLineHeightInPx } from "../element/textMeasurements";

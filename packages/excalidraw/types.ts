@@ -42,7 +42,7 @@ import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type { StoreActionType } from "./store";
-import { GlobalPoint } from "../math";
+import type { GlobalPoint } from "../math";
 
 export type SocketId = string & { _brand: "SocketId" };
 
