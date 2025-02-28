@@ -463,23 +463,10 @@ export const maybeBindLinearElement = (
   }
 };
 
-const normalizePointBinding = (
-  binding: { focus: number; gap: number },
-  hoveredElement: ExcalidrawBindableElement,
-) => {
-  let gap = binding.gap;
-  const maxGap = maxBindingGap(
-    hoveredElement,
-    hoveredElement.width,
-    hoveredElement.height,
-  );
-
-  if (gap > maxGap) {
-    gap = BINDING_HIGHLIGHT_THICKNESS + BINDING_HIGHLIGHT_OFFSET;
-  }
+const normalizePointBinding = (binding: { focus: number; gap: number }) => {
   return {
     ...binding,
-    gap,
+    gap: FIXED_BINDING_DISTANCE,
   };
 };
 
@@ -729,7 +716,7 @@ const calculateFocusAndGap = (
 
   return {
     focus: determineFocusDistance(hoveredElement, adjacentPoint, edgePoint),
-    gap: Math.max(1, distanceToBindableElement(hoveredElement, edgePoint)),
+    gap: FIXED_BINDING_DISTANCE,
   };
 };
 
@@ -747,7 +734,7 @@ export const updateBoundElements = (
     changedElements?: Map<string, OrderedExcalidrawElement>;
   },
 ) => {
-  const { newSize, simultaneouslyUpdated } = options ?? {};
+  const { simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -780,23 +767,13 @@ export const updateBoundElements = (
       startBounds = getElementBounds(startBindingElement, elementsMap);
       endBounds = getElementBounds(endBindingElement, elementsMap);
     }
-
-    const bindings = {
-      startBinding: maybeCalculateNewGapWhenScaling(
-        changedElement,
-        element.startBinding,
-        newSize,
-      ),
-      endBinding: maybeCalculateNewGapWhenScaling(
-        changedElement,
-        element.endBinding,
-        newSize,
-      ),
-    };
-
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
-      mutateElement(element, bindings, true);
+      mutateElement(
+        element,
+        { startBinding: element.startBinding, endBinding: element.endBinding },
+        true,
+      );
       return;
     }
 
@@ -818,7 +795,9 @@ export const updateBoundElements = (
           const point = updateBoundPoint(
             element,
             bindingProp,
-            bindings[bindingProp],
+            bindingProp === "startBinding"
+              ? element.startBinding
+              : element.endBinding,
             bindableElement,
             elementsMap,
           );
@@ -1040,10 +1019,7 @@ export const avoidRectangularCorner = (
   element: ExcalidrawBindableElement,
   p: GlobalPoint,
 ): GlobalPoint => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
   const nonRotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
   if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
@@ -1226,7 +1202,6 @@ const updateBoundPoint = (
         linearElement,
         bindableElement,
         startOrEnd === "startBinding" ? "start" : "end",
-        elementsMap,
       ).fixedPoint;
     const globalMidPoint = pointFrom<GlobalPoint>(
       bindableElement.x + bindableElement.width / 2,
@@ -1336,7 +1311,6 @@ export const calculateFixedPointForElbowArrowBinding = (
   linearElement: NonDeleted<ExcalidrawElbowArrowElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
-  elementsMap: ElementsMap,
 ): { fixedPoint: FixedPoint } => {
   const bounds = [
     hoveredElement.x,
@@ -1367,28 +1341,6 @@ export const calculateFixedPointForElbowArrowBinding = (
         hoveredElement.height,
     ]),
   };
-};
-
-const maybeCalculateNewGapWhenScaling = (
-  changedElement: ExcalidrawBindableElement,
-  currentBinding: PointBinding | null | undefined,
-  newSize: { width: number; height: number } | undefined,
-): PointBinding | null | undefined => {
-  if (currentBinding == null || newSize == null) {
-    return currentBinding;
-  }
-  const { width: newWidth, height: newHeight } = newSize;
-  const { width, height } = changedElement;
-  const newGap = Math.max(
-    1,
-    Math.min(
-      maxBindingGap(changedElement, newWidth, newHeight),
-      currentBinding.gap *
-        (newWidth < newHeight ? newWidth / width : newHeight / height),
-    ),
-  );
-
-  return { ...currentBinding, gap: newGap };
 };
 
 const getElligibleElementForBindingElement = (

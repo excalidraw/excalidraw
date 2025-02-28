@@ -4779,12 +4779,12 @@ describe("history", () => {
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
                 focus: 0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
                 focus: -0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               isDeleted: true,
             }),
