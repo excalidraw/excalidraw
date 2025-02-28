@@ -64,7 +64,7 @@ We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles ins
 │   └── types/
 ```
 
-##### JavaScript: required `"type": "module"`  in package.json
+##### JavaScript: required `"type": "module"` in package.json
 
 Make sure that your JavaScript environment supports ES modules, as it might be required to define `"type": "module"` in your `package.json` file or as part of the `<script type="module" />` attribute.
 
@@ -77,7 +77,6 @@ Since `"node"` and `"node10"` do not support `package.json` `"exports"` fields, 
 Dependening on the environment, this is how imports should look like with the `ESM`:
 
 **With bundler (Vite, Next.js, etc.)**
-
 
 ```ts
 // excalidraw library with public API
