@@ -11,17 +11,16 @@
     <title>React App</title>
     <script>
       window.name = "codesandbox";
-      window.EXCALIDRAW_ASSET_PATH = window.origin;
+      window.EXCALIDRAW_ASSET_PATH =
+        "https://esm.sh/@excalidraw/excalidraw@0.18.0-rc.5/dist/prod/";
     </script>
-    <link rel="stylesheet" href="/dist/browser/dev/index.css" />
+    <link rel="stylesheet" href="/dist/dev/index.css" />
   </head>
 
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <div id="root"></div>
 
-    <!-- This is so that we use the bundled excalidraw.development.js file instead
-    of the actual source code -->
     <script type="module">
       import * as ExcalidrawLib from "@excalidraw/excalidraw";
 

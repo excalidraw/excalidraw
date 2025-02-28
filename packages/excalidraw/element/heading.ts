@@ -4,7 +4,7 @@ import type {
   Triangle,
   Vector,
   Radians,
-} from "../../math";
+} from "@excalidraw/math";
 import {
   pointFrom,
   pointRotateRads,
@@ -12,7 +12,7 @@ import {
   radiansToDegrees,
   triangleIncludesPoint,
   vectorFromPoint,
-} from "../../math";
+} from "@excalidraw/math";
 import { getCenterForBounds, type Bounds } from "./bounds";
 import type { ExcalidrawBindableElement } from "./types";
 

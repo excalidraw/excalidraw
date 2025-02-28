@@ -7,7 +7,7 @@ import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { arrayToMap } from "../utils";
-import { pointFrom } from "../../math";
+import { pointFrom } from "@excalidraw/math";
 
 const { h } = window;
 

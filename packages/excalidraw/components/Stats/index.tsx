@@ -9,7 +9,7 @@ import type {
 } from "../../types";
 import { CloseIcon } from "../icons";
 import { Island } from "../Island";
-import { throttle } from "lodash";
+import throttle from "lodash.throttle";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
 import FontSize from "./FontSize";
@@ -30,7 +30,7 @@ import clsx from "clsx";
 import "./Stats.scss";
 import { isGridModeEnabled } from "../../snapping";
 import { getUncroppedWidthAndHeight } from "../../element/cropElement";
-import { round } from "../../../math";
+import { round } from "@excalidraw/math";
 import { frameAndChildrenSelectedTogether } from "../../frame";
 
 interface StatsProps {

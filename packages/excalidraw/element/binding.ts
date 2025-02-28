@@ -19,7 +19,7 @@ import type {
 import type { Bounds } from "./bounds";
 import { getCenterForBounds } from "./bounds";
 import type { AppState } from "../types";
-import { isPointOnShape } from "../../utils/collision";
+import { isPointOnShape } from "@excalidraw/utils/collision";
 import {
   isArrowElement,
   isBindableElement,
@@ -53,7 +53,7 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import type { LocalPoint, Radians } from "../../math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
   lineSegment,
   pointFrom,
@@ -69,7 +69,7 @@ import {
   vectorCross,
   pointsEqual,
   lineSegmentIntersectionPoints,
-} from "../../math";
+} from "@excalidraw/math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 

@@ -7,11 +7,9 @@
     "packages/excalidraw",
     "packages/utils",
     "packages/math",
-    "examples/excalidraw",
-    "examples/excalidraw/*"
+    "examples/*"
   ],
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@excalidraw/eslint-config": "1.0.3",
     "@excalidraw/prettier-config": "1.0.2",
     "@types/chai": "4.3.0",
@@ -53,11 +51,13 @@
     "build-node": "node ./scripts/build-node.js",
     "build:app:docker": "yarn --cwd ./excalidraw-app build:app:docker",
     "build:app": "yarn --cwd ./excalidraw-app build:app",
+    "build:package": "yarn --cwd ./packages/excalidraw build:esm",
     "build:version": "yarn --cwd ./excalidraw-app build:version",
     "build": "yarn --cwd ./excalidraw-app build",
     "build:preview": "yarn --cwd ./excalidraw-app build:preview",
     "start": "yarn --cwd ./excalidraw-app start",
     "start:production": "yarn --cwd ./excalidraw-app start:production",
+    "start:example": "yarn build:package && yarn --cwd ./examples/with-script-in-browser start",
     "test:all": "yarn test:typecheck && yarn test:code && yarn test:other && yarn test:app --watch=false",
     "test:app": "vitest",
     "test:code": "eslint --max-warnings=0 --ext .js,.ts,.tsx .",
@@ -78,7 +78,7 @@
     "autorelease": "node scripts/autorelease.js",
     "prerelease:excalidraw": "node scripts/prerelease.js",
     "release:excalidraw": "node scripts/release.js",
-    "rm:build": "rm -rf excalidraw-app/{build,dist,dev-dist} && rm -rf packages/*/{dist,build} && rm -rf examples/*/*/{build,dist}",
+    "rm:build": "rm -rf excalidraw-app/{build,dist,dev-dist} && rm -rf packages/*/{dist,build} && rm -rf examples/*/{build,dist}",
     "rm:node_modules": "rm -rf node_modules && rm -rf excalidraw-app/node_modules && rm -rf packages/*/node_modules",
     "clean-install": "yarn rm:node_modules && yarn install"
   },

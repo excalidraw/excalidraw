@@ -1,21 +1,25 @@
 {
   "name": "@excalidraw/excalidraw",
-  "version": "0.17.1",
-  "main": "./dist/prod/index.js",
+  "version": "0.18.0",
   "type": "module",
+  "types": "./dist/types/excalidraw/index.d.ts",
+  "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
-    ".": {
-      "development": "./dist/dev/index.js",
-      "types": "./dist/excalidraw/index.d.ts",
-      "default": "./dist/prod/index.js"
+    "./*": {
+      "types": "./dist/types/excalidraw/*.d.ts"
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
-      "default": "./dist/prod/index.css"
+      "production": "./dist/prod/index.css"
+    },
+    ".": {
+      "types": "./dist/types/excalidraw/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
     }
   },
-  "types": "./dist/excalidraw/index.d.ts",
   "files": [
     "dist/*"
   ],
@@ -23,7 +27,6 @@
     "access": "public"
   },
   "description": "Excalidraw as a React component",
-  "repository": "https://github.com/excalidraw/excalidraw",
   "license": "MIT",
   "keywords": [
     "excalidraw",
@@ -73,9 +76,10 @@
     "jotai": "2.11.0",
     "jotai-scope": "0.7.2",
     "lodash.throttle": "4.1.1",
+    "lodash.debounce": "4.0.8",
     "nanoid": "3.3.3",
     "open-color": "1.9.1",
-    "pako": "1.0.11",
+    "pako": "2.0.3",
     "perfect-freehand": "1.2.0",
     "pica": "7.1.1",
     "png-chunk-text": "1.0.0",
@@ -88,53 +92,32 @@
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
-    "@babel/core": "7.24.5",
-    "@babel/plugin-transform-arrow-functions": "7.24.1",
-    "@babel/plugin-transform-async-to-generator": "7.24.1",
-    "@babel/plugin-transform-runtime": "7.24.3",
-    "@babel/plugin-transform-typescript": "7.24.5",
-    "@babel/preset-env": "7.24.5",
-    "@babel/preset-react": "7.24.1",
-    "@babel/preset-typescript": "7.24.1",
     "@size-limit/preset-big-lib": "9.0.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
-    "@types/pako": "1.0.3",
+    "@types/lodash.debounce": "4.0.8",
+    "@types/pako": "2.0.3",
     "@types/pica": "5.1.3",
     "@types/resize-observer-browser": "0.1.7",
     "ansicolor": "2.0.3",
     "autoprefixer": "10.4.7",
-    "babel-loader": "8.2.5",
-    "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
-    "css-loader": "6.7.1",
     "dotenv": "16.0.1",
     "esbuild": "0.19.10",
-    "esbuild-plugin-external-global": "1.0.1",
     "esbuild-sass-plugin": "2.16.0",
     "eslint-plugin-react": "7.32.2",
     "fake-indexeddb": "3.1.7",
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
-    "import-meta-loader": "1.1.0",
     "jest-diff": "29.7.0",
-    "mini-css-extract-plugin": "2.6.1",
-    "postcss-loader": "7.0.1",
-    "sass-loader": "13.0.2",
-    "size-limit": "9.0.0",
-    "style-loader": "3.3.3",
-    "ts-loader": "9.3.1",
     "typescript": "4.9.4"
   },
+  "repository": "https://github.com/excalidraw/excalidraw",
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types",
-    "pack": "yarn build:umd && yarn pack",
-    "start": "node ../../scripts/buildExample.mjs && vite",
-    "build:example": "node ../../scripts/buildExample.mjs",
-    "size": "yarn build:umd && size-limit"
+    "build:esm": "rm -rf dist && node ../../scripts/buildPackage.js && yarn gen:types"
   }
 }

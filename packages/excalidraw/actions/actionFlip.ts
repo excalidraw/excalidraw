@@ -18,7 +18,7 @@ import {
 } from "../element/binding";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { flipHorizontal, flipVertical } from "../components/icons";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import {
   isArrowElement,
   isElbowArrow,
@@ -47,7 +47,7 @@ export const actionFlipHorizontal = register({
         app,
       ),
       appState,
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) => event.shiftKey && event.code === CODES.H,
@@ -72,7 +72,7 @@ export const actionFlipVertical = register({
         app,
       ),
       appState,
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>

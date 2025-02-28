@@ -1,16 +1,20 @@
 {
   "name": "@excalidraw/math",
   "version": "0.1.0",
-  "main": "./dist/prod/index.js",
   "type": "module",
+  "types": "./dist/types/math/index.d.ts",
+  "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
       "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
+    },
+    "./*": {
+      "types": "./../math/dist/types/math/*"
     }
   },
-  "types": "./dist/utils/index.d.ts",
   "files": [
     "dist/*"
   ],
@@ -48,14 +52,8 @@
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
-  "dependencies": {
-    "@excalidraw/utils": "*"
-  },
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:umd": "cross-env NODE_ENV=production webpack --config webpack.prod.config.js",
-    "build:esm": "rm -rf dist && node ../../scripts/buildUtils.js && yarn gen:types",
-    "build:umd:withAnalyzer": "cross-env NODE_ENV=production ANALYZER=true webpack --config webpack.prod.config.js",
-    "pack": "yarn build:umd && yarn pack"
+    "build:esm": "rm -rf dist && node ../../scripts/buildMath.js && yarn gen:types"
   }
 }
