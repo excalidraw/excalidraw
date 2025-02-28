@@ -91,14 +91,6 @@
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
-    "@babel/core": "7.24.5",
-    "@babel/plugin-transform-arrow-functions": "7.24.1",
-    "@babel/plugin-transform-async-to-generator": "7.24.1",
-    "@babel/plugin-transform-runtime": "7.24.3",
-    "@babel/plugin-transform-typescript": "7.24.5",
-    "@babel/preset-env": "7.24.5",
-    "@babel/preset-react": "7.24.1",
-    "@babel/preset-typescript": "7.24.1",
     "@size-limit/preset-big-lib": "9.0.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
@@ -109,7 +101,6 @@
     "@types/resize-observer-browser": "0.1.7",
     "ansicolor": "2.0.3",
     "autoprefixer": "10.4.7",
-    "babel-plugin-transform-class-properties": "6.24.1",
     "cross-env": "7.0.3",
     "dotenv": "16.0.1",
     "esbuild": "0.19.10",
