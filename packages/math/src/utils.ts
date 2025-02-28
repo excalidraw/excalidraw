@@ -6,7 +6,7 @@ export const clamp = (value: number, min: number, max: number) => {
 
 export const round = (
   value: number,
-  precision: number,
+  precision: number = (Math.log(1 / PRECISION) * Math.LOG10E + 1) | 0,
   func: "round" | "floor" | "ceil" = "round",
 ) => {
   const multiplier = Math.pow(10, precision);
