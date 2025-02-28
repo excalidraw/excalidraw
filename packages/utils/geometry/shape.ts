@@ -12,7 +12,7 @@
  * to pure shapes
  */
 
-import type { Curve, LineSegment, Polygon, Radians } from "../../math";
+import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
 import {
   curve,
   lineSegment,
@@ -31,8 +31,8 @@ import {
   vectorScale,
   type GlobalPoint,
   type LocalPoint,
-} from "../../math";
-import { getElementAbsoluteCoords } from "../../excalidraw/element";
+} from "@excalidraw/math";
+import { getElementAbsoluteCoords } from "@excalidraw/excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -48,10 +48,10 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
-} from "../../excalidraw/element/types";
+} from "@excalidraw/excalidraw/element/types";
 import { pointsOnBezierCurves } from "points-on-curve";
 import type { Drawable, Op } from "roughjs/bin/core";
-import { invariant } from "../../excalidraw/utils";
+import { invariant } from "@excalidraw/excalidraw/utils";
 
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also

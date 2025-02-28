@@ -1,12 +1,12 @@
-import type { Curve } from "../math";
+import type { Curve } from "@excalidraw/math";
 import {
   isLineSegment,
   lineSegment,
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
-} from "../math";
-import type { LineSegment } from "../utils";
+} from "@excalidraw/math";
+import type { LineSegment } from "@excalidraw/utils";
 import type { Bounds } from "./element/bounds";
 import { isBounds } from "./element/typeChecks";
 

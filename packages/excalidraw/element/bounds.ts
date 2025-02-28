@@ -30,7 +30,7 @@ import type {
   LineSegment,
   LocalPoint,
   Radians,
-} from "../../math";
+} from "@excalidraw/math";
 import {
   degreesToRadians,
   lineSegment,
@@ -38,7 +38,7 @@ import {
   pointDistance,
   pointFromArray,
   pointRotateRads,
-} from "../../math";
+} from "@excalidraw/math";
 import type { Mutable } from "../utility-types";
 
 export type RectangleBox = {

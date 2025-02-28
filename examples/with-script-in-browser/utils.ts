@@ -1,7 +1,6 @@
 import { unstable_batchedUpdates } from "react-dom";
 import { fileOpen as _fileOpen } from "browser-fs-access";
 import { MIME_TYPES } from "@excalidraw/excalidraw";
-import { AbortError } from "../../packages/excalidraw/errors";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 
@@ -85,7 +84,7 @@ export const fileOpen = <M extends boolean | undefined = false>(opts: {
         if (rejectPromise) {
           // so that something is shown in console if we need to debug this
           console.warn("Opening the file was canceled (legacy-fs).");
-          rejectPromise(new AbortError());
+          rejectPromise(new Error("Request Aborted"));
         }
       };
     },

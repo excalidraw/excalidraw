@@ -11,7 +11,7 @@ import {
   vectorScale,
   type GlobalPoint,
   type LocalPoint,
-} from "../../math";
+} from "@excalidraw/math";
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";

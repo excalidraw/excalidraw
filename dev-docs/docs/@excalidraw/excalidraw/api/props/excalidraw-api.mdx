@@ -65,7 +65,7 @@ You can use this function to update the scene with the sceneData. It accepts the
 | `elements` | [`ImportedDataState["elements"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L38) | The `elements` to be updated in the scene |
 | `appState` | [`ImportedDataState["appState"]`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L39) | The `appState` to be updated in the scene. |
 | `collaborators` | <code>Map<string, <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L37">Collaborator></a></code> | The list of collaborators to be updated in the scene. |
-| `commitToStore` | `boolean` | Implies if the change should be captured and commited to the `store`. Commited changes are emmitted and listened to by other components, such as `History` for undo / redo purposes. Defaults to `false`. |
+| `captureUpdate` | [`CaptureUpdateAction`](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/store.ts#L40) | Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes. |
 
 ```jsx live
 function App() {
@@ -105,6 +105,7 @@ function App() {
       appState: {
         viewBackgroundColor: "#edf2ff",
       },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
     excalidrawAPI.updateScene(sceneData);
   };
@@ -120,6 +121,18 @@ function App() {
   );
 }
 ```
+
+#### captureUpdate
+
+You can use the `captureUpdate` to influence undo / redo behaviour.
+
+> **NOTE**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `captureUpdate` value.
+
+|  | `captureUpdate` value | Notes |
+| --- | --- | --- |
+| _Immediately undoable_ | `CaptureUpdateAction.IMMEDIATELY` | Use for updates which should be captured. Should be used for most of the local updates. These updates will _immediately_ make it to the local undo / redo stacks. |
+| _Eventually undoable_ | `CaptureUpdateAction.EVENTUALLY` | Use for updates which should not be captured immediately - likely exceptions which are part of some async multi-step process. Otherwise, all such updates would end up being captured with the next `CaptureUpdateAction.IMMEDIATELY` - triggered either by the next `updateScene` or internally by the editor. These updates will _eventually_ make it to the local undo / redo stacks. |
+| _Never undoable_ | `CaptureUpdateAction.NEVER` | Use for updates which should never be recorded, such as remote updates or scene initialization. These updates will _never_ make it to the local undo / redo stacks. |
 
 ### updateLibrary
 

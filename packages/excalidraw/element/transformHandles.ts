@@ -19,8 +19,8 @@ import {
   isAndroid,
   isIOS,
 } from "../constants";
-import type { Radians } from "../../math";
-import { pointFrom, pointRotateRads } from "../../math";
+import type { Radians } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 export type TransformHandleDirection =
   | "n"
