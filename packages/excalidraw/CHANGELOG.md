@@ -64,13 +64,22 @@ We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles ins
 │   └── types/
 ```
 
-Due to the ESM, it's now necessary to define `"type": "module"` in your `package.json` file or as part of the `<script type="module" />` attribute.
+##### JavaScript: required `"type": "module"`  in package.json
+
+Make sure that your JavaScript environment supports ES modules, as it might be required to define `"type": "module"` in your `package.json` file or as part of the `<script type="module" />` attribute.
+
+##### Typescript: deprecated "moduleResolution": `"node"` or `"node10"`
+
+Since `"node"` and `"node10"` do not support `package.json` `"exports"` fields, having these values in your `tsconfig.json` will not work. Instead, use `"bundler"`, `"node16"` or `"nodenext"` values. For more information, see [Typescript's documentation](https://www.typescriptlang.org/tsconfig/#moduleResolution).
+
+##### New structure of the imports
 
 Dependening on the environment, this is how imports should look like with the `ESM`:
 
-```ts
-// Environment: vite with react & typescript
+**With bundler (Vite, Next.js, etc.)**
 
+
+```ts
 // excalidraw library with public API
 import * as excalidrawLib from "@excalidraw/excalidraw";
 // excalidraw react component
@@ -81,7 +90,7 @@ import "@excalidraw/excalidraw/index.css";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 ```
 
-or
+**Without bundler (Browser)**
 
 ```html
 <!-- Environment: browser with a script tag and no bundler -->
