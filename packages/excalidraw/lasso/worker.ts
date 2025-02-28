@@ -166,7 +166,8 @@ const intersectionTest = (
   return lassoSegments.some((lassoSegment) =>
     elementSegments.some(
       (elementSegment) =>
-        lineSegmentIntersectionPoints(lassoSegment, elementSegment) !== null,
+        // introduce a bit of tolerance to account for roughness and simplification of paths
+        lineSegmentIntersectionPoints(lassoSegment, elementSegment, 1) !== null,
     ),
   );
 };
