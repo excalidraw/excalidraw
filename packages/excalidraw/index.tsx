@@ -217,6 +217,7 @@ export {
   isInvisiblySmallElement,
   getNonDeletedElements,
   getTextFromElements,
+  duplicateElements,
 } from "./element";
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
