@@ -1,36 +1,19 @@
-import { pointsOnBezierCurves } from "points-on-curve";
-import {
-  type Curve,
-  type GlobalPoint,
-  type LineSegment,
-  type Radians,
-  lineSegment,
-  pointFrom,
-  pointRotateRads,
-} from "../../math";
+import { type GlobalPoint, type LineSegment, pointFrom } from "../../math";
 import { AnimatedTrail } from "../animated-trail";
 import { type AnimationFrameHandler } from "../animation-frame-handler";
 import type App from "../components/App";
+import { getElementLineSegments } from "../element/bounds";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
 import type {
-  ElementsMap,
   ExcalidrawElement,
-  ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
-  ExcalidrawRectanguloidElement,
   NonDeleted,
 } from "../element/types";
 import { getFrameChildren } from "../frame";
 import { selectGroupsForSelectedElements } from "../groups";
-import { getElementShape } from "../shapes";
 import { arrayToMap, easeOut } from "../utils";
-import type { LassoWorkerInput, LassoWorkerOutput } from "./worker";
-import {
-  deconstructDiamondElement,
-  deconstructRectanguloidElement,
-} from "../element/utils";
-import { getElementAbsoluteCoords } from "../element";
+import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
 
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
@@ -187,178 +170,3 @@ export class LassoTrail extends AnimatedTrail {
     this.worker?.terminate();
   }
 }
-
-/**
- * Given an element, return the line segments that make up the element.
- *
- * Uses helpers from /math
- */
-const getElementLineSegments = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-): LineSegment<GlobalPoint>[] => {
-  const shape = getElementShape(element, elementsMap);
-  const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    elementsMap,
-  );
-  const center = pointFrom<GlobalPoint>(cx, cy);
-
-  if (shape.type === "polycurve") {
-    const curves = shape.data;
-    const points = curves
-      .map((curve) => pointsOnBezierCurves(curve, 10))
-      .flat();
-    let i = 0;
-    const segments: LineSegment<GlobalPoint>[] = [];
-    while (i < points.length - 1) {
-      segments.push(
-        lineSegment(
-          pointFrom(points[i][0], points[i][1]),
-          pointFrom(points[i + 1][0], points[i + 1][1]),
-        ),
-      );
-      i++;
-    }
-
-    return segments;
-  } else if (shape.type === "polyline") {
-    return shape.data as LineSegment<GlobalPoint>[];
-  } else if (isRectanguloidElement(element)) {
-    const [sides, corners] = deconstructRectanguloidElement(element);
-    const cornerSegments: LineSegment<GlobalPoint>[] = corners
-      .map((corner) => getSegmentsOnCurve(corner, center, element.angle))
-      .flat();
-    const rotatedSides = getRotatedSides(sides, center, element.angle);
-    return [...rotatedSides, ...cornerSegments];
-  } else if (element.type === "diamond") {
-    const [sides, corners] = deconstructDiamondElement(element);
-    const cornerSegments = corners
-      .map((corner) => getSegmentsOnCurve(corner, center, element.angle))
-      .flat();
-    const rotatedSides = getRotatedSides(sides, center, element.angle);
-
-    return [...rotatedSides, ...cornerSegments];
-  } else if (shape.type === "polygon") {
-    const points = shape.data as GlobalPoint[];
-    const segments: LineSegment<GlobalPoint>[] = [];
-    for (let i = 0; i < points.length - 1; i++) {
-      segments.push(lineSegment(points[i], points[i + 1]));
-    }
-    return segments;
-  } else if (shape.type === "ellipse") {
-    return getSegmentsOnEllipse(element as ExcalidrawEllipseElement);
-  }
-
-  const [nw, ne, sw, se, , , w, e] = (
-    [
-      [x1, y1],
-      [x2, y1],
-      [x1, y2],
-      [x2, y2],
-      [cx, y1],
-      [cx, y2],
-      [x1, cy],
-      [x2, cy],
-    ] as GlobalPoint[]
-  ).map((point) => pointRotateRads(point, center, element.angle));
-
-  return [
-    lineSegment(nw, ne),
-    lineSegment(sw, se),
-    lineSegment(nw, sw),
-    lineSegment(ne, se),
-    lineSegment(nw, e),
-    lineSegment(sw, e),
-    lineSegment(ne, w),
-    lineSegment(se, w),
-  ];
-};
-
-const isRectanguloidElement = (
-  element: ExcalidrawElement,
-): element is ExcalidrawRectanguloidElement => {
-  return (
-    element != null &&
-    (element.type === "rectangle" ||
-      element.type === "image" ||
-      element.type === "iframe" ||
-      element.type === "embeddable" ||
-      element.type === "frame" ||
-      element.type === "magicframe" ||
-      (element.type === "text" && !element.containerId))
-  );
-};
-
-const getRotatedSides = (
-  sides: LineSegment<GlobalPoint>[],
-  center: GlobalPoint,
-  angle: Radians,
-) => {
-  return sides.map((side) => {
-    return lineSegment(
-      pointRotateRads<GlobalPoint>(side[0], center, angle),
-      pointRotateRads<GlobalPoint>(side[1], center, angle),
-    );
-  });
-};
-
-const getSegmentsOnCurve = (
-  curve: Curve<GlobalPoint>,
-  center: GlobalPoint,
-  angle: Radians,
-): LineSegment<GlobalPoint>[] => {
-  const points = pointsOnBezierCurves(curve, 10);
-  let i = 0;
-  const segments: LineSegment<GlobalPoint>[] = [];
-  while (i < points.length - 1) {
-    segments.push(
-      lineSegment(
-        pointRotateRads<GlobalPoint>(
-          pointFrom(points[i][0], points[i][1]),
-          center,
-          angle,
-        ),
-        pointRotateRads<GlobalPoint>(
-          pointFrom(points[i + 1][0], points[i + 1][1]),
-          center,
-          angle,
-        ),
-      ),
-    );
-    i++;
-  }
-
-  return segments;
-};
-
-const getSegmentsOnEllipse = (
-  ellipse: ExcalidrawEllipseElement,
-): LineSegment<GlobalPoint>[] => {
-  const center = pointFrom<GlobalPoint>(
-    ellipse.x + ellipse.width / 2,
-    ellipse.y + ellipse.height / 2,
-  );
-
-  const a = ellipse.width / 2;
-  const b = ellipse.height / 2;
-
-  const segments: LineSegment<GlobalPoint>[] = [];
-  const points: GlobalPoint[] = [];
-  const n = 90;
-  const deltaT = (Math.PI * 2) / n;
-
-  for (let i = 0; i < n; i++) {
-    const t = i * deltaT;
-    const x = center[0] + a * Math.cos(t);
-    const y = center[1] + b * Math.sin(t);
-    points.push(pointRotateRads(pointFrom(x, y), center, ellipse.angle));
-  }
-
-  for (let i = 0; i < points.length - 1; i++) {
-    segments.push(lineSegment(points[i], points[i + 1]));
-  }
-
-  segments.push(lineSegment(points[points.length - 1], points[0]));
-  return segments;
-};

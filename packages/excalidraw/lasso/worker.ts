@@ -3,6 +3,11 @@ import { polygonFromPoints, polygonIncludesPoint } from "../../math/polygon";
 import type { ExcalidrawElement } from "../element/types";
 import { lineSegment, lineSegmentIntersectionPoints } from "../../math/segment";
 import { simplify } from "points-on-curve";
+import type {
+  ElementsSegmentsMap,
+  LassoWorkerInput,
+  LassoWorkerOutput,
+} from "./types";
 
 // variables to track processing state and latest input data
 // for "backpressure" purposes
@@ -71,21 +76,6 @@ const processInputData = () => {
   }
 };
 
-type ElementsSegments = Map<string, LineSegment<GlobalPoint>[]>;
-
-export type LassoWorkerInput = {
-  lassoPath: GlobalPoint[];
-  elements: readonly ExcalidrawElement[];
-  elementsSegments: ElementsSegments;
-  intersectedElements: Set<ExcalidrawElement["id"]>;
-  enclosedElements: Set<ExcalidrawElement["id"]>;
-  simplifyDistance: number;
-};
-
-export type LassoWorkerOutput = {
-  selectedElementIds: string[];
-};
-
 export const updateSelection = (input: LassoWorkerInput): LassoWorkerOutput => {
   const {
     lassoPath,
@@ -96,7 +86,7 @@ export const updateSelection = (input: LassoWorkerInput): LassoWorkerOutput => {
     simplifyDistance,
   } = input;
   // simplify the path to reduce the number of points
-  let path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
+  const path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
   // close the path to form a polygon for enclosure check
   const closedPath = polygonFromPoints(path);
   // as the path might not enclose a shape anymore, clear before checking
@@ -132,7 +122,7 @@ export const updateSelection = (input: LassoWorkerInput): LassoWorkerOutput => {
 const enclosureTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegments,
+  elementsSegments: ElementsSegmentsMap,
 ): boolean => {
   const lassoPolygon = polygonFromPoints(lassoPath);
   const segments = elementsSegments.get(element.id);
@@ -148,7 +138,7 @@ const enclosureTest = (
 const intersectionTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
-  elementsSegments: ElementsSegments,
+  elementsSegments: ElementsSegmentsMap,
 ): boolean => {
   const elementSegments = elementsSegments.get(element.id);
   if (!elementSegments) {
