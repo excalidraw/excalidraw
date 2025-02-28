@@ -33,7 +33,7 @@ import type { Mutable } from "../utility-types";
 import { arrayToMap, getFontString } from "../utils";
 import { register } from "./register";
 import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { measureText } from "../element/textMeasurements";
 
 export const actionUnbindText = register({
@@ -86,7 +86,7 @@ export const actionUnbindText = register({
     return {
       elements,
       appState,
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
@@ -163,7 +163,7 @@ export const actionBindText = register({
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
       appState: { ...appState, selectedElementIds: { [container.id]: true } },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
@@ -323,7 +323,7 @@ export const actionWrapTextInContainer = register({
         ...appState,
         selectedElementIds: containerIds,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });

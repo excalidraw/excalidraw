@@ -15,8 +15,8 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
-import type { LocalPoint } from "../../math";
-import { pointFrom } from "../../math";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import { resizeSingleElement } from "../element/resizeElements";
 import { getSizeFromPoints } from "../points";
 

@@ -1,5 +1,5 @@
-import type { GlobalPoint, Radians } from "../../../math";
-import { pointFrom, pointRotateRads } from "../../../math";
+import type { GlobalPoint, Radians } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import { MIME_TYPES } from "../../constants";
 import type { Bounds } from "../../element/bounds";
 import { getElementAbsoluteCoords } from "../../element/bounds";

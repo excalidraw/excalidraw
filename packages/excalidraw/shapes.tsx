@@ -7,7 +7,7 @@ import {
   pointsEqual,
   type GlobalPoint,
   type LocalPoint,
-} from "../math";
+} from "@excalidraw/math";
 import {
   getClosedCurveShape,
   getCurvePathOps,
@@ -16,7 +16,7 @@ import {
   getFreedrawShape,
   getPolygonShape,
   type GeometricShape,
-} from "../utils/geometry/shape";
+} from "@excalidraw/utils/geometry/shape";
 import {
   ArrowIcon,
   DiamondIcon,

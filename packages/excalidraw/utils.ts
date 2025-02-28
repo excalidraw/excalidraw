@@ -1,5 +1,5 @@
 import Pool from "es6-promise-pool";
-import { average } from "../math";
+import { average } from "@excalidraw/math";
 import { COLOR_PALETTE } from "./colors";
 import type { EVENT } from "./constants";
 import {

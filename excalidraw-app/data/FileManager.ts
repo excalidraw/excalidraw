@@ -1,20 +1,20 @@
-import { StoreAction } from "../../packages/excalidraw";
-import { compressData } from "../../packages/excalidraw/data/encode";
-import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
+import { CaptureUpdateAction } from "@excalidraw/excalidraw";
+import { compressData } from "@excalidraw/excalidraw/data/encode";
+import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
+import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   FileId,
   InitializedExcalidrawImageElement,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
+} from "@excalidraw/excalidraw/element/types";
+import { t } from "@excalidraw/excalidraw/i18n";
 import type {
   BinaryFileData,
   BinaryFileMetadata,
   ExcalidrawImperativeAPI,
   BinaryFiles,
-} from "../../packages/excalidraw/types";
+} from "@excalidraw/excalidraw/types";
 
 type FileVersion = Required<BinaryFileData>["version"];
 
@@ -268,6 +268,6 @@ export const updateStaleImageStatuses = (params: {
         }
         return element;
       }),
-    storeAction: StoreAction.UPDATE,
+    captureUpdate: CaptureUpdateAction.NEVER,
   });
 };

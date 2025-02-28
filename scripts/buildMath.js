@@ -1,108 +1,52 @@
-const fs = require("fs");
+const path = require("path");
 const { build } = require("esbuild");
+const { sassPlugin } = require("esbuild-sass-plugin");
 
-const browserConfig = {
-  entryPoints: ["index.ts"],
+// contains all dependencies bundled inside
+const getConfig = (outdir) => ({
+  outdir,
   bundle: true,
   format: "esm",
-};
+  entryPoints: ["index.ts"],
+  entryNames: "[name]",
+  assetNames: "[dir]/[name]",
+  alias: {
+    "@excalidraw/excalidraw": path.resolve(__dirname, "../packages/excalidraw"),
+    "@excalidraw/utils": path.resolve(__dirname, "../packages/utils"),
+    "@excalidraw/math": path.resolve(__dirname, "../packages/math"),
+  },
+});
 
-// Will be used later for treeshaking
-
-// function getFiles(dir, files = []) {
-//   const fileList = fs.readdirSync(dir);
-//   for (const file of fileList) {
-//     const name = `${dir}/${file}`;
-//     if (
-//       name.includes("node_modules") ||
-//       name.includes("config") ||
-//       name.includes("package.json") ||
-//       name.includes("main.js") ||
-//       name.includes("index-node.ts") ||
-//       name.endsWith(".d.ts") ||
-//       name.endsWith(".md")
-//     ) {
-//       continue;
-//     }
-
-//     if (fs.statSync(name).isDirectory()) {
-//       getFiles(name, files);
-//     } else if (
-//       name.match(/\.(sa|sc|c)ss$/) ||
-//       name.match(/\.(woff|woff2|eot|ttf|otf)$/) ||
-//       name.match(/locales\/[^/]+\.json$/)
-//     ) {
-//       continue;
-//     } else {
-//       files.push(name);
-//     }
-//   }
-//   return files;
-// }
-const createESMBrowserBuild = async () => {
-  // Development unminified build with source maps
-  const browserDev = await build({
-    ...browserConfig,
-    outdir: "dist/browser/dev",
+function buildDev(config) {
+  return build({
+    ...config,
+    plugins: [sassPlugin()],
     sourcemap: true,
-    metafile: true,
     define: {
       "import.meta.env": JSON.stringify({ DEV: true }),
     },
   });
-  fs.writeFileSync(
-    "meta-browser-dev.json",
-    JSON.stringify(browserDev.metafile),
-  );
+}
 
-  // production minified build without sourcemaps
-  const browserProd = await build({
-    ...browserConfig,
-    outdir: "dist/browser/prod",
+function buildProd(config) {
+  return build({
+    ...config,
+    plugins: [sassPlugin()],
     minify: true,
-    metafile: true,
     define: {
       "import.meta.env": JSON.stringify({ PROD: true }),
     },
   });
-  fs.writeFileSync(
-    "meta-browser-prod.json",
-    JSON.stringify(browserProd.metafile),
-  );
-};
-
-const rawConfig = {
-  entryPoints: ["index.ts"],
-  bundle: true,
-  format: "esm",
-  packages: "external",
-};
+}
 
 const createESMRawBuild = async () => {
-  // Development unminified build with source maps
-  const rawDev = await build({
-    ...rawConfig,
-    outdir: "dist/dev",
-    sourcemap: true,
-    metafile: true,
-    define: {
-      "import.meta.env": JSON.stringify({ DEV: true }),
-    },
-  });
-  fs.writeFileSync("meta-raw-dev.json", JSON.stringify(rawDev.metafile));
+  // development unminified build with source maps
+  buildDev(getConfig("dist/dev"));
 
   // production minified build without sourcemaps
-  const rawProd = await build({
-    ...rawConfig,
-    outdir: "dist/prod",
-    minify: true,
-    metafile: true,
-    define: {
-      "import.meta.env": JSON.stringify({ PROD: true }),
-    },
-  });
-  fs.writeFileSync("meta-raw-prod.json", JSON.stringify(rawProd.metafile));
+  buildProd(getConfig("dist/prod"));
 };
 
-createESMRawBuild();
-createESMBrowserBuild();
+(async () => {
+  await createESMRawBuild();
+})();

@@ -26,10 +26,13 @@ import { getElementsWithinSelection, getSelectedElements } from "./scene";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import { getElementLineSegments } from "./element/bounds";
-import { doLineSegmentsIntersect, elementsOverlappingBBox } from "../utils/";
+import {
+  doLineSegmentsIntersect,
+  elementsOverlappingBBox,
+} from "@excalidraw/utils";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
-import { isPointWithinBounds, pointFrom } from "../math";
+import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (

@@ -9,7 +9,7 @@ import { setCursorForShape } from "../cursor";
 import { register } from "./register";
 import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { getSelectedElements } from "../scene";
 import { newFrameElement } from "../element/newElement";
 import { getElementsInGroup } from "../groups";
@@ -49,14 +49,14 @@ export const actionSelectAllElementsInFrame = register({
             return acc;
           }, {} as Record<ExcalidrawElement["id"], true>),
         },
-        storeAction: StoreAction.CAPTURE,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
     return {
       elements,
       appState,
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -80,14 +80,14 @@ export const actionRemoveAllElementsFromFrame = register({
             [selectedElement.id]: true,
           },
         },
-        storeAction: StoreAction.CAPTURE,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
     return {
       elements,
       appState,
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -109,7 +109,7 @@ export const actionupdateFrameRendering = register({
           enabled: !appState.frameRendering.enabled,
         },
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState: AppState) => appState.frameRendering.enabled,
@@ -139,7 +139,7 @@ export const actionSetFrameAsActiveTool = register({
           type: "frame",
         }),
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) =>
@@ -208,7 +208,7 @@ export const actionWrapSelectionInFrame = register({
       appState: {
         selectedElementIds: { [frame.id]: true },
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });

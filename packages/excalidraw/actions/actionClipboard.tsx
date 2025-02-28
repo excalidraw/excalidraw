@@ -14,7 +14,7 @@ import { getTextFromElements, isTextElement } from "../element";
 import { t } from "../i18n";
 import { isFirefox } from "../constants";
 import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 export const actionCopy = register({
   name: "copy",
@@ -32,7 +32,7 @@ export const actionCopy = register({
       await copyToClipboard(elementsToCopy, app.files, event);
     } catch (error: any) {
       return {
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
           ...appState,
           errorMessage: error.message,
@@ -41,7 +41,7 @@ export const actionCopy = register({
     }
 
     return {
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   // don't supply a shortcut since we handle this conditionally via onCopy event
@@ -67,7 +67,7 @@ export const actionPaste = register({
 
       if (isFirefox) {
         return {
-          storeAction: StoreAction.NONE,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
           appState: {
             ...appState,
             errorMessage: t("hints.firefox_clipboard_write"),
@@ -76,7 +76,7 @@ export const actionPaste = register({
       }
 
       return {
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
           ...appState,
           errorMessage: t("errors.asyncPasteFailedOnRead"),
@@ -89,7 +89,7 @@ export const actionPaste = register({
     } catch (error: any) {
       console.error(error);
       return {
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
           ...appState,
           errorMessage: t("errors.asyncPasteFailedOnParse"),
@@ -98,7 +98,7 @@ export const actionPaste = register({
     }
 
     return {
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   // don't supply a shortcut since we handle this conditionally via onCopy event
@@ -125,7 +125,7 @@ export const actionCopyAsSvg = register({
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
@@ -167,7 +167,7 @@ export const actionCopyAsSvg = register({
             }),
           },
         },
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     } catch (error: any) {
       console.error(error);
@@ -175,7 +175,7 @@ export const actionCopyAsSvg = register({
         appState: {
           errorMessage: error.message,
         },
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
   },
@@ -193,7 +193,7 @@ export const actionCopyAsPng = register({
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
     const selectedElements = app.scene.getSelectedElements({
@@ -227,7 +227,7 @@ export const actionCopyAsPng = register({
             }),
           },
         },
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     } catch (error: any) {
       console.error(error);
@@ -236,7 +236,7 @@ export const actionCopyAsPng = register({
           ...appState,
           errorMessage: error.message,
         },
-        storeAction: StoreAction.NONE,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
   },
@@ -263,7 +263,7 @@ export const copyText = register({
       throw new Error(t("errors.copyToSystemClipboardFailed"));
     }
     return {
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   predicate: (elements, appState, _, app) => {

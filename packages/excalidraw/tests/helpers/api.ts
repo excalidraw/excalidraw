@@ -39,7 +39,7 @@ import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
 import type { Action } from "../../actions/types";
 import { mutateElement } from "../../element/mutateElement";
-import { pointFrom, type LocalPoint, type Radians } from "../../../math";
+import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 import { selectGroupsForSelectedElements } from "../../groups";
 
 const readFile = util.promisify(fs.readFile);

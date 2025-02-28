@@ -1,6 +1,6 @@
 import { register } from "./register";
 import { cropIcon } from "../components/icons";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { ToolButton } from "../components/ToolButton";
 import { t } from "../i18n";
 import { isImageElement } from "../element/typeChecks";
@@ -25,7 +25,7 @@ export const actionToggleCropEditor = register({
         isCropping: false,
         croppingElementId: selectedElement.id,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   predicate: (elements, appState, _, app) => {

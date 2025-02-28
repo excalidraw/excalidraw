@@ -23,7 +23,7 @@ import {
 } from "../element/typeChecks";
 import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
-import { pointFrom, pointDistance, type LocalPoint } from "../../math";
+import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { getCornerRadius, isPathALoop } from "../shapes";
 import { headingForPointIsHorizontal } from "../element/heading";
 

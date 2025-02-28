@@ -57,8 +57,8 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import type { LocalPoint, Radians } from "../../math";
-import { isFiniteNumber, pointFrom } from "../../math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
+import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 import { detectLineHeight } from "../element/textMeasurements";
 
 type RestoredAppState = Omit<

@@ -14,11 +14,11 @@ import type {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  UserIdleState,
   Device,
   PendingExcalidrawElements,
 } from "../types";
 import type { MakeBrand } from "../utility-types";
+import type { UserIdleState } from "../constants";
 
 export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;

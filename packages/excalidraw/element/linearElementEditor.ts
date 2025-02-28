@@ -47,7 +47,7 @@ import type { Mutable } from "../utility-types";
 import { ShapeCache } from "../scene/ShapeCache";
 import type { Store } from "../store";
 import type Scene from "../scene/Scene";
-import type { Radians } from "../../math";
+import type { Radians } from "@excalidraw/math";
 import {
   pointCenter,
   pointFrom,
@@ -59,7 +59,7 @@ import {
   pointDistance,
   pointTranslate,
   vectorFromPoint,
-} from "../../math";
+} from "@excalidraw/math";
 import {
   getBezierCurveLength,
   getBezierXY,

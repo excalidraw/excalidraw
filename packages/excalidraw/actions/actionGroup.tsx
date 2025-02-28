@@ -34,7 +34,7 @@ import {
   replaceAllElementsInFrame,
 } from "../frame";
 import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -84,7 +84,11 @@ export const actionGroup = register({
     );
     if (selectedElements.length < 2) {
       // nothing to group
-      return { appState, elements, storeAction: StoreAction.NONE };
+      return {
+        appState,
+        elements,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
     }
     // if everything is already grouped into 1 group, there is nothing to do
     const selectedGroupIds = getSelectedGroupIds(appState);
@@ -104,7 +108,11 @@ export const actionGroup = register({
       ]);
       if (combinedSet.size === elementIdsInGroup.size) {
         // no incremental ids in the selected ids
-        return { appState, elements, storeAction: StoreAction.NONE };
+        return {
+          appState,
+          elements,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
+        };
       }
     }
 
@@ -170,7 +178,7 @@ export const actionGroup = register({
         ),
       },
       elements: reorderedElements,
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -200,7 +208,11 @@ export const actionUngroup = register({
     const elementsMap = arrayToMap(elements);
 
     if (groupIds.length === 0) {
-      return { appState, elements, storeAction: StoreAction.NONE };
+      return {
+        appState,
+        elements,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
     }
 
     let nextElements = [...elements];
@@ -273,7 +285,7 @@ export const actionUngroup = register({
     return {
       appState: { ...appState, ...updateAppState },
       elements: nextElements,
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>

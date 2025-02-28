@@ -33,8 +33,8 @@ import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
-import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
-import { pointFrom, pointRotateRads } from "../../../math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import { cropElement } from "../../element/cropElement";
 import type { ToolType } from "../../types";
 

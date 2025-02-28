@@ -34,7 +34,7 @@ import { trackEvent } from "../../analytics";
 import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
 import { getLinkHandleFromCoords } from "./helpers";
-import { pointFrom, type GlobalPoint } from "../../../math";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { isElementLink } from "../../element/elementLink";
 
 import "./Hyperlink.scss";

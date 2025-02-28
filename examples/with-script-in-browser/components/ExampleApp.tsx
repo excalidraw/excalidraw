@@ -33,12 +33,12 @@ import type {
   Gesture,
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
-} from "@excalidraw/excalidraw/dist/excalidraw/types";
+} from "@excalidraw/excalidraw/types";
 import type {
   NonDeletedExcalidrawElement,
   Theme,
-} from "@excalidraw/excalidraw/dist/excalidraw/element/types";
-import type { ImportedLibraryData } from "@excalidraw/excalidraw/dist/excalidraw/data/types";
+} from "@excalidraw/excalidraw/element/types";
+import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
 
 import "./ExampleApp.scss";
 

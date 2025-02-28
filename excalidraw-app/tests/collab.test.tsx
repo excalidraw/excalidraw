@@ -1,17 +1,13 @@
 import { vi } from "vitest";
-import {
-  act,
-  render,
-  waitFor,
-} from "../../packages/excalidraw/tests/test-utils";
+import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import ExcalidrawApp from "../App";
-import { API } from "../../packages/excalidraw/tests/helpers/api";
-import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { syncInvalidIndices } from "@excalidraw/excalidraw/fractionalIndex";
 import {
   createRedoAction,
   createUndoAction,
-} from "../../packages/excalidraw/actions/actionHistory";
-import { StoreAction, newElementWith } from "../../packages/excalidraw";
+} from "@excalidraw/excalidraw/actions/actionHistory";
+import { CaptureUpdateAction, newElementWith } from "@excalidraw/excalidraw";
 
 const { h } = window;
 
@@ -89,7 +85,7 @@ describe("collaboration", () => {
 
     API.updateScene({
       elements: syncInvalidIndices([rect1, rect2]),
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
     API.updateScene({
@@ -97,7 +93,7 @@ describe("collaboration", () => {
         rect1,
         newElementWith(h.elements[1], { isDeleted: true }),
       ]),
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
     await waitFor(() => {
@@ -144,7 +140,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     API.updateScene({
       elements: syncInvalidIndices([rect1]),
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     });
 
     await waitFor(() => {
@@ -182,7 +178,7 @@ describe("collaboration", () => {
         h.elements[0],
         newElementWith(h.elements[1], { x: 100 }),
       ]),
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
     await waitFor(() => {
@@ -217,7 +213,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     API.updateScene({
       elements: syncInvalidIndices([rect1]),
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     });
 
     // snapshot was correctly updated and marked the element as deleted

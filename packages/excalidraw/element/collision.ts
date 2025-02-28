@@ -8,9 +8,9 @@ import type {
 } from "./types";
 import { getElementBounds } from "./bounds";
 import type { FrameNameBounds } from "../types";
-import type { GeometricShape } from "../../utils/geometry/shape";
-import { getPolygonShape } from "../../utils/geometry/shape";
-import { isPointInShape, isPointOnShape } from "../../utils/collision";
+import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
+import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 import { isTransparent } from "../utils";
 import {
   hasBoundTextElement,
@@ -25,7 +25,7 @@ import type {
   LocalPoint,
   Polygon,
   Radians,
-} from "../../math";
+} from "@excalidraw/math";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -35,8 +35,11 @@ import {
   pointFrom,
   pointRotateRads,
   pointsEqual,
-} from "../../math";
-import { ellipse, ellipseLineIntersectionPoints } from "../../math/ellipse";
+} from "@excalidraw/math";
+import {
+  ellipse,
+  ellipseLineIntersectionPoints,
+} from "@excalidraw/math/ellipse";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,

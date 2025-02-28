@@ -136,6 +136,9 @@ export const SidebarInner = forwardRef(
       <Island
         {...rest}
         className={clsx("sidebar", { "sidebar--docked": docked }, className)}
+        style={{
+          "--right-sidebar-width": "302px",
+        }}
         ref={islandRef}
       >
         <SidebarPropsContext.Provider value={headerPropsRef.current}>

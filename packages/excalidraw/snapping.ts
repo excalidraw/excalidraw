@@ -1,4 +1,4 @@
-import type { InclusiveRange } from "../math";
+import type { InclusiveRange } from "@excalidraw/math";
 import {
   pointFrom,
   pointRotateRads,
@@ -6,7 +6,7 @@ import {
   rangeIntersection,
   rangesOverlap,
   type GlobalPoint,
-} from "../math";
+} from "@excalidraw/math";
 import { TOOL_TYPE } from "./constants";
 import type { Bounds } from "./element/bounds";
 import {
