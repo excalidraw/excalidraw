@@ -7,10 +7,10 @@
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
-      "default": "./dist/prod/index.js",
+      "types": "./dist/types/utils/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
-      "types": "./dist/types/utils/index.d.ts"
+      "default": "./dist/prod/index.js"
     },
     "./*": {
       "types": "./../utils/dist/types/utils/*"
