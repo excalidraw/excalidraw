@@ -164,6 +164,10 @@ const config = {
                 },
               ],
             },
+            optimization: {
+              // disable terser minification
+              minimize: false,
+            },
           };
         },
       };
