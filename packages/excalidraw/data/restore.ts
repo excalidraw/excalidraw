@@ -238,6 +238,8 @@ const restoreElementWithProperties = <
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element | null => {
+  element = { ...element };
+
   // NOTE (mtolmacs): This is a temporary check to detect extremely large
   // element position or sizing
   if (
@@ -255,6 +257,10 @@ const restoreElement = (
 
   switch (element.type) {
     case "text":
+      // temp fix: cleanup legacy obsidian-excalidraw attribute else it'll
+      // conflict when porting between the apps
+      delete (element as any).rawText;
+
       let fontSize = element.fontSize;
       let fontFamily = element.fontFamily;
       if ("font" in element) {
