@@ -965,6 +965,9 @@ export const bindPointToSnapToElementOutline = (
           otherPoint,
         ),
       ),
+    ).sort(
+      (g, h) =>
+        pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
     )[0];
   } else {
     intersection = intersectElementWithLineSegment(
