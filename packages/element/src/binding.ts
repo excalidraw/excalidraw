@@ -923,10 +923,12 @@ export const bindPointToSnapToElementOutline = (
 
   const aabb = aabbForElement(bindableElement);
   const localP =
-    arrow.points[startOrEnd === "start" ? 0 : arrow.points.length - 1];
+    linearElement.points[
+      startOrEnd === "start" ? 0 : linearElement.points.length - 1
+    ];
   const globalP = pointFrom<GlobalPoint>(
-    arrow.x + localP[0],
-    arrow.y + localP[1],
+    linearElement.x + localP[0],
+    linearElement.y + localP[1],
   );
   const edgePoint = isRectanguloidElement(bindableElement)
     ? avoidRectangularCorner(bindableElement, globalP)
