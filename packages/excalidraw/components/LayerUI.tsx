@@ -526,7 +526,7 @@ const LayerUI = ({
               appState.openSidebar &&
               isSidebarDocked &&
               device.editor.canFitSidebar
-                ? { width: `calc(100% - var(--right-sidebar-width)px)` }
+                ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
           >
