@@ -123,7 +123,7 @@ describe("move element", () => {
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
     expect([Math.round(arrow.x), Math.round(arrow.y)]).toEqual([110, 50]);
     expect([Math.round(arrow.width), Math.round(arrow.height)]).toEqual([
-      84, 84,
+      87, 88,
     ]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());

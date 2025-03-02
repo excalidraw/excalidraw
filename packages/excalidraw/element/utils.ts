@@ -14,6 +14,7 @@ import {
 import { getCornerRadius } from "../shapes";
 import type {
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
@@ -64,10 +65,7 @@ export function deconstructRectanguloidElement(
     return [sides, []];
   }
 
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   const r = rectangle(
     pointFrom(element.x, element.y),
@@ -250,10 +248,7 @@ export function deconstructDiamondElement(
     return [[topRight, bottomRight, bottomLeft, topLeft], []];
   }
 
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   const [top, right, bottom, left]: GlobalPoint[] = [
     pointFrom(element.x + topX, element.y + topY),
@@ -352,4 +347,11 @@ export function deconstructDiamondElement(
   ];
 
   return [sides, corners];
+}
+
+export function elementCenterPoint(element: ExcalidrawElement) {
+  return pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
 }

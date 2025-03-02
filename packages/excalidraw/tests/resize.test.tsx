@@ -19,6 +19,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import { pointFrom } from "@excalidraw/math";
 import { resizeSingleElement } from "../element/resizeElements";
 import { getSizeFromPoints } from "../points";
+import { FIXED_BINDING_DISTANCE } from "../element/binding";
 
 unmountComponent();
 
@@ -186,7 +187,7 @@ describe("generic element", () => {
     UI.resize(rectangle, "w", [50, 0]);
 
     expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80, 0);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80.62, 0);
   });
 
   it("resizes with a label", async () => {
@@ -501,13 +502,13 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.79);
 
     UI.resize(rectangle, "se", [-200, -150]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.79);
   });
 
   it("flips the fixed point binding on negative resize for group selection", () => {
@@ -529,13 +530,13 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.79);
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.13);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.11);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.14);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.21);
   });
 });
 
@@ -801,7 +802,7 @@ describe("image element", () => {
     });
     API.setElements([image]);
     const arrow = UI.createElement("arrow", {
-      x: -30,
+      x: -29,
       y: 50,
       width: 28,
       height: 5,
@@ -811,14 +812,14 @@ describe("image element", () => {
 
     UI.resize(image, "ne", [40, 0]);
 
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(31, 0);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30, 0);
 
     const imageWidth = image.width;
     const scale = 20 / image.height;
     UI.resize(image, "nw", [50, 20]);
 
     expect(arrow.endBinding?.elementId).toEqual(image.id);
-    expect(Math.floor(arrow.width + arrow.endBinding!.gap)).toBeCloseTo(
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(
       30 + imageWidth * scale,
       0,
     );
@@ -1025,11 +1026,11 @@ describe("multiple selection", () => {
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(143, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(146.46, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();
-    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(10);
+    expect(leftBoundArrow.endBinding?.gap).toEqual(FIXED_BINDING_DISTANCE);
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );
@@ -1043,7 +1044,7 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.height).toBeCloseTo(0);
     expect(rightBoundArrow.angle).toEqual(0);
     expect(rightBoundArrow.startBinding).toBeNull();
-    expect(rightBoundArrow.endBinding?.gap).toBeCloseTo(8.0952);
+    expect(rightBoundArrow.endBinding?.gap).toEqual(FIXED_BINDING_DISTANCE);
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );

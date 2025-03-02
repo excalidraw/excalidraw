@@ -1671,7 +1671,6 @@ export const actionChangeArrowType = register({
                     newElement,
                     startElement,
                     "start",
-                    elementsMap,
                   ),
                 },
               }
@@ -1685,7 +1684,6 @@ export const actionChangeArrowType = register({
                     newElement,
                     endElement,
                     "end",
-                    elementsMap,
                   ),
                 },
               }

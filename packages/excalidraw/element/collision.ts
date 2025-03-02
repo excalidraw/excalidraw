@@ -43,6 +43,7 @@ import {
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
+  elementCenterPoint,
 } from "./utils";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
@@ -184,10 +185,7 @@ const intersectRectanguloidWithLineSegment = (
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedA = pointRotateRads<GlobalPoint>(
@@ -205,28 +203,28 @@ const intersectRectanguloidWithLineSegment = (
   const [sides, corners] = deconstructRectanguloidElement(element, offset);
 
   return (
-    [
-      // Test intersection against the sides, keep only the valid
-      // intersection points and rotate them back to scene space
-      ...sides
-        .map((s) =>
-          lineSegmentIntersectionPoints(
-            lineSegment<GlobalPoint>(rotatedA, rotatedB),
-            s,
-          ),
-        )
-        .filter((x) => x != null)
-        .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle)),
+    // Test intersection against the sides, keep only the valid
+    // intersection points and rotate them back to scene space
+    sides
+      .map((s) =>
+        lineSegmentIntersectionPoints(
+          lineSegment<GlobalPoint>(rotatedA, rotatedB),
+          s,
+        ),
+      )
+      .filter((x) => x != null)
+      .map((j) => pointRotateRads<GlobalPoint>(j!, center, element.angle))
       // Test intersection against the corners which are cubic bezier curves,
       // keep only the valid intersection points and rotate them back to scene
       // space
-      ...corners
-        .flatMap((t) =>
-          curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB)),
-        )
-        .filter((i) => i != null)
-        .map((j) => pointRotateRads(j, center, element.angle)),
-    ]
+      .concat(
+        corners
+          .flatMap((t) =>
+            curveIntersectLineSegment(t, lineSegment(rotatedA, rotatedB)),
+          )
+          .filter((i) => i != null)
+          .map((j) => pointRotateRads(j, center, element.angle)),
+      )
       // Remove duplicates
       .filter(
         (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
@@ -246,10 +244,7 @@ const intersectDiamondWithLineSegment = (
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
@@ -259,25 +254,25 @@ const intersectDiamondWithLineSegment = (
   const [sides, curves] = deconstructDiamondElement(element, offset);
 
   return (
-    [
-      ...sides
-        .map((s) =>
-          lineSegmentIntersectionPoints(
-            lineSegment<GlobalPoint>(rotatedA, rotatedB),
-            s,
-          ),
-        )
-        .filter((p): p is GlobalPoint => p != null)
-        // Rotate back intersection points
-        .map((p) => pointRotateRads<GlobalPoint>(p!, center, element.angle)),
-      ...curves
-        .flatMap((p) =>
-          curveIntersectLineSegment(p, lineSegment(rotatedA, rotatedB)),
-        )
-        .filter((p) => p != null)
-        // Rotate back intersection points
-        .map((p) => pointRotateRads(p, center, element.angle)),
-    ]
+    sides
+      .map((s) =>
+        lineSegmentIntersectionPoints(
+          lineSegment<GlobalPoint>(rotatedA, rotatedB),
+          s,
+        ),
+      )
+      .filter((p): p is GlobalPoint => p != null)
+      // Rotate back intersection points
+      .map((p) => pointRotateRads<GlobalPoint>(p!, center, element.angle))
+      .concat(
+        curves
+          .flatMap((p) =>
+            curveIntersectLineSegment(p, lineSegment(rotatedA, rotatedB)),
+          )
+          .filter((p) => p != null)
+          // Rotate back intersection points
+          .map((p) => pointRotateRads(p, center, element.angle)),
+      )
       // Remove duplicates
       .filter(
         (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
@@ -297,10 +292,7 @@ const intersectEllipseWithLineSegment = (
   l: LineSegment<GlobalPoint>,
   offset: number = 0,
 ): GlobalPoint[] => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   const rotatedA = pointRotateRads(l[0], center, -element.angle as Radians);
   const rotatedB = pointRotateRads(l[1], center, -element.angle as Radians);

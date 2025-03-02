@@ -12,13 +12,13 @@ import {
   TrashIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
-import type { Curve } from "../../packages/math";
 import {
   isLineSegment,
+  isCurve,
+  type Curve,
   type GlobalPoint,
   type LineSegment,
-} from "../../packages/math";
-import { isCurve } from "../../packages/math/curve";
+} from "@excalidraw/math";
 
 const renderLine = (
   context: CanvasRenderingContext2D,

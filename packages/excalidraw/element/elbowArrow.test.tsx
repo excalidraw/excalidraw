@@ -189,11 +189,11 @@ describe("elbow arrow routing", () => {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 
-    expect(arrow.points).toEqual([
+    expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
       [45, 0],
-      [45, 200],
-      [90, 200],
+      [45, 206.55],
+      [90, 206.55],
     ]);
   });
 });
@@ -232,9 +232,9 @@ describe("elbow arrow ui", () => {
     expect(h.state.currentItemArrowType).toBe(ARROW_TYPE.elbow);
 
     mouse.reset();
-    mouse.moveTo(-43, -99);
+    mouse.moveTo(-50, -100);
     mouse.click();
-    mouse.moveTo(43, 99);
+    mouse.moveTo(50, 100);
     mouse.click();
 
     const arrow = h.scene.getSelectedElements(
@@ -243,7 +243,7 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.type).toBe("arrow");
     expect(arrow.elbowed).toBe(true);
-    expect(arrow.points).toEqual([
+    expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
       [45, 0],
       [45, 200],
@@ -288,8 +288,8 @@ describe("elbow arrow ui", () => {
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
       [35, 0],
-      [35, 165],
-      [103, 165],
+      [35, 183],
+      [96, 183],
     ]);
   });
 });

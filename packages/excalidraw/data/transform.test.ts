@@ -2,7 +2,8 @@ import { vi } from "vitest";
 import type { ExcalidrawElementSkeleton } from "./transform";
 import { convertToExcalidrawElements } from "./transform";
 import type { ExcalidrawArrowElement } from "../element/types";
-import { pointFrom } from "@excalidraw/math";
+import { pointFrom } from "../../math";
+import { FIXED_BINDING_DISTANCE } from "../element/binding";
 
 const opts = { regenerateIds: false };
 
@@ -430,7 +431,7 @@ describe("Test Transform", () => {
         startBinding: {
           elementId: rectangle.id,
           focus: 0,
-          gap: 1,
+          gap: FIXED_BINDING_DISTANCE,
         },
         endBinding: {
           elementId: ellipse.id,
@@ -515,7 +516,7 @@ describe("Test Transform", () => {
         startBinding: {
           elementId: text2.id,
           focus: 0,
-          gap: 1,
+          gap: FIXED_BINDING_DISTANCE,
         },
         endBinding: {
           elementId: text3.id,
@@ -778,7 +779,7 @@ describe("Test Transform", () => {
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
         focus: -0,
-        gap: 14,
+        gap: FIXED_BINDING_DISTANCE,
       });
       expect(rect.boundElements).toStrictEqual([
         {

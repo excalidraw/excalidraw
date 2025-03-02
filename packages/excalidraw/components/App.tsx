@@ -8169,7 +8169,6 @@ class App extends React.Component<AppProps, AppState> {
             );
           },
           linearElementEditor,
-          this.scene,
         );
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -8579,10 +8578,22 @@ class App extends React.Component<AppProps, AppState> {
             points.length === 2 ||
             (points.length > 1 && isElbowArrow(newElement))
           ) {
+            const globalPoint = LinearElementEditor.getOutlineAvoidingPoint(
+              newElement,
+              { x: newElement.x + dx, y: newElement.y + dy },
+              1,
+              this,
+            );
             mutateElement(
               newElement,
               {
-                points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
+                points: [
+                  ...points.slice(0, -1),
+                  pointFrom<LocalPoint>(
+                    globalPoint[0] - newElement.x,
+                    globalPoint[1] - newElement.y,
+                  ),
+                ],
               },
               false,
               { isDragging: true },
