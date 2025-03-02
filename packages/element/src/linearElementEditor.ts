@@ -257,7 +257,7 @@ export class LinearElementEditor {
       return null;
     }
     const { elementId } = linearElementEditor;
-    const elementsMap = scene.getNonDeletedElementsMap();
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return null;
@@ -333,19 +333,54 @@ export class LinearElementEditor {
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
+            let p = pointFrom<GlobalPoint>(
+              element.x + element.points[pointIndex][0] + deltaX,
+              element.y + element.points[pointIndex][1] + deltaY,
+            );
+            if (
+              pointIndex === lastClickedPoint &&
+              (pointIndex === 0 || pointIndex === element.points.length - 1)
+            ) {
+              const hoveredElement = getHoveredElementForBinding(
+                {
+                  x: scenePointerX,
+                  y: scenePointerY,
+                },
+                app.scene.getNonDeletedElements(),
+                app.scene.getNonDeletedElementsMap(),
+                app.state.zoom,
+                isElbowArrow(element),
+                isElbowArrow(element),
+              );
+              if (hoveredElement) {
+                const newPoints = Array.from(element.points);
+                newPoints[pointIndex] = pointFrom(
+                  element.points[pointIndex][0] + deltaX,
+                  element.points[pointIndex][1] + deltaY,
+                );
+                p = bindPointToSnapToElementOutline(
+                  {
+                    ...element,
+                    points: newPoints,
+                  },
+                  hoveredElement,
+                  pointIndex === 0 ? "start" : "end",
+                );
+              }
+            }
+
             const newPointPosition: LocalPoint =
               pointIndex === lastClickedPoint
                 ? LinearElementEditor.createPointAt(
                     element,
                     elementsMap,
-                    scenePointerX - linearElementEditor.pointerOffset.x,
-                    scenePointerY - linearElementEditor.pointerOffset.y,
+                    p[0],
+                    p[1],
+                    // p[0] - linearElementEditor.pointerOffset.x,
+                    // p[1] - linearElementEditor.pointerOffset.y,
                     event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
                   )
-                : pointFrom(
-                    element.points[pointIndex][0] + deltaX,
-                    element.points[pointIndex][1] + deltaY,
-                  );
+                : pointFrom(p[0] - element.x, p[1] - element.y);
             return {
               index: pointIndex,
               point: newPointPosition,

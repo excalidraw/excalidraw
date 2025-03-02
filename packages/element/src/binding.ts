@@ -965,6 +965,7 @@ export const bindPointToSnapToElementOutline = (
           ),
           otherPoint,
         ),
+        adjacentPoint,
       ),
     ).sort(
       (g, h) =>
@@ -1016,7 +1017,31 @@ export const bindPointToSnapToElementOutline = (
     );
   }
 
-  return edgePoint;
+  const currentDistance = pointDistance(edgePoint, center);
+  const fullDistance = Math.max(
+    pointDistance(intersection ?? edgePoint, center),
+    1e-5, // Avoid division by zero
+  );
+  const ratio = round(currentDistance / fullDistance);
+
+  switch (true) {
+    case ratio > 0.5:
+      return pointFromVector(
+        vectorScale(
+          vectorNormalize(
+            vectorFromPoint(intersection ?? center, adjacentPoint),
+          ),
+          -FIXED_BINDING_DISTANCE,
+        ),
+        intersection ?? edgePoint,
+      );
+    default:
+      if (elbowed) {
+        return headingToMidBindPoint(edgePoint, bindableElement, aabb);
+      }
+
+      return edgePoint;
+  }
 };
 
 export const avoidRectangularCorner = (
