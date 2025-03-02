@@ -263,8 +263,10 @@ export class LinearElementEditor {
       return null;
     }
 
+    const elbowed = isElbowArrow(element);
+
     if (
-      isElbowArrow(element) &&
+      elbowed &&
       !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
       linearElementEditor.pointerDownState.lastClickedPoint !== 0
     ) {
@@ -281,7 +283,7 @@ export class LinearElementEditor {
             : undefined,
         ].filter((idx): idx is number => idx !== undefined)
       : linearElementEditor.selectedPointsIndices;
-    const lastClickedPoint = isElbowArrow(element)
+    const lastClickedPoint = elbowed
       ? linearElementEditor.pointerDownState.lastClickedPoint > 0
         ? element.points.length - 1
         : 0
@@ -337,6 +339,7 @@ export class LinearElementEditor {
               element.x + element.points[pointIndex][0] + deltaX,
               element.y + element.points[pointIndex][1] + deltaY,
             );
+
             if (
               pointIndex === lastClickedPoint &&
               (pointIndex === 0 || pointIndex === element.points.length - 1)
@@ -349,8 +352,8 @@ export class LinearElementEditor {
                 app.scene.getNonDeletedElements(),
                 app.scene.getNonDeletedElementsMap(),
                 app.state.zoom,
-                isElbowArrow(element),
-                isElbowArrow(element),
+                elbowed,
+                elbowed,
               );
               if (hoveredElement) {
                 const newPoints = Array.from(element.points);
