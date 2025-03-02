@@ -238,6 +238,43 @@ export class LinearElementEditor {
     });
   }
 
+  static getOutlineAvoidingPoint(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    coords: { x: number; y: number },
+    pointIndex: number,
+    app: AppClassProperties,
+  ): GlobalPoint {
+    const elbowed = isElbowArrow(element);
+    const hoveredElement = getHoveredElementForBinding(
+      coords,
+      app.scene.getNonDeletedElements(),
+      app.scene.getNonDeletedElementsMap(),
+      app.state.zoom,
+      elbowed,
+      elbowed,
+    );
+    const p = pointFrom<GlobalPoint>(coords.x, coords.y);
+
+    if (hoveredElement) {
+      const newPoints = Array.from(element.points);
+      newPoints[pointIndex] = pointFrom<LocalPoint>(
+        p[0] - element.x,
+        p[1] - element.y,
+      );
+
+      return bindPointToSnapToElementOutline(
+        {
+          ...element,
+          points: newPoints,
+        },
+        hoveredElement,
+        pointIndex === 0 ? "start" : "end",
+      );
+    }
+
+    return p;
+  }
+
   /**
    * @returns whether point was dragged
    */
@@ -351,33 +388,16 @@ export class LinearElementEditor {
                 pointIndex === 0 ||
                 pointIndex === element.points.length - 1
               ) {
-                const hoveredElement = getHoveredElementForBinding(
-                  {
-                    x: scenePointerX,
-                    y: scenePointerY,
-                  },
-                  app.scene.getNonDeletedElements(),
-                  app.scene.getNonDeletedElementsMap(),
-                  app.state.zoom,
-                  elbowed,
-                  elbowed,
-                );
-
-                if (hoveredElement) {
-                  const newPoints = Array.from(element.points);
-                  newPoints[pointIndex] = pointFrom(
-                    element.points[pointIndex][0] + deltaX,
-                    element.points[pointIndex][1] + deltaY,
-                  );
-                  globalNewPointPosition = bindPointToSnapToElementOutline(
+                globalNewPointPosition =
+                  LinearElementEditor.getOutlineAvoidingPoint(
+                    element,
                     {
-                      ...element,
-                      points: newPoints,
+                      x: element.x + element.points[pointIndex][0] + deltaX,
+                      y: element.y + element.points[pointIndex][1] + deltaY,
                     },
-                    hoveredElement,
-                    pointIndex === 0 ? "start" : "end",
+                    pointIndex,
+                    app,
                   );
-                }
               }
 
               newPointPosition = LinearElementEditor.createPointAt(
