@@ -8273,7 +8273,6 @@ class App extends React.Component<AppProps, AppState> {
             );
           },
           linearElementEditor,
-          this.scene,
         );
         if (newLinearElementEditor) {
           pointerDownState.lastCoords.x = pointerCoords.x;
