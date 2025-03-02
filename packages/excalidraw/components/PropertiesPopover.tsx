@@ -14,8 +14,8 @@ interface PropertiesPopoverProps {
   onClose: () => void;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   onPointerLeave?: React.PointerEventHandler<HTMLDivElement>;
-  onFocusOutside?: Popover.DismissableLayerProps["onFocusOutside"];
-  onPointerDownOutside?: Popover.DismissableLayerProps["onPointerDownOutside"];
+  onFocusOutside?: Popover.PopoverContentProps["onFocusOutside"];
+  onPointerDownOutside?: Popover.PopoverContentProps["onPointerDownOutside"];
 }
 
 export const PropertiesPopover = React.forwardRef<
