@@ -335,55 +335,60 @@ export class LinearElementEditor {
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
-            let p = pointFrom<GlobalPoint>(
-              element.x + element.points[pointIndex][0] + deltaX,
-              element.y + element.points[pointIndex][1] + deltaY,
+            let newPointPosition = pointFrom<LocalPoint>(
+              element.points[pointIndex][0] + deltaX,
+              element.points[pointIndex][1] + deltaY,
             );
 
-            if (
-              pointIndex === lastClickedPoint &&
-              (pointIndex === 0 || pointIndex === element.points.length - 1)
-            ) {
-              const hoveredElement = getHoveredElementForBinding(
-                {
-                  x: scenePointerX,
-                  y: scenePointerY,
-                },
-                app.scene.getNonDeletedElements(),
-                app.scene.getNonDeletedElementsMap(),
-                app.state.zoom,
-                elbowed,
-                elbowed,
+            // Check if point dragging is happening
+            if (pointIndex === lastClickedPoint) {
+              let globalNewPointPosition = pointFrom<GlobalPoint>(
+                scenePointerX - linearElementEditor.pointerOffset.x,
+                scenePointerY - linearElementEditor.pointerOffset.y,
               );
-              if (hoveredElement) {
-                const newPoints = Array.from(element.points);
-                newPoints[pointIndex] = pointFrom(
-                  element.points[pointIndex][0] + deltaX,
-                  element.points[pointIndex][1] + deltaY,
-                );
-                p = bindPointToSnapToElementOutline(
+
+              if (
+                pointIndex === 0 ||
+                pointIndex === element.points.length - 1
+              ) {
+                const hoveredElement = getHoveredElementForBinding(
                   {
-                    ...element,
-                    points: newPoints,
+                    x: scenePointerX,
+                    y: scenePointerY,
                   },
-                  hoveredElement,
-                  pointIndex === 0 ? "start" : "end",
+                  app.scene.getNonDeletedElements(),
+                  app.scene.getNonDeletedElementsMap(),
+                  app.state.zoom,
+                  elbowed,
+                  elbowed,
                 );
+
+                if (hoveredElement) {
+                  const newPoints = Array.from(element.points);
+                  newPoints[pointIndex] = pointFrom(
+                    element.points[pointIndex][0] + deltaX,
+                    element.points[pointIndex][1] + deltaY,
+                  );
+                  globalNewPointPosition = bindPointToSnapToElementOutline(
+                    {
+                      ...element,
+                      points: newPoints,
+                    },
+                    hoveredElement,
+                    pointIndex === 0 ? "start" : "end",
+                  );
+                }
               }
+
+              newPointPosition = LinearElementEditor.createPointAt(
+                element,
+                elementsMap,
+                globalNewPointPosition[0],
+                globalNewPointPosition[1],
+                event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
+              );
             }
 
-            const newPointPosition: LocalPoint =
-              pointIndex === lastClickedPoint
-                ? LinearElementEditor.createPointAt(
-                    element,
-                    elementsMap,
-                    p[0],
-                    p[1],
-                    // p[0] - linearElementEditor.pointerOffset.x,
-                    // p[1] - linearElementEditor.pointerOffset.y,
-                    event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
-                  )
-                : pointFrom(p[0] - element.x, p[1] - element.y);
             return {
               index: pointIndex,
               point: newPointPosition,
