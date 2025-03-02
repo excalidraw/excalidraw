@@ -197,7 +197,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "99.23572",
+  "height": "99.58947",
   "id": "id172",
   "index": "a2",
   "isDeleted": false,
@@ -211,8 +211,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "96.42891",
-      "99.23572",
+      "99.58947",
+      "99.58947",
     ],
   ],
   "roughness": 1,
@@ -227,8 +227,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 40,
-  "width": "96.42891",
-  "x": "3.53553",
+  "width": "99.58947",
+  "x": 0,
   "y": 0,
 }
 `;
@@ -297,7 +297,7 @@ History {
                 "focus": "0.00990",
                 "gap": 5,
               },
-              "height": "0.92998",
+              "height": "0.92900",
               "points": [
                 [
                   0,
@@ -305,7 +305,7 @@ History {
                 ],
                 [
                   "92.92893",
-                  "-0.92998",
+                  "-0.92900",
                 ],
               ],
               "startBinding": {
@@ -313,14 +313,15 @@ History {
                 "focus": "0.02970",
                 "gap": 5,
               },
+              "width": "92.92893",
             },
             "inserted": {
               "endBinding": {
                 "elementId": "id171",
-                "focus": "-0.02000",
+                "focus": "-0.02052",
                 "gap": 5,
               },
-              "height": "0.00611",
+              "height": "0.04625",
               "points": [
                 [
                   0,
@@ -328,14 +329,15 @@ History {
                 ],
                 [
                   "92.92893",
-                  "0.00611",
+                  "0.04625",
                 ],
               ],
               "startBinding": {
                 "elementId": "id170",
-                "focus": "0.02000",
+                "focus": "0.01841",
                 "gap": 5,
               },
+              "width": "92.92893",
             },
           },
         },
@@ -389,18 +391,20 @@ History {
                 "focus": 0,
                 "gap": 1,
               },
-              "height": "99.23572",
+              "height": "99.58947",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  "96.42891",
-                  "99.23572",
+                  "99.58947",
+                  "99.58947",
                 ],
               ],
               "startBinding": null,
+              "width": "99.58947",
+              "x": 0,
               "y": 0,
             },
             "inserted": {
@@ -409,7 +413,7 @@ History {
                 "focus": "0.00990",
                 "gap": 5,
               },
-              "height": "0.93503",
+              "height": "0.92678",
               "points": [
                 [
                   0,
@@ -417,7 +421,7 @@ History {
                 ],
                 [
                   "92.92893",
-                  "-0.93503",
+                  "-0.92678",
                 ],
               ],
               "startBinding": {
@@ -425,7 +429,9 @@ History {
                 "focus": "0.02970",
                 "gap": 5,
               },
-              "y": "0.97365",
+              "width": "92.92893",
+              "x": "3.53553",
+              "y": "0.96071",
             },
           },
           "id175" => Delta {
@@ -856,6 +862,7 @@ History {
                   0,
                 ],
               ],
+              "width": 0,
             },
             "inserted": {
               "points": [
@@ -864,10 +871,11 @@ History {
                   0,
                 ],
                 [
-                  100,
+                  90,
                   0,
                 ],
               ],
+              "width": 90,
             },
           },
         },
@@ -924,6 +932,8 @@ History {
                 ],
               ],
               "startBinding": null,
+              "width": 100,
+              "x": 150,
             },
             "inserted": {
               "endBinding": {
@@ -946,6 +956,8 @@ History {
                 "focus": 0,
                 "gap": 5,
               },
+              "width": 0,
+              "x": "146.46447",
             },
           },
         },
