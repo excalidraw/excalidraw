@@ -10,7 +10,6 @@ import {
 import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
 import { newArrowElement, newElement } from "./newElement";
-import type { SceneElementsMap } from "./types";
 import {
   type ElementsMap,
   type ExcalidrawBindableElement,
@@ -472,7 +471,7 @@ const createBindingArrow = (
 
   const update = updateElbowArrowPoints(
     bindingArrow,
-    toBrandedType<SceneElementsMap>(
+    toBrandedType<NonDeletedSceneElementsMap>(
       new Map([
         ...elementsMap.entries(),
         [startBindingElement.id, startBindingElement],

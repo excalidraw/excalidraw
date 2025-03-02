@@ -268,14 +268,16 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
-    : // We have to update the focus and gap of the binding, so let's rebind
+    : !isElbowArrow(selectedElement)
+    ? // We have to update the focus and gap of the binding, so let's rebind
       getElligibleElementForBindingElement(
         selectedElement,
         "start",
         elementsMap,
         elements,
         zoom,
-      );
+      )
+    : null;
   const end = endDragged
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(
@@ -286,14 +288,16 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
-    : // We have to update the focus and gap of the binding, so let's rebind
+    : !isElbowArrow(selectedElement)
+    ? // We have to update the focus and gap of the binding, so let's rebind
       getElligibleElementForBindingElement(
         selectedElement,
         "end",
         elementsMap,
         elements,
         zoom,
-      );
+      )
+    : null;
 
   return [start, end];
 };
@@ -305,6 +309,11 @@ const getBindingStrategyForDraggingArrowOrJoints = (
   isBindingEnabled: boolean,
   zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
+  // Elbow arrows don't bind when dragged as a whole
+  if (isElbowArrow(selectedElement)) {
+    return [null, null];
+  }
+
   const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
     selectedElement,
     elementsMap,
