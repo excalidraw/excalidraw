@@ -2223,6 +2223,7 @@ const getGlobalPoint = (
         arrow,
         element,
         startOrEnd,
+        elementsMap,
       );
 
       return snapToMid(element, snapPoint);
