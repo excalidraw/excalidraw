@@ -234,7 +234,8 @@ const intersectRectanguloidWithLineSegment = (
       )
       // Remove duplicates
       .filter(
-        (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
+        (p, idx, points) =>
+          points.findIndex((d) => pointsEqual(p, d, 1e-3)) === idx,
       )
   );
 };
@@ -282,7 +283,8 @@ const intersectDiamondWithLineSegment = (
       )
       // Remove duplicates
       .filter(
-        (p, idx, points) => points.findIndex((d) => pointsEqual(p, d)) === idx,
+        (p, idx, points) =>
+          points.findIndex((d) => pointsEqual(p, d, 1e-3)) === idx,
       )
   );
 };
