@@ -916,6 +916,7 @@ export const bindPointToSnapToElementOutline = (
   arrow: ExcalidrawElbowArrowElement,
   bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
 ): GlobalPoint => {
   if (isDevEnv() || isTestEnv()) {
     invariant(arrow.points.length > 1, "Arrow should have at least 2 points");
@@ -1022,26 +1023,16 @@ export const bindPointToSnapToElementOutline = (
     pointDistance(intersection ?? edgePoint, center),
     1e-5, // Avoid division by zero
   );
-  const ratio = round(currentDistance / fullDistance);
 
-  switch (true) {
-    case ratio > 0.5:
-      return pointFromVector(
-        vectorScale(
-          vectorNormalize(
-            vectorFromPoint(intersection ?? center, adjacentPoint),
-          ),
-          -FIXED_BINDING_DISTANCE,
-        ),
-        intersection ?? edgePoint,
-      );
-    default:
-      if (elbowed) {
-        return headingToMidBindPoint(edgePoint, bindableElement, aabb);
-      }
-
-      return edgePoint;
+  if (!isInside) {
+    return intersection;
   }
+
+  if (elbowed) {
+    return headingToMidBindPoint(edgePoint, bindableElement, aabb);
+  }
+
+  return edgePoint;
 };
 
 export const avoidRectangularCorner = (
@@ -1231,6 +1222,7 @@ const updateBoundPoint = (
         linearElement,
         bindableElement,
         startOrEnd === "startBinding" ? "start" : "end",
+        elementsMap,
       ).fixedPoint;
     const globalMidPoint = pointFrom<GlobalPoint>(
       bindableElement.x + bindableElement.width / 2,
@@ -1317,6 +1309,24 @@ const updateBoundPoint = (
       ),
     ];
 
+    // debugClear();
+    // intersections.forEach((intersection) => {
+    //   debugDrawPoint(intersection, { permanent: true, color: "red" });
+    // });
+    // debugDrawLine(
+    //   lineSegment<GlobalPoint>(
+    //     adjacentPoint,
+    //     pointFromVector(
+    //       vectorScale(
+    //         vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
+    //         interceptorLength,
+    //       ),
+    //       adjacentPoint,
+    //     ),
+    //   ),
+    //   { permanent: true, color: "green" },
+    // );
+
     if (intersections.length > 1) {
       // The adjacent point is outside the shape (+ gap)
       newEdgePoint = intersections[0];
@@ -1340,6 +1350,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   linearElement: NonDeleted<ExcalidrawElbowArrowElement>,
   hoveredElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
 ): { fixedPoint: FixedPoint } => {
   const bounds = [
     hoveredElement.x,
@@ -1351,6 +1362,7 @@ export const calculateFixedPointForElbowArrowBinding = (
     linearElement,
     hoveredElement,
     startOrEnd,
+    elementsMap,
   );
   const globalMidPoint = pointFrom(
     bounds[0] + (bounds[2] - bounds[0]) / 2,
