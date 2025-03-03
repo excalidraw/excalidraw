@@ -52,68 +52,73 @@ export class LassoTrail extends AnimatedTrail {
     this.intersectedElements.clear();
     this.enclosedElements.clear();
 
-    this.worker = new Worker(new URL("./worker.ts", import.meta.url), {
-      type: "module",
-    });
+    try {
+      this.worker = new Worker(new URL("./worker.ts", import.meta.url), {
+        type: "module",
+      });
 
-    this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
-      const { selectedElementIds } = event.data;
+      this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
+        const { selectedElementIds } = event.data;
+        this.selectElementsFromIds(selectedElementIds);
+      };
 
-      this.app.setState((prevState) => {
-        const nextSelectedElementIds = selectedElementIds.reduce((acc, id) => {
-          acc[id] = true;
-          return acc;
-        }, {} as Record<ExcalidrawElement["id"], true>);
+      this.worker.onerror = (error) => {
+        console.error("Worker error:", error);
+      };
+    } catch (error) {
+      console.error("Failed to start worker", error);
+    }
+  }
 
-        for (const [id] of Object.entries(nextSelectedElementIds)) {
-          const element = this.app.scene.getNonDeletedElement(id);
-          if (element && isFrameLikeElement(element)) {
-            const elementsInFrame = getFrameChildren(
-              this.app.scene.getNonDeletedElementsMap(),
-              element.id,
-            );
-            for (const child of elementsInFrame) {
-              delete nextSelectedElementIds[child.id];
-            }
+  selectElementsFromIds = (ids: string[]) => {
+    this.app.setState((prevState) => {
+      const nextSelectedElementIds = ids.reduce((acc, id) => {
+        acc[id] = true;
+        return acc;
+      }, {} as Record<ExcalidrawElement["id"], true>);
+
+      for (const [id] of Object.entries(nextSelectedElementIds)) {
+        const element = this.app.scene.getNonDeletedElement(id);
+        if (element && isFrameLikeElement(element)) {
+          const elementsInFrame = getFrameChildren(
+            this.app.scene.getNonDeletedElementsMap(),
+            element.id,
+          );
+          for (const child of elementsInFrame) {
+            delete nextSelectedElementIds[child.id];
           }
         }
+      }
 
-        const nextSelection = selectGroupsForSelectedElements(
-          {
-            editingGroupId: prevState.editingGroupId,
-            selectedElementIds: nextSelectedElementIds,
-          },
-          this.app.scene.getNonDeletedElements(),
-          prevState,
-          this.app,
-        );
+      const nextSelection = selectGroupsForSelectedElements(
+        {
+          editingGroupId: prevState.editingGroupId,
+          selectedElementIds: nextSelectedElementIds,
+        },
+        this.app.scene.getNonDeletedElements(),
+        prevState,
+        this.app,
+      );
 
-        const selectedIds = [...Object.keys(nextSelection.selectedElementIds)];
-        const selectedGroupIds = [
-          ...Object.keys(nextSelection.selectedGroupIds),
-        ];
+      const selectedIds = [...Object.keys(nextSelection.selectedElementIds)];
+      const selectedGroupIds = [...Object.keys(nextSelection.selectedGroupIds)];
 
-        return {
-          selectedElementIds: nextSelection.selectedElementIds,
-          selectedGroupIds: nextSelection.selectedGroupIds,
-          selectedLinearElement:
-            selectedIds.length === 1 &&
-            !selectedGroupIds.length &&
-            isLinearElement(this.app.scene.getNonDeletedElement(selectedIds[0]))
-              ? new LinearElementEditor(
-                  this.app.scene.getNonDeletedElement(
-                    selectedIds[0],
-                  ) as NonDeleted<ExcalidrawLinearElement>,
-                )
-              : null,
-        };
-      });
-    };
-
-    this.worker.onerror = (error) => {
-      console.error("Worker error:", error);
-    };
-  }
+      return {
+        selectedElementIds: nextSelection.selectedElementIds,
+        selectedGroupIds: nextSelection.selectedGroupIds,
+        selectedLinearElement:
+          selectedIds.length === 1 &&
+          !selectedGroupIds.length &&
+          isLinearElement(this.app.scene.getNonDeletedElement(selectedIds[0]))
+            ? new LinearElementEditor(
+                this.app.scene.getNonDeletedElement(
+                  selectedIds[0],
+                ) as NonDeleted<ExcalidrawLinearElement>,
+              )
+            : null,
+      };
+    });
+  };
 
   addPointToPath = (x: number, y: number) => {
     super.addPointToPath(x, y);

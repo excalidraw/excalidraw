@@ -9,7 +9,7 @@ export type LassoWorkerInput = {
   elementsSegments: ElementsSegmentsMap;
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
-  simplifyDistance: number;
+  simplifyDistance?: number;
 };
 
 export type LassoWorkerOutput = {

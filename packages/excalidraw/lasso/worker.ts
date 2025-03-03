@@ -86,7 +86,10 @@ export const updateSelection = (input: LassoWorkerInput): LassoWorkerOutput => {
     simplifyDistance,
   } = input;
   // simplify the path to reduce the number of points
-  const path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
+  let path: GlobalPoint[] = lassoPath;
+  if (simplifyDistance) {
+    path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
+  }
   // close the path to form a polygon for enclosure check
   const closedPath = polygonFromPoints(path);
   // as the path might not enclose a shape anymore, clear before checking
