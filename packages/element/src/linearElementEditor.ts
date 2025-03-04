@@ -238,24 +238,23 @@ export class LinearElementEditor {
     });
   }
 
-  static getOutlineAvoidingPoint(
+  static getOutlineAvoidingPointOrNull(
     element: NonDeleted<ExcalidrawLinearElement>,
     coords: { x: number; y: number },
     pointIndex: number,
     app: AppClassProperties,
-  ): GlobalPoint {
-    const elbowed = isElbowArrow(element);
+  ) {
     const hoveredElement = getHoveredElementForBinding(
       coords,
       app.scene.getNonDeletedElements(),
       app.scene.getNonDeletedElementsMap(),
       app.state.zoom,
       true,
-      elbowed,
+      isElbowArrow(element),
     );
-    const p = pointFrom<GlobalPoint>(coords.x, coords.y);
 
     if (hoveredElement) {
+      const p = pointFrom<GlobalPoint>(coords.x, coords.y);
       const newPoints = Array.from(element.points);
       newPoints[pointIndex] = pointFrom<LocalPoint>(
         p[0] - element.x,
@@ -273,7 +272,27 @@ export class LinearElementEditor {
       );
     }
 
-    return p;
+    return null;
+  }
+
+  static getOutlineAvoidingPoint(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    coords: { x: number; y: number },
+    pointIndex: number,
+    app: AppClassProperties,
+  ): GlobalPoint {
+    const p = LinearElementEditor.getOutlineAvoidingPointOrNull(
+      element,
+      coords,
+      pointIndex,
+      app,
+    );
+
+    if (p) {
+      return p;
+    }
+
+    return pointFrom<GlobalPoint>(coords.x, coords.y);
   }
 
   /**
