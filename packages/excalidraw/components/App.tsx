@@ -3956,7 +3956,7 @@ class App extends React.Component<AppProps, AppState> {
     if (force === true) {
       this.scene.triggerUpdate();
     } else {
-      this.setState({});
+      this.forceUpdate();
     }
   };
 
