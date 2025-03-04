@@ -33,7 +33,6 @@ import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
-  updateBoundElements,
 } from "./binding";
 import { invariant, tupleToCoors } from "../utils";
 import {
