@@ -219,7 +219,9 @@ export class LinearElementEditor {
     });
   }
 
-  /** @returns whether point was dragged */
+  /**
+   * @returns whether point was dragged
+   */
   static handlePointDragging(
     event: PointerEvent,
     app: AppClassProperties,
