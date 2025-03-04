@@ -33,6 +33,7 @@ import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
+  updateBoundElements,
 } from "./binding";
 import { invariant, tupleToCoors } from "../utils";
 import {
@@ -380,6 +381,34 @@ export class LinearElementEditor {
 
         if (coords.length) {
           maybeSuggestBinding(element, coords);
+        }
+      }
+
+      if (selectedPointsIndices && draggingPoint) {
+        if (
+          lastClickedPoint === 0 ||
+          lastClickedPoint === element.points.length - 1
+        ) {
+          // Remove the binding at drag start
+          bindOrUnbindLinearElement(
+            element,
+            lastClickedPoint === 0 ? null : "keep",
+            lastClickedPoint === element.points.length - 1 ? null : "keep",
+            elementsMap,
+            scene,
+          );
+        }
+
+        // Run updateBoundElements for the opposite point
+        if (element.startBinding || element.endBinding) {
+          const elementId = element.startBinding?.elementId
+            ? element.startBinding.elementId
+            : element.endBinding!.elementId;
+          const bindingElement = elementsMap.get(elementId);
+
+          if (bindingElement) {
+            updateBoundElements(bindingElement, elementsMap);
+          }
         }
       }
 
