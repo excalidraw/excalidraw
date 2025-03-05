@@ -943,7 +943,10 @@ export const bindPointToSnapToElementOutline = (
       ),
     )[0];
     const currentDistance = pointDistance(p, center);
-    const fullDistance = pointDistance(intersection ?? p, center);
+    const fullDistance = Math.max(
+      pointDistance(intersection ?? p, center),
+      1e-5,
+    );
     const ratio = currentDistance / fullDistance;
 
     switch (true) {
