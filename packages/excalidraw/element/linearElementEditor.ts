@@ -14,11 +14,7 @@ import type {
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
-import {
-  getCurvePathOps,
-  getElementPointsCoords,
-  getMinMaxXYFromCurvePathOps,
-} from "./bounds";
+import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
 import type {
   AppState,
   PointerCoords,
@@ -53,11 +49,9 @@ import {
   pointFrom,
   pointRotateRads,
   pointsEqual,
-  vector,
   type GlobalPoint,
   type LocalPoint,
   pointDistance,
-  pointTranslate,
   vectorFromPoint,
 } from "@excalidraw/math";
 import {
@@ -69,6 +63,7 @@ import {
 } from "../shapes";
 import { getGridPoint } from "../snapping";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
+import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
 
 const editorMidPointsCache: {
   version: number | null;
@@ -1273,34 +1268,28 @@ export class LinearElementEditor {
     // all the other points in the opposite direction by delta to
     // offset it. We do the same with actual element.x/y position, so
     // this hacks are completely transparent to the user.
-    let offsetX = 0;
-    let offsetY = 0;
+    const [deltaX, deltaY] =
+      targetPoints.find(({ index }) => index === 0)?.point ??
+      pointFrom<LocalPoint>(0, 0);
+    const [offsetX, offsetY] = pointFrom<LocalPoint>(
+      deltaX - points[0][0],
+      deltaY - points[0][1],
+    );
 
-    const selectedOriginPoint = targetPoints.find(({ index }) => index === 0);
+    const nextPoints = isElbowArrow(element)
+      ? [
+          targetPoints.find((t) => t.index === 0)?.point ?? points[0],
+          targetPoints.find((t) => t.index === points.length - 1)?.point ??
+            points[points.length - 1],
+        ]
+      : points.map((p, idx) => {
+          const current = targetPoints.find((t) => t.index === idx)?.point ?? p;
 
-    if (selectedOriginPoint) {
-      offsetX =
-        selectedOriginPoint.point[0] + points[selectedOriginPoint.index][0];
-      offsetY =
-        selectedOriginPoint.point[1] + points[selectedOriginPoint.index][1];
-    }
-
-    const nextPoints: LocalPoint[] = points.map((p, idx) => {
-      const selectedPointData = targetPoints.find((t) => t.index === idx);
-      if (selectedPointData) {
-        if (selectedPointData.index === 0) {
-          return p;
-        }
-
-        const deltaX =
-          selectedPointData.point[0] - points[selectedPointData.index][0];
-        const deltaY =
-          selectedPointData.point[1] - points[selectedPointData.index][1];
-
-        return pointFrom(p[0] + deltaX - offsetX, p[1] + deltaY - offsetY);
-      }
-      return offsetX || offsetY ? pointFrom(p[0] - offsetX, p[1] - offsetY) : p;
-    });
+          return pointFrom<LocalPoint>(
+            current[0] - offsetX,
+            current[1] - offsetY,
+          );
+        });
 
     LinearElementEditor._updatePoints(
       element,
@@ -1451,14 +1440,6 @@ export class LinearElementEditor {
       }
 
       updates.points = Array.from(nextPoints);
-      updates.points[0] = pointTranslate(
-        updates.points[0],
-        vector(offsetX, offsetY),
-      );
-      updates.points[updates.points.length - 1] = pointTranslate(
-        updates.points[updates.points.length - 1],
-        vector(offsetX, offsetY),
-      );
 
       mutateElement(element, updates, true, {
         isDragging: options?.isDragging,
