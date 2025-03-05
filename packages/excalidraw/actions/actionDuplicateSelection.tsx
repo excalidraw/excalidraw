@@ -43,7 +43,6 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 import { CaptureUpdateAction } from "../store";
-import { clamp } from "@excalidraw/math";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -161,14 +160,8 @@ const duplicateElements = (
             element.x + DEFAULT_GRID_SIZE / 2,
             element.y + DEFAULT_GRID_SIZE / 2,
           );
-          // @ts-ignore
-          newElement.x = clamp(newElement.x, -1e4, 1e4);
-          // @ts-ignore
-          newElement.y = clamp(newElement.y, -1e4, 1e4);
-          // @ts-ignore
-          newElement.width = clamp(newElement.width, -1e4, 1e4);
-          // @ts-ignore
-          newElement.height = clamp(newElement.height, -1e4, 1e4);
+
+          return acc;
         }
 
         processedIds.set(newElement.id, true);

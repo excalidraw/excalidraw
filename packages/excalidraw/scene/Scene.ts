@@ -26,7 +26,7 @@ import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
 import { ENV } from "../constants";
 import { getElementsInGroup } from "../groups";
-import { clamp, type LocalPoint, pointFrom } from "@excalidraw/math";
+import { type LocalPoint } from "@excalidraw/math";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -305,7 +305,12 @@ class Scene {
         Math.abs(element.x) > 1e6 ||
         Math.abs(element.x) > 1e6 ||
         Math.abs(element.width) > 1e6 ||
-        Math.abs(element.height) > 1e6
+        Math.abs(element.height) > 1e6 ||
+        // @ts-ignore
+        element.points?.some(
+          (point: LocalPoint) =>
+            Math.abs(point[0]) > 1e6 || Math.abs(point[1]) > 1e6,
+        )
       ) {
         console.error(
           `replaceAllElements() received an element with invalid dimensions`,
@@ -319,25 +324,6 @@ class Scene {
           // @ts-ignore
           element.endBinding?.elementId,
         );
-        // @ts-ignore
-        element.x = clamp(element.x, -1e2, 1e2);
-        // @ts-ignore
-        element.y = clamp(element.y, -1e2, 1e2);
-        // @ts-ignore
-        element.width = clamp(element.width, -1e2, 1e2);
-        // @ts-ignore
-        element.height = clamp(element.height, -1e2, 1e2);
-
-        // @ts-ignore
-        if (Array.isArray(element.points)) {
-          // @ts-ignore
-          element.points = element.points.map((point) =>
-            pointFrom<LocalPoint>(
-              clamp(point[0], -1e2, 1e2),
-              clamp(point[1], -1e2, 1e2),
-            ),
-          );
-        }
       }
 
       if (isFrameLikeElement(element)) {

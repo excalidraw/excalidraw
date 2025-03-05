@@ -8458,14 +8458,8 @@ class App extends React.Component<AppProps, AppState> {
                   element.height,
                   isInSelection,
                 );
-                // @ts-ignore
-                element.x = clamp(element.x, -1e7, 1e7);
-                // @ts-ignore
-                element.y = clamp(element.y, -1e7, 1e7);
-                // @ts-ignore
-                element.width = clamp(element.width, -1e7, 1e7);
-                // @ts-ignore
-                element.height = clamp(element.height, -1e7, 1e7);
+
+                return;
               }
 
               if (isInSelection) {
@@ -8489,22 +8483,8 @@ class App extends React.Component<AppProps, AppState> {
                     duplicatedElement.width,
                     duplicatedElement.height,
                   );
-                  // @ts-ignore
-                  duplicatedElement.x = clamp(duplicatedElement.x, -1e7, 1e7);
-                  // @ts-ignore
-                  duplicatedElement.y = clamp(duplicatedElement.y, -1e7, 1e7);
-                  // @ts-ignore
-                  duplicatedElement.width = clamp(
-                    duplicatedElement.width,
-                    -1e7,
-                    1e7,
-                  );
-                  // @ts-ignore
-                  duplicatedElement.height = clamp(
-                    duplicatedElement.height,
-                    -1e7,
-                    1e7,
-                  );
+
+                  return;
                 }
 
                 const origElement = pointerDownState.originalElements.get(
@@ -8525,14 +8505,8 @@ class App extends React.Component<AppProps, AppState> {
                     origElement.width,
                     origElement.height,
                   );
-                  // @ts-ignore
-                  origElement.x = clamp(origElement.x, -1e7, 1e7);
-                  // @ts-ignore
-                  origElement.y = clamp(origElement.y, -1e7, 1e7);
-                  // @ts-ignore
-                  origElement.width = clamp(origElement.width, -1e7, 1e7);
-                  // @ts-ignore
-                  origElement.height = clamp(origElement.height, -1e7, 1e7);
+
+                  return;
                 }
 
                 mutateElement(duplicatedElement, {
