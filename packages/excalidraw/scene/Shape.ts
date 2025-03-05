@@ -430,12 +430,26 @@ export const _generateElementShape = (
         : [pointFrom<LocalPoint>(0, 0)];
 
       if (isElbowArrow(element)) {
-        shape = [
-          generator.path(
-            generateElbowArrowShape(points, 16),
-            generateRoughOptions(element, true),
-          ),
-        ];
+        // NOTE (mtolmacs): Temporary fix for extremely big arrow shapes
+        if (
+          !points.every(
+            (point) => Math.abs(point[0]) <= 1e6 && Math.abs(point[1]) <= 1e6,
+          )
+        ) {
+          console.error(
+            `Elbow arrow with extreme point positions detected. Arrow not rendered.`,
+            element.id,
+            JSON.stringify(points),
+          );
+          shape = [];
+        } else {
+          shape = [
+            generator.path(
+              generateElbowArrowShape(points, 16),
+              generateRoughOptions(element, true),
+            ),
+          ];
+        }
       } else if (!element.roundness) {
         // curve is always the first element
         // this simplifies finding the curve for an element

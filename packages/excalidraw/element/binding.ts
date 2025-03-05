@@ -943,7 +943,10 @@ export const bindPointToSnapToElementOutline = (
       ),
     )[0];
     const currentDistance = pointDistance(p, center);
-    const fullDistance = pointDistance(intersection, center);
+    const fullDistance = Math.max(
+      pointDistance(intersection ?? p, center),
+      1e-5,
+    );
     const ratio = currentDistance / fullDistance;
 
     switch (true) {
@@ -954,10 +957,10 @@ export const bindPointToSnapToElementOutline = (
 
         return pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, intersection)),
+            vectorNormalize(vectorFromPoint(p, intersection ?? center)),
             ratio > 1 ? FIXED_BINDING_DISTANCE : -FIXED_BINDING_DISTANCE,
           ),
-          intersection,
+          intersection ?? center,
         );
 
       default:

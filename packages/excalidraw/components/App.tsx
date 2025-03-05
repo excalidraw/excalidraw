@@ -8437,21 +8437,78 @@ class App extends React.Component<AppProps, AppState> {
             const elements = this.scene.getElementsIncludingDeleted();
 
             for (const element of elements) {
-              if (
+              const isInSelection =
                 selectedElementIds.has(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
-                  pointerDownState.hit.wasAddedToSelection)
+                  pointerDownState.hit.wasAddedToSelection);
+              // NOTE (mtolmacs): This is a temporary fix for very large scenes
+              if (
+                Math.abs(element.x) > 1e7 ||
+                Math.abs(element.x) > 1e7 ||
+                Math.abs(element.width) > 1e7 ||
+                Math.abs(element.height) > 1e7
               ) {
+                console.error(
+                  `Alt+dragging element in scene with invalid dimensions`,
+                  element.x,
+                  element.y,
+                  element.width,
+                  element.height,
+                  isInSelection,
+                );
+
+                return;
+              }
+
+              if (isInSelection) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
                   groupIdMap,
                   element,
                 );
+
+                // NOTE (mtolmacs): This is a temporary fix for very large scenes
+                if (
+                  Math.abs(duplicatedElement.x) > 1e7 ||
+                  Math.abs(duplicatedElement.x) > 1e7 ||
+                  Math.abs(duplicatedElement.width) > 1e7 ||
+                  Math.abs(duplicatedElement.height) > 1e7
+                ) {
+                  console.error(
+                    `Alt+dragging duplicated element with invalid dimensions`,
+                    duplicatedElement.x,
+                    duplicatedElement.y,
+                    duplicatedElement.width,
+                    duplicatedElement.height,
+                  );
+
+                  return;
+                }
+
                 const origElement = pointerDownState.originalElements.get(
                   element.id,
                 )!;
+
+                // NOTE (mtolmacs): This is a temporary fix for very large scenes
+                if (
+                  Math.abs(origElement.x) > 1e7 ||
+                  Math.abs(origElement.x) > 1e7 ||
+                  Math.abs(origElement.width) > 1e7 ||
+                  Math.abs(origElement.height) > 1e7
+                ) {
+                  console.error(
+                    `Alt+dragging duplicated element with invalid dimensions`,
+                    origElement.x,
+                    origElement.y,
+                    origElement.width,
+                    origElement.height,
+                  );
+
+                  return;
+                }
+
                 mutateElement(duplicatedElement, {
                   x: origElement.x,
                   y: origElement.y,

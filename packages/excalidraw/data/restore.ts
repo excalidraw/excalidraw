@@ -8,6 +8,7 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   PointBinding,
   StrokeRoundness,
@@ -60,6 +61,10 @@ import {
 import type { LocalPoint, Radians } from "@excalidraw/math";
 import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 import { detectLineHeight } from "../element/textMeasurements";
+import {
+  updateElbowArrowPoints,
+  validateElbowPoints,
+} from "../element/elbowArrow";
 
 type RestoredAppState = Omit<
   AppState,
@@ -206,24 +211,6 @@ const restoreElementWithProperties = <
       "customData" in extra ? extra.customData : element.customData;
   }
 
-  // NOTE (mtolmacs): This is a temporary check to detect extremely large
-  // element position or sizing
-  if (
-    element.x < -1e6 ||
-    element.x > 1e6 ||
-    element.y < -1e6 ||
-    element.y > 1e6 ||
-    element.width < -1e6 ||
-    element.width > 1e6 ||
-    element.height < -1e6 ||
-    element.height > 1e6
-  ) {
-    console.error(
-      "Restore element with properties size or position is too large",
-      { element },
-    );
-  }
-
   return {
     // spread the original element properties to not lose unknown ones
     // for forward-compatibility
@@ -239,21 +226,6 @@ const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
 ): typeof element | null => {
   element = { ...element };
-
-  // NOTE (mtolmacs): This is a temporary check to detect extremely large
-  // element position or sizing
-  if (
-    element.x < -1e6 ||
-    element.x > 1e6 ||
-    element.y < -1e6 ||
-    element.y > 1e6 ||
-    element.width < -1e6 ||
-    element.width > 1e6 ||
-    element.height < -1e6 ||
-    element.height > 1e6
-  ) {
-    console.error("Restore element size or position is too large", { element });
-  }
 
   switch (element.type) {
     case "text":
@@ -596,7 +568,73 @@ export const restoreElements = (
     }
   }
 
-  return restoredElements;
+  // NOTE (mtolmacs): Temporary fix for extremely large arrows
+  // Need to iterate again so we have attached text nodes in elementsMap
+  return restoredElements.map((element) => {
+    if (
+      isElbowArrow(element) &&
+      element.startBinding == null &&
+      element.endBinding == null &&
+      !validateElbowPoints(element.points)
+    ) {
+      return {
+        ...element,
+        ...updateElbowArrowPoints(
+          element,
+          restoredElementsMap as NonDeletedSceneElementsMap,
+          {
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              element.points[element.points.length - 1],
+            ],
+          },
+        ),
+        index: element.index,
+      };
+    }
+
+    if (
+      isElbowArrow(element) &&
+      element.startBinding &&
+      element.endBinding &&
+      element.startBinding.elementId === element.endBinding.elementId &&
+      element.points.length > 1 &&
+      element.points.some(
+        ([rx, ry]) => Math.abs(rx) > 1e6 || Math.abs(ry) > 1e6,
+      )
+    ) {
+      console.error("Fixing self-bound elbow arrow", element.id);
+      const boundElement = restoredElementsMap.get(
+        element.startBinding.elementId,
+      );
+      if (!boundElement) {
+        console.error(
+          "Bound element not found",
+          element.startBinding.elementId,
+        );
+        return element;
+      }
+
+      return {
+        ...element,
+        x: boundElement.x + boundElement.width / 2,
+        y: boundElement.y - 5,
+        width: boundElement.width,
+        height: boundElement.height,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(0, -10),
+          pointFrom<LocalPoint>(boundElement.width / 2 + 5, -10),
+          pointFrom<LocalPoint>(
+            boundElement.width / 2 + 5,
+            boundElement.height / 2 + 5,
+          ),
+        ],
+      };
+    }
+
+    return element;
+  });
 };
 
 const coalesceAppStateValue = <
