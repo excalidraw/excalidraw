@@ -2245,7 +2245,7 @@ const getHoveredElements = (
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
 
-const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
+export const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
   points: readonly P[],
   tolerance: number = DEDUP_TRESHOLD,
 ) =>

@@ -60,6 +60,7 @@ import {
 import type { LocalPoint, Radians } from "@excalidraw/math";
 import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 import { detectLineHeight } from "../element/textMeasurements";
+import { validateElbowPoints } from "../element/elbowArrow";
 
 type RestoredAppState = Omit<
   AppState,
@@ -572,9 +573,10 @@ export const restoreElements = (
       element.endBinding &&
       element.startBinding.elementId === element.endBinding.elementId &&
       element.points.length > 1 &&
-      element.points.some(
+      (element.points.some(
         ([rx, ry]) => Math.abs(rx) > 1e6 || Math.abs(ry) > 1e6,
-      )
+      ) ||
+        validateElbowPoints(element.points))
     ) {
       console.error("Fixing self-bound elbow arrow", element.id);
       const boundElement = restoredElementsMap.get(
