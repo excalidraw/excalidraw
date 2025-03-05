@@ -993,7 +993,10 @@ export const updateElbowArrowPoints = (
     updates.startBinding === arrow.startBinding &&
     updates.endBinding === arrow.endBinding &&
     (updates.points ?? []).every((p, i) =>
-      pointsEqual(p, arrow.points[i] ?? Infinity),
+      pointsEqual(
+        p,
+        arrow.points[i] ?? pointFrom<LocalPoint>(Infinity, Infinity),
+      ),
     )
   ) {
     return {};
