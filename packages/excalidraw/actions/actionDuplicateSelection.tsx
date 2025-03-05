@@ -142,28 +142,6 @@ const duplicateElements = (
           },
         );
 
-        // NOTE (mtolmacs): This is a temporary fix for very large scenes
-        if (
-          Math.abs(newElement.x) > 1e4 ||
-          Math.abs(newElement.x) > 1e4 ||
-          Math.abs(newElement.width) > 1e4 ||
-          Math.abs(newElement.height) > 1e4
-        ) {
-          console.error(
-            `duplicateAndOffsetElement() created an element with invalid dimensions`,
-            newElement.x,
-            newElement.y,
-            newElement.width,
-            newElement.height,
-            element.x,
-            element.y,
-            element.x + DEFAULT_GRID_SIZE / 2,
-            element.y + DEFAULT_GRID_SIZE / 2,
-          );
-
-          return acc;
-        }
-
         processedIds.set(newElement.id, true);
 
         duplicatedElementsMap.set(newElement.id, newElement);

@@ -764,23 +764,7 @@ export const duplicateElements = (
       clonedElement.frameId = maybeGetNewId(clonedElement.frameId);
     }
 
-    // NOTE (mtolmacs): This is a temporary fix for very large scenes
-    if (
-      Math.abs(clonedElement.x) > 1e4 ||
-      Math.abs(clonedElement.x) > 1e4 ||
-      Math.abs(clonedElement.width) > 1e4 ||
-      Math.abs(clonedElement.height) > 1e4
-    ) {
-      console.error(
-        `duplicateElements() created an element with invalid dimensions`,
-        clonedElement.x,
-        clonedElement.y,
-        clonedElement.width,
-        clonedElement.height,
-      );
-    } else {
-      clonedElements.push(clonedElement);
-    }
+    clonedElements.push(clonedElement);
   }
 
   return clonedElements;
