@@ -991,7 +991,10 @@ export const updateElbowArrowPoints = (
   // Short circuit on no-op to avoid huge performance hit
   if (
     updates.startBinding === arrow.startBinding &&
-    updates.endBinding === arrow.endBinding
+    updates.endBinding === arrow.endBinding &&
+    (updates.points ?? []).every((p, i) =>
+      pointsEqual(p, arrow.points[i] ?? Infinity),
+    )
   ) {
     return {};
   }
