@@ -26,6 +26,7 @@ import { arrayToMap } from "../utils";
 import { toBrandedType } from "../utils";
 import { ENV } from "../constants";
 import { getElementsInGroup } from "../groups";
+import { clamp, type LocalPoint, pointFrom } from "@excalidraw/math";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -299,6 +300,46 @@ class Scene {
     this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
+      // NOTE (mtolmacs): This is a temporary fix for very large scenes
+      if (
+        Math.abs(element.x) > 1e6 ||
+        Math.abs(element.x) > 1e6 ||
+        Math.abs(element.width) > 1e6 ||
+        Math.abs(element.height) > 1e6
+      ) {
+        console.error(
+          `replaceAllElements() received an element with invalid dimensions`,
+          element.id,
+          element.x,
+          element.y,
+          element.width,
+          element.height,
+          // @ts-ignore
+          element.startBinding?.elementId,
+          // @ts-ignore
+          element.endBinding?.elementId,
+        );
+        // @ts-ignore
+        element.x = clamp(element.x, -1e2, 1e2);
+        // @ts-ignore
+        element.y = clamp(element.y, -1e2, 1e2);
+        // @ts-ignore
+        element.width = clamp(element.width, -1e2, 1e2);
+        // @ts-ignore
+        element.height = clamp(element.height, -1e2, 1e2);
+
+        // @ts-ignore
+        if (Array.isArray(element.points)) {
+          // @ts-ignore
+          element.points = element.points.map((point) =>
+            pointFrom<LocalPoint>(
+              clamp(point[0], -1e2, 1e2),
+              clamp(point[1], -1e2, 1e2),
+            ),
+          );
+        }
+      }
+
       if (isFrameLikeElement(element)) {
         nextFrameLikes.push(element);
       }

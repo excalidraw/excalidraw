@@ -48,6 +48,7 @@ import type { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getLineHeight } from "../fonts";
 import type { Radians } from "@excalidraw/math";
 import { normalizeText, measureText } from "./textMeasurements";
+import { clamp } from "@excalidraw/math";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,
@@ -762,6 +763,30 @@ export const duplicateElements = (
 
     if (clonedElement.frameId) {
       clonedElement.frameId = maybeGetNewId(clonedElement.frameId);
+    }
+
+    // NOTE (mtolmacs): This is a temporary fix for very large scenes
+    if (
+      Math.abs(clonedElement.x) > 1e4 ||
+      Math.abs(clonedElement.x) > 1e4 ||
+      Math.abs(clonedElement.width) > 1e4 ||
+      Math.abs(clonedElement.height) > 1e4
+    ) {
+      console.error(
+        `duplicateElements() created an element with invalid dimensions`,
+        clonedElement.x,
+        clonedElement.y,
+        clonedElement.width,
+        clonedElement.height,
+      );
+      // @ts-ignore
+      clonedElement.x = clamp(clonedElement.x, -1e4, 1e4);
+      // @ts-ignore
+      clonedElement.y = clamp(clonedElement.y, -1e4, 1e4);
+      // @ts-ignore
+      clonedElement.width = clamp(clonedElement.width, -1e4, 1e4);
+      // @ts-ignore
+      clonedElement.height = clamp(clonedElement.height, -1e4, 1e4);
     }
 
     clonedElements.push(clonedElement);

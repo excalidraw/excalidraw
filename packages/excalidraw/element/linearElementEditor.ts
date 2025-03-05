@@ -14,11 +14,7 @@ import type {
 } from "./types";
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
 import type { Bounds } from "./bounds";
-import {
-  getCurvePathOps,
-  getElementPointsCoords,
-  getMinMaxXYFromCurvePathOps,
-} from "./bounds";
+import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
 import type {
   AppState,
   PointerCoords,
@@ -69,6 +65,7 @@ import {
 } from "../shapes";
 import { getGridPoint } from "../snapping";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
+import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
 
 const editorMidPointsCache: {
   version: number | null;

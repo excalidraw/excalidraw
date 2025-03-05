@@ -43,6 +43,7 @@ import {
   getSelectedElements,
 } from "../scene/selection";
 import { CaptureUpdateAction } from "../store";
+import { clamp } from "@excalidraw/math";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -141,6 +142,34 @@ const duplicateElements = (
             y: element.y + DEFAULT_GRID_SIZE / 2,
           },
         );
+
+        // NOTE (mtolmacs): This is a temporary fix for very large scenes
+        if (
+          Math.abs(newElement.x) > 1e4 ||
+          Math.abs(newElement.x) > 1e4 ||
+          Math.abs(newElement.width) > 1e4 ||
+          Math.abs(newElement.height) > 1e4
+        ) {
+          console.error(
+            `duplicateAndOffsetElement() created an element with invalid dimensions`,
+            newElement.x,
+            newElement.y,
+            newElement.width,
+            newElement.height,
+            element.x,
+            element.y,
+            element.x + DEFAULT_GRID_SIZE / 2,
+            element.y + DEFAULT_GRID_SIZE / 2,
+          );
+          // @ts-ignore
+          newElement.x = clamp(newElement.x, -1e4, 1e4);
+          // @ts-ignore
+          newElement.y = clamp(newElement.y, -1e4, 1e4);
+          // @ts-ignore
+          newElement.width = clamp(newElement.width, -1e4, 1e4);
+          // @ts-ignore
+          newElement.height = clamp(newElement.height, -1e4, 1e4);
+        }
 
         processedIds.set(newElement.id, true);
 
