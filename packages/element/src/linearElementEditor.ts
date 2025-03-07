@@ -239,14 +239,15 @@ export class LinearElementEditor {
     });
   }
 
-  static getOutlineAvoidingPointOrNull(
+  static getOutlineAvoidingPoint(
     element: NonDeleted<ExcalidrawLinearElement>,
-    coords: { x: number; y: number },
+    coords: GlobalPoint,
     pointIndex: number,
     app: AppClassProperties,
-  ) {
+    fallback?: GlobalPoint,
+  ): GlobalPoint {
     const hoveredElement = getHoveredElementForBinding(
-      coords,
+      { x: coords[0], y: coords[1] },
       app.scene.getNonDeletedElements(),
       app.scene.getNonDeletedElementsMap(),
       app.state.zoom,
@@ -255,11 +256,10 @@ export class LinearElementEditor {
     );
 
     if (hoveredElement) {
-      const p = pointFrom<GlobalPoint>(coords.x, coords.y);
       const newPoints = Array.from(element.points);
       newPoints[pointIndex] = pointFrom<LocalPoint>(
-        p[0] - element.x,
-        p[1] - element.y,
+        coords[0] - element.x,
+        coords[1] - element.y,
       );
 
       return bindPointToSnapToElementOutline(
@@ -273,27 +273,7 @@ export class LinearElementEditor {
       );
     }
 
-    return null;
-  }
-
-  static getOutlineAvoidingPoint(
-    element: NonDeleted<ExcalidrawLinearElement>,
-    coords: { x: number; y: number },
-    pointIndex: number,
-    app: AppClassProperties,
-  ): GlobalPoint {
-    const p = LinearElementEditor.getOutlineAvoidingPointOrNull(
-      element,
-      coords,
-      pointIndex,
-      app,
-    );
-
-    if (p) {
-      return p;
-    }
-
-    return pointFrom<GlobalPoint>(coords.x, coords.y);
+    return fallback ?? coords;
   }
 
   /**
@@ -412,10 +392,10 @@ export class LinearElementEditor {
                 globalNewPointPosition =
                   LinearElementEditor.getOutlineAvoidingPoint(
                     element,
-                    {
-                      x: element.x + element.points[pointIndex][0] + deltaX,
-                      y: element.y + element.points[pointIndex][1] + deltaY,
-                    },
+                    pointFrom<GlobalPoint>(
+                      element.x + element.points[pointIndex][0] + deltaX,
+                      element.y + element.points[pointIndex][1] + deltaY,
+                    ),
                     pointIndex,
                     app,
                   );
