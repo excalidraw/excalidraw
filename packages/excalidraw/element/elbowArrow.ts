@@ -1038,7 +1038,13 @@ export const updateElbowArrowPoints = (
   // Short circuit on no-op to avoid huge performance hit
   if (
     updates.startBinding === arrow.startBinding &&
-    updates.endBinding === arrow.endBinding
+    updates.endBinding === arrow.endBinding &&
+    (updates.points ?? []).every((p, i) =>
+      pointsEqual(
+        p,
+        arrow.points[i] ?? pointFrom<LocalPoint>(Infinity, Infinity),
+      ),
+    )
   ) {
     return {};
   }
@@ -2034,7 +2040,6 @@ const normalizeArrowElementUpdate = (
 } => {
   const offsetX = global[0][0];
   const offsetY = global[0][1];
-
   let points = global.map((p) =>
     pointTranslate<GlobalPoint, LocalPoint>(
       p,
@@ -2240,7 +2245,7 @@ const getHoveredElements = (
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
 
-const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
+export const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
   points: readonly P[],
   tolerance: number = DEDUP_TRESHOLD,
 ) =>

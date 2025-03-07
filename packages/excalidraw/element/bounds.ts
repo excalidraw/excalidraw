@@ -40,6 +40,7 @@ import {
   pointRotateRads,
 } from "@excalidraw/math";
 import type { Mutable } from "../utility-types";
+import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
 
 export type RectangleBox = {
   x: number;
@@ -367,15 +368,6 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 };
 
-export const getCurvePathOps = (shape: Drawable): Op[] => {
-  for (const set of shape.sets) {
-    if (set.type === "path") {
-      return set.ops;
-    }
-  }
-  return shape.sets[0].ops;
-};
-
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
 const getBezierValueForT = (
   t: number,
@@ -583,6 +575,10 @@ export const getArrowheadPoints = (
   position: "start" | "end",
   arrowhead: Arrowhead,
 ) => {
+  if (shape.length < 1) {
+    return null;
+  }
+
   const ops = getCurvePathOps(shape[0]);
   if (ops.length < 1) {
     return null;
@@ -1013,3 +1009,17 @@ export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
     bounds[0] + (bounds[2] - bounds[0]) / 2,
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   );
+
+export const doBoundsIntersect = (
+  bounds1: Bounds | null,
+  bounds2: Bounds | null,
+): boolean => {
+  if (bounds1 == null || bounds2 == null) {
+    return false;
+  }
+
+  const [minX1, minY1, maxX1, maxY1] = bounds1;
+  const [minX2, minY2, maxX2, maxY2] = bounds2;
+
+  return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
+};
