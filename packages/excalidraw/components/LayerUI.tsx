@@ -1,12 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 import type { ActionManager } from "../actions/manager";
-import {
-  CLASSES,
-  DEFAULT_SIDEBAR,
-  LIBRARY_SIDEBAR_WIDTH,
-  TOOL_TYPE,
-} from "../constants";
+import { CLASSES, DEFAULT_SIDEBAR, TOOL_TYPE } from "../constants";
 import { showSelectedShapeActions } from "../element";
 import type { NonDeletedExcalidrawElement } from "../element/types";
 import type { Language } from "../i18n";
@@ -531,7 +526,7 @@ const LayerUI = ({
               appState.openSidebar &&
               isSidebarDocked &&
               device.editor.canFitSidebar
-                ? { width: `calc(100% - ${LIBRARY_SIDEBAR_WIDTH}px)` }
+                ? { width: `calc(100% - var(--right-sidebar-width))` }
                 : {}
             }
           >

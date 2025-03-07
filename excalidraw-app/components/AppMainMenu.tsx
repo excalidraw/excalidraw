@@ -3,9 +3,9 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
-} from "../../packages/excalidraw/components/icons";
-import type { Theme } from "../../packages/excalidraw/element/types";
-import { MainMenu } from "../../packages/excalidraw/index";
+} from "@excalidraw/excalidraw/components/icons";
+import type { Theme } from "@excalidraw/excalidraw/element/types";
+import { MainMenu } from "@excalidraw/excalidraw/index";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 import { LanguageList } from "../app-language/LanguageList";
 import { saveDebugState } from "./DebugCanvas";

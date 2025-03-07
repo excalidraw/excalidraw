@@ -1,13 +1,13 @@
-import type { ExcalidrawImperativeAPI } from "../../packages/excalidraw/types";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import {
   DiagramToCodePlugin,
   exportToBlob,
   getTextFromElements,
   MIME_TYPES,
   TTDDialog,
-} from "../../packages/excalidraw";
-import { getDataURL } from "../../packages/excalidraw/data/blob";
-import { safelyParseJSON } from "../../packages/excalidraw/utils";
+} from "@excalidraw/excalidraw";
+import { getDataURL } from "@excalidraw/excalidraw/data/blob";
+import { safelyParseJSON } from "@excalidraw/excalidraw/utils";
 
 export const AIComponents = ({
   excalidrawAPI,

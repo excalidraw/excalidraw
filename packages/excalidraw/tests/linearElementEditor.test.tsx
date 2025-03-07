@@ -30,8 +30,8 @@ import * as textElementUtils from "../element/textElement";
 import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { vi } from "vitest";
 import { arrayToMap } from "../utils";
-import type { GlobalPoint } from "../../math";
-import { pointCenter, pointFrom } from "../../math";
+import type { GlobalPoint } from "@excalidraw/math";
+import { pointCenter, pointFrom } from "@excalidraw/math";
 import { wrapText } from "../element/textWrapping";
 
 const renderInteractiveScene = vi.spyOn(

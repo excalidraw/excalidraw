@@ -41,8 +41,9 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
-import type { StoreActionType } from "./store";
-import type { GlobalPoint } from "../math";
+import type { CaptureUpdateActionType } from "./store";
+import type { UserIdleState } from "./constants";
+import type { GlobalPoint } from "@excalidraw/math/types";
 
 export type SocketId = string & { _brand: "SocketId" };
 
@@ -594,14 +595,8 @@ export type SceneData = {
   elements?: ImportedDataState["elements"];
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
-  storeAction?: StoreActionType;
+  captureUpdate?: CaptureUpdateActionType;
 };
-
-export enum UserIdleState {
-  ACTIVE = "active",
-  AWAY = "away",
-  IDLE = "idle",
-}
 
 export type ExportOpts = {
   saveFileToDisk?: boolean;

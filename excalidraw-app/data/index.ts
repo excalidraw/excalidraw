@@ -1,33 +1,33 @@
 import {
   compressData,
   decompressData,
-} from "../../packages/excalidraw/data/encode";
+} from "@excalidraw/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
-import { restore } from "../../packages/excalidraw/data/restore";
-import type { ImportedDataState } from "../../packages/excalidraw/data/types";
-import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
-import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
+} from "@excalidraw/excalidraw/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { restore } from "@excalidraw/excalidraw/data/restore";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { SceneBounds } from "@excalidraw/excalidraw/element/bounds";
+import { isInvisiblySmallElement } from "@excalidraw/excalidraw/element/sizeHelpers";
+import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
 import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
+} from "@excalidraw/excalidraw/element/types";
+import { t } from "@excalidraw/excalidraw/i18n";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
-import type { MakeBrand } from "../../packages/excalidraw/utility-types";
-import { bytesToHexString } from "../../packages/excalidraw/utils";
+} from "@excalidraw/excalidraw/types";
+import type { UserIdleState } from "@excalidraw/excalidraw/constants";
+import type { MakeBrand } from "@excalidraw/excalidraw/utility-types";
+import { bytesToHexString } from "@excalidraw/excalidraw/utils";
 import type { WS_SUBTYPES } from "../app_constants";
 import {
   DELETED_ELEMENT_TIMEOUT,

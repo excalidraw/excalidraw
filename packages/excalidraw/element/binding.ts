@@ -17,9 +17,13 @@ import type {
 } from "./types";
 
 import type { Bounds } from "./bounds";
-import { getCenterForBounds } from "./bounds";
+import {
+  getCenterForBounds,
+  getElementBounds,
+  doBoundsIntersect,
+} from "./bounds";
 import type { AppState } from "../types";
-import { isPointOnShape } from "../../utils/collision";
+import { isPointOnShape } from "@excalidraw/utils/collision";
 import {
   isArrowElement,
   isBindableElement,
@@ -53,7 +57,7 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import type { LocalPoint, Radians } from "../../math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
   lineSegment,
   pointFrom,
@@ -69,7 +73,7 @@ import {
   vectorCross,
   pointsEqual,
   lineSegmentIntersectionPoints,
-} from "../../math";
+} from "@excalidraw/math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 
@@ -743,6 +747,21 @@ export const updateBoundElements = (
       return;
     }
 
+    // Check for intersections before updating bound elements incase connected elements overlap
+    const startBindingElement = element.startBinding
+      ? elementsMap.get(element.startBinding.elementId)
+      : null;
+    const endBindingElement = element.endBinding
+      ? elementsMap.get(element.endBinding.elementId)
+      : null;
+
+    let startBounds: Bounds | null = null;
+    let endBounds: Bounds | null = null;
+    if (startBindingElement && endBindingElement) {
+      startBounds = getElementBounds(startBindingElement, elementsMap);
+      endBounds = getElementBounds(endBindingElement, elementsMap);
+    }
+
     const bindings = {
       startBinding: maybeCalculateNewGapWhenScaling(
         changedElement,
@@ -770,7 +789,12 @@ export const updateBoundElements = (
           bindableElement &&
           isBindableElement(bindableElement) &&
           (bindingProp === "startBinding" || bindingProp === "endBinding") &&
-          changedElement.id === element[bindingProp]?.elementId
+          (changedElement.id === element[bindingProp]?.elementId ||
+            (changedElement.id ===
+              element[
+                bindingProp === "startBinding" ? "endBinding" : "startBinding"
+              ]?.elementId &&
+              !doBoundsIntersect(startBounds, endBounds)))
         ) {
           const point = updateBoundPoint(
             element,
@@ -919,7 +943,10 @@ export const bindPointToSnapToElementOutline = (
       ),
     )[0];
     const currentDistance = pointDistance(p, center);
-    const fullDistance = pointDistance(intersection, center);
+    const fullDistance = Math.max(
+      pointDistance(intersection ?? p, center),
+      1e-5,
+    );
     const ratio = currentDistance / fullDistance;
 
     switch (true) {
@@ -930,10 +957,10 @@ export const bindPointToSnapToElementOutline = (
 
         return pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, intersection)),
+            vectorNormalize(vectorFromPoint(p, intersection ?? center)),
             ratio > 1 ? FIXED_BINDING_DISTANCE : -FIXED_BINDING_DISTANCE,
           ),
-          intersection,
+          intersection ?? center,
         );
 
       default:
@@ -2206,9 +2233,13 @@ export const normalizeFixedPoint = <T extends FixedPoint | null>(
 ): T extends null ? null : FixedPoint => {
   // Do not allow a precise 0.5 for fixed point ratio
   // to avoid jumping arrow heading due to floating point imprecision
-  if (fixedPoint && (fixedPoint[0] === 0.5 || fixedPoint[1] === 0.5)) {
+  if (
+    fixedPoint &&
+    (Math.abs(fixedPoint[0] - 0.5) < 0.0001 ||
+      Math.abs(fixedPoint[1] - 0.5) < 0.0001)
+  ) {
     return fixedPoint.map((ratio) =>
-      ratio === 0.5 ? 0.5001 : ratio,
+      Math.abs(ratio - 0.5) < 0.0001 ? 0.5001 : ratio,
     ) as T extends null ? null : FixedPoint;
   }
   return fixedPoint as any as T extends null ? null : FixedPoint;
