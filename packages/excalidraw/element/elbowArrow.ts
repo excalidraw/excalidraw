@@ -981,10 +981,7 @@ export const updateElbowArrowPoints = (
     );
   }
 
-  if (
-    elementsMap.size === 0 &&
-    (updates.startBinding || updates.startBinding)
-  ) {
+  if (elementsMap.size === 0 && (updates.startBinding || updates.endBinding)) {
     return {};
   }
   // TODO: REMOVE UNTIL THIS
