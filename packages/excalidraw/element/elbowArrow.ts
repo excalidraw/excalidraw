@@ -981,6 +981,14 @@ export const updateElbowArrowPoints = (
     );
   }
 
+  if (
+    elementsMap.size === 0 &&
+    (updates.startBinding || updates.startBinding)
+  ) {
+    return {};
+  }
+  // TODO: REMOVE UNTIL THIS
+
   const updatedPoints: readonly LocalPoint[] = updates.points
     ? updates.points && updates.points.length === 2
       ? arrow.points.map((p, idx) =>
