@@ -340,7 +340,6 @@ describe("elbow arrow ui", () => {
     const duplicatedArrow = h.scene.getSelectedElements(
       h.state,
     )[2] as ExcalidrawArrowElement;
-    console.log(duplicatedArrow);
 
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
@@ -395,7 +394,6 @@ describe("elbow arrow ui", () => {
     const duplicatedArrow = h.scene.getSelectedElements(
       h.state,
     )[0] as ExcalidrawArrowElement;
-    console.log(duplicatedArrow);
 
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
