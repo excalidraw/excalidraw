@@ -963,29 +963,6 @@ export const updateElbowArrowPoints = (
     );
   }
 
-  // 0. During all element replacement in the scene, we just need to renormalize
-  // the arrow
-  // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
-  if (
-    elementsMap.size === 0 &&
-    updates.points &&
-    validateElbowPoints(updates.points)
-  ) {
-    return normalizeArrowElementUpdate(
-      updates.points.map((p) =>
-        pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
-      ),
-      arrow.fixedSegments,
-      arrow.startIsSpecial,
-      arrow.endIsSpecial,
-    );
-  }
-
-  if (elementsMap.size === 0 && (updates.startBinding || updates.endBinding)) {
-    return {};
-  }
-  // TODO: REMOVE UNTIL THIS
-
   const updatedPoints: readonly LocalPoint[] = updates.points
     ? updates.points && updates.points.length === 2
       ? arrow.points.map((p, idx) =>
@@ -997,6 +974,20 @@ export const updateElbowArrowPoints = (
         )
       : updates.points.slice()
     : arrow.points.slice();
+
+  // 0. During all element replacement in the scene, we just need to renormalize
+  // the arrow
+  // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
+  if (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) {
+    return normalizeArrowElementUpdate(
+      updatedPoints.map((p) =>
+        pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
+      ),
+      arrow.fixedSegments,
+      arrow.startIsSpecial,
+      arrow.endIsSpecial,
+    );
+  }
 
   const {
     startHeading,
