@@ -1502,7 +1502,7 @@ describe("textWysiwyg", () => {
           strokeWidth: 2,
           type: "rectangle",
           updated: 1,
-          version: 2,
+          version: 3,
           width: 610,
           x: 15,
           y: 25,
@@ -1510,7 +1510,7 @@ describe("textWysiwyg", () => {
       );
       expect(h.elements[2] as ExcalidrawTextElement).toEqual(
         expect.objectContaining({
-          text: "Excalidraw is an opensource virtual collaborative whiteboard",
+          text: "Excalidraw is an opensource virtual collaborative\nwhiteboard",
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
           textAlign: TEXT_ALIGN.CENTER,
           boundElements: null,
