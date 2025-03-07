@@ -978,7 +978,21 @@ export const updateElbowArrowPoints = (
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
   // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
-  if (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) {
+  const startBinding =
+    typeof updates.startBinding !== "undefined"
+      ? updates.startBinding
+      : arrow.startBinding;
+  const endBinding =
+    typeof updates.endBinding !== "undefined"
+      ? updates.endBinding
+      : arrow.endBinding;
+  const startElement = startBinding && elementsMap.get(startBinding.elementId);
+  const endElement = endBinding && elementsMap.get(endBinding.elementId);
+  if (
+    (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) ||
+    startElement?.id !== startBinding?.elementId ||
+    endElement?.id !== endBinding?.elementId
+  ) {
     return normalizeArrowElementUpdate(
       updatedPoints.map((p) =>
         pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
@@ -1001,14 +1015,8 @@ export const updateElbowArrowPoints = (
     {
       x: arrow.x,
       y: arrow.y,
-      startBinding:
-        typeof updates.startBinding !== "undefined"
-          ? updates.startBinding
-          : arrow.startBinding,
-      endBinding:
-        typeof updates.endBinding !== "undefined"
-          ? updates.endBinding
-          : arrow.endBinding,
+      startBinding,
+      endBinding,
       startArrowhead: arrow.startArrowhead,
       endArrowhead: arrow.endArrowhead,
     },
