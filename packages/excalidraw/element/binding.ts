@@ -315,7 +315,7 @@ const getBindingStrategyForDraggingArrowOrJoints = (
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
   // Elbow arrows don't bind when dragged as a whole
   if (isElbowArrow(selectedElement)) {
-    return [null, null];
+    return ["keep", "keep"];
   }
 
   const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
