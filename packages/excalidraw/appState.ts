@@ -72,6 +72,7 @@ export const getDefaultAppState = (): Omit<
     isBindingEnabled: true,
     bindingPreference: "enabled",
     isMidpointSnappingEnabled: true,
+    isShapeSnapEnabled: true,
     defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
@@ -196,6 +197,7 @@ const APP_STATE_STORAGE_CONF = (<
   boxSelectionMode: { browser: true, export: false, server: false },
   bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
+  isShapeSnapEnabled: { browser: true, export: true, server: true }, // Add shape snapping config
   defaultSidebarDockedPreference: {
     browser: true,
     export: false,
