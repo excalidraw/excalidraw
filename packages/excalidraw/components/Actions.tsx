@@ -47,6 +47,7 @@ import {
   mermaidLogoIcon,
   laserPointerToolIcon,
   MagicIcon,
+  LassoIcon,
 } from "./icons";
 import { KEYS } from "../keys";
 import { useTunnels } from "../context/tunnels";
@@ -69,7 +70,6 @@ export const canChangeStrokeColor = (
 
   return (
     (hasStrokeColor(appState.activeTool.type) &&
-      appState.activeTool.type !== "image" &&
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "magicframe") ||
@@ -281,6 +281,8 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const lassoToolSelected = activeTool.type === "lasso";
+
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
@@ -302,6 +304,7 @@ export const ShapesSwitcher = ({
         const shortcut = letter
           ? `${letter} ${t("helpDialog.or")} ${numericKey}`
           : `${numericKey}`;
+
         return (
           <ToolButton
             className={clsx("Shape", { fillable })}
@@ -318,6 +321,14 @@ export const ShapesSwitcher = ({
             onPointerDown={({ pointerType }) => {
               if (!appState.penDetected && pointerType === "pen") {
                 app.togglePenMode(true);
+              }
+
+              if (value === "selection") {
+                if (appState.activeTool.type === "selection") {
+                  app.setActiveTool({ type: "lasso" });
+                } else {
+                  app.setActiveTool({ type: "selection" });
+                }
               }
             }}
             onChange={({ pointerType }) => {
@@ -344,6 +355,7 @@ export const ShapesSwitcher = ({
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
               embeddableToolSelected ||
+              lassoToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
@@ -403,6 +415,14 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "lasso" })}
+            icon={LassoIcon}
+            data-testid="toolbar-lasso"
+            selected={lassoToolSelected}
+          >
+            {t("toolBar.lasso")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
