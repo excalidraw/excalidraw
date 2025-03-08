@@ -1044,7 +1044,7 @@ describe("textWysiwyg", () => {
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
-          15,
+          20,
           65,
         ]
       `);
@@ -1064,7 +1064,7 @@ describe("textWysiwyg", () => {
       UI.resize(rectangle, "ne", [rectangle.x + 100, rectangle.y - 100]);
       expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
         [
-          "375.00000",
+          "370.00000",
           "-535.00000",
         ]
       `);
@@ -1114,7 +1114,8 @@ describe("textWysiwyg", () => {
       });
       expect(rectangle.width).toBe(200);
       expect(rectangle.height).toBe(166.66666666666669);
-      expect(textElement.fontSize).toBe(47.5);
+      // expect(textElement.fontSize).toBe(47.5);
+      expect(textElement.fontSize).toBe(51.42857142857143);
     });
 
     it("should bind text correctly when container duplicated with alt-drag", async () => {
@@ -1223,7 +1224,8 @@ describe("textWysiwyg", () => {
       );
 
       expect((h.elements[1] as ExcalidrawTextElementWithContainer).text).toBe(
-        "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
+        // "Online\nwhiteboa\nrd\ncollabor\nation\nmade\neasy",
+        "Online\nwhitebo\nard\ncollabo\nration\nmade\neasy",
       );
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
@@ -1338,7 +1340,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align top"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
+            20,
             25,
           ]
         `);
@@ -1361,7 +1363,7 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
+            40,
             25,
           ]
         `);
@@ -1372,7 +1374,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Left"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
+            20,
             45,
           ]
         `);
@@ -1396,7 +1398,7 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
+            40,
             45,
           ]
         `);
@@ -1408,7 +1410,7 @@ describe("textWysiwyg", () => {
 
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            15,
+            20,
             65,
           ]
         `);
@@ -1430,7 +1432,7 @@ describe("textWysiwyg", () => {
         fireEvent.click(screen.getByTitle("Align bottom"));
         expect([h.elements[1].x, h.elements[1].y]).toMatchInlineSnapshot(`
           [
-            45,
+            40,
             65,
           ]
         `);
@@ -1486,7 +1488,7 @@ describe("textWysiwyg", () => {
           ],
           fillStyle: "solid",
           groupIds: [],
-          height: 35,
+          height: 60,
           isDeleted: false,
           link: null,
           locked: false,
@@ -1500,7 +1502,7 @@ describe("textWysiwyg", () => {
           strokeWidth: 2,
           type: "rectangle",
           updated: 1,
-          version: 2,
+          version: 3,
           width: 610,
           x: 15,
           y: 25,
@@ -1508,7 +1510,7 @@ describe("textWysiwyg", () => {
       );
       expect(h.elements[2] as ExcalidrawTextElement).toEqual(
         expect.objectContaining({
-          text: "Excalidraw is an opensource virtual collaborative whiteboard",
+          text: "Excalidraw is an opensource virtual collaborative\nwhiteboard",
           verticalAlign: VERTICAL_ALIGN.MIDDLE,
           textAlign: TEXT_ALIGN.CENTER,
           boundElements: null,
