@@ -90,9 +90,10 @@ export function isPoint(p: unknown): p is LocalPoint | GlobalPoint {
 export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
   a: Point,
   b: Point,
+  precision = PRECISION,
 ): boolean {
   const abs = Math.abs;
-  return abs(a[0] - b[0]) < PRECISION && abs(a[1] - b[1]) < PRECISION;
+  return abs(a[0] - b[0]) < precision && abs(a[1] - b[1]) < precision;
 }
 
 /**

@@ -155,22 +155,13 @@ export function curveIntersectLineSegment<
     return bezierEquation(c, t);
   };
 
-  let solution = calculate(initial_guesses[0]);
-  if (solution) {
-    return [solution];
-  }
+  const solutions = [
+    calculate(initial_guesses[0]),
+    calculate(initial_guesses[1]),
+    calculate(initial_guesses[2]),
+  ].filter((x, i, a): x is Point => x !== null && a.indexOf(x) === i);
 
-  solution = calculate(initial_guesses[1]);
-  if (solution) {
-    return [solution];
-  }
-
-  solution = calculate(initial_guesses[2]);
-  if (solution) {
-    return [solution];
-  }
-
-  return [];
+  return solutions;
 }
 
 /**

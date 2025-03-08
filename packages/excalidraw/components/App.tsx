@@ -441,7 +441,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 import {
   clamp,
   pointFrom,
@@ -5910,17 +5910,33 @@ class App extends React.Component<AppProps, AppState> {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
+
+        const outlineGlobalPoint =
+          LinearElementEditor.getOutlineAvoidingPointOrNull(
+            multiElement,
+            {
+              x: scenePointerX,
+              y: scenePointerY,
+            },
+            multiElement.points.length - 1,
+            this,
+          );
+
+        const nextPoint = outlineGlobalPoint
+          ? pointFrom<LocalPoint>(
+              outlineGlobalPoint[0] - rx,
+              outlineGlobalPoint[1] - ry,
+            )
+          : pointFrom<LocalPoint>(
+              lastCommittedX + dxFromLastCommitted,
+              lastCommittedY + dyFromLastCommitted,
+            );
+
         // update last uncommitted point
         mutateElement(
           multiElement,
           {
-            points: [
-              ...points.slice(0, -1),
-              pointFrom<LocalPoint>(
-                lastCommittedX + dxFromLastCommitted,
-                lastCommittedY + dyFromLastCommitted,
-              ),
-            ],
+            points: [...points.slice(0, -1), nextPoint],
           },
           false,
           {
@@ -7649,18 +7665,34 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const { x: rx, y: ry, lastCommittedPoint } = multiElement;
+      const lastGlobalPoint = pointFrom<GlobalPoint>(
+        rx + multiElement.points[multiElement.points.length - 1][0],
+        ry + multiElement.points[multiElement.points.length - 1][1],
+      );
+      const hoveredElementForBinding = getHoveredElementForBinding(
+        {
+          x: lastGlobalPoint[0],
+          y: lastGlobalPoint[1],
+        },
+        this.scene.getNonDeletedElements(),
+        this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
+        true,
+        isElbowArrow(multiElement),
+      );
 
       // clicking inside commit zone → finalize arrow
       if (
-        multiElement.points.length > 1 &&
-        lastCommittedPoint &&
-        pointDistance(
-          pointFrom(
-            pointerDownState.origin.x - rx,
-            pointerDownState.origin.y - ry,
-          ),
-          lastCommittedPoint,
-        ) < LINE_CONFIRM_THRESHOLD
+        !!hoveredElementForBinding ||
+        (multiElement.points.length > 1 &&
+          lastCommittedPoint &&
+          pointDistance(
+            pointFrom(
+              pointerDownState.origin.x - rx,
+              pointerDownState.origin.y - ry,
+            ),
+            lastCommittedPoint,
+          ) < LINE_CONFIRM_THRESHOLD)
       ) {
         this.actionManager.executeAction(actionFinalize);
         return;
@@ -8169,7 +8201,6 @@ class App extends React.Component<AppProps, AppState> {
             );
           },
           linearElementEditor,
-          this.scene,
         );
         if (didDrag) {
           pointerDownState.lastCoords.x = pointerCoords.x;
@@ -8636,10 +8667,22 @@ class App extends React.Component<AppProps, AppState> {
             points.length === 2 ||
             (points.length > 1 && isElbowArrow(newElement))
           ) {
+            const globalPoint = LinearElementEditor.getOutlineAvoidingPoint(
+              newElement,
+              { x: newElement.x + dx, y: newElement.y + dy },
+              1,
+              this,
+            );
             mutateElement(
               newElement,
               {
-                points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
+                points: [
+                  ...points.slice(0, -1),
+                  pointFrom<LocalPoint>(
+                    globalPoint[0] - newElement.x,
+                    globalPoint[1] - newElement.y,
+                  ),
+                ],
               },
               false,
               { isDragging: true },

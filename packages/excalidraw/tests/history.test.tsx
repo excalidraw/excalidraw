@@ -49,6 +49,7 @@ import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, CaptureUpdateAction } from "../store";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 import { pointFrom } from "@excalidraw/math";
+import { FIXED_BINDING_DISTANCE } from "../element/binding.js";
 
 const { h } = window;
 
@@ -4764,12 +4765,12 @@ describe("history", () => {
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
                 focus: 0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
                 focus: -0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               isDeleted: true,
             }),

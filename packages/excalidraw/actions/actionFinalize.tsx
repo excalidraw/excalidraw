@@ -10,12 +10,17 @@ import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
 } from "../element/binding";
-import { isBindingElement, isLinearElement } from "../element/typeChecks";
+import {
+  isBindingElement,
+  isElbowArrow,
+  isLinearElement,
+} from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { CaptureUpdateAction } from "../store";
-import { pointFrom } from "@excalidraw/math";
+import { type GlobalPoint, pointFrom } from "@excalidraw/math";
 import { isPathALoop } from "../shapes";
 
 export const actionFinalize = register({
@@ -83,10 +88,26 @@ export const actionFinalize = register({
         multiPointElement.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = multiPointElement;
+        const { x: rx, y: ry, points, lastCommittedPoint } = multiPointElement;
+        const lastGlobalPoint = pointFrom<GlobalPoint>(
+          rx + points[points.length - 1][0],
+          ry + points[points.length - 1][1],
+        );
+        const hoveredElementForBinding = getHoveredElementForBinding(
+          {
+            x: lastGlobalPoint[0],
+            y: lastGlobalPoint[1],
+          },
+          elements,
+          elementsMap,
+          app.state.zoom,
+          true,
+          isElbowArrow(multiPointElement),
+        );
         if (
-          !lastCommittedPoint ||
-          points[points.length - 1] !== lastCommittedPoint
+          !hoveredElementForBinding &&
+          (!lastCommittedPoint ||
+            points[points.length - 1] !== lastCommittedPoint)
         ) {
           mutateElement(multiPointElement, {
             points: multiPointElement.points.slice(0, -1),
