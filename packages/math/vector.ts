@@ -137,12 +137,9 @@ export function vectorMagnitude(v: Vector) {
 export const vectorNormalize = (v: Vector): Vector => {
   const m = vectorMagnitude(v);
 
-  return vector(v[0] / m, v[1] / m);
-};
+  if (m === 0) {
+    return vector(0, 0);
+  }
 
-/**
- * Project the first vector onto the second vector
- */
-export const vectorProjection = (a: Vector, b: Vector) => {
-  return vectorScale(b, vectorDot(a, b) / vectorDot(b, b));
+  return vector(v[0] / m, v[1] / m);
 };

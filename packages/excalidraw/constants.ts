@@ -1,4 +1,3 @@
-import cssVariables from "./css/variables.module.scss";
 import type { AppProps, AppState } from "./types";
 import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
@@ -191,7 +190,7 @@ export const DEFAULT_TRANSFORM_HANDLE_SPACING = 2;
 export const SIDE_RESIZING_THRESHOLD = 2 * DEFAULT_TRANSFORM_HANDLE_SPACING;
 // a small epsilon to make side resizing always take precedence
 // (avoids an increase in renders and changes to tests)
-const EPSILON = 0.00001;
+export const EPSILON = 0.00001;
 export const DEFAULT_COLLISION_THRESHOLD =
   2 * SIDE_RESIZING_THRESHOLD - EPSILON;
 
@@ -272,7 +271,8 @@ export const IDLE_THRESHOLD = 60_000;
 // Report a user active each ACTIVE_THRESHOLD milliseconds
 export const ACTIVE_THRESHOLD = 3_000;
 
-export const THEME_FILTER = cssVariables.themeFilter;
+// duplicates --theme-filter, should be removed soon
+export const THEME_FILTER = "invert(93%) hue-rotate(180deg)";
 
 export const URL_QUERY_KEYS = {
   addLibrary: "addLibrary",
@@ -306,8 +306,6 @@ export const MQ_MAX_HEIGHT_LANDSCAPE = 500;
 // sidebar
 export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
 // -----------------------------------------------------------------------------
-
-export const LIBRARY_SIDEBAR_WIDTH = parseInt(cssVariables.rightSidebarWidth);
 
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
@@ -613,3 +611,9 @@ export const ELEMENT_LINK_KEY = "element";
 
 /** used in tests */
 export const ORIG_ID = Symbol.for("__test__originalId__");
+
+export enum UserIdleState {
+  ACTIVE = "active",
+  AWAY = "away",
+  IDLE = "idle",
+}

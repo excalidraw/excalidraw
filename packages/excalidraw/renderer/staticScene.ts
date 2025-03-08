@@ -360,7 +360,14 @@ const _renderStaticScene = ({
           renderLinkIcon(element, context, appState, elementsMap);
         }
       } catch (error: any) {
-        console.error(error);
+        console.error(
+          error,
+          element.id,
+          element.x,
+          element.y,
+          element.width,
+          element.height,
+        );
       }
     });
 

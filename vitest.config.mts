@@ -1,6 +1,36 @@
+import path from "path";
+
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: [
+      {
+        find: /^@excalidraw\/excalidraw$/,
+        replacement: path.resolve(__dirname, "./packages/excalidraw/index.tsx"),
+      },
+      {
+        find: /^@excalidraw\/excalidraw\/(.*?)/,
+        replacement: path.resolve(__dirname, "./packages/excalidraw/$1"),
+      },
+      {
+        find: /^@excalidraw\/utils$/,
+        replacement: path.resolve(__dirname, "./packages/utils/index.ts"),
+      },
+      {
+        find: /^@excalidraw\/utils\/(.*?)/,
+        replacement: path.resolve(__dirname, "./packages/utils/$1"),
+      },
+      {
+        find: /^@excalidraw\/math$/,
+        replacement: path.resolve(__dirname, "./packages/math/index.ts"),
+      },
+      {
+        find: /^@excalidraw\/math\/(.*?)/,
+        replacement: path.resolve(__dirname, "./packages/math/$1"),
+      },
+    ],
+  },
   //@ts-ignore
   test: {
     // Since hooks are running in stack in v2, which means all hooks run serially whereas

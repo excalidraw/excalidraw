@@ -1,3 +1,4 @@
+import type { JSX } from "react";
 import { actionLoadScene, actionShortcuts } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { t, useI18n } from "../../i18n";

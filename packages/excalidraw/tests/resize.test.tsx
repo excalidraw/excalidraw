@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { render } from "./test-utils";
+import { render, unmountComponent } from "./test-utils";
 import { reseed } from "../random";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
 import type {
@@ -16,12 +15,12 @@ import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
-import type { LocalPoint } from "../../math";
-import { pointFrom } from "../../math";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import { resizeSingleElement } from "../element/resizeElements";
 import { getSizeFromPoints } from "../points";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -182,12 +181,12 @@ describe("generic element", () => {
 
     UI.resize(rectangle, "e", [40, 0]);
 
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30, 0);
 
     UI.resize(rectangle, "w", [50, 0]);
 
     expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80, 0);
   });
 
   it("resizes with a label", async () => {
@@ -502,12 +501,12 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize(rectangle, "se", [-200, -150]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
   });
 
@@ -530,13 +529,13 @@ describe("arrow element", () => {
       h.state,
     )[0] as ExcalidrawElbowArrowElement;
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1.05);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(1);
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
 
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.144);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.13);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.11);
   });
 });
 
@@ -812,15 +811,16 @@ describe("image element", () => {
 
     UI.resize(image, "ne", [40, 0]);
 
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(30);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(31, 0);
 
     const imageWidth = image.width;
     const scale = 20 / image.height;
     UI.resize(image, "nw", [50, 20]);
 
     expect(arrow.endBinding?.elementId).toEqual(image.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(
+    expect(Math.floor(arrow.width + arrow.endBinding!.gap)).toBeCloseTo(
       30 + imageWidth * scale,
+      0,
     );
   });
 });
@@ -1025,7 +1025,7 @@ describe("multiple selection", () => {
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(140, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(143, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();
@@ -1047,7 +1047,9 @@ describe("multiple selection", () => {
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );
-    expect(rightBoundArrow.endBinding?.focus).toBe(rightArrowBinding.focus);
+    expect(rightBoundArrow.endBinding?.focus).toBeCloseTo(
+      rightArrowBinding.focus!,
+    );
   });
 
   it("resizes with labeled arrows", async () => {

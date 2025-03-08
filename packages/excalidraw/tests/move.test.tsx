@@ -1,6 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { render, fireEvent, act } from "./test-utils";
+import "../../utils/test-utils";
+import { render, fireEvent, act, unmountComponent } from "./test-utils";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
@@ -16,8 +16,7 @@ import { KEYS } from "../keys";
 import { vi } from "vitest";
 import type Scene from "../scene/Scene";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,
@@ -123,10 +122,8 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([Math.round(arrow.x), Math.round(arrow.y)]).toEqual([110, 50]);
-    expect([Math.round(arrow.width), Math.round(arrow.height)]).toEqual([
-      81, 81,
-    ]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[107.07, 47.07]]);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[86.86, 87.3]]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

@@ -1,7 +1,11 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { Excalidraw } from "../index";
-import { GlobalTestState, render, screen } from "../tests/test-utils";
+import {
+  GlobalTestState,
+  render,
+  screen,
+  unmountComponent,
+} from "../tests/test-utils";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { CODES, KEYS } from "../keys";
 import {
@@ -19,10 +23,9 @@ import type {
 import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import { pointFrom } from "../../math";
+import { pointFrom } from "@excalidraw/math";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const tab = "    ";
 const mouse = new Pointer("mouse");

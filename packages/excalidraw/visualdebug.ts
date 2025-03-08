@@ -1,12 +1,13 @@
+import type { Curve } from "@excalidraw/math";
 import {
   isLineSegment,
   lineSegment,
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
-} from "../math";
-import type { LineSegment } from "../utils";
-import type { BoundingBox, Bounds } from "./element/bounds";
+} from "@excalidraw/math";
+import type { LineSegment } from "@excalidraw/utils";
+import type { Bounds } from "./element/bounds";
 import { isBounds } from "./element/typeChecks";
 
 // The global data holder to collect the debug operations
@@ -16,15 +17,27 @@ declare global {
       data: DebugElement[][];
       currentFrame?: number;
     };
-    debugDrawPoint: typeof debugDrawPoint;
-    debugDrawLine: typeof debugDrawLine;
   }
 }
 
 export type DebugElement = {
   color: string;
-  data: LineSegment<GlobalPoint>;
+  data: LineSegment<GlobalPoint> | Curve<GlobalPoint>;
   permanent: boolean;
+};
+
+export const debugDrawCubicBezier = (
+  c: Curve<GlobalPoint>,
+  opts?: {
+    color?: string;
+    permanent?: boolean;
+  },
+) => {
+  addToCurrentFrame({
+    color: opts?.color ?? "purple",
+    permanent: !!opts?.permanent,
+    data: c,
+  });
 };
 
 export const debugDrawLine = (
@@ -77,41 +90,6 @@ export const debugDrawPoint = (
       color: opts?.color ?? "cyan",
       permanent: opts?.permanent,
     },
-  );
-};
-
-export const debugDrawBoundingBox = (
-  box: BoundingBox | BoundingBox[],
-  opts?: {
-    color?: string;
-    permanent?: boolean;
-  },
-) => {
-  (Array.isArray(box) ? box : [box]).forEach((bbox) =>
-    debugDrawLine(
-      [
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.minX, bbox.minY),
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.minY),
-        ),
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.minY),
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.maxY),
-        ),
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.maxX, bbox.maxY),
-          pointFrom<GlobalPoint>(bbox.minX, bbox.maxY),
-        ),
-        lineSegment(
-          pointFrom<GlobalPoint>(bbox.minX, bbox.maxY),
-          pointFrom<GlobalPoint>(bbox.minX, bbox.minY),
-        ),
-      ],
-      {
-        color: opts?.color ?? "cyan",
-        permanent: opts?.permanent,
-      },
-    ),
   );
 };
 

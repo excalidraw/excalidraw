@@ -297,6 +297,7 @@ export {
   MIME_TYPES,
   ROUNDNESS,
   DEFAULT_LASER_COLOR,
+  UserIdleState,
 } from "./constants";
 
 export {
@@ -305,7 +306,7 @@ export {
   bumpVersion,
 } from "./element/mutateElement";
 
-export { StoreAction } from "./store";
+export { CaptureUpdateAction } from "./store";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
@@ -338,7 +339,7 @@ export {
   elementsOverlappingBBox,
   isElementInsideBBox,
   elementPartiallyOverlapsWithOrContainsBBox,
-} from "../utils/withinBounds";
+} from "@excalidraw/utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";

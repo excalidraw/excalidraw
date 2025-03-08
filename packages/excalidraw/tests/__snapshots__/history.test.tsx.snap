@@ -197,7 +197,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 99,
+  "height": "102.35417",
   "id": "id172",
   "index": "a2",
   "isDeleted": false,
@@ -211,8 +211,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "98.20800",
-      99,
+      "101.77517",
+      "102.35417",
     ],
   ],
   "roughness": 1,
@@ -227,8 +227,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 40,
-  "width": "98.20800",
-  "x": 1,
+  "width": "101.77517",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -294,24 +294,22 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id171",
-                "fixedPoint": null,
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": "0.98017",
+              "height": "0.98586",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  98,
-                  "-0.98017",
+                  "98.58579",
+                  "-0.98586",
                 ],
               ],
               "startBinding": {
                 "elementId": "id170",
-                "fixedPoint": null,
                 "focus": "0.02970",
                 "gap": 1,
               },
@@ -319,24 +317,22 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id171",
-                "fixedPoint": null,
                 "focus": "-0.02000",
                 "gap": 1,
               },
-              "height": "0.00169",
+              "height": "0.00000",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  98,
-                  "0.00169",
+                  "98.58579",
+                  "0.00000",
                 ],
               ],
               "startBinding": {
                 "elementId": "id170",
-                "fixedPoint": null,
                 "focus": "0.02000",
                 "gap": 1,
               },
@@ -393,15 +389,15 @@ History {
                 "focus": 0,
                 "gap": 1,
               },
-              "height": 99,
+              "height": "102.35417",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  "98.20800",
-                  99,
+                  "101.77517",
+                  "102.35417",
                 ],
               ],
               "startBinding": null,
@@ -410,28 +406,26 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id171",
-                "fixedPoint": null,
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": "0.98161",
+              "height": "0.98586",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  98,
-                  "-0.98161",
+                  "98.58579",
+                  "-0.98586",
                 ],
               ],
               "startBinding": {
                 "elementId": "id170",
-                "fixedPoint": null,
                 "focus": "0.02970",
                 "gap": 1,
               },
-              "y": "0.99245",
+              "y": "0.99364",
             },
           },
           "id175" => Delta {
@@ -824,7 +818,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 30,
-  "width": 0,
+  "width": 50,
   "x": 200,
   "y": 0,
 }
@@ -858,7 +852,7 @@ History {
                   0,
                 ],
                 [
-                  0,
+                  50,
                   0,
                 ],
               ],
@@ -934,8 +928,7 @@ History {
             "inserted": {
               "endBinding": {
                 "elementId": "id166",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "points": [
@@ -944,13 +937,12 @@ History {
                   0,
                 ],
                 [
-                  0,
+                  50,
                   0,
                 ],
               ],
               "startBinding": {
                 "elementId": "id165",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -1246,7 +1238,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "2.61991",
+  "height": "1.30038",
   "id": "id178",
   "index": "Zz",
   "isDeleted": false,
@@ -1260,8 +1252,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "98.00000",
-      "-2.61991",
+      "98.58579",
+      "1.30038",
     ],
   ],
   "roughness": 1,
@@ -1284,9 +1276,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 11,
-  "width": "98.00000",
-  "x": "1.00000",
-  "y": "3.98333",
+  "width": "98.58579",
+  "x": "0.70711",
+  "y": 0,
 }
 `;
 
@@ -1617,7 +1609,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "2.61991",
+  "height": "1.30038",
   "id": "id181",
   "index": "a0",
   "isDeleted": false,
@@ -1631,8 +1623,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      "98.00000",
-      "-2.61991",
+      "98.58579",
+      "1.30038",
     ],
   ],
   "roughness": 1,
@@ -1655,9 +1647,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 11,
-  "width": "98.00000",
-  "x": "1.00000",
-  "y": "3.98333",
+  "width": "98.58579",
+  "x": "0.70711",
+  "y": 0,
 }
 `;
 
@@ -1775,7 +1767,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": "22.36242",
+              "height": "11.27227",
               "index": "a0",
               "isDeleted": false,
               "lastCommittedPoint": null,
@@ -1788,8 +1780,8 @@ History {
                   0,
                 ],
                 [
-                  "98.00000",
-                  "-22.36242",
+                  "98.58579",
+                  "11.27227",
                 ],
               ],
               "roughness": 1,
@@ -1810,9 +1802,9 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": "98.00000",
-              "x": 1,
-              "y": 34,
+              "width": "98.58579",
+              "x": "0.70711",
+              "y": 0,
             },
             "inserted": {
               "isDeleted": true,
@@ -2322,14 +2314,13 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id185",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": "408.19672",
+  "height": "374.05754",
   "id": "id186",
   "index": "a2",
   "isDeleted": false,
@@ -2343,8 +2334,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      498,
-      "-408.19672",
+      "502.78936",
+      "-374.05754",
     ],
   ],
   "roughness": 1,
@@ -2354,7 +2345,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id184",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -2364,9 +2354,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 10,
-  "width": 498,
-  "x": 1,
-  "y": 0,
+  "width": "502.78936",
+  "x": "-0.83465",
+  "y": "-36.58211",
 }
 `;
 
@@ -2484,8 +2474,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id185",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "fillStyle": "solid",
@@ -2515,7 +2504,6 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id184",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15122,8 +15110,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id58",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -15143,7 +15130,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      "98.00000",
+      "98.58579",
       0,
     ],
   ],
@@ -15154,7 +15141,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id56",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15164,8 +15150,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "type": "arrow",
   "updated": 1,
   "version": 10,
-  "width": "98.00000",
-  "x": 1,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -15493,8 +15479,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id58",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "fillStyle": "solid",
@@ -15524,7 +15509,6 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id56",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -15821,8 +15805,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id52",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -15842,7 +15825,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      "98.00000",
+      "98.58579",
       0,
     ],
   ],
@@ -15853,7 +15836,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id50",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -15863,8 +15845,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "type": "arrow",
   "updated": 1,
   "version": 10,
-  "width": "98.00000",
-  "x": 1,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -16116,8 +16098,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id52",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "fillStyle": "solid",
@@ -16147,7 +16128,6 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id50",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -16444,8 +16424,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id64",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -16465,7 +16444,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      "98.00000",
+      "98.58579",
       0,
     ],
   ],
@@ -16476,7 +16455,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id62",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -16486,8 +16464,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "type": "arrow",
   "updated": 1,
   "version": 10,
-  "width": "98.00000",
-  "x": 1,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -16739,8 +16717,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id64",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "fillStyle": "solid",
@@ -16770,7 +16747,6 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id62",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17065,8 +17041,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id70",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -17086,7 +17061,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      "98.00000",
+      "98.58579",
       0,
     ],
   ],
@@ -17097,7 +17072,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id68",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -17107,8 +17081,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "type": "arrow",
   "updated": 1,
   "version": 10,
-  "width": "98.00000",
-  "x": 1,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -17170,7 +17144,6 @@ History {
               ],
               "startBinding": {
                 "elementId": "id68",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17431,8 +17404,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id70",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "fillStyle": "solid",
@@ -17462,7 +17434,6 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id68",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -17783,8 +17754,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "endArrowhead": "arrow",
   "endBinding": {
     "elementId": "id77",
-    "fixedPoint": null,
-    "focus": 0,
+    "focus": -0,
     "gap": 1,
   },
   "fillStyle": "solid",
@@ -17804,7 +17774,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      "98.00000",
+      "98.58579",
       0,
     ],
   ],
@@ -17815,7 +17785,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id75",
-    "fixedPoint": null,
     "focus": 0,
     "gap": 1,
   },
@@ -17825,8 +17794,8 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "type": "arrow",
   "updated": 1,
   "version": 11,
-  "width": "98.00000",
-  "x": 1,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -17887,8 +17856,7 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id77",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "points": [
@@ -17903,7 +17871,6 @@ History {
               ],
               "startBinding": {
                 "elementId": "id75",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },
@@ -18165,8 +18132,7 @@ History {
               "endArrowhead": "arrow",
               "endBinding": {
                 "elementId": "id77",
-                "fixedPoint": null,
-                "focus": 0,
+                "focus": -0,
                 "gap": 1,
               },
               "fillStyle": "solid",
@@ -18196,7 +18162,6 @@ History {
               "startArrowhead": null,
               "startBinding": {
                 "elementId": "id75",
-                "fixedPoint": null,
                 "focus": 0,
                 "gap": 1,
               },

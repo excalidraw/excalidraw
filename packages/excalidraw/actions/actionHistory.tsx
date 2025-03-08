@@ -10,7 +10,7 @@ import { arrayToMap } from "../utils";
 import { isWindows } from "../constants";
 import type { SceneElementsMap } from "../element/types";
 import type { Store } from "../store";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
 import { useEmitter } from "../hooks/useEmitter";
 
 const executeHistoryAction = (
@@ -30,7 +30,7 @@ const executeHistoryAction = (
     const result = updater();
 
     if (!result) {
-      return { storeAction: StoreAction.NONE };
+      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
 
     const [nextElementsMap, nextAppState] = result;
@@ -39,11 +39,11 @@ const executeHistoryAction = (
     return {
       appState: nextAppState,
       elements: nextElements,
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     };
   }
 
-  return { storeAction: StoreAction.NONE };
+  return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
 };
 
 type ActionCreator = (history: History, store: Store) => Action;

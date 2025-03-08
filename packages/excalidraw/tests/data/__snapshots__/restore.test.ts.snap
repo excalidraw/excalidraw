@@ -173,7 +173,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": 100,
   "id": "id-freedraw01",
   "index": "a0",
   "isDeleted": false,
@@ -181,7 +181,16 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "link": null,
   "locked": false,
   "opacity": 100,
-  "points": [],
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      10,
+      10,
+    ],
+  ],
   "pressures": [],
   "roughness": 1,
   "roundness": {
@@ -196,7 +205,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
   "updated": 1,
   "version": 2,
   "versionNonce": Any<Number>,
-  "width": 0,
+  "width": 100,
   "x": 0,
   "y": 0,
 }
