@@ -235,6 +235,16 @@ const handleSegmentRenormalization = (
                 nextPoints.map((p) =>
                   pointFrom<LocalPoint>(p[0] - arrow.x, p[1] - arrow.y),
                 ),
+                arrow.startBinding &&
+                  getBindableElementForId(
+                    arrow.startBinding.elementId,
+                    elementsMap,
+                  ),
+                arrow.endBinding &&
+                  getBindableElementForId(
+                    arrow.endBinding.elementId,
+                    elementsMap,
+                  ),
               ),
             ) ?? [],
           ),
@@ -296,6 +306,8 @@ const handleSegmentRelease = (
   // We need to render a sub-arrow path to restore deleted segments
   const x = arrow.x + (prevSegment ? prevSegment.end[0] : 0);
   const y = arrow.y + (prevSegment ? prevSegment.end[1] : 0);
+  const startBinding = prevSegment ? null : arrow.startBinding;
+  const endBinding = nextSegment ? null : arrow.endBinding;
   const {
     startHeading,
     endHeading,
@@ -308,8 +320,8 @@ const handleSegmentRelease = (
     {
       x,
       y,
-      startBinding: prevSegment ? null : arrow.startBinding,
-      endBinding: nextSegment ? null : arrow.endBinding,
+      startBinding,
+      endBinding,
       startArrowhead: null,
       endArrowhead: null,
       points: arrow.points,
@@ -326,6 +338,9 @@ const handleSegmentRelease = (
           y,
       ),
     ],
+    startBinding &&
+      getBindableElementForId(startBinding.elementId, elementsMap),
+    endBinding && getBindableElementForId(endBinding.elementId, elementsMap),
     { isDragging: false },
   );
 
@@ -988,8 +1003,11 @@ export const updateElbowArrowPoints = (
     typeof updates.endBinding !== "undefined"
       ? updates.endBinding
       : arrow.endBinding;
-  const startElement = startBinding && elementsMap.get(startBinding.elementId);
-  const endElement = endBinding && elementsMap.get(endBinding.elementId);
+  const startElement =
+    startBinding &&
+    getBindableElementForId(startBinding.elementId, elementsMap);
+  const endElement =
+    endBinding && getBindableElementForId(endBinding.elementId, elementsMap);
   if (
     (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) ||
     startElement?.id !== startBinding?.elementId ||
@@ -1025,6 +1043,8 @@ export const updateElbowArrowPoints = (
     },
     elementsMap,
     updatedPoints,
+    startElement,
+    endElement,
     options,
   );
 
@@ -1162,6 +1182,8 @@ const getElbowArrowData = (
   },
   elementsMap: NonDeletedSceneElementsMap,
   nextPoints: readonly LocalPoint[],
+  startElement: ExcalidrawBindableElement | null,
+  endElement: ExcalidrawBindableElement | null,
   options?: {
     isDragging?: boolean;
     zoom?: AppState["zoom"];
@@ -1175,12 +1197,6 @@ const getElbowArrowData = (
     LocalPoint,
     GlobalPoint
   >(nextPoints[nextPoints.length - 1], vector(arrow.x, arrow.y));
-  const startElement =
-    arrow.startBinding &&
-    getBindableElementForId(arrow.startBinding.elementId, elementsMap);
-  const endElement =
-    arrow.endBinding &&
-    getBindableElementForId(arrow.endBinding.elementId, elementsMap);
 
   let hoveredStartElement = startElement;
   let hoveredEndElement = endElement;
