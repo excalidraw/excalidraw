@@ -1,10 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import {
   fireEvent,
   GlobalTestState,
   render,
   screen,
+  unmountComponent,
   waitFor,
 } from "./test-utils";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -27,8 +27,8 @@ import { KEYS } from "../keys";
 import { getBoundTextElementPosition } from "../element/textElement";
 import { createPasteEvent } from "../clipboard";
 import { arrayToMap, cloneJSON } from "../utils";
-import type { LocalPoint } from "../../math";
-import { pointFrom, type Radians } from "../../math";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom, type Radians } from "@excalidraw/math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -43,8 +43,7 @@ vi.mock("../data/blob", async (actual) => {
 });
 
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   mouse.reset();
   localStorage.clear();

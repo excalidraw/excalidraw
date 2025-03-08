@@ -1,22 +1,24 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
-import { type AppState } from "../../packages/excalidraw/types";
-import { throttleRAF } from "../../packages/excalidraw/utils";
+import { useCallback, useImperativeHandle, useRef } from "react";
+import { type AppState } from "@excalidraw/excalidraw/types";
+import { throttleRAF } from "@excalidraw/excalidraw/utils";
 import {
   bootstrapCanvas,
   getNormalizedCanvasDimensions,
-} from "../../packages/excalidraw/renderer/helpers";
-import type { DebugElement } from "../../packages/excalidraw/visualdebug";
+} from "@excalidraw/excalidraw/renderer/helpers";
+import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
 import {
   ArrowheadArrowIcon,
   CloseIcon,
   TrashIcon,
-} from "../../packages/excalidraw/components/icons";
+} from "@excalidraw/excalidraw/components/icons";
 import { STORAGE_KEYS } from "../app_constants";
+import type { Curve } from "../../packages/math";
 import {
   isLineSegment,
   type GlobalPoint,
   type LineSegment,
 } from "../../packages/math";
+import { isCurve } from "../../packages/math/curve";
 
 const renderLine = (
   context: CanvasRenderingContext2D,
@@ -29,6 +31,28 @@ const renderLine = (
   context.beginPath();
   context.moveTo(segment[0][0] * zoom, segment[0][1] * zoom);
   context.lineTo(segment[1][0] * zoom, segment[1][1] * zoom);
+  context.stroke();
+  context.restore();
+};
+
+const renderCubicBezier = (
+  context: CanvasRenderingContext2D,
+  zoom: number,
+  [start, control1, control2, end]: Curve<GlobalPoint>,
+  color: string,
+) => {
+  context.save();
+  context.strokeStyle = color;
+  context.beginPath();
+  context.moveTo(start[0] * zoom, start[1] * zoom);
+  context.bezierCurveTo(
+    control1[0] * zoom,
+    control1[1] * zoom,
+    control2[0] * zoom,
+    control2[1] * zoom,
+    end[0] * zoom,
+    end[1] * zoom,
+  );
   context.stroke();
   context.restore();
 };
@@ -60,6 +84,16 @@ const render = (
           el.color,
         );
         break;
+      case isCurve(el.data):
+        renderCubicBezier(
+          context,
+          appState.zoom.value,
+          el.data as Curve<GlobalPoint>,
+          el.color,
+        );
+        break;
+      default:
+        throw new Error(`Unknown element type ${JSON.stringify(el)}`);
     }
   });
 };
@@ -276,36 +310,35 @@ export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
 interface DebugCanvasProps {
   appState: AppState;
   scale: number;
+  ref?: React.Ref<HTMLCanvasElement>;
 }
 
-const DebugCanvas = forwardRef<HTMLCanvasElement, DebugCanvasProps>(
-  ({ appState, scale }, ref) => {
-    const { width, height } = appState;
+const DebugCanvas = ({ appState, scale, ref }: DebugCanvasProps) => {
+  const { width, height } = appState;
 
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    useImperativeHandle<HTMLCanvasElement | null, HTMLCanvasElement | null>(
-      ref,
-      () => canvasRef.current,
-      [canvasRef],
-    );
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useImperativeHandle<HTMLCanvasElement | null, HTMLCanvasElement | null>(
+    ref,
+    () => canvasRef.current,
+    [canvasRef],
+  );
 
-    return (
-      <canvas
-        style={{
-          width,
-          height,
-          position: "absolute",
-          zIndex: 2,
-          pointerEvents: "none",
-        }}
-        width={width * scale}
-        height={height * scale}
-        ref={canvasRef}
-      >
-        Debug Canvas
-      </canvas>
-    );
-  },
-);
+  return (
+    <canvas
+      style={{
+        width,
+        height,
+        position: "absolute",
+        zIndex: 2,
+        pointerEvents: "none",
+      }}
+      width={width * scale}
+      height={height * scale}
+      ref={canvasRef}
+    >
+      Debug Canvas
+    </canvas>
+  );
+};
 
 export default DebugCanvas;

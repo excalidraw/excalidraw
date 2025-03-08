@@ -5,7 +5,7 @@ import throttle from "lodash.throttle";
 const scrollPositionAtom = atom<number>(0);
 
 export const useScrollPosition = <T extends HTMLElement>(
-  elementRef: React.RefObject<T>,
+  elementRef: React.RefObject<T | null>,
 ) => {
   const [scrollPosition, setScrollPosition] = useAtom(scrollPositionAtom);
 

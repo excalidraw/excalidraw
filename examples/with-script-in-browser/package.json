@@ -1,0 +1,20 @@
+{
+  "name": "with-script-in-browser",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "@excalidraw/excalidraw": "0.18.0-rc.5",
+    "browser-fs-access": "0.29.1"
+  },
+  "devDependencies": {
+    "vite": "5.0.12",
+    "typescript": "^5"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "build:preview": "yarn build && vite preview --port 5002"
+  }
+}

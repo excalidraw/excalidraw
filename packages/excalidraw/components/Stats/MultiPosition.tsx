@@ -13,7 +13,7 @@ import { useMemo } from "react";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 import type { AtomicUnit } from "./utils";
 import type { AppState } from "../../types";
-import { pointFrom, pointRotateRads } from "../../../math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 interface MultiPositionProps {
   property: "x" | "y";

@@ -62,7 +62,7 @@ import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getAreaLimit, getWidthHeightLimit } from "../obsidianUtils";
 import { getVerticalOffset } from "../fonts";
-import { isRightAngleRads } from "../../math";
+import { isRightAngleRads } from "@excalidraw/math";
 import { getCornerRadius } from "../shapes";
 import { getUncroppedImageElement } from "../element/cropElement";
 import { getLineHeightInPx } from "../element/textMeasurements";

@@ -23,7 +23,7 @@ import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit } from "./utils";
 import type { AtomicUnit } from "./utils";
 import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { pointFrom, type GlobalPoint } from "../../../math";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 interface MultiDimensionProps {
   property: "width" | "height";

@@ -12,7 +12,7 @@ import {
   getUncroppedWidthAndHeight,
 } from "../../element/cropElement";
 import { mutateElement } from "../../element/mutateElement";
-import { clamp, round } from "../../../math";
+import { clamp, round } from "@excalidraw/math";
 
 interface DimensionDragInputProps {
   property: "width" | "height";

@@ -1,12 +1,15 @@
+import { GlobalPoint } from "@excalidraw/math/types";
 import { FreedrawIcon } from "./components/icons";
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { FONT_FAMILY } from "./constants";
-import type { NonDeletedExcalidrawElement } from "./element/types";
+import type { ElementsMap, ExcalidrawElement, NonDeletedExcalidrawElement } from "./element/types";
 import { Fonts } from "./fonts";
 import type { FontMetadata } from "./fonts/FontMetadata";
 import { FONT_METADATA } from "./fonts/FontMetadata";
 import type { AppState } from "./types";
+import { intersectElementWithLineSegment } from "./element/collision";
+import { lineSegment } from "@excalidraw/math";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;
@@ -191,3 +194,18 @@ export async function getSharedMermaidInstance(): Promise<MermaidToExcalidrawLib
 export async function loadMermaid(): Promise<MermaidToExcalidrawLibProps> {
   return await loadMermaidLib();
 }
+
+
+//moved here as part of https://github.com/zsviczian/excalidraw/pull/286
+export const intersectElementWithLine = (
+  element: ExcalidrawElement,
+  // Point on the line, in absolute coordinates
+  a: GlobalPoint,
+  // Another point on the line, in absolute coordinates
+  b: GlobalPoint,
+  // If given, the element is inflated by this value
+  gap: number = 0,
+  elementsMap: ElementsMap,
+): GlobalPoint[] | undefined => {
+  return intersectElementWithLineSegment(element, lineSegment(a, b), gap);
+};

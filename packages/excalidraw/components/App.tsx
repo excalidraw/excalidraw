@@ -238,8 +238,8 @@ import {
   getElementShape,
   isPathALoop,
 } from "../shapes";
-import { getSelectionBoxShape } from "../../utils/geometry/shape";
-import { isPointInShape } from "../../utils/collision";
+import { getSelectionBoxShape } from "@excalidraw/utils/geometry/shape";
+import { isPointInShape } from "@excalidraw/utils/collision";
 import type {
   AppClassProperties,
   AppProps,
@@ -422,8 +422,7 @@ import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import FollowMode from "./FollowMode/FollowMode";
 import { getFontSize } from "../actions/actionProperties";
-
-import { Store, StoreAction } from "../store";
+import { Store, CaptureUpdateAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
@@ -468,7 +467,7 @@ import {
   getLinkDirectionFromKey,
 } from "../element/flowchart";
 import { searchItemInFocusAtom } from "./SearchMenu";
-import type { LocalPoint, Radians } from "../../math";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
   clamp,
   pointFrom,
@@ -480,7 +479,7 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-} from "../../math";
+} from "@excalidraw/math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
 import { actionCopyElementLink } from "../actions/actionElementLink";
@@ -1638,6 +1637,7 @@ class App extends React.Component<AppProps, AppState> {
               : POINTER_EVENTS.enabled,
           }, //zsviczian
           ...this.state.dynamicStyle, //zsviczian
+          ["--right-sidebar-width" as any]: "302px",
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -2213,12 +2213,12 @@ class App extends React.Component<AppProps, AppState> {
           if (shouldUpdateStrokeColor) {
             this.syncActionResult({
               appState: { ...this.state, currentItemStrokeColor: color },
-              storeAction: StoreAction.CAPTURE,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           } else {
             this.syncActionResult({
               appState: { ...this.state, currentItemBackgroundColor: color },
-              storeAction: StoreAction.CAPTURE,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           }
         } else {
@@ -2232,7 +2232,7 @@ class App extends React.Component<AppProps, AppState> {
               }
               return el;
             }),
-            storeAction: StoreAction.CAPTURE,
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
         }
       },
@@ -2253,9 +2253,9 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (actionResult.storeAction === StoreAction.UPDATE) {
+    if (actionResult.captureUpdate === CaptureUpdateAction.NEVER) {
       this.store.shouldUpdateSnapshot();
-    } else if (actionResult.storeAction === StoreAction.CAPTURE) {
+    } else if (actionResult.captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
       this.store.shouldCaptureIncrement();
     }
 
@@ -2331,7 +2331,10 @@ class App extends React.Component<AppProps, AppState> {
       didUpdate = true;
     }
 
-    if (!didUpdate && actionResult.storeAction !== StoreAction.NONE) {
+    if (
+      !didUpdate &&
+      actionResult.captureUpdate !== CaptureUpdateAction.EVENTUALLY
+    ) {
       this.scene.triggerUpdate();
     }
   });
@@ -2459,7 +2462,7 @@ class App extends React.Component<AppProps, AppState> {
     this.resetHistory();
     this.syncActionResult({
       ...scene,
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     });
 
     // clear the shape and image cache so that any images in initialData
@@ -3001,7 +3004,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state.editingLinearElement &&
       !this.state.selectedElementIds[this.state.editingLinearElement.elementId]
     ) {
-      // defer so that the storeAction flag isn't reset via current update
+      // defer so that the shouldCaptureIncrement flag isn't reset via current update
       setTimeout(() => {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
@@ -4200,7 +4203,7 @@ class App extends React.Component<AppProps, AppState> {
         }, {} as any),
         highlightSearchResult, //zsviczian
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.NEVER,
       forceFlushSync: true,
     });
   };
@@ -4300,13 +4303,26 @@ class App extends React.Component<AppProps, AppState> {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
-      /** @default StoreAction.NONE */
-      storeAction?: SceneData["storeAction"];
-      forceFlushSync?: boolean;
+      /**
+       *  Controls which updates should be captured by the `Store`. Captured updates are emmitted and listened to by other components, such as `History` for undo / redo purposes.
+       *
+       *  - `CaptureUpdateAction.IMMEDIATELY`: Updates are immediately undoable. Use for most local updates.
+       *  - `CaptureUpdateAction.NEVER`: Updates never make it to undo/redo stack. Use for remote updates or scene initialization.
+       *  - `CaptureUpdateAction.EVENTUALLY`: Updates will be eventually be captured as part of a future increment.
+       *
+       * Check [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props/excalidraw-api#captureUpdate) for more details.
+       *
+       * @default CaptureUpdateAction.EVENTUALLY
+       */
+      captureUpdate?: SceneData["captureUpdate"];
+      forceFlushSync?: boolean; //zsviczian
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
-      if (sceneData.storeAction && sceneData.storeAction !== StoreAction.NONE) {
+      if (
+        sceneData.captureUpdate &&
+        sceneData.captureUpdate !== CaptureUpdateAction.EVENTUALLY
+      ) {
         const prevCommittedAppState = this.store.snapshot.appState;
         const prevCommittedElements = this.store.snapshot.elements;
 
@@ -4323,12 +4339,12 @@ class App extends React.Component<AppProps, AppState> {
 
         // WARN: store action always performs deep clone of changed elements, for ephemeral remote updates (i.e. remote dragging, resizing, drawing) we might consider doing something smarter
         // do NOT schedule store actions (execute after re-render), as it might cause unexpected concurrency issues if not handled well
-        if (sceneData.storeAction === StoreAction.CAPTURE) {
+        if (sceneData.captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
           this.store.captureIncrement(
             nextCommittedElements,
             nextCommittedAppState,
           );
-        } else if (sceneData.storeAction === StoreAction.UPDATE) {
+        } else if (sceneData.captureUpdate === CaptureUpdateAction.NEVER) {
           this.store.updateSnapshot(
             nextCommittedElements,
             nextCommittedAppState,
@@ -5060,7 +5076,9 @@ class App extends React.Component<AppProps, AppState> {
     if (!event.altKey) {
       if (this.flowChartNavigator.isExploring) {
         this.flowChartNavigator.clear();
-        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+        this.syncActionResult({
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
       }
     }
 
@@ -5107,7 +5125,9 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         this.flowChartCreator.clear();
-        this.syncActionResult({ storeAction: StoreAction.CAPTURE });
+        this.syncActionResult({
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
       }
     }
   });
@@ -6966,10 +6986,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
           ),
         },
-        storeAction:
+        captureUpdate:
           this.state.openDialog?.name === "elementLinkSelector"
-            ? StoreAction.NONE
-            : StoreAction.UPDATE,
+            ? CaptureUpdateAction.EVENTUALLY
+            : CaptureUpdateAction.NEVER,
       });
       return;
     }
@@ -9037,21 +9057,78 @@ class App extends React.Component<AppProps, AppState> {
             const elements = this.scene.getElementsIncludingDeleted();
 
             for (const element of elements) {
-              if (
+              const isInSelection =
                 selectedElementIds.has(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
-                  pointerDownState.hit.wasAddedToSelection)
+                  pointerDownState.hit.wasAddedToSelection);
+              // NOTE (mtolmacs): This is a temporary fix for very large scenes
+              if (
+                Math.abs(element.x) > 1e7 ||
+                Math.abs(element.x) > 1e7 ||
+                Math.abs(element.width) > 1e7 ||
+                Math.abs(element.height) > 1e7
               ) {
+                console.error(
+                  `Alt+dragging element in scene with invalid dimensions`,
+                  element.x,
+                  element.y,
+                  element.width,
+                  element.height,
+                  isInSelection,
+                );
+
+                return;
+              }
+
+              if (isInSelection) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
                   groupIdMap,
                   element,
                 );
+
+                // NOTE (mtolmacs): This is a temporary fix for very large scenes
+                if (
+                  Math.abs(duplicatedElement.x) > 1e7 ||
+                  Math.abs(duplicatedElement.x) > 1e7 ||
+                  Math.abs(duplicatedElement.width) > 1e7 ||
+                  Math.abs(duplicatedElement.height) > 1e7
+                ) {
+                  console.error(
+                    `Alt+dragging duplicated element with invalid dimensions`,
+                    duplicatedElement.x,
+                    duplicatedElement.y,
+                    duplicatedElement.width,
+                    duplicatedElement.height,
+                  );
+
+                  return;
+                }
+
                 const origElement = pointerDownState.originalElements.get(
                   element.id,
                 )!;
+
+                // NOTE (mtolmacs): This is a temporary fix for very large scenes
+                if (
+                  Math.abs(origElement.x) > 1e7 ||
+                  Math.abs(origElement.x) > 1e7 ||
+                  Math.abs(origElement.width) > 1e7 ||
+                  Math.abs(origElement.height) > 1e7
+                ) {
+                  console.error(
+                    `Alt+dragging duplicated element with invalid dimensions`,
+                    origElement.x,
+                    origElement.y,
+                    origElement.width,
+                    origElement.height,
+                  );
+
+                  return;
+                }
+
                 mutateElement(duplicatedElement, {
                   x: origElement.x,
                   y: origElement.y,
@@ -9668,7 +9745,7 @@ class App extends React.Component<AppProps, AppState> {
           appState: {
             newElement: null,
           },
-          storeAction: StoreAction.UPDATE,
+          captureUpdate: CaptureUpdateAction.NEVER,
         });
 
         return;
@@ -9838,7 +9915,7 @@ class App extends React.Component<AppProps, AppState> {
           elements: this.scene
             .getElementsIncludingDeleted()
             .filter((el) => el.id !== resizingElement.id),
-          storeAction: StoreAction.UPDATE,
+          captureUpdate: CaptureUpdateAction.NEVER,
         });
       }
 
@@ -10860,7 +10937,7 @@ class App extends React.Component<AppProps, AppState> {
                 isLoading: false,
               },
               replaceFiles: true,
-              storeAction: StoreAction.CAPTURE,
+              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
             return;
           } catch (error: any) {
@@ -10989,7 +11066,7 @@ class App extends React.Component<AppProps, AppState> {
             isLoading: false,
           },
           replaceFiles: true,
-          storeAction: StoreAction.CAPTURE,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

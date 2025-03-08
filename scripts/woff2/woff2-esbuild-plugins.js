@@ -20,8 +20,6 @@ module.exports.woff2ServerPlugin = (options = {}) => {
   return {
     name: "woff2ServerPlugin",
     setup(build) {
-      const { outdir, generateTtf } = options;
-      const outputDir = path.resolve(outdir);
       const fonts = new Map();
 
       build.onResolve({ filter: /\.woff2$/ }, (args) => {
@@ -94,9 +92,12 @@ module.exports.woff2ServerPlugin = (options = {}) => {
       );
 
       build.onEnd(async () => {
-        if (!generateTtf) {
+        const { outdir } = options;
+
+        if (!outdir) {
           return;
         }
+        const outputDir = path.resolve(outdir);
 
         const isFontToolsInstalled = await which("fonttools", {
           nothrow: true,
