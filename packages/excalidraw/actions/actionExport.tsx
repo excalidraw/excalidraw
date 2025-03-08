@@ -16,10 +16,11 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import type { Theme } from "../element/types";
+import type { ExcalidrawElement, Theme } from "../element/types";
 
 import "../components/ToolIcon.scss";
 import { CaptureUpdateAction } from "../store";
+import { isInGroup } from "../groups";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
@@ -133,6 +134,41 @@ export const actionChangeExportEmbedScene = register({
     </CheckboxItem>
   ),
 });
+
+export const saveFileToLocalStorage = register({
+  name: "saveFileToLocalStorage",
+  label: "buttons.save",
+  icon: ExportIcon,
+  trackEvent: { category: "export" },
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.saveFileToLocalStorage &&
+      !!appState.fileHandle &&
+      !appState.viewModeEnabled
+    );
+  },
+  perform: async (elements, appState, value, app) => {
+    try {
+      const files: Record<string, ExcalidrawElement> = localStorage.getItem("files") !== null ? JSON.parse(localStorage.getItem("files")) : {};
+      const fileName = prompt("Enter file name");
+
+      if (!fileName) {
+        alert("Please enter a file name");
+        return
+      }
+
+      if (fileName in files) {
+        if (!confirm("File already exists. Overwrite?")) {
+          return
+        }
+      }
+
+      localStorage.setItem("files", JSON.stringify({ ...files, [fileName]: JSON.stringify(elements) }));
+    } catch (error: any) {
+      return
+    }
+  }
+})
 
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
