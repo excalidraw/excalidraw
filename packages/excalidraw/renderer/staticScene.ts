@@ -108,6 +108,61 @@ const strokeGrid = (
   }
   context.restore();
 };
+const strokeNotebookLines = (
+  context: CanvasRenderingContext2D,
+  /** Line spacing in pixels */
+  lineSpacing: number,
+  /** Determines when to draw a bold line (e.g., every 5th line) */
+  boldStep: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number
+) => {
+  const offsetY = (scrollY % lineSpacing) - lineSpacing;
+  const actualLineSpacing = lineSpacing * zoom.value;
+
+  context.save();
+
+  if (zoom.value === 1) {
+    context.translate(0, offsetY % 1 ? 0 : 0.5);
+  }
+
+  for (
+    let y = offsetY;
+    y < offsetY + height + lineSpacing * 2;
+    y += lineSpacing
+  ) {
+    const isBold = boldStep > 1 && Math.round(y - scrollY) % (boldStep * lineSpacing) === 0;
+
+    if (!isBold && actualLineSpacing < 10) {
+      continue;
+    }
+
+    const lineWidth = Math.min(1 / zoom.value, isBold ? 2 : 1);
+    context.lineWidth = lineWidth;
+    context.setLineDash([]); // Notebook lines are solid
+
+    context.beginPath();
+    context.strokeStyle = isBold
+      ? "rgba(0, 0, 150, 0.2)"
+      : "rgba(0, 0, 255, 0.1)"; // Slightly darker bold lines
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+  }
+
+  // Optional: Add a red left margin line
+  context.strokeStyle = "rgba(255, 0, 0, 0.3)"; // Light red margin line
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(40, 0); // Adjust margin position
+  context.lineTo(40, height);
+  context.stroke();
+
+  context.restore();
+};
+
 
 const frameClip = (
   frame: ExcalidrawFrameLikeElement,
@@ -219,7 +274,7 @@ const _renderStaticScene = ({
     return;
   }
 
-  const { renderGrid = true, isExporting } = renderConfig;
+  const { renderGrid = true, renderGridNotebook=true, isExporting } = renderConfig;
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -246,6 +301,16 @@ const _renderStaticScene = ({
       appState.gridSize,
       appState.gridStep,
       appState.scrollX,
+      appState.scrollY,
+      appState.zoom,
+      normalizedWidth / appState.zoom.value,
+      normalizedHeight / appState.zoom.value,
+    );
+  } else if (renderGridNotebook) {
+    strokeNotebookLines(
+      context,
+      appState.gridSize,
+      appState.gridStep,
       appState.scrollY,
       appState.zoom,
       normalizedWidth / appState.zoom.value,
