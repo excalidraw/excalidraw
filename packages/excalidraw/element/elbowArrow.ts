@@ -963,24 +963,6 @@ export const updateElbowArrowPoints = (
     );
   }
 
-  // 0. During all element replacement in the scene, we just need to renormalize
-  // the arrow
-  // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
-  if (
-    elementsMap.size === 0 &&
-    updates.points &&
-    validateElbowPoints(updates.points)
-  ) {
-    return normalizeArrowElementUpdate(
-      updates.points.map((p) =>
-        pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
-      ),
-      arrow.fixedSegments,
-      arrow.startIsSpecial,
-      arrow.endIsSpecial,
-    );
-  }
-
   const updatedPoints: readonly LocalPoint[] = updates.points
     ? updates.points && updates.points.length === 2
       ? arrow.points.map((p, idx) =>
@@ -992,6 +974,34 @@ export const updateElbowArrowPoints = (
         )
       : updates.points.slice()
     : arrow.points.slice();
+
+  // 0. During all element replacement in the scene, we just need to renormalize
+  // the arrow
+  // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
+  const startBinding =
+    typeof updates.startBinding !== "undefined"
+      ? updates.startBinding
+      : arrow.startBinding;
+  const endBinding =
+    typeof updates.endBinding !== "undefined"
+      ? updates.endBinding
+      : arrow.endBinding;
+  const startElement = startBinding && elementsMap.get(startBinding.elementId);
+  const endElement = endBinding && elementsMap.get(endBinding.elementId);
+  if (
+    (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) ||
+    startElement?.id !== startBinding?.elementId ||
+    endElement?.id !== endBinding?.elementId
+  ) {
+    return normalizeArrowElementUpdate(
+      updatedPoints.map((p) =>
+        pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
+      ),
+      arrow.fixedSegments,
+      arrow.startIsSpecial,
+      arrow.endIsSpecial,
+    );
+  }
 
   const {
     startHeading,
@@ -1005,14 +1015,8 @@ export const updateElbowArrowPoints = (
     {
       x: arrow.x,
       y: arrow.y,
-      startBinding:
-        typeof updates.startBinding !== "undefined"
-          ? updates.startBinding
-          : arrow.startBinding,
-      endBinding:
-        typeof updates.endBinding !== "undefined"
-          ? updates.endBinding
-          : arrow.endBinding,
+      startBinding,
+      endBinding,
       startArrowhead: arrow.startArrowhead,
       endArrowhead: arrow.endArrowhead,
     },
