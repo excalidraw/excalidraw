@@ -15,6 +15,14 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@excalidraw/excalidraw": ["../excalidraw/index.tsx"],
+      "@excalidraw/excalidraw/*": ["../excalidraw/*"],
+      "@excalidraw/utils": ["../utils/index.ts"],
+      "@excalidraw/utils/*": ["../utils/*"],
+      "@excalidraw/math": ["../math/index.ts"],
+      "@excalidraw/math/*": ["../math/*"]
+    }
   }
 }

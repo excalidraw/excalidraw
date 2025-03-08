@@ -4,9 +4,17 @@
     "module": "es2015",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "sourceMap": true,
     "allowJs": true,
-    "lib": ["es2017", "dom"] // Ensure this is compatible with iOS 15
+    "lib": ["es2017", "dom"], // Ensure this is compatible with iOS 15
+    "paths": {
+      "@excalidraw/excalidraw": ["../excalidraw/index.tsx"],
+      "@excalidraw/utils": ["../utils/index.ts"],
+      "@excalidraw/math": ["../math/index.ts"],
+      "@excalidraw/excalidraw/*": ["../excalidraw/*"],
+      "@excalidraw/utils/*": ["../utils/*"],
+      "@excalidraw/math/*": ["../math/*"]
+    }
   }
 }

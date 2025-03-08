@@ -1,16 +1,24 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.18.0",
+  "version": "0.18.0-0",
   "main": "main.js",
   "module": "./dist/prod/index.js",
   "types": "types/excalidraw/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./types/excalidraw/index.d.ts",
-      "import": "./dist/prod/index.js",
-      "require": "./main.js"
+    "./*": {
+      "types": "./dist/types/excalidraw/*.d.ts"
     },
-    "./index.css": "./styles.production.css"
+    "./index.css": {
+      "development": "./dist/dev/index.css",
+      "production": "./dist/prod/index.css"
+    },
+    ".": {
+      "types": "./dist/types/excalidraw/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js",
+      "require": "./main.js"
+    }
   },
   "files": [
     "dist/*",
@@ -98,7 +106,7 @@
     "dotenv": "16.0.1",
     "esbuild": "0.19.10",
     "esbuild-sass-plugin": "2.16.0",
-    "eslint-plugin-react": "7.32.2",
+    "eslint-plugin-react": "^7.37.4",
     "fake-indexeddb": "3.1.7",
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
@@ -111,26 +119,27 @@
     "ts-loader": "9.3.1",
     "typescript": "4.9.4",
     "rimraf": "^5.0.5",
-    "webpack": "5.76.0",
+    "webpack": "^5.98.0",
     "terser-webpack-plugin": "5.3.3",
     "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "4.10.0",
-    "webpack-dev-server": "4.9.3",
-    "webpack-merge": "5.8.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0",
+    "webpack-merge": "^6.0.1",
     "copy-webpack-plugin": "12.0.2",
     "import-meta-loader": "1.1.0",
-    "@babel/core": "7.24.5",
-    "@babel/plugin-transform-arrow-functions": "7.24.1",
-    "@babel/plugin-transform-async-to-generator": "7.24.1",
-    "@babel/plugin-transform-runtime": "7.24.3",
-    "@babel/plugin-transform-typescript": "7.24.5",
-    "@babel/preset-env": "7.24.5",
-    "@babel/preset-react": "7.24.1",
-    "@babel/preset-typescript": "7.24.1",
-    "babel-loader": "8.2.5",
-    "babel-plugin-transform-class-properties": "6.24.1",
-    "css-loader": "6.7.1",
-    "esbuild-plugin-external-global": "1.0.1"
+    "@babel/core": "^7.26.9",
+    "@babel/plugin-transform-arrow-functions": "^7.25.9",
+    "@babel/plugin-transform-async-to-generator": "^7.25.9",
+    "@babel/plugin-transform-runtime": "^7.26.9",
+    "@babel/plugin-transform-typescript": "^7.26.8",
+    "@babel/plugin-transform-class-properties": "^7.25.9",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@babel/preset-typescript": "^7.26.0",
+    "babel-loader": "^10.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "css-loader": "^7.1.2",
+    "esbuild-plugin-external-global": "^1.0.1"
   },
   "repository": "https://github.com/excalidraw/excalidraw",
   "bugs": "https://github.com/excalidraw/excalidraw/issues",

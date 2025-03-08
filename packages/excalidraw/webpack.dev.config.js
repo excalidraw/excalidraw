@@ -24,6 +24,11 @@ module.exports = {
   },
   resolve: {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
+    alias: {
+      "@excalidraw/excalidraw": path.resolve(__dirname),
+      "@excalidraw/utils": path.resolve(__dirname, "../utils"),
+      "@excalidraw/math": path.resolve(__dirname, "../math"),
+    }
   },
   module: {
     rules: [
@@ -61,6 +66,24 @@ module.exports = {
         use: [
           {
             loader: "import-meta-loader",
+          },
+          {
+            loader: "babel-loader", // Add this babel-loader
+            options: {
+              presets: [
+                "@babel/preset-env",
+                ["@babel/preset-react", { 
+                  runtime: "classic", // Use classic JSX transform
+                  pragma: "React.createElement",
+                  pragmaFrag: "React.Fragment"
+                }],
+                "@babel/preset-typescript",
+              ],
+              plugins: [
+                "transform-class-properties",
+                "@babel/plugin-transform-runtime",
+              ],
+            },
           },
           {
             loader: "ts-loader",
@@ -142,5 +165,17 @@ module.exports = {
       commonjs: "react-dom",
       amd: "react-dom",
     },
+    'react/jsx-runtime': {
+      root: ['React', 'jsxRuntime'],
+      commonjs2: 'react/jsx-runtime',
+      commonjs: 'react/jsx-runtime',
+      amd: 'react/jsx-runtime'
+    },
+    'react/jsx-dev-runtime': {
+      root: ['React', 'jsxRuntime'],
+      commonjs2: 'react/jsx-dev-runtime',
+      commonjs: 'react/jsx-dev-runtime',
+      amd: 'react/jsx-dev-runtime'
+    }
   },
 };
