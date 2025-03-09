@@ -6820,7 +6820,7 @@ class App extends React.Component<AppProps, AppState> {
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
-    invalidateContextMenu = true;
+    this.resetContextMenuTimer(); //zsviczian
   };
 
   handleHoverSelectedLinearElement(
@@ -11100,6 +11100,10 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type !== "selection"
     ) {
       return;
+    }
+
+    if (this.state.isResizing) {
+      return; //zsviczian - avoid context menu during resizing on Mobiles
     }
 
     const { x, y } = viewportCoordsToSceneCoords(event, this.state);
