@@ -73,6 +73,8 @@ import {
   vectorCross,
   pointsEqual,
   lineSegmentIntersectionPoints,
+  round,
+  PRECISION,
 } from "@excalidraw/math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
@@ -954,13 +956,17 @@ export const bindPointToSnapToElementOutline = (
     const currentDistance = pointDistance(p, center);
     const fullDistance = Math.max(
       pointDistance(intersection ?? p, center),
-      1e-5,
+      PRECISION,
     );
-    const ratio = currentDistance / fullDistance;
+    const ratio = round(currentDistance / fullDistance, 6);
 
     switch (true) {
       case ratio > 0.9:
-        if (currentDistance - fullDistance > FIXED_BINDING_DISTANCE) {
+        if (
+          currentDistance - fullDistance > FIXED_BINDING_DISTANCE ||
+          // Too close to determine vector from intersection to p
+          pointDistanceSq(p, intersection) < PRECISION
+        ) {
           return p;
         }
 
