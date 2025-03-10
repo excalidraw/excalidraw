@@ -545,7 +545,7 @@ export const actionToggleLassoTool = register({
         activeEmbeddable: null,
         activeTool,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
