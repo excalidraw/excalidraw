@@ -3221,7 +3221,7 @@ describe("history", () => {
       const textProps = {
         type: "text",
         text: "que pasa",
-        x: 15,
+        x: 20,
         y: 15,
         angle: 0,
       } as const;
@@ -4040,7 +4040,7 @@ describe("history", () => {
           expect.objectContaining({
             ...textProps,
             // text element got redrawn!
-            x: 205,
+            x: 210,
             y: 205,
             angle: 90,
             id: text.id,
@@ -4084,7 +4084,7 @@ describe("history", () => {
           }),
           expect.objectContaining({
             ...textProps,
-            x: 205,
+            x: 210,
             y: 205,
             angle: 90,
             id: text.id,

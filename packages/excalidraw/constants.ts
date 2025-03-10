@@ -323,6 +323,7 @@ export const VERSIONS = {
 } as const;
 
 export const BOUND_TEXT_PADDING = 5;
+export const INCREASED_BOUND_TEXT_PADDING = 5;
 export const ARROW_LABEL_WIDTH_FRACTION = 0.7;
 export const ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO = 11;
 
