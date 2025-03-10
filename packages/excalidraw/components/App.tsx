@@ -603,7 +603,7 @@ class App extends React.Component<AppProps, AppState> {
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
   public flowChartCreator: FlowChartCreator = new FlowChartCreator();
-  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
+  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator(this);
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -4160,51 +4160,10 @@ class App extends React.Component<AppProps, AppState> {
           if (selectedElements.length === 1 && arrowKeyPressed) {
             event.preventDefault();
 
-            const nextId = this.flowChartNavigator.exploreByDirection(
+            return this.flowChartNavigator.exploreByDirection(
               selectedElements[0],
-              this.scene.getNonDeletedElementsMap(),
               getLinkDirectionFromKey(event.key),
             );
-
-            if (nextId) {
-              this.setState((prevState) => ({
-                selectedElementIds: makeNextSelectedElementIds(
-                  {
-                    [nextId]: true,
-                  },
-                  prevState,
-                ),
-              }));
-
-              const nextNode = this.scene
-                .getNonDeletedElementsMap()
-                .get(nextId);
-
-              if (
-                nextNode &&
-                !isElementCompletelyInViewport(
-                  [nextNode],
-                  this.canvas.width / window.devicePixelRatio,
-                  this.canvas.height / window.devicePixelRatio,
-                  {
-                    offsetLeft: this.state.offsetLeft,
-                    offsetTop: this.state.offsetTop,
-                    scrollX: this.state.scrollX,
-                    scrollY: this.state.scrollY,
-                    zoom: this.state.zoom,
-                  },
-                  this.scene.getNonDeletedElementsMap(),
-                  this.getEditorUIOffsets(),
-                )
-              ) {
-                this.scrollToContent(nextNode, {
-                  animate: true,
-                  duration: 300,
-                  canvasOffsets: this.getEditorUIOffsets(),
-                });
-              }
-            }
-            return;
           }
         }
       }
