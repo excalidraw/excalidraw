@@ -1,4 +1,4 @@
-import type { ExcalidrawElement, SceneElementsMap } from "./types";
+import type { ExcalidrawElement, NonDeletedSceneElementsMap } from "./types";
 import Scene from "../scene/Scene";
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
@@ -44,7 +44,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
       typeof startBinding !== "undefined" ||
       typeof endBinding !== "undefined") // manual binding to element
   ) {
-    const elementsMap = toBrandedType<SceneElementsMap>(
+    const elementsMap = toBrandedType<NonDeletedSceneElementsMap>(
       Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
     );
 
