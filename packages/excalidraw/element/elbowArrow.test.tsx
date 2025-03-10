@@ -71,9 +71,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [115, 0],
-      [115, 199.9],
-      [195, 199.9],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
 
     mouse.reset();
@@ -82,9 +82,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [115, 0],
-      [115, 199.9],
-      [195, 199.9],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
   });
 
@@ -248,9 +248,9 @@ describe("elbow arrow ui", () => {
     expect(arrow.elbowed).toBe(true);
     expect(arrow.points).toEqual([
       [0, 0],
-      [43, 0],
-      [43, 198.9],
-      [88, 198.9],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
   });
 
@@ -290,9 +290,9 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [33, 0],
-      [33, 164],
-      [101, 164],
+      [35, 0],
+      [35, 165],
+      [103, 165],
     ]);
   });
 
@@ -346,9 +346,9 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.elbowed).toBe(true);
     expect(duplicatedArrow.points).toEqual([
       [0, 0],
-      [43, 0],
-      [43, 198.9],
-      [88, 198.9],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);
@@ -400,9 +400,9 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.elbowed).toBe(true);
     expect(duplicatedArrow.points).toEqual([
       [0, 0],
-      [43, 0],
-      [43, 198.9],
-      [88, 198.9],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
   });
 });
