@@ -283,7 +283,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
         elements,
         zoom,
       )
-    : null;
+    : "keep";
   const end = endDragged
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(
@@ -303,7 +303,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
         elements,
         zoom,
       )
-    : null;
+    : "keep";
 
   return [start, end];
 };
