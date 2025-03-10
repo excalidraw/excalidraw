@@ -1201,34 +1201,21 @@ const getElbowArrowData = (
   let hoveredStartElement = startElement;
   let hoveredEndElement = endElement;
   if (options?.isDragging) {
-    const isEndDragged =
-      Math.abs(
-        arrow.x +
-          arrow.points[arrow.points.length - 1][0] -
-          (arrow.x + nextPoints[nextPoints.length - 1][0]),
-      ) > 0 ||
-      Math.abs(
-        arrow.y +
-          arrow.points[arrow.points.length - 1][1] -
-          (arrow.y + nextPoints[nextPoints.length - 1][1]),
-      ) > 0;
     const elements = Array.from(elementsMap.values());
-    if (!isEndDragged) {
-      hoveredStartElement = getHoveredElement(
+    hoveredStartElement =
+      getHoveredElement(
         origStartGlobalPoint,
         elementsMap,
         elements,
         options?.zoom,
-      );
-    }
-    if (isEndDragged) {
-      hoveredEndElement = getHoveredElement(
+      ) || startElement;
+    hoveredEndElement =
+      getHoveredElement(
         origEndGlobalPoint,
         elementsMap,
         elements,
         options?.zoom,
-      );
-    }
+      ) || endElement;
   }
 
   const startGlobalPoint = getGlobalPoint(
