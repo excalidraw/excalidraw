@@ -487,31 +487,30 @@ export const bindLinearElement = (
     return;
   }
 
-  const binding: PointBinding | FixedPointBinding = {
+  let binding: PointBinding | FixedPointBinding = {
     elementId: hoveredElement.id,
-    ...(isElbowArrow(linearElement)
-      ? {
-          ...calculateFixedPointForElbowArrowBinding(
-            linearElement,
-            hoveredElement,
-            startOrEnd,
-            elementsMap,
-          ),
-          focus: 0,
-          gap: 0,
-        }
-      : {
-          ...normalizePointBinding(
-            calculateFocusAndGap(
-              linearElement,
-              hoveredElement,
-              startOrEnd,
-              elementsMap,
-            ),
-            hoveredElement,
-          ),
-        }),
+    ...normalizePointBinding(
+      calculateFocusAndGap(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
+      hoveredElement,
+    ),
   };
+
+  if (isElbowArrow(linearElement)) {
+    binding = {
+      ...binding,
+      ...calculateFixedPointForElbowArrowBinding(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
+    };
+  }
 
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
@@ -1726,21 +1725,6 @@ const determineFocusDistance = (
           : Math.sqrt(element.width ** 2 + element.height ** 2) / 2),
     )
     .sort((g, h) => Math.abs(g) - Math.abs(h));
-
-  // debugClear();
-  // [
-  //   lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[0]),
-  //   lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[1]),
-  // ]
-  //   .filter((p): p is GlobalPoint => p !== null)
-  //   .forEach((p) => debugDrawPoint(p, { color: "black", permanent: true }));
-  // debugDrawPoint(determineFocusPoint(element, ordered[0] ?? 0, rotatedA), {
-  //   color: "red",
-  //   permanent: true,
-  // });
-  // debugDrawLine(rotatedInterceptor, { color: "green", permanent: true });
-  // debugDrawLine(interceptees[0], { color: "red", permanent: true });
-  // debugDrawLine(interceptees[1], { color: "red", permanent: true });
 
   const signedDistanceRatio = ordered[0] ?? 0;
 

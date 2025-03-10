@@ -1701,6 +1701,24 @@ export const actionChangeArrowType = register({
           elementsMap,
           app.state,
         );
+      } else {
+        const elementsMap = app.scene.getNonDeletedElementsMap();
+        if (newElement.startBinding) {
+          const startElement = elementsMap.get(
+            newElement.startBinding.elementId,
+          ) as ExcalidrawBindableElement;
+          if (startElement) {
+            bindLinearElement(newElement, startElement, "start", elementsMap);
+          }
+        }
+        if (newElement.endBinding) {
+          const endElement = elementsMap.get(
+            newElement.endBinding.elementId,
+          ) as ExcalidrawBindableElement;
+          if (endElement) {
+            bindLinearElement(newElement, endElement, "end", elementsMap);
+          }
+        }
       }
 
       return newElement;
