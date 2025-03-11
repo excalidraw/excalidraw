@@ -2152,6 +2152,14 @@ class App extends React.Component<AppProps, AppState> {
     let editingTextElement: AppState["editingTextElement"] | null = null;
     if (actionResult.elements) {
       this.scene.replaceAllElements(actionResult.elements);
+      // TODO [HACK] (mtolamcs): Until elbow arrow routing can't access scene
+      // elements, we need to wait for re-routing to have all elements inserted
+      // into scene.
+      actionResult.elements.forEach((element) => {
+        if (isElbowArrow(element)) {
+          mutateElement(element, { points: element.points });
+        }
+      });
       didUpdate = true;
     }
 
