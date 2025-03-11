@@ -1587,6 +1587,8 @@ export const actionChangeArrowType = register({
       });
 
       if (isElbowArrow(newElement)) {
+        newElement.fixedSegments = null;
+
         const elementsMap = app.scene.getNonDeletedElementsMap();
 
         app.dismissLinearEditor();
