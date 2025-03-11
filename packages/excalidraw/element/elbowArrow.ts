@@ -1018,6 +1018,8 @@ export const updateElbowArrowPoints = (
     endBinding && getBindableElementForId(endBinding.elementId, elementsMap);
 
   if (
+    (startBinding && !startElement) ||
+    (endBinding && !endElement) ||
     (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) ||
     (Object.keys(restOfTheUpdates).length === 0 &&
       (startElement?.id !== startBinding?.elementId ||
