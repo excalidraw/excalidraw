@@ -6,7 +6,6 @@ import {
 } from "./constants";
 import { createFile, isSupportedImageFileType } from "./data/blob";
 import { mutateElement } from "./element/mutateElement";
-import { deepCopyElement } from "./element/newElement";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
@@ -15,11 +14,14 @@ import { ExcalidrawError } from "./errors";
 import { getContainingFrame } from "./frame";
 import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
 
+import { deepCopyElement } from "./element/duplicate";
+
 import type { Spreadsheet } from "./charts";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
+
 import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
