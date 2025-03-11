@@ -1,4 +1,5 @@
 {
   "outputDirectory": "dist",
-  "installCommand": "yarn install"
+  "installCommand": "yarn install",
+  "buildCommand": "yarn build:package && yarn build"
 }

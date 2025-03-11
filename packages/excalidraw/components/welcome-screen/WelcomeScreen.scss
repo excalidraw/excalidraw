@@ -222,16 +222,6 @@
     .welcome-screen-menu-item__text {
       color: var(--color-gray-100);
     }
-
-    &--promo {
-      color: var(--color-promo) !important;
-
-      &:hover {
-        .welcome-screen-menu-item__text {
-          color: var(--color-promo) !important;
-        }
-      }
-    }
   }
 
   &.theme--dark {

@@ -12,7 +12,7 @@ if (ExecutionEnvironment.canUseDOM) {
 const Excalidraw = React.forwardRef((props, ref) => {
   if (!window.EXCALIDRAW_ASSET_PATH) {
     window.EXCALIDRAW_ASSET_PATH =
-      "https://esm.sh/@excalidraw/excalidraw@0.18.0-rc.5/dist/prod/";
+      "https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/prod/";
   }
 
   const { colorMode } = useColorMode();
