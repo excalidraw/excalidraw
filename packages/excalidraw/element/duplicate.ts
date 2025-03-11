@@ -3,9 +3,14 @@ import { getNewGroupIdsForDuplication } from "../groups";
 import { randomId, randomInteger } from "../random";
 import type { AppState } from "../types";
 import type { Mutable } from "../utility-types";
-import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
+import {
+  arrayToMap,
+  castArray,
+  getUpdatedTimestamp,
+  invariant,
+  isTestEnv,
+} from "../utils";
 import { bumpVersion } from "./mutateElement";
-import { isArrowElement } from "./typeChecks";
 import type { ExcalidrawElement, GroupId } from "./types";
 
 /**
@@ -176,10 +181,26 @@ export const duplicateElements = (
       clonedElement.frameId = maybeGetNewIdFor(clonedElement.frameId);
     }
 
+    insertAfterIndex();
+
     clonedElements.push(clonedElement);
   }
 
   return clonedElements;
+};
+
+const insertAfterIndex = (
+  elementsWithClones: ExcalidrawElement[],
+  index: number,
+  elements: ExcalidrawElement | null | ExcalidrawElement[],
+) => {
+  invariant(index !== -1, "targetIndex === -1 ");
+
+  if (!Array.isArray(elements) && !elements) {
+    return;
+  }
+
+  return elementsWithClones.splice(index + 1, 0, ...castArray(elements));
 };
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement.
