@@ -1081,7 +1081,8 @@ export const updateElbowArrowPoints = (
         p,
         arrow.points[i] ?? pointFrom<LocalPoint>(Infinity, Infinity),
       ),
-    )
+    ) &&
+    validateElbowPoints(updatedPoints)
   ) {
     return {};
   }
