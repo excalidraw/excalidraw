@@ -7,7 +7,8 @@ import { API } from "../tests/helpers/api";
 import { isPrimitive } from "../utils";
 
 import { mutateElement } from "./mutateElement";
-import { duplicateElement, duplicateElements } from "./newElement";
+
+import { duplicateElement, duplicateElements } from "./duplicate";
 
 import type { ExcalidrawLinearElement } from "./types";
 

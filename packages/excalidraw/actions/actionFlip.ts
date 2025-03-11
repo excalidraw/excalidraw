@@ -6,7 +6,6 @@ import {
 } from "../element/binding";
 import { getCommonBoundingBox } from "../element/bounds";
 import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement } from "../element/newElement";
 import { resizeMultipleElements } from "../element/resizeElements";
 import {
   isArrowElement,
@@ -18,6 +17,8 @@ import { CODES, KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../store";
 import { arrayToMap } from "../utils";
+
+import { deepCopyElement } from "../element/duplicate";
 
 import { register } from "./register";
 

@@ -163,9 +163,8 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { deepCopyElement, duplicateElements } from "../element/duplicate";
 import {
-  deepCopyElement,
-  duplicateElements,
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
