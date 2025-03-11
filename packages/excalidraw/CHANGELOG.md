@@ -13,7 +13,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
-## 18.0.0 (2025-02-28)
+## 0.18.0 (2025-03-11)
 
 ### Highlights
 
@@ -365,6 +365,8 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Grouped together Undo and Redo buttons on mobile [#9109](https://github.com/excalidraw/excalidraw/pull/9109)
 
+- Remove GA code from binding [#9042](https://github.com/excalidraw/excalidraw/pull/9042)
+
 - Load old library if migration fails
 
 - Change LibraryPersistenceAdapter `load()` `source` -> `priority`
@@ -674,6 +676,24 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 - Remove t from getDefaultAppState and allow name to be nullable [#7666](https://github.com/excalidraw/excalidraw/pull/7666)
 
 - Stop using structuredClone [#9128](https://github.com/excalidraw/excalidraw/pull/9128)
+
+- Fix elbow arrow fixed binding on restore [#9197](https://github.com/excalidraw/excalidraw/pull/9197)
+
+- Cleanup legacy `element.rawText` (obsidian) [#9203](https://github.com/excalidraw/excalidraw/pull/9203)
+
+- React 18 element.ref was accessed error [#9208](https://github.com/excalidraw/excalidraw/pull/9208)
+
+- Docked sidebar width [#9213](https://github.com/excalidraw/excalidraw/pull/9213)
+
+- Arrow updated on both sides [#8593](https://github.com/excalidraw/excalidraw/pull/8593)
+
+- Package env vars [#9221](https://github.com/excalidraw/excalidraw/pull/9221)
+
+- Bound elbow arrow on duplication does not route correctly [#9236](https://github.com/excalidraw/excalidraw/pull/9236)
+
+- Do not rebind undragged elbow arrow endpoint [#9191](https://github.com/excalidraw/excalidraw/pull/9191)
+
+- Logging and fixing extremely large scenes [#9225](https://github.com/excalidraw/excalidraw/pull/9225)
 
 ### Refactor
 
