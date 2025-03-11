@@ -5,6 +5,7 @@ import type { AppState } from "../types";
 import type { Mutable } from "../utility-types";
 import { arrayToMap, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { bumpVersion } from "./mutateElement";
+import { isArrowElement } from "./typeChecks";
 import type { ExcalidrawElement, GroupId } from "./types";
 
 /**
@@ -66,7 +67,8 @@ export const duplicateElements = (
   elements: readonly ExcalidrawElement[],
   opts?: {
     /** NOTE also updates version flags and `updated` */
-    randomizeSeed: boolean;
+    randomizeSeed?: boolean;
+    overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
   },
 ) => {
   const clonedElements: ExcalidrawElement[] = [];
@@ -79,7 +81,7 @@ export const duplicateElements = (
     /* new */ ExcalidrawElement["id"]
   >();
 
-  const maybeGetNewId = (id: ExcalidrawElement["id"]) => {
+  const maybeGetNewIdFor = (id: ExcalidrawElement["id"]) => {
     // if we've already migrated the element id, return the new one directly
     if (elementNewIdsMap.has(id)) {
       return elementNewIdsMap.get(id)!;
@@ -98,9 +100,16 @@ export const duplicateElements = (
   const groupNewIdsMap = new Map</* orig */ GroupId, /* new */ GroupId>();
 
   for (const element of elements) {
-    const clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
+    let clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
 
-    clonedElement.id = maybeGetNewId(element.id)!;
+    if (opts?.overrides) {
+      clonedElement = Object.assign(
+        clonedElement,
+        opts.overrides(clonedElement),
+      );
+    }
+
+    clonedElement.id = maybeGetNewIdFor(element.id)!;
     if (isTestEnv()) {
       __test__defineOrigId(clonedElement, element.id);
     }
@@ -120,7 +129,7 @@ export const duplicateElements = (
     }
 
     if ("containerId" in clonedElement && clonedElement.containerId) {
-      const newContainerId = maybeGetNewId(clonedElement.containerId);
+      const newContainerId = maybeGetNewIdFor(clonedElement.containerId);
       clonedElement.containerId = newContainerId;
     }
 
@@ -130,7 +139,7 @@ export const duplicateElements = (
           acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
           binding,
         ) => {
-          const newBindingId = maybeGetNewId(binding.id);
+          const newBindingId = maybeGetNewIdFor(binding.id);
           if (newBindingId) {
             acc.push({ ...binding, id: newBindingId });
           }
@@ -141,7 +150,9 @@ export const duplicateElements = (
     }
 
     if ("endBinding" in clonedElement && clonedElement.endBinding) {
-      const newEndBindingId = maybeGetNewId(clonedElement.endBinding.elementId);
+      const newEndBindingId = maybeGetNewIdFor(
+        clonedElement.endBinding.elementId,
+      );
       clonedElement.endBinding = newEndBindingId
         ? {
             ...clonedElement.endBinding,
@@ -150,7 +161,7 @@ export const duplicateElements = (
         : null;
     }
     if ("startBinding" in clonedElement && clonedElement.startBinding) {
-      const newEndBindingId = maybeGetNewId(
+      const newEndBindingId = maybeGetNewIdFor(
         clonedElement.startBinding.elementId,
       );
       clonedElement.startBinding = newEndBindingId
@@ -162,7 +173,7 @@ export const duplicateElements = (
     }
 
     if (clonedElement.frameId) {
-      clonedElement.frameId = maybeGetNewId(clonedElement.frameId);
+      clonedElement.frameId = maybeGetNewIdFor(clonedElement.frameId);
     }
 
     clonedElements.push(clonedElement);
