@@ -8445,24 +8445,6 @@ class App extends React.Component<AppProps, AppState> {
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
                   pointerDownState.hit.wasAddedToSelection);
-              // NOTE (mtolmacs): This is a temporary fix for very large scenes
-              if (
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.width) > 1e7 ||
-                Math.abs(element.height) > 1e7
-              ) {
-                console.error(
-                  `Alt+dragging element in scene with invalid dimensions`,
-                  element.x,
-                  element.y,
-                  element.width,
-                  element.height,
-                  isInSelection,
-                );
-
-                return;
-              }
 
               if (isInSelection) {
                 const duplicatedElement = duplicateElement(
