@@ -73,6 +73,8 @@ import {
   vectorCross,
   pointsEqual,
   lineSegmentIntersectionPoints,
+  round,
+  PRECISION,
 } from "@excalidraw/math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
@@ -272,14 +274,16 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
-    : // We have to update the focus and gap of the binding, so let's rebind
+    : !isElbowArrow(selectedElement)
+    ? // We have to update the focus and gap of the binding, so let's rebind
       getElligibleElementForBindingElement(
         selectedElement,
         "start",
         elementsMap,
         elements,
         zoom,
-      );
+      )
+    : "keep";
   const end = endDragged
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(
@@ -290,14 +294,16 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
-    : // We have to update the focus and gap of the binding, so let's rebind
+    : !isElbowArrow(selectedElement)
+    ? // We have to update the focus and gap of the binding, so let's rebind
       getElligibleElementForBindingElement(
         selectedElement,
         "end",
         elementsMap,
         elements,
         zoom,
-      );
+      )
+    : "keep";
 
   return [start, end];
 };
@@ -309,6 +315,11 @@ const getBindingStrategyForDraggingArrowOrJoints = (
   isBindingEnabled: boolean,
   zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
+  // Elbow arrows don't bind when dragged as a whole
+  if (isElbowArrow(selectedElement)) {
+    return ["keep", "keep"];
+  }
+
   const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
     selectedElement,
     elementsMap,
@@ -945,13 +956,17 @@ export const bindPointToSnapToElementOutline = (
     const currentDistance = pointDistance(p, center);
     const fullDistance = Math.max(
       pointDistance(intersection ?? p, center),
-      1e-5,
+      PRECISION,
     );
-    const ratio = currentDistance / fullDistance;
+    const ratio = round(currentDistance / fullDistance, 6);
 
     switch (true) {
       case ratio > 0.9:
-        if (currentDistance - fullDistance > FIXED_BINDING_DISTANCE) {
+        if (
+          currentDistance - fullDistance > FIXED_BINDING_DISTANCE ||
+          // Too close to determine vector from intersection to p
+          pointDistanceSq(p, intersection) < PRECISION
+        ) {
           return p;
         }
 

@@ -30,7 +30,7 @@ Excalidraw takes _100%_ of `width` and `height` of the containing block so make 
 
 ## Demo
 
-Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/mrazator/release-v18/examples/with-script-in-browser) example.
+Go to [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example.
 
 ## Integration
 

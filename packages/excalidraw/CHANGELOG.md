@@ -13,7 +13,7 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw Library
 
-## 18.0.0 (2025-02-28)
+## 0.18.0 (2025-03-11)
 
 ### Highlights
 
@@ -45,9 +45,9 @@ Please add the latest change on the top under the correct section.
 
 #### Deprecated UMD bundle in favor of ES modules [#7441](https://github.com/excalidraw/excalidraw/pull/7441), [#9127](https://github.com/excalidraw/excalidraw/pull/9127)
 
-We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles inside `@excalidraw/excalidraw` package now contain only bundled source files, making any dependencies tree-shakable. The npm package comes with the following structure:
+We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` folder inside `@excalidraw/excalidraw` package now contains only bundled source files, making any dependencies tree-shakable. The package comes with the following structure:
 
-> **Note**: The structure is simplified for the sake of brevity, omitting lazy-loadable modules, including locales (previously treated as json assets) and source maps in the development bundle.
+> **Note**: The structure is simplified for the sake of brevity, omitting lazy-loadable modules, including locales (previously treated as JSON assets) and source maps in the development bundle.
 
 ```
 @excalidraw/excalidraw/
@@ -64,17 +64,23 @@ We've transitioned from `UMD` to `ESM` bundle format. Our new `dist` bundles ins
 │   └── types/
 ```
 
-##### JavaScript: required `"type": "module"` in package.json
-
-Make sure that your JavaScript environment supports ES modules, as it might be required to define `"type": "module"` in your `package.json` file or as part of the `<script type="module" />` attribute.
+Make sure that your JavaScript environment supports ES modules. You _may_ need to define `"type": "module"` in your `package.json` file or as part of the `<script type="module" />` attribute.
 
 ##### Typescript: deprecated "moduleResolution": `"node"` or `"node10"`
 
 Since `"node"` and `"node10"` do not support `package.json` `"exports"` fields, having these values in your `tsconfig.json` will not work. Instead, use `"bundler"`, `"node16"` or `"nodenext"` values. For more information, see [Typescript's documentation](https://www.typescriptlang.org/tsconfig/#moduleResolution).
 
+##### ESM strict resolution
+
+Due to ESM's strict resolution, if you're using Webpack or other bundler that expects import paths to be fully specified, you'll need to disable this feature explicitly.
+
+For example in Webpack, you should set [`resolve.fullySpecified`](https://webpack.js.org/configuration/resolve/#resolvefullyspecified) to `false`.
+
+For this reason, CRA will no longer work unless you eject or use a workaround such as [craco](https://stackoverflow.com/a/75109686).
+
 ##### New structure of the imports
 
-Dependening on the environment, this is how imports should look like with the `ESM`:
+Depending on the environment, this is how imports should look like with the `ESM`:
 
 **With bundler (Vite, Next.js, etc.)**
 
@@ -122,7 +128,7 @@ The `excalidraw-assets` and `excalidraw-assets-dev` folders, which contained loc
 
 ##### Locales
 
-Locales are no longer treated as static `.json` assets, but are transpiled with `esbuild` dirrectly to the `.js` as ES modules. Note that some build tools (i.e. Vite) may require setting `es2022` as a build target, in order to support "Arbitrary module namespace identifier names", e.g. `export { english as "en-us" } )`.
+Locales are no longer treated as static `.json` assets but are transpiled with `esbuild` directly to the `.js` as ES modules. Note that some build tools (i.e. Vite) may require setting `es2022` as a build target, in order to support "Arbitrary module namespace identifier names", e.g. `export { english as "en-us" } )`.
 
 ```js
 // vite.config.js
@@ -139,7 +145,7 @@ optimizeDeps: {
 
 ##### Fonts
 
-New fonts, which we've added, are automatically loaded from the CDN. For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
+All fonts are automatically loaded from the [esm.run](https://esm.run/) CDN. For self-hosting purposes, you'll have to copy the content of the folder `node_modules/@excalidraw/excalidraw/dist/prod/fonts` to the path where your assets should be served from (i.e. `public/` directory in your project). In that case, you should also set `window.EXCALIDRAW_ASSET_PATH` to the very same path, i.e. `/` in case it's in the root:
 
 ```js
 <script>window.EXCALIDRAW_ASSET_PATH = "/";</script>
@@ -153,7 +159,7 @@ or, if you serve your assets from the root of your CDN, you would do:
 </script>
 ```
 
-or, if you prefer the path to be dynamicly set based on the `location.origin`, you could do the following:
+or, if you prefer the path to be dynamically set based on the `location.origin`, you could do the following:
 
 ```jsx
 // Next.js
@@ -183,7 +189,7 @@ updateScene({
 }); // B
 ```
 
-The `updateScene` API has changed due to the added `Store` component, as part of multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `captureUpdate: CaptureUpdateActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below.
+The `updateScene` API has changed due to the added `Store` component, as part of the multiplayer undo / redo initiative. Specifically, optional `sceneData` parameter `commitToHistory: boolean` was replaced with optional `captureUpdate: CaptureUpdateActionType` parameter. Therefore, make sure to update all instances of `updateScene`, which use `commitToHistory` parameter according to the _before / after_ table below.
 
 > **Note**: Some updates are not observed by the store / history - i.e. updates to `collaborators` object or parts of `AppState` which are not observed (not `ObservedAppState`). Such updates will never make it to the undo / redo stacks, regardless of the passed `captureUpdate` value.
 
@@ -197,7 +203,7 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - `ExcalidrawTextElement.baseline` was removed and replaced with a vertical offset computation based on font metrics, performed on each text element re-render. In case of custom font usage, extend the `FONT_METRICS` object with the related properties. [#7693](https://github.com/excalidraw/excalidraw/pull/7693)
 
-- `ExcalidrawEmbeddableElement.validated` was removed and moved to private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
+- `ExcalidrawEmbeddableElement.validated` was removed and moved to the private editor state. This should largely not affect your apps unless you were reading from this attribute. We keep validating embeddable urls internally, and the public [`props.validateEmbeddable`](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api/props#validateembeddable) still applies. [#7539](https://github.com/excalidraw/excalidraw/pull/7539)
 
 - Stats container CSS has changed, so if you're using `renderCustomStats`, you may need to adjust your styles to retain the same layout. [#8361](https://github.com/excalidraw/excalidraw/pull/8361)
 
@@ -359,6 +365,8 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Grouped together Undo and Redo buttons on mobile [#9109](https://github.com/excalidraw/excalidraw/pull/9109)
 
+- Remove GA code from binding [#9042](https://github.com/excalidraw/excalidraw/pull/9042)
+
 - Load old library if migration fails
 
 - Change LibraryPersistenceAdapter `load()` `source` -> `priority`
@@ -479,7 +487,7 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Linear element complete button disabled [#8492](https://github.com/excalidraw/excalidraw/pull/8492)
 
-- Aspect ratio of distorted images are not preserved in SVG exports [#8061](https://github.com/excalidraw/excalidraw/pull/8061)
+- Aspect ratios of distorted images are not preserved in SVG exports [#8061](https://github.com/excalidraw/excalidraw/pull/8061)
 
 - WYSIWYG editor padding is not normalized with zoom.value [#8481](https://github.com/excalidraw/excalidraw/pull/8481)
 
@@ -509,7 +517,7 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 
 - Round coordinates and sizes for rectangle intersection [#8366](https://github.com/excalidraw/excalidraw/pull/8366)
 
-- Text content with tab characters act different in view/edit [#8336](https://github.com/excalidraw/excalidraw/pull/8336)
+- Text content with tab characters act differently in view/edit [#8336](https://github.com/excalidraw/excalidraw/pull/8336)
 
 - Drawing from 0-dimension canvas [#8356](https://github.com/excalidraw/excalidraw/pull/8356)
 
@@ -668,6 +676,24 @@ The `updateScene` API has changed due to the added `Store` component, as part of
 - Remove t from getDefaultAppState and allow name to be nullable [#7666](https://github.com/excalidraw/excalidraw/pull/7666)
 
 - Stop using structuredClone [#9128](https://github.com/excalidraw/excalidraw/pull/9128)
+
+- Fix elbow arrow fixed binding on restore [#9197](https://github.com/excalidraw/excalidraw/pull/9197)
+
+- Cleanup legacy `element.rawText` (obsidian) [#9203](https://github.com/excalidraw/excalidraw/pull/9203)
+
+- React 18 element.ref was accessed error [#9208](https://github.com/excalidraw/excalidraw/pull/9208)
+
+- Docked sidebar width [#9213](https://github.com/excalidraw/excalidraw/pull/9213)
+
+- Arrow updated on both sides [#8593](https://github.com/excalidraw/excalidraw/pull/8593)
+
+- Package env vars [#9221](https://github.com/excalidraw/excalidraw/pull/9221)
+
+- Bound elbow arrow on duplication does not route correctly [#9236](https://github.com/excalidraw/excalidraw/pull/9236)
+
+- Do not rebind undragged elbow arrow endpoint [#9191](https://github.com/excalidraw/excalidraw/pull/9191)
+
+- Logging and fixing extremely large scenes [#9225](https://github.com/excalidraw/excalidraw/pull/9225)
 
 ### Refactor
 

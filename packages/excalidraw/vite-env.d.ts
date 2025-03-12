@@ -43,9 +43,8 @@ interface ImportMetaEnv {
   VITE_APP_ENABLE_ESLINT: string;
   VITE_APP_ENABLE_TRACKING: string;
 
-  VITE_PKG_NAME: string;
-  VITE_PKG_VERSION: string;
-  VITE_IS_EXCALIDRAW_NPM_PACKAGE: string;
+  PKG_NAME: string;
+  PKG_VERSION: string;
 
   VITE_APP_PLUS_LP: string;
   VITE_APP_PLUS_APP: string;
