@@ -1,6 +1,7 @@
 {
   "extends": ["@excalidraw/eslint-config", "react-app"],
   "rules": {
+    "import/order": "warn",
     "import/no-anonymous-default-export": "off",
     "no-restricted-globals": "off",
     "@typescript-eslint/consistent-type-imports": [
