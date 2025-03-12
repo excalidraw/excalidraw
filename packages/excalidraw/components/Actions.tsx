@@ -1,12 +1,24 @@
-import { useState } from "react";
 import clsx from "clsx";
-import type { ActionManager } from "../actions/manager";
-import type {
-  ExcalidrawElement,
-  ExcalidrawElementType,
-  NonDeletedElementsMap,
-  NonDeletedSceneElementsMap,
-} from "../element/types";
+import { useState } from "react";
+
+import { actionToggleZenMode } from "../actions";
+
+import { KEYS } from "../keys";
+import { CLASSES } from "../constants";
+import { alignActionsPredicate } from "../actions/actionAlign";
+import { trackEvent } from "../analytics";
+import { useTunnels } from "../context/tunnels";
+import {
+  shouldAllowVerticalAlign,
+  suppportsHorizontalAlign,
+} from "../element/textElement";
+import {
+  hasBoundTextElement,
+  isElbowArrow,
+  isImageElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 import { t } from "../i18n";
 import {
   canChangeRoundness,
@@ -16,29 +28,17 @@ import {
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
-import { SHAPES } from "../shapes";
-import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
-import { capitalizeString, isTransparent } from "../utils";
 import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
-import { trackEvent } from "../analytics";
-import {
-  hasBoundTextElement,
-  isElbowArrow,
-  isImageElement,
-  isLinearElement,
-  isTextElement,
-} from "../element/typeChecks";
-import { actionToggleZenMode } from "../actions";
-import {
-  shouldAllowVerticalAlign,
-  suppportsHorizontalAlign,
-} from "../element/textElement";
+import { SHAPES } from "../shapes";
+import { capitalizeString, isTransparent } from "../utils";
 
 import "./Actions.scss";
-import { KEYS } from "../keys";
-import { useTunnels } from "../context/tunnels";
-import { CLASSES } from "../constants";
-import { alignActionsPredicate } from "../actions/actionAlign";
+
+import { useDevice } from "./App";
+import Stack from "./Stack";
+import { ToolButton } from "./ToolButton";
+import { Tooltip } from "./Tooltip";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   EmbedIcon,
   extraToolsIcon,
@@ -47,11 +47,15 @@ import {
   laserPointerToolIcon,
   MagicIcon,
 } from "./icons";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { Tooltip } from "./Tooltip";
-import { ToolButton } from "./ToolButton";
-import Stack from "./Stack";
-import { useDevice } from "./App";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawElementType,
+  NonDeletedElementsMap,
+  NonDeletedSceneElementsMap,
+} from "../element/types";
+import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import type { ActionManager } from "../actions/manager";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,

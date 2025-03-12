@@ -1,10 +1,12 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
-import { useCallbackRefState } from "../hooks/useCallbackRefState";
-import { KEYS } from "../keys";
+
 import { useSetAtom } from "../editor-jotai";
+import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
+import { KEYS } from "../keys";
 import { queryFocusableElements } from "../utils";
+
 import {
   useExcalidrawContainer,
   useDevice,
@@ -12,8 +14,8 @@ import {
 } from "./App";
 import "./Dialog.scss";
 import { Island } from "./Island";
-import { Modal } from "./Modal";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import { Modal } from "./Modal";
 import { CloseIcon } from "./icons";
 
 export type DialogSize = number | "small" | "regular" | "wide" | undefined;

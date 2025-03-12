@@ -2,7 +2,6 @@ import React from "react";
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import initialData from "@site/src/initialData";
 import { useColorMode } from "@docusaurus/theme-common";
-
 import "@excalidraw/excalidraw/index.css";
 
 let ExcalidrawComp = {};

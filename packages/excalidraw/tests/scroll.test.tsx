@@ -1,14 +1,16 @@
 import React from "react";
+
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
+
+import { API } from "./helpers/api";
+import { Keyboard } from "./helpers/ui";
 import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
-import { API } from "./helpers/api";
-import { Keyboard } from "./helpers/ui";
 
 const { h } = window;
 

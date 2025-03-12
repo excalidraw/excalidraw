@@ -1,48 +1,41 @@
 import React from "react";
-import "../global.d.ts";
-import { vi } from "vitest";
 import {
   queryByText,
   fireEvent,
   queryByTestId,
   waitFor,
 } from "@testing-library/react";
-import type { LocalPoint, Radians } from "@excalidraw/math";
+import { vi } from "vitest";
 import { pointFrom } from "@excalidraw/math";
-import * as StaticScene from "../renderer/staticScene";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
+import "../global.d.ts";
 import "../../utils/test-utils";
-import { getDefaultAppState } from "../appState";
+
+import {
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+} from "../actions";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { getDefaultAppState } from "../appState";
+import { HistoryEntry } from "../history";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+import * as StaticScene from "../renderer/staticScene";
 import { EXPORT_DATA_TYPES, MIME_TYPES, ORIG_ID } from "../constants";
-import type { AppState } from "../types";
+import { Snapshot, CaptureUpdateAction } from "../store";
 import { arrayToMap } from "../utils";
 import {
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "../colors";
-import { KEYS } from "../keys";
 import { newElementWith } from "../element/mutateElement";
-import type {
-  ExcalidrawElbowArrowElement,
-  ExcalidrawFrameElement,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  FixedPointBinding,
-  FractionalIndex,
-  SceneElementsMap,
-} from "../element/types";
-import {
-  actionSendBackward,
-  actionBringForward,
-  actionSendToBack,
-} from "../actions";
-import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
-import { Snapshot, CaptureUpdateAction } from "../store";
-import { Excalidraw } from "../index";
+
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -53,6 +46,18 @@ import {
   togglePopover,
   getCloneByOrigId,
 } from "./test-utils";
+
+import type {
+  ExcalidrawElbowArrowElement,
+  ExcalidrawFrameElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  FixedPointBinding,
+  FractionalIndex,
+  SceneElementsMap,
+} from "../element/types";
+import type { AppState } from "../types";
 
 const { h } = window;
 

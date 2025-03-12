@@ -1,4 +1,3 @@
-import type { Curve, LineSegment } from "@excalidraw/math";
 import {
   curve,
   lineSegment,
@@ -10,12 +9,17 @@ import {
   vectorScale,
   type GlobalPoint,
 } from "@excalidraw/math";
+
+import type { Curve, LineSegment } from "@excalidraw/math";
+
 import { getCornerRadius } from "../shapes";
+
+import { getDiamondPoints } from ".";
+
 import type {
   ExcalidrawDiamondElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
-import { getDiamondPoints } from ".";
 
 /**
  * Get the building components of a rectanguloid element in the form of

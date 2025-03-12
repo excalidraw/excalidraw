@@ -1,4 +1,5 @@
 import { wrapText, parseTokens } from "./textWrapping";
+
 import type { FontString } from "./types";
 
 describe("Test wrapText", () => {

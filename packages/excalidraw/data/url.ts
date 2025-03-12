@@ -1,4 +1,5 @@
 import { sanitizeUrl } from "@braintree/sanitize-url";
+
 import { escapeDoubleQuotes } from "../utils";
 
 export const normalizeLink = (link: string) => {

@@ -1,9 +1,11 @@
-import React from "react";
 import { queryByText, queryByTestId } from "@testing-library/react";
+import React from "react";
 import { useMemo } from "react";
-import { Excalidraw, Footer, MainMenu } from "../index";
+
 import { THEME } from "../constants";
 import { t } from "../i18n";
+import { Excalidraw, Footer, MainMenu } from "../index";
+
 import { fireEvent, GlobalTestState, toggleMenu, render } from "./test-utils";
 
 const { h } = window;

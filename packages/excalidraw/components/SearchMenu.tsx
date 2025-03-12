@@ -1,25 +1,28 @@
-import { Fragment, memo, useEffect, useRef, useState } from "react";
-import debounce from "lodash.debounce";
-import clsx from "clsx";
 import { round } from "@excalidraw/math";
-import type { AppClassProperties } from "../types";
-import { isTextElement, newTextElement } from "../element";
-import type { ExcalidrawTextElement } from "../element/types";
-import { addEventListener, getFontString } from "../utils";
-import { KEYS } from "../keys";
-import { atom, useAtom } from "../editor-jotai";
-import { t } from "../i18n";
-import { isElementCompletelyInViewport } from "../element/sizeHelpers";
-import { randomInteger } from "../random";
-import { CLASSES, EVENT } from "../constants";
-import { useStable } from "../hooks/useStable";
+import clsx from "clsx";
+import debounce from "lodash.debounce";
+import { Fragment, memo, useEffect, useRef, useState } from "react";
 
-import "./SearchMenu.scss";
+import { CLASSES, EVENT } from "../constants";
+import { atom, useAtom } from "../editor-jotai";
+import { isTextElement, newTextElement } from "../element";
+import { isElementCompletelyInViewport } from "../element/sizeHelpers";
+
 import { measureText } from "../element/textMeasurements";
+import { useStable } from "../hooks/useStable";
+import { t } from "../i18n";
+import { KEYS } from "../keys";
+import { randomInteger } from "../random";
+import { addEventListener, getFontString } from "../utils";
+
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
+import "./SearchMenu.scss";
 import { TextField } from "./TextField";
 import { collapseDownIcon, upIcon, searchIcon } from "./icons";
+
+import type { ExcalidrawTextElement } from "../element/types";
+import type { AppClassProperties } from "../types";
 
 const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);

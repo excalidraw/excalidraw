@@ -1,11 +1,13 @@
 import React from "react";
+
+import { trackEvent } from "../analytics";
+import { isPromiseLike } from "../utils";
+
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
 } from "../element/types";
 import type { AppClassProperties, AppState } from "../types";
-import { trackEvent } from "../analytics";
-import { isPromiseLike } from "../utils";
 import type {
   Action,
   UpdaterFn,

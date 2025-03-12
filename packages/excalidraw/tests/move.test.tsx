@@ -1,20 +1,23 @@
 import React from "react";
-import "../../utils/test-utils";
 import { vi } from "vitest";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import { reseed } from "../random";
+
+import "../../utils/test-utils";
 import { bindOrUnbindLinearElement } from "../element/binding";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+import { reseed } from "../random";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import * as StaticScene from "../renderer/staticScene";
+
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { render, fireEvent, act, unmountComponent } from "./test-utils";
+
 import type {
   ExcalidrawLinearElement,
   NonDeleted,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { KEYS } from "../keys";
 import type Scene from "../scene/Scene";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { render, fireEvent, act, unmountComponent } from "./test-utils";
 
 unmountComponent();
 

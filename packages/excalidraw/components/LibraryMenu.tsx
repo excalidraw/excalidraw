@@ -6,13 +6,35 @@ import React, {
   memo,
   useRef,
 } from "react";
-import type Library from "../data/library";
+
+import { trackEvent } from "../analytics";
+import { LIBRARY_DISABLED_TYPES } from "../constants";
+import { useUIAppState } from "../context/ui-appState";
 import {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
+import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 import { randomId } from "../random";
+import { getSelectedElements } from "../scene";
+import { isShallowEqual } from "../utils";
+
+import "./LibraryMenu.scss";
+import {
+  useApp,
+  useAppProps,
+  useExcalidrawElements,
+  useExcalidrawSetAppState,
+} from "./App";
+import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
+import LibraryMenuItems from "./LibraryMenuItems";
+import Spinner from "./Spinner";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import type {
   LibraryItems,
   LibraryItem,
@@ -20,27 +42,7 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-import { trackEvent } from "../analytics";
-import { atom, useAtom } from "../editor-jotai";
-import { getSelectedElements } from "../scene";
-import { useUIAppState } from "../context/ui-appState";
-
-import "./LibraryMenu.scss";
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
-import { LIBRARY_DISABLED_TYPES } from "../constants";
-import { isShallowEqual } from "../utils";
-import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
-import {
-  useApp,
-  useAppProps,
-  useExcalidrawElements,
-  useExcalidrawSetAppState,
-} from "./App";
-import Spinner from "./Spinner";
-import LibraryMenuItems from "./LibraryMenuItems";
+import type Library from "../data/library";
 
 export const isLibraryMenuOpenAtom = atom(false);
 

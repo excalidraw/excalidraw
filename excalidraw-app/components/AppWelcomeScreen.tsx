@@ -1,8 +1,9 @@
-import React from "react";
 import { loginIcon } from "@excalidraw/excalidraw/components/icons";
+import { POINTER_EVENTS } from "@excalidraw/excalidraw/constants";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
-import { POINTER_EVENTS } from "@excalidraw/excalidraw/constants";
+import React from "react";
+
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 export const AppWelcomeScreen: React.FC<{

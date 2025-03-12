@@ -1,19 +1,21 @@
-import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { useEffect, useRef, useState } from "react";
+
 import { EVENT } from "../../constants";
-import { KEYS } from "../../keys";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import { deepCopyElement } from "../../element/newElement";
+import { KEYS } from "../../keys";
+import { CaptureUpdateAction } from "../../store";
+import { cloneJSON } from "../../utils";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
-import { CaptureUpdateAction } from "../../store";
-import type Scene from "../../scene/Scene";
 
 import "./DragInput.scss";
-import type { AppState } from "../../types";
-import { cloneJSON } from "../../utils";
 import { SMALLEST_DELTA } from "./utils";
+
 import type { StatsInputProperty } from "./utils";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import type Scene from "../../scene/Scene";
+import type { AppState } from "../../types";
 
 export type DragInputCallbackType<
   P extends StatsInputProperty,

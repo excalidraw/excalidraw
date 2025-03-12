@@ -1,13 +1,3 @@
-import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
-import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
-import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
-import type {
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Polygon,
-  Radians,
-} from "@excalidraw/math";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -22,16 +12,33 @@ import {
   ellipse,
   ellipseLineIntersectionPoints,
 } from "@excalidraw/math/ellipse";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
+import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
+
+import type {
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+  Polygon,
+  Radians,
+} from "@excalidraw/math";
+import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
+
 import { getBoundTextShape, isPathALoop } from "../shapes";
 import { isTransparent } from "../utils";
-import type { FrameNameBounds } from "../types";
+
+import { getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,
   isIframeLikeElement,
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getElementBounds } from "./bounds";
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+} from "./utils";
+
 import type {
   ElementsMap,
   ExcalidrawDiamondElement,
@@ -40,10 +47,7 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
-import {
-  deconstructDiamondElement,
-  deconstructRectanguloidElement,
-} from "./utils";
+import type { FrameNameBounds } from "../types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {

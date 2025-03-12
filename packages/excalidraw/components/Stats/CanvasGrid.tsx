@@ -1,8 +1,10 @@
+import { getNormalizedGridStep } from "../../scene";
+
+import StatsDragInput from "./DragInput";
+import { getStepSizedValue } from "./utils";
+
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import { getNormalizedGridStep } from "../../scene";
-import { getStepSizedValue } from "./utils";
-import StatsDragInput from "./DragInput";
 
 interface PositionProps {
   property: "gridStep";

@@ -1,12 +1,15 @@
 import clsx from "clsx";
 import { memo, useEffect, useRef, useState } from "react";
-import type { LibraryItem } from "../types";
-import type { SvgCache } from "../hooks/useLibraryItemSvg";
+
 import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
+
 import { useDevice } from "./App";
 import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
+
+import type { LibraryItem } from "../types";
+import type { SvgCache } from "../hooks/useLibraryItemSvg";
 
 export const LibraryUnit = memo(
   ({

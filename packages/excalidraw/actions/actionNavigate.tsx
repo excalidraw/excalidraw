@@ -1,7 +1,7 @@
 import clsx from "clsx";
+
 import { getClientColor } from "../clients";
 import { Avatar } from "../components/Avatar";
-import type { GoToCollaboratorComponentProps } from "../components/UserList";
 import {
   eyeIcon,
   microphoneIcon,
@@ -9,8 +9,11 @@ import {
 } from "../components/icons";
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
-import type { Collaborator } from "../types";
+
 import { register } from "./register";
+
+import type { GoToCollaboratorComponentProps } from "../components/UserList";
+import type { Collaborator } from "../types";
 
 export const actionGoToCollaborator = register({
   name: "goToCollaborator",

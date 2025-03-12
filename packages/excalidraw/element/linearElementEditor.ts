@@ -1,4 +1,3 @@
-import type { Radians } from "@excalidraw/math";
 import {
   pointCenter,
   pointFrom,
@@ -10,22 +9,12 @@ import {
   vectorFromPoint,
 } from "@excalidraw/math";
 import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
-import type {
-  AppState,
-  PointerCoords,
-  InteractiveCanvasAppState,
-  AppClassProperties,
-  NullableGridSize,
-  Zoom,
-} from "../types";
 
-import { invariant, tupleToCoors } from "../utils";
-import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
+import type { Radians } from "@excalidraw/math";
+
 import { DRAGGING_THRESHOLD } from "../constants";
-import type { Mutable } from "../utility-types";
+import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
 import { ShapeCache } from "../scene/ShapeCache";
-import type { Store } from "../store";
-import type Scene from "../scene/Scene";
 import {
   getBezierCurveLength,
   getBezierXY,
@@ -34,21 +23,26 @@ import {
   mapIntervalToBezierT,
 } from "../shapes";
 import { getGridPoint } from "../snapping";
+import { invariant, tupleToCoors } from "../utils";
+
+import {
+  bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
+  isBindingEnabled,
+} from "./binding";
+import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
+import { headingIsHorizontal, vectorToHeading } from "./heading";
+import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isBindingElement,
   isElbowArrow,
   isFixedPointBinding,
 } from "./typeChecks";
-import {
-  bindOrUnbindLinearElement,
-  getHoveredElementForBinding,
-  isBindingEnabled,
-} from "./binding";
-import { mutateElement } from "./mutateElement";
-import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
+
+import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
+
 import type { Bounds } from "./bounds";
-import { headingIsHorizontal, vectorToHeading } from "./heading";
 import type {
   NonDeleted,
   ExcalidrawLinearElement,
@@ -63,7 +57,17 @@ import type {
   FixedSegment,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
+import type Scene from "../scene/Scene";
+import type { Store } from "../store";
+import type {
+  AppState,
+  PointerCoords,
+  InteractiveCanvasAppState,
+  AppClassProperties,
+  NullableGridSize,
+  Zoom,
+} from "../types";
+import type { Mutable } from "../utility-types";
 
 const editorMidPointsCache: {
   version: number | null;

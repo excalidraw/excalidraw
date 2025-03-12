@@ -1,13 +1,5 @@
 import type { Radians } from "@excalidraw/math";
-import {
-  arrayToMap,
-  getFontString,
-  getUpdatedTimestamp,
-  isTestEnv,
-} from "../utils";
-import { randomInteger, randomId } from "../random";
-import { getNewGroupIdsForDuplication } from "../groups";
-import type { AppState } from "../types";
+
 import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -17,12 +9,24 @@ import {
   ORIG_ID,
   VERTICAL_ALIGN,
 } from "../constants";
-import type { MarkOptional, Merge, Mutable } from "../utility-types";
 import { getLineHeight } from "../fonts";
-import { wrapText } from "./textWrapping";
-import { getBoundTextMaxWidth } from "./textElement";
+import { getNewGroupIdsForDuplication } from "../groups";
+import { randomInteger, randomId } from "../random";
+import {
+  arrayToMap,
+  getFontString,
+  getUpdatedTimestamp,
+  isTestEnv,
+} from "../utils";
+
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { bumpVersion, newElementWith } from "./mutateElement";
+import { getBoundTextMaxWidth } from "./textElement";
+import { normalizeText, measureText } from "./textMeasurements";
+import { wrapText } from "./textWrapping";
+
+import { getElementAbsoluteCoords } from ".";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -46,8 +50,8 @@ import type {
   FixedSegment,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import { normalizeText, measureText } from "./textMeasurements";
-import { getElementAbsoluteCoords } from ".";
+import type { AppState } from "../types";
+import type { MarkOptional, Merge, Mutable } from "../utility-types";
 
 export type ElementConstructorOpts = MarkOptional<
   Omit<ExcalidrawGenericElement, "id" | "type" | "isDeleted" | "updated">,

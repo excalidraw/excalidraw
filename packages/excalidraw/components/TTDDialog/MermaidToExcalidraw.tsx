@@ -1,25 +1,29 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
-import type { BinaryFiles } from "../../types";
+
 import { useApp } from "../App";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { ArrowRightIcon } from "../icons";
-import "./MermaidToExcalidraw.scss";
-import { t } from "../../i18n";
-import Trans from "../Trans";
-import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { EDITOR_LS_KEYS } from "../../constants";
+import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { t } from "../../i18n";
 import { debounce, isDevEnv } from "../../utils";
-import type { MermaidToExcalidrawLibProps } from "./common";
+import Trans from "../Trans";
+
+import { TTDDialogInput } from "./TTDDialogInput";
+import { TTDDialogOutput } from "./TTDDialogOutput";
+import { TTDDialogPanel } from "./TTDDialogPanel";
+import { TTDDialogPanels } from "./TTDDialogPanels";
+import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 import {
   convertMermaidToExcalidraw,
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
-import { TTDDialogPanels } from "./TTDDialogPanels";
-import { TTDDialogPanel } from "./TTDDialogPanel";
-import { TTDDialogInput } from "./TTDDialogInput";
-import { TTDDialogOutput } from "./TTDDialogOutput";
-import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
+
+import "./MermaidToExcalidraw.scss";
+
+import type { BinaryFiles } from "../../types";
+import type { MermaidToExcalidrawLibProps } from "./common";
+import type { NonDeletedExcalidrawElement } from "../../element/types";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";

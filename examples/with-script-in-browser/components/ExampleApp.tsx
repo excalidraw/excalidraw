@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import React, {
   useEffect,
   useState,
@@ -8,9 +9,11 @@ import React, {
 } from "react";
 
 import type * as TExcalidraw from "@excalidraw/excalidraw";
-
-import { nanoid } from "nanoid";
-
+import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from "@excalidraw/excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -20,12 +23,8 @@ import type {
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
 } from "@excalidraw/excalidraw/types";
-import type {
-  NonDeletedExcalidrawElement,
-  Theme,
-} from "@excalidraw/excalidraw/element/types";
-import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
-import type { ResolvablePromise } from "../utils";
+
+import initialData from "../initialData";
 import {
   resolvablePromise,
   distance2d,
@@ -34,13 +33,12 @@ import {
   withBatchedUpdatesThrottled,
 } from "../utils";
 
-import initialData from "../initialData";
 import CustomFooter from "./CustomFooter";
+import "./ExampleApp.scss";
 import MobileFooter from "./MobileFooter";
-
 import ExampleSidebar from "./sidebar/ExampleSidebar";
 
-import "./ExampleApp.scss";
+import type { ResolvablePromise } from "../utils";
 
 type Comment = {
   x: number;

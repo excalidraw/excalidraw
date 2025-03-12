@@ -1,4 +1,3 @@
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import {
   DiagramToCodePlugin,
   exportToBlob,
@@ -8,6 +7,8 @@ import {
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/excalidraw/utils";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 export const AIComponents = ({
   excalidrawAPI,

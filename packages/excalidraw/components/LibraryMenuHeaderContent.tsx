@@ -1,17 +1,23 @@
-import { useCallback, useState } from "react";
 import clsx from "clsx";
-import { t } from "../i18n";
-import { useAtom } from "../editor-jotai";
-import type { LibraryItem, LibraryItems, UIAppState } from "../types";
-import { saveLibraryAsJSON } from "../data/json";
-import type Library from "../data/library";
-import { libraryItemsAtom } from "../data/library";
-import { fileOpen } from "../data/filesystem";
-import { muteFSAbortError } from "../utils";
+import { useCallback, useState } from "react";
+
 import { useUIAppState } from "../context/ui-appState";
+import { fileOpen } from "../data/filesystem";
+import { saveLibraryAsJSON } from "../data/json";
+import { libraryItemsAtom } from "../data/library";
+import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
-import Trans from "./Trans";
+import { t } from "../i18n";
+import { muteFSAbortError } from "../utils";
+
 import { useApp, useExcalidrawSetAppState } from "./App";
+import ConfirmDialog from "./ConfirmDialog";
+import { Dialog } from "./Dialog";
+import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+import PublishLibrary from "./PublishLibrary";
+import { ToolButton } from "./ToolButton";
+import Trans from "./Trans";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   DotsIcon,
   ExportIcon,
@@ -19,12 +25,9 @@ import {
   publishIcon,
   TrashIcon,
 } from "./icons";
-import { ToolButton } from "./ToolButton";
-import ConfirmDialog from "./ConfirmDialog";
-import PublishLibrary from "./PublishLibrary";
-import { Dialog } from "./Dialog";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import { isLibraryMenuOpenAtom } from "./LibraryMenu";
+
+import type Library from "../data/library";
+import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,

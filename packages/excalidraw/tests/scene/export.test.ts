@@ -1,9 +1,7 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
-import type {
-  ExcalidrawTextElement,
-  FractionalIndex,
-  NonDeletedExcalidrawElement,
-} from "../../element/types";
+
+import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
+import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
@@ -12,8 +10,12 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
-import { prepareElementsForExport } from "../../data";
+
+import type {
+  ExcalidrawTextElement,
+  FractionalIndex,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
 
 describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;

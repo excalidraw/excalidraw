@@ -1,5 +1,3 @@
-import { isPointOnShape } from "@excalidraw/utils/collision";
-import type { LocalPoint, Radians } from "@excalidraw/math";
 import {
   lineSegment,
   pointFrom,
@@ -18,15 +16,52 @@ import {
   round,
   PRECISION,
 } from "@excalidraw/math";
-import type { AppState } from "../types";
-import type Scene from "../scene/Scene";
+import { isPointOnShape } from "@excalidraw/utils/collision";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
+import { KEYS } from "../keys";
+import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import {
   arrayToMap,
   isBindingFallthroughEnabled,
   tupleToCoors,
 } from "../utils";
-import { KEYS } from "../keys";
-import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
+
+import {
+  getCenterForBounds,
+  getElementBounds,
+  doBoundsIntersect,
+} from "./bounds";
+import { intersectElementWithLineSegment } from "./collision";
+import { distanceToBindableElement } from "./distance";
+import {
+  compareHeading,
+  HEADING_DOWN,
+  HEADING_RIGHT,
+  HEADING_UP,
+  headingForPointFromElement,
+  vectorToHeading,
+  type Heading,
+} from "./heading";
+import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  isArrowElement,
+  isBindableElement,
+  isBindingElement,
+  isBoundToContainer,
+  isElbowArrow,
+  isFixedPointBinding,
+  isFrameLikeElement,
+  isLinearElement,
+  isRectanguloidElement,
+  isTextElement,
+} from "./typeChecks";
+
+import type { Bounds } from "./bounds";
+import type { ElementUpdate } from "./mutateElement";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -44,40 +79,8 @@ import type {
   SceneElementsMap,
   FixedPointBinding,
 } from "./types";
-
-import type { Bounds } from "./bounds";
-import {
-  getCenterForBounds,
-  getElementBounds,
-  doBoundsIntersect,
-} from "./bounds";
-import {
-  isArrowElement,
-  isBindableElement,
-  isBindingElement,
-  isBoundToContainer,
-  isElbowArrow,
-  isFixedPointBinding,
-  isFrameLikeElement,
-  isLinearElement,
-  isRectanguloidElement,
-  isTextElement,
-} from "./typeChecks";
-import type { ElementUpdate } from "./mutateElement";
-import { mutateElement } from "./mutateElement";
-import { LinearElementEditor } from "./linearElementEditor";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import {
-  compareHeading,
-  HEADING_DOWN,
-  HEADING_RIGHT,
-  HEADING_UP,
-  headingForPointFromElement,
-  vectorToHeading,
-  type Heading,
-} from "./heading";
-import { intersectElementWithLineSegment } from "./collision";
-import { distanceToBindableElement } from "./distance";
+import type Scene from "../scene/Scene";
+import type { AppState } from "../types";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

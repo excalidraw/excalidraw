@@ -1,5 +1,7 @@
 import { vi } from "vitest";
+
 import * as constants from "../constants";
+
 import { getPerfectElementSize } from "./sizeHelpers";
 
 const EPSILON_DIGITS = 3;

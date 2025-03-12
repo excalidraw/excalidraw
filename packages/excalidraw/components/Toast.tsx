@@ -1,8 +1,10 @@
-import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef } from "react";
+
 import { CloseIcon } from "./icons";
 import "./Toast.scss";
 import { ToolButton } from "./ToolButton";
+
+import type { CSSProperties } from "react";
 
 const DEFAULT_TOAST_TIMEOUT = 5000;
 

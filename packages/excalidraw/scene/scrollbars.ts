@@ -1,8 +1,9 @@
 import { getCommonBounds } from "../element";
-import type { InteractiveCanvasAppState } from "../types";
-import { getGlobalCSSVariable } from "../utils";
 import { getLanguage } from "../i18n";
+import { getGlobalCSSVariable } from "../utils";
+
 import type { ExcalidrawElement } from "../element/types";
+import type { InteractiveCanvasAppState } from "../types";
 import type { ScrollBars } from "./types";
 
 export const SCROLLBAR_MARGIN = 4;

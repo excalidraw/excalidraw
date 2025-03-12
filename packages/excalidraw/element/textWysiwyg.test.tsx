@@ -1,29 +1,31 @@
-import React from "react";
-import { queryByText } from "@testing-library/react";
 import { pointFrom } from "@excalidraw/math";
+import { queryByText } from "@testing-library/react";
+import React from "react";
+
+import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { Excalidraw } from "../index";
+import { CODES, KEYS } from "../keys";
+import { API } from "../tests/helpers/api";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
 import {
   GlobalTestState,
   render,
   screen,
   unmountComponent,
 } from "../tests/test-utils";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { CODES, KEYS } from "../keys";
 import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
-import { API } from "../tests/helpers/api";
-import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
+import { getOriginalContainerHeightFromCache } from "./containerCache";
+
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { getOriginalContainerHeightFromCache } from "./containerCache";
 
 unmountComponent();
 

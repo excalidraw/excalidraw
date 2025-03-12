@@ -1,19 +1,22 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+
 import { rgbToHex } from "../colors";
 import { EVENT } from "../constants";
 import { useUIAppState } from "../context/ui-appState";
+import { atom } from "../editor-jotai";
 import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 import { useOutsideClick } from "../hooks/useOutsideClick";
+import { useStable } from "../hooks/useStable";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
-import { useStable } from "../hooks/useStable";
 
 import "./EyeDropper.scss";
-import type { ExcalidrawElement } from "../element/types";
-import { atom } from "../editor-jotai";
-import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+
+import type { ExcalidrawElement } from "../element/types";
+
+import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
 
 export type EyeDropperProperties = {
   keepOpenOnAlt: boolean;

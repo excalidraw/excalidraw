@@ -1,13 +1,25 @@
+import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
 import {
   doLineSegmentsIntersect,
   elementsOverlappingBBox,
 } from "@excalidraw/utils";
-import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
+
 import {
   getCommonBounds,
   getElementAbsoluteCoords,
   isTextElement,
 } from "./element";
+import { getElementLineSegments } from "./element/bounds";
+import { mutateElement } from "./element/mutateElement";
+import {
+  getBoundTextElement,
+  getContainerElement,
+} from "./element/textElement";
+import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
+import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
+import { getElementsWithinSelection, getSelectedElements } from "./scene";
+import { arrayToMap } from "./utils";
+
 import type {
   ElementsMap,
   ElementsMapOrArray,
@@ -16,22 +28,12 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import {
-  getBoundTextElement,
-  getContainerElement,
-} from "./element/textElement";
-import { arrayToMap } from "./utils";
-import { mutateElement } from "./element/mutateElement";
+import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
 import type {
   AppClassProperties,
   AppState,
   StaticCanvasAppState,
 } from "./types";
-import { getElementsWithinSelection, getSelectedElements } from "./scene";
-import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
-import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
-import { getElementLineSegments } from "./element/bounds";
-import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
 import type { ReadonlySetLike } from "./utility-types";
 
 // --------------------------- Frame State ------------------------------------

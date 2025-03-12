@@ -1,19 +1,13 @@
-import type { Radians } from "@excalidraw/math";
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
-import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
+
+import type { Radians } from "@excalidraw/math";
+
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   isAndroid,
   isIOS,
 } from "../constants";
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  PointerType,
-} from "./types";
 
-import type { Bounds } from "./bounds";
 import { getElementAbsoluteCoords } from "./bounds";
 import {
   isElbowArrow,
@@ -21,6 +15,15 @@ import {
   isImageElement,
   isLinearElement,
 } from "./typeChecks";
+
+import type { Device, InteractiveCanvasAppState, Zoom } from "../types";
+import type { Bounds } from "./bounds";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  PointerType,
+} from "./types";
 
 export type TransformHandleDirection =
   | "n"

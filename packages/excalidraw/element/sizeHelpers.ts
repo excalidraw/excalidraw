@@ -1,10 +1,12 @@
 import { SHIFT_LOCKING_ANGLE } from "../constants";
-import type { AppState, Offsets, Zoom } from "../types";
 import { viewportCoordsToSceneCoords } from "../utils";
-import type { ElementsMap, ExcalidrawElement } from "./types";
+
+import { getCommonBounds, getElementBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { isFreeDrawElement, isLinearElement } from "./typeChecks";
-import { getCommonBounds, getElementBounds } from "./bounds";
+
+import type { ElementsMap, ExcalidrawElement } from "./types";
+import type { AppState, Offsets, Zoom } from "../types";
 
 // TODO:  remove invisible elements consistently actions, so that invisible elements are not recorded by the store, exported, broadcasted or persisted
 //        - perhaps could be as part of a standalone 'cleanup' action, in addition to 'finalize'

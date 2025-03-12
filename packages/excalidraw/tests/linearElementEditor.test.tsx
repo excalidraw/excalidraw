@@ -1,30 +1,27 @@
-import React from "react";
-import { act, queryByTestId, queryByText } from "@testing-library/react";
-import { vi } from "vitest";
-import type { GlobalPoint } from "@excalidraw/math";
 import { pointCenter, pointFrom } from "@excalidraw/math";
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FontString,
-} from "../element/types";
-import { Excalidraw, mutateElement } from "../index";
-import { reseed } from "../random";
-import * as StaticScene from "../renderer/staticScene";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
+import { act, queryByTestId, queryByText } from "@testing-library/react";
+import React from "react";
+import { vi } from "vitest";
 
-import { API } from "../tests/helpers/api";
-import { KEYS } from "../keys";
+import type { GlobalPoint } from "@excalidraw/math";
+
+import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   getBoundTextElementPosition,
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import * as textElementUtils from "../element/textElement";
-import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
-import { arrayToMap } from "../utils";
 import { wrapText } from "../element/textWrapping";
+import { Excalidraw, mutateElement } from "../index";
+import { KEYS } from "../keys";
+import { reseed } from "../random";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import * as StaticScene from "../renderer/staticScene";
+import { API } from "../tests/helpers/api";
+import { arrayToMap } from "../utils";
+
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   screen,
   render,
@@ -32,7 +29,13 @@ import {
   GlobalTestState,
   unmountComponent,
 } from "./test-utils";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "../element/types";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

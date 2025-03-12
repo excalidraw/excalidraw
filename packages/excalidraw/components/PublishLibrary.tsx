@@ -1,10 +1,7 @@
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import OpenColor from "open-color";
-
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
-import type { LibraryItems, LibraryItem, UIAppState } from "../types";
-import { t } from "../i18n";
+import OpenColor from "open-color";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
@@ -12,17 +9,21 @@ import {
   MIME_TYPES,
   VERSIONS,
 } from "../constants";
-import type { ExportedLibraryData } from "../data/types";
-import { canvasToBlob, resizeImageFile } from "../data/blob";
-import { chunk } from "../utils";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { CloseIcon } from "./icons";
+import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { t } from "../i18n";
+import { chunk } from "../utils";
+
+import { Dialog } from "./Dialog";
+import DialogActionButton from "./DialogActionButton";
+import "./PublishLibrary.scss";
 import { ToolButton } from "./ToolButton";
 import Trans from "./Trans";
-import DialogActionButton from "./DialogActionButton";
-import { Dialog } from "./Dialog";
+import { CloseIcon } from "./icons";
 
-import "./PublishLibrary.scss";
+import type { ReactNode } from "react";
+import type { ExportedLibraryData } from "../data/types";
+import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 
 interface PublishLibraryDataParams {
   authorName: string;

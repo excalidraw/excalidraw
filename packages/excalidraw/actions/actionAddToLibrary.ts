@@ -1,8 +1,9 @@
-import { deepCopyElement } from "../element/newElement";
-import { randomId } from "../random";
-import { t } from "../i18n";
 import { LIBRARY_DISABLED_TYPES } from "../constants";
+import { deepCopyElement } from "../element/newElement";
+import { t } from "../i18n";
+import { randomId } from "../random";
 import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
 
 export const actionAddToLibrary = register({

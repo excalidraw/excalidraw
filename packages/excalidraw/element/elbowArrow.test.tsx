@@ -1,6 +1,13 @@
-import React from "react";
-import type { LocalPoint } from "@excalidraw/math";
 import { pointFrom } from "@excalidraw/math";
+import React from "react";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import "../../utils/test-utils";
+import { actionSelectAll } from "../actions";
+import { actionDuplicateSelection } from "../actions/actionDuplicateSelection";
+import { ARROW_TYPE } from "../constants";
+import { Excalidraw, mutateElement } from "../index";
 import Scene from "../scene/Scene";
 import { API } from "../tests/helpers/api";
 import { Pointer, UI } from "../tests/helpers/ui";
@@ -11,17 +18,14 @@ import {
   queryByTestId,
   render,
 } from "../tests/test-utils";
-import { Excalidraw, mutateElement } from "../index";
-import { ARROW_TYPE } from "../constants";
-import { actionDuplicateSelection } from "../actions/actionDuplicateSelection";
-import { actionSelectAll } from "../actions";
+
 import { bindLinearElement } from "./binding";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import "../../utils/test-utils";
 
 const { h } = window;
 

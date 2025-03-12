@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, {
   useEffect,
   useLayoutEffect,
@@ -7,25 +8,27 @@ import React, {
   useImperativeHandle,
   useCallback,
 } from "react";
-import clsx from "clsx";
-import { Island } from "../Island";
-import { atom, useSetAtom } from "../../editor-jotai";
-import { useDevice, useExcalidrawSetAppState } from "../App";
-import { updateObject } from "../../utils";
-import { KEYS } from "../../keys";
+
 import { EVENT } from "../../constants";
 import { useUIAppState } from "../../context/ui-appState";
+import { atom, useSetAtom } from "../../editor-jotai";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
-import type { SidebarProps, SidebarPropsContextValue } from "./common";
-import { SidebarPropsContext } from "./common";
+import { KEYS } from "../../keys";
+import { updateObject } from "../../utils";
+import { useDevice, useExcalidrawSetAppState } from "../App";
+import { Island } from "../Island";
+
 import { SidebarHeader } from "./SidebarHeader";
-import { SidebarTrigger } from "./SidebarTrigger";
-import { SidebarTabTriggers } from "./SidebarTabTriggers";
 import { SidebarTabTrigger } from "./SidebarTabTrigger";
+import { SidebarTabTriggers } from "./SidebarTabTriggers";
+import { SidebarTrigger } from "./SidebarTrigger";
+import { SidebarPropsContext } from "./common";
 import { SidebarTabs } from "./SidebarTabs";
 import { SidebarTab } from "./SidebarTab";
 
 import "./Sidebar.scss";
+
+import type { SidebarProps, SidebarPropsContextValue } from "./common";
 
 /**
  * Flags whether the currently rendered Sidebar is docked or not, for use

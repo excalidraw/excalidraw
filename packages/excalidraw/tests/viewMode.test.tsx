@@ -1,10 +1,12 @@
 import React from "react";
+
+import { CURSOR_TYPE } from "../constants";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
-import { CURSOR_TYPE } from "../constants";
+
+import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { render, GlobalTestState } from "./test-utils";
-import { API } from "./helpers/api";
 
 const mouse = new Pointer("mouse");
 const touch = new Pointer("touch");

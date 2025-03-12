@@ -1,22 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import { mutateElement } from "../element/mutateElement";
+
+import { normalizeLink } from "../data/url";
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
 } from "../element/elementLink";
-import { getSelectedElements } from "../scene";
-import type { AppProps, AppState, UIAppState } from "../types";
+import { mutateElement } from "../element/mutateElement";
 import { t } from "../i18n";
-import type { ElementsMap, ExcalidrawElement } from "../element/types";
-import { normalizeLink } from "../data/url";
 import { KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
 
-import { TextField } from "./TextField";
 import DialogActionButton from "./DialogActionButton";
-import { TrashIcon } from "./icons";
-import { ToolButton } from "./ToolButton";
-
 import "./ElementLinkDialog.scss";
+import { TextField } from "./TextField";
+import { ToolButton } from "./ToolButton";
+import { TrashIcon } from "./icons";
+
+import type { ElementsMap, ExcalidrawElement } from "../element/types";
+import type { AppProps, AppState, UIAppState } from "../types";
 
 const ElementLinkDialog = ({
   sourceElementId,

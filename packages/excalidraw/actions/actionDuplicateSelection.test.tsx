@@ -1,13 +1,15 @@
 import React from "react";
+
+import { ORIG_ID } from "../constants";
 import { Excalidraw } from "../index";
+import { API } from "../tests/helpers/api";
 import {
   act,
   assertElements,
   getCloneByOrigId,
   render,
 } from "../tests/test-utils";
-import { API } from "../tests/helpers/api";
-import { ORIG_ID } from "../constants";
+
 import { actionDuplicateSelection } from "./actionDuplicateSelection";
 
 const { h } = window;

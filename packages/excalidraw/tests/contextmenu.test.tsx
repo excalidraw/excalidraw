@@ -1,13 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import { reseed } from "../random";
-import { KEYS } from "../keys";
-import type { ShortcutName } from "../actions/shortcuts";
+
 import { copiedStyles } from "../actions/actionStyles";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+import { reseed } from "../random";
+import * as StaticScene from "../renderer/staticScene";
 import { setDateTimeForTests } from "../utils";
-import type { ActionName } from "../actions/types";
+
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
@@ -23,6 +23,9 @@ import {
   togglePopover,
   unmountComponent,
 } from "./test-utils";
+
+import type { ShortcutName } from "../actions/shortcuts";
+import type { ActionName } from "../actions/types";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(

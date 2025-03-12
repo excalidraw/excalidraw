@@ -1,10 +1,13 @@
 import * as Popover from "@radix-ui/react-popover";
 import { useMemo } from "react";
+
+import { t } from "../../i18n";
 import { ButtonIcon } from "../ButtonIcon";
 import { TextIcon } from "../icons";
-import type { FontFamilyValues } from "../../element/types";
-import { t } from "../../i18n";
+
 import { isDefaultFont } from "./FontPicker";
+
+import type { FontFamilyValues } from "../../element/types";
 
 interface FontPickerTriggerProps {
   selectedFontFamily: FontFamilyValues | null;

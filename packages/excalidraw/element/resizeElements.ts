@@ -1,4 +1,3 @@
-import type { GlobalPoint } from "@excalidraw/math";
 import {
   pointCenter,
   normalizeRadians,
@@ -8,13 +7,54 @@ import {
   type Radians,
   type LocalPoint,
 } from "@excalidraw/math";
+
+import type { GlobalPoint } from "@excalidraw/math";
+
 import { MIN_FONT_SIZE, SHIFT_LOCKING_ANGLE } from "../constants";
-import { rescalePoints } from "../points";
-import type { Mutable } from "../utility-types";
-import { getFontString } from "../utils";
-import type { PointerDownState } from "../types";
-import type Scene from "../scene/Scene";
 import { isInGroup } from "../groups";
+import { rescalePoints } from "../points";
+import { getFontString } from "../utils";
+
+import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
+import {
+  getElementAbsoluteCoords,
+  getCommonBounds,
+  getResizedElementAbsoluteCoords,
+  getCommonBoundingBox,
+  getElementBounds,
+} from "./bounds";
+import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
+import {
+  getBoundTextElement,
+  getBoundTextElementId,
+  getContainerElement,
+  handleBindTextResize,
+  getBoundTextMaxWidth,
+} from "./textElement";
+import {
+  getMinTextElementWidth,
+  measureText,
+  getApproxMinLineWidth,
+  getApproxMinLineHeight,
+} from "./textMeasurements";
+import { wrapText } from "./textWrapping";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isElbowArrow,
+  isFrameLikeElement,
+  isFreeDrawElement,
+  isImageElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
+
+import type { BoundingBox } from "./bounds";
+import type {
+  MaybeTransformHandleType,
+  TransformHandleDirection,
+} from "./transformHandles";
 import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -27,45 +67,9 @@ import type {
   SceneElementsMap,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import {
-  getElementAbsoluteCoords,
-  getCommonBounds,
-  getResizedElementAbsoluteCoords,
-  getCommonBoundingBox,
-  getElementBounds,
-} from "./bounds";
-import type { BoundingBox } from "./bounds";
-import {
-  isArrowElement,
-  isBoundToContainer,
-  isElbowArrow,
-  isFrameLikeElement,
-  isFreeDrawElement,
-  isImageElement,
-  isLinearElement,
-  isTextElement,
-} from "./typeChecks";
-import { mutateElement } from "./mutateElement";
-import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
-import type {
-  MaybeTransformHandleType,
-  TransformHandleDirection,
-} from "./transformHandles";
-import {
-  getBoundTextElement,
-  getBoundTextElementId,
-  getContainerElement,
-  handleBindTextResize,
-  getBoundTextMaxWidth,
-} from "./textElement";
-import { wrapText } from "./textWrapping";
-import { LinearElementEditor } from "./linearElementEditor";
-import {
-  getMinTextElementWidth,
-  measureText,
-  getApproxMinLineWidth,
-  getApproxMinLineHeight,
-} from "./textMeasurements";
+import type Scene from "../scene/Scene";
+import type { PointerDownState } from "../types";
+import type { Mutable } from "../utility-types";
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (

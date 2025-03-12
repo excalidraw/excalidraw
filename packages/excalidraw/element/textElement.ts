@@ -1,4 +1,3 @@
-import { getFontString, arrayToMap } from "../utils";
 import {
   ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
   ARROW_LABEL_WIDTH_FRACTION,
@@ -7,8 +6,21 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
 } from "../constants";
-import type { AppState } from "../types";
-import type { ExtractSetType } from "../utility-types";
+import { getFontString, arrayToMap } from "../utils";
+
+import {
+  resetOriginalContainerCache,
+  updateOriginalContainerCache,
+} from "./containerCache";
+import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
+import { measureText } from "./textMeasurements";
+import { wrapText } from "./textWrapping";
+import { isBoundToContainer, isArrowElement } from "./typeChecks";
+
+import { isTextElement } from ".";
+
+import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -18,17 +30,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "./types";
-import { mutateElement } from "./mutateElement";
-import type { MaybeTransformHandleType } from "./transformHandles";
-import { wrapText } from "./textWrapping";
-import { isBoundToContainer, isArrowElement } from "./typeChecks";
-import { LinearElementEditor } from "./linearElementEditor";
-import {
-  resetOriginalContainerCache,
-  updateOriginalContainerCache,
-} from "./containerCache";
-import { measureText } from "./textMeasurements";
-import { isTextElement } from ".";
+import type { AppState } from "../types";
+import type { ExtractSetType } from "../utility-types";
 
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,

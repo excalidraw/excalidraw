@@ -1,8 +1,10 @@
-import { useEffect, useLayoutEffect, useState } from "react";
 import { THEME } from "@excalidraw/excalidraw";
 import { EVENT } from "@excalidraw/excalidraw/constants";
-import type { Theme } from "@excalidraw/excalidraw/element/types";
 import { CODES, KEYS } from "@excalidraw/excalidraw/keys";
+import { useEffect, useLayoutEffect, useState } from "react";
+
+import type { Theme } from "@excalidraw/excalidraw/element/types";
+
 import { STORAGE_KEYS } from "./app_constants";
 
 const getDarkThemeMediaQuery = (): MediaQueryList | undefined =>

@@ -1,9 +1,10 @@
-import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
+import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { showSelectedShapeActions, getNonDeletedElements } from "../element";
+import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
 
 export const actionToggleCanvasMenu = register({

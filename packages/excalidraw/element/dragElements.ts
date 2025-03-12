@@ -1,20 +1,13 @@
-import type {
-  AppState,
-  NormalizedZoomValue,
-  NullableGridSize,
-  PointerDownState,
-} from "../types";
-import type Scene from "../scene/Scene";
-import { getFontString } from "../utils";
 import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
 import { getGridPoint } from "../snapping";
+import { getFontString } from "../utils";
+
 import { updateBoundElements } from "./binding";
-import type { Bounds } from "./bounds";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import type { NonDeletedExcalidrawElement } from "./types";
 import { getBoundTextElement } from "./textElement";
+import { getMinTextElementWidth } from "./textMeasurements";
 import {
   isArrowElement,
   isElbowArrow,
@@ -22,7 +15,16 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getMinTextElementWidth } from "./textMeasurements";
+
+import type { Bounds } from "./bounds";
+import type { NonDeletedExcalidrawElement } from "./types";
+import type Scene from "../scene/Scene";
+import type {
+  AppState,
+  NormalizedZoomValue,
+  NullableGridSize,
+  PointerDownState,
+} from "../types";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
