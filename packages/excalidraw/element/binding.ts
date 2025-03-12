@@ -1286,7 +1286,7 @@ const updateBoundPoint = (
             adjacentPoint,
           ),
         ),
-        binding.gap + 1,
+        binding.gap,
       ).sort(
         (g, h) =>
           pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
