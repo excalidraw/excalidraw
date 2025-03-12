@@ -11,6 +11,7 @@ import {
   getMenuContentComponent,
   getMenuTriggerComponent,
 } from "./dropdownMenuUtils";
+
 import "./DropdownMenu.scss";
 
 const DropdownMenu = ({

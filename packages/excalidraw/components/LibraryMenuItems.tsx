@@ -20,9 +20,10 @@ import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
-import "./LibraryMenuItems.scss";
 import Spinner from "./Spinner";
 import Stack from "./Stack";
+
+import "./LibraryMenuItems.scss";
 
 import type {
   ExcalidrawProps,

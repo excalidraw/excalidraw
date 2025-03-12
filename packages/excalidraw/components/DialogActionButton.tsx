@@ -1,7 +1,8 @@
 import clsx from "clsx";
 
-import "./DialogActionButton.scss";
 import Spinner from "./Spinner";
+
+import "./DialogActionButton.scss";
 
 import type { ReactNode } from "react";
 

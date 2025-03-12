@@ -16,10 +16,11 @@ import { chunk } from "../utils";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import "./PublishLibrary.scss";
 import { ToolButton } from "./ToolButton";
 import Trans from "./Trans";
 import { CloseIcon } from "./icons";
+
+import "./PublishLibrary.scss";
 
 import type { ReactNode } from "react";
 import type { ExportedLibraryData } from "../data/types";

@@ -8,6 +8,7 @@ import { exportToSvg } from "../scene/export";
 
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
+
 import "./PasteChartDialog.scss";
 
 import type { ChartElements, Spreadsheet } from "../charts";

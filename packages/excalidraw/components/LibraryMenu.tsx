@@ -20,7 +20,6 @@ import { randomId } from "../random";
 import { getSelectedElements } from "../scene";
 import { isShallowEqual } from "../utils";
 
-import "./LibraryMenu.scss";
 import {
   useApp,
   useAppProps,
@@ -30,6 +29,8 @@ import {
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import LibraryMenuItems from "./LibraryMenuItems";
 import Spinner from "./Spinner";
+
+import "./LibraryMenu.scss";
 
 import type {
   ExcalidrawElement,

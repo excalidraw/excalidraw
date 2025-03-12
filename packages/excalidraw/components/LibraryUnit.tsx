@@ -4,9 +4,10 @@ import { memo, useEffect, useRef, useState } from "react";
 import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 import { useDevice } from "./App";
-import "./LibraryUnit.scss";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
+
+import "./LibraryUnit.scss";
 
 import type { LibraryItem } from "../types";
 import type { SvgCache } from "../hooks/useLibraryItemSvg";

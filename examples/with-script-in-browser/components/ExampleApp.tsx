@@ -34,9 +34,10 @@ import {
 } from "../utils";
 
 import CustomFooter from "./CustomFooter";
-import "./ExampleApp.scss";
 import MobileFooter from "./MobileFooter";
 import ExampleSidebar from "./sidebar/ExampleSidebar";
+
+import "./ExampleApp.scss";
 
 import type { ResolvablePromise } from "../utils";
 

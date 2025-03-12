@@ -31,6 +31,7 @@ import { getSelectedElements } from "../../scene";
 import { isEmbeddableElement } from "../../element/typeChecks";
 
 import { getLinkHandleFromCoords } from "./helpers";
+
 import "./Hyperlink.scss";
 
 import type {

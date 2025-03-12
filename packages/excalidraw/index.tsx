@@ -7,13 +7,14 @@ import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollab
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { DEFAULT_UI_OPTIONS } from "./constants";
-import "./css/app.scss";
-import "./css/styles.scss";
-import "./fonts/fonts.css";
 import { defaultLang } from "./i18n";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 import { isShallowEqual } from "./utils";
+
+import "./css/app.scss";
+import "./css/styles.scss";
+import "./fonts/fonts.css";
 
 import type { AppProps, ExcalidrawProps } from "./types";
 

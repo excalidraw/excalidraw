@@ -9,8 +9,9 @@ import { cloneJSON } from "../../utils";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
-import "./DragInput.scss";
 import { SMALLEST_DELTA } from "./utils";
+
+import "./DragInput.scss";
 
 import type { StatsInputProperty } from "./utils";
 import type { ElementsMap, ExcalidrawElement } from "../../element/types";

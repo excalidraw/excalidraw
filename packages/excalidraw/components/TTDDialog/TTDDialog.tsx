@@ -26,8 +26,9 @@ import {
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
-import "./TTDDialog.scss";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
+
+import "./TTDDialog.scss";
 
 import type { ChangeEventHandler } from "react";
 import type { MermaidToExcalidrawLibProps } from "./common";

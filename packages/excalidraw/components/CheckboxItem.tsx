@@ -2,6 +2,7 @@ import clsx from "clsx";
 import React from "react";
 
 import { checkIcon } from "./icons";
+
 import "./CheckboxItem.scss";
 
 export const CheckboxItem: React.FC<{

@@ -29,8 +29,9 @@ import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";
 import { Tooltip } from "./Tooltip";
-import "./ImageExportDialog.scss";
 import { FilledButton } from "./FilledButton";
+
+import "./ImageExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 import type { NonDeletedExcalidrawElement } from "../element/types";

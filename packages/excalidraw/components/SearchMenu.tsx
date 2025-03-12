@@ -17,9 +17,10 @@ import { addEventListener, getFontString } from "../utils";
 
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
-import "./SearchMenu.scss";
 import { TextField } from "./TextField";
 import { collapseDownIcon, upIcon, searchIcon } from "./icons";
+
+import "./SearchMenu.scss";
 
 import type { ExcalidrawTextElement } from "../element/types";
 import type { AppClassProperties } from "../types";

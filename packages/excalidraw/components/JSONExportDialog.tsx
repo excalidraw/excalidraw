@@ -9,9 +9,10 @@ import { getFrame } from "../utils";
 
 import { Card } from "./Card";
 import { Dialog } from "./Dialog";
-import "./ExportDialog.scss";
 import { ToolButton } from "./ToolButton";
 import { exportToFileIcon, LinkIcon } from "./icons";
+
+import "./ExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 import type { NonDeletedExcalidrawElement } from "../element/types";

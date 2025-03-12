@@ -13,6 +13,7 @@ import {
 
 import { FontPickerList } from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
+
 import "./FontPicker.scss";
 
 import type { FontFamilyValues } from "../../element/types";

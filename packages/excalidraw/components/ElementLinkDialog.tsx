@@ -11,10 +11,11 @@ import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 
 import DialogActionButton from "./DialogActionButton";
-import "./ElementLinkDialog.scss";
 import { TextField } from "./TextField";
 import { ToolButton } from "./ToolButton";
 import { TrashIcon } from "./icons";
+
+import "./ElementLinkDialog.scss";
 
 import type { ElementsMap, ExcalidrawElement } from "../element/types";
 import type { AppProps, AppState, UIAppState } from "../types";

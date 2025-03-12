@@ -11,8 +11,9 @@ import { useStable } from "../hooks/useStable";
 import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 
-import "./EyeDropper.scss";
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+
+import "./EyeDropper.scss";
 
 import type { ExcalidrawElement } from "../element/types";
 

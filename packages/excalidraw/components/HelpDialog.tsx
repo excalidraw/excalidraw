@@ -8,8 +8,9 @@ import { KEYS } from "../keys";
 import { getShortcutKey } from "../utils";
 
 import { Dialog } from "./Dialog";
-import "./HelpDialog.scss";
 import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+
+import "./HelpDialog.scss";
 
 import type { JSX } from "react";
 

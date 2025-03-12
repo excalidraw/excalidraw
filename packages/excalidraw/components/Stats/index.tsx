@@ -26,6 +26,7 @@ import MultiFontSize from "./MultiFontSize";
 import MultiPosition from "./MultiPosition";
 import Position from "./Position";
 import { getAtomicUnits } from "./utils";
+
 import "./Stats.scss";
 
 import type { NonDeletedExcalidrawElement } from "../../element/types";

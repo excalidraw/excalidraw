@@ -7,9 +7,10 @@ import {
   useState,
 } from "react";
 
-import "./TextField.scss";
 import { Button } from "./Button";
 import { eyeIcon, eyeClosedIcon } from "./icons";
+
+import "./TextField.scss";
 
 import type { KeyboardEvent } from "react";
 

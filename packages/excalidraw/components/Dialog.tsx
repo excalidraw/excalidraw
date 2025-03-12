@@ -12,11 +12,12 @@ import {
   useDevice,
   useExcalidrawSetAppState,
 } from "./App";
-import "./Dialog.scss";
 import { Island } from "./Island";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { Modal } from "./Modal";
 import { CloseIcon } from "./icons";
+
+import "./Dialog.scss";
 
 export type DialogSize = number | "small" | "regular" | "wide" | undefined;
 
