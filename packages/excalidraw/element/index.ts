@@ -1,10 +1,11 @@
+import { isInvisiblySmallElement } from "./sizeHelpers";
+import { isLinearElementType } from "./typeChecks";
+
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
 } from "./types";
-import { isInvisiblySmallElement } from "./sizeHelpers";
-import { isLinearElementType } from "./typeChecks";
 
 export {
   newElement,

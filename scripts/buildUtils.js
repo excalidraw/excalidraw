@@ -1,6 +1,8 @@
 const path = require("path");
+
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
+
 const { woff2ServerPlugin } = require("./woff2/woff2-esbuild-plugins");
 
 // contains all dependencies bundled inside

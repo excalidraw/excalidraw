@@ -1,20 +1,23 @@
+import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { AppClassProperties, AppState, Primitive } from "../types";
-import type { CaptureUpdateActionType } from "../store";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import { trackEvent } from "../analytics";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
 } from "../colors";
-import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { IconPicker } from "../components/IconPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
+import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
+import { Range } from "../components/Range";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -71,6 +74,14 @@ import {
   isTextElement,
   redrawTextBoundingBox,
 } from "../element";
+import {
+  bindLinearElement,
+  bindPointToSnapToElementOutline,
+  calculateFixedPointForElbowArrowBinding,
+  getHoveredElementForBinding,
+  updateBoundElements,
+} from "../element/binding";
+import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { getBoundTextElement } from "../element/textElement";
 import {
@@ -80,17 +91,7 @@ import {
   isLinearElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import type {
-  Arrowhead,
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  FontFamilyValues,
-  TextAlign,
-  VerticalAlign,
-  NonDeletedSceneElementsMap,
-} from "../element/types";
+import { Fonts, getLineHeight } from "../fonts";
 import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";
@@ -102,26 +103,29 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import { hasStrokeColor } from "../scene/comparisons";
+import { CaptureUpdateAction } from "../store";
 import {
   arrayToMap,
   getFontFamilyString,
   getShortcutKey,
   tupleToCoors,
 } from "../utils";
+
 import { register } from "./register";
-import { CaptureUpdateAction } from "../store";
-import { Fonts, getLineHeight } from "../fonts";
-import {
-  bindLinearElement,
-  bindPointToSnapToElementOutline,
-  calculateFixedPointForElbowArrowBinding,
-  getHoveredElementForBinding,
-  updateBoundElements,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
-import { Range } from "../components/Range";
+
+import type {
+  Arrowhead,
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  FontFamilyValues,
+  TextAlign,
+  VerticalAlign,
+  NonDeletedSceneElementsMap,
+} from "../element/types";
+import type { CaptureUpdateActionType } from "../store";
+import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

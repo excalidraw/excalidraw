@@ -2,8 +2,9 @@
  * @param func handler taking at most single parameter (event).
  */
 
-import { unstable_batchedUpdates } from "react-dom";
 import { version as ReactVersion } from "react";
+import { unstable_batchedUpdates } from "react-dom";
+
 import { throttleRAF } from "./utils";
 
 export const withBatchedUpdates = <

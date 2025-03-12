@@ -1,10 +1,11 @@
 import { render } from "@testing-library/react";
 
+import { EditorJotaiProvider } from "../editor-jotai";
 import fallbackLangData from "../locales/en.json";
 
 import Trans from "./Trans";
+
 import type { TranslationKeys } from "../i18n";
-import { EditorJotaiProvider } from "../editor-jotai";
 
 describe("Test <Trans/>", () => {
   it("should translate the the strings correctly", () => {

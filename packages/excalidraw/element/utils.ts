@@ -1,5 +1,3 @@
-import { getDiamondPoints } from ".";
-import type { Curve, LineSegment } from "@excalidraw/math";
 import {
   curve,
   lineSegment,
@@ -11,7 +9,13 @@ import {
   vectorScale,
   type GlobalPoint,
 } from "@excalidraw/math";
+
+import type { Curve, LineSegment } from "@excalidraw/math";
+
 import { getCornerRadius } from "../shapes";
+
+import { getDiamondPoints } from ".";
+
 import type {
   ExcalidrawDiamondElement,
   ExcalidrawRectanguloidElement,

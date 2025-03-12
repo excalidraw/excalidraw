@@ -1,4 +1,3 @@
-import type { JSX } from "react";
 import React, {
   useMemo,
   useState,
@@ -7,6 +6,11 @@ import React, {
   useCallback,
   type KeyboardEventHandler,
 } from "react";
+
+import { type FontFamilyValues } from "../../element/types";
+import { Fonts } from "../../fonts";
+import { t } from "../../i18n";
+import { arrayToList, debounce, getFontFamilyString } from "../../utils";
 import { useApp, useAppProps, useExcalidrawContainer } from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
@@ -16,13 +20,12 @@ import DropdownMenuItem, {
   DropDownMenuItemBadgeType,
   DropDownMenuItemBadge,
 } from "../dropdownMenu/DropdownMenuItem";
-import { type FontFamilyValues } from "../../element/types";
-import { arrayToList, debounce, getFontFamilyString } from "../../utils";
-import { t } from "../../i18n";
-import { fontPickerKeyHandler } from "./keyboardNavHandlers";
-import { Fonts } from "../../fonts";
-import type { ValueOf } from "../../utility-types";
 import { FontFamilyNormalIcon } from "../icons";
+
+import { fontPickerKeyHandler } from "./keyboardNavHandlers";
+
+import type { ValueOf } from "../../utility-types";
+import type { JSX } from "react";
 
 export interface FontDescriptor {
   value: number;

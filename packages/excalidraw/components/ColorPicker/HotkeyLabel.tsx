@@ -1,4 +1,5 @@
 import React from "react";
+
 import { getContrastYIQ } from "./colorPickerUtils";
 
 interface HotkeyLabelProps {

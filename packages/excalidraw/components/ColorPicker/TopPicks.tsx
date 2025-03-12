@@ -1,10 +1,12 @@
 import clsx from "clsx";
-import type { ColorPickerType } from "./colorPickerUtils";
+
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
 } from "../../colors";
+
+import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
   onChange: (color: string) => void;

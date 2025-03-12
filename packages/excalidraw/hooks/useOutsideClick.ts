@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+
 import { EVENT } from "../constants";
 
 export function useOutsideClick<T extends HTMLElement>(

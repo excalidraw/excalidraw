@@ -1,8 +1,9 @@
-import type { JSX } from "react";
 import clsx from "clsx";
-import type { ToolButtonSize } from "./ToolButton";
 
 import "./ToolIcon.scss";
+
+import type { ToolButtonSize } from "./ToolButton";
+import type { JSX } from "react";
 
 const DEFAULT_SIZE: ToolButtonSize = "small";
 

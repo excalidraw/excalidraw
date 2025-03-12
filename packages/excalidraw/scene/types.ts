@@ -1,5 +1,4 @@
-import type { RoughCanvas } from "roughjs/bin/canvas";
-import type { Drawable } from "roughjs/bin/core";
+import type { UserIdleState } from "../constants";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
@@ -18,7 +17,8 @@ import type {
   PendingExcalidrawElements,
 } from "../types";
 import type { MakeBrand } from "../utility-types";
-import type { UserIdleState } from "../constants";
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { Drawable } from "roughjs/bin/core";
 
 export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;

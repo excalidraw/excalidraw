@@ -1,5 +1,6 @@
-import type { JSX } from "react";
 import { useDevice } from "../App";
+
+import type { JSX } from "react";
 
 const MenuItemContent = ({
   textStyle,

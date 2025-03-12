@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { Stats } from "@excalidraw/excalidraw";
+import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
+import { DEFAULT_VERSION } from "@excalidraw/excalidraw/constants";
+import { t } from "@excalidraw/excalidraw/i18n";
 import { debounce, getVersion, nFormatter } from "@excalidraw/excalidraw/utils";
+import { useEffect, useState } from "react";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
+import type { UIAppState } from "@excalidraw/excalidraw/types";
+
 import {
   getElementsStorageSize,
   getTotalStorageSize,
 } from "./data/localStorage";
-import { DEFAULT_VERSION } from "@excalidraw/excalidraw/constants";
-import { t } from "@excalidraw/excalidraw/i18n";
-import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
-import type { NonDeletedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
-import type { UIAppState } from "@excalidraw/excalidraw/types";
-import { Stats } from "@excalidraw/excalidraw";
 
 type StorageSizes = { scene: number; total: number };
 

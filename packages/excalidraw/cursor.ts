@@ -1,7 +1,9 @@
-import { CURSOR_TYPE, MIME_TYPES, THEME } from "./constants";
 import OpenColor from "open-color";
-import type { AppState, DataURL } from "./types";
+
 import { isHandToolActive, isEraserActive } from "./appState";
+import { CURSOR_TYPE, MIME_TYPES, THEME } from "./constants";
+
+import type { AppState, DataURL } from "./types";
 
 const laserPointerCursorSVG_tag = `<svg viewBox="0 0 24 24" stroke-width="1" width="28" height="28" xmlns="http://www.w3.org/2000/svg">`;
 const laserPointerCursorBackgroundSVG = `<path d="M6.164 11.755a5.314 5.314 0 0 1-4.932-5.298 5.314 5.314 0 0 1 5.311-5.311 5.314 5.314 0 0 1 5.307 5.113l8.773 8.773a3.322 3.322 0 0 1 0 4.696l-.895.895a3.322 3.322 0 0 1-4.696 0l-8.868-8.868Z" style="fill:#fff"/>`;

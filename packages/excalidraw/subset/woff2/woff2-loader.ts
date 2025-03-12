@@ -7,8 +7,8 @@
  * In the future consider separating common utils into a separate shared chunk.
  */
 
-import binary from "./woff2-wasm";
 import bindings from "./woff2-bindings";
+import binary from "./woff2-wasm";
 
 /**
  * Lazy loads wasm and respective bindings for woff2 compression and decompression.

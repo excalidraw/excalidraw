@@ -6,12 +6,13 @@
 // Note: when adding new icons, review https://developer.mozilla.org/en-US/docs/Mozilla/Developer_guide/RTL_Guidelines
 // to determine whether or not the icons should be mirrored in right-to-left languages.
 
+import clsx from "clsx";
+import oc from "open-color";
 import React from "react";
 
-import oc from "open-color";
-import clsx from "clsx";
-import type { Theme } from "../element/types";
 import { THEME } from "../constants";
+
+import type { Theme } from "../element/types";
 
 export const iconFillColor = (theme: Theme) => "var(--icon-fill-color)";
 

@@ -1,6 +1,7 @@
-import type { AppProps, AppState } from "./types";
-import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
 import { COLOR_PALETTE } from "./colors";
+
+import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
+import type { AppProps, AppState } from "./types";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);

@@ -1,25 +1,27 @@
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { KEYS } from "../keys";
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { register } from "./register";
+import { TrashIcon } from "../components/icons";
 import { getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
-import type { AppClassProperties, AppState } from "../types";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import { getElementsInGroup, selectGroupsForSelectedElements } from "../groups";
-import { LinearElementEditor } from "../element/linearElementEditor";
 import { fixBindingsAfterDeletion } from "../element/binding";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { mutateElement, newElementWith } from "../element/mutateElement";
+import { getContainerElement } from "../element/textElement";
 import {
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
 } from "../element/typeChecks";
-import { updateActiveTool } from "../utils";
-import { TrashIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
-import { getContainerElement } from "../element/textElement";
 import { getFrameChildren } from "../frame";
+import { getElementsInGroup, selectGroupsForSelectedElements } from "../groups";
+import { t } from "../i18n";
+import { KEYS } from "../keys";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { CaptureUpdateAction } from "../store";
+import { updateActiveTool } from "../utils";
+
+import { register } from "./register";
+
+import type { ExcalidrawElement } from "../element/types";
+import type { AppClassProperties, AppState } from "../types";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],

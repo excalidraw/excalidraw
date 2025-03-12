@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_FAMILY,
 } from "../constants";
 import { getFontString, isTestEnv, normalizeEOL } from "../utils";
+
 import type { FontString, ExcalidrawTextElement } from "./types";
 
 export const measureText = (

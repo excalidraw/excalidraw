@@ -1,6 +1,8 @@
 import { vi } from "vitest";
-import { getPerfectElementSize } from "./sizeHelpers";
+
 import * as constants from "../constants";
+
+import { getPerfectElementSize } from "./sizeHelpers";
 
 const EPSILON_DIGITS = 3;
 // Needed so that we can mock the value of constants which is done in

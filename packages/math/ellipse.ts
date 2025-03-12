@@ -4,13 +4,6 @@ import {
   pointFromVector,
   pointsEqual,
 } from "./point";
-import type {
-  Ellipse,
-  GlobalPoint,
-  Line,
-  LineSegment,
-  LocalPoint,
-} from "./types";
 import { PRECISION } from "./utils";
 import {
   vector,
@@ -19,6 +12,14 @@ import {
   vectorFromPoint,
   vectorScale,
 } from "./vector";
+
+import type {
+  Ellipse,
+  GlobalPoint,
+  Line,
+  LineSegment,
+  LocalPoint,
+} from "./types";
 
 /**
  * Construct an Ellipse object from the parameters

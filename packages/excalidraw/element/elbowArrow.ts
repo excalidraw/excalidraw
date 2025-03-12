@@ -12,11 +12,12 @@ import {
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
+
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
 import { invariant, isAnyTrue, tupleToCoors } from "../utils";
-import type { AppState } from "../types";
+
 import {
   bindPointToSnapToElementOutline,
   FIXED_BINDING_DISTANCE,
@@ -25,8 +26,7 @@ import {
   snapToMid,
   getHoveredElementForBinding,
 } from "./binding";
-import type { Bounds } from "./bounds";
-import type { Heading } from "./heading";
+import { distanceToBindableElement } from "./distance";
 import {
   compareHeading,
   flipHeading,
@@ -46,6 +46,9 @@ import {
   type NonDeletedSceneElementsMap,
   type SceneElementsMap,
 } from "./types";
+
+import type { Bounds } from "./bounds";
+import type { Heading } from "./heading";
 import type {
   Arrowhead,
   ElementsMap,
@@ -54,7 +57,7 @@ import type {
   FixedSegment,
   NonDeletedExcalidrawElement,
 } from "./types";
-import { distanceToBindableElement } from "./distance";
+import type { AppState } from "../types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 

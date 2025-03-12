@@ -1,11 +1,13 @@
-import React, { forwardRef, useState } from "react";
 import clsx from "clsx";
+import React, { forwardRef, useState } from "react";
+
+import { AbortError } from "../errors";
+import { isPromiseLike } from "../utils";
+
+import Spinner from "./Spinner";
+import { tablerCheckIcon } from "./icons";
 
 import "./FilledButton.scss";
-import { AbortError } from "../errors";
-import Spinner from "./Spinner";
-import { isPromiseLike } from "../utils";
-import { tablerCheckIcon } from "./icons";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
 export type ButtonColor =

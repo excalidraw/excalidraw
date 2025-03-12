@@ -1,11 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
+
 import { Excalidraw, CaptureUpdateAction } from "../../index";
-import type { ExcalidrawImperativeAPI } from "../../types";
 import { resolvablePromise } from "../../utils";
-import { render } from "../test-utils";
-import { Pointer } from "../helpers/ui";
 import { API } from "../helpers/api";
+import { Pointer } from "../helpers/ui";
+import { render } from "../test-utils";
+
+import type { ExcalidrawImperativeAPI } from "../../types";
 
 describe("event callbacks", () => {
   const h = window.h;

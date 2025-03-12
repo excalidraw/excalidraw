@@ -1,3 +1,56 @@
+import { isFiniteNumber, pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
+import { getDefaultAppState } from "../appState";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_ALIGN,
+  DEFAULT_VERTICAL_ALIGN,
+  FONT_FAMILY,
+  ROUNDNESS,
+  DEFAULT_SIDEBAR,
+  DEFAULT_ELEMENT_PROPS,
+  DEFAULT_GRID_SIZE,
+  DEFAULT_GRID_STEP,
+} from "../constants";
+import {
+  getNonDeletedElements,
+  getNormalizedDimensions,
+  isInvisiblySmallElement,
+  refreshTextDimensions,
+} from "../element";
+import { normalizeFixedPoint } from "../element/binding";
+import {
+  updateElbowArrowPoints,
+  validateElbowPoints,
+} from "../element/elbowArrow";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { bumpVersion } from "../element/mutateElement";
+import { getContainerElement } from "../element/textElement";
+import { detectLineHeight } from "../element/textMeasurements";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isFixedPointBinding,
+  isLinearElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
+import { getLineHeight } from "../fonts";
+import { syncInvalidIndices } from "../fractionalIndex";
+import { randomId } from "../random";
+import {
+  getNormalizedGridSize,
+  getNormalizedGridStep,
+  getNormalizedZoom,
+} from "../scene";
+import { getUpdatedTimestamp, updateActiveTool } from "../utils";
+import { arrayToMap } from "../utils";
+import { getSizeFromPoints } from "../points";
+
+import { normalizeLink } from "./url";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -14,57 +67,8 @@ import type {
   StrokeRoundness,
 } from "../element/types";
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
-import type { ImportedDataState, LegacyAppState } from "./types";
-import {
-  getNonDeletedElements,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-  refreshTextDimensions,
-} from "../element";
-import {
-  isArrowElement,
-  isElbowArrow,
-  isFixedPointBinding,
-  isLinearElement,
-  isTextElement,
-  isUsingAdaptiveRadius,
-} from "../element/typeChecks";
-import { randomId } from "../random";
-import {
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_TEXT_ALIGN,
-  DEFAULT_VERTICAL_ALIGN,
-  FONT_FAMILY,
-  ROUNDNESS,
-  DEFAULT_SIDEBAR,
-  DEFAULT_ELEMENT_PROPS,
-  DEFAULT_GRID_SIZE,
-  DEFAULT_GRID_STEP,
-} from "../constants";
-import { getDefaultAppState } from "../appState";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { bumpVersion } from "../element/mutateElement";
-import { getUpdatedTimestamp, updateActiveTool } from "../utils";
-import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
-import { getContainerElement } from "../element/textElement";
-import { normalizeLink } from "./url";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
-import { getLineHeight } from "../fonts";
-import { normalizeFixedPoint } from "../element/binding";
-import {
-  getNormalizedGridSize,
-  getNormalizedGridStep,
-  getNormalizedZoom,
-} from "../scene";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
-import { detectLineHeight } from "../element/textMeasurements";
-import {
-  updateElbowArrowPoints,
-  validateElbowPoints,
-} from "../element/elbowArrow";
+import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
   AppState,

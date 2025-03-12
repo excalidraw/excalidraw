@@ -1,4 +1,3 @@
-import type { InclusiveRange } from "@excalidraw/math";
 import {
   pointFrom,
   pointRotateRads,
@@ -7,26 +6,30 @@ import {
   rangesOverlap,
   type GlobalPoint,
 } from "@excalidraw/math";
+
+import type { InclusiveRange } from "@excalidraw/math";
+
 import { TOOL_TYPE } from "./constants";
-import type { Bounds } from "./element/bounds";
 import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
 } from "./element/bounds";
-import type { MaybeTransformHandleType } from "./element/transformHandles";
 import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
 import { getMaximumGroups } from "./groups";
 import { KEYS } from "./keys";
 import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,
 } from "./scene/selection";
+
+import type { Bounds } from "./element/bounds";
+import type { MaybeTransformHandleType } from "./element/transformHandles";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
 import type {
   AppClassProperties,
   AppState,

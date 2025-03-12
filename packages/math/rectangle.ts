@@ -1,5 +1,6 @@
 import { pointFrom } from "./point";
 import { lineSegment, lineSegmentIntersectionPoints } from "./segment";
+
 import type { GlobalPoint, LineSegment, LocalPoint, Rectangle } from "./types";
 
 export function rectangle<P extends GlobalPoint | LocalPoint>(

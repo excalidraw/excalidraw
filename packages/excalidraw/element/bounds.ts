@@ -1,3 +1,39 @@
+import {
+  degreesToRadians,
+  lineSegment,
+  pointFrom,
+  pointDistance,
+  pointFromArray,
+  pointRotateRads,
+} from "@excalidraw/math";
+import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
+import rough from "roughjs/bin/rough";
+
+import type {
+  Degrees,
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+  Radians,
+} from "@excalidraw/math";
+
+import { rescalePoints } from "../points";
+import { generateRoughOptions } from "../scene/Shape";
+import { ShapeCache } from "../scene/ShapeCache";
+import { arrayToMap, invariant } from "../utils";
+
+import { LinearElementEditor } from "./linearElementEditor";
+import { getBoundTextElement, getContainerElement } from "./textElement";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
+
+import type { AppState } from "../types";
+import type { Mutable } from "../utility-types";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -7,40 +43,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
 } from "./types";
-import rough from "roughjs/bin/rough";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { AppState } from "../types";
-import { generateRoughOptions } from "../scene/Shape";
-import {
-  isArrowElement,
-  isBoundToContainer,
-  isFreeDrawElement,
-  isLinearElement,
-  isTextElement,
-} from "./typeChecks";
-import { rescalePoints } from "../points";
-import { getBoundTextElement, getContainerElement } from "./textElement";
-import { LinearElementEditor } from "./linearElementEditor";
-import { ShapeCache } from "../scene/ShapeCache";
-import { arrayToMap, invariant } from "../utils";
-import type {
-  Degrees,
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Radians,
-} from "@excalidraw/math";
-import {
-  degreesToRadians,
-  lineSegment,
-  pointFrom,
-  pointDistance,
-  pointFromArray,
-  pointRotateRads,
-} from "@excalidraw/math";
-import type { Mutable } from "../utility-types";
-import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export type RectangleBox = {
   x: number;

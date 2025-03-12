@@ -1,19 +1,21 @@
+import { frameToolIcon } from "../components/icons";
+import { setCursorForShape } from "../cursor";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
+import { mutateElement } from "../element/mutateElement";
+import { newFrameElement } from "../element/newElement";
+import { isFrameLikeElement } from "../element/typeChecks";
 import { addElementsToFrame, removeAllElementsFromFrame } from "../frame";
 import { getFrameChildren } from "../frame";
-import { KEYS } from "../keys";
-import type { AppClassProperties, AppState, UIAppState } from "../types";
-import { updateActiveTool } from "../utils";
-import { setCursorForShape } from "../cursor";
-import { register } from "./register";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { frameToolIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
-import { getSelectedElements } from "../scene";
-import { newFrameElement } from "../element/newElement";
 import { getElementsInGroup } from "../groups";
-import { mutateElement } from "../element/mutateElement";
+import { KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
+import { CaptureUpdateAction } from "../store";
+import { updateActiveTool } from "../utils";
+
+import { register } from "./register";
+
+import type { ExcalidrawElement } from "../element/types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 const isSingleFrameSelected = (
   appState: UIAppState,

@@ -1,4 +1,5 @@
 import { pointFrom } from "./point";
+
 import type { GlobalPoint, Line, LocalPoint } from "./types";
 
 /**

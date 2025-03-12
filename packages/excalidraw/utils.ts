@@ -1,7 +1,7 @@
-import Pool from "es6-promise-pool";
 import { average } from "@excalidraw/math";
+import Pool from "es6-promise-pool";
+
 import { COLOR_PALETTE } from "./colors";
-import type { EVENT } from "./constants";
 import {
   DEFAULT_VERSION,
   FONT_FAMILY,
@@ -9,6 +9,8 @@ import {
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
+
+import type { EVENT } from "./constants";
 import type {
   ExcalidrawBindableElement,
   FontFamilyValues,

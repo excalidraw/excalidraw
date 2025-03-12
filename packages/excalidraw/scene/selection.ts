@@ -1,11 +1,5 @@
-import type {
-  ElementsMap,
-  ElementsMapOrArray,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
 import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import type { AppState, InteractiveCanvasAppState } from "../types";
+import { isElementInViewport } from "../element/sizeHelpers";
 import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
 import {
   elementOverlapsWithFrame,
@@ -13,7 +7,14 @@ import {
   getFrameChildren,
 } from "../frame";
 import { isShallowEqual } from "../utils";
-import { isElementInViewport } from "../element/sizeHelpers";
+
+import type {
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
+import type { AppState, InteractiveCanvasAppState } from "../types";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.

@@ -10,6 +10,13 @@
  *   (localStorage, indexedDB).
  */
 
+import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+} from "@excalidraw/excalidraw/constants";
+import { clearElementsForLocalStorage } from "@excalidraw/excalidraw/element";
+import { debounce } from "@excalidraw/excalidraw/utils";
 import {
   createStore,
   entries,
@@ -19,14 +26,9 @@ import {
   setMany,
   get,
 } from "idb-keyval";
-import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
-import {
-  CANVAS_SEARCH_TAB,
-  DEFAULT_SIDEBAR,
-} from "@excalidraw/excalidraw/constants";
+
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import { clearElementsForLocalStorage } from "@excalidraw/excalidraw/element";
 import type {
   ExcalidrawElement,
   FileId,
@@ -37,8 +39,9 @@ import type {
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 import type { MaybePromise } from "@excalidraw/excalidraw/utility-types";
-import { debounce } from "@excalidraw/excalidraw/utils";
+
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
+
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";

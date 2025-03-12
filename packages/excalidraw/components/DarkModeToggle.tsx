@@ -1,8 +1,10 @@
+import { THEME } from "../constants";
+import { t } from "../i18n";
+
+import { ToolButton } from "./ToolButton";
+
 import "./ToolIcon.scss";
 
-import { t } from "../i18n";
-import { ToolButton } from "./ToolButton";
-import { THEME } from "../constants";
 import type { Theme } from "../element/types";
 
 // We chose to use only explicit toggle and not a third option for system value,

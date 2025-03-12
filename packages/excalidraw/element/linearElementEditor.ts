@@ -1,3 +1,48 @@
+import {
+  pointCenter,
+  pointFrom,
+  pointRotateRads,
+  pointsEqual,
+  type GlobalPoint,
+  type LocalPoint,
+  pointDistance,
+  vectorFromPoint,
+} from "@excalidraw/math";
+import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
+
+import type { Radians } from "@excalidraw/math";
+
+import { DRAGGING_THRESHOLD } from "../constants";
+import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
+import { ShapeCache } from "../scene/ShapeCache";
+import {
+  getBezierCurveLength,
+  getBezierXY,
+  getControlPointsForBezierCurve,
+  isPathALoop,
+  mapIntervalToBezierT,
+} from "../shapes";
+import { getGridPoint } from "../snapping";
+import { invariant, tupleToCoors } from "../utils";
+
+import {
+  bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
+  isBindingEnabled,
+} from "./binding";
+import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
+import { headingIsHorizontal, vectorToHeading } from "./heading";
+import { mutateElement } from "./mutateElement";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  isBindingElement,
+  isElbowArrow,
+  isFixedPointBinding,
+} from "./typeChecks";
+
+import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
+
+import type { Bounds } from "./bounds";
 import type {
   NonDeleted,
   ExcalidrawLinearElement,
@@ -12,9 +57,8 @@ import type {
   FixedSegment,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from ".";
-import type { Bounds } from "./bounds";
-import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
+import type Scene from "../scene/Scene";
+import type { Store } from "../store";
 import type {
   AppState,
   PointerCoords,
@@ -23,47 +67,7 @@ import type {
   NullableGridSize,
   Zoom,
 } from "../types";
-import { mutateElement } from "./mutateElement";
-
-import {
-  bindOrUnbindLinearElement,
-  getHoveredElementForBinding,
-  isBindingEnabled,
-} from "./binding";
-import { invariant, tupleToCoors } from "../utils";
-import {
-  isBindingElement,
-  isElbowArrow,
-  isFixedPointBinding,
-} from "./typeChecks";
-import { KEYS, shouldRotateWithDiscreteAngle } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { DRAGGING_THRESHOLD } from "../constants";
 import type { Mutable } from "../utility-types";
-import { ShapeCache } from "../scene/ShapeCache";
-import type { Store } from "../store";
-import type Scene from "../scene/Scene";
-import type { Radians } from "@excalidraw/math";
-import {
-  pointCenter,
-  pointFrom,
-  pointRotateRads,
-  pointsEqual,
-  type GlobalPoint,
-  type LocalPoint,
-  pointDistance,
-  vectorFromPoint,
-} from "@excalidraw/math";
-import {
-  getBezierCurveLength,
-  getBezierXY,
-  getControlPointsForBezierCurve,
-  isPathALoop,
-  mapIntervalToBezierT,
-} from "../shapes";
-import { getGridPoint } from "../snapping";
-import { headingIsHorizontal, vectorToHeading } from "./heading";
-import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
 
 const editorMidPointsCache: {
   version: number | null;

@@ -1,14 +1,17 @@
-import type { Drawable } from "roughjs/bin/core";
 import { RoughGenerator } from "roughjs/bin/generator";
+
+import { COLOR_PALETTE } from "../colors";
+import { elementWithCanvasCache } from "../renderer/renderElement";
+
+import { _generateElementShape } from "./Shape";
+
 import type {
   ExcalidrawElement,
   ExcalidrawSelectionElement,
 } from "../element/types";
-import { elementWithCanvasCache } from "../renderer/renderElement";
-import { _generateElementShape } from "./Shape";
-import type { ElementShape, ElementShapes } from "./types";
-import { COLOR_PALETTE } from "../colors";
 import type { AppState, EmbedsValidationStatus } from "../types";
+import type { ElementShape, ElementShapes } from "./types";
+import type { Drawable } from "roughjs/bin/core";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();

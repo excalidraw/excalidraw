@@ -1,12 +1,13 @@
 import React from "react";
+
+import { actionSelectAll } from "../actions";
+import { mutateElement } from "../element/mutateElement";
+import { t } from "../i18n";
 import { Excalidraw } from "../index";
-import { render, unmountComponent } from "../tests/test-utils";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { KEYS } from "../keys";
 import { API } from "../tests/helpers/api";
-import { actionSelectAll } from "../actions";
-import { t } from "../i18n";
-import { mutateElement } from "../element/mutateElement";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { render, unmountComponent } from "../tests/test-utils";
 
 unmountComponent();
 

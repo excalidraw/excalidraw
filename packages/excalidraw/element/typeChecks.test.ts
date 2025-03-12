@@ -1,4 +1,5 @@
 import { API } from "../tests/helpers/api";
+
 import { hasBoundTextElement } from "./typeChecks";
 
 describe("Test TypeChecks", () => {

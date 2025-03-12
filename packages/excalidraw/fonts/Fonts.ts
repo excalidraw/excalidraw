@@ -7,15 +7,17 @@ import {
 } from "../constants";
 import { isTextElement } from "../element";
 import { getContainerElement } from "../element/textElement";
+import { charWidth } from "../element/textMeasurements";
 import { containsCJK } from "../element/textWrapping";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getFontString, PromisePool, promiseTry } from "../utils";
-import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
+import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 import { ExcalifontFontFaces } from "./Excalifont";
+import { FONT_METADATA, type FontMetadata } from "./FontMetadata";
 import { HelveticaFontFaces } from "./Helvetica";
 import { LiberationFontFaces } from "./Liberation";
 import { LilitaFontFaces } from "./Lilita";
@@ -23,7 +25,6 @@ import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
-import { FONT_METADATA, type FontMetadata } from "./FontMetadata";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -31,7 +32,6 @@ import type {
 } from "../element/types";
 import type Scene from "../scene/Scene";
 import type { ValueOf } from "../utility-types";
-import { charWidth } from "../element/textMeasurements";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use

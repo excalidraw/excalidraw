@@ -1,3 +1,32 @@
+import fs from "fs";
+import path from "path";
+import util from "util";
+
+import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
+
+import { getDefaultAppState } from "../../appState";
+import { createTestHook } from "../../components/App";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
+import { getMimeType } from "../../data/blob";
+import { newElement, newTextElement, newLinearElement } from "../../element";
+import { mutateElement } from "../../element/mutateElement";
+import {
+  newArrowElement,
+  newEmbeddableElement,
+  newFrameElement,
+  newFreeDrawElement,
+  newIframeElement,
+  newImageElement,
+  newMagicFrameElement,
+} from "../../element/newElement";
+import { isLinearElementType } from "../../element/typeChecks";
+import { selectGroupsForSelectedElements } from "../../groups";
+import { getSelectedElements } from "../../scene/selection";
+import { assertNever } from "../../utils";
+import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+
+import type { Action } from "../../actions/types";
+import type App from "../../components/App";
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -13,34 +42,8 @@ import type {
   ExcalidrawArrowElement,
   FixedSegment,
 } from "../../element/types";
-import { newElement, newTextElement, newLinearElement } from "../../element";
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
-import { getDefaultAppState } from "../../appState";
-import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
-import fs from "fs";
-import util from "util";
-import path from "path";
-import { getMimeType } from "../../data/blob";
-import {
-  newArrowElement,
-  newEmbeddableElement,
-  newFrameElement,
-  newFreeDrawElement,
-  newIframeElement,
-  newImageElement,
-  newMagicFrameElement,
-} from "../../element/newElement";
 import type { AppState } from "../../types";
-import { getSelectedElements } from "../../scene/selection";
-import { isLinearElementType } from "../../element/typeChecks";
 import type { Mutable } from "../../utility-types";
-import { assertNever } from "../../utils";
-import type App from "../../components/App";
-import { createTestHook } from "../../components/App";
-import type { Action } from "../../actions/types";
-import { mutateElement } from "../../element/mutateElement";
-import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
-import { selectGroupsForSelectedElements } from "../../groups";
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.

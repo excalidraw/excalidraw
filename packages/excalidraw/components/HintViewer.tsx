@@ -1,5 +1,4 @@
-import { t } from "../i18n";
-import type { AppClassProperties, Device, UIAppState } from "../types";
+import { isEraserActive } from "../appState";
 import {
   isFlowchartNodeElement,
   isImageElement,
@@ -7,13 +6,17 @@ import {
   isTextBindableContainer,
   isTextElement,
 } from "../element/typeChecks";
-import { getShortcutKey } from "../utils";
-import { isEraserActive } from "../appState";
+import { t } from "../i18n";
 
-import "./HintViewer.scss";
+import { getShortcutKey } from "../utils";
+
 import { isNodeInFlowchart } from "../element/flowchart";
 import { isGridModeEnabled } from "../snapping";
 import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
+
+import "./HintViewer.scss";
+
+import type { AppClassProperties, Device, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;

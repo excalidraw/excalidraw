@@ -1,3 +1,43 @@
+import { isRightAngleRads } from "@excalidraw/math";
+import { getStroke } from "perfect-freehand";
+import rough from "roughjs/bin/rough";
+
+import { getDefaultAppState } from "../appState";
+import {
+  BOUND_TEXT_PADDING,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
+  ELEMENT_READY_TO_ERASE_OPACITY,
+  FRAME_STYLE,
+  MIME_TYPES,
+  THEME,
+} from "../constants";
+import { getElementAbsoluteCoords } from "../element/bounds";
+import { getUncroppedImageElement } from "../element/cropElement";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import {
+  getBoundTextElement,
+  getContainerCoords,
+  getContainerElement,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
+} from "../element/textElement";
+import { getLineHeightInPx } from "../element/textMeasurements";
+import {
+  isTextElement,
+  isLinearElement,
+  isFreeDrawElement,
+  isInitializedImageElement,
+  isArrowElement,
+  hasBoundTextElement,
+  isMagicFrameElement,
+  isImageElement,
+} from "../element/typeChecks";
+import { getVerticalOffset } from "../fonts";
+import { getContainingFrame } from "../frame";
+import { ShapeCache } from "../scene/ShapeCache";
+import { getCornerRadius } from "../shapes";
+import { distance, getFontString, isRTL } from "../utils";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -9,26 +49,11 @@ import type {
   NonDeletedSceneElementsMap,
   ElementsMap,
 } from "../element/types";
-import {
-  isTextElement,
-  isLinearElement,
-  isFreeDrawElement,
-  isInitializedImageElement,
-  isArrowElement,
-  hasBoundTextElement,
-  isMagicFrameElement,
-  isImageElement,
-} from "../element/typeChecks";
-import { getElementAbsoluteCoords } from "../element/bounds";
-import type { RoughCanvas } from "roughjs/bin/canvas";
-
 import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
   InteractiveCanvasRenderConfig,
 } from "../scene/types";
-import { distance, getFontString, isRTL } from "../utils";
-import rough from "roughjs/bin/rough";
 import type {
   AppState,
   StaticCanvasAppState,
@@ -37,33 +62,8 @@ import type {
   ElementsPendingErasure,
   PendingExcalidrawElements,
 } from "../types";
-import { getDefaultAppState } from "../appState";
-import {
-  BOUND_TEXT_PADDING,
-  DEFAULT_REDUCED_GLOBAL_ALPHA,
-  ELEMENT_READY_TO_ERASE_OPACITY,
-  FRAME_STYLE,
-  MIME_TYPES,
-  THEME,
-} from "../constants";
 import type { StrokeOptions } from "perfect-freehand";
-import { getStroke } from "perfect-freehand";
-import {
-  getBoundTextElement,
-  getContainerCoords,
-  getContainerElement,
-  getBoundTextMaxHeight,
-  getBoundTextMaxWidth,
-} from "../element/textElement";
-import { LinearElementEditor } from "../element/linearElementEditor";
-
-import { getContainingFrame } from "../frame";
-import { ShapeCache } from "../scene/ShapeCache";
-import { getVerticalOffset } from "../fonts";
-import { isRightAngleRads } from "@excalidraw/math";
-import { getCornerRadius } from "../shapes";
-import { getUncroppedImageElement } from "../element/cropElement";
-import { getLineHeightInPx } from "../element/textMeasurements";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original

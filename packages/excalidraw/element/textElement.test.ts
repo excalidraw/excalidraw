@@ -1,6 +1,7 @@
 import { FONT_FAMILY } from "../constants";
 import { getLineHeight } from "../fonts";
 import { API } from "../tests/helpers/api";
+
 import {
   computeContainerDimensionForBoundText,
   getContainerCoords,
@@ -8,6 +9,7 @@ import {
   getBoundTextMaxHeight,
 } from "./textElement";
 import { detectLineHeight, getLineHeightInPx } from "./textMeasurements";
+
 import type { ExcalidrawTextElementWithContainer } from "./types";
 
 describe("Test measureText", () => {

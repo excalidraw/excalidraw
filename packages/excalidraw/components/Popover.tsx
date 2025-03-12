@@ -1,8 +1,10 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
-import "./Popover.scss";
 import { unstable_batchedUpdates } from "react-dom";
-import { queryFocusableElements } from "../utils";
+
 import { KEYS } from "../keys";
+import { queryFocusableElements } from "../utils";
+
+import "./Popover.scss";
 
 type Props = {
   top?: number;

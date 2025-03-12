@@ -1,6 +1,8 @@
 import { API } from "../tests/helpers/api";
+
 import { mutateElement } from "./mutateElement";
 import { normalizeElementOrder } from "./sortElements";
+
 import type { ExcalidrawElement } from "./types";
 
 const assertOrder = (

@@ -1,7 +1,5 @@
+import { exportToCanvas } from "@excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
-
-import type { ActionManager } from "../actions/manager";
-import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
 import {
   actionExportWithDarkMode,
@@ -17,25 +15,27 @@ import {
   isFirefox,
   EXPORT_SCALES,
 } from "../constants";
-
+import { prepareElementsForExport } from "../data";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import type { NonDeletedExcalidrawElement } from "../element/types";
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
+
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "@excalidraw/utils/export";
+import { cloneJSON } from "../utils";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
 import { Switch } from "./Switch";
 import { Tooltip } from "./Tooltip";
+import { FilledButton } from "./FilledButton";
 
 import "./ImageExportDialog.scss";
-import { FilledButton } from "./FilledButton";
-import { cloneJSON } from "../utils";
-import { prepareElementsForExport } from "../data";
-import { useCopyStatus } from "../hooks/useCopiedIndicator";
+
+import type { ActionManager } from "../actions/manager";
+import type { NonDeletedExcalidrawElement } from "../element/types";
+import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;

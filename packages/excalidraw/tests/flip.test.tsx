@@ -1,4 +1,21 @@
+import { pointFrom, type Radians } from "@excalidraw/math";
 import React from "react";
+import { vi } from "vitest";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import { actionFlipHorizontal, actionFlipVertical } from "../actions";
+import { createPasteEvent } from "../clipboard";
+import { ROUNDNESS } from "../constants";
+import { getElementAbsoluteCoords } from "../element";
+import { newLinearElement } from "../element";
+import { getBoundTextElementPosition } from "../element/textElement";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+import { arrayToMap, cloneJSON } from "../utils";
+
+import { API } from "./helpers/api";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
   fireEvent,
   GlobalTestState,
@@ -7,10 +24,7 @@ import {
   unmountComponent,
   waitFor,
 } from "./test-utils";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { actionFlipHorizontal, actionFlipVertical } from "../actions";
-import { getElementAbsoluteCoords } from "../element";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -18,17 +32,7 @@ import type {
   ExcalidrawTextElementWithContainer,
   FileId,
 } from "../element/types";
-import { newLinearElement } from "../element";
-import { Excalidraw } from "../index";
 import type { NormalizedZoomValue } from "../types";
-import { ROUNDNESS } from "../constants";
-import { vi } from "vitest";
-import { KEYS } from "../keys";
-import { getBoundTextElementPosition } from "../element/textElement";
-import { createPasteEvent } from "../clipboard";
-import { arrayToMap, cloneJSON } from "../utils";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom, type Radians } from "@excalidraw/math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

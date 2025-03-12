@@ -1,7 +1,8 @@
 import { ROUNDNESS } from "../constants";
+import { assertNever } from "../utils";
+
 import type { ElementOrToolType } from "../types";
 import type { MarkNonNullable } from "../utility-types";
-import { assertNever } from "../utils";
 import type { Bounds } from "./bounds";
 import type {
   ExcalidrawElement,

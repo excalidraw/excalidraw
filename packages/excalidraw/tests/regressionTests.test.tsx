@@ -1,10 +1,13 @@
 import React from "react";
-import type { ExcalidrawElement } from "../element/types";
-import { CODES, KEYS } from "../keys";
+import { vi } from "vitest";
+
+import { FONT_FAMILY } from "../constants";
 import { Excalidraw } from "../index";
+import { CODES, KEYS } from "../keys";
 import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
 import { setDateTimeForTests } from "../utils";
+
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -15,8 +18,8 @@ import {
   togglePopover,
   unmountComponent,
 } from "./test-utils";
-import { FONT_FAMILY } from "../constants";
-import { vi } from "vitest";
+
+import type { ExcalidrawElement } from "../element/types";
 
 const { h } = window;
 

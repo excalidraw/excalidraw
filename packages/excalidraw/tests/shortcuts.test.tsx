@@ -1,6 +1,8 @@
 import React from "react";
-import { KEYS } from "../keys";
+
 import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { fireEvent, render, waitFor } from "./test-utils";

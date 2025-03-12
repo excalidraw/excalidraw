@@ -1,10 +1,13 @@
-import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 import { LaserPointer } from "@excalidraw/laser-pointer";
-import type { AnimationFrameHandler } from "./animation-frame-handler";
-import type { AppState } from "./types";
-import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
-import type App from "./components/App";
+
+import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
+
 import { SVG_NS } from "./constants";
+import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
+
+import type { AnimationFrameHandler } from "./animation-frame-handler";
+import type App from "./components/App";
+import type { AppState } from "./types";
 
 export interface Trail {
   start(container: SVGSVGElement): void;

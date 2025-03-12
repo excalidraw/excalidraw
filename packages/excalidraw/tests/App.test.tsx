@@ -1,10 +1,10 @@
 import React from "react";
-import * as StaticScene from "../renderer/staticScene";
-import { reseed } from "../random";
-import { render, queryByTestId, unmountComponent } from "../tests/test-utils";
+import { vi } from "vitest";
 
 import { Excalidraw } from "../index";
-import { vi } from "vitest";
+import { reseed } from "../random";
+import * as StaticScene from "../renderer/staticScene";
+import { render, queryByTestId, unmountComponent } from "../tests/test-utils";
 
 const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 

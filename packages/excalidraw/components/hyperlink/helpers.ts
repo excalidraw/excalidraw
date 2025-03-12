@@ -1,14 +1,17 @@
-import type { GlobalPoint, Radians } from "@excalidraw/math";
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
+
 import { MIME_TYPES } from "../../constants";
-import type { Bounds } from "../../element/bounds";
 import { getElementAbsoluteCoords } from "../../element/bounds";
 import { hitElementBoundingBox } from "../../element/collision";
+import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
+
+import type { Bounds } from "../../element/bounds";
 import type {
   ElementsMap,
   NonDeletedExcalidrawElement,
 } from "../../element/types";
-import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
 import type { AppState, UIAppState } from "../../types";
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");

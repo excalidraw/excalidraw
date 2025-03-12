@@ -1,8 +1,10 @@
 import clsx from "clsx";
-import { useAtom } from "../../editor-jotai";
 import { useEffect, useRef } from "react";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+
+import { useAtom } from "../../editor-jotai";
+
 import HotkeyLabel from "./HotkeyLabel";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 interface CustomColorListProps {
   colors: string[];

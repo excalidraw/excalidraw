@@ -1,4 +1,3 @@
-import type { JSX } from "react";
 import {
   FreedrawIcon,
   FontFamilyNormalIcon,
@@ -6,6 +5,8 @@ import {
   FontFamilyCodeIcon,
 } from "../components/icons";
 import { FONT_FAMILY, FONT_FAMILY_FALLBACKS } from "../constants";
+
+import type { JSX } from "react";
 
 /**
  * Encapsulates font metrics with additional font metadata.

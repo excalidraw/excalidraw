@@ -1,25 +1,28 @@
-import { isTransparent } from "../../utils";
-import type { ExcalidrawElement } from "../../element/types";
-import type { AppState } from "../../types";
-import { TopPicks } from "./TopPicks";
-import { ButtonSeparator } from "../ButtonSeparator";
-import { Picker } from "./Picker";
 import * as Popover from "@radix-ui/react-popover";
-import type { ColorPickerType } from "./colorPickerUtils";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
-import { useExcalidrawContainer } from "../App";
-import type { ColorTuple, ColorPaletteCustom } from "../../colors";
-import { COLOR_PALETTE } from "../../colors";
-import PickerHeading from "./PickerHeading";
-import { t } from "../../i18n";
 import clsx from "clsx";
 import { useRef } from "react";
+
+import { COLOR_PALETTE } from "../../colors";
 import { useAtom } from "../../editor-jotai";
-import { ColorInput } from "./ColorInput";
+import { t } from "../../i18n";
+import { isTransparent } from "../../utils";
+import { useExcalidrawContainer } from "../App";
+import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
 
+import { ColorInput } from "./ColorInput";
+import { Picker } from "./Picker";
+import PickerHeading from "./PickerHeading";
+import { TopPicks } from "./TopPicks";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+
 import "./ColorPicker.scss";
+
+import type { ColorPickerType } from "./colorPickerUtils";
+import type { ColorTuple, ColorPaletteCustom } from "../../colors";
+import type { ExcalidrawElement } from "../../element/types";
+import type { AppState } from "../../types";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;

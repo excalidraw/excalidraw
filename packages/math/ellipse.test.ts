@@ -8,6 +8,7 @@ import {
 import { line } from "./line";
 import { pointFrom } from "./point";
 import { lineSegment } from "./segment";
+
 import type { Ellipse, GlobalPoint } from "./types";
 
 describe("point and ellipse", () => {

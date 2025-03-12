@@ -1,19 +1,21 @@
 import { isTextElement, redrawTextBoundingBox } from "../../element";
 import { mutateElement } from "../../element/mutateElement";
+import { getBoundTextElement } from "../../element/textElement";
 import { hasBoundTextElement } from "../../element/typeChecks";
+import { isInGroup } from "../../groups";
+import { fontSizeIcon } from "../icons";
+
+import StatsDragInput from "./DragInput";
+import { getStepSizedValue } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
   NonDeletedSceneElementsMap,
 } from "../../element/types";
-import { isInGroup } from "../../groups";
 import type Scene from "../../scene/Scene";
-import { fontSizeIcon } from "../icons";
-import StatsDragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue } from "./utils";
 import type { AppState } from "../../types";
-import { getBoundTextElement } from "../../element/textElement";
 
 interface MultiFontSizeProps {
   elements: readonly ExcalidrawElement[];

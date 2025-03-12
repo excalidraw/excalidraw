@@ -1,14 +1,16 @@
 import { generateNKeysBetween } from "fractional-indexing";
+
 import { mutateElement } from "./element/mutateElement";
+import { getBoundTextElement } from "./element/textElement";
+import { hasBoundTextElement } from "./element/typeChecks";
+import { InvalidFractionalIndexError } from "./errors";
+import { arrayToMap } from "./utils";
+
 import type {
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,
 } from "./element/types";
-import { InvalidFractionalIndexError } from "./errors";
-import { hasBoundTextElement } from "./element/typeChecks";
-import { getBoundTextElement } from "./element/textElement";
-import { arrayToMap } from "./utils";
 
 /**
  * Envisioned relation between array order and fractional indices:

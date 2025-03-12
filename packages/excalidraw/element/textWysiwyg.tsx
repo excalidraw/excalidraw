@@ -1,24 +1,28 @@
+import {
+  actionResetZoom,
+  actionZoomIn,
+  actionZoomOut,
+} from "../actions/actionCanvas";
+import {
+  actionDecreaseFontSize,
+  actionIncreaseFontSize,
+} from "../actions/actionProperties";
+import { parseClipboard } from "../clipboard";
+import { CLASSES, POINTER_BUTTON } from "../constants";
 import { CODES, KEYS } from "../keys";
+import Scene from "../scene/Scene";
 import {
   isWritableElement,
   getFontString,
   getFontFamilyString,
   isTestEnv,
 } from "../utils";
-import Scene from "../scene/Scene";
+
 import {
-  isArrowElement,
-  isBoundToContainer,
-  isTextElement,
-} from "./typeChecks";
-import { CLASSES, POINTER_BUTTON } from "../constants";
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  ExcalidrawTextElement,
-} from "./types";
-import type { AppState } from "../types";
+  originalContainerCache,
+  updateOriginalContainerCache,
+} from "./containerCache";
+import { LinearElementEditor } from "./linearElementEditor";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import {
   getBoundTextElementId,
@@ -31,25 +35,23 @@ import {
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
-import { wrapText } from "./textWrapping";
-import {
-  actionDecreaseFontSize,
-  actionIncreaseFontSize,
-} from "../actions/actionProperties";
-import {
-  actionResetZoom,
-  actionZoomIn,
-  actionZoomOut,
-} from "../actions/actionCanvas";
-import type App from "../components/App";
-import { LinearElementEditor } from "./linearElementEditor";
-import { parseClipboard } from "../clipboard";
-import {
-  originalContainerCache,
-  updateOriginalContainerCache,
-} from "./containerCache";
 import { getTextWidth } from "./textMeasurements";
 import { normalizeText } from "./textMeasurements";
+import { wrapText } from "./textWrapping";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isTextElement,
+} from "./typeChecks";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  ExcalidrawTextElement,
+} from "./types";
+import type App from "../components/App";
+import type { AppState } from "../types";
 
 const getTransform = (
   width: number,

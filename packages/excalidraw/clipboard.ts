@@ -1,25 +1,26 @@
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
-import type { BinaryFiles } from "./types";
-import type { Spreadsheet } from "./charts";
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 import {
   ALLOWED_PASTE_MIME_TYPES,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
 } from "./constants";
+import { createFile, isSupportedImageFileType } from "./data/blob";
+import { mutateElement } from "./element/mutateElement";
+import { deepCopyElement } from "./element/newElement";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
 } from "./element/typeChecks";
-import { deepCopyElement } from "./element/newElement";
-import { mutateElement } from "./element/mutateElement";
+import { ExcalidrawError } from "./errors";
 import { getContainingFrame } from "./frame";
 import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
-import { createFile, isSupportedImageFileType } from "./data/blob";
-import { ExcalidrawError } from "./errors";
+
+import type { Spreadsheet } from "./charts";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./element/types";
+import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;

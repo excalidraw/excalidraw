@@ -1,5 +1,24 @@
-import type { JSX } from "react";
 import React from "react";
+
+import { isHandToolActive } from "../appState";
+import { useTunnels } from "../context/tunnels";
+import { showSelectedShapeActions } from "../element";
+import { t } from "../i18n";
+import { calculateScrollCenter } from "../scene";
+import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+
+import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { FixedSideContainer } from "./FixedSideContainer";
+import { HandButton } from "./HandButton";
+import { HintViewer } from "./HintViewer";
+import { Island } from "./Island";
+import { LockButton } from "./LockButton";
+import { PenModeButton } from "./PenModeButton";
+import { Section } from "./Section";
+import Stack from "./Stack";
+
+import type { ActionManager } from "../actions/manager";
+import type { NonDeletedExcalidrawElement } from "../element/types";
 import type {
   AppClassProperties,
   AppProps,
@@ -8,23 +27,7 @@ import type {
   ExcalidrawProps,
   UIAppState,
 } from "../types";
-import type { ActionManager } from "../actions/manager";
-import { t } from "../i18n";
-import Stack from "./Stack";
-import { showSelectedShapeActions } from "../element";
-import type { NonDeletedExcalidrawElement } from "../element/types";
-import { FixedSideContainer } from "./FixedSideContainer";
-import { Island } from "./Island";
-import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import { Section } from "./Section";
-import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
-import { LockButton } from "./LockButton";
-import { PenModeButton } from "./PenModeButton";
-import { HandButton } from "./HandButton";
-import { isHandToolActive } from "../appState";
-import { useTunnels } from "../context/tunnels";
+import type { JSX } from "react";
 
 type MobileMenuProps = {
   appState: UIAppState;

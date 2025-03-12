@@ -1,9 +1,11 @@
-import { KEYS } from "../keys";
-import { register } from "./register";
-import type { AppState } from "../types";
 import { searchIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
+import { KEYS } from "../keys";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
+import type { AppState } from "../types";
 
 export const actionToggleSearchMenu = register({
   name: "searchMenu",

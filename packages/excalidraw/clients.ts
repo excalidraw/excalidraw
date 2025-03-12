@@ -6,6 +6,7 @@ import {
   UserIdleState,
 } from "./constants";
 import { roundRect } from "./renderer/roundRect";
+
 import type { InteractiveCanvasRenderConfig } from "./scene/types";
 import type {
   Collaborator,

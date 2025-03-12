@@ -1,5 +1,7 @@
 import type { Radians } from "@excalidraw/math";
+
 import { DEFAULT_FONT_FAMILY } from "../../constants";
+
 import type { ExcalidrawElement } from "../../element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {

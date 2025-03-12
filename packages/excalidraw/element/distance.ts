@@ -1,4 +1,3 @@
-import type { GlobalPoint, Radians } from "@excalidraw/math";
 import {
   curvePointDistance,
   distanceToLineSegment,
@@ -6,16 +5,20 @@ import {
   pointRotateRads,
 } from "@excalidraw/math";
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
+
+import type { GlobalPoint, Radians } from "@excalidraw/math";
+
+import {
+  deconstructDiamondElement,
+  deconstructRectanguloidElement,
+} from "./utils";
+
 import type {
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawEllipseElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
-import {
-  deconstructDiamondElement,
-  deconstructRectanguloidElement,
-} from "./utils";
 
 export const distanceToBindableElement = (
   element: ExcalidrawBindableElement,

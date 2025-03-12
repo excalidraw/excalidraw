@@ -5,6 +5,7 @@
 import { ELEMENT_LINK_KEY } from "../constants";
 import { normalizeLink } from "../data/url";
 import { elementsAreInSameGroup } from "../groups";
+
 import type { AppProps, AppState } from "../types";
 import type { ExcalidrawElement } from "./types";
 

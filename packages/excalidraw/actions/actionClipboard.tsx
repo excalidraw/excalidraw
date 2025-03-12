@@ -1,5 +1,3 @@
-import { CODES, KEYS } from "../keys";
-import { register } from "./register";
 import {
   copyTextToSystemClipboard,
   copyToClipboard,
@@ -8,13 +6,16 @@ import {
   probablySupportsClipboardWriteText,
   readSystemClipboard,
 } from "../clipboard";
-import { actionDeleteSelected } from "./actionDeleteSelected";
+import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import { isFirefox } from "../constants";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { getTextFromElements, isTextElement } from "../element";
 import { t } from "../i18n";
-import { isFirefox } from "../constants";
-import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import { CODES, KEYS } from "../keys";
 import { CaptureUpdateAction } from "../store";
+
+import { actionDeleteSelected } from "./actionDeleteSelected";
+import { register } from "./register";
 
 export const actionCopy = register({
   name: "copy",

@@ -1,9 +1,10 @@
-import type { ElementsMap, ExcalidrawElement } from "./element/types";
-import { mutateElement } from "./element/mutateElement";
-import type { BoundingBox } from "./element/bounds";
-import { getCommonBoundingBox } from "./element/bounds";
-import { getMaximumGroups } from "./groups";
 import { updateBoundElements } from "./element/binding";
+import { getCommonBoundingBox } from "./element/bounds";
+import { mutateElement } from "./element/mutateElement";
+import { getMaximumGroups } from "./groups";
+
+import type { BoundingBox } from "./element/bounds";
+import type { ElementsMap, ExcalidrawElement } from "./element/types";
 import type Scene from "./scene/Scene";
 
 export interface Alignment {

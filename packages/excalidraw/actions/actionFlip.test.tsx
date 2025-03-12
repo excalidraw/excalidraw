@@ -1,8 +1,10 @@
-import React from "react";
-import { Excalidraw } from "../index";
-import { render } from "../tests/test-utils";
-import { API } from "../tests/helpers/api";
 import { pointFrom } from "@excalidraw/math";
+import React from "react";
+
+import { Excalidraw } from "../index";
+import { API } from "../tests/helpers/api";
+import { render } from "../tests/test-utils";
+
 import { actionFlipHorizontal, actionFlipVertical } from "./actionFlip";
 
 const { h } = window;

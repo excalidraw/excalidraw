@@ -1,7 +1,8 @@
-import { vi } from "vitest";
 import * as MermaidToExcalidraw from "@excalidraw/mermaid-to-excalidraw";
-import type { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 import React from "react";
+import { vi } from "vitest";
+
+import type { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 
 export const mockMermaidToExcalidraw = (opts: {
   parseMermaidToExcalidraw: typeof parseMermaidToExcalidraw;

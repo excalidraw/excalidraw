@@ -1,4 +1,5 @@
 import React from "react";
+
 import { DEFAULT_SIDEBAR } from "../constants";
 import { DefaultSidebar } from "../index";
 import {
@@ -6,6 +7,7 @@ import {
   waitFor,
   withExcalidrawDimensions,
 } from "../tests/test-utils";
+
 import {
   assertExcalidrawWithSidebar,
   assertSidebarDockButton,

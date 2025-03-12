@@ -1,16 +1,6 @@
 import rough from "roughjs/bin/rough";
-import type {
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawTextElement,
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../element/types";
-import type { Bounds } from "../element/bounds";
-import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
-import { renderSceneToSvg } from "../renderer/staticSvgScene";
-import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
-import type { AppState, BinaryFiles } from "../types";
+
+import { getDefaultAppState } from "../appState";
 import {
   DEFAULT_EXPORT_PADDING,
   FRAME_STYLE,
@@ -21,27 +11,39 @@ import {
   MIME_TYPES,
   EXPORT_DATA_TYPES,
 } from "../constants";
-import { getDefaultAppState } from "../appState";
+import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
+import { newTextElement } from "../element";
+import { getCommonBounds, getElementAbsoluteCoords } from "../element/bounds";
 import {
   getInitializedImageElements,
   updateImageCache,
 } from "../element/image";
+import { newElementWith } from "../element/mutateElement";
+import { isFrameLikeElement } from "../element/typeChecks";
+import { Fonts } from "../fonts";
+import { syncInvalidIndices } from "../fractionalIndex";
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
 } from "../frame";
-import { newTextElement } from "../element";
-import { type Mutable } from "../utility-types";
-import { newElementWith } from "../element/mutateElement";
-import { isFrameLikeElement } from "../element/typeChecks";
-import type { RenderableElementsMap } from "./types";
-import { syncInvalidIndices } from "../fractionalIndex";
 import { renderStaticScene } from "../renderer/staticScene";
-import { Fonts } from "../fonts";
-import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
+import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import { type Mutable } from "../utility-types";
+import { arrayToMap, distance, getFontString, toBrandedType } from "../utils";
+
+import type { RenderableElementsMap } from "./types";
+import type { Bounds } from "../element/bounds";
+import type {
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "../element/types";
+import type { AppState, BinaryFiles } from "../types";
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   if (element.width <= maxWidth) {

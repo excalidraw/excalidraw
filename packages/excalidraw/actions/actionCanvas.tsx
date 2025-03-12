@@ -1,4 +1,14 @@
+import { clamp, roundToStep } from "@excalidraw/math";
+
+import {
+  getDefaultAppState,
+  isEraserActive,
+  isHandToolActive,
+} from "../appState";
+import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { ToolButton } from "../components/ToolButton";
+import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
   MoonIcon,
@@ -9,7 +19,6 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
 import {
   CURSOR_TYPE,
   MAX_ZOOM,
@@ -17,28 +26,22 @@ import {
   THEME,
   ZOOM_STEP,
 } from "../constants";
+import { setCursor } from "../cursor";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
+import { newElementWith } from "../element/mutateElement";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type { AppState, Offsets } from "../types";
-import { getShortcutKey, updateActiveTool } from "../utils";
-import { register } from "./register";
-import { Tooltip } from "../components/Tooltip";
-import { newElementWith } from "../element/mutateElement";
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-} from "../appState";
-import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
-import type { SceneBounds } from "../element/bounds";
-import { setCursor } from "../cursor";
 import { CaptureUpdateAction } from "../store";
-import { clamp, roundToStep } from "@excalidraw/math";
+import { getShortcutKey, updateActiveTool } from "../utils";
+
+import { register } from "./register";
+
+import type { SceneBounds } from "../element/bounds";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppState, Offsets } from "../types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

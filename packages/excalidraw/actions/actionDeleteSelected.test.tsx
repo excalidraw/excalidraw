@@ -1,7 +1,9 @@
 import React from "react";
+
 import { Excalidraw, mutateElement } from "../index";
-import { act, assertElements, render } from "../tests/test-utils";
 import { API } from "../tests/helpers/api";
+import { act, assertElements, render } from "../tests/test-utils";
+
 import { actionDeleteSelected } from "./actionDeleteSelected";
 
 const { h } = window;
