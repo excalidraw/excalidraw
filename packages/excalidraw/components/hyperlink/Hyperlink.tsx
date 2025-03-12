@@ -1,20 +1,5 @@
-import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
-import {
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
-  wrapEvent,
-} from "../../utils";
-import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
-import { mutateElement } from "../../element/mutateElement";
-import type {
-  ElementsMap,
-  ExcalidrawEmbeddableElement,
-  NonDeletedExcalidrawElement,
-} from "../../element/types";
-
-import { ToolButton } from "../ToolButton";
-import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
-import { t } from "../../i18n";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
+import clsx from "clsx";
 import {
   useCallback,
   useEffect,
@@ -22,22 +7,39 @@ import {
   useRef,
   useState,
 } from "react";
-import clsx from "clsx";
-import { KEYS } from "../../keys";
-import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
-import { getElementAbsoluteCoords } from "../../element/bounds";
-import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
-import { getSelectedElements } from "../../scene";
-import { hitElementBoundingBox } from "../../element/collision";
-import { isLocalLink, normalizeLink } from "../../data/url";
+
 import { trackEvent } from "../../analytics";
-import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
-import { isEmbeddableElement } from "../../element/typeChecks";
-import { getLinkHandleFromCoords } from "./helpers";
-import { pointFrom, type GlobalPoint } from "@excalidraw/math";
+import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
+import { isLocalLink, normalizeLink } from "../../data/url";
+import { getElementAbsoluteCoords } from "../../element/bounds";
+import { hitElementBoundingBox } from "../../element/collision";
 import { isElementLink } from "../../element/elementLink";
+import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
+import { mutateElement } from "../../element/mutateElement";
+import { t } from "../../i18n";
+import {
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+  wrapEvent,
+} from "../../utils";
+import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
+import { ToolButton } from "../ToolButton";
+import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
+import { KEYS } from "../../keys";
+import { getSelectedElements } from "../../scene";
+import { isEmbeddableElement } from "../../element/typeChecks";
+
+import { getLinkHandleFromCoords } from "./helpers";
 
 import "./Hyperlink.scss";
+
+import type {
+  ElementsMap,
+  ExcalidrawEmbeddableElement,
+  NonDeletedExcalidrawElement,
+} from "../../element/types";
+import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
 
 const POPUP_WIDTH = 380;
 const POPUP_HEIGHT = 42;

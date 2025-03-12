@@ -1,6 +1,6 @@
-import { unstable_batchedUpdates } from "react-dom";
-import { fileOpen as _fileOpen } from "browser-fs-access";
 import { MIME_TYPES } from "@excalidraw/excalidraw";
+import { fileOpen as _fileOpen } from "browser-fs-access";
+import { unstable_batchedUpdates } from "react-dom";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 

@@ -1,5 +1,3 @@
-import type { Drawable } from "roughjs/bin/core";
-import type { RoughSVG } from "roughjs/bin/svg";
 import {
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
@@ -8,6 +6,7 @@ import {
 } from "../constants";
 import { normalizeLink, toValidURL } from "../data/url";
 import { getElementAbsoluteCoords, hashString } from "../element";
+import { getUncroppedWidthAndHeight } from "../element/cropElement";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
@@ -17,27 +16,30 @@ import {
   getBoundTextElement,
   getContainerElement,
 } from "../element/textElement";
+import { getLineHeightInPx } from "../element/textMeasurements";
 import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
 } from "../element/typeChecks";
+import { getVerticalOffset } from "../fonts";
+import { getContainingFrame } from "../frame";
+import { ShapeCache } from "../scene/ShapeCache";
+import { getCornerRadius, isPathALoop } from "../shapes";
+import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
+
+import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "../element/types";
-import { getContainingFrame } from "../frame";
-import { ShapeCache } from "../scene/ShapeCache";
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
-import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
-import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
-import { getVerticalOffset } from "../fonts";
-import { getCornerRadius, isPathALoop } from "../shapes";
-import { getUncroppedWidthAndHeight } from "../element/cropElement";
-import { getLineHeightInPx } from "../element/textMeasurements";
+import type { Drawable } from "roughjs/bin/core";
+import type { RoughSVG } from "roughjs/bin/svg";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,

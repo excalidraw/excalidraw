@@ -1,6 +1,8 @@
-import type { JSX } from "react";
 import clsx from "clsx";
+
 import { ButtonIcon } from "./ButtonIcon";
+
+import type { JSX } from "react";
 
 // TODO: It might be "clever" to add option.icon to the existing component <ButtonSelect />
 export const ButtonIconSelect = <T extends Object>(

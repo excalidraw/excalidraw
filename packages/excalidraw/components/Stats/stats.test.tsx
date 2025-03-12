@@ -1,31 +1,35 @@
-import React from "react";
+import { degreesToRadians, pointFrom, pointRotateRads } from "@excalidraw/math";
 import { act, fireEvent, queryByTestId } from "@testing-library/react";
+import React from "react";
+import { vi } from "vitest";
+
+import type { Degrees } from "@excalidraw/math";
+
+import { Excalidraw, mutateElement } from "../..";
+import { actionGroup } from "../../actions";
+import { getCommonBounds, isTextElement } from "../../element";
+import { isInGroup } from "../../groups";
+import { t } from "../../i18n";
+import { reseed } from "../../random";
+import * as StaticScene from "../../renderer/staticScene";
+import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
-import { getStepSizedValue } from "./utils";
+import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
 import {
   GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
-import * as StaticScene from "../../renderer/staticScene";
-import { vi } from "vitest";
-import { reseed } from "../../random";
 import { setDateTimeForTests } from "../../utils";
-import { Excalidraw, mutateElement } from "../..";
-import { t } from "../../i18n";
+
+import { getStepSizedValue } from "./utils";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "../../element/types";
-import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
-import { getCommonBounds, isTextElement } from "../../element";
-import { API } from "../../tests/helpers/api";
-import { actionGroup } from "../../actions";
-import { isInGroup } from "../../groups";
-import type { Degrees } from "@excalidraw/math";
-import { degreesToRadians, pointFrom, pointRotateRads } from "@excalidraw/math";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

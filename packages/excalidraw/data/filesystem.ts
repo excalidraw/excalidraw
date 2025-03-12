@@ -1,12 +1,14 @@
-import type { FileSystemHandle } from "browser-fs-access";
 import {
   fileOpen as _fileOpen,
   fileSave as _fileSave,
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
+
 import { EVENT, MIME_TYPES } from "../constants";
 import { AbortError } from "../errors";
 import { debounce } from "../utils";
+
+import type { FileSystemHandle } from "browser-fs-access";
 
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
 

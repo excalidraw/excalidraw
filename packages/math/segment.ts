@@ -5,7 +5,6 @@ import {
   pointFromVector,
   pointRotateRads,
 } from "./point";
-import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
 import { PRECISION } from "./utils";
 import {
   vectorAdd,
@@ -14,6 +13,8 @@ import {
   vectorScale,
   vectorSubtract,
 } from "./vector";
+
+import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
 
 /**
  * Create a line segment from two points.

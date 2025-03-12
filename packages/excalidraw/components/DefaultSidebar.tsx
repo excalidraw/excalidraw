@@ -1,4 +1,5 @@
 import clsx from "clsx";
+
 import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
@@ -6,16 +7,19 @@ import {
 } from "../constants";
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
-import type { MarkOptional, Merge } from "../utility-types";
 import { composeEventHandlers } from "../utils";
-import { useExcalidrawSetAppState } from "./App";
-import { withInternalFallback } from "./hoc/withInternalFallback";
-import { LibraryMenu } from "./LibraryMenu";
-import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
-import { Sidebar } from "./Sidebar/Sidebar";
+
 import "../components/dropdownMenu/DropdownMenu.scss";
+
+import { useExcalidrawSetAppState } from "./App";
+import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
+import { Sidebar } from "./Sidebar/Sidebar";
+import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
+
+import type { MarkOptional, Merge } from "../utility-types";
+import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 
 const DefaultSidebarTrigger = withInternalFallback(
   "DefaultSidebarTrigger",

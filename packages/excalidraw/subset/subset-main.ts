@@ -1,6 +1,6 @@
-import { WorkerPool } from "../workers";
-import { isServerEnv, promiseTry } from "../utils";
 import { WorkerInTheMainChunkError, WorkerUrlNotDefinedError } from "../errors";
+import { isServerEnv, promiseTry } from "../utils";
+import { WorkerPool } from "../workers";
 
 import type { Commands } from "./subset-shared.chunk";
 

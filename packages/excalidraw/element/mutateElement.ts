@@ -1,13 +1,16 @@
-import type { ExcalidrawElement, NonDeletedSceneElementsMap } from "./types";
-import Scene from "../scene/Scene";
+import type { Radians } from "@excalidraw/math";
+
 import { getSizeFromPoints } from "../points";
 import { randomInteger } from "../random";
-import { getUpdatedTimestamp, toBrandedType } from "../utils";
-import type { Mutable } from "../utility-types";
+import Scene from "../scene/Scene";
 import { ShapeCache } from "../scene/ShapeCache";
-import { isElbowArrow } from "./typeChecks";
+import { getUpdatedTimestamp, toBrandedType } from "../utils";
+
 import { updateElbowArrowPoints } from "./elbowArrow";
-import type { Radians } from "@excalidraw/math";
+import { isElbowArrow } from "./typeChecks";
+
+import type { ExcalidrawElement, NonDeletedSceneElementsMap } from "./types";
+import type { Mutable } from "../utility-types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,

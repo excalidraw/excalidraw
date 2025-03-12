@@ -1,31 +1,3 @@
-import type {
-  ElementsMap,
-  ExcalidrawDiamondElement,
-  ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawRectangleElement,
-  ExcalidrawRectanguloidElement,
-} from "./types";
-import { getElementBounds } from "./bounds";
-import type { FrameNameBounds } from "../types";
-import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
-import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
-import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
-import { isTransparent } from "../utils";
-import {
-  hasBoundTextElement,
-  isIframeLikeElement,
-  isImageElement,
-  isTextElement,
-} from "./typeChecks";
-import { getBoundTextShape, isPathALoop } from "../shapes";
-import type {
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Polygon,
-  Radians,
-} from "@excalidraw/math";
 import {
   curveIntersectLineSegment,
   isPointWithinBounds,
@@ -40,10 +12,42 @@ import {
   ellipse,
   ellipseLineIntersectionPoints,
 } from "@excalidraw/math/ellipse";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
+import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
+
+import type {
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+  Polygon,
+  Radians,
+} from "@excalidraw/math";
+import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
+
+import { getBoundTextShape, isPathALoop } from "../shapes";
+import { isTransparent } from "../utils";
+
+import { getElementBounds } from "./bounds";
+import {
+  hasBoundTextElement,
+  isIframeLikeElement,
+  isImageElement,
+  isTextElement,
+} from "./typeChecks";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
 } from "./utils";
+
+import type {
+  ElementsMap,
+  ExcalidrawDiamondElement,
+  ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawRectangleElement,
+  ExcalidrawRectanguloidElement,
+} from "./types";
+import type { FrameNameBounds } from "../types";
 
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {

@@ -1,8 +1,10 @@
 import * as RadixTabs from "@radix-ui/react-tabs";
-import type { ReactNode } from "react";
 import { useRef } from "react";
-import { useExcalidrawSetAppState } from "../App";
+
 import { isMemberOf } from "../../utils";
+import { useExcalidrawSetAppState } from "../App";
+
+import type { ReactNode } from "react";
 
 const TTDDialogTabs = (
   props: {

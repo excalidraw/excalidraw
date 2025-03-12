@@ -1,48 +1,23 @@
 import {
-  getElementAbsoluteCoords,
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getCommonBounds,
-} from "../element";
+  pointFrom,
+  type GlobalPoint,
+  type LocalPoint,
+  type Radians,
+} from "@excalidraw/math";
+import oc from "open-color";
 
-import { roundRect } from "../renderer/roundRect";
-
-import {
-  getScrollBars,
-  SCROLLBAR_COLOR,
-  SCROLLBAR_WIDTH,
-} from "../scene/scrollbars";
-
-import { renderSelectionElement } from "../renderer/renderElement";
 import { getClientColor, renderRemoteCursors } from "../clients";
-import {
-  isSelectedViaGroup,
-  getSelectedGroupIds,
-  getElementsInGroup,
-  selectGroupsFromGivenElements,
-} from "../groups";
-import type {
-  TransformHandles,
-  TransformHandleType,
-} from "../element/transformHandles";
-import {
-  getOmitSidesForDevice,
-  shouldShowBoundingBox,
-} from "../element/transformHandles";
-import { arrayToMap, invariant, throttleRAF } from "../utils";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   THEME,
 } from "../constants";
-import { type InteractiveCanvasAppState } from "../types";
-
-import { renderSnaps } from "../renderer/renderSnaps";
-
-import type {
-  SuggestedBinding,
-  SuggestedPointBinding,
-} from "../element/binding";
+import {
+  getElementAbsoluteCoords,
+  getTransformHandlesFromCoords,
+  getTransformHandles,
+  getCommonBounds,
+} from "../element";
 import {
   BINDING_HIGHLIGHT_OFFSET,
   BINDING_HIGHLIGHT_THICKNESS,
@@ -50,11 +25,9 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
-  bootstrapCanvas,
-  fillCircle,
-  getNormalizedCanvasDimensions,
-} from "./helpers";
-import oc from "open-color";
+  getOmitSidesForDevice,
+  shouldShowBoundingBox,
+} from "../element/transformHandles";
 import {
   isElbowArrow,
   isFrameLikeElement,
@@ -62,6 +35,38 @@ import {
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
+import {
+  isSelectedViaGroup,
+  getSelectedGroupIds,
+  getElementsInGroup,
+  selectGroupsFromGivenElements,
+} from "../groups";
+import { renderSelectionElement } from "../renderer/renderElement";
+import { renderSnaps } from "../renderer/renderSnaps";
+import { roundRect } from "../renderer/roundRect";
+import {
+  getScrollBars,
+  SCROLLBAR_COLOR,
+  SCROLLBAR_WIDTH,
+} from "../scene/scrollbars";
+import { getCornerRadius } from "../shapes";
+import { type InteractiveCanvasAppState } from "../types";
+import { arrayToMap, invariant, throttleRAF } from "../utils";
+
+import {
+  bootstrapCanvas,
+  fillCircle,
+  getNormalizedCanvasDimensions,
+} from "./helpers";
+
+import type {
+  SuggestedBinding,
+  SuggestedPointBinding,
+} from "../element/binding";
+import type {
+  TransformHandles,
+  TransformHandleType,
+} from "../element/transformHandles";
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -78,13 +83,6 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import {
-  pointFrom,
-  type GlobalPoint,
-  type LocalPoint,
-  type Radians,
-} from "@excalidraw/math";
-import { getCornerRadius } from "../shapes";
 
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,

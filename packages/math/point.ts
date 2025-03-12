@@ -1,4 +1,7 @@
 import { degreesToRadians } from "./angle";
+import { PRECISION } from "./utils";
+import { vectorFromPoint, vectorScale } from "./vector";
+
 import type {
   LocalPoint,
   GlobalPoint,
@@ -6,8 +9,6 @@ import type {
   Degrees,
   Vector,
 } from "./types";
-import { PRECISION } from "./utils";
-import { vectorFromPoint, vectorScale } from "./vector";
 
 /**
  * Create a properly typed Point instance from the X and Y coordinates.

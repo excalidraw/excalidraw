@@ -1,7 +1,9 @@
-import type { NewElementSceneRenderConfig } from "../scene/types";
 import { throttleRAF } from "../utils";
+
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import { renderElement } from "./renderElement";
+
+import type { NewElementSceneRenderConfig } from "../scene/types";
 
 const _renderNewElementScene = ({
   canvas,

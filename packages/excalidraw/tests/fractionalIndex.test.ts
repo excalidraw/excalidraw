@@ -1,15 +1,18 @@
 /* eslint-disable no-lone-blocks */
+import { generateKeyBetween } from "fractional-indexing";
+
+import { deepCopyElement } from "../element/newElement";
+import { InvalidFractionalIndexError } from "../errors";
 import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
-import { API } from "./helpers/api";
 import { arrayToMap } from "../utils";
-import { InvalidFractionalIndexError } from "../errors";
+
+import { API } from "./helpers/api";
+
 import type { ExcalidrawElement, FractionalIndex } from "../element/types";
-import { deepCopyElement } from "../element/newElement";
-import { generateKeyBetween } from "fractional-indexing";
 
 describe("sync invalid indices with array order", () => {
   describe("should NOT sync empty array", () => {
