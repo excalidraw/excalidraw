@@ -27,8 +27,12 @@ import {
   ZOOM_STEP,
 } from "../constants";
 import { setCursor } from "../cursor";
-import { getCommonBounds, getNonDeletedElements } from "../element";
-import { newElementWith } from "../element/mutateElement";
+import {
+  getCommonBounds,
+  getNonDeletedElements,
+  isInvisiblySmallElement,
+} from "../element";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
@@ -36,6 +40,7 @@ import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { CaptureUpdateAction } from "../store";
 import { getShortcutKey, updateActiveTool } from "../utils";
+import { isLinearElement } from "../element/typeChecks";
 
 import { register } from "./register";
 
@@ -544,13 +549,44 @@ export const actionToggleHandTool = register({
       setCursor(app.interactiveCanvas, CURSOR_TYPE.GRAB);
     }
 
+    let newElements = elements;
+
+    const multiPointElement =
+      appState.multiElement && isLinearElement(appState.multiElement)
+        ? appState.multiElement
+        : null;
+
+    if (multiPointElement) {
+      // pen and mouse have hover
+      if (appState.lastPointerDownWith !== "touch") {
+        const { points, lastCommittedPoint } = multiPointElement;
+        if (
+          !lastCommittedPoint ||
+          points[points.length - 1] !== lastCommittedPoint
+        ) {
+          mutateElement(multiPointElement, {
+            points: multiPointElement.points.slice(0, -1),
+          });
+        }
+      }
+      if (isInvisiblySmallElement(multiPointElement)) {
+        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
+        newElements = newElements.filter(
+          (el) => el.id !== multiPointElement.id,
+        );
+      }
+    }
+
     return {
+      elements: newElements,
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
         activeEmbeddable: null,
         activeTool,
+        newElement: null,
+        multiElement: null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
