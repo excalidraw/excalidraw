@@ -17,7 +17,11 @@ import {
   THEME,
   ZOOM_STEP,
 } from "../constants";
-import { getCommonBounds, getNonDeletedElements } from "../element";
+import {
+  getCommonBounds,
+  getNonDeletedElements,
+  isInvisiblySmallElement,
+} from "../element";
 import type { ExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
@@ -28,7 +32,7 @@ import type { AppState, Offsets } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
-import { newElementWith } from "../element/mutateElement";
+import { mutateElement, newElementWith } from "../element/mutateElement";
 import {
   getDefaultAppState,
   isEraserActive,
@@ -39,6 +43,7 @@ import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { CaptureUpdateAction } from "../store";
 import { clamp, roundToStep } from "@excalidraw/math";
+import { isLinearElement } from "../element/typeChecks";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
@@ -541,13 +546,44 @@ export const actionToggleHandTool = register({
       setCursor(app.interactiveCanvas, CURSOR_TYPE.GRAB);
     }
 
+    let newElements = elements;
+
+    const multiPointElement =
+      appState.multiElement && isLinearElement(appState.multiElement)
+        ? appState.multiElement
+        : null;
+
+    if (multiPointElement) {
+      // pen and mouse have hover
+      if (appState.lastPointerDownWith !== "touch") {
+        const { points, lastCommittedPoint } = multiPointElement;
+        if (
+          !lastCommittedPoint ||
+          points[points.length - 1] !== lastCommittedPoint
+        ) {
+          mutateElement(multiPointElement, {
+            points: multiPointElement.points.slice(0, -1),
+          });
+        }
+      }
+      if (isInvisiblySmallElement(multiPointElement)) {
+        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
+        newElements = newElements.filter(
+          (el) => el.id !== multiPointElement.id,
+        );
+      }
+    }
+
     return {
+      elements: newElements,
       appState: {
         ...appState,
         selectedElementIds: {},
         selectedGroupIds: {},
         activeEmbeddable: null,
         activeTool,
+        newElement: null,
+        multiElement: null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
