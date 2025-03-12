@@ -10,7 +10,10 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "freedraw";
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
-  type !== "image" && type !== "frame" && type !== "magicframe";
+  type !== "image" &&
+  type !== "frame" &&
+  type !== "magicframe" &&
+  type !== "lasso";
 
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
