@@ -3579,7 +3579,7 @@ class App extends React.Component<AppProps, AppState> {
           ...prevState.activeTool,
           ...updateActiveTool(
             this.state,
-            prevState.activeTool.locked
+            prevState.activeTool.locked && !prevState.newElement
               ? { type: "selection" }
               : prevState.activeTool,
           ),
@@ -4693,6 +4693,11 @@ class App extends React.Component<AppProps, AppState> {
         `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
       );
       return;
+    }
+
+    //cancel adding linearElement if tool is switched
+    if (this.state.newElement && isLinearElement(this.state.newElement)) {
+      this.actionManager.executeAction(actionFinalize);
     }
 
     const nextActiveTool = updateActiveTool(this.state, tool);
