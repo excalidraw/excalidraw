@@ -1,12 +1,58 @@
 import clsx from "clsx";
 import React from "react";
-import type { ActionManager } from "../actions/manager";
+
+import { mutateElement } from "../element/mutateElement";
+import { ShapeCache } from "../scene/ShapeCache";
+import Scene from "../scene/Scene";
+import { actionToggleStats } from "../actions";
+import { trackEvent } from "../analytics";
+import { isHandToolActive } from "../appState";
 import { CLASSES, DEFAULT_SIDEBAR, TOOL_TYPE } from "../constants";
+import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
+import { UIAppStateContext } from "../context/ui-appState";
+import { useAtom, useAtomValue } from "../editor-jotai";
 import { showSelectedShapeActions } from "../element";
-import type { NonDeletedExcalidrawElement } from "../element/types";
-import type { Language } from "../i18n";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
+import { capitalizeString, isShallowEqual } from "../utils";
+
+import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { LoadingMessage } from "./LoadingMessage";
+import { LockButton } from "./LockButton";
+import { MobileMenu } from "./MobileMenu";
+import { PasteChartDialog } from "./PasteChartDialog";
+import { Section } from "./Section";
+import Stack from "./Stack";
+import { UserList } from "./UserList";
+import { PenModeButton } from "./PenModeButton";
+import Footer from "./footer/Footer";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+import MainMenu from "./main-menu/MainMenu";
+import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
+import { useDevice } from "./App";
+import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
+import { LibraryIcon } from "./icons";
+import { DefaultSidebar } from "./DefaultSidebar";
+import { TTDDialog } from "./TTDDialog/TTDDialog";
+import { Stats } from "./Stats";
+import ElementLinkDialog from "./ElementLinkDialog";
+import { ErrorDialog } from "./ErrorDialog";
+import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
+import { FixedSideContainer } from "./FixedSideContainer";
+import { HandButton } from "./HandButton";
+import { HelpDialog } from "./HelpDialog";
+import { HintViewer } from "./HintViewer";
+import { ImageExportDialog } from "./ImageExportDialog";
+import { Island } from "./Island";
+import { JSONExportDialog } from "./JSONExportDialog";
+import { LaserPointerButton } from "./LaserPointerButton";
+
+import "./LayerUI.scss";
+import "./Toolbar.scss";
+
+import type { ActionManager } from "../actions/manager";
+import type { NonDeletedExcalidrawElement } from "../element/types";
+import type { Language } from "../i18n";
 import type {
   AppProps,
   AppState,
@@ -15,49 +61,6 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-import { capitalizeString, isShallowEqual } from "../utils";
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
-import { ErrorDialog } from "./ErrorDialog";
-import { ImageExportDialog } from "./ImageExportDialog";
-import { FixedSideContainer } from "./FixedSideContainer";
-import { HintViewer } from "./HintViewer";
-import { Island } from "./Island";
-import { LoadingMessage } from "./LoadingMessage";
-import { LockButton } from "./LockButton";
-import { MobileMenu } from "./MobileMenu";
-import { PasteChartDialog } from "./PasteChartDialog";
-import { Section } from "./Section";
-import { HelpDialog } from "./HelpDialog";
-import Stack from "./Stack";
-import { UserList } from "./UserList";
-import { JSONExportDialog } from "./JSONExportDialog";
-import { PenModeButton } from "./PenModeButton";
-import { trackEvent } from "../analytics";
-import { useDevice } from "./App";
-import Footer from "./footer/Footer";
-import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { useAtom, useAtomValue } from "../editor-jotai";
-import MainMenu from "./main-menu/MainMenu";
-import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
-import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
-import { HandButton } from "./HandButton";
-import { isHandToolActive } from "../appState";
-import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
-import { LibraryIcon } from "./icons";
-import { UIAppStateContext } from "../context/ui-appState";
-import { DefaultSidebar } from "./DefaultSidebar";
-import { EyeDropper, activeEyeDropperAtom } from "./EyeDropper";
-import { mutateElement } from "../element/mutateElement";
-import { ShapeCache } from "../scene/ShapeCache";
-import Scene from "../scene/Scene";
-import { LaserPointerButton } from "./LaserPointerButton";
-import { TTDDialog } from "./TTDDialog/TTDDialog";
-import { Stats } from "./Stats";
-import { actionToggleStats } from "../actions";
-import ElementLinkDialog from "./ElementLinkDialog";
-
-import "./LayerUI.scss";
-import "./Toolbar.scss";
 
 interface LayerUIProps {
   actionManager: ActionManager;

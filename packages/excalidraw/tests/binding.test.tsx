@@ -1,13 +1,15 @@
-import React from "react";
-import { fireEvent, render } from "./test-utils";
-import { Excalidraw, isLinearElement } from "../index";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { getTransformHandles } from "../element/transformHandles";
-import { API } from "./helpers/api";
-import { KEYS } from "../keys";
-import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { arrayToMap } from "../utils";
 import { pointFrom } from "@excalidraw/math";
+import React from "react";
+
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import { getTransformHandles } from "../element/transformHandles";
+import { Excalidraw, isLinearElement } from "../index";
+import { KEYS } from "../keys";
+import { arrayToMap } from "../utils";
+
+import { API } from "./helpers/api";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { fireEvent, render } from "./test-utils";
 
 const { h } = window;
 

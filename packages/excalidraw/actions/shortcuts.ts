@@ -1,7 +1,8 @@
 import { isDarwin } from "../constants";
 import { t } from "../i18n";
-import type { SubtypeOf } from "../utility-types";
 import { getShortcutKey } from "../utils";
+
+import type { SubtypeOf } from "../utility-types";
 import type { ActionName } from "./types";
 
 export type ShortcutName =

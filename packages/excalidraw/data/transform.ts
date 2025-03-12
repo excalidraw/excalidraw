@@ -1,3 +1,5 @@
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
+
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -11,7 +13,6 @@ import {
   redrawTextBoundingBox,
 } from "../element";
 import { bindLinearElement } from "../element/binding";
-import type { ElementConstructorOpts } from "../element/newElement";
 import {
   newArrowElement,
   newFrameElement,
@@ -19,6 +20,22 @@ import {
   newMagicFrameElement,
   newTextElement,
 } from "../element/newElement";
+import { measureText, normalizeText } from "../element/textMeasurements";
+import { isArrowElement } from "../element/typeChecks";
+import { getLineHeight } from "../fonts";
+import { syncInvalidIndices } from "../fractionalIndex";
+import { getSizeFromPoints } from "../points";
+import { randomId } from "../random";
+import {
+  arrayToMap,
+  assertNever,
+  cloneJSON,
+  getFontString,
+  isDevEnv,
+  toBrandedType,
+} from "../utils";
+
+import type { ElementConstructorOpts } from "../element/newElement";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -40,21 +57,6 @@ import type {
   VerticalAlign,
 } from "../element/types";
 import type { MarkOptional } from "../utility-types";
-import {
-  arrayToMap,
-  assertNever,
-  cloneJSON,
-  getFontString,
-  isDevEnv,
-  toBrandedType,
-} from "../utils";
-import { getSizeFromPoints } from "../points";
-import { randomId } from "../random";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { getLineHeight } from "../fonts";
-import { isArrowElement } from "../element/typeChecks";
-import { pointFrom, type LocalPoint } from "@excalidraw/math";
-import { measureText, normalizeText } from "../element/textMeasurements";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";

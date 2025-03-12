@@ -1,16 +1,19 @@
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
-import StatsDragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
-import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
 import { clamp, pointFrom, pointRotateRads, round } from "@excalidraw/math";
-import { isImageElement } from "../../element/typeChecks";
+
 import {
   getFlipAdjustedCropPosition,
   getUncroppedWidthAndHeight,
 } from "../../element/cropElement";
 import { mutateElement } from "../../element/mutateElement";
+import { isImageElement } from "../../element/typeChecks";
+
+import StatsDragInput from "./DragInput";
+import { getStepSizedValue, moveElement } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
+import type { ElementsMap, ExcalidrawElement } from "../../element/types";
+import type Scene from "../../scene/Scene";
+import type { AppState } from "../../types";
 
 interface PositionProps {
   property: "x" | "y";

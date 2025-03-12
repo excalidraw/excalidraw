@@ -1,33 +1,36 @@
-import type {
-  ExcalidrawElement,
-  PointerType,
-  NonDeletedExcalidrawElement,
-  ElementsMap,
-} from "./types";
-
-import type {
-  TransformHandleType,
-  TransformHandle,
-  MaybeTransformHandleType,
-} from "./transformHandles";
-import {
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getOmitSidesForDevice,
-  canResizeFromSides,
-} from "./transformHandles";
-import type { AppState, Device, Zoom } from "../types";
-import type { Bounds } from "./bounds";
-import { getElementAbsoluteCoords } from "./bounds";
-import { SIDE_RESIZING_THRESHOLD } from "../constants";
-import { isImageElement, isLinearElement } from "./typeChecks";
-import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 import {
   pointFrom,
   pointOnLineSegment,
   pointRotateRads,
   type Radians,
 } from "@excalidraw/math";
+
+import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
+
+import { SIDE_RESIZING_THRESHOLD } from "../constants";
+
+import { getElementAbsoluteCoords } from "./bounds";
+import {
+  getTransformHandlesFromCoords,
+  getTransformHandles,
+  getOmitSidesForDevice,
+  canResizeFromSides,
+} from "./transformHandles";
+import { isImageElement, isLinearElement } from "./typeChecks";
+
+import type { AppState, Device, Zoom } from "../types";
+import type { Bounds } from "./bounds";
+import type {
+  TransformHandleType,
+  TransformHandle,
+  MaybeTransformHandleType,
+} from "./transformHandles";
+import type {
+  ExcalidrawElement,
+  PointerType,
+  NonDeletedExcalidrawElement,
+  ElementsMap,
+} from "./types";
 
 const isInsideTransformHandle = (
   transformHandle: TransformHandle,

@@ -1,5 +1,7 @@
-import type { Radians } from "@excalidraw/math";
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import type { Radians } from "@excalidraw/math";
+
 import {
   bindOrUnbindLinearElements,
   updateBoundElements,
@@ -11,17 +13,18 @@ import {
   isLinearElement,
   isTextElement,
 } from "../../element/typeChecks";
+import {
+  getSelectedGroupIds,
+  getElementsInGroup,
+  isInGroup,
+} from "../../groups";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "../../element/types";
-import {
-  getSelectedGroupIds,
-  getElementsInGroup,
-  isInGroup,
-} from "../../groups";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 

@@ -1,11 +1,32 @@
+import clsx from "clsx";
+
+import {
+  actionClearCanvas,
+  actionLoadScene,
+  actionSaveToActiveFile,
+  actionShortcuts,
+  actionToggleSearchMenu,
+  actionToggleTheme,
+} from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+import { trackEvent } from "../../analytics";
+import { THEME } from "../../constants";
+import { useUIAppState } from "../../context/ui-appState";
+import { useSetAtom } from "../../editor-jotai";
 import { useI18n } from "../../i18n";
+import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import {
   useExcalidrawSetAppState,
   useExcalidrawActionManager,
   useExcalidrawElements,
   useAppProps,
 } from "../App";
+import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
+import Trans from "../Trans";
+import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
+import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
+import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
+import { GithubIcon, DiscordIcon, XBrandIcon } from "../icons";
 import {
   boltIcon,
   DeviceDesktopIcon,
@@ -20,28 +41,10 @@ import {
   TrashIcon,
   usersIcon,
 } from "../icons";
-import { GithubIcon, DiscordIcon, XBrandIcon } from "../icons";
-import DropdownMenuItem from "../dropdownMenu/DropdownMenuItem";
-import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
-import {
-  actionClearCanvas,
-  actionLoadScene,
-  actionSaveToActiveFile,
-  actionShortcuts,
-  actionToggleSearchMenu,
-  actionToggleTheme,
-} from "../../actions";
-import clsx from "clsx";
-import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import { useSetAtom } from "../../editor-jotai";
-import { useUIAppState } from "../../context/ui-appState";
-import { openConfirmModal } from "../OverwriteConfirm/OverwriteConfirmState";
-import Trans from "../Trans";
-import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
-import { THEME } from "../../constants";
-import type { Theme } from "../../element/types";
-import { trackEvent } from "../../analytics";
+
 import "./DefaultItems.scss";
+
+import type { Theme } from "../../element/types";
 
 export const LoadScene = () => {
   const { t } = useI18n();
