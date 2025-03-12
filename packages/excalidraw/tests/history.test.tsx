@@ -1,13 +1,17 @@
 import React from "react";
 import "../global.d.ts";
 import { vi } from "vitest";
-import { queryByText } from "@testing-library/react";
+import {
+  queryByText,
+  fireEvent,
+  queryByTestId,
+  waitFor,
+} from "@testing-library/react";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 import { pointFrom } from "@excalidraw/math";
 import * as StaticScene from "../renderer/staticScene";
 import "../../utils/test-utils";
 import { getDefaultAppState } from "../appState";
-import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { EXPORT_DATA_TYPES, MIME_TYPES, ORIG_ID } from "../constants";

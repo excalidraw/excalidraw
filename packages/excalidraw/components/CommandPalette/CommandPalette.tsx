@@ -51,14 +51,14 @@ import {
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { trackEvent } from "../../analytics";
 import { useStable } from "../../hooks/useStable";
-import type { CommandPaletteItem } from "./types";
-import * as defaultItems from "./defaultCommandPaletteItems";
-
-import "./CommandPalette.scss";
 import {
   actionCopyElementLink,
   actionLinkToElement,
 } from "../../actions/actionElementLink";
+import type { CommandPaletteItem } from "./types";
+import * as defaultItems from "./defaultCommandPaletteItems";
+
+import "./CommandPalette.scss";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 

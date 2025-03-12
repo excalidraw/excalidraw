@@ -16,6 +16,9 @@ import { elementsAreInSameGroup } from "../../groups";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { STATS_PANELS } from "../../constants";
 import { isElbowArrow, isImageElement } from "../../element/typeChecks";
+import { isGridModeEnabled } from "../../snapping";
+import { getUncroppedWidthAndHeight } from "../../element/cropElement";
+import { frameAndChildrenSelectedTogether } from "../../frame";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
 import FontSize from "./FontSize";
@@ -29,9 +32,6 @@ import { getAtomicUnits } from "./utils";
 import CanvasGrid from "./CanvasGrid";
 
 import "./Stats.scss";
-import { isGridModeEnabled } from "../../snapping";
-import { getUncroppedWidthAndHeight } from "../../element/cropElement";
-import { frameAndChildrenSelectedTogether } from "../../frame";
 
 interface StatsProps {
   app: AppClassProperties;

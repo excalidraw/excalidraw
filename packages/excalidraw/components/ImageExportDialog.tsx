@@ -4,6 +4,9 @@ import { exportToCanvas } from "@excalidraw/utils/export";
 import type { ActionManager } from "../actions/manager";
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
+import { cloneJSON } from "../utils";
+import { prepareElementsForExport } from "../data";
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
 import {
   actionExportWithDarkMode,
   actionChangeExportBackground,
@@ -33,9 +36,6 @@ import { Tooltip } from "./Tooltip";
 
 import "./ImageExportDialog.scss";
 import { FilledButton } from "./FilledButton";
-import { cloneJSON } from "../utils";
-import { prepareElementsForExport } from "../data";
-import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;

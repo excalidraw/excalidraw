@@ -1,5 +1,6 @@
 import type { ChangeEventHandler } from "react";
 import { useEffect, useRef, useState } from "react";
+import { isFiniteNumber } from "@excalidraw/math";
 import { Dialog } from "../Dialog";
 import { useApp, useExcalidrawSetAppState } from "../App";
 import { useUIAppState } from "../../context/ui-appState";
@@ -7,6 +8,9 @@ import { withInternalFallback } from "../hoc/withInternalFallback";
 import { t } from "../../i18n";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import type { BinaryFiles } from "../../types";
+import { atom, useAtom } from "../../editor-jotai";
+import { trackEvent } from "../../analytics";
+import { InlineIcon } from "../InlineIcon";
 import { ArrowRightIcon } from "../icons";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import TTDDialogTabs from "./TTDDialogTabs";
@@ -25,11 +29,7 @@ import {
 } from "./common";
 
 import "./TTDDialog.scss";
-import { atom, useAtom } from "../../editor-jotai";
-import { trackEvent } from "../../analytics";
-import { InlineIcon } from "../InlineIcon";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
-import { isFiniteNumber } from "@excalidraw/math";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;

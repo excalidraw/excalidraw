@@ -1,5 +1,3 @@
-import { TextField } from "./TextField";
-import DialogActionButton from "./DialogActionButton";
 import { useCallback, useEffect, useState } from "react";
 import { mutateElement } from "../element/mutateElement";
 import {
@@ -10,12 +8,15 @@ import { getSelectedElements } from "../scene";
 import type { AppProps, AppState, UIAppState } from "../types";
 import { t } from "../i18n";
 import type { ElementsMap, ExcalidrawElement } from "../element/types";
+import { normalizeLink } from "../data/url";
 import { KEYS } from "../keys";
 
-import "./ElementLinkDialog.scss";
-import { normalizeLink } from "../data/url";
+import { TextField } from "./TextField";
+import DialogActionButton from "./DialogActionButton";
 import { TrashIcon } from "./icons";
 import { ToolButton } from "./ToolButton";
+
+import "./ElementLinkDialog.scss";
 
 const ElementLinkDialog = ({
   sourceElementId,

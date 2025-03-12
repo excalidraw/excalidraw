@@ -1,4 +1,6 @@
 import React from "react";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import Scene from "../scene/Scene";
 import { API } from "../tests/helpers/api";
 import { Pointer, UI } from "../tests/helpers/ui";
@@ -20,8 +22,6 @@ import type {
   ExcalidrawElbowArrowElement,
 } from "./types";
 import "../../utils/test-utils";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
 
 const { h } = window;
 

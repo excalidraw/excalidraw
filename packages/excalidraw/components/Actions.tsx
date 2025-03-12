@@ -29,7 +29,6 @@ import {
   isTextElement,
 } from "../element/typeChecks";
 import { actionToggleZenMode } from "../actions";
-import { Tooltip } from "./Tooltip";
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
@@ -49,6 +48,7 @@ import {
   MagicIcon,
 } from "./icons";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { Tooltip } from "./Tooltip";
 import { ToolButton } from "./ToolButton";
 import Stack from "./Stack";
 import { useDevice } from "./App";

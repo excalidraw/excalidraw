@@ -8,7 +8,6 @@ import { resaveAsImageWithScene } from "../data/resave";
 import { t } from "../i18n";
 import { useDevice } from "../components/App";
 import { KEYS } from "../keys";
-import { register } from "./register";
 import { CheckboxItem } from "../components/CheckboxItem";
 import { getExportSize } from "../scene/export";
 import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
@@ -16,10 +15,11 @@ import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
+import { CaptureUpdateAction } from "../store";
 import type { Theme } from "../element/types";
+import { register } from "./register";
 
 import "../components/ToolIcon.scss";
-import { CaptureUpdateAction } from "../store";
 
 export const actionChangeProjectName = register({
   name: "changeProjectName",
