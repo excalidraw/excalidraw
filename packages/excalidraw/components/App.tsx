@@ -42,6 +42,7 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggleGridNotebookMode,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -341,6 +342,7 @@ import {
   SnapCache,
   isGridModeEnabled,
   getGridPoint,
+  isGridModeNotebookEnabled,
 } from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
@@ -1744,6 +1746,7 @@ class App extends React.Component<AppProps, AppState> {
                             imageCache: this.imageCache,
                             isExporting: false,
                             renderGrid: isGridModeEnabled(this),
+                            renderGridNotebook: isGridModeNotebookEnabled(this),
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
@@ -1763,6 +1766,7 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               renderGrid: false,
+                              renderGridNotebook: false,
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
                               embedsValidationStatus:
@@ -10844,6 +10848,7 @@ class App extends React.Component<AppProps, AppState> {
         return [
           ...options,
           actionToggleGridMode,
+          actionToggleGridNotebookMode,
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
@@ -10861,6 +10866,7 @@ class App extends React.Component<AppProps, AppState> {
         actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
+        actionToggleGridNotebookMode,
         actionToggleObjectsSnapMode,
         actionToggleZenMode,
         actionToggleViewMode,

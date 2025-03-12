@@ -65,6 +65,7 @@ export const getDefaultAppState = (): Omit<
     gridSize: DEFAULT_GRID_SIZE,
     gridStep: DEFAULT_GRID_STEP,
     gridModeEnabled: false,
+    gridModeNotebookEnabled: false,
     isBindingEnabled: true,
     defaultSidebarDockedPreference: false,
     isLoading: false,
@@ -185,6 +186,7 @@ const APP_STATE_STORAGE_CONF = (<
   gridSize: { browser: true, export: true, server: true },
   gridStep: { browser: true, export: true, server: true },
   gridModeEnabled: { browser: true, export: true, server: true },
+  gridModeNotebookEnabled: { browser: true, export: true, server: true },
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: false, export: false, server: false },
   defaultSidebarDockedPreference: {

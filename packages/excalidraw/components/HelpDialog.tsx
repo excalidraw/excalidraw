@@ -292,6 +292,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               shortcuts={[getShortcutKey("CtrlOrCmd+'")]}
             />
             <Shortcut
+              label={t("labels.toggleGridNotebook")}
+              shortcuts={[getShortcutKey("CtrlOrCmd+;")]}
+            />
+            <Shortcut
               label={t("labels.viewMode")}
               shortcuts={[getShortcutKey("Alt+R")]}
             />
