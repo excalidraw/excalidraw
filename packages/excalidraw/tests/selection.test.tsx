@@ -106,6 +106,104 @@ describe("box-selection", () => {
   });
 });
 
+describe("deselect when pressing escape", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("deselects elements", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([rect1, rect2]);
+
+    mouse.clickAt(0, 0);
+
+    assertSelectedElements([rect1.id]);
+
+    Keyboard.keyDown(KEYS.ESCAPE);
+
+    assertSelectedElements([]);
+
+    mouse.downAt(-10, -10);
+    mouse.moveTo(160, 60);
+    mouse.up();
+
+    assertSelectedElements([rect1.id, rect2.id]);
+
+    Keyboard.keyDown(KEYS.ESCAPE);
+
+    assertSelectedElements([]);
+  });
+
+  it("deselects groups", async () => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const rect3 = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([rect1, rect2, rect3]);
+
+    mouse.downAt(-10, -10);
+    mouse.moveTo(160, 60);
+    mouse.up();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyDown(KEYS.G);
+    });
+
+    expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
+    assertSelectedElements([rect1.id, rect2.id]);
+
+    Keyboard.keyDown(KEYS.ESCAPE);
+
+    expect(Object.keys(h.state.selectedGroupIds).length).toBe(0);
+    assertSelectedElements([]);
+
+    mouse.clickAt(100, 0);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickAt(200, 0);
+    });
+
+    expect(Object.keys(h.state.selectedGroupIds).length).toBe(1);
+    assertSelectedElements([rect1.id, rect2.id, rect3.id]);
+
+    Keyboard.keyDown(KEYS.ESCAPE);
+
+    expect(Object.keys(h.state.selectedGroupIds).length).toBe(0);
+    assertSelectedElements([]);
+  });
+});
+
 describe("inner box-selection", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
@@ -316,7 +414,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -348,7 +446,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -380,7 +478,7 @@ describe("select single element on the scene", () => {
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -424,8 +522,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -468,8 +566,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
-    expect(renderStaticScene).toHaveBeenCalledTimes(6);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
+    expect(renderStaticScene).toHaveBeenCalledTimes(7);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
