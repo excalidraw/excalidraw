@@ -40,13 +40,13 @@ import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { CaptureUpdateAction } from "../store";
 import { getShortcutKey, updateActiveTool } from "../utils";
+import { isLinearElement } from "../element/typeChecks";
 
 import { register } from "./register";
 
 import type { SceneBounds } from "../element/bounds";
 import type { ExcalidrawElement } from "../element/types";
 import type { AppState, Offsets } from "../types";
-import { isLinearElement } from "../element/typeChecks";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
