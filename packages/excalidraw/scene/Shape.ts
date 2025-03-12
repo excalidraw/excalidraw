@@ -1,19 +1,9 @@
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
-import type { Drawable, Options } from "roughjs/bin/core";
-import type { RoughGenerator } from "roughjs/bin/generator";
-import { getDiamondPoints, getArrowheadPoints } from "../element";
-import type { ElementShapes } from "./types";
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  ExcalidrawSelectionElement,
-  ExcalidrawLinearElement,
-  Arrowhead,
-} from "../element/types";
-import { generateFreeDrawShape } from "../renderer/renderElement";
-import { isTransparent, assertNever } from "../utils";
+import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { simplify } from "points-on-curve";
+
 import { ROUGHNESS } from "../constants";
+import { getDiamondPoints, getArrowheadPoints } from "../element";
+import { headingForPointIsHorizontal } from "../element/heading";
 import {
   isElbowArrow,
   isEmbeddableElement,
@@ -21,11 +11,24 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
-import { canChangeRoundness } from "./comparisons";
-import type { EmbedsValidationStatus } from "../types";
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
+import { generateFreeDrawShape } from "../renderer/renderElement";
 import { getCornerRadius, isPathALoop } from "../shapes";
-import { headingForPointIsHorizontal } from "../element/heading";
+import { isTransparent, assertNever } from "../utils";
+
+import { canChangeRoundness } from "./comparisons";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  ExcalidrawSelectionElement,
+  ExcalidrawLinearElement,
+  Arrowhead,
+} from "../element/types";
+import type { EmbedsValidationStatus } from "../types";
+import type { ElementShapes } from "./types";
+import type { Drawable, Options } from "roughjs/bin/core";
+import type { RoughGenerator } from "roughjs/bin/generator";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 

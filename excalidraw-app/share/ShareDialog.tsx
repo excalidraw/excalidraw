@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { getFrame } from "@excalidraw/excalidraw/utils";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { KEYS } from "@excalidraw/excalidraw/keys";
+import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
 import { Dialog } from "@excalidraw/excalidraw/components/Dialog";
+import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
+import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import {
   copyIcon,
   LinkIcon,
@@ -14,15 +12,19 @@ import {
   shareIOS,
   shareWindows,
 } from "@excalidraw/excalidraw/components/icons";
-import { TextField } from "@excalidraw/excalidraw/components/TextField";
-import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
-import type { CollabAPI } from "../collab/Collab";
-import { activeRoomLinkAtom } from "../collab/Collab";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { KEYS } from "@excalidraw/excalidraw/keys";
+import { getFrame } from "@excalidraw/excalidraw/utils";
+import { useEffect, useRef, useState } from "react";
+
 import { atom, useAtom, useAtomValue } from "../app-jotai";
+import { activeRoomLinkAtom } from "../collab/Collab";
 
 import "./ShareDialog.scss";
+
+import type { CollabAPI } from "../collab/Collab";
 
 type OnExportToBackend = () => void;
 type ShareDialogType = "share" | "collaborationOnly";

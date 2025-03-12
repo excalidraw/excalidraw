@@ -1,7 +1,8 @@
-import { register } from "./register";
-import { CODES, KEYS } from "../keys";
 import { abacusIcon } from "../components/icons";
+import { CODES, KEYS } from "../keys";
 import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 export const actionToggleStats = register({
   name: "stats",

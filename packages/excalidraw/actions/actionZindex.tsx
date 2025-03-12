@@ -1,21 +1,22 @@
 import {
-  moveOneLeft,
-  moveOneRight,
-  moveAllLeft,
-  moveAllRight,
-} from "../zindex";
-import { KEYS, CODES } from "../keys";
-import { t } from "../i18n";
-import { getShortcutKey } from "../utils";
-import { register } from "./register";
-import {
   BringForwardIcon,
   BringToFrontIcon,
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
 import { isDarwin } from "../constants";
+import { t } from "../i18n";
+import { KEYS, CODES } from "../keys";
 import { CaptureUpdateAction } from "../store";
+import { getShortcutKey } from "../utils";
+import {
+  moveOneLeft,
+  moveOneRight,
+  moveAllLeft,
+  moveAllRight,
+} from "../zindex";
+
+import { register } from "./register";
 
 export const actionSendBackward = register({
   name: "sendBackward",

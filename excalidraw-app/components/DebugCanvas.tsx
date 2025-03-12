@@ -1,24 +1,27 @@
-import { useCallback, useImperativeHandle, useRef } from "react";
-import { type AppState } from "@excalidraw/excalidraw/types";
-import { throttleRAF } from "@excalidraw/excalidraw/utils";
-import {
-  bootstrapCanvas,
-  getNormalizedCanvasDimensions,
-} from "@excalidraw/excalidraw/renderer/helpers";
-import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
 import {
   ArrowheadArrowIcon,
   CloseIcon,
   TrashIcon,
 } from "@excalidraw/excalidraw/components/icons";
-import { STORAGE_KEYS } from "../app_constants";
-import type { Curve } from "../../packages/math";
+import {
+  bootstrapCanvas,
+  getNormalizedCanvasDimensions,
+} from "@excalidraw/excalidraw/renderer/helpers";
+import { type AppState } from "@excalidraw/excalidraw/types";
+import { throttleRAF } from "@excalidraw/excalidraw/utils";
+import { useCallback, useImperativeHandle, useRef } from "react";
+
+import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
+
 import {
   isLineSegment,
   type GlobalPoint,
   type LineSegment,
 } from "../../packages/math";
 import { isCurve } from "../../packages/math/curve";
+import { STORAGE_KEYS } from "../app_constants";
+
+import type { Curve } from "../../packages/math";
 
 const renderLine = (
   context: CanvasRenderingContext2D,

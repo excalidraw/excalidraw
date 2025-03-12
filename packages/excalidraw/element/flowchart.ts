@@ -1,3 +1,12 @@
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
+
+import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
+import { KEYS } from "../keys";
+import { aabbForElement } from "../shapes";
+import { invariant, toBrandedType } from "../utils";
+
+import { bindLinearElement } from "./binding";
+import { updateElbowArrowPoints } from "./elbowArrow";
 import {
   HEADING_DOWN,
   HEADING_LEFT,
@@ -7,9 +16,15 @@ import {
   headingForPointFromElement,
   type Heading,
 } from "./heading";
-import { bindLinearElement } from "./binding";
 import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
+import {
+  isBindableElement,
+  isElbowArrow,
+  isFrameElement,
+  isFlowchartNodeElement,
+} from "./typeChecks";
 import {
   type ElementsMap,
   type ExcalidrawBindableElement,
@@ -19,20 +34,8 @@ import {
   type Ordered,
   type OrderedExcalidrawElement,
 } from "./types";
-import { KEYS } from "../keys";
+
 import type { AppState, PendingExcalidrawElements } from "../types";
-import { mutateElement } from "./mutateElement";
-import { elementOverlapsWithFrame, elementsAreInFrameBounds } from "../frame";
-import {
-  isBindableElement,
-  isElbowArrow,
-  isFrameElement,
-  isFlowchartNodeElement,
-} from "./typeChecks";
-import { invariant, toBrandedType } from "../utils";
-import { pointFrom, type LocalPoint } from "@excalidraw/math";
-import { aabbForElement } from "../shapes";
-import { updateElbowArrowPoints } from "./elbowArrow";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 

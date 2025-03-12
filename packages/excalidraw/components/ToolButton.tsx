@@ -1,13 +1,16 @@
+import clsx from "clsx";
+import React, { useEffect, useRef, useState } from "react";
+
+import { AbortError } from "../errors";
+import { isPromiseLike } from "../utils";
+
 import "./ToolIcon.scss";
 
-import type { CSSProperties } from "react";
-import React, { useEffect, useRef, useState } from "react";
-import clsx from "clsx";
-import { useExcalidrawContainer } from "./App";
-import { AbortError } from "../errors";
 import Spinner from "./Spinner";
+import { useExcalidrawContainer } from "./App";
+
 import type { PointerType } from "../element/types";
-import { isPromiseLike } from "../utils";
+import type { CSSProperties } from "react";
 
 export type ToolButtonSize = "small" | "medium";
 
