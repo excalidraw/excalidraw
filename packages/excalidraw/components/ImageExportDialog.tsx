@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
+import { exportToCanvas } from "@excalidraw/utils/export";
 import type { ActionManager } from "../actions/manager";
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
@@ -23,7 +24,6 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 import type { NonDeletedExcalidrawElement } from "../element/types";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "@excalidraw/utils/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";

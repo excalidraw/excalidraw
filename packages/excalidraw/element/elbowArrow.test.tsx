@@ -9,19 +9,19 @@ import {
   queryByTestId,
   render,
 } from "../tests/test-utils";
-import { bindLinearElement } from "./binding";
 import { Excalidraw, mutateElement } from "../index";
+import { ARROW_TYPE } from "../constants";
+import { actionDuplicateSelection } from "../actions/actionDuplicateSelection";
+import { actionSelectAll } from "../actions";
+import { bindLinearElement } from "./binding";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import { ARROW_TYPE } from "../constants";
 import "../../utils/test-utils";
 import type { LocalPoint } from "@excalidraw/math";
 import { pointFrom } from "@excalidraw/math";
-import { actionDuplicateSelection } from "../actions/actionDuplicateSelection";
-import { actionSelectAll } from "../actions";
 
 const { h } = window;
 

@@ -2,7 +2,6 @@ import React from "react";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
@@ -19,13 +18,14 @@ import {
   generateEncryptionKey,
 } from "@excalidraw/excalidraw/data/encryption";
 import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
-import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
-import { encodeFilesForUpload } from "../data/FileManager";
 import { uploadBytes, ref } from "firebase/storage";
 import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getFrame } from "@excalidraw/excalidraw/utils";
 import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
+import { encodeFilesForUpload } from "../data/FileManager";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],

@@ -1,5 +1,12 @@
 import React from "react";
 import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "../element/types";
+import type { AppClassProperties, AppState } from "../types";
+import { trackEvent } from "../analytics";
+import { isPromiseLike } from "../utils";
+import type {
   Action,
   UpdaterFn,
   ActionName,
@@ -7,13 +14,6 @@ import type {
   PanelComponentProps,
   ActionSource,
 } from "./types";
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-} from "../element/types";
-import type { AppClassProperties, AppState } from "../types";
-import { trackEvent } from "../analytics";
-import { isPromiseLike } from "../utils";
 
 const trackAction = (
   action: Action,

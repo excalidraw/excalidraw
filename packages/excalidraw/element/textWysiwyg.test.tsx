@@ -1,4 +1,6 @@
 import React from "react";
+import { queryByText } from "@testing-library/react";
+import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "../index";
 import {
   GlobalTestState,
@@ -13,17 +15,15 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
-import { queryByText } from "@testing-library/react";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
+import { API } from "../tests/helpers/api";
+import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "./types";
-import { API } from "../tests/helpers/api";
 import { getOriginalContainerHeightFromCache } from "./containerCache";
-import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
-import { pointFrom } from "@excalidraw/math";
 
 unmountComponent();
 

@@ -1,9 +1,6 @@
 import React from "react";
-import { act, unmountComponent, render } from "./test-utils";
 import { Excalidraw } from "../index";
 import { defaultLang, setLanguage } from "../i18n";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import {
   actionAlignVerticallyCentered,
@@ -14,6 +11,9 @@ import {
   actionAlignLeft,
   actionAlignRight,
 } from "../actions";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { API } from "./helpers/api";
+import { act, unmountComponent, render } from "./test-utils";
 
 const mouse = new Pointer("mouse");
 

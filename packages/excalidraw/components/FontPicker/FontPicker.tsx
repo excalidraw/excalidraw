@@ -1,8 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import * as Popover from "@radix-ui/react-popover";
 
-import { FontPickerList } from "./FontPickerList";
-import { FontPickerTrigger } from "./FontPickerTrigger";
 import { ButtonIconSelect } from "../ButtonIconSelect";
 import {
   FontFamilyCodeIcon,
@@ -13,6 +11,8 @@ import { ButtonSeparator } from "../ButtonSeparator";
 import type { FontFamilyValues } from "../../element/types";
 import { FONT_FAMILY } from "../../constants";
 import { t } from "../../i18n";
+import { FontPickerTrigger } from "./FontPickerTrigger";
+import { FontPickerList } from "./FontPickerList";
 
 import "./FontPicker.scss";
 

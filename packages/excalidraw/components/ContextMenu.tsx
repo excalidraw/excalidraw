@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { Popover } from "./Popover";
 import type { TranslationKeys } from "../i18n";
 import { t } from "../i18n";
+import { Popover } from "./Popover";
 
 import "./ContextMenu.scss";
 import type { ShortcutName } from "../actions/shortcuts";

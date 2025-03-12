@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { NonDeletedSceneElementsMap } from "../../element/types";
 import type { AppState } from "../../types";
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
 } from "../../scene/types";
-import type { RoughCanvas } from "roughjs/bin/canvas";
 import { renderNewElementScene } from "../../renderer/renderNewElementScene";
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 

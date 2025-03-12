@@ -1,10 +1,10 @@
+import { pointFrom } from "@excalidraw/math";
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
 import { arrayToMap, updateActiveTool } from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
-import { register } from "./register";
 import { mutateElement } from "../element/mutateElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -15,8 +15,8 @@ import { isBindingElement, isLinearElement } from "../element/typeChecks";
 import type { AppState } from "../types";
 import { resetCursor } from "../cursor";
 import { CaptureUpdateAction } from "../store";
-import { pointFrom } from "@excalidraw/math";
 import { isPathALoop } from "../shapes";
+import { register } from "./register";
 
 export const actionFinalize = register({
   name: "finalize",

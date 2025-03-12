@@ -29,6 +29,54 @@ import {
   resolvablePromise,
   throttleRAF,
 } from "@excalidraw/excalidraw/utils";
+import { t } from "@excalidraw/excalidraw/i18n";
+import {
+  IDLE_THRESHOLD,
+  ACTIVE_THRESHOLD,
+  UserIdleState,
+} from "@excalidraw/excalidraw/constants";
+import { AbortError } from "@excalidraw/excalidraw/errors";
+import {
+  isImageElement,
+  isInitializedImageElement,
+} from "@excalidraw/excalidraw/element/typeChecks";
+import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
+import { decryptData } from "@excalidraw/excalidraw/data/encryption";
+import type { Mutable, ValueOf } from "@excalidraw/excalidraw/utility-types";
+import { getVisibleSceneBounds } from "@excalidraw/excalidraw/element/bounds";
+import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
+import type {
+  ReconciledExcalidrawElement,
+  RemoteExcalidrawElement,
+} from "@excalidraw/excalidraw/data/reconcile";
+import { appJotaiStore, atom } from "../app-jotai";
+import { LocalData } from "../data/LocalData";
+import { resetBrowserStateVersions } from "../data/tabSync";
+import {
+  encodeFilesForUpload,
+  FileManager,
+  updateStaleImageStatuses,
+} from "../data/FileManager";
+import {
+  importUsernameFromLocalStorage,
+  saveUsernameToLocalStorage,
+} from "../data/localStorage";
+import {
+  isSavedToFirebase,
+  loadFilesFromFirebase,
+  loadFromFirebase,
+  saveFilesToFirebase,
+  saveToFirebase,
+} from "../data/firebase";
+import {
+  generateCollaborationLinkData,
+  getCollaborationLink,
+  getSyncableElements,
+} from "../data";
+import type {
+  SocketUpdateDataSource,
+  SyncableExcalidrawElement,
+} from "../data";
 import {
   CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
@@ -39,56 +87,8 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
   WS_EVENTS,
 } from "../app_constants";
-import type {
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
-} from "../data";
-import {
-  generateCollaborationLinkData,
-  getCollaborationLink,
-  getSyncableElements,
-} from "../data";
-import {
-  isSavedToFirebase,
-  loadFilesFromFirebase,
-  loadFromFirebase,
-  saveFilesToFirebase,
-  saveToFirebase,
-} from "../data/firebase";
-import {
-  importUsernameFromLocalStorage,
-  saveUsernameToLocalStorage,
-} from "../data/localStorage";
-import Portal from "./Portal";
-import { t } from "@excalidraw/excalidraw/i18n";
-import {
-  IDLE_THRESHOLD,
-  ACTIVE_THRESHOLD,
-  UserIdleState,
-} from "@excalidraw/excalidraw/constants";
-import {
-  encodeFilesForUpload,
-  FileManager,
-  updateStaleImageStatuses,
-} from "../data/FileManager";
-import { AbortError } from "@excalidraw/excalidraw/errors";
-import {
-  isImageElement,
-  isInitializedImageElement,
-} from "@excalidraw/excalidraw/element/typeChecks";
-import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
-import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { resetBrowserStateVersions } from "../data/tabSync";
-import { LocalData } from "../data/LocalData";
-import { appJotaiStore, atom } from "../app-jotai";
-import type { Mutable, ValueOf } from "@excalidraw/excalidraw/utility-types";
-import { getVisibleSceneBounds } from "@excalidraw/excalidraw/element/bounds";
-import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
 import { collabErrorIndicatorAtom } from "./CollabError";
-import type {
-  ReconciledExcalidrawElement,
-  RemoteExcalidrawElement,
-} from "@excalidraw/excalidraw/data/reconcile";
+import Portal from "./Portal";
 
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);

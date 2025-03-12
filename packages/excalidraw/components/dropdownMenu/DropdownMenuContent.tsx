@@ -1,13 +1,13 @@
-import { Island } from "../Island";
-import { useDevice } from "../App";
 import clsx from "clsx";
-import Stack from "../Stack";
 import React, { useEffect, useRef } from "react";
-import { DropdownMenuContentPropsContext } from "./common";
+import Stack from "../Stack";
+import { useDevice } from "../App";
+import { Island } from "../Island";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { KEYS } from "../../keys";
 import { EVENT } from "../../constants";
 import { useStable } from "../../hooks/useStable";
+import { DropdownMenuContentPropsContext } from "./common";
 
 const MenuContent = ({
   children,

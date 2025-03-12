@@ -2,13 +2,13 @@ import type { JSX } from "react";
 import React from "react";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
-import { Dialog } from "./Dialog";
 import { getShortcutKey } from "../utils";
 import "./HelpDialog.scss";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { isDarwin, isFirefox, isWindows } from "../constants";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+import { Dialog } from "./Dialog";
 
 const Header = () => (
   <div className="HelpDialog__header">

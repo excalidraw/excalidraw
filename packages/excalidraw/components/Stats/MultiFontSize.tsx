@@ -9,11 +9,11 @@ import type {
 import { isInGroup } from "../../groups";
 import type Scene from "../../scene/Scene";
 import { fontSizeIcon } from "../icons";
+import type { AppState } from "../../types";
+import { getBoundTextElement } from "../../element/textElement";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue } from "./utils";
-import type { AppState } from "../../types";
-import { getBoundTextElement } from "../../element/textElement";
 
 interface MultiFontSizeProps {
   elements: readonly ExcalidrawElement[];

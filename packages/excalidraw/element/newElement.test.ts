@@ -1,11 +1,11 @@
-import { duplicateElement, duplicateElements } from "./newElement";
-import { mutateElement } from "./mutateElement";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import { API } from "../tests/helpers/api";
 import { FONT_FAMILY, ROUNDNESS } from "../constants";
 import { isPrimitive } from "../utils";
+import { duplicateElement, duplicateElements } from "./newElement";
+import { mutateElement } from "./mutateElement";
 import type { ExcalidrawLinearElement } from "./types";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
 
 const assertCloneObjects = (source: any, clone: any) => {
   for (const key in clone) {

@@ -1,3 +1,32 @@
+import { isPointOnShape } from "@excalidraw/utils/collision";
+import type { LocalPoint, Radians } from "@excalidraw/math";
+import {
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+  vectorFromPoint,
+  pointDistanceSq,
+  clamp,
+  pointDistance,
+  pointFromVector,
+  vectorScale,
+  vectorNormalize,
+  vectorCross,
+  pointsEqual,
+  lineSegmentIntersectionPoints,
+  round,
+  PRECISION,
+} from "@excalidraw/math";
+import type { AppState } from "../types";
+import type Scene from "../scene/Scene";
+import {
+  arrayToMap,
+  isBindingFallthroughEnabled,
+  tupleToCoors,
+} from "../utils";
+import { KEYS } from "../keys";
+import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -22,8 +51,6 @@ import {
   getElementBounds,
   doBoundsIntersect,
 } from "./bounds";
-import type { AppState } from "../types";
-import { isPointOnShape } from "@excalidraw/utils/collision";
 import {
   isArrowElement,
   isBindableElement,
@@ -38,16 +65,8 @@ import {
 } from "./typeChecks";
 import type { ElementUpdate } from "./mutateElement";
 import { mutateElement } from "./mutateElement";
-import type Scene from "../scene/Scene";
 import { LinearElementEditor } from "./linearElementEditor";
-import {
-  arrayToMap,
-  isBindingFallthroughEnabled,
-  tupleToCoors,
-} from "../utils";
-import { KEYS } from "../keys";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import {
   compareHeading,
   HEADING_DOWN,
@@ -57,25 +76,6 @@ import {
   vectorToHeading,
   type Heading,
 } from "./heading";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import {
-  lineSegment,
-  pointFrom,
-  pointRotateRads,
-  type GlobalPoint,
-  vectorFromPoint,
-  pointDistanceSq,
-  clamp,
-  pointDistance,
-  pointFromVector,
-  vectorScale,
-  vectorNormalize,
-  vectorCross,
-  pointsEqual,
-  lineSegmentIntersectionPoints,
-  round,
-  PRECISION,
-} from "@excalidraw/math";
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 

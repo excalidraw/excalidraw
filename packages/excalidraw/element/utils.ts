@@ -1,4 +1,3 @@
-import { getDiamondPoints } from ".";
 import type { Curve, LineSegment } from "@excalidraw/math";
 import {
   curve,
@@ -16,6 +15,7 @@ import type {
   ExcalidrawDiamondElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+import { getDiamondPoints } from ".";
 
 /**
  * Get the building components of a rectanguloid element in the form of

@@ -1,3 +1,4 @@
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -53,7 +54,6 @@ import { randomId } from "../random";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getLineHeight } from "../fonts";
 import { isArrowElement } from "../element/typeChecks";
-import { pointFrom, type LocalPoint } from "@excalidraw/math";
 import { measureText, normalizeText } from "../element/textMeasurements";
 
 export type ValidLinearElement = {

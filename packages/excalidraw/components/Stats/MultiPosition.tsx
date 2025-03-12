@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -5,15 +7,13 @@ import type {
   NonDeletedSceneElementsMap,
 } from "../../element/types";
 import type Scene from "../../scene/Scene";
+import { getCommonBounds, isTextElement } from "../../element";
+import type { AppState } from "../../types";
 import StatsDragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
-import { getCommonBounds, isTextElement } from "../../element";
-import { useMemo } from "react";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 import type { AtomicUnit } from "./utils";
-import type { AppState } from "../../types";
-import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 interface MultiPositionProps {
   property: "x" | "y";

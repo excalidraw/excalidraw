@@ -3,10 +3,10 @@ import { useRef, useState } from "react";
 import { copyTextToSystemClipboard } from "../clipboard";
 import { useI18n } from "../i18n";
 
+import { useCopyStatus } from "../hooks/useCopiedIndicator";
 import { Dialog } from "./Dialog";
 import { TextField } from "./TextField";
 import { FilledButton } from "./FilledButton";
-import { useCopyStatus } from "../hooks/useCopiedIndicator";
 import { copyIcon } from "./icons";
 
 import "./ShareableLinkDialog.scss";

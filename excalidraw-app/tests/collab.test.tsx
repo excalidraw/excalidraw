@@ -1,6 +1,5 @@
 import { vi } from "vitest";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
-import ExcalidrawApp from "../App";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { syncInvalidIndices } from "@excalidraw/excalidraw/fractionalIndex";
 import {
@@ -8,6 +7,7 @@ import {
   createUndoAction,
 } from "@excalidraw/excalidraw/actions/actionHistory";
 import { CaptureUpdateAction, newElementWith } from "@excalidraw/excalidraw";
+import ExcalidrawApp from "../App";
 
 const { h } = window;
 

@@ -1,6 +1,6 @@
 import React from "react";
-import { Excalidraw } from "../index";
 import { queryByTestId } from "@testing-library/react";
+import { Excalidraw } from "../index";
 import { render } from "../tests/test-utils";
 import { UI } from "../tests/helpers/ui";
 import { API } from "../tests/helpers/api";

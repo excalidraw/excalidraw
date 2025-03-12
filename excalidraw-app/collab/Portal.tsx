@@ -1,14 +1,4 @@
-import type {
-  SocketUpdateData,
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
-} from "../data";
-import { isSyncableElement } from "../data";
-
-import type { TCollabClass } from "./Collab";
-
 import type { OrderedExcalidrawElement } from "@excalidraw/excalidraw/element/types";
-import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
 import type {
   OnUserFollowedPayload,
   SocketId,
@@ -20,6 +10,14 @@ import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
 import { encryptData } from "@excalidraw/excalidraw/data/encryption";
 import type { Socket } from "socket.io-client";
 import { CaptureUpdateAction } from "@excalidraw/excalidraw";
+import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
+import { isSyncableElement } from "../data";
+import type {
+  SocketUpdateData,
+  SocketUpdateDataSource,
+  SyncableExcalidrawElement,
+} from "../data";
+import type { TCollabClass } from "./Collab";
 
 class Portal {
   collab: TCollabClass;

@@ -1,24 +1,6 @@
-import type {
-  ElementsMap,
-  ExcalidrawDiamondElement,
-  ExcalidrawElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawRectangleElement,
-  ExcalidrawRectanguloidElement,
-} from "./types";
-import { getElementBounds } from "./bounds";
-import type { FrameNameBounds } from "../types";
 import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
 import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
-import { isTransparent } from "../utils";
-import {
-  hasBoundTextElement,
-  isIframeLikeElement,
-  isImageElement,
-  isTextElement,
-} from "./typeChecks";
-import { getBoundTextShape, isPathALoop } from "../shapes";
 import type {
   GlobalPoint,
   LineSegment,
@@ -40,6 +22,24 @@ import {
   ellipse,
   ellipseLineIntersectionPoints,
 } from "@excalidraw/math/ellipse";
+import { getBoundTextShape, isPathALoop } from "../shapes";
+import { isTransparent } from "../utils";
+import type { FrameNameBounds } from "../types";
+import {
+  hasBoundTextElement,
+  isIframeLikeElement,
+  isImageElement,
+  isTextElement,
+} from "./typeChecks";
+import { getElementBounds } from "./bounds";
+import type {
+  ElementsMap,
+  ExcalidrawDiamondElement,
+  ExcalidrawElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawRectangleElement,
+  ExcalidrawRectanguloidElement,
+} from "./types";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,

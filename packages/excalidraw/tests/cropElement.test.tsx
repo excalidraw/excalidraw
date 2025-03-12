@@ -1,15 +1,15 @@
 import React from "react";
 import { vi } from "vitest";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
 import type { ExcalidrawImageElement, ImageCrop } from "../element/types";
-import { act, GlobalTestState, render, unmountComponent } from "./test-utils";
 import { Excalidraw, exportToCanvas, exportToSvg } from "..";
-import { API } from "./helpers/api";
 import type { NormalizedZoomValue } from "../types";
 import { KEYS } from "../keys";
 import { duplicateElement } from "../element";
 import { cloneJSON } from "../utils";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
+import { API } from "./helpers/api";
+import { act, GlobalTestState, render, unmountComponent } from "./test-utils";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

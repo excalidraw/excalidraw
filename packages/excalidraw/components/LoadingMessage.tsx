@@ -1,9 +1,9 @@
-import { t } from "../i18n";
 import { useState, useEffect } from "react";
-import Spinner from "./Spinner";
 import clsx from "clsx";
+import { t } from "../i18n";
 import { THEME } from "../constants";
 import type { Theme } from "../element/types";
+import Spinner from "./Spinner";
 
 export const LoadingMessage: React.FC<{ delay?: number; theme?: Theme }> = ({
   delay,

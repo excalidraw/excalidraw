@@ -1,7 +1,7 @@
 import React from "react";
-import { render, waitFor } from "./test-utils";
-import { Excalidraw } from "../index";
 import { expect } from "vitest";
+import { Excalidraw } from "../index";
+import { render, waitFor } from "./test-utils";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 

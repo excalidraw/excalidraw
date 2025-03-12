@@ -1,9 +1,9 @@
 import "./ToolIcon.scss";
 
 import clsx from "clsx";
+import { KEYS } from "../keys";
 import { ToolButton } from "./ToolButton";
 import { handIcon } from "./icons";
-import { KEYS } from "../keys";
 
 type LockIconProps = {
   title?: string;

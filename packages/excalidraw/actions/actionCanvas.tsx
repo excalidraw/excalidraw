@@ -1,3 +1,4 @@
+import { clamp, roundToStep } from "@excalidraw/math";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import {
   handIcon,
@@ -26,7 +27,6 @@ import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import type { AppState, Offsets } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
-import { register } from "./register";
 import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
 import {
@@ -38,7 +38,7 @@ import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { CaptureUpdateAction } from "../store";
-import { clamp, roundToStep } from "@excalidraw/math";
+import { register } from "./register";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

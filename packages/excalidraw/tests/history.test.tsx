@@ -1,18 +1,11 @@
 import React from "react";
 import "../global.d.ts";
+import { vi } from "vitest";
+import { queryByText } from "@testing-library/react";
+import type { LocalPoint, Radians } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import * as StaticScene from "../renderer/staticScene";
-import {
-  GlobalTestState,
-  act,
-  assertSelectedElements,
-  render,
-  togglePopover,
-  getCloneByOrigId,
-} from "./test-utils";
 import "../../utils/test-utils";
-import { Excalidraw } from "../index";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { API } from "./helpers/api";
 import { getDefaultAppState } from "../appState";
 import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
 import { createUndoAction, createRedoAction } from "../actions/actionHistory";
@@ -42,13 +35,20 @@ import {
   actionBringForward,
   actionSendToBack,
 } from "../actions";
-import { vi } from "vitest";
-import { queryByText } from "@testing-library/react";
 import { HistoryEntry } from "../history";
 import { AppStateChange, ElementsChange } from "../change";
 import { Snapshot, CaptureUpdateAction } from "../store";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
+import { Excalidraw } from "../index";
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import {
+  GlobalTestState,
+  act,
+  assertSelectedElements,
+  render,
+  togglePopover,
+  getCloneByOrigId,
+} from "./test-utils";
 
 const { h } = window;
 

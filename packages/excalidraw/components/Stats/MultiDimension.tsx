@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { getCommonBounds, isTextElement } from "../../element";
 import { updateBoundElements } from "../../element/binding";
 import { mutateElement } from "../../element/mutateElement";
@@ -17,13 +18,12 @@ import type {
 } from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
+import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
 import DragInput from "./DragInput";
 import type { DragInputCallbackType } from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit } from "./utils";
 import type { AtomicUnit } from "./utils";
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 interface MultiDimensionProps {
   property: "width" | "height";

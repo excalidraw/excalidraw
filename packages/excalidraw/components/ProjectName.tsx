@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { focusNearestParent } from "../utils";
 
 import "./ProjectName.scss";
-import { useExcalidrawContainer } from "./App";
 import { KEYS } from "../keys";
+import { useExcalidrawContainer } from "./App";
 
 type Props = {
   value: string;

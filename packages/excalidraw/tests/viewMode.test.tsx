@@ -1,9 +1,9 @@
 import React from "react";
-import { render, GlobalTestState } from "./test-utils";
 import { Excalidraw } from "../index";
 import { KEYS } from "../keys";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { CURSOR_TYPE } from "../constants";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { render, GlobalTestState } from "./test-utils";
 import { API } from "./helpers/api";
 
 const mouse = new Pointer("mouse");

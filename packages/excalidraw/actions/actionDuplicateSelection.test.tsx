@@ -1,3 +1,4 @@
+import React from "react";
 import { Excalidraw } from "../index";
 import {
   act,
@@ -6,9 +7,8 @@ import {
   render,
 } from "../tests/test-utils";
 import { API } from "../tests/helpers/api";
-import { actionDuplicateSelection } from "./actionDuplicateSelection";
-import React from "react";
 import { ORIG_ID } from "../constants";
+import { actionDuplicateSelection } from "./actionDuplicateSelection";
 
 const { h } = window;
 

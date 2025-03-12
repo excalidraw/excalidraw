@@ -3,11 +3,11 @@ import "./ToolIcon.scss";
 import type { CSSProperties } from "react";
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import { useExcalidrawContainer } from "./App";
 import { AbortError } from "../errors";
-import Spinner from "./Spinner";
 import type { PointerType } from "../element/types";
 import { isPromiseLike } from "../utils";
+import Spinner from "./Spinner";
+import { useExcalidrawContainer } from "./App";
 
 export type ToolButtonSize = "small" | "medium";
 

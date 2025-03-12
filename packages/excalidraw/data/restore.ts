@@ -1,3 +1,5 @@
+import type { LocalPoint, Radians } from "@excalidraw/math";
+import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -14,7 +16,6 @@ import type {
   StrokeRoundness,
 } from "../element/types";
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
-import type { ImportedDataState, LegacyAppState } from "./types";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
@@ -48,7 +49,6 @@ import { getUpdatedTimestamp, updateActiveTool } from "../utils";
 import { arrayToMap } from "../utils";
 import type { MarkOptional, Mutable } from "../utility-types";
 import { getContainerElement } from "../element/textElement";
-import { normalizeLink } from "./url";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { getLineHeight } from "../fonts";
@@ -58,13 +58,13 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 import { detectLineHeight } from "../element/textMeasurements";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
 } from "../element/elbowArrow";
+import { normalizeLink } from "./url";
+import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
   AppState,

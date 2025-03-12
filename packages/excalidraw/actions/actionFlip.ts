@@ -1,4 +1,3 @@
-import { register } from "./register";
 import { getSelectedElements } from "../scene";
 import { getNonDeletedElements } from "../element";
 import type {
@@ -27,6 +26,7 @@ import {
 import { mutateElement, newElementWith } from "../element/mutateElement";
 import { deepCopyElement } from "../element/newElement";
 import { getCommonBoundingBox } from "../element/bounds";
+import { register } from "./register";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",

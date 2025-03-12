@@ -1,6 +1,6 @@
 import React from "react";
 import "../../utils/test-utils";
-import { render, fireEvent, act, unmountComponent } from "./test-utils";
+import { vi } from "vitest";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
@@ -11,10 +11,10 @@ import type {
   NonDeleted,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { KEYS } from "../keys";
-import { vi } from "vitest";
 import type Scene from "../scene/Scene";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import { render, fireEvent, act, unmountComponent } from "./test-utils";
 
 unmountComponent();
 

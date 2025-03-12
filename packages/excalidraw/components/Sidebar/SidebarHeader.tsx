@@ -2,10 +2,10 @@ import clsx from "clsx";
 import { useContext } from "react";
 import { t } from "../../i18n";
 import { useDevice } from "../App";
-import { SidebarPropsContext } from "./common";
 import { CloseIcon, PinIcon } from "../icons";
 import { Tooltip } from "../Tooltip";
 import { Button } from "../Button";
+import { SidebarPropsContext } from "./common";
 
 export const SidebarHeader = ({
   children,

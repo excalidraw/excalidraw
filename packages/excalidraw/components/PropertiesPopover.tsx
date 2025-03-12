@@ -2,9 +2,9 @@ import React, { type ReactNode } from "react";
 import clsx from "clsx";
 import * as Popover from "@radix-ui/react-popover";
 
+import { isInteractive } from "../utils";
 import { useDevice } from "./App";
 import { Island } from "./Island";
-import { isInteractive } from "../utils";
 
 interface PropertiesPopoverProps {
   className?: string;

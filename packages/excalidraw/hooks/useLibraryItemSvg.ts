@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { exportToSvg } from "@excalidraw/utils/export";
 import { COLOR_PALETTE } from "../colors";
 import { atom, useAtom } from "../editor-jotai";
-import { exportToSvg } from "@excalidraw/utils/export";
 import type { LibraryItem } from "../types";
 
 export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;

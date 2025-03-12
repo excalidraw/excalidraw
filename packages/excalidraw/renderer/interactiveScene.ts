@@ -1,3 +1,10 @@
+import oc from "open-color";
+import {
+  pointFrom,
+  type GlobalPoint,
+  type LocalPoint,
+  type Radians,
+} from "@excalidraw/math";
 import {
   getElementAbsoluteCoords,
   getTransformHandlesFromCoords,
@@ -50,12 +57,6 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
-  bootstrapCanvas,
-  fillCircle,
-  getNormalizedCanvasDimensions,
-} from "./helpers";
-import oc from "open-color";
-import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -78,13 +79,12 @@ import type {
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import {
-  pointFrom,
-  type GlobalPoint,
-  type LocalPoint,
-  type Radians,
-} from "@excalidraw/math";
 import { getCornerRadius } from "../shapes";
+import {
+  bootstrapCanvas,
+  fillCircle,
+  getNormalizedCanvasDimensions,
+} from "./helpers";
 
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,

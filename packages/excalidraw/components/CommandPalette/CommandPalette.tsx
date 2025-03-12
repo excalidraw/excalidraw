@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import fuzzy from "fuzzy";
 import {
   useApp,
   useAppProps,
@@ -8,7 +10,6 @@ import {
 import { KEYS } from "../../keys";
 import { Dialog } from "../Dialog";
 import { TextField } from "../TextField";
-import clsx from "clsx";
 import { getSelectedElements } from "../../scene";
 import type { Action } from "../../actions/types";
 import type { TranslationKeys } from "../../i18n";
@@ -28,7 +29,6 @@ import {
   brainIconThin,
   LibraryIcon,
 } from "../icons";
-import fuzzy from "fuzzy";
 import { useUIAppState } from "../../context/ui-appState";
 import type { AppProps, AppState, UIAppState } from "../../types";
 import {
@@ -49,10 +49,10 @@ import {
   actionToggleSearchMenu,
 } from "../../actions";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
-import type { CommandPaletteItem } from "./types";
-import * as defaultItems from "./defaultCommandPaletteItems";
 import { trackEvent } from "../../analytics";
 import { useStable } from "../../hooks/useStable";
+import type { CommandPaletteItem } from "./types";
+import * as defaultItems from "./defaultCommandPaletteItems";
 
 import "./CommandPalette.scss";
 import {

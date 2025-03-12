@@ -1,3 +1,5 @@
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -22,7 +24,6 @@ import {
 import { KEYS } from "../../keys";
 import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 import { mutateElement } from "../../element/mutateElement";
-import { API } from "./api";
 import {
   isLinearElement,
   isFreeDrawElement,
@@ -33,10 +34,9 @@ import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
 import { getTextEditor } from "../queries/dom";
 import { arrayToMap } from "../../utils";
 import { createTestHook } from "../../components/App";
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
-import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import { cropElement } from "../../element/cropElement";
 import type { ToolType } from "../../types";
+import { API } from "./api";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();

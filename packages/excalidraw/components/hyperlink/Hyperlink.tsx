@@ -1,3 +1,12 @@
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import clsx from "clsx";
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
 import {
   sceneCoordsToViewportCoords,
@@ -15,14 +24,6 @@ import type {
 import { ToolButton } from "../ToolButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { t } from "../../i18n";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import clsx from "clsx";
 import { KEYS } from "../../keys";
 import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
 import { getElementAbsoluteCoords } from "../../element/bounds";
@@ -33,9 +34,8 @@ import { isLocalLink, normalizeLink } from "../../data/url";
 import { trackEvent } from "../../analytics";
 import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
 import { isEmbeddableElement } from "../../element/typeChecks";
-import { getLinkHandleFromCoords } from "./helpers";
-import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { isElementLink } from "../../element/elementLink";
+import { getLinkHandleFromCoords } from "./helpers";
 
 import "./Hyperlink.scss";
 

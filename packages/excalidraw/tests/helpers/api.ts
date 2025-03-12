@@ -1,3 +1,7 @@
+import fs from "fs";
+import util from "util";
+import path from "path";
+import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -17,9 +21,6 @@ import { newElement, newTextElement, newLinearElement } from "../../element";
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
-import fs from "fs";
-import util from "util";
-import path from "path";
 import { getMimeType } from "../../data/blob";
 import {
   newArrowElement,
@@ -39,7 +40,6 @@ import type App from "../../components/App";
 import { createTestHook } from "../../components/App";
 import type { Action } from "../../actions/types";
 import { mutateElement } from "../../element/mutateElement";
-import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 import { selectGroupsForSelectedElements } from "../../groups";
 
 const readFile = util.promisify(fs.readFile);

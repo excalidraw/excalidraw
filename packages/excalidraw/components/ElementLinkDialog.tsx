@@ -1,21 +1,21 @@
 import { TextField } from "./TextField";
-import type { AppProps, AppState, UIAppState } from "../types";
 import DialogActionButton from "./DialogActionButton";
-import { getSelectedElements } from "../scene";
+import { useCallback, useEffect, useState } from "react";
+import { mutateElement } from "../element/mutateElement";
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
 } from "../element/elementLink";
-import { mutateElement } from "../element/mutateElement";
-import { useCallback, useEffect, useState } from "react";
+import { getSelectedElements } from "../scene";
+import type { AppProps, AppState, UIAppState } from "../types";
 import { t } from "../i18n";
 import type { ElementsMap, ExcalidrawElement } from "../element/types";
-import { ToolButton } from "./ToolButton";
-import { TrashIcon } from "./icons";
 import { KEYS } from "../keys";
 
 import "./ElementLinkDialog.scss";
 import { normalizeLink } from "../data/url";
+import { TrashIcon } from "./icons";
+import { ToolButton } from "./ToolButton";
 
 const ElementLinkDialog = ({
   sourceElementId,

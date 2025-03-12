@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import type { AppClassProperties, AppState, Primitive } from "../types";
 import type { CaptureUpdateActionType } from "../store";
 import {
@@ -108,7 +110,6 @@ import {
   getShortcutKey,
   tupleToCoors,
 } from "../utils";
-import { register } from "./register";
 import { CaptureUpdateAction } from "../store";
 import { Fonts, getLineHeight } from "../fonts";
 import {
@@ -119,9 +120,8 @@ import {
   updateBoundElements,
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
 import { Range } from "../components/Range";
+import { register } from "./register";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

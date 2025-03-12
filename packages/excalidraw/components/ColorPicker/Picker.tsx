@@ -2,10 +2,17 @@ import React, { useEffect, useState } from "react";
 import { t } from "../../i18n";
 
 import type { ExcalidrawElement } from "../../element/types";
+import { useAtom } from "../../editor-jotai";
+import type { ColorPaletteCustom } from "../../colors";
+import {
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+} from "../../colors";
+import { KEYS } from "../../keys";
+import { EVENT } from "../../constants";
 import { ShadeList } from "./ShadeList";
 
 import PickerColorList from "./PickerColorList";
-import { useAtom } from "../../editor-jotai";
 import { CustomColorList } from "./CustomColorList";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import PickerHeading from "./PickerHeading";
@@ -16,13 +23,6 @@ import {
   getMostUsedCustomColors,
   isCustomColor,
 } from "./colorPickerUtils";
-import type { ColorPaletteCustom } from "../../colors";
-import {
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
-  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
-} from "../../colors";
-import { KEYS } from "../../keys";
-import { EVENT } from "../../constants";
 
 interface PickerProps {
   color: string;

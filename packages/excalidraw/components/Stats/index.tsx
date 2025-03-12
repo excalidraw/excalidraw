@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState, memo } from "react";
+import throttle from "lodash.throttle";
+import clsx from "clsx";
+import { round } from "@excalidraw/math";
 import { getCommonBounds } from "../../element/bounds";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import { t } from "../../i18n";
@@ -9,28 +12,25 @@ import type {
 } from "../../types";
 import { CloseIcon } from "../icons";
 import { Island } from "../Island";
-import throttle from "lodash.throttle";
+import { elementsAreInSameGroup } from "../../groups";
+import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
+import { STATS_PANELS } from "../../constants";
+import { isElbowArrow, isImageElement } from "../../element/typeChecks";
 import Dimension from "./Dimension";
 import Angle from "./Angle";
 import FontSize from "./FontSize";
 import MultiDimension from "./MultiDimension";
-import { elementsAreInSameGroup } from "../../groups";
 import MultiAngle from "./MultiAngle";
 import MultiFontSize from "./MultiFontSize";
 import Position from "./Position";
 import MultiPosition from "./MultiPosition";
 import Collapsible from "./Collapsible";
-import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { getAtomicUnits } from "./utils";
-import { STATS_PANELS } from "../../constants";
-import { isElbowArrow, isImageElement } from "../../element/typeChecks";
 import CanvasGrid from "./CanvasGrid";
-import clsx from "clsx";
 
 import "./Stats.scss";
 import { isGridModeEnabled } from "../../snapping";
 import { getUncroppedWidthAndHeight } from "../../element/cropElement";
-import { round } from "@excalidraw/math";
 import { frameAndChildrenSelectedTogether } from "../../frame";
 
 interface StatsProps {

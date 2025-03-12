@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { useI18n } from "../../i18n";
 import {
@@ -31,7 +32,6 @@ import {
   actionToggleSearchMenu,
   actionToggleTheme,
 } from "../../actions";
-import clsx from "clsx";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
 import { useSetAtom } from "../../editor-jotai";
 import { useUIAppState } from "../../context/ui-appState";

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
+import type { DOMAttributes } from "react";
 import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
-import type { DOMAttributes } from "react";
 import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
 import type {
   InteractiveCanvasRenderConfig,

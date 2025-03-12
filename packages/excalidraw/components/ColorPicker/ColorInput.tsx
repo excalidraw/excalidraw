@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getColor } from "./ColorPicker";
-import type { ColorPickerType } from "./colorPickerUtils";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import clsx from "clsx";
 import { eyeDropperIcon } from "../icons";
 import { useAtom } from "../../editor-jotai";
 import { KEYS } from "../../keys";
 import { activeEyeDropperAtom } from "../EyeDropper";
-import clsx from "clsx";
 import { t } from "../../i18n";
 import { useDevice } from "../App";
 import { getShortcutKey } from "../../utils";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import type { ColorPickerType } from "./colorPickerUtils";
+import { getColor } from "./ColorPicker";
 
 interface ColorInputProps {
   color: string;

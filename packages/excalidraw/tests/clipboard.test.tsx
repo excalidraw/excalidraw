@@ -1,22 +1,22 @@
 import React from "react";
 import { vi } from "vitest";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+import { getLineHeightInPx } from "../element/textMeasurements";
+import { getElementBounds } from "../element";
+import type { NormalizedZoomValue } from "../types";
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+import { arrayToMap } from "../utils";
+import { getLineHeight } from "../fonts";
+import { mockMermaidToExcalidraw } from "./helpers/mocks";
+import { API } from "./helpers/api";
+import { Pointer, Keyboard } from "./helpers/ui";
 import {
   render,
   waitFor,
   GlobalTestState,
   unmountComponent,
 } from "./test-utils";
-import { Pointer, Keyboard } from "./helpers/ui";
-import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { getLineHeightInPx } from "../element/textMeasurements";
-import { getElementBounds } from "../element";
-import type { NormalizedZoomValue } from "../types";
-import { API } from "./helpers/api";
-import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
-import { arrayToMap } from "../utils";
-import { mockMermaidToExcalidraw } from "./helpers/mocks";
-import { getLineHeight } from "../fonts";
 
 const { h } = window;
 

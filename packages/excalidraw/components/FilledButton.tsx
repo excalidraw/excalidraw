@@ -3,8 +3,8 @@ import clsx from "clsx";
 
 import "./FilledButton.scss";
 import { AbortError } from "../errors";
-import Spinner from "./Spinner";
 import { isPromiseLike } from "../utils";
+import Spinner from "./Spinner";
 import { tablerCheckIcon } from "./icons";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";

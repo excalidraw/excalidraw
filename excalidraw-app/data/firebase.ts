@@ -5,7 +5,6 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/excalidraw/element/types";
 import { getSceneVersion } from "@excalidraw/excalidraw/element";
-import type Portal from "../collab/Portal";
 import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 import type {
   AppState,
@@ -13,15 +12,12 @@ import type {
   BinaryFileMetadata,
   DataURL,
 } from "@excalidraw/excalidraw/types";
-import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "@excalidraw/excalidraw/data/encode";
 import {
   encryptData,
   decryptData,
 } from "@excalidraw/excalidraw/data/encryption";
 import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
-import type { SyncableExcalidrawElement } from ".";
-import { getSyncableElements } from ".";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -33,6 +29,10 @@ import {
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import type { Socket } from "socket.io-client";
 import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
+import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
+import type Portal from "../collab/Portal";
+import { getSyncableElements } from ".";
+import type { SyncableExcalidrawElement } from ".";
 
 // private
 // -----------------------------------------------------------------------------

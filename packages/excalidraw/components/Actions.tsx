@@ -1,4 +1,5 @@
 import { useState } from "react";
+import clsx from "clsx";
 import type { ActionManager } from "../actions/manager";
 import type {
   ExcalidrawElement,
@@ -7,7 +8,6 @@ import type {
   NonDeletedSceneElementsMap,
 } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "./App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -19,8 +19,6 @@ import {
 import { SHAPES } from "../shapes";
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import { capitalizeString, isTransparent } from "../utils";
-import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
 import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
 import { trackEvent } from "../analytics";
 import {
@@ -30,7 +28,6 @@ import {
   isLinearElement,
   isTextElement,
 } from "../element/typeChecks";
-import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
 import { Tooltip } from "./Tooltip";
 import {
@@ -39,7 +36,10 @@ import {
 } from "../element/textElement";
 
 import "./Actions.scss";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { KEYS } from "../keys";
+import { useTunnels } from "../context/tunnels";
+import { CLASSES } from "../constants";
+import { alignActionsPredicate } from "../actions/actionAlign";
 import {
   EmbedIcon,
   extraToolsIcon,
@@ -48,10 +48,10 @@ import {
   laserPointerToolIcon,
   MagicIcon,
 } from "./icons";
-import { KEYS } from "../keys";
-import { useTunnels } from "../context/tunnels";
-import { CLASSES } from "../constants";
-import { alignActionsPredicate } from "../actions/actionAlign";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { ToolButton } from "./ToolButton";
+import Stack from "./Stack";
+import { useDevice } from "./App";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,

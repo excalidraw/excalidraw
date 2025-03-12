@@ -1,5 +1,4 @@
 import React from "react";
-import { act, getCloneByOrigId, render, unmountComponent } from "./test-utils";
 import { Excalidraw } from "../index";
 import { reseed } from "../random";
 import {
@@ -10,13 +9,14 @@ import {
   actionDuplicateSelection,
 } from "../actions";
 import type { AppState } from "../types";
-import { API } from "./helpers/api";
 import { selectGroupsForSelectedElements } from "../groups";
 import type {
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawSelectionElement,
 } from "../element/types";
+import { API } from "./helpers/api";
+import { act, getCloneByOrigId, render, unmountComponent } from "./test-utils";
 
 unmountComponent();
 

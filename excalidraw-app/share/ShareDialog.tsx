@@ -16,10 +16,10 @@ import {
 } from "@excalidraw/excalidraw/components/icons";
 import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
-import type { CollabAPI } from "../collab/Collab";
-import { activeRoomLinkAtom } from "../collab/Collab";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
+import type { CollabAPI } from "../collab/Collab";
+import { activeRoomLinkAtom } from "../collab/Collab";
 import { atom, useAtom, useAtomValue } from "../app-jotai";
 
 import "./ShareDialog.scss";

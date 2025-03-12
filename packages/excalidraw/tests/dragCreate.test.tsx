@@ -1,8 +1,11 @@
 import React from "react";
+import { vi } from "vitest";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveScene from "../renderer/interactiveScene";
 import { KEYS } from "../keys";
+import type { ExcalidrawLinearElement } from "../element/types";
+import { reseed } from "../random";
 import {
   render,
   fireEvent,
@@ -10,9 +13,6 @@ import {
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
 } from "./test-utils";
-import type { ExcalidrawLinearElement } from "../element/types";
-import { reseed } from "../random";
-import { vi } from "vitest";
 
 unmountComponent();
 

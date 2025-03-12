@@ -5,10 +5,10 @@ import type {
   ExcalidrawSelectionElement,
 } from "../element/types";
 import { elementWithCanvasCache } from "../renderer/renderElement";
-import { _generateElementShape } from "./Shape";
-import type { ElementShape, ElementShapes } from "./types";
 import { COLOR_PALETTE } from "../colors";
 import type { AppState, EmbedsValidationStatus } from "../types";
+import { _generateElementShape } from "./Shape";
+import type { ElementShape, ElementShapes } from "./types";
 
 export class ShapeCache {
   private static rg = new RoughGenerator();

@@ -1,4 +1,8 @@
 import React from "react";
+import { act, queryByTestId, queryByText } from "@testing-library/react";
+import { vi } from "vitest";
+import type { GlobalPoint } from "@excalidraw/math";
+import { pointCenter, pointFrom } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -10,7 +14,17 @@ import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 
-import { Keyboard, Pointer, UI } from "./helpers/ui";
+import { API } from "../tests/helpers/api";
+import { KEYS } from "../keys";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import {
+  getBoundTextElementPosition,
+  getBoundTextMaxWidth,
+} from "../element/textElement";
+import * as textElementUtils from "../element/textElement";
+import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
+import { arrayToMap } from "../utils";
+import { wrapText } from "../element/textWrapping";
 import {
   screen,
   render,
@@ -18,21 +32,7 @@ import {
   GlobalTestState,
   unmountComponent,
 } from "./test-utils";
-import { API } from "../tests/helpers/api";
-import { KEYS } from "../keys";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { act, queryByTestId, queryByText } from "@testing-library/react";
-import {
-  getBoundTextElementPosition,
-  getBoundTextMaxWidth,
-} from "../element/textElement";
-import * as textElementUtils from "../element/textElement";
-import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
-import { vi } from "vitest";
-import { arrayToMap } from "../utils";
-import type { GlobalPoint } from "@excalidraw/math";
-import { pointCenter, pointFrom } from "@excalidraw/math";
-import { wrapText } from "../element/textWrapping";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

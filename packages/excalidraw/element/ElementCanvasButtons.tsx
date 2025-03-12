@@ -1,8 +1,8 @@
 import type { AppState } from "../types";
 import { sceneCoordsToViewportCoords } from "../utils";
+import { useExcalidrawAppState } from "../components/App";
 import type { ElementsMap, NonDeletedExcalidrawElement } from "./types";
 import { getElementAbsoluteCoords } from ".";
-import { useExcalidrawAppState } from "../components/App";
 
 import "./ElementCanvasButtons.scss";
 

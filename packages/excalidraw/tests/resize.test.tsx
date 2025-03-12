@@ -1,7 +1,6 @@
 import React from "react";
-import { render, unmountComponent } from "./test-utils";
-import { reseed } from "../random";
-import { UI, Keyboard, Pointer } from "./helpers/ui";
+import type { LocalPoint } from "@excalidraw/math";
+import { pointFrom } from "@excalidraw/math";
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
@@ -10,15 +9,16 @@ import type {
 import type { Bounds } from "../element/bounds";
 import { getElementPointsCoords } from "../element/bounds";
 import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
 import { KEYS } from "../keys";
 import { isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { arrayToMap } from "../utils";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
+import { reseed } from "../random";
 import { resizeSingleElement } from "../element/resizeElements";
 import { getSizeFromPoints } from "../points";
+import { API } from "./helpers/api";
+import { UI, Keyboard, Pointer } from "./helpers/ui";
+import { render, unmountComponent } from "./test-utils";
 
 unmountComponent();
 

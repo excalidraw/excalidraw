@@ -10,16 +10,16 @@ import {
   cleanup,
 } from "@testing-library/react";
 
-import * as toolQueries from "./queries/toolQueries";
+import ansi from "ansicolor";
 import type { ImportedDataState } from "../data/types";
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 import { getSelectedElements } from "../scene/selection";
 import type { ExcalidrawElement } from "../element/types";
-import { UI } from "./helpers/ui";
-import ansi from "ansicolor";
 import { ORIG_ID } from "../constants";
 import { arrayToMap } from "../utils";
 import type { AllPossibleKeys } from "../utility-types";
+import { UI } from "./helpers/ui";
+import * as toolQueries from "./queries/toolQueries";
 
 export { cleanup as unmountComponent };
 

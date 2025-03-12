@@ -1,3 +1,4 @@
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 import type {
   ExcalidrawTextElement,
   FractionalIndex,
@@ -11,7 +12,6 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
 import { prepareElementsForExport } from "../../data";
 
