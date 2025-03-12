@@ -1,4 +1,18 @@
+import { clamp, roundToStep } from "@excalidraw/math";
+import { excludeElementsInFramesFromSelection } from "../scene/selection"; //zsviczian
+import {
+  getDefaultAppState,
+  isEraserActive,
+  isHandToolActive,
+  isLaserPointerActive,
+} from "../appState";
+import {
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE, //zsviczian
+} from "../colors";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { ToolButton } from "../components/ToolButton";
+import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
   laserPointerToolIcon,
@@ -10,7 +24,6 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
 import {
   CURSOR_TYPE,
   MAX_ZOOM,
@@ -18,33 +31,23 @@ import {
   THEME,
   ZOOM_STEP,
 } from "../constants";
+import { setCursor } from "../cursor";
 import { getCommonBounds, getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
+import { newElementWith } from "../element/mutateElement";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type { AppState, Offsets, AppClassProperties } from "../types";
-import { getShortcutKey, updateActiveTool } from "../utils";
-import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-  isLaserPointerActive,
-} from "../appState";
-import {
-  DEFAULT_CANVAS_BACKGROUND_PICKS,
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE, //zsviczian
-} from "../colors";
-import { excludeElementsInFramesFromSelection } from "../scene/selection"; //zsviczian
-import type { SceneBounds } from "../element/bounds";
-import { setCursor } from "../cursor";
-import { getMaxZoom } from "../obsidianUtils";
 import { CaptureUpdateAction } from "../store";
-import { clamp, roundToStep } from "@excalidraw/math";
+import { getShortcutKey, updateActiveTool } from "../utils";
+
+import { register } from "./register";
+
+import type { SceneBounds } from "../element/bounds";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppClassProperties, AppState, Offsets } from "../types";
+import { getMaxZoom } from "../obsidianUtils";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

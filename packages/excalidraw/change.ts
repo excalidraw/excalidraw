@@ -1,5 +1,4 @@
 import { ENV } from "./constants";
-import type { BindableProp, BindingProp } from "./element/binding";
 import {
   BoundElement,
   BindableElement,
@@ -7,7 +6,6 @@ import {
   updateBoundElements,
 } from "./element/binding";
 import { LinearElementEditor } from "./element/linearElementEditor";
-import type { ElementUpdate } from "./element/mutateElement";
 import { mutateElement, newElementWith } from "./element/mutateElement";
 import {
   getBoundTextElementId,
@@ -20,6 +18,19 @@ import {
   isImageElement,
   isTextElement,
 } from "./element/typeChecks";
+import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
+import { getNonDeletedGroupIds } from "./groups";
+import { getObservedAppState } from "./store";
+import {
+  arrayToMap,
+  arrayToObject,
+  assertNever,
+  isShallowEqual,
+  toBrandedType,
+} from "./utils";
+
+import type { BindableProp, BindingProp } from "./element/binding";
+import type { ElementUpdate } from "./element/mutateElement";
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -30,9 +41,6 @@ import type {
   OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./element/types";
-import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
-import { getNonDeletedGroupIds } from "./groups";
-import { getObservedAppState } from "./store";
 import type {
   AppState,
   ObservedAppState,
@@ -40,13 +48,6 @@ import type {
   ObservedStandaloneAppState,
 } from "./types";
 import type { SubtypeOf, ValueOf } from "./utility-types";
-import {
-  arrayToMap,
-  arrayToObject,
-  assertNever,
-  isShallowEqual,
-  toBrandedType,
-} from "./utils";
 
 /**
  * Represents the difference between two objects of the same type.

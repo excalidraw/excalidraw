@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import { LoadingMessage } from "./LoadingMessage";
-import type { Language } from "../i18n";
 import { defaultLang, languages, setLanguage } from "../i18n";
+
+import { LoadingMessage } from "./LoadingMessage";
+
 import type { Theme } from "../element/types";
+import type { Language } from "../i18n";
 
 interface Props {
   langCode: Language["code"];

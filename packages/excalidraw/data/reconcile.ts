@@ -1,14 +1,16 @@
 import throttle from "lodash.throttle";
+
 import { ENV } from "../constants";
-import type { OrderedExcalidrawElement } from "../element/types";
 import {
   orderByFractionalIndex,
   syncInvalidIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
+import { arrayToMap } from "../utils";
+
+import type { OrderedExcalidrawElement } from "../element/types";
 import type { AppState } from "../types";
 import type { MakeBrand } from "../utility-types";
-import { arrayToMap } from "../utils";
 
 export type ReconciledExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"ReconciledElement">;

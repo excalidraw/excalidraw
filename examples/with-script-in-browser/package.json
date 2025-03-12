@@ -5,7 +5,7 @@
   "dependencies": {
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "@excalidraw/excalidraw": "0.18.0-rc.5",
+    "@excalidraw/excalidraw": "*",
     "browser-fs-access": "0.29.1"
   },
   "devDependencies": {
@@ -15,6 +15,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "build:preview": "yarn build && vite preview --port 5002"
+    "build:preview": "yarn build && vite preview --port 5002",
+    "build:package": "yarn workspace @excalidraw/excalidraw run build:esm"
   }
 }

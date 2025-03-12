@@ -1,5 +1,6 @@
+import { nanoid, customAlphabet } from "nanoid";
 import { Random } from "roughjs/bin/math";
-import { nanoid, customAlphabet } from "nanoid"; //zsviczian
+
 import { isTestEnv } from "./utils";
 
 let random = new Random(Date.now());

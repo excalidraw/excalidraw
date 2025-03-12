@@ -1,5 +1,7 @@
 import { ENV } from "../constants";
+
 import { charWidth, getLineWidth } from "./textMeasurements";
+
 import type { FontString } from "./types";
 
 let cachedCjkRegex: RegExp | undefined;

@@ -1,6 +1,8 @@
 import { queries, buildQueries } from "@testing-library/react";
-import type { ToolType } from "../../types";
+
 import { TOOL_TYPE } from "../../constants";
+
+import type { ToolType } from "../../types";
 
 const _getAllByToolName = (container: HTMLElement, tool: ToolType | "lock") => {
   const toolTitle = tool === "lock" ? "lock" : TOOL_TYPE[tool];

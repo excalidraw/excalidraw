@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { useUIAppState } from "../../context/ui-appState";
 import { useDevice } from "../App";
+import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
 const MenuTrigger = ({
   className = "",

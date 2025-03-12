@@ -1,10 +1,10 @@
+import { SVG_NS } from "./constants";
+import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
+import type { AnimationFrameHandler } from "./animation-frame-handler";
+import type App from "./components/App";
+import type { AppState } from "./types";
 import type { LaserPointerOptions } from "@zsviczian/laser-pointer";
 import { LaserPointer } from "@zsviczian/laser-pointer";
-import type { AnimationFrameHandler } from "./animation-frame-handler";
-import type { AppState } from "./types";
-import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
-import type App from "./components/App";
-import { SVG_NS } from "./constants";
 
 export interface Trail {
   start(container: SVGSVGElement): void;

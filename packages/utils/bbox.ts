@@ -4,6 +4,7 @@ import {
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
+
 import type { Bounds } from "@excalidraw/excalidraw/element/bounds";
 
 export type LineSegment<P extends LocalPoint | GlobalPoint> = [P, P];

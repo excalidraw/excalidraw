@@ -1,17 +1,15 @@
-import {
-  isTextElement,
-  isExcalidrawElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { CODES, KEYS } from "../keys";
-import { t } from "../i18n";
-import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
+import { paintIcon } from "../components/icons";
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
 } from "../constants";
+import {
+  isTextElement,
+  isExcalidrawElement,
+  redrawTextBoundingBox,
+} from "../element";
+import { newElementWith } from "../element/mutateElement";
 import { getBoundTextElement } from "../element/textElement";
 import {
   hasBoundTextElement,
@@ -20,11 +18,15 @@ import {
   isFrameLikeElement,
   isArrowElement,
 } from "../element/typeChecks";
-import { getSelectedElements } from "../scene";
-import type { ExcalidrawTextElement } from "../element/types";
-import { paintIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 import { getLineHeight } from "../fonts";
+import { t } from "../i18n";
+import { CODES, KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
+import type { ExcalidrawTextElement } from "../element/types";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";

@@ -1,3 +1,5 @@
+import { PRECISION } from "./utils";
+
 import type {
   Degrees,
   GlobalPoint,
@@ -5,7 +7,6 @@ import type {
   PolarCoords,
   Radians,
 } from "./types";
-import { PRECISION } from "./utils";
 
 // TODO: Simplify with modulo and fix for angles beyond 4*Math.PI and - 4*Math.PI
 export const normalizeRadians = (angle: Radians): Radians => {

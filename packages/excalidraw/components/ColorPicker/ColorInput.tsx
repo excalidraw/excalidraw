@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getColor } from "./ColorPicker";
-import type { ColorPickerType } from "./colorPickerUtils";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
-import { eyeDropperIcon } from "../icons";
-import { useAtom } from "../../editor-jotai";
-import { KEYS } from "../../keys";
-import { COLOR_NAMES } from "../../constants"; //zsviczian
-import { activeEyeDropperAtom } from "../EyeDropper";
 import clsx from "clsx";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useDevice } from "../App";
+import { KEYS } from "../../keys";
 import { getShortcutKey } from "../../utils";
+import { useDevice } from "../App";
+import { activeEyeDropperAtom } from "../EyeDropper";
+import { eyeDropperIcon } from "../icons";
+
+import { getColor } from "./ColorPicker";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+
+import type { ColorPickerType } from "./colorPickerUtils";
+import { COLOR_NAMES } from "@excalidraw/excalidraw/constants";
 
 interface ColorInputProps {
   color: string;

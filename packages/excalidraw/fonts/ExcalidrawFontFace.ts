@@ -1,8 +1,9 @@
 import { stringToBase64, toByteString } from "../data/encode";
 import { fetchFontFromVault } from "../obsidianUtils";
-import { promiseTry } from "../utils";
-import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
 import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
+import { promiseTry } from "../utils";
+
+import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
 
 type DataURL = string;
 
@@ -11,9 +12,9 @@ export class ExcalidrawFontFace {
   public readonly fontFace: FontFace;
 
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
-    import.meta.env.VITE_PKG_NAME
-      ? `${import.meta.env.VITE_PKG_NAME}@${import.meta.env.VITE_PKG_VERSION}` // should be provided by vite during package build
-      : "@excalidraw/excalidraw" // fallback to latest package version (i.e. for app)
+    import.meta.env.PKG_NAME
+      ? `${import.meta.env.PKG_NAME}@${import.meta.env.PKG_VERSION}` // is provided during package build
+      : "@excalidraw/excalidraw" // fallback to the latest package version (i.e. for app)
   }/dist/prod/`;
 
   constructor(family: string, uri: string, descriptors?: FontFaceDescriptors) {
@@ -241,8 +242,8 @@ export class ExcalidrawFontFace {
       try {
         const result = await fetchFontFromVault(url); //zsviczian
         if (result) {
-          return `data:font/woff2;base64,${await stringToBase64(
-            await toByteString(result),
+          return `data:font/woff2;base64,${stringToBase64(
+            toByteString(result),
             true,
           )}`;
         }
@@ -257,8 +258,8 @@ export class ExcalidrawFontFace {
           const mimeType = response.headers.get("Content-Type");
           const buffer = await response.arrayBuffer();
 
-          return `data:${mimeType};base64,${await stringToBase64(
-            await toByteString(buffer),
+          return `data:${mimeType};base64,${stringToBase64(
+            toByteString(buffer),
             true,
           )}`;
         }
