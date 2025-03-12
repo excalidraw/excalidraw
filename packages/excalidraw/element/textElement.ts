@@ -13,6 +13,7 @@ import {
   ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO,
   ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
+  INCREASED_BOUND_TEXT_PADDING,
   DEFAULT_FONT_SIZE,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
@@ -360,6 +361,12 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
     offsetX += container.width / 4;
     offsetY += container.height / 4;
   }
+
+  if (container.type === "rectangle") {
+    //Increase horizontal padding without modifying BOUND_TEXT_PADDING.
+    offsetX = BOUND_TEXT_PADDING + INCREASED_BOUND_TEXT_PADDING;
+  }
+
   return {
     x: container.x + offsetX,
     y: container.y + offsetY,
@@ -475,6 +482,12 @@ export const getBoundTextMaxWidth = (
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
   }
+
+  if (container.type === "rectangle") {
+    //Adjust width to accommodate increased horizontal padding in getContainerCoords() .
+    return width - (BOUND_TEXT_PADDING + INCREASED_BOUND_TEXT_PADDING) * 2;
+  }
+
   return width - BOUND_TEXT_PADDING * 2;
 };
 

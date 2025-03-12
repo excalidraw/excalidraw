@@ -2642,7 +2642,7 @@ CONTAINER",
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 160,
-  "x": 505,
+  "x": 510,
   "y": 305,
 }
 `;

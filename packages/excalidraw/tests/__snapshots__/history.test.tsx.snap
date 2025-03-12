@@ -2743,7 +2743,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 6,
   "verticalAlign": "top",
   "width": 100,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -2784,7 +2784,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 11,
   "verticalAlign": "top",
   "width": 30,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -3045,7 +3045,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 9,
   "verticalAlign": "top",
   "width": 100,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -3086,7 +3086,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 11,
   "verticalAlign": "top",
   "width": 30,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -3332,7 +3332,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 7,
   "verticalAlign": "top",
   "width": 30,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -3373,7 +3373,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 9,
   "verticalAlign": "top",
   "width": 80,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -3602,7 +3602,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 60,
+  "height": 85,
   "id": "id146",
   "index": "a0V",
   "isDeleted": false,
@@ -3638,7 +3638,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "fontSize": 20,
   "frameId": null,
   "groupIds": [],
-  "height": 50,
+  "height": 75,
   "id": "id145",
   "index": "a1",
   "isDeleted": false,
@@ -3655,14 +3655,15 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "text": "que
-pasa",
+pas
+a",
   "textAlign": "left",
   "type": "text",
   "updated": 1,
   "version": 13,
   "verticalAlign": "top",
-  "width": 40,
-  "x": 105,
+  "width": 30,
+  "x": 110,
   "y": 105,
 }
 `;
@@ -3872,7 +3873,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "updated": 1,
   "version": 9,
   "width": 100,
-  "x": 35,
+  "x": 40,
   "y": 10,
 }
 `;
@@ -3913,7 +3914,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 10,
   "verticalAlign": "top",
   "width": 80,
-  "x": 40,
+  "x": 50,
   "y": 15,
 }
 `;
@@ -4156,7 +4157,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 12,
   "verticalAlign": "top",
   "width": 80,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -4418,7 +4419,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 8,
   "verticalAlign": "top",
   "width": 80,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -4476,7 +4477,7 @@ History {
               "type": "text",
               "verticalAlign": "top",
               "width": 80,
-              "x": 15,
+              "x": 20,
               "y": 15,
             },
             "inserted": {
@@ -4694,7 +4695,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 7,
   "verticalAlign": "top",
   "width": 80,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -4722,12 +4723,12 @@ History {
           "id164" => Delta {
             "deleted": {
               "angle": 0,
-              "x": 15,
+              "x": 20,
               "y": 15,
             },
             "inserted": {
               "angle": 0,
-              "x": 15,
+              "x": 20,
               "y": 15,
             },
           },
@@ -4928,7 +4929,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 6,
   "verticalAlign": "top",
   "width": 80,
-  "x": 205,
+  "x": 210,
   "y": 205,
 }
 `;
@@ -5157,7 +5158,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 3,
   "verticalAlign": "top",
   "width": 100,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
@@ -5394,7 +5395,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "version": 8,
   "verticalAlign": "top",
   "width": 100,
-  "x": 15,
+  "x": 20,
   "y": 15,
 }
 `;
