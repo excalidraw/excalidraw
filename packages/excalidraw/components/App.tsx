@@ -258,6 +258,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  isDevEnv,
 } from "../utils";
 import {
   createSrcDoc,
@@ -2434,7 +2435,7 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
-    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    if (import.meta.env.MODE === ENV.TEST || isDevEnv()) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -11060,7 +11061,7 @@ declare global {
 }
 
 export const createTestHook = () => {
-  if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+  if (import.meta.env.MODE === ENV.TEST || isDevEnv()) {
     window.h = window.h || ({} as Window["h"]);
 
     Object.defineProperties(window.h, {

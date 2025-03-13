@@ -6,7 +6,7 @@ import {
   syncInvalidIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
-import { arrayToMap } from "../utils";
+import { arrayToMap, isDevEnv } from "../utils";
 
 import type { OrderedExcalidrawElement } from "../element/types";
 import type { AppState } from "../types";
@@ -48,7 +48,7 @@ const validateIndicesThrottled = throttle(
     remoteElements: readonly RemoteExcalidrawElement[],
   ) => {
     if (
-      import.meta.env.DEV ||
+      isDevEnv() ||
       import.meta.env.MODE === ENV.TEST ||
       window?.DEBUG_FRACTIONAL_INDICES
     ) {
@@ -59,7 +59,7 @@ const validateIndicesThrottled = throttle(
 
       validateFractionalIndices(elements, {
         // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        shouldThrow: isDevEnv() || import.meta.env.MODE === ENV.TEST,
         includeBoundTextValidation: true,
         reconciliationContext: {
           localElements,
