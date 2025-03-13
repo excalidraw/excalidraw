@@ -1621,13 +1621,12 @@ class App extends React.Component<AppProps, AppState> {
               this.state.trayModeEnabled), //zsviczian
         })}
         style={{
-          ...{
-            //zsviczian
-            ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
+          //zsviczian
+          ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
               ? POINTER_EVENTS.disabled
               : POINTER_EVENTS.enabled,
-          }, //zsviczian
-          ...this.state.dynamicStyle, //zsviczian
+          //zsviczian
+          ...this.state.dynamicStyle || {}, //zsviczian
           ["--right-sidebar-width" as any]: "302px",
         }}
         ref={this.excalidrawContainerRef}
