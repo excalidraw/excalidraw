@@ -236,7 +236,7 @@ const restoreElement = (
     case "text":
       // temp fix: cleanup legacy obsidian-excalidraw attribute else it'll
       // conflict when porting between the apps
-      delete (element as any).rawText;
+      //delete (element as any).rawText;
 
       let fontSize = element.fontSize;
       let fontFamily = element.fontFamily;
