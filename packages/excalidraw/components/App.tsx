@@ -352,7 +352,7 @@ import {
   setCursorForShape,
 } from "../cursor";
 import { Emitter } from "../emitter";
-import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
+import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { COLOR_PALETTE } from "../colors";
 import { Store, CaptureUpdateAction } from "../store";
 import { AnimatedTrail } from "../animated-trail";
