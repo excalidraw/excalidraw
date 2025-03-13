@@ -1,8 +1,5 @@
-import { register } from "../actions/register";
 import { FONT_FAMILY, VERTICAL_ALIGN } from "../constants";
-import { setCursorForShape } from "../cursor";
-import { CaptureUpdateAction } from "../store";
-import { escapeDoubleQuotes, getFontString, updateActiveTool } from "../utils";
+import { escapeDoubleQuotes, getFontString } from "../utils";
 
 import { newTextElement } from "./newElement";
 import { wrapText } from "./textWrapping";
@@ -318,34 +315,6 @@ export const createPlaceholderEmbeddableLabel = (
     angle: element.angle ?? 0,
   });
 };
-
-export const actionSetEmbeddableAsActiveTool = register({
-  name: "setEmbeddableAsActiveTool",
-  trackEvent: { category: "toolbar" },
-  target: "Tool",
-  label: "toolBar.embeddable",
-  perform: (elements, appState, _, app) => {
-    const nextActiveTool = updateActiveTool(appState, {
-      type: "embeddable",
-    });
-
-    setCursorForShape(app.canvas, {
-      ...appState,
-      activeTool: nextActiveTool,
-    });
-
-    return {
-      elements,
-      appState: {
-        ...appState,
-        activeTool: updateActiveTool(appState, {
-          type: "embeddable",
-        }),
-      },
-      captureUpdate: CaptureUpdateAction.EVENTUALLY,
-    };
-  },
-});
 
 const matchHostname = (
   url: string,
