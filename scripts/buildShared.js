@@ -17,6 +17,7 @@ const getConfig = (outdir) => ({
     "@excalidraw/excalidraw": path.resolve(__dirname, "../packages/excalidraw"),
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils"),
     "@excalidraw/math": path.resolve(__dirname, "../packages/math"),
+    "@excalidraw/element": path.resolve(__dirname, "../packages/element"),
   },
 });
 

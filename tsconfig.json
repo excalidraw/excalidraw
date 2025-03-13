@@ -22,9 +22,11 @@
       "@excalidraw/excalidraw": ["./packages/excalidraw/index.tsx"],
       "@excalidraw/utils": ["./packages/utils/index.ts"],
       "@excalidraw/math": ["./packages/math/index.ts"],
+      "@excalidraw/element": ["./packages/element/index.ts"],
       "@excalidraw/excalidraw/*": ["./packages/excalidraw/*"],
       "@excalidraw/utils/*": ["./packages/utils/*"],
-      "@excalidraw/math/*": ["./packages/math/*"]
+      "@excalidraw/math/*": ["./packages/math/*"],
+      "@excalidraw/element/*": ["./packages/element/*"]
     }
   },
   "include": ["packages", "excalidraw-app"],

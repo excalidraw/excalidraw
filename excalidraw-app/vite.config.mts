@@ -47,6 +47,14 @@ export default defineConfig(({ mode }) => {
           find: /^@excalidraw\/math\/(.*?)/,
           replacement: path.resolve(__dirname, "../packages/math/$1"),
         },
+        {
+          find: /^@excalidraw\/element$/,
+          replacement: path.resolve(__dirname, "../packages/element/index.ts"),
+        },
+        {
+          find: /^@excalidraw\/element\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/element/$1"),
+        },
       ],
     },
     build: {
