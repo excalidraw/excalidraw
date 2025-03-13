@@ -1,3 +1,8 @@
+import type {
+  ExcalidrawTextElement,
+  FontFamilyValues,
+} from "@excalidraw/element/types";
+
 import {
   FreedrawIcon,
   FontFamilyNormalIcon,
@@ -149,3 +154,34 @@ export const GOOGLE_FONTS_RANGES = {
 
 /** local protocol to skip the local font from registering or inlining */
 export const LOCAL_FONT_PROTOCOL = "local:";
+
+/**
+ * Calculates vertical offset for a text with alphabetic baseline.
+ */
+export const getVerticalOffset = (
+  fontFamily: ExcalidrawTextElement["fontFamily"],
+  fontSize: ExcalidrawTextElement["fontSize"],
+  lineHeightPx: number,
+) => {
+  const { unitsPerEm, ascender, descender } =
+    FONT_METADATA[fontFamily]?.metrics ||
+    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
+
+  const fontSizeEm = fontSize / unitsPerEm;
+  const lineGap =
+    (lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender) / 2;
+
+  const verticalOffset = fontSizeEm * ascender + lineGap;
+  return verticalOffset;
+};
+
+/**
+ * Gets line height for a selected family.
+ */
+export const getLineHeight = (fontFamily: FontFamilyValues) => {
+  const { lineHeight } =
+    FONT_METADATA[fontFamily]?.metrics ||
+    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
+
+  return lineHeight as ExcalidrawTextElement["lineHeight"];
+};

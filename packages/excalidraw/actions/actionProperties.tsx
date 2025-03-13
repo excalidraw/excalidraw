@@ -91,7 +91,8 @@ import {
   isLinearElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import { Fonts, getLineHeight } from "../fonts";
+import { Fonts } from "../fonts";
+import { getLineHeight } from "../fonts/FontMetadata";
 import { getLanguage, t } from "../i18n";
 import { KEYS } from "../keys";
 import { randomInteger } from "../random";

@@ -22,7 +22,7 @@ import {
 } from "../element/newElement";
 import { measureText, normalizeText } from "../element/textMeasurements";
 import { isArrowElement } from "../element/typeChecks";
-import { getLineHeight } from "../fonts";
+import { getLineHeight } from "../fonts/FontMetadata";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { getSizeFromPoints } from "../points";
 import { randomId } from "../random";

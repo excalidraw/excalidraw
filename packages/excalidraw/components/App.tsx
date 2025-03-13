@@ -305,7 +305,8 @@ import {
 } from "../components/hyperlink/Hyperlink";
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
-import { Fonts, getLineHeight } from "../fonts";
+import { Fonts } from "../fonts";
+import { getLineHeight } from "../fonts/FontMetadata";
 import {
   getFrameChildren,
   isCursorInFrame,

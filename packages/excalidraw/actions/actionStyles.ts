@@ -18,7 +18,7 @@ import {
   isFrameLikeElement,
   isArrowElement,
 } from "../element/typeChecks";
-import { getLineHeight } from "../fonts";
+import { getLineHeight } from "../fonts/FontMetadata";
 import { t } from "../i18n";
 import { CODES, KEYS } from "../keys";
 import { getSelectedElements } from "../scene";

@@ -32,7 +32,7 @@ import {
   isMagicFrameElement,
   isImageElement,
 } from "../element/typeChecks";
-import { getVerticalOffset } from "../fonts";
+import { getVerticalOffset } from "../fonts/FontMetadata";
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getCornerRadius } from "../shapes";

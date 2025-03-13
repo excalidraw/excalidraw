@@ -37,7 +37,7 @@ import {
   isTextElement,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
-import { getLineHeight } from "../fonts";
+import { getLineHeight } from "../fonts/FontMetadata";
 import { syncInvalidIndices } from "../fractionalIndex";
 import { randomId } from "../random";
 import {

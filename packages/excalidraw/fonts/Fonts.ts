@@ -454,37 +454,6 @@ export class Fonts {
   }
 }
 
-/**
- * Calculates vertical offset for a text with alphabetic baseline.
- */
-export const getVerticalOffset = (
-  fontFamily: ExcalidrawTextElement["fontFamily"],
-  fontSize: ExcalidrawTextElement["fontSize"],
-  lineHeightPx: number,
-) => {
-  const { unitsPerEm, ascender, descender } =
-    Fonts.registered.get(fontFamily)?.metadata.metrics ||
-    FONT_METADATA[FONT_FAMILY.Virgil].metrics;
-
-  const fontSizeEm = fontSize / unitsPerEm;
-  const lineGap =
-    (lineHeightPx - fontSizeEm * ascender + fontSizeEm * descender) / 2;
-
-  const verticalOffset = fontSizeEm * ascender + lineGap;
-  return verticalOffset;
-};
-
-/**
- * Gets line height forr a selected family.
- */
-export const getLineHeight = (fontFamily: FontFamilyValues) => {
-  const { lineHeight } =
-    Fonts.registered.get(fontFamily)?.metadata.metrics ||
-    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
-
-  return lineHeight as ExcalidrawTextElement["lineHeight"];
-};
-
 export interface ExcalidrawFontFaceDescriptor {
   uri: string;
   descriptors?: FontFaceDescriptors;

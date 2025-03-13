@@ -1,5 +1,6 @@
+import { getLineHeight } from "@excalidraw/excalidraw/fonts/FontMetadata";
+
 import { FONT_FAMILY } from "../constants";
-import { getLineHeight } from "../fonts";
 import { API } from "../tests/helpers/api";
 
 import {
