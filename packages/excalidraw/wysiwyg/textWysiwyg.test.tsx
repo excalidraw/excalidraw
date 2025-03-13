@@ -1,6 +1,11 @@
 import { pointFrom } from "@excalidraw/math";
+import { getOriginalContainerHeightFromCache } from "@excalidraw/element/containerCache";
 import { queryByText } from "@testing-library/react";
-import React from "react";
+
+import type {
+  ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
+} from "@excalidraw/element/types";
 
 import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { Excalidraw } from "../index";
@@ -19,13 +24,6 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
-
-import { getOriginalContainerHeightFromCache } from "./containerCache";
-
-import type {
-  ExcalidrawTextElement,
-  ExcalidrawTextElementWithContainer,
-} from "./types";
 
 unmountComponent();
 

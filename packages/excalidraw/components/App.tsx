@@ -364,7 +364,7 @@ import {
   hitElementBoundingBoxOnly,
   hitElementItself,
 } from "../element/collision";
-import { textWysiwyg } from "../element/textWysiwyg";
+import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
 import { getVisibleSceneBounds } from "../element/bounds";
