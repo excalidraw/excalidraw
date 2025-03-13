@@ -10,7 +10,7 @@ import {
 } from "../fractionalIndex";
 import { getElementsInGroup } from "../groups";
 import { randomInteger } from "../random";
-import { arrayToMap } from "../utils";
+import { arrayToMap, isDevEnv } from "../utils";
 import { toBrandedType } from "../utils";
 
 import { getSelectedElements } from "./selection";
@@ -58,13 +58,13 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
 const validateIndicesThrottled = throttle(
   (elements: readonly ExcalidrawElement[]) => {
     if (
-      import.meta.env.DEV ||
+      isDevEnv() ||
       import.meta.env.MODE === ENV.TEST ||
       window?.DEBUG_FRACTIONAL_INDICES
     ) {
       validateFractionalIndices(elements, {
         // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        shouldThrow: isDevEnv() || import.meta.env.MODE === ENV.TEST,
         includeBoundTextValidation: true,
       });
     }
