@@ -165,7 +165,8 @@
     "unCroppedDimension": "Uncropped dimension",
     "copyElementLink": "Copy link to object",
     "linkToElement": "Link to object",
-    "wrapSelectionInFrame": "Wrap selection in frame"
+    "wrapSelectionInFrame": "Wrap selection in frame",
+    "slash": "Slash"
   },
   "elementLink": {
     "title": "Link to object",

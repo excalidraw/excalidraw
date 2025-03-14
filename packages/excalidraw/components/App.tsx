@@ -166,6 +166,10 @@ import {
   isElbowArrow,
   isFlowchartNodeElement,
   isBindableElement,
+  isGenericSwitchableElement,
+  isGenericSwitchableToolType,
+  isLinearSwitchableElement,
+  isLinearSwitchableToolType,
 } from "../element/typeChecks";
 import type {
   ExcalidrawBindableElement,
@@ -467,6 +471,7 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
 } from "../element/textMeasurements";
+import ShapeSwitch from "./ShapeSwitch";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -559,6 +564,7 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
+let textWysiwygSubmitHandler: (() => void) | null = null;
 
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
@@ -1805,6 +1811,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        <ShapeSwitch app={this} />
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -4093,6 +4100,56 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (
+          selectedElements.length === 1 &&
+          (selectedElements[0].type === "rectangle" ||
+            selectedElements[0].type === "diamond" ||
+            selectedElements[0].type === "ellipse" ||
+            selectedElements[0].type === "arrow" ||
+            selectedElements[0].type === "line")
+        ) {
+          if (this.state.showShapeSwitchPanel && event.key === KEYS.ESCAPE) {
+            this.setState({
+              showShapeSwitchPanel: false,
+            });
+
+            return;
+          }
+
+          if (event.key === KEYS.SLASH) {
+            if (!this.state.showShapeSwitchPanel) {
+              this.setState({
+                showShapeSwitchPanel: true,
+              });
+            } else if (
+              selectedElements[0].type === "rectangle" ||
+              selectedElements[0].type === "diamond" ||
+              selectedElements[0].type === "ellipse"
+            ) {
+              const index = ["rectangle", "diamond", "ellipse"].indexOf(
+                selectedElements[0].type,
+              );
+              const nextType = ["rectangle", "diamond", "ellipse"][
+                (index + 1) % 3
+              ] as ToolType;
+              this.setActiveTool({ type: nextType });
+            } else if (
+              selectedElements[0].type === "arrow" ||
+              selectedElements[0].type === "line"
+            ) {
+              const index = ["arrow", "line"].indexOf(selectedElements[0].type);
+              const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
+              this.setActiveTool({ type: nextType });
+            }
+
+            return;
+          }
+
+          this.setState({
+            showShapeSwitchPanel: false,
+          });
+        }
+
+        if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
         ) {
@@ -4742,6 +4799,95 @@ class App extends React.Component<AppProps, AppState> {
         ...commonResets,
       };
     });
+
+    const selectedElements = getSelectedElements(
+      this.scene.getNonDeletedElementsMap(),
+      this.state,
+    );
+    const firstElement = selectedElements[0];
+
+    if (
+      firstElement &&
+      selectedElements.length === 1 &&
+      isGenericSwitchableElement(firstElement) &&
+      isGenericSwitchableToolType(tool.type)
+    ) {
+      ShapeCache.delete(firstElement);
+
+      mutateElement(firstElement, {
+        type: tool.type,
+        roundness:
+          tool.type === "diamond" && firstElement.roundness
+            ? {
+                type: isUsingAdaptiveRadius(tool.type)
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+                value: ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
+            : firstElement.roundness,
+      });
+
+      this.setActiveTool({ type: "selection" });
+
+      if (firstElement.boundElements?.some((e) => e.type === "text")) {
+        this.startTextEditing({
+          sceneX: firstElement.x + firstElement.width / 2,
+          sceneY: firstElement.y + firstElement.height / 2,
+          container: firstElement as ExcalidrawTextContainer,
+          keepContainerDimensions: true,
+        });
+      }
+
+      textWysiwygSubmitHandler?.();
+
+      this.setState({
+        selectedElementIds: {
+          [firstElement.id]: true,
+        },
+      });
+
+      this.store.shouldCaptureIncrement();
+    }
+
+    if (
+      firstElement &&
+      selectedElements.length === 1 &&
+      isLinearSwitchableElement(firstElement) &&
+      isLinearSwitchableToolType(tool.type)
+    ) {
+      ShapeCache.delete(firstElement);
+
+      mutateElement(firstElement as ExcalidrawLinearElement, {
+        type: tool.type,
+        startArrowhead: null,
+        endArrowhead: tool.type === "arrow" ? "arrow" : null,
+      });
+
+      this.setActiveTool({ type: "selection" });
+
+      if (
+        firstElement.boundElements?.some((e) => e.type === "text") &&
+        isArrowElement(firstElement)
+      ) {
+        this.startTextEditing({
+          sceneX: firstElement.x + firstElement.width / 2,
+          sceneY: firstElement.y + firstElement.height / 2,
+          container: firstElement,
+          keepContainerDimensions: true,
+        });
+      }
+
+      textWysiwygSubmitHandler?.();
+
+      this.setState({
+        selectedElementIds: {
+          [firstElement.id]: true,
+        },
+        selectedLinearElement: new LinearElementEditor(
+          firstElement as ExcalidrawLinearElement,
+        ),
+      });
+    }
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
@@ -4843,8 +4989,10 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
+      keepContainerDimensions = false,
     }: {
       isExistingElement?: boolean;
+      keepContainerDimensions?: boolean;
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -4871,7 +5019,7 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
-    textWysiwyg({
+    textWysiwygSubmitHandler = textWysiwyg({
       id: element.id,
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
@@ -4894,6 +5042,7 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
+        textWysiwygSubmitHandler = null;
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
         // select the created text element only if submitting via keyboard
@@ -4949,6 +5098,7 @@ class App extends React.Component<AppProps, AppState> {
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
       autoSelect: !this.device.isTouchScreen,
+      keepContainerDimensions,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -5181,6 +5331,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter = true,
     container,
     autoEdit = true,
+    keepContainerDimensions = false,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5190,6 +5341,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
+    keepContainerDimensions?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -5325,6 +5477,7 @@ class App extends React.Component<AppProps, AppState> {
     if (autoEdit || existingTextElement || container) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
+        keepContainerDimensions,
       });
     } else {
       this.setState({
@@ -8768,6 +8921,7 @@ class App extends React.Component<AppProps, AppState> {
         cursorButton: "up",
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
+        showShapeSwitchPanel: false,
       }));
 
       this.lastPointerMoveCoords = null;

@@ -26,6 +26,9 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
+  ExcalidrawRectangleElement,
+  ExcalidrawEllipseElement,
+  ExcalidrawDiamondElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -336,3 +339,49 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[1] === "number" &&
   typeof box[2] === "number" &&
   typeof box[3] === "number";
+
+type ExcalidrawGenericSwitchableElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawDiamondElement;
+
+type GenericSwitchableToolType = "rectangle" | "ellipse" | "diamond";
+
+type LinearSwitchableToolType = "arrow" | "line";
+
+export const isGenericSwitchableElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawGenericSwitchableElement => {
+  return (
+    element.type === "rectangle" ||
+    element.type === "ellipse" ||
+    element.type === "diamond"
+  );
+};
+
+export const isGenericSwitchableToolType = (
+  type: string,
+): type is GenericSwitchableToolType => {
+  return type === "rectangle" || type === "ellipse" || type === "diamond";
+};
+
+export const isLinearSwitchableElement = (
+  element: ExcalidrawElement,
+): element is ExcalidrawLinearElement => {
+  if (element.type === "arrow" || element.type === "line") {
+    if (
+      (!element.boundElements || element.boundElements.length === 0) &&
+      !element.startBinding &&
+      !element.endBinding
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const isLinearSwitchableToolType = (
+  type: string,
+): type is LinearSwitchableToolType => {
+  return type === "arrow" || type === "line";
+};
