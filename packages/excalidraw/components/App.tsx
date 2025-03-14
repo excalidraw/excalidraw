@@ -4119,7 +4119,7 @@ class App extends React.Component<AppProps, AppState> {
             return;
           }
 
-          if (event.key === KEYS.SLASH) {
+          if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
             if (!this.state.showShapeSwitchPanel) {
               this.setState({
                 showShapeSwitchPanel: true,
