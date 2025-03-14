@@ -1,17 +1,54 @@
 import { ORIG_ID } from "../constants";
-import { getNewGroupIdsForDuplication } from "../groups";
+import {
+  getElementsInGroup,
+  getNewGroupIdsForDuplication,
+  getSelectedGroupForElement,
+} from "../groups";
+
 import { randomId, randomInteger } from "../random";
-import type { AppState } from "../types";
-import type { Mutable } from "../utility-types";
+
 import {
   arrayToMap,
   castArray,
+  findLastIndex,
   getUpdatedTimestamp,
   invariant,
   isTestEnv,
 } from "../utils";
+
+import {
+  bindElementsToFramesAfterDuplication,
+  getFrameChildren,
+} from "../frame";
+
+import { normalizeElementOrder } from "./sortElements";
+
 import { bumpVersion } from "./mutateElement";
-import type { ExcalidrawElement, GroupId } from "./types";
+
+import {
+  hasBoundTextElement,
+  isBoundToContainer,
+  isElbowArrow,
+  isFrameLikeElement,
+} from "./typeChecks";
+
+import {
+  bindTextToShapeAfterDuplication,
+  getBoundTextElement,
+  getContainerElement,
+} from "./textElement";
+
+import { updateElbowArrowPoints } from "./elbowArrow";
+
+import type { AppState } from "../types";
+import type { Mutable } from "../utility-types";
+
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  GroupId,
+  NonDeletedSceneElementsMap,
+} from "./types";
 
 /**
  * Duplicate an element, often used in the alt-drag operation.
@@ -32,6 +69,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
   groupIdMapForOperation: Map<GroupId, GroupId>,
   element: TElement,
   overrides?: Partial<TElement>,
+  randomizeSeed?: boolean,
 ): Readonly<TElement> => {
   let copy = deepCopyElement(element);
 
@@ -41,7 +79,11 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 
   copy.id = randomId();
   copy.updated = getUpdatedTimestamp();
-  copy.seed = randomInteger();
+  if (randomizeSeed) {
+    copy.seed = randomInteger();
+    bumpVersion(copy);
+  }
+
   copy.groupIds = getNewGroupIdsForDuplication(
     copy.groupIds,
     editingGroupId,
@@ -58,6 +100,300 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
   return copy;
 };
 
+export const duplicateElements = (
+  elements: readonly ExcalidrawElement[],
+  opts?: {
+    idsOfElementsToDuplicate?: Map<ExcalidrawElement["id"], ExcalidrawElement>;
+    appState?: {
+      editingGroupId: AppState["editingGroupId"];
+      selectedGroupIds: AppState["selectedGroupIds"];
+    };
+    overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
+    randomizeSeed?: boolean;
+  },
+) => {
+  // Ids of elements that have already been processed so we don't push them
+  // into the array twice if we end up backtracking when retrieving
+  // discontiguous group of elements (can happen due to a bug, or in edge
+  // cases such as a group containing deleted elements which were not selected).
+  //
+  // This is not enough to prevent duplicates, so we do a second loop afterwards
+  // to remove them.
+  //
+  // For convenience we mark even the newly created ones even though we don't
+  // loop over them.
+  const processedIds = new Map<ExcalidrawElement["id"], true>();
+  const groupIdMap = new Map();
+  const newElements: ExcalidrawElement[] = [];
+  const oldElements: ExcalidrawElement[] = [];
+  const oldIdToDuplicatedId = new Map();
+  const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
+  const elementsMap = arrayToMap(elements) as ElementsMap;
+  const _idsOfElementsToDuplicate =
+    opts?.idsOfElementsToDuplicate ?? new Set(elements.map((el) => el.id));
+
+  elements = normalizeElementOrder(elements);
+
+  const elementsWithClones: ExcalidrawElement[] = elements.slice();
+
+  // helper functions
+  // -------------------------------------------------------------------------
+
+  // Used for the heavy lifing of copying a single element, a group of elements
+  // an element with bound text etc.
+  const copyElements = <T extends ExcalidrawElement | ExcalidrawElement[]>(
+    element: T,
+  ): T extends ExcalidrawElement[]
+    ? ExcalidrawElement[]
+    : ExcalidrawElement | null => {
+    const elements = castArray(element);
+
+    const _newElements = elements.reduce(
+      (acc: ExcalidrawElement[], element) => {
+        if (processedIds.has(element.id)) {
+          return acc;
+        }
+
+        processedIds.set(element.id, true);
+
+        const newElement = duplicateElement(
+          opts?.appState?.editingGroupId ?? null,
+          groupIdMap,
+          element,
+          opts?.overrides?.(element),
+          opts?.randomizeSeed,
+        );
+
+        processedIds.set(newElement.id, true);
+
+        duplicatedElementsMap.set(newElement.id, newElement);
+        oldIdToDuplicatedId.set(element.id, newElement.id);
+
+        oldElements.push(element);
+        newElements.push(newElement);
+
+        acc.push(newElement);
+        return acc;
+      },
+      [],
+    );
+
+    return (
+      Array.isArray(element) ? _newElements : _newElements[0] || null
+    ) as T extends ExcalidrawElement[]
+      ? ExcalidrawElement[]
+      : ExcalidrawElement | null;
+  };
+
+  // Helper to position cloned elements in the Z-order the product needs it
+  const insertAfterIndex = (
+    index: number,
+    elements: ExcalidrawElement | null | ExcalidrawElement[],
+  ) => {
+    invariant(index !== -1, "targetIndex === -1 ");
+
+    if (!Array.isArray(elements) && !elements) {
+      return;
+    }
+
+    elementsWithClones.splice(index + 1, 0, ...castArray(elements));
+  };
+
+  const frameIdsToDuplicate = new Set(
+    elements
+      .filter(
+        (el) => _idsOfElementsToDuplicate.has(el.id) && isFrameLikeElement(el),
+      )
+      .map((el) => el.id),
+  );
+
+  for (const element of elements) {
+    if (processedIds.has(element.id)) {
+      continue;
+    }
+
+    if (!_idsOfElementsToDuplicate.has(element.id)) {
+      continue;
+    }
+
+    // groups
+    // -------------------------------------------------------------------------
+
+    const groupId = getSelectedGroupForElement(
+      (opts?.appState ?? {
+        editingGroupId: null,
+        selectedGroupIds: {},
+      }) as AppState,
+      element,
+    );
+    if (groupId) {
+      const groupElements = getElementsInGroup(elements, groupId).flatMap(
+        (element) =>
+          isFrameLikeElement(element)
+            ? [...getFrameChildren(elements, element.id), element]
+            : [element],
+      );
+
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return el.groupIds?.includes(groupId);
+      });
+
+      insertAfterIndex(targetIndex, copyElements(groupElements));
+      continue;
+    }
+
+    // frame duplication
+    // -------------------------------------------------------------------------
+
+    if (element.frameId && frameIdsToDuplicate.has(element.frameId)) {
+      continue;
+    }
+
+    if (isFrameLikeElement(element)) {
+      const frameId = element.id;
+
+      const frameChildren = getFrameChildren(elements, frameId);
+
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return el.frameId === frameId || el.id === frameId;
+      });
+
+      insertAfterIndex(targetIndex, copyElements([...frameChildren, element]));
+      continue;
+    }
+
+    // text container
+    // -------------------------------------------------------------------------
+
+    if (hasBoundTextElement(element)) {
+      const boundTextElement = getBoundTextElement(element, elementsMap);
+
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return (
+          el.id === element.id ||
+          ("containerId" in el && el.containerId === element.id)
+        );
+      });
+
+      if (boundTextElement) {
+        insertAfterIndex(
+          targetIndex,
+          copyElements([element, boundTextElement]),
+        );
+      } else {
+        insertAfterIndex(targetIndex, copyElements(element));
+      }
+
+      continue;
+    }
+
+    if (isBoundToContainer(element)) {
+      const container = getContainerElement(element, elementsMap);
+
+      const targetIndex = findLastIndex(elementsWithClones, (el) => {
+        return el.id === element.id || el.id === container?.id;
+      });
+
+      if (container) {
+        insertAfterIndex(targetIndex, copyElements([container, element]));
+      } else {
+        insertAfterIndex(targetIndex, copyElements(element));
+      }
+
+      continue;
+    }
+
+    // default duplication (regular elements)
+    // -------------------------------------------------------------------------
+
+    insertAfterIndex(
+      findLastIndex(elementsWithClones, (el) => el.id === element.id),
+      copyElements(element),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+
+  bindTextToShapeAfterDuplication(
+    elementsWithClones,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
+
+  const fixBindingsAfterDuplication = (
+    newElements: Mutable<ExcalidrawElement>[],
+    oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
+    duplicatedElementsMap: NonDeletedSceneElementsMap,
+  ) => {
+    for (const element of newElements) {
+      if ("boundElements" in element && element.boundElements) {
+        element.boundElements = element.boundElements.reduce(
+          (
+            acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+            binding,
+          ) => {
+            const newBindingId = oldIdToDuplicatedId.get(binding.id);
+            if (newBindingId) {
+              acc.push({ ...binding, id: newBindingId });
+            }
+            return acc;
+          },
+          [],
+        );
+      }
+
+      if ("endBinding" in element && element.endBinding) {
+        const newEndBindingId = oldIdToDuplicatedId.get(
+          element.endBinding.elementId,
+        );
+        element.endBinding = newEndBindingId
+          ? {
+              ...element.endBinding,
+              elementId: newEndBindingId,
+            }
+          : null;
+      }
+      if ("startBinding" in element && element.startBinding) {
+        const newEndBindingId = oldIdToDuplicatedId.get(
+          element.startBinding.elementId,
+        );
+        element.startBinding = newEndBindingId
+          ? {
+              ...element.startBinding,
+              elementId: newEndBindingId,
+            }
+          : null;
+      }
+
+      if (isElbowArrow(element)) {
+        Object.assign(
+          element,
+          updateElbowArrowPoints(element, duplicatedElementsMap, {
+            points: [
+              element.points[0],
+              element.points[element.points.length - 1],
+            ],
+          }),
+        );
+      }
+    }
+  };
+
+  fixBindingsAfterDuplication(
+    newElements,
+    oldIdToDuplicatedId,
+    duplicatedElementsMap as NonDeletedSceneElementsMap,
+  );
+
+  bindElementsToFramesAfterDuplication(
+    elementsWithClones,
+    oldElements,
+    oldIdToDuplicatedId,
+  );
+
+  return newElements;
+};
+
 /**
  * Clones elements, regenerating their ids (including bindings) and group ids.
  *
@@ -68,140 +404,124 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
  *
  * NOTE by default does not randomize or regenerate anything except the id.
  */
-export const duplicateElements = (
-  elements: readonly ExcalidrawElement[],
-  opts?: {
-    /** NOTE also updates version flags and `updated` */
-    randomizeSeed?: boolean;
-    overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
-  },
-) => {
-  const clonedElements: ExcalidrawElement[] = [];
+// export const duplicateElements = (
+//   elements: readonly ExcalidrawElement[],
+//   opts?: {
+//     /** NOTE also updates version flags and `updated` */
+//     randomizeSeed?: boolean;
+//     overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
+//   },
+// ) => {
+//   const clonedElements: ExcalidrawElement[] = [];
 
-  const origElementsMap = arrayToMap(elements);
+//   const origElementsMap = arrayToMap(elements);
 
-  // used for for migrating old ids to new ids
-  const elementNewIdsMap = new Map<
-    /* orig */ ExcalidrawElement["id"],
-    /* new */ ExcalidrawElement["id"]
-  >();
+//   // used for for migrating old ids to new ids
+//   const elementNewIdsMap = new Map<
+//     /* orig */ ExcalidrawElement["id"],
+//     /* new */ ExcalidrawElement["id"]
+//   >();
 
-  const maybeGetNewIdFor = (id: ExcalidrawElement["id"]) => {
-    // if we've already migrated the element id, return the new one directly
-    if (elementNewIdsMap.has(id)) {
-      return elementNewIdsMap.get(id)!;
-    }
-    // if we haven't migrated the element id, but an old element with the same
-    // id exists, generate a new id for it and return it
-    if (origElementsMap.has(id)) {
-      const newId = randomId();
-      elementNewIdsMap.set(id, newId);
-      return newId;
-    }
-    // if old element doesn't exist, return null to mark it for removal
-    return null;
-  };
+//   const maybeGetNewIdFor = (id: ExcalidrawElement["id"]) => {
+//     // if we've already migrated the element id, return the new one directly
+//     if (elementNewIdsMap.has(id)) {
+//       return elementNewIdsMap.get(id)!;
+//     }
+//     // if we haven't migrated the element id, but an old element with the same
+//     // id exists, generate a new id for it and return it
+//     if (origElementsMap.has(id)) {
+//       const newId = randomId();
+//       elementNewIdsMap.set(id, newId);
+//       return newId;
+//     }
+//     // if old element doesn't exist, return null to mark it for removal
+//     return null;
+//   };
 
-  const groupNewIdsMap = new Map</* orig */ GroupId, /* new */ GroupId>();
+//   const groupNewIdsMap = new Map</* orig */ GroupId, /* new */ GroupId>();
 
-  for (const element of elements) {
-    let clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
+//   for (const element of elements) {
+//     let clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
 
-    if (opts?.overrides) {
-      clonedElement = Object.assign(
-        clonedElement,
-        opts.overrides(clonedElement),
-      );
-    }
+//     if (opts?.overrides) {
+//       clonedElement = Object.assign(
+//         clonedElement,
+//         opts.overrides(clonedElement),
+//       );
+//     }
 
-    clonedElement.id = maybeGetNewIdFor(element.id)!;
-    if (isTestEnv()) {
-      __test__defineOrigId(clonedElement, element.id);
-    }
+//     clonedElement.id = maybeGetNewIdFor(element.id)!;
+//     if (isTestEnv()) {
+//       __test__defineOrigId(clonedElement, element.id);
+//     }
 
-    if (opts?.randomizeSeed) {
-      clonedElement.seed = randomInteger();
-      bumpVersion(clonedElement);
-    }
+//     if (opts?.randomizeSeed) {
+//       clonedElement.seed = randomInteger();
+//       bumpVersion(clonedElement);
+//     }
 
-    if (clonedElement.groupIds) {
-      clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
-        if (!groupNewIdsMap.has(groupId)) {
-          groupNewIdsMap.set(groupId, randomId());
-        }
-        return groupNewIdsMap.get(groupId)!;
-      });
-    }
+//     if (clonedElement.groupIds) {
+//       clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
+//         if (!groupNewIdsMap.has(groupId)) {
+//           groupNewIdsMap.set(groupId, randomId());
+//         }
+//         return groupNewIdsMap.get(groupId)!;
+//       });
+//     }
 
-    if ("containerId" in clonedElement && clonedElement.containerId) {
-      const newContainerId = maybeGetNewIdFor(clonedElement.containerId);
-      clonedElement.containerId = newContainerId;
-    }
+//     if ("containerId" in clonedElement && clonedElement.containerId) {
+//       const newContainerId = maybeGetNewIdFor(clonedElement.containerId);
+//       clonedElement.containerId = newContainerId;
+//     }
 
-    if ("boundElements" in clonedElement && clonedElement.boundElements) {
-      clonedElement.boundElements = clonedElement.boundElements.reduce(
-        (
-          acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
-          binding,
-        ) => {
-          const newBindingId = maybeGetNewIdFor(binding.id);
-          if (newBindingId) {
-            acc.push({ ...binding, id: newBindingId });
-          }
-          return acc;
-        },
-        [],
-      );
-    }
+//     if ("boundElements" in clonedElement && clonedElement.boundElements) {
+//       clonedElement.boundElements = clonedElement.boundElements.reduce(
+//         (
+//           acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+//           binding,
+//         ) => {
+//           const newBindingId = maybeGetNewIdFor(binding.id);
+//           if (newBindingId) {
+//             acc.push({ ...binding, id: newBindingId });
+//           }
+//           return acc;
+//         },
+//         [],
+//       );
+//     }
 
-    if ("endBinding" in clonedElement && clonedElement.endBinding) {
-      const newEndBindingId = maybeGetNewIdFor(
-        clonedElement.endBinding.elementId,
-      );
-      clonedElement.endBinding = newEndBindingId
-        ? {
-            ...clonedElement.endBinding,
-            elementId: newEndBindingId,
-          }
-        : null;
-    }
-    if ("startBinding" in clonedElement && clonedElement.startBinding) {
-      const newEndBindingId = maybeGetNewIdFor(
-        clonedElement.startBinding.elementId,
-      );
-      clonedElement.startBinding = newEndBindingId
-        ? {
-            ...clonedElement.startBinding,
-            elementId: newEndBindingId,
-          }
-        : null;
-    }
+//     if ("endBinding" in clonedElement && clonedElement.endBinding) {
+//       const newEndBindingId = maybeGetNewIdFor(
+//         clonedElement.endBinding.elementId,
+//       );
+//       clonedElement.endBinding = newEndBindingId
+//         ? {
+//             ...clonedElement.endBinding,
+//             elementId: newEndBindingId,
+//           }
+//         : null;
+//     }
+//     if ("startBinding" in clonedElement && clonedElement.startBinding) {
+//       const newEndBindingId = maybeGetNewIdFor(
+//         clonedElement.startBinding.elementId,
+//       );
+//       clonedElement.startBinding = newEndBindingId
+//         ? {
+//             ...clonedElement.startBinding,
+//             elementId: newEndBindingId,
+//           }
+//         : null;
+//     }
 
-    if (clonedElement.frameId) {
-      clonedElement.frameId = maybeGetNewIdFor(clonedElement.frameId);
-    }
+//     if (clonedElement.frameId) {
+//       clonedElement.frameId = maybeGetNewIdFor(clonedElement.frameId);
+//     }
 
-    insertAfterIndex();
+//     clonedElements.push(clonedElement);
+//   }
 
-    clonedElements.push(clonedElement);
-  }
-
-  return clonedElements;
-};
-
-const insertAfterIndex = (
-  elementsWithClones: ExcalidrawElement[],
-  index: number,
-  elements: ExcalidrawElement | null | ExcalidrawElement[],
-) => {
-  invariant(index !== -1, "targetIndex === -1 ");
-
-  if (!Array.isArray(elements) && !elements) {
-    return;
-  }
-
-  return elementsWithClones.splice(index + 1, 0, ...castArray(elements));
-};
+//   return clonedElements;
+// };
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement.
 //

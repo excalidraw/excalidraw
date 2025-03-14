@@ -1290,22 +1290,6 @@ const updateBoundPoint = (
         pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
     );
 
-    // debugClear();
-    // debugDrawPoint(intersections[0], { color: "red", permanent: true });
-    // debugDrawLine(
-    //   lineSegment<GlobalPoint>(
-    //     adjacentPoint,
-    //     pointFromVector(
-    //       vectorScale(
-    //         vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
-    //         interceptorLength,
-    //       ),
-    //       adjacentPoint,
-    //     ),
-    //   ),
-    //   { permanent: true, color: "green" },
-    // );
-
     if (intersections.length > 1) {
       // The adjacent point is outside the shape (+ gap)
       newEdgePoint = intersections[0];
