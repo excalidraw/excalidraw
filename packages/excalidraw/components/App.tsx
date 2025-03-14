@@ -8451,6 +8451,8 @@ class App extends React.Component<AppProps, AppState> {
                   this.state.editingGroupId,
                   groupIdMap,
                   element,
+                  undefined,
+                  true,
                 );
 
                 // NOTE (mtolmacs): This is a temporary fix for very large scenes

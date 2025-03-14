@@ -39,12 +39,15 @@ import {
   invariant,
 } from "../utils";
 
+import { syncMovedIndices } from "../fractionalIndex";
+
 import { duplicateElements } from "../element/duplicate";
 
 import { register } from "./register";
 
 import type { ActionResult } from "./types";
 import type { ExcalidrawElement } from "../element/types";
+
 import type { AppState } from "../types";
 
 export const actionDuplicateSelection = register({
@@ -78,6 +81,13 @@ export const actionDuplicateSelection = register({
 
     const origElements: ExcalidrawElement[] = elements.slice();
     const clonedElements = duplicateElements(elements, {
+      idsOfElementsToDuplicate: arrayToMap(
+        getSelectedElements(elements, appState, {
+          includeBoundTextElement: true,
+          includeElementsInFrames: true,
+        }),
+      ),
+      appState,
       randomizeSeed: true,
       overrides: (element) => ({
         x: element.x + DEFAULT_GRID_SIZE / 2,
@@ -94,7 +104,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    //nextElements = syncMovedIndices(nextElements, arrayToMap(clonedElements));
+    nextElements = syncMovedIndices(nextElements, arrayToMap(clonedElements));
 
     const nextElementsToSelect =
       excludeElementsInFramesFromSelection(clonedElements);
