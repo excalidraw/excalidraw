@@ -1,10 +1,26 @@
+import {
+  clamp,
+  pointFrom,
+  pointDistance,
+  vector,
+  pointRotateRads,
+  vectorScale,
+  vectorFromPoint,
+  vectorSubtract,
+  vectorDot,
+  vectorNormalize,
+} from "@excalidraw/math";
+import { isPointInShape } from "@excalidraw/utils/collision";
+import { getSelectionBoxShape } from "@excalidraw/utils/geometry/shape";
+import clsx from "clsx";
+import throttle from "lodash.throttle";
+import { nanoid } from "nanoid";
 import React, { useContext } from "react";
 import { flushSync } from "react-dom";
-
-import type { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
-import clsx from "clsx";
-import { nanoid } from "nanoid";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -37,17 +53,29 @@ import {
   actionToggleObjectsSnapMode,
   actionToggleCropEditor,
 } from "../actions";
+import { actionWrapTextInContainer } from "../actions/actionBoundText";
+import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import { actionPaste } from "../actions/actionClipboard";
+import { actionCopyElementLink } from "../actions/actionElementLink";
+import { actionUnlockAllElements } from "../actions/actionElementLock";
+import {
+  actionRemoveAllElementsFromFrame,
+  actionSelectAllElementsInFrame,
+  actionWrapSelectionInFrame,
+} from "../actions/actionFrame";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import type { Action, ActionResult } from "../actions/types";
+import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { trackEvent } from "../analytics";
+import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import {
   APP_NAME,
@@ -92,7 +120,6 @@ import {
   isSafari,
   type EXPORT_IMAGE_TYPES,
 } from "../constants";
-import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
@@ -171,30 +198,6 @@ import {
   isLinearSwitchableElement,
   isLinearSwitchableToolType,
 } from "../element/typeChecks";
-import type {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-  InitializedExcalidrawImageElement,
-  ExcalidrawImageElement,
-  FileId,
-  NonDeletedExcalidrawElement,
-  ExcalidrawTextContainer,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawMagicFrameElement,
-  ExcalidrawIframeLikeElement,
-  IframeData,
-  ExcalidrawIframeElement,
-  ExcalidrawEmbeddableElement,
-  Ordered,
-  MagicGenerationData,
-  ExcalidrawNonSelectionElement,
-  ExcalidrawArrowElement,
-} from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
   editGroupForSelectedElement,
@@ -228,10 +231,6 @@ import {
   isSomeElementSelected,
 } from "../scene";
 import Scene from "../scene/Scene";
-import type {
-  RenderInteractiveSceneCallback,
-  ScrollBars,
-} from "../scene/types";
 import { getStateForZoom } from "../scene/zoom";
 import {
   findShapeByKey,
@@ -240,36 +239,6 @@ import {
   getElementShape,
   isPathALoop,
 } from "../shapes";
-import { getSelectionBoxShape } from "@excalidraw/utils/geometry/shape";
-import { isPointInShape } from "@excalidraw/utils/collision";
-import type {
-  AppClassProperties,
-  AppProps,
-  AppState,
-  BinaryFileData,
-  DataURL,
-  ExcalidrawImperativeAPI,
-  BinaryFiles,
-  Gesture,
-  GestureEvent,
-  LibraryItems,
-  PointerDownState,
-  SceneData,
-  Device,
-  FrameNameBoundsCache,
-  SidebarName,
-  SidebarTabName,
-  KeyboardModifiersObject,
-  CollaboratorPointer,
-  ToolType,
-  OnUserFollowedPayload,
-  UnsubscribeCallback,
-  EmbedsValidationStatus,
-  ElementsPendingErasure,
-  GenerateDiagramToCode,
-  NullableGridSize,
-  Offsets,
-} from "../types";
 import {
   debounce,
   distance,
@@ -303,11 +272,6 @@ import {
   maybeParseEmbedSrc,
   getEmbedLink,
 } from "../element/embeddable";
-import type { ContextMenuItems } from "./ContextMenu";
-import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
-import LayerUI from "./LayerUI";
-import { Toast } from "./Toast";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import {
   dataURLToFile,
   dataURLToString,
@@ -330,8 +294,6 @@ import {
   normalizeSVG,
   updateImageCache as _updateImageCache,
 } from "../element/image";
-import throttle from "lodash.throttle";
-import type { FileSystemHandle } from "../data/filesystem";
 import { fileOpen } from "../data/filesystem";
 import {
   bindTextToShapeAfterDuplication,
@@ -347,7 +309,6 @@ import {
 } from "../components/hyperlink/Hyperlink";
 import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
 import { shouldShowBoundingBox } from "../element/transformHandles";
-import { actionUnlockAllElements } from "../actions/actionElementLock";
 import { Fonts, getLineHeight } from "../fonts";
 import {
   getFrameChildren,
@@ -370,15 +331,7 @@ import {
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
 } from "../scene/selection";
-import { actionPaste } from "../actions/actionClipboard";
-import {
-  actionRemoveAllElementsFromFrame,
-  actionSelectAllElementsInFrame,
-  actionWrapSelectionInFrame,
-} from "../actions/actionFrame";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { editorJotaiStore } from "../editor-jotai";
-import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { ImageSceneDataError } from "../errors";
 import {
   getSnapLinesAtPointer,
@@ -393,17 +346,9 @@ import {
   isGridModeEnabled,
   getGridPoint,
 } from "../snapping";
-import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import BraveMeasureTextError from "./BraveMeasureTextError";
-import { activeEyeDropperAtom } from "./EyeDropper";
-import type { ExcalidrawElementSkeleton } from "../data/transform";
 import { convertToExcalidrawElements } from "../data/transform";
-import type { ValueOf } from "../utility-types";
-import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
-import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import { Renderer } from "../scene/Renderer";
 import { ShapeCache } from "../scene/ShapeCache";
-import { SVGLayer } from "./SVGLayer";
 import {
   setEraserCursor,
   setCursor,
@@ -413,11 +358,7 @@ import {
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
 import { COLOR_PALETTE } from "../colors";
-import { ElementCanvasButton } from "./MagicButton";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
-import FollowMode from "./FollowMode/FollowMode";
 import { Store, CaptureUpdateAction } from "../store";
-import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
@@ -430,37 +371,15 @@ import {
 import { textWysiwyg } from "../element/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
-import {
-  isPointHittingLink,
-  isPointHittingLinkIcon,
-} from "./hyperlink/helpers";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
-import NewElementCanvas from "./canvases/NewElementCanvas";
 import {
   FlowChartCreator,
   FlowChartNavigator,
   getLinkDirectionFromKey,
 } from "../element/flowchart";
-import { searchItemInFocusAtom } from "./SearchMenu";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import {
-  clamp,
-  pointFrom,
-  pointDistance,
-  vector,
-  pointRotateRads,
-  vectorScale,
-  vectorFromPoint,
-  vectorSubtract,
-  vectorDot,
-  vectorNormalize,
-} from "@excalidraw/math";
 import { cropElement } from "../element/cropElement";
 import { wrapText } from "../element/textWrapping";
-import { actionCopyElementLink } from "../actions/actionElementLink";
 import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
 import {
   isMeasureTextSupported,
@@ -471,7 +390,92 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
 } from "../element/textMeasurements";
+
 import ShapeSwitch from "./ShapeSwitch";
+
+import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import BraveMeasureTextError from "./BraveMeasureTextError";
+import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
+import { activeEyeDropperAtom } from "./EyeDropper";
+import FollowMode from "./FollowMode/FollowMode";
+import LayerUI from "./LayerUI";
+import { ElementCanvasButton } from "./MagicButton";
+import { SVGLayer } from "./SVGLayer";
+import { searchItemInFocusAtom } from "./SearchMenu";
+import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+import { StaticCanvas, InteractiveCanvas } from "./canvases";
+import NewElementCanvas from "./canvases/NewElementCanvas";
+import {
+  isPointHittingLink,
+  isPointHittingLinkIcon,
+} from "./hyperlink/helpers";
+import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { Toast } from "./Toast";
+
+import type { Action, ActionResult } from "../actions/types";
+import type { PastedMixedContent } from "../clipboard";
+import type { ExportedElements } from "../data";
+import type { ContextMenuItems } from "./ContextMenu";
+import type { FileSystemHandle } from "../data/filesystem";
+import type { ExcalidrawElementSkeleton } from "../data/transform";
+import type {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  InitializedExcalidrawImageElement,
+  ExcalidrawImageElement,
+  FileId,
+  NonDeletedExcalidrawElement,
+  ExcalidrawTextContainer,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawIframeLikeElement,
+  IframeData,
+  ExcalidrawIframeElement,
+  ExcalidrawEmbeddableElement,
+  Ordered,
+  MagicGenerationData,
+  ExcalidrawNonSelectionElement,
+  ExcalidrawArrowElement,
+} from "../element/types";
+import type {
+  RenderInteractiveSceneCallback,
+  ScrollBars,
+} from "../scene/types";
+import type {
+  AppClassProperties,
+  AppProps,
+  AppState,
+  BinaryFileData,
+  DataURL,
+  ExcalidrawImperativeAPI,
+  BinaryFiles,
+  Gesture,
+  GestureEvent,
+  LibraryItems,
+  PointerDownState,
+  SceneData,
+  Device,
+  FrameNameBoundsCache,
+  SidebarName,
+  SidebarTabName,
+  KeyboardModifiersObject,
+  CollaboratorPointer,
+  ToolType,
+  OnUserFollowedPayload,
+  UnsubscribeCallback,
+  EmbedsValidationStatus,
+  ElementsPendingErasure,
+  GenerateDiagramToCode,
+  NullableGridSize,
+  Offsets,
+} from "../types";
+import type { ValueOf } from "../utility-types";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -8590,21 +8594,78 @@ class App extends React.Component<AppProps, AppState> {
             const elements = this.scene.getElementsIncludingDeleted();
 
             for (const element of elements) {
-              if (
+              const isInSelection =
                 selectedElementIds.has(element.id) ||
                 // case: the state.selectedElementIds might not have been
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
-                  pointerDownState.hit.wasAddedToSelection)
+                  pointerDownState.hit.wasAddedToSelection);
+              // NOTE (mtolmacs): This is a temporary fix for very large scenes
+              if (
+                Math.abs(element.x) > 1e7 ||
+                Math.abs(element.x) > 1e7 ||
+                Math.abs(element.width) > 1e7 ||
+                Math.abs(element.height) > 1e7
               ) {
+                console.error(
+                  `Alt+dragging element in scene with invalid dimensions`,
+                  element.x,
+                  element.y,
+                  element.width,
+                  element.height,
+                  isInSelection,
+                );
+
+                return;
+              }
+
+              if (isInSelection) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
                   groupIdMap,
                   element,
                 );
+
+                // NOTE (mtolmacs): This is a temporary fix for very large scenes
+                if (
+                  Math.abs(duplicatedElement.x) > 1e7 ||
+                  Math.abs(duplicatedElement.x) > 1e7 ||
+                  Math.abs(duplicatedElement.width) > 1e7 ||
+                  Math.abs(duplicatedElement.height) > 1e7
+                ) {
+                  console.error(
+                    `Alt+dragging duplicated element with invalid dimensions`,
+                    duplicatedElement.x,
+                    duplicatedElement.y,
+                    duplicatedElement.width,
+                    duplicatedElement.height,
+                  );
+
+                  return;
+                }
+
                 const origElement = pointerDownState.originalElements.get(
                   element.id,
                 )!;
+
+                // NOTE (mtolmacs): This is a temporary fix for very large scenes
+                if (
+                  Math.abs(origElement.x) > 1e7 ||
+                  Math.abs(origElement.x) > 1e7 ||
+                  Math.abs(origElement.width) > 1e7 ||
+                  Math.abs(origElement.height) > 1e7
+                ) {
+                  console.error(
+                    `Alt+dragging duplicated element with invalid dimensions`,
+                    origElement.x,
+                    origElement.y,
+                    origElement.width,
+                    origElement.height,
+                  );
+
+                  return;
+                }
+
                 mutateElement(duplicatedElement, {
                   x: origElement.x,
                   y: origElement.y,

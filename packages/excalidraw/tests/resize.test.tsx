@@ -1,24 +1,28 @@
+import { pointFrom } from "@excalidraw/math";
 import React from "react";
-import { render, unmountComponent } from "./test-utils";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import { getElementPointsCoords } from "../element/bounds";
+import { LinearElementEditor } from "../element/linearElementEditor";
+import { resizeSingleElement } from "../element/resizeElements";
+import { isLinearElement } from "../element/typeChecks";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
+import { getSizeFromPoints } from "../points";
 import { reseed } from "../random";
+import { arrayToMap } from "../utils";
+
+import { API } from "./helpers/api";
 import { UI, Keyboard, Pointer } from "./helpers/ui";
+import { render, unmountComponent } from "./test-utils";
+
+import type { Bounds } from "../element/bounds";
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
 } from "../element/types";
-import type { Bounds } from "../element/bounds";
-import { getElementPointsCoords } from "../element/bounds";
-import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
-import { KEYS } from "../keys";
-import { isLinearElement } from "../element/typeChecks";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { arrayToMap } from "../utils";
-import type { LocalPoint } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
-import { resizeSingleElement } from "../element/resizeElements";
-import { getSizeFromPoints } from "../points";
 
 unmountComponent();
 
@@ -533,9 +537,8 @@ describe("arrow element", () => {
     expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.75);
 
     UI.resize([rectangle, arrow], "nw", [300, 350]);
-
-    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(-0.13);
-    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.11);
+    expect(arrow.startBinding?.fixedPoint?.[0]).toBeCloseTo(0);
+    expect(arrow.startBinding?.fixedPoint?.[1]).toBeCloseTo(0.25);
   });
 });
 

@@ -1,19 +1,28 @@
+import {
+  EXTERNAL_LINK_IMG,
+  ELEMENT_LINK_IMG,
+  getLinkHandleFromCoords,
+} from "../components/hyperlink/helpers";
 import { FRAME_STYLE } from "../constants";
 import { getElementAbsoluteCoords } from "../element";
-
-import {
-  elementOverlapsWithFrame,
-  getTargetFrame,
-  shouldApplyFrameClip,
-} from "../frame";
+import { isElementLink } from "../element/elementLink";
+import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
+import { getBoundTextElement } from "../element/textElement";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
 } from "../element/typeChecks";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  shouldApplyFrameClip,
+} from "../frame";
 import { renderElement } from "../renderer/renderElement";
-import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import type { StaticCanvasAppState, Zoom } from "../types";
+import { throttleRAF } from "../utils";
+
+import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
@@ -23,15 +32,7 @@ import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
-import {
-  EXTERNAL_LINK_IMG,
-  ELEMENT_LINK_IMG,
-  getLinkHandleFromCoords,
-} from "../components/hyperlink/helpers";
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
-import { throttleRAF } from "../utils";
-import { getBoundTextElement } from "../element/textElement";
-import { isElementLink } from "../element/elementLink";
+import type { StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {
   Bold: "#dddddd",
@@ -351,7 +352,14 @@ const _renderStaticScene = ({
           renderLinkIcon(element, context, appState, elementsMap);
         }
       } catch (error: any) {
-        console.error(error);
+        console.error(
+          error,
+          element.id,
+          element.x,
+          element.y,
+          element.width,
+          element.height,
+        );
       }
     });
 

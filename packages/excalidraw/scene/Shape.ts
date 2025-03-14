@@ -1,19 +1,9 @@
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
-import type { Drawable, Options } from "roughjs/bin/core";
-import type { RoughGenerator } from "roughjs/bin/generator";
-import { getDiamondPoints, getArrowheadPoints } from "../element";
-import type { ElementShapes } from "./types";
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-  ExcalidrawSelectionElement,
-  ExcalidrawLinearElement,
-  Arrowhead,
-} from "../element/types";
-import { generateFreeDrawShape } from "../renderer/renderElement";
-import { isTransparent, assertNever } from "../utils";
+import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { simplify } from "points-on-curve";
+
 import { ROUGHNESS } from "../constants";
+import { getDiamondPoints, getArrowheadPoints } from "../element";
+import { headingForPointIsHorizontal } from "../element/heading";
 import {
   isElbowArrow,
   isEmbeddableElement,
@@ -21,11 +11,24 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "../element/typeChecks";
-import { canChangeRoundness } from "./comparisons";
-import type { EmbedsValidationStatus } from "../types";
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
+import { generateFreeDrawShape } from "../renderer/renderElement";
 import { getCornerRadius, isPathALoop } from "../shapes";
-import { headingForPointIsHorizontal } from "../element/heading";
+import { isTransparent, assertNever } from "../utils";
+
+import { canChangeRoundness } from "./comparisons";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+  ExcalidrawSelectionElement,
+  ExcalidrawLinearElement,
+  Arrowhead,
+} from "../element/types";
+import type { EmbedsValidationStatus } from "../types";
+import type { ElementShapes } from "./types";
+import type { Drawable, Options } from "roughjs/bin/core";
+import type { RoughGenerator } from "roughjs/bin/generator";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -430,12 +433,26 @@ export const _generateElementShape = (
         : [pointFrom<LocalPoint>(0, 0)];
 
       if (isElbowArrow(element)) {
-        shape = [
-          generator.path(
-            generateElbowArrowShape(points, 16),
-            generateRoughOptions(element, true),
-          ),
-        ];
+        // NOTE (mtolmacs): Temporary fix for extremely big arrow shapes
+        if (
+          !points.every(
+            (point) => Math.abs(point[0]) <= 1e6 && Math.abs(point[1]) <= 1e6,
+          )
+        ) {
+          console.error(
+            `Elbow arrow with extreme point positions detected. Arrow not rendered.`,
+            element.id,
+            JSON.stringify(points),
+          );
+          shape = [];
+        } else {
+          shape = [
+            generator.path(
+              generateElbowArrowShape(points, 16),
+              generateRoughOptions(element, true),
+            ),
+          ];
+        }
       } else if (!element.roundness) {
         // curve is always the first element
         // this simplifies finding the curve for an element

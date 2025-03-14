@@ -12,7 +12,8 @@
  * to pure shapes
  */
 
-import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
+import { getElementAbsoluteCoords } from "@excalidraw/excalidraw/element";
+import { invariant } from "@excalidraw/excalidraw/utils";
 import {
   curve,
   lineSegment,
@@ -32,7 +33,8 @@ import {
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
-import { getElementAbsoluteCoords } from "@excalidraw/excalidraw/element";
+import { pointsOnBezierCurves } from "points-on-curve";
+
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -49,9 +51,9 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
 } from "@excalidraw/excalidraw/element/types";
-import { pointsOnBezierCurves } from "points-on-curve";
+import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
+
 import type { Drawable, Op } from "roughjs/bin/core";
-import { invariant } from "@excalidraw/excalidraw/utils";
 
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
@@ -192,6 +194,11 @@ export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
 };
 
 export const getCurvePathOps = (shape: Drawable): Op[] => {
+  // NOTE (mtolmacs): Temporary fix for extremely large elements
+  if (!shape) {
+    return [];
+  }
+
   for (const set of shape.sets) {
     if (set.type === "path") {
       return set.ops;

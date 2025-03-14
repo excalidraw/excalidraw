@@ -1,3 +1,39 @@
+import {
+  degreesToRadians,
+  lineSegment,
+  pointFrom,
+  pointDistance,
+  pointFromArray,
+  pointRotateRads,
+} from "@excalidraw/math";
+import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
+import rough from "roughjs/bin/rough";
+
+import type {
+  Degrees,
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+  Radians,
+} from "@excalidraw/math";
+
+import { rescalePoints } from "../points";
+import { generateRoughOptions } from "../scene/Shape";
+import { ShapeCache } from "../scene/ShapeCache";
+import { arrayToMap, invariant } from "../utils";
+
+import { LinearElementEditor } from "./linearElementEditor";
+import { getBoundTextElement, getContainerElement } from "./textElement";
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isFreeDrawElement,
+  isLinearElement,
+  isTextElement,
+} from "./typeChecks";
+
+import type { AppState } from "../types";
+import type { Mutable } from "../utility-types";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -7,39 +43,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ElementsMap,
 } from "./types";
-import rough from "roughjs/bin/rough";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { AppState } from "../types";
-import { generateRoughOptions } from "../scene/Shape";
-import {
-  isArrowElement,
-  isBoundToContainer,
-  isFreeDrawElement,
-  isLinearElement,
-  isTextElement,
-} from "./typeChecks";
-import { rescalePoints } from "../points";
-import { getBoundTextElement, getContainerElement } from "./textElement";
-import { LinearElementEditor } from "./linearElementEditor";
-import { ShapeCache } from "../scene/ShapeCache";
-import { arrayToMap, invariant } from "../utils";
-import type {
-  Degrees,
-  GlobalPoint,
-  LineSegment,
-  LocalPoint,
-  Radians,
-} from "@excalidraw/math";
-import {
-  degreesToRadians,
-  lineSegment,
-  pointFrom,
-  pointDistance,
-  pointFromArray,
-  pointRotateRads,
-} from "@excalidraw/math";
-import type { Mutable } from "../utility-types";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
 
 export type RectangleBox = {
   x: number;
@@ -367,15 +372,6 @@ export const getDiamondPoints = (element: ExcalidrawElement) => {
   return [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY];
 };
 
-export const getCurvePathOps = (shape: Drawable): Op[] => {
-  for (const set of shape.sets) {
-    if (set.type === "path") {
-      return set.ops;
-    }
-  }
-  return shape.sets[0].ops;
-};
-
 // reference: https://eliot-jones.com/2019/12/cubic-bezier-curve-bounding-boxes
 const getBezierValueForT = (
   t: number,
@@ -583,6 +579,10 @@ export const getArrowheadPoints = (
   position: "start" | "end",
   arrowhead: Arrowhead,
 ) => {
+  if (shape.length < 1) {
+    return null;
+  }
+
   const ops = getCurvePathOps(shape[0]);
   if (ops.length < 1) {
     return null;

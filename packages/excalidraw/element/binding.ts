@@ -1,3 +1,67 @@
+import {
+  lineSegment,
+  pointFrom,
+  pointRotateRads,
+  type GlobalPoint,
+  vectorFromPoint,
+  pointDistanceSq,
+  clamp,
+  pointDistance,
+  pointFromVector,
+  vectorScale,
+  vectorNormalize,
+  vectorCross,
+  pointsEqual,
+  lineSegmentIntersectionPoints,
+  round,
+  PRECISION,
+} from "@excalidraw/math";
+import { isPointOnShape } from "@excalidraw/utils/collision";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
+import { KEYS } from "../keys";
+import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
+import {
+  arrayToMap,
+  isBindingFallthroughEnabled,
+  tupleToCoors,
+} from "../utils";
+
+import {
+  getCenterForBounds,
+  getElementBounds,
+  doBoundsIntersect,
+} from "./bounds";
+import { intersectElementWithLineSegment } from "./collision";
+import { distanceToBindableElement } from "./distance";
+import {
+  compareHeading,
+  HEADING_DOWN,
+  HEADING_RIGHT,
+  HEADING_UP,
+  headingForPointFromElement,
+  vectorToHeading,
+  type Heading,
+} from "./heading";
+import { LinearElementEditor } from "./linearElementEditor";
+import { mutateElement } from "./mutateElement";
+import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  isArrowElement,
+  isBindableElement,
+  isBindingElement,
+  isBoundToContainer,
+  isElbowArrow,
+  isFixedPointBinding,
+  isFrameLikeElement,
+  isLinearElement,
+  isRectanguloidElement,
+  isTextElement,
+} from "./typeChecks";
+
+import type { Bounds } from "./bounds";
+import type { ElementUpdate } from "./mutateElement";
 import type {
   ExcalidrawBindableElement,
   ExcalidrawElement,
@@ -15,67 +79,8 @@ import type {
   SceneElementsMap,
   FixedPointBinding,
 } from "./types";
-
-import type { Bounds } from "./bounds";
-import {
-  getCenterForBounds,
-  getElementBounds,
-  doBoundsIntersect,
-} from "./bounds";
-import type { AppState } from "../types";
-import { isPointOnShape } from "@excalidraw/utils/collision";
-import {
-  isArrowElement,
-  isBindableElement,
-  isBindingElement,
-  isBoundToContainer,
-  isElbowArrow,
-  isFixedPointBinding,
-  isFrameLikeElement,
-  isLinearElement,
-  isRectanguloidElement,
-  isTextElement,
-} from "./typeChecks";
-import type { ElementUpdate } from "./mutateElement";
-import { mutateElement } from "./mutateElement";
 import type Scene from "../scene/Scene";
-import { LinearElementEditor } from "./linearElementEditor";
-import {
-  arrayToMap,
-  isBindingFallthroughEnabled,
-  tupleToCoors,
-} from "../utils";
-import { KEYS } from "../keys";
-import { getBoundTextElement, handleBindTextResize } from "./textElement";
-import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
-import {
-  compareHeading,
-  HEADING_DOWN,
-  HEADING_RIGHT,
-  HEADING_UP,
-  headingForPointFromElement,
-  vectorToHeading,
-  type Heading,
-} from "./heading";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import {
-  lineSegment,
-  pointFrom,
-  pointRotateRads,
-  type GlobalPoint,
-  vectorFromPoint,
-  pointDistanceSq,
-  clamp,
-  pointDistance,
-  pointFromVector,
-  vectorScale,
-  vectorNormalize,
-  vectorCross,
-  pointsEqual,
-  lineSegmentIntersectionPoints,
-} from "@excalidraw/math";
-import { intersectElementWithLineSegment } from "./collision";
-import { distanceToBindableElement } from "./distance";
+import type { AppState } from "../types";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -272,14 +277,16 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
-    : // We have to update the focus and gap of the binding, so let's rebind
+    : !isElbowArrow(selectedElement)
+    ? // We have to update the focus and gap of the binding, so let's rebind
       getElligibleElementForBindingElement(
         selectedElement,
         "start",
         elementsMap,
         elements,
         zoom,
-      );
+      )
+    : "keep";
   const end = endDragged
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(
@@ -290,14 +297,16 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
-    : // We have to update the focus and gap of the binding, so let's rebind
+    : !isElbowArrow(selectedElement)
+    ? // We have to update the focus and gap of the binding, so let's rebind
       getElligibleElementForBindingElement(
         selectedElement,
         "end",
         elementsMap,
         elements,
         zoom,
-      );
+      )
+    : "keep";
 
   return [start, end];
 };
@@ -309,6 +318,11 @@ const getBindingStrategyForDraggingArrowOrJoints = (
   isBindingEnabled: boolean,
   zoom?: AppState["zoom"],
 ): (NonDeleted<ExcalidrawBindableElement> | null | "keep")[] => {
+  // Elbow arrows don't bind when dragged as a whole
+  if (isElbowArrow(selectedElement)) {
+    return ["keep", "keep"];
+  }
+
   const [startIsClose, endIsClose] = getOriginalBindingsIfStillCloseToArrowEnds(
     selectedElement,
     elementsMap,
@@ -943,21 +957,28 @@ export const bindPointToSnapToElementOutline = (
       ),
     )[0];
     const currentDistance = pointDistance(p, center);
-    const fullDistance = pointDistance(intersection, center);
-    const ratio = currentDistance / fullDistance;
+    const fullDistance = Math.max(
+      pointDistance(intersection ?? p, center),
+      PRECISION,
+    );
+    const ratio = round(currentDistance / fullDistance, 6);
 
     switch (true) {
       case ratio > 0.9:
-        if (currentDistance - fullDistance > FIXED_BINDING_DISTANCE) {
+        if (
+          currentDistance - fullDistance > FIXED_BINDING_DISTANCE ||
+          // Too close to determine vector from intersection to p
+          pointDistanceSq(p, intersection) < PRECISION
+        ) {
           return p;
         }
 
         return pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, intersection)),
+            vectorNormalize(vectorFromPoint(p, intersection ?? center)),
             ratio > 1 ? FIXED_BINDING_DISTANCE : -FIXED_BINDING_DISTANCE,
           ),
-          intersection,
+          intersection ?? center,
         );
 
       default:

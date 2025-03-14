@@ -1,5 +1,7 @@
 import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
+
 import { THEME } from "../constants";
+
 import type { PointSnapLine, PointerSnapLine } from "../snapping";
 import type { InteractiveCanvasAppState } from "../types";
 

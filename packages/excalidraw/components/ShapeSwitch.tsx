@@ -1,22 +1,13 @@
-import { getSelectedElements } from "../scene";
-import type App from "./App";
-import { ToolButton } from "./ToolButton";
-import {
-  ArrowIcon,
-  DiamondIcon,
-  EllipseIcon,
-  LineIcon,
-  RectangleIcon,
-} from "./icons";
 import { type ReactNode, useEffect, useRef } from "react";
-import { trackEvent } from "../analytics";
-import type { ToolType } from "../types";
-import { sceneCoordsToViewportCoords } from "../utils";
-import type { ExcalidrawElement } from "../element/types";
-import "./ShapeSwitch.scss";
+
 import clsx from "clsx";
-import { getElementAbsoluteCoords } from "../element";
+
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import { getElementAbsoluteCoords } from "../element";
+import { sceneCoordsToViewportCoords } from "../utils";
+import { getSelectedElements } from "../scene";
+import { trackEvent } from "../analytics";
 import {
   isArrowElement,
   isGenericSwitchableElement,
@@ -24,6 +15,21 @@ import {
   isLinearSwitchableElement,
 } from "../element/typeChecks";
 import { t } from "../i18n";
+
+import "./ShapeSwitch.scss";
+
+import {
+  ArrowIcon,
+  DiamondIcon,
+  EllipseIcon,
+  LineIcon,
+  RectangleIcon,
+} from "./icons";
+import { ToolButton } from "./ToolButton";
+
+import type App from "./App";
+import type { ExcalidrawElement } from "../element/types";
+import type { ToolType } from "../types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;

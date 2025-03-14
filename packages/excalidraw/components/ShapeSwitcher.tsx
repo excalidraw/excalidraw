@@ -1,9 +1,11 @@
 // render the shape switcher div on top of the canvas at the selected element's position
 
 import { THEME } from "../constants";
+
+import { sceneCoordsToViewportCoords } from "../utils";
+
 import type { ExcalidrawElement } from "../element/types";
 import type { AppState } from "../types";
-import { sceneCoordsToViewportCoords } from "../utils";
 
 const ShapeSwitcher = ({
   appState,

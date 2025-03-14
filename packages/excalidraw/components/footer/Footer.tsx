@@ -1,6 +1,7 @@
 import clsx from "clsx";
+
 import { actionShortcuts } from "../../actions";
-import type { ActionManager } from "../../actions/manager";
+import { useTunnels } from "../../context/tunnels";
 import {
   ExitZenModeAction,
   FinalizeAction,
@@ -8,10 +9,11 @@ import {
   ZoomActions,
 } from "../Actions";
 import { useDevice } from "../App";
-import { useTunnels } from "../../context/tunnels";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
+
+import type { ActionManager } from "../../actions/manager";
 import type { UIAppState } from "../../types";
 
 const Footer = ({

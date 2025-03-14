@@ -1,5 +1,5 @@
-import type { Alignment } from "../align";
 import { alignElements } from "../align";
+import { ToolButton } from "../components/ToolButton";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -8,18 +8,20 @@ import {
   CenterHorizontallyIcon,
   CenterVerticallyIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
 import { getNonDeletedElements } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
-import type { ExcalidrawElement } from "../element/types";
 import { updateFrameMembershipOfSelectedElements } from "../frame";
 import { t } from "../i18n";
 import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
-import type { AppClassProperties, AppState, UIAppState } from "../types";
 import { arrayToMap, getShortcutKey } from "../utils";
+
 import { register } from "./register";
+
+import type { Alignment } from "../align";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 export const alignActionsPredicate = (
   appState: UIAppState,

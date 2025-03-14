@@ -1,19 +1,22 @@
 import { nanoid } from "nanoid";
+
 import { cleanAppStateForExport } from "../appState";
 import { IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
-import type { ExcalidrawElement, FileId } from "../element/types";
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
-import type { AppState, DataURL, LibraryItem } from "../types";
-import type { ValueOf } from "../utility-types";
 import { bytesToHexString, isPromiseLike } from "../utils";
+
 import { base64ToString, stringToBase64, toByteString } from "./encode";
-import type { FileSystemHandle } from "./filesystem";
 import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
+
+import type { FileSystemHandle } from "./filesystem";
+import type { ExcalidrawElement, FileId } from "../element/types";
+import type { AppState, DataURL, LibraryItem } from "../types";
+import type { ValueOf } from "../utility-types";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {

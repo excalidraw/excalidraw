@@ -1,8 +1,12 @@
-import type { LocalPoint } from "@excalidraw/math";
 import { pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint } from "@excalidraw/math";
+
 import { ROUNDNESS } from "../constants";
 import { arrayToMap } from "../utils";
+
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+
 import type { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 
 const _ce = ({

@@ -11,6 +11,7 @@ import {
   THEME,
   DEFAULT_GRID_STEP,
 } from "./constants";
+
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)

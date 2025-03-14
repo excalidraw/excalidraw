@@ -1,12 +1,15 @@
 import clsx from "clsx";
-import { useAtom } from "../../editor-jotai";
 import { useEffect, useRef } from "react";
+
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
+
+import HotkeyLabel from "./HotkeyLabel";
 import {
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
-import HotkeyLabel from "./HotkeyLabel";
-import { t } from "../../i18n";
+
 import type { ColorPaletteCustom } from "../../colors";
 
 interface ShadeListProps {
