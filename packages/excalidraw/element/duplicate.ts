@@ -314,12 +314,6 @@ export const duplicateElements = (
 
   // ---------------------------------------------------------------------------
 
-  bindTextToShapeAfterDuplication(
-    elementsWithClones,
-    oldElements,
-    oldIdToDuplicatedId,
-  );
-
   const fixBindingsAfterDuplication = (
     newElements: Mutable<ExcalidrawElement>[],
     oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
@@ -383,6 +377,12 @@ export const duplicateElements = (
     newElements,
     oldIdToDuplicatedId,
     duplicatedElementsMap as NonDeletedSceneElementsMap,
+  );
+
+  bindTextToShapeAfterDuplication(
+    elementsWithClones,
+    oldElements,
+    oldIdToDuplicatedId,
   );
 
   bindElementsToFramesAfterDuplication(
