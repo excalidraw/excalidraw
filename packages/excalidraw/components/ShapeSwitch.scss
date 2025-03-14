@@ -15,7 +15,6 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
-    background: var(--default-bg-color);
 
     .key {
       background: var(--color-primary-light);
@@ -43,5 +42,6 @@
     border-radius: 0.5rem;
     background: var(--default-bg-color);
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
   }
 }

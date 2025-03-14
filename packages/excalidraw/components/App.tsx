@@ -4103,13 +4103,15 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        const firstElement = selectedElements[0];
+        const isGenericSwitchable =
+          firstElement && isGenericSwitchableElement(firstElement);
+        const isLinearSwitchable =
+          firstElement && isLinearSwitchableElement(firstElement);
+
         if (
           selectedElements.length === 1 &&
-          (selectedElements[0].type === "rectangle" ||
-            selectedElements[0].type === "diamond" ||
-            selectedElements[0].type === "ellipse" ||
-            selectedElements[0].type === "arrow" ||
-            selectedElements[0].type === "line")
+          (isGenericSwitchable || isLinearSwitchable)
         ) {
           if (this.state.showShapeSwitchPanel && event.key === KEYS.ESCAPE) {
             this.setState({
@@ -4121,28 +4123,29 @@ class App extends React.Component<AppProps, AppState> {
 
           if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
             if (!this.state.showShapeSwitchPanel) {
-              this.setState({
-                showShapeSwitchPanel: true,
-              });
-            } else if (
-              selectedElements[0].type === "rectangle" ||
-              selectedElements[0].type === "diamond" ||
-              selectedElements[0].type === "ellipse"
-            ) {
-              const index = ["rectangle", "diamond", "ellipse"].indexOf(
-                selectedElements[0].type,
+              flushSync(() =>
+                this.setState({
+                  showShapeSwitchPanel: true,
+                }),
               );
-              const nextType = ["rectangle", "diamond", "ellipse"][
-                (index + 1) % 3
-              ] as ToolType;
-              this.setActiveTool({ type: nextType });
-            } else if (
-              selectedElements[0].type === "arrow" ||
-              selectedElements[0].type === "line"
-            ) {
-              const index = ["arrow", "line"].indexOf(selectedElements[0].type);
-              const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
-              this.setActiveTool({ type: nextType });
+            }
+
+            if (this.state.showShapeSwitchPanel) {
+              if (isGenericSwitchable) {
+                const index = ["rectangle", "diamond", "ellipse"].indexOf(
+                  selectedElements[0].type,
+                );
+                const nextType = ["rectangle", "diamond", "ellipse"][
+                  (index + 1) % 3
+                ] as ToolType;
+                this.setActiveTool({ type: nextType });
+              } else if (isLinearSwitchable) {
+                const index = ["arrow", "line"].indexOf(
+                  selectedElements[0].type,
+                );
+                const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
+                this.setActiveTool({ type: nextType });
+              }
             }
 
             return;

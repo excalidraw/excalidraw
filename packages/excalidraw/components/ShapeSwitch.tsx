@@ -45,17 +45,38 @@ const ShapeSwitch = ({ app }: { app: App }) => {
     return app.setState({ showShapeSwitchPanel: false });
   }, [app]);
 
-  if (
-    firstElement &&
-    selectedElements.length === 1 &&
-    (isGenericSwitchableElement(firstElement) ||
-      isLinearSwitchableElement(firstElement))
-  ) {
-    return app.state.showShapeSwitchPanel ? (
-      <Panel app={app} element={firstElement} />
-    ) : (
-      <Hint app={app} element={firstElement} />
-    );
+  const isGeneric = firstElement && isGenericSwitchableElement(firstElement);
+  const isLinear = firstElement && isLinearSwitchableElement(firstElement);
+  const isGenericInChart =
+    isGeneric &&
+    app.scene
+      .getNonDeletedElements()
+      .some(
+        (el) =>
+          el.type === "arrow" &&
+          (el.startBinding?.elementId === firstElement.id ||
+            el.endBinding?.elementId === firstElement.id),
+      );
+  const isLinearInChart =
+    isLinear &&
+    isArrowElement(firstElement) &&
+    (firstElement.startBinding || firstElement.endBinding);
+
+  if (firstElement && selectedElements.length === 1) {
+    if (isGeneric) {
+      return app.state.showShapeSwitchPanel ? (
+        <Panel app={app} element={firstElement} />
+      ) : isGenericInChart ? (
+        <Hint app={app} element={firstElement} />
+      ) : null;
+    }
+    if (isLinear) {
+      return app.state.showShapeSwitchPanel ? (
+        <Panel app={app} element={firstElement} />
+      ) : isLinearInChart ? (
+        <Hint app={app} element={firstElement} />
+      ) : null;
+    }
   }
 
   return null;
@@ -155,7 +176,7 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
       style={{
         position: "absolute",
         top: `${
-          y + GAP_VERTICAL * app.state.zoom.value - app.state.offsetTop
+          y + (GAP_VERTICAL + 8) * app.state.zoom.value - app.state.offsetTop
         }px`,
         left: `${x - app.state.offsetLeft - GAP_HORIZONTAL}px`,
         zIndex: 2,
@@ -175,11 +196,11 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
         return (
           <ToolButton
             className="Shape"
-            key={type}
+            key={`${element.version}_${type}`}
             type="radio"
             icon={icon}
             checked={isSelected}
-            name="editor-current-shape"
+            name="shape-switch-option"
             title={type}
             keyBindingLabel={""}
             aria-label={type}
