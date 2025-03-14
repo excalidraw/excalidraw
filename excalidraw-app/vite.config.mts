@@ -24,6 +24,22 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: [
         {
+          find: /^@excalidraw\/common$/,
+          replacement: path.resolve(__dirname, "../packages/common/index.ts"),
+        },
+        {
+          find: /^@excalidraw\/common\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/common/$1"),
+        },
+        {
+          find: /^@excalidraw\/element$/,
+          replacement: path.resolve(__dirname, "../packages/element/index.ts"),
+        },
+        {
+          find: /^@excalidraw\/element\/(.*?)/,
+          replacement: path.resolve(__dirname, "../packages/element/$1"),
+        },
+        {
           find: /^@excalidraw\/excalidraw$/,
           replacement: path.resolve(__dirname, "../packages/excalidraw/index.tsx"),
         },
@@ -46,14 +62,6 @@ export default defineConfig(({ mode }) => {
         {
           find: /^@excalidraw\/math\/(.*?)/,
           replacement: path.resolve(__dirname, "../packages/math/$1"),
-        },
-        {
-          find: /^@excalidraw\/element$/,
-          replacement: path.resolve(__dirname, "../packages/element/index.ts"),
-        },
-        {
-          find: /^@excalidraw\/element\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/element/$1"),
         },
       ],
     },

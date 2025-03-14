@@ -28,10 +28,11 @@ const getConfig = (outdir) => ({
   assetNames: "[dir]/[name]",
   chunkNames: "[dir]/[name]-[hash]",
   alias: {
+    "@excalidraw/common": path.resolve(__dirname, "../packages/common"),
+    "@excalidraw/element": path.resolve(__dirname, "../packages/element"),
     "@excalidraw/excalidraw": path.resolve(__dirname, "../packages/excalidraw"),
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils"),
     "@excalidraw/math": path.resolve(__dirname, "../packages/math"),
-    "@excalidraw/element": path.resolve(__dirname, "../packages/element"),
   },
   loader: {
     ".woff2": "file",
