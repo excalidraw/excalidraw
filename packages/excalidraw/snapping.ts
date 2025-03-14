@@ -1411,18 +1411,3 @@ export const isActiveToolNonLinearSnappable = (
     activeToolType === TOOL_TYPE.text
   );
 };
-
-// TODO: Rounding this point causes some shake when free drawing
-export const getGridPoint = (
-  x: number,
-  y: number,
-  gridSize: NullableGridSize,
-): [number, number] => {
-  if (gridSize) {
-    return [
-      Math.round(x / gridSize) * gridSize,
-      Math.round(y / gridSize) * gridSize,
-    ];
-  }
-  return [x, y];
-};

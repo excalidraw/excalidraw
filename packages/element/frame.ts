@@ -16,8 +16,8 @@ import {
   getContainerElement,
 } from "./element/textElement";
 import { isFrameElement, isFrameLikeElement } from "./element/typeChecks";
-import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
-import { getElementsWithinSelection, getSelectedElements } from "./scene";
+import { getElementsInGroup, selectGroupsFromGivenElements } from "../excalidraw/groups";
+import { getElementsWithinSelection, getSelectedElements } from "../excalidraw/scene";
 import { arrayToMap } from "./utils";
 
 import type {
@@ -28,13 +28,13 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-import type { ExcalidrawElementsIncludingDeleted } from "./scene/Scene";
+import type { ExcalidrawElementsIncludingDeleted } from "../excalidraw/scene/Scene";
 import type {
   AppClassProperties,
   AppState,
   StaticCanvasAppState,
-} from "./types";
-import type { ReadonlySetLike } from "./utility-types";
+} from "../excalidraw/types";
+import type { ReadonlySetLike } from "../excalidraw/utility-types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (
@@ -98,59 +98,6 @@ export const getElementsCompletelyInFrame = (
       (!isFrameLikeElement(element) && !element.frameId) ||
       element.frameId === frame.id,
   );
-
-export const isElementContainingFrame = (
-  element: ExcalidrawElement,
-  frame: ExcalidrawFrameLikeElement,
-  elementsMap: ElementsMap,
-) => {
-  return getElementsWithinSelection([frame], element, elementsMap).some(
-    (e) => e.id === frame.id,
-  );
-};
-
-export const getElementsIntersectingFrame = (
-  elements: readonly ExcalidrawElement[],
-  frame: ExcalidrawFrameLikeElement,
-) => {
-  const elementsMap = arrayToMap(elements);
-  return elements.filter((element) =>
-    isElementIntersectingFrame(element, frame, elementsMap),
-  );
-};
-
-export const elementsAreInFrameBounds = (
-  elements: readonly ExcalidrawElement[],
-  frame: ExcalidrawFrameLikeElement,
-  elementsMap: ElementsMap,
-) => {
-  const [frameX1, frameY1, frameX2, frameY2] = getElementAbsoluteCoords(
-    frame,
-    elementsMap,
-  );
-
-  const [elementX1, elementY1, elementX2, elementY2] =
-    getCommonBounds(elements);
-
-  return (
-    frameX1 <= elementX1 &&
-    frameY1 <= elementY1 &&
-    frameX2 >= elementX2 &&
-    frameY2 >= elementY2
-  );
-};
-
-export const elementOverlapsWithFrame = (
-  element: ExcalidrawElement,
-  frame: ExcalidrawFrameLikeElement,
-  elementsMap: ElementsMap,
-) => {
-  return (
-    elementsAreInFrameBounds([element], frame, elementsMap) ||
-    isElementIntersectingFrame(element, frame, elementsMap) ||
-    isElementContainingFrame(element, frame, elementsMap)
-  );
-};
 
 export const isCursorInFrame = (
   cursorCoords: {
