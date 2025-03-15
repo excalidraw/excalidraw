@@ -1308,22 +1308,6 @@ const updateBoundPoint = (
         pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
     );
 
-    // debugClear();
-    // debugDrawPoint(intersections[0], { color: "red", permanent: true });
-    // debugDrawLine(
-    //   lineSegment<GlobalPoint>(
-    //     adjacentPoint,
-    //     pointFromVector(
-    //       vectorScale(
-    //         vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
-    //         interceptorLength,
-    //       ),
-    //       adjacentPoint,
-    //     ),
-    //   ),
-    //   { permanent: true, color: "green" },
-    // );
-
     if (intersections.length > 1) {
       // The adjacent point is outside the shape (+ gap)
       newEdgePoint = intersections[0];
@@ -1744,21 +1728,6 @@ const determineFocusDistance = (
           : Math.sqrt(element.width ** 2 + element.height ** 2) / 2),
     )
     .sort((g, h) => Math.abs(g) - Math.abs(h));
-
-  // debugClear();
-  // [
-  //   lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[0]),
-  //   lineSegmentIntersectionPoints(rotatedInterceptor, interceptees[1]),
-  // ]
-  //   .filter((p): p is GlobalPoint => p !== null)
-  //   .forEach((p) => debugDrawPoint(p, { color: "black", permanent: true }));
-  // debugDrawPoint(determineFocusPoint(element, ordered[0] ?? 0, rotatedA), {
-  //   color: "red",
-  //   permanent: true,
-  // });
-  // debugDrawLine(rotatedInterceptor, { color: "green", permanent: true });
-  // debugDrawLine(interceptees[0], { color: "red", permanent: true });
-  // debugDrawLine(interceptees[1], { color: "red", permanent: true });
 
   const signedDistanceRatio = ordered[0] ?? 0;
 
