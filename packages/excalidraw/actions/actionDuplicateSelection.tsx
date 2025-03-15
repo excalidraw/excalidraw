@@ -2,7 +2,7 @@ import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
 import { DEFAULT_GRID_SIZE } from "../constants";
 import { getNonDeletedElements } from "../element";
-import { isBoundToContainer } from "../element/typeChecks";
+import { isBoundToContainer, isLinearElement } from "../element/typeChecks";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { selectGroupsForSelectedElements } from "../groups";
 import { t } from "../i18n";
@@ -52,8 +52,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    const origElements: ExcalidrawElement[] = elements.slice();
-    const clonedElements = duplicateElements(elements, {
+    const duplicatedElements = duplicateElements(elements, {
       idsOfElementsToDuplicate: arrayToMap(
         getSelectedElements(elements, appState, {
           includeBoundTextElement: true,
@@ -68,7 +67,9 @@ export const actionDuplicateSelection = register({
       }),
     });
 
-    let nextElements = origElements.concat(clonedElements);
+    let nextElements = (elements as ExcalidrawElement[])
+      .slice()
+      .concat(duplicatedElements);
 
     if (app.props.onDuplicate && nextElements) {
       const mappedElements = app.props.onDuplicate(nextElements, elements);
@@ -77,38 +78,22 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    nextElements = syncMovedIndices(nextElements, arrayToMap(clonedElements));
-    // clonedElements
-    //   .filter((e) => e.type === "text")
-    //   .forEach((e) => {
-    //     console.log(JSON.stringify(e.boundElements));
-    //   });
-    // console.log("----");
-    // nextElements
-    //   .filter((e) => e.type === "text")
-    //   .forEach((e) => {
-    //     console.log(JSON.stringify(e.boundElements));
-    //   });
-    const nextElementsToSelect =
-      excludeElementsInFramesFromSelection(clonedElements);
-
     return {
-      elements: nextElements,
+      elements: syncMovedIndices(nextElements, arrayToMap(duplicatedElements)),
       appState: {
         ...appState,
-        ...updateLinearElementEditors(nextElements),
+        ...updateLinearElementEditors(duplicatedElements),
         ...selectGroupsForSelectedElements(
           {
             editingGroupId: appState.editingGroupId,
-            selectedElementIds: nextElementsToSelect.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                if (!isBoundToContainer(element)) {
-                  acc[element.id] = true;
-                }
-                return acc;
-              },
-              {},
-            ),
+            selectedElementIds: excludeElementsInFramesFromSelection(
+              duplicatedElements,
+            ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
+              if (!isBoundToContainer(element)) {
+                acc[element.id] = true;
+              }
+              return acc;
+            }, {}),
           },
           getNonDeletedElements(nextElements),
           appState,

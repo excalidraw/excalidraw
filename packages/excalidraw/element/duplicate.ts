@@ -27,7 +27,6 @@ import { bumpVersion } from "./mutateElement";
 
 import {
   hasBoundTextElement,
-  isArrowElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
@@ -321,10 +320,6 @@ export const duplicateElements = (
     duplicatedElementsMap: NonDeletedSceneElementsMap,
   ) => {
     for (const element of newElements) {
-      if (!isArrowElement(element)) {
-        continue;
-      }
-
       if ("boundElements" in element && element.boundElements) {
         Object.assign(element, {
           boundElements: element.boundElements.reduce(
