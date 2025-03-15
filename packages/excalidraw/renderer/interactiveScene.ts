@@ -51,7 +51,13 @@ import {
 } from "../scene/scrollbars";
 import { getCornerRadius } from "../shapes";
 import { type InteractiveCanvasAppState } from "../types";
-import { arrayToMap, invariant, throttleRAF } from "../utils";
+import {
+  arrayToMap,
+  invariant,
+  isDevEnv,
+  isTestEnv,
+  throttleRAF,
+} from "../utils";
 
 import {
   bootstrapCanvas,
@@ -886,23 +892,33 @@ const _renderInteractiveScene = ({
     );
   }
 
-  if (
-    isElbowArrow(selectedElements[0]) &&
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.segmentMidPointHoveredCoords
-  ) {
-    renderElbowArrowMidPointHighlight(context, appState);
-  } else if (
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0 &&
-    !(
-      isElbowArrow(selectedElements[0]) &&
-      appState.selectedLinearElement.hoverPointIndex > 0 &&
-      appState.selectedLinearElement.hoverPointIndex <
-        selectedElements[0].points.length - 1
-    )
-  ) {
-    renderLinearElementPointHighlight(context, appState, elementsMap);
+  // Arrows have a different highlight behavior when
+  // they are the only selected element
+  if (appState.selectedLinearElement) {
+    if (isTestEnv() || isDevEnv()) {
+      invariant(
+        selectedElements.length <= 1,
+        `There is an active selectedLinearElement on app state but the selectedElements length is ${selectedElements?.length} not 1`,
+      );
+    }
+
+    const editor = appState.selectedLinearElement;
+    const firstSelectedLinear = selectedElements.find(
+      (el) => el.id === editor.elementId, // Don't forget bound text elements!
+    );
+
+    if (isElbowArrow(firstSelectedLinear)) {
+      if (editor.segmentMidPointHoveredCoords) {
+        renderElbowArrowMidPointHighlight(context, appState);
+      } else if (
+        editor.hoverPointIndex !== 0 &&
+        editor.hoverPointIndex !== firstSelectedLinear.points.length - 1
+      ) {
+        renderLinearElementPointHighlight(context, appState, elementsMap);
+      }
+    } else if (editor.hoverPointIndex >= 0) {
+      renderLinearElementPointHighlight(context, appState, elementsMap);
+    }
   }
 
   // Paint selected elements

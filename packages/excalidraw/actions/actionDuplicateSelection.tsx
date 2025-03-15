@@ -96,6 +96,7 @@ export const actionDuplicateSelection = register({
       elements: nextElements,
       appState: {
         ...appState,
+        ...updateLinearElementEditors(nextElements),
         ...selectGroupsForSelectedElements(
           {
             editingGroupId: appState.editingGroupId,
@@ -131,3 +132,24 @@ export const actionDuplicateSelection = register({
     />
   ),
 });
+
+const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
+  const linears = clonedElements.filter(isLinearElement);
+  if (linears.length === 1) {
+    const linear = linears[0];
+    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
+    const onlySingleLinearSelected = clonedElements.every(
+      (el) => el.id === linear.id || boundElements.includes(el.id),
+    );
+
+    if (onlySingleLinearSelected) {
+      return {
+        selectedLinearElement: new LinearElementEditor(linear),
+      };
+    }
+  }
+
+  return {
+    selectedLinearElement: null,
+  };
+};
