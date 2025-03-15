@@ -27,6 +27,7 @@ import { bumpVersion } from "./mutateElement";
 
 import {
   hasBoundTextElement,
+  isArrowElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
@@ -315,48 +316,58 @@ export const duplicateElements = (
   // ---------------------------------------------------------------------------
 
   const fixBindingsAfterDuplication = (
-    newElements: Mutable<ExcalidrawElement>[],
+    newElements: ExcalidrawElement[],
     oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
     duplicatedElementsMap: NonDeletedSceneElementsMap,
   ) => {
     for (const element of newElements) {
+      if (!isArrowElement(element)) {
+        continue;
+      }
+
       if ("boundElements" in element && element.boundElements) {
-        element.boundElements = element.boundElements.reduce(
-          (
-            acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
-            binding,
-          ) => {
-            const newBindingId = oldIdToDuplicatedId.get(binding.id);
-            if (newBindingId) {
-              acc.push({ ...binding, id: newBindingId });
-            }
-            return acc;
-          },
-          [],
-        );
+        Object.assign(element, {
+          boundElements: element.boundElements.reduce(
+            (
+              acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+              binding,
+            ) => {
+              const newBindingId = oldIdToDuplicatedId.get(binding.id);
+              if (newBindingId) {
+                acc.push({ ...binding, id: newBindingId });
+              }
+              return acc;
+            },
+            [],
+          ),
+        });
       }
 
       if ("endBinding" in element && element.endBinding) {
         const newEndBindingId = oldIdToDuplicatedId.get(
           element.endBinding.elementId,
         );
-        element.endBinding = newEndBindingId
-          ? {
-              ...element.endBinding,
-              elementId: newEndBindingId,
-            }
-          : null;
+        Object.assign(element, {
+          endBinding: newEndBindingId
+            ? {
+                ...element.endBinding,
+                elementId: newEndBindingId,
+              }
+            : null,
+        });
       }
       if ("startBinding" in element && element.startBinding) {
         const newEndBindingId = oldIdToDuplicatedId.get(
           element.startBinding.elementId,
         );
-        element.startBinding = newEndBindingId
-          ? {
-              ...element.startBinding,
-              elementId: newEndBindingId,
-            }
-          : null;
+        Object.assign(element, {
+          startBinding: newEndBindingId
+            ? {
+                ...element.startBinding,
+                elementId: newEndBindingId,
+              }
+            : null,
+        });
       }
 
       if (isElbowArrow(element)) {
