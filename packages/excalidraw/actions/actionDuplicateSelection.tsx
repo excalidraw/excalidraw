@@ -52,6 +52,10 @@ export const actionDuplicateSelection = register({
   icon: DuplicateIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
+    if (appState.selectedElementsAreBeingDragged) {
+      return false;
+    }
+
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
       // TODO: Invariants should be checked here instead of duplicateSelectedPoints()
