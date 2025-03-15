@@ -1,5 +1,4 @@
 import React from "react";
-import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -7,7 +6,6 @@ import { Excalidraw } from "../index";
 
 import { KEYS } from "../keys";
 
-import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
 import { Keyboard, Pointer } from "./helpers/ui";
 import { render } from "./test-utils";
@@ -21,7 +19,7 @@ describe("arrow undo/redo", () => {
 
   it("should maintain arrow shape after undo/redo", () => {
     // Create a rectangle
-    const rectangle = UI.createElement("rectangle", {
+    UI.createElement("rectangle", {
       x: 100,
       y: 100,
       width: 100,
@@ -51,6 +49,16 @@ describe("arrow undo/redo", () => {
     });
 
     // Verify arrow points are exactly the same after redo
+    expect(arrow.points).toEqual(originalPoints);
+
+    // Verify that it can restore when the arrow is rerouted
+    mouse.downAt(100, 100);
+    mouse.moveTo(103, 100);
+    mouse.moveTo(100, 100);
+    mouse.up();
+
+    Keyboard.undo();
+
     expect(arrow.points).toEqual(originalPoints);
   });
 });
