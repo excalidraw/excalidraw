@@ -2088,7 +2088,7 @@ class App extends React.Component<AppProps, AppState> {
       swapPreviewOnAlt: true,
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
-      onSelect: (color: string, event: KeyboardEvent) => {
+      onSelect: (color, event) => {
         const shouldUpdateStrokeColor =
           (type === "background" && event.altKey) ||
           (type === "stroke" && !event.altKey);
