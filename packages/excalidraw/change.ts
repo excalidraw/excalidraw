@@ -1266,14 +1266,19 @@ export class ElementsChange implements Change<SceneElementsMap> {
       (directlyApplicablePartial as any).points &&
       !directlyApplicablePartial.isDeleted
     ) {
-      // Only update points if there's a binding change
-      if (
-        ((directlyApplicablePartial as any).startBinding !== undefined &&
-          (directlyApplicablePartial as any).startBinding !==
-            element.startBinding) ||
-        ((directlyApplicablePartial as any).endBinding !== undefined &&
-          (directlyApplicablePartial as any).endBinding !== element.endBinding)
-      ) {
+      // Only update points if there's a binding change that would affect the arrow shape
+      const startBindingChanged =
+        (directlyApplicablePartial as any).startBinding !== undefined &&
+        JSON.stringify((directlyApplicablePartial as any).startBinding) !==
+          JSON.stringify(element.startBinding);
+
+      const endBindingChanged =
+        (directlyApplicablePartial as any).endBinding !== undefined &&
+        JSON.stringify((directlyApplicablePartial as any).endBinding) !==
+          JSON.stringify(element.endBinding);
+
+      // If binding relationship changed significantly, we need to update points
+      if (startBindingChanged || endBindingChanged) {
         // Let the points be updated by the delta
         return newElementWith(
           element,
@@ -1523,6 +1528,8 @@ export class ElementsChange implements Change<SceneElementsMap> {
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
+        // Only preserve points during undo/redo when the binding relationship hasn't changed significantly
+        // This helps maintain arrow shape while allowing necessary updates when bindings change
         updateBoundElements(element, elements, {
           changedElements: changed,
           preservePoints: true, // Preserve arrow points during undo/redo

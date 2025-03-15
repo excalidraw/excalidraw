@@ -801,16 +801,29 @@ export const updateBoundElements = (
     }
 
     // If preservePoints is true, only update the bindings without changing the points
+    // This is specifically for undo/redo operations to maintain arrow shape
     if (preservePoints && isArrowElement(element)) {
-      mutateElement(element, {
-        ...(changedElement.id === element.startBinding?.elementId
-          ? { startBinding: bindings.startBinding }
-          : {}),
-        ...(changedElement.id === element.endBinding?.elementId
-          ? { endBinding: bindings.endBinding }
-          : {}),
-      });
-      return;
+      // Only preserve points if the binding relationship hasn't changed
+      const startBindingChanged =
+        changedElement.id === element.startBinding?.elementId &&
+        bindings.startBinding !== element.startBinding;
+
+      const endBindingChanged =
+        changedElement.id === element.endBinding?.elementId &&
+        bindings.endBinding !== element.endBinding;
+
+      // If binding relationship changed, we need to update points
+      if (!startBindingChanged && !endBindingChanged) {
+        mutateElement(element, {
+          ...(changedElement.id === element.startBinding?.elementId
+            ? { startBinding: bindings.startBinding }
+            : {}),
+          ...(changedElement.id === element.endBinding?.elementId
+            ? { endBinding: bindings.endBinding }
+            : {}),
+        });
+        return;
+      }
     }
 
     const updates = bindableElementsVisitor(
