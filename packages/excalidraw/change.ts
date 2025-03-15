@@ -17,6 +17,7 @@ import {
   isBoundToContainer,
   isImageElement,
   isTextElement,
+  isArrowElement,
 } from "./element/typeChecks";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
@@ -393,7 +394,7 @@ class Delta<T> {
 }
 
 /**
- * Encapsulates the modifications captured as `Delta`/s.
+ * Encapsulates the modifications captured as `Delta`s.
  */
 interface Change<T> {
   /**
@@ -1212,12 +1213,8 @@ export class ElementsChange implements Change<SceneElementsMap> {
     flags: {
       containsVisibleDifference: boolean;
       containsZindexDifference: boolean;
-    } = {
-      // by default we don't care about about the flags
-      containsVisibleDifference: true,
-      containsZindexDifference: true,
     },
-  ) {
+  ): OrderedExcalidrawElement {
     const { boundElements, ...directlyApplicablePartial } = delta.inserted;
 
     if (
@@ -1260,6 +1257,38 @@ export class ElementsChange implements Change<SceneElementsMap> {
     if (!flags.containsZindexDifference) {
       flags.containsZindexDifference =
         delta.deleted.index !== delta.inserted.index;
+    }
+
+    // Fix for arrow points preservation during undo/redo
+    if (
+      element.type === "arrow" &&
+      isArrowElement(element) &&
+      (directlyApplicablePartial as any).points &&
+      !directlyApplicablePartial.isDeleted
+    ) {
+      // Only update points if there's a binding change
+      if (
+        ((directlyApplicablePartial as any).startBinding !== undefined &&
+          (directlyApplicablePartial as any).startBinding !==
+            element.startBinding) ||
+        ((directlyApplicablePartial as any).endBinding !== undefined &&
+          (directlyApplicablePartial as any).endBinding !== element.endBinding)
+      ) {
+        // Let the points be updated by the delta
+        return newElementWith(
+          element,
+          directlyApplicablePartial as ElementUpdate<typeof element>,
+        );
+      }
+
+      // Otherwise preserve the original points
+      const partialWithoutPoints = { ...directlyApplicablePartial };
+      delete (partialWithoutPoints as any).points;
+
+      return newElementWith(
+        element,
+        partialWithoutPoints as ElementUpdate<typeof element>,
+      );
     }
 
     return newElementWith(element, directlyApplicablePartial);
@@ -1496,6 +1525,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       if (!element.isDeleted && isBindableElement(element)) {
         updateBoundElements(element, elements, {
           changedElements: changed,
+          preservePoints: true, // Preserve arrow points during undo/redo
         });
       }
     }
