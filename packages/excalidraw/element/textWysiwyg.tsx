@@ -35,7 +35,7 @@ import {
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
-import { getTextWidth } from "./textMeasurements";
+import { getTextWidth, measureText } from "./textMeasurements";
 import { normalizeText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
@@ -74,6 +74,8 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+type SubmitHandler = () => void;
+
 export const textWysiwyg = ({
   id,
   onChange,
@@ -84,6 +86,7 @@ export const textWysiwyg = ({
   excalidrawContainer,
   app,
   autoSelect = true,
+  keepContainerDimensions = false,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -100,7 +103,8 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
-}) => {
+  keepContainerDimensions?: boolean;
+}): SubmitHandler => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -181,11 +185,52 @@ export const textWysiwyg = ({
         }
 
         maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
-
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
         );
+
+        if (keepContainerDimensions) {
+          const wrappedText = wrapText(
+            updatedTextElement.text,
+            getFontString(updatedTextElement),
+            maxWidth,
+          );
+
+          let metrics = measureText(
+            wrappedText,
+            getFontString(updatedTextElement),
+            updatedTextElement.lineHeight,
+          );
+
+          if (width > maxWidth || height > maxHeight) {
+            let nextFontSize = updatedTextElement.fontSize;
+            while (
+              (metrics.width > maxWidth || metrics.height > maxHeight) &&
+              nextFontSize > 0
+            ) {
+              nextFontSize -= 1;
+              const _updatedTextElement = {
+                ...updatedTextElement,
+                fontSize: nextFontSize,
+              };
+              metrics = measureText(
+                updatedTextElement.text,
+                getFontString(_updatedTextElement),
+                updatedTextElement.lineHeight,
+              );
+            }
+
+            mutateElement(
+              updatedTextElement,
+              { fontSize: nextFontSize },
+              false,
+            );
+          }
+
+          width = metrics.width;
+          height = metrics.height;
+        }
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && height > maxHeight) {
@@ -729,4 +774,6 @@ export const textWysiwyg = ({
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
+
+  return handleSubmit;
 };
