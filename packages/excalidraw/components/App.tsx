@@ -163,9 +163,8 @@ import {
 } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { mutateElement, newElementWith } from "../element/mutateElement";
+import { deepCopyElement, duplicateElements } from "../element/duplicate";
 import {
-  deepCopyElement,
-  duplicateElements,
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
@@ -6095,7 +6094,12 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               activeEmbeddable: { element: hitElement, state: "hover" },
             });
-          } else if (!hitElement || !isElbowArrow(hitElement)) {
+          } else if (
+            !hitElement ||
+            // Ebow arrows can only be moved when unconnected
+            !isElbowArrow(hitElement) ||
+            !(hitElement.startBinding || hitElement.endBinding)
+          ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
@@ -6288,7 +6292,13 @@ class App extends React.Component<AppProps, AppState> {
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          if (
+            // Ebow arrows can only be moved when unconnected
+            !isElbowArrow(element) ||
+            !(element.startBinding || element.endBinding)
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
@@ -8446,30 +8456,14 @@ class App extends React.Component<AppProps, AppState> {
                 // updated yet by the time this mousemove event is fired
                 (element.id === hitElement?.id &&
                   pointerDownState.hit.wasAddedToSelection);
-              // NOTE (mtolmacs): This is a temporary fix for very large scenes
-              if (
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.width) > 1e7 ||
-                Math.abs(element.height) > 1e7
-              ) {
-                console.error(
-                  `Alt+dragging element in scene with invalid dimensions`,
-                  element.x,
-                  element.y,
-                  element.width,
-                  element.height,
-                  isInSelection,
-                );
-
-                return;
-              }
 
               if (isInSelection) {
                 const duplicatedElement = duplicateElement(
                   this.state.editingGroupId,
                   groupIdMap,
                   element,
+                  undefined,
+                  true,
                 );
 
                 // NOTE (mtolmacs): This is a temporary fix for very large scenes

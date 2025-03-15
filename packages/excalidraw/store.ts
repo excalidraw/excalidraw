@@ -2,9 +2,10 @@ import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
 import { ENV } from "./constants";
 import { newElementWith } from "./element/mutateElement";
-import { deepCopyElement } from "./element/newElement";
 import { Emitter } from "./emitter";
 import { isShallowEqual } from "./utils";
+
+import { deepCopyElement } from "./element/duplicate";
 
 import type { OrderedExcalidrawElement } from "./element/types";
 import type { AppState, ObservedAppState } from "./types";
