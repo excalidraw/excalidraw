@@ -487,31 +487,30 @@ export const bindLinearElement = (
     return;
   }
 
-  const binding: PointBinding | FixedPointBinding = {
+  let binding: PointBinding | FixedPointBinding = {
     elementId: hoveredElement.id,
-    ...(isElbowArrow(linearElement)
-      ? {
-          ...calculateFixedPointForElbowArrowBinding(
-            linearElement,
-            hoveredElement,
-            startOrEnd,
-            elementsMap,
-          ),
-          focus: 0,
-          gap: 0,
-        }
-      : {
-          ...normalizePointBinding(
-            calculateFocusAndGap(
-              linearElement,
-              hoveredElement,
-              startOrEnd,
-              elementsMap,
-            ),
-            hoveredElement,
-          ),
-        }),
+    ...normalizePointBinding(
+      calculateFocusAndGap(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
+      hoveredElement,
+    ),
   };
+
+  if (isElbowArrow(linearElement)) {
+    binding = {
+      ...binding,
+      ...calculateFixedPointForElbowArrowBinding(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
+    };
+  }
 
   mutateElement(linearElement, {
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
@@ -1303,23 +1302,35 @@ const updateBoundPoint = (
       pointDistance(adjacentPoint, edgePointAbsolute) +
       pointDistance(adjacentPoint, center) +
       Math.max(bindableElement.width, bindableElement.height) * 2;
-    const intersections = intersectElementWithLineSegment(
-      bindableElement,
-      lineSegment<GlobalPoint>(
-        adjacentPoint,
-        pointFromVector(
-          vectorScale(
-            vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
-            interceptorLength,
-          ),
+    const intersections = [
+      ...intersectElementWithLineSegment(
+        bindableElement,
+        lineSegment<GlobalPoint>(
           adjacentPoint,
+          pointFromVector(
+            vectorScale(
+              vectorNormalize(
+                vectorFromPoint(focusPointAbsolute, adjacentPoint),
+              ),
+              interceptorLength,
+            ),
+            adjacentPoint,
+          ),
         ),
+        binding.gap,
+      ).sort(
+        (g, h) =>
+          pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
       ),
-      binding.gap,
-    ).sort(
-      (g, h) =>
-        pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
-    );
+      // Fallback when arrow doesn't point to the shape
+      pointFromVector(
+        vectorScale(
+          vectorNormalize(vectorFromPoint(focusPointAbsolute, adjacentPoint)),
+          pointDistance(adjacentPoint, edgePointAbsolute),
+        ),
+        adjacentPoint,
+      ),
+    ];
 
     if (intersections.length > 1) {
       // The adjacent point is outside the shape (+ gap)
