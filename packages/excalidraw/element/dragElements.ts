@@ -17,7 +17,7 @@ import {
 } from "./typeChecks";
 
 import type { Bounds } from "./bounds";
-import type { NonDeletedExcalidrawElement } from "./types";
+import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
 import type Scene from "../scene/Scene";
 import type {
   AppState,
@@ -78,13 +78,20 @@ export const dragSelectedElements = (
     }
   }
 
-  const commonBounds = getCommonBounds(
-    Array.from(elementsToUpdate).map(
-      (el) => pointerDownState.originalElements.get(el.id) ?? el,
-    ),
-  );
+  const origElements: ExcalidrawElement[] = [];
+
+  for (const element of elementsToUpdate) {
+    const origElement = pointerDownState.originalElements.get(element.id);
+    // if original element is not set (e.g. when you duplicate during a drag
+    // operation), exit to avoid undefined behavior
+    if (!origElement) {
+      return;
+    }
+    origElements.push(origElement);
+  }
+
   const adjustedOffset = calculateOffset(
-    commonBounds,
+    getCommonBounds(origElements),
     offset,
     snapOffset,
     gridSize,
