@@ -162,7 +162,8 @@ export default function LibraryMenuItems({
           ...item,
           // duplicate each library item before inserting on canvas to confine
           // ids and bindings to each library item. See #6465
-          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+          elements: duplicateElements(item.elements, { randomizeSeed: true })
+            .newElements,
         };
       });
     },

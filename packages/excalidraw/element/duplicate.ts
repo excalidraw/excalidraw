@@ -130,7 +130,8 @@ export const duplicateElements = (
   const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
   const elementsMap = arrayToMap(elements) as ElementsMap;
   const _idsOfElementsToDuplicate =
-    opts?.idsOfElementsToDuplicate ?? new Set(elements.map((el) => el.id));
+    opts?.idsOfElementsToDuplicate ??
+    new Map(elements.map((el) => [el.id, el]));
 
   elements = normalizeElementOrder(elements);
 
@@ -397,137 +398,11 @@ export const duplicateElements = (
     oldIdToDuplicatedId,
   );
 
-  return newElements;
+  return {
+    newElements,
+    elementsWithClones,
+  };
 };
-
-/**
- * Clones elements, regenerating their ids (including bindings) and group ids.
- *
- * If bindings don't exist in the elements array, they are removed. Therefore,
- * it's advised to supply the whole elements array, or sets of elements that
- * are encapsulated (such as library items), if the purpose is to retain
- * bindings to the cloned elements intact.
- *
- * NOTE by default does not randomize or regenerate anything except the id.
- */
-// export const duplicateElements = (
-//   elements: readonly ExcalidrawElement[],
-//   opts?: {
-//     /** NOTE also updates version flags and `updated` */
-//     randomizeSeed?: boolean;
-//     overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
-//   },
-// ) => {
-//   const clonedElements: ExcalidrawElement[] = [];
-
-//   const origElementsMap = arrayToMap(elements);
-
-//   // used for for migrating old ids to new ids
-//   const elementNewIdsMap = new Map<
-//     /* orig */ ExcalidrawElement["id"],
-//     /* new */ ExcalidrawElement["id"]
-//   >();
-
-//   const maybeGetNewIdFor = (id: ExcalidrawElement["id"]) => {
-//     // if we've already migrated the element id, return the new one directly
-//     if (elementNewIdsMap.has(id)) {
-//       return elementNewIdsMap.get(id)!;
-//     }
-//     // if we haven't migrated the element id, but an old element with the same
-//     // id exists, generate a new id for it and return it
-//     if (origElementsMap.has(id)) {
-//       const newId = randomId();
-//       elementNewIdsMap.set(id, newId);
-//       return newId;
-//     }
-//     // if old element doesn't exist, return null to mark it for removal
-//     return null;
-//   };
-
-//   const groupNewIdsMap = new Map</* orig */ GroupId, /* new */ GroupId>();
-
-//   for (const element of elements) {
-//     let clonedElement: Mutable<ExcalidrawElement> = _deepCopyElement(element);
-
-//     if (opts?.overrides) {
-//       clonedElement = Object.assign(
-//         clonedElement,
-//         opts.overrides(clonedElement),
-//       );
-//     }
-
-//     clonedElement.id = maybeGetNewIdFor(element.id)!;
-//     if (isTestEnv()) {
-//       __test__defineOrigId(clonedElement, element.id);
-//     }
-
-//     if (opts?.randomizeSeed) {
-//       clonedElement.seed = randomInteger();
-//       bumpVersion(clonedElement);
-//     }
-
-//     if (clonedElement.groupIds) {
-//       clonedElement.groupIds = clonedElement.groupIds.map((groupId) => {
-//         if (!groupNewIdsMap.has(groupId)) {
-//           groupNewIdsMap.set(groupId, randomId());
-//         }
-//         return groupNewIdsMap.get(groupId)!;
-//       });
-//     }
-
-//     if ("containerId" in clonedElement && clonedElement.containerId) {
-//       const newContainerId = maybeGetNewIdFor(clonedElement.containerId);
-//       clonedElement.containerId = newContainerId;
-//     }
-
-//     if ("boundElements" in clonedElement && clonedElement.boundElements) {
-//       clonedElement.boundElements = clonedElement.boundElements.reduce(
-//         (
-//           acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
-//           binding,
-//         ) => {
-//           const newBindingId = maybeGetNewIdFor(binding.id);
-//           if (newBindingId) {
-//             acc.push({ ...binding, id: newBindingId });
-//           }
-//           return acc;
-//         },
-//         [],
-//       );
-//     }
-
-//     if ("endBinding" in clonedElement && clonedElement.endBinding) {
-//       const newEndBindingId = maybeGetNewIdFor(
-//         clonedElement.endBinding.elementId,
-//       );
-//       clonedElement.endBinding = newEndBindingId
-//         ? {
-//             ...clonedElement.endBinding,
-//             elementId: newEndBindingId,
-//           }
-//         : null;
-//     }
-//     if ("startBinding" in clonedElement && clonedElement.startBinding) {
-//       const newEndBindingId = maybeGetNewIdFor(
-//         clonedElement.startBinding.elementId,
-//       );
-//       clonedElement.startBinding = newEndBindingId
-//         ? {
-//             ...clonedElement.startBinding,
-//             elementId: newEndBindingId,
-//           }
-//         : null;
-//     }
-
-//     if (clonedElement.frameId) {
-//       clonedElement.frameId = maybeGetNewIdFor(clonedElement.frameId);
-//     }
-
-//     clonedElements.push(clonedElement);
-//   }
-
-//   return clonedElements;
-// };
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement.
 //

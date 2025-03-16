@@ -52,24 +52,21 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    const duplicatedElements = duplicateElements(elements, {
-      idsOfElementsToDuplicate: arrayToMap(
-        getSelectedElements(elements, appState, {
-          includeBoundTextElement: true,
-          includeElementsInFrames: true,
+    let { newElements: duplicatedElements, elementsWithClones: nextElements } =
+      duplicateElements(elements, {
+        idsOfElementsToDuplicate: arrayToMap(
+          getSelectedElements(elements, appState, {
+            includeBoundTextElement: true,
+            includeElementsInFrames: true,
+          }),
+        ),
+        appState,
+        randomizeSeed: true,
+        overrides: (element) => ({
+          x: element.x + DEFAULT_GRID_SIZE / 2,
+          y: element.y + DEFAULT_GRID_SIZE / 2,
         }),
-      ),
-      appState,
-      randomizeSeed: true,
-      overrides: (element) => ({
-        x: element.x + DEFAULT_GRID_SIZE / 2,
-        y: element.y + DEFAULT_GRID_SIZE / 2,
-      }),
-    });
-
-    let nextElements = (elements as ExcalidrawElement[])
-      .slice()
-      .concat(duplicatedElements);
+      });
 
     if (app.props.onDuplicate && nextElements) {
       const mappedElements = app.props.onDuplicate(nextElements, elements);

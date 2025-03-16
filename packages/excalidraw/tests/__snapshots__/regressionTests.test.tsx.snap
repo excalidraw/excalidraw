@@ -2139,7 +2139,7 @@ History {
               "frameId": null,
               "groupIds": [],
               "height": 10,
-              "index": "a0",
+              "index": "a1",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -2153,8 +2153,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": 20,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -2164,12 +2164,10 @@ History {
         "updated": Map {
           "id0" => Delta {
             "deleted": {
-              "index": "a1",
               "x": 20,
               "y": 20,
             },
             "inserted": {
-              "index": "a0",
               "x": 10,
               "y": 10,
             },
@@ -10631,7 +10629,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "a0",
+              "index": "a3",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10645,8 +10643,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 10,
-              "y": 10,
+              "x": 20,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10664,7 +10662,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "a1",
+              "index": "a4",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10678,8 +10676,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 30,
-              "y": 10,
+              "x": 40,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10697,7 +10695,7 @@ History {
                 "id7",
               ],
               "height": 10,
-              "index": "a2",
+              "index": "a5",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10711,8 +10709,8 @@ History {
               "strokeWidth": 2,
               "type": "rectangle",
               "width": 10,
-              "x": 50,
-              "y": 10,
+              "x": 60,
+              "y": 20,
             },
             "inserted": {
               "isDeleted": true,
@@ -10722,36 +10720,30 @@ History {
         "updated": Map {
           "id0" => Delta {
             "deleted": {
-              "index": "a3",
               "x": 20,
               "y": 20,
             },
             "inserted": {
-              "index": "a0",
               "x": 10,
               "y": 10,
             },
           },
           "id1" => Delta {
             "deleted": {
-              "index": "a4",
               "x": 40,
               "y": 20,
             },
             "inserted": {
-              "index": "a1",
               "x": 30,
               "y": 10,
             },
           },
           "id2" => Delta {
             "deleted": {
-              "index": "a5",
               "x": 60,
               "y": 20,
             },
             "inserted": {
-              "index": "a2",
               "x": 50,
               "y": 10,
             },

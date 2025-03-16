@@ -46,7 +46,7 @@ describe("duplicating single elements", () => {
       points: [pointFrom<LocalPoint>(1, 2), pointFrom<LocalPoint>(3, 4)],
     });
 
-    const copy = duplicateElement(null, new Map(), element);
+    const copy = duplicateElement(null, new Map(), element, undefined, true);
 
     assertCloneObjects(element, copy);
 
@@ -65,6 +65,8 @@ describe("duplicating single elements", () => {
       ...element,
       id: copy.id,
       seed: copy.seed,
+      version: copy.version,
+      versionNonce: copy.versionNonce,
     });
   });
 
@@ -150,7 +152,7 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, text2] as const;
-    const clonedElements = duplicateElements(origElements);
+    const { newElements: clonedElements } = duplicateElements(origElements);
 
     // generic id in-equality checks
     // --------------------------------------------------------------------------
@@ -369,7 +371,9 @@ describe("duplicating multiple elements", () => {
         groupIds: ["g1"],
       });
 
-      const [clonedRectangle1] = duplicateElements([rectangle1]);
+      const {
+        newElements: [clonedRectangle1],
+      } = duplicateElements([rectangle1]);
 
       expect(typeof clonedRectangle1.groupIds[0]).toBe("string");
       expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);

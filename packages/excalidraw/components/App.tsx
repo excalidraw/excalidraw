@@ -3219,7 +3219,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const newElements = duplicateElements(
+    const { newElements } = duplicateElements(
       elements.map((element) => {
         return newElementWith(element, {
           x: element.x + gridX - minX,
@@ -8419,6 +8419,7 @@ class App extends React.Component<AppProps, AppState> {
 
             pointerDownState.hit.hasBeenDuplicated = true;
 
+            const elements = this.scene.getElementsIncludingDeleted();
             const hitElement = pointerDownState.hit.element;
             const selectedElements = this.scene.getSelectedElements({
               selectedElementIds: this.state.selectedElementIds,
@@ -8431,13 +8432,18 @@ class App extends React.Component<AppProps, AppState> {
             ) {
               selectedElements.push(hitElement);
             }
-            const clonedElements = duplicateElements(selectedElements, {
-              appState: this.state,
-              randomizeSeed: true,
-            });
+
+            const { newElements: clonedElements, elementsWithClones } =
+              duplicateElements(elements, {
+                appState: this.state,
+                randomizeSeed: true,
+                idsOfElementsToDuplicate: new Map(
+                  selectedElements.map((el) => [el.id, el]),
+                ),
+              });
 
             const nextSceneElements = syncMovedIndices(
-              [...clonedElements, ...this.scene.getElementsIncludingDeleted()],
+              elementsWithClones,
               arrayToMap(clonedElements),
             );
 
