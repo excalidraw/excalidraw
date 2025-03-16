@@ -739,13 +739,13 @@ export const updateBoundElements = (
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
-    preservePoints?: boolean; // Add this option to preserve arrow points during undo/redo
+    preservePoints?: boolean; // [FIX] added
   },
 ) => {
   const {
     newSize,
     simultaneouslyUpdated,
-    preservePoints = false,
+    preservePoints = false, // [FIX] default false
   } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
@@ -760,12 +760,10 @@ export const updateBoundElements = (
       return;
     }
 
-    // In case the boundElements are stale
     if (!doesNeedUpdate(element, changedElement)) {
       return;
     }
 
-    // Check for intersections before updating bound elements incase connected elements overlap
     const startBindingElement = element.startBinding
       ? elementsMap.get(element.startBinding.elementId)
       : null;
@@ -793,36 +791,23 @@ export const updateBoundElements = (
       ),
     };
 
-    // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
       mutateElement(element, bindings, true);
       return;
     }
 
-    // If preservePoints is true, only update the bindings without changing the points
-    // This is specifically for undo/redo operations to maintain arrow shape
+    // [FIX] If preservePoints is true, skip adjusting arrow geometry.
     if (preservePoints && isArrowElement(element)) {
-      // Only preserve points if the binding relationship hasn't changed
-      const startBindingChanged =
-        changedElement.id === element.startBinding?.elementId &&
-        bindings.startBinding !== element.startBinding;
-
-      const endBindingChanged =
-        changedElement.id === element.endBinding?.elementId &&
-        bindings.endBinding !== element.endBinding;
-
-      // If binding relationship changed, we need to update points
-      if (!startBindingChanged && !endBindingChanged) {
-        mutateElement(element, {
-          ...(changedElement.id === element.startBinding?.elementId
-            ? { startBinding: bindings.startBinding }
-            : {}),
-          ...(changedElement.id === element.endBinding?.elementId
-            ? { endBinding: bindings.endBinding }
-            : {}),
-        });
-        return;
-      }
+      // Only update the binding fields
+      mutateElement(element, {
+        ...(changedElement.id === element.startBinding?.elementId
+          ? { startBinding: bindings.startBinding }
+          : {}),
+        ...(changedElement.id === element.endBinding?.elementId
+          ? { endBinding: bindings.endBinding }
+          : {}),
+      });
+      return;
     }
 
     const updates = bindableElementsVisitor(

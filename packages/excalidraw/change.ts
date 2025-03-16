@@ -1131,7 +1131,9 @@ export class ElementsChange implements Change<SceneElementsMap> {
       );
 
       // Need ordered nextElements to avoid z-index binding issues
-      ElementsChange.redrawBoundArrows(nextElements, changedElements);
+      ElementsChange.redrawBoundArrows(nextElements, changedElements, {
+        preservePoints: true,
+      });
     } catch (e) {
       console.error(
         `Couldn't mutate elements after applying elements change`,
@@ -1266,34 +1268,19 @@ export class ElementsChange implements Change<SceneElementsMap> {
       (directlyApplicablePartial as any).points &&
       !directlyApplicablePartial.isDeleted
     ) {
-      // Only update points if there's a binding change that would affect the arrow shape
+      const oldStart = element.startBinding;
+      const oldEnd = element.endBinding;
+      const newStart = (directlyApplicablePartial as any).startBinding;
+      const newEnd = (directlyApplicablePartial as any).endBinding;
+
       const startBindingChanged =
-        (directlyApplicablePartial as any).startBinding !== undefined &&
-        JSON.stringify((directlyApplicablePartial as any).startBinding) !==
-          JSON.stringify(element.startBinding);
-
+        JSON.stringify(oldStart || null) !== JSON.stringify(newStart || null);
       const endBindingChanged =
-        (directlyApplicablePartial as any).endBinding !== undefined &&
-        JSON.stringify((directlyApplicablePartial as any).endBinding) !==
-          JSON.stringify(element.endBinding);
+        JSON.stringify(oldEnd || null) !== JSON.stringify(newEnd || null);
 
-      // If binding relationship changed significantly, we need to update points
-      if (startBindingChanged || endBindingChanged) {
-        // Let the points be updated by the delta
-        return newElementWith(
-          element,
-          directlyApplicablePartial as ElementUpdate<typeof element>,
-        );
+      if (!startBindingChanged && !endBindingChanged) {
+        delete (directlyApplicablePartial as any).points;
       }
-
-      // Otherwise preserve the original points
-      const partialWithoutPoints = { ...directlyApplicablePartial };
-      delete (partialWithoutPoints as any).points;
-
-      return newElementWith(
-        element,
-        partialWithoutPoints as ElementUpdate<typeof element>,
-      );
     }
 
     return newElementWith(element, directlyApplicablePartial);
@@ -1525,14 +1512,13 @@ export class ElementsChange implements Change<SceneElementsMap> {
   private static redrawBoundArrows(
     elements: SceneElementsMap,
     changed: Map<string, OrderedExcalidrawElement>,
+    options?: { preservePoints?: boolean },
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
-        // Only preserve points during undo/redo when the binding relationship hasn't changed significantly
-        // This helps maintain arrow shape while allowing necessary updates when bindings change
         updateBoundElements(element, elements, {
           changedElements: changed,
-          preservePoints: true, // Preserve arrow points during undo/redo
+          preservePoints: options?.preservePoints === true,
         });
       }
     }
