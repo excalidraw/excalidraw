@@ -169,7 +169,7 @@ export const throttleRAF = <T extends any[]>(
   };
 
   const ret = (...args: T) => {
-    if (import.meta.env.MODE === "test") {
+    if (isTestEnv()) {
       fn(...args);
       return;
     }

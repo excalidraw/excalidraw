@@ -27,6 +27,7 @@ import {
   assertNever,
   isDevEnv,
   isShallowEqual,
+  isTestEnv,
   toBrandedType,
 } from "./utils";
 
@@ -515,7 +516,7 @@ export class AppStateChange implements Change<AppState> {
       // shouldn't really happen, but just in case
       console.error(`Couldn't apply appstate change`, e);
 
-      if (isDevEnv() || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
 
@@ -553,7 +554,7 @@ export class AppStateChange implements Change<AppState> {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
       console.error(`Couldn't postprocess appstate change deltas.`);
 
-      if (isDevEnv() || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
     } finally {
@@ -843,7 +844,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       change = new ElementsChange(added, removed, updated);
     }
 
-    if (isDevEnv() || import.meta.env.MODE === ENV.TEST) {
+    if (isTestEnv() || isDevEnv()) {
       ElementsChange.validate(change, "added", this.satisfiesAddition);
       ElementsChange.validate(change, "removed", this.satisfiesRemoval);
       ElementsChange.validate(change, "updated", this.satisfiesUpdate);
@@ -1107,7 +1108,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     } catch (e) {
       console.error(`Couldn't apply elements change`, e);
 
-      if (isDevEnv() || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
 
@@ -1138,7 +1139,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
         e,
       );
 
-      if (isDevEnv() || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
     } finally {
@@ -1552,7 +1553,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       // if postprocessing fails, it does not make sense to bubble up, but let's make sure we know about it
       console.error(`Couldn't postprocess elements change deltas.`);
 
-      if (isDevEnv() || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
     } finally {

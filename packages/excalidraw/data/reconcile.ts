@@ -6,7 +6,7 @@ import {
   syncInvalidIndices,
   validateFractionalIndices,
 } from "../fractionalIndex";
-import { arrayToMap, isDevEnv } from "../utils";
+import { arrayToMap, isDevEnv, isTestEnv } from "../utils";
 
 import type { OrderedExcalidrawElement } from "../element/types";
 import type { AppState } from "../types";
@@ -47,11 +47,7 @@ const validateIndicesThrottled = throttle(
     localElements: readonly OrderedExcalidrawElement[],
     remoteElements: readonly RemoteExcalidrawElement[],
   ) => {
-    if (
-      isDevEnv() ||
-      import.meta.env.MODE === ENV.TEST ||
-      window?.DEBUG_FRACTIONAL_INDICES
-    ) {
+    if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
       // create new instances due to the mutation
       const elements = syncInvalidIndices(
         orderedElements.map((x) => ({ ...x })),
@@ -59,7 +55,7 @@ const validateIndicesThrottled = throttle(
 
       validateFractionalIndices(elements, {
         // throw in dev & test only, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: isDevEnv() || import.meta.env.MODE === ENV.TEST,
+        shouldThrow: isTestEnv() || isDevEnv(),
         includeBoundTextValidation: true,
         reconciliationContext: {
           localElements,

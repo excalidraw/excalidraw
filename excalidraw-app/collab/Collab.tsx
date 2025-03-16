@@ -25,6 +25,7 @@ import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
 import {
   assertNever,
   isDevEnv,
+  isTestEnv,
   preventUnload,
   resolvablePromise,
   throttleRAF,
@@ -241,7 +242,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
     appJotaiStore.set(collabAPIAtom, collabAPI);
 
-    if (import.meta.env.MODE === ENV.TEST || isDevEnv()) {
+    if (isTestEnv() || isDevEnv()) {
       window.collab = window.collab || ({} as Window["collab"]);
       Object.defineProperties(window, {
         collab: {
@@ -1014,7 +1015,7 @@ declare global {
   }
 }
 
-if (import.meta.env.MODE === ENV.TEST || isDevEnv()) {
+if (isTestEnv() || isDevEnv()) {
   window.collab = window.collab || ({} as Window["collab"]);
 }
 
