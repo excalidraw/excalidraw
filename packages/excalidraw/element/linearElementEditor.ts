@@ -232,15 +232,15 @@ export class LinearElementEditor {
     ) => void,
     linearElementEditor: LinearElementEditor,
     scene: Scene,
-  ): boolean {
+  ): LinearElementEditor | null {
     if (!linearElementEditor) {
-      return false;
+      return null;
     }
     const { elementId } = linearElementEditor;
     const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
-      return false;
+      return null;
     }
 
     if (
@@ -248,24 +248,18 @@ export class LinearElementEditor {
       !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
       linearElementEditor.pointerDownState.lastClickedPoint !== 0
     ) {
-      return false;
+      return null;
     }
 
     const selectedPointsIndices = isElbowArrow(element)
-      ? linearElementEditor.selectedPointsIndices
-          ?.reduce(
-            (startEnd, index) =>
-              (index === 0
-                ? [0, startEnd[1]]
-                : [startEnd[0], element.points.length - 1]) as [
-                boolean | number,
-                boolean | number,
-              ],
-            [false, false] as [number | boolean, number | boolean],
-          )
-          .filter(
-            (idx: number | boolean): idx is number => typeof idx === "number",
-          )
+      ? [
+          !!linearElementEditor.selectedPointsIndices?.includes(0)
+            ? 0
+            : undefined,
+          !!linearElementEditor.selectedPointsIndices?.find((idx) => idx > 0)
+            ? element.points.length - 1
+            : undefined,
+        ].filter((idx): idx is number => idx !== undefined)
       : linearElementEditor.selectedPointsIndices;
     const lastClickedPoint = isElbowArrow(element)
       ? linearElementEditor.pointerDownState.lastClickedPoint > 0
@@ -274,9 +268,7 @@ export class LinearElementEditor {
       : linearElementEditor.pointerDownState.lastClickedPoint;
 
     // point that's being dragged (out of all selected points)
-    const draggingPoint = element.points[lastClickedPoint] as
-      | [number, number]
-      | undefined;
+    const draggingPoint = element.points[lastClickedPoint];
 
     if (selectedPointsIndices && draggingPoint) {
       if (
@@ -384,10 +376,23 @@ export class LinearElementEditor {
         }
       }
 
-      return true;
+      return {
+        ...linearElementEditor,
+        selectedPointsIndices,
+        segmentMidPointHoveredCoords:
+          lastClickedPoint !== 0 &&
+          lastClickedPoint !== element.points.length - 1
+            ? this.getPointGlobalCoordinates(
+                element,
+                draggingPoint,
+                elementsMap,
+              )
+            : null,
+        isDragging: true,
+      };
     }
 
-    return false;
+    return null;
   }
 
   static handlePointerUp(
