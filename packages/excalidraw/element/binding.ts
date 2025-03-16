@@ -24,7 +24,10 @@ import { KEYS } from "../keys";
 import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import {
   arrayToMap,
+  invariant,
   isBindingFallthroughEnabled,
+  isDevEnv,
+  isTestEnv,
   tupleToCoors,
 } from "../utils";
 
@@ -41,6 +44,7 @@ import {
   HEADING_RIGHT,
   HEADING_UP,
   headingForPointFromElement,
+  headingIsHorizontal,
   vectorToHeading,
   type Heading,
 } from "./heading";
@@ -81,6 +85,7 @@ import type {
 } from "./types";
 import type Scene from "../scene/Scene";
 import type { AppState } from "../types";
+import { debugClear, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>
@@ -925,103 +930,105 @@ const getDistanceForBinding = (
 
 export const bindPointToSnapToElementOutline = (
   arrow: ExcalidrawElbowArrowElement,
-  bindableElement: ExcalidrawBindableElement | undefined,
+  bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
 ): GlobalPoint => {
-  const aabb = bindableElement && aabbForElement(bindableElement);
+  if (isDevEnv() || isTestEnv()) {
+    invariant(arrow.points.length > 1, "Arrow should have at least 2 points");
+  }
+
+  const aabb = aabbForElement(bindableElement);
   const localP =
     arrow.points[startOrEnd === "start" ? 0 : arrow.points.length - 1];
   const globalP = pointFrom<GlobalPoint>(
     arrow.x + localP[0],
     arrow.y + localP[1],
   );
-  const p = isRectanguloidElement(bindableElement)
+  const edgePoint = isRectanguloidElement(bindableElement)
     ? avoidRectangularCorner(bindableElement, globalP)
     : globalP;
+  const elbowed = isElbowArrow(arrow);
+  const center = getCenterForBounds(aabb);
+  const adjacentPointIdx = startOrEnd === "start" ? 1 : arrow.points.length - 2;
+  const adjacentPoint = pointRotateRads(
+    pointFrom<GlobalPoint>(
+      arrow.x + arrow.points[adjacentPointIdx][0],
+      arrow.y + arrow.points[adjacentPointIdx][1],
+    ),
+    center,
+    arrow.angle ?? 0,
+  );
 
-  if (bindableElement && aabb) {
-    const center = getCenterForBounds(aabb);
-
-    const intersection = intersectElementWithLineSegment(
+  let intersection: GlobalPoint | null = null;
+  if (elbowed) {
+    const isHorizontal = headingIsHorizontal(
+      headingForPointFromElement(bindableElement, aabb, globalP),
+    );
+    const otherPoint = pointFrom<GlobalPoint>(
+      isHorizontal ? center[0] : edgePoint[0],
+      !isHorizontal ? center[1] : edgePoint[1],
+    );
+    intersection = intersectElementWithLineSegment(
       bindableElement,
       lineSegment(
-        center,
+        otherPoint,
         pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, center)),
-            Math.max(bindableElement.width, bindableElement.height),
+            vectorNormalize(vectorFromPoint(edgePoint, otherPoint)),
+            Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
-          center,
+          otherPoint,
         ),
       ),
+      FIXED_BINDING_DISTANCE,
     )[0];
-    const currentDistance = pointDistance(p, center);
-    const fullDistance = Math.max(
-      pointDistance(intersection ?? p, center),
-      PRECISION,
-    );
-    const ratio = round(currentDistance / fullDistance, 6);
-
-    switch (true) {
-      case ratio > 0.9:
-        if (
-          currentDistance - fullDistance > FIXED_BINDING_DISTANCE ||
-          // Too close to determine vector from intersection to p
-          pointDistanceSq(p, intersection) < PRECISION
-        ) {
-          return p;
-        }
-
-        return pointFromVector(
+  } else {
+    intersection = intersectElementWithLineSegment(
+      bindableElement,
+      lineSegment(
+        adjacentPoint,
+        pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, intersection ?? center)),
-            ratio > 1 ? FIXED_BINDING_DISTANCE : -FIXED_BINDING_DISTANCE,
+            vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
+            pointDistance(edgePoint, adjacentPoint) +
+              Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
-          intersection ?? center,
-        );
-
-      default:
-        return headingToMidBindPoint(p, bindableElement, aabb);
-    }
+          adjacentPoint,
+        ),
+      ),
+      FIXED_BINDING_DISTANCE,
+    ).sort(
+      (g, h) =>
+        pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
+    )[0];
   }
 
-  return p;
-};
-
-const headingToMidBindPoint = (
-  p: GlobalPoint,
-  bindableElement: ExcalidrawBindableElement,
-  aabb: Bounds,
-): GlobalPoint => {
-  const center = getCenterForBounds(aabb);
-  const heading = vectorToHeading(vectorFromPoint(p, center));
-
-  switch (true) {
-    case compareHeading(heading, HEADING_UP):
-      return pointRotateRads(
-        pointFrom((aabb[0] + aabb[2]) / 2 + 0.1, aabb[1]),
-        center,
-        bindableElement.angle,
-      );
-    case compareHeading(heading, HEADING_RIGHT):
-      return pointRotateRads(
-        pointFrom(aabb[2], (aabb[1] + aabb[3]) / 2 + 0.1),
-        center,
-        bindableElement.angle,
-      );
-    case compareHeading(heading, HEADING_DOWN):
-      return pointRotateRads(
-        pointFrom((aabb[0] + aabb[2]) / 2 - 0.1, aabb[3]),
-        center,
-        bindableElement.angle,
-      );
-    default:
-      return pointRotateRads(
-        pointFrom(aabb[0], (aabb[1] + aabb[3]) / 2 - 0.1),
-        center,
-        bindableElement.angle,
-      );
+  if (
+    !intersection ||
+    // Too close to determine vector from intersection to edgePoint
+    pointDistanceSq(edgePoint, intersection) < PRECISION
+  ) {
+    return edgePoint;
   }
+
+  if (elbowed) {
+    const scalar =
+      pointDistanceSq(edgePoint, center) -
+        pointDistanceSq(intersection, center) >
+      0
+        ? FIXED_BINDING_DISTANCE
+        : -FIXED_BINDING_DISTANCE;
+
+    return pointFromVector(
+      vectorScale(
+        vectorNormalize(vectorFromPoint(edgePoint, intersection)),
+        scalar,
+      ),
+      intersection,
+    );
+  }
+
+  return edgePoint;
 };
 
 export const avoidRectangularCorner = (
@@ -1146,7 +1153,7 @@ export const snapToMid = (
   ) {
     // LEFT
     return pointRotateRads(
-      pointFrom(x - FIXED_BINDING_DISTANCE, center[1]),
+      pointFrom(x - 2 * FIXED_BINDING_DISTANCE, center[1]),
       center,
       angle,
     );
@@ -1157,7 +1164,7 @@ export const snapToMid = (
   ) {
     // TOP
     return pointRotateRads(
-      pointFrom(center[0], y - FIXED_BINDING_DISTANCE),
+      pointFrom(center[0], y - 2 * FIXED_BINDING_DISTANCE),
       center,
       angle,
     );
@@ -1168,7 +1175,7 @@ export const snapToMid = (
   ) {
     // RIGHT
     return pointRotateRads(
-      pointFrom(x + width + FIXED_BINDING_DISTANCE, center[1]),
+      pointFrom(x + width + 2 * FIXED_BINDING_DISTANCE, center[1]),
       center,
       angle,
     );
@@ -1179,7 +1186,7 @@ export const snapToMid = (
   ) {
     // DOWN
     return pointRotateRads(
-      pointFrom(center[0], y + height + FIXED_BINDING_DISTANCE),
+      pointFrom(center[0], y + height + 2 * FIXED_BINDING_DISTANCE),
       center,
       angle,
     );
