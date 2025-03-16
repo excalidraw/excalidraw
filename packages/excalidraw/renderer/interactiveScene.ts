@@ -51,13 +51,7 @@ import {
 } from "../scene/scrollbars";
 import { getCornerRadius } from "../shapes";
 import { type InteractiveCanvasAppState } from "../types";
-import {
-  arrayToMap,
-  invariant,
-  isDevEnv,
-  isTestEnv,
-  throttleRAF,
-} from "../utils";
+import { arrayToMap, invariant, throttleRAF } from "../utils";
 
 import {
   bootstrapCanvas,
@@ -895,13 +889,6 @@ const _renderInteractiveScene = ({
   // Arrows have a different highlight behavior when
   // they are the only selected element
   if (appState.selectedLinearElement) {
-    if (isTestEnv() || isDevEnv()) {
-      invariant(
-        selectedElements.length <= 1,
-        `There is an active selectedLinearElement on app state but the selectedElements length is ${selectedElements?.length} not 1`,
-      );
-    }
-
     const editor = appState.selectedLinearElement;
     const firstSelectedLinear = selectedElements.find(
       (el) => el.id === editor.elementId, // Don't forget bound text elements!
