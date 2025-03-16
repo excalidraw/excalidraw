@@ -13,7 +13,6 @@ import {
   vectorCross,
   pointsEqual,
   lineSegmentIntersectionPoints,
-  round,
   PRECISION,
 } from "@excalidraw/math";
 import { isPointOnShape } from "@excalidraw/utils/collision";
@@ -39,10 +38,6 @@ import {
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 import {
-  compareHeading,
-  HEADING_DOWN,
-  HEADING_RIGHT,
-  HEADING_UP,
   headingForPointFromElement,
   headingIsHorizontal,
   vectorToHeading,
@@ -85,7 +80,6 @@ import type {
 } from "./types";
 import type Scene from "../scene/Scene";
 import type { AppState } from "../types";
-import { debugClear, debugDrawPoint } from "../visualdebug";
 
 export type SuggestedBinding =
   | NonDeleted<ExcalidrawBindableElement>

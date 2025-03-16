@@ -40,7 +40,7 @@ import {
   headingForPoint,
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
-import { isBindableElement, isElbowArrow } from "./typeChecks";
+import { isBindableElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -58,7 +58,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 import type { AppState } from "../types";
-import { debugClear } from "../visualdebug";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
 
@@ -1236,8 +1235,7 @@ const getElbowArrowData = (
       ? getBindableElementForId(arrow.endBinding.elementId, elementsMap) || null
       : null;
   }
-  debugClear();
-  console.log("----");
+
   const startGlobalPoint = getGlobalPoint(
     {
       ...arrow,
