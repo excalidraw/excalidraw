@@ -388,6 +388,11 @@ export class LinearElementEditor {
                 elementsMap,
               )
             : null,
+        hoverPointIndex:
+          lastClickedPoint === 0 ||
+          lastClickedPoint === element.points.length - 1
+            ? lastClickedPoint
+            : -1,
         isDragging: true,
       };
     }
