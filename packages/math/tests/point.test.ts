@@ -1,6 +1,6 @@
-import { pointFrom, pointRotateRads } from "./point";
+import { pointFrom, pointRotateRads } from "../src/point";
 
-import type { Radians } from "./types";
+import type { Radians } from "../src/types";
 
 describe("rotate", () => {
   it("should rotate over (x2, y2) and return the rotated coordinates for (x1, y1)", () => {

@@ -1,5 +1,5 @@
-import { line, linesIntersectAt } from "./line";
-import { pointFrom } from "./point";
+import { line, linesIntersectAt } from "../src/line";
+import { pointFrom } from "../src/point";
 
 describe("line-line intersections", () => {
   it("should correctly detect intersection at origin", () => {

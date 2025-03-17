@@ -14,7 +14,7 @@ const getConfig = (outdir) => ({
   entryNames: "[name]",
   assetNames: "[dir]/[name]",
   alias: {
-    "@excalidraw/common": path.resolve(__dirname, "../packages/common/src"),
+    "@excalidraw/common": path.resolve(__dirname, "../packages/common"),
     "@excalidraw/element": path.resolve(__dirname, "../packages/element"),
     "@excalidraw/excalidraw": path.resolve(__dirname, "../packages/excalidraw"),
     "@excalidraw/utils": path.resolve(__dirname, "../packages/utils"),

@@ -1,13 +1,13 @@
-import "../utils/test-utils";
+import "../../utils/test-utils";
 
 import {
   curve,
   curveClosestPoint,
   curveIntersectLineSegment,
   curvePointDistance,
-} from "./curve";
-import { pointFrom } from "./point";
-import { lineSegment } from "./segment";
+} from "../src/curve";
+import { pointFrom } from "../src/point";
+import { lineSegment } from "../src/segment";
 
 describe("Math curve", () => {
   describe("line segment intersection", () => {

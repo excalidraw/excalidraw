@@ -1,4 +1,4 @@
-import { isVector } from ".";
+import { isVector } from "../src/vector";
 
 describe("Vector", () => {
   test("isVector", () => {

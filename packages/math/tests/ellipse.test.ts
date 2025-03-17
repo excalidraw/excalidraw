@@ -4,12 +4,12 @@ import {
   ellipseIncludesPoint,
   ellipseTouchesPoint,
   ellipseLineIntersectionPoints,
-} from "./ellipse";
-import { line } from "./line";
-import { pointFrom } from "./point";
-import { lineSegment } from "./segment";
+} from "../src/ellipse";
+import { line } from "../src/line";
+import { pointFrom } from "../src/point";
+import { lineSegment } from "../src/segment";
 
-import type { Ellipse, GlobalPoint } from "./types";
+import type { Ellipse, GlobalPoint } from "../src/types";
 
 describe("point and ellipse", () => {
   it("point on ellipse", () => {

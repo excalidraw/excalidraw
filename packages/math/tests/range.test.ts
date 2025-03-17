@@ -1,4 +1,4 @@
-import { rangeInclusive, rangeIntersection, rangesOverlap } from "./range";
+import { rangeInclusive, rangeIntersection, rangesOverlap } from "../src/range";
 
 describe("range overlap", () => {
   const range1_4 = rangeInclusive(1, 4);

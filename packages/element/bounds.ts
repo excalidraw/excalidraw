@@ -17,10 +17,10 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import { rescalePoints } from "../points";
-import { generateRoughOptions } from "../scene/Shape";
-import { ShapeCache } from "../scene/ShapeCache";
-import { arrayToMap, invariant } from "../utils";
+import { rescalePoints } from "@excalidraw/excalidraw/points";
+import { generateRoughOptions } from "@excalidraw/excalidraw/scene/Shape";
+import { ShapeCache } from "@excalidraw/excalidraw/scene/ShapeCache";
+import { arrayToMap, invariant } from "@excalidraw/excalidraw/utils";
 
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";

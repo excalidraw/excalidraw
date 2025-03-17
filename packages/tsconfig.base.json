@@ -19,7 +19,7 @@
         "@excalidraw/excalidraw": ["./excalidraw/index.tsx"],
         "@excalidraw/excalidraw/*": ["./excalidraw/*"],
         "@excalidraw/math": ["./math/index.ts"],
-        "@excalidraw/math/*": ["./math/*"],
+        "@excalidraw/math/*": ["./math/src/*"],
         "@excalidraw/utils": ["./utils/index.ts"],
         "@excalidraw/utils/*": ["./utils/*"],
       }
