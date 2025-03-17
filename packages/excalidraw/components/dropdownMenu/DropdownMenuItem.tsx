@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
-import { THEME } from "../../constants";
+import { THEME } from "@excalidraw/common";
+
 import { useExcalidrawAppState } from "../App";
 
 import MenuItemContent from "./DropdownMenuItemContent";

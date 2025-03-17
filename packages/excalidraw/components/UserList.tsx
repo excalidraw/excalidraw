@@ -2,9 +2,9 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import React, { useLayoutEffect } from "react";
 
-import { supportsResizeObserver } from "../constants";
+import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
+
 import { t } from "../i18n";
-import { isShallowEqual } from "../utils";
 
 import { useExcalidrawActionManager } from "./App";
 import { Island } from "./Island";

@@ -2,6 +2,15 @@ import { exportToCanvas } from "@excalidraw/utils/export";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_IMAGE_TYPES,
+  isFirefox,
+  EXPORT_SCALES,
+} from "@excalidraw/common";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
+import {
   actionExportWithDarkMode,
   actionChangeExportBackground,
   actionChangeExportEmbedScene,
@@ -9,12 +18,6 @@ import {
   actionChangeProjectName,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import {
-  DEFAULT_EXPORT_PADDING,
-  EXPORT_IMAGE_TYPES,
-  isFirefox,
-  EXPORT_SCALES,
-} from "../constants";
 import { prepareElementsForExport } from "../data";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
@@ -34,7 +37,7 @@ import { FilledButton } from "./FilledButton";
 import "./ImageExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
-import type { NonDeletedExcalidrawElement } from "../element/types";
+
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
 const supportsContextFilters =

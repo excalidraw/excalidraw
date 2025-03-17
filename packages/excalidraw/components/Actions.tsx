@@ -1,24 +1,39 @@
 import clsx from "clsx";
 import { useState } from "react";
 
-import { actionToggleZenMode } from "../actions";
+import {
+  CLASSES,
+  KEYS,
+  capitalizeString,
+  isTransparent,
+} from "@excalidraw/common";
 
-import { KEYS } from "../keys";
-import { CLASSES } from "../constants";
-import { alignActionsPredicate } from "../actions/actionAlign";
-import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
-} from "../element/textElement";
+} from "@excalidraw/element/textElement";
+
 import {
   hasBoundTextElement,
   isElbowArrow,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawElementType,
+  NonDeletedElementsMap,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
+
+import { actionToggleZenMode } from "../actions";
+
+import { alignActionsPredicate } from "../actions/actionAlign";
+import { trackEvent } from "../analytics";
+import { useTunnels } from "../context/tunnels";
+
 import { t } from "../i18n";
 import {
   canChangeRoundness,
@@ -29,8 +44,8 @@ import {
   hasStrokeWidth,
 } from "../scene";
 import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
-import { SHAPES } from "../shapes";
-import { capitalizeString, isTransparent } from "../utils";
+
+import { SHAPES } from "./shapes";
 
 import "./Actions.scss";
 
@@ -48,12 +63,6 @@ import {
   MagicIcon,
 } from "./icons";
 
-import type {
-  ExcalidrawElement,
-  ExcalidrawElementType,
-  NonDeletedElementsMap,
-  NonDeletedSceneElementsMap,
-} from "../element/types";
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
 

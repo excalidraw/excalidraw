@@ -1,11 +1,12 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 
-import { EVENT } from "../../constants";
-import { deepCopyElement } from "../../element/newElement";
-import { KEYS } from "../../keys";
+import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
+import { deepCopyElement } from "@excalidraw/element/newElement";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
 import { CaptureUpdateAction } from "../../store";
-import { cloneJSON } from "../../utils";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
@@ -14,7 +15,6 @@ import { SMALLEST_DELTA } from "./utils";
 import "./DragInput.scss";
 
 import type { StatsInputProperty } from "./utils";
-import type { ElementsMap, ExcalidrawElement } from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 

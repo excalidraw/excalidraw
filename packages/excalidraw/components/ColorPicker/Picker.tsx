@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 
+import { EVENT } from "@excalidraw/common";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "../../colors";
-import { EVENT } from "../../constants";
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 import { KEYS } from "../../keys";
@@ -23,7 +26,6 @@ import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 import type { ColorPaletteCustom } from "../../colors";
-import type { ExcalidrawElement } from "../../element/types";
 
 interface PickerProps {
   color: string;

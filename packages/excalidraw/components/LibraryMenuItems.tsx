@@ -6,7 +6,8 @@ import React, {
   useState,
 } from "react";
 
-import { MIME_TYPES } from "../constants";
+import { MIME_TYPES } from "@excalidraw/common";
+
 import { serializeLibraryAsJSON } from "../data/json";
 import { duplicateElements } from "../element/newElement";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";

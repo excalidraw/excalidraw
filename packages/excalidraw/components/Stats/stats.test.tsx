@@ -3,14 +3,21 @@ import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
+import { getCommonBounds, isTextElement } from "@excalidraw/element";
+
+import { setDateTimeForTests, isInGroup, reseed } from "@excalidraw/common";
+
 import type { Degrees } from "@excalidraw/math";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import { Excalidraw, mutateElement } from "../..";
 import { actionGroup } from "../../actions";
-import { getCommonBounds, isTextElement } from "../../element";
-import { isInGroup } from "../../groups";
 import { t } from "../../i18n";
-import { reseed } from "../../random";
 import * as StaticScene from "../../renderer/staticScene";
 import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
@@ -21,15 +28,8 @@ import {
   render,
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
-import { setDateTimeForTests } from "../../utils";
 
 import { getStepSizedValue } from "./utils";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-} from "../../element/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

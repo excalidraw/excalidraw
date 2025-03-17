@@ -28,7 +28,7 @@
       "@excalidraw/math": ["./packages/math/index.ts"],
       "@excalidraw/math/*": ["./packages/math/src/*"],
       "@excalidraw/utils": ["./packages/utils/index.ts"],
-      "@excalidraw/utils/*": ["./packages/utils/*"],
+      "@excalidraw/utils/*": ["./packages/utils/*"]
     }
   },
   "include": ["packages", "excalidraw-app"],

@@ -8,7 +8,7 @@ import {
   getContainerCoords,
   getBoundTextMaxWidth,
   getBoundTextMaxHeight,
-a} from "../src/textElement";
+} from "../src/textElement";
 import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
 
 import type { ExcalidrawTextElementWithContainer } from "../src/types";

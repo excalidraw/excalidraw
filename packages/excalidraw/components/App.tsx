@@ -193,7 +193,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
-} from "@excalidraw/common/utils";
+} from "@excalidraw/common";
 
 import {
   createSrcDoc,

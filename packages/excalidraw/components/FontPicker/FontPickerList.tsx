@@ -7,10 +7,12 @@ import React, {
   type KeyboardEventHandler,
 } from "react";
 
-import { type FontFamilyValues } from "../../element/types";
+import { type FontFamilyValues } from "@excalidraw/element/types";
+
+import { arrayToList, debounce, getFontFamilyString } from "@excalidraw/common";
+
 import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
-import { arrayToList, debounce, getFontFamilyString } from "../../utils";
 import { useApp, useAppProps, useExcalidrawContainer } from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";

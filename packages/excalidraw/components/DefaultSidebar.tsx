@@ -4,10 +4,11 @@ import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
-} from "../constants";
+  composeEventHandlers,
+} from "@excalidraw/common";
+
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
-import { composeEventHandlers } from "../utils";
 
 import "../components/dropdownMenu/DropdownMenu.scss";
 

@@ -3,12 +3,15 @@ import clsx from "clsx";
 import throttle from "lodash.throttle";
 import { useEffect, useMemo, useState, memo } from "react";
 
-import { STATS_PANELS } from "../../constants";
-import { getCommonBounds } from "../../element/bounds";
-import { getUncroppedWidthAndHeight } from "../../element/cropElement";
-import { isElbowArrow, isImageElement } from "../../element/typeChecks";
-import { frameAndChildrenSelectedTogether } from "../../frame";
-import { elementsAreInSameGroup } from "../../groups";
+import { STATS_PANELS, elementsAreInSameGroup } from "@excalidraw/common";
+import { getCommonBounds } from "@excalidraw/element/bounds";
+import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
+import { isElbowArrow, isImageElement } from "@excalidraw/element/typeChecks";
+
+import { frameAndChildrenSelectedTogether } from "@excalidraw/element/frame";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import { t } from "../../i18n";
 import { isGridModeEnabled } from "../../snapping";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
@@ -29,7 +32,6 @@ import { getAtomicUnits } from "./utils";
 
 import "./Stats.scss";
 
-import type { NonDeletedExcalidrawElement } from "../../element/types";
 import type {
   AppClassProperties,
   AppState,

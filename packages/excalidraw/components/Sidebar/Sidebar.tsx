@@ -9,12 +9,11 @@ import React, {
   useCallback,
 } from "react";
 
-import { EVENT } from "../../constants";
+import { EVENT, KEYS, updateObject } from "@excalidraw/common";
+
 import { useUIAppState } from "../../context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
-import { KEYS } from "../../keys";
-import { updateObject } from "../../utils";
 import { useDevice, useExcalidrawSetAppState } from "../App";
 import { Island } from "../Island";
 
