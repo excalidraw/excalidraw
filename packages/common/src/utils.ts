@@ -1,5 +1,27 @@
-import Pool from "es6-promise-pool";
 import { average } from "@excalidraw/math";
+
+import type {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  FontFamilyValues,
+  FontString,
+  GroupId,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import type {
+  ActiveTool,
+  AppState,
+  NullableGridSize,
+  ToolType,
+  UnsubscribeCallback,
+  Zoom,
+} from "@excalidraw/excalidraw/types";
+
+import type {
+  MaybePromise,
+  ResolutionType,
+} from "@excalidraw/excalidraw/utility-types";
 
 import { COLOR_PALETTE } from "./colors";
 import {
@@ -11,19 +33,6 @@ import {
 } from "./constants";
 
 import type { EVENT } from "./constants";
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-} from "./element/types";
-import type {
-  ActiveTool,
-  AppState,
-  ToolType,
-  UnsubscribeCallback,
-  Zoom,
-} from "./types";
-import type { MaybePromise, ResolutionType } from "./utility-types";
 
 let mockDateTime: string | null = null;
 
@@ -1186,54 +1195,6 @@ export const safelyParseJSON = (json: string): Record<string, any> | null => {
     return null;
   }
 };
-// extending the missing types
-// relying on the [Index, T] to keep a correct order
-type TPromisePool<T, Index = number> = Pool<[Index, T][]> & {
-  addEventListener: (
-    type: "fulfilled",
-    listener: (event: { data: { result: [Index, T] } }) => void,
-  ) => (event: { data: { result: [Index, T] } }) => void;
-  removeEventListener: (
-    type: "fulfilled",
-    listener: (event: { data: { result: [Index, T] } }) => void,
-  ) => void;
-};
-
-export class PromisePool<T> {
-  private readonly pool: TPromisePool<T>;
-  private readonly entries: Record<number, T> = {};
-
-  constructor(
-    source: IterableIterator<Promise<void | readonly [number, T]>>,
-    concurrency: number,
-  ) {
-    this.pool = new Pool(
-      source as unknown as () => void | PromiseLike<[number, T][]>,
-      concurrency,
-    ) as TPromisePool<T>;
-  }
-
-  public all() {
-    const listener = (event: { data: { result: void | [number, T] } }) => {
-      if (event.data.result) {
-        // by default pool does not return the results, so we are gathering them manually
-        // with the correct call order (represented by the index in the tuple)
-        const [index, value] = event.data.result;
-        this.entries[index] = value;
-      }
-    };
-
-    this.pool.addEventListener("fulfilled", listener);
-
-    return this.pool.start().then(() => {
-      setTimeout(() => {
-        this.pool.removeEventListener("fulfilled", listener);
-      });
-
-      return Object.values(this.entries);
-    });
-  }
-}
 
 /**
  * use when you need to render unsafe string as HTML attribute, but MAKE SURE
@@ -1246,8 +1207,7 @@ export const escapeDoubleQuotes = (str: string) => {
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
 
-
-// TODO_SEP: perhaps could be refactored away?
+// TODO_SEP: perhaps could be refactored away
 
 // TODO: Rounding this point causes some shake when free drawing
 export const getGridPoint = (

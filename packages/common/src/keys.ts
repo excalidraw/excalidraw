@@ -1,6 +1,6 @@
-import { isDarwin } from "./constants";
+import type { ValueOf } from "@excalidraw/excalidraw/utility-types";
 
-import type { ValueOf } from "../excalidraw/utility-types";
+import { isDarwin } from "./constants";
 
 export const CODES = {
   EQUAL: "Equal",

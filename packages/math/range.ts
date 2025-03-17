@@ -1,4 +1,4 @@
-import { toBrandedType } from "@excalidraw/excalidraw/utils";
+import { toBrandedType } from "@excalidraw/common/utils";
 
 import type { InclusiveRange } from "./types";
 

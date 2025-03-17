@@ -1,7 +1,10 @@
-import { COLOR_PALETTE } from "./colors";
+import type {
+  ExcalidrawElement,
+  FontFamilyValues,
+} from "@excalidraw/element/types";
+import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
-import type { ExcalidrawElement, FontFamilyValues } from "./element/types";
-import type { AppProps, AppState } from "./types";
+import { COLOR_PALETTE } from "./colors";
 
 export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 export const isWindows = /^Win/.test(navigator.platform);

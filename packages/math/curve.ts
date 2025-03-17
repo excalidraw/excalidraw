@@ -1,8 +1,9 @@
+import type { Bounds } from "@excalidraw/element/bounds";
+
 import { isPoint, pointDistance, pointFrom } from "./point";
 import { rectangle, rectangleIntersectLineSegment } from "./rectangle";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
-import type { Bounds } from "../excalidraw/element/bounds";
 
 /**
  *

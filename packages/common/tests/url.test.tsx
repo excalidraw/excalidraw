@@ -1,4 +1,4 @@
-import { normalizeLink } from "./url";
+import { normalizeLink } from "../src/url";
 
 describe("normalizeLink", () => {
   // NOTE not an extensive XSS test suite, just to check if we're not

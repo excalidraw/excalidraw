@@ -48,8 +48,13 @@
       ]
     },
     "dependencies": {
+      "es6-promise-pool": "2.5.0",
+      "nanoid": "3.3.3",
+      "open-color": "1.9.1",
+      "roughjs": "4.6.4"
     },
     "devDependencies": {
+      "typescript": "4.9.4"
     },
     "bugs": "https://github.com/excalidraw/excalidraw/issues",
     "repository": "https://github.com/excalidraw/excalidraw",

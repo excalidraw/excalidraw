@@ -13,15 +13,15 @@
       "emitDeclarationOnly": true,
       "paths": {
         "@excalidraw/common": ["./common/index.ts"],
+        "@excalidraw/common/*": ["./common/src/*"],
         "@excalidraw/element": ["./element/index.ts"],
-        "@excalidraw/excalidraw": ["./excalidraw/index.tsx"],
-        "@excalidraw/utils": ["./utils/index.ts"],
-        "@excalidraw/math": ["./math/index.ts"],
-        "@excalidraw/common/*": ["./common/*"],
         "@excalidraw/element/*": ["./element/*"],
+        "@excalidraw/excalidraw": ["./excalidraw/index.tsx"],
         "@excalidraw/excalidraw/*": ["./excalidraw/*"],
-        "@excalidraw/utils/*": ["./utils/*"],
+        "@excalidraw/math": ["./math/index.ts"],
         "@excalidraw/math/*": ["./math/*"],
+        "@excalidraw/utils": ["./utils/index.ts"],
+        "@excalidraw/utils/*": ["./utils/*"],
       }
     },
     "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]

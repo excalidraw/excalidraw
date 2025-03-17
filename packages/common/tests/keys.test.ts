@@ -1,4 +1,4 @@
-import { KEYS, matchKey } from "./keys";
+import { KEYS, matchKey } from "../src/keys";
 
 describe("key matcher", async () => {
   it("should not match unexpected key", async () => {
