@@ -2,7 +2,6 @@ import { isRightAngleRads } from "@excalidraw/math";
 import { getStroke } from "perfect-freehand";
 import rough from "roughjs/bin/rough";
 
-import { getDefaultAppState } from "../appState";
 import {
   BOUND_TEXT_PADDING,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
@@ -10,18 +9,21 @@ import {
   FRAME_STYLE,
   MIME_TYPES,
   THEME,
-} from "../constants";
-import { getElementAbsoluteCoords } from "../element/bounds";
-import { getUncroppedImageElement } from "../element/cropElement";
-import { LinearElementEditor } from "../element/linearElementEditor";
+  distance,
+  getFontString,
+  isRTL,
+} from "@excalidraw/common";
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getUncroppedImageElement } from "@excalidraw/element/cropElement";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getBoundTextElement,
   getContainerCoords,
   getContainerElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
-} from "../element/textElement";
-import { getLineHeightInPx } from "../element/textMeasurements";
+} from "@excalidraw/element/textElement";
+import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
 import {
   isTextElement,
   isLinearElement,
@@ -31,12 +33,9 @@ import {
   hasBoundTextElement,
   isMagicFrameElement,
   isImageElement,
-} from "../element/typeChecks";
-import { getVerticalOffset } from "../fonts/FontMetadata";
-import { getContainingFrame } from "../frame";
-import { ShapeCache } from "../scene/ShapeCache";
-import { getCornerRadius } from "../shapes";
-import { distance, getFontString, isRTL } from "../utils";
+} from "@excalidraw/element/typeChecks";
+import { getContainingFrame } from "@excalidraw/element/frame";
+import { getCornerRadius } from "@excalidraw/element/shapes";
 
 import type {
   ExcalidrawElement,
@@ -48,7 +47,12 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { getDefaultAppState } from "../appState";
+import { getVerticalOffset } from "../fonts/FontMetadata";
+import { ShapeCache } from "../scene/ShapeCache";
+
 import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,

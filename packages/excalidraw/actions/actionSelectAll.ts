@@ -1,14 +1,17 @@
-import { selectAllIcon } from "../components/icons";
-import { getNonDeletedElements, isTextElement } from "../element";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { isLinearElement } from "../element/typeChecks";
+import { getNonDeletedElements, isTextElement } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { isLinearElement } from "@excalidraw/element/typeChecks";
+
+import { KEYS } from "@excalidraw/common";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { selectGroupsForSelectedElements } from "../groups";
-import { KEYS } from "../keys";
 import { CaptureUpdateAction } from "../store";
 
-import { register } from "./register";
+import { selectAllIcon } from "../components/icons";
 
-import type { ExcalidrawElement } from "../element/types";
+import { register } from "./register";
 
 export const actionSelectAll = register({
   name: "selectAll",

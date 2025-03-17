@@ -7,34 +7,37 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
-import type { InclusiveRange } from "@excalidraw/math";
-
-import { TOOL_TYPE } from "./constants";
+import { TOOL_TYPE, KEYS } from "@excalidraw/common";
 import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
-} from "./element/bounds";
-import { isBoundToContainer, isFrameLikeElement } from "./element/typeChecks";
+} from "@excalidraw/element/bounds";
+import {
+  isBoundToContainer,
+  isFrameLikeElement,
+} from "@excalidraw/element/typeChecks";
+
+import type { InclusiveRange } from "@excalidraw/math";
+
+import type { Bounds } from "@excalidraw/element/bounds";
+import type { MaybeTransformHandleType } from "@excalidraw/element/transformHandles";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
 import { getMaximumGroups } from "./groups";
-import { KEYS } from "./keys";
 import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,
 } from "./scene/selection";
 
-import type { Bounds } from "./element/bounds";
-import type { MaybeTransformHandleType } from "./element/transformHandles";
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "./element/types";
 import type {
   AppClassProperties,
   AppState,
   KeyboardModifiersObject,
-  NullableGridSize,
 } from "./types";
 
 const SNAP_DISTANCE = 8;

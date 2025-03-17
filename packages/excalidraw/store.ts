@@ -1,12 +1,14 @@
+import { ENV, isShallowEqual } from "@excalidraw/common";
+
+import { deepCopyElement, newElementWith } from "@excalidraw/element";
+
+import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+
 import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
-import { ENV } from "./constants";
-import { newElementWith } from "./element/mutateElement";
-import { deepCopyElement } from "./element/newElement";
-import { Emitter } from "./emitter";
-import { isShallowEqual } from "./utils";
 
-import type { OrderedExcalidrawElement } from "./element/types";
+import { Emitter } from "./emitter";
+
 import type { AppState, ObservedAppState } from "./types";
 import type { ValueOf } from "./utility-types";
 

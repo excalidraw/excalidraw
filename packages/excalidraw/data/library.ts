@@ -7,29 +7,33 @@ import {
   EVENT,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
-} from "../constants";
-import { atom, editorJotaiStore } from "../editor-jotai";
-import { hashElementsVersion, hashString } from "../element";
-import { getCommonBoundingBox } from "../element/bounds";
-import { Emitter } from "../emitter";
-import { AbortError } from "../errors";
-import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
-import { t } from "../i18n";
-import { Queue } from "../queue";
-import {
   arrayToMap,
   cloneJSON,
   preventUnload,
   promiseTry,
   resolvablePromise,
-} from "../utils";
+  toValidURL,
+} from "@excalidraw/common";
+
+import { hashElementsVersion, hashString } from "@excalidraw/element";
+
+import { getCommonBoundingBox } from "@excalidraw/element/bounds";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { atom, editorJotaiStore } from "../editor-jotai";
+
+import { Emitter } from "../emitter";
+import { AbortError } from "../errors";
+import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
+import { t } from "../i18n";
+import { Queue } from "../queue";
 
 import { loadLibraryFromBlob } from "./blob";
 import { restoreLibraryItems } from "./restore";
-import { toValidURL } from "./url";
 
 import type App from "../components/App";
-import type { ExcalidrawElement } from "../element/types";
+
 import type {
   LibraryItems,
   LibraryItem,

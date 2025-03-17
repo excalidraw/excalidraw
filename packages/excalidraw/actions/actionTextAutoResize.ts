@@ -1,9 +1,11 @@
-import { isTextElement } from "../element";
-import { newElementWith } from "../element/mutateElement";
-import { measureText } from "../element/textMeasurements";
+import { getFontString } from "@excalidraw/common";
+
+import { isTextElement } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element/mutateElement";
+import { measureText } from "@excalidraw/element/textMeasurements";
+
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../store";
-import { getFontString } from "../utils";
 
 import { register } from "./register";
 

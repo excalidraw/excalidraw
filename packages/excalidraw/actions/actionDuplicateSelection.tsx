@@ -1,49 +1,60 @@
-import { ToolButton } from "../components/ToolButton";
-import { DuplicateIcon } from "../components/icons";
-import { DEFAULT_GRID_SIZE } from "../constants";
-import { duplicateElement, getNonDeletedElements } from "../element";
-import { fixBindingsAfterDuplication } from "../element/binding";
+import {
+  DEFAULT_GRID_SIZE,
+  KEYS,
+  arrayToMap,
+  castArray,
+  findLastIndex,
+  getShortcutKey,
+  invariant,
+} from "@excalidraw/common";
+
+import { duplicateElement, getNonDeletedElements } from "@excalidraw/element";
+
+import { fixBindingsAfterDuplication } from "@excalidraw/element/binding";
+
 import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
   getContainerElement,
-} from "../element/textElement";
+} from "@excalidraw/element/textElement";
+
 import {
   hasBoundTextElement,
   isBoundToContainer,
   isFrameLikeElement,
-} from "../element/typeChecks";
-import { normalizeElementOrder } from "../element/sortElements";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/typeChecks";
+
+import { normalizeElementOrder } from "@excalidraw/element/sortElements";
+
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
 import {
   bindElementsToFramesAfterDuplication,
   getFrameChildren,
-} from "../frame";
+} from "@excalidraw/element/frame";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { ToolButton } from "../components/ToolButton";
+import { DuplicateIcon } from "../components/icons";
+
 import {
   selectGroupsForSelectedElements,
   getSelectedGroupForElement,
   getElementsInGroup,
 } from "../groups";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { isSomeElementSelected } from "../scene";
 import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
 import { CaptureUpdateAction } from "../store";
-import {
-  arrayToMap,
-  castArray,
-  findLastIndex,
-  getShortcutKey,
-  invariant,
-} from "../utils";
 
 import { register } from "./register";
 
 import type { ActionResult } from "./types";
-import type { ExcalidrawElement } from "../element/types";
+
 import type { AppState } from "../types";
 
 export const actionDuplicateSelection = register({

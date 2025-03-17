@@ -6,35 +6,62 @@ import {
 } from "@excalidraw/math";
 import oc from "open-color";
 
-import { getClientColor, renderRemoteCursors } from "../clients";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   THEME,
-} from "../constants";
+  arrayToMap,
+  invariant,
+  throttleRAF,
+} from "@excalidraw/common";
 import {
   getElementAbsoluteCoords,
   getTransformHandlesFromCoords,
   getTransformHandles,
   getCommonBounds,
-} from "../element";
+} from "@excalidraw/element";
 import {
   BINDING_HIGHLIGHT_OFFSET,
   BINDING_HIGHLIGHT_THICKNESS,
   maxBindingGap,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getOmitSidesForDevice,
   shouldShowBoundingBox,
-} from "../element/transformHandles";
+} from "@excalidraw/element/transformHandles";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import { getCornerRadius } from "@excalidraw/element/shapes";
+
+import type {
+  SuggestedBinding,
+  SuggestedPointBinding,
+} from "@excalidraw/element/binding";
+
+import type {
+  TransformHandles,
+  TransformHandleType,
+} from "@excalidraw/element/transformHandles";
+
+import type {
+  ElementsMap,
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  GroupId,
+  NonDeleted,
+} from "@excalidraw/element/types";
+
 import {
   isSelectedViaGroup,
   getSelectedGroupIds,
@@ -49,9 +76,9 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
-import { getCornerRadius } from "../shapes";
 import { type InteractiveCanvasAppState } from "../types";
-import { arrayToMap, invariant, throttleRAF } from "../utils";
+
+import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,
@@ -59,25 +86,6 @@ import {
   getNormalizedCanvasDimensions,
 } from "./helpers";
 
-import type {
-  SuggestedBinding,
-  SuggestedPointBinding,
-} from "../element/binding";
-import type {
-  TransformHandles,
-  TransformHandleType,
-} from "../element/transformHandles";
-import type {
-  ElementsMap,
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  GroupId,
-  NonDeleted,
-} from "../element/types";
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,

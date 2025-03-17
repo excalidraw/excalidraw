@@ -1,3 +1,5 @@
+import { FONT_FAMILY, FONT_FAMILY_FALLBACKS } from "@excalidraw/common";
+
 import type {
   ExcalidrawTextElement,
   FontFamilyValues,
@@ -9,7 +11,6 @@ import {
   FontFamilyHeadingIcon,
   FontFamilyCodeIcon,
 } from "../components/icons";
-import { FONT_FAMILY, FONT_FAMILY_FALLBACKS } from "../constants";
 
 import type { JSX } from "react";
 

@@ -1,21 +1,14 @@
 import throttle from "lodash.throttle";
 
-import { ENV } from "../constants";
-import { isNonDeletedElement } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import {
-  syncInvalidIndices,
-  syncMovedIndices,
-  validateFractionalIndices,
-} from "../fractionalIndex";
-import { getElementsInGroup } from "../groups";
-import { randomInteger } from "../random";
-import { arrayToMap } from "../utils";
-import { toBrandedType } from "../utils";
+import { ENV } from "@excalidraw/common";
+import { isNonDeletedElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 
-import { getSelectedElements } from "./selection";
+import { randomInteger } from "@excalidraw/common";
+import { arrayToMap } from "@excalidraw/common";
+import { toBrandedType } from "@excalidraw/common";
 
-import type { LinearElementEditor } from "../element/linearElementEditor";
+import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -26,7 +19,17 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { getElementsInGroup } from "../groups";
+import {
+  syncInvalidIndices,
+  syncMovedIndices,
+  validateFractionalIndices,
+} from "../fractionalIndex";
+
+import { getSelectedElements } from "./selection";
+
 import type { AppState } from "../types";
 import type { Assert, SameType } from "../utility-types";
 

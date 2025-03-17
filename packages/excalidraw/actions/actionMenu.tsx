@@ -1,8 +1,14 @@
+import { KEYS } from "@excalidraw/common";
+
+import {
+  showSelectedShapeActions,
+  getNonDeletedElements,
+} from "@excalidraw/element";
+
 import { ToolButton } from "../components/ToolButton";
 import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
-import { showSelectedShapeActions, getNonDeletedElements } from "../element";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
+
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";

@@ -1,6 +1,4 @@
-import { getBoundTextElement } from "./element/textElement";
-import { getSelectedElements } from "./scene";
-import { makeNextSelectedElementIds } from "./scene/selection";
+import { getBoundTextElement } from "@excalidraw/element/textElement";
 
 import type {
   GroupId,
@@ -9,7 +7,11 @@ import type {
   NonDeletedExcalidrawElement,
   ElementsMapOrArray,
   ElementsMap,
-} from "./element/types";
+} from "@excalidraw/element/types";
+
+import { getSelectedElements } from "./scene";
+import { makeNextSelectedElementIds } from "./scene/selection";
+
 import type {
   AppClassProperties,
   AppState,

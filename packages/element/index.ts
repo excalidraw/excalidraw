@@ -7,71 +7,19 @@ import type {
   NonDeleted,
 } from "./src/types";
 
-export {
-  aabbForElement,
-  getElementShape,
-  pointInsideBounds,
-} from "./src/shapes";
-
-export {
-  newElement,
-  newTextElement,
-  refreshTextDimensions,
-  newLinearElement,
-  newArrowElement,
-  newImageElement,
-  duplicateElement,
-} from "./src/newElement";
-
-export {
-  getElementAbsoluteCoords,
-  getElementBounds,
-  getCommonBounds,
-  getDiamondPoints,
-  getArrowheadPoints,
-  getClosestElementBounds,
-} from "./src/bounds";
-
-export {
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-} from "./src/transformHandles";
-
-export {
-  resizeTest,
-  getCursorForResizingElement,
-  getElementWithTransformHandleType,
-  getTransformHandleTypeFromCoords,
-} from "./src/resizeTest";
-
-export {
-  transformElements,
-  getResizeOffsetXY,
-  getResizeArrowDirection,
-} from "./src/resizeElements";
-
-export {
-  dragSelectedElements,
-  getDragOffsetXY,
-  dragNewElement,
-} from "./src/dragElements";
-
-export { isTextElement, isExcalidrawElement } from "./src/typeChecks";
-export { redrawTextBoundingBox, getTextFromElements } from "./src/textElement";
-
-export {
-  getPerfectElementSize,
-  getLockedLinearCursorAlignSize,
-  isInvisiblySmallElement,
-  resizePerfectLineForNWHandler,
-  getNormalizedDimensions,
-} from "./src/sizeHelpers";
-
-export { showSelectedShapeActions } from "./src/showSelectedShapeActions";
-
+export * from "./src/bounds";
+export * from "./src/dragElements";
 export * from "./src/frame";
+export * from "./src/mutateElement";
+export * from "./src/newElement";
+export * from "./src/resizeElements";
+export * from "./src/resizeTest";
 export * from "./src/shapes";
+export * from "./src/showSelectedShapeActions";
+export * from "./src/textElement";
+export * from "./src/typeChecks";
+export * from "./src/transformHandles";
+export * from "./src/sizeHelpers";
 
 /**
  * @deprecated unsafe, use hashElementsVersion instead

@@ -5,37 +5,37 @@ import {
   DEFAULT_FONT_SIZE,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
-} from "../constants";
-import {
-  getCommonBounds,
-  newElement,
-  newLinearElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { bindLinearElement } from "../element/binding";
-import {
-  newArrowElement,
-  newFrameElement,
-  newImageElement,
-  newMagicFrameElement,
-  newTextElement,
-} from "../element/newElement";
-import { measureText, normalizeText } from "../element/textMeasurements";
-import { isArrowElement } from "../element/typeChecks";
-import { getLineHeight } from "../fonts/FontMetadata";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
-import { randomId } from "../random";
-import {
+  getSizeFromPoints,
+  randomId,
   arrayToMap,
   assertNever,
   cloneJSON,
   getFontString,
   isDevEnv,
   toBrandedType,
-} from "../utils";
+} from "@excalidraw/common";
+import {
+  getCommonBounds,
+  newElement,
+  newLinearElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element";
+import { bindLinearElement } from "@excalidraw/element/binding";
+import {
+  newArrowElement,
+  newFrameElement,
+  newImageElement,
+  newMagicFrameElement,
+  newTextElement,
+} from "@excalidraw/element/newElement";
+import {
+  measureText,
+  normalizeText,
+} from "@excalidraw/element/textMeasurements";
+import { isArrowElement } from "@excalidraw/element/typeChecks";
 
-import type { ElementConstructorOpts } from "../element/newElement";
+import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
+
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -55,7 +55,11 @@ import type {
   NonDeletedSceneElementsMap,
   TextAlign,
   VerticalAlign,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { getLineHeight } from "../fonts/FontMetadata";
+import { syncInvalidIndices } from "../fractionalIndex";
+
 import type { MarkOptional } from "../utility-types";
 
 export type ValidLinearElement = {

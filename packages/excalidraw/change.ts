@@ -1,36 +1,38 @@
-import { ENV } from "./constants";
+import {
+  ENV,
+  arrayToMap,
+  arrayToObject,
+  assertNever,
+  isShallowEqual,
+  toBrandedType,
+} from "@excalidraw/common";
 import {
   BoundElement,
   BindableElement,
   bindingProperties,
   updateBoundElements,
-} from "./element/binding";
-import { LinearElementEditor } from "./element/linearElementEditor";
-import { mutateElement, newElementWith } from "./element/mutateElement";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import {
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element/mutateElement";
 import {
   getBoundTextElementId,
   redrawTextBoundingBox,
-} from "./element/textElement";
+} from "@excalidraw/element/textElement";
 import {
   hasBoundTextElement,
   isBindableElement,
   isBoundToContainer,
   isImageElement,
   isTextElement,
-} from "./element/typeChecks";
-import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
-import { getNonDeletedGroupIds } from "./groups";
-import { getObservedAppState } from "./store";
-import {
-  arrayToMap,
-  arrayToObject,
-  assertNever,
-  isShallowEqual,
-  toBrandedType,
-} from "./utils";
+} from "@excalidraw/element/typeChecks";
 
-import type { BindableProp, BindingProp } from "./element/binding";
-import type { ElementUpdate } from "./element/mutateElement";
+import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
+
+import type { ElementUpdate } from "@excalidraw/element/mutateElement";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -40,7 +42,12 @@ import type {
   Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
-} from "./element/types";
+} from "@excalidraw/element/types";
+
+import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
+import { getNonDeletedGroupIds } from "./groups";
+import { getObservedAppState } from "./store";
+
 import type {
   AppState,
   ObservedAppState,

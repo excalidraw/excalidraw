@@ -1,10 +1,11 @@
-import type { UserIdleState } from "../constants";
+import type { UserIdleState } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
 import type {
   AppClassProperties,
   AppState,

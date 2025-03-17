@@ -1,19 +1,26 @@
-import { getElementAbsoluteCoords, getElementBounds } from "../element";
-import { isElementInViewport } from "../element/sizeHelpers";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
+import {
+  getElementAbsoluteCoords,
+  getElementBounds,
+} from "@excalidraw/element/bounds";
+import { isElementInViewport } from "@excalidraw/element/sizeHelpers";
+import {
+  isBoundToContainer,
+  isFrameLikeElement,
+} from "@excalidraw/element/typeChecks";
 import {
   elementOverlapsWithFrame,
   getContainingFrame,
   getFrameChildren,
-} from "../frame";
-import { isShallowEqual } from "../utils";
+} from "@excalidraw/element/frame";
+import { isShallowEqual } from "@excalidraw/common";
 
 import type {
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
 import type { AppState, InteractiveCanvasAppState } from "../types";
 
 /**

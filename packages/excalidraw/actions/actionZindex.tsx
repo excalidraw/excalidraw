@@ -1,14 +1,13 @@
+import { KEYS, CODES, getShortcutKey, isDarwin } from "@excalidraw/common";
+
 import {
   BringForwardIcon,
   BringToFrontIcon,
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
-import { isDarwin } from "../constants";
 import { t } from "../i18n";
-import { KEYS, CODES } from "../keys";
 import { CaptureUpdateAction } from "../store";
-import { getShortcutKey } from "../utils";
 import {
   moveOneLeft,
   moveOneRight,

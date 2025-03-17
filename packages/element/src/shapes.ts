@@ -1,4 +1,11 @@
 import {
+  DEFAULT_ADAPTIVE_RADIUS,
+  DEFAULT_PROPORTIONAL_RADIUS,
+  LINE_CONFIRM_THRESHOLD,
+  ROUNDNESS,
+  invariant,
+} from "@excalidraw/common";
+import {
   isPoint,
   pointFrom,
   pointDistance,
@@ -18,27 +25,22 @@ import {
   type GeometricShape,
 } from "@excalidraw/utils/geometry/shape";
 
-import {
-  DEFAULT_ADAPTIVE_RADIUS,
-  DEFAULT_PROPORTIONAL_RADIUS,
-  LINE_CONFIRM_THRESHOLD,
-  ROUNDNESS,
-} from "./constants";
-import { getElementAbsoluteCoords } from "./element";
-import { shouldTestInside } from "./element/collision";
-import { LinearElementEditor } from "./element/linearElementEditor";
-import { getBoundTextElement } from "./element/textElement";
-import { ShapeCache } from "./scene/ShapeCache";
-import { invariant } from "./utils";
+import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 
-import type { Bounds } from "./element/bounds";
+import { getElementAbsoluteCoords } from "../index";
+
+import { shouldTestInside } from "./collision";
+import { LinearElementEditor } from "./linearElementEditor";
+import { getBoundTextElement } from "./textElement";
+import { ShapeCache } from "./scene/ShapeCache";
+
+import type { Bounds } from "./bounds";
 import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
-} from "./element/types";
-import type { NormalizedZoomValue, Zoom } from "./types";
+} from "./types";
 
 /**
  * get the pure geometric shape of an excalidraw elementw

@@ -1,4 +1,15 @@
 import {
+  CODES,
+  KEYS,
+  CLASSES,
+  POINTER_BUTTON,
+  isWritableElement,
+  getFontString,
+  getFontFamilyString,
+  isTestEnv,
+} from "@excalidraw/common";
+
+import {
   originalContainerCache,
   updateOriginalContainerCache,
 } from "@excalidraw/element/containerCache";
@@ -32,15 +43,7 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import {
-  isWritableElement,
-  getFontString,
-  getFontFamilyString,
-  isTestEnv,
-} from "../utils";
 import Scene from "../scene/Scene";
-import { CODES, KEYS } from "../keys";
-import { CLASSES, POINTER_BUTTON } from "../constants";
 import { parseClipboard } from "../clipboard";
 import {
   actionDecreaseFontSize,

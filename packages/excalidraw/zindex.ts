@@ -1,14 +1,17 @@
-import { isFrameLikeElement } from "./element/typeChecks";
-import { syncMovedIndices } from "./fractionalIndex";
-import { getElementsInGroup } from "./groups";
-import { getSelectedElements } from "./scene";
-import Scene from "./scene/Scene";
-import { arrayToMap, findIndex, findLastIndex } from "./utils";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+
+import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
-} from "./element/types";
+} from "@excalidraw/element/types";
+
+import { syncMovedIndices } from "./fractionalIndex";
+import { getElementsInGroup } from "./groups";
+import { getSelectedElements } from "./scene";
+import Scene from "./scene/Scene";
+
 import type { AppState } from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {

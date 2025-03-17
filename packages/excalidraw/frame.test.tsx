@@ -1,10 +1,10 @@
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { API } from "./tests/helpers/api";
 import { Keyboard, Pointer } from "./tests/helpers/ui";
 import { getCloneByOrigId, render } from "./tests/test-utils";
 
 import { convertToExcalidrawElements, Excalidraw } from "./index";
-
-import type { ExcalidrawElement } from "./element/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

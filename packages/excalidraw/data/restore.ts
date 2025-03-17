@@ -1,8 +1,5 @@
 import { isFiniteNumber, pointFrom } from "@excalidraw/math";
 
-import type { LocalPoint, Radians } from "@excalidraw/math";
-
-import { getDefaultAppState } from "../appState";
 import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
@@ -13,22 +10,28 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_GRID_SIZE,
   DEFAULT_GRID_STEP,
-} from "../constants";
+  randomId,
+  getUpdatedTimestamp,
+  updateActiveTool,
+  arrayToMap,
+  getSizeFromPoints,
+  normalizeLink,
+} from "@excalidraw/common";
 import {
   getNonDeletedElements,
   getNormalizedDimensions,
   isInvisiblySmallElement,
   refreshTextDimensions,
-} from "../element";
-import { normalizeFixedPoint } from "../element/binding";
+} from "@excalidraw/element";
+import { normalizeFixedPoint } from "@excalidraw/element/binding";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
-} from "../element/elbowArrow";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { bumpVersion } from "../element/mutateElement";
-import { getContainerElement } from "../element/textElement";
-import { detectLineHeight } from "../element/textMeasurements";
+} from "@excalidraw/element/elbowArrow";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { bumpVersion } from "@excalidraw/element/mutateElement";
+import { getContainerElement } from "@excalidraw/element/textElement";
+import { detectLineHeight } from "@excalidraw/element/textMeasurements";
 import {
   isArrowElement,
   isElbowArrow,
@@ -36,20 +39,9 @@ import {
   isLinearElement,
   isTextElement,
   isUsingAdaptiveRadius,
-} from "../element/typeChecks";
-import { getLineHeight } from "../fonts/FontMetadata";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { randomId } from "../random";
-import {
-  getNormalizedGridSize,
-  getNormalizedGridStep,
-  getNormalizedZoom,
-} from "../scene";
-import { getUpdatedTimestamp, updateActiveTool } from "../utils";
-import { arrayToMap } from "../utils";
-import { getSizeFromPoints } from "../points";
+} from "@excalidraw/element/typeChecks";
 
-import { normalizeLink } from "./url";
+import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
   ExcalidrawArrowElement,
@@ -65,7 +57,18 @@ import type {
   OrderedExcalidrawElement,
   PointBinding,
   StrokeRoundness,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { getDefaultAppState } from "../appState";
+
+import { getLineHeight } from "../fonts/FontMetadata";
+import { syncInvalidIndices } from "../fractionalIndex";
+import {
+  getNormalizedGridSize,
+  getNormalizedGridStep,
+  getNormalizedZoom,
+} from "../scene";
+
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { MarkOptional, Mutable } from "../utility-types";
 import type { ImportedDataState, LegacyAppState } from "./types";

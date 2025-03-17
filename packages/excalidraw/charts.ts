@@ -1,21 +1,23 @@
 import { pointFrom } from "@excalidraw/math";
 
-import type { Radians } from "@excalidraw/math";
-
 import {
   COLOR_PALETTE,
   DEFAULT_CHART_COLOR_INDEX,
   getAllColorsSpecificShade,
-} from "./colors";
-import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   VERTICAL_ALIGN,
-} from "./constants";
-import { newElement, newLinearElement, newTextElement } from "./element";
-import { randomId } from "./random";
+  randomId,
+} from "@excalidraw/common";
+import {
+  newElement,
+  newLinearElement,
+  newTextElement,
+} from "@excalidraw/element";
 
-import type { NonDeletedExcalidrawElement } from "./element/types";
+import type { Radians } from "@excalidraw/math";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 

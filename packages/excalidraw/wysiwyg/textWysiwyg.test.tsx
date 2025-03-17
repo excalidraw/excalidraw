@@ -1,15 +1,22 @@
+import { queryByText } from "@testing-library/react";
+
 import { pointFrom } from "@excalidraw/math";
 import { getOriginalContainerHeightFromCache } from "@excalidraw/element/containerCache";
-import { queryByText } from "@testing-library/react";
+
+import {
+  CODES,
+  KEYS,
+  FONT_FAMILY,
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
+} from "@excalidraw/common";
 
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
 } from "@excalidraw/element/types";
 
-import { FONT_FAMILY, TEXT_ALIGN, VERTICAL_ALIGN } from "../constants";
 import { Excalidraw } from "../index";
-import { CODES, KEYS } from "../keys";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { getTextEditor, updateTextEditor } from "../tests/queries/dom";
