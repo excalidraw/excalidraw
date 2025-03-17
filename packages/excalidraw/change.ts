@@ -1215,8 +1215,12 @@ export class ElementsChange implements Change<SceneElementsMap> {
     flags: {
       containsVisibleDifference: boolean;
       containsZindexDifference: boolean;
+    } = {
+      // by default we don't care about about the flags
+      containsVisibleDifference: true,
+      containsZindexDifference: true,
     },
-  ): OrderedExcalidrawElement {
+  ) {
     const { boundElements, ...directlyApplicablePartial } = delta.inserted;
 
     if (
