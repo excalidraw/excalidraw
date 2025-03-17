@@ -28,17 +28,12 @@ import { bumpVersion } from "./mutateElement";
 import {
   hasBoundTextElement,
   isBoundToContainer,
-  isElbowArrow,
   isFrameLikeElement,
 } from "./typeChecks";
 
-import {
-  bindTextToShapeAfterDuplication,
-  getBoundTextElement,
-  getContainerElement,
-} from "./textElement";
+import { getBoundTextElement, getContainerElement } from "./textElement";
 
-import { updateElbowArrowPoints } from "./elbowArrow";
+import { fixBindingsAfterDuplication } from "./binding";
 
 import type { AppState } from "../types";
 import type { Mutable } from "../utility-types";
@@ -315,81 +310,10 @@ export const duplicateElements = (
 
   // ---------------------------------------------------------------------------
 
-  const fixBindingsAfterDuplication = (
-    newElements: ExcalidrawElement[],
-    oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-    duplicatedElementsMap: NonDeletedSceneElementsMap,
-  ) => {
-    for (const element of newElements) {
-      if ("boundElements" in element && element.boundElements) {
-        Object.assign(element, {
-          boundElements: element.boundElements.reduce(
-            (
-              acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
-              binding,
-            ) => {
-              const newBindingId = oldIdToDuplicatedId.get(binding.id);
-              if (newBindingId) {
-                acc.push({ ...binding, id: newBindingId });
-              }
-              return acc;
-            },
-            [],
-          ),
-        });
-      }
-
-      if ("endBinding" in element && element.endBinding) {
-        const newEndBindingId = oldIdToDuplicatedId.get(
-          element.endBinding.elementId,
-        );
-        Object.assign(element, {
-          endBinding: newEndBindingId
-            ? {
-                ...element.endBinding,
-                elementId: newEndBindingId,
-              }
-            : null,
-        });
-      }
-      if ("startBinding" in element && element.startBinding) {
-        const newEndBindingId = oldIdToDuplicatedId.get(
-          element.startBinding.elementId,
-        );
-        Object.assign(element, {
-          startBinding: newEndBindingId
-            ? {
-                ...element.startBinding,
-                elementId: newEndBindingId,
-              }
-            : null,
-        });
-      }
-
-      if (isElbowArrow(element)) {
-        Object.assign(
-          element,
-          updateElbowArrowPoints(element, duplicatedElementsMap, {
-            points: [
-              element.points[0],
-              element.points[element.points.length - 1],
-            ],
-          }),
-        );
-      }
-    }
-  };
-
   fixBindingsAfterDuplication(
     newElements,
     oldIdToDuplicatedId,
     duplicatedElementsMap as NonDeletedSceneElementsMap,
-  );
-
-  bindTextToShapeAfterDuplication(
-    elementsWithClones,
-    oldElements,
-    oldIdToDuplicatedId,
   );
 
   bindElementsToFramesAfterDuplication(

@@ -8440,10 +8440,25 @@ class App extends React.Component<AppProps, AppState> {
                 idsOfElementsToDuplicate: new Map(
                   selectedElements.map((el) => [el.id, el]),
                 ),
+                overrides: (el) => {
+                  const origEl = pointerDownState.originalElements.get(el.id)!;
+                  return {
+                    x: origEl.x,
+                    y: origEl.y,
+                  };
+                },
               });
+            clonedElements.forEach((element) => {
+              pointerDownState.originalElements.set(element.id, element);
+            });
+
+            const mappedNewSceneElements = this.props.onDuplicate?.(
+              elementsWithClones,
+              elements,
+            );
 
             const nextSceneElements = syncMovedIndices(
-              elementsWithClones,
+              mappedNewSceneElements || elementsWithClones,
               arrayToMap(clonedElements),
             );
 

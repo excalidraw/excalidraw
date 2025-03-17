@@ -209,6 +209,7 @@ describe("duplicating multiple elements", () => {
         type: clonedText1.type,
       }),
     );
+    expect(clonedRectangle.type).toBe("rectangle");
 
     clonedArrows.forEach((arrow) => {
       expect(
@@ -302,9 +303,9 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, arrow3] as const;
-    const clonedElements = duplicateElements(
+    const { newElements: clonedElements } = duplicateElements(
       origElements,
-    ) as any as typeof origElements;
+    ) as any as { newElements: typeof origElements };
     const [
       clonedRectangle,
       clonedText1,
@@ -324,7 +325,7 @@ describe("duplicating multiple elements", () => {
       elementId: clonedRectangle.id,
     });
     expect(clonedArrow2.endBinding).toBe(null);
-
+    console.log(clonedArrow3);
     expect(clonedArrow3.startBinding).toBe(null);
     expect(clonedArrow3.endBinding).toEqual({
       ...arrow3.endBinding,
@@ -348,9 +349,9 @@ describe("duplicating multiple elements", () => {
       });
 
       const origElements = [rectangle1, rectangle2, rectangle3] as const;
-      const clonedElements = duplicateElements(
+      const { newElements: clonedElements } = duplicateElements(
         origElements,
-      ) as any as typeof origElements;
+      ) as any as { newElements: typeof origElements };
       const [clonedRectangle1, clonedRectangle2, clonedRectangle3] =
         clonedElements;
 
