@@ -1,11 +1,17 @@
-import { isInvisiblySmallElement } from "./sizeHelpers";
-import { isLinearElementType } from "./typeChecks";
+import { isInvisiblySmallElement } from "./src/sizeHelpers";
+import { isLinearElementType } from "./src/typeChecks";
 
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
-} from "./types";
+} from "./src/types";
+
+export {
+  aabbForElement,
+  getElementShape,
+  pointInsideBounds,
+} from "./src/shapes";
 
 export {
   newElement,
@@ -15,7 +21,8 @@ export {
   newArrowElement,
   newImageElement,
   duplicateElement,
-} from "./newElement";
+} from "./src/newElement";
+
 export {
   getElementAbsoluteCoords,
   getElementBounds,
@@ -23,39 +30,48 @@ export {
   getDiamondPoints,
   getArrowheadPoints,
   getClosestElementBounds,
-} from "./bounds";
+} from "./src/bounds";
 
 export {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   getTransformHandlesFromCoords,
   getTransformHandles,
-} from "./transformHandles";
+} from "./src/transformHandles";
+
 export {
   resizeTest,
   getCursorForResizingElement,
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
-} from "./resizeTest";
+} from "./src/resizeTest";
+
 export {
   transformElements,
   getResizeOffsetXY,
   getResizeArrowDirection,
-} from "./resizeElements";
+} from "./src/resizeElements";
+
 export {
   dragSelectedElements,
   getDragOffsetXY,
   dragNewElement,
-} from "./dragElements";
-export { isTextElement, isExcalidrawElement } from "./typeChecks";
-export { redrawTextBoundingBox, getTextFromElements } from "./textElement";
+} from "./src/dragElements";
+
+export { isTextElement, isExcalidrawElement } from "./src/typeChecks";
+export { redrawTextBoundingBox, getTextFromElements } from "./src/textElement";
+
 export {
   getPerfectElementSize,
   getLockedLinearCursorAlignSize,
   isInvisiblySmallElement,
   resizePerfectLineForNWHandler,
   getNormalizedDimensions,
-} from "./sizeHelpers";
-export { showSelectedShapeActions } from "./showSelectedShapeActions";
+} from "./src/sizeHelpers";
+
+export { showSelectedShapeActions } from "./src/showSelectedShapeActions";
+
+export * from "./src/frame";
+export * from "./src/shapes";
 
 /**
  * @deprecated unsafe, use hashElementsVersion instead

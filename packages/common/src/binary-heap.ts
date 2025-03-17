@@ -1,4 +1,4 @@
-export default class BinaryHeap<T> {
+export class BinaryHeap<T> {
   private content: T[] = [];
 
   constructor(private scoreFunction: (node: T) => number) {}

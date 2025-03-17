@@ -24,7 +24,7 @@
       "@excalidraw/excalidraw": ["./packages/excalidraw/index.tsx"],
       "@excalidraw/excalidraw/*": ["./packages/excalidraw/*"],
       "@excalidraw/element": ["./packages/element/index.ts"],
-      "@excalidraw/element/*": ["./packages/element/*"],
+      "@excalidraw/element/*": ["./packages/element/src/*"],
       "@excalidraw/math": ["./packages/math/index.ts"],
       "@excalidraw/math/*": ["./packages/math/src/*"],
       "@excalidraw/utils": ["./packages/utils/index.ts"],
