@@ -4,6 +4,8 @@ import { MIME_TYPES } from "@excalidraw/common";
 import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 import { hitElementBoundingBox } from "@excalidraw/element/collision";
 
+import { DEFAULT_LINK_SIZE } from "@excalidraw/element/renderElement";
+
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import type { Bounds } from "@excalidraw/element/bounds";
@@ -11,8 +13,6 @@ import type {
   ElementsMap,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
-
-import { DEFAULT_LINK_SIZE } from "../../renderer/renderElement";
 
 import type { AppState, UIAppState } from "../../types";
 

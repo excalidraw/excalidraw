@@ -1,4 +1,4 @@
-import type { ElementOrToolType } from "../types";
+import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
 export const hasBackground = (type: ElementOrToolType) =>
   type === "rectangle" ||

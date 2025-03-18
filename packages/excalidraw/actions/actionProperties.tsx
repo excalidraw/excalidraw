@@ -52,6 +52,8 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
+import { hasStrokeColor } from "@excalidraw/element/comparisons";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
@@ -128,7 +130,6 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { hasStrokeColor } from "../scene/comparisons";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";

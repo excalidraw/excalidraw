@@ -1,6 +1,7 @@
-import { isRightAngleRads } from "@excalidraw/math";
-import { getStroke } from "perfect-freehand";
 import rough from "roughjs/bin/rough";
+import { getStroke } from "perfect-freehand";
+
+import { isRightAngleRads } from "@excalidraw/math";
 
 import {
   BOUND_TEXT_PADDING,
@@ -37,6 +38,9 @@ import {
 import { getContainingFrame } from "@excalidraw/element/frame";
 import { getCornerRadius } from "@excalidraw/element/shapes";
 
+// TODO: consider separating
+import { getVerticalOffset } from "@excalidraw/excalidraw/fonts/FontMetadata";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -49,15 +53,6 @@ import type {
   ElementsMap,
 } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../appState";
-import { getVerticalOffset } from "../fonts/FontMetadata";
-import { ShapeCache } from "../scene/ShapeCache";
-
-import type {
-  StaticCanvasRenderConfig,
-  RenderableElementsMap,
-  InteractiveCanvasRenderConfig,
-} from "../scene/types";
 import type {
   AppState,
   StaticCanvasAppState,
@@ -65,7 +60,17 @@ import type {
   InteractiveCanvasAppState,
   ElementsPendingErasure,
   PendingExcalidrawElements,
-} from "../types";
+  NormalizedZoomValue,
+} from "@excalidraw/excalidraw/types";
+
+import type {
+  StaticCanvasRenderConfig,
+  RenderableElementsMap,
+  InteractiveCanvasRenderConfig,
+} from "@excalidraw/excalidraw/scene/types";
+
+import { ShapeCache } from "./ShapeCache";
+
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
@@ -75,8 +80,6 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 // desatured, alas...)
 export const IMAGE_INVERT_FILTER =
   "invert(100%) hue-rotate(180deg) saturate(1.25)";
-
-const defaultAppState = getDefaultAppState();
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -537,7 +540,11 @@ const generateElementWithCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState,
 ) => {
-  const zoom: Zoom = renderConfig ? appState.zoom : defaultAppState.zoom;
+  const zoom: Zoom = renderConfig
+    ? appState.zoom
+    : {
+        value: 1 as NormalizedZoomValue,
+      };
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&

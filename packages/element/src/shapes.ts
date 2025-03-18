@@ -30,7 +30,7 @@ import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 import { shouldTestInside } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement } from "./textElement";
-import { ShapeCache } from "./scene/ShapeCache";
+import { ShapeCache } from "./ShapeCache";
 
 import { getElementAbsoluteCoords } from "./";
 

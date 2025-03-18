@@ -14,6 +14,8 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element/frame";
 
+import { renderElement } from "@excalidraw/element/renderElement";
+
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
@@ -25,7 +27,6 @@ import {
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
-import { renderElement } from "../renderer/renderElement";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 

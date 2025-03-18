@@ -1,12 +1,13 @@
 import throttle from "lodash.throttle";
 
-import { ENV } from "@excalidraw/common";
+import {
+  ENV,
+  randomInteger,
+  arrayToMap,
+  toBrandedType,
+} from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
-
-import { randomInteger } from "@excalidraw/common";
-import { arrayToMap } from "@excalidraw/common";
-import { toBrandedType } from "@excalidraw/common";
 
 import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {

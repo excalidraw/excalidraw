@@ -21,6 +21,8 @@ import {
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
+import { hasStrokeColor, toolIsArrow } from "@excalidraw/element/comparisons";
+
 import type {
   ExcalidrawElement,
   ExcalidrawElementType,
@@ -43,7 +45,6 @@ import {
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
-import { hasStrokeColor, toolIsArrow } from "../scene/comparisons";
 
 import { SHAPES } from "./shapes";
 

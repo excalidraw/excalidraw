@@ -31,6 +31,13 @@ import { getContainingFrame } from "@excalidraw/element/frame";
 
 import { getCornerRadius, isPathALoop } from "@excalidraw/element/shapes";
 
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import {
+  getFreeDrawSvgPath,
+  IMAGE_INVERT_FILTER,
+} from "@excalidraw/element/renderElement";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
@@ -38,9 +45,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getVerticalOffset } from "../fonts/FontMetadata";
-import { ShapeCache } from "../scene/ShapeCache";
-
-import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";

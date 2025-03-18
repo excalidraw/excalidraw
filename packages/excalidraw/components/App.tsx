@@ -270,6 +270,10 @@ import {
   getMinTextElementWidth,
 } from "@excalidraw/element/textMeasurements";
 
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import { getRenderOpacity } from "@excalidraw/element/renderElement";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -428,7 +432,6 @@ import {
 } from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
-import { ShapeCache } from "../scene/ShapeCache";
 import {
   setEraserCursor,
   setCursor,
@@ -441,7 +444,6 @@ import { Store, CaptureUpdateAction } from "../store";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
-import { getRenderOpacity } from "../renderer/renderElement";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";

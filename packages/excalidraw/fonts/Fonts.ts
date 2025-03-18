@@ -12,12 +12,12 @@ import { containsCJK } from "@excalidraw/element/textWrapping";
 
 import { getFontString, PromisePool, promiseTry } from "@excalidraw/common";
 
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
-
-import { ShapeCache } from "../scene/ShapeCache";
 
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";

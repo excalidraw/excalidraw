@@ -13,9 +13,10 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { ShapeCache } from "../scene/ShapeCache";
 import Scene from "../scene/Scene";
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";

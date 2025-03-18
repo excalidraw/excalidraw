@@ -40,6 +40,8 @@ import {
 
 import { getCornerRadius } from "@excalidraw/element/shapes";
 
+import { renderSelectionElement } from "@excalidraw/element/renderElement";
+
 import type {
   SuggestedBinding,
   SuggestedPointBinding,
@@ -68,7 +70,6 @@ import {
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "../groups";
-import { renderSelectionElement } from "../renderer/renderElement";
 import { renderSnaps } from "../renderer/renderSnaps";
 import { roundRect } from "../renderer/roundRect";
 import {

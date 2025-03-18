@@ -12,8 +12,7 @@ import {
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
-import { generateRoughOptions } from "@excalidraw/excalidraw/scene/Shape";
-import { ShapeCache } from "@excalidraw/excalidraw/scene/ShapeCache";
+import { generateRoughOptions } from "@excalidraw/element/Shape";
 
 import type {
   Degrees,

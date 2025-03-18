@@ -19,7 +19,6 @@ import {
   invariant,
   tupleToCoors,
 } from "@excalidraw/common";
-import { ShapeCache } from "@excalidraw/excalidraw/scene/ShapeCache";
 
 import {
   getBezierCurveLength,
@@ -28,6 +27,8 @@ import {
   isPathALoop,
   mapIntervalToBezierT,
 } from "@excalidraw/element";
+
+import type { Store } from "@excalidraw/excalidraw/store";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -58,6 +59,8 @@ import {
   isElbowArrow,
   isFixedPointBinding,
 } from "./typeChecks";
+
+import { ShapeCache } from "./ShapeCache";
 
 import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from "./";
 

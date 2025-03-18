@@ -12,7 +12,7 @@ export {
   hasStrokeStyle,
   canHaveArrowheads,
   canChangeRoundness,
-} from "./comparisons";
+} from "@excalidraw/element/comparisons";
 export {
   getNormalizedZoom,
   getNormalizedGridSize,

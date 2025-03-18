@@ -7,12 +7,19 @@ import type {
   ExcalidrawSelectionElement,
 } from "@excalidraw/element/types";
 
-import { elementWithCanvasCache } from "../renderer/renderElement";
+import type {
+  AppState,
+  EmbedsValidationStatus,
+} from "@excalidraw/excalidraw/types";
+import type {
+  ElementShape,
+  ElementShapes,
+} from "@excalidraw/excalidraw/scene/types";
 
 import { _generateElementShape } from "./Shape";
 
-import type { AppState, EmbedsValidationStatus } from "../types";
-import type { ElementShape, ElementShapes } from "./types";
+import { elementWithCanvasCache } from "./renderElement";
+
 import type { Drawable } from "roughjs/bin/core";
 
 export class ShapeCache {

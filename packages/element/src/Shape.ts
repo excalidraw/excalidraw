@@ -1,9 +1,10 @@
-import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { simplify } from "points-on-curve";
 
+import { pointFrom, pointDistance, type LocalPoint } from "@excalidraw/math";
 import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
 import { getDiamondPoints, getArrowheadPoints } from "@excalidraw/element";
 import { headingForPointIsHorizontal } from "@excalidraw/element/heading";
+import { getCornerRadius, isPathALoop } from "@excalidraw/element/shapes";
 import {
   isElbowArrow,
   isEmbeddableElement,
@@ -11,8 +12,6 @@ import {
   isIframeLikeElement,
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
-
-import { getCornerRadius, isPathALoop } from "@excalidraw/element/shapes";
 
 import type {
   ExcalidrawElement,
@@ -22,12 +21,12 @@ import type {
   Arrowhead,
 } from "@excalidraw/element/types";
 
-import { generateFreeDrawShape } from "../renderer/renderElement";
+import type { EmbedsValidationStatus } from "@excalidraw/excalidraw/types";
+import type { ElementShapes } from "@excalidraw/excalidraw/scene/types";
 
 import { canChangeRoundness } from "./comparisons";
+import { generateFreeDrawShape } from "./renderElement";
 
-import type { EmbedsValidationStatus } from "../types";
-import type { ElementShapes } from "./types";
 import type { Drawable, Options } from "roughjs/bin/core";
 import type { RoughGenerator } from "roughjs/bin/generator";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";

@@ -242,7 +242,7 @@ export {
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
 } from "./data/blob";
-export { getFreeDrawSvgPath } from "./renderer/renderElement";
+export { getFreeDrawSvgPath } from "@excalidraw/element/renderElement";
 export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "@excalidraw/element/typeChecks";
 
