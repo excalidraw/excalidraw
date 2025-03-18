@@ -4,12 +4,10 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { getDefaultAppState } from "../../appState";
-import { createTestHook } from "../../components/App";
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "../../constants";
-import { getMimeType } from "../../data/blob";
-import { newElement, newTextElement, newLinearElement } from "../../element";
-import { mutateElement } from "../../element/mutateElement";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "@excalidraw/common";
+
+import { newElement, newTextElement, newLinearElement } from "@excalidraw/element";
+import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   newArrowElement,
   newEmbeddableElement,
@@ -18,15 +16,12 @@ import {
   newIframeElement,
   newImageElement,
   newMagicFrameElement,
-} from "../../element/newElement";
-import { isLinearElementType } from "../../element/typeChecks";
-import { selectGroupsForSelectedElements } from "../../groups";
-import { getSelectedElements } from "../../scene/selection";
-import { assertNever } from "../../utils";
-import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+} from "@excalidraw/element/newElement";
+import { isLinearElementType } from "@excalidraw/element/typeChecks";
 
-import type { Action } from "../../actions/types";
-import type App from "../../components/App";
+import { getSelectedElements } from "@excalidraw/excalidraw/scene/selection";
+import { assertNever } from "@excalidraw/common";
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -41,7 +36,16 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { selectGroupsForSelectedElements } from "../../groups";
+import { getMimeType } from "../../data/blob";
+import { createTestHook } from "../../components/App";
+import { getDefaultAppState } from "../../appState";
+import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
+
+import type { Action } from "../../actions/types";
+import type App from "../../components/App";
 import type { AppState } from "../../types";
 import type { Mutable } from "../../utility-types";
 

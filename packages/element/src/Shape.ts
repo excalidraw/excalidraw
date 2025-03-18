@@ -13,6 +13,8 @@ import {
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
 
+import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -512,7 +514,10 @@ export const _generateElementShape = (
 
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(element.points, 0.75);
+        const simplifiedPoints = simplify(
+          element.points as Mutable<LocalPoint[]>,
+          0.75,
+        );
         shape = generator.curve(simplifiedPoints as [number, number][], {
           ...generateRoughOptions(element),
           stroke: "none",

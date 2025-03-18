@@ -1,3 +1,4 @@
+import { isInGroup } from "@excalidraw/common";
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
@@ -21,11 +22,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import {
-  getSelectedGroupIds,
-  getElementsInGroup,
-  isInGroup,
-} from "../../groups";
+import { getSelectedGroupIds, getElementsInGroup } from "../../groups";
 
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";

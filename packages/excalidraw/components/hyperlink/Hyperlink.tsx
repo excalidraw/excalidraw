@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "@excalidraw/common";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 

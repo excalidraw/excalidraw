@@ -5,6 +5,8 @@ import {
 import { KEYS, invariant, toBrandedType } from "@excalidraw/common";
 import { aabbForElement } from "@excalidraw/element";
 
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
+
 import type {
   AppState,
   PendingExcalidrawElements,

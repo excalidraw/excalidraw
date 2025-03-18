@@ -1,3 +1,5 @@
+import { isInGroup } from "@excalidraw/common";
+
 import { isTextElement, redrawTextBoundingBox } from "@excalidraw/element";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
@@ -9,7 +11,6 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { isInGroup } from "../../groups";
 import { fontSizeIcon } from "../icons";
 
 import StatsDragInput from "./DragInput";

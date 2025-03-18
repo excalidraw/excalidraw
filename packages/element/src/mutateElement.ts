@@ -5,11 +5,12 @@ import {
   toBrandedType,
 } from "@excalidraw/common";
 
+// TODO_SEP: should be passed in or injected instead
+import Scene from "@excalidraw/excalidraw/scene/Scene";
+
 import type { Radians } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/excalidraw/utility-types";
-
-import Scene from "../scene/Scene";
 
 import { ShapeCache } from "./ShapeCache";
 

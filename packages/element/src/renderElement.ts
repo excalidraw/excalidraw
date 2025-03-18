@@ -38,7 +38,7 @@ import {
 import { getContainingFrame } from "@excalidraw/element/frame";
 import { getCornerRadius } from "@excalidraw/element/shapes";
 
-// TODO: consider separating
+// TODO_SEP: consider separating
 import { getVerticalOffset } from "@excalidraw/excalidraw/fonts/FontMetadata";
 
 import type {
