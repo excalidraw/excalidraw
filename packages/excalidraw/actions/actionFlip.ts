@@ -1,6 +1,26 @@
-import { register } from "./register";
-import { getSelectedElements } from "../scene";
+import { flipHorizontal, flipVertical } from "../components/icons";
 import { getNonDeletedElements } from "../element";
+import {
+  bindOrUnbindLinearElements,
+  isBindingEnabled,
+} from "../element/binding";
+import { getCommonBoundingBox } from "../element/bounds";
+import { mutateElement, newElementWith } from "../element/mutateElement";
+import { deepCopyElement } from "../element/newElement";
+import { resizeMultipleElements } from "../element/resizeElements";
+import {
+  isArrowElement,
+  isElbowArrow,
+  isLinearElement,
+} from "../element/typeChecks";
+import { updateFrameMembershipOfSelectedElements } from "../frame";
+import { CODES, KEYS } from "../keys";
+import { getSelectedElements } from "../scene";
+import { CaptureUpdateAction } from "../store";
+import { arrayToMap } from "../utils";
+
+import { register } from "./register";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
@@ -8,25 +28,7 @@ import type {
   NonDeleted,
   NonDeletedSceneElementsMap,
 } from "../element/types";
-import { resizeMultipleElements } from "../element/resizeElements";
 import type { AppClassProperties, AppState } from "../types";
-import { arrayToMap } from "../utils";
-import { CODES, KEYS } from "../keys";
-import {
-  bindOrUnbindLinearElements,
-  isBindingEnabled,
-} from "../element/binding";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
-import { flipHorizontal, flipVertical } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
-import {
-  isArrowElement,
-  isElbowArrow,
-  isLinearElement,
-} from "../element/typeChecks";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import { deepCopyElement } from "../element/newElement";
-import { getCommonBoundingBox } from "../element/bounds";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",

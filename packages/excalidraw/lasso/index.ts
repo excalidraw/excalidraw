@@ -1,18 +1,21 @@
 import { type GlobalPoint, type LineSegment, pointFrom } from "../../math";
 import { AnimatedTrail } from "../animated-trail";
 import { type AnimationFrameHandler } from "../animation-frame-handler";
-import type App from "../components/App";
+
 import { getElementLineSegments } from "../element/bounds";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
+
+import { getFrameChildren } from "../frame";
+import { selectGroupsForSelectedElements } from "../groups";
+import { arrayToMap, easeOut } from "../utils";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
 } from "../element/types";
-import { getFrameChildren } from "../frame";
-import { selectGroupsForSelectedElements } from "../groups";
-import { arrayToMap, easeOut } from "../utils";
+import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
 
 export class LassoTrail extends AnimatedTrail {

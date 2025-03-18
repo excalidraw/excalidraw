@@ -1,9 +1,9 @@
-import { render, unmountComponent } from "../tests/test-utils";
-import { reseed } from "../random";
-import { UI, Keyboard, Pointer } from "../tests/helpers/ui";
 import { Excalidraw } from "../index";
-import { API } from "../tests/helpers/api";
 import { KEYS } from "../keys";
+import { reseed } from "../random";
+import { API } from "../tests/helpers/api";
+import { UI, Keyboard, Pointer } from "../tests/helpers/ui";
+import { render, unmountComponent } from "../tests/test-utils";
 
 unmountComponent();
 

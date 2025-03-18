@@ -1,6 +1,7 @@
 import { magnetIcon } from "../components/icons";
 import { CODES, KEYS } from "../keys";
 import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
 
 export const actionToggleObjectsSnapMode = register({

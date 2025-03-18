@@ -1,6 +1,43 @@
 import React from "react";
+import {
+  queryByText,
+  fireEvent,
+  queryByTestId,
+  waitFor,
+} from "@testing-library/react";
+import { vi } from "vitest";
+import { pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint, Radians } from "@excalidraw/math";
+
 import "../global.d.ts";
+import "../../utils/test-utils";
+
+import {
+  actionSendBackward,
+  actionBringForward,
+  actionSendToBack,
+} from "../actions";
+import { createUndoAction, createRedoAction } from "../actions/actionHistory";
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import { getDefaultAppState } from "../appState";
+import { HistoryEntry } from "../history";
+import { Excalidraw } from "../index";
+import { KEYS } from "../keys";
 import * as StaticScene from "../renderer/staticScene";
+import { EXPORT_DATA_TYPES, MIME_TYPES, ORIG_ID } from "../constants";
+import { Snapshot, CaptureUpdateAction } from "../store";
+import { arrayToMap } from "../utils";
+import {
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+} from "../colors";
+import { newElementWith } from "../element/mutateElement";
+import { AppStateChange, ElementsChange } from "../change";
+
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   GlobalTestState,
   act,
@@ -9,24 +46,7 @@ import {
   togglePopover,
   getCloneByOrigId,
 } from "./test-utils";
-import "../../utils/test-utils";
-import { Excalidraw } from "../index";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { getDefaultAppState } from "../appState";
-import { fireEvent, queryByTestId, waitFor } from "@testing-library/react";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { EXPORT_DATA_TYPES, MIME_TYPES, ORIG_ID } from "../constants";
-import type { AppState } from "../types";
-import { arrayToMap } from "../utils";
-import {
-  COLOR_PALETTE,
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
-  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
-} from "../colors";
-import { KEYS } from "../keys";
-import { newElementWith } from "../element/mutateElement";
+
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFrameElement,
@@ -37,18 +57,7 @@ import type {
   FractionalIndex,
   SceneElementsMap,
 } from "../element/types";
-import {
-  actionSendBackward,
-  actionBringForward,
-  actionSendToBack,
-} from "../actions";
-import { vi } from "vitest";
-import { queryByText } from "@testing-library/react";
-import { HistoryEntry } from "../history";
-import { AppStateChange, ElementsChange } from "../change";
-import { Snapshot, CaptureUpdateAction } from "../store";
-import type { LocalPoint, Radians } from "@excalidraw/math";
-import { pointFrom } from "@excalidraw/math";
+import type { AppState } from "../types";
 
 const { h } = window;
 

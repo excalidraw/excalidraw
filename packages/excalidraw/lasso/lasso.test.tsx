@@ -16,7 +16,7 @@
 
 import { act, render } from "../tests/test-utils";
 import { Excalidraw } from "../index";
-import type { ExcalidrawElement } from "../element/types";
+
 import {
   type GlobalPoint,
   type LocalPoint,
@@ -24,8 +24,12 @@ import {
   type Radians,
 } from "../../math";
 import { getSelectedElements } from "../scene";
-import { updateSelection } from "./worker";
+
 import { getElementLineSegments } from "../element/bounds";
+
+import { updateSelection } from "./worker";
+
+import type { ExcalidrawElement } from "../element/types";
 import type { ElementsSegmentsMap } from "./types";
 
 const { h } = window;

@@ -1,17 +1,13 @@
+import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
+import { getGridPoint } from "../snapping";
+import { getFontString } from "../utils";
+
 import { updateBoundElements } from "./binding";
-import type { Bounds } from "./bounds";
 import { getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getPerfectElementSize } from "./sizeHelpers";
-import type { NonDeletedExcalidrawElement } from "./types";
-import type {
-  AppState,
-  NormalizedZoomValue,
-  NullableGridSize,
-  PointerDownState,
-} from "../types";
 import { getBoundTextElement } from "./textElement";
-import type Scene from "../scene/Scene";
+import { getMinTextElementWidth } from "./textMeasurements";
 import {
   isArrowElement,
   isElbowArrow,
@@ -19,10 +15,16 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
-import { getFontString } from "../utils";
-import { TEXT_AUTOWRAP_THRESHOLD } from "../constants";
-import { getGridPoint } from "../snapping";
-import { getMinTextElementWidth } from "./textMeasurements";
+
+import type { Bounds } from "./bounds";
+import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "./types";
+import type Scene from "../scene/Scene";
+import type {
+  AppState,
+  NormalizedZoomValue,
+  NullableGridSize,
+  PointerDownState,
+} from "../types";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -76,13 +78,20 @@ export const dragSelectedElements = (
     }
   }
 
-  const commonBounds = getCommonBounds(
-    Array.from(elementsToUpdate).map(
-      (el) => pointerDownState.originalElements.get(el.id) ?? el,
-    ),
-  );
+  const origElements: ExcalidrawElement[] = [];
+
+  for (const element of elementsToUpdate) {
+    const origElement = pointerDownState.originalElements.get(element.id);
+    // if original element is not set (e.g. when you duplicate during a drag
+    // operation), exit to avoid undefined behavior
+    if (!origElement) {
+      return;
+    }
+    origElements.push(origElement);
+  }
+
   const adjustedOffset = calculateOffset(
-    commonBounds,
+    getCommonBounds(origElements),
     offset,
     snapOffset,
     gridSize,

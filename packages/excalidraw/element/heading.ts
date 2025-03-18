@@ -1,10 +1,3 @@
-import type {
-  LocalPoint,
-  GlobalPoint,
-  Triangle,
-  Vector,
-  Radians,
-} from "@excalidraw/math";
 import {
   pointFrom,
   pointRotateRads,
@@ -13,7 +6,17 @@ import {
   triangleIncludesPoint,
   vectorFromPoint,
 } from "@excalidraw/math";
+
+import type {
+  LocalPoint,
+  GlobalPoint,
+  Triangle,
+  Vector,
+  Radians,
+} from "@excalidraw/math";
+
 import { getCenterForBounds, type Bounds } from "./bounds";
+
 import type { ExcalidrawBindableElement } from "./types";
 
 export const HEADING_RIGHT = [1, 0] as Heading;

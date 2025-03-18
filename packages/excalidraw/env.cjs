@@ -9,9 +9,10 @@ const parseEnvVariables = (filepath) => {
     },
     {},
   );
-  envVars.VITE_PKG_NAME = pkg.name;
-  envVars.VITE_PKG_VERSION = pkg.version;
-  envVars.VITE_IS_EXCALIDRAW_NPM_PACKAGE = true;
+
+  envVars.PKG_NAME = pkg.name;
+  envVars.PKG_VERSION = pkg.version;
+
   return envVars;
 };
 

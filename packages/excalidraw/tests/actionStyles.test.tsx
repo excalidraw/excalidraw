@@ -1,4 +1,6 @@
 import React from "react";
+
+import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
 import { CODES } from "../keys";
 import { API } from "../tests/helpers/api";
@@ -10,7 +12,6 @@ import {
   screen,
   togglePopover,
 } from "../tests/test-utils";
-import { copiedStyles } from "../actions/actionStyles";
 
 const { h } = window;
 

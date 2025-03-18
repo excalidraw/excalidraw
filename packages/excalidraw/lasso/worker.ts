@@ -1,8 +1,12 @@
-import type { GlobalPoint, LineSegment } from "../../math/types";
-import { polygonFromPoints, polygonIncludesPoint } from "../../math/polygon";
-import type { ExcalidrawElement } from "../element/types";
-import { lineSegment, lineSegmentIntersectionPoints } from "../../math/segment";
 import { simplify } from "points-on-curve";
+
+import { polygonFromPoints, polygonIncludesPoint } from "../../math/polygon";
+
+import { lineSegment, lineSegmentIntersectionPoints } from "../../math/segment";
+
+import type { GlobalPoint, LineSegment } from "../../math/types";
+import type { ExcalidrawElement } from "../element/types";
+
 import type {
   ElementsSegmentsMap,
   LassoWorkerInput,

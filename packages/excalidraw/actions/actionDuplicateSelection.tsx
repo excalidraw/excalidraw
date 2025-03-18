@@ -1,27 +1,8 @@
-import { KEYS } from "../keys";
-import { register } from "./register";
-import type { ExcalidrawElement } from "../element/types";
-import { duplicateElement, getNonDeletedElements } from "../element";
-import { isSomeElementSelected } from "../scene";
 import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import {
-  arrayToMap,
-  castArray,
-  findLastIndex,
-  getShortcutKey,
-  invariant,
-} from "../utils";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import {
-  selectGroupsForSelectedElements,
-  getSelectedGroupForElement,
-  getElementsInGroup,
-} from "../groups";
-import type { AppState } from "../types";
-import { fixBindingsAfterDuplication } from "../element/binding";
-import type { ActionResult } from "./types";
+import { DuplicateIcon } from "../components/icons";
 import { DEFAULT_GRID_SIZE } from "../constants";
+import { duplicateElement, getNonDeletedElements } from "../element";
+import { fixBindingsAfterDuplication } from "../element/binding";
 import {
   bindTextToShapeAfterDuplication,
   getBoundTextElement,
@@ -33,16 +14,37 @@ import {
   isFrameLikeElement,
 } from "../element/typeChecks";
 import { normalizeElementOrder } from "../element/sortElements";
-import { DuplicateIcon } from "../components/icons";
+import { LinearElementEditor } from "../element/linearElementEditor";
 import {
   bindElementsToFramesAfterDuplication,
   getFrameChildren,
 } from "../frame";
 import {
+  selectGroupsForSelectedElements,
+  getSelectedGroupForElement,
+  getElementsInGroup,
+} from "../groups";
+import { t } from "../i18n";
+import { KEYS } from "../keys";
+import { isSomeElementSelected } from "../scene";
+import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "../scene/selection";
 import { CaptureUpdateAction } from "../store";
+import {
+  arrayToMap,
+  castArray,
+  findLastIndex,
+  getShortcutKey,
+  invariant,
+} from "../utils";
+
+import { register } from "./register";
+
+import type { ActionResult } from "./types";
+import type { ExcalidrawElement } from "../element/types";
+import type { AppState } from "../types";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -50,6 +52,10 @@ export const actionDuplicateSelection = register({
   icon: DuplicateIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
+    if (appState.selectedElementsAreBeingDragged) {
+      return false;
+    }
+
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
       // TODO: Invariants should be checked here instead of duplicateSelectedPoints()

@@ -3,8 +3,10 @@
 // -----------------------------------------------------------------------------
 
 import { MIME_TYPES, SVG_NS } from "../constants";
-import type { AppClassProperties, DataURL, BinaryFiles } from "../types";
+
 import { isInitializedImageElement } from "./typeChecks";
+
+import type { AppClassProperties, DataURL, BinaryFiles } from "../types";
 import type {
   ExcalidrawElement,
   FileId,
