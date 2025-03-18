@@ -19,6 +19,8 @@ import { hashElementsVersion, hashString } from "@excalidraw/element";
 
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
 
+import { Queue } from "@excalidraw/common/queue";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MaybePromise } from "@excalidraw/common/utility-types";
@@ -29,7 +31,6 @@ import { Emitter } from "../emitter";
 import { AbortError } from "../errors";
 import { libraryItemSvgsCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
-import { Queue } from "../queue";
 
 import { loadLibraryFromBlob } from "./blob";
 import { restoreLibraryItems } from "./restore";

@@ -1,4 +1,4 @@
-import { Queue } from "./queue";
+import { Queue } from "../src/queue";
 
 describe("Queue", () => {
   const calls: any[] = [];
