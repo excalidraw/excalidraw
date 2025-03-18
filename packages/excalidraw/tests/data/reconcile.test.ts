@@ -1,14 +1,16 @@
 import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
 
-import { reconcileElements } from "../../data/reconcile";
-import { randomInteger } from "../../random";
-import { cloneJSON } from "../../utils";
+import { randomInteger, cloneJSON } from "@excalidraw/common";
 
-import type { RemoteExcalidrawElement } from "../../data/reconcile";
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { reconcileElements } from "../../data/reconcile";
+
+import type { RemoteExcalidrawElement } from "../../data/reconcile";
+
 import type { AppState } from "../../types";
 
 type Id = string;

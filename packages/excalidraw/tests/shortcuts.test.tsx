@@ -1,7 +1,8 @@
 import React from "react";
 
+import { KEYS } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";

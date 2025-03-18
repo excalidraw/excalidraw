@@ -1,8 +1,8 @@
 import React from "react";
 
-import { CURSOR_TYPE } from "../constants";
+import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";

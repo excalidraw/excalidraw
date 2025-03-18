@@ -13,6 +13,11 @@ import {
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
+import {
+  getSelectedGroupIds,
+  getElementsInGroup,
+} from "@excalidraw/element/groups";
+
 import type { Radians } from "@excalidraw/math";
 
 import type {
@@ -21,8 +26,6 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
-
-import { getSelectedGroupIds, getElementsInGroup } from "../../groups";
 
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";

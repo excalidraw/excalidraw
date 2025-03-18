@@ -1,8 +1,9 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { resolvablePromise } from "@excalidraw/common";
+
 import { Excalidraw, CaptureUpdateAction } from "../../index";
-import { resolvablePromise } from "../../utils";
 import { API } from "../helpers/api";
 import { Pointer } from "../helpers/ui";
 import { render } from "../test-utils";

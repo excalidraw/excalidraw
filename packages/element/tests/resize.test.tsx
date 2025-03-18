@@ -1,28 +1,34 @@
 import { pointFrom } from "@excalidraw/math";
 import React from "react";
 
+import { getElementPointsCoords } from "@excalidraw/element/bounds";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { resizeSingleElement } from "@excalidraw/element/resizeElements";
+import { isLinearElement } from "@excalidraw/element/typeChecks";
+
+import { Excalidraw } from "@excalidraw/excalidraw";
+import {
+  KEYS,
+  getSizeFromPoints,
+  reseed,
+  arrayToMap,
+} from "@excalidraw/common";
+
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import {
+  render,
+  unmountComponent,
+} from "@excalidraw/excalidraw/tests/test-utils";
+
 import type { LocalPoint } from "@excalidraw/math";
 
-import { getElementPointsCoords } from "../element/bounds";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { resizeSingleElement } from "../element/resizeElements";
-import { isLinearElement } from "../element/typeChecks";
-import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { getSizeFromPoints } from "../points";
-import { reseed } from "../random";
-import { arrayToMap } from "../utils";
-
-import { API } from "./helpers/api";
-import { UI, Keyboard, Pointer } from "./helpers/ui";
-import { render, unmountComponent } from "./test-utils";
-
-import type { Bounds } from "../element/bounds";
+import type { Bounds } from "@excalidraw/element/bounds";
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
 
 unmountComponent();
 

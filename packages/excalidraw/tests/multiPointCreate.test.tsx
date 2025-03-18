@@ -1,9 +1,12 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { KEYS, reseed } from "@excalidraw/common";
+
+import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { reseed } from "../random";
+
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
@@ -14,8 +17,6 @@ import {
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
 } from "./test-utils";
-
-import type { ExcalidrawLinearElement } from "../element/types";
 
 unmountComponent();
 

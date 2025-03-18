@@ -2,17 +2,24 @@ import { pointFrom, type Radians } from "@excalidraw/math";
 import React from "react";
 import { vi } from "vitest";
 
+import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { newLinearElement } from "@excalidraw/element";
+import { getBoundTextElementPosition } from "@excalidraw/element/textElement";
+
 import type { LocalPoint } from "@excalidraw/math";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FileId,
+} from "@excalidraw/element/types";
 
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { createPasteEvent } from "../clipboard";
-import { ROUNDNESS } from "../constants";
-import { getElementAbsoluteCoords } from "../element";
-import { newLinearElement } from "../element";
-import { getBoundTextElementPosition } from "../element/textElement";
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { arrayToMap, cloneJSON } from "../utils";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
@@ -25,13 +32,6 @@ import {
   waitFor,
 } from "./test-utils";
 
-import type {
-  ExcalidrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FileId,
-} from "../element/types";
 import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;

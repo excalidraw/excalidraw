@@ -1,5 +1,7 @@
 import React from "react";
 
+import { KEYS } from "@excalidraw/common";
+
 import {
   actionAlignVerticallyCentered,
   actionAlignHorizontallyCentered,
@@ -11,7 +13,6 @@ import {
 } from "../actions";
 import { defaultLang, setLanguage } from "../i18n";
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
