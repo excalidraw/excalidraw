@@ -4,9 +4,10 @@ import { isLinearElement } from "@excalidraw/element/typeChecks";
 
 import { KEYS } from "@excalidraw/common";
 
+import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { selectGroupsForSelectedElements } from "../groups";
 import { CaptureUpdateAction } from "../store";
 
 import { selectAllIcon } from "../components/icons";

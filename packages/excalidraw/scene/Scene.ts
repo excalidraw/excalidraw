@@ -9,6 +9,8 @@ import {
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
 import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {
   ExcalidrawElement,
@@ -22,7 +24,6 @@ import type {
   Ordered,
 } from "@excalidraw/element/types";
 
-import { getElementsInGroup } from "../groups";
 import {
   syncInvalidIndices,
   syncMovedIndices,

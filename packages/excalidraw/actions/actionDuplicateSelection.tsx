@@ -33,16 +33,17 @@ import {
   getFrameChildren,
 } from "@excalidraw/element/frame";
 
+import {
+  selectGroupsForSelectedElements,
+  getSelectedGroupForElement,
+  getElementsInGroup,
+} from "@excalidraw/element/groups";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
 
-import {
-  selectGroupsForSelectedElements,
-  getSelectedGroupForElement,
-  getElementsInGroup,
-} from "../groups";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import {

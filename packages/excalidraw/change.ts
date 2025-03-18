@@ -29,6 +29,8 @@ import {
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
+import { getNonDeletedGroupIds } from "@excalidraw/element/groups";
+
 import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
 
 import type { ElementUpdate } from "@excalidraw/element/mutateElement";
@@ -45,7 +47,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
-import { getNonDeletedGroupIds } from "./groups";
 import { getObservedAppState } from "./store";
 
 import type {

@@ -10,9 +10,10 @@ import { getFrameChildren } from "@excalidraw/element/frame";
 
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { getElementsInGroup } from "../groups";
 import { setCursorForShape } from "../cursor";
 import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";

@@ -274,6 +274,16 @@ import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
 import { getRenderOpacity } from "@excalidraw/element/renderElement";
 
+import {
+  editGroupForSelectedElement,
+  getElementsInGroup,
+  getSelectedGroupIdForElement,
+  getSelectedGroupIds,
+  isElementInGroup,
+  isSelectedViaGroup,
+  selectGroupsForSelectedElements,
+} from "@excalidraw/element/groups";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -362,15 +372,6 @@ import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 
 import { getCenter, getDistance } from "../gesture";
-import {
-  editGroupForSelectedElement,
-  getElementsInGroup,
-  getSelectedGroupIdForElement,
-  getSelectedGroupIds,
-  isElementInGroup,
-  isSelectedViaGroup,
-  selectGroupsForSelectedElements,
-} from "../groups";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 

@@ -16,6 +16,16 @@ import {
 
 import { KEYS, randomId, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
+import {
+  getSelectedGroupIds,
+  selectGroup,
+  selectGroupsForSelectedElements,
+  getElementsInGroup,
+  addToGroup,
+  removeFromSelectedGroups,
+  isElementInGroup,
+} from "@excalidraw/element/groups";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -27,15 +37,6 @@ import { UngroupIcon, GroupIcon } from "../components/icons";
 
 import { syncMovedIndices } from "../fractionalIndex";
 
-import {
-  getSelectedGroupIds,
-  selectGroup,
-  selectGroupsForSelectedElements,
-  getElementsInGroup,
-  addToGroup,
-  removeFromSelectedGroups,
-  isElementInGroup,
-} from "../groups";
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";

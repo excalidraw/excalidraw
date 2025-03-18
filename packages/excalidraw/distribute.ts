@@ -1,9 +1,9 @@
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import { getMaximumGroups } from "@excalidraw/element/groups";
 
-import { getMaximumGroups } from "./groups";
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 export interface Distribution {
   space: "between";

@@ -1,10 +1,16 @@
+import {
+  convertToExcalidrawElements,
+  Excalidraw,
+} from "@excalidraw/excalidraw";
+
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import {
+  getCloneByOrigId,
+  render,
+} from "@excalidraw/excalidraw/tests/test-utils";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
-
-import { API } from "./tests/helpers/api";
-import { Keyboard, Pointer } from "./tests/helpers/ui";
-import { getCloneByOrigId, render } from "./tests/test-utils";
-
-import { convertToExcalidrawElements, Excalidraw } from "./index";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

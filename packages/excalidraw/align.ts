@@ -2,10 +2,10 @@ import { updateBoundElements } from "@excalidraw/element/binding";
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 
+import { getMaximumGroups } from "@excalidraw/element/groups";
+
 import type { BoundingBox } from "@excalidraw/element/bounds";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
-
-import { getMaximumGroups } from "./groups";
 
 import type Scene from "./scene/Scene";
 

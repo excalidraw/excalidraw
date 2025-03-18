@@ -18,6 +18,8 @@ import {
   isFrameLikeElement,
 } from "@excalidraw/element/typeChecks";
 
+import { getMaximumGroups } from "@excalidraw/element/groups";
+
 import type { InclusiveRange } from "@excalidraw/math";
 
 import type { Bounds } from "@excalidraw/element/bounds";
@@ -28,7 +30,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { getMaximumGroups } from "./groups";
 import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,

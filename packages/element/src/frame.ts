@@ -6,11 +6,6 @@ import {
 } from "@excalidraw/utils";
 
 import {
-  getElementsInGroup,
-  selectGroupsFromGivenElements,
-} from "@excalidraw/excalidraw/groups";
-
-import {
   getElementsWithinSelection,
   getSelectedElements,
 } from "@excalidraw/excalidraw/scene";
@@ -35,6 +30,8 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import type { ReadonlySetLike } from "@excalidraw/excalidraw/utility-types";
+
+import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 
 import { getElementLineSegments, getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";

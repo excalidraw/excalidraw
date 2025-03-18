@@ -15,9 +15,13 @@ import {
 } from "@excalidraw/element/typeChecks";
 import { getFrameChildren } from "@excalidraw/element/frame";
 
+import {
+  getElementsInGroup,
+  selectGroupsForSelectedElements,
+} from "@excalidraw/element/groups";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { getElementsInGroup, selectGroupsForSelectedElements } from "../groups";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
