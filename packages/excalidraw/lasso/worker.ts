@@ -13,6 +13,8 @@ import type {
   LassoWorkerOutput,
 } from "./types";
 
+const ctx = self as unknown as Worker;
+
 // variables to track processing state and latest input data
 // for "backpressure" purposes
 let isProcessing: boolean = false;
@@ -168,3 +170,5 @@ const intersectionTest = (
     ),
   );
 };
+
+export default ctx;

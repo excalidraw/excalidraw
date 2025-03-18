@@ -18,6 +18,8 @@ import type {
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
 
+import LassoWorker from "./worker?worker&inline";
+
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
   private enclosedElements: Set<ExcalidrawElement["id"]> = new Set();
@@ -56,9 +58,7 @@ export class LassoTrail extends AnimatedTrail {
     this.enclosedElements.clear();
 
     try {
-      this.worker = new Worker(new URL("./worker.ts", import.meta.url), {
-        type: "module",
-      });
+      this.worker = new LassoWorker();
 
       this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
         const { selectedElementIds } = event.data;

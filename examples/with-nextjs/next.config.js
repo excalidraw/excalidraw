@@ -1,26 +1,12 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   distDir: "build",
   typescript: {
-    // Temporarily ignore build errors until the TS config mismatch is resolved
+    // The ts config doesn't work with `jsx: preserve" and if updated to `react-jsx` it gets ovewritten by next js throwing ts errors hence I am ignoring build errors until this is fixed.
     ignoreBuildErrors: true,
   },
-  // Transpile sibling/parent packages in a monorepo
+  // This is needed as in pages router the code for importing types throws error as its outside next js app
   transpilePackages: ["../"],
-  webpack(config, { isServer }) {
-    if (!isServer) {
-      config.module.rules.push({
-        test: /\.worker\.(js|ts)$/,
-        use: {
-          loader: "worker-loader",
-          options: {
-            // You can tweak the filename pattern here
-            filename: "static/chunks/[hash].worker.js",
-          },
-        },
-      });
-    }
-
-    return config;
-  },
 };
+
+module.exports = nextConfig;
