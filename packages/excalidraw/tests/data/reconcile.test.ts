@@ -1,5 +1,6 @@
+import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
 import { reconcileElements } from "../../data/reconcile";
-import { syncInvalidIndices } from "../../fractionalIndex";
 import { randomInteger } from "../../random";
 import { cloneJSON } from "../../utils";
 

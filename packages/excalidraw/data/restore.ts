@@ -41,6 +41,8 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
+import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -62,7 +64,6 @@ import type {
 import { getDefaultAppState } from "../appState";
 
 import { getLineHeight } from "../fonts/FontMetadata";
-import { syncInvalidIndices } from "../fractionalIndex";
 import {
   getNormalizedGridSize,
   getNormalizedGridStep,

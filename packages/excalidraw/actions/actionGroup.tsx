@@ -26,6 +26,8 @@ import {
   isElementInGroup,
 } from "@excalidraw/element/groups";
 
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -34,8 +36,6 @@ import type {
 
 import { ToolButton } from "../components/ToolButton";
 import { UngroupIcon, GroupIcon } from "../components/icons";
-
-import { syncMovedIndices } from "../fractionalIndex";
 
 import { t } from "../i18n";
 

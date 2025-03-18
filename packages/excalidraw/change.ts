@@ -31,6 +31,11 @@ import {
 
 import { getNonDeletedGroupIds } from "@excalidraw/element/groups";
 
+import {
+  orderByFractionalIndex,
+  syncMovedIndices,
+} from "@excalidraw/element/fractionalIndex";
+
 import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
 
 import type { ElementUpdate } from "@excalidraw/element/mutateElement";
@@ -46,7 +51,6 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getObservedAppState } from "./store";
 
 import type {

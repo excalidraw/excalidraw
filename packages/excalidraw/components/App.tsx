@@ -284,6 +284,11 @@ import {
   selectGroupsForSelectedElements,
 } from "@excalidraw/element/groups";
 
+import {
+  syncInvalidIndices,
+  syncMovedIndices,
+} from "@excalidraw/element/fractionalIndex";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -447,7 +452,6 @@ import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
-import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 

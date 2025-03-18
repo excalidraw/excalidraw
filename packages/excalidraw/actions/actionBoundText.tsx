@@ -29,6 +29,8 @@ import {
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { measureText } from "@excalidraw/element/textMeasurements";
 
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -36,7 +38,6 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import { syncMovedIndices } from "../fractionalIndex";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";

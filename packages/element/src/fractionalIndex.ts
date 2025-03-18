@@ -1,10 +1,10 @@
 import { generateNKeysBetween } from "fractional-indexing";
 
+import { arrayToMap } from "@excalidraw/common";
+
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { hasBoundTextElement } from "@excalidraw/element/typeChecks";
-
-import { arrayToMap } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -12,7 +12,7 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { InvalidFractionalIndexError } from "./errors";
+import { InvalidFractionalIndexError } from "../../excalidraw/errors";
 
 /**
  * Envisioned relation between array order and fractional indices:

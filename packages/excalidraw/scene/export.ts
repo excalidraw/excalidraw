@@ -38,6 +38,8 @@ import {
   getRootElements,
 } from "@excalidraw/element/frame";
 
+import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
 import type { Bounds } from "@excalidraw/element/bounds";
 
 import type {
@@ -53,7 +55,6 @@ import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
 
 import { Fonts } from "../fonts";
-import { syncInvalidIndices } from "../fractionalIndex";
 
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";

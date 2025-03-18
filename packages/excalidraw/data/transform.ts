@@ -34,6 +34,8 @@ import {
 } from "@excalidraw/element/textMeasurements";
 import { isArrowElement } from "@excalidraw/element/typeChecks";
 
+import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
 import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
 
 import type {
@@ -58,7 +60,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getLineHeight } from "../fonts/FontMetadata";
-import { syncInvalidIndices } from "../fractionalIndex";
 
 import type { MarkOptional } from "../utility-types";
 

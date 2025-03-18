@@ -11,6 +11,12 @@ import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
+import {
+  syncInvalidIndices,
+  syncMovedIndices,
+  validateFractionalIndices,
+} from "@excalidraw/element/fractionalIndex";
+
 import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {
   ExcalidrawElement,
@@ -23,12 +29,6 @@ import type {
   OrderedExcalidrawElement,
   Ordered,
 } from "@excalidraw/element/types";
-
-import {
-  syncInvalidIndices,
-  syncMovedIndices,
-  validateFractionalIndices,
-} from "../fractionalIndex";
 
 import { getSelectedElements } from "./selection";
 

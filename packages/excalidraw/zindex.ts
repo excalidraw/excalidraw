@@ -4,12 +4,13 @@ import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
 } from "@excalidraw/element/types";
 
-import { syncMovedIndices } from "./fractionalIndex";
 import { getSelectedElements } from "./scene";
 import Scene from "./scene/Scene";
 
