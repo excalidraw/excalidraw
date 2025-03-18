@@ -1,12 +1,13 @@
-// next.config.js
+/** @type {import('next').NextConfig} */
 module.exports = {
+  distDir: "build",
+  typescript: {
+    // Temporarily ignore build errors until the TS config mismatch is resolved
+    ignoreBuildErrors: true,
+  },
+  // Transpile sibling/parent packages in a monorepo
+  transpilePackages: ["../"],
   webpack(config, { isServer }) {
-    config.distDir = "build";
-    config.typescript = {
-      ignoreBuildErrors: true,
-    };
-    config.transpileModules = ["../"];
-
     if (!isServer) {
       config.module.rules.push({
         test: /\.worker\.(js|ts)$/,

@@ -20,6 +20,7 @@
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "path2d-polyfill": "2.0.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "worker-loader": "3.0.8"
   }
 }
