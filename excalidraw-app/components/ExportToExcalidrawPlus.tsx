@@ -2,15 +2,15 @@ import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
 import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
-import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
+import { MIME_TYPES } from "@excalidraw/common";
 import {
   encryptData,
   generateEncryptionKey,
 } from "@excalidraw/excalidraw/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
+import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { getFrame } from "@excalidraw/excalidraw/utils";
+import { getFrame } from "@excalidraw/common";
 import { uploadBytes, ref } from "firebase/storage";
 import { nanoid } from "nanoid";
 import React from "react";
@@ -18,7 +18,7 @@ import React from "react";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,

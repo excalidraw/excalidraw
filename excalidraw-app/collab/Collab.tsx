@@ -6,19 +6,19 @@ import {
   reconcileElements,
 } from "@excalidraw/excalidraw";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "@excalidraw/excalidraw/constants";
+import { APP_NAME, ENV, EVENT } from "@excalidraw/common";
 import {
   IDLE_THRESHOLD,
   ACTIVE_THRESHOLD,
   UserIdleState,
-} from "@excalidraw/excalidraw/constants";
+} from "@excalidraw/common";
 import { decryptData } from "@excalidraw/excalidraw/data/encryption";
-import { getVisibleSceneBounds } from "@excalidraw/excalidraw/element/bounds";
-import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
+import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 import {
   isImageElement,
   isInitializedImageElement,
-} from "@excalidraw/excalidraw/element/typeChecks";
+} from "@excalidraw/element/typeChecks";
 import { AbortError } from "@excalidraw/excalidraw/errors";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
@@ -27,7 +27,7 @@ import {
   preventUnload,
   resolvablePromise,
   throttleRAF,
-} from "@excalidraw/excalidraw/utils";
+} from "@excalidraw/common";
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
 
@@ -41,7 +41,7 @@ import type {
   FileId,
   InitializedExcalidrawImageElement,
   OrderedExcalidrawElement,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type {
   BinaryFileData,
   ExcalidrawImperativeAPI,
