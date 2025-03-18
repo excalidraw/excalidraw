@@ -10,6 +10,8 @@ import { getFrameChildren } from "../frame";
 import { selectGroupsForSelectedElements } from "../groups";
 import { arrayToMap, easeOut } from "../utils";
 
+import LassoWorker from "./worker?worker&inline";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -17,8 +19,6 @@ import type {
 } from "../element/types";
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
-
-import LassoWorker from "./worker?worker&inline";
 
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
