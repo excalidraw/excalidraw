@@ -4,7 +4,7 @@ import {
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
-import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
+import { MIME_TYPES } from "@excalidraw/common";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { restore } from "@excalidraw/excalidraw/data/restore";
@@ -17,7 +17,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };

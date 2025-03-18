@@ -3,7 +3,6 @@ import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
 import {
   doLineSegmentsIntersect,
   elementsOverlappingBBox,
-  getCommonBounds,
 } from "@excalidraw/utils";
 
 import {
@@ -37,7 +36,7 @@ import type {
 
 import type { ReadonlySetLike } from "@excalidraw/excalidraw/utility-types";
 
-import { getElementLineSegments } from "./bounds";
+import { getElementLineSegments, getCommonBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { isFrameElement, isFrameLikeElement } from "./typeChecks";

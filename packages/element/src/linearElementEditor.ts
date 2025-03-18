@@ -45,11 +45,6 @@ import type {
 import type { Mutable } from "@excalidraw/excalidraw/utility-types";
 
 import {
-  getElementAbsoluteCoords,
-  getLockedLinearCursorAlignSize,
-} from "../index";
-
-import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
@@ -63,6 +58,8 @@ import {
   isElbowArrow,
   isFixedPointBinding,
 } from "./typeChecks";
+
+import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from "./";
 
 import type { Bounds } from "./bounds";
 import type {

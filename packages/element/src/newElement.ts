@@ -27,13 +27,13 @@ import type {
   Mutable,
 } from "@excalidraw/excalidraw/utility-types";
 
-import { getElementAbsoluteCoords } from "../index";
-
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+
+import { getElementAbsoluteCoords } from ".";
 
 import type {
   ExcalidrawElement,

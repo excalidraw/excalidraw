@@ -6,14 +6,14 @@ import React, {
   useState,
 } from "react";
 
-import { MIME_TYPES } from "@excalidraw/common";
+import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
+
+import { duplicateElements } from "@excalidraw/element/newElement";
 
 import { serializeLibraryAsJSON } from "../data/json";
-import { duplicateElements } from "../element/newElement";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
-import { arrayToMap } from "../utils";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";

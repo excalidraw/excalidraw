@@ -1,12 +1,12 @@
-import { getElementBounds } from "@excalidraw/excalidraw/element/bounds";
+import { arrayToMap } from "@excalidraw/common";
+import { getElementBounds } from "@excalidraw/element/bounds";
 import {
   isArrowElement,
   isExcalidrawElement,
   isFreeDrawElement,
   isLinearElement,
   isTextElement,
-} from "@excalidraw/excalidraw/element/typeChecks";
-import { arrayToMap } from "@excalidraw/excalidraw/utils";
+} from "@excalidraw/element/typeChecks";
 import {
   rangeIncludesValue,
   pointFrom,
@@ -14,13 +14,13 @@ import {
   rangeInclusive,
 } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/excalidraw/element/bounds";
+import type { Bounds } from "@excalidraw/element/bounds";
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   NonDeletedExcalidrawElement,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type { LocalPoint } from "@excalidraw/math";
 
 type Element = NonDeletedExcalidrawElement;

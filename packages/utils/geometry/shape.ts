@@ -12,8 +12,8 @@
  * to pure shapes
  */
 
-import { getElementAbsoluteCoords } from "@excalidraw/excalidraw/element";
-import { invariant } from "@excalidraw/excalidraw/utils";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { invariant } from "@excalidraw/common";
 import {
   curve,
   lineSegment,
@@ -50,7 +50,7 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
 
 import type { Drawable, Op } from "roughjs/bin/core";

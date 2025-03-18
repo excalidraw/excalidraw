@@ -27,12 +27,12 @@ import {
 
 import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 
-import { getElementAbsoluteCoords } from "../index";
-
 import { shouldTestInside } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement } from "./textElement";
 import { ShapeCache } from "./scene/ShapeCache";
+
+import { getElementAbsoluteCoords } from "./";
 
 import type { Bounds } from "./bounds";
 import type {

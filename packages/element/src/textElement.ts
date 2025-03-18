@@ -13,8 +13,6 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { ExtractSetType } from "@excalidraw/excalidraw/utility-types";
 
-import { isTextElement } from "../index";
-
 import {
   resetOriginalContainerCache,
   updateOriginalContainerCache,
@@ -24,6 +22,8 @@ import { mutateElement } from "./mutateElement";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import { isBoundToContainer, isArrowElement } from "./typeChecks";
+
+import { isTextElement } from "./";
 
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
