@@ -36,6 +36,13 @@ import type {
   ExcalidrawNonSelectionElement,
 } from "@excalidraw/element/types";
 
+import type {
+  Merge,
+  MaybePromise,
+  ValueOf,
+  MakeBrand,
+} from "@excalidraw/common/utility-types";
+
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
@@ -44,7 +51,6 @@ import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
-import type { Merge, MaybePromise, ValueOf, MakeBrand } from "./utility-types";
 import type { CaptureUpdateActionType } from "./store";
 import type { ImportedDataState } from "./data/types";
 

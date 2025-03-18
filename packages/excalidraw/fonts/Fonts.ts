@@ -19,6 +19,8 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import { CascadiaFontFaces } from "./Cascadia";
 import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
@@ -33,7 +35,6 @@ import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
 import type Scene from "../scene/Scene";
-import type { ValueOf } from "../utility-types";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use

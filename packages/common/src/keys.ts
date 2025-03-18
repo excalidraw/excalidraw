@@ -1,4 +1,4 @@
-import type { ValueOf } from "@excalidraw/excalidraw/utility-types";
+import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import { isDarwin } from "./constants";
 

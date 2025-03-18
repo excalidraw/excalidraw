@@ -6,7 +6,7 @@ import {
 } from "@excalidraw/common";
 
 import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
-import type { MarkRequired } from "@excalidraw/excalidraw/utility-types";
+import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "./newElement";
 import { wrapText } from "./textWrapping";

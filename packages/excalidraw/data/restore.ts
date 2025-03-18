@@ -61,6 +61,8 @@ import type {
   StrokeRoundness,
 } from "@excalidraw/element/types";
 
+import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
+
 import { getDefaultAppState } from "../appState";
 
 import { getLineHeight } from "../fonts/FontMetadata";
@@ -71,7 +73,6 @@ import {
 } from "../scene";
 
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
-import type { MarkOptional, Mutable } from "../utility-types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<

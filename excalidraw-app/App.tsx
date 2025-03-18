@@ -71,7 +71,7 @@ import type {
   ExcalidrawInitialDataState,
   UIAppState,
 } from "@excalidraw/excalidraw/types";
-import type { ResolutionType } from "@excalidraw/excalidraw/utility-types";
+import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common";
 
 import CustomStats from "./CustomStats";

@@ -40,6 +40,8 @@ import {
 
 import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
 
+import { type Mutable } from "@excalidraw/common/utility-types";
+
 import type { Bounds } from "@excalidraw/element/bounds";
 
 import type {
@@ -58,7 +60,6 @@ import { Fonts } from "../fonts";
 
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
-import { type Mutable } from "../utility-types";
 
 import type { RenderableElementsMap } from "./types";
 

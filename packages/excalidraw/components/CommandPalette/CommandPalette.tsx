@@ -11,6 +11,8 @@ import {
   isWritableElement,
 } from "@excalidraw/common";
 
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
 import {
   actionClearCanvas,
   actionLink,
@@ -61,7 +63,6 @@ import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
 import type { AppProps, AppState, UIAppState } from "../../types";
-import type { MarkRequired } from "../../utility-types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";

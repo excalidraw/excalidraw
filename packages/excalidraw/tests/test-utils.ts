@@ -13,6 +13,8 @@ import { ORIG_ID, arrayToMap } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
+
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 import { getSelectedElements } from "../scene/selection";
 
@@ -22,8 +24,6 @@ import * as toolQueries from "./queries/toolQueries";
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
 import type { ImportedDataState } from "../data/types";
-
-import type { AllPossibleKeys } from "../utility-types";
 
 export { cleanup as unmountComponent };
 

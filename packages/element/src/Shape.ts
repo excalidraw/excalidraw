@@ -13,7 +13,7 @@ import {
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
 
-import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type {
   ExcalidrawElement,

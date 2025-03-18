@@ -11,6 +11,8 @@ import { clearElementsForExport } from "@excalidraw/element";
 
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import { cleanAppStateForExport } from "../appState";
 
 import { CanvasError, ImageSceneDataError } from "../errors";
@@ -25,7 +27,6 @@ import { restore, restoreLibraryItems } from "./restore";
 import type { FileSystemHandle } from "./filesystem";
 
 import type { AppState, DataURL, LibraryItem } from "../types";
-import type { ValueOf } from "../utility-types";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {

@@ -6,6 +6,8 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
 import type {
   AppClassProperties,
   AppState,
@@ -17,7 +19,6 @@ import type {
   Device,
   PendingExcalidrawElements,
 } from "../types";
-import type { MakeBrand } from "../utility-types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 

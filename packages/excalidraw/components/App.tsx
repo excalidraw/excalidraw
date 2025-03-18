@@ -316,6 +316,8 @@ import type {
   ExcalidrawArrowElement,
 } from "@excalidraw/element/types";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import {
   actionAddToLibrary,
   actionBringForward,
@@ -515,7 +517,6 @@ import type {
   NullableGridSize,
   Offsets,
 } from "../types";
-import type { ValueOf } from "../utility-types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
 

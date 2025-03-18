@@ -10,7 +10,7 @@ import Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { Radians } from "@excalidraw/math";
 
-import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./ShapeCache";
 

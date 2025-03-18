@@ -2,7 +2,7 @@ import { promiseTry, resolvablePromise } from "@excalidraw/common";
 
 import type { ResolvablePromise } from "@excalidraw/common";
 
-import type { MaybePromise } from "./utility-types";
+import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 type Job<T, TArgs extends unknown[]> = (...args: TArgs) => MaybePromise<T>;
 

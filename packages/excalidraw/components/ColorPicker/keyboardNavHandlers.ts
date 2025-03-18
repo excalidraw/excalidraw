@@ -6,13 +6,14 @@ import type {
   ColorPaletteCustom,
 } from "@excalidraw/common";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import {
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
 import type { ActiveColorPickerSectionAtomType } from "./colorPickerUtils";
-import type { ValueOf } from "../../utility-types";
 
 const arrowHandler = (
   eventKey: string,

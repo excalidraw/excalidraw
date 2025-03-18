@@ -29,7 +29,7 @@ import type {
   StaticCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 
-import type { ReadonlySetLike } from "@excalidraw/excalidraw/utility-types";
+import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 

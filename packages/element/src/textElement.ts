@@ -11,7 +11,7 @@ import {
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { ExtractSetType } from "@excalidraw/excalidraw/utility-types";
+import type { ExtractSetType } from "@excalidraw/common/utility-types";
 
 import {
   resetOriginalContainerCache,

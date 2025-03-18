@@ -25,7 +25,7 @@ import type {
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";

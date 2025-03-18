@@ -51,6 +51,8 @@ import type {
   SceneElementsMap,
 } from "@excalidraw/element/types";
 
+import type { SubtypeOf, ValueOf } from "@excalidraw/common/utility-types";
+
 import { getObservedAppState } from "./store";
 
 import type {
@@ -59,7 +61,6 @@ import type {
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import type { SubtypeOf, ValueOf } from "./utility-types";
 
 /**
  * Represents the difference between two objects of the same type.

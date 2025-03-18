@@ -38,12 +38,13 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
+import type { Mutable } from "@excalidraw/common/utility-types";
+
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
 import type { AppState } from "../types";
-import type { Mutable } from "../utility-types";
 
 export const actionUnbindText = register({
   name: "unbindText",

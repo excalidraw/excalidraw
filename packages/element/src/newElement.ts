@@ -25,7 +25,7 @@ import type {
   MarkOptional,
   Merge,
   Mutable,
-} from "@excalidraw/excalidraw/utility-types";
+} from "@excalidraw/common/utility-types";
 
 import { getResizedElementAbsoluteCoords } from "./bounds";
 import { bumpVersion, newElementWith } from "./mutateElement";

@@ -21,6 +21,8 @@ import { getCommonBoundingBox } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import type { MaybePromise } from "@excalidraw/common/utility-types";
+
 import { atom, editorJotaiStore } from "../editor-jotai";
 
 import { Emitter } from "../emitter";
@@ -41,7 +43,6 @@ import type {
   LibraryItemsSource,
   LibraryItems_anyVersion,
 } from "../types";
-import type { MaybePromise } from "../utility-types";
 
 /**
  * format: hostname or hostname/pathname

@@ -49,7 +49,7 @@ import type {
   Collaborator,
   Gesture,
 } from "@excalidraw/excalidraw/types";
-import type { Mutable, ValueOf } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import { appJotaiStore, atom } from "../app-jotai";
 import {

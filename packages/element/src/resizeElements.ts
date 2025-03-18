@@ -22,7 +22,7 @@ import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { PointerDownState } from "@excalidraw/excalidraw/types";
 
-import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { getArrowLocalFixedPoints, updateBoundElements } from "./binding";
 import {

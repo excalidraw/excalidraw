@@ -4,13 +4,14 @@ import { deepCopyElement, newElementWith } from "@excalidraw/element";
 
 import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
 
 import { Emitter } from "./emitter";
 
 import type { AppState, ObservedAppState } from "./types";
-import type { ValueOf } from "./utility-types";
 
 // hidden non-enumerable property for runtime checks
 const hiddenObservedAppStateProp = "__observedAppState";

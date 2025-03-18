@@ -13,7 +13,7 @@ import type {
   MarkNonNullable,
   Merge,
   ValueOf,
-} from "@excalidraw/excalidraw/utility-types";
+} from "@excalidraw/common/utility-types";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";

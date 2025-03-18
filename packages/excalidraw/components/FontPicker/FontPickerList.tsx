@@ -11,6 +11,8 @@ import { type FontFamilyValues } from "@excalidraw/element/types";
 
 import { arrayToList, debounce, getFontFamilyString } from "@excalidraw/common";
 
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
 import { useApp, useAppProps, useExcalidrawContainer } from "../App";
@@ -26,7 +28,6 @@ import { FontFamilyNormalIcon } from "../icons";
 
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
 
-import type { ValueOf } from "../../utility-types";
 import type { JSX } from "react";
 
 export interface FontDescriptor {

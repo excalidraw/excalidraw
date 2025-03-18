@@ -21,7 +21,7 @@ import type {
 import type {
   MaybePromise,
   ResolutionType,
-} from "@excalidraw/excalidraw/utility-types";
+} from "@excalidraw/common/utility-types";
 
 import { COLOR_PALETTE } from "./colors";
 import {

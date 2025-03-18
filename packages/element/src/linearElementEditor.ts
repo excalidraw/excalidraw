@@ -43,7 +43,7 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
-import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 import {
   bindOrUnbindLinearElement,

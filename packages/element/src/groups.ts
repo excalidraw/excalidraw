@@ -17,7 +17,7 @@ import type {
   AppState,
   InteractiveCanvasAppState,
 } from "@excalidraw/excalidraw/types";
-import type { Mutable } from "@excalidraw/excalidraw/utility-types";
+import type { Mutable } from "@excalidraw/common/utility-types";
 
 export const selectGroup = (
   groupId: GroupId,

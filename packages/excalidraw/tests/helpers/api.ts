@@ -22,6 +22,8 @@ import { isLinearElementType } from "@excalidraw/element/typeChecks";
 import { getSelectedElements } from "@excalidraw/excalidraw/scene/selection";
 import { assertNever } from "@excalidraw/common";
 
+import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+
 import type {
   ExcalidrawElement,
   ExcalidrawGenericElement,
@@ -38,7 +40,8 @@ import type {
   FixedSegment,
 } from "@excalidraw/element/types";
 
-import { selectGroupsForSelectedElements } from "../../groups";
+import type { Mutable } from "@excalidraw/common/utility-types";
+
 import { getMimeType } from "../../data/blob";
 import { createTestHook } from "../../components/App";
 import { getDefaultAppState } from "../../appState";
@@ -47,7 +50,7 @@ import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
 import type { Action } from "../../actions/types";
 import type App from "../../components/App";
 import type { AppState } from "../../types";
-import type { Mutable } from "../../utility-types";
+
 
 const readFile = util.promisify(fs.readFile);
 // so that window.h is available when App.tsx is not imported as well.

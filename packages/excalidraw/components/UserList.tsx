@@ -4,6 +4,8 @@ import React, { useLayoutEffect } from "react";
 
 import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
 
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
 import { t } from "../i18n";
 
 import { useExcalidrawActionManager } from "./App";
@@ -16,7 +18,6 @@ import "./UserList.scss";
 
 import type { ActionManager } from "../actions/manager";
 import type { Collaborator, SocketId } from "../types";
-import type { MarkRequired } from "../utility-types";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

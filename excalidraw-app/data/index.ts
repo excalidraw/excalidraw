@@ -28,7 +28,7 @@ import type {
   BinaryFiles,
   SocketId,
 } from "@excalidraw/excalidraw/types";
-import type { MakeBrand } from "@excalidraw/excalidraw/utility-types";
+import type { MakeBrand } from "@excalidraw/common/utility-types";
 
 import {
   DELETED_ELEMENT_TIMEOUT,

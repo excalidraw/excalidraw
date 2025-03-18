@@ -32,7 +32,7 @@ import type {
   BinaryFileData,
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
-import type { MaybePromise } from "@excalidraw/excalidraw/utility-types";
+import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 

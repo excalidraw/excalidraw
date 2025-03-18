@@ -59,9 +59,9 @@ import type {
   VerticalAlign,
 } from "@excalidraw/element/types";
 
-import { getLineHeight } from "../fonts/FontMetadata";
+import type { MarkOptional } from "@excalidraw/common/utility-types";
 
-import type { MarkOptional } from "../utility-types";
+import { getLineHeight } from "../fonts/FontMetadata";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";

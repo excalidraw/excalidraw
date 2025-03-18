@@ -30,10 +30,11 @@ import type {
   Ordered,
 } from "@excalidraw/element/types";
 
+import type { Assert, SameType } from "@excalidraw/common/utility-types";
+
 import { getSelectedElements } from "./selection";
 
 import type { AppState } from "../types";
-import type { Assert, SameType } from "../utility-types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
