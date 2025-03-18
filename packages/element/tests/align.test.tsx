@@ -1,5 +1,3 @@
-import React from "react";
-
 import { KEYS } from "@excalidraw/common";
 
 import {
@@ -10,13 +8,17 @@ import {
   actionAlignBottom,
   actionAlignLeft,
   actionAlignRight,
-} from "../actions";
-import { defaultLang, setLanguage } from "../i18n";
-import { Excalidraw } from "../index";
+} from "@excalidraw/excalidraw/actions";
+import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
+import { Excalidraw } from "@excalidraw/excalidraw";
 
-import { API } from "./helpers/api";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { act, unmountComponent, render } from "./test-utils";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
+import {
+  act,
+  unmountComponent,
+  render,
+} from "@excalidraw/excalidraw/tests/test-utils";
 
 const mouse = new Pointer("mouse");
 

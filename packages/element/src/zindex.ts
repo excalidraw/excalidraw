@@ -6,15 +6,16 @@ import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
+import { getSelectedElements } from "@excalidraw/excalidraw/scene";
+
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
 } from "@excalidraw/element/types";
 
-import { getSelectedElements } from "./scene";
-import Scene from "./scene/Scene";
+import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { AppState } from "./types";
+import Scene from "../../excalidraw/scene/Scene";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
   return element.frameId === frameId || element.id === frameId;

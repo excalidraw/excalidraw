@@ -1,14 +1,6 @@
-import React from "react";
-
 import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
 
 import { reseed } from "@excalidraw/common";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawFrameElement,
-  ExcalidrawSelectionElement,
-} from "@excalidraw/element/types";
 
 import {
   actionSendBackward,
@@ -16,14 +8,25 @@ import {
   actionBringToFront,
   actionSendToBack,
   actionDuplicateSelection,
-} from "../actions";
+} from "@excalidraw/excalidraw/actions";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "@excalidraw/excalidraw";
 
-import { API } from "./helpers/api";
-import { act, getCloneByOrigId, render, unmountComponent } from "./test-utils";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import {
+  act,
+  getCloneByOrigId,
+  render,
+  unmountComponent,
+} from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { AppState } from "../types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawFrameElement,
+  ExcalidrawSelectionElement,
+} from "@excalidraw/element/types";
+
+import type { AppState } from "@excalidraw/excalidraw/types";
 
 unmountComponent();
 

@@ -7,7 +7,7 @@ import { getMaximumGroups } from "@excalidraw/element/groups";
 import type { BoundingBox } from "@excalidraw/element/bounds";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "./scene/Scene";
+import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
 export interface Alignment {
   position: "start" | "center" | "end";

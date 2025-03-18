@@ -6,9 +6,12 @@ import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/fra
 
 import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
+import { alignElements } from "@excalidraw/element/align";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { alignElements } from "../align";
+import type { Alignment } from "@excalidraw/element/align";
+
 import { ToolButton } from "../components/ToolButton";
 import {
   AlignBottomIcon,
@@ -26,7 +29,6 @@ import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { Alignment } from "../align";
 import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 export const alignActionsPredicate = (

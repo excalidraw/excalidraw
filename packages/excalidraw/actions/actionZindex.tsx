@@ -1,6 +1,13 @@
 import { KEYS, CODES, getShortcutKey, isDarwin } from "@excalidraw/common";
 
 import {
+  moveOneLeft,
+  moveOneRight,
+  moveAllLeft,
+  moveAllRight,
+} from "@excalidraw/element/zindex";
+
+import {
   BringForwardIcon,
   BringToFrontIcon,
   SendBackwardIcon,
@@ -8,12 +15,6 @@ import {
 } from "../components/icons";
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
-import {
-  moveOneLeft,
-  moveOneRight,
-  moveAllLeft,
-  moveAllRight,
-} from "../zindex";
 
 import { register } from "./register";
 

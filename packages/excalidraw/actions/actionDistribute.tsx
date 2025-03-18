@@ -6,14 +6,17 @@ import { CODES, KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
 
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
 
+import { distributeElements } from "@excalidraw/element/distribute";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Distribution } from "@excalidraw/element/distribute";
 
 import { ToolButton } from "../components/ToolButton";
 import {
   DistributeHorizontallyIcon,
   DistributeVerticallyIcon,
 } from "../components/icons";
-import { distributeElements } from "../distribute";
 
 import { t } from "../i18n";
 
@@ -21,8 +24,6 @@ import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
-
-import type { Distribution } from "../distribute";
 
 import type { AppClassProperties, AppState } from "../types";
 
