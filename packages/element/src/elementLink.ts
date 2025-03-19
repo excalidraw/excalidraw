@@ -2,14 +2,12 @@
  * Create and link between shapes.
  */
 
-import {
-  ELEMENT_LINK_KEY,
-  normalizeLink,
-  elementsAreInSameGroup,
-} from "@excalidraw/common";
+import { ELEMENT_LINK_KEY, normalizeLink } from "@excalidraw/common";
 
 import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { elementsAreInSameGroup } from "./groups";
 
 export const defaultGetElementLinkFromSelection: Exclude<
   AppProps["generateLinkForSelection"],

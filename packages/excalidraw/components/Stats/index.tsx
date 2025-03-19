@@ -3,12 +3,14 @@ import clsx from "clsx";
 import throttle from "lodash.throttle";
 import { useEffect, useMemo, useState, memo } from "react";
 
-import { STATS_PANELS, elementsAreInSameGroup } from "@excalidraw/common";
+import { STATS_PANELS } from "@excalidraw/common";
 import { getCommonBounds } from "@excalidraw/element/bounds";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
 import { isElbowArrow, isImageElement } from "@excalidraw/element/typeChecks";
 
 import { frameAndChildrenSelectedTogether } from "@excalidraw/element/frame";
+
+import { elementsAreInSameGroup } from "@excalidraw/element/groups";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 

@@ -360,3 +360,42 @@ export const getNonDeletedGroupIds = (elements: ElementsMap) => {
 
   return nonDeletedGroupIds;
 };
+
+export const elementsAreInSameGroup = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const allGroups = elements.flatMap((element) => element.groupIds);
+  const groupCount = new Map<string, number>();
+  let maxGroup = 0;
+
+  for (const group of allGroups) {
+    groupCount.set(group, (groupCount.get(group) ?? 0) + 1);
+    if (groupCount.get(group)! > maxGroup) {
+      maxGroup = groupCount.get(group)!;
+    }
+  }
+
+  return maxGroup === elements.length;
+};
+
+export const isInGroup = (element: NonDeletedExcalidrawElement) => {
+  return element.groupIds.length > 0;
+};
+
+export const getNewGroupIdsForDuplication = (
+  groupIds: ExcalidrawElement["groupIds"],
+  editingGroupId: AppState["editingGroupId"],
+  mapper: (groupId: GroupId) => GroupId,
+) => {
+  const copy = [...groupIds];
+  const positionOfEditingGroupId = editingGroupId
+    ? groupIds.indexOf(editingGroupId)
+    : -1;
+  const endIndex =
+    positionOfEditingGroupId > -1 ? positionOfEditingGroupId : groupIds.length;
+  for (let index = 0; index < endIndex; index++) {
+    copy[index] = mapper(copy[index]);
+  }
+
+  return copy;
+};
