@@ -5,11 +5,10 @@ import { getElementBounds } from "@excalidraw/element";
 
 import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
 
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
-import { getLineHeight } from "../fonts/FontMetadata";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";

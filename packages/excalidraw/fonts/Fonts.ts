@@ -10,7 +10,13 @@ import { getContainerElement } from "@excalidraw/element/textElement";
 import { charWidth } from "@excalidraw/element/textMeasurements";
 import { containsCJK } from "@excalidraw/element/textWrapping";
 
-import { getFontString, PromisePool, promiseTry } from "@excalidraw/common";
+import {
+  FONT_METADATA,
+  type FontMetadata,
+  getFontString,
+  PromisePool,
+  promiseTry,
+} from "@excalidraw/common";
 
 import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
@@ -26,7 +32,6 @@ import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
 import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 import { ExcalifontFontFaces } from "./Excalifont";
-import { FONT_METADATA, type FontMetadata } from "./FontMetadata";
 import { HelveticaFontFaces } from "./Helvetica";
 import { LiberationFontFaces } from "./Liberation";
 import { LilitaFontFaces } from "./Lilita";

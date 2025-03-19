@@ -13,6 +13,7 @@ import {
   distance,
   getFontString,
   isRTL,
+  getVerticalOffset,
 } from "@excalidraw/common";
 import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 import { getUncroppedImageElement } from "@excalidraw/element/cropElement";
@@ -38,8 +39,6 @@ import {
 import { getContainingFrame } from "@excalidraw/element/frame";
 import { getCornerRadius } from "@excalidraw/element/shapes";
 
-// TODO_SEP: consider separating
-import { getVerticalOffset } from "@excalidraw/excalidraw/fonts/FontMetadata";
 
 import type {
   ExcalidrawElement,

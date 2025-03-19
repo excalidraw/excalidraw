@@ -13,6 +13,7 @@ import {
   getFontString,
   isDevEnv,
   toBrandedType,
+  getLineHeight,
 } from "@excalidraw/common";
 import {
   getCommonBounds,
@@ -60,8 +61,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
-
-import { getLineHeight } from "../fonts/FontMetadata";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";

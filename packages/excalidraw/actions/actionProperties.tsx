@@ -19,6 +19,7 @@ import {
   getFontFamilyString,
   getShortcutKey,
   tupleToCoors,
+  getLineHeight,
 } from "@excalidraw/common";
 
 import {
@@ -121,7 +122,6 @@ import {
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
-import { getLineHeight } from "../fonts/FontMetadata";
 import { getLanguage, t } from "../i18n";
 import {
   canHaveArrowheads,

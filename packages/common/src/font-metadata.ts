@@ -5,15 +5,6 @@ import type {
   FontFamilyValues,
 } from "@excalidraw/element/types";
 
-import {
-  FreedrawIcon,
-  FontFamilyNormalIcon,
-  FontFamilyHeadingIcon,
-  FontFamilyCodeIcon,
-} from "../components/icons";
-
-import type { JSX } from "react";
-
 /**
  * Encapsulates font metrics with additional font metadata.
  * */
@@ -29,8 +20,6 @@ export interface FontMetadata {
     /** harcoded unitless line-height, https://github.com/excalidraw/excalidraw/pull/6360#issuecomment-1477635971 */
     lineHeight: number;
   };
-  /** element to be displayed as an icon  */
-  icon?: JSX.Element;
   /** flag to indicate a deprecated font */
   deprecated?: true;
   /** flag to indicate a server-side only font */
@@ -49,7 +38,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -374,
       lineHeight: 1.25,
     },
-    icon: FreedrawIcon,
   },
   [FONT_FAMILY.Nunito]: {
     metrics: {
@@ -58,7 +46,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -353,
       lineHeight: 1.35,
     },
-    icon: FontFamilyNormalIcon,
   },
   [FONT_FAMILY["Lilita One"]]: {
     metrics: {
@@ -67,7 +54,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -220,
       lineHeight: 1.15,
     },
-    icon: FontFamilyHeadingIcon,
   },
   [FONT_FAMILY["Comic Shanns"]]: {
     metrics: {
@@ -76,7 +62,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -250,
       lineHeight: 1.25,
     },
-    icon: FontFamilyCodeIcon,
   },
   [FONT_FAMILY.Virgil]: {
     metrics: {
@@ -85,7 +70,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -374,
       lineHeight: 1.25,
     },
-    icon: FreedrawIcon,
     deprecated: true,
   },
   [FONT_FAMILY.Helvetica]: {
@@ -95,7 +79,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -471,
       lineHeight: 1.15,
     },
-    icon: FontFamilyNormalIcon,
     deprecated: true,
     local: true,
   },
@@ -106,7 +89,6 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -480,
       lineHeight: 1.2,
     },
-    icon: FontFamilyCodeIcon,
     deprecated: true,
   },
   [FONT_FAMILY["Liberation Sans"]]: {

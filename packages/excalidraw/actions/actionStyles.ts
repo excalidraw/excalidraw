@@ -4,6 +4,7 @@ import {
   DEFAULT_TEXT_ALIGN,
   CODES,
   KEYS,
+  getLineHeight,
 } from "@excalidraw/common";
 
 import {
@@ -28,7 +29,6 @@ import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { paintIcon } from "../components/icons";
 
-import { getLineHeight } from "../fonts/FontMetadata";
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../store";

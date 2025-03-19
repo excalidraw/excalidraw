@@ -16,6 +16,7 @@ import {
   arrayToMap,
   getSizeFromPoints,
   normalizeLink,
+  getLineHeight,
 } from "@excalidraw/common";
 import {
   getNonDeletedElements,
@@ -65,7 +66,6 @@ import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
 
 import { getDefaultAppState } from "../appState";
 
-import { getLineHeight } from "../fonts/FontMetadata";
 import {
   getNormalizedGridSize,
   getNormalizedGridStep,

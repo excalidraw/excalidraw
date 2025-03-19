@@ -8,14 +8,12 @@ import {
   VERTICAL_ALIGN,
   randomInteger,
   randomId,
-  getNewGroupIdsForDuplication,
   arrayToMap,
   getFontString,
   getUpdatedTimestamp,
   isTestEnv,
+  getLineHeight
 } from "@excalidraw/common";
-
-import { getLineHeight } from "@excalidraw/excalidraw/fonts/FontMetadata";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -32,6 +30,7 @@ import { bumpVersion, newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+import { getNewGroupIdsForDuplication } from "./groups";
 
 import { getElementAbsoluteCoords } from ".";
 

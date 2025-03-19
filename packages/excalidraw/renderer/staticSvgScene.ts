@@ -6,6 +6,7 @@ import {
   getFontFamilyString,
   isRTL,
   isTestEnv,
+  getVerticalOffset,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { getElementAbsoluteCoords, hashString } from "@excalidraw/element";
@@ -43,8 +44,6 @@ import type {
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
-
-import { getVerticalOffset } from "../fonts/FontMetadata";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";

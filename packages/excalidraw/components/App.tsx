@@ -72,6 +72,7 @@ import {
   normalizeLink,
   toValidURL,
   getGridPoint,
+  getLineHeight,
   type EXPORT_IMAGE_TYPES,
 } from "@excalidraw/common";
 
@@ -424,7 +425,6 @@ import {
 } from "../components/hyperlink/Hyperlink";
 
 import { Fonts } from "../fonts";
-import { getLineHeight } from "../fonts/FontMetadata";
 import { editorJotaiStore } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
