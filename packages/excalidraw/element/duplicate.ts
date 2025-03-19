@@ -129,6 +129,15 @@ export const duplicateElements = (
     opts?.idsOfElementsToDuplicate ??
     new Map(elements.map((el) => [el.id, el]));
 
+  // For sanity
+  if (opts?.appState?.selectedGroupIds) {
+    for (const groupId of Object.keys(opts.appState.selectedGroupIds)) {
+      elements
+        .filter((el) => el.groupIds?.includes(groupId))
+        .forEach((el) => _idsOfElementsToDuplicate.set(el.id, el));
+    }
+  }
+
   elements = normalizeElementOrder(elements);
 
   const elementsWithClones: ExcalidrawElement[] = elements.slice();
