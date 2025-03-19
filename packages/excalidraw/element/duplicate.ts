@@ -193,8 +193,18 @@ export const duplicateElements = (
       return;
     }
 
+    if (opts?.reverseOrder && index < 1) {
+      elementsWithClones.unshift(...castArray(elements));
+      return;
+    }
+
+    if (!opts?.reverseOrder && index > elementsWithClones.length - 1) {
+      elementsWithClones.push(...castArray(elements));
+      return;
+    }
+
     elementsWithClones.splice(
-      Math.max(index + (!!opts?.reverseOrder ? -1 : 1), 0),
+      index + (!!opts?.reverseOrder ? 0 : 1),
       0,
       ...castArray(elements),
     );
@@ -278,7 +288,7 @@ export const duplicateElements = (
 
       if (boundTextElement) {
         insertAfterIndex(
-          targetIndex,
+          targetIndex + (!!opts?.reverseOrder ? -1 : 0),
           copyElements([element, boundTextElement]),
         );
       } else {
