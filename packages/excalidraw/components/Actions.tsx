@@ -368,7 +368,15 @@ export const ShapesSwitcher = ({
           onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
           title={t("toolBar.extraTools")}
         >
-          {extraToolsIcon}
+          {frameToolSelected
+            ? frameToolIcon
+            : embeddableToolSelected
+            ? EmbedIcon
+            : laserToolSelected && !app.props.isCollaborating
+            ? laserPointerToolIcon
+            : lassoToolSelected
+            ? LassoIcon
+            : extraToolsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}
