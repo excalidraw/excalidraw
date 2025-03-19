@@ -1,16 +1,20 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { FONT_FAMILY } from "../constants";
+import { FONT_FAMILY, ORIG_ID } from "../constants";
 import { Excalidraw } from "../index";
 import { CODES, KEYS } from "../keys";
 import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
 import { setDateTimeForTests } from "../utils";
 
+import { actionDuplicateSelection } from "../actions";
+
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
+  act,
+  assertElements,
   assertSelectedElements,
   fireEvent,
   render,
@@ -1184,3 +1188,139 @@ it(
     expect(API.getSelectedElements().length).toBe(1);
   },
 );
+
+describe("duplication z-order", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("duplication z order with Cmd+D for the lowest z-ordered element should be +1 for the clone", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+    });
+    const rectangle3 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+    });
+
+    API.setElements([rectangle1, rectangle2, rectangle3]);
+    API.setSelectedElements([rectangle1]);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { [ORIG_ID]: rectangle1.id, selected: true },
+      { id: rectangle2.id },
+      { id: rectangle3.id },
+    ]);
+  });
+
+  it("duplication z order with Cmd+D  for the highest z-ordered element should be +1 for the clone", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+    });
+    const rectangle3 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+    });
+
+    API.setElements([rectangle1, rectangle2, rectangle3]);
+    API.setSelectedElements([rectangle3]);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { id: rectangle3.id },
+      { [ORIG_ID]: rectangle3.id, selected: true },
+    ]);
+  });
+
+  it("duplication z order with alt+drag for the lowest z-ordered element should be +1 for the clone", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+    });
+    const rectangle3 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+    });
+
+    API.setElements([rectangle1, rectangle2, rectangle3]);
+
+    mouse.select(rectangle1);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle1.x + 5, rectangle1.y + 5);
+      mouse.up(rectangle1.x + 5, rectangle1.y + 5);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: rectangle1.id },
+      { id: rectangle1.id, selected: true },
+      { id: rectangle2.id },
+      { id: rectangle3.id },
+    ]);
+  });
+
+  it("duplication z order with alt+drag for the highest z-ordered element should be +1 for the clone", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+    });
+    const rectangle3 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+    });
+
+    API.setElements([rectangle1, rectangle2, rectangle3]);
+
+    mouse.select(rectangle3);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle3.x + 5, rectangle3.y + 5);
+      mouse.up(rectangle3.x + 5, rectangle3.y + 5);
+    });
+
+    assertElements(h.elements, [
+      { id: rectangle1.id },
+      { id: rectangle2.id },
+      { [ORIG_ID]: rectangle3.id },
+      { id: rectangle3.id, selected: true },
+    ]);
+  });
+});
