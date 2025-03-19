@@ -174,7 +174,7 @@ describe("duplicate element on move when ALT is clicked", () => {
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
 
-    // behavior should be the same as Ctrl+D
+    // previous element should stay intact
     expect([h.elements[0].x, h.elements[0].y]).toEqual([30, 20]);
     expect([h.elements[1].x, h.elements[1].y]).toEqual([-10, 60]);
 

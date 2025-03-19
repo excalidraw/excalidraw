@@ -21,7 +21,6 @@ import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "./element/types";
-
 import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
