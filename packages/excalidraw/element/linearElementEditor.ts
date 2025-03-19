@@ -25,11 +25,16 @@ import {
 import { getGridPoint } from "../snapping";
 import { invariant, tupleToCoors } from "../utils";
 
+import Scene from "../scene/Scene";
+
 import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
+
+import { updateElbowArrowPoints } from "./elbowArrow";
+
 import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
@@ -57,7 +62,6 @@ import type {
   FixedSegment,
   ExcalidrawElbowArrowElement,
 } from "./types";
-import type Scene from "../scene/Scene";
 import type { Store } from "../store";
 import type {
   AppState,
@@ -67,6 +71,7 @@ import type {
   NullableGridSize,
   Zoom,
 } from "../types";
+
 import type { Mutable } from "../utility-types";
 
 const editorMidPointsCache: {
@@ -1274,6 +1279,7 @@ export class LinearElementEditor {
       startBinding?: PointBinding | null;
       endBinding?: PointBinding | null;
     },
+    sceneElementsMap?: NonDeletedSceneElementsMap,
   ) {
     const { points } = element;
 
@@ -1317,6 +1323,7 @@ export class LinearElementEditor {
             dragging || targetPoint.isDragging === true,
           false,
         ),
+        sceneElementsMap,
       },
     );
   }
@@ -1430,6 +1437,7 @@ export class LinearElementEditor {
     options?: {
       isDragging?: boolean;
       zoom?: AppState["zoom"];
+      sceneElementsMap?: NonDeletedSceneElementsMap;
     },
   ) {
     if (isElbowArrow(element)) {
@@ -1455,9 +1463,26 @@ export class LinearElementEditor {
 
       updates.points = Array.from(nextPoints);
 
-      mutateElement(element, updates, true, {
-        isDragging: options?.isDragging,
-      });
+      if (!options?.sceneElementsMap || Scene.getScene(element)) {
+        mutateElement(element, updates, true, {
+          isDragging: options?.isDragging,
+        });
+      } else {
+        // The element is not in the scene, so we need to use the provided
+        // scene map.
+        Object.assign(element, {
+          ...updates,
+          angle: 0 as Radians,
+          ...updateElbowArrowPoints(
+            element,
+            options.sceneElementsMap,
+            updates,
+            {
+              isDragging: options?.isDragging,
+            },
+          ),
+        });
+      }
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
       const prevCoords = getElementPointsCoords(element, element.points);

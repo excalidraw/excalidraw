@@ -839,14 +839,19 @@ export const updateBoundElements = (
       }> => update !== null,
     );
 
-    LinearElementEditor.movePoints(element, updates, {
-      ...(changedElement.id === element.startBinding?.elementId
-        ? { startBinding: bindings.startBinding }
-        : {}),
-      ...(changedElement.id === element.endBinding?.elementId
-        ? { endBinding: bindings.endBinding }
-        : {}),
-    });
+    LinearElementEditor.movePoints(
+      element,
+      updates,
+      {
+        ...(changedElement.id === element.startBinding?.elementId
+          ? { startBinding: bindings.startBinding }
+          : {}),
+        ...(changedElement.id === element.endBinding?.elementId
+          ? { endBinding: bindings.endBinding }
+          : {}),
+      },
+      elementsMap as NonDeletedSceneElementsMap,
+    );
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {

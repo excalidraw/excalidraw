@@ -984,7 +984,7 @@ export const updateElbowArrowPoints = (
       : updates.points.slice()
     : arrow.points.slice();
 
-  // 0. During all element replacement in the scene, we just need to renormalize
+  // During all element replacement in the scene, we just need to renormalize
   // the arrow
   // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
   const {
@@ -1005,11 +1005,12 @@ export const updateElbowArrowPoints = (
     getBindableElementForId(startBinding.elementId, elementsMap);
   const endElement =
     endBinding && getBindableElementForId(endBinding.elementId, elementsMap);
+  const areUpdatedPointsValid = validateElbowPoints(updatedPoints);
 
   if (
-    (startBinding && !startElement) ||
-    (endBinding && !endElement) ||
-    (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) ||
+    (startBinding && !startElement && areUpdatedPointsValid) ||
+    (endBinding && !endElement && areUpdatedPointsValid) ||
+    (elementsMap.size === 0 && areUpdatedPointsValid) ||
     (Object.keys(restOfTheUpdates).length === 0 &&
       (startElement?.id !== startBinding?.elementId ||
         endElement?.id !== endBinding?.elementId))
@@ -1050,7 +1051,7 @@ export const updateElbowArrowPoints = (
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
   // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
-  if (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) {
+  if (elementsMap.size === 0 && areUpdatedPointsValid) {
     return normalizeArrowElementUpdate(
       updatedPoints.map((p) =>
         pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
@@ -1083,7 +1084,7 @@ export const updateElbowArrowPoints = (
         arrow.points[i] ?? pointFrom<LocalPoint>(Infinity, Infinity),
       ),
     ) &&
-    validateElbowPoints(updatedPoints)
+    areUpdatedPointsValid
   ) {
     return {};
   }
