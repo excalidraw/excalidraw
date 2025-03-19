@@ -285,7 +285,7 @@ describe("duplicating multiple elements", () => {
 
     const arrow3 = API.createElement({
       type: "arrow",
-      id: "arrow2",
+      id: "arrow3",
       startBinding: {
         elementId: "rectangle-not-exists",
         focus: 0.2,
@@ -306,6 +306,7 @@ describe("duplicating multiple elements", () => {
     const { newElements: clonedElements } = duplicateElements(
       origElements,
     ) as any as { newElements: typeof origElements };
+
     const [
       clonedRectangle,
       clonedText1,
@@ -325,7 +326,6 @@ describe("duplicating multiple elements", () => {
       elementId: clonedRectangle.id,
     });
     expect(clonedArrow2.endBinding).toBe(null);
-    console.log(clonedArrow3);
     expect(clonedArrow3.startBinding).toBe(null);
     expect(clonedArrow3.endBinding).toEqual({
       ...arrow3.endBinding,
