@@ -254,7 +254,7 @@ describe("actionDuplicateSelection", () => {
       act(() => {
         h.app.actionManager.executeAction(actionDuplicateSelection);
       });
-      console.log(h.elements, h.state.selectedElementIds);
+
       assertElements(h.elements, [
         { id: frame.id },
         { id: text.id, frameId: frame.id },
