@@ -194,7 +194,7 @@ export const duplicateElements = (
     }
 
     elementsWithClones.splice(
-      index + (opts?.reverseOrder ? 0 : +1),
+      index + (opts?.reverseOrder ? -1 : +1),
       0,
       ...castArray(elements),
     );
