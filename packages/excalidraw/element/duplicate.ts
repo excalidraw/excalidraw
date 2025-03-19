@@ -245,9 +245,13 @@ export const duplicateElements = (
             : [element],
       );
 
-      const targetIndex = findLastIndex(elementsWithClones, (el) => {
-        return el.groupIds?.includes(groupId);
-      });
+      const targetIndex = opts?.reverseOrder
+        ? elementsWithClones.findIndex((el) => {
+            return el.groupIds?.includes(groupId);
+          })
+        : findLastIndex(elementsWithClones, (el) => {
+            return el.groupIds?.includes(groupId);
+          });
 
       insertBeforeOrAfterIndex(targetIndex, copyElements(groupElements));
       continue;
