@@ -194,7 +194,7 @@ export const duplicateElements = (
     }
 
     elementsWithClones.splice(
-      index + (opts?.reverseOrder ? -1 : +1),
+      Math.max(index + (!!opts?.reverseOrder ? -1 : 1), 0),
       0,
       ...castArray(elements),
     );
