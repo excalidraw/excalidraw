@@ -391,7 +391,7 @@ import {
   getMinTextElementWidth,
 } from "../element/textMeasurements";
 
-import ShapeSwitch from "./ShapeSwitch";
+import ShapeSwitch, { shapeSwitchAtom } from "./ShapeSwitch";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -4113,47 +4113,25 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements.length === 1 &&
           (isGenericSwitchable || isLinearSwitchable)
         ) {
-          if (this.state.showShapeSwitchPanel && event.key === KEYS.ESCAPE) {
-            this.setState({
-              showShapeSwitchPanel: false,
-            });
+          if (event.key === KEYS.ESCAPE) {
+            editorJotaiStore.set(shapeSwitchAtom, null);
+          } else if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
+            editorJotaiStore.set(shapeSwitchAtom, "panel");
 
-            return;
-          }
-
-          if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
-            if (!this.state.showShapeSwitchPanel) {
-              flushSync(() =>
-                this.setState({
-                  showShapeSwitchPanel: true,
-                }),
+            if (isGenericSwitchable) {
+              const index = ["rectangle", "diamond", "ellipse"].indexOf(
+                selectedElements[0].type,
               );
+              const nextType = ["rectangle", "diamond", "ellipse"][
+                (index + 1) % 3
+              ] as ToolType;
+              this.setActiveTool({ type: nextType });
+            } else if (isLinearSwitchable) {
+              const index = ["arrow", "line"].indexOf(selectedElements[0].type);
+              const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
+              this.setActiveTool({ type: nextType });
             }
-
-            if (this.state.showShapeSwitchPanel) {
-              if (isGenericSwitchable) {
-                const index = ["rectangle", "diamond", "ellipse"].indexOf(
-                  selectedElements[0].type,
-                );
-                const nextType = ["rectangle", "diamond", "ellipse"][
-                  (index + 1) % 3
-                ] as ToolType;
-                this.setActiveTool({ type: nextType });
-              } else if (isLinearSwitchable) {
-                const index = ["arrow", "line"].indexOf(
-                  selectedElements[0].type,
-                );
-                const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
-                this.setActiveTool({ type: nextType });
-              }
-            }
-
-            return;
           }
-
-          this.setState({
-            showShapeSwitchPanel: false,
-          });
         }
 
         if (
@@ -4717,6 +4695,8 @@ class App extends React.Component<AppProps, AppState> {
               canvasOffsets: this.getEditorUIOffsets(),
             });
           }
+
+          editorJotaiStore.set(shapeSwitchAtom, "hint");
         }
 
         this.flowChartCreator.clear();
@@ -8985,7 +8965,6 @@ class App extends React.Component<AppProps, AppState> {
         cursorButton: "up",
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
-        showShapeSwitchPanel: false,
       }));
 
       this.lastPointerMoveCoords = null;

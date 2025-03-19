@@ -4,16 +4,13 @@ import clsx from "clsx";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
+import { editorJotaiStore, atom } from "../editor-jotai";
+
 import { getElementAbsoluteCoords } from "../element";
 import { sceneCoordsToViewportCoords } from "../utils";
 import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
-import {
-  isArrowElement,
-  isGenericSwitchableElement,
-  isLinearElement,
-  isLinearSwitchableElement,
-} from "../element/typeChecks";
+import { isArrowElement, isLinearElement } from "../element/typeChecks";
 import { t } from "../i18n";
 
 import "./ShapeSwitch.scss";
@@ -34,48 +31,29 @@ import type { ToolType } from "../types";
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
 
+export const shapeSwitchAtom = atom<"hint" | "panel" | null>(null);
+
 const ShapeSwitch = ({ app }: { app: App }) => {
+  const shapeSwitchAtomValue = editorJotaiStore.get(shapeSwitchAtom);
+
+  if (!shapeSwitchAtomValue) {
+    return null;
+  }
+
   const selectedElements = getSelectedElements(
     app.scene.getNonDeletedElementsMap(),
     app.state,
   );
   const firstElement = selectedElements[0];
 
-  useEffect(() => {
-    return app.setState({ showShapeSwitchPanel: false });
-  }, [app]);
-
-  const isGeneric = firstElement && isGenericSwitchableElement(firstElement);
-  const isLinear = firstElement && isLinearSwitchableElement(firstElement);
-  const isGenericInChart =
-    isGeneric &&
-    app.scene
-      .getNonDeletedElements()
-      .some(
-        (el) =>
-          el.type === "arrow" &&
-          (el.startBinding?.elementId === firstElement.id ||
-            el.endBinding?.elementId === firstElement.id),
-      );
-  const isLinearInChart =
-    isLinear &&
-    isArrowElement(firstElement) &&
-    (firstElement.startBinding || firstElement.endBinding);
-
   if (firstElement && selectedElements.length === 1) {
-    if (isGeneric) {
-      return app.state.showShapeSwitchPanel ? (
-        <Panel app={app} element={firstElement} />
-      ) : isGenericInChart ? (
-        <Hint app={app} element={firstElement} />
-      ) : null;
-    }
-    if (isLinear) {
-      return app.state.showShapeSwitchPanel ? (
-        <Panel app={app} element={firstElement} />
-      ) : isLinearInChart ? (
-        <Hint app={app} element={firstElement} />
-      ) : null;
+    switch (shapeSwitchAtomValue) {
+      case "hint":
+        return <Hint app={app} element={firstElement} />;
+      case "panel":
+        return <Panel app={app} element={firstElement} />;
+      default:
+        return null;
     }
   }
 
@@ -109,9 +87,14 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
       hintRef.current?.classList.remove("animation");
     };
 
-    if (hintRef.current) {
-      hintRef.current.addEventListener("animationend", listener);
+    const hint = hintRef.current;
+
+    if (hint) {
+      hint.addEventListener("animationend", listener);
+      editorJotaiStore.set(shapeSwitchAtom, null);
     }
+
+    return () => hint?.removeEventListener("animationend", listener);
   }, [element.id]);
 
   return (
@@ -170,6 +153,12 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
         ["diamond", "3", DiamondIcon],
         ["ellipse", "4", EllipseIcon],
       ];
+
+  useEffect(() => {
+    return () => {
+      editorJotaiStore.set(shapeSwitchAtom, null);
+    };
+  }, []);
 
   return (
     <div
