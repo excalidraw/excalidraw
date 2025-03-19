@@ -1323,4 +1323,75 @@ describe("duplication z-order", () => {
       { id: rectangle3.id, selected: true },
     ]);
   });
+
+  it("duplication z order with alt+drag for the lowest z-ordered element should be +1 for the clone", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+    });
+    const rectangle3 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+    });
+
+    API.setElements([rectangle1, rectangle2, rectangle3]);
+
+    mouse.select(rectangle1);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle1.x + 5, rectangle1.y + 5);
+      mouse.up(rectangle1.x + 5, rectangle1.y + 5);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: rectangle1.id },
+      { id: rectangle1.id, selected: true },
+      { id: rectangle2.id },
+      { id: rectangle3.id },
+    ]);
+  });
+
+  it("duplication z order with alt+drag with grouped elements should consider the group together when determining z-index", () => {
+    const rectangle1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["group1"],
+    });
+    const rectangle2 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      groupIds: ["group1"],
+    });
+    const rectangle3 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+      groupIds: ["group1"],
+    });
+
+    API.setElements([rectangle1, rectangle2, rectangle3]);
+
+    mouse.select(rectangle1);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle1.x + 5, rectangle1.y + 5);
+      mouse.up(rectangle1.x + 15, rectangle1.y + 15);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: rectangle1.id },
+      { [ORIG_ID]: rectangle2.id },
+      { [ORIG_ID]: rectangle3.id },
+      { id: rectangle1.id, selected: true },
+      { id: rectangle2.id, selected: true },
+      { id: rectangle3.id, selected: true },
+    ]);
+  });
 });
