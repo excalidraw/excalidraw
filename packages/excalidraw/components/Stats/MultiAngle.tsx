@@ -1,11 +1,11 @@
-import { isInGroup } from "@excalidraw/common";
-
 import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 
 import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { isArrowElement } from "@excalidraw/element/typeChecks";
+
+import { isInGroup } from "@excalidraw/element/groups";
 
 import type { Degrees } from "@excalidraw/math";
 

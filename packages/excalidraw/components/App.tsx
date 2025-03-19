@@ -289,6 +289,11 @@ import {
   syncMovedIndices,
 } from "@excalidraw/element/fractionalIndex";
 
+import {
+  excludeElementsInFramesFromSelection,
+  makeNextSelectedElementIds,
+} from "@excalidraw/element/selection";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -420,10 +425,6 @@ import {
 
 import { Fonts } from "../fonts";
 import { getLineHeight } from "../fonts/FontMetadata";
-import {
-  excludeElementsInFramesFromSelection,
-  makeNextSelectedElementIds,
-} from "../scene/selection";
 import { editorJotaiStore } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {

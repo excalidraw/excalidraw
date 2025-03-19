@@ -1,4 +1,4 @@
-import { makeNextSelectedElementIds } from "./selection";
+import { makeNextSelectedElementIds } from "../src/selection";
 
 describe("makeNextSelectedElementIds", () => {
   const _makeNextSelectedElementIds = (

@@ -4,7 +4,7 @@ export {
   getCommonAttributeOfSelectedElements,
   getSelectedElements,
   getTargetElements,
-} from "./selection";
+} from "@excalidraw/element/selection";
 export { calculateScrollCenter } from "./scroll";
 export {
   hasBackground,

@@ -1,8 +1,5 @@
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 
-import { getSelectedElements } from "@excalidraw/excalidraw/scene";
-import { makeNextSelectedElementIds } from "@excalidraw/excalidraw/scene/selection";
-
 import type {
   GroupId,
   ExcalidrawElement,
@@ -18,6 +15,8 @@ import type {
   InteractiveCanvasAppState,
 } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
+
+import { makeNextSelectedElementIds, getSelectedElements } from "./selection";
 
 export const selectGroup = (
   groupId: GroupId,

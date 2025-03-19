@@ -1,6 +1,6 @@
-import { getSelectedElements } from "@excalidraw/excalidraw/scene";
-
 import type { UIAppState } from "@excalidraw/excalidraw/types";
+
+import { getSelectedElements } from "./selection";
 
 import type { NonDeletedExcalidrawElement } from "./types";
 

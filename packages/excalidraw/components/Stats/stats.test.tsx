@@ -5,7 +5,9 @@ import { vi } from "vitest";
 
 import { getCommonBounds, isTextElement } from "@excalidraw/element";
 
-import { setDateTimeForTests, isInGroup, reseed } from "@excalidraw/common";
+import { setDateTimeForTests, reseed } from "@excalidraw/common";
+
+import { isInGroup } from "@excalidraw/element/groups";
 
 import type { Degrees } from "@excalidraw/math";
 

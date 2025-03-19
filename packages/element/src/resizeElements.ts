@@ -11,7 +11,6 @@ import {
 import {
   MIN_FONT_SIZE,
   SHIFT_LOCKING_ANGLE,
-  isInGroup,
   rescalePoints,
   getFontString,
 } from "@excalidraw/common";
@@ -58,6 +57,8 @@ import {
   isLinearElement,
   isTextElement,
 } from "./typeChecks";
+
+import { isInGroup } from "./groups";
 
 import type { BoundingBox } from "./bounds";
 import type {

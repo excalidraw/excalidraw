@@ -1,4 +1,3 @@
-import { isInGroup } from "@excalidraw/common";
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
@@ -16,6 +15,7 @@ import {
 import {
   getSelectedGroupIds,
   getElementsInGroup,
+  isInGroup,
 } from "@excalidraw/element/groups";
 
 import type { Radians } from "@excalidraw/math";

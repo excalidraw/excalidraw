@@ -39,6 +39,11 @@ import {
   getElementsInGroup,
 } from "@excalidraw/element/groups";
 
+import {
+  excludeElementsInFramesFromSelection,
+  getSelectedElements,
+} from "@excalidraw/element/selection";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
@@ -46,10 +51,6 @@ import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import {
-  excludeElementsInFramesFromSelection,
-  getSelectedElements,
-} from "../scene/selection";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";

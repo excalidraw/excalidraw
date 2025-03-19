@@ -17,6 +17,8 @@ import {
   validateFractionalIndices,
 } from "@excalidraw/element/fractionalIndex";
 
+import { getSelectedElements } from "@excalidraw/element/selection";
+
 import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {
   ExcalidrawElement,
@@ -31,8 +33,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { Assert, SameType } from "@excalidraw/common/utility-types";
-
-import { getSelectedElements } from "./selection";
 
 import type { AppState } from "../types";
 

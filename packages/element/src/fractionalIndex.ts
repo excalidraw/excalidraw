@@ -12,7 +12,9 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { InvalidFractionalIndexError } from "../../excalidraw/errors";
+export class InvalidFractionalIndexError extends Error {
+  public code = "ELEMENT_HAS_INVALID_INDEX" as const;
+}
 
 /**
  * Envisioned relation between array order and fractional indices:

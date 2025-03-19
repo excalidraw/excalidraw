@@ -5,11 +5,6 @@ import {
   elementsOverlappingBBox,
 } from "@excalidraw/utils";
 
-import {
-  getElementsWithinSelection,
-  getSelectedElements,
-} from "@excalidraw/excalidraw/scene";
-
 import { getElementAbsoluteCoords, isTextElement } from "@excalidraw/element";
 
 import type {
@@ -31,6 +26,7 @@ import type {
 
 import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
+import { getElementsWithinSelection, getSelectedElements } from "./selection";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 
 import { getElementLineSegments, getCommonBounds } from "./bounds";

@@ -20,6 +20,11 @@ import {
 
 import { getMaximumGroups } from "@excalidraw/element/groups";
 
+import {
+  getSelectedElements,
+  getVisibleAndNonSelectedElements,
+} from "@excalidraw/element/selection";
+
 import type { InclusiveRange } from "@excalidraw/math";
 
 import type { Bounds } from "@excalidraw/element/bounds";
@@ -29,11 +34,6 @@ import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
-
-import {
-  getSelectedElements,
-  getVisibleAndNonSelectedElements,
-} from "./scene/selection";
 
 import type {
   AppClassProperties,

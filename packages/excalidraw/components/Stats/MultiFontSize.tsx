@@ -1,9 +1,9 @@
-import { isInGroup } from "@excalidraw/common";
-
 import { isTextElement, redrawTextBoundingBox } from "@excalidraw/element";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { hasBoundTextElement } from "@excalidraw/element/typeChecks";
+
+import { isInGroup } from "@excalidraw/element/groups";
 
 import type {
   ExcalidrawElement,
