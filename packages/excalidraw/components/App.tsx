@@ -8441,11 +8441,16 @@ class App extends React.Component<AppProps, AppState> {
                   selectedElements.map((el) => [el.id, el]),
                 ),
                 overrides: (el) => {
-                  const origEl = pointerDownState.originalElements.get(el.id)!;
-                  return {
-                    x: origEl.x,
-                    y: origEl.y,
-                  };
+                  const origEl = pointerDownState.originalElements.get(el.id);
+
+                  if (origEl) {
+                    return {
+                      x: origEl.x,
+                      y: origEl.y,
+                    };
+                  }
+
+                  return {};
                 },
                 reverseOrder: true,
               });

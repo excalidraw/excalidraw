@@ -183,7 +183,7 @@ export const duplicateElements = (
   };
 
   // Helper to position cloned elements in the Z-order the product needs it
-  const insertAfterIndex = (
+  const insertBeforeOrAfterIndex = (
     index: number,
     elements: ExcalidrawElement | null | ExcalidrawElement[],
   ) => {
@@ -249,7 +249,7 @@ export const duplicateElements = (
         return el.groupIds?.includes(groupId);
       });
 
-      insertAfterIndex(targetIndex, copyElements(groupElements));
+      insertBeforeOrAfterIndex(targetIndex, copyElements(groupElements));
       continue;
     }
 
@@ -269,7 +269,10 @@ export const duplicateElements = (
         return el.frameId === frameId || el.id === frameId;
       });
 
-      insertAfterIndex(targetIndex, copyElements([...frameChildren, element]));
+      insertBeforeOrAfterIndex(
+        targetIndex,
+        copyElements([...frameChildren, element]),
+      );
       continue;
     }
 
@@ -287,12 +290,12 @@ export const duplicateElements = (
       });
 
       if (boundTextElement) {
-        insertAfterIndex(
+        insertBeforeOrAfterIndex(
           targetIndex + (!!opts?.reverseOrder ? -1 : 0),
           copyElements([element, boundTextElement]),
         );
       } else {
-        insertAfterIndex(targetIndex, copyElements(element));
+        insertBeforeOrAfterIndex(targetIndex, copyElements(element));
       }
 
       continue;
@@ -306,9 +309,12 @@ export const duplicateElements = (
       });
 
       if (container) {
-        insertAfterIndex(targetIndex, copyElements([container, element]));
+        insertBeforeOrAfterIndex(
+          targetIndex,
+          copyElements([container, element]),
+        );
       } else {
-        insertAfterIndex(targetIndex, copyElements(element));
+        insertBeforeOrAfterIndex(targetIndex, copyElements(element));
       }
 
       continue;
@@ -317,7 +323,7 @@ export const duplicateElements = (
     // default duplication (regular elements)
     // -------------------------------------------------------------------------
 
-    insertAfterIndex(
+    insertBeforeOrAfterIndex(
       findLastIndex(elementsWithClones, (el) => el.id === element.id),
       copyElements(element),
     );
