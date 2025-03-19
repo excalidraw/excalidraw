@@ -197,7 +197,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "102.35417",
   "id": "id172",
   "index": "a2",
   "isDeleted": false,
@@ -211,8 +211,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      100,
-      0,
+      "101.77517",
+      "102.35417",
     ],
   ],
   "roughness": 1,
@@ -226,9 +226,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 40,
-  "width": 100,
-  "x": 0,
+  "version": 56,
+  "width": "101.77517",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -297,15 +297,15 @@ History {
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": 1,
+              "height": "0.98586",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  100,
-                  -1,
+                  "98.58579",
+                  "-0.98586",
                 ],
               ],
               "startBinding": {
@@ -320,15 +320,15 @@ History {
                 "focus": "-0.02000",
                 "gap": 1,
               },
-              "height": 0,
+              "height": "0.00000",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  100,
-                  0,
+                  "98.58579",
+                  "0.00000",
                 ],
               ],
               "startBinding": {
@@ -389,15 +389,15 @@ History {
                 "focus": 0,
                 "gap": 1,
               },
-              "height": 0,
+              "height": "102.35417",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  100,
-                  0,
+                  "101.77517",
+                  "102.35417",
                 ],
               ],
               "startBinding": null,
@@ -409,15 +409,15 @@ History {
                 "focus": "0.00990",
                 "gap": 1,
               },
-              "height": 1,
+              "height": "0.98586",
               "points": [
                 [
                   0,
                   0,
                 ],
                 [
-                  100,
-                  -1,
+                  "98.58579",
+                  "-0.98586",
                 ],
               ],
               "startBinding": {
@@ -425,7 +425,7 @@ History {
                 "focus": "0.02970",
                 "gap": 1,
               },
-              "y": 1,
+              "y": "0.99364",
             },
           },
           "id175" => Delta {
@@ -686,6 +686,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "selectedElementIds": {
     "id167": true,
   },
+  "selectedElementIds": {
+    "id167": true,
+  },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectionElement": null,
@@ -817,7 +820,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 30,
+  "version": 22,
   "width": 100,
   "x": 150,
   "y": 0,
@@ -852,7 +855,7 @@ History {
                   0,
                 ],
                 [
-                  100,
+                  0,
                   0,
                 ],
               ],
@@ -937,7 +940,7 @@ History {
                   0,
                 ],
                 [
-                  100,
+                  0,
                   0,
                 ],
               ],
@@ -1238,7 +1241,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 100,
+  "height": "1.30038",
   "id": "id178",
   "index": "Zz",
   "isDeleted": false,
@@ -1252,8 +1255,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      100,
-      100,
+      "98.58579",
+      "1.30038",
     ],
   ],
   "roughness": 1,
@@ -1275,9 +1278,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
-  "width": 100,
-  "x": 0,
+  "version": 15,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -1609,7 +1612,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 100,
+  "height": "1.30038",
   "id": "id181",
   "index": "a0",
   "isDeleted": false,
@@ -1623,8 +1626,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      100,
-      100,
+      "98.58579",
+      "1.30038",
     ],
   ],
   "roughness": 1,
@@ -1646,9 +1649,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
-  "width": 100,
-  "x": 0,
+  "version": 15,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -1767,7 +1770,7 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [],
-              "height": 100,
+              "height": "11.27227",
               "index": "a0",
               "isDeleted": false,
               "lastCommittedPoint": null,
@@ -1780,8 +1783,8 @@ History {
                   0,
                 ],
                 [
-                  100,
-                  100,
+                  "98.58579",
+                  "11.27227",
                 ],
               ],
               "roughness": 1,
@@ -1802,8 +1805,8 @@ History {
               "strokeStyle": "solid",
               "strokeWidth": 2,
               "type": "arrow",
-              "width": 100,
-              "x": 0,
+              "width": "98.58579",
+              "x": "0.70711",
               "y": 0,
             },
             "inserted": {
@@ -2320,7 +2323,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": "374.05754",
   "id": "id186",
   "index": "a2",
   "isDeleted": false,
@@ -2334,8 +2337,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       0,
     ],
     [
-      100,
-      0,
+      "502.78936",
+      "-374.05754",
     ],
   ],
   "roughness": 1,
@@ -2353,10 +2356,10 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 100,
-  "x": 0,
-  "y": 0,
+  "version": 12,
+  "width": "502.78936",
+  "x": "-0.83465",
+  "y": "-36.58211",
 }
 `;
 
@@ -10310,13 +10313,13 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 10,
+  "height": 30,
   "id": "id98",
   "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": [
-    10,
-    10,
+    30,
+    30,
   ],
   "link": null,
   "locked": false,
@@ -10354,8 +10357,8 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 10,
+  "version": 13,
+  "width": 30,
   "x": 0,
   "y": 0,
 }
@@ -10369,89 +10372,7 @@ History {
       [Function],
     ],
   },
-  "redoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedLinearElementId": null,
-          },
-          "inserted": {
-            "selectedLinearElementId": "id98",
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id98" => Delta {
-            "deleted": {
-              "height": 10,
-              "lastCommittedPoint": [
-                10,
-                10,
-              ],
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  10,
-                  10,
-                ],
-              ],
-              "width": 10,
-            },
-            "inserted": {
-              "height": 30,
-              "lastCommittedPoint": [
-                30,
-                30,
-              ],
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  5,
-                  5,
-                ],
-                [
-                  10,
-                  10,
-                ],
-                [
-                  15,
-                  15,
-                ],
-                [
-                  20,
-                  20,
-                ],
-              ],
-              "width": 30,
-            },
-          },
-        },
-      },
-    },
-  ],
+  "redoStack": [],
   "undoStack": [
     HistoryEntry {
       "appStateChange": AppStateChange {
@@ -10523,13 +10444,94 @@ History {
         "updated": Map {},
       },
     },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id98" => Delta {
+            "deleted": {
+              "height": 30,
+              "lastCommittedPoint": [
+                30,
+                30,
+              ],
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  5,
+                  5,
+                ],
+                [
+                  10,
+                  10,
+                ],
+                [
+                  15,
+                  15,
+                ],
+                [
+                  20,
+                  20,
+                ],
+              ],
+              "width": 30,
+            },
+            "inserted": {
+              "height": 10,
+              "lastCommittedPoint": [
+                10,
+                10,
+              ],
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  10,
+                  10,
+                ],
+              ],
+              "width": 10,
+            },
+          },
+        },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "selectedLinearElementId": "id98",
+          },
+          "inserted": {
+            "selectedLinearElementId": null,
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
   ],
 }
 `;
 
 exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of elements 1`] = `1`;
 
-exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `11`;
+exports[`history > multiplayer undo/redo > should override remotely added points on undo, but restore them on redo > [end of test] number of renders 1`] = `15`;
 
 exports[`history > multiplayer undo/redo > should redistribute deltas when element gets removed locally but is restored remotely > [end of test] appState 1`] = `
 {
@@ -15131,7 +15133,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      100,
+      "98.58579",
       0,
     ],
   ],
@@ -15150,9 +15152,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 100,
-  "x": 0,
+  "version": 12,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -15826,7 +15828,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      100,
+      "98.58579",
       0,
     ],
   ],
@@ -15845,9 +15847,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 100,
-  "x": 0,
+  "version": 12,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -16445,7 +16447,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      100,
+      "98.58579",
       0,
     ],
   ],
@@ -16464,9 +16466,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 100,
-  "x": 0,
+  "version": 12,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -17062,7 +17064,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      100,
+      "98.58579",
       0,
     ],
   ],
@@ -17081,9 +17083,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
-  "width": 100,
-  "x": 0,
+  "version": 12,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -17775,7 +17777,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       0,
     ],
     [
-      100,
+      "98.58579",
       0,
     ],
   ],
@@ -17794,9 +17796,9 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 11,
-  "width": 100,
-  "x": 0,
+  "version": 13,
+  "width": "98.58579",
+  "x": "0.70711",
   "y": 0,
 }
 `;
@@ -19752,39 +19754,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": {
-    "elbowed": false,
-    "elementId": "id27",
-    "endBindingElement": "keep",
-    "hoverPointIndex": -1,
-    "isDragging": false,
-    "lastUncommittedPoint": null,
-    "pointerDownState": {
-      "lastClickedIsEndPoint": true,
-      "lastClickedPoint": 2,
-      "origin": {
-        "x": 20,
-        "y": 20,
-      },
-      "prevSelectedPointsIndices": [
-        1,
-      ],
-      "segmentMidpoint": {
-        "added": false,
-        "index": null,
-        "value": null,
-      },
-    },
-    "pointerOffset": {
-      "x": 0,
-      "y": 0,
-    },
-    "segmentMidPointHoveredCoords": null,
-    "selectedPointsIndices": [
-      2,
-    ],
-    "startBindingElement": "keep",
-  },
+  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -19877,7 +19847,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 10,
+  "height": 20,
   "id": "id27",
   "index": "a0",
   "isDeleted": false,
@@ -19913,7 +19883,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 10,
+  "version": 15,
   "width": 20,
   "x": 0,
   "y": 0,
@@ -19928,75 +19898,7 @@ History {
       [Function],
     ],
   },
-  "redoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "editingLinearElementId": "id27",
-          },
-          "inserted": {
-            "editingLinearElementId": null,
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id27" => Delta {
-            "deleted": {
-              "height": 10,
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  10,
-                  10,
-                ],
-                [
-                  20,
-                  0,
-                ],
-              ],
-            },
-            "inserted": {
-              "height": 20,
-              "points": [
-                [
-                  0,
-                  0,
-                ],
-                [
-                  10,
-                  10,
-                ],
-                [
-                  20,
-                  20,
-                ],
-              ],
-            },
-          },
-        },
-      },
-    },
-  ],
+  "redoStack": [],
   "undoStack": [
     HistoryEntry {
       "appStateChange": AppStateChange {
@@ -20156,10 +20058,77 @@ History {
         "updated": Map {},
       },
     },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {},
+          "inserted": {},
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {
+          "id27" => Delta {
+            "deleted": {
+              "height": 20,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  10,
+                  10,
+                ],
+                [
+                  20,
+                  20,
+                ],
+              ],
+            },
+            "inserted": {
+              "height": 10,
+              "points": [
+                [
+                  0,
+                  0,
+                ],
+                [
+                  10,
+                  10,
+                ],
+                [
+                  20,
+                  0,
+                ],
+              ],
+            },
+          },
+        },
+      },
+    },
+    HistoryEntry {
+      "appStateChange": AppStateChange {
+        "delta": Delta {
+          "deleted": {
+            "editingLinearElementId": null,
+          },
+          "inserted": {
+            "editingLinearElementId": "id27",
+          },
+        },
+      },
+      "elementsChange": ElementsChange {
+        "added": Map {},
+        "removed": Map {},
+        "updated": Map {},
+      },
+    },
   ],
 }
 `;
 
 exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of elements 1`] = `1`;
 
-exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `11`;
+exports[`history > singleplayer undo/redo > should support linear element creation and points manipulation through the editor > [end of test] number of renders 1`] = `21`;

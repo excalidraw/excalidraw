@@ -739,14 +739,9 @@ export const updateBoundElements = (
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
     newSize?: { width: number; height: number };
     changedElements?: Map<string, OrderedExcalidrawElement>;
-    preservePoints?: boolean;
   },
 ) => {
-  const {
-    newSize,
-    simultaneouslyUpdated,
-    preservePoints = false,
-  } = options ?? {};
+  const { newSize, simultaneouslyUpdated } = options ?? {};
   const simultaneouslyUpdatedElementIds = getSimultaneouslyUpdatedElementIds(
     simultaneouslyUpdated,
   );
@@ -796,20 +791,6 @@ export const updateBoundElements = (
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
       mutateElement(element, bindings, true);
-      return;
-    }
-
-    // If preservePoints is true, skip adjusting arrow geometry.
-    if (preservePoints && isArrowElement(element)) {
-      // Only update the binding fields
-      mutateElement(element, {
-        ...(changedElement.id === element.startBinding?.elementId
-          ? { startBinding: bindings.startBinding }
-          : {}),
-        ...(changedElement.id === element.endBinding?.elementId
-          ? { endBinding: bindings.endBinding }
-          : {}),
-      });
       return;
     }
 

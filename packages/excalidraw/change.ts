@@ -394,7 +394,7 @@ class Delta<T> {
 }
 
 /**
- * Encapsulates the modifications captured as `Delta`s.
+ * Encapsulates the modifications captured as `Delta`/s.
  */
 interface Change<T> {
   /**
@@ -1131,9 +1131,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       );
 
       // Need ordered nextElements to avoid z-index binding issues
-      ElementsChange.redrawBoundArrows(nextElements, changedElements, {
-        preservePoints: true,
-      });
+      ElementsChange.redrawBoundArrows(nextElements, changedElements);
     } catch (e) {
       console.error(
         `Couldn't mutate elements after applying elements change`,
@@ -1263,28 +1261,6 @@ export class ElementsChange implements Change<SceneElementsMap> {
     if (!flags.containsZindexDifference) {
       flags.containsZindexDifference =
         delta.deleted.index !== delta.inserted.index;
-    }
-
-    // Fix for arrow points preservation during undo/redo
-    if (
-      element.type === "arrow" &&
-      isArrowElement(element) &&
-      (directlyApplicablePartial as any).points &&
-      !directlyApplicablePartial.isDeleted
-    ) {
-      const oldStart = element.startBinding;
-      const oldEnd = element.endBinding;
-      const newStart = (directlyApplicablePartial as any).startBinding;
-      const newEnd = (directlyApplicablePartial as any).endBinding;
-
-      const startBindingChanged =
-        JSON.stringify(oldStart || null) !== JSON.stringify(newStart || null);
-      const endBindingChanged =
-        JSON.stringify(oldEnd || null) !== JSON.stringify(newEnd || null);
-
-      if (!startBindingChanged && !endBindingChanged) {
-        delete (directlyApplicablePartial as any).points;
-      }
     }
 
     return newElementWith(element, directlyApplicablePartial);
@@ -1516,14 +1492,72 @@ export class ElementsChange implements Change<SceneElementsMap> {
   private static redrawBoundArrows(
     elements: SceneElementsMap,
     changed: Map<string, OrderedExcalidrawElement>,
-    options?: { preservePoints?: boolean },
   ) {
+    // First, collect all arrow elements that need to be updated
+    const arrowsToUpdate = new Set<string>();
+
+    // Check for bindable elements that were changed
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
+        // Find all arrows connected to this bindable element
+        const boundElements = element.boundElements || [];
+        for (const binding of boundElements) {
+          if (binding.type === "arrow") {
+            arrowsToUpdate.add(binding.id);
+          }
+        }
+
+        // Update bound elements for this bindable element
         updateBoundElements(element, elements, {
           changedElements: changed,
-          preservePoints: options?.preservePoints === true,
         });
+      }
+    }
+
+    // Check for arrow elements that were changed
+    for (const element of changed.values()) {
+      if (!element.isDeleted && isArrowElement(element)) {
+        arrowsToUpdate.add(element.id);
+      }
+    }
+
+    // Process all arrows that need updating
+    for (const arrowId of arrowsToUpdate) {
+      const arrowElement = elements.get(arrowId);
+      if (
+        arrowElement &&
+        isArrowElement(arrowElement) &&
+        !arrowElement.isDeleted
+      ) {
+        // Cast to ExcalidrawLinearElement to access binding properties
+        const arrow = arrowElement as NonDeleted<ExcalidrawLinearElement>;
+
+        // Make sure startBinding and endBinding are consistent
+        if (arrow.startBinding) {
+          const bindTarget = elements.get(arrow.startBinding.elementId);
+          if (!bindTarget || bindTarget.isDeleted) {
+            // If the target was deleted, remove the binding
+            mutateElement(arrow, { startBinding: null });
+          } else {
+            // Ensure the bound element has this arrow in its boundElements
+            updateBoundElements(bindTarget, elements, {
+              simultaneouslyUpdated: [arrow],
+            });
+          }
+        }
+
+        if (arrow.endBinding) {
+          const bindTarget = elements.get(arrow.endBinding.elementId);
+          if (!bindTarget || bindTarget.isDeleted) {
+            // If the target was deleted, remove the binding
+            mutateElement(arrow, { endBinding: null });
+          } else {
+            // Ensure the bound element has this arrow in its boundElements
+            updateBoundElements(bindTarget, elements, {
+              simultaneouslyUpdated: [arrow],
+            });
+          }
+        }
       }
     }
   }
