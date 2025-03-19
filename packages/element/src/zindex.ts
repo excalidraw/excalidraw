@@ -6,8 +6,6 @@ import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
-import { getSelectedElements } from "@excalidraw/excalidraw/scene";
-
 import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
@@ -15,7 +13,9 @@ import type {
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import Scene from "../../excalidraw/scene/Scene";
+import type Scene from "@excalidraw/excalidraw/scene/Scene";
+
+import { getSelectedElements } from "./selection";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
   return element.frameId === frameId || element.id === frameId;
@@ -85,11 +85,11 @@ const getTargetIndexAccountingForBinding = (
   nextElement: ExcalidrawElement,
   elements: readonly ExcalidrawElement[],
   direction: "left" | "right",
+  scene: Scene,
 ) => {
   if ("containerId" in nextElement && nextElement.containerId) {
-    const containerElement = Scene.getScene(nextElement)!.getElement(
-      nextElement.containerId,
-    );
+    // TODO: why not to get the container from the nextElements?
+    const containerElement = scene.getElement(nextElement.containerId);
     if (containerElement) {
       return direction === "left"
         ? Math.min(
@@ -106,8 +106,7 @@ const getTargetIndexAccountingForBinding = (
       (binding) => binding.type !== "arrow",
     )?.id;
     if (boundElementId) {
-      const boundTextElement =
-        Scene.getScene(nextElement)!.getElement(boundElementId);
+      const boundTextElement = scene.getElement(boundElementId);
       if (boundTextElement) {
         return direction === "left"
           ? Math.min(
@@ -157,6 +156,7 @@ const getTargetIndex = (
    * If whole frame (including all children) is being moved, supply `null`.
    */
   containingFrame: ExcalidrawFrameLikeElement["id"] | null,
+  scene: Scene,
 ) => {
   const sourceElement = elements[boundaryIndex];
 
@@ -196,8 +196,12 @@ const getTargetIndex = (
       sourceElement?.groupIds.join("") === nextElement?.groupIds.join("")
     ) {
       return (
-        getTargetIndexAccountingForBinding(nextElement, elements, direction) ??
-        candidateIndex
+        getTargetIndexAccountingForBinding(
+          nextElement,
+          elements,
+          direction,
+          scene,
+        ) ?? candidateIndex
       );
     } else if (!nextElement?.groupIds.includes(appState.editingGroupId)) {
       // candidate element is outside current editing group → prevent
@@ -220,8 +224,12 @@ const getTargetIndex = (
 
   if (!nextElement.groupIds.length) {
     return (
-      getTargetIndexAccountingForBinding(nextElement, elements, direction) ??
-      candidateIndex
+      getTargetIndexAccountingForBinding(
+        nextElement,
+        elements,
+        direction,
+        scene,
+      ) ?? candidateIndex
     );
   }
 
@@ -261,6 +269,7 @@ const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
+  scene: Scene,
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
@@ -295,6 +304,7 @@ const shiftElementsByOne = (
       boundaryIndex,
       direction,
       containingFrame,
+      scene,
     );
 
     if (targetIndex === -1 || boundaryIndex === targetIndex) {
@@ -508,15 +518,17 @@ function shiftElementsAccountingForFrames(
 export const moveOneLeft = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
+  scene: Scene,
 ) => {
-  return shiftElementsByOne(allElements, appState, "left");
+  return shiftElementsByOne(allElements, appState, "left", scene);
 };
 
 export const moveOneRight = (
   allElements: readonly ExcalidrawElement[],
   appState: AppState,
+  scene: Scene,
 ) => {
-  return shiftElementsByOne(allElements, appState, "right");
+  return shiftElementsByOne(allElements, appState, "right", scene);
 };
 
 export const moveAllLeft = (

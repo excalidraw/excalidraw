@@ -24,9 +24,9 @@ export const actionSendBackward = register({
   keywords: ["move down", "zindex", "layer"],
   icon: SendBackwardIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneLeft(elements, appState),
+      elements: moveOneLeft(elements, appState, app.scene),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -54,9 +54,9 @@ export const actionBringForward = register({
   keywords: ["move up", "zindex", "layer"],
   icon: BringForwardIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState) => {
+  perform: (elements, appState, value, app) => {
     return {
-      elements: moveOneRight(elements, appState),
+      elements: moveOneRight(elements, appState, app.scene),
       appState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };

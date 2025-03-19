@@ -8,7 +8,6 @@ import {
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
-
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import {
