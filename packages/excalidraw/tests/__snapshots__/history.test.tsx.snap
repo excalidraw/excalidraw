@@ -686,9 +686,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "selectedElementIds": {
     "id167": true,
   },
-  "selectedElementIds": {
-    "id167": true,
-  },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
   "selectionElement": null,
@@ -820,9 +817,9 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 22,
-  "width": 100,
-  "x": 150,
+  "version": 44,
+  "width": 0,
+  "x": "149.29289",
   "y": 0,
 }
 `;
