@@ -105,6 +105,7 @@ export const duplicateElements = (
     };
     overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
     randomizeSeed?: boolean;
+    reverseOrder?: boolean;
   },
 ) => {
   // Ids of elements that have already been processed so we don't push them
@@ -192,7 +193,11 @@ export const duplicateElements = (
       return;
     }
 
-    elementsWithClones.splice(index + 1, 0, ...castArray(elements));
+    elementsWithClones.splice(
+      index + (opts?.reverseOrder ? 0 : +1),
+      0,
+      ...castArray(elements),
+    );
   };
 
   const frameIdsToDuplicate = new Set(

@@ -8447,6 +8447,7 @@ class App extends React.Component<AppProps, AppState> {
                     y: origEl.y,
                   };
                 },
+                reverseOrder: true,
               });
             clonedElements.forEach((element) => {
               pointerDownState.originalElements.set(element.id, element);
