@@ -11,12 +11,13 @@ import ansi from "ansicolor";
 
 import { ORIG_ID, arrayToMap } from "@excalidraw/common";
 
+import { getSelectedElements } from "@excalidraw/element/selection";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
 
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
-import { getSelectedElements } from "../scene/selection";
 
 import { UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";

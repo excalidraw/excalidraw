@@ -39,7 +39,6 @@ import {
 import { getContainingFrame } from "@excalidraw/element/frame";
 import { getCornerRadius } from "@excalidraw/element/shapes";
 
-
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,

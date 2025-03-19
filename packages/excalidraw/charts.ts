@@ -375,7 +375,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      import.meta.env.DEV,
+      !!import.meta.env.DEV,
     ),
   ];
 };
@@ -457,7 +457,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      import.meta.env.DEV,
+      !!import.meta.env.DEV,
     ),
     line,
     ...lines,

@@ -69,7 +69,9 @@ const validateIndicesThrottled = throttle(
     ) {
       validateFractionalIndices(elements, {
         // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        shouldThrow: Boolean(
+          import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        ),
         includeBoundTextValidation: true,
       });
     }

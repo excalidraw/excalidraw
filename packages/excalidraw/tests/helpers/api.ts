@@ -19,7 +19,7 @@ import {
 } from "@excalidraw/element/newElement";
 import { isLinearElementType } from "@excalidraw/element/typeChecks";
 
-import { getSelectedElements } from "@excalidraw/excalidraw/scene/selection";
+import { getSelectedElements } from "@excalidraw/element/selection";
 import { assertNever } from "@excalidraw/common";
 
 import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";

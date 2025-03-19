@@ -12,7 +12,7 @@ import {
   getFontString,
   getUpdatedTimestamp,
   isTestEnv,
-  getLineHeight
+  getLineHeight,
 } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";

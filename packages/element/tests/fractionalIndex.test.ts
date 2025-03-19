@@ -11,14 +11,14 @@ import {
 
 import { deepCopyElement } from "@excalidraw/element/newElement";
 
-import { InvalidFractionalIndexError } from "@excalidraw/excalidraw/errors";
-
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type {
   ExcalidrawElement,
   FractionalIndex,
 } from "@excalidraw/element/types";
+
+import { InvalidFractionalIndexError } from "../src/fractionalIndex";
 
 describe("sync invalid indices with array order", () => {
   describe("should NOT sync empty array", () => {

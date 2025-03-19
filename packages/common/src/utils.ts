@@ -2,17 +2,13 @@ import { average } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
-  ExcalidrawElement,
   FontFamilyValues,
   FontString,
-  GroupId,
-  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
   AppState,
-  NullableGridSize,
   ToolType,
   UnsubscribeCallback,
   Zoom,
