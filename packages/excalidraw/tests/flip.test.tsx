@@ -1,8 +1,10 @@
-import { pointFrom, type Radians } from "@excalidraw/math";
 import React from "react";
 import { vi } from "vitest";
 
 import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
+
+import { pointFrom, type Radians } from "@excalidraw/math";
+
 import { getBoundTextElementPosition } from "@excalidraw/element/textElement";
 import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 import { newLinearElement } from "@excalidraw/element/newElement";
@@ -21,6 +23,9 @@ import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { createPasteEvent } from "../clipboard";
 import { Excalidraw } from "../index";
 
+// Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
+import * as blobModule from "../data/blob";
+
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import {
@@ -37,13 +42,12 @@ import type { NormalizedZoomValue } from "../types";
 const { h } = window;
 const mouse = new Pointer("mouse");
 
-vi.mock("../data/blob", async (actual) => {
-  const orig: Object = await actual();
-  return {
-    ...orig,
-    resizeImageFile: (imageFile: File) => imageFile,
-    generateIdFromFile: () => "fileId" as FileId,
-  };
+beforeEach(() => {
+  const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
+  const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
+
+  generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+  resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
 });
 
 beforeEach(async () => {

@@ -27,7 +27,7 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-vi.mock("../keys.ts", async (importOriginal) => {
+vi.mock("@excalidraw/common", async (importOriginal) => {
   const module: any = await importOriginal();
   return {
     __esmodule: true,

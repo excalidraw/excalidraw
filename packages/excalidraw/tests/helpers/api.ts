@@ -4,7 +4,7 @@ import util from "util";
 
 import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
-import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "@excalidraw/common";
+import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
 
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
@@ -19,11 +19,9 @@ import {
   newMagicFrameElement,
   newTextElement,
 } from "@excalidraw/element/newElement";
+
 import { isLinearElementType } from "@excalidraw/element/typeChecks";
-
 import { getSelectedElements } from "@excalidraw/element/selection";
-import { assertNever } from "@excalidraw/common";
-
 import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
 
 import type {
