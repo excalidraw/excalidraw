@@ -315,6 +315,19 @@ export const getElementLineSegments = (
 
     return [...rotatedSides, ...cornerSegments];
   } else if (shape.type === "polygon") {
+    if (isTextElement(element)) {
+      const container = getContainerElement(element, elementsMap);
+      if (container && isLinearElement(container)) {
+        const segments: LineSegment<GlobalPoint>[] = [
+          lineSegment(pointFrom(x1, y1), pointFrom(x2, y1)),
+          lineSegment(pointFrom(x2, y1), pointFrom(x2, y2)),
+          lineSegment(pointFrom(x2, y2), pointFrom(x1, y2)),
+          lineSegment(pointFrom(x1, y2), pointFrom(x1, y1)),
+        ];
+        return segments;
+      }
+    }
+
     const points = shape.data as GlobalPoint[];
     const segments: LineSegment<GlobalPoint>[] = [];
     for (let i = 0; i < points.length - 1; i++) {

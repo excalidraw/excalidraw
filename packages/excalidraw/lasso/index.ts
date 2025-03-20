@@ -4,7 +4,11 @@ import { type AnimationFrameHandler } from "../animation-frame-handler";
 
 import { getElementLineSegments } from "../element/bounds";
 import { LinearElementEditor } from "../element/linearElementEditor";
-import { isFrameLikeElement, isLinearElement } from "../element/typeChecks";
+import {
+  isFrameLikeElement,
+  isLinearElement,
+  isTextElement,
+} from "../element/typeChecks";
 
 import { getFrameChildren } from "../frame";
 import { selectGroupsForSelectedElements } from "../groups";
@@ -19,6 +23,7 @@ import type {
 } from "../element/types";
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
+import { getContainerElement } from "../element/textElement";
 
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
@@ -106,6 +111,17 @@ export class LassoTrail extends AnimatedTrail {
           );
           for (const child of elementsInFrame) {
             delete nextSelectedElementIds[child.id];
+          }
+        }
+
+        if (element && isTextElement(element)) {
+          const container = getContainerElement(
+            element,
+            this.app.scene.getNonDeletedElementsMap(),
+          );
+          if (container) {
+            nextSelectedElementIds[container.id] = true;
+            delete nextSelectedElementIds[element.id];
           }
         }
       }
