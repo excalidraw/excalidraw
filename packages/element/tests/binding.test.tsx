@@ -3,12 +3,14 @@ import { KEYS, arrayToMap } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 
 import { actionWrapTextInContainer } from "@excalidraw/excalidraw/actions/actionBoundText";
-import { getTransformHandles } from "@excalidraw/element/transformHandles";
+
 import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
+
+import { getTransformHandles } from "../src/transformHandles";
 
 const { h } = window;
 

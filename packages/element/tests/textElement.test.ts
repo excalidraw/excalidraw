@@ -1,4 +1,4 @@
-import { getLineHeight } from "@excalidraw/common/font-metadata";
+import { getLineHeight } from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { FONT_FAMILY } from "@excalidraw/common";

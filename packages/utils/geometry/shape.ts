@@ -12,7 +12,6 @@
  * to pure shapes
  */
 
-import { getElementAbsoluteCoords } from "@excalidraw/element";
 import { invariant } from "@excalidraw/common";
 import {
   curve,
@@ -34,6 +33,8 @@ import {
   type LocalPoint,
 } from "@excalidraw/math";
 import { pointsOnBezierCurves } from "points-on-curve";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 
 import type {
   ElementsMap,

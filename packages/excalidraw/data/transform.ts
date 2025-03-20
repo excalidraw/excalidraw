@@ -15,17 +15,14 @@ import {
   toBrandedType,
   getLineHeight,
 } from "@excalidraw/common";
-import {
-  getCommonBounds,
-  newElement,
-  newLinearElement,
-  redrawTextBoundingBox,
-} from "@excalidraw/element";
+
 import { bindLinearElement } from "@excalidraw/element/binding";
 import {
   newArrowElement,
+  newElement,
   newFrameElement,
   newImageElement,
+  newLinearElement,
   newMagicFrameElement,
   newTextElement,
 } from "@excalidraw/element/newElement";
@@ -36,6 +33,8 @@ import {
 import { isArrowElement } from "@excalidraw/element/typeChecks";
 
 import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
+import { redrawTextBoundingBox } from "@excalidraw/element/textElement";
 
 import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
 
@@ -61,6 +60,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
+
+import { getCommonBounds } from "..";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";

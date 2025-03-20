@@ -5,17 +5,6 @@ import {
   elementsOverlappingBBox,
 } from "@excalidraw/utils";
 
-import { getElementAbsoluteCoords, isTextElement } from "@excalidraw/element";
-
-import type {
-  ElementsMap,
-  ElementsMapOrArray,
-  ExcalidrawElement,
-  ExcalidrawFrameLikeElement,
-  NonDeleted,
-  NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
-
 import type { ExcalidrawElementsIncludingDeleted } from "@excalidraw/excalidraw/scene/Scene";
 
 import type {
@@ -29,10 +18,27 @@ import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 import { getElementsWithinSelection, getSelectedElements } from "./selection";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 
-import { getElementLineSegments, getCommonBounds } from "./bounds";
+import {
+  getElementLineSegments,
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
-import { isFrameElement, isFrameLikeElement } from "./typeChecks";
+import {
+  isFrameElement,
+  isFrameLikeElement,
+  isTextElement,
+} from "./typeChecks";
+
+import type {
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 // --------------------------- Frame State ------------------------------------
 export const bindElementsToFramesAfterDuplication = (

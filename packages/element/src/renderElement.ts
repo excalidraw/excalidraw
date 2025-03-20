@@ -15,41 +15,6 @@ import {
   isRTL,
   getVerticalOffset,
 } from "@excalidraw/common";
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
-import { getUncroppedImageElement } from "@excalidraw/element/cropElement";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import {
-  getBoundTextElement,
-  getContainerCoords,
-  getContainerElement,
-  getBoundTextMaxHeight,
-  getBoundTextMaxWidth,
-} from "@excalidraw/element/textElement";
-import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
-import {
-  isTextElement,
-  isLinearElement,
-  isFreeDrawElement,
-  isInitializedImageElement,
-  isArrowElement,
-  hasBoundTextElement,
-  isMagicFrameElement,
-  isImageElement,
-} from "@excalidraw/element/typeChecks";
-import { getContainingFrame } from "@excalidraw/element/frame";
-import { getCornerRadius } from "@excalidraw/element/shapes";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-  NonDeletedExcalidrawElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawImageElement,
-  ExcalidrawTextElementWithContainer,
-  ExcalidrawFrameLikeElement,
-  NonDeletedSceneElementsMap,
-  ElementsMap,
-} from "@excalidraw/element/types";
 
 import type {
   AppState,
@@ -67,7 +32,43 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
+import { getElementAbsoluteCoords } from "./bounds";
+import { getUncroppedImageElement } from "./cropElement";
+import { LinearElementEditor } from "./linearElementEditor";
+import {
+  getBoundTextElement,
+  getContainerCoords,
+  getContainerElement,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
+} from "./textElement";
+import { getLineHeightInPx } from "./textMeasurements";
+import {
+  isTextElement,
+  isLinearElement,
+  isFreeDrawElement,
+  isInitializedImageElement,
+  isArrowElement,
+  hasBoundTextElement,
+  isMagicFrameElement,
+  isImageElement,
+} from "./typeChecks";
+import { getContainingFrame } from "./frame";
+import { getCornerRadius } from "./shapes";
+
 import { ShapeCache } from "./ShapeCache";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawImageElement,
+  ExcalidrawTextElementWithContainer,
+  ExcalidrawFrameLikeElement,
+  NonDeletedSceneElementsMap,
+  ElementsMap,
+} from "./types";
 
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";

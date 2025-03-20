@@ -9,7 +9,7 @@ import {
   getVerticalOffset,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
-import { getElementAbsoluteCoords, hashString } from "@excalidraw/element";
+import { hashString } from "@excalidraw/element";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
 import {
   createPlaceholderEmbeddableLabel,
@@ -38,6 +38,8 @@ import {
   getFreeDrawSvgPath,
   IMAGE_INVERT_FILTER,
 } from "@excalidraw/element/renderElement";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 
 import type {
   ExcalidrawElement,

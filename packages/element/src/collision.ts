@@ -18,8 +18,6 @@ import {
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
 
-import { getBoundTextShape, isPathALoop } from "@excalidraw/element/shapes";
-
 import type {
   GlobalPoint,
   LineSegment,
@@ -32,6 +30,7 @@ import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
+import { getBoundTextShape, isPathALoop } from "./shapes";
 import { getElementBounds } from "./bounds";
 import {
   hasBoundTextElement,

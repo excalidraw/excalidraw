@@ -24,12 +24,6 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import {
-  aabbForElement,
-  getElementShape,
-  pointInsideBounds,
-} from "@excalidraw/element";
-
 import { isPointOnShape } from "@excalidraw/utils/collision";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
@@ -69,6 +63,8 @@ import {
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
+
+import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
 
 import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";

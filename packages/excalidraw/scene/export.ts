@@ -15,8 +15,6 @@ import {
   toBrandedType,
 } from "@excalidraw/common";
 
-import { newTextElement } from "@excalidraw/element";
-
 import {
   getCommonBounds,
   getElementAbsoluteCoords,
@@ -41,6 +39,8 @@ import {
 import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
 
 import { type Mutable } from "@excalidraw/common/utility-types";
+
+import { newTextElement } from "@excalidraw/element/newElement";
 
 import type { Bounds } from "@excalidraw/element/bounds";
 

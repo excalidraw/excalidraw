@@ -2,15 +2,15 @@ import { generateNKeysBetween } from "fractional-indexing";
 
 import { arrayToMap } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-import { getBoundTextElement } from "@excalidraw/element/textElement";
-import { hasBoundTextElement } from "@excalidraw/element/typeChecks";
+import { mutateElement } from "./mutateElement";
+import { getBoundTextElement } from "./textElement";
+import { hasBoundTextElement } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
   FractionalIndex,
   OrderedExcalidrawElement,
-} from "@excalidraw/element/types";
+} from "./types";
 
 export class InvalidFractionalIndexError extends Error {
   public code = "ELEMENT_HAS_INVALID_INDEX" as const;

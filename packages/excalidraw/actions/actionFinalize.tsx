@@ -1,6 +1,5 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { isInvisiblySmallElement } from "@excalidraw/element";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
@@ -14,6 +13,8 @@ import {
 
 import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element/shapes";
+
+import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";

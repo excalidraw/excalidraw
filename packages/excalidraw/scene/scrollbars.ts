@@ -1,6 +1,6 @@
-import { getCommonBounds } from "@excalidraw/element";
-
 import { getGlobalCSSVariable } from "@excalidraw/common";
+
+import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

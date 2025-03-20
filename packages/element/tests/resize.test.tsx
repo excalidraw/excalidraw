@@ -1,10 +1,4 @@
 import { pointFrom } from "@excalidraw/math";
-import React from "react";
-
-import { getElementPointsCoords } from "@excalidraw/element/bounds";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { resizeSingleElement } from "@excalidraw/element/resizeElements";
-import { isLinearElement } from "@excalidraw/element/typeChecks";
 
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
@@ -23,12 +17,17 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element/bounds";
+import { isLinearElement } from "../src/typeChecks";
+import { resizeSingleElement } from "../src/resizeElements";
+import { LinearElementEditor } from "../src/linearElementEditor";
+import { getElementPointsCoords } from "../src/bounds";
+
+import type { Bounds } from "../src/bounds";
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
-} from "@excalidraw/element/types";
+} from "../src/types";
 
 unmountComponent();
 

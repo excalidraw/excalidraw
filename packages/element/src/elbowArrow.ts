@@ -21,8 +21,6 @@ import {
   getSizeFromPoints,
 } from "@excalidraw/common";
 
-import { aabbForElement, pointInsideBounds } from "@excalidraw/element";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
@@ -53,6 +51,8 @@ import {
   type NonDeletedSceneElementsMap,
   type SceneElementsMap,
 } from "./types";
+
+import { aabbForElement, pointInsideBounds } from "./shapes";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";

@@ -2,7 +2,6 @@ import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { useMemo } from "react";
 
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
-import { getCommonBounds, isTextElement } from "@excalidraw/element";
 import { updateBoundElements } from "@excalidraw/element/binding";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
@@ -13,6 +12,10 @@ import {
   getBoundTextElement,
   handleBindTextResize,
 } from "@excalidraw/element/textElement";
+
+import { isTextElement } from "@excalidraw/element/typeChecks";
+
+import { getCommonBounds } from "@excalidraw/utils";
 
 import type {
   ElementsMap,

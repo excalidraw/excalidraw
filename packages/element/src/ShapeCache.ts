@@ -3,11 +3,6 @@ import { RoughGenerator } from "roughjs/bin/generator";
 import { COLOR_PALETTE } from "@excalidraw/common";
 
 import type {
-  ExcalidrawElement,
-  ExcalidrawSelectionElement,
-} from "@excalidraw/element/types";
-
-import type {
   AppState,
   EmbedsValidationStatus,
 } from "@excalidraw/excalidraw/types";
@@ -19,6 +14,8 @@ import type {
 import { _generateElementShape } from "./Shape";
 
 import { elementWithCanvasCache } from "./renderElement";
+
+import type { ExcalidrawElement, ExcalidrawSelectionElement } from "./types";
 
 import type { Drawable } from "roughjs/bin/core";
 

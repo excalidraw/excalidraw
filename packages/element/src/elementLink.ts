@@ -5,9 +5,10 @@
 import { ELEMENT_LINK_KEY, normalizeLink } from "@excalidraw/common";
 
 import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { elementsAreInSameGroup } from "./groups";
+
+import type { ExcalidrawElement } from "./types";
 
 export const defaultGetElementLinkFromSelection: Exclude<
   AppProps["generateLinkForSelection"],

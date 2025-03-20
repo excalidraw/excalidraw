@@ -12,8 +12,6 @@ import {
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
-import { generateRoughOptions } from "@excalidraw/element/Shape";
-import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
 import type {
   Degrees,
@@ -27,6 +25,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
+import { ShapeCache } from "./ShapeCache";
+import { generateRoughOptions } from "./Shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {

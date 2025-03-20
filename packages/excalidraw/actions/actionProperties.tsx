@@ -22,11 +22,7 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import {
-  getNonDeletedElements,
-  isTextElement,
-  redrawTextBoundingBox,
-} from "@excalidraw/element";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 import {
   bindLinearElement,
@@ -43,13 +39,17 @@ import {
   newElementWith,
 } from "@excalidraw/element/mutateElement";
 
-import { getBoundTextElement } from "@excalidraw/element/textElement";
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
 
 import {
   isArrowElement,
   isBoundToContainer,
   isElbowArrow,
   isLinearElement,
+  isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 

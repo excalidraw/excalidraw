@@ -1,4 +1,4 @@
-import { getCommonBounds, getNonDeletedElements } from "@excalidraw/element";
+import { getNonDeletedElements } from "@excalidraw/element";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { newFrameElement } from "@excalidraw/element/newElement";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
@@ -11,6 +11,8 @@ import { getFrameChildren } from "@excalidraw/element/frame";
 import { KEYS, updateActiveTool } from "@excalidraw/common";
 
 import { getElementsInGroup } from "@excalidraw/element/groups";
+
+import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

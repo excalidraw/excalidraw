@@ -1,11 +1,11 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { getElementBounds } from "@excalidraw/element";
-
 import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
 
 import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+
+import { getElementBounds } from "@excalidraw/element/bounds";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 

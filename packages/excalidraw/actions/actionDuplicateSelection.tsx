@@ -8,7 +8,7 @@ import {
   invariant,
 } from "@excalidraw/common";
 
-import { duplicateElement, getNonDeletedElements } from "@excalidraw/element";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 import { fixBindingsAfterDuplication } from "@excalidraw/element/binding";
 
@@ -43,6 +43,8 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
 } from "@excalidraw/element/selection";
+
+import { duplicateElement } from "@excalidraw/element/newElement";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

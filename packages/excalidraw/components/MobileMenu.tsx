@@ -1,6 +1,6 @@
 import React from "react";
 
-import { showSelectedShapeActions } from "@excalidraw/element";
+import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 

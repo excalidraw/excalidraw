@@ -13,13 +13,12 @@ import {
   promiseTry,
   resolvablePromise,
   toValidURL,
+  Queue,
 } from "@excalidraw/common";
 
 import { hashElementsVersion, hashString } from "@excalidraw/element";
 
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
-
-import { Queue } from "@excalidraw/common/queue";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

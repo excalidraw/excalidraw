@@ -11,7 +11,7 @@ import {
 
 import { mutateElement } from "@excalidraw/element/mutateElement";
 
-import { showSelectedShapeActions } from "@excalidraw/element";
+import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
 
 import { ShapeCache } from "@excalidraw/element/ShapeCache";
 

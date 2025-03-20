@@ -10,7 +10,7 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

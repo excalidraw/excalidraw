@@ -1,9 +1,4 @@
-import {
-  elementOverlapsWithFrame,
-  elementsAreInFrameBounds,
-} from "@excalidraw/element";
 import { KEYS, invariant, toBrandedType } from "@excalidraw/common";
-import { aabbForElement } from "@excalidraw/element";
 
 import { pointFrom, type LocalPoint } from "@excalidraw/math";
 
@@ -26,6 +21,8 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
+import { aabbForElement } from "./shapes";
+import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
   isBindableElement,
   isElbowArrow,

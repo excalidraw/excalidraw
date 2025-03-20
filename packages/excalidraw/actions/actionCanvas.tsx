@@ -13,11 +13,9 @@ import {
   KEYS,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getNonDeletedElements } from "@excalidraw/element";
-
+import { getNonDeletedElements } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element/mutateElement";
-
-import type { SceneBounds } from "@excalidraw/element/bounds";
+import { getCommonBounds, type SceneBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

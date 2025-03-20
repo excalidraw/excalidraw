@@ -1,5 +1,3 @@
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
-
 import { reseed } from "@excalidraw/common";
 
 import {
@@ -20,13 +18,15 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
+import type { AppState } from "@excalidraw/excalidraw/types";
+
+import { selectGroupsForSelectedElements } from "../src/groups";
+
 import type {
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawSelectionElement,
-} from "@excalidraw/element/types";
-
-import type { AppState } from "@excalidraw/excalidraw/types";
+} from "../src/types";
 
 unmountComponent();
 

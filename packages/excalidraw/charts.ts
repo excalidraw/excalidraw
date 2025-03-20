@@ -9,11 +9,12 @@ import {
   VERTICAL_ALIGN,
   randomId,
 } from "@excalidraw/common";
+
 import {
-  newElement,
-  newLinearElement,
   newTextElement,
-} from "@excalidraw/element";
+  newLinearElement,
+  newElement,
+} from "@excalidraw/element/newElement";
 
 import type { Radians } from "@excalidraw/math";
 

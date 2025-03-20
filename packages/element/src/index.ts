@@ -7,20 +7,6 @@ import type {
   NonDeleted,
 } from "./types";
 
-export * from "./bounds";
-export * from "./dragElements";
-export * from "./frame";
-export * from "./mutateElement";
-export * from "./newElement";
-export * from "./resizeElements";
-export * from "./resizeTest";
-export * from "./shapes";
-export * from "./showSelectedShapeActions";
-export * from "./textElement";
-export * from "./typeChecks";
-export * from "./transformHandles";
-export * from "./sizeHelpers";
-
 /**
  * @deprecated unsafe, use hashElementsVersion instead
  */

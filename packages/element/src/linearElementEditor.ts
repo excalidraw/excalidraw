@@ -20,14 +20,6 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-import {
-  getBezierCurveLength,
-  getBezierXY,
-  getControlPointsForBezierCurve,
-  isPathALoop,
-  mapIntervalToBezierT,
-} from "@excalidraw/element";
-
 import type { Store } from "@excalidraw/excalidraw/store";
 
 import type { Radians } from "@excalidraw/math";
@@ -50,7 +42,11 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
 } from "./binding";
-import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
+import {
+  getElementAbsoluteCoords,
+  getElementPointsCoords,
+  getMinMaxXYFromCurvePathOps,
+} from "./bounds";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
@@ -62,7 +58,15 @@ import {
 
 import { ShapeCache } from "./ShapeCache";
 
-import { getElementAbsoluteCoords, getLockedLinearCursorAlignSize } from "./";
+import {
+  isPathALoop,
+  getBezierCurveLength,
+  getControlPointsForBezierCurve,
+  mapIntervalToBezierT,
+  getBezierXY,
+} from "./shapes";
+
+import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
 import type { Bounds } from "./bounds";
 import type {

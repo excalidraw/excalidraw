@@ -1,12 +1,12 @@
-import {
-  getCommonBounds,
-  getClosestElementBounds,
-  getVisibleElements,
-} from "@excalidraw/element";
+import { getVisibleElements } from "@excalidraw/element";
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
+
+import { getClosestElementBounds } from "@excalidraw/element/bounds";
+
+import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 

@@ -6,16 +6,18 @@ import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS } from "@excalidraw/common";
 
-import { newElement, newTextElement, newLinearElement } from "@excalidraw/element";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   newArrowElement,
+  newElement,
   newEmbeddableElement,
   newFrameElement,
   newFreeDrawElement,
   newIframeElement,
   newImageElement,
+  newLinearElement,
   newMagicFrameElement,
+  newTextElement,
 } from "@excalidraw/element/newElement";
 import { isLinearElementType } from "@excalidraw/element/typeChecks";
 

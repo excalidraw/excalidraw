@@ -1,7 +1,12 @@
-import { isTextElement, redrawTextBoundingBox } from "@excalidraw/element";
 import { mutateElement } from "@excalidraw/element/mutateElement";
-import { getBoundTextElement } from "@excalidraw/element/textElement";
-import { hasBoundTextElement } from "@excalidraw/element/typeChecks";
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+import {
+  hasBoundTextElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
 
 import type {
   ExcalidrawElement,

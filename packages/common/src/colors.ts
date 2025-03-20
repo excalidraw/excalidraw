@@ -1,6 +1,6 @@
 import oc from "open-color";
 
-import type { Merge } from "@excalidraw/common/utility-types";
+import type { Merge } from "./utility-types";
 
 // FIXME can't put to utils.ts rn because of circular dependency
 const pick = <R extends Record<string, any>, K extends readonly (keyof R)[]>(

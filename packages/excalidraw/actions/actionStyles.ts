@@ -7,12 +7,6 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import {
-  isTextElement,
-  isExcalidrawElement,
-  redrawTextBoundingBox,
-} from "@excalidraw/element";
-
 import { newElementWith } from "@excalidraw/element/mutateElement";
 
 import {
@@ -21,9 +15,14 @@ import {
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
+  isExcalidrawElement,
+  isTextElement,
 } from "@excalidraw/element/typeChecks";
 
-import { getBoundTextElement } from "@excalidraw/element/textElement";
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 

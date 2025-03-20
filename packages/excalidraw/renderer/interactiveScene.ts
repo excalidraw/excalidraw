@@ -14,12 +14,7 @@ import {
   invariant,
   throttleRAF,
 } from "@excalidraw/common";
-import {
-  getElementAbsoluteCoords,
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getCommonBounds,
-} from "@excalidraw/element";
+
 import {
   BINDING_HIGHLIGHT_OFFSET,
   BINDING_HIGHLIGHT_THICKNESS,
@@ -28,6 +23,8 @@ import {
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getOmitSidesForDevice,
+  getTransformHandles,
+  getTransformHandlesFromCoords,
   shouldShowBoundingBox,
 } from "@excalidraw/element/transformHandles";
 import {
@@ -48,6 +45,11 @@ import {
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element/groups";
+
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "@excalidraw/element/bounds";
 
 import type {
   SuggestedBinding,

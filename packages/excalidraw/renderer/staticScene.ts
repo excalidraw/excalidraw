@@ -1,5 +1,4 @@
 import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
-import { getElementAbsoluteCoords } from "@excalidraw/element";
 import { isElementLink } from "@excalidraw/element/elementLink";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element/embeddable";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
@@ -15,6 +14,8 @@ import {
 } from "@excalidraw/element/frame";
 
 import { renderElement } from "@excalidraw/element/renderElement";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 
 import type {
   ElementsMap,

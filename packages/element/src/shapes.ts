@@ -32,9 +32,8 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement } from "./textElement";
 import { ShapeCache } from "./ShapeCache";
 
-import { getElementAbsoluteCoords } from "./";
+import { getElementAbsoluteCoords, type Bounds } from "./bounds";
 
-import type { Bounds } from "./bounds";
 import type {
   ElementsMap,
   ExcalidrawElement,

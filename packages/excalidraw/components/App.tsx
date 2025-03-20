@@ -77,30 +77,9 @@ import {
 } from "@excalidraw/common";
 
 import {
-  dragNewElement,
-  dragSelectedElements,
-  duplicateElement,
   getCommonBounds,
-  getCursorForResizingElement,
-  getDragOffsetXY,
-  getElementWithTransformHandleType,
-  getNormalizedDimensions,
-  getResizeArrowDirection,
-  getResizeOffsetXY,
-  getLockedLinearCursorAlignSize,
-  getTransformHandleTypeFromCoords,
-  isInvisiblySmallElement,
-  isNonDeletedElement,
-  isTextElement,
-  newElement,
-  newLinearElement,
-  newTextElement,
-  newImageElement,
-  transformElements,
-  refreshTextDimensions,
-  redrawTextBoundingBox,
   getElementAbsoluteCoords,
-} from "@excalidraw/element";
+} from "@excalidraw/element/bounds";
 
 import {
   bindOrUnbindLinearElement,
@@ -132,6 +111,12 @@ import {
   newMagicFrameElement,
   newIframeElement,
   newArrowElement,
+  duplicateElement,
+  newElement,
+  newImageElement,
+  newLinearElement,
+  newTextElement,
+  refreshTextDimensions,
 } from "@excalidraw/element/newElement";
 
 import {
@@ -154,11 +139,15 @@ import {
   isElbowArrow,
   isFlowchartNodeElement,
   isBindableElement,
+  isTextElement,
 } from "@excalidraw/element/typeChecks";
 
 import {
+  getLockedLinearCursorAlignSize,
+  getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
+  isInvisiblySmallElement,
 } from "@excalidraw/element/sizeHelpers";
 
 import {
@@ -216,6 +205,7 @@ import {
   getContainerCenter,
   getContainerElement,
   isValidTextContainer,
+  redrawTextBoundingBox,
 } from "@excalidraw/element/textElement";
 
 import { shouldShowBoundingBox } from "@excalidraw/element/transformHandles";
@@ -294,6 +284,26 @@ import {
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
 } from "@excalidraw/element/selection";
+
+import {
+  getResizeOffsetXY,
+  getResizeArrowDirection,
+  transformElements,
+} from "@excalidraw/element/resizeElements";
+
+import {
+  getCursorForResizingElement,
+  getElementWithTransformHandleType,
+  getTransformHandleTypeFromCoords,
+} from "@excalidraw/element/resizeTest";
+
+import {
+  dragNewElement,
+  dragSelectedElements,
+  getDragOffsetXY,
+} from "@excalidraw/element/dragElements";
+
+import { isNonDeletedElement } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 

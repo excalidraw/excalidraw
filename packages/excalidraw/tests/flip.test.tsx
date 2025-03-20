@@ -3,9 +3,9 @@ import React from "react";
 import { vi } from "vitest";
 
 import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
-import { getElementAbsoluteCoords } from "@excalidraw/element";
-import { newLinearElement } from "@excalidraw/element";
 import { getBoundTextElementPosition } from "@excalidraw/element/textElement";
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { newLinearElement } from "@excalidraw/element/newElement";
 
 import type { LocalPoint } from "@excalidraw/math";
 

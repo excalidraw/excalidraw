@@ -5,7 +5,6 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
   getFontFamilyFallbacks,
 } from "@excalidraw/common";
-import { isTextElement } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element/textElement";
 import { charWidth } from "@excalidraw/element/textMeasurements";
 import { containsCJK } from "@excalidraw/element/textWrapping";
@@ -19,6 +18,8 @@ import {
 } from "@excalidraw/common";
 
 import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import { isTextElement } from "@excalidraw/element/typeChecks";
 
 import type {
   ExcalidrawElement,

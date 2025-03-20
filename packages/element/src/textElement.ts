@@ -21,9 +21,11 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
-import { isBoundToContainer, isArrowElement } from "./typeChecks";
-
-import { isTextElement } from "./";
+import {
+  isBoundToContainer,
+  isArrowElement,
+  isTextElement,
+} from "./typeChecks";
 
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {

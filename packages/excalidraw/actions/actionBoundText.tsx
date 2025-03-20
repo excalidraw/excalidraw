@@ -6,7 +6,6 @@ import {
   arrayToMap,
   getFontString,
 } from "@excalidraw/common";
-import { isTextElement, newElement } from "@excalidraw/element";
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
@@ -23,6 +22,7 @@ import {
 import {
   hasBoundTextElement,
   isTextBindableContainer,
+  isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
@@ -30,6 +30,8 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 import { measureText } from "@excalidraw/element/textMeasurements";
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
+import { newElement } from "@excalidraw/element/newElement";
 
 import type {
   ExcalidrawElement,

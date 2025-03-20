@@ -3,11 +3,11 @@ import { act, fireEvent, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
-import { getCommonBounds, isTextElement } from "@excalidraw/element";
-
 import { setDateTimeForTests, reseed } from "@excalidraw/common";
 
 import { isInGroup } from "@excalidraw/element/groups";
+
+import { isTextElement } from "@excalidraw/element/typeChecks";
 
 import type { Degrees } from "@excalidraw/math";
 
@@ -17,7 +17,7 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, mutateElement } from "../..";
+import { Excalidraw, getCommonBounds, mutateElement } from "../..";
 import { actionGroup } from "../../actions";
 import { t } from "../../i18n";
 import * as StaticScene from "../../renderer/staticScene";

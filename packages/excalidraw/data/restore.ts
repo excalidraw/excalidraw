@@ -18,12 +18,7 @@ import {
   normalizeLink,
   getLineHeight,
 } from "@excalidraw/common";
-import {
-  getNonDeletedElements,
-  getNormalizedDimensions,
-  isInvisiblySmallElement,
-  refreshTextDimensions,
-} from "@excalidraw/element";
+import { getNonDeletedElements } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element/binding";
 import {
   updateElbowArrowPoints,
@@ -43,6 +38,10 @@ import {
 } from "@excalidraw/element/typeChecks";
 
 import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
+import { refreshTextDimensions } from "@excalidraw/element/newElement";
+
+import { getNormalizedDimensions } from "@excalidraw/element/sizeHelpers";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -71,6 +70,8 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
+
+import { isInvisiblySmallElement } from "..";
 
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";

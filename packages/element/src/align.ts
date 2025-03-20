@@ -1,13 +1,12 @@
-import { updateBoundElements } from "@excalidraw/element/binding";
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
-import { mutateElement } from "@excalidraw/element/mutateElement";
-
-import { getMaximumGroups } from "@excalidraw/element/groups";
-
-import type { BoundingBox } from "@excalidraw/element/bounds";
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
-
 import type Scene from "@excalidraw/excalidraw/scene/Scene";
+
+import { updateBoundElements } from "./binding";
+import { getCommonBoundingBox } from "./bounds";
+import { mutateElement } from "./mutateElement";
+import { getMaximumGroups } from "./groups";
+
+import type { BoundingBox } from "./bounds";
+import type { ElementsMap, ExcalidrawElement } from "./types";
 
 export interface Alignment {
   position: "start" | "center" | "end";

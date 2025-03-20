@@ -1,13 +1,6 @@
 import { isShallowEqual } from "@excalidraw/common";
 
 import type {
-  ElementsMap,
-  ElementsMapOrArray,
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
-
-import type {
   AppState,
   InteractiveCanvasAppState,
 } from "@excalidraw/excalidraw/types";
@@ -20,6 +13,13 @@ import {
   getContainingFrame,
   getFrameChildren,
 } from "./frame";
+
+import type {
+  ElementsMap,
+  ElementsMapOrArray,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./types";
 
 /**
  * Frames and their containing elements are not to be selected at the same time.

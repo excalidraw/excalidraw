@@ -14,11 +14,6 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
-import type {
-  MaybePromise,
-  ResolutionType,
-} from "@excalidraw/common/utility-types";
-
 import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
@@ -27,6 +22,8 @@ import {
   isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
+
+import type { MaybePromise, ResolutionType } from "./utility-types";
 
 import type { EVENT } from "./constants";
 
