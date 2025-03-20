@@ -9687,9 +9687,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !activeTool.locked &&
         activeTool.type !== "freedraw" &&
-        // if lasso is turned on but from selection => reset to selection
-        activeTool.type === "lasso" &&
-        activeTool.fromSelection
+        (activeTool.type !== "lasso" ||
+          // if lasso is turned on but from selection => reset to selection
+          (activeTool.type === "lasso" && activeTool.fromSelection))
       ) {
         resetCursor(this.interactiveCanvas);
         this.setState({
