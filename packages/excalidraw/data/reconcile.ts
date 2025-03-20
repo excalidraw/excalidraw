@@ -1,6 +1,5 @@
 import throttle from "lodash.throttle";
 
-import { ENV } from "../constants";
 import {
   orderByFractionalIndex,
   syncInvalidIndices,

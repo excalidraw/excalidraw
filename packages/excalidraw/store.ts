@@ -1,6 +1,5 @@
 import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
-import { ENV } from "./constants";
 import { newElementWith } from "./element/mutateElement";
 import { Emitter } from "./emitter";
 import { isDevEnv, isShallowEqual, isTestEnv } from "./utils";

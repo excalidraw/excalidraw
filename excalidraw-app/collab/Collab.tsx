@@ -6,7 +6,7 @@ import {
   reconcileElements,
 } from "@excalidraw/excalidraw";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "@excalidraw/excalidraw/constants";
+import { APP_NAME, EVENT } from "@excalidraw/excalidraw/constants";
 import {
   IDLE_THRESHOLD,
   ACTIVE_THRESHOLD,

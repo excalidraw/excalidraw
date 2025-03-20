@@ -1,6 +1,5 @@
 import throttle from "lodash.throttle";
 
-import { ENV } from "../constants";
 import { isNonDeletedElement } from "../element";
 import { isFrameLikeElement } from "../element/typeChecks";
 import {

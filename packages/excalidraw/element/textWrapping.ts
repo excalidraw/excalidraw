@@ -1,4 +1,3 @@
-import { ENV } from "../constants";
 import { isDevEnv, isTestEnv } from "../utils";
 
 import { charWidth, getLineWidth } from "./textMeasurements";
