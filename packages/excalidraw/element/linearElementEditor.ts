@@ -37,7 +37,7 @@ import { updateElbowArrowPoints } from "./elbowArrow";
 
 import { getElementPointsCoords, getMinMaxXYFromCurvePathOps } from "./bounds";
 import { headingIsHorizontal, vectorToHeading } from "./heading";
-import { mutateElement } from "./mutateElement";
+import { bumpVersion, mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isBindingElement,
@@ -1473,6 +1473,7 @@ export class LinearElementEditor {
         Object.assign(element, {
           ...updates,
           angle: 0 as Radians,
+
           ...updateElbowArrowPoints(
             element,
             options.sceneElementsMap,
@@ -1483,6 +1484,7 @@ export class LinearElementEditor {
           ),
         });
       }
+      bumpVersion(element);
     } else {
       const nextCoords = getElementPointsCoords(element, nextPoints);
       const prevCoords = getElementPointsCoords(element, element.points);
