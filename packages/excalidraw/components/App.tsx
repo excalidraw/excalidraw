@@ -6562,6 +6562,7 @@ class App extends React.Component<AppProps, AppState> {
       this.lassoTrail.startPath(
         pointerDownState.origin.x,
         pointerDownState.origin.y,
+        event.shiftKey,
       );
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
@@ -7020,7 +7021,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private clearSelectionIfNotUsingSelection = (): void => {
-    if (this.state.activeTool.type !== "selection") {
+    if (
+      this.state.activeTool.type !== "selection" &&
+      this.state.activeTool.type !== "lasso"
+    ) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
@@ -8261,7 +8265,8 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
           !this.state.editingTextElement &&
-          this.state.activeEmbeddable?.state !== "active"
+          this.state.activeEmbeddable?.state !== "active" &&
+          this.state.activeTool.type !== "lasso"
         ) {
           const dragOffset = {
             x: pointerCoords.x - pointerDownState.origin.x,
@@ -8611,7 +8616,11 @@ class App extends React.Component<AppProps, AppState> {
           this.lassoTrail.endPath();
           selectionSwitch = false;
         } else {
-          this.lassoTrail.addPointToPath(pointerCoords.x, pointerCoords.y);
+          this.lassoTrail.addPointToPath(
+            pointerCoords.x,
+            pointerCoords.y,
+            event.shiftKey,
+          );
         }
       } else {
         // It is very important to read this.state within each move event,

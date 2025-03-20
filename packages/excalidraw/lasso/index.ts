@@ -26,6 +26,7 @@ export class LassoTrail extends AnimatedTrail {
   private worker: Worker | null = null;
   private elementsSegments: Map<string, LineSegment<GlobalPoint>[]> | null =
     null;
+  private keepPreviousSelection: boolean = false;
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
     super(animationFrameHandler, app, {
@@ -49,13 +50,23 @@ export class LassoTrail extends AnimatedTrail {
     });
   }
 
-  startPath(x: number, y: number) {
+  startPath(x: number, y: number, keepPreviousSelection = false) {
     // clear any existing trails just in case
     this.endPath();
 
     super.startPath(x, y);
     this.intersectedElements.clear();
     this.enclosedElements.clear();
+
+    this.keepPreviousSelection = keepPreviousSelection;
+
+    if (!this.keepPreviousSelection) {
+      this.app.setState({
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        selectedLinearElement: null,
+      });
+    }
 
     try {
       this.worker = new LassoWorker();
@@ -79,6 +90,12 @@ export class LassoTrail extends AnimatedTrail {
         acc[id] = true;
         return acc;
       }, {} as Record<ExcalidrawElement["id"], true>);
+
+      if (this.keepPreviousSelection) {
+        for (const id of Object.keys(prevState.selectedElementIds)) {
+          nextSelectedElementIds[id] = true;
+        }
+      }
 
       for (const [id] of Object.entries(nextSelectedElementIds)) {
         const element = this.app.scene.getNonDeletedElement(id);
@@ -123,8 +140,10 @@ export class LassoTrail extends AnimatedTrail {
     });
   };
 
-  addPointToPath = (x: number, y: number) => {
+  addPointToPath = (x: number, y: number, keepPreviousSelection = false) => {
     super.addPointToPath(x, y);
+
+    this.keepPreviousSelection = keepPreviousSelection;
 
     this.app.setState({
       lassoSelection: {
