@@ -4696,7 +4696,7 @@ class App extends React.Component<AppProps, AppState> {
             }
         )
       | { type: "custom"; customType: string }
-    ) & { locked?: boolean },
+    ) & { locked?: boolean; fromSelection?: boolean },
   ) => {
     if (!this.isToolSupported(tool.type)) {
       console.warn(
@@ -8592,7 +8592,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
-          this.setActiveTool({ type: "lasso" });
+          this.setActiveTool({ type: "lasso", fromSelection: true });
           this.lassoTrail.startPath(pointerCoords.x, pointerCoords.y);
           this.setAppState({
             selectionElement: null,
@@ -9684,7 +9684,13 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw") {
+      if (
+        !activeTool.locked &&
+        activeTool.type !== "freedraw" &&
+        // if lasso is turned on but from selection => reset to selection
+        activeTool.type === "lasso" &&
+        activeTool.fromSelection
+      ) {
         resetCursor(this.interactiveCanvas);
         this.setState({
           newElement: null,

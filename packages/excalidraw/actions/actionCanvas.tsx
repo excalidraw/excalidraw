@@ -532,6 +532,7 @@ export const actionToggleLassoTool = register({
     if (appState.activeTool.type !== "lasso") {
       activeTool = updateActiveTool(appState, {
         type: "lasso",
+        fromSelection: false,
       });
       setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
     } else {
