@@ -395,6 +395,7 @@ import ShapeSwitch, {
   GENERIC_SWITCHABLE_SHAPES,
   LINEAR_SWITCHABLE_SHAPES,
   shapeSwitchAtom,
+  shapeSwitchFontSizeAtom,
 } from "./ShapeSwitch";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
@@ -4143,6 +4144,18 @@ class App extends React.Component<AppProps, AppState> {
             editorJotaiStore.set(shapeSwitchAtom, {
               type: "panel",
             });
+            if (!editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
+              const boundText = getBoundTextElement(
+                firstElement,
+                this.scene.getNonDeletedElementsMap(),
+              );
+              if (boundText && isGenericSwitchable) {
+                editorJotaiStore.set(shapeSwitchFontSizeAtom, {
+                  fontSize: boundText.fontSize,
+                  elementType: firstElement.type,
+                });
+              }
+            }
           }
         }
 
@@ -4829,7 +4842,26 @@ class App extends React.Component<AppProps, AppState> {
             : firstElement.roundness,
       });
 
-      if (firstElement.boundElements?.some((e) => e.type === "text")) {
+      const boundText = getBoundTextElement(
+        firstElement,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      if (boundText) {
+        if (
+          editorJotaiStore.get(shapeSwitchFontSizeAtom)?.elementType ===
+          tool.type
+        ) {
+          mutateElement(
+            boundText,
+            {
+              fontSize:
+                editorJotaiStore.get(shapeSwitchFontSizeAtom)?.fontSize ??
+                boundText.fontSize,
+            },
+            false,
+          );
+        }
+
         this.startTextEditing({
           sceneX: firstElement.x + firstElement.width / 2,
           sceneY: firstElement.y + firstElement.height / 2,

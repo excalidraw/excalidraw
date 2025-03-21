@@ -45,11 +45,18 @@ export const shapeSwitchAtom = atom<
     }
   | null
 >(null);
+export const shapeSwitchFontSizeAtom = atom<{
+  fontSize: number;
+  elementType: "rectangle" | "diamond" | "ellipse";
+} | null>(null);
 
 const ShapeSwitch = ({ app }: { app: App }) => {
   const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
+  const [, setShapeSwitchFontSize] = useAtom(shapeSwitchFontSizeAtom);
 
+  // clear if not active
   if (!shapeSwitch) {
+    setShapeSwitchFontSize(null);
     return null;
   }
 
@@ -59,24 +66,29 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   );
   const firstElement = selectedElements[0];
 
-  if (shapeSwitch.type === "hint" && firstElement.id !== shapeSwitch.id) {
+  const isSingleSelected = firstElement && selectedElements.length === 1;
+
+  // clear if hint target no longer matches
+  if (shapeSwitch.type === "hint" && firstElement?.id !== shapeSwitch.id) {
     setShapeSwitch(null);
     return null;
   }
 
-  if (firstElement && selectedElements.length === 1) {
-    switch (shapeSwitch.type) {
-      case "hint":
-        return <Hint app={app} element={firstElement} />;
-      case "panel":
-        return <Panel app={app} element={firstElement} />;
-      default:
-        return null;
-    }
+  if (!isSingleSelected) {
+    setShapeSwitch(null);
+    return null;
   }
 
-  setShapeSwitch(null);
-  return null;
+  const props = { app, element: firstElement };
+
+  switch (shapeSwitch.type) {
+    case "hint":
+      return <Hint {...props} />;
+    case "panel":
+      return <Panel {...props} />;
+    default:
+      return null;
+  }
 };
 
 const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
