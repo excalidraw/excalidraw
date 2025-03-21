@@ -4829,8 +4829,6 @@ class App extends React.Component<AppProps, AppState> {
             : firstElement.roundness,
       });
 
-      this.setActiveTool({ type: "selection" });
-
       if (firstElement.boundElements?.some((e) => e.type === "text")) {
         this.startTextEditing({
           sceneX: firstElement.x + firstElement.width / 2,
@@ -4840,13 +4838,14 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      textWysiwygSubmitHandler?.();
-
-      this.setState({
+      this.setState((prevState) => ({
         selectedElementIds: {
           [firstElement.id]: true,
         },
-      });
+        activeTool: updateActiveTool(prevState, { type: "selection" }),
+      }));
+
+      textWysiwygSubmitHandler?.();
 
       this.store.shouldCaptureIncrement();
     }
@@ -4865,30 +4864,15 @@ class App extends React.Component<AppProps, AppState> {
         endArrowhead: tool.type === "arrow" ? "arrow" : null,
       });
 
-      this.setActiveTool({ type: "selection" });
-
-      if (
-        firstElement.boundElements?.some((e) => e.type === "text") &&
-        isArrowElement(firstElement)
-      ) {
-        this.startTextEditing({
-          sceneX: firstElement.x + firstElement.width / 2,
-          sceneY: firstElement.y + firstElement.height / 2,
-          container: firstElement,
-          keepContainerDimensions: true,
-        });
-      }
-
-      textWysiwygSubmitHandler?.();
-
-      this.setState({
+      this.setState((prevState) => ({
         selectedElementIds: {
           [firstElement.id]: true,
         },
         selectedLinearElement: new LinearElementEditor(
           firstElement as ExcalidrawLinearElement,
         ),
-      });
+        activeTool: updateActiveTool(prevState, { type: "selection" }),
+      }));
     }
   };
 
