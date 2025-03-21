@@ -55,6 +55,8 @@ import {
 
 import { hasStrokeColor } from "@excalidraw/element/comparisons";
 
+import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
@@ -1582,7 +1584,7 @@ export const actionChangeArrowType = register({
       if (!isArrowElement(el)) {
         return el;
       }
-      const newElement = newElementWith(el, {
+      let newElement = newElementWith(el, {
         roundness:
           value === ARROW_TYPE.round
             ? {
@@ -1597,6 +1599,8 @@ export const actionChangeArrowType = register({
       });
 
       if (isElbowArrow(newElement)) {
+        newElement.fixedSegments = null;
+
         const elementsMap = app.scene.getNonDeletedElementsMap();
 
         app.dismissLinearEditor();
@@ -1671,46 +1675,71 @@ export const actionChangeArrowType = register({
         endHoveredElement &&
           bindLinearElement(newElement, endHoveredElement, "end", elementsMap);
 
-        mutateElement(newElement, {
-          points: [finalStartPoint, finalEndPoint].map(
-            (p): LocalPoint =>
-              pointFrom(p[0] - newElement.x, p[1] - newElement.y),
-          ),
-          ...(startElement && newElement.startBinding
+        const startBinding =
+          startElement && newElement.startBinding
             ? {
-                startBinding: {
-                  // @ts-ignore TS cannot discern check above
-                  ...newElement.startBinding!,
-                  ...calculateFixedPointForElbowArrowBinding(
-                    newElement,
-                    startElement,
-                    "start",
-                    elementsMap,
-                  ),
-                },
+                // @ts-ignore TS cannot discern check above
+                ...newElement.startBinding!,
+                ...calculateFixedPointForElbowArrowBinding(
+                  newElement,
+                  startElement,
+                  "start",
+                  elementsMap,
+                ),
               }
-            : {}),
-          ...(endElement && newElement.endBinding
+            : null;
+        const endBinding =
+          endElement && newElement.endBinding
             ? {
-                endBinding: {
-                  // @ts-ignore TS cannot discern check above
-                  ...newElement.endBinding,
-                  ...calculateFixedPointForElbowArrowBinding(
-                    newElement,
-                    endElement,
-                    "end",
-                    elementsMap,
-                  ),
-                },
+                // @ts-ignore TS cannot discern check above
+                ...newElement.endBinding,
+                ...calculateFixedPointForElbowArrowBinding(
+                  newElement,
+                  endElement,
+                  "end",
+                  elementsMap,
+                ),
               }
-            : {}),
-        });
+            : null;
+
+        newElement = {
+          ...newElement,
+          startBinding,
+          endBinding,
+          ...updateElbowArrowPoints(newElement, elementsMap, {
+            points: [finalStartPoint, finalEndPoint].map(
+              (p): LocalPoint =>
+                pointFrom(p[0] - newElement.x, p[1] - newElement.y),
+            ),
+            startBinding,
+            endBinding,
+            fixedSegments: null,
+          }),
+        };
 
         LinearElementEditor.updateEditorMidPointsCache(
           newElement,
           elementsMap,
           app.state,
         );
+      } else {
+        const elementsMap = app.scene.getNonDeletedElementsMap();
+        if (newElement.startBinding) {
+          const startElement = elementsMap.get(
+            newElement.startBinding.elementId,
+          ) as ExcalidrawBindableElement;
+          if (startElement) {
+            bindLinearElement(newElement, startElement, "start", elementsMap);
+          }
+        }
+        if (newElement.endBinding) {
+          const endElement = elementsMap.get(
+            newElement.endBinding.elementId,
+          ) as ExcalidrawBindableElement;
+          if (endElement) {
+            bindLinearElement(newElement, endElement, "end", elementsMap);
+          }
+        }
       }
 
       return newElement;
