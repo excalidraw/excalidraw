@@ -31,7 +31,20 @@ import type { ToolType } from "../types";
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
 
-export const shapeSwitchAtom = atom<"hint" | "panel" | null>(null);
+export const GENERIC_SWITCHABLE_SHAPES = ["rectangle", "diamond", "ellipse"];
+
+export const LINEAR_SWITCHABLE_SHAPES = ["line", "arrow"];
+
+export const shapeSwitchAtom = atom<
+  | {
+      type: "hint";
+      id: string;
+    }
+  | {
+      type: "panel";
+    }
+  | null
+>(null);
 
 const ShapeSwitch = ({ app }: { app: App }) => {
   const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
@@ -46,8 +59,13 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   );
   const firstElement = selectedElements[0];
 
+  if (shapeSwitch.type === "hint" && firstElement.id !== shapeSwitch.id) {
+    setShapeSwitch(null);
+    return null;
+  }
+
   if (firstElement && selectedElements.length === 1) {
-    switch (shapeSwitch) {
+    switch (shapeSwitch.type) {
       case "hint":
         return <Hint app={app} element={firstElement} />;
       case "panel":
@@ -64,13 +82,6 @@ const ShapeSwitch = ({ app }: { app: App }) => {
 const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
   const [, setShapeSwitch] = useAtom(shapeSwitchAtom);
   const hintRef = useRef<HTMLDivElement>(null);
-  const initialElementRef = useRef(element);
-
-  useEffect(() => {
-    if (element !== initialElementRef.current) {
-      setShapeSwitch(null);
-    }
-  }, [element, setShapeSwitch]);
 
   useEffect(() => {
     const hint = hintRef.current;
@@ -89,10 +100,6 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
       hint.removeEventListener("animationend", handleAnimationEnd);
     };
   }, [setShapeSwitch]);
-
-  if (element !== initialElementRef.current) {
-    return null;
-  }
 
   const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
     element,
@@ -140,22 +147,6 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
 };
 
 const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
-  const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
-
-  const isMounted = useRef(true);
-  useEffect(() => {
-    isMounted.current = true;
-
-    return () => {
-      isMounted.current = false;
-      requestAnimationFrame(() => {
-        if (!isMounted.current && shapeSwitch === "panel") {
-          setShapeSwitch(null);
-        }
-      });
-    };
-  }, [shapeSwitch, setShapeSwitch]);
-
   const [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
     element,
     app.scene.getNonDeletedElementsMap(),

@@ -391,7 +391,11 @@ import {
   getMinTextElementWidth,
 } from "../element/textMeasurements";
 
-import ShapeSwitch, { shapeSwitchAtom } from "./ShapeSwitch";
+import ShapeSwitch, {
+  GENERIC_SWITCHABLE_SHAPES,
+  LINEAR_SWITCHABLE_SHAPES,
+  shapeSwitchAtom,
+} from "./ShapeSwitch";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -4116,25 +4120,29 @@ class App extends React.Component<AppProps, AppState> {
           if (event.key === KEYS.ESCAPE) {
             editorJotaiStore.set(shapeSwitchAtom, null);
           } else if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
-            if (editorJotaiStore.get(shapeSwitchAtom) === "panel") {
-              if (isGenericSwitchable) {
-                const index = ["rectangle", "diamond", "ellipse"].indexOf(
-                  selectedElements[0].type,
-                );
-                const nextType = ["rectangle", "diamond", "ellipse"][
-                  (index + 1) % 3
-                ] as ToolType;
-                this.setActiveTool({ type: nextType });
-              } else if (isLinearSwitchable) {
-                const index = ["arrow", "line"].indexOf(
-                  selectedElements[0].type,
-                );
-                const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
-                this.setActiveTool({ type: nextType });
-              }
+            event.preventDefault();
+
+            if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
+              const index = isGenericSwitchable
+                ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+                : LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type);
+
+              const nextType = (
+                isGenericSwitchable
+                  ? GENERIC_SWITCHABLE_SHAPES[
+                      (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
+                    ]
+                  : LINEAR_SWITCHABLE_SHAPES[
+                      (index + 1) % LINEAR_SWITCHABLE_SHAPES.length
+                    ]
+              ) as ToolType;
+
+              this.setActiveTool({ type: nextType });
             }
 
-            editorJotaiStore.set(shapeSwitchAtom, "panel");
+            editorJotaiStore.set(shapeSwitchAtom, {
+              type: "panel",
+            });
           }
         }
 
@@ -4700,7 +4708,10 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
 
-          editorJotaiStore.set(shapeSwitchAtom, "hint");
+          editorJotaiStore.set(shapeSwitchAtom, {
+            type: "hint",
+            id: firstNode.id,
+          });
         }
 
         this.flowChartCreator.clear();
