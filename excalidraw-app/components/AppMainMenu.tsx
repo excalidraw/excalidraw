@@ -12,6 +12,7 @@ import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
+import { isDevEnv } from "@excalidraw/excalidraw/utils";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -57,7 +58,7 @@ export const AppMainMenu: React.FC<{
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       </MainMenu.ItemLink>
-      {import.meta.env.DEV && (
+      {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
           onClick={() => {

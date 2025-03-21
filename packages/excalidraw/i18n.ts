@@ -3,6 +3,7 @@ import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
 import type { NestedKeyOf } from "./utility-types";
+import { isDevEnv } from "./utils";
 
 const COMPLETION_THRESHOLD = 85;
 
@@ -73,7 +74,7 @@ export const languages: Language[] = [
 ];
 
 const TEST_LANG_CODE = "__test__";
-if (import.meta.env.DEV) {
+if (isDevEnv()) {
   languages.unshift(
     { code: TEST_LANG_CODE, label: "test language" },
     {
