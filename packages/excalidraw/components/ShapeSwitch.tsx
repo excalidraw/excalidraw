@@ -4,7 +4,7 @@ import clsx from "clsx";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { editorJotaiStore, atom } from "../editor-jotai";
+import { atom, useAtom } from "../editor-jotai";
 
 import { getElementAbsoluteCoords } from "../element";
 import { sceneCoordsToViewportCoords } from "../utils";
@@ -34,9 +34,9 @@ const GAP_VERTICAL = 10;
 export const shapeSwitchAtom = atom<"hint" | "panel" | null>(null);
 
 const ShapeSwitch = ({ app }: { app: App }) => {
-  const shapeSwitchAtomValue = editorJotaiStore.get(shapeSwitchAtom);
+  const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
 
-  if (!shapeSwitchAtomValue) {
+  if (!shapeSwitch) {
     return null;
   }
 
@@ -47,7 +47,7 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   const firstElement = selectedElements[0];
 
   if (firstElement && selectedElements.length === 1) {
-    switch (shapeSwitchAtomValue) {
+    switch (shapeSwitch) {
       case "hint":
         return <Hint app={app} element={firstElement} />;
       case "panel":
@@ -57,10 +57,43 @@ const ShapeSwitch = ({ app }: { app: App }) => {
     }
   }
 
+  setShapeSwitch(null);
   return null;
 };
 
 const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
+  const [, setShapeSwitch] = useAtom(shapeSwitchAtom);
+  const hintRef = useRef<HTMLDivElement>(null);
+  const initialElementRef = useRef(element);
+
+  useEffect(() => {
+    if (element !== initialElementRef.current) {
+      setShapeSwitch(null);
+    }
+  }, [element, setShapeSwitch]);
+
+  useEffect(() => {
+    const hint = hintRef.current;
+    if (!hint) {
+      return;
+    }
+
+    const handleAnimationEnd = () => {
+      hint.classList.remove("animation");
+      setShapeSwitch(null);
+    };
+
+    hint.addEventListener("animationend", handleAnimationEnd, { once: true });
+
+    return () => {
+      hint.removeEventListener("animationend", handleAnimationEnd);
+    };
+  }, [setShapeSwitch]);
+
+  if (element !== initialElementRef.current) {
+    return null;
+  }
+
   const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
     element,
     app.scene.getNonDeletedElementsMap(),
@@ -79,23 +112,6 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
     },
     app.state,
   );
-
-  const hintRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const listener = () => {
-      hintRef.current?.classList.remove("animation");
-    };
-
-    const hint = hintRef.current;
-
-    if (hint) {
-      hint.addEventListener("animationend", listener);
-      editorJotaiStore.set(shapeSwitchAtom, null);
-    }
-
-    return () => hint?.removeEventListener("animationend", listener);
-  }, [element.id]);
 
   return (
     <div
@@ -124,6 +140,22 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
 };
 
 const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
+  const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
+
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => {
+      isMounted.current = false;
+      requestAnimationFrame(() => {
+        if (!isMounted.current && shapeSwitch === "panel") {
+          setShapeSwitch(null);
+        }
+      });
+    };
+  }, [shapeSwitch, setShapeSwitch]);
+
   const [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
     element,
     app.scene.getNonDeletedElementsMap(),
@@ -153,12 +185,6 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
         ["diamond", "3", DiamondIcon],
         ["ellipse", "4", EllipseIcon],
       ];
-
-  useEffect(() => {
-    return () => {
-      editorJotaiStore.set(shapeSwitchAtom, null);
-    };
-  }, []);
 
   return (
     <div

@@ -4116,21 +4116,25 @@ class App extends React.Component<AppProps, AppState> {
           if (event.key === KEYS.ESCAPE) {
             editorJotaiStore.set(shapeSwitchAtom, null);
           } else if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
-            editorJotaiStore.set(shapeSwitchAtom, "panel");
-
-            if (isGenericSwitchable) {
-              const index = ["rectangle", "diamond", "ellipse"].indexOf(
-                selectedElements[0].type,
-              );
-              const nextType = ["rectangle", "diamond", "ellipse"][
-                (index + 1) % 3
-              ] as ToolType;
-              this.setActiveTool({ type: nextType });
-            } else if (isLinearSwitchable) {
-              const index = ["arrow", "line"].indexOf(selectedElements[0].type);
-              const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
-              this.setActiveTool({ type: nextType });
+            if (editorJotaiStore.get(shapeSwitchAtom) === "panel") {
+              if (isGenericSwitchable) {
+                const index = ["rectangle", "diamond", "ellipse"].indexOf(
+                  selectedElements[0].type,
+                );
+                const nextType = ["rectangle", "diamond", "ellipse"][
+                  (index + 1) % 3
+                ] as ToolType;
+                this.setActiveTool({ type: nextType });
+              } else if (isLinearSwitchable) {
+                const index = ["arrow", "line"].indexOf(
+                  selectedElements[0].type,
+                );
+                const nextType = ["arrow", "line"][(index + 1) % 2] as ToolType;
+                this.setActiveTool({ type: nextType });
+              }
             }
+
+            editorJotaiStore.set(shapeSwitchAtom, "panel");
           }
         }
 
