@@ -103,7 +103,9 @@ export const duplicateElements = (
       editingGroupId: AppState["editingGroupId"];
       selectedGroupIds: AppState["selectedGroupIds"];
     };
-    overrides?: (element: ExcalidrawElement) => Partial<ExcalidrawElement>;
+    overrides?: (
+      originalElement: ExcalidrawElement,
+    ) => Partial<ExcalidrawElement>;
     randomizeSeed?: boolean;
     reverseOrder?: boolean;
   },
