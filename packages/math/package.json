@@ -53,7 +53,10 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildMath.js && yarn gen:types"
+    "gen:types": "rimraf -rf types && tsc",
+    "build:esm": "rimraf -rf dist && node ../../scripts/buildMath.js && yarn gen:types"
+  },
+  "devDependencies": {
+    "rimraf": "6.0.1"
   }
 }
