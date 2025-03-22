@@ -97,7 +97,7 @@ export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
 }
 
 /**
- * Roate a point by [angle] radians.
+ * Rotate a point by [angle] radians.
  *
  * @param point The point to rotate
  * @param center The point to rotate around, the center point
@@ -116,7 +116,7 @@ export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
 }
 
 /**
- * Roate a point by [angle] degree.
+ * Rotate a point by [angle] degree.
  *
  * @param point The point to rotate
  * @param center The point to rotate around, the center point
