@@ -198,7 +198,7 @@ export const duplicateElements = (
   ) => {
     invariant(index !== -1, "targetIndex === -1 ");
 
-    if (!Array.isArray(elements) && !elements) {
+    if (!elements) {
       return;
     }
 
@@ -213,7 +213,7 @@ export const duplicateElements = (
     }
 
     elementsWithClones.splice(
-      index + (!!opts?.reverseOrder ? 0 : 1),
+      index + (opts?.reverseOrder ? 0 : 1),
       0,
       ...castArray(elements),
     );
@@ -304,7 +304,7 @@ export const duplicateElements = (
 
       if (boundTextElement) {
         insertBeforeOrAfterIndex(
-          targetIndex + (!!opts?.reverseOrder ? -1 : 0),
+          targetIndex + (opts?.reverseOrder ? -1 : 0),
           copyElements([element, boundTextElement]),
         );
       } else {
