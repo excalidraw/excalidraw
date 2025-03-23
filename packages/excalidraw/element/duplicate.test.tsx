@@ -7,7 +7,12 @@ import { FONT_FAMILY, ORIG_ID, ROUNDNESS } from "../constants";
 import { API } from "../tests/helpers/api";
 import { isPrimitive } from "../utils";
 
-import { act, assertElements, render } from "../tests/test-utils";
+import {
+  act,
+  assertElements,
+  getCloneByOrigId,
+  render,
+} from "../tests/test-utils";
 import { Excalidraw } from "..";
 import { actionDuplicateSelection } from "../actions";
 
@@ -162,7 +167,10 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, text2] as const;
-    const { newElements: clonedElements } = duplicateElements(origElements);
+    const { newElements: clonedElements } = duplicateElements({
+      type: "everything",
+      elements: origElements,
+    });
 
     // generic id in-equality checks
     // --------------------------------------------------------------------------
@@ -313,9 +321,10 @@ describe("duplicating multiple elements", () => {
     // -------------------------------------------------------------------------
 
     const origElements = [rectangle1, text1, arrow1, arrow2, arrow3] as const;
-    const { newElements: clonedElements } = duplicateElements(
-      origElements,
-    ) as any as { newElements: typeof origElements };
+    const { newElements: clonedElements } = duplicateElements({
+      type: "everything",
+      elements: origElements,
+    }) as any as { newElements: typeof origElements };
 
     const [
       clonedRectangle,
@@ -359,9 +368,10 @@ describe("duplicating multiple elements", () => {
       });
 
       const origElements = [rectangle1, rectangle2, rectangle3] as const;
-      const { newElements: clonedElements } = duplicateElements(
-        origElements,
-      ) as any as { newElements: typeof origElements };
+      const { newElements: clonedElements } = duplicateElements({
+        type: "everything",
+        elements: origElements,
+      }) as any as { newElements: typeof origElements };
       const [clonedRectangle1, clonedRectangle2, clonedRectangle3] =
         clonedElements;
 
@@ -384,7 +394,7 @@ describe("duplicating multiple elements", () => {
 
       const {
         newElements: [clonedRectangle1],
-      } = duplicateElements([rectangle1]);
+      } = duplicateElements({ type: "everything", elements: [rectangle1] });
 
       expect(typeof clonedRectangle1.groupIds[0]).toBe("string");
       expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);

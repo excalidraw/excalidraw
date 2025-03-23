@@ -53,7 +53,9 @@ export const actionDuplicateSelection = register({
     }
 
     let { newElements: duplicatedElements, elementsWithClones: nextElements } =
-      duplicateElements(elements, {
+      duplicateElements({
+        type: "in-place",
+        elements,
         idsOfElementsToDuplicate: arrayToMap(
           getSelectedElements(elements, appState, {
             includeBoundTextElement: true,
@@ -66,6 +68,7 @@ export const actionDuplicateSelection = register({
           x: element.x + DEFAULT_GRID_SIZE / 2,
           y: element.y + DEFAULT_GRID_SIZE / 2,
         }),
+        reverseOrder: false,
       });
 
     if (app.props.onDuplicate && nextElements) {

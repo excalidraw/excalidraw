@@ -3219,17 +3219,16 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const { newElements } = duplicateElements(
-      elements.map((element) => {
+    const { newElements } = duplicateElements({
+      type: "everything",
+      elements: elements.map((element) => {
         return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
         });
       }),
-      {
-        randomizeSeed: !opts.retainSeed,
-      },
-    );
+      randomizeSeed: !opts.retainSeed,
+    });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
     let nextElements = [...prevElements, ...newElements];
@@ -8434,7 +8433,9 @@ class App extends React.Component<AppProps, AppState> {
             }
 
             const { newElements: clonedElements, elementsWithClones } =
-              duplicateElements(elements, {
+              duplicateElements({
+                type: "in-place",
+                elements,
                 appState: this.state,
                 randomizeSeed: true,
                 idsOfElementsToDuplicate: new Map(

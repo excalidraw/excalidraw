@@ -96,20 +96,62 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 };
 
 export const duplicateElements = (
-  elements: readonly ExcalidrawElement[],
-  opts?: {
-    idsOfElementsToDuplicate?: Map<ExcalidrawElement["id"], ExcalidrawElement>;
-    appState?: {
-      editingGroupId: AppState["editingGroupId"];
-      selectedGroupIds: AppState["selectedGroupIds"];
-    };
+  opts: {
+    elements: readonly ExcalidrawElement[];
+    randomizeSeed?: boolean;
     overrides?: (
       originalElement: ExcalidrawElement,
     ) => Partial<ExcalidrawElement>;
-    randomizeSeed?: boolean;
-    reverseOrder?: boolean;
-  },
+  } & (
+    | {
+        /**
+         * Duplicates all elements in array.
+         *
+         * Use this when programmaticaly duplicating elements, without direct
+         * user interaction.
+         */
+        type: "everything";
+      }
+    | {
+        /**
+         * Duplicates specified elements and inserts them back into the array
+         * in specified order.
+         *
+         * Use this when duplicating Scene elements, during user interaction
+         * such as alt-drag or on duplicate action.
+         */
+        type: "in-place";
+        idsOfElementsToDuplicate: Map<
+          ExcalidrawElement["id"],
+          ExcalidrawElement
+        >;
+        appState: {
+          editingGroupId: AppState["editingGroupId"];
+          selectedGroupIds: AppState["selectedGroupIds"];
+        };
+        /**
+         * If true, duplicated elements are inserted _before_ specified
+         * elements. Case: alt-dragging elements to duplicate them.
+         *
+         * TODO: remove this once (if) we stop replacing the original element
+         * with the duplicated one in the scene array.
+         */
+        reverseOrder: boolean;
+      }
+  ),
 ) => {
+  let { elements } = opts;
+
+  const appState =
+    "appState" in opts
+      ? opts.appState
+      : ({
+          editingGroupId: null,
+          selectedGroupIds: {},
+        } as const);
+
+  const reverseOrder = opts.type === "in-place" ? opts.reverseOrder : false;
+
   // Ids of elements that have already been processed so we don't push them
   // into the array twice if we end up backtracking when retrieving
   // discontiguous group of elements (can happen due to a bug, or in edge
@@ -128,11 +170,12 @@ export const duplicateElements = (
   const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
   const elementsMap = arrayToMap(elements) as ElementsMap;
   const _idsOfElementsToDuplicate =
-    opts?.idsOfElementsToDuplicate ??
-    new Map(elements.map((el) => [el.id, el]));
+    opts.type === "in-place"
+      ? opts.idsOfElementsToDuplicate
+      : new Map(elements.map((el) => [el.id, el]));
 
   // For sanity
-  if (opts?.appState?.selectedGroupIds) {
+  if (opts.type === "in-place") {
     for (const groupId of Object.keys(opts.appState.selectedGroupIds)) {
       elements
         .filter((el) => el.groupIds?.includes(groupId))
@@ -165,11 +208,11 @@ export const duplicateElements = (
         processedIds.set(element.id, true);
 
         const newElement = duplicateElement(
-          opts?.appState?.editingGroupId ?? null,
+          appState.editingGroupId,
           groupIdMap,
           element,
-          opts?.overrides?.(element),
-          opts?.randomizeSeed,
+          opts.overrides?.(element),
+          opts.randomizeSeed,
         );
 
         processedIds.set(newElement.id, true);
@@ -204,18 +247,18 @@ export const duplicateElements = (
       return;
     }
 
-    if (opts?.reverseOrder && index < 1) {
+    if (reverseOrder && index < 1) {
       elementsWithClones.unshift(...castArray(elements));
       return;
     }
 
-    if (!opts?.reverseOrder && index > elementsWithClones.length - 1) {
+    if (!reverseOrder && index > elementsWithClones.length - 1) {
       elementsWithClones.push(...castArray(elements));
       return;
     }
 
     elementsWithClones.splice(
-      index + (opts?.reverseOrder ? 0 : 1),
+      index + (reverseOrder ? 0 : 1),
       0,
       ...castArray(elements),
     );
@@ -241,13 +284,7 @@ export const duplicateElements = (
     // groups
     // -------------------------------------------------------------------------
 
-    const groupId = getSelectedGroupForElement(
-      (opts?.appState ?? {
-        editingGroupId: null,
-        selectedGroupIds: {},
-      }) as AppState,
-      element,
-    );
+    const groupId = getSelectedGroupForElement(appState, element);
     if (groupId) {
       const groupElements = getElementsInGroup(elements, groupId).flatMap(
         (element) =>
@@ -256,7 +293,7 @@ export const duplicateElements = (
             : [element],
       );
 
-      const targetIndex = opts?.reverseOrder
+      const targetIndex = reverseOrder
         ? elementsWithClones.findIndex((el) => {
             return el.groupIds?.includes(groupId);
           })
@@ -306,7 +343,7 @@ export const duplicateElements = (
 
       if (boundTextElement) {
         insertBeforeOrAfterIndex(
-          targetIndex + (opts?.reverseOrder ? -1 : 0),
+          targetIndex + (reverseOrder ? -1 : 0),
           copyElements([element, boundTextElement]),
         );
       } else {
