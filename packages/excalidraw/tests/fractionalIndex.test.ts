@@ -1,7 +1,6 @@
 /* eslint-disable no-lone-blocks */
 import { generateKeyBetween } from "fractional-indexing";
 
-import { deepCopyElement } from "../element/newElement";
 import { InvalidFractionalIndexError } from "../errors";
 import {
   syncInvalidIndices,
@@ -9,6 +8,8 @@ import {
   validateFractionalIndices,
 } from "../fractionalIndex";
 import { arrayToMap } from "../utils";
+
+import { deepCopyElement } from "../element/duplicate";
 
 import { API } from "./helpers/api";
 

@@ -8,11 +8,12 @@ import React, {
 
 import { MIME_TYPES } from "../constants";
 import { serializeLibraryAsJSON } from "../data/json";
-import { duplicateElements } from "../element/newElement";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
 import { t } from "../i18n";
 import { arrayToMap } from "../utils";
+
+import { duplicateElements } from "../element/duplicate";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
@@ -20,6 +21,7 @@ import {
   LibraryMenuSection,
   LibraryMenuSectionGrid,
 } from "./LibraryMenuSection";
+
 import Spinner from "./Spinner";
 import Stack from "./Stack";
 
@@ -160,7 +162,11 @@ export default function LibraryMenuItems({
           ...item,
           // duplicate each library item before inserting on canvas to confine
           // ids and bindings to each library item. See #6465
-          elements: duplicateElements(item.elements, { randomizeSeed: true }),
+          elements: duplicateElements({
+            type: "everything",
+            elements: item.elements,
+            randomizeSeed: true,
+          }).newElements,
         };
       });
     },

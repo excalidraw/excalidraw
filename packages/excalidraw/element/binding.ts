@@ -13,7 +13,6 @@ import {
   vectorCross,
   pointsEqual,
   lineSegmentIntersectionPoints,
-  round,
   PRECISION,
 } from "@excalidraw/math";
 import { isPointOnShape } from "@excalidraw/utils/collision";
@@ -24,7 +23,10 @@ import { KEYS } from "../keys";
 import { aabbForElement, getElementShape, pointInsideBounds } from "../shapes";
 import {
   arrayToMap,
+  invariant,
   isBindingFallthroughEnabled,
+  isDevEnv,
+  isTestEnv,
   tupleToCoors,
 } from "../utils";
 
@@ -36,11 +38,8 @@ import {
 import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 import {
-  compareHeading,
-  HEADING_DOWN,
-  HEADING_RIGHT,
-  HEADING_UP,
   headingForPointFromElement,
+  headingIsHorizontal,
   vectorToHeading,
   type Heading,
 } from "./heading";
@@ -50,7 +49,6 @@ import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
   isBindableElement,
-  isBindingElement,
   isBoundToContainer,
   isElbowArrow,
   isFixedPointBinding,
@@ -59,6 +57,10 @@ import {
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
+
+import { updateElbowArrowPoints } from "./elbowArrow";
+
+import type { Mutable } from "../utility-types";
 
 import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";
@@ -837,14 +839,19 @@ export const updateBoundElements = (
       }> => update !== null,
     );
 
-    LinearElementEditor.movePoints(element, updates, {
-      ...(changedElement.id === element.startBinding?.elementId
-        ? { startBinding: bindings.startBinding }
-        : {}),
-      ...(changedElement.id === element.endBinding?.elementId
-        ? { endBinding: bindings.endBinding }
-        : {}),
-    });
+    LinearElementEditor.movePoints(
+      element,
+      updates,
+      {
+        ...(changedElement.id === element.startBinding?.elementId
+          ? { startBinding: bindings.startBinding }
+          : {}),
+        ...(changedElement.id === element.endBinding?.elementId
+          ? { endBinding: bindings.endBinding }
+          : {}),
+      },
+      elementsMap as NonDeletedSceneElementsMap,
+    );
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
@@ -925,103 +932,104 @@ const getDistanceForBinding = (
 
 export const bindPointToSnapToElementOutline = (
   arrow: ExcalidrawElbowArrowElement,
-  bindableElement: ExcalidrawBindableElement | undefined,
+  bindableElement: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
 ): GlobalPoint => {
-  const aabb = bindableElement && aabbForElement(bindableElement);
+  if (isDevEnv() || isTestEnv()) {
+    invariant(arrow.points.length > 1, "Arrow should have at least 2 points");
+  }
+
+  const aabb = aabbForElement(bindableElement);
   const localP =
     arrow.points[startOrEnd === "start" ? 0 : arrow.points.length - 1];
   const globalP = pointFrom<GlobalPoint>(
     arrow.x + localP[0],
     arrow.y + localP[1],
   );
-  const p = isRectanguloidElement(bindableElement)
+  const edgePoint = isRectanguloidElement(bindableElement)
     ? avoidRectangularCorner(bindableElement, globalP)
     : globalP;
+  const elbowed = isElbowArrow(arrow);
+  const center = getCenterForBounds(aabb);
+  const adjacentPointIdx = startOrEnd === "start" ? 1 : arrow.points.length - 2;
+  const adjacentPoint = pointRotateRads(
+    pointFrom<GlobalPoint>(
+      arrow.x + arrow.points[adjacentPointIdx][0],
+      arrow.y + arrow.points[adjacentPointIdx][1],
+    ),
+    center,
+    arrow.angle ?? 0,
+  );
 
-  if (bindableElement && aabb) {
-    const center = getCenterForBounds(aabb);
-
-    const intersection = intersectElementWithLineSegment(
+  let intersection: GlobalPoint | null = null;
+  if (elbowed) {
+    const isHorizontal = headingIsHorizontal(
+      headingForPointFromElement(bindableElement, aabb, globalP),
+    );
+    const otherPoint = pointFrom<GlobalPoint>(
+      isHorizontal ? center[0] : edgePoint[0],
+      !isHorizontal ? center[1] : edgePoint[1],
+    );
+    intersection = intersectElementWithLineSegment(
       bindableElement,
       lineSegment(
-        center,
+        otherPoint,
         pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, center)),
-            Math.max(bindableElement.width, bindableElement.height),
+            vectorNormalize(vectorFromPoint(edgePoint, otherPoint)),
+            Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
-          center,
+          otherPoint,
         ),
       ),
     )[0];
-    const currentDistance = pointDistance(p, center);
-    const fullDistance = Math.max(
-      pointDistance(intersection ?? p, center),
-      PRECISION,
-    );
-    const ratio = round(currentDistance / fullDistance, 6);
-
-    switch (true) {
-      case ratio > 0.9:
-        if (
-          currentDistance - fullDistance > FIXED_BINDING_DISTANCE ||
-          // Too close to determine vector from intersection to p
-          pointDistanceSq(p, intersection) < PRECISION
-        ) {
-          return p;
-        }
-
-        return pointFromVector(
+  } else {
+    intersection = intersectElementWithLineSegment(
+      bindableElement,
+      lineSegment(
+        adjacentPoint,
+        pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(p, intersection ?? center)),
-            ratio > 1 ? FIXED_BINDING_DISTANCE : -FIXED_BINDING_DISTANCE,
+            vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
+            pointDistance(edgePoint, adjacentPoint) +
+              Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
-          intersection ?? center,
-        );
-
-      default:
-        return headingToMidBindPoint(p, bindableElement, aabb);
-    }
+          adjacentPoint,
+        ),
+      ),
+      FIXED_BINDING_DISTANCE,
+    ).sort(
+      (g, h) =>
+        pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
+    )[0];
   }
 
-  return p;
-};
-
-const headingToMidBindPoint = (
-  p: GlobalPoint,
-  bindableElement: ExcalidrawBindableElement,
-  aabb: Bounds,
-): GlobalPoint => {
-  const center = getCenterForBounds(aabb);
-  const heading = vectorToHeading(vectorFromPoint(p, center));
-
-  switch (true) {
-    case compareHeading(heading, HEADING_UP):
-      return pointRotateRads(
-        pointFrom((aabb[0] + aabb[2]) / 2 + 0.1, aabb[1]),
-        center,
-        bindableElement.angle,
-      );
-    case compareHeading(heading, HEADING_RIGHT):
-      return pointRotateRads(
-        pointFrom(aabb[2], (aabb[1] + aabb[3]) / 2 + 0.1),
-        center,
-        bindableElement.angle,
-      );
-    case compareHeading(heading, HEADING_DOWN):
-      return pointRotateRads(
-        pointFrom((aabb[0] + aabb[2]) / 2 - 0.1, aabb[3]),
-        center,
-        bindableElement.angle,
-      );
-    default:
-      return pointRotateRads(
-        pointFrom(aabb[0], (aabb[1] + aabb[3]) / 2 - 0.1),
-        center,
-        bindableElement.angle,
-      );
+  if (
+    !intersection ||
+    // Too close to determine vector from intersection to edgePoint
+    pointDistanceSq(edgePoint, intersection) < PRECISION
+  ) {
+    return edgePoint;
   }
+
+  if (elbowed) {
+    const scalar =
+      pointDistanceSq(edgePoint, center) -
+        pointDistanceSq(intersection, center) >
+      0
+        ? FIXED_BINDING_DISTANCE
+        : -FIXED_BINDING_DISTANCE;
+
+    return pointFromVector(
+      vectorScale(
+        vectorNormalize(vectorFromPoint(edgePoint, intersection)),
+        scalar,
+      ),
+      intersection,
+    );
+  }
+
+  return edgePoint;
 };
 
 export const avoidRectangularCorner = (
@@ -1411,107 +1419,75 @@ const getLinearElementEdgeCoors = (
   );
 };
 
-// We need to:
-// 1: Update elements not selected to point to duplicated elements
-// 2: Update duplicated elements to point to other duplicated elements
 export const fixBindingsAfterDuplication = (
-  sceneElements: readonly ExcalidrawElement[],
-  oldElements: readonly ExcalidrawElement[],
+  newElements: ExcalidrawElement[],
   oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-  // There are three copying mechanisms: Copy-paste, duplication and alt-drag.
-  // Only when alt-dragging the new "duplicates" act as the "old", while
-  // the "old" elements act as the "new copy" - essentially working reverse
-  // to the other two.
-  duplicatesServeAsOld?: "duplicatesServeAsOld" | undefined,
-): void => {
-  // First collect all the binding/bindable elements, so we only update
-  // each once, regardless of whether they were duplicated or not.
-  const allBoundElementIds: Set<ExcalidrawElement["id"]> = new Set();
-  const allBindableElementIds: Set<ExcalidrawElement["id"]> = new Set();
-  const shouldReverseRoles = duplicatesServeAsOld === "duplicatesServeAsOld";
-  const duplicateIdToOldId = new Map(
-    [...oldIdToDuplicatedId].map(([key, value]) => [value, key]),
-  );
-  oldElements.forEach((oldElement) => {
-    const { boundElements } = oldElement;
-    if (boundElements != null && boundElements.length > 0) {
-      boundElements.forEach((boundElement) => {
-        if (shouldReverseRoles && !oldIdToDuplicatedId.has(boundElement.id)) {
-          allBoundElementIds.add(boundElement.id);
-        }
+  duplicatedElementsMap: NonDeletedSceneElementsMap,
+) => {
+  for (const element of newElements) {
+    if ("boundElements" in element && element.boundElements) {
+      Object.assign(element, {
+        boundElements: element.boundElements.reduce(
+          (
+            acc: Mutable<NonNullable<ExcalidrawElement["boundElements"]>>,
+            binding,
+          ) => {
+            const newBindingId = oldIdToDuplicatedId.get(binding.id);
+            if (newBindingId) {
+              acc.push({ ...binding, id: newBindingId });
+            }
+            return acc;
+          },
+          [],
+        ),
       });
-      allBindableElementIds.add(oldIdToDuplicatedId.get(oldElement.id)!);
     }
-    if (isBindingElement(oldElement)) {
-      if (oldElement.startBinding != null) {
-        const { elementId } = oldElement.startBinding;
-        if (shouldReverseRoles && !oldIdToDuplicatedId.has(elementId)) {
-          allBindableElementIds.add(elementId);
-        }
-      }
-      if (oldElement.endBinding != null) {
-        const { elementId } = oldElement.endBinding;
-        if (shouldReverseRoles && !oldIdToDuplicatedId.has(elementId)) {
-          allBindableElementIds.add(elementId);
-        }
-      }
-      if (oldElement.startBinding != null || oldElement.endBinding != null) {
-        allBoundElementIds.add(oldIdToDuplicatedId.get(oldElement.id)!);
-      }
+
+    if ("containerId" in element && element.containerId) {
+      Object.assign(element, {
+        containerId: oldIdToDuplicatedId.get(element.containerId) ?? null,
+      });
     }
-  });
 
-  // Update the linear elements
-  (
-    sceneElements.filter(({ id }) =>
-      allBoundElementIds.has(id),
-    ) as ExcalidrawLinearElement[]
-  ).forEach((element) => {
-    const { startBinding, endBinding } = element;
-    mutateElement(element, {
-      startBinding: newBindingAfterDuplication(
-        startBinding,
-        oldIdToDuplicatedId,
-      ),
-      endBinding: newBindingAfterDuplication(endBinding, oldIdToDuplicatedId),
-    });
-  });
+    if ("endBinding" in element && element.endBinding) {
+      const newEndBindingId = oldIdToDuplicatedId.get(
+        element.endBinding.elementId,
+      );
+      Object.assign(element, {
+        endBinding: newEndBindingId
+          ? {
+              ...element.endBinding,
+              elementId: newEndBindingId,
+            }
+          : null,
+      });
+    }
+    if ("startBinding" in element && element.startBinding) {
+      const newEndBindingId = oldIdToDuplicatedId.get(
+        element.startBinding.elementId,
+      );
+      Object.assign(element, {
+        startBinding: newEndBindingId
+          ? {
+              ...element.startBinding,
+              elementId: newEndBindingId,
+            }
+          : null,
+      });
+    }
 
-  // Update the bindable shapes
-  sceneElements
-    .filter(({ id }) => allBindableElementIds.has(id))
-    .forEach((bindableElement) => {
-      const oldElementId = duplicateIdToOldId.get(bindableElement.id);
-      const boundElements = sceneElements.find(
-        ({ id }) => id === oldElementId,
-      )?.boundElements;
-
-      if (boundElements && boundElements.length > 0) {
-        mutateElement(bindableElement, {
-          boundElements: boundElements.map((boundElement) =>
-            oldIdToDuplicatedId.has(boundElement.id)
-              ? {
-                  id: oldIdToDuplicatedId.get(boundElement.id)!,
-                  type: boundElement.type,
-                }
-              : boundElement,
-          ),
-        });
-      }
-    });
-};
-
-const newBindingAfterDuplication = (
-  binding: PointBinding | null,
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-): PointBinding | null => {
-  if (binding == null) {
-    return null;
+    if (isElbowArrow(element)) {
+      Object.assign(
+        element,
+        updateElbowArrowPoints(element, duplicatedElementsMap, {
+          points: [
+            element.points[0],
+            element.points[element.points.length - 1],
+          ],
+        }),
+      );
+    }
   }
-  return {
-    ...binding,
-    elementId: oldIdToDuplicatedId.get(binding.elementId) ?? binding.elementId,
-  };
 };
 
 export const fixBindingsAfterDeletion = (

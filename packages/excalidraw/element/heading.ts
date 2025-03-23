@@ -1,4 +1,5 @@
 import {
+  normalizeRadians,
   pointFrom,
   pointRotateRads,
   pointScaleFromOrigin,
@@ -30,8 +31,9 @@ export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
   b: Point,
 ) => {
   const angle = radiansToDegrees(
-    Math.atan2(b[1] - a[1], b[0] - a[0]) as Radians,
+    normalizeRadians(Math.atan2(b[1] - a[1], b[0] - a[0]) as Radians),
   );
+
   if (angle >= 315 || angle < 45) {
     return HEADING_UP;
   } else if (angle >= 45 && angle < 135) {
@@ -77,9 +79,7 @@ export const headingIsVertical = (a: Heading) => !headingIsHorizontal(a);
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
-export const headingForPointFromElement = <
-  Point extends GlobalPoint | LocalPoint,
->(
+export const headingForPointFromElement = <Point extends GlobalPoint>(
   element: Readonly<ExcalidrawBindableElement>,
   aabb: Readonly<Bounds>,
   p: Readonly<Point>,

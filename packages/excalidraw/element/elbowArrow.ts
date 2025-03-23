@@ -238,16 +238,6 @@ const handleSegmentRenormalization = (
                 nextPoints.map((p) =>
                   pointFrom<LocalPoint>(p[0] - arrow.x, p[1] - arrow.y),
                 ),
-                arrow.startBinding &&
-                  getBindableElementForId(
-                    arrow.startBinding.elementId,
-                    elementsMap,
-                  ),
-                arrow.endBinding &&
-                  getBindableElementForId(
-                    arrow.endBinding.elementId,
-                    elementsMap,
-                  ),
               ),
             ) ?? [],
           ),
@@ -341,9 +331,6 @@ const handleSegmentRelease = (
           y,
       ),
     ],
-    startBinding &&
-      getBindableElementForId(startBinding.elementId, elementsMap),
-    endBinding && getBindableElementForId(endBinding.elementId, elementsMap),
     { isDragging: false },
   );
 
@@ -983,6 +970,8 @@ export const updateElbowArrowPoints = (
     );
   }
 
+  const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
+
   const updatedPoints: readonly LocalPoint[] = updates.points
     ? updates.points && updates.points.length === 2
       ? arrow.points.map((p, idx) =>
@@ -995,7 +984,7 @@ export const updateElbowArrowPoints = (
       : updates.points.slice()
     : arrow.points.slice();
 
-  // 0. During all element replacement in the scene, we just need to renormalize
+  // During all element replacement in the scene, we just need to renormalize
   // the arrow
   // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
   const {
@@ -1016,11 +1005,12 @@ export const updateElbowArrowPoints = (
     getBindableElementForId(startBinding.elementId, elementsMap);
   const endElement =
     endBinding && getBindableElementForId(endBinding.elementId, elementsMap);
+  const areUpdatedPointsValid = validateElbowPoints(updatedPoints);
 
   if (
-    (startBinding && !startElement) ||
-    (endBinding && !endElement) ||
-    (elementsMap.size === 0 && validateElbowPoints(updatedPoints)) ||
+    (startBinding && !startElement && areUpdatedPointsValid) ||
+    (endBinding && !endElement && areUpdatedPointsValid) ||
+    (elementsMap.size === 0 && areUpdatedPointsValid) ||
     (Object.keys(restOfTheUpdates).length === 0 &&
       (startElement?.id !== startBinding?.elementId ||
         endElement?.id !== endBinding?.elementId))
@@ -1055,12 +1045,22 @@ export const updateElbowArrowPoints = (
     },
     elementsMap,
     updatedPoints,
-    startElement,
-    endElement,
     options,
   );
 
-  const fixedSegments = updates.fixedSegments ?? arrow.fixedSegments ?? [];
+  // 0. During all element replacement in the scene, we just need to renormalize
+  // the arrow
+  // TODO (dwelle,mtolmacs): Remove this once Scene.getScene() is removed
+  if (elementsMap.size === 0 && areUpdatedPointsValid) {
+    return normalizeArrowElementUpdate(
+      updatedPoints.map((p) =>
+        pointFrom<GlobalPoint>(arrow.x + p[0], arrow.y + p[1]),
+      ),
+      arrow.fixedSegments,
+      arrow.startIsSpecial,
+      arrow.endIsSpecial,
+    );
+  }
 
   ////
   // 1. Renormalize the arrow
@@ -1084,7 +1084,7 @@ export const updateElbowArrowPoints = (
         arrow.points[i] ?? pointFrom<LocalPoint>(Infinity, Infinity),
       ),
     ) &&
-    validateElbowPoints(updatedPoints)
+    areUpdatedPointsValid
   ) {
     return {};
   }
@@ -1195,8 +1195,6 @@ const getElbowArrowData = (
   },
   elementsMap: NonDeletedSceneElementsMap,
   nextPoints: readonly LocalPoint[],
-  startElement: ExcalidrawBindableElement | null,
-  endElement: ExcalidrawBindableElement | null,
   options?: {
     isDragging?: boolean;
     zoom?: AppState["zoom"];
@@ -1211,8 +1209,8 @@ const getElbowArrowData = (
     GlobalPoint
   >(nextPoints[nextPoints.length - 1], vector(arrow.x, arrow.y));
 
-  let hoveredStartElement = startElement;
-  let hoveredEndElement = endElement;
+  let hoveredStartElement = null;
+  let hoveredEndElement = null;
   if (options?.isDragging) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
@@ -1221,39 +1219,47 @@ const getElbowArrowData = (
         elementsMap,
         elements,
         options?.zoom,
-      ) || startElement;
+      ) || null;
     hoveredEndElement =
       getHoveredElement(
         origEndGlobalPoint,
         elementsMap,
         elements,
         options?.zoom,
-      ) || endElement;
+      ) || null;
+  } else {
+    hoveredStartElement = arrow.startBinding
+      ? getBindableElementForId(arrow.startBinding.elementId, elementsMap) ||
+        null
+      : null;
+    hoveredEndElement = arrow.endBinding
+      ? getBindableElementForId(arrow.endBinding.elementId, elementsMap) || null
+      : null;
   }
 
   const startGlobalPoint = getGlobalPoint(
     {
       ...arrow,
+      type: "arrow",
       elbowed: true,
       points: nextPoints,
     } as ExcalidrawElbowArrowElement,
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
-    startElement,
     hoveredStartElement,
     options?.isDragging,
   );
   const endGlobalPoint = getGlobalPoint(
     {
       ...arrow,
+      type: "arrow",
       elbowed: true,
       points: nextPoints,
     } as ExcalidrawElbowArrowElement,
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
-    endElement,
     hoveredEndElement,
     options?.isDragging,
   );
@@ -2199,36 +2205,35 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
-  boundElement?: ExcalidrawBindableElement | null,
-  hoveredElement?: ExcalidrawBindableElement | null,
+  element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
 ): GlobalPoint => {
   if (isDragging) {
-    if (hoveredElement) {
+    if (element) {
       const snapPoint = bindPointToSnapToElementOutline(
         arrow,
-        hoveredElement,
+        element,
         startOrEnd,
       );
 
-      return snapToMid(hoveredElement, snapPoint);
+      return snapToMid(element, snapPoint);
     }
 
     return initialPoint;
   }
 
-  if (boundElement) {
+  if (element) {
     const fixedGlobalPoint = getGlobalFixedPointForBindableElement(
       fixedPointRatio || [0, 0],
-      boundElement,
+      element,
     );
 
     // NOTE: Resize scales the binding position point too, so we need to update it
     return Math.abs(
-      distanceToBindableElement(boundElement, fixedGlobalPoint) -
+      distanceToBindableElement(element, fixedGlobalPoint) -
         FIXED_BINDING_DISTANCE,
     ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, boundElement, startOrEnd)
+      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
       : fixedGlobalPoint;
   }
 
