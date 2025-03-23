@@ -2,8 +2,9 @@ import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
-import type { NestedKeyOf } from "./utility-types";
 import { isDevEnv } from "./utils";
+
+import type { NestedKeyOf } from "./utility-types";
 
 const COMPLETION_THRESHOLD = 85;
 

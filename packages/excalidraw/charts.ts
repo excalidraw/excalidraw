@@ -15,8 +15,9 @@ import {
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { randomId } from "./random";
 
-import type { NonDeletedExcalidrawElement } from "./element/types";
 import { isDevEnv } from "./utils";
+
+import type { NonDeletedExcalidrawElement } from "./element/types";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
 
