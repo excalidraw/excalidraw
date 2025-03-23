@@ -288,6 +288,7 @@ export const actionDeleteSelected = register({
         activeTool: updateActiveTool(appState, { type: "selection" }),
         multiElement: null,
         activeEmbeddable: null,
+        selectedLinearElement: null,
       },
       captureUpdate: isSomeElementSelected(
         getNonDeletedElements(elements),
