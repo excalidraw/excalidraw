@@ -886,23 +886,24 @@ const _renderInteractiveScene = ({
     );
   }
 
-  if (
-    isElbowArrow(selectedElements[0]) &&
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.segmentMidPointHoveredCoords
-  ) {
-    renderElbowArrowMidPointHighlight(context, appState);
-  } else if (
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0 &&
-    !(
-      isElbowArrow(selectedElements[0]) &&
-      appState.selectedLinearElement.hoverPointIndex > 0 &&
-      appState.selectedLinearElement.hoverPointIndex <
-        selectedElements[0].points.length - 1
-    )
-  ) {
-    renderLinearElementPointHighlight(context, appState, elementsMap);
+  // Arrows have a different highlight behavior when
+  // they are the only selected element
+  if (appState.selectedLinearElement) {
+    const editor = appState.selectedLinearElement;
+    const firstSelectedLinear = selectedElements.find(
+      (el) => el.id === editor.elementId, // Don't forget bound text elements!
+    );
+
+    if (editor.segmentMidPointHoveredCoords) {
+      renderElbowArrowMidPointHighlight(context, appState);
+    } else if (
+      isElbowArrow(firstSelectedLinear)
+        ? editor.hoverPointIndex === 0 ||
+          editor.hoverPointIndex === firstSelectedLinear.points.length - 1
+        : editor.hoverPointIndex >= 0
+    ) {
+      renderLinearElementPointHighlight(context, appState, elementsMap);
+    }
   }
 
   // Paint selected elements
@@ -1073,7 +1074,7 @@ const _renderInteractiveScene = ({
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;
-      const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+      const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
       const lineWidth = context.lineWidth;

@@ -14,8 +14,8 @@ export {
   newLinearElement,
   newArrowElement,
   newImageElement,
-  duplicateElement,
 } from "./newElement";
+export { duplicateElement } from "./duplicate";
 export {
   getElementAbsoluteCoords,
   getElementBounds,
