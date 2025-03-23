@@ -607,4 +607,90 @@ describe("duplication z-order", () => {
       { id: rectangle3.id, selected: true },
     ]);
   });
+
+  it("reverse-duplicating text container (in-order)", async () => {
+    const [rectangle, text] = API.createTextContainer();
+    API.setElements([rectangle, text]);
+    API.setSelectedElements([rectangle, text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle.x + 5, rectangle.y + 5);
+      mouse.up(rectangle.x + 15, rectangle.y + 15);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: rectangle.id },
+      {
+        [ORIG_ID]: text.id,
+        containerId: getCloneByOrigId(rectangle.id)?.id,
+      },
+      { id: rectangle.id, selected: true },
+      { id: text.id, containerId: rectangle.id, selected: true },
+    ]);
+  });
+
+  it("reverse-duplicating text container (out-of-order)", async () => {
+    const [rectangle, text] = API.createTextContainer();
+    API.setElements([text, rectangle]);
+    API.setSelectedElements([rectangle, text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(rectangle.x + 5, rectangle.y + 5);
+      mouse.up(rectangle.x + 15, rectangle.y + 15);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: rectangle.id },
+      {
+        [ORIG_ID]: text.id,
+        containerId: getCloneByOrigId(rectangle.id)?.id,
+      },
+      { id: rectangle.id, selected: true },
+      { id: text.id, containerId: rectangle.id, selected: true },
+    ]);
+  });
+
+  it("reverse-duplicating labeled arrows (in-order)", async () => {
+    const [arrow, text] = API.createLabeledArrow();
+
+    API.setElements([arrow, text]);
+    API.setSelectedElements([arrow, text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(arrow.x + 5, arrow.y + 5);
+      mouse.up(arrow.x + 15, arrow.y + 15);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: arrow.id },
+      {
+        [ORIG_ID]: text.id,
+        containerId: getCloneByOrigId(arrow.id)?.id,
+      },
+      { id: arrow.id, selected: true },
+      { id: text.id, containerId: arrow.id, selected: true },
+    ]);
+  });
+
+  it("reverse-duplicating labeled arrows (out-of-order)", async () => {
+    const [arrow, text] = API.createLabeledArrow();
+
+    API.setElements([text, arrow]);
+    API.setSelectedElements([arrow, text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(arrow.x + 5, arrow.y + 5);
+      mouse.up(arrow.x + 15, arrow.y + 15);
+    });
+
+    assertElements(h.elements, [
+      { [ORIG_ID]: arrow.id },
+      {
+        [ORIG_ID]: text.id,
+        containerId: getCloneByOrigId(arrow.id)?.id,
+      },
+      { id: arrow.id, selected: true },
+      { id: text.id, containerId: arrow.id, selected: true },
+    ]);
+  });
 });
