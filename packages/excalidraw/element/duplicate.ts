@@ -12,7 +12,6 @@ import {
   castArray,
   findLastIndex,
   getUpdatedTimestamp,
-  invariant,
   isTestEnv,
 } from "../utils";
 
@@ -241,8 +240,6 @@ export const duplicateElements = (
     index: number,
     elements: ExcalidrawElement | null | ExcalidrawElement[],
   ) => {
-    invariant(index >= 0, "targetIndex must be >= 0");
-
     if (!elements) {
       return;
     }
