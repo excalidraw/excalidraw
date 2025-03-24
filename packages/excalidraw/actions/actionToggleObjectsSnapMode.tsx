@@ -19,6 +19,7 @@ export const actionToggleObjectsSnapMode = register({
         ...appState,
         objectsSnapModeEnabled: !this.checked!(appState),
         gridModeEnabled: false,
+        gridModeNotebookEnabled: false,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
