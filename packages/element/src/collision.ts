@@ -16,7 +16,7 @@ import {
 } from "@excalidraw/math/ellipse";
 
 import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
-import { getPolygonShape } from "@excalidraw/utils/geometry/shape";
+import { getPolygonShape } from "@excalidraw/utils/shape";
 
 import type {
   GlobalPoint,
@@ -26,7 +26,7 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import type { GeometricShape } from "@excalidraw/utils/geometry/shape";
+import type { GeometricShape } from "@excalidraw/utils/shape";
 
 import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 

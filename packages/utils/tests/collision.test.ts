@@ -9,9 +9,9 @@ import {
 
 import type { Curve, Degrees, GlobalPoint } from "@excalidraw/math";
 
-import { pointOnCurve, pointOnPolyline } from "./collision";
+import { pointOnCurve, pointOnPolyline } from "../src/collision";
 
-import type { Polyline } from "./geometry/shape";
+import type { Polyline } from "../src/shape";
 
 describe("point and curve", () => {
   const c: Curve<GlobalPoint> = curve(

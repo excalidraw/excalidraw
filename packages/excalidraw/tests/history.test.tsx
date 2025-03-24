@@ -21,6 +21,8 @@ import {
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
 } from "@excalidraw/common";
 
+import "@excalidraw/utils/test-utils";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -35,7 +37,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import "../global.d.ts";
-import "../../utils/test-utils";
 
 import {
   actionSendBackward,

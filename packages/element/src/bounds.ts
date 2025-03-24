@@ -11,7 +11,7 @@ import {
   pointRotateRads,
 } from "@excalidraw/math";
 
-import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
+import { getCurvePathOps } from "@excalidraw/utils/shape";
 
 import type {
   Degrees,

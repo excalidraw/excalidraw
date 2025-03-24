@@ -5,7 +5,7 @@ import {
   toBrandedType,
 } from "@excalidraw/common";
 
-// TODO_SEP: should be passed in or injected instead
+// TODO: remove direct dependency on the scene, should be passed in or injected instead
 import Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { Radians } from "@excalidraw/math";

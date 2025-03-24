@@ -6,7 +6,7 @@ import {
   elementPartiallyOverlapsWithOrContainsBBox,
   elementsOverlappingBBox,
   isElementInsideBBox,
-} from "./withinBounds";
+} from "../src/withinBounds";
 
 const makeElement = (x: number, y: number, width: number, height: number) =>
   API.createElement({

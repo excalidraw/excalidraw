@@ -17,11 +17,11 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
+import "@excalidraw/utils/test-utils";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import { bindLinearElement } from "../src/binding";
-
-import "../../utils/test-utils";
 
 import type {
   ExcalidrawArrowElement,

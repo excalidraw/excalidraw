@@ -23,7 +23,7 @@ import {
   getFreedrawShape,
   getPolygonShape,
   type GeometricShape,
-} from "@excalidraw/utils/geometry/shape";
+} from "@excalidraw/utils/shape";
 
 import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
 

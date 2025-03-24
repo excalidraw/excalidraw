@@ -1,4 +1,4 @@
-import "../../utils/test-utils";
+import "@excalidraw/utils/test-utils";
 
 import {
   curve,

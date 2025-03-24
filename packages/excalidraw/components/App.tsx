@@ -18,7 +18,7 @@ import {
   vectorNormalize,
 } from "@excalidraw/math";
 import { isPointInShape } from "@excalidraw/utils/collision";
-import { getSelectionBoxShape } from "@excalidraw/utils/geometry/shape";
+import { getSelectionBoxShape } from "@excalidraw/utils/shape";
 
 import {
   COLOR_PALETTE,

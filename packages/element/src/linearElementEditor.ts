@@ -9,7 +9,7 @@ import {
   vectorFromPoint,
 } from "@excalidraw/math";
 
-import { getCurvePathOps } from "@excalidraw/utils/geometry/shape";
+import { getCurvePathOps } from "@excalidraw/utils/shape";
 
 import {
   DRAGGING_THRESHOLD,
@@ -20,7 +20,7 @@ import {
   tupleToCoors,
 } from "@excalidraw/common";
 
-// TODO: remove the dependency on the scene
+// TODO: remove direct dependency on the scene, should be passed in or injected instead
 import Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { Store } from "@excalidraw/excalidraw/store";

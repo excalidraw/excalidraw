@@ -19,8 +19,8 @@
       "@excalidraw/excalidraw/*": ["./excalidraw/*"],
       "@excalidraw/math": ["./math/src/index.ts"],
       "@excalidraw/math/*": ["./math/src/*"],
-      "@excalidraw/utils": ["./utils/index.ts"],
-      "@excalidraw/utils/*": ["./utils/*"]
+      "@excalidraw/utils": ["./utils/src/index.ts"],
+      "@excalidraw/utils/*": ["./utils/src/*"]
     }
   },
   "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]

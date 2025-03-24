@@ -4,7 +4,7 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 
-import * as utils from "./index";
+import * as utils from "../src";
 
 // NOTE this test file is using the actual API, unmocked. Hence splitting it
 // from the other test file, because I couldn't figure out how to test
