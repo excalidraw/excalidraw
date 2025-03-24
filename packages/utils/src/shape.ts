@@ -11,6 +11,7 @@
  * also included in this file are methods for converting an Excalidraw element or a Drawable from roughjs
  * to pure shapes
  */
+import { pointsOnBezierCurves } from "points-on-curve";
 
 import { invariant } from "@excalidraw/common";
 import {
@@ -32,7 +33,6 @@ import {
   type GlobalPoint,
   type LocalPoint,
 } from "@excalidraw/math";
-import { pointsOnBezierCurves } from "points-on-curve";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 

@@ -12,9 +12,9 @@ import {
 
 import type { Curve } from "@excalidraw/math";
 
-import { pointInEllipse, pointOnEllipse, type GeometricShape } from "./shape";
+import { pointInEllipse, pointOnEllipse } from "./shape";
 
-import type { Polycurve, Polyline } from "./shape";
+import type { Polycurve, Polyline, GeometricShape } from "./shape";
 
 // check if the given point is considered on the given shape's border
 export const isPointOnShape = <Point extends GlobalPoint | LocalPoint>(

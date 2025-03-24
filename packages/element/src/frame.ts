@@ -1,9 +1,7 @@
 import { arrayToMap } from "@excalidraw/common";
 import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
-import {
-  doLineSegmentsIntersect,
-  elementsOverlappingBBox,
-} from "@excalidraw/utils";
+import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
+import { elementsOverlappingBBox } from "@excalidraw/utils/withinBounds";
 
 import type { ExcalidrawElementsIncludingDeleted } from "@excalidraw/excalidraw/scene/Scene";
 
