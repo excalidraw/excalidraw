@@ -195,7 +195,7 @@ describe("generic element", () => {
     UI.resize(rectangle, "w", [50, 0]);
 
     expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80, 0);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(81, 0);
   });
 
   it("resizes with a label", async () => {
@@ -826,8 +826,9 @@ describe("image element", () => {
     UI.resize(image, "nw", [50, 20]);
 
     expect(arrow.endBinding?.elementId).toEqual(image.id);
-    expect(Math.floor(arrow.width + arrow.endBinding!.gap)).toBeCloseTo(
-      30 + imageWidth * scale,
+
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(
+      30 + imageWidth * scale + 1,
       0,
     );
   });
@@ -1033,11 +1034,11 @@ describe("multiple selection", () => {
 
     expect(leftBoundArrow.x).toBeCloseTo(-110);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(143, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(146, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();
-    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(10);
+    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(5);
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );

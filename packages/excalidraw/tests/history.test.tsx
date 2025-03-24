@@ -52,6 +52,8 @@ import * as StaticScene from "../renderer/staticScene";
 import { Snapshot, CaptureUpdateAction } from "../store";
 import { AppStateChange, ElementsChange } from "../change";
 
+import { FIXED_BINDING_DISTANCE } from "../element/binding.js";
+
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -4779,12 +4781,12 @@ describe("history", () => {
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
                 focus: 0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
                 focus: -0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               isDeleted: true,
             }),
