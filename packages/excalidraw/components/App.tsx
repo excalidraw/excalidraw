@@ -85,7 +85,6 @@ import {
   DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
-  ENV,
   EVENT,
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
@@ -258,6 +257,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  isDevEnv,
 } from "../utils";
 import {
   createSrcDoc,
@@ -2434,7 +2434,7 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
-    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    if (isTestEnv() || isDevEnv()) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -11060,7 +11060,7 @@ declare global {
 }
 
 export const createTestHook = () => {
-  if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+  if (isTestEnv() || isDevEnv()) {
     window.h = window.h || ({} as Window["h"]);
 
     Object.defineProperties(window.h, {
