@@ -15,6 +15,7 @@ import type {
   ExcalidrawBindableElement,
   FontFamilyValues,
   FontString,
+  ExcalidrawElement,
 } from "./element/types";
 import type {
   ActiveTool,
@@ -1245,3 +1246,13 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+export const elementCenterPoint = (element: ExcalidrawElement) => {
+  const { x, y, width, height } = element;
+
+  const centerXPoint = x + width / 2;
+
+  const centerYPoint = y + height / 2;
+
+  return { x: centerXPoint, y: centerYPoint };
+};
