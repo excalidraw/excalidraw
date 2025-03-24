@@ -360,7 +360,7 @@ describe("elbow arrow ui", () => {
     expect(arrow.endBinding).not.toBe(null);
   });
 
-  it("keeps arrow shape when only the bound arrow is duplicated", async () => {
+  it("changes arrow shape to unbind variant if only the connected elbow arrow is duplicated", async () => {
     UI.createElement("rectangle", {
       x: -150,
       y: -150,
@@ -406,8 +406,8 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.elbowed).toBe(true);
     expect(duplicatedArrow.points).toEqual([
       [0, 0],
-      [45, 0],
-      [45, 200],
+      [0, 100],
+      [90, 100],
       [90, 200],
     ]);
   });

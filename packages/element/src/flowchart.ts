@@ -1,6 +1,6 @@
 import { KEYS, invariant, toBrandedType } from "@excalidraw/common";
 
-import { pointFrom, type LocalPoint } from "@excalidraw/math";
+import { type GlobalPoint, pointFrom, type LocalPoint } from "@excalidraw/math";
 
 import type {
   AppState,
@@ -96,7 +96,7 @@ const getNodeRelatives = (
         const heading = headingForPointFromElement(node, aabbForElement(node), [
           edgePoint[0] + el.x,
           edgePoint[1] + el.y,
-        ] as Readonly<LocalPoint>);
+        ] as Readonly<GlobalPoint>);
 
         acc.push({
           relative,

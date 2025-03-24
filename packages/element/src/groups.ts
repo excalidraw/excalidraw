@@ -215,7 +215,10 @@ export const isSelectedViaGroup = (
 ) => getSelectedGroupForElement(appState, element) != null;
 
 export const getSelectedGroupForElement = (
-  appState: InteractiveCanvasAppState,
+  appState: Pick<
+    InteractiveCanvasAppState,
+    "editingGroupId" | "selectedGroupIds"
+  >,
   element: ExcalidrawElement,
 ) =>
   element.groupIds

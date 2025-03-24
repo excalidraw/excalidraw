@@ -9,7 +9,7 @@ import {
   validateFractionalIndices,
 } from "@excalidraw/element/fractionalIndex";
 
-import { deepCopyElement } from "@excalidraw/element/newElement";
+import { deepCopyElement } from "@excalidraw/element/duplicate";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 

@@ -8,7 +8,7 @@ import {
 } from "@excalidraw/common";
 
 import { mutateElement } from "@excalidraw/element/mutateElement";
-import { deepCopyElement } from "@excalidraw/element/newElement";
+import { deepCopyElement } from "@excalidraw/element/duplicate";
 import {
   isFrameLikeElement,
   isInitializedImageElement,

@@ -2,7 +2,8 @@ import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 
 import { EVENT, KEYS, cloneJSON } from "@excalidraw/common";
-import { deepCopyElement } from "@excalidraw/element/newElement";
+
+import { deepCopyElement } from "@excalidraw/element/duplicate";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 

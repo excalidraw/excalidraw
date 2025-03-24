@@ -1184,3 +1184,7 @@ it(
     expect(API.getSelectedElements().length).toBe(1);
   },
 );
+
+//
+// DEPRECATED: DO NOT ADD TESTS HERE
+//

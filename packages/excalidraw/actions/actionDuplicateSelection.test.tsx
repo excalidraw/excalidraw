@@ -257,7 +257,7 @@ describe("actionDuplicateSelection", () => {
       assertElements(h.elements, [
         { id: frame.id },
         { id: text.id, frameId: frame.id },
-        { [ORIG_ID]: text.id, frameId: frame.id },
+        { [ORIG_ID]: text.id, frameId: frame.id, selected: true },
       ]);
     });
 

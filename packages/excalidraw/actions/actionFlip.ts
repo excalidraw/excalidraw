@@ -8,7 +8,7 @@ import {
   mutateElement,
   newElementWith,
 } from "@excalidraw/element/mutateElement";
-import { deepCopyElement } from "@excalidraw/element/newElement";
+import { deepCopyElement } from "@excalidraw/element/duplicate";
 import { resizeMultipleElements } from "@excalidraw/element/resizeElements";
 import {
   isArrowElement,

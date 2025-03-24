@@ -6,7 +6,6 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   getFontString,
-  arrayToMap,
 } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -115,48 +114,6 @@ export const redrawTextBoundingBox = (
   }
 
   mutateElement(textElement, boundTextUpdates, informMutation);
-};
-
-export const bindTextToShapeAfterDuplication = (
-  newElements: ExcalidrawElement[],
-  oldElements: ExcalidrawElement[],
-  oldIdToDuplicatedId: Map<ExcalidrawElement["id"], ExcalidrawElement["id"]>,
-): void => {
-  const newElementsMap = arrayToMap(newElements) as Map<
-    ExcalidrawElement["id"],
-    ExcalidrawElement
-  >;
-  oldElements.forEach((element) => {
-    const newElementId = oldIdToDuplicatedId.get(element.id) as string;
-    const boundTextElementId = getBoundTextElementId(element);
-
-    if (boundTextElementId) {
-      const newTextElementId = oldIdToDuplicatedId.get(boundTextElementId);
-      if (newTextElementId) {
-        const newContainer = newElementsMap.get(newElementId);
-        if (newContainer) {
-          mutateElement(newContainer, {
-            boundElements: (element.boundElements || [])
-              .filter(
-                (boundElement) =>
-                  boundElement.id !== newTextElementId &&
-                  boundElement.id !== boundTextElementId,
-              )
-              .concat({
-                type: "text",
-                id: newTextElementId,
-              }),
-          });
-        }
-        const newTextElement = newElementsMap.get(newTextElementId);
-        if (newTextElement && isTextElement(newTextElement)) {
-          mutateElement(newTextElement, {
-            containerId: newContainer ? newElementId : null,
-          });
-        }
-      }
-    }
-  });
 };
 
 export const handleBindTextResize = (

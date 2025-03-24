@@ -110,7 +110,6 @@ import {
   bindOrUnbindLinearElement,
   bindOrUnbindLinearElements,
   fixBindingsAfterDeletion,
-  fixBindingsAfterDuplication,
   getHoveredElementForBinding,
   isBindingEnabled,
   isLinearElementSimpleAndAlreadyBound,
@@ -128,21 +127,23 @@ import {
 } from "@excalidraw/element/mutateElement";
 
 import {
-  deepCopyElement,
-  duplicateElements,
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
   newMagicFrameElement,
   newIframeElement,
   newArrowElement,
-  duplicateElement,
   newElement,
   newImageElement,
   newLinearElement,
   newTextElement,
   refreshTextDimensions,
 } from "@excalidraw/element/newElement";
+
+import {
+  deepCopyElement,
+  duplicateElements,
+} from "@excalidraw/element/duplicate";
 
 import {
   hasBoundTextElement,
@@ -197,7 +198,6 @@ import {
 } from "@excalidraw/element/image";
 
 import {
-  bindTextToShapeAfterDuplication,
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
@@ -210,7 +210,6 @@ import { shouldShowBoundingBox } from "@excalidraw/element/transformHandles";
 import {
   getFrameChildren,
   isCursorInFrame,
-  bindElementsToFramesAfterDuplication,
   addElementsToFrame,
   replaceAllElementsInFrame,
   removeElementsFromFrame,
@@ -390,7 +389,6 @@ import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
-
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -424,7 +422,6 @@ import {
 } from "../data/blob";
 
 import { fileOpen } from "../data/filesystem";
-
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
@@ -3281,17 +3278,16 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const newElements = duplicateElements(
-      elements.map((element) => {
+    const { newElements } = duplicateElements({
+      type: "everything",
+      elements: elements.map((element) => {
         return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
         });
       }),
-      {
-        randomizeSeed: !opts.retainSeed,
-      },
-    );
+      randomizeSeed: !opts.retainSeed,
+    });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
     let nextElements = [...prevElements, ...newElements];
@@ -6152,7 +6148,12 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               activeEmbeddable: { element: hitElement, state: "hover" },
             });
-          } else if (!hitElement || !isElbowArrow(hitElement)) {
+          } else if (
+            !hitElement ||
+            // Ebow arrows can only be moved when unconnected
+            !isElbowArrow(hitElement) ||
+            !(hitElement.startBinding || hitElement.endBinding)
+          ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
@@ -6345,7 +6346,13 @@ class App extends React.Component<AppProps, AppState> {
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          if (
+            // Ebow arrows can only be moved when unconnected
+            !isElbowArrow(element) ||
+            !(element.startBinding || element.endBinding)
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
@@ -8195,6 +8202,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...this.state.selectedLinearElement,
                   pointerDownState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
+                  segmentMidPointHoveredCoords: null,
                 },
               });
             }
@@ -8204,6 +8212,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...this.state.editingLinearElement,
                   pointerDownState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
+                  segmentMidPointHoveredCoords: null,
                 },
               });
             }
@@ -8217,7 +8226,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const didDrag = LinearElementEditor.handlePointDragging(
+        const newLinearElementEditor = LinearElementEditor.handlePointDragging(
           event,
           this,
           pointerCoords.x,
@@ -8231,29 +8240,18 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor,
           this.scene,
         );
-        if (didDrag) {
+        if (newLinearElementEditor) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
           pointerDownState.drag.hasOccurred = true;
-          if (
-            this.state.editingLinearElement &&
-            !this.state.editingLinearElement.isDragging
-          ) {
-            this.setState({
-              editingLinearElement: {
-                ...this.state.editingLinearElement,
-                isDragging: true,
-              },
-            });
-          }
-          if (!this.state.selectedLinearElement.isDragging) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                isDragging: true,
-              },
-            });
-          }
+
+          this.setState({
+            editingLinearElement: this.state.editingLinearElement
+              ? newLinearElementEditor
+              : null,
+            selectedLinearElement: newLinearElementEditor,
+          });
+
           return;
         }
       }
@@ -8479,145 +8477,55 @@ class App extends React.Component<AppProps, AppState> {
 
             pointerDownState.hit.hasBeenDuplicated = true;
 
-            const nextElements = [];
-            const elementsToAppend = [];
-            const groupIdMap = new Map();
-            const oldIdToDuplicatedId = new Map();
-            const hitElement = pointerDownState.hit.element;
-            const selectedElementIds = new Set(
-              this.scene
-                .getSelectedElements({
-                  selectedElementIds: this.state.selectedElementIds,
-                  includeBoundTextElement: true,
-                  includeElementsInFrames: true,
-                })
-                .map((element) => element.id),
-            );
-
             const elements = this.scene.getElementsIncludingDeleted();
-
-            for (const element of elements) {
-              const isInSelection =
-                selectedElementIds.has(element.id) ||
-                // case: the state.selectedElementIds might not have been
-                // updated yet by the time this mousemove event is fired
-                (element.id === hitElement?.id &&
-                  pointerDownState.hit.wasAddedToSelection);
-              // NOTE (mtolmacs): This is a temporary fix for very large scenes
-              if (
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.width) > 1e7 ||
-                Math.abs(element.height) > 1e7
-              ) {
-                console.error(
-                  `Alt+dragging element in scene with invalid dimensions`,
-                  element.x,
-                  element.y,
-                  element.width,
-                  element.height,
-                  isInSelection,
-                );
-
-                return;
-              }
-
-              if (isInSelection) {
-                const duplicatedElement = duplicateElement(
-                  this.state.editingGroupId,
-                  groupIdMap,
-                  element,
-                );
-
-                // NOTE (mtolmacs): This is a temporary fix for very large scenes
-                if (
-                  Math.abs(duplicatedElement.x) > 1e7 ||
-                  Math.abs(duplicatedElement.x) > 1e7 ||
-                  Math.abs(duplicatedElement.width) > 1e7 ||
-                  Math.abs(duplicatedElement.height) > 1e7
-                ) {
-                  console.error(
-                    `Alt+dragging duplicated element with invalid dimensions`,
-                    duplicatedElement.x,
-                    duplicatedElement.y,
-                    duplicatedElement.width,
-                    duplicatedElement.height,
-                  );
-
-                  return;
-                }
-
-                const origElement = pointerDownState.originalElements.get(
-                  element.id,
-                )!;
-
-                // NOTE (mtolmacs): This is a temporary fix for very large scenes
-                if (
-                  Math.abs(origElement.x) > 1e7 ||
-                  Math.abs(origElement.x) > 1e7 ||
-                  Math.abs(origElement.width) > 1e7 ||
-                  Math.abs(origElement.height) > 1e7
-                ) {
-                  console.error(
-                    `Alt+dragging duplicated element with invalid dimensions`,
-                    origElement.x,
-                    origElement.y,
-                    origElement.width,
-                    origElement.height,
-                  );
-
-                  return;
-                }
-
-                mutateElement(duplicatedElement, {
-                  x: origElement.x,
-                  y: origElement.y,
-                });
-
-                // put duplicated element to pointerDownState.originalElements
-                // so that we can snap to the duplicated element without releasing
-                pointerDownState.originalElements.set(
-                  duplicatedElement.id,
-                  duplicatedElement,
-                );
-
-                nextElements.push(duplicatedElement);
-                elementsToAppend.push(element);
-                oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
-              } else {
-                nextElements.push(element);
-              }
+            const hitElement = pointerDownState.hit.element;
+            const selectedElements = this.scene.getSelectedElements({
+              selectedElementIds: this.state.selectedElementIds,
+              includeBoundTextElement: true,
+              includeElementsInFrames: true,
+            });
+            if (
+              hitElement &&
+              !selectedElements.find((el) => el.id === hitElement.id)
+            ) {
+              selectedElements.push(hitElement);
             }
 
-            let nextSceneElements: ExcalidrawElement[] = [
-              ...nextElements,
-              ...elementsToAppend,
-            ];
+            const { newElements: clonedElements, elementsWithClones } =
+              duplicateElements({
+                type: "in-place",
+                elements,
+                appState: this.state,
+                randomizeSeed: true,
+                idsOfElementsToDuplicate: new Map(
+                  selectedElements.map((el) => [el.id, el]),
+                ),
+                overrides: (el) => {
+                  const origEl = pointerDownState.originalElements.get(el.id);
+
+                  if (origEl) {
+                    return {
+                      x: origEl.x,
+                      y: origEl.y,
+                    };
+                  }
+
+                  return {};
+                },
+                reverseOrder: true,
+              });
+            clonedElements.forEach((element) => {
+              pointerDownState.originalElements.set(element.id, element);
+            });
 
             const mappedNewSceneElements = this.props.onDuplicate?.(
-              nextSceneElements,
+              elementsWithClones,
               elements,
             );
 
-            nextSceneElements = mappedNewSceneElements || nextSceneElements;
-
-            syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
-
-            bindTextToShapeAfterDuplication(
-              nextElements,
-              elementsToAppend,
-              oldIdToDuplicatedId,
-            );
-            fixBindingsAfterDuplication(
-              nextSceneElements,
-              elementsToAppend,
-              oldIdToDuplicatedId,
-              "duplicatesServeAsOld",
-            );
-            bindElementsToFramesAfterDuplication(
-              nextSceneElements,
-              elementsToAppend,
-              oldIdToDuplicatedId,
+            const nextSceneElements = syncMovedIndices(
+              mappedNewSceneElements || elementsWithClones,
+              arrayToMap(clonedElements),
             );
 
             this.scene.replaceAllElements(nextSceneElements);
