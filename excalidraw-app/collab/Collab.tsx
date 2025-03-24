@@ -11,6 +11,10 @@ import {
   IDLE_THRESHOLD,
   ACTIVE_THRESHOLD,
   UserIdleState,
+  assertNever,
+  preventUnload,
+  resolvablePromise,
+  throttleRAF,
 } from "@excalidraw/common";
 import { decryptData } from "@excalidraw/excalidraw/data/encryption";
 import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
@@ -22,12 +26,7 @@ import {
 import { AbortError } from "@excalidraw/excalidraw/errors";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
-import {
-  assertNever,
-  preventUnload,
-  resolvablePromise,
-  throttleRAF,
-} from "@excalidraw/common";
+
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
 

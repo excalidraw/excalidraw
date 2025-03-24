@@ -22,13 +22,6 @@ import {
   THEME,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
-} from "@excalidraw/common";
-import polyfill from "@excalidraw/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
-import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
-import { t } from "@excalidraw/excalidraw/i18n";
-import {
   debounce,
   getVersion,
   getFrame,
@@ -37,6 +30,12 @@ import {
   resolvablePromise,
   isRunningInIframe,
 } from "@excalidraw/common";
+import polyfill from "@excalidraw/excalidraw/polyfill";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
+import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
+import { t } from "@excalidraw/excalidraw/i18n";
+
 import {
   GithubIcon,
   XBrandIcon,
@@ -72,7 +71,7 @@ import type {
   UIAppState,
 } from "@excalidraw/excalidraw/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
-import type { ResolvablePromise } from "@excalidraw/common";
+import type { ResolvablePromise } from "@excalidraw/common/utils";
 
 import CustomStats from "./CustomStats";
 import {

@@ -1,6 +1,5 @@
 import { THEME } from "@excalidraw/excalidraw";
-import { EVENT } from "@excalidraw/common";
-import { CODES, KEYS } from "@excalidraw/common";
+import { EVENT, CODES, KEYS } from "@excalidraw/common";
 import { useEffect, useLayoutEffect, useState } from "react";
 
 import type { Theme } from "@excalidraw/element/types";

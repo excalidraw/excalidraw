@@ -11,9 +11,12 @@
  */
 
 import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+  debounce,
+} from "@excalidraw/common";
 import { clearElementsForLocalStorage } from "@excalidraw/element";
-import { debounce } from "@excalidraw/common";
 import {
   createStore,
   entries,
