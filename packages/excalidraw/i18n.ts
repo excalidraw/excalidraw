@@ -2,6 +2,8 @@ import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
 
+import { isDevEnv } from "./utils";
+
 import type { NestedKeyOf } from "./utility-types";
 
 const COMPLETION_THRESHOLD = 85;
@@ -73,7 +75,7 @@ export const languages: Language[] = [
 ];
 
 const TEST_LANG_CODE = "__test__";
-if (import.meta.env.DEV) {
+if (isDevEnv()) {
   languages.unshift(
     { code: TEST_LANG_CODE, label: "test language" },
     {

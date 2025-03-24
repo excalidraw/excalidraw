@@ -16,7 +16,7 @@ import {
 import BinaryHeap from "../binaryheap";
 import { getSizeFromPoints } from "../points";
 import { aabbForElement, pointInsideBounds } from "../shapes";
-import { invariant, isAnyTrue, tupleToCoors } from "../utils";
+import { invariant, isAnyTrue, isDevEnv, tupleToCoors } from "../utils";
 
 import {
   bindPointToSnapToElementOutline,
@@ -248,7 +248,7 @@ const handleSegmentRenormalization = (
       );
     }
 
-    import.meta.env.DEV &&
+    isDevEnv() &&
       invariant(
         validateElbowPoints(nextPoints),
         "Invalid elbow points with fixed segments",

@@ -14,7 +14,7 @@ import { useUIAppState } from "../../context/ui-appState";
 import { atom, useSetAtom } from "../../editor-jotai";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { KEYS } from "../../keys";
-import { updateObject } from "../../utils";
+import { isDevEnv, updateObject } from "../../utils";
 import { useDevice, useExcalidrawSetAppState } from "../App";
 import { Island } from "../Island";
 
@@ -52,7 +52,7 @@ export const SidebarInner = forwardRef(
     }: SidebarProps & Omit<React.RefAttributes<HTMLDivElement>, "onSelect">,
     ref: React.ForwardedRef<HTMLDivElement>,
   ) => {
-    if (import.meta.env.DEV && onDock && docked == null) {
+    if (isDevEnv() && onDock && docked == null) {
       console.warn(
         "Sidebar: `docked` must be set when `onDock` is supplied for the sidebar to be user-dockable. To hide this message, either pass `docked` or remove `onDock`",
       );

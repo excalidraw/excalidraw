@@ -1,4 +1,4 @@
-import { ENV } from "../constants";
+import { isDevEnv, isTestEnv } from "../utils";
 
 import { charWidth, getLineWidth } from "./textMeasurements";
 
@@ -562,7 +562,7 @@ const isSingleCharacter = (maybeSingleCharacter: string) => {
  * Invariant for the word wrapping algorithm.
  */
 const satisfiesWordInvariant = (word: string) => {
-  if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+  if (isTestEnv() || isDevEnv()) {
     if (/\s/.test(word)) {
       throw new Error("Word should not contain any whitespaces!");
     }

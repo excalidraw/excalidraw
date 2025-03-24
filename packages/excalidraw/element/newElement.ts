@@ -10,6 +10,7 @@ import {
 } from "../constants";
 import { getLineHeight } from "../fonts";
 import { randomInteger, randomId } from "../random";
+
 import { getFontString, getUpdatedTimestamp } from "../utils";
 
 import { getResizedElementAbsoluteCoords } from "./bounds";

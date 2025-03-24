@@ -36,6 +36,7 @@ import {
   preventUnload,
   resolvablePromise,
   isRunningInIframe,
+  isDevEnv,
 } from "@excalidraw/excalidraw/utils";
 import {
   GithubIcon,
@@ -383,7 +384,7 @@ const ExcalidrawWrapper = () => {
   const [, forceRefresh] = useState(false);
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (isDevEnv()) {
       const debugState = loadSavedDebugState();
 
       if (debugState.enabled && !window.visualDebug) {
