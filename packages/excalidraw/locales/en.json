@@ -166,7 +166,7 @@
     "copyElementLink": "Copy link to object",
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
-    "slash": "Slash"
+    "tab": "Tab"
   },
   "elementLink": {
     "title": "Link to object",

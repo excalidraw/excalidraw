@@ -4119,7 +4119,7 @@ class App extends React.Component<AppProps, AppState> {
 
           if (event.key === KEYS.ESCAPE) {
             editorJotaiStore.set(shapeSwitchAtom, null);
-          } else if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
+          } else if (event.key === KEYS.TAB) {
             event.preventDefault();
 
             if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {

@@ -177,7 +177,7 @@ const Hint = ({
       className={clsx("ShapeSwitch__Hint", "animation")}
     >
       <div className="key">&#47;</div>
-      <div className="text">{t("labels.slash")}</div>
+      <div className="text">{t("labels.tab")}</div>
     </div>
   );
 };
