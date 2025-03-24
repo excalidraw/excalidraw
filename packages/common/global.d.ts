@@ -1,13 +1,3 @@
-interface Window {
-  EXCALIDRAW_EXPORT_SOURCE: string;
-}
-
-interface ImportMetaEnv {
-  MODE: string;
-  DEV: string;
-  PROD: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+/// <reference types="vite/client" />
+import "@excalidraw/excalidraw/global";
+import "@excalidraw/excalidraw/css";

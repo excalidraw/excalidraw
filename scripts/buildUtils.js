@@ -51,10 +51,10 @@ function buildProd(config) {
 
 const createESMRawBuild = async () => {
   // development unminified build with source maps
-  buildDev(getConfig("dist/dev"));
+  await buildDev(getConfig("dist/dev"));
 
   // production minified build without sourcemaps
-  buildProd(getConfig("dist/prod"));
+  await buildProd(getConfig("dist/prod"));
 };
 
 (async () => {
