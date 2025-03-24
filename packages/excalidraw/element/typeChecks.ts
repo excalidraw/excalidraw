@@ -350,18 +350,17 @@ type ExcalidrawGenericSwitchableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawDiamondElement;
 
-export const isGenericSwitchableElement = (
+export const areGenericSwitchableElements = (
   elements: ExcalidrawElement[],
 ): elements is NonEmptyArray<ExcalidrawGenericSwitchableElement> => {
   if (elements.length === 0) {
     return false;
   }
-  const firstType = elements[0].type;
-  return (
-    (firstType === "rectangle" ||
-      firstType === "ellipse" ||
-      firstType === "diamond") &&
-    elements.every((element) => element.type === firstType)
+  return elements.every(
+    (element) =>
+      element.type === "rectangle" ||
+      element.type === "ellipse" ||
+      element.type === "diamond",
   );
 };
 
@@ -371,7 +370,7 @@ export const isGenericSwitchableToolType = (
   return type === "rectangle" || type === "ellipse" || type === "diamond";
 };
 
-export const isLinearSwitchableElement = (
+export const areLinearSwitchableElements = (
   elements: ExcalidrawElement[],
 ): elements is NonEmptyArray<ExcalidrawLinearElement> => {
   if (elements.length === 0) {

@@ -192,6 +192,10 @@ const Panel = ({
   let [x1, y2, cx, cy] = [0, 0, 0, 0];
   let rotatedBottomLeft = [0, 0];
 
+  const sameType = elements.every(
+    (element) => element.type === elements[0].type,
+  );
+
   if (elements.length === 1) {
     [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
       elements[0],
@@ -245,17 +249,18 @@ const Panel = ({
     >
       {SHAPES.map(([type, shortcut, icon]) => {
         const isSelected =
-          type === elements[0].type ||
-          (isArrowElement(elements[0]) &&
-            elements[0].elbowed &&
-            type === "elbow") ||
-          (isArrowElement(elements[0]) &&
-            elements[0].roundness &&
-            type === "curve") ||
-          (isArrowElement(elements[0]) &&
-            !elements[0].elbowed &&
-            !elements[0].roundness &&
-            type === "straight");
+          sameType &&
+          (type === elements[0].type ||
+            (isArrowElement(elements[0]) &&
+              elements[0].elbowed &&
+              type === "elbow") ||
+            (isArrowElement(elements[0]) &&
+              elements[0].roundness &&
+              type === "curve") ||
+            (isArrowElement(elements[0]) &&
+              !elements[0].elbowed &&
+              !elements[0].roundness &&
+              type === "straight"));
 
         return (
           <ToolButton

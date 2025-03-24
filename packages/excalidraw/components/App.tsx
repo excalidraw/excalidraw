@@ -193,9 +193,9 @@ import {
   isElbowArrow,
   isFlowchartNodeElement,
   isBindableElement,
-  isGenericSwitchableElement,
+  areGenericSwitchableElements,
   isGenericSwitchableToolType,
-  isLinearSwitchableElement,
+  areLinearSwitchableElements,
   isLinearSwitchableToolType,
 } from "../element/typeChecks";
 import { getCenter, getDistance } from "../gesture";
@@ -4110,8 +4110,9 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const genericSwitchable = isGenericSwitchableElement(selectedElements);
-        const linearSwitchable = isLinearSwitchableElement(selectedElements);
+        const genericSwitchable =
+          areGenericSwitchableElements(selectedElements);
+        const linearSwitchable = areLinearSwitchableElements(selectedElements);
 
         if (genericSwitchable || linearSwitchable) {
           const firstElement = selectedElements[0];
@@ -4122,21 +4123,31 @@ class App extends React.Component<AppProps, AppState> {
             event.preventDefault();
 
             if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
-              const index = genericSwitchable
-                ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
-                : LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type);
+              const sameType = selectedElements.every(
+                (element) => element.type === selectedElements[0].type,
+              );
 
-              const nextType = (
-                genericSwitchable
-                  ? GENERIC_SWITCHABLE_SHAPES[
-                      (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
-                    ]
-                  : LINEAR_SWITCHABLE_SHAPES[
-                      (index + 1) % LINEAR_SWITCHABLE_SHAPES.length
-                    ]
-              ) as ToolType;
+              let nextType;
 
-              this.setActiveTool({ type: nextType });
+              if (genericSwitchable) {
+                const index = sameType
+                  ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+                  : -1;
+
+                nextType = GENERIC_SWITCHABLE_SHAPES[
+                  (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
+                ] as ToolType;
+                this.setActiveTool({ type: nextType });
+              } else if (linearSwitchable) {
+                const index = sameType
+                  ? LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+                  : -1;
+
+                nextType = LINEAR_SWITCHABLE_SHAPES[
+                  (index + 1) % LINEAR_SWITCHABLE_SHAPES.length
+                ] as ToolType;
+                this.setActiveTool({ type: nextType });
+              }
             }
 
             editorJotaiStore.set(shapeSwitchAtom, {
@@ -4827,7 +4838,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (
-      isGenericSwitchableElement(selectedElements) &&
+      areGenericSwitchableElements(selectedElements) &&
       isGenericSwitchableToolType(tool.type)
     ) {
       selectedElements.forEach((element) => {
@@ -4889,7 +4900,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (
-      isLinearSwitchableElement(selectedElements) &&
+      areLinearSwitchableElements(selectedElements) &&
       isLinearSwitchableToolType(tool.type)
     ) {
       selectedElements.forEach((element) => {
