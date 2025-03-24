@@ -557,7 +557,6 @@ let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: (() => void) | null = null;
-let selectionSwitch = false;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -4697,6 +4696,7 @@ class App extends React.Component<AppProps, AppState> {
         )
       | { type: "custom"; customType: string }
     ) & { locked?: boolean; fromSelection?: boolean },
+    keepSelection = false,
   ) => {
     if (!this.isToolSupported(tool.type)) {
       console.warn(
@@ -4738,7 +4738,21 @@ class App extends React.Component<AppProps, AppState> {
         this.store.shouldCaptureIncrement();
       }
 
-      if (nextActiveTool.type !== "selection") {
+      if (nextActiveTool.type === "lasso") {
+        return {
+          ...prevState,
+          activeTool: nextActiveTool,
+          ...(keepSelection
+            ? {}
+            : {
+                selectedElementIds: makeNextSelectedElementIds({}, prevState),
+                selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+                editingGroupId: null,
+                multiElement: null,
+              }),
+          ...commonResets,
+        };
+      } else if (nextActiveTool.type !== "selection") {
         return {
           ...prevState,
           activeTool: nextActiveTool,
@@ -7041,7 +7055,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    if (this.state.activeTool.type === "selection") {
+    if (this.state.activeTool.type === "selection" && !event.altKey) {
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -8597,24 +8611,29 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
         if (event.altKey) {
-          this.setActiveTool({ type: "lasso", fromSelection: true });
-          this.lassoTrail.startPath(pointerCoords.x, pointerCoords.y);
+          this.setActiveTool(
+            { type: "lasso", fromSelection: true },
+            event.shiftKey,
+          );
+          this.lassoTrail.startPath(
+            pointerCoords.x,
+            pointerCoords.y,
+            event.shiftKey,
+          );
           this.setAppState({
             selectionElement: null,
           });
-          selectionSwitch = true;
         } else {
           this.maybeDragNewGenericElement(pointerDownState, event);
         }
       } else if (this.state.activeTool.type === "lasso") {
-        if (!event.altKey && selectionSwitch) {
+        if (!event.altKey && this.state.activeTool.fromSelection) {
           this.setActiveTool({ type: "selection" });
           this.createGenericElementOnPointerDown("selection", pointerDownState);
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
           this.maybeDragNewGenericElement(pointerDownState, event);
           this.lassoTrail.endPath();
-          selectionSwitch = false;
         } else {
           this.lassoTrail.addPointToPath(
             pointerCoords.x,
@@ -8878,7 +8897,6 @@ class App extends React.Component<AppProps, AppState> {
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
-      selectionSwitch = false;
       this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
