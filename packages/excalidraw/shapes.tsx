@@ -42,7 +42,7 @@ import { LinearElementEditor } from "./element/linearElementEditor";
 import { getBoundTextElement } from "./element/textElement";
 import { KEYS } from "./keys";
 import { ShapeCache } from "./scene/ShapeCache";
-import { invariant } from "./utils";
+import { invariant, elementCenterPoint } from "./utils";
 
 import type { Bounds } from "./element/bounds";
 import type {
@@ -395,7 +395,7 @@ export const aabbForElement = (
     midY: element.y + element.height / 2,
   };
 
-  const center = pointFrom(bbox.midX, bbox.midY);
+  const center = elementCenterPoint(element);
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(bbox.minX, bbox.minY),
     center,
