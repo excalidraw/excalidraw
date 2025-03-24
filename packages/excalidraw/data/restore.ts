@@ -43,6 +43,8 @@ import { refreshTextDimensions } from "@excalidraw/element/newElement";
 
 import { getNormalizedDimensions } from "@excalidraw/element/sizeHelpers";
 
+import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -70,8 +72,6 @@ import {
   getNormalizedGridStep,
   getNormalizedZoom,
 } from "../scene";
-
-import { isInvisiblySmallElement } from "..";
 
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";

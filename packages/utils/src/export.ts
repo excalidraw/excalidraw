@@ -1,10 +1,10 @@
+import { MIME_TYPES } from "@excalidraw/common";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
-import { MIME_TYPES } from "@excalidraw/common";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { restore } from "@excalidraw/excalidraw/data/restore";
