@@ -4161,6 +4161,7 @@ class App extends React.Component<AppProps, AppState> {
                 );
                 if (boundText && genericSwitchable && firstElement) {
                   editorJotaiStore.set(shapeSwitchFontSizeAtom, {
+                    ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
                     [element.id]: {
                       fontSize: boundText.fontSize,
                       elementType: element.type as GenericSwitchableToolType,
