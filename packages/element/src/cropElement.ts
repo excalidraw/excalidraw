@@ -19,6 +19,8 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 
+import { elementCenterPoint } from "../utils";
+
 import type { TransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
@@ -61,7 +63,7 @@ export const cropElement = (
 
   const rotatedPointer = pointRotateRads(
     pointFrom(pointerX, pointerY),
-    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
+    elementCenterPoint(element),
     -element.angle as Radians,
   );
 

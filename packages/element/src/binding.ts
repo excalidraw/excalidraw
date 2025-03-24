@@ -6,6 +6,7 @@ import {
   invariant,
   isDevEnv,
   isTestEnv,
+  elementCenterPoint,
 } from "@excalidraw/common";
 
 import {
@@ -904,13 +905,7 @@ export const getHeadingForElbowArrowSnap = (
 
   if (!distance) {
     return vectorToHeading(
-      vectorFromPoint(
-        p,
-        pointFrom<GlobalPoint>(
-          bindableElement.x + bindableElement.width / 2,
-          bindableElement.y + bindableElement.height / 2,
-        ),
-      ),
+      vectorFromPoint(p, elementCenterPoint(bindableElement)),
     );
   }
 
@@ -1040,10 +1035,7 @@ export const avoidRectangularCorner = (
   element: ExcalidrawBindableElement,
   p: GlobalPoint,
 ): GlobalPoint => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
   const nonRotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
 
   if (nonRotatedPoint[0] < element.x && nonRotatedPoint[1] < element.y) {
@@ -1140,10 +1132,9 @@ export const snapToMid = (
   tolerance: number = 0.05,
 ): GlobalPoint => {
   const { x, y, width, height, angle } = element;
-  const center = pointFrom<GlobalPoint>(
-    x + width / 2 - 0.1,
-    y + height / 2 - 0.1,
-  );
+
+  const center = elementCenterPoint(element, -0.1, -0.1);
+
   const nonRotated = pointRotateRads(p, center, -angle as Radians);
 
   // snap-to-center point is adaptive to element size, but we don't want to go
@@ -1228,10 +1219,7 @@ const updateBoundPoint = (
         startOrEnd === "startBinding" ? "start" : "end",
         elementsMap,
       ).fixedPoint;
-    const globalMidPoint = pointFrom<GlobalPoint>(
-      bindableElement.x + bindableElement.width / 2,
-      bindableElement.y + bindableElement.height / 2,
-    );
+    const globalMidPoint = elementCenterPoint(bindableElement);
     const global = pointFrom<GlobalPoint>(
       bindableElement.x + fixedPoint[0] * bindableElement.width,
       bindableElement.y + fixedPoint[1] * bindableElement.height,
@@ -1275,10 +1263,7 @@ const updateBoundPoint = (
         elementsMap,
       );
 
-    const center = pointFrom<GlobalPoint>(
-      bindableElement.x + bindableElement.width / 2,
-      bindableElement.y + bindableElement.height / 2,
-    );
+    const center = elementCenterPoint(bindableElement);
     const interceptorLength =
       pointDistance(adjacentPoint, edgePointAbsolute) +
       pointDistance(adjacentPoint, center) +
@@ -1771,10 +1756,7 @@ const determineFocusDistance = (
   // Another point on the line, in absolute coordinates (closer to element)
   b: GlobalPoint,
 ): number => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   if (pointsEqual(a, b)) {
     return 0;
@@ -1904,10 +1886,7 @@ const determineFocusPoint = (
   focus: number,
   adjacentPoint: GlobalPoint,
 ): GlobalPoint => {
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   if (focus === 0) {
     return center;
@@ -2338,10 +2317,7 @@ export const getGlobalFixedPointForBindableElement = (
       element.x + element.width * fixedX,
       element.y + element.height * fixedY,
     ),
-    pointFrom<GlobalPoint>(
-      element.x + element.width / 2,
-      element.y + element.height / 2,
-    ),
+    elementCenterPoint(element),
     element.angle,
   );
 };
