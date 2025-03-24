@@ -1,4 +1,4 @@
-import { average } from "@excalidraw/math";
+import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
@@ -1203,12 +1203,16 @@ export const escapeDoubleQuotes = (str: string) => {
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
 
-export const elementCenterPoint = (element: ExcalidrawElement) => {
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
   const { x, y, width, height } = element;
 
-  const centerXPoint = x + width / 2;
+  const centerXPoint = x + width / 2 + xOffset;
 
-  const centerYPoint = y + height / 2;
+  const centerYPoint = y + height / 2 + yOffset;
 
-  return { x: centerXPoint, y: centerYPoint };
+  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
 };
