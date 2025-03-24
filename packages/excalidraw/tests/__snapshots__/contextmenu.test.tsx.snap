@@ -5,6 +5,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1089,6 +1090,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1309,6 +1311,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1644,6 +1647,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -1979,6 +1983,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2199,6 +2204,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2443,6 +2449,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -2748,6 +2755,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3121,6 +3129,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3600,6 +3609,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -3927,6 +3937,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4254,6 +4265,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4661,6 +4673,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5883,6 +5896,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7151,6 +7165,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7829,6 +7844,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8818,6 +8834,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
