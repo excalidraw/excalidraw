@@ -30,6 +30,8 @@ import type {
   ExcalidrawRectangleElement,
   ExcalidrawEllipseElement,
   ExcalidrawDiamondElement,
+  GenericSwitchableToolType,
+  LinearSwitchableToolType,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -341,22 +343,25 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[2] === "number" &&
   typeof box[3] === "number";
 
+type NonEmptyArray<T> = [T, ...T[]];
+
 type ExcalidrawGenericSwitchableElement =
   | ExcalidrawRectangleElement
   | ExcalidrawEllipseElement
   | ExcalidrawDiamondElement;
 
-type GenericSwitchableToolType = "rectangle" | "ellipse" | "diamond";
-
-type LinearSwitchableToolType = "arrow" | "line";
-
 export const isGenericSwitchableElement = (
-  element: ExcalidrawElement,
-): element is ExcalidrawGenericSwitchableElement => {
+  elements: ExcalidrawElement[],
+): elements is NonEmptyArray<ExcalidrawGenericSwitchableElement> => {
+  if (elements.length === 0) {
+    return false;
+  }
+  const firstType = elements[0].type;
   return (
-    element.type === "rectangle" ||
-    element.type === "ellipse" ||
-    element.type === "diamond"
+    (firstType === "rectangle" ||
+      firstType === "ellipse" ||
+      firstType === "diamond") &&
+    elements.every((element) => element.type === firstType)
   );
 };
 
@@ -367,18 +372,16 @@ export const isGenericSwitchableToolType = (
 };
 
 export const isLinearSwitchableElement = (
-  element: ExcalidrawElement,
-): element is ExcalidrawLinearElement => {
-  if (element.type === "arrow" || element.type === "line") {
-    if (
-      (!element.boundElements || element.boundElements.length === 0) &&
-      !element.startBinding &&
-      !element.endBinding
-    ) {
-      return true;
-    }
+  elements: ExcalidrawElement[],
+): elements is NonEmptyArray<ExcalidrawLinearElement> => {
+  if (elements.length === 0) {
+    return false;
   }
-  return false;
+  const firstType = elements[0].type;
+  return (
+    (firstType === "arrow" || firstType === "line") &&
+    elements.every((element) => element.type === firstType)
+  );
 };
 
 export const isLinearSwitchableToolType = (

@@ -10,7 +10,6 @@ import {
 import { parseClipboard } from "../clipboard";
 import { CLASSES, POINTER_BUTTON } from "../constants";
 import { CODES, KEYS } from "../keys";
-import Scene from "../scene/Scene";
 import {
   isWritableElement,
   getFontString,
@@ -35,7 +34,7 @@ import {
   computeBoundTextPosition,
   getBoundTextElement,
 } from "./textElement";
-import { getTextWidth, measureText } from "./textMeasurements";
+import { getTextWidth } from "./textMeasurements";
 import { normalizeText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
@@ -86,7 +85,6 @@ export const textWysiwyg = ({
   excalidrawContainer,
   app,
   autoSelect = true,
-  keepContainerDimensions = false,
 }: {
   id: ExcalidrawElement["id"];
   /**
@@ -127,8 +125,7 @@ export const textWysiwyg = ({
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
-    const updatedTextElement =
-      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
 
     if (!updatedTextElement) {
       return;
@@ -189,48 +186,6 @@ export const textWysiwyg = ({
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
         );
-
-        if (keepContainerDimensions) {
-          const wrappedText = wrapText(
-            updatedTextElement.text,
-            getFontString(updatedTextElement),
-            maxWidth,
-          );
-
-          let metrics = measureText(
-            wrappedText,
-            getFontString(updatedTextElement),
-            updatedTextElement.lineHeight,
-          );
-
-          if (width > maxWidth || height > maxHeight) {
-            let nextFontSize = updatedTextElement.fontSize;
-            while (
-              (metrics.width > maxWidth || metrics.height > maxHeight) &&
-              nextFontSize > 0
-            ) {
-              nextFontSize -= 1;
-              const _updatedTextElement = {
-                ...updatedTextElement,
-                fontSize: nextFontSize,
-              };
-              metrics = measureText(
-                updatedTextElement.text,
-                getFontString(_updatedTextElement),
-                updatedTextElement.lineHeight,
-              );
-            }
-
-            mutateElement(
-              updatedTextElement,
-              { fontSize: nextFontSize },
-              false,
-            );
-          }
-
-          width = metrics.width;
-          height = metrics.height;
-        }
 
         // autogrow container height if text exceeds
         if (!isArrowElement(container) && height > maxHeight) {
@@ -578,7 +533,7 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = Scene.getScene(element)?.getElement(
+    const updateElement = app.scene.getElement(
       element.id,
     ) as ExcalidrawTextElement;
     if (!updateElement) {

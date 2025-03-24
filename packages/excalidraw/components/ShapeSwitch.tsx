@@ -6,15 +6,24 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { atom, useAtom } from "../editor-jotai";
 
-import { getElementAbsoluteCoords } from "../element";
-import { sceneCoordsToViewportCoords } from "../utils";
+import { getElementAbsoluteCoords, refreshTextDimensions } from "../element";
+import { getFontString, sceneCoordsToViewportCoords } from "../utils";
 import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
 import { isArrowElement, isLinearElement } from "../element/typeChecks";
 import { t } from "../i18n";
 
-import "./ShapeSwitch.scss";
+import {
+  computeBoundTextPosition,
+  getBoundTextMaxHeight,
+  getBoundTextMaxWidth,
+} from "../element/textElement";
+import { wrapText } from "../element/textWrapping";
+import { measureText } from "../element/textMeasurements";
+import { mutateElement } from "../element/mutateElement";
+import { getCommonBoundingBox } from "../element/bounds";
 
+import { ToolButton } from "./ToolButton";
 import {
   ArrowIcon,
   DiamondIcon,
@@ -22,10 +31,17 @@ import {
   LineIcon,
   RectangleIcon,
 } from "./icons";
-import { ToolButton } from "./ToolButton";
+
+import "./ShapeSwitch.scss";
 
 import type App from "./App";
-import type { ExcalidrawElement } from "../element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
+  GenericSwitchableToolType,
+} from "../element/types";
 import type { ToolType } from "../types";
 
 const GAP_HORIZONTAL = 8;
@@ -46,8 +62,10 @@ export const shapeSwitchAtom = atom<
   | null
 >(null);
 export const shapeSwitchFontSizeAtom = atom<{
-  fontSize: number;
-  elementType: "rectangle" | "diamond" | "ellipse";
+  [id: string]: {
+    fontSize: number;
+    elementType: GenericSwitchableToolType;
+  };
 } | null>(null);
 
 const ShapeSwitch = ({ app }: { app: App }) => {
@@ -64,22 +82,22 @@ const ShapeSwitch = ({ app }: { app: App }) => {
     app.scene.getNonDeletedElementsMap(),
     app.state,
   );
-  const firstElement = selectedElements[0];
-
-  const isSingleSelected = firstElement && selectedElements.length === 1;
 
   // clear if hint target no longer matches
-  if (shapeSwitch.type === "hint" && firstElement?.id !== shapeSwitch.id) {
+  if (
+    shapeSwitch.type === "hint" &&
+    selectedElements?.[0]?.id !== shapeSwitch.id
+  ) {
     setShapeSwitch(null);
     return null;
   }
 
-  if (!isSingleSelected) {
+  if (selectedElements.length === 0) {
     setShapeSwitch(null);
     return null;
   }
 
-  const props = { app, element: firstElement };
+  const props = { app, elements: selectedElements };
 
   switch (shapeSwitch.type) {
     case "hint":
@@ -91,7 +109,13 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   }
 };
 
-const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
+const Hint = ({
+  app,
+  elements,
+}: {
+  app: App;
+  elements: ExcalidrawElement[];
+}) => {
   const [, setShapeSwitch] = useAtom(shapeSwitchAtom);
   const hintRef = useRef<HTMLDivElement>(null);
 
@@ -114,14 +138,14 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
   }, [setShapeSwitch]);
 
   const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
-    element,
+    elements[0],
     app.scene.getNonDeletedElementsMap(),
   );
 
   const rotatedTopLeft = pointRotateRads(
     pointFrom(x1, y1),
     pointFrom(cx, cy),
-    element.angle,
+    elements[0].angle,
   );
 
   const { x, y } = sceneCoordsToViewportCoords(
@@ -135,7 +159,7 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
   return (
     <div
       ref={hintRef}
-      key={element.id}
+      // key={element.id}
       style={{
         position: "absolute",
         bottom: `${
@@ -158,17 +182,35 @@ const Hint = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
   );
 };
 
-const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
-  const [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
-    element,
-    app.scene.getNonDeletedElementsMap(),
-  );
+const Panel = ({
+  app,
+  elements,
+}: {
+  app: App;
+  elements: ExcalidrawElement[];
+}) => {
+  let [x1, y2, cx, cy] = [0, 0, 0, 0];
+  let rotatedBottomLeft = [0, 0];
 
-  const rotatedBottomLeft = pointRotateRads(
-    pointFrom(x1, y2),
-    pointFrom(cx, cy),
-    element.angle,
-  );
+  if (elements.length === 1) {
+    [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
+      elements[0],
+      app.scene.getNonDeletedElementsMap(),
+    );
+
+    rotatedBottomLeft = pointRotateRads(
+      pointFrom(x1, y2),
+      pointFrom(cx, cy),
+      elements[0].angle,
+    );
+  } else {
+    const { minX, maxY, midX, midY } = getCommonBoundingBox(elements);
+    x1 = minX;
+    y2 = maxY;
+    cx = midX;
+    cy = midY;
+    rotatedBottomLeft = pointFrom(x1, y2);
+  }
 
   const { x, y } = sceneCoordsToViewportCoords(
     {
@@ -178,7 +220,7 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
     app.state,
   );
 
-  const SHAPES: [string, string, ReactNode][] = isLinearElement(element)
+  const SHAPES: [string, string, ReactNode][] = isLinearElement(elements[0])
     ? [
         ["arrow", "5", ArrowIcon],
         ["line", "6", LineIcon],
@@ -203,18 +245,22 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
     >
       {SHAPES.map(([type, shortcut, icon]) => {
         const isSelected =
-          type === element.type ||
-          (isArrowElement(element) && element.elbowed && type === "elbow") ||
-          (isArrowElement(element) && element.roundness && type === "curve") ||
-          (isArrowElement(element) &&
-            !element.elbowed &&
-            !element.roundness &&
+          type === elements[0].type ||
+          (isArrowElement(elements[0]) &&
+            elements[0].elbowed &&
+            type === "elbow") ||
+          (isArrowElement(elements[0]) &&
+            elements[0].roundness &&
+            type === "curve") ||
+          (isArrowElement(elements[0]) &&
+            !elements[0].elbowed &&
+            !elements[0].roundness &&
             type === "straight");
 
         return (
           <ToolButton
             className="Shape"
-            key={`${element.version}_${type}`}
+            key={`${elements[0].version}_${type}`}
             type="radio"
             icon={icon}
             checked={isSelected}
@@ -238,6 +284,79 @@ const Panel = ({ app, element }: { app: App; element: ExcalidrawElement }) => {
         );
       })}
     </div>
+  );
+};
+
+export const adjustBoundTextSize = (
+  container: ExcalidrawTextContainer,
+  boundText: ExcalidrawTextElementWithContainer,
+  elementsMap: ElementsMap,
+) => {
+  const maxWidth = getBoundTextMaxWidth(container, boundText);
+  const maxHeight = getBoundTextMaxHeight(container, boundText);
+
+  const wrappedText = wrapText(
+    boundText.text,
+    getFontString(boundText),
+    maxWidth,
+  );
+
+  let metrics = measureText(
+    wrappedText,
+    getFontString(boundText),
+    boundText.lineHeight,
+  );
+
+  let nextFontSize = boundText.fontSize;
+  while (
+    (metrics.width > maxWidth || metrics.height > maxHeight) &&
+    nextFontSize > 0
+  ) {
+    nextFontSize -= 1;
+    const _updatedTextElement = {
+      ...boundText,
+      fontSize: nextFontSize,
+    };
+    metrics = measureText(
+      boundText.text,
+      getFontString(_updatedTextElement),
+      boundText.lineHeight,
+    );
+  }
+
+  mutateElement(
+    boundText,
+    {
+      fontSize: nextFontSize,
+      width: metrics.width,
+      height: metrics.height,
+    },
+    false,
+  );
+
+  const { x, y } = computeBoundTextPosition(container, boundText, elementsMap);
+
+  mutateElement(
+    boundText,
+    {
+      x,
+      y,
+    },
+    false,
+  );
+
+  mutateElement(
+    boundText,
+    {
+      ...refreshTextDimensions(
+        boundText,
+        container,
+        elementsMap,
+        boundText.originalText,
+      ),
+      containerId: container.id,
+    },
+    false,
   );
 };
 

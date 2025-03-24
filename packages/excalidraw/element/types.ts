@@ -411,3 +411,6 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+export type GenericSwitchableToolType = "rectangle" | "ellipse" | "diamond";
+export type LinearSwitchableToolType = "line" | "arrow";

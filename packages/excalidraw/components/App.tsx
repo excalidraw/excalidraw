@@ -392,6 +392,7 @@ import {
 } from "../element/textMeasurements";
 
 import ShapeSwitch, {
+  adjustBoundTextSize,
   GENERIC_SWITCHABLE_SHAPES,
   LINEAR_SWITCHABLE_SHAPES,
   shapeSwitchAtom,
@@ -446,6 +447,8 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  GenericSwitchableToolType,
+  LinearSwitchableToolType,
 } from "../element/types";
 import type {
   RenderInteractiveSceneCallback,
@@ -573,7 +576,6 @@ const gesture: Gesture = {
   initialDistance: null,
   initialScale: null,
 };
-let textWysiwygSubmitHandler: (() => void) | null = null;
 
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
@@ -4108,28 +4110,24 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const firstElement = selectedElements[0];
-        const isGenericSwitchable =
-          firstElement && isGenericSwitchableElement(firstElement);
-        const isLinearSwitchable =
-          firstElement && isLinearSwitchableElement(firstElement);
+        const genericSwitchable = isGenericSwitchableElement(selectedElements);
+        const linearSwitchable = isLinearSwitchableElement(selectedElements);
 
-        if (
-          selectedElements.length === 1 &&
-          (isGenericSwitchable || isLinearSwitchable)
-        ) {
+        if (genericSwitchable || linearSwitchable) {
+          const firstElement = selectedElements[0];
+
           if (event.key === KEYS.ESCAPE) {
             editorJotaiStore.set(shapeSwitchAtom, null);
           } else if (event.key === KEYS.SLASH || event.key === KEYS.TAB) {
             event.preventDefault();
 
             if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
-              const index = isGenericSwitchable
+              const index = genericSwitchable
                 ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
                 : LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type);
 
               const nextType = (
-                isGenericSwitchable
+                genericSwitchable
                   ? GENERIC_SWITCHABLE_SHAPES[
                       (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
                     ]
@@ -4145,16 +4143,20 @@ class App extends React.Component<AppProps, AppState> {
               type: "panel",
             });
             if (!editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
-              const boundText = getBoundTextElement(
-                firstElement,
-                this.scene.getNonDeletedElementsMap(),
-              );
-              if (boundText && isGenericSwitchable) {
-                editorJotaiStore.set(shapeSwitchFontSizeAtom, {
-                  fontSize: boundText.fontSize,
-                  elementType: firstElement.type,
-                });
-              }
+              selectedElements.forEach((element) => {
+                const boundText = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+                if (boundText && genericSwitchable && firstElement) {
+                  editorJotaiStore.set(shapeSwitchFontSizeAtom, {
+                    [element.id]: {
+                      fontSize: boundText.fontSize,
+                      elementType: element.type as GenericSwitchableToolType,
+                    },
+                  });
+                }
+              });
             }
           }
         }
@@ -4819,90 +4821,98 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getNonDeletedElementsMap(),
       this.state,
     );
-    const firstElement = selectedElements[0];
+    const selectedElementIds = selectedElements.reduce(
+      (acc, element) => ({ ...acc, [element.id]: true }),
+      {},
+    );
 
     if (
-      firstElement &&
-      selectedElements.length === 1 &&
-      isGenericSwitchableElement(firstElement) &&
+      isGenericSwitchableElement(selectedElements) &&
       isGenericSwitchableToolType(tool.type)
     ) {
-      ShapeCache.delete(firstElement);
+      selectedElements.forEach((element) => {
+        ShapeCache.delete(element);
 
-      mutateElement(firstElement, {
-        type: tool.type,
-        roundness:
-          tool.type === "diamond" && firstElement.roundness
-            ? {
-                type: isUsingAdaptiveRadius(tool.type)
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-                value: ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : firstElement.roundness,
-      });
+        mutateElement(
+          element,
+          {
+            type: tool.type as GenericSwitchableToolType,
+            roundness:
+              tool.type === "diamond" && element.roundness
+                ? {
+                    type: isUsingAdaptiveRadius(tool.type)
+                      ? ROUNDNESS.ADAPTIVE_RADIUS
+                      : ROUNDNESS.PROPORTIONAL_RADIUS,
+                    value: ROUNDNESS.PROPORTIONAL_RADIUS,
+                  }
+                : element.roundness,
+          },
+          false,
+        );
 
-      const boundText = getBoundTextElement(
-        firstElement,
-        this.scene.getNonDeletedElementsMap(),
-      );
-      if (boundText) {
-        if (
-          editorJotaiStore.get(shapeSwitchFontSizeAtom)?.elementType ===
-          tool.type
-        ) {
-          mutateElement(
+        const boundText = getBoundTextElement(
+          element,
+          this.scene.getNonDeletedElementsMap(),
+        );
+        if (boundText) {
+          if (
+            editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+              ?.elementType === tool.type
+          ) {
+            mutateElement(
+              boundText,
+              {
+                fontSize:
+                  editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+                    ?.fontSize ?? boundText.fontSize,
+              },
+              false,
+            );
+          }
+
+          adjustBoundTextSize(
+            element,
             boundText,
-            {
-              fontSize:
-                editorJotaiStore.get(shapeSwitchFontSizeAtom)?.fontSize ??
-                boundText.fontSize,
-            },
-            false,
+            this.scene.getNonDeletedElementsMap(),
           );
         }
+      });
 
-        this.startTextEditing({
-          sceneX: firstElement.x + firstElement.width / 2,
-          sceneY: firstElement.y + firstElement.height / 2,
-          container: firstElement as ExcalidrawTextContainer,
-          keepContainerDimensions: true,
-        });
-      }
-
-      this.setState((prevState) => ({
-        selectedElementIds: {
-          [firstElement.id]: true,
-        },
-        activeTool: updateActiveTool(prevState, { type: "selection" }),
-      }));
-
-      textWysiwygSubmitHandler?.();
+      this.setState((prevState) => {
+        return {
+          selectedElementIds,
+          activeTool: updateActiveTool(prevState, { type: "selection" }),
+        };
+      });
 
       this.store.shouldCaptureIncrement();
     }
 
     if (
-      firstElement &&
-      selectedElements.length === 1 &&
-      isLinearSwitchableElement(firstElement) &&
+      isLinearSwitchableElement(selectedElements) &&
       isLinearSwitchableToolType(tool.type)
     ) {
-      ShapeCache.delete(firstElement);
+      selectedElements.forEach((element) => {
+        ShapeCache.delete(element);
 
-      mutateElement(firstElement as ExcalidrawLinearElement, {
-        type: tool.type,
-        startArrowhead: null,
-        endArrowhead: tool.type === "arrow" ? "arrow" : null,
+        mutateElement(
+          element as ExcalidrawLinearElement,
+          {
+            type: tool.type as LinearSwitchableToolType,
+            startArrowhead: null,
+            endArrowhead: tool.type === "arrow" ? "arrow" : null,
+          },
+          false,
+        );
       });
+      const firstElement = selectedElements[0];
 
       this.setState((prevState) => ({
-        selectedElementIds: {
-          [firstElement.id]: true,
-        },
-        selectedLinearElement: new LinearElementEditor(
-          firstElement as ExcalidrawLinearElement,
-        ),
+        selectedElementIds,
+        selectedLinearElement:
+          selectedElements.length === 1
+            ? new LinearElementEditor(firstElement as ExcalidrawLinearElement)
+            : null,
         activeTool: updateActiveTool(prevState, { type: "selection" }),
       }));
     }
@@ -5037,7 +5047,7 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
-    textWysiwygSubmitHandler = textWysiwyg({
+    textWysiwyg({
       id: element.id,
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
@@ -5060,7 +5070,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
-        textWysiwygSubmitHandler = null;
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
         // select the created text element only if submitting via keyboard
