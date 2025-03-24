@@ -128,10 +128,8 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[103.54, 43.53]]);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([
-      [93.93, 94.41],
-    ]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[107.07, 47.07]]);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[86.86, 87.3]]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

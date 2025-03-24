@@ -61,7 +61,7 @@ export const cropElement = (
 
   const rotatedPointer = pointRotateRads(
     pointFrom(pointerX, pointerY),
-    elementCenterPoint(element),
+    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
     -element.angle as Radians,
   );
 

@@ -433,7 +433,7 @@ describe("Test Transform", () => {
         startBinding: {
           elementId: rectangle.id,
           focus: 0,
-          gap: FIXED_BINDING_DISTANCE,
+          gap: 1,
         },
         endBinding: {
           elementId: ellipse.id,
@@ -518,7 +518,7 @@ describe("Test Transform", () => {
         startBinding: {
           elementId: text2.id,
           focus: 0,
-          gap: FIXED_BINDING_DISTANCE,
+          gap: 1,
         },
         endBinding: {
           elementId: text3.id,
@@ -781,7 +781,7 @@ describe("Test Transform", () => {
       expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
         elementId: "rect-1",
         focus: -0,
-        gap: FIXED_BINDING_DISTANCE,
+        gap: 14,
       });
       expect(rect.boundElements).toStrictEqual([
         {

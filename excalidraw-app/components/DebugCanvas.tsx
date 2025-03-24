@@ -13,8 +13,6 @@ import { useCallback, useImperativeHandle, useRef } from "react";
 
 import {
   isLineSegment,
-  isCurve,
-  type Curve,
   type GlobalPoint,
   type LineSegment,
 } from "@excalidraw/math";
