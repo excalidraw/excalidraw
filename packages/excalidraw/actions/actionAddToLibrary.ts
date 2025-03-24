@@ -1,5 +1,5 @@
 import { LIBRARY_DISABLED_TYPES } from "../constants";
-import { deepCopyElement } from "../element/newElement";
+import { deepCopyElement } from "../element/duplicate";
 import { t } from "../i18n";
 import { randomId } from "../random";
 import { CaptureUpdateAction } from "../store";
