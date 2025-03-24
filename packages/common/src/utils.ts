@@ -2,6 +2,7 @@ import { average } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
+  ExcalidrawElement,
   FontFamilyValues,
   FontString,
 } from "@excalidraw/element/types";
@@ -1200,3 +1201,6 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+export const toLocalPoint = (p: GlobalPoint, element: ExcalidrawElement) =>
+  pointTranslate<GlobalPoint, LocalPoint>(p, vector(-element.x, -element.y));

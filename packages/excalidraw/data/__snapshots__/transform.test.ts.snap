@@ -89,7 +89,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endBinding": {
     "elementId": "ellipse-1",
     "focus": -0.007519379844961235,
-    "gap": 11.562288374879595,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -119,7 +119,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startBinding": {
     "elementId": "id49",
     "focus": -0.0813953488372095,
-    "gap": 1,
+    "gap": 5,
   },
   "strokeColor": "#1864ab",
   "strokeStyle": "solid",
@@ -145,7 +145,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "endBinding": {
     "elementId": "ellipse-1",
     "focus": 0.10666666666666667,
-    "gap": 3.8343264684446097,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -175,7 +175,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "startBinding": {
     "elementId": "diamond-1",
     "focus": 0,
-    "gap": 4.545343408287929,
+    "gap": 5,
   },
   "strokeColor": "#e67700",
   "strokeStyle": "solid",
@@ -335,7 +335,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endBinding": {
     "elementId": "text-2",
     "focus": 0,
-    "gap": 14,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -365,7 +365,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "startBinding": {
     "elementId": "text-1",
     "focus": 0,
-    "gap": 1,
+    "gap": 5,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -437,7 +437,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "endBinding": {
     "elementId": "id42",
     "focus": -0,
-    "gap": 1,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -467,7 +467,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "startBinding": {
     "elementId": "id41",
     "focus": 0,
-    "gap": 1,
+    "gap": 5,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -613,7 +613,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "endBinding": {
     "elementId": "id46",
     "focus": -0,
-    "gap": 1,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -643,7 +643,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "startBinding": {
     "elementId": "id45",
     "focus": 0,
-    "gap": 1,
+    "gap": 5,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -1475,7 +1475,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endBinding": {
     "elementId": "Alice",
     "focus": -0,
-    "gap": 5.299874999999986,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -1507,7 +1507,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startBinding": {
     "elementId": "Bob",
     "focus": 0,
-    "gap": 1,
+    "gap": 5,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -1538,7 +1538,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "endBinding": {
     "elementId": "B",
     "focus": 0,
-    "gap": 14,
+    "gap": 5,
   },
   "fillStyle": "solid",
   "frameId": null,
@@ -1566,7 +1566,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "startBinding": {
     "elementId": "Bob",
     "focus": 0,
-    "gap": 1,
+    "gap": 5,
   },
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",

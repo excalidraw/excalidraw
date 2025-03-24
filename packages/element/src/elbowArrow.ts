@@ -1254,6 +1254,7 @@ const getElbowArrowData = (
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
+    elementsMap,
     hoveredStartElement,
     options?.isDragging,
   );
@@ -1267,6 +1268,7 @@ const getElbowArrowData = (
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
+    elementsMap,
     hoveredEndElement,
     options?.isDragging,
   );
@@ -2212,6 +2214,7 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
+  elementsMap: NonDeletedSceneElementsMap,
   element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
 ): GlobalPoint => {
@@ -2221,6 +2224,7 @@ const getGlobalPoint = (
         arrow,
         element,
         startOrEnd,
+        elementsMap,
       );
 
       return snapToMid(element, snapPoint);
@@ -2240,7 +2244,7 @@ const getGlobalPoint = (
       distanceToBindableElement(element, fixedGlobalPoint) -
         FIXED_BINDING_DISTANCE,
     ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
+      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd, elementsMap)
       : fixedGlobalPoint;
   }
 
@@ -2268,7 +2272,6 @@ const getBindPointHeading = (
           number,
         ],
       ),
-    elementsMap,
     origPoint,
   );
 
