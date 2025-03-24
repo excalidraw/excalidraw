@@ -91,26 +91,10 @@ export const actionFinalize = register({
         multiPointElement.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { x: rx, y: ry, points, lastCommittedPoint } = multiPointElement;
-        const lastGlobalPoint = pointFrom<GlobalPoint>(
-          rx + points[points.length - 1][0],
-          ry + points[points.length - 1][1],
-        );
-        const hoveredElementForBinding = getHoveredElementForBinding(
-          {
-            x: lastGlobalPoint[0],
-            y: lastGlobalPoint[1],
-          },
-          elements,
-          elementsMap,
-          app.state.zoom,
-          true,
-          isElbowArrow(multiPointElement),
-        );
+        const { points, lastCommittedPoint } = multiPointElement;
         if (
-          !hoveredElementForBinding &&
-          (!lastCommittedPoint ||
-            points[points.length - 1] !== lastCommittedPoint)
+          !lastCommittedPoint ||
+          points[points.length - 1] !== lastCommittedPoint
         ) {
           mutateElement(multiPointElement, {
             points: multiPointElement.points.slice(0, -1),

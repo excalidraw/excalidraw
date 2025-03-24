@@ -1249,7 +1249,6 @@ const getElbowArrowData = (
       ...arrow,
       type: "arrow",
       elbowed: true,
-      type: "arrow",
       points: nextPoints,
     } as ExcalidrawElbowArrowElement,
     "start",
@@ -1263,7 +1262,6 @@ const getElbowArrowData = (
       ...arrow,
       type: "arrow",
       elbowed: true,
-      type: "arrow",
       points: nextPoints,
     } as ExcalidrawElbowArrowElement,
     "end",
@@ -2223,7 +2221,6 @@ const getGlobalPoint = (
         arrow,
         element,
         startOrEnd,
-        elementsMap,
       );
 
       return snapToMid(element, snapPoint);

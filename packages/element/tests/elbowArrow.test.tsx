@@ -77,9 +77,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [107.93, 0],
-      [107.93, 185.86],
-      [185.86, 185.86],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
 
     mouse.reset();
@@ -88,9 +88,9 @@ describe("elbow arrow segment move", () => {
 
     expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [107.93, 0],
-      [107.93, 185.86],
-      [185.86, 185.86],
+      [110, 0],
+      [110, 200],
+      [190, 200],
     ]);
   });
 
@@ -198,11 +198,11 @@ describe("elbow arrow routing", () => {
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
     });
 
-    expect(arrow.points).toCloselyEqualPoints([
+    expect(arrow.points).toEqual([
       [0, 0],
-      [42.93, 0],
-      [42.93, 195.7],
-      [85.86, 195.7],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
   });
 });
@@ -241,9 +241,9 @@ describe("elbow arrow ui", () => {
     expect(h.state.currentItemArrowType).toBe(ARROW_TYPE.elbow);
 
     mouse.reset();
-    mouse.moveTo(-50, -100);
+    mouse.moveTo(-43, -99);
     mouse.click();
-    mouse.moveTo(50, 100);
+    mouse.moveTo(43, 99);
     mouse.click();
 
     const arrow = h.scene.getSelectedElements(
@@ -252,11 +252,11 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.type).toBe("arrow");
     expect(arrow.elbowed).toBe(true);
-    expect(arrow.points).toCloselyEqualPoints([
+    expect(arrow.points).toEqual([
       [0, 0],
-      [42.93, 0],
-      [42.93, 153.48],
-      [85.86, 153.48],
+      [45, 0],
+      [45, 200],
+      [90, 200],
     ]);
   });
 
@@ -296,8 +296,9 @@ describe("elbow arrow ui", () => {
 
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [129, 0],
-      [129, 131],
+      [35, 0],
+      [35, 165],
+      [103, 165],
     ]);
   });
 

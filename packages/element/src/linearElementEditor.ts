@@ -238,43 +238,6 @@ export class LinearElementEditor {
     });
   }
 
-  static getOutlineAvoidingPoint(
-    element: NonDeleted<ExcalidrawLinearElement>,
-    coords: GlobalPoint,
-    pointIndex: number,
-    app: AppClassProperties,
-    fallback?: GlobalPoint,
-  ): GlobalPoint {
-    const hoveredElement = getHoveredElementForBinding(
-      { x: coords[0], y: coords[1] },
-      app.scene.getNonDeletedElements(),
-      app.scene.getNonDeletedElementsMap(),
-      app.state.zoom,
-      true,
-      isElbowArrow(element),
-    );
-
-    if (hoveredElement) {
-      const newPoints = Array.from(element.points);
-      newPoints[pointIndex] = pointFrom<LocalPoint>(
-        coords[0] - element.x,
-        coords[1] - element.y,
-      );
-
-      return bindPointToSnapToElementOutline(
-        {
-          ...element,
-          points: newPoints,
-        },
-        hoveredElement,
-        pointIndex === 0 ? "start" : "end",
-        app.scene.getNonDeletedElementsMap(),
-      );
-    }
-
-    return fallback ?? coords;
-  }
-
   /**
    * @returns whether point was dragged
    */
@@ -294,16 +257,14 @@ export class LinearElementEditor {
       return null;
     }
     const { elementId } = linearElementEditor;
-    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const elementsMap = scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return null;
     }
 
-    const elbowed = isElbowArrow(element);
-
     if (
-      elbowed &&
+      isElbowArrow(element) &&
       !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
       linearElementEditor.pointerDownState.lastClickedPoint !== 0
     ) {
@@ -320,7 +281,7 @@ export class LinearElementEditor {
             : undefined,
         ].filter((idx): idx is number => idx !== undefined)
       : linearElementEditor.selectedPointsIndices;
-    const lastClickedPoint = elbowed
+    const lastClickedPoint = isElbowArrow(element)
       ? linearElementEditor.pointerDownState.lastClickedPoint > 0
         ? element.points.length - 1
         : 0
@@ -372,43 +333,19 @@ export class LinearElementEditor {
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
-            let newPointPosition = pointFrom<LocalPoint>(
-              element.points[pointIndex][0] + deltaX,
-              element.points[pointIndex][1] + deltaY,
-            );
-
-            // Check if point dragging is happening
-            if (pointIndex === lastClickedPoint) {
-              let globalNewPointPosition = pointFrom<GlobalPoint>(
-                scenePointerX - linearElementEditor.pointerOffset.x,
-                scenePointerY - linearElementEditor.pointerOffset.y,
-              );
-
-              if (
-                pointIndex === 0 ||
-                pointIndex === element.points.length - 1
-              ) {
-                globalNewPointPosition =
-                  LinearElementEditor.getOutlineAvoidingPoint(
+            const newPointPosition: LocalPoint =
+              pointIndex === lastClickedPoint
+                ? LinearElementEditor.createPointAt(
                     element,
-                    pointFrom<GlobalPoint>(
-                      element.x + element.points[pointIndex][0] + deltaX,
-                      element.y + element.points[pointIndex][1] + deltaY,
-                    ),
-                    pointIndex,
-                    app,
+                    elementsMap,
+                    scenePointerX - linearElementEditor.pointerOffset.x,
+                    scenePointerY - linearElementEditor.pointerOffset.y,
+                    event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
+                  )
+                : pointFrom(
+                    element.points[pointIndex][0] + deltaX,
+                    element.points[pointIndex][1] + deltaY,
                   );
-              }
-
-              newPointPosition = LinearElementEditor.createPointAt(
-                element,
-                elementsMap,
-                globalNewPointPosition[0],
-                globalNewPointPosition[1],
-                event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
-              );
-            }
-
             return {
               index: pointIndex,
               point: newPointPosition,

@@ -1,6 +1,7 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
+  pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
 
@@ -52,7 +53,10 @@ const distanceToRectanguloidElement = (
   element: ExcalidrawRectanguloidElement,
   p: GlobalPoint,
 ) => {
-  const center = elementCenterPoint(element);
+  const center = pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
@@ -80,7 +84,10 @@ const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
   p: GlobalPoint,
 ): number => {
-  const center = elementCenterPoint(element);
+  const center = pointFrom<GlobalPoint>(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
@@ -108,7 +115,10 @@ const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
   p: GlobalPoint,
 ): number => {
-  const center = elementCenterPoint(element);
+  const center = pointFrom(
+    element.x + element.width / 2,
+    element.y + element.height / 2,
+  );
   return ellipseDistanceFromPoint(
     // Instead of rotating the ellipse, rotate the point to the inverse angle
     pointRotateRads(p, center, -element.angle as Radians),

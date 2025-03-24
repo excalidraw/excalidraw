@@ -190,18 +190,7 @@ describe("element binding", () => {
 
     // Sever connection
     expect(API.getSelectedElement().type).toBe("arrow");
-    Keyboard.withModifierKeys({ shift: true }, () => {
-      // We have to move a significant distance to get out of the binding zone
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-    });
+    Keyboard.keyPress(KEYS.ARROW_LEFT);
     expect(arrow.endBinding).toBe(null);
     Keyboard.keyPress(KEYS.ARROW_RIGHT);
     expect(arrow.endBinding).toBe(null);
