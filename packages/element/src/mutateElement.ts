@@ -6,6 +6,7 @@ import {
 } from "@excalidraw/common";
 
 // TODO: remove direct dependency on the scene, should be passed in or injected instead
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { Radians } from "@excalidraw/math";
