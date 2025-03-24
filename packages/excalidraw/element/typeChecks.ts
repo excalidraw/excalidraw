@@ -27,11 +27,9 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
-  ExcalidrawRectangleElement,
-  ExcalidrawEllipseElement,
-  ExcalidrawDiamondElement,
   GenericSwitchableToolType,
   LinearSwitchableToolType,
+  ExcalidrawGenericSwitchableElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -345,11 +343,6 @@ export const isBounds = (box: unknown): box is Bounds =>
 
 type NonEmptyArray<T> = [T, ...T[]];
 
-type ExcalidrawGenericSwitchableElement =
-  | ExcalidrawRectangleElement
-  | ExcalidrawEllipseElement
-  | ExcalidrawDiamondElement;
-
 export const areGenericSwitchableElements = (
   elements: ExcalidrawElement[],
 ): elements is NonEmptyArray<ExcalidrawGenericSwitchableElement> => {
@@ -379,7 +372,9 @@ export const areLinearSwitchableElements = (
   const firstType = elements[0].type;
   return (
     (firstType === "arrow" || firstType === "line") &&
-    elements.every((element) => element.type === firstType)
+    elements.every(
+      (element) => element.type === "arrow" || element.type === "line",
+    )
   );
 };
 

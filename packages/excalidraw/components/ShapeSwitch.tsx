@@ -1,20 +1,31 @@
-import { type ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useMemo, useRef } from "react";
 
 import clsx from "clsx";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { atom, useAtom } from "../editor-jotai";
+import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
 
 import { getElementAbsoluteCoords, refreshTextDimensions } from "../element";
-import { getFontString, sceneCoordsToViewportCoords } from "../utils";
+import {
+  getFontString,
+  sceneCoordsToViewportCoords,
+  updateActiveTool,
+} from "../utils";
 import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
-import { isArrowElement, isLinearElement } from "../element/typeChecks";
+import {
+  areGenericSwitchableElements,
+  areLinearSwitchableElements,
+  isArrowElement,
+  isLinearElement,
+  isUsingAdaptiveRadius,
+} from "../element/typeChecks";
 import { t } from "../i18n";
 
 import {
   computeBoundTextPosition,
+  getBoundTextElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
 } from "../element/textElement";
@@ -22,6 +33,9 @@ import { wrapText } from "../element/textWrapping";
 import { measureText } from "../element/textMeasurements";
 import { mutateElement } from "../element/mutateElement";
 import { getCommonBoundingBox } from "../element/bounds";
+import { ShapeCache } from "../scene/ShapeCache";
+import { ROUNDNESS } from "../constants";
+import { LinearElementEditor } from "../element/linearElementEditor";
 
 import { ToolButton } from "./ToolButton";
 import {
@@ -38,11 +52,12 @@ import type App from "./App";
 import type {
   ElementsMap,
   ExcalidrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   GenericSwitchableToolType,
+  LinearSwitchableToolType,
 } from "../element/types";
-import type { ToolType } from "../types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
@@ -72,21 +87,42 @@ const ShapeSwitch = ({ app }: { app: App }) => {
   const [shapeSwitch, setShapeSwitch] = useAtom(shapeSwitchAtom);
   const [, setShapeSwitchFontSize] = useAtom(shapeSwitchFontSizeAtom);
 
+  const selectedElements = useMemo(
+    () => getSelectedElements(app.scene.getNonDeletedElementsMap(), app.state),
+    [app.scene, app.state],
+  );
+  const selectedElementsTypeRef = useRef<"generic" | "linear">(null);
+
+  // close shape switch panel if selecting different "types" of elements
+  useEffect(() => {
+    const selectedElementsType = areGenericSwitchableElements(selectedElements)
+      ? "generic"
+      : areLinearSwitchableElements(selectedElements)
+      ? "linear"
+      : null;
+
+    if (selectedElementsType && !selectedElementsTypeRef.current) {
+      selectedElementsTypeRef.current = selectedElementsType;
+    } else if (
+      (selectedElementsTypeRef.current && !selectedElementsType) ||
+      (selectedElementsTypeRef.current &&
+        selectedElementsType !== selectedElementsTypeRef.current)
+    ) {
+      setShapeSwitch(null);
+      selectedElementsTypeRef.current = null;
+    }
+  }, [selectedElements, app.state.selectedElementIds, setShapeSwitch]);
+
   // clear if not active
   if (!shapeSwitch) {
     setShapeSwitchFontSize(null);
     return null;
   }
 
-  const selectedElements = getSelectedElements(
-    app.scene.getNonDeletedElementsMap(),
-    app.state,
-  );
-
   // clear if hint target no longer matches
   if (
     shapeSwitch.type === "hint" &&
-    selectedElements?.[0]?.id !== shapeSwitch.id
+    selectedElements[0]?.id !== shapeSwitch.id
   ) {
     setShapeSwitch(null);
     return null;
@@ -283,7 +319,13 @@ const Panel = ({
               if (app.state.activeTool.type !== type) {
                 trackEvent("shape-switch", type, "ui");
               }
-              app.setActiveTool({ type: type as ToolType });
+              switchShapes(app, {
+                genericSwitchable: GENERIC_SWITCHABLE_SHAPES.includes(type),
+                linearSwitchable: LINEAR_SWITCHABLE_SHAPES.includes(type),
+                nextType: type as
+                  | GenericSwitchableToolType
+                  | LinearSwitchableToolType,
+              });
             }}
           />
         );
@@ -364,5 +406,147 @@ export const adjustBoundTextSize = (
     false,
   );
 };
+
+export const switchShapes = (
+  app: App,
+  {
+    genericSwitchable,
+    linearSwitchable,
+    nextType,
+  }: {
+    genericSwitchable?: boolean;
+    linearSwitchable?: boolean;
+    nextType?: GenericSwitchableToolType | LinearSwitchableToolType;
+  } = {},
+): boolean => {
+  if (!genericSwitchable && !linearSwitchable) {
+    return false;
+  }
+
+  const selectedElements = getSelectedElements(
+    app.scene.getNonDeletedElementsMap(),
+    app.state,
+  );
+
+  const selectedElementIds = selectedElements.reduce(
+    (acc, element) => ({ ...acc, [element.id]: true }),
+    {},
+  );
+
+  const sameType = selectedElements.every(
+    (element) => element.type === selectedElements[0].type,
+  );
+
+  if (genericSwitchable) {
+    // TODO: filter generic elements
+    const index = sameType
+      ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+      : -1;
+
+    nextType =
+      nextType ??
+      (GENERIC_SWITCHABLE_SHAPES[
+        (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
+      ] as GenericSwitchableToolType);
+
+    selectedElements.forEach((element) => {
+      ShapeCache.delete(element);
+
+      mutateElement(
+        element,
+        {
+          type: nextType as GenericSwitchableToolType,
+          roundness:
+            nextType === "diamond" && element.roundness
+              ? {
+                  type: isUsingAdaptiveRadius(nextType)
+                    ? ROUNDNESS.ADAPTIVE_RADIUS
+                    : ROUNDNESS.PROPORTIONAL_RADIUS,
+                  value: ROUNDNESS.PROPORTIONAL_RADIUS,
+                }
+              : element.roundness,
+        },
+        false,
+      );
+
+      const boundText = getBoundTextElement(
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      );
+      if (boundText) {
+        if (
+          editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+            ?.elementType === nextType
+        ) {
+          mutateElement(
+            boundText,
+            {
+              fontSize:
+                editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
+                  ?.fontSize ?? boundText.fontSize,
+            },
+            false,
+          );
+        }
+
+        adjustBoundTextSize(
+          element as ExcalidrawTextContainer,
+          boundText,
+          app.scene.getNonDeletedElementsMap(),
+        );
+      }
+    });
+
+    app.setState((prevState) => {
+      return {
+        selectedElementIds,
+        activeTool: updateActiveTool(prevState, {
+          type: "selection",
+        }),
+      };
+    });
+  }
+
+  if (linearSwitchable) {
+    const index = sameType
+      ? LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+      : -1;
+    nextType =
+      nextType ??
+      (LINEAR_SWITCHABLE_SHAPES[
+        (index + 1) % LINEAR_SWITCHABLE_SHAPES.length
+      ] as LinearSwitchableToolType);
+
+    selectedElements.forEach((element) => {
+      ShapeCache.delete(element);
+
+      mutateElement(
+        element as ExcalidrawLinearElement,
+        {
+          type: nextType as LinearSwitchableToolType,
+          startArrowhead: null,
+          endArrowhead: nextType === "arrow" ? "arrow" : null,
+        },
+        false,
+      );
+    });
+    const firstElement = selectedElements[0];
+
+    app.setState((prevState) => ({
+      selectedElementIds,
+      selectedLinearElement:
+        selectedElements.length === 1
+          ? new LinearElementEditor(firstElement as ExcalidrawLinearElement)
+          : null,
+      activeTool: updateActiveTool(prevState, {
+        type: "selection",
+      }),
+    }));
+  }
+
+  return true;
+};
+
+export const switchLinearShapes = (app: App) => {};
 
 export default ShapeSwitch;

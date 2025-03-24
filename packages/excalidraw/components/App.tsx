@@ -191,9 +191,7 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   areGenericSwitchableElements,
-  isGenericSwitchableToolType,
   areLinearSwitchableElements,
-  isLinearSwitchableToolType,
 } from "../element/typeChecks";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -387,11 +385,9 @@ import {
 } from "../element/textMeasurements";
 
 import ShapeSwitch, {
-  adjustBoundTextSize,
-  GENERIC_SWITCHABLE_SHAPES,
-  LINEAR_SWITCHABLE_SHAPES,
   shapeSwitchAtom,
   shapeSwitchFontSizeAtom,
+  switchShapes,
 } from "./ShapeSwitch";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
@@ -443,7 +439,6 @@ import type {
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
   GenericSwitchableToolType,
-  LinearSwitchableToolType,
 } from "../element/types";
 import type {
   RenderInteractiveSceneCallback,
@@ -4104,46 +4099,28 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const genericSwitchable =
-          areGenericSwitchableElements(selectedElements);
-        const linearSwitchable = areLinearSwitchableElements(selectedElements);
+        // Shape switching
+        if (event.key === KEYS.ESCAPE) {
+          editorJotaiStore.set(shapeSwitchAtom, null);
+        } else if (event.key === KEYS.TAB) {
+          event.preventDefault();
 
-        if (genericSwitchable || linearSwitchable) {
-          const firstElement = selectedElements[0];
+          const genericSwitchable =
+            areGenericSwitchableElements(selectedElements);
+          const linearSwitchable =
+            areLinearSwitchableElements(selectedElements);
 
-          if (event.key === KEYS.ESCAPE) {
-            editorJotaiStore.set(shapeSwitchAtom, null);
-          } else if (event.key === KEYS.TAB) {
-            event.preventDefault();
-
-            if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
-              const sameType = selectedElements.every(
-                (element) => element.type === selectedElements[0].type,
-              );
-
-              let nextType;
-
-              if (genericSwitchable) {
-                const index = sameType
-                  ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
-                  : -1;
-
-                nextType = GENERIC_SWITCHABLE_SHAPES[
-                  (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
-                ] as ToolType;
-                this.setActiveTool({ type: nextType });
-              } else if (linearSwitchable) {
-                const index = sameType
-                  ? LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
-                  : -1;
-
-                nextType = LINEAR_SWITCHABLE_SHAPES[
-                  (index + 1) % LINEAR_SWITCHABLE_SHAPES.length
-                ] as ToolType;
-                this.setActiveTool({ type: nextType });
-              }
+          if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
+            if (
+              switchShapes(this, {
+                genericSwitchable,
+                linearSwitchable,
+              })
+            ) {
+              this.store.shouldCaptureIncrement();
             }
-
+          }
+          if (genericSwitchable || linearSwitchable) {
             editorJotaiStore.set(shapeSwitchAtom, {
               type: "panel",
             });
@@ -4153,7 +4130,7 @@ class App extends React.Component<AppProps, AppState> {
                   element,
                   this.scene.getNonDeletedElementsMap(),
                 );
-                if (boundText && genericSwitchable && firstElement) {
+                if (boundText && genericSwitchable && element) {
                   editorJotaiStore.set(shapeSwitchFontSizeAtom, {
                     ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
                     [element.id]: {
@@ -4822,106 +4799,6 @@ class App extends React.Component<AppProps, AppState> {
         ...commonResets,
       };
     });
-
-    const selectedElements = getSelectedElements(
-      this.scene.getNonDeletedElementsMap(),
-      this.state,
-    );
-    const selectedElementIds = selectedElements.reduce(
-      (acc, element) => ({ ...acc, [element.id]: true }),
-      {},
-    );
-
-    if (
-      areGenericSwitchableElements(selectedElements) &&
-      isGenericSwitchableToolType(tool.type)
-    ) {
-      selectedElements.forEach((element) => {
-        ShapeCache.delete(element);
-
-        mutateElement(
-          element,
-          {
-            type: tool.type as GenericSwitchableToolType,
-            roundness:
-              tool.type === "diamond" && element.roundness
-                ? {
-                    type: isUsingAdaptiveRadius(tool.type)
-                      ? ROUNDNESS.ADAPTIVE_RADIUS
-                      : ROUNDNESS.PROPORTIONAL_RADIUS,
-                    value: ROUNDNESS.PROPORTIONAL_RADIUS,
-                  }
-                : element.roundness,
-          },
-          false,
-        );
-
-        const boundText = getBoundTextElement(
-          element,
-          this.scene.getNonDeletedElementsMap(),
-        );
-        if (boundText) {
-          if (
-            editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
-              ?.elementType === tool.type
-          ) {
-            mutateElement(
-              boundText,
-              {
-                fontSize:
-                  editorJotaiStore.get(shapeSwitchFontSizeAtom)?.[element.id]
-                    ?.fontSize ?? boundText.fontSize,
-              },
-              false,
-            );
-          }
-
-          adjustBoundTextSize(
-            element,
-            boundText,
-            this.scene.getNonDeletedElementsMap(),
-          );
-        }
-      });
-
-      this.setState((prevState) => {
-        return {
-          selectedElementIds,
-          activeTool: updateActiveTool(prevState, { type: "selection" }),
-        };
-      });
-
-      this.store.shouldCaptureIncrement();
-    }
-
-    if (
-      areLinearSwitchableElements(selectedElements) &&
-      isLinearSwitchableToolType(tool.type)
-    ) {
-      selectedElements.forEach((element) => {
-        ShapeCache.delete(element);
-
-        mutateElement(
-          element as ExcalidrawLinearElement,
-          {
-            type: tool.type as LinearSwitchableToolType,
-            startArrowhead: null,
-            endArrowhead: tool.type === "arrow" ? "arrow" : null,
-          },
-          false,
-        );
-      });
-      const firstElement = selectedElements[0];
-
-      this.setState((prevState) => ({
-        selectedElementIds,
-        selectedLinearElement:
-          selectedElements.length === 1
-            ? new LinearElementEditor(firstElement as ExcalidrawLinearElement)
-            : null,
-        activeTool: updateActiveTool(prevState, { type: "selection" }),
-      }));
-    }
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
