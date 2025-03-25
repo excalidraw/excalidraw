@@ -15,6 +15,8 @@ import {
 import { newElement, newLinearElement, newTextElement } from "./element";
 import { randomId } from "./random";
 
+import { isDevEnv } from "./utils";
+
 import type { NonDeletedExcalidrawElement } from "./element/types";
 
 export type ChartElements = readonly NonDeletedExcalidrawElement[];
@@ -373,7 +375,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      import.meta.env.DEV,
+      isDevEnv(),
     ),
   ];
 };
@@ -455,7 +457,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      import.meta.env.DEV,
+      isDevEnv(),
     ),
     line,
     ...lines,
