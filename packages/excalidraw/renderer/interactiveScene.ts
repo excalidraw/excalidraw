@@ -41,7 +41,10 @@ import {
   getElementsInGroup,
   selectGroupsFromGivenElements,
 } from "../groups";
-import { renderSelectionElement } from "../renderer/renderElement";
+import {
+  renderLassoSelection,
+  renderSelectionElement,
+} from "../renderer/renderElement";
 import { renderSnaps } from "../renderer/renderSnaps";
 import { roundRect } from "../renderer/roundRect";
 import {
@@ -822,6 +825,15 @@ const _renderInteractiveScene = ({
     } catch (error: any) {
       console.error(error);
     }
+  }
+
+  if (appState.lassoSelection) {
+    renderLassoSelection(
+      appState.lassoSelection,
+      context,
+      appState,
+      renderConfig.selectionColor,
+    );
   }
 
   if (

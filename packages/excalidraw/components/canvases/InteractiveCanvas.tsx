@@ -194,6 +194,7 @@ const getRelevantAppStateProps = (
   theme: appState.theme,
   pendingImageElementId: appState.pendingImageElementId,
   selectionElement: appState.selectionElement,
+  lassoSelection: appState.lassoSelection,
   selectedGroupIds: appState.selectedGroupIds,
   selectedLinearElement: appState.selectedLinearElement,
   multiElement: appState.multiElement,
