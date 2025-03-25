@@ -393,9 +393,10 @@ export const textWysiwyg = ({
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
-    } else if (event.key === KEYS.S && event[KEYS.CTRL_OR_CMD]) {
+    } else if (actionSaveToActiveFile.keyTest(event)) {
       event.preventDefault();
-      app.actionManager.executeAction(actionSaveToActiveFile, "ui");
+      handleSubmit();
+      app.actionManager.executeAction(actionSaveToActiveFile);
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
