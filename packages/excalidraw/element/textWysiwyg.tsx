@@ -18,6 +18,8 @@ import {
   isTestEnv,
 } from "../utils";
 
+import { actionSaveToActiveFile } from "../actions";
+
 import {
   originalContainerCache,
   updateOriginalContainerCache,
@@ -52,7 +54,6 @@ import type {
 } from "./types";
 import type App from "../components/App";
 import type { AppState } from "../types";
-import { actionSaveToActiveFile } from "../actions";
 
 const getTransform = (
   width: number,
