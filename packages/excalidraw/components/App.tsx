@@ -189,6 +189,7 @@ import {
   isElbowArrow,
   isFlowchartNodeElement,
   isBindableElement,
+  getSwitchableTypeFromElements,
 } from "../element/typeChecks";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -382,6 +383,12 @@ import {
   getMinTextElementWidth,
 } from "../element/textMeasurements";
 
+import ShapeSwitch, {
+  shapeSwitchAtom,
+  shapeSwitchFontSizeAtom,
+  switchShapes,
+} from "./ShapeSwitch";
+
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -430,6 +437,7 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  GenericSwitchableToolType,
 } from "../element/types";
 import type {
   RenderInteractiveSceneCallback,
@@ -1803,6 +1811,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        <ShapeSwitch app={this} />
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -4089,6 +4098,49 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Shape switching
+        if (event.key === KEYS.ESCAPE) {
+          editorJotaiStore.set(shapeSwitchAtom, null);
+        } else if (event.key === KEYS.TAB) {
+          event.preventDefault();
+
+          const { generic, linear } =
+            getSwitchableTypeFromElements(selectedElements);
+
+          if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
+            if (
+              switchShapes(this, {
+                generic,
+                linear,
+              })
+            ) {
+              this.store.shouldCaptureIncrement();
+            }
+          }
+          if (generic || linear) {
+            editorJotaiStore.set(shapeSwitchAtom, {
+              type: "panel",
+            });
+            if (!editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
+              selectedElements.forEach((element) => {
+                const boundText = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+                if (boundText && generic && element) {
+                  editorJotaiStore.set(shapeSwitchFontSizeAtom, {
+                    ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
+                    [element.id]: {
+                      fontSize: boundText.fontSize,
+                      elementType: element.type as GenericSwitchableToolType,
+                    },
+                  });
+                }
+              });
+            }
+          }
+        }
+
         if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
@@ -4650,6 +4702,11 @@ class App extends React.Component<AppProps, AppState> {
               canvasOffsets: this.getEditorUIOffsets(),
             });
           }
+
+          editorJotaiStore.set(shapeSwitchAtom, {
+            type: "hint",
+            id: firstNode.id,
+          });
         }
 
         this.flowChartCreator.clear();
@@ -4840,8 +4897,10 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
+      keepContainerDimensions = false,
     }: {
       isExistingElement?: boolean;
+      keepContainerDimensions?: boolean;
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -4946,6 +5005,7 @@ class App extends React.Component<AppProps, AppState> {
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
       autoSelect: !this.device.isTouchScreen,
+      keepContainerDimensions,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -5178,6 +5238,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter = true,
     container,
     autoEdit = true,
+    keepContainerDimensions = false,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5187,6 +5248,7 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
+    keepContainerDimensions?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -5322,6 +5384,7 @@ class App extends React.Component<AppProps, AppState> {
     if (autoEdit || existingTextElement || container) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
+        keepContainerDimensions,
       });
     } else {
       this.setState({
