@@ -1,10 +1,11 @@
 import throttle from "lodash.throttle";
 
 import {
-  ENV,
   randomInteger,
   arrayToMap,
   toBrandedType,
+  isDevEnv,
+  isTestEnv,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
 import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
@@ -62,16 +63,10 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
 
 const validateIndicesThrottled = throttle(
   (elements: readonly ExcalidrawElement[]) => {
-    if (
-      import.meta.env.DEV ||
-      import.meta.env.MODE === ENV.TEST ||
-      window?.DEBUG_FRACTIONAL_INDICES
-    ) {
+    if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
       validateFractionalIndices(elements, {
         // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: Boolean(
-          import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
-        ),
+        shouldThrow: isDevEnv() || isTestEnv(),
         includeBoundTextValidation: true,
       });
     }

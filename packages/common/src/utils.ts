@@ -17,6 +17,7 @@ import type {
 import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
+  ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
   isDarwin,
@@ -171,7 +172,7 @@ export const throttleRAF = <T extends any[]>(
   };
 
   const ret = (...args: T) => {
-    if (import.meta.env.MODE === "test") {
+    if (isTestEnv()) {
       fn(...args);
       return;
     }
@@ -732,9 +733,9 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
     return acc;
   }, [] as Node<T>[]);
 
-export const isTestEnv = () => import.meta.env.MODE === "test";
+export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
-export const isDevEnv = () => import.meta.env.MODE === "development";
+export const isDevEnv = () => import.meta.env.MODE === ENV.DEVELOPMENT;
 
 export const isServerEnv = () =>
   typeof process !== "undefined" && !!process?.env?.NODE_ENV;

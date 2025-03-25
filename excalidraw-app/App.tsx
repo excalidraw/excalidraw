@@ -29,6 +29,7 @@ import {
   preventUnload,
   resolvablePromise,
   isRunningInIframe,
+  isDevEnv,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -382,7 +383,7 @@ const ExcalidrawWrapper = () => {
   const [, forceRefresh] = useState(false);
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (isDevEnv()) {
       const debugState = loadSavedDebugState();
 
       if (debugState.enabled && !window.visualDebug) {

@@ -6,6 +6,8 @@ import {
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
+import { isDevEnv } from "@excalidraw/common";
+
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
@@ -57,7 +59,7 @@ export const AppMainMenu: React.FC<{
       >
         {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
       </MainMenu.ItemLink>
-      {import.meta.env.DEV && (
+      {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
           onClick={() => {

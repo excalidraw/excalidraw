@@ -8,6 +8,7 @@ import {
   DEFAULT_FONT_SIZE,
   VERTICAL_ALIGN,
   randomId,
+  isDevEnv,
 } from "@excalidraw/common";
 
 import {
@@ -376,7 +377,7 @@ const chartTypeBar = (
       y,
       groupId,
       backgroundColor,
-      !!import.meta.env.DEV,
+      isDevEnv(),
     ),
   ];
 };
@@ -458,7 +459,7 @@ const chartTypeLine = (
       y,
       groupId,
       backgroundColor,
-      !!import.meta.env.DEV,
+      isDevEnv(),
     ),
     line,
     ...lines,

@@ -19,6 +19,7 @@ import {
   isAnyTrue,
   tupleToCoors,
   getSizeFromPoints,
+  isDevEnv,
 } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -254,7 +255,7 @@ const handleSegmentRenormalization = (
       );
     }
 
-    import.meta.env.DEV &&
+    isDevEnv() &&
       invariant(
         validateElbowPoints(nextPoints),
         "Invalid elbow points with fixed segments",

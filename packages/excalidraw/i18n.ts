@@ -1,3 +1,5 @@
+import { isDevEnv } from "@excalidraw/common";
+
 import type { NestedKeyOf } from "@excalidraw/common/utility-types";
 
 import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
@@ -73,7 +75,7 @@ export const languages: Language[] = [
 ];
 
 const TEST_LANG_CODE = "__test__";
-if (import.meta.env.DEV) {
+if (isDevEnv()) {
   languages.unshift(
     { code: TEST_LANG_CODE, label: "test language" },
     {

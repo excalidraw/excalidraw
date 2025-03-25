@@ -1,4 +1,4 @@
-import { ENV, isShallowEqual } from "@excalidraw/common";
+import { isDevEnv, isShallowEqual, isTestEnv } from "@excalidraw/common";
 
 import { deepCopyElement } from "@excalidraw/element/duplicate";
 
@@ -261,7 +261,7 @@ export class Store implements IStore {
       const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledActions.size}".`;
       console.error(message, this.scheduledActions.values());
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw new Error(message);
       }
     }
