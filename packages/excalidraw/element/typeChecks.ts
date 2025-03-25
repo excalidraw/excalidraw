@@ -27,9 +27,6 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
-  GenericSwitchableToolType,
-  LinearSwitchableToolType,
-  ExcalidrawGenericSwitchableElement,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -341,45 +338,54 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[2] === "number" &&
   typeof box[3] === "number";
 
-type NonEmptyArray<T> = [T, ...T[]];
-
-export const areGenericSwitchableElements = (
+export const getSwitchableTypeFromElements = (
   elements: ExcalidrawElement[],
-): elements is NonEmptyArray<ExcalidrawGenericSwitchableElement> => {
+):
+  | {
+      generic: true;
+      linear: false;
+    }
+  | {
+      linear: true;
+      generic: false;
+    }
+  | {
+      generic: false;
+      linear: false;
+    } => {
   if (elements.length === 0) {
-    return false;
+    return {
+      generic: false,
+      linear: false,
+    };
   }
-  return elements.every(
-    (element) =>
+
+  let onlyLinear = true;
+  for (const element of elements) {
+    if (
       element.type === "rectangle" ||
       element.type === "ellipse" ||
-      element.type === "diamond",
-  );
-};
-
-export const isGenericSwitchableToolType = (
-  type: string,
-): type is GenericSwitchableToolType => {
-  return type === "rectangle" || type === "ellipse" || type === "diamond";
-};
-
-export const areLinearSwitchableElements = (
-  elements: ExcalidrawElement[],
-): elements is NonEmptyArray<ExcalidrawLinearElement> => {
-  if (elements.length === 0) {
-    return false;
+      element.type === "diamond"
+    ) {
+      return {
+        generic: true,
+        linear: false,
+      };
+    }
+    if (element.type !== "arrow" && element.type !== "line") {
+      onlyLinear = false;
+    }
   }
-  const firstType = elements[0].type;
-  return (
-    (firstType === "arrow" || firstType === "line") &&
-    elements.every(
-      (element) => element.type === "arrow" || element.type === "line",
-    )
-  );
-};
 
-export const isLinearSwitchableToolType = (
-  type: string,
-): type is LinearSwitchableToolType => {
-  return type === "arrow" || type === "line";
+  if (onlyLinear) {
+    return {
+      linear: true,
+      generic: false,
+    };
+  }
+
+  return {
+    generic: false,
+    linear: false,
+  };
 };

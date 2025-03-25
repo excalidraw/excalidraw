@@ -414,7 +414,3 @@ export type ElementsMapOrArray =
 
 export type GenericSwitchableToolType = "rectangle" | "ellipse" | "diamond";
 export type LinearSwitchableToolType = "line" | "arrow";
-export type ExcalidrawGenericSwitchableElement =
-  | ExcalidrawRectangleElement
-  | ExcalidrawEllipseElement
-  | ExcalidrawDiamondElement;

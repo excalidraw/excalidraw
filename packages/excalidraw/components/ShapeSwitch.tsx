@@ -15,10 +15,7 @@ import {
 import { getSelectedElements } from "../scene";
 import { trackEvent } from "../analytics";
 import {
-  areGenericSwitchableElements,
-  areLinearSwitchableElements,
-  isArrowElement,
-  isLinearElement,
+  getSwitchableTypeFromElements,
   isUsingAdaptiveRadius,
 } from "../element/typeChecks";
 import { t } from "../i18n";
@@ -95,18 +92,15 @@ const ShapeSwitch = ({ app }: { app: App }) => {
 
   // close shape switch panel if selecting different "types" of elements
   useEffect(() => {
-    const selectedElementsType = areGenericSwitchableElements(selectedElements)
-      ? "generic"
-      : areLinearSwitchableElements(selectedElements)
-      ? "linear"
-      : null;
+    const { generic, linear } = getSwitchableTypeFromElements(selectedElements);
+    const type = generic ? "generic" : linear ? "linear" : null;
 
-    if (selectedElementsType && !selectedElementsTypeRef.current) {
-      selectedElementsTypeRef.current = selectedElementsType;
+    if (type && !selectedElementsTypeRef.current) {
+      selectedElementsTypeRef.current = type;
     } else if (
-      (selectedElementsTypeRef.current && !selectedElementsType) ||
+      (selectedElementsTypeRef.current && !type) ||
       (selectedElementsTypeRef.current &&
-        selectedElementsType !== selectedElementsTypeRef.current)
+        type !== selectedElementsTypeRef.current)
     ) {
       setShapeSwitch(null);
       selectedElementsTypeRef.current = null;
@@ -228,9 +222,17 @@ const Panel = ({
   let [x1, y2, cx, cy] = [0, 0, 0, 0];
   let rotatedBottomLeft = [0, 0];
 
-  const sameType = elements.every(
-    (element) => element.type === elements[0].type,
-  );
+  const { generic, linear } = getSwitchableTypeFromElements(elements);
+
+  const genericElements = generic ? getGenericSwitchableElements(elements) : [];
+
+  const sameType = generic
+    ? genericElements.every(
+        (element) => element.type === genericElements[0].type,
+      )
+    : linear
+    ? elements.every((element) => element.type === elements[0].type)
+    : false;
 
   if (elements.length === 1) {
     [x1, , , y2, cx, cy] = getElementAbsoluteCoords(
@@ -260,16 +262,18 @@ const Panel = ({
     app.state,
   );
 
-  const SHAPES: [string, string, ReactNode][] = isLinearElement(elements[0])
+  const SHAPES: [string, string, ReactNode][] = linear
     ? [
         ["arrow", "5", ArrowIcon],
         ["line", "6", LineIcon],
       ]
-    : [
+    : generic
+    ? [
         ["rectangle", "2", RectangleIcon],
         ["diamond", "3", DiamondIcon],
         ["ellipse", "4", EllipseIcon],
-      ];
+      ]
+    : [];
 
   return (
     <div
@@ -286,17 +290,8 @@ const Panel = ({
       {SHAPES.map(([type, shortcut, icon]) => {
         const isSelected =
           sameType &&
-          (type === elements[0].type ||
-            (isArrowElement(elements[0]) &&
-              elements[0].elbowed &&
-              type === "elbow") ||
-            (isArrowElement(elements[0]) &&
-              elements[0].roundness &&
-              type === "curve") ||
-            (isArrowElement(elements[0]) &&
-              !elements[0].elbowed &&
-              !elements[0].roundness &&
-              type === "straight"));
+          ((generic && genericElements[0].type === type) ||
+            (linear && elements[0].type === type));
 
         return (
           <ToolButton
@@ -320,8 +315,8 @@ const Panel = ({
                 trackEvent("shape-switch", type, "ui");
               }
               switchShapes(app, {
-                genericSwitchable: GENERIC_SWITCHABLE_SHAPES.includes(type),
-                linearSwitchable: LINEAR_SWITCHABLE_SHAPES.includes(type),
+                generic: GENERIC_SWITCHABLE_SHAPES.includes(type),
+                linear: LINEAR_SWITCHABLE_SHAPES.includes(type),
                 nextType: type as
                   | GenericSwitchableToolType
                   | LinearSwitchableToolType,
@@ -410,16 +405,16 @@ export const adjustBoundTextSize = (
 export const switchShapes = (
   app: App,
   {
-    genericSwitchable,
-    linearSwitchable,
+    generic,
+    linear,
     nextType,
   }: {
-    genericSwitchable?: boolean;
-    linearSwitchable?: boolean;
+    generic?: boolean;
+    linear?: boolean;
     nextType?: GenericSwitchableToolType | LinearSwitchableToolType;
   } = {},
 ): boolean => {
-  if (!genericSwitchable && !linearSwitchable) {
+  if (!generic && !linear) {
     return false;
   }
 
@@ -433,14 +428,18 @@ export const switchShapes = (
     {},
   );
 
-  const sameType = selectedElements.every(
-    (element) => element.type === selectedElements[0].type,
-  );
+  if (generic) {
+    const selectedGenericSwitchableElements =
+      getGenericSwitchableElements(selectedElements);
 
-  if (genericSwitchable) {
-    // TODO: filter generic elements
+    const sameType = selectedGenericSwitchableElements.every(
+      (element) => element.type === selectedGenericSwitchableElements[0].type,
+    );
+
     const index = sameType
-      ? GENERIC_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
+      ? GENERIC_SWITCHABLE_SHAPES.indexOf(
+          selectedGenericSwitchableElements[0].type,
+        )
       : -1;
 
     nextType =
@@ -449,7 +448,7 @@ export const switchShapes = (
         (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
       ] as GenericSwitchableToolType);
 
-    selectedElements.forEach((element) => {
+    selectedGenericSwitchableElements.forEach((element) => {
       ShapeCache.delete(element);
 
       mutateElement(
@@ -507,7 +506,10 @@ export const switchShapes = (
     });
   }
 
-  if (linearSwitchable) {
+  if (linear) {
+    const sameType = selectedElements.every(
+      (element) => element.type === selectedElements[0].type,
+    );
     const index = sameType
       ? LINEAR_SWITCHABLE_SHAPES.indexOf(selectedElements[0].type)
       : -1;
@@ -547,6 +549,9 @@ export const switchShapes = (
   return true;
 };
 
-export const switchLinearShapes = (app: App) => {};
+const getGenericSwitchableElements = (elements: ExcalidrawElement[]) =>
+  elements.filter((element) =>
+    GENERIC_SWITCHABLE_SHAPES.includes(element.type),
+  );
 
 export default ShapeSwitch;

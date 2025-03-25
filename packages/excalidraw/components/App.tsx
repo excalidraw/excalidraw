@@ -190,8 +190,7 @@ import {
   isElbowArrow,
   isFlowchartNodeElement,
   isBindableElement,
-  areGenericSwitchableElements,
-  areLinearSwitchableElements,
+  getSwitchableTypeFromElements,
 } from "../element/typeChecks";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -4105,22 +4104,20 @@ class App extends React.Component<AppProps, AppState> {
         } else if (event.key === KEYS.TAB) {
           event.preventDefault();
 
-          const genericSwitchable =
-            areGenericSwitchableElements(selectedElements);
-          const linearSwitchable =
-            areLinearSwitchableElements(selectedElements);
+          const { generic, linear } =
+            getSwitchableTypeFromElements(selectedElements);
 
           if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
             if (
               switchShapes(this, {
-                genericSwitchable,
-                linearSwitchable,
+                generic,
+                linear,
               })
             ) {
               this.store.shouldCaptureIncrement();
             }
           }
-          if (genericSwitchable || linearSwitchable) {
+          if (generic || linear) {
             editorJotaiStore.set(shapeSwitchAtom, {
               type: "panel",
             });
@@ -4130,7 +4127,7 @@ class App extends React.Component<AppProps, AppState> {
                   element,
                   this.scene.getNonDeletedElementsMap(),
                 );
-                if (boundText && genericSwitchable && element) {
+                if (boundText && generic && element) {
                   editorJotaiStore.set(shapeSwitchFontSizeAtom, {
                     ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
                     [element.id]: {
