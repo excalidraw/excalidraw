@@ -52,7 +52,7 @@ import type {
 } from "./types";
 import type App from "../components/App";
 import type { AppState } from "../types";
-import { actionSaveFileToDisk } from "../actions";
+import { actionSaveToActiveFile } from "../actions";
 
 const getTransform = (
   width: number,
@@ -395,7 +395,7 @@ export const textWysiwyg = ({
       handleSubmit();
     } else if (event.key === KEYS.S && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
-      app.actionManager.executeAction(actionSaveFileToDisk, "ui");
+      app.actionManager.executeAction(actionSaveToActiveFile, "ui");
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
