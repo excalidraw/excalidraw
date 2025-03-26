@@ -18,6 +18,8 @@ import {
   isTestEnv,
 } from "../utils";
 
+import { actionSaveToActiveFile } from "../actions";
+
 import {
   originalContainerCache,
   updateOriginalContainerCache,
@@ -392,6 +394,10 @@ export const textWysiwyg = ({
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
+    } else if (actionSaveToActiveFile.keyTest(event)) {
+      event.preventDefault();
+      handleSubmit();
+      app.actionManager.executeAction(actionSaveToActiveFile);
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
