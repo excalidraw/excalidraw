@@ -3,6 +3,17 @@ import fuzzy from "fuzzy";
 import { useEffect, useRef, useState } from "react";
 
 import {
+  DEFAULT_SIDEBAR,
+  EVENT,
+  KEYS,
+  capitalizeString,
+  getShortcutKey,
+  isWritableElement,
+} from "@excalidraw/common";
+
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
+import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
@@ -13,12 +24,10 @@ import {
 } from "../../actions/actionElementLink";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
-import { DEFAULT_SIDEBAR, EVENT } from "../../constants";
 import { useUIAppState } from "../../context/ui-appState";
 import { deburr } from "../../deburr";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { KEYS } from "../../keys";
 import {
   useApp,
   useAppProps,
@@ -42,13 +51,7 @@ import {
   LibraryIcon,
 } from "../icons";
 
-import {
-  capitalizeString,
-  getShortcutKey,
-  isWritableElement,
-} from "../../utils";
-
-import { SHAPES } from "../../shapes";
+import { SHAPES } from "../shapes";
 import { canChangeBackgroundColor, canChangeStrokeColor } from "../Actions";
 import { useStableCallback } from "../../hooks/useStableCallback";
 import { activeConfirmDialogAtom } from "../ActiveConfirmDialog";
@@ -60,7 +63,6 @@ import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
 import type { AppProps, AppState, UIAppState } from "../../types";
-import type { MarkRequired } from "../../utility-types";
 import type { ShortcutName } from "../../actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";

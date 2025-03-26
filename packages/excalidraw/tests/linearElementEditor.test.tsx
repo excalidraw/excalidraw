@@ -3,23 +3,35 @@ import { act, queryByTestId, queryByText } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import {
+  ROUNDNESS,
+  VERTICAL_ALIGN,
+  KEYS,
+  reseed,
+  arrayToMap,
+} from "@excalidraw/common";
 
-import { ROUNDNESS, VERTICAL_ALIGN } from "../constants";
-import { LinearElementEditor } from "../element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getBoundTextElementPosition,
   getBoundTextMaxWidth,
-} from "../element/textElement";
-import * as textElementUtils from "../element/textElement";
-import { wrapText } from "../element/textWrapping";
+} from "@excalidraw/element/textElement";
+import * as textElementUtils from "@excalidraw/element/textElement";
+import { wrapText } from "@excalidraw/element/textWrapping";
+
+import type { GlobalPoint } from "@excalidraw/math";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElementWithContainer,
+  FontString,
+} from "@excalidraw/element/types";
+
 import { Excalidraw, mutateElement } from "../index";
-import { KEYS } from "../keys";
-import { reseed } from "../random";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 import { API } from "../tests/helpers/api";
-import { arrayToMap } from "../utils";
 
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
@@ -29,13 +41,6 @@ import {
   GlobalTestState,
   unmountComponent,
 } from "./test-utils";
-
-import type {
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElementWithContainer,
-  FontString,
-} from "../element/types";
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

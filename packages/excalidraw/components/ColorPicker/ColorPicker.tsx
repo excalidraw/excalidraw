@@ -2,10 +2,14 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { useRef } from "react";
 
-import { COLOR_PALETTE } from "../../colors";
+import { COLOR_PALETTE, isTransparent } from "@excalidraw/common";
+
+import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { isTransparent } from "../../utils";
 import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
@@ -20,8 +24,7 @@ import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
-import type { ColorTuple, ColorPaletteCustom } from "../../colors";
-import type { ExcalidrawElement } from "../../element/types";
+
 import type { AppState } from "../../types";
 
 const isValidColor = (color: string) => {

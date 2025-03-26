@@ -8,11 +8,12 @@ import {
   EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
+  chunk,
+} from "@excalidraw/common";
+
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
-import { chunk } from "../utils";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";

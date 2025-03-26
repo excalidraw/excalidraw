@@ -1,6 +1,5 @@
-import React from "react";
+import { ORIG_ID } from "@excalidraw/common";
 
-import { ORIG_ID } from "../constants";
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import {
