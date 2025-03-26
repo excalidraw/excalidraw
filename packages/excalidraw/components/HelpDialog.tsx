@@ -1,11 +1,12 @@
 import React from "react";
 
+import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
+
+import { KEYS, getShortcutKey } from "@excalidraw/common";
+
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { isDarwin, isFirefox, isWindows } from "../constants";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { getShortcutKey } from "../utils";
 
 import { Dialog } from "./Dialog";
 import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";

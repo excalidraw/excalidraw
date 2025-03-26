@@ -3,39 +3,50 @@ import {
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
-} from "../constants";
-import { normalizeLink, toValidURL } from "../data/url";
-import { getElementAbsoluteCoords, hashString } from "../element";
-import { getUncroppedWidthAndHeight } from "../element/cropElement";
+  getFontFamilyString,
+  isRTL,
+  isTestEnv,
+  getVerticalOffset,
+} from "@excalidraw/common";
+import { normalizeLink, toValidURL } from "@excalidraw/common";
+import { hashString } from "@excalidraw/element";
+import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
-} from "../element/embeddable";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/embeddable";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getBoundTextElement,
   getContainerElement,
-} from "../element/textElement";
-import { getLineHeightInPx } from "../element/textMeasurements";
+} from "@excalidraw/element/textElement";
+import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
 import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
-} from "../element/typeChecks";
-import { getVerticalOffset } from "../fonts";
-import { getContainingFrame } from "../frame";
-import { ShapeCache } from "../scene/ShapeCache";
-import { getCornerRadius, isPathALoop } from "../shapes";
-import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
+} from "@excalidraw/element/typeChecks";
 
-import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
+import { getContainingFrame } from "@excalidraw/element/frame";
+
+import { getCornerRadius, isPathALoop } from "@excalidraw/element/shapes";
+
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import {
+  getFreeDrawSvgPath,
+  IMAGE_INVERT_FILTER,
+} from "@excalidraw/element/renderElement";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 
 import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";

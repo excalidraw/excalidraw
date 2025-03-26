@@ -1,6 +1,6 @@
 // place here categories that you want to track. We want to track just a
 
-import { isDevEnv } from "./utils";
+import { isDevEnv } from "@excalidraw/common";
 
 // small subset of categories at a given time.
 const ALLOWED_CATEGORIES_TO_TRACK = new Set(["command_palette", "export"]);

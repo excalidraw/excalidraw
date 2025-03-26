@@ -1,72 +1,66 @@
+import oc from "open-color";
 import {
   pointFrom,
   type GlobalPoint,
   type LocalPoint,
   type Radians,
 } from "@excalidraw/math";
-import oc from "open-color";
 
-import { getClientColor, renderRemoteCursors } from "../clients";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   THEME,
-} from "../constants";
-import {
-  getElementAbsoluteCoords,
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getCommonBounds,
-} from "../element";
+  arrayToMap,
+  invariant,
+  throttleRAF,
+} from "@excalidraw/common";
+
 import {
   BINDING_HIGHLIGHT_OFFSET,
   BINDING_HIGHLIGHT_THICKNESS,
   maxBindingGap,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getOmitSidesForDevice,
+  getTransformHandles,
+  getTransformHandlesFromCoords,
   shouldShowBoundingBox,
-} from "../element/transformHandles";
+} from "@excalidraw/element/transformHandles";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import { getCornerRadius } from "@excalidraw/element/shapes";
+
+import { renderSelectionElement } from "@excalidraw/element/renderElement";
+
 import {
   isSelectedViaGroup,
   getSelectedGroupIds,
   getElementsInGroup,
   selectGroupsFromGivenElements,
-} from "../groups";
-import { renderSelectionElement } from "../renderer/renderElement";
-import { renderSnaps } from "../renderer/renderSnaps";
-import { roundRect } from "../renderer/roundRect";
-import {
-  getScrollBars,
-  SCROLLBAR_COLOR,
-  SCROLLBAR_WIDTH,
-} from "../scene/scrollbars";
-import { getCornerRadius } from "../shapes";
-import { type InteractiveCanvasAppState } from "../types";
-import { arrayToMap, invariant, throttleRAF } from "../utils";
+} from "@excalidraw/element/groups";
 
 import {
-  bootstrapCanvas,
-  fillCircle,
-  getNormalizedCanvasDimensions,
-} from "./helpers";
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "@excalidraw/element/bounds";
 
 import type {
   SuggestedBinding,
   SuggestedPointBinding,
-} from "../element/binding";
+} from "@excalidraw/element/binding";
+
 import type {
   TransformHandles,
   TransformHandleType,
-} from "../element/transformHandles";
+} from "@excalidraw/element/transformHandles";
+
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -77,7 +71,25 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { renderSnaps } from "../renderer/renderSnaps";
+import { roundRect } from "../renderer/roundRect";
+import {
+  getScrollBars,
+  SCROLLBAR_COLOR,
+  SCROLLBAR_WIDTH,
+} from "../scene/scrollbars";
+import { type InteractiveCanvasAppState } from "../types";
+
+import { getClientColor, renderRemoteCursors } from "../clients";
+
+import {
+  bootstrapCanvas,
+  fillCircle,
+  getNormalizedCanvasDimensions,
+} from "./helpers";
+
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,

@@ -2,9 +2,10 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import React, { useEffect } from "react";
 
+import { isArrowKey, KEYS } from "@excalidraw/common";
+
 import { atom, useAtom } from "../editor-jotai";
 import { getLanguage, t } from "../i18n";
-import { isArrowKey, KEYS } from "../keys";
 
 import Collapsible from "./Stats/Collapsible";
 import { useDevice } from "./App";

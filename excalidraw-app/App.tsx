@@ -22,13 +22,6 @@ import {
   THEME,
   TITLE_TIMEOUT,
   VERSION_TIMEOUT,
-} from "@excalidraw/excalidraw/constants";
-import polyfill from "@excalidraw/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
-import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
-import { t } from "@excalidraw/excalidraw/i18n";
-import {
   debounce,
   getVersion,
   getFrame,
@@ -37,7 +30,13 @@ import {
   resolvablePromise,
   isRunningInIframe,
   isDevEnv,
-} from "@excalidraw/excalidraw/utils";
+} from "@excalidraw/common";
+import polyfill from "@excalidraw/excalidraw/polyfill";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
+import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
+import { t } from "@excalidraw/excalidraw/i18n";
+
 import {
   GithubIcon,
   XBrandIcon,
@@ -48,10 +47,10 @@ import {
   share,
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
-import { isElementLink } from "@excalidraw/excalidraw/element/elementLink";
+import { isElementLink } from "@excalidraw/element/elementLink";
 import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
-import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
+import { newElementWith } from "@excalidraw/element/mutateElement";
+import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
@@ -64,7 +63,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   OrderedExcalidrawElement,
-} from "@excalidraw/excalidraw/element/types";
+} from "@excalidraw/element/types";
 import type {
   AppState,
   ExcalidrawImperativeAPI,
@@ -72,8 +71,8 @@ import type {
   ExcalidrawInitialDataState,
   UIAppState,
 } from "@excalidraw/excalidraw/types";
-import type { ResolutionType } from "@excalidraw/excalidraw/utility-types";
-import type { ResolvablePromise } from "@excalidraw/excalidraw/utils";
+import type { ResolutionType } from "@excalidraw/common/utility-types";
+import type { ResolvablePromise } from "@excalidraw/common/utils";
 
 import CustomStats from "./CustomStats";
 import {

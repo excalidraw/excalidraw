@@ -4,9 +4,9 @@ import {
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
 
-import { EVENT, MIME_TYPES } from "../constants";
+import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
+
 import { AbortError } from "../errors";
-import { debounce } from "../utils";
 
 import type { FileSystemHandle } from "browser-fs-access";
 
