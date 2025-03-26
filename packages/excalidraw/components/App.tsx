@@ -101,6 +101,7 @@ import {
   arrayToMap,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
+  toLocalPoint,
 } from "@excalidraw/common";
 
 import {
@@ -119,6 +120,8 @@ import {
   shouldEnableBindingForPointerEvent,
   updateBoundElements,
   getSuggestedBindingsForArrows,
+  getOutlineAvoidingPoint,
+  FIXED_BINDING_DISTANCE,
 } from "@excalidraw/element/binding";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
@@ -230,6 +233,7 @@ import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
+  intersectElementWithLineSegment,
 } from "@excalidraw/element/collision";
 
 import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
@@ -330,7 +334,7 @@ import type {
   ExcalidrawArrowElement,
 } from "@excalidraw/element/types";
 
-import type { ValueOf } from "@excalidraw/common/utility-types";
+import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import {
   actionAddToLibrary,

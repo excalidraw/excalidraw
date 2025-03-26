@@ -1,4 +1,10 @@
-import { average } from "@excalidraw/math";
+import {
+  average,
+  type GlobalPoint,
+  type LocalPoint,
+  pointTranslate,
+  vector,
+} from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,

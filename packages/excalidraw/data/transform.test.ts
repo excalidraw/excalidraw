@@ -1,6 +1,8 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
+import { FIXED_BINDING_DISTANCE } from "@excalidraw/element/binding";
+
 import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
 
 import { convertToExcalidrawElements } from "./transform";

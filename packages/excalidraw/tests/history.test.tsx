@@ -6,6 +6,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { vi } from "vitest";
+import { FIXED_BINDING_DISTANCE } from "@excalidraw/element/binding";
 import { pointFrom } from "@excalidraw/math";
 
 import { newElementWith } from "@excalidraw/element/mutateElement";
@@ -51,8 +52,6 @@ import { Excalidraw } from "../index";
 import * as StaticScene from "../renderer/staticScene";
 import { Snapshot, CaptureUpdateAction } from "../store";
 import { AppStateChange, ElementsChange } from "../change";
-
-import { FIXED_BINDING_DISTANCE } from "../element/binding.js";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
