@@ -16,6 +16,7 @@ import {
   isBoundToContainer,
   isImageElement,
   isTextElement,
+  isArrowElement,
 } from "./element/typeChecks";
 import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
 import { getNonDeletedGroupIds } from "./groups";
@@ -1493,11 +1494,71 @@ export class ElementsChange implements Change<SceneElementsMap> {
     elements: SceneElementsMap,
     changed: Map<string, OrderedExcalidrawElement>,
   ) {
+    // First, collect all arrow elements that need to be updated
+    const arrowsToUpdate = new Set<string>();
+
+    // Check for bindable elements that were changed
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
+        // Find all arrows connected to this bindable element
+        const boundElements = element.boundElements || [];
+        for (const binding of boundElements) {
+          if (binding.type === "arrow") {
+            arrowsToUpdate.add(binding.id);
+          }
+        }
+
+        // Update bound elements for this bindable element
         updateBoundElements(element, elements, {
           changedElements: changed,
         });
+      }
+    }
+
+    // Check for arrow elements that were changed
+    for (const element of changed.values()) {
+      if (!element.isDeleted && isArrowElement(element)) {
+        arrowsToUpdate.add(element.id);
+      }
+    }
+
+    // Process all arrows that need updating
+    for (const arrowId of arrowsToUpdate) {
+      const arrowElement = elements.get(arrowId);
+      if (
+        arrowElement &&
+        isArrowElement(arrowElement) &&
+        !arrowElement.isDeleted
+      ) {
+        // Cast to ExcalidrawLinearElement to access binding properties
+        const arrow = arrowElement as NonDeleted<ExcalidrawLinearElement>;
+
+        // Make sure startBinding and endBinding are consistent
+        if (arrow.startBinding) {
+          const bindTarget = elements.get(arrow.startBinding.elementId);
+          if (!bindTarget || bindTarget.isDeleted) {
+            // If the target was deleted, remove the binding
+            mutateElement(arrow, { startBinding: null });
+          } else {
+            // Ensure the bound element has this arrow in its boundElements
+            updateBoundElements(bindTarget, elements, {
+              simultaneouslyUpdated: [arrow],
+            });
+          }
+        }
+
+        if (arrow.endBinding) {
+          const bindTarget = elements.get(arrow.endBinding.elementId);
+          if (!bindTarget || bindTarget.isDeleted) {
+            // If the target was deleted, remove the binding
+            mutateElement(arrow, { endBinding: null });
+          } else {
+            // Ensure the bound element has this arrow in its boundElements
+            updateBoundElements(bindTarget, elements, {
+              simultaneouslyUpdated: [arrow],
+            });
+          }
+        }
       }
     }
   }
