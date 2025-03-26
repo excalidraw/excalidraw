@@ -9,8 +9,6 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
-import { actionSaveToActiveFile } from "../actions";
-
 import {
   originalContainerCache,
   updateOriginalContainerCache,
@@ -44,6 +42,8 @@ import type {
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
+
+import { actionSaveToActiveFile } from "../actions";
 
 import Scene from "../scene/Scene";
 import { parseClipboard } from "../clipboard";
