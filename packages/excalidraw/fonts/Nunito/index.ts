@@ -1,4 +1,5 @@
-import { GOOGLE_FONTS_RANGES } from "../FontMetadata";
+import { GOOGLE_FONTS_RANGES } from "@excalidraw/common";
+
 import { type ExcalidrawFontFaceDescriptor } from "../Fonts";
 
 import Cyrilic from "./Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTA3j6zbXWjgevT5.woff2";

@@ -1,12 +1,14 @@
+import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
+
+import { KEYS, getShortcutKey } from "@excalidraw/common";
+
 import { ToolButton } from "../components/ToolButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
-import { isEmbeddableElement } from "../element/typeChecks";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
+
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../store";
-import { getShortcutKey } from "../utils";
 
 import { register } from "./register";
 

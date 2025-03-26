@@ -1,13 +1,15 @@
 import React, { useEffect, useRef } from "react";
 
-import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderStaticScene } from "../../renderer/staticScene";
-import { isShallowEqual } from "../../utils";
+import { isShallowEqual } from "@excalidraw/common";
 
 import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { isRenderThrottlingEnabled } from "../../reactUtils";
+import { renderStaticScene } from "../../renderer/staticScene";
+
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,

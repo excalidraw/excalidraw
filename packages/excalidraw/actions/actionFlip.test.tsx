@@ -1,5 +1,4 @@
 import { pointFrom } from "@excalidraw/math";
-import React from "react";
 
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";

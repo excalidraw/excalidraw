@@ -1,7 +1,6 @@
-import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
-import { promiseTry } from "../utils";
+import { promiseTry, LOCAL_FONT_PROTOCOL } from "@excalidraw/common";
 
-import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
+import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
 
 type DataURL = string;
 

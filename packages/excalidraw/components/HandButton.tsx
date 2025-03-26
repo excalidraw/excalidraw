@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { KEYS } from "../keys";
+import { KEYS } from "@excalidraw/common";
 
 import { ToolButton } from "./ToolButton";
 import { handIcon } from "./icons";

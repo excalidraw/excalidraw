@@ -1,13 +1,15 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
+
+import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+
+import { getElementBounds } from "@excalidraw/element/bounds";
+
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
-import { getElementBounds } from "../element";
-import { getLineHeightInPx } from "../element/textMeasurements";
-import { getLineHeight } from "../fonts";
+
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { arrayToMap } from "../utils";
 
 import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
@@ -25,7 +27,7 @@ const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-vi.mock("../keys.ts", async (importOriginal) => {
+vi.mock("@excalidraw/common", async (importOriginal) => {
   const module: any = await importOriginal();
   return {
     __esmodule: true,

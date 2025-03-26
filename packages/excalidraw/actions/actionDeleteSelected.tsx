@@ -1,26 +1,35 @@
-import { ToolButton } from "../components/ToolButton";
-import { TrashIcon } from "../components/icons";
-import { getNonDeletedElements } from "../element";
-import { fixBindingsAfterDeletion } from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import { getContainerElement } from "../element/textElement";
+import { KEYS, updateActiveTool } from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+import { fixBindingsAfterDeletion } from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import {
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element/mutateElement";
+import { getContainerElement } from "@excalidraw/element/textElement";
 import {
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
-} from "../element/typeChecks";
-import { getFrameChildren } from "../frame";
-import { getElementsInGroup, selectGroupsForSelectedElements } from "../groups";
+} from "@excalidraw/element/typeChecks";
+import { getFrameChildren } from "@excalidraw/element/frame";
+
+import {
+  getElementsInGroup,
+  selectGroupsForSelectedElements,
+} from "@excalidraw/element/groups";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
-import { updateActiveTool } from "../utils";
+import { TrashIcon } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";
 
-import type { ExcalidrawElement } from "../element/types";
 import type { AppClassProperties, AppState } from "../types";
 
 const deleteSelectedElements = (

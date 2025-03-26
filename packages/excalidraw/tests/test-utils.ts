@@ -9,10 +9,15 @@ import {
 } from "@testing-library/react";
 import ansi from "ansicolor";
 
+import { ORIG_ID, arrayToMap } from "@excalidraw/common";
+
+import { getSelectedElements } from "@excalidraw/element/selection";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
+
 import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
-import { ORIG_ID } from "../constants";
-import { getSelectedElements } from "../scene/selection";
-import { arrayToMap } from "../utils";
 
 import { UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
@@ -20,8 +25,6 @@ import * as toolQueries from "./queries/toolQueries";
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
 import type { ImportedDataState } from "../data/types";
-import type { ExcalidrawElement } from "../element/types";
-import type { AllPossibleKeys } from "../utility-types";
 
 export { cleanup as unmountComponent };
 

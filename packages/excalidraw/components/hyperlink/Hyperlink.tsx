@@ -8,37 +8,51 @@ import {
   useState,
 } from "react";
 
-import { trackEvent } from "../../analytics";
-import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
-import { EVENT, HYPERLINK_TOOLTIP_DELAY } from "../../constants";
-import { isLocalLink, normalizeLink } from "../../data/url";
-import { getElementAbsoluteCoords } from "../../element/bounds";
-import { hitElementBoundingBox } from "../../element/collision";
-import { isElementLink } from "../../element/elementLink";
-import { getEmbedLink, embeddableURLValidator } from "../../element/embeddable";
-import { mutateElement } from "../../element/mutateElement";
-import { t } from "../../i18n";
+import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+
+import { hitElementBoundingBox } from "@excalidraw/element/collision";
+
+import { isElementLink } from "@excalidraw/element/elementLink";
+
+import {
+  getEmbedLink,
+  embeddableURLValidator,
+} from "@excalidraw/element/embeddable";
+
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
 import {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
   wrapEvent,
-} from "../../utils";
-import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
-import { ToolButton } from "../ToolButton";
-import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
-import { KEYS } from "../../keys";
-import { getSelectedElements } from "../../scene";
-import { isEmbeddableElement } from "../../element/typeChecks";
+  isLocalLink,
+  normalizeLink,
+} from "@excalidraw/common";
 
-import { getLinkHandleFromCoords } from "./helpers";
-
-import "./Hyperlink.scss";
+import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
 
 import type {
   ElementsMap,
   ExcalidrawEmbeddableElement,
   NonDeletedExcalidrawElement,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { trackEvent } from "../../analytics";
+import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
+
+import { t } from "../../i18n";
+
+import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
+import { ToolButton } from "../ToolButton";
+import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
+import { getSelectedElements } from "../../scene";
+
+import { getLinkHandleFromCoords } from "./helpers";
+
+import "./Hyperlink.scss";
+
 import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
 
 const POPUP_WIDTH = 380;

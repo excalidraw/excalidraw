@@ -1,8 +1,9 @@
 import React from "react";
 import { expect } from "vitest";
 
+import { reseed } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
-import { reseed } from "../random";
 
 import { UI } from "./helpers/ui";
 import { render, unmountComponent } from "./test-utils";

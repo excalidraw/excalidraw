@@ -1,4 +1,5 @@
-import { LOCAL_FONT_PROTOCOL } from "../FontMetadata";
+import { LOCAL_FONT_PROTOCOL } from "@excalidraw/common";
+
 import { type ExcalidrawFontFaceDescriptor } from "../Fonts";
 
 export const EmojiFontFaces: ExcalidrawFontFaceDescriptor[] = [

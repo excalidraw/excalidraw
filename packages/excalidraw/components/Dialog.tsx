@@ -1,11 +1,11 @@
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 
+import { KEYS, queryFocusableElements } from "@excalidraw/common";
+
 import { useSetAtom } from "../editor-jotai";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
 import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { queryFocusableElements } from "../utils";
 
 import {
   useExcalidrawContainer,

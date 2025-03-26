@@ -1,10 +1,13 @@
 import React from "react";
 
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import { KEYS } from "@excalidraw/common";
+
 import { actionSelectAll } from "../actions";
-import { mutateElement } from "../element/mutateElement";
 import { t } from "../i18n";
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
+
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
 import { render, unmountComponent } from "../tests/test-utils";

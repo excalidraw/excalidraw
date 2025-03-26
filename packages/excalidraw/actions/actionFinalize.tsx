@@ -1,21 +1,26 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { ToolButton } from "../components/ToolButton";
-import { done } from "../components/icons";
-import { resetCursor } from "../cursor";
-import { isInvisiblySmallElement } from "../element";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement } from "../element/mutateElement";
-import { isBindingElement, isLinearElement } from "../element/typeChecks";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import {
+  isBindingElement,
+  isLinearElement,
+} from "@excalidraw/element/typeChecks";
+
+import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
+import { isPathALoop } from "@excalidraw/element/shapes";
+
+import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+
 import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { isPathALoop } from "../shapes";
+import { resetCursor } from "../cursor";
+import { done } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
 import { CaptureUpdateAction } from "../store";
-import { arrayToMap, updateActiveTool } from "../utils";
 
 import { register } from "./register";
 

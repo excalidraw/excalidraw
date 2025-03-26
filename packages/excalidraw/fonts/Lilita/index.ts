@@ -1,4 +1,5 @@
-import { GOOGLE_FONTS_RANGES } from "../FontMetadata";
+import { GOOGLE_FONTS_RANGES } from "@excalidraw/common";
+
 import { type ExcalidrawFontFaceDescriptor } from "../Fonts";
 
 import LilitaLatinExt from "./Lilita-Regular-i7dPIFZ9Zz-WBtRtedDbYE98RXi4EwSsbg.woff2";

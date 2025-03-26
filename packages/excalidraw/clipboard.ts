@@ -1,26 +1,32 @@
-import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 import {
   ALLOWED_PASTE_MIME_TYPES,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
-} from "./constants";
-import { createFile, isSupportedImageFileType } from "./data/blob";
-import { mutateElement } from "./element/mutateElement";
+  arrayToMap,
+  isMemberOf,
+  isPromiseLike,
+} from "@excalidraw/common";
+
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import { deepCopyElement } from "@excalidraw/element/duplicate";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
-} from "./element/typeChecks";
-import { ExcalidrawError } from "./errors";
-import { getContainingFrame } from "./frame";
-import { arrayToMap, isMemberOf, isPromiseLike } from "./utils";
+} from "@excalidraw/element/typeChecks";
 
-import { deepCopyElement } from "./element/duplicate";
+import { getContainingFrame } from "@excalidraw/element/frame";
 
-import type { Spreadsheet } from "./charts";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
-} from "./element/types";
+} from "@excalidraw/element/types";
+
+import { ExcalidrawError } from "./errors";
+import { createFile, isSupportedImageFileType } from "./data/blob";
+import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
+
+import type { Spreadsheet } from "./charts";
+
 import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {

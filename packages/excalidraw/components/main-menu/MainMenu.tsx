@@ -1,9 +1,10 @@
 import React from "react";
 
+import { composeEventHandlers } from "@excalidraw/common";
+
 import { useTunnels } from "../../context/tunnels";
 import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
-import { composeEventHandlers } from "../../utils";
 import { useDevice, useExcalidrawSetAppState } from "../App";
 import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";

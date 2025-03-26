@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 
+import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import { useApp } from "../App";
 import { ArrowRightIcon } from "../icons";
-import { EDITOR_LS_KEYS } from "../../constants";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
-import { debounce, isDevEnv } from "../../utils";
 import Trans from "../Trans";
 
 import { TTDDialogInput } from "./TTDDialogInput";
@@ -23,7 +25,6 @@ import "./MermaidToExcalidraw.scss";
 
 import type { BinaryFiles } from "../../types";
 import type { MermaidToExcalidrawLibProps } from "./common";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
 
 const MERMAID_EXAMPLE =
   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";

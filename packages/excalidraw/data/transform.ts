@@ -5,37 +5,39 @@ import {
   DEFAULT_FONT_SIZE,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
-} from "../constants";
-import {
-  getCommonBounds,
-  newElement,
-  newLinearElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { bindLinearElement } from "../element/binding";
-import {
-  newArrowElement,
-  newFrameElement,
-  newImageElement,
-  newMagicFrameElement,
-  newTextElement,
-} from "../element/newElement";
-import { measureText, normalizeText } from "../element/textMeasurements";
-import { isArrowElement } from "../element/typeChecks";
-import { getLineHeight } from "../fonts";
-import { syncInvalidIndices } from "../fractionalIndex";
-import { getSizeFromPoints } from "../points";
-import { randomId } from "../random";
-import {
+  getSizeFromPoints,
+  randomId,
   arrayToMap,
   assertNever,
   cloneJSON,
   getFontString,
   isDevEnv,
   toBrandedType,
-} from "../utils";
+  getLineHeight,
+} from "@excalidraw/common";
 
-import type { ElementConstructorOpts } from "../element/newElement";
+import { bindLinearElement } from "@excalidraw/element/binding";
+import {
+  newArrowElement,
+  newElement,
+  newFrameElement,
+  newImageElement,
+  newLinearElement,
+  newMagicFrameElement,
+  newTextElement,
+} from "@excalidraw/element/newElement";
+import {
+  measureText,
+  normalizeText,
+} from "@excalidraw/element/textMeasurements";
+import { isArrowElement } from "@excalidraw/element/typeChecks";
+
+import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
+import { redrawTextBoundingBox } from "@excalidraw/element/textElement";
+
+import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
+
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
@@ -55,8 +57,11 @@ import type {
   NonDeletedSceneElementsMap,
   TextAlign,
   VerticalAlign,
-} from "../element/types";
-import type { MarkOptional } from "../utility-types";
+} from "@excalidraw/element/types";
+
+import type { MarkOptional } from "@excalidraw/common/utility-types";
+
+import { getCommonBounds } from "..";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";

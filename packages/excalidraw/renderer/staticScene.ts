@@ -1,33 +1,36 @@
-import {
-  EXTERNAL_LINK_IMG,
-  ELEMENT_LINK_IMG,
-  getLinkHandleFromCoords,
-} from "../components/hyperlink/helpers";
-import { FRAME_STYLE } from "../constants";
-import { getElementAbsoluteCoords } from "../element";
-import { isElementLink } from "../element/elementLink";
-import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import { getBoundTextElement } from "../element/textElement";
+import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
+import { isElementLink } from "@excalidraw/element/elementLink";
+import { createPlaceholderEmbeddableLabel } from "@excalidraw/element/embeddable";
+import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
 import {
   elementOverlapsWithFrame,
   getTargetFrame,
   shouldApplyFrameClip,
-} from "../frame";
-import { renderElement } from "../renderer/renderElement";
-import { throttleRAF } from "../utils";
+} from "@excalidraw/element/frame";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import { renderElement } from "@excalidraw/element/renderElement";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
 
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import {
+  EXTERNAL_LINK_IMG,
+  ELEMENT_LINK_IMG,
+  getLinkHandleFromCoords,
+} from "../components/hyperlink/helpers";
+
+import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,

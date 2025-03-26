@@ -4,9 +4,7 @@
   "packageManager": "yarn@1.22.22",
   "workspaces": [
     "excalidraw-app",
-    "packages/excalidraw",
-    "packages/utils",
-    "packages/math",
+    "packages/*",
     "examples/*"
   ],
   "devDependencies": {

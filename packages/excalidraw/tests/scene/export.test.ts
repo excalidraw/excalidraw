@@ -1,6 +1,13 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 
-import { FONT_FAMILY, FRAME_STYLE } from "../../constants";
+import { FONT_FAMILY, FRAME_STYLE } from "@excalidraw/common";
+
+import type {
+  ExcalidrawTextElement,
+  FractionalIndex,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
 import {
@@ -10,12 +17,6 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
-
-import type {
-  ExcalidrawTextElement,
-  FractionalIndex,
-  NonDeletedExcalidrawElement,
-} from "../../element/types";
 
 describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;

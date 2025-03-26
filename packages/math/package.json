@@ -54,6 +54,6 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildMath.js && yarn gen:types"
+    "build:esm": "rm -rf dist && node ../../scripts/buildBase.js && yarn gen:types"
   }
 }

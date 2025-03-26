@@ -1,7 +1,8 @@
 import { exportToSvg } from "@excalidraw/utils/export";
 import { useEffect, useState } from "react";
 
-import { COLOR_PALETTE } from "../colors";
+import { COLOR_PALETTE } from "@excalidraw/common";
+
 import { atom, useAtom } from "../editor-jotai";
 
 import type { LibraryItem } from "../types";

@@ -1,17 +1,24 @@
-import { isTextElement, redrawTextBoundingBox } from "../../element";
-import { mutateElement } from "../../element/mutateElement";
-import { getBoundTextElement } from "../../element/textElement";
-import { hasBoundTextElement } from "../../element/typeChecks";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+import {
+  hasBoundTextElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
 import { fontSizeIcon } from "../icons";
 
 import StatsDragInput from "./DragInput";
 import { getStepSizedValue } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type {
-  ExcalidrawElement,
-  ExcalidrawTextElement,
-} from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 

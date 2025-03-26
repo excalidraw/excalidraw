@@ -1,20 +1,25 @@
 import throttle from "lodash.throttle";
 
-import { isNonDeletedElement } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
+import {
+  randomInteger,
+  arrayToMap,
+  toBrandedType,
+  isDevEnv,
+  isTestEnv,
+} from "@excalidraw/common";
+import { isNonDeletedElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
 import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "../fractionalIndex";
-import { getElementsInGroup } from "../groups";
-import { randomInteger } from "../random";
-import { arrayToMap, isDevEnv, isTestEnv } from "../utils";
-import { toBrandedType } from "../utils";
+} from "@excalidraw/element/fractionalIndex";
 
-import { getSelectedElements } from "./selection";
+import { getSelectedElements } from "@excalidraw/element/selection";
 
-import type { LinearElementEditor } from "../element/linearElementEditor";
+import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -25,9 +30,11 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import type { Assert, SameType } from "@excalidraw/common/utility-types";
+
 import type { AppState } from "../types";
-import type { Assert, SameType } from "../utility-types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;

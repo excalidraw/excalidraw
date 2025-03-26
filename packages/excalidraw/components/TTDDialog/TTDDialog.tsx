@@ -1,5 +1,8 @@
-import { isFiniteNumber } from "@excalidraw/math";
 import { useEffect, useRef, useState } from "react";
+
+import { isFiniteNumber } from "@excalidraw/math";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
@@ -32,7 +35,7 @@ import "./TTDDialog.scss";
 
 import type { ChangeEventHandler } from "react";
 import type { MermaidToExcalidrawLibProps } from "./common";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+
 import type { BinaryFiles } from "../../types";
 
 const MIN_PROMPT_LENGTH = 3;

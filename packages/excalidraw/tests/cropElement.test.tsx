@@ -1,17 +1,22 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { KEYS, cloneJSON } from "@excalidraw/common";
+
+import { duplicateElement } from "@excalidraw/element/duplicate";
+
+import type {
+  ExcalidrawImageElement,
+  ImageCrop,
+} from "@excalidraw/element/types";
+
 import { Excalidraw, exportToCanvas, exportToSvg } from "..";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
-import { duplicateElement } from "../element";
-import { KEYS } from "../keys";
-import { cloneJSON } from "../utils";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { act, GlobalTestState, render, unmountComponent } from "./test-utils";
 
-import type { ExcalidrawImageElement, ImageCrop } from "../element/types";
 import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;

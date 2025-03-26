@@ -1,11 +1,29 @@
 import { clamp, roundToStep } from "@excalidraw/math";
 
 import {
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  CURSOR_TYPE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  THEME,
+  ZOOM_STEP,
+  getShortcutKey,
+  updateActiveTool,
+  CODES,
+  KEYS,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element/mutateElement";
+import { getCommonBounds, type SceneBounds } from "@excalidraw/element/bounds";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
 } from "../appState";
-import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
@@ -19,28 +37,16 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import {
-  CURSOR_TYPE,
-  MAX_ZOOM,
-  MIN_ZOOM,
-  THEME,
-  ZOOM_STEP,
-} from "../constants";
 import { setCursor } from "../cursor";
-import { getCommonBounds, getNonDeletedElements } from "../element";
-import { newElementWith } from "../element/mutateElement";
+
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
 import { CaptureUpdateAction } from "../store";
-import { getShortcutKey, updateActiveTool } from "../utils";
 
 import { register } from "./register";
 
-import type { SceneBounds } from "../element/bounds";
-import type { ExcalidrawElement } from "../element/types";
 import type { AppState, Offsets } from "../types";
 
 export const actionChangeViewBackgroundColor = register({

@@ -1,7 +1,8 @@
 import React from "react";
 
+import { resolvablePromise } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
-import { resolvablePromise } from "../utils";
 
 import { Pointer } from "./helpers/ui";
 import { act, render } from "./test-utils";

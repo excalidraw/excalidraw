@@ -1,8 +1,8 @@
-import { KEYS } from "../../keys";
+import { KEYS } from "@excalidraw/common";
+
+import type { Node } from "@excalidraw/common";
 
 import { type FontDescriptor } from "./FontPickerList";
-
-import type { Node } from "../../utils";
 
 interface FontPickerKeyNavHandlerProps {
   event: React.KeyboardEvent<HTMLDivElement>;

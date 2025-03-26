@@ -1,27 +1,40 @@
-import { ToolButton } from "../components/ToolButton";
-import { DuplicateIcon } from "../components/icons";
-import { DEFAULT_GRID_SIZE } from "../constants";
-import { getNonDeletedElements } from "../element";
-import { isBoundToContainer, isLinearElement } from "../element/typeChecks";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { selectGroupsForSelectedElements } from "../groups";
-import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { isSomeElementSelected } from "../scene";
+import {
+  DEFAULT_GRID_SIZE,
+  KEYS,
+  arrayToMap,
+  getShortcutKey,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import {
+  isBoundToContainer,
+  isLinearElement,
+} from "@excalidraw/element/typeChecks";
+
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
+import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+
 import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
-} from "../scene/selection";
+} from "@excalidraw/element/selection";
+
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
+import { duplicateElements } from "@excalidraw/element/duplicate";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { ToolButton } from "../components/ToolButton";
+import { DuplicateIcon } from "../components/icons";
+
+import { t } from "../i18n";
+import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../store";
-import { arrayToMap, getShortcutKey } from "../utils";
-
-import { syncMovedIndices } from "../fractionalIndex";
-
-import { duplicateElements } from "../element/duplicate";
 
 import { register } from "./register";
-
-import type { ExcalidrawElement } from "../element/types";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",

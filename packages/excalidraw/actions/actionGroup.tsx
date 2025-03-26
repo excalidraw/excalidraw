@@ -1,9 +1,9 @@
-import { ToolButton } from "../components/ToolButton";
-import { UngroupIcon, GroupIcon } from "../components/icons";
-import { getNonDeletedElements } from "../element";
-import { newElementWith } from "../element/mutateElement";
-import { isBoundToContainer } from "../element/typeChecks";
-import { syncMovedIndices } from "../fractionalIndex";
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { newElementWith } from "@excalidraw/element/mutateElement";
+
+import { isBoundToContainer } from "@excalidraw/element/typeChecks";
+
 import {
   frameAndChildrenSelectedTogether,
   getElementsInResizingFrame,
@@ -12,7 +12,10 @@ import {
   groupByFrameLikes,
   removeElementsFromFrame,
   replaceAllElementsInFrame,
-} from "../frame";
+} from "@excalidraw/element/frame";
+
+import { KEYS, randomId, arrayToMap, getShortcutKey } from "@excalidraw/common";
+
 import {
   getSelectedGroupIds,
   selectGroup,
@@ -21,21 +24,26 @@ import {
   addToGroup,
   removeFromSelectedGroups,
   isElementInGroup,
-} from "../groups";
-import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { randomId } from "../random";
-import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
-import { arrayToMap, getShortcutKey } from "../utils";
+} from "@excalidraw/element/groups";
 
-import { register } from "./register";
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
   OrderedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { ToolButton } from "../components/ToolButton";
+import { UngroupIcon, GroupIcon } from "../components/icons";
+
+import { t } from "../i18n";
+
+import { isSomeElementSelected } from "../scene";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
 import type { AppClassProperties, AppState } from "../types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {

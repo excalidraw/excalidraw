@@ -8,20 +8,21 @@ import {
   getNormalizedCanvasDimensions,
 } from "@excalidraw/excalidraw/renderer/helpers";
 import { type AppState } from "@excalidraw/excalidraw/types";
-import { throttleRAF } from "@excalidraw/excalidraw/utils";
+import { throttleRAF } from "@excalidraw/common";
 import { useCallback, useImperativeHandle, useRef } from "react";
-
-import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
 
 import {
   isLineSegment,
   type GlobalPoint,
   type LineSegment,
-} from "../../packages/math";
-import { isCurve } from "../../packages/math/curve";
-import { STORAGE_KEYS } from "../app_constants";
+} from "@excalidraw/math";
+import { isCurve } from "@excalidraw/math/curve";
 
-import type { Curve } from "../../packages/math";
+import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
+
+import type { Curve } from "@excalidraw/math";
+
+import { STORAGE_KEYS } from "../app_constants";
 
 const renderLine = (
   context: CanvasRenderingContext2D,

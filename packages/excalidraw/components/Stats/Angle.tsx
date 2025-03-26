@@ -1,17 +1,20 @@
 import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import { getBoundTextElement } from "@excalidraw/element/textElement";
+import { isArrowElement, isElbowArrow } from "@excalidraw/element/typeChecks";
+
 import type { Degrees } from "@excalidraw/math";
 
-import { mutateElement } from "../../element/mutateElement";
-import { getBoundTextElement } from "../../element/textElement";
-import { isArrowElement, isElbowArrow } from "../../element/typeChecks";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { angleIcon } from "../icons";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type { ExcalidrawElement } from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 

@@ -1,8 +1,9 @@
 import clsx from "clsx";
 import React, { forwardRef, useState } from "react";
 
+import { isPromiseLike } from "@excalidraw/common";
+
 import { AbortError } from "../errors";
-import { isPromiseLike } from "../utils";
 
 import Spinner from "./Spinner";
 import { tablerCheckIcon } from "./icons";

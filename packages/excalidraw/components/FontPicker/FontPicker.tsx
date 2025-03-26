@@ -1,7 +1,10 @@
 import * as Popover from "@radix-ui/react-popover";
 import React, { useCallback, useMemo } from "react";
 
-import { FONT_FAMILY } from "../../constants";
+import { FONT_FAMILY } from "@excalidraw/common";
+
+import type { FontFamilyValues } from "@excalidraw/element/types";
+
 import { t } from "../../i18n";
 import { ButtonIconSelect } from "../ButtonIconSelect";
 import { ButtonSeparator } from "../ButtonSeparator";
@@ -15,8 +18,6 @@ import { FontPickerList } from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
 
 import "./FontPicker.scss";
-
-import type { FontFamilyValues } from "../../element/types";
 
 export const DEFAULT_FONTS = [
   {

@@ -1,8 +1,11 @@
-import { getCommonBounds } from "../element";
-import { getLanguage } from "../i18n";
-import { getGlobalCSSVariable } from "../utils";
+import { getGlobalCSSVariable } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "../element/types";
+import { getCommonBounds } from "@excalidraw/element/bounds";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { getLanguage } from "../i18n";
+
 import type { InteractiveCanvasAppState } from "../types";
 import type { ScrollBars } from "./types";
 

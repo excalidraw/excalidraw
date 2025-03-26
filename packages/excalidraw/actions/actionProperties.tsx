@@ -1,15 +1,77 @@
 import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { LocalPoint } from "@excalidraw/math";
-
-import { trackEvent } from "../analytics";
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
-} from "../colors";
+  ARROW_TYPE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  FONT_FAMILY,
+  ROUNDNESS,
+  STROKE_WIDTH,
+  VERTICAL_ALIGN,
+  KEYS,
+  randomInteger,
+  arrayToMap,
+  getFontFamilyString,
+  getShortcutKey,
+  tupleToCoors,
+  getLineHeight,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import {
+  bindLinearElement,
+  bindPointToSnapToElementOutline,
+  calculateFixedPointForElbowArrowBinding,
+  getHoveredElementForBinding,
+  updateBoundElements,
+} from "@excalidraw/element/binding";
+
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
+import {
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element/mutateElement";
+
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+
+import {
+  isArrowElement,
+  isBoundToContainer,
+  isElbowArrow,
+  isLinearElement,
+  isTextElement,
+  isUsingAdaptiveRadius,
+} from "@excalidraw/element/typeChecks";
+
+import { hasStrokeColor } from "@excalidraw/element/comparisons";
+
+import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import type {
+  Arrowhead,
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  FontFamilyValues,
+  TextAlign,
+  VerticalAlign,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
+
+import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
@@ -60,41 +122,9 @@ import {
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
 } from "../components/icons";
-import {
-  ARROW_TYPE,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SIZE,
-  FONT_FAMILY,
-  ROUNDNESS,
-  STROKE_WIDTH,
-  VERTICAL_ALIGN,
-} from "../constants";
-import {
-  getNonDeletedElements,
-  isTextElement,
-  redrawTextBoundingBox,
-} from "../element";
-import {
-  bindLinearElement,
-  bindPointToSnapToElementOutline,
-  calculateFixedPointForElbowArrowBinding,
-  getHoveredElementForBinding,
-  updateBoundElements,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import { getBoundTextElement } from "../element/textElement";
-import {
-  isArrowElement,
-  isBoundToContainer,
-  isElbowArrow,
-  isLinearElement,
-  isUsingAdaptiveRadius,
-} from "../element/typeChecks";
-import { Fonts, getLineHeight } from "../fonts";
+
+import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
-import { KEYS } from "../keys";
-import { randomInteger } from "../random";
 import {
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
@@ -102,30 +132,10 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { hasStrokeColor } from "../scene/comparisons";
 import { CaptureUpdateAction } from "../store";
-import {
-  arrayToMap,
-  getFontFamilyString,
-  getShortcutKey,
-  tupleToCoors,
-} from "../utils";
-
-import { updateElbowArrowPoints } from "../element/elbowArrow";
 
 import { register } from "./register";
 
-import type {
-  Arrowhead,
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  FontFamilyValues,
-  TextAlign,
-  VerticalAlign,
-  NonDeletedSceneElementsMap,
-} from "../element/types";
 import type { CaptureUpdateActionType } from "../store";
 import type { AppClassProperties, AppState, Primitive } from "../types";
 

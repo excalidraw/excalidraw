@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { normalizeLink } from "../data/url";
+import { normalizeLink, KEYS } from "@excalidraw/common";
+
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
-} from "../element/elementLink";
-import { mutateElement } from "../element/mutateElement";
+} from "@excalidraw/element/elementLink";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
 import { t } from "../i18n";
-import { KEYS } from "../keys";
 import { getSelectedElements } from "../scene";
 
 import DialogActionButton from "./DialogActionButton";
@@ -17,7 +20,6 @@ import { TrashIcon } from "./icons";
 
 import "./ElementLinkDialog.scss";
 
-import type { ElementsMap, ExcalidrawElement } from "../element/types";
 import type { AppProps, AppState, UIAppState } from "../types";
 
 const ElementLinkDialog = ({

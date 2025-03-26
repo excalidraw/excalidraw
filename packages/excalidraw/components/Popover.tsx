@@ -1,8 +1,7 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 
-import { KEYS } from "../keys";
-import { queryFocusableElements } from "../utils";
+import { KEYS, queryFocusableElements } from "@excalidraw/common";
 
 import "./Popover.scss";
 

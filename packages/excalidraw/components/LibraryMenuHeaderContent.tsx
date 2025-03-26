@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
+import { muteFSAbortError } from "@excalidraw/common";
+
 import { useUIAppState } from "../context/ui-appState";
 import { fileOpen } from "../data/filesystem";
 import { saveLibraryAsJSON } from "../data/json";
@@ -8,7 +10,6 @@ import { libraryItemsAtom } from "../data/library";
 import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
-import { muteFSAbortError } from "../utils";
 
 import { useApp, useExcalidrawSetAppState } from "./App";
 import ConfirmDialog from "./ConfirmDialog";

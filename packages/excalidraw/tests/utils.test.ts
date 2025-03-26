@@ -1,4 +1,4 @@
-import { isTransparent } from "../utils";
+import { isTransparent } from "@excalidraw/common";
 
 describe("Test isTransparent", () => {
   it("should return true when color is rgb transparent", () => {

@@ -1,10 +1,10 @@
 import clsx from "clsx";
 import React, { useEffect, useRef } from "react";
 
-import { EVENT } from "../../constants";
+import { EVENT, KEYS } from "@excalidraw/common";
+
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
-import { KEYS } from "../../keys";
 import { useDevice } from "../App";
 import { Island } from "../Island";
 import Stack from "../Stack";

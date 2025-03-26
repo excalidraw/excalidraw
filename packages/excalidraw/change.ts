@@ -1,26 +1,4 @@
 import {
-  BoundElement,
-  BindableElement,
-  bindingProperties,
-  updateBoundElements,
-} from "./element/binding";
-import { LinearElementEditor } from "./element/linearElementEditor";
-import { mutateElement, newElementWith } from "./element/mutateElement";
-import {
-  getBoundTextElementId,
-  redrawTextBoundingBox,
-} from "./element/textElement";
-import {
-  hasBoundTextElement,
-  isBindableElement,
-  isBoundToContainer,
-  isImageElement,
-  isTextElement,
-} from "./element/typeChecks";
-import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
-import { getNonDeletedGroupIds } from "./groups";
-import { getObservedAppState } from "./store";
-import {
   arrayToMap,
   arrayToObject,
   assertNever,
@@ -28,10 +6,41 @@ import {
   isShallowEqual,
   isTestEnv,
   toBrandedType,
-} from "./utils";
+} from "@excalidraw/common";
+import {
+  BoundElement,
+  BindableElement,
+  bindingProperties,
+  updateBoundElements,
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import {
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element/mutateElement";
+import {
+  getBoundTextElementId,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+import {
+  hasBoundTextElement,
+  isBindableElement,
+  isBoundToContainer,
+  isImageElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
 
-import type { BindableProp, BindingProp } from "./element/binding";
-import type { ElementUpdate } from "./element/mutateElement";
+import { getNonDeletedGroupIds } from "@excalidraw/element/groups";
+
+import {
+  orderByFractionalIndex,
+  syncMovedIndices,
+} from "@excalidraw/element/fractionalIndex";
+
+import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
+
+import type { ElementUpdate } from "@excalidraw/element/mutateElement";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -41,14 +50,18 @@ import type {
   Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
-} from "./element/types";
+} from "@excalidraw/element/types";
+
+import type { SubtypeOf, ValueOf } from "@excalidraw/common/utility-types";
+
+import { getObservedAppState } from "./store";
+
 import type {
   AppState,
   ObservedAppState,
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import type { SubtypeOf, ValueOf } from "./utility-types";
 
 /**
  * Represents the difference between two objects of the same type.
