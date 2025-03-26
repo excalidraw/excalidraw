@@ -26,7 +26,7 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import { isPointOnShape } from "@excalidraw/utils/collision";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 

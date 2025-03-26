@@ -3,11 +3,13 @@ import { type GlobalPoint, pointFrom } from "@excalidraw/math";
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
 } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   isBindingElement,
+  isElbowArrow,
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
 
