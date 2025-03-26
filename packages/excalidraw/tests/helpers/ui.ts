@@ -21,7 +21,7 @@ import {
   isFrameLikeElement,
 } from "../../element/typeChecks";
 import { KEYS } from "../../keys";
-import { arrayToMap } from "../../utils";
+import { arrayToMap, elementCenterPoint } from "../../utils";
 import { getTextEditor } from "../queries/dom";
 import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 
@@ -162,7 +162,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = pointFrom(x + width / 2, y + height / 2);
+    center = elementCenterPoint(element);
   }
 
   if (isTextElement(element)) {
