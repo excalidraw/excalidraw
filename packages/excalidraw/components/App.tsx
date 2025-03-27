@@ -16,7 +16,6 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-  lineSegment,
 } from "@excalidraw/math";
 import { isPointInShape } from "@excalidraw/utils/collision";
 import { getSelectionBoxShape } from "@excalidraw/utils/shape";
@@ -120,7 +119,6 @@ import {
   updateBoundElements,
   getSuggestedBindingsForArrows,
   getOutlineAvoidingPoint,
-  FIXED_BINDING_DISTANCE,
 } from "@excalidraw/element/binding";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
@@ -232,7 +230,6 @@ import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-  intersectElementWithLineSegment,
 } from "@excalidraw/element/collision";
 
 import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
@@ -7830,43 +7827,19 @@ class App extends React.Component<AppProps, AppState> {
               this.state.currentItemArrowType === ARROW_TYPE.elbow ? [] : null,
           });
 
-        const hoveredElement = getHoveredElementForBinding(
-          { x: gridX, y: gridY },
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
+        const [x, y] = getOutlineAvoidingPoint(
+          arrow,
+          pointFrom<GlobalPoint>(gridX, gridY),
+          0,
+          this.scene,
           this.state.zoom,
-          true,
-          this.state.currentItemArrowType === ARROW_TYPE.elbow,
         );
 
-        if (hoveredElement) {
-          [arrow.x, arrow.y] =
-            intersectElementWithLineSegment(
-              hoveredElement,
-              lineSegment(
-                pointFrom<GlobalPoint>(gridX, gridY),
-                pointFrom<GlobalPoint>(
-                  gridX,
-                  hoveredElement.y + hoveredElement.height / 2,
-                ),
-              ),
-              2 * FIXED_BINDING_DISTANCE,
-            )[0] ??
-            intersectElementWithLineSegment(
-              hoveredElement,
-              lineSegment(
-                pointFrom<GlobalPoint>(gridX, gridY),
-                pointFrom<GlobalPoint>(
-                  hoveredElement.x + hoveredElement.width / 2,
-                  gridY,
-                ),
-              ),
-              2 * FIXED_BINDING_DISTANCE,
-            )[0] ??
-            pointFrom<GlobalPoint>(gridX, gridY);
-        }
-
-        element = arrow;
+        element = {
+          ...arrow,
+          x,
+          y,
+        };
       } else {
         element = newLinearElement({
           type: elementType,
