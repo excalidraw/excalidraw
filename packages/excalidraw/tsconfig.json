@@ -2,5 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist/types"
-  }
+  },
+  "include": ["**/*"],
+  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
 }

@@ -22,6 +22,5 @@
       "@excalidraw/utils": ["./utils/src/index.ts"],
       "@excalidraw/utils/*": ["./utils/src/*"]
     }
-  },
-  "exclude": ["**/*.test.*", "tests", "types", "examples", "dist"]
+  }
 }
