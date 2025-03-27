@@ -12,7 +12,7 @@
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../math/dist/types/math/*"
+      "types": "./../math/dist/types/math/src/*.d.ts"
     }
   },
   "files": [

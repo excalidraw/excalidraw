@@ -6,6 +6,18 @@
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
+    "./common/*": {
+      "types": "./dist/types/common/src/*.d.ts"
+    },
+    "./element/*": {
+      "types": "./dist/types/element/src/*.d.ts"
+    },
+    "./math/*": {
+      "types": "./dist/types/math/src/*.d.ts"
+    },
+    "./utils/*": {
+      "types": "./dist/types/utils/src/*.d.ts"
+    },
     "./*": {
       "types": "./dist/types/excalidraw/*.d.ts"
     },

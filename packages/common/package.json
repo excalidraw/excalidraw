@@ -13,7 +13,7 @@
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../common/dist/types/common/*"
+      "types": "./../common/dist/types/common/src/*.d.ts"
     }
   },
   "files": [
@@ -48,6 +48,7 @@
     ]
   },
   "dependencies": {
+    "@braintree/sanitize-url": "6.0.2",
     "es6-promise-pool": "2.5.0",
     "nanoid": "3.3.3",
     "open-color": "1.9.1",
