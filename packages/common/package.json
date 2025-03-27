@@ -2,18 +2,18 @@
   "name": "@excalidraw/common",
   "version": "0.1.0",
   "type": "module",
-  "types": "./dist/types/common/index.d.ts",
+  "types": "./dist/types/common/src/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "exports": {
     ".": {
-      "types": "./dist/types/common/index.d.ts",
+      "types": "./dist/types/common/src/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
     "./*": {
-      "types": "./../common/dist/types/common/*"
+      "types": "./../common/dist/types/common/src/*.d.ts"
     }
   },
   "files": [
@@ -46,15 +46,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "dependencies": {
-    "es6-promise-pool": "2.5.0",
-    "nanoid": "3.3.3",
-    "open-color": "1.9.1",
-    "roughjs": "4.6.4"
-  },
-  "devDependencies": {
-    "typescript": "4.9.4"
   },
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
