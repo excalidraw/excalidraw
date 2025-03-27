@@ -1279,13 +1279,6 @@ const updateBoundPoint = (
 
   let newEdgePoint: GlobalPoint;
 
-  // // The linear element was not originally pointing inside the bound shape,
-  // // we can point directly at the focus point
-  // if (binding.gap === 0) {
-  //   newEdgePoint = focusPointAbsolute;
-  // } else {
-  //  ...
-  // }
   const edgePointAbsolute =
     LinearElementEditor.getPointAtIndexGlobalCoordinates(
       linearElement,
