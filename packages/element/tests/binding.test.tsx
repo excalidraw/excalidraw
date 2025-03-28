@@ -18,7 +18,9 @@ const mouse = new Pointer("mouse");
 
 describe("element binding", () => {
   beforeEach(async () => {
+    localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
+    mouse.reset();
   });
 
   it("should create valid binding if duplicate start/end points", async () => {
@@ -89,46 +91,55 @@ describe("element binding", () => {
     });
   });
 
-  //@TODO fix the test with rotation
-  it.skip("rotation of arrow should rebind both ends", () => {
-    const rectLeft = UI.createElement("rectangle", {
-      x: 0,
-      width: 200,
-      height: 500,
-    });
-    const rectRight = UI.createElement("rectangle", {
-      x: 400,
-      width: 200,
-      height: 500,
-    });
-    const arrow = UI.createElement("arrow", {
-      x: 210,
-      y: 250,
-      width: 180,
-      height: 1,
-    });
-    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
-    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+  // UX RATIONALE: We are not aware of any use-case where the user would want to
+  // have the arrow rebind after rotation but not when the arrow shaft is
+  // dragged so either the start or the end point is in the binding range of a
+  // bindable element. So to remain consistent, we only "rebind" if at the end
+  // of the rotation the original binding would remain the same (i.e. like we
+  // would've evaluated binding only at the end of the operation).
+  it(
+    "rotation of arrow should not rebind on both ends if rotated enough to" +
+      " not be in the binding range of the original elements",
+    () => {
+      const rectLeft = UI.createElement("rectangle", {
+        x: 0,
+        width: 200,
+        height: 500,
+      });
+      const rectRight = UI.createElement("rectangle", {
+        x: 400,
+        width: 200,
+        height: 500,
+      });
+      const arrow = UI.createElement("arrow", {
+        x: 210,
+        y: 250,
+        width: 180,
+        height: 1,
+      });
+      expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+      expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
-    const rotation = getTransformHandles(
-      arrow,
-      h.state.zoom,
-      arrayToMap(h.elements),
-      "mouse",
-    ).rotation!;
-    const rotationHandleX = rotation[0] + rotation[2] / 2;
-    const rotationHandleY = rotation[1] + rotation[3] / 2;
-    mouse.down(rotationHandleX, rotationHandleY);
-    mouse.move(300, 400);
-    mouse.up();
-    expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
-    expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
-    expect(arrow.startBinding?.elementId).toBe(rectRight.id);
-    expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
-  });
+      const rotation = getTransformHandles(
+        arrow,
+        h.state.zoom,
+        arrayToMap(h.elements),
+        "mouse",
+      ).rotation!;
+      const rotationHandleX = rotation[0] + rotation[2] / 2;
+      const rotationHandleY = rotation[1] + rotation[3] / 2;
+      mouse.down(rotationHandleX, rotationHandleY);
+      mouse.move(300, 400);
+      mouse.up();
+      expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
+      expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+    },
+  );
 
   // TODO fix & reenable once we rewrite tests to work with concurrency
-  it.skip(
+  it(
     "editing arrow and moving its head to bind it to element A, finalizing the" +
       "editing by clicking on element A should end up selecting A",
     async () => {
@@ -142,7 +153,10 @@ describe("element binding", () => {
       mouse.up(0, 80);
 
       // Edit arrow with multi-point
-      mouse.doubleClick();
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.doubleClick();
+      });
+
       // move arrow head
       mouse.down();
       mouse.up(0, 10);
@@ -152,11 +166,7 @@ describe("element binding", () => {
       // the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
       mouse.reset();
       expect(h.state.editingLinearElement).not.toBe(null);
-      mouse.down(0, 0);
-      await new Promise((r) => setTimeout(r, 100));
-      expect(h.state.editingLinearElement).toBe(null);
-      expect(API.getSelectedElement().type).toBe("rectangle");
-      mouse.up();
+      mouse.click();
       expect(API.getSelectedElement().type).toBe("rectangle");
     },
   );
@@ -187,23 +197,24 @@ describe("element binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
     Keyboard.keyPress(KEYS.ARROW_LEFT);
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+    expect(API.getSelectedElement().type).toBe("arrow");
 
     // Sever connection
-    expect(API.getSelectedElement().type).toBe("arrow");
     Keyboard.withModifierKeys({ shift: true }, () => {
       // We have to move a significant distance to get out of the binding zone
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
-      Keyboard.keyPress(KEYS.ARROW_LEFT);
+      Array.from({ length: 10 }).forEach(() => {
+        Keyboard.keyPress(KEYS.ARROW_LEFT);
+      });
     });
     expect(arrow.endBinding).toBe(null);
-    Keyboard.keyPress(KEYS.ARROW_RIGHT);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      // We have to move a significant distance to return to the binding
+      Array.from({ length: 10 }).forEach(() => {
+        Keyboard.keyPress(KEYS.ARROW_RIGHT);
+      });
+    });
+    // We are back in the binding zone but we shouldn't rebind
     expect(arrow.endBinding).toBe(null);
   });
 

@@ -109,8 +109,10 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([arrow.x, arrow.y]).toEqual([110, 50]);
-    expect([arrow.width, arrow.height]).toEqual([80, 80]);
+    expect([Math.round(arrow.x), Math.round(arrow.y)]).toEqual([104, 50]);
+    expect([Math.round(arrow.width), Math.round(arrow.height)]).toEqual([
+      93, 81,
+    ]);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -128,8 +130,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[107.07, 47.07]]);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[86.86, 87.3]]);
+
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[103.53, 50.01]]);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([
+      [93.9289, 82.1813],
+    ]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

@@ -87,6 +87,16 @@ describe("flipping arrowheads", () => {
     await render(<Excalidraw />);
   });
 
+  // UX RATIONALE: If we flip bound arrows by the center axes then there could
+  // be a case where the bindable objects are offset and the arrow would lay
+  // outside both bindable objects binding range, yet remain bound to then,
+  // resulting in a jump on movement.
+  //
+  // We are aware that 2+ point simple arrows behave incorrectly when flipped
+  // this way but it was decided that there is no known use case for this so
+  // left as it is.
+  //
+  // Demo: https://excalidraw.com/#json=isE-S8LqNlD1u-LsS8Ezz,iZZ09PPasp6OWbGtJwOUGQ
   it("flipping bound arrow should flip arrowheads only", () => {
     const rect = API.createElement({
       type: "rectangle",
@@ -123,6 +133,7 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).endArrowhead).toBe("arrow");
   });
 
+  // UX RATIONALE: See above for the reasoning.
   it("flipping bound arrow should flip arrowheads only 2", () => {
     const rect = API.createElement({
       type: "rectangle",
@@ -164,7 +175,9 @@ describe("flipping arrowheads", () => {
     expect(API.getElement(arrow).endArrowhead).toBe("circle");
   });
 
-  it("flipping unbound arrow shouldn't flip arrowheads", () => {
+  // UX RATIONALE: Unbound arrows are not constrained by other elements and
+  // should behave like any other element when flipped for consisency.
+  it("flipping unbound arrow should mirror on horizontal or vertical axis", () => {
     const arrow = API.createElement({
       type: "arrow",
       id: "arrow1",

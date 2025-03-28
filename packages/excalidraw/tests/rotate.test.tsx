@@ -3,6 +3,8 @@ import { expect } from "vitest";
 
 import { reseed } from "@excalidraw/common";
 
+import "@excalidraw/utils/test-utils";
+
 import { Excalidraw } from "../index";
 
 import { UI } from "./helpers/ui";
@@ -71,14 +73,16 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(ellipseArrow.endBinding?.elementId).toEqual(ellipse.id);
   expect(ellipseArrow.x).toEqual(0);
   expect(ellipseArrow.y).toEqual(0);
-  expect(ellipseArrow.points[0]).toEqual([0, 0]);
-  expect(ellipseArrow.points[1][0]).toBeCloseTo(48.98, 1);
-  expect(ellipseArrow.points[1][1]).toBeCloseTo(125.79, 1);
+
+  expect(ellipseArrow.points).toCloselyEqualPoints([
+    [0, 0],
+    [90.1827, 98.5896],
+  ]);
 
   expect(textArrow.endBinding?.elementId).toEqual(text.id);
   expect(textArrow.x).toEqual(360);
   expect(textArrow.y).toEqual(300);
   expect(textArrow.points[0]).toEqual([0, 0]);
-  expect(textArrow.points[1][0]).toBeCloseTo(-94, 0);
-  expect(textArrow.points[1][1]).toBeCloseTo(-116.1, 0);
+  expect(textArrow.points[1][0]).toBeCloseTo(-95, 0);
+  expect(textArrow.points[1][1]).toBeCloseTo(-129.1, 0);
 });
