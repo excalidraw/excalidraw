@@ -1,33 +1,58 @@
+import {
+  CaptureUpdateAction,
+  getSceneVersion,
+  restoreElements,
+  zoomToFitBounds,
+  reconcileElements,
+} from "@excalidraw/excalidraw";
+import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
+import { APP_NAME, EVENT } from "@excalidraw/common";
+import {
+  IDLE_THRESHOLD,
+  ACTIVE_THRESHOLD,
+  UserIdleState,
+  assertNever,
+  isDevEnv,
+  isTestEnv,
+  preventUnload,
+  resolvablePromise,
+  throttleRAF,
+} from "@excalidraw/common";
+import { decryptData } from "@excalidraw/excalidraw/data/encryption";
+import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
+import { newElementWith } from "@excalidraw/element/mutateElement";
+import {
+  isImageElement,
+  isInitializedImageElement,
+} from "@excalidraw/element/typeChecks";
+import { AbortError } from "@excalidraw/excalidraw/errors";
+import { t } from "@excalidraw/excalidraw/i18n";
+import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
+
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
+
 import type {
-  BinaryFileData,
-  ExcalidrawImperativeAPI,
-  SocketId,
-} from "../../packages/excalidraw/types";
-import { ErrorDialog } from "../../packages/excalidraw/components/ErrorDialog";
-import { APP_NAME, ENV, EVENT } from "../../packages/excalidraw/constants";
-import type { ImportedDataState } from "../../packages/excalidraw/data/types";
+  ReconciledExcalidrawElement,
+  RemoteExcalidrawElement,
+} from "@excalidraw/excalidraw/data/reconcile";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type {
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
   OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import {
-  StoreAction,
-  getSceneVersion,
-  restoreElements,
-  zoomToFitBounds,
-  reconcileElements,
-} from "../../packages/excalidraw";
-import type { Collaborator, Gesture } from "../../packages/excalidraw/types";
-import {
-  assertNever,
-  preventUnload,
-  resolvablePromise,
-  throttleRAF,
-} from "../../packages/excalidraw/utils";
+} from "@excalidraw/element/types";
+import type {
+  BinaryFileData,
+  ExcalidrawImperativeAPI,
+  SocketId,
+  Collaborator,
+  Gesture,
+} from "@excalidraw/excalidraw/types";
+import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
+
+import { appJotaiStore, atom } from "../app-jotai";
 import {
   CURSOR_SYNC_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
@@ -38,15 +63,17 @@ import {
   SYNC_FULL_SCENE_INTERVAL_MS,
   WS_EVENTS,
 } from "../app_constants";
-import type {
-  SocketUpdateDataSource,
-  SyncableExcalidrawElement,
-} from "../data";
 import {
   generateCollaborationLinkData,
   getCollaborationLink,
   getSyncableElements,
 } from "../data";
+import {
+  encodeFilesForUpload,
+  FileManager,
+  updateStaleImageStatuses,
+} from "../data/FileManager";
+import { LocalData, SyncIndexedDBAdapter } from "../data/LocalData";
 import {
   isSavedToFirebase,
   loadFilesFromFirebase,
@@ -58,37 +85,15 @@ import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
-import Portal from "./Portal";
-import { t } from "../../packages/excalidraw/i18n";
-import { UserIdleState } from "../../packages/excalidraw/types";
-import {
-  IDLE_THRESHOLD,
-  ACTIVE_THRESHOLD,
-} from "../../packages/excalidraw/constants";
-import {
-  encodeFilesForUpload,
-  FileManager,
-  updateStaleImageStatuses,
-} from "../data/FileManager";
-import { AbortError } from "../../packages/excalidraw/errors";
-import {
-  isImageElement,
-  isInitializedImageElement,
-} from "../../packages/excalidraw/element/typeChecks";
-import { newElementWith } from "../../packages/excalidraw/element/mutateElement";
-import { decryptData } from "../../packages/excalidraw/data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
-import { LocalData, SyncIndexedDBAdapter } from "../data/LocalData";
-import { appJotaiStore, atom } from "../app-jotai";
-import type { Mutable, ValueOf } from "../../packages/excalidraw/utility-types";
-import { getVisibleSceneBounds } from "../../packages/excalidraw/element/bounds";
-import { withBatchedUpdates } from "../../packages/excalidraw/reactUtils";
+
 import { collabErrorIndicatorAtom } from "./CollabError";
+import Portal from "./Portal";
+
 import type {
-  ReconciledExcalidrawElement,
-  RemoteExcalidrawElement,
-} from "../../packages/excalidraw/data/reconcile";
-import { SyncClient } from "../../packages/excalidraw/sync/client";
+  SocketUpdateDataSource,
+  SyncableExcalidrawElement,
+} from "../data";
 
 export const syncApiAtom = atom<SyncClient | null>(null);
 export const collabAPIAtom = atom<CollabAPI | null>(null);
@@ -243,7 +248,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       },
     );
 
-    if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+    if (isTestEnv() || isDevEnv()) {
       window.collab = window.collab || ({} as Window["collab"]);
       Object.defineProperties(window, {
         collab: {
@@ -393,7 +398,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
       this.excalidrawAPI.updateScene({
         elements,
-        storeAction: StoreAction.UPDATE,
+        captureUpdate: CaptureUpdateAction.NEVER,
       });
     }
   };
@@ -544,7 +549,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       // to database even if deleted before creating the room.
       this.excalidrawAPI.updateScene({
         elements,
-        storeAction: StoreAction.UPDATE,
+        captureUpdate: CaptureUpdateAction.NEVER,
       });
 
       this.saveCollabRoomToFirebase(getSyncableElements(elements));
@@ -782,7 +787,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   ) => {
     this.excalidrawAPI.updateScene({
       elements,
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     });
 
     this.loadImageFiles();
@@ -1018,7 +1023,7 @@ declare global {
   }
 }
 
-if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
+if (isTestEnv() || isDevEnv()) {
   window.collab = window.collab || ({} as Window["collab"]);
 }
 

@@ -1,21 +1,26 @@
-import { TextField } from "./TextField";
-import type { AppProps, AppState, UIAppState } from "../types";
-import DialogActionButton from "./DialogActionButton";
-import { getSelectedElements } from "../scene";
+import { useCallback, useEffect, useState } from "react";
+
+import { normalizeLink, KEYS } from "@excalidraw/common";
+
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
-} from "../element/elementLink";
-import { mutateElement } from "../element/mutateElement";
-import { useCallback, useEffect, useState } from "react";
+} from "@excalidraw/element/elementLink";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+
 import { t } from "../i18n";
-import type { ElementsMap, ExcalidrawElement } from "../element/types";
+import { getSelectedElements } from "../scene";
+
+import DialogActionButton from "./DialogActionButton";
+import { TextField } from "./TextField";
 import { ToolButton } from "./ToolButton";
 import { TrashIcon } from "./icons";
-import { KEYS } from "../keys";
 
 import "./ElementLinkDialog.scss";
-import { normalizeLink } from "../data/url";
+
+import type { AppProps, AppState, UIAppState } from "../types";
 
 const ElementLinkDialog = ({
   sourceElementId,

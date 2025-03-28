@@ -1,13 +1,18 @@
-import React, { useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { isArrowKey, KEYS } from "../keys";
-import { getLanguage, t } from "../i18n";
 import clsx from "clsx";
-import Collapsible from "./Stats/Collapsible";
+import React, { useEffect } from "react";
+
+import { isArrowKey, KEYS } from "@excalidraw/common";
+
 import { atom, useAtom } from "../editor-jotai";
-import { useDevice } from "..";
+import { getLanguage, t } from "../i18n";
+
+import Collapsible from "./Stats/Collapsible";
+import { useDevice } from "./App";
 
 import "./IconPicker.scss";
+
+import type { JSX } from "react";
 
 const moreOptionsAtom = atom(false);
 

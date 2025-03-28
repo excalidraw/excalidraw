@@ -1,21 +1,24 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { vi } from "vitest";
+
+import { KEYS, reseed } from "@excalidraw/common";
+
+import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+
+import { Excalidraw } from "../index";
+
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import * as StaticScene from "../renderer/staticScene";
+
 import {
   render,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
+  unmountComponent,
 } from "./test-utils";
-import { Excalidraw } from "../index";
-import * as StaticScene from "../renderer/staticScene";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import { KEYS } from "../keys";
-import type { ExcalidrawLinearElement } from "../element/types";
-import { reseed } from "../random";
-import { vi } from "vitest";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
   InteractiveCanvas,

@@ -1,12 +1,20 @@
 import React from "react";
-import { act, render, waitFor } from "./test-utils";
+
+import {
+  CANVAS_SEARCH_TAB,
+  CLASSES,
+  DEFAULT_SIDEBAR,
+  KEYS,
+} from "@excalidraw/common";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
-import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
-import { Keyboard } from "./helpers/ui";
-import { KEYS } from "../keys";
-import { updateTextEditor } from "./queries/dom";
+
 import { API } from "./helpers/api";
-import type { ExcalidrawTextElement } from "../element/types";
+import { Keyboard } from "./helpers/ui";
+import { updateTextEditor } from "./queries/dom";
+import { act, render, waitFor } from "./test-utils";
 
 const { h } = window;
 

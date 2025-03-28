@@ -1,30 +1,38 @@
 import {
-  isTextElement,
-  isExcalidrawElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { CODES, KEYS } from "../keys";
-import { t } from "../i18n";
-import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
-import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
-} from "../constants";
-import { getBoundTextElement } from "../element/textElement";
+  CODES,
+  KEYS,
+  getLineHeight,
+} from "@excalidraw/common";
+
+import { newElementWith } from "@excalidraw/element/mutateElement";
+
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
-} from "../element/typeChecks";
-import { getSelectedElements } from "../scene";
-import type { ExcalidrawTextElement } from "../element/types";
+  isExcalidrawElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
+
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { paintIcon } from "../components/icons";
-import { StoreAction } from "../store";
-import { getLineHeight } from "../fonts";
+
+import { t } from "../i18n";
+import { getSelectedElements } from "../scene";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
@@ -53,7 +61,7 @@ export const actionCopyStyles = register({
         ...appState,
         toast: { message: t("toast.copyStyles") },
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) =>
@@ -70,7 +78,7 @@ export const actionPasteStyles = register({
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];
     if (!isExcalidrawElement(pastedElement)) {
-      return { elements, storeAction: StoreAction.NONE };
+      return { elements, captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
 
     const selectedElements = getSelectedElements(elements, appState, {
@@ -159,7 +167,7 @@ export const actionPasteStyles = register({
         }
         return element;
       }),
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>

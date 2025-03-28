@@ -1,0 +1,56 @@
+{
+  "name": "@excalidraw/common",
+  "version": "0.1.0",
+  "type": "module",
+  "types": "./dist/types/common/src/index.d.ts",
+  "main": "./dist/prod/index.js",
+  "module": "./dist/prod/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/common/src/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
+    },
+    "./*": {
+      "types": "./../common/dist/types/common/src/*.d.ts"
+    }
+  },
+  "files": [
+    "dist/*"
+  ],
+  "description": "Excalidraw common functions, constants, etc.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "keywords": [
+    "excalidraw",
+    "excalidraw-utils"
+  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not ie <= 11",
+      "not op_mini all",
+      "not safari < 12",
+      "not kaios <= 2.5",
+      "not edge < 79",
+      "not chrome < 70",
+      "not and_uc < 13",
+      "not samsung < 10"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "scripts": {
+    "gen:types": "rm -rf types && tsc",
+    "build:esm": "rm -rf dist && node ../../scripts/buildBase.js && yarn gen:types"
+  }
+}

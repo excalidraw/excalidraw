@@ -1,37 +1,41 @@
-import { FRAME_STYLE } from "../constants";
-import { getElementAbsoluteCoords } from "../element";
-
-import {
-  elementOverlapsWithFrame,
-  getTargetFrame,
-  shouldApplyFrameClip,
-} from "../frame";
+import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
+import { isElementLink } from "@excalidraw/element/elementLink";
+import { createPlaceholderEmbeddableLabel } from "@excalidraw/element/embeddable";
+import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
   isEmbeddableElement,
   isIframeLikeElement,
   isTextElement,
-} from "../element/typeChecks";
-import { renderElement } from "../renderer/renderElement";
-import { createPlaceholderEmbeddableLabel } from "../element/embeddable";
-import type { StaticCanvasAppState, Zoom } from "../types";
+} from "@excalidraw/element/typeChecks";
+import {
+  elementOverlapsWithFrame,
+  getTargetFrame,
+  shouldApplyFrameClip,
+} from "@excalidraw/element/frame";
+
+import { renderElement } from "@excalidraw/element/renderElement";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
-} from "../element/types";
-import type {
-  StaticCanvasRenderConfig,
-  StaticSceneRenderConfig,
-} from "../scene/types";
+} from "@excalidraw/element/types";
+
 import {
   EXTERNAL_LINK_IMG,
   ELEMENT_LINK_IMG,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
+
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
-import { throttleRAF } from "../utils";
-import { getBoundTextElement } from "../element/textElement";
-import { isElementLink } from "../element/elementLink";
+
+import type {
+  StaticCanvasRenderConfig,
+  StaticSceneRenderConfig,
+} from "../scene/types";
+import type { StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {
   Bold: "#dddddd",
@@ -351,7 +355,14 @@ const _renderStaticScene = ({
           renderLinkIcon(element, context, appState, elementsMap);
         }
       } catch (error: any) {
-        console.error(error);
+        console.error(
+          error,
+          element.id,
+          element.x,
+          element.y,
+          element.width,
+          element.height,
+        );
       }
     });
 

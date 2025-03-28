@@ -1,24 +1,33 @@
 import React from "react";
 import { vi } from "vitest";
-import ReactDOM from "react-dom";
-import { render, waitFor, GlobalTestState } from "./test-utils";
-import { Pointer, Keyboard } from "./helpers/ui";
-import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { getLineHeightInPx } from "../element/textElement";
-import { getElementBounds } from "../element";
-import type { NormalizedZoomValue } from "../types";
-import { API } from "./helpers/api";
+
+import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
+
+import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+
+import { getElementBounds } from "@excalidraw/element/bounds";
+
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
-import { arrayToMap } from "../utils";
+
+import { Excalidraw } from "../index";
+
+import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
-import { getLineHeight } from "../fonts";
+import { Pointer, Keyboard } from "./helpers/ui";
+import {
+  render,
+  waitFor,
+  GlobalTestState,
+  unmountComponent,
+} from "./test-utils";
+
+import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;
 
 const mouse = new Pointer("mouse");
 
-vi.mock("../keys.ts", async (importOriginal) => {
+vi.mock("@excalidraw/common", async (importOriginal) => {
   const module: any = await importOriginal();
   return {
     __esmodule: true,
@@ -63,7 +72,7 @@ const sleep = (ms: number) => {
 };
 
 beforeEach(async () => {
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   localStorage.clear();
 

@@ -1,10 +1,16 @@
-import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
+import { KEYS } from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
+
 import { ToolButton } from "../components/ToolButton";
+import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { t } from "../i18n";
-import { showSelectedShapeActions, getNonDeletedElements } from "../element";
+
+import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
-import { KEYS } from "../keys";
-import { StoreAction } from "../store";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
@@ -15,7 +21,7 @@ export const actionToggleCanvasMenu = register({
       ...appState,
       openMenu: appState.openMenu === "canvas" ? null : "canvas",
     },
-    storeAction: StoreAction.NONE,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
@@ -37,7 +43,7 @@ export const actionToggleEditMenu = register({
       ...appState,
       openMenu: appState.openMenu === "shape" ? null : "shape",
     },
-    storeAction: StoreAction.NONE,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -74,7 +80,7 @@ export const actionShortcuts = register({
                 name: "help",
               },
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,

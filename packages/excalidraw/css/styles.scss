@@ -649,15 +649,21 @@ body.excalidraw-cursor-resize * {
     @include filledButtonOnCanvas;
   }
 
+  .App-mobile-menu,
   .App-menu__left {
     --button-border: transparent;
     --button-bg: var(--color-surface-mid);
+  }
 
-    @at-root .excalidraw.theme--dark#{&} {
+  @at-root .excalidraw.theme--dark#{&} {
+    .App-mobile-menu,
+    .App-menu__left {
       --button-hover-bg: #363541;
       --button-bg: var(--color-surface-high);
     }
+  }
 
+  .App-menu__left {
     .buttonList {
       padding: 0.25rem 0;
     }

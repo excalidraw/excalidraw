@@ -1,16 +1,24 @@
-import { mutateElement } from "../../element/mutateElement";
-import { getBoundTextElement } from "../../element/textElement";
-import { isArrowElement } from "../../element/typeChecks";
-import type { ExcalidrawElement } from "../../element/types";
-import { isInGroup } from "../../groups";
-import type Scene from "../../scene/Scene";
+import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
+
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import { getBoundTextElement } from "@excalidraw/element/textElement";
+import { isArrowElement } from "@excalidraw/element/typeChecks";
+
+import { isInGroup } from "@excalidraw/element/groups";
+
+import type { Degrees } from "@excalidraw/math";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { angleIcon } from "../icons";
+
 import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
+import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
-import type { Degrees } from "../../../math";
-import { degreesToRadians, radiansToDegrees } from "../../../math";
 
 interface MultiAngleProps {
   elements: readonly ExcalidrawElement[];

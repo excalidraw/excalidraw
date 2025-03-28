@@ -6,6 +6,20 @@ import React, {
   useCallback,
   type KeyboardEventHandler,
 } from "react";
+
+import { type FontFamilyValues } from "@excalidraw/element/types";
+
+import {
+  arrayToList,
+  debounce,
+  FONT_FAMILY,
+  getFontFamilyString,
+} from "@excalidraw/common";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
+import { Fonts } from "../../fonts";
+import { t } from "../../i18n";
 import { useApp, useAppProps, useExcalidrawContainer } from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
@@ -15,13 +29,16 @@ import DropdownMenuItem, {
   DropDownMenuItemBadgeType,
   DropDownMenuItemBadge,
 } from "../dropdownMenu/DropdownMenuItem";
-import { type FontFamilyValues } from "../../element/types";
-import { arrayToList, debounce, getFontFamilyString } from "../../utils";
-import { t } from "../../i18n";
+import {
+  FontFamilyCodeIcon,
+  FontFamilyHeadingIcon,
+  FontFamilyNormalIcon,
+  FreedrawIcon,
+} from "../icons";
+
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
-import { Fonts } from "../../fonts";
-import type { ValueOf } from "../../utility-types";
-import { FontFamilyNormalIcon } from "../icons";
+
+import type { JSX } from "react";
 
 export interface FontDescriptor {
   value: number;
@@ -43,6 +60,24 @@ interface FontPickerListProps {
   onOpen: () => void;
   onClose: () => void;
 }
+
+const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
+  switch (fontFamily) {
+    case FONT_FAMILY.Excalifont:
+    case FONT_FAMILY.Virgil:
+      return FreedrawIcon;
+    case FONT_FAMILY.Nunito:
+    case FONT_FAMILY.Helvetica:
+      return FontFamilyNormalIcon;
+    case FONT_FAMILY["Lilita One"]:
+      return FontFamilyHeadingIcon;
+    case FONT_FAMILY["Comic Shanns"]:
+    case FONT_FAMILY.Cascadia:
+      return FontFamilyCodeIcon;
+    default:
+      return FontFamilyNormalIcon;
+  }
+};
 
 export const FontPickerList = React.memo(
   ({
@@ -69,7 +104,7 @@ export const FontPickerList = React.memo(
           .map(([familyId, { metadata, fontFaces }]) => {
             const fontDescriptor = {
               value: familyId,
-              icon: metadata.icon ?? FontFamilyNormalIcon,
+              icon: getFontFamilyIcon(familyId),
               text: fontFaces[0]?.fontFace?.family ?? "Unknown",
             };
 

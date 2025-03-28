@@ -1,9 +1,10 @@
-import { register } from "./register";
-import { deepCopyElement } from "../element/newElement";
-import { randomId } from "../random";
+import { LIBRARY_DISABLED_TYPES, randomId } from "@excalidraw/common";
+import { deepCopyElement } from "@excalidraw/element/duplicate";
+
 import { t } from "../i18n";
-import { LIBRARY_DISABLED_TYPES } from "../constants";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 export const actionAddToLibrary = register({
   name: "addToLibrary",
@@ -18,7 +19,7 @@ export const actionAddToLibrary = register({
     for (const type of LIBRARY_DISABLED_TYPES) {
       if (selectedElements.some((element) => element.type === type)) {
         return {
-          storeAction: StoreAction.NONE,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
           appState: {
             ...appState,
             errorMessage: t(`errors.libraryElementTypeError.${type}`),
@@ -42,7 +43,7 @@ export const actionAddToLibrary = register({
       })
       .then(() => {
         return {
-          storeAction: StoreAction.NONE,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
           appState: {
             ...appState,
             toast: { message: t("toast.addedToLibrary") },
@@ -51,7 +52,7 @@ export const actionAddToLibrary = register({
       })
       .catch((error) => {
         return {
-          storeAction: StoreAction.NONE,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
           appState: {
             ...appState,
             errorMessage: error.message,

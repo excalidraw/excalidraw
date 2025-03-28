@@ -1,7 +1,7 @@
-import "./FixedSideContainer.scss";
-
 import React from "react";
 import clsx from "clsx";
+
+import "./FixedSideContainer.scss";
 
 type FixedSideContainerProps = {
   children: React.ReactNode;

@@ -1,19 +1,29 @@
-import { getCommonBounds, getNonDeletedElements } from "../element";
-import type { ExcalidrawElement } from "../element/types";
-import { addElementsToFrame, removeAllElementsFromFrame } from "../frame";
-import { getFrameChildren } from "../frame";
-import { KEYS } from "../keys";
-import type { AppClassProperties, AppState, UIAppState } from "../types";
-import { updateActiveTool } from "../utils";
+import { getNonDeletedElements } from "@excalidraw/element";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import { newFrameElement } from "@excalidraw/element/newElement";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import {
+  addElementsToFrame,
+  removeAllElementsFromFrame,
+} from "@excalidraw/element/frame";
+import { getFrameChildren } from "@excalidraw/element/frame";
+
+import { KEYS, updateActiveTool } from "@excalidraw/common";
+
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
+import { getCommonBounds } from "@excalidraw/element/bounds";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { setCursorForShape } from "../cursor";
-import { register } from "./register";
-import { isFrameLikeElement } from "../element/typeChecks";
 import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
-import { newFrameElement } from "../element/newElement";
-import { getElementsInGroup } from "../groups";
-import { mutateElement } from "../element/mutateElement";
-import { StoreAction } from "../store";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 const isSingleFrameSelected = (
   appState: UIAppState,
@@ -49,14 +59,14 @@ export const actionSelectAllElementsInFrame = register({
             return acc;
           }, {} as Record<ExcalidrawElement["id"], true>),
         },
-        storeAction: StoreAction.CAPTURE,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
     return {
       elements,
       appState,
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -80,14 +90,14 @@ export const actionRemoveAllElementsFromFrame = register({
             [selectedElement.id]: true,
           },
         },
-        storeAction: StoreAction.CAPTURE,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
     return {
       elements,
       appState,
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   predicate: (elements, appState, _, app) =>
@@ -109,7 +119,7 @@ export const actionupdateFrameRendering = register({
           enabled: !appState.frameRendering.enabled,
         },
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState: AppState) => appState.frameRendering.enabled,
@@ -139,7 +149,7 @@ export const actionSetFrameAsActiveTool = register({
           type: "frame",
         }),
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) =>
@@ -208,7 +218,7 @@ export const actionWrapSelectionInFrame = register({
       appState: {
         selectedElementIds: { [frame.id]: true },
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });

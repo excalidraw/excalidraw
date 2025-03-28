@@ -53,6 +53,9 @@
   --scrollbar-thumb: var(--button-gray-2);
   --scrollbar-thumb-hover: var(--button-gray-3);
 
+  --color-slider-track: hsl(240, 100%, 90%);
+  --color-slider-thumb: var(--color-gray-80);
+
   --modal-shadow: 0px 100px 80px rgba(0, 0, 0, 0.07),
     0px 41.7776px 33.4221px rgba(0, 0, 0, 0.0503198),
     0px 22.3363px 17.869px rgba(0, 0, 0, 0.0417275),
@@ -167,7 +170,7 @@
   }
 
   &.theme--dark {
-    --theme-filter: #{$theme-filter};
+    --theme-filter: invert(93%) hue-rotate(180deg);
     --button-destructive-bg-color: #5a0000;
     --button-destructive-color: #{$oc-red-3};
 
@@ -206,6 +209,8 @@
 
     --scrollbar-thumb: #{$oc-gray-8};
     --scrollbar-thumb-hover: #{$oc-gray-7};
+
+    --color-slider-track: hsl(244, 23%, 39%);
 
     // will be inverted to a lighter color.
     --color-selection: #3530c4;

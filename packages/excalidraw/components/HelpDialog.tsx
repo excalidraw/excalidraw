@@ -1,13 +1,19 @@
 import React from "react";
-import { t } from "../i18n";
-import { KEYS } from "../keys";
-import { Dialog } from "./Dialog";
-import { getShortcutKey } from "../utils";
-import "./HelpDialog.scss";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
-import { probablySupportsClipboardBlob } from "../clipboard";
-import { isDarwin, isFirefox, isWindows } from "../constants";
+
+import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
+
+import { KEYS, getShortcutKey } from "@excalidraw/common";
+
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { probablySupportsClipboardBlob } from "../clipboard";
+import { t } from "../i18n";
+
+import { Dialog } from "./Dialog";
+import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+
+import "./HelpDialog.scss";
+
+import type { JSX } from "react";
 
 const Header = () => (
   <div className="HelpDialog__header">

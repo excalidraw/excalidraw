@@ -1,5 +1,5 @@
 import { Delta } from "../common/delta";
-import { elementsToMap, newElementWith, shouldThrow } from "../common/utils";
+import { newElementWith, shouldThrow } from "../common/utils";
 
 import type { DeltaContainer } from "../common/interfaces";
 import type {

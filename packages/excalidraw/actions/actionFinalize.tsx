@@ -1,22 +1,30 @@
-import { KEYS } from "../keys";
-import { isInvisiblySmallElement } from "../element";
-import { arrayToMap, updateActiveTool } from "../utils";
-import { ToolButton } from "../components/ToolButton";
-import { done } from "../components/icons";
-import { t } from "../i18n";
-import { register } from "./register";
-import { mutateElement } from "../element/mutateElement";
-import { LinearElementEditor } from "../element/linearElementEditor";
+import { pointFrom } from "@excalidraw/math";
+
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
-} from "../element/binding";
-import { isBindingElement, isLinearElement } from "../element/typeChecks";
-import type { AppState } from "../types";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import {
+  isBindingElement,
+  isLinearElement,
+} from "@excalidraw/element/typeChecks";
+
+import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
+import { isPathALoop } from "@excalidraw/element/shapes";
+
+import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+
+import { t } from "../i18n";
 import { resetCursor } from "../cursor";
-import { StoreAction } from "../store";
-import { pointFrom } from "../../math";
-import { isPathALoop } from "../shapes";
+import { done } from "../components/icons";
+import { ToolButton } from "../components/ToolButton";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
+import type { AppState } from "../types";
 
 export const actionFinalize = register({
   name: "finalize",
@@ -52,7 +60,7 @@ export const actionFinalize = register({
             cursorButton: "up",
             editingLinearElement: null,
           },
-          storeAction: StoreAction.CAPTURE,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       }
     }
@@ -199,7 +207,7 @@ export const actionFinalize = register({
         pendingImageElementId: null,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event, appState) =>

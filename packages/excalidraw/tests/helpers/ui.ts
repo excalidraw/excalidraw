@@ -1,3 +1,30 @@
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
+import {
+  getCommonBounds,
+  getElementPointsCoords,
+} from "@excalidraw/element/bounds";
+import { cropElement } from "@excalidraw/element/cropElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import {
+  getTransformHandles,
+  getTransformHandlesFromCoords,
+  OMIT_SIDES_FOR_FRAME,
+  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
+  type TransformHandle,
+  type TransformHandleDirection,
+} from "@excalidraw/element/transformHandles";
+import {
+  isLinearElement,
+  isFreeDrawElement,
+  isTextElement,
+  isFrameLikeElement,
+} from "@excalidraw/element/typeChecks";
+import { KEYS, arrayToMap } from "@excalidraw/common";
+
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
+
+import type { TransformHandleType } from "@excalidraw/element/transformHandles";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -9,33 +36,14 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
-} from "../../element/types";
-import type { TransformHandleType } from "../../element/transformHandles";
-import {
-  getTransformHandles,
-  getTransformHandlesFromCoords,
-  OMIT_SIDES_FOR_FRAME,
-  OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
-  type TransformHandle,
-  type TransformHandleDirection,
-} from "../../element/transformHandles";
-import { KEYS } from "../../keys";
-import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
-import { mutateElement } from "../../element/mutateElement";
-import { API } from "./api";
-import {
-  isLinearElement,
-  isFreeDrawElement,
-  isTextElement,
-  isFrameLikeElement,
-} from "../../element/typeChecks";
-import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
-import { getTextEditor } from "../queries/dom";
-import { arrayToMap } from "../../utils";
+} from "@excalidraw/element/types";
+
 import { createTestHook } from "../../components/App";
-import type { GlobalPoint, LocalPoint, Radians } from "../../../math";
-import { pointFrom, pointRotateRads } from "../../../math";
-import { cropElement } from "../../element/cropElement";
+import { getTextEditor } from "../queries/dom";
+import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
+
+import { API } from "./api";
+
 import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.

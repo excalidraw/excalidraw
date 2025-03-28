@@ -1,67 +1,66 @@
+import oc from "open-color";
 import {
-  getElementAbsoluteCoords,
-  getTransformHandlesFromCoords,
-  getTransformHandles,
-  getCommonBounds,
-} from "../element";
+  pointFrom,
+  type GlobalPoint,
+  type LocalPoint,
+  type Radians,
+} from "@excalidraw/math";
 
-import { roundRect } from "../renderer/roundRect";
-
-import {
-  getScrollBars,
-  SCROLLBAR_COLOR,
-  SCROLLBAR_WIDTH,
-} from "../scene/scrollbars";
-
-import { renderSelectionElement } from "../renderer/renderElement";
-import { getClientColor, renderRemoteCursors } from "../clients";
-import {
-  isSelectedViaGroup,
-  getSelectedGroupIds,
-  getElementsInGroup,
-  selectGroupsFromGivenElements,
-} from "../groups";
-import type {
-  TransformHandles,
-  TransformHandleType,
-} from "../element/transformHandles";
-import {
-  getOmitSidesForDevice,
-  shouldShowBoundingBox,
-} from "../element/transformHandles";
-import { arrayToMap, invariant, throttleRAF } from "../utils";
 import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   THEME,
-} from "../constants";
-import { type InteractiveCanvasAppState } from "../types";
+  arrayToMap,
+  invariant,
+  throttleRAF,
+} from "@excalidraw/common";
 
-import { renderSnaps } from "../renderer/renderSnaps";
-
-import type {
-  SuggestedBinding,
-  SuggestedPointBinding,
-} from "../element/binding";
 import {
   BINDING_HIGHLIGHT_OFFSET,
   BINDING_HIGHLIGHT_THICKNESS,
   maxBindingGap,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
-  bootstrapCanvas,
-  fillCircle,
-  getNormalizedCanvasDimensions,
-} from "./helpers";
-import oc from "open-color";
+  getOmitSidesForDevice,
+  getTransformHandles,
+  getTransformHandlesFromCoords,
+  shouldShowBoundingBox,
+} from "@excalidraw/element/transformHandles";
 import {
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import { getCornerRadius } from "@excalidraw/element/shapes";
+
+import { renderSelectionElement } from "@excalidraw/element/renderElement";
+
+import {
+  isSelectedViaGroup,
+  getSelectedGroupIds,
+  getElementsInGroup,
+  selectGroupsFromGivenElements,
+} from "@excalidraw/element/groups";
+
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+} from "@excalidraw/element/bounds";
+
+import type {
+  SuggestedBinding,
+  SuggestedPointBinding,
+} from "@excalidraw/element/binding";
+
+import type {
+  TransformHandles,
+  TransformHandleType,
+} from "@excalidraw/element/transformHandles";
+
 import type {
   ElementsMap,
   ExcalidrawBindableElement,
@@ -72,19 +71,30 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import { renderSnaps } from "../renderer/renderSnaps";
+import { roundRect } from "../renderer/roundRect";
+import {
+  getScrollBars,
+  SCROLLBAR_COLOR,
+  SCROLLBAR_WIDTH,
+} from "../scene/scrollbars";
+import { type InteractiveCanvasAppState } from "../types";
+
+import { getClientColor, renderRemoteCursors } from "../clients";
+
+import {
+  bootstrapCanvas,
+  fillCircle,
+  getNormalizedCanvasDimensions,
+} from "./helpers";
+
 import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
 } from "../scene/types";
-import {
-  pointFrom,
-  type GlobalPoint,
-  type LocalPoint,
-  type Radians,
-} from "../../math";
-import { getCornerRadius } from "../shapes";
 
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
@@ -888,23 +898,24 @@ const _renderInteractiveScene = ({
     );
   }
 
-  if (
-    isElbowArrow(selectedElements[0]) &&
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.segmentMidPointHoveredCoords
-  ) {
-    renderElbowArrowMidPointHighlight(context, appState);
-  } else if (
-    appState.selectedLinearElement &&
-    appState.selectedLinearElement.hoverPointIndex >= 0 &&
-    !(
-      isElbowArrow(selectedElements[0]) &&
-      appState.selectedLinearElement.hoverPointIndex > 0 &&
-      appState.selectedLinearElement.hoverPointIndex <
-        selectedElements[0].points.length - 1
-    )
-  ) {
-    renderLinearElementPointHighlight(context, appState, elementsMap);
+  // Arrows have a different highlight behavior when
+  // they are the only selected element
+  if (appState.selectedLinearElement) {
+    const editor = appState.selectedLinearElement;
+    const firstSelectedLinear = selectedElements.find(
+      (el) => el.id === editor.elementId, // Don't forget bound text elements!
+    );
+
+    if (editor.segmentMidPointHoveredCoords) {
+      renderElbowArrowMidPointHighlight(context, appState);
+    } else if (
+      isElbowArrow(firstSelectedLinear)
+        ? editor.hoverPointIndex === 0 ||
+          editor.hoverPointIndex === firstSelectedLinear.points.length - 1
+        : editor.hoverPointIndex >= 0
+    ) {
+      renderLinearElementPointHighlight(context, appState, elementsMap);
+    }
   }
 
   // Paint selected elements
@@ -1075,7 +1086,7 @@ const _renderInteractiveScene = ({
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
       context.fillStyle = oc.white;
-      const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
+      const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
       const lineWidth = context.lineWidth;

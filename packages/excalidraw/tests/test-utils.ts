@@ -1,16 +1,32 @@
 import "pepjs";
+import { act } from "@testing-library/react";
+import {
+  render,
+  queries,
+  waitFor,
+  fireEvent,
+  cleanup,
+} from "@testing-library/react";
+import ansi from "ansicolor";
+
+import { ORIG_ID, arrayToMap } from "@excalidraw/common";
+
+import { getSelectedElements } from "@excalidraw/element/selection";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { AllPossibleKeys } from "@excalidraw/common/utility-types";
+
+import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
+
+import { UI } from "./helpers/ui";
+import * as toolQueries from "./queries/toolQueries";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
-import { act } from "@testing-library/react";
-import { render, queries, waitFor, fireEvent } from "@testing-library/react";
 
-import * as toolQueries from "./queries/toolQueries";
 import type { ImportedDataState } from "../data/types";
-import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
-import { getSelectedElements } from "../scene/selection";
-import type { ExcalidrawElement } from "../element/types";
-import { UI } from "./helpers/ui";
-import { diffStringsUnified } from "jest-diff";
+
+export { cleanup as unmountComponent };
 
 const customQueries = {
   ...queries,
@@ -247,36 +263,6 @@ expect.extend({
       pass: false,
     };
   },
-
-  toCloselyEqualPoints(received, expected, precision) {
-    if (!Array.isArray(received) || !Array.isArray(expected)) {
-      throw new Error("expected and received are not point arrays");
-    }
-
-    const COMPARE = 1 / Math.pow(10, precision || 2);
-    const pass = received.every(
-      (point, idx) =>
-        Math.abs(expected[idx]?.[0] - point[0]) < COMPARE &&
-        Math.abs(expected[idx]?.[1] - point[1]) < COMPARE,
-    );
-
-    if (!pass) {
-      return {
-        message: () => ` The provided array of points are not close enough.
-
-${diffStringsUnified(
-  JSON.stringify(expected, undefined, 2),
-  JSON.stringify(received, undefined, 2),
-)}`,
-        pass: false,
-      };
-    }
-
-    return {
-      message: () => `expected ${received} to not be close to ${expected}`,
-      pass: true,
-    };
-  },
 });
 
 /**
@@ -295,3 +281,150 @@ expect.addSnapshotSerializer({
     );
   },
 });
+
+export const getCloneByOrigId = <T extends boolean = false>(
+  origId: ExcalidrawElement["id"],
+  returnNullIfNotExists: T = false as T,
+): T extends true ? ExcalidrawElement | null : ExcalidrawElement => {
+  const clonedElement = window.h.elements?.find(
+    (el) => (el as any)[ORIG_ID] === origId,
+  );
+  if (clonedElement) {
+    return clonedElement;
+  }
+  if (returnNullIfNotExists !== true) {
+    throw new Error(`cloned element not found for origId: ${origId}`);
+  }
+  return null as T extends true ? ExcalidrawElement | null : ExcalidrawElement;
+};
+
+/**
+ * Assertion helper that strips the actual elements of extra attributes
+ * so that diffs are easier to read in case of failure.
+ *
+ * Asserts element order as well, and selected element ids
+ * (when `selected: true` set for given element).
+ *
+ * If testing cloned elements, you can use { `[ORIG_ID]: origElement.id }
+ * If you need to refer to cloned element properties, you can use
+ * `getCloneByOrigId()`, e.g.: `{ frameId: getCloneByOrigId(origFrame.id)?.id }`
+ */
+export const assertElements = <T extends AllPossibleKeys<ExcalidrawElement>>(
+  actualElements: readonly ExcalidrawElement[],
+  /** array order matters */
+  expectedElements: (Partial<Record<T, any>> & {
+    /** meta, will be stripped for element attribute checks */
+    selected?: true;
+  } & (
+      | {
+          id: ExcalidrawElement["id"];
+        }
+      | { [ORIG_ID]?: string }
+    ))[],
+) => {
+  const h = window.h;
+
+  const expectedElementsWithIds: (typeof expectedElements[number] & {
+    id: ExcalidrawElement["id"];
+  })[] = expectedElements.map((el) => {
+    if ("id" in el) {
+      return el;
+    }
+    const actualElement = actualElements.find(
+      (act) => (act as any)[ORIG_ID] === el[ORIG_ID],
+    );
+    if (actualElement) {
+      return { ...el, id: actualElement.id };
+    }
+    return {
+      ...el,
+      id: "UNKNOWN_ID",
+    };
+  });
+
+  const map_expectedElements = arrayToMap(expectedElementsWithIds);
+
+  const selectedElementIds = expectedElementsWithIds.reduce(
+    (acc: Record<ExcalidrawElement["id"], true>, el) => {
+      if (el.selected) {
+        acc[el.id] = true;
+      }
+      return acc;
+    },
+    {},
+  );
+
+  const mappedActualElements = actualElements.map((el) => {
+    const expectedElement = map_expectedElements.get(el.id);
+    if (expectedElement) {
+      const pickedAttrs: Record<string, any> = {};
+
+      for (const key of Object.keys(expectedElement)) {
+        if (key === "selected") {
+          delete expectedElement.selected;
+          continue;
+        }
+        pickedAttrs[key] = (el as any)[key];
+      }
+
+      if (ORIG_ID in expectedElement) {
+        // @ts-ignore
+        pickedAttrs[ORIG_ID] = (el as any)[ORIG_ID];
+      }
+
+      return pickedAttrs;
+    }
+    return el;
+  });
+
+  try {
+    // testing order separately for even easier diffs
+    expect(actualElements.map((x) => x.id)).toEqual(
+      expectedElementsWithIds.map((x) => x.id),
+    );
+  } catch (err: any) {
+    let errStr = "\n\nmismatched element order\n\n";
+
+    errStr += `actual:   ${ansi.lightGray(
+      `[${err.actual
+        .map((id: string, index: number) => {
+          const act = actualElements[index];
+
+          return `${
+            id === err.expected[index] ? ansi.green(id) : ansi.red(id)
+          } (${act.type.slice(0, 4)}${
+            ORIG_ID in act ? ` ↳ ${(act as any)[ORIG_ID]}` : ""
+          })`;
+        })
+        .join(", ")}]`,
+    )}\n${ansi.lightGray(
+      `expected: [${err.expected
+        .map((exp: string, index: number) => {
+          const expEl = actualElements.find((el) => el.id === exp);
+          const origEl =
+            expEl &&
+            actualElements.find((el) => el.id === (expEl as any)[ORIG_ID]);
+          return expEl
+            ? `${
+                exp === err.actual[index]
+                  ? ansi.green(expEl.id)
+                  : ansi.red(expEl.id)
+              } (${expEl.type.slice(0, 4)}${origEl ? ` ↳ ${origEl.id}` : ""})`
+            : exp;
+        })
+        .join(", ")}]\n`,
+    )}`;
+
+    const error = new Error(errStr);
+    const stack = err.stack.split("\n");
+    stack.splice(1, 1);
+    error.stack = stack.join("\n");
+    throw error;
+  }
+
+  expect(mappedActualElements).toEqual(
+    expect.arrayContaining(expectedElementsWithIds),
+  );
+
+  expect(h.state.selectedElementIds).toEqual(selectedElementIds);
+};

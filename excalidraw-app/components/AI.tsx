@@ -1,13 +1,14 @@
-import type { ExcalidrawImperativeAPI } from "../../packages/excalidraw/types";
 import {
   DiagramToCodePlugin,
   exportToBlob,
   getTextFromElements,
   MIME_TYPES,
   TTDDialog,
-} from "../../packages/excalidraw";
-import { getDataURL } from "../../packages/excalidraw/data/blob";
-import { safelyParseJSON } from "../../packages/excalidraw/utils";
+} from "@excalidraw/excalidraw";
+import { getDataURL } from "@excalidraw/excalidraw/data/blob";
+import { safelyParseJSON } from "@excalidraw/common";
+
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -83,7 +84,6 @@ export const AIComponents = ({
           }
 
           try {
-            // @ts-expect-error
             const { html } = await response.json();
 
             if (!html) {
@@ -141,11 +141,9 @@ export const AIComponents = ({
                 };
               }
 
-              // @ts-expect-error
               throw new Error(json.message || "Generation failed...");
             }
 
-            // @ts-expect-error
             const generatedResponse = json.generatedResponse;
             if (!generatedResponse) {
               throw new Error("Generation failed...");

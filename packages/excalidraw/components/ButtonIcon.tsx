@@ -1,7 +1,9 @@
-import { forwardRef } from "react";
 import clsx from "clsx";
+import { forwardRef } from "react";
 
 import "./ButtonIcon.scss";
+
+import type { JSX } from "react";
 
 interface ButtonIconProps {
   icon: JSX.Element;

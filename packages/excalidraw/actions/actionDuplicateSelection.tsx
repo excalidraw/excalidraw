@@ -1,38 +1,40 @@
-import { KEYS } from "../keys";
-import { register } from "./register";
-import type { ExcalidrawElement } from "../element/types";
-import { duplicateElement, getNonDeletedElements } from "../element";
-import { isSomeElementSelected } from "../scene";
-import { ToolButton } from "../components/ToolButton";
-import { t } from "../i18n";
-import { arrayToMap, getShortcutKey } from "../utils";
-import { LinearElementEditor } from "../element/linearElementEditor";
 import {
-  selectGroupsForSelectedElements,
-  getSelectedGroupForElement,
-  getElementsInGroup,
-} from "../groups";
-import type { AppState } from "../types";
-import { fixBindingsAfterDuplication } from "../element/binding";
-import type { ActionResult } from "./types";
-import { DEFAULT_GRID_SIZE } from "../constants";
+  DEFAULT_GRID_SIZE,
+  KEYS,
+  arrayToMap,
+  getShortcutKey,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
 import {
-  bindTextToShapeAfterDuplication,
-  getBoundTextElement,
-} from "../element/textElement";
-import { isBoundToContainer, isFrameLikeElement } from "../element/typeChecks";
-import { normalizeElementOrder } from "../element/sortElements";
-import { DuplicateIcon } from "../components/icons";
-import {
-  bindElementsToFramesAfterDuplication,
-  getFrameChildren,
-} from "../frame";
+  isBoundToContainer,
+  isLinearElement,
+} from "@excalidraw/element/typeChecks";
+
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
+import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
+
 import {
   excludeElementsInFramesFromSelection,
   getSelectedElements,
-} from "../scene/selection";
-import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "../store";
+} from "@excalidraw/element/selection";
+
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
+import { duplicateElements } from "@excalidraw/element/duplicate";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { ToolButton } from "../components/ToolButton";
+import { DuplicateIcon } from "../components/icons";
+
+import { t } from "../i18n";
+import { isSomeElementSelected } from "../scene";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
@@ -40,6 +42,10 @@ export const actionDuplicateSelection = register({
   icon: DuplicateIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
+    if (appState.selectedElementsAreBeingDragged) {
+      return false;
+    }
+
     // duplicate selected point(s) if editing a line
     if (appState.editingLinearElement) {
       // TODO: Invariants should be checked here instead of duplicateSelectedPoints()
@@ -52,16 +58,62 @@ export const actionDuplicateSelection = register({
         return {
           elements,
           appState: newAppState,
-          storeAction: StoreAction.CAPTURE,
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         };
       } catch {
         return false;
       }
     }
 
+    let { newElements: duplicatedElements, elementsWithClones: nextElements } =
+      duplicateElements({
+        type: "in-place",
+        elements,
+        idsOfElementsToDuplicate: arrayToMap(
+          getSelectedElements(elements, appState, {
+            includeBoundTextElement: true,
+            includeElementsInFrames: true,
+          }),
+        ),
+        appState,
+        randomizeSeed: true,
+        overrides: (element) => ({
+          x: element.x + DEFAULT_GRID_SIZE / 2,
+          y: element.y + DEFAULT_GRID_SIZE / 2,
+        }),
+        reverseOrder: false,
+      });
+
+    if (app.props.onDuplicate && nextElements) {
+      const mappedElements = app.props.onDuplicate(nextElements, elements);
+      if (mappedElements) {
+        nextElements = mappedElements;
+      }
+    }
+
     return {
-      ...duplicateElements(elements, appState),
-      storeAction: StoreAction.CAPTURE,
+      elements: syncMovedIndices(nextElements, arrayToMap(duplicatedElements)),
+      appState: {
+        ...appState,
+        ...updateLinearElementEditors(duplicatedElements),
+        ...selectGroupsForSelectedElements(
+          {
+            editingGroupId: appState.editingGroupId,
+            selectedElementIds: excludeElementsInFramesFromSelection(
+              duplicatedElements,
+            ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
+              if (!isBoundToContainer(element)) {
+                acc[element.id] = true;
+              }
+              return acc;
+            }, {}),
+          },
+          getNonDeletedElements(nextElements),
+          appState,
+          null,
+        ),
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.D,
@@ -79,216 +131,23 @@ export const actionDuplicateSelection = register({
   ),
 });
 
-const duplicateElements = (
-  elements: readonly ExcalidrawElement[],
-  appState: AppState,
-): Partial<ActionResult> => {
-  // ---------------------------------------------------------------------------
-
-  // step (1)
-
-  const sortedElements = normalizeElementOrder(elements);
-  const groupIdMap = new Map();
-  const newElements: ExcalidrawElement[] = [];
-  const oldElements: ExcalidrawElement[] = [];
-  const oldIdToDuplicatedId = new Map();
-  const duplicatedElementsMap = new Map<string, ExcalidrawElement>();
-
-  const duplicateAndOffsetElement = (element: ExcalidrawElement) => {
-    const newElement = duplicateElement(
-      appState.editingGroupId,
-      groupIdMap,
-      element,
-      {
-        x: element.x + DEFAULT_GRID_SIZE / 2,
-        y: element.y + DEFAULT_GRID_SIZE / 2,
-      },
+const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
+  const linears = clonedElements.filter(isLinearElement);
+  if (linears.length === 1) {
+    const linear = linears[0];
+    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
+    const onlySingleLinearSelected = clonedElements.every(
+      (el) => el.id === linear.id || boundElements.includes(el.id),
     );
-    duplicatedElementsMap.set(newElement.id, newElement);
-    oldIdToDuplicatedId.set(element.id, newElement.id);
-    oldElements.push(element);
-    newElements.push(newElement);
-    return newElement;
-  };
 
-  const idsOfElementsToDuplicate = arrayToMap(
-    getSelectedElements(sortedElements, appState, {
-      includeBoundTextElement: true,
-      includeElementsInFrames: true,
-    }),
-  );
-
-  // Ids of elements that have already been processed so we don't push them
-  // into the array twice if we end up backtracking when retrieving
-  // discontiguous group of elements (can happen due to a bug, or in edge
-  // cases such as a group containing deleted elements which were not selected).
-  //
-  // This is not enough to prevent duplicates, so we do a second loop afterwards
-  // to remove them.
-  //
-  // For convenience we mark even the newly created ones even though we don't
-  // loop over them.
-  const processedIds = new Map<ExcalidrawElement["id"], true>();
-
-  const markAsProcessed = (elements: ExcalidrawElement[]) => {
-    for (const element of elements) {
-      processedIds.set(element.id, true);
-    }
-    return elements;
-  };
-
-  const elementsWithClones: ExcalidrawElement[] = [];
-
-  let index = -1;
-
-  while (++index < sortedElements.length) {
-    const element = sortedElements[index];
-
-    if (processedIds.get(element.id)) {
-      continue;
-    }
-
-    const boundTextElement = getBoundTextElement(element, arrayToMap(elements));
-    const isElementAFrameLike = isFrameLikeElement(element);
-
-    if (idsOfElementsToDuplicate.get(element.id)) {
-      // if a group or a container/bound-text or frame, duplicate atomically
-      if (element.groupIds.length || boundTextElement || isElementAFrameLike) {
-        const groupId = getSelectedGroupForElement(appState, element);
-        if (groupId) {
-          // TODO:
-          // remove `.flatMap...`
-          // if the elements in a frame are grouped when the frame is grouped
-          const groupElements = getElementsInGroup(
-            sortedElements,
-            groupId,
-          ).flatMap((element) =>
-            isFrameLikeElement(element)
-              ? [...getFrameChildren(elements, element.id), element]
-              : [element],
-          );
-
-          elementsWithClones.push(
-            ...markAsProcessed([
-              ...groupElements,
-              ...groupElements.map((element) =>
-                duplicateAndOffsetElement(element),
-              ),
-            ]),
-          );
-          continue;
-        }
-        if (boundTextElement) {
-          elementsWithClones.push(
-            ...markAsProcessed([
-              element,
-              boundTextElement,
-              duplicateAndOffsetElement(element),
-              duplicateAndOffsetElement(boundTextElement),
-            ]),
-          );
-          continue;
-        }
-        if (isElementAFrameLike) {
-          const elementsInFrame = getFrameChildren(sortedElements, element.id);
-
-          elementsWithClones.push(
-            ...markAsProcessed([
-              ...elementsInFrame,
-              element,
-              ...elementsInFrame.map((e) => duplicateAndOffsetElement(e)),
-              duplicateAndOffsetElement(element),
-            ]),
-          );
-
-          continue;
-        }
-      }
-      // since elements in frames have a lower z-index than the frame itself,
-      // they will be looped first and if their frames are selected as well,
-      // they will have been copied along with the frame atomically in the
-      // above branch, so we must skip those elements here
-      //
-      // now, for elements do not belong any frames or elements whose frames
-      // are selected (or elements that are left out from the above
-      // steps for whatever reason) we (should at least) duplicate them here
-      if (!element.frameId || !idsOfElementsToDuplicate.has(element.frameId)) {
-        elementsWithClones.push(
-          ...markAsProcessed([element, duplicateAndOffsetElement(element)]),
-        );
-      }
-    } else {
-      elementsWithClones.push(...markAsProcessed([element]));
+    if (onlySingleLinearSelected) {
+      return {
+        selectedLinearElement: new LinearElementEditor(linear),
+      };
     }
   }
-
-  // step (2)
-
-  // second pass to remove duplicates. We loop from the end as it's likelier
-  // that the last elements are in the correct order (contiguous or otherwise).
-  // Thus we need to reverse as the last step (3).
-
-  const finalElementsReversed: ExcalidrawElement[] = [];
-
-  const finalElementIds = new Map<ExcalidrawElement["id"], true>();
-  index = elementsWithClones.length;
-
-  while (--index >= 0) {
-    const element = elementsWithClones[index];
-    if (!finalElementIds.get(element.id)) {
-      finalElementIds.set(element.id, true);
-      finalElementsReversed.push(element);
-    }
-  }
-
-  // step (3)
-  const finalElements = syncMovedIndices(
-    finalElementsReversed.reverse(),
-    arrayToMap(newElements),
-  );
-
-  // ---------------------------------------------------------------------------
-
-  bindTextToShapeAfterDuplication(
-    elementsWithClones,
-    oldElements,
-    oldIdToDuplicatedId,
-  );
-  fixBindingsAfterDuplication(
-    elementsWithClones,
-    oldElements,
-    oldIdToDuplicatedId,
-  );
-  bindElementsToFramesAfterDuplication(
-    finalElements,
-    oldElements,
-    oldIdToDuplicatedId,
-  );
-
-  const nextElementsToSelect =
-    excludeElementsInFramesFromSelection(newElements);
 
   return {
-    elements: finalElements,
-    appState: {
-      ...appState,
-      ...selectGroupsForSelectedElements(
-        {
-          editingGroupId: appState.editingGroupId,
-          selectedElementIds: nextElementsToSelect.reduce(
-            (acc: Record<ExcalidrawElement["id"], true>, element) => {
-              if (!isBoundToContainer(element)) {
-                acc[element.id] = true;
-              }
-              return acc;
-            },
-            {},
-          ),
-        },
-        getNonDeletedElements(finalElements),
-        appState,
-        null,
-      ),
-    },
+    selectedLinearElement: null,
   };
 };

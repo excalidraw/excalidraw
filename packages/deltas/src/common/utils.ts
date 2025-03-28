@@ -86,13 +86,10 @@ export const getNonDeletedGroupIds = (elements: ElementsMap) => {
 
 // ------------------------------------------------------------
 
-// @ts-expect-error
 export const isTestEnv = () => import.meta.env.MODE === "test";
 
-// @ts-expect-error
 export const isDevEnv = () => import.meta.env.MODE === "development";
 
-// @ts-expect-error
 export const isServerEnv = () => import.meta.env.MODE === "server";
 
 export const shouldThrow = () => isDevEnv() || isTestEnv() || isServerEnv();

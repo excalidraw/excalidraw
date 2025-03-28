@@ -1,15 +1,18 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { Excalidraw } from "../index";
-import { render } from "../tests/test-utils";
-import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
-import { KEYS } from "../keys";
-import { API } from "../tests/helpers/api";
+
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import { KEYS } from "@excalidraw/common";
+
 import { actionSelectAll } from "../actions";
 import { t } from "../i18n";
-import { mutateElement } from "../element/mutateElement";
+import { Excalidraw } from "../index";
 
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+import { API } from "../tests/helpers/api";
+import { Keyboard, Pointer, UI } from "../tests/helpers/ui";
+import { render, unmountComponent } from "../tests/test-utils";
+
+unmountComponent();
 
 const mouse = new Pointer("mouse");
 const h = window.h;

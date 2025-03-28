@@ -1,29 +1,31 @@
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
 import OpenColor from "open-color";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Dialog } from "./Dialog";
-import { t } from "../i18n";
-import Trans from "./Trans";
-
-import type { LibraryItems, LibraryItem, UIAppState } from "../types";
-import { exportToCanvas, exportToSvg } from "../../utils/export";
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
-import type { ExportedLibraryData } from "../data/types";
-import { canvasToBlob, resizeImageFile } from "../data/blob";
-import { chunk } from "../utils";
-import DialogActionButton from "./DialogActionButton";
-import { CloseIcon } from "./icons";
-import { ToolButton } from "./ToolButton";
+  chunk,
+} from "@excalidraw/common";
+
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
+import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { t } from "../i18n";
+
+import { Dialog } from "./Dialog";
+import DialogActionButton from "./DialogActionButton";
+import { ToolButton } from "./ToolButton";
+import Trans from "./Trans";
+import { CloseIcon } from "./icons";
 
 import "./PublishLibrary.scss";
+
+import type { ReactNode } from "react";
+import type { ExportedLibraryData } from "../data/types";
+import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 
 interface PublishLibraryDataParams {
   authorName: string;
@@ -304,7 +306,6 @@ const PublishLibrary = ({
       .then(
         (response) => {
           if (response.ok) {
-            // @ts-expect-error
             return response.json().then(({ url }) => {
               // flush data from local storage
               EditorLocalStorage.delete(EDITOR_LS_KEYS.PUBLISH_LIBRARY);
@@ -322,7 +323,6 @@ const PublishLibrary = ({
             })
             .then((error) => {
               throw new Error(
-                // @ts-expect-error
                 error.message || response.statusText || "something went wrong",
               );
             });

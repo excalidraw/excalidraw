@@ -1,6 +1,8 @@
-import type { Radians } from "../../../math";
-import { DEFAULT_FONT_FAMILY } from "../../constants";
-import type { ExcalidrawElement } from "../../element/types";
+import { DEFAULT_FONT_FAMILY } from "@excalidraw/common";
+
+import type { Radians } from "@excalidraw/math";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 const elementBase: Omit<ExcalidrawElement, "type"> = {
   id: "vWrqOAfkind2qcm7LDAGZ",

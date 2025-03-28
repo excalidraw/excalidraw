@@ -1,50 +1,57 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import {
-  fireEvent,
-  GlobalTestState,
-  render,
-  screen,
-  waitFor,
-} from "./test-utils";
-import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { API } from "./helpers/api";
-import { actionFlipHorizontal, actionFlipVertical } from "../actions";
-import { getElementAbsoluteCoords } from "../element";
+import { vi } from "vitest";
+
+import { ROUNDNESS, KEYS, arrayToMap, cloneJSON } from "@excalidraw/common";
+
+import { pointFrom, type Radians } from "@excalidraw/math";
+
+import { getBoundTextElementPosition } from "@excalidraw/element/textElement";
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { newLinearElement } from "@excalidraw/element/newElement";
+
+import type { LocalPoint } from "@excalidraw/math";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   FileId,
-} from "../element/types";
-import { newLinearElement } from "../element";
-import { Excalidraw } from "../index";
-import type { NormalizedZoomValue } from "../types";
-import { ROUNDNESS } from "../constants";
-import { vi } from "vitest";
-import { KEYS } from "../keys";
-import { getBoundTextElementPosition } from "../element/textElement";
+} from "@excalidraw/element/types";
+
+import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 import { createPasteEvent } from "../clipboard";
-import { arrayToMap, cloneJSON } from "../utils";
-import type { LocalPoint } from "../../math";
-import { pointFrom, type Radians } from "../../math";
+import { Excalidraw } from "../index";
+
+// Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
+import * as blobModule from "../data/blob";
+
+import { API } from "./helpers/api";
+import { UI, Pointer, Keyboard } from "./helpers/ui";
+import {
+  fireEvent,
+  GlobalTestState,
+  render,
+  screen,
+  unmountComponent,
+  waitFor,
+} from "./test-utils";
+
+import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
 
-vi.mock("../data/blob", async (actual) => {
-  const orig: Object = await actual();
-  return {
-    ...orig,
-    resizeImageFile: (imageFile: File) => imageFile,
-    generateIdFromFile: () => "fileId" as FileId,
-  };
+beforeEach(() => {
+  const generateIdSpy = vi.spyOn(blobModule, "generateIdFromFile");
+  const resizeFileSpy = vi.spyOn(blobModule, "resizeImageFile");
+
+  generateIdSpy.mockImplementation(() => Promise.resolve("fileId" as FileId));
+  resizeFileSpy.mockImplementation((file: File) => Promise.resolve(file));
 });
 
 beforeEach(async () => {
-  // Unmount ReactDOM from root
-  ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+  unmountComponent();
 
   mouse.reset();
   localStorage.clear();

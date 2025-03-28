@@ -1,41 +1,45 @@
 import {
   compressData,
   decompressData,
-} from "../../packages/excalidraw/data/encode";
+} from "@excalidraw/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
-import { restore } from "../../packages/excalidraw/data/restore";
-import type { ImportedDataState } from "../../packages/excalidraw/data/types";
-import type { SceneBounds } from "../../packages/excalidraw/element/bounds";
-import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
+} from "@excalidraw/excalidraw/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { restore } from "@excalidraw/excalidraw/data/restore";
+import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
+import { t } from "@excalidraw/excalidraw/i18n";
+import { bytesToHexString } from "@excalidraw/common";
+
+import type { UserIdleState } from "@excalidraw/common";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { SceneBounds } from "@excalidraw/element/bounds";
 import type {
   ExcalidrawElement,
   FileId,
   OrderedExcalidrawElement,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
+} from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
-import type { MakeBrand } from "../../packages/excalidraw/utility-types";
-import { bytesToHexString } from "../../packages/excalidraw/utils";
-import type { WS_SUBTYPES } from "../app_constants";
+} from "@excalidraw/excalidraw/types";
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
 } from "../app_constants";
+
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
+
+import type { WS_SUBTYPES } from "../app_constants";
 
 export type SyncableExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"SyncableExcalidrawElement">;
@@ -309,23 +313,19 @@ export const exportToBackend = async (
       body: payload.buffer,
     });
     const json = await response.json();
-    // @ts-expect-error
     if (json.id) {
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      // @ts-expect-error
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
       await saveFilesToFirebase({
-        // @ts-expect-error
         prefix: `/files/shareLinks/${json.id}`,
         files: filesToUpload,
       });
 
       return { url: urlString, errorMessage: null };
-      // @ts-expect-error
     } else if (json.error_class === "RequestTooLargeError") {
       return {
         url: null,

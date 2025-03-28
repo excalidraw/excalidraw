@@ -1,5 +1,5 @@
-import { COLOR_PALETTE } from "./colors";
 import {
+  COLOR_PALETTE,
   ARROW_TYPE,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
@@ -10,7 +10,8 @@ import {
   STATS_PANELS,
   THEME,
   DEFAULT_GRID_STEP,
-} from "./constants";
+} from "@excalidraw/common";
+
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)

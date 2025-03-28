@@ -1,17 +1,21 @@
 import React, { useEffect, useRef } from "react";
-import type { RoughCanvas } from "roughjs/bin/canvas";
+
+import { isShallowEqual } from "@excalidraw/common";
+
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "@excalidraw/element/types";
+
+import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderStaticScene } from "../../renderer/staticScene";
-import { isShallowEqual } from "../../utils";
-import type { AppState, StaticCanvasAppState } from "../../types";
+
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
 } from "../../scene/types";
-import type {
-  NonDeletedExcalidrawElement,
-  NonDeletedSceneElementsMap,
-} from "../../element/types";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
+import type { AppState, StaticCanvasAppState } from "../../types";
+import type { RoughCanvas } from "roughjs/bin/canvas";
 
 type StaticCanvasProps = {
   canvas: HTMLCanvasElement;

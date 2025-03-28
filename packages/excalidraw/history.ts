@@ -1,6 +1,8 @@
+import type { SceneElementsMap } from "@excalidraw/element/types";
+
 import { Emitter } from "./emitter";
 import { type Store, StoreDelta, StoreIncrement } from "./store";
-import type { SceneElementsMap } from "./element/types";
+
 import type { AppState } from "./types";
 
 export class HistoryEntry extends StoreDelta {}

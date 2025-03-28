@@ -2129,7 +2129,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id0_copy" => Delta {
+          "id2" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -2139,7 +2139,7 @@ History {
               "frameId": null,
               "groupIds": [],
               "height": 10,
-              "index": "a0",
+              "index": "Zz",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -2164,12 +2164,10 @@ History {
         "updated": Map {
           "id0" => Delta {
             "deleted": {
-              "index": "a1",
               "x": 20,
               "y": 20,
             },
             "inserted": {
-              "index": "a0",
               "x": 10,
               "y": 10,
             },
@@ -10619,7 +10617,7 @@ History {
       "elementsChange": ElementsChange {
         "added": Map {},
         "removed": Map {
-          "id0_copy" => Delta {
+          "id6" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10628,10 +10626,10 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [
-                "id4_copy",
+                "id7",
               ],
               "height": 10,
-              "index": "a0",
+              "index": "Zx",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10652,7 +10650,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id1_copy" => Delta {
+          "id8" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10661,10 +10659,10 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [
-                "id4_copy",
+                "id7",
               ],
               "height": 10,
-              "index": "a1",
+              "index": "Zy",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10685,7 +10683,7 @@ History {
               "isDeleted": true,
             },
           },
-          "id2_copy" => Delta {
+          "id9" => Delta {
             "deleted": {
               "angle": 0,
               "backgroundColor": "transparent",
@@ -10694,10 +10692,10 @@ History {
               "fillStyle": "solid",
               "frameId": null,
               "groupIds": [
-                "id4_copy",
+                "id7",
               ],
               "height": 10,
-              "index": "a2",
+              "index": "Zz",
               "isDeleted": false,
               "link": null,
               "locked": false,
@@ -10722,36 +10720,30 @@ History {
         "updated": Map {
           "id0" => Delta {
             "deleted": {
-              "index": "a3",
               "x": 20,
               "y": 20,
             },
             "inserted": {
-              "index": "a0",
               "x": 10,
               "y": 10,
             },
           },
           "id1" => Delta {
             "deleted": {
-              "index": "a4",
               "x": 40,
               "y": 20,
             },
             "inserted": {
-              "index": "a1",
               "x": 30,
               "y": 10,
             },
           },
           "id2" => Delta {
             "deleted": {
-              "index": "a5",
               "x": 60,
               "y": 20,
             },
             "inserted": {
-              "index": "a2",
               "x": 50,
               "y": 10,
             },

@@ -1,43 +1,56 @@
-import type { Drawable } from "roughjs/bin/core";
-import type { RoughSVG } from "roughjs/bin/svg";
 import {
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   MIME_TYPES,
   SVG_NS,
-} from "../constants";
-import { normalizeLink, toValidURL } from "../data/url";
-import { getElementAbsoluteCoords, hashString } from "../element";
+  getFontFamilyString,
+  isRTL,
+  isTestEnv,
+  getVerticalOffset,
+} from "@excalidraw/common";
+import { normalizeLink, toValidURL } from "@excalidraw/common";
+import { hashString } from "@excalidraw/element";
+import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
 import {
   createPlaceholderEmbeddableLabel,
   getEmbedLink,
-} from "../element/embeddable";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/embeddable";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   getBoundTextElement,
   getContainerElement,
-  getLineHeightInPx,
-} from "../element/textElement";
+} from "@excalidraw/element/textElement";
+import { getLineHeightInPx } from "@excalidraw/element/textMeasurements";
 import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import { getContainingFrame } from "@excalidraw/element/frame";
+
+import { getCornerRadius, isPathALoop } from "@excalidraw/element/shapes";
+
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import {
+  getFreeDrawSvgPath,
+  IMAGE_INVERT_FILTER,
+} from "@excalidraw/element/renderElement";
+
+import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
-} from "../element/types";
-import { getContainingFrame } from "../frame";
-import { ShapeCache } from "../scene/ShapeCache";
+} from "@excalidraw/element/types";
+
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
-import { getFontFamilyString, isRTL, isTestEnv } from "../utils";
-import { getFreeDrawSvgPath, IMAGE_INVERT_FILTER } from "./renderElement";
-import { getVerticalOffset } from "../fonts";
-import { getCornerRadius, isPathALoop } from "../shapes";
-import { getUncroppedWidthAndHeight } from "../element/cropElement";
+import type { Drawable } from "roughjs/bin/core";
+import type { RoughSVG } from "roughjs/bin/svg";
 
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
@@ -362,7 +375,6 @@ const renderElementToSvg = (
         root.appendChild(g);
       } else {
         addToRoot(group, element);
-        // @ts-expect-error
         root.append(maskPath);
       }
       break;

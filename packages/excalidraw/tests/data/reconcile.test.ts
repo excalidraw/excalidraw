@@ -1,13 +1,17 @@
-import type { RemoteExcalidrawElement } from "../../data/reconcile";
-import { reconcileElements } from "../../data/reconcile";
+import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+
+import { randomInteger, cloneJSON } from "@excalidraw/common";
+
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
-} from "../../element/types";
-import { syncInvalidIndices } from "../../fractionalIndex";
-import { randomInteger } from "../../random";
+} from "@excalidraw/element/types";
+
+import { reconcileElements } from "../../data/reconcile";
+
+import type { RemoteExcalidrawElement } from "../../data/reconcile";
+
 import type { AppState } from "../../types";
-import { cloneJSON } from "../../utils";
 
 type Id = string;
 type ElementLike = {
@@ -80,9 +84,12 @@ const test = <U extends `${string}:${"L" | "R"}`>(
   const reconciledIds = reconciled.map((x) => x.id);
   const reconciledIndices = reconciled.map((x) => x.index);
 
-  expect(target.length).equal(reconciled.length);
-  expect(reconciledIndices.length).equal(new Set([...reconciledIndices]).size); // expect no duplicated indices
-  expect(reconciledIds).deep.equal(
+  expect(target.length).toEqual(reconciled.length);
+  expect(reconciledIndices.length).toEqual(
+    new Set([...reconciledIndices]).size,
+  ); // expect no duplicated indices
+  assert.deepEqual(
+    reconciledIds,
     target.map((uid) => {
       const [, id, source] = uid.match(/^(\w+):([LR])$/)!;
       const element = (source === "L" ? _local : _remote).find(
@@ -96,13 +103,15 @@ const test = <U extends `${string}:${"L" | "R"}`>(
 
   // convergent reconciliation on the remote client
   try {
-    expect(
+    assert.deepEqual(
       reconcileElements(
         cloneJSON(_remote),
         cloneJSON(_local as RemoteExcalidrawElement[]),
         {} as AppState,
       ).map((x) => x.id),
-    ).deep.equal(reconciledIds, "convergent reconciliation");
+      reconciledIds,
+      "convergent reconciliation",
+    );
   } catch (error: any) {
     console.error("local original", _remote);
     console.error("remote original", _local);
@@ -111,13 +120,15 @@ const test = <U extends `${string}:${"L" | "R"}`>(
 
   // bidirectional re-reconciliation on remote client
   try {
-    expect(
+    assert.deepEqual(
       reconcileElements(
         cloneJSON(_remote),
         cloneJSON(reconciled as unknown as RemoteExcalidrawElement[]),
         {} as AppState,
       ).map((x) => x.id),
-    ).deep.equal(reconciledIds, "local re-reconciliation");
+      reconciledIds,
+      "local re-reconciliation",
+    );
   } catch (error: any) {
     console.error("local original", _remote);
     console.error("remote reconciled", reconciled);
@@ -309,7 +320,10 @@ describe("elements reconciliation", () => {
         throw new Error("reconcileElements: duplicate elements found");
       }
 
-      expect(ret.map((x) => x.id)).to.deep.equal(expected);
+      assert.deepEqual(
+        ret.map((x) => x.id),
+        expected,
+      );
     };
 
     // identical id/version/versionNonce/index

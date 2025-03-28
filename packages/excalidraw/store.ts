@@ -1,20 +1,31 @@
-import { ENV } from "./constants";
-import { Emitter } from "./emitter";
-import { randomId } from "./random";
-import { getDefaultAppState } from "./appState";
-import { AppStateDelta, Delta, ElementsDelta } from "./delta";
-import { newElementWith } from "./element/mutateElement";
-import { deepCopyElement } from "./element/newElement";
-import type { AppState, ObservedAppState } from "./types";
-import type { DTO, ValueOf } from "./utility-types";
+import {
+  arrayToMap,
+  assertNever,
+  isDevEnv,
+  isTestEnv,
+  randomId,
+} from "@excalidraw/common";
+
+import { hashElementsVersion } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element/duplicate";
+import { newElementWith } from "@excalidraw/element/mutateElement";
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
 import type {
   ExcalidrawElement,
   OrderedExcalidrawElement,
   SceneElementsMap,
-} from "./element/types";
-import { arrayToMap, assertNever } from "./utils";
-import { hashElementsVersion } from "./element";
-import { syncMovedIndices } from "./fractionalIndex";
+} from "@excalidraw/element/types";
+
+import type { DTO, ValueOf } from "@excalidraw/common/utility-types";
+
+import { getDefaultAppState } from "./appState";
+
+import { Emitter } from "./emitter";
+
+import { ElementsDelta, AppStateDelta, Delta } from "./delta";
+
+import type { AppState, ObservedAppState } from "./types";
 
 // hidden non-enumerable property for runtime checks
 const hiddenObservedAppStateProp = "__observedAppState";
@@ -45,7 +56,7 @@ const isObservedAppState = (
   !!Reflect.get(appState, hiddenObservedAppStateProp);
 
 // CFDO: consider adding a "remote" action, which should perform update but never be emitted (so that it we don't have to filter it when pushing it into sync api)
-export const StoreAction = {
+export const CaptureUpdateAction = {
   /**
    * Immediately undoable.
    *
@@ -54,7 +65,7 @@ export const StoreAction = {
    *
    * These updates will _immediately_ make it to the local undo / redo stacks.
    */
-  CAPTURE: "CAPTURE_DELTA",
+  IMMEDIATELY: "IMMEDIATELY",
   /**
    * Never undoable.
    *
@@ -63,24 +74,22 @@ export const StoreAction = {
    *
    * These updates will _never_ make it to the local undo / redo stacks.
    */
-  UPDATE: "UPDATE_SNAPSHOT",
+  NEVER: "NEVER",
   /**
    * Eventually undoable.
    *
-   * Use for updates which should not be captured as deltas immediately, such as
-   * exceptions which are part of some async multi-step proces.
-   *
-   * These updates will be captured with the next `StoreAction.CAPTURE`,
-   * triggered either by the next `updateScene` or internally by the editor.
+   * Use for updates which should not be captured immediately - likely
+   * exceptions which are part of some async multi-step process. Otherwise, all
+   * such updates would end up being captured with the next
+   * `CaptureUpdateAction.IMMEDIATELY` - triggered either by the next `updateScene`
+   * or internally by the editor.
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
    */
-  // CFDO: none is not really "none" anymore, as it at very least emits an ephemeral increment
-  // we should likely rename these somehow and keep "none" only for real "no action" cases
-  NONE: "NONE",
+  EVENTUALLY: "EVENTUALLY",
 } as const;
 
-export type StoreActionType = ValueOf<typeof StoreAction>;
+export type CaptureUpdateActionType = ValueOf<typeof CaptureUpdateAction>;
 
 /**
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
@@ -90,6 +99,7 @@ export class Store {
     [DurableStoreIncrement | EphemeralStoreIncrement]
   >();
 
+  private scheduledActions: Set<CaptureUpdateActionType> = new Set();
   private _snapshot = StoreSnapshot.empty();
 
   public get snapshot() {
@@ -100,9 +110,7 @@ export class Store {
     this._snapshot = snapshot;
   }
 
-  private scheduledActions: Set<StoreActionType> = new Set();
-
-  public scheduleAction(action: StoreActionType) {
+  public scheduleAction(action: CaptureUpdateActionType) {
     this.scheduledActions.add(action);
     this.satisfiesScheduledActionsInvariant();
   }
@@ -112,27 +120,27 @@ export class Store {
    */
   // TODO: Suspicious that this is called so many places. Seems error-prone.
   public scheduleCapture() {
-    this.scheduleAction(StoreAction.CAPTURE);
+    this.scheduleAction(CaptureUpdateAction.IMMEDIATELY);
   }
 
   private get scheduledAction() {
     // Capture has a precedence over update, since it also performs snapshot update
-    if (this.scheduledActions.has(StoreAction.CAPTURE)) {
-      return StoreAction.CAPTURE;
+    if (this.scheduledActions.has(CaptureUpdateAction.IMMEDIATELY)) {
+      return CaptureUpdateAction.IMMEDIATELY;
     }
 
     // Update has a precedence over none, since it also emits an (ephemeral) increment
-    if (this.scheduledActions.has(StoreAction.UPDATE)) {
-      return StoreAction.UPDATE;
+    if (this.scheduledActions.has(CaptureUpdateAction.NEVER)) {
+      return CaptureUpdateAction.NEVER;
     }
 
     // CFDO: maybe it should be explicitly set so that we don't clone on every single component update
     // Emit ephemeral increment, don't update the snapshot
-    return StoreAction.NONE;
+    return CaptureUpdateAction.EVENTUALLY;
   }
 
   /**
-   * Performs the incoming `StoreAction` and emits the corresponding `StoreIncrement`.
+   * Performs the incoming `CaptureUpdateAction` and emits the corresponding `StoreIncrement`.
    * Emits `DurableStoreIncrement` when action is "capture", emits `EphemeralStoreIncrement` otherwise.
    *
    * @emits StoreIncrement
@@ -145,13 +153,13 @@ export class Store {
       const { scheduledAction } = this;
 
       switch (scheduledAction) {
-        case StoreAction.CAPTURE:
+        case CaptureUpdateAction.IMMEDIATELY:
           this.snapshot = this.captureDurableIncrement(elements, appState);
           break;
-        case StoreAction.UPDATE:
+        case CaptureUpdateAction.NEVER:
           this.snapshot = this.emitEphemeralIncrement(elements);
           break;
-        case StoreAction.NONE:
+        case CaptureUpdateAction.EVENTUALLY:
           // ÇFDO: consider perf. optimisation without creating a snapshot if it is not updated in the end, it shall not be needed (more complex though)
           this.emitEphemeralIncrement(elements);
           return;
@@ -334,13 +342,13 @@ export class Store {
     if (
       !(
         this.scheduledActions.size >= 0 &&
-        this.scheduledActions.size <= Object.keys(StoreAction).length
+        this.scheduledActions.size <= Object.keys(CaptureUpdateAction).length
       )
     ) {
       const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledActions.size}".`;
       console.error(message, this.scheduledActions.values());
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw new Error(message);
       }
     }

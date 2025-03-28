@@ -7,8 +7,8 @@
  * In the future consider separating common utils into a separate shared chunk.
  */
 
-import binary from "./harfbuzz-wasm";
 import bindings from "./harfbuzz-bindings";
+import binary from "./harfbuzz-wasm";
 
 /**
  * Lazy loads wasm and respective bindings for font subsetting based on the harfbuzzjs.
@@ -25,8 +25,8 @@ const load = (): Promise<{
   return new Promise(async (resolve, reject) => {
     try {
       const module = await WebAssembly.instantiate(binary);
-      // @ts-expect-error
       const harfbuzzJsWasm = module.instance.exports;
+      // @ts-expect-error
       const heapu8 = new Uint8Array(harfbuzzJsWasm.memory.buffer);
 
       const hbSubset = {

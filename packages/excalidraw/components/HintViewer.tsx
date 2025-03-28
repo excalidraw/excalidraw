@@ -1,19 +1,24 @@
-import { t } from "../i18n";
-import type { AppClassProperties, Device, UIAppState } from "../types";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import {
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
   isTextElement,
-} from "../element/typeChecks";
-import { getShortcutKey } from "../utils";
+} from "@excalidraw/element/typeChecks";
+
+import { getShortcutKey } from "@excalidraw/common";
+
+import { isNodeInFlowchart } from "@excalidraw/element/flowchart";
+
+import { t } from "../i18n";
 import { isEraserActive } from "../appState";
+import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
-import { isNodeInFlowchart } from "../element/flowchart";
-import { isGridModeEnabled } from "../snapping";
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
+
+import type { AppClassProperties, Device, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;

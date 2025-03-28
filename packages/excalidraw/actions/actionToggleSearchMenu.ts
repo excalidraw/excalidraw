@@ -1,9 +1,16 @@
-import { KEYS } from "../keys";
-import { register } from "./register";
-import type { AppState } from "../types";
+import {
+  KEYS,
+  CANVAS_SEARCH_TAB,
+  CLASSES,
+  DEFAULT_SIDEBAR,
+} from "@excalidraw/common";
+
 import { searchIcon } from "../components/icons";
-import { StoreAction } from "../store";
-import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
+import type { AppState } from "../types";
 
 export const actionToggleSearchMenu = register({
   name: "searchMenu",
@@ -29,7 +36,7 @@ export const actionToggleSearchMenu = register({
       if (searchInput?.matches(":focus")) {
         return {
           appState: { ...appState, openSidebar: null },
-          storeAction: StoreAction.NONE,
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
         };
       }
 
@@ -44,7 +51,7 @@ export const actionToggleSearchMenu = register({
         openSidebar: { name: DEFAULT_SIDEBAR.name, tab: CANVAS_SEARCH_TAB },
         openDialog: null,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState: AppState) => appState.gridModeEnabled,

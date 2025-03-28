@@ -1,18 +1,21 @@
-import React, { useCallback, useMemo } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import React, { useCallback, useMemo } from "react";
 
-import { FontPickerList } from "./FontPickerList";
-import { FontPickerTrigger } from "./FontPickerTrigger";
+import { FONT_FAMILY } from "@excalidraw/common";
+
+import type { FontFamilyValues } from "@excalidraw/element/types";
+
+import { t } from "../../i18n";
 import { ButtonIconSelect } from "../ButtonIconSelect";
+import { ButtonSeparator } from "../ButtonSeparator";
 import {
   FontFamilyCodeIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
 } from "../icons";
-import { ButtonSeparator } from "../ButtonSeparator";
-import type { FontFamilyValues } from "../../element/types";
-import { FONT_FAMILY } from "../../constants";
-import { t } from "../../i18n";
+
+import { FontPickerList } from "./FontPickerList";
+import { FontPickerTrigger } from "./FontPickerTrigger";
 
 import "./FontPicker.scss";
 

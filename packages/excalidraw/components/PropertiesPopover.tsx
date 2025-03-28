@@ -1,10 +1,11 @@
-import React, { type ReactNode } from "react";
-import clsx from "clsx";
 import * as Popover from "@radix-ui/react-popover";
+import clsx from "clsx";
+import React, { type ReactNode } from "react";
+
+import { isInteractive } from "@excalidraw/common";
 
 import { useDevice } from "./App";
 import { Island } from "./Island";
-import { isInteractive } from "../utils";
 
 interface PropertiesPopoverProps {
   className?: string;
@@ -14,8 +15,8 @@ interface PropertiesPopoverProps {
   onClose: () => void;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   onPointerLeave?: React.PointerEventHandler<HTMLDivElement>;
-  onFocusOutside?: Popover.DismissableLayerProps["onFocusOutside"];
-  onPointerDownOutside?: Popover.DismissableLayerProps["onPointerDownOutside"];
+  onFocusOutside?: Popover.PopoverContentProps["onFocusOutside"];
+  onPointerDownOutside?: Popover.PopoverContentProps["onPointerDownOutside"];
 }
 
 export const PropertiesPopover = React.forwardRef<

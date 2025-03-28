@@ -3,38 +3,50 @@ import {
   ROUNDNESS,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
-} from "../constants";
-import { isTextElement, newElement } from "../element";
-import { mutateElement } from "../element/mutateElement";
-import {
-  computeBoundTextPosition,
-  computeContainerDimensionForBoundText,
-  getBoundTextElement,
-  measureText,
-  redrawTextBoundingBox,
-} from "../element/textElement";
+  arrayToMap,
+  getFontString,
+} from "@excalidraw/common";
 import {
   getOriginalContainerHeightFromCache,
   resetOriginalContainerCache,
   updateOriginalContainerCache,
-} from "../element/containerCache";
+} from "@excalidraw/element/containerCache";
+
+import {
+  computeBoundTextPosition,
+  computeContainerDimensionForBoundText,
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+
 import {
   hasBoundTextElement,
   isTextBindableContainer,
+  isTextElement,
   isUsingAdaptiveRadius,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import { measureText } from "@excalidraw/element/textMeasurements";
+
+import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
+
+import { newElement } from "@excalidraw/element/newElement";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
-} from "../element/types";
-import type { AppState } from "../types";
-import type { Mutable } from "../utility-types";
-import { arrayToMap, getFontString } from "../utils";
+} from "@excalidraw/element/types";
+
+import type { Mutable } from "@excalidraw/common/utility-types";
+
+import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
-import { syncMovedIndices } from "../fractionalIndex";
-import { StoreAction } from "../store";
+
+import type { AppState } from "../types";
 
 export const actionUnbindText = register({
   name: "unbindText",
@@ -86,7 +98,7 @@ export const actionUnbindText = register({
     return {
       elements,
       appState,
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
@@ -163,7 +175,7 @@ export const actionBindText = register({
     return {
       elements: pushTextAboveContainer(elements, container, textElement),
       appState: { ...appState, selectedElementIds: { [container.id]: true } },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });
@@ -323,7 +335,7 @@ export const actionWrapTextInContainer = register({
         ...appState,
         selectedElementIds: containerIds,
       },
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
 });

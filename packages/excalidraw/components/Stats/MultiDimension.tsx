@@ -1,29 +1,36 @@
+import { pointFrom, type GlobalPoint } from "@excalidraw/math";
 import { useMemo } from "react";
-import { getCommonBounds, isTextElement } from "../../element";
-import { updateBoundElements } from "../../element/binding";
-import { mutateElement } from "../../element/mutateElement";
+
+import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
+import { updateBoundElements } from "@excalidraw/element/binding";
+import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   rescalePointsInElement,
   resizeSingleElement,
-} from "../../element/resizeElements";
+} from "@excalidraw/element/resizeElements";
 import {
   getBoundTextElement,
   handleBindTextResize,
-} from "../../element/textElement";
+} from "@excalidraw/element/textElement";
+
+import { isTextElement } from "@excalidraw/element/typeChecks";
+
+import { getCommonBounds } from "@excalidraw/utils";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../../element/types";
-import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
+} from "@excalidraw/element/types";
+
 import DragInput from "./DragInput";
-import type { DragInputCallbackType } from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit } from "./utils";
+
+import type { DragInputCallbackType } from "./DragInput";
 import type { AtomicUnit } from "./utils";
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
-import { pointFrom, type GlobalPoint } from "../../../math";
+import type Scene from "../../scene/Scene";
+import type { AppState } from "../../types";
 
 interface MultiDimensionProps {
   property: "width" | "height";
