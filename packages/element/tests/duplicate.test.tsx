@@ -10,11 +10,14 @@ import {
 
 import { Excalidraw } from "@excalidraw/excalidraw";
 
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
+import {
+  actionDuplicateSelection,
+  actionSelectAll,
+} from "@excalidraw/excalidraw/actions";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 
 import {
   act,
@@ -28,7 +31,10 @@ import type { LocalPoint } from "@excalidraw/math";
 import { mutateElement } from "../src/mutateElement";
 import { duplicateElement, duplicateElements } from "../src/duplicate";
 
-import type { ExcalidrawLinearElement } from "../src/types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawLinearElement,
+} from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -405,6 +411,122 @@ describe("duplicating multiple elements", () => {
       expect(typeof clonedRectangle1.groupIds[0]).toBe("string");
       expect(rectangle1.groupIds[0]).not.toBe(clonedRectangle1.groupIds[0]);
     });
+  });
+});
+
+describe("elbow arrow duplication", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("keeps arrow shape when the whole set of arrow and bindables are duplicated", async () => {
+    UI.createElement("rectangle", {
+      x: -150,
+      y: -150,
+      width: 100,
+      height: 100,
+    });
+    UI.createElement("rectangle", {
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(-43, -99);
+    mouse.click();
+    mouse.moveTo(43, 99);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+    const originalArrowId = arrow.id;
+
+    expect(arrow.startBinding).not.toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionSelectAll);
+    });
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    expect(h.elements.length).toEqual(6);
+
+    const duplicatedArrow = h.scene.getSelectedElements(
+      h.state,
+    )[2] as ExcalidrawArrowElement;
+
+    expect(duplicatedArrow.id).not.toBe(originalArrowId);
+    expect(duplicatedArrow.type).toBe("arrow");
+    expect(duplicatedArrow.elbowed).toBe(true);
+    expect(duplicatedArrow.points).toEqual([
+      [0, 0],
+      [45, 0],
+      [45, 200],
+      [90, 200],
+    ]);
+    expect(arrow.startBinding).not.toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
+  });
+
+  it("changes arrow shape to unbind variant if only the connected elbow arrow is duplicated", async () => {
+    UI.createElement("rectangle", {
+      x: -150,
+      y: -150,
+      width: 100,
+      height: 100,
+    });
+    UI.createElement("rectangle", {
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(-43, -99);
+    mouse.click();
+    mouse.moveTo(43, 99);
+    mouse.click();
+
+    const arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+    const originalArrowId = arrow.id;
+
+    expect(arrow.startBinding).not.toBe(null);
+    expect(arrow.endBinding).not.toBe(null);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    expect(h.elements.length).toEqual(4);
+
+    const duplicatedArrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+
+    expect(duplicatedArrow.id).not.toBe(originalArrowId);
+    expect(duplicatedArrow.type).toBe("arrow");
+    expect(duplicatedArrow.elbowed).toBe(true);
+    expect(duplicatedArrow.points).toEqual([
+      [0, 0],
+      [0, 100],
+      [90, 100],
+      [90, 200],
+    ]);
   });
 });
 
