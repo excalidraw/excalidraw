@@ -38,12 +38,12 @@
     "arrowhead_none": "कोई भी नहीं",
     "arrowhead_arrow": "तीर",
     "arrowhead_bar": "बार",
-    "arrowhead_circle": "",
-    "arrowhead_circle_outline": "",
+    "arrowhead_circle": "वृत्त",
+    "arrowhead_circle_outline": "वृत्त रूपरेखा",
     "arrowhead_triangle": "त्रिकोण",
-    "arrowhead_triangle_outline": "",
-    "arrowhead_diamond": "",
-    "arrowhead_diamond_outline": "",
+    "arrowhead_triangle_outline": "त्रिकोण रूपरेखा",
+    "arrowhead_diamond": "तिर्यग्वर्ग",
+    "arrowhead_diamond_outline": "तिर्यग्वर्ग रूपरेखा",
     "fontSize": "फ़ॉन्ट का आकार",
     "fontFamily": "फ़ॉन्ट का परिवार",
     "addWatermark": "ऐड \"मेड विथ एक्सकैलिडराव\"",
@@ -103,9 +103,9 @@
     "flipVertical": "ऊपर नीचे पलटे",
     "viewMode": "अलग अलग देखें",
     "share": "शेयर करें",
-    "showStroke": "",
+    "showStroke": "रेखा दिखाएं",
     "showBackground": "पृष्ठभूमि रंग वरक़ दिखाये",
-    "toggleTheme": "",
+    "toggleTheme": "हल्का/गहरा विषय बदलें",
     "personalLib": "वैयक्तिक समूहकोष",
     "excalidrawLib": "एक्सकेलीड्रॉ समूहकोष",
     "decreaseFontSize": "आकार घटाइऐ",
@@ -115,12 +115,12 @@
     "createContainerFromText": "मूलपाठ कंटेनर में मोड के दिखाए",
     "link": {
       "edit": "कड़ी संपादित करे",
-      "editEmbed": "",
-      "create": "",
-      "createEmbed": "",
-      "label": "",
-      "labelEmbed": "",
-      "empty": ""
+      "editEmbed": "एम्बेड बदलें",
+      "create": "बनाएं",
+      "createEmbed": "एम्बेड बनाएं",
+      "label": "लेबल",
+      "labelEmbed": "लेबल एम्बेड करे",
+      "empty": "खाली"
     },
     "lineEditor": {
       "edit": "रेखा संपादित करे",
@@ -134,11 +134,11 @@
     },
     "statusPublished": "प्रकाशित",
     "sidebarLock": "साइडबार खुला रखे.",
-    "selectAllElementsInFrame": "",
-    "removeAllElementsFromFrame": "",
+    "selectAllElementsInFrame": "फ्रेम में सब कुछ चुनें",
+    "removeAllElementsFromFrame": "फ्रेम में सब कुछ हटाएं",
     "eyeDropper": "चित्रफलक से रंग चुने",
-    "textToDiagram": "",
-    "prompt": ""
+    "textToDiagram": "टेक्स्ट से डायग्राम",
+    "prompt": "संकेत"
   },
   "library": {
     "noItems": "अभी तक कोई आइटम जोडा नहीं गया.",
@@ -147,11 +147,11 @@
   },
   "buttons": {
     "clearReset": "कैनवास रीसेट करें",
-    "exportJSON": "",
+    "exportJSON": "JSON निर्यात करें",
     "exportImage": "प्रतिमा निर्यात करे...",
     "export": "यंहा सुरक्षित करे...",
     "copyToClipboard": "क्लिपबोर्ड पर प्रतिलिपि बनाएँ",
-    "save": "",
+    "save": "सहेजें",
     "saveAs": "सेव करे इस तरह",
     "load": "खोलें",
     "getShareableLink": "साझा करने योग्य लिंक प्राप्त करें",
@@ -166,7 +166,7 @@
     "edit": "संशोधन करें",
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
-    "resetLibrary": "",
+    "resetLibrary": "लाइब्रेरी रीसेट करें",
     "createNewRoom": "एक नया कमरा बनाएं",
     "fullScreen": "पूरी स्क्रीन",
     "darkMode": "डार्क मोड",
@@ -174,14 +174,14 @@
     "zenMode": "ज़ेन मोड",
     "objectsSnapMode": "वस्तुओं से पकड़े",
     "exitZenMode": "जेन मोड से बाहर निकलें",
-    "cancel": "",
+    "cancel": "रद्द करें",
     "clear": "साफ़ करे",
     "remove": "हटाएं",
-    "embed": "",
+    "embed": "एम्बेड करें",
     "publishLibrary": "प्रकाशित करें",
     "submit": "प्रस्तुत करे",
     "confirm": "पुष्टि करें",
-    "embeddableInteractionButton": ""
+    "embeddableInteractionButton": "एम्बेड करने योग्य इंटरैक्शन बटन"
   },
   "alerts": {
     "clearReset": "इससे पूरा कैनवास साफ हो जाएगा। क्या आपको यकीन है?",
@@ -211,7 +211,7 @@
     "imageInsertError": "छवि सम्मिलित नहीं की जा सकी. पुनः प्रयत्न करे...",
     "fileTooBig": "फ़ाइल ज़रूरत से ज़्यादा बड़ी हैं. अधिकतम अनुमित परिमाण {{maxSize}} हैं",
     "svgImageInsertError": "एसवीजी छवि सम्मिलित नहीं कर सके, एसवीजी रचना अनुचित हैं",
-    "failedToFetchImage": "",
+    "failedToFetchImage": "छवि प्राप्त करने में विफल",
     "invalidSVGString": "अनुचित SVG",
     "cannotResolveCollabServer": "कॉलेब सर्वर से कनेक्शन नहीं हो पा रहा. कृपया पृष्ठ को पुनः लाने का प्रयास करे.",
     "importLibraryError": "संग्रह प्रतिष्ठापित नहीं किया जा सका",
@@ -225,9 +225,9 @@
       "line4": "यदि इस सेटिंग्स को अक्षम करने पर भी पृष्ठ ठीक नहीं दिखता हो तो, हमारे GitHub पर एक <issueLink>मुद्दा प्रस्तुत</issueLink> करे, या हमें <discordLink>डिस्कोर्ड</discordLink> पर लिखित सम्पर्क करें"
     },
     "libraryElementTypeError": {
-      "embeddable": "",
+      "embeddable": "एम्बेड करने योग्य समूहकोष में जोडा नहीं जा सका.",
       "iframe": "आयफ़्रेम तत्व समूहकोष में जोडा नहीं जा सका.",
-      "image": ""
+      "image": "छवि समूहकोष में  समूहकोष में जोडा नहीं जा सकी."
     },
     "asyncPasteFailedOnRead": "चिपकाया नहीं जा सका (सिस्टम क्लिपबोर्ड से पढ़ा नहीं जा सका).",
     "asyncPasteFailedOnParse": "चिपकाया नहीं जा सका.",
@@ -246,14 +246,14 @@
     "library": "लाइब्रेरी",
     "lock": "ड्राइंग के बाद चयनित टूल को सक्रिय रखें",
     "penMode": "पेन का मोड - स्पर्श टाले",
-    "link": "",
+    "link": "लिंक",
     "eraser": "रबड़",
-    "frame": "",
+    "frame": "frame",
     "magicframe": "तारिक ढाँचें को सांकेतिक लिपि में",
-    "embeddable": "",
+    "embeddable": "एम्बेड करने योग्य",
     "laser": "लेसर टॉर्च",
     "hand": "हाथ ( खिसकाने का औज़ार)",
-    "extraTools": "",
+    "extraTools": "अतिरिक्त उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
     "magicSettings": "कृतिम बुद्धिमत्ता सेटिंग्स"
   },
@@ -267,21 +267,21 @@
     "linearElement": "कई बिंदुओं को शुरू करने के लिए क्लिक करें, सिंगल लाइन के लिए खींचें",
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोड़ो",
     "text": "आप चयन टूल से कहीं भी डबल-क्लिक करके टेक्स्ट जोड़ सकते हैं",
-    "embeddable": "",
-    "text_selected": "",
-    "text_editing": "",
+    "embeddable": "एम्बेड करने योग्य",
+    "text_selected": "चयनित पाठ",
+    "text_editing": "पाठ संपादन",
     "linearElementMulti": "अंतिम बिंदु पर क्लिक करें या समाप्त होने के लिए एस्केप या एंटर दबाएं",
     "lockAngle": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को मोड़ सकते हैं",
     "resize": "आकार बदलते समय आप SHIFT को पकड़ कर अनुपात में कमी कर सकते हैं,\nकेंद्र से आकार बदलने के लिए ALT दबाए रखें",
-    "resizeImage": "",
+    "resizeImage": "आप SHIFT दबाकर स्वतंत्र रूप से आकार बदल सकते हैं, \nकेंद्र से आकार बदलने के लिए ALT दबाकर रखें।",
     "rotate": "आप घूर्णन करते समय SHIFT पकड़कर कोणों को विवश कर सकते हैं",
     "lineEditor_info": "बिंदुओं को सम्पादित करने के लिए CtrlOrCmd को दबायें रखते हुये डबल क्लिक करे, अथवा CtrlOrCmd + Enter साथ दबाये",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
-    "placeImage": "",
-    "publishLibrary": "",
-    "bindTextToElement": "",
-    "deepBoxSelect": "",
+    "lineEditor_pointSelected": "बिंदु(ओं) को हटाने के लिए डिलीट दबाएं, \nडुप्लिकेट करने के लिए Ctrl या Cmd+D दबाएं, या स्थानांतरित करने के लिए खींचें",
+    "lineEditor_nothingSelected": "एक बिंदु चुनें जिसे संपादित करें (एकाधिक चुनने के लिए SHIFT दबाए रखें), \nया नए बिंदु जोड़ने के लिए Alt दबाए रखें और क्लिक करें",
+    "placeImage": "छवि रखने के लिए क्लिक करें, या आकार को मैन्युअल रूप से सेट करने के लिए क्लिक करें और खींचें",
+    "publishLibrary": "अपनी खुद की लाइब्रेरी प्रकाशित करें",
+    "bindTextToElement": "टेक्स्ट जोड़ने के लिए एंटर दबाएं",
+    "deepBoxSelect": "गहरे चयन के लिए Ctrl या Cmd दबाए रखें, और खींचने से रोकने के लिए।",
     "eraserRevert": "मिटाने के लिए चुने हुए चीजों को ना चुनने के लिए Alt साथ में दबाए",
     "firefox_clipboard_write": "\"dom.events.asyncClipboard.clipboardItem\" फ़्लैग को \"true\" पर सेट करके इस सुविधा को संभवतः सक्षम किया जा सकता है। Firefox में ब्राउज़र फ़्लैग बदलने के लिए, \"about:config\" पृष्ठ पर जाएँ।",
     "disableSnapping": "स्नैपिंग को निष्क्रिय करने के लिए CtrlOrCmd दबाए रखें"
@@ -307,31 +307,31 @@
     "desc_inProgressIntro": "लाइव सहयोग सत्र अब जारी है।",
     "desc_shareLink": "इस लिंक को आप जिस किसी के साथ भी सहयोग करना चाहते हैं, उसके साथ साझा करें",
     "desc_exitSession": "सत्र रोकना आपको रूम से बाहर कर देगा, लेकिन आप स्थानीय स्तर पर दृश्य के साथ काम करना जारी रख पाएंगे। ध्यान दें कि यह अन्य लोगों को प्रभावित नहीं करेगा, और वे अभी भी अपने संस्करण पर सहयोग करने में सक्षम होंगे।",
-    "shareTitle": ""
+    "shareTitle": "Excalidraw पर एक लाइव सहयोग सत्र में शामिल हों"
   },
   "errorDialog": {
     "title": "गलती"
   },
   "exportDialog": {
-    "disk_title": "",
-    "disk_details": "",
-    "disk_button": "",
-    "link_title": "",
-    "link_details": "",
-    "link_button": "",
-    "excalidrawplus_description": "",
-    "excalidrawplus_button": "",
-    "excalidrawplus_exportError": ""
+    "disk_title": "डिस्क पर सहेजें",
+    "disk_details": "दृश्य डेटा को एक फ़ाइल में निर्यात करें जिससे आप बाद में आयात कर सकें।",
+    "disk_button": "फाइल में सहेजें",
+    "link_title": "शेयर करने योग्य लिंक",
+    "link_details": "एक केवल पढ़ने के लिए लिंक के रूप में निर्यात करें।",
+    "link_button": "लिंक पर निर्यात करें",
+    "excalidrawplus_description": "दृश्य को अपने Excalidraw+ कार्यक्षेत्र में सहेजें।",
+    "excalidrawplus_button": "निर्यात",
+    "excalidrawplus_exportError": "इस क्षण में Excalidraw+ पर निर्यात नहीं कर सका..."
   },
   "helpDialog": {
     "blog": "हमारा ब्लॉग पढे",
     "click": "क्लिक करें",
-    "deepSelect": "",
-    "deepBoxSelect": "",
+    "deepSelect": "डीप सेलेक्ट",
+    "deepBoxSelect": "बॉक्स के भीतर गहराई से चयन करें, और खींचने से रोकें",
     "curvedArrow": "वक्र तीर",
     "curvedLine": "वक्र रेखा",
-    "documentation": "",
-    "doubleClick": "",
+    "documentation": "दस्तावेज़ीकरण",
+    "doubleClick": "डबल-क्लिक",
     "drag": "खींचें",
     "editor": "संपादक",
     "editLineArrowPoints": "रेखा/तीर बिंदु सम्पादित करे",
@@ -342,8 +342,8 @@
     "preventBinding": "तीर बंधन रोकें",
     "tools": "औज़ार",
     "shortcuts": "कीबोर्ड के शॉर्टकट्स",
-    "textFinish": "",
-    "textNewLine": "",
+    "textFinish": "संपादन समाप्त करें (पाठ संपादक)",
+    "textNewLine": "नई पंक्ति जोड़ें (पाठ संपादक)",
     "title": "मदद",
     "view": "दृश्य",
     "zoomToFit": "सभी तत्वों को फिट करने के लिए ज़ूम करें",
@@ -353,71 +353,71 @@
     "movePageLeftRight": "पृष्ठ बायी/दायी तरफ करे"
   },
   "clearCanvasDialog": {
-    "title": ""
+    "title": "स्पष्ट कैनवास"
   },
   "publishDialog": {
-    "title": "",
-    "itemName": "",
-    "authorName": "",
-    "githubUsername": "",
-    "twitterUsername": "",
-    "libraryName": "",
-    "libraryDesc": "",
-    "website": "",
+    "title": "पब्लिश लाइब्रेरी",
+    "itemName": "आइटम का नाम",
+    "authorName": "लेखक का नाम",
+    "githubUsername": "गिटहब उपयोगकर्ता नाम",
+    "twitterUsername": "ट्विटर उपयोगकर्ता नाम",
+    "libraryName": "पुस्तकालय का नाम",
+    "libraryDesc": "पुस्तकालय का विवरण",
+    "website": "वेबसाइट",
     "placeholder": {
-      "authorName": "",
-      "libraryName": "",
-      "libraryDesc": "",
-      "githubHandle": "",
-      "twitterHandle": "",
-      "website": ""
+      "authorName": "आपका नाम या उपयोगकर्ता नाम",
+      "libraryName": "आपकी पुस्तकालय का नाम",
+      "libraryDesc": "आपकी पुस्तकालय का विवरण ताकि लोग इसके उपयोग को समझ सकें",
+      "githubHandle": "GitHub हैंडल (वैकल्पिक), ताकि आप समीक्षा के लिए प्रस्तुत करने के बाद पुस्तकालय को संपादित कर सकें।",
+      "twitterHandle": "ट्विटर उपयोगकर्ता नाम (वैकल्पिक), ताकि हम जान सकें कि ट्विटर पर प्रचार करते समय किसे श्रेय देना है",
+      "website": "आपकी व्यक्तिगत वेबसाइट या अन्यत्र का लिंक (वैकल्पिक)"
     },
     "errors": {
-      "required": "",
+      "required": "आवश्यक",
       "website": "मान्य URL प्रविष्ट करें"
     },
     "noteDescription": "संग्रह सम्मिलित करने हेतु प्रस्तुत करें <link>सार्वजनिक संग्रहालय</link>अन्य वक्तियों को उनके चित्रकारी में उपयोग के लिये",
     "noteGuidelines": "संग्रह को पहले स्वीकृति आवश्यक कृपया यह पढ़ें <link>दिशा-निर्देश</link>",
     "noteLicense": "जमा करके, आप सहमत हैं कि संग्रहण को <link>MIT लाइसेंस</link> के तहत प्रकाशित किया जाएगा, जिसका संक्षिप्त अर्थ है कि कोई भी बिना किसी प्रतिबंध के उनका उपयोग कर सकता है।",
-    "noteItems": "",
-    "atleastOneLibItem": "",
+    "noteItems": "प्रत्येक पुस्तकालय आइटम का अपना नाम होना चाहिए ताकि इसे फ़िल्टर किया जा सके। निम्नलिखित पुस्तकालय आइटम शामिल किए जाएंगे",
+    "atleastOneLibItem": "कृपया शुरू करने के लिए कम से कम एक पुस्तकालय आइटम चुनें",
     "republishWarning": "टिप्पणी: कुछ चुने हुवे आइटम पहले ही प्रकाशित/प्रस्तुत किए जा चुके हैं। किसी प्रकाशित संग्रह को अद्यतन करते समय या पहले से प्रस्तुत आइटम को पुन्हा प्रस्तुत करते समय, आप बस उसे केवल अद्यतन करें ।"
   },
   "publishSuccessDialog": {
-    "title": "",
+    "title": "पुस्तकालय प्रस्तुत किया गया",
     "content": "{{authorName}} धन्यवाद. आपका संग्रहण समीक्षा के लिए दर्ज हो चुका है. समीक्षा स्थिति <link>यहाँ</link>जान सकते हैं."
   },
   "confirmDialog": {
-    "resetLibrary": "",
-    "removeItemsFromLib": ""
+    "resetLibrary": "पुस्तकालय रीसेट करें",
+    "removeItemsFromLib": "लाइब्रेरी से चयनित आइटम हटाएं"
   },
   "imageExportDialog": {
-    "header": "",
+    "header": "छवि निर्यात करें",
     "label": {
-      "withBackground": "",
-      "onlySelected": "",
-      "darkMode": "",
-      "embedScene": "",
-      "scale": "",
-      "padding": ""
+      "withBackground": "पृष्ठभूमि",
+      "onlySelected": "केवल चयनित",
+      "darkMode": "डार्क मोड",
+      "embedScene": "दृश्य एम्बेड करें",
+      "scale": "स्केल",
+      "padding": "पैडिंग"
     },
     "tooltip": {
-      "embedScene": ""
+      "embedScene": "दृश्य डेटा को निर्यातित पीएनजी/एसवीजी फ़ाइल में सहेजा जाएगा ताकि दृश्य को इससे पुनर्स्थापित किया जा सके। \nयह निर्यातित फ़ाइल के आकार को बढ़ा देगा।"
     },
     "title": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पीएनजी में निर्यात करें",
+      "exportToSvg": "एसवीजी में निर्यात करें",
+      "copyPngToClipboard": "PNG को क्लिपबोर्ड में कॉपी करें"
     },
     "button": {
-      "exportToPng": "",
-      "exportToSvg": "",
-      "copyPngToClipboard": ""
+      "exportToPng": "पीएनजी",
+      "exportToSvg": "एसवीजी",
+      "copyPngToClipboard": "क्लिपबोर्ड पर कॉपी करें"
     }
   },
   "encrypted": {
     "tooltip": "आपके चित्र अंत-से-अंत एन्क्रिप्टेड हैं, इसलिए एक्सक्लूसिव्रॉव के सर्वर उन्हें कभी नहीं देखेंगे।",
-    "link": ""
+    "link": "एक्स्कैलिड्रॉ में एंड-टू-एंड एन्क्रिप्शन पर ब्लॉग पोस्ट"
   },
   "stats": {
     "angle": "कोण",
@@ -435,20 +435,20 @@
     "width": "चौड़ाई"
   },
   "toast": {
-    "addedToLibrary": "",
+    "addedToLibrary": "पुस्तकालय में जोड़ा गया",
     "copyStyles": "काॅपी कीए स्टाइल",
     "copyToClipboard": "क्लिपबोर्ड में कॉपी कीए",
-    "copyToClipboardAsPng": "",
-    "fileSaved": "",
-    "fileSavedToFilename": "",
-    "canvas": "",
-    "selection": "",
+    "copyToClipboardAsPng": "{{exportSelection}} को PNG \n({{exportColorScheme}}) के रूप में क्लिपबोर्ड पर कॉपी किया गया।",
+    "fileSaved": "फाइल सहेजी गई",
+    "fileSavedToFilename": "{filename} में सहेजा गया",
+    "canvas": "कैनवास",
+    "selection": "चयन",
     "pasteAsSingleElement": "एक अवयव के रूप में चिपकाने के लिए {{shortcut}} का उपयोग करें,\nया किसी मौजूदा पाठ संपादक में चिपकायें",
-    "unableToEmbed": "",
-    "unrecognizedLinkFormat": ""
+    "unableToEmbed": "इस यूआरएल को एम्बेड करना वर्तमान में अनुमति नहीं है। यूआरएल को व्हाइटलिस्ट करने के लिए GitHub पर एक मुद्दा उठाएं।",
+    "unrecognizedLinkFormat": "आपके द्वारा एम्बेड किया गया लिंक अपेक्षित प्रारूप से मेल नहीं खाता। कृपया स्रोत साइट द्वारा प्रदान किया गया 'एम्बेड' स्ट्रिंग पेस्ट करने का प्रयास करें।"
   },
   "colors": {
-    "transparent": "",
+    "transparent": "पारदर्शी",
     "black": "काला",
     "white": "सफ़ेद",
     "red": "लाल",
@@ -518,7 +518,7 @@
   "mermaid": {
     "title": "मर्मेड से एक्सकाली में",
     "button": "अंदर डाले",
-    "description": "",
+    "description": "वर्तमान में केवल <flowchartLink>फ्लोचार्ट</flowchartLink>, <sequenceLink>अनुक्रम</sequenceLink> और <classLink>क्लास</classLink> आरेखों का समर्थन किया जाता है। अन्य प्रकारों को एक्स्कैलिड्रॉ में चित्र के रूप में प्रदर्शित किया जाएगा।",
     "syntax": "मर्मेड संरचना नियम",
     "preview": "पूर्वावलोकन"
   }
