@@ -92,7 +92,7 @@ export const hitElementItself = <Point extends GlobalPoint | LocalPoint>({
   frameNameBound = null,
 }: HitTestArgs<Point>) => {
   let hit = shouldTestInside(element)
-    ? // Since `inShape` tests STRICTLY againt the insides of a shape
+    ? // Since `inShape` tests STRICTLY against the insides of a shape
       // we would need `onShape` as well to include the "borders"
       isPointInShape(pointFrom(x, y), shape) ||
       isPointOnShape(pointFrom(x, y), shape, threshold)

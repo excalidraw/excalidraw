@@ -21,7 +21,7 @@ export interface ExportedDataState {
 
 /**
  * Map of legacy AppState keys, with values of:
- *  [<legacy type>, <new AppState proeprty>]
+ *  [<legacy type>, <new AppState property>]
  *
  * This is a helper type used in downstream abstractions.
  * Don't consume on its own.

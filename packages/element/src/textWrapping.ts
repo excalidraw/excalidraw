@@ -56,7 +56,7 @@ const COMMON = {
   /**
    * Generally do not break, unless closed symbol is followed by an opening symbol.
    *
-   * Also, western punctation is often used in modern Korean and expects to be treated
+   * Also, western punctuation is often used in modern Korean and expects to be treated
    * similarly to the CJK opening and closing symbols.
    *
    * Hello(한글)→ ["Hello", "(한", "글)"]

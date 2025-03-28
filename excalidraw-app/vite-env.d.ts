@@ -17,7 +17,7 @@ interface ImportMetaEnv {
 
   VITE_APP_FIREBASE_CONFIG: string;
 
-  // whether to disable live reload / HMR. Usuaully what you want to do when
+  // whether to disable live reload / HMR. Usually what you want to do when
   // debugging Service Workers.
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;
 

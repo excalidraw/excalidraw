@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 
 import "../common.scss";
 
-// Since client components get prerenderd on server as well hence importing the excalidraw stuff dynamically
+// Since client components get pre-rendered on server as well hence importing the excalidraw stuff dynamically
 // with ssr false
 const Excalidraw = dynamic(
   async () => (await import("../excalidrawWrapper")).default,
