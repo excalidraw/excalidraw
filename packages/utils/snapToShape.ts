@@ -27,182 +27,67 @@ interface ShapeRecognitionResult {
   boundingBox: BoundingBox;
 }
 
-interface ShapeRecognitionOptions {
-  shapeIsClosedPercentThreshold: number;      // Max distance between stroke start/end to consider shape closed
-  arrowTipAngleThreshold: number;             // Angle (in degrees) below which a corner is considered "sharp" (for arrow detection)
-  rdpTolerancePercent: number;                // RDP simplification tolerance (percentage of bounding box diagonal)
-  rectangleCornersAngleThreshold: number;     // Angle (in degrees) to check for rectangle corners
-  rectangleOrientationAngleThreshold: number; // Angle difference (in degrees) to nearest 0/90 orientation to call it rectangle
-  ellipseRadiusVarianceThreshold: number;     // Variance in radius to consider a shape an ellipse
-}
+const QUADRILATERAL_SIDES = 4;
+const QUADRILATERAL_MIN_POINTS = 4; // RDP simplified vertices
+const QUADRILATERAL_MAX_POINTS = 5; // RDP might include closing point
+const ARROW_EXPECTED_POINTS = 5; // RDP simplified vertices for arrow shape
+const LINE_EXPECTED_POINTS = 2; // RDP simplified vertices for line shape
 
-const DEFAULT_OPTIONS: ShapeRecognitionOptions = {
+const DEFAULT_OPTIONS = {
+  // Max distance between stroke start/end (as % of bbox diagonal) to consider closed
   shapeIsClosedPercentThreshold: 20,
-  arrowTipAngleThreshold: 60,
+  // Min distance (px) to consider shape closed (takes precedence if larger than %)
+  shapeIsClosedDistanceThreshold: 10,
+  // RDP simplification tolerance (% of bbox diagonal)
   rdpTolerancePercent: 10,
-  rectangleCornersAngleThreshold: 20,
+  // Arrow specific thresholds
+  arrowMinTipAngle: 30, // Min angle degrees for the tip
+  arrowMaxTipAngle: 150, // Max angle degrees for the tip
+  arrowHeadMaxShaftRatio: 0.8, // Max length ratio of arrowhead segment to shaft
+  // Quadrilateral specific thresholds
+  rectangleMinCornerAngle: 20, // Min deviation from 180 degrees for a valid corner
+  rectangleMaxCornerAngle: 160, // Max deviation from 0 degrees for a valid corner
+  // Angle difference (degrees) to nearest 0/90 orientation to classify as rectangle
   rectangleOrientationAngleThreshold: 10,
-  ellipseRadiusVarianceThreshold: 0.5
-};
+  // Max variance in radius (normalized) to consider a shape an ellipse
+  ellipseRadiusVarianceThreshold: 0.5,
+} as const; // Use 'as const' for stricter typing of default values
 
 
-/**
- * Recognizes common shapes from free-draw input
- * @param element The freedraw element to analyze
- * @returns Information about the recognized shape, or null if no shape is recognized
- */
-export const recognizeShape = (
-  element: ExcalidrawFreeDrawElement,
-  opts: Partial<ShapeRecognitionOptions> = {},
-): ShapeRecognitionResult => {
-  const options = { ...DEFAULT_OPTIONS, ...opts };
+// Options for shape recognition, allowing partial overrides
+type ShapeRecognitionOptions = typeof DEFAULT_OPTIONS;
+type PartialShapeRecognitionOptions = Partial<ShapeRecognitionOptions>;
 
-  const boundingBox = getCommonBoundingBox([element]);;
-
-  // We need at least a few points to recognize a shape
-  if (!element.points || element.points.length < 3) {
-    return { type: "freedraw", simplified: element.points, boundingBox };
-  }
-
-  const tolerance = pointDistance(
-    [boundingBox.minX, boundingBox.minY] as LocalPoint,
-    [boundingBox.maxX, boundingBox.maxY] as LocalPoint,
-  ) * options.rdpTolerancePercent / 100;
-  const simplified = simplifyRDP(element.points, tolerance);
-
-  const start = element.points[0], end = element.points[element.points.length - 1];
-  const closedDist = pointDistance(start, end);
-  const boundingBoxDiagonal = Math.hypot(boundingBox.width, boundingBox.height);
-  // e.g., threshold: 10px or % of size
-  const isClosed = closedDist < Math.max(10, boundingBoxDiagonal * options.shapeIsClosedPercentThreshold / 100);
-
-  let bestShape: Shape = 'freedraw';
-
-  const boundingBoxCenter = getCenterForBounds([
-    boundingBox.minX,
-    boundingBox.minY,
-    boundingBox.maxX,
-    boundingBox.maxY,
-  ] as Bounds);
-
-  // **Line** (open shape with low deviation from a straight line)
-  if (!isClosed && simplified.length == 2) {
-    bestShape = 'line';
-  }
-
-  // **Arrow** (open shape with a sharp angle indicating an arrowhead)
-  if (!isClosed && simplified.length == 5) {
-    // The last two segments will make an arrowhead
-    console.log("Simplified points:", simplified);
-    const arrow_start = simplified[2], arrow_tip = simplified[3], arrow_end = simplified[4];
-    const tipAngle = angleBetween(arrow_tip, arrow_start, arrow_end); // angle at the second-last point (potential arrow tip)
-    // Lengths of the last two segments
-
-    const seg1Len = pointDistance(arrow_start, arrow_tip);
-    const seg2Len = pointDistance(arrow_tip, arrow_end);
-    // Length of the rest of the stroke (approx arrow shaft length)
-    const shaftLen = pointDistance(simplified[0], simplified[1])
-    // Heuristic checks for arrowhead: sharp angle and short segments relative to shaft
-    console.log("Arrow tip angle:", tipAngle);
-    if (tipAngle > 30 && tipAngle < 150 && seg1Len < shaftLen * 0.8 && seg2Len < shaftLen * 0.8) {
-      bestShape = 'arrow';
-    }
-  }
-
-  // **Rectangle or Diamond** (closed shape with 4 corners - RDP might include last point
-  if (isClosed && (simplified.length == 4 || simplified.length == 5)) {
-    const vertices = simplified.slice(); // copy
-    if (simplified.length === 5) {
-      vertices.pop(); // remove last point if RDP included it
-    }
-
-    // Compute angles at each corner
-    console.log("Vertices:", vertices);
-    var angles = []
-    for (let i = 0; i < vertices.length; i++) {
-      angles.push(angleBetween(vertices[i], vertices[(i + 1) % vertices.length], vertices[(i + 2) % vertices.length]));
-    }
-
-    console.log("Angles:", angles);
-    console.log("Angles sum:", angles.reduce((a, b) => a + b, 0));
-
-    // All angles are sharp enough, so we can check for rectangle/diamond
-    if (angles.every(a => (a > options.rectangleCornersAngleThreshold && a < 180 - options.rectangleCornersAngleThreshold))) {
-      // Determine orientation by checking the slope of each segment
-      interface Segment { length: number; angleDeg: number; }
-      const segments: Segment[] = [];
-      for (let i = 0; i < 4; i++) {
-        const p1 = simplified[i];
-        const p2 = simplified[(i + 1) % (simplified.length)];
-        const dx = p2[0] - p1[0];
-        const dy = p2[1] - p1[1];
-        const length = Math.hypot(dx, dy);
-        // angle of segment in degrees from horizontal
-        let segAngle = (Math.atan2(dy, dx) * 180) / Math.PI;
-        if (segAngle < 0) segAngle += 360;
-        if (segAngle > 180) segAngle -= 180; // use [0,180] range for undirected line
-        segments.push({ length, angleDeg: segAngle });
-      }
-      // Check for axis-aligned orientation
-      const hasAxisAlignedSide = segments.some(seg => {
-        const angle = seg.angleDeg;
-        const distToHoriz = Math.min(Math.abs(angle - 0), Math.abs(angle - 180));
-        const distToVert = Math.abs(angle - 90);
-        return (distToHoriz < options.rectangleOrientationAngleThreshold) || (distToVert < options.rectangleOrientationAngleThreshold);
-      });
-      if (hasAxisAlignedSide) {
-        bestShape = "rectangle";
-      } else {
-        // Not near axis-aligned, likely a rotated shape -> diamond
-        bestShape = "diamond";
-      }
-    }
-  } else if (isClosed) { // **Ellipse** (closed shape with few corners)
-    // Measure radius variance
-    const cx = boundingBoxCenter[0];
-    const cy = boundingBoxCenter[1];
-    let totalDist = 0, maxDist = 0, minDist = Infinity;
-    for (const p of simplified) {
-      const d = Math.hypot(p[0] - cx, p[1] - cy);
-      totalDist += d;
-      maxDist = Math.max(maxDist, d);
-      minDist = Math.min(minDist, d);
-    }
-    const avgDist = totalDist / simplified.length;
-    const radiusVar = (maxDist - minDist) / (avgDist || 1);
-    // If variance in radius is small, shape is round
-    if (radiusVar < options.ellipseRadiusVarianceThreshold) {
-      bestShape = 'ellipse';
-    }
-  }
-
-  return {
-    type: bestShape,
-    simplified,
-    boundingBox
-  } as ShapeRecognitionResult;
-};
+interface Segment {
+  length: number;
+  angleDeg: number; // Angle in degrees [0, 180) representing the line's orientation
+}
 
 /**
  * Simplify a polyline using Ramer-Douglas-Peucker algorithm.
- * @param points Array of points [x,y] representing the stroke.
- * @param epsilon Tolerance for simplification (higher = more simplification).
- * @returns Simplified list of points.
  */
-function simplifyRDP(points: readonly LocalPoint[], epsilon: number): readonly LocalPoint[] {
-  if (points.length < 3) return points;
-  // Find the point with the maximum distance from the line between first and last
-  const first = points[0], last = points[points.length - 1];
+function simplifyRDP(
+  points: readonly LocalPoint[],
+  epsilon: number,
+): readonly LocalPoint[] {
+  if (points.length < 3) {
+    return points;
+  }
+
+  const first = points[0];
+  const last = points[points.length - 1];
   let index = -1;
   let maxDist = 0;
+
+  // Find the point with the maximum distance from the line segment between first and last
   for (let i = 1; i < points.length - 1; i++) {
-    // Perpendicular distance from points[i] to line (first-last)
     const dist = perpendicularDistance(points[i], first, last);
     if (dist > maxDist) {
       maxDist = dist;
       index = i;
     }
   }
+
   // If max distance is greater than epsilon, recursively simplify
   if (maxDist > epsilon && index !== -1) {
     const left = simplifyRDP(points.slice(0, index + 1), epsilon);
@@ -210,10 +95,276 @@ function simplifyRDP(points: readonly LocalPoint[], epsilon: number): readonly L
     // Concatenate results (omit duplicate point at junction)
     return left.slice(0, -1).concat(right);
   } else {
-    // Not enough deviation, return straight line (keep only endpoints)
+    // Not enough deviation, return straight line segment (keep only endpoints)
     return [first, last];
   }
 }
+
+/**
+ * Calculates the properties (length, angle) of segments in a polygon.
+ */
+function calculateSegments(vertices: readonly LocalPoint[]): Segment[] {
+  const segments: Segment[] = [];
+  const numVertices = vertices.length;
+  for (let i = 0; i < numVertices; i++) {
+    const p1 = vertices[i];
+    // Ensure wrapping for the last segment connecting back to the start
+    const p2 = vertices[(i + 1) % numVertices];
+    const dx = p2[0] - p1[0];
+    const dy = p2[1] - p1[1];
+    const length = Math.hypot(dx, dy);
+
+    // Calculate angle in degrees [0, 360)
+    let angleRad = Math.atan2(dy, dx);
+    if (angleRad < 0) {
+      angleRad += 2 * Math.PI;
+    }
+    let angleDeg = (angleRad * 180) / Math.PI;
+
+    // Normalize angle to [0, 180) for undirected line orientation
+    if (angleDeg >= 180) {
+      angleDeg -= 180;
+    }
+
+    segments.push({ length, angleDeg });
+  }
+  return segments;
+}
+
+/**
+ * Checks if the shape is closed based on the distance between start and end points.
+ */
+function isShapeClosed(
+  points: readonly LocalPoint[],
+  boundingBoxDiagonal: number,
+  options: ShapeRecognitionOptions,
+): boolean {
+  const start = points[0];
+  const end = points[points.length - 1];
+  const closedDist = pointDistance(start, end);
+  const closedThreshold = Math.max(
+    options.shapeIsClosedDistanceThreshold,
+    boundingBoxDiagonal * (options.shapeIsClosedPercentThreshold / 100),
+  );
+  return closedDist < closedThreshold;
+}
+
+/**
+ * Checks if a quadrilateral is likely axis-aligned based on its segment angles.
+ */
+function isAxisAligned(
+  segments: Segment[],
+  orientationThreshold: number,
+): boolean {
+  return segments.some((seg) => {
+    const angle = seg.angleDeg;
+    // Distance to horizontal (0 or 180 degrees)
+    const distToHoriz = Math.min(angle, 180 - angle);
+    // Distance to vertical (90 degrees)
+    const distToVert = Math.abs(angle - 90);
+    return (
+      distToHoriz < orientationThreshold || distToVert < orientationThreshold
+    );
+  });
+}
+
+/**
+ * Calculates the variance of the distance from points to a center point.
+ * Returns a normalized variance value (0 = perfectly round).
+ */
+function calculateRadiusVariance(
+  points: readonly LocalPoint[],
+  boundingBox: BoundingBox,
+): number {
+  if (points.length === 0) {
+    return 0; // Or handle as an error/special case
+  }
+
+  const [cx, cy] = getCenterForBounds([
+    boundingBox.minX,
+    boundingBox.minY,
+    boundingBox.maxX,
+    boundingBox.maxY,
+  ] as Bounds);
+
+  let totalDist = 0;
+  let maxDist = 0;
+  let minDist = Infinity;
+
+  for (const p of points) {
+    const d = Math.hypot(p[0] - cx, p[1] - cy);
+    totalDist += d;
+    maxDist = Math.max(maxDist, d);
+    minDist = Math.min(minDist, d);
+  }
+
+  const avgDist = totalDist / points.length;
+
+  // Avoid division by zero if avgDist is 0 (e.g., all points are at the center)
+  if (avgDist === 0) {
+    return 0;
+  }
+
+  const radiusVariance = (maxDist - minDist) / avgDist;
+  return radiusVariance;
+}
+
+/** Checks if the points form a straight line segment. */
+function checkLine(
+  points: readonly LocalPoint[],
+  isClosed: boolean,
+): Shape | null {
+  if (!isClosed && points.length === LINE_EXPECTED_POINTS) {
+    return "line";
+  }
+  return null;
+}
+
+/** Checks if the points form an arrow shape. */
+function checkArrow(
+  points: readonly LocalPoint[],
+  isClosed: boolean,
+  options: ShapeRecognitionOptions,
+): Shape | null {
+  if (isClosed || points.length !== ARROW_EXPECTED_POINTS) {
+    return null;
+  }
+
+  const shaftStart = points[0];
+  const shaftEnd = points[1]; // Assuming RDP simplifies shaft to 2 points
+  const arrowBase = points[2];
+  const arrowTip = points[3];
+  const arrowTailEnd = points[4];
+
+  const tipAngle = angleBetween(arrowTip, arrowBase, arrowTailEnd);
+
+  if (tipAngle <= options.arrowMinTipAngle || tipAngle >= options.arrowMaxTipAngle) {
+    return null;
+  }
+
+  const headSegment1Len = pointDistance(arrowBase, arrowTip);
+  const headSegment2Len = pointDistance(arrowTip, arrowTailEnd);
+  const shaftLen = pointDistance(shaftStart, shaftEnd); // Approx shaft length
+
+  // Heuristic: Arrowhead segments should be significantly shorter than the shaft
+  const isHeadShortEnough =
+    headSegment1Len < shaftLen * options.arrowHeadMaxShaftRatio &&
+    headSegment2Len < shaftLen * options.arrowHeadMaxShaftRatio;
+
+  return isHeadShortEnough ? "arrow" : null;
+}
+
+/** Checks if the points form a rectangle or diamond shape. */
+function checkQuadrilateral(
+  points: readonly LocalPoint[],
+  isClosed: boolean,
+  options: ShapeRecognitionOptions,
+): Shape | null {
+  if (
+    !isClosed ||
+    points.length < QUADRILATERAL_MIN_POINTS ||
+    points.length > QUADRILATERAL_MAX_POINTS
+  ) {
+    return null;
+  }
+
+  // Take the first 4 points as vertices (RDP might add 5th closing point)
+  const vertices = points.slice(0, QUADRILATERAL_SIDES);
+  // console.log("Vertices (Quad Check):", vertices);
+
+  // Calculate internal angles
+  const angles: number[] = [];
+  for (let i = 0; i < QUADRILATERAL_SIDES; i++) {
+    const p1 = vertices[i];
+    const p2 = vertices[(i + 1) % QUADRILATERAL_SIDES];
+    const p3 = vertices[(i + 2) % QUADRILATERAL_SIDES];
+
+    angles.push(angleBetween(p1, p2, p3));
+  }
+
+  const allCornersAreValid = angles.every(
+    (a) =>
+      a > options.rectangleMinCornerAngle &&
+      a < options.rectangleMaxCornerAngle,
+  );
+
+  if (!allCornersAreValid) {
+    return null;
+  }
+
+  const segments = calculateSegments(vertices);
+
+  if (isAxisAligned(segments, options.rectangleOrientationAngleThreshold)) {
+    return "rectangle";
+  } else {
+    // Not axis-aligned, but quadrilateral => classify as diamond
+    return "diamond";
+  }
+}
+
+/** Checks if the points form an ellipse shape. */
+function checkEllipse(
+  points: readonly LocalPoint[],
+  isClosed: boolean,
+  boundingBox: BoundingBox,
+  options: ShapeRecognitionOptions,
+): Shape | null {
+  if (!isClosed) {
+    return null;
+  }
+
+  // Need a minimum number of points for it to be an ellipse
+  if (points.length < QUADRILATERAL_MAX_POINTS) {
+    return null;
+  }
+
+  const radiusVariance = calculateRadiusVariance(points, boundingBox);
+
+  return radiusVariance < options.ellipseRadiusVarianceThreshold
+    ? "ellipse"
+    : null;
+}
+
+/**
+ * Recognizes common shapes from free-draw input points.
+ * @param element The freedraw element to analyze.
+ * @param opts Optional overrides for recognition thresholds.
+ * @returns Information about the recognized shape.
+ */
+export const recognizeShape = (
+  element: ExcalidrawFreeDrawElement,
+  opts: PartialShapeRecognitionOptions = {},
+): ShapeRecognitionResult => {
+  const options = { ...DEFAULT_OPTIONS, ...opts };
+  const { points } = element;
+  const boundingBox = getCommonBoundingBox([element]);
+
+  // Need at least a few points to recognize a shape
+  if (!points || points.length < 3) {
+    return { type: "freedraw", simplified: points, boundingBox };
+  }
+
+  const boundingBoxDiagonal = Math.hypot(boundingBox.width, boundingBox.height);
+  const rdpTolerance = boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
+  const simplifiedPoints = simplifyRDP(points, rdpTolerance);
+
+  const isClosed = isShapeClosed(simplifiedPoints, boundingBoxDiagonal, options);
+
+  // --- Shape check order matters here ---
+  let recognizedType: Shape =
+    checkLine(simplifiedPoints, isClosed) ??
+    checkArrow(simplifiedPoints, isClosed, options) ??
+    checkQuadrilateral(simplifiedPoints, isClosed, options) ??
+    checkEllipse(simplifiedPoints, isClosed, boundingBox, options) ??
+    "freedraw"; // Default if no other shape matches
+
+  return {
+    type: recognizedType,
+    simplified: simplifiedPoints,
+    boundingBox,
+  };
+};
+
 
 /**
  * Converts a freedraw element to the detected shape
