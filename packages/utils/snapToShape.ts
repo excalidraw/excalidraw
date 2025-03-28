@@ -28,19 +28,21 @@ interface ShapeRecognitionResult {
 }
 
 interface ShapeRecognitionOptions {
-  closedDistThreshPercent: number;     // Max distance between stroke start/end to consider shape closed
-  cornerAngleThresh: number;           // Angle (in degrees) below which a corner is considered "sharp" (for arrow detection)
-  rdpTolerancePercent: number;         // RDP simplification tolerance (percentage of bounding box diagonal)
-  rectAngleThresh: number;         // Angle (in degrees) to check for rectangle corners
-  rectOrientationThresh: number;       // Angle difference (in degrees) to nearest 0/90 orientation to call it rectangle
+  shapeIsClosedPercentThreshold: number;      // Max distance between stroke start/end to consider shape closed
+  arrowTipAngleThreshold: number;             // Angle (in degrees) below which a corner is considered "sharp" (for arrow detection)
+  rdpTolerancePercent: number;                // RDP simplification tolerance (percentage of bounding box diagonal)
+  rectangleCornersAngleThreshold: number;     // Angle (in degrees) to check for rectangle corners
+  rectangleOrientationAngleThreshold: number; // Angle difference (in degrees) to nearest 0/90 orientation to call it rectangle
+  ellipseRadiusVarianceThreshold: number;     // Variance in radius to consider a shape an ellipse
 }
 
 const DEFAULT_OPTIONS: ShapeRecognitionOptions = {
-  closedDistThreshPercent: 10,  // distance between start/end < % of bounding box diagonal
-  cornerAngleThresh: 60,        // <60° considered a sharp corner (possible arrow tip)
-  rdpTolerancePercent: 10,      // percentage of bounding box diagonal
-  rectAngleThresh: 20,         // <20° considered a sharp corner (rectangle)
-  rectOrientationThresh: 10,    //
+  shapeIsClosedPercentThreshold: 20,
+  arrowTipAngleThreshold: 60,
+  rdpTolerancePercent: 10,
+  rectangleCornersAngleThreshold: 20,
+  rectangleOrientationAngleThreshold: 10,
+  ellipseRadiusVarianceThreshold: 0.5
 };
 
 
@@ -67,16 +69,14 @@ export const recognizeShape = (
     [boundingBox.maxX, boundingBox.maxY] as LocalPoint,
   ) * options.rdpTolerancePercent / 100;
   const simplified = simplifyRDP(element.points, tolerance);
-  console.log("Simplified points:", simplified);
 
-  // Check if the original points form a closed shape
   const start = element.points[0], end = element.points[element.points.length - 1];
   const closedDist = pointDistance(start, end);
-  const diag = Math.hypot(boundingBox.width, boundingBox.height); // diagonal of bounding box
-  const isClosed = closedDist < Math.max(10, diag * options.closedDistThreshPercent / 100);  // e.g., threshold: 10px or % of size
-  console.log("Closed shape:", isClosed);
+  const boundingBoxDiagonal = Math.hypot(boundingBox.width, boundingBox.height);
+  // e.g., threshold: 10px or % of size
+  const isClosed = closedDist < Math.max(10, boundingBoxDiagonal * options.shapeIsClosedPercentThreshold / 100);
 
-  let bestShape: Shape = 'freedraw'; // TODO: Should this even be possible in this mode?
+  let bestShape: Shape = 'freedraw';
 
   const boundingBoxCenter = getCenterForBounds([
     boundingBox.minX,
@@ -127,7 +127,7 @@ export const recognizeShape = (
     console.log("Angles sum:", angles.reduce((a, b) => a + b, 0));
 
     // All angles are sharp enough, so we can check for rectangle/diamond
-    if (angles.every(a => (a > options.rectAngleThresh && a < 180 - options.rectAngleThresh))) {
+    if (angles.every(a => (a > options.rectangleCornersAngleThreshold && a < 180 - options.rectangleCornersAngleThreshold))) {
       // Determine orientation by checking the slope of each segment
       interface Segment { length: number; angleDeg: number; }
       const segments: Segment[] = [];
@@ -148,7 +148,7 @@ export const recognizeShape = (
         const angle = seg.angleDeg;
         const distToHoriz = Math.min(Math.abs(angle - 0), Math.abs(angle - 180));
         const distToVert = Math.abs(angle - 90);
-        return (distToHoriz < options.rectOrientationThresh) || (distToVert < options.rectOrientationThresh);
+        return (distToHoriz < options.rectangleOrientationAngleThreshold) || (distToVert < options.rectangleOrientationAngleThreshold);
       });
       if (hasAxisAlignedSide) {
         bestShape = "rectangle";
@@ -157,26 +157,22 @@ export const recognizeShape = (
         bestShape = "diamond";
       }
     }
-  } else {
-    const aspectRatio = boundingBox.width && boundingBox.height ? Math.min(boundingBox.width, boundingBox.height) / Math.max(boundingBox.width, boundingBox.height) : 1;
-    // If aspect ratio ~1 (nearly square) and simplified has few corners, good for circle
-    if (aspectRatio > 0.8) {
-      // Measure radius variance
-      const cx = boundingBoxCenter[0];
-      const cy = boundingBoxCenter[1];
-      let totalDist = 0, maxDist = 0, minDist = Infinity;
-      for (const p of simplified) {
-        const d = Math.hypot(p[0] - cx, p[1] - cy);
-        totalDist += d;
-        maxDist = Math.max(maxDist, d);
-        minDist = Math.min(minDist, d);
-      }
-      const avgDist = totalDist / simplified.length;
-      const radiusVar = (maxDist - minDist) / (avgDist || 1);
-      // If variance in radius is small, shape is round
-      if (radiusVar < 0.3) {
-        bestShape = 'ellipse';
-      }
+  } else if (isClosed) { // **Ellipse** (closed shape with few corners)
+    // Measure radius variance
+    const cx = boundingBoxCenter[0];
+    const cy = boundingBoxCenter[1];
+    let totalDist = 0, maxDist = 0, minDist = Infinity;
+    for (const p of simplified) {
+      const d = Math.hypot(p[0] - cx, p[1] - cy);
+      totalDist += d;
+      maxDist = Math.max(maxDist, d);
+      minDist = Math.min(minDist, d);
+    }
+    const avgDist = totalDist / simplified.length;
+    const radiusVar = (maxDist - minDist) / (avgDist || 1);
+    // If variance in radius is small, shape is round
+    if (radiusVar < options.ellipseRadiusVarianceThreshold) {
+      bestShape = 'ellipse';
     }
   }
 
