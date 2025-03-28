@@ -47,6 +47,7 @@
     "build": "yarn build:app && yarn build:version",
     "start": "yarn && vite",
     "start:production": "yarn build && yarn serve",
+    "start:dev:docker": "yarn && vite --no-open --host",
     "serve": "npx http-server build -a localhost -p 5001 -o",
     "build:preview": "yarn build && vite preview --port 5000"
   },

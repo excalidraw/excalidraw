@@ -1,0 +1,22 @@
+services:
+  excalidraw:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    command: yarn start:dev:docker
+    develop:
+      watch:
+        - action: sync
+          path: ./packages
+          target: /app/packages
+          ignore:
+            - node_modules/
+        - action: sync
+          path: ./excalidraw-app
+          target: /app/excalidraw-app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    ports:
+      - 3000:3000
