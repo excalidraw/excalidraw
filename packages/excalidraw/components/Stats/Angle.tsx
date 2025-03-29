@@ -12,7 +12,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { angleIcon } from "../icons";
 
 import DragInput from "./DragInput";
-import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
+import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
 import type Scene from "../../scene/Scene";
@@ -35,7 +35,6 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   scene,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   if (origElement && !isElbowArrow(origElement)) {
     const latestElement = elementsMap.get(origElement.id);
@@ -48,7 +47,6 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       mutateElement(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, elementsMap, elements, scene);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -74,7 +72,6 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     mutateElement(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, elementsMap, elements, scene);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
