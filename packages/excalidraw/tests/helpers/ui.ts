@@ -464,6 +464,7 @@ export class UI {
       height: initialHeight = initialWidth,
       angle = 0,
       points: initialPoints,
+      elbowed = false,
     }: {
       position?: number;
       x?: number;
@@ -473,6 +474,7 @@ export class UI {
       height?: number;
       angle?: number;
       points?: T extends "line" | "arrow" | "freedraw" ? LocalPoint[] : never;
+      elbowed?: boolean;
     } = {},
   ): Element<T> & {
     /** Returns the actual, current element from the elements array, instead
@@ -491,6 +493,17 @@ export class UI {
     if (type === "text") {
       mouse.reset();
       mouse.click(x, y);
+    } else if (type === "arrow" && points.length === 2 && elbowed) {
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.moveTo(x + points[0][0], y + points[0][1]);
+      mouse.click();
+      mouse.moveTo(
+        x + points[points.length - 1][0],
+        y + points[points.length - 1][1],
+      );
+      mouse.click();
+      Keyboard.keyPress(KEYS.ESCAPE);
     } else if ((type === "line" || type === "arrow") && points.length > 2) {
       points.forEach((point) => {
         mouse.reset();

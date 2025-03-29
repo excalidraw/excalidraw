@@ -503,4 +503,82 @@ describe("element binding", () => {
       });
     });
   });
+
+  // UX RATIONALE: The arrow might be outside of the shape at high zoom and you
+  // won't see what's going on.
+  it(
+    "allow non-binding simple (complex) arrow creation while start and end" +
+      " points are in the same shape",
+    () => {
+      UI.createElement("rectangle", {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      const arrow = UI.createElement("arrow", {
+        x: 5,
+        y: 5,
+        height: 95,
+        width: 95,
+      });
+
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+      expect(arrow.points).toCloselyEqualPoints([
+        [0, 0],
+        [95, 95],
+      ]);
+
+      const rect2 = API.createElement({
+        type: "rectangle",
+        x: 300,
+        y: 300,
+        width: 100,
+        height: 100,
+        backgroundColor: "red",
+        fillStyle: "solid",
+      });
+
+      API.setElements([rect2]);
+
+      const arrow2 = UI.createElement("arrow", {
+        x: 305,
+        y: 305,
+        height: 95,
+        width: 95,
+      });
+
+      expect(arrow2.startBinding).toBe(null);
+      expect(arrow2.endBinding).toBe(null);
+      expect(arrow2.points).toCloselyEqualPoints([
+        [0, 0],
+        [95, 95],
+      ]);
+
+      UI.createElement("rectangle", {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      const arrow3 = UI.createElement("arrow", {
+        x: 5,
+        y: 5,
+        height: 95,
+        width: 95,
+        elbowed: true,
+      });
+
+      expect(arrow3.startBinding).toBe(null);
+      expect(arrow3.endBinding).toBe(null);
+      expect(arrow3.points).toCloselyEqualPoints([
+        [0, 0],
+        [45, 45],
+        [95, 95],
+      ]);
+    },
+  );
 });
