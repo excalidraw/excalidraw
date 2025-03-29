@@ -16,6 +16,7 @@ import {
 } from "@excalidraw/element/groups";
 
 import {
+  getOriginalBindingsIfStillCloseToArrowEnds,
   unbindLinearElement,
   updateBoundElements,
 } from "@excalidraw/element/binding";
@@ -29,7 +30,6 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 export type StatsInputProperty =
@@ -122,8 +122,6 @@ export const moveElement = (
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  scene: Scene,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
@@ -159,7 +157,9 @@ export const moveElement = (
     shouldInformMutation,
   );
 
-  updateBindings(latestElement, elementsMap);
+  if (isBindableElement(latestElement)) {
+    updateBoundElements(latestElement, elementsMap);
+  }
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -203,18 +203,33 @@ export const getAtomicUnits = (
 export const updateBindings = (
   latestElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
-  options?: {
-    simultaneouslyUpdated?: readonly ExcalidrawElement[];
-  },
+  zoom?: AppState["zoom"],
+  remainedBound?: () => void,
 ) => {
   if (isBindingElement(latestElement)) {
-    if (latestElement.startBinding) {
-      unbindLinearElement(latestElement, "start");
+    const [start, end] = getOriginalBindingsIfStillCloseToArrowEnds(
+      latestElement,
+      elementsMap,
+      zoom,
+    );
+
+    if (
+      (latestElement.startBinding && start) ||
+      (latestElement.endBinding && end)
+    ) {
+      remainedBound?.();
+    } else {
+      if (latestElement.startBinding && !start) {
+        unbindLinearElement(latestElement, "start");
+      }
+
+      if (latestElement.endBinding && !end) {
+        unbindLinearElement(latestElement, "end");
+      }
     }
-    if (latestElement.endBinding) {
-      unbindLinearElement(latestElement, "end");
-    }
-  } else if (isBindableElement(latestElement)) {
-    updateBoundElements(latestElement, elementsMap, options);
+
+    // else if (end) {
+    //   updateBoundElements(end, elementsMap);
+    // }
   }
 };
