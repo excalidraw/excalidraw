@@ -608,7 +608,13 @@ const ExcalidrawWrapper = () => {
           excalidrawAPI.getSceneElements(),
         )
       ) {
-        preventUnload(event);
+        if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
+          preventUnload(event);
+        } else {
+          console.warn(
+            "preventing unload disabled (VITE_APP_DISABLE_PREVENT_UNLOAD)",
+          );
+        }
       }
     };
     window.addEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
