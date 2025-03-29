@@ -1,4 +1,5 @@
 import tEXt from "png-chunk-text";
+import { encode as encodeITXt, decode as decodeITXt } from "png-chunk-itxt";
 import encodePng from "png-chunks-encode";
 import decodePng from "png-chunks-extract";
 
@@ -11,48 +12,89 @@ import { encode, decode } from "./encode";
 // PNG
 // -----------------------------------------------------------------------------
 
-export const getTEXtChunk = async (
+export const getMetadataChunk = async (
   blob: Blob,
 ): Promise<{ keyword: string; text: string } | null> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
-  const metadataChunk = chunks.find((chunk) => chunk.name === "tEXt");
-  if (metadataChunk) {
-    return tEXt.decode(metadataChunk.data);
+  
+  const iTXtChunk = chunks.find((chunk) => chunk.name === "iTXt");
+  if (iTXtChunk) {
+    try {
+      const decoded = decodeITXt(iTXtChunk.data);
+      return { keyword: decoded.keyword, text: decoded.text };
+    } catch (error) {
+      console.error("Failed to decode iTXt chunk:", error);
+    }
   }
+  
+  const tEXtChunk = chunks.find((chunk) => chunk.name === "tEXt");
+  if (tEXtChunk) {
+    return tEXt.decode(tEXtChunk.data);
+  }
+  
   return null;
 };
 
 export const encodePngMetadata = async ({
   blob,
   metadata,
+  useITXt = true,
 }: {
   blob: Blob;
   metadata: string;
+  useITXt?: boolean;
 }) => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
-
-  const metadataChunk = tEXt.encode(
-    MIME_TYPES.excalidraw,
-    JSON.stringify(
-      encode({
-        text: metadata,
-        compress: true,
-      }),
-    ),
+  
+  const filteredChunks = chunks.filter(
+    (chunk) => 
+      !(chunk.name === "tEXt" && 
+        tEXt.decode(chunk.data).keyword === MIME_TYPES.excalidraw) &&
+      !(chunk.name === "iTXt" && 
+        decodeITXt(chunk.data).keyword === MIME_TYPES.excalidraw)
   );
-  // insert metadata before last chunk (iEND)
-  chunks.splice(-1, 0, metadataChunk);
+  
+  const encodedData = JSON.stringify(
+    encode({
+      text: metadata,
+      compress: true,
+    }),
+  );
 
-  return new Blob([encodePng(chunks)], { type: MIME_TYPES.png });
+  let metadataChunk;
+  try {
+    if (useITXt) {
+      metadataChunk = encodeITXt(
+        MIME_TYPES.excalidraw,
+        encodedData,
+        { 
+          compressed: false, //Already compressed in encode
+          language: "en",
+          translated: ""
+        }
+      );
+    } else {
+      throw new Error("Fallback to tEXt");
+    }
+  } catch (error) {
+    console.warn("iTXt encoding failed, falling back to tEXt:", error);
+    metadataChunk = tEXt.encode(
+      MIME_TYPES.excalidraw,
+      encodedData,
+    );
+  }
+  
+  filteredChunks.splice(-1, 0, metadataChunk);
+
+  return new Blob([encodePng(filteredChunks)], { type: MIME_TYPES.png });
 };
 
 export const decodePngMetadata = async (blob: Blob) => {
-  const metadata = await getTEXtChunk(blob);
+  const metadata = await getMetadataChunk(blob);
   if (metadata?.keyword === MIME_TYPES.excalidraw) {
     try {
       const encodedData = JSON.parse(metadata.text);
       if (!("encoded" in encodedData)) {
-        // legacy, un-encoded scene JSON
         if (
           "type" in encodedData &&
           encodedData.type === EXPORT_DATA_TYPES.excalidraw

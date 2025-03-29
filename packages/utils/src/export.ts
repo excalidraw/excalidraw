@@ -101,9 +101,10 @@ export const exportToBlob = async (
     mimeType?: string;
     quality?: number;
     exportPadding?: number;
+    useITXt?: boolean;
   },
 ): Promise<Blob> => {
-  let { mimeType = MIME_TYPES.png, quality } = opts;
+  let { mimeType = MIME_TYPES.png, quality, useITXt = true } = opts;
 
   if (mimeType === MIME_TYPES.png && typeof quality === "number") {
     console.warn(`"quality" will be ignored for "${MIME_TYPES.png}" mimeType`);
@@ -150,6 +151,7 @@ export const exportToBlob = async (
               opts.files || {},
               "local",
             ),
+            useITXt,
           });
         }
         resolve(blob);
