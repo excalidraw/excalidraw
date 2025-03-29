@@ -17,7 +17,7 @@ export const getMetadataChunk = async (
 ): Promise<{ keyword: string; text: string } | null> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
   
-  const iTXtChunk = chunks.find((chunk) => chunk.name === "iTXt");
+  const iTXtChunk = chunks.find((chunk) => chunk.name === PNGChunkType.iTXt);
   if (iTXtChunk) {
     try {
       const decoded = decodeITXt(iTXtChunk.data);
@@ -27,7 +27,7 @@ export const getMetadataChunk = async (
     }
   }
   
-  const tEXtChunk = chunks.find((chunk) => chunk.name === "tEXt");
+  const tEXtChunk = chunks.find((chunk) => chunk.name === PNGChunkType.tEXt);
   if (tEXtChunk) {
     return tEXt.decode(tEXtChunk.data);
   }
@@ -48,9 +48,9 @@ export const encodePngMetadata = async ({
   
   const filteredChunks = chunks.filter(
     (chunk) => 
-      !(chunk.name === "tEXt" && 
+      !(chunk.name === PNGChunkType.tEXt && 
         tEXt.decode(chunk.data).keyword === MIME_TYPES.excalidraw) &&
-      !(chunk.name === "iTXt" && 
+      !(chunk.name === PNGChunkType.iTXt && 
         decodeITXt(chunk.data).keyword === MIME_TYPES.excalidraw)
   );
   
@@ -68,7 +68,8 @@ export const encodePngMetadata = async ({
         MIME_TYPES.excalidraw,
         encodedData,
         { 
-          compressed: false, //Already compressed in encode
+          compressed: true,
+          compressedMethod: 0,
           language: "en",
           translated: ""
         }
@@ -101,13 +102,13 @@ export const decodePngMetadata = async (blob: Blob) => {
         ) {
           return metadata.text;
         }
-        throw new Error("FAILED");
+        throw new Error("Malformed or unexpected metadata format");
       }
       return decode(encodedData);
     } catch (error: any) {
       console.error(error);
-      throw new Error("FAILED");
+      throw new Error("Malformed or unexpected metadata format");
     }
   }
-  throw new Error("INVALID");
+  throw new Error("Invalid or unsupported PNG metadata format");
 };
