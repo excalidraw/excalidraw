@@ -1,14 +1,11 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import {
-  bindOrUnbindLinearElements,
-  updateBoundElements,
-} from "@excalidraw/element/binding";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
+  isBindableElement,
+  isBindingElement,
   isFrameLikeElement,
-  isLinearElement,
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
@@ -17,6 +14,11 @@ import {
   getElementsInGroup,
   isInGroup,
 } from "@excalidraw/element/groups";
+
+import {
+  unbindLinearElement,
+  updateBoundElements,
+} from "@excalidraw/element/binding";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -156,7 +158,8 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
-  updateBindings(latestElement, elementsMap, elements, scene);
+
+  updateBindings(latestElement, elementsMap);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -200,25 +203,18 @@ export const getAtomicUnits = (
 export const updateBindings = (
   latestElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  scene: Scene,
   options?: {
     simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    newSize?: { width: number; height: number };
-    zoom?: AppState["zoom"];
   },
 ) => {
-  if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements(
-      [latestElement],
-      elementsMap,
-      elements,
-      scene,
-      true,
-      [],
-      options?.zoom,
-    );
-  } else {
+  if (isBindingElement(latestElement)) {
+    if (latestElement.startBinding) {
+      unbindLinearElement(latestElement, "start");
+    }
+    if (latestElement.endBinding) {
+      unbindLinearElement(latestElement, "end");
+    }
+  } else if (isBindableElement(latestElement)) {
     updateBoundElements(latestElement, elementsMap, options);
   }
 };

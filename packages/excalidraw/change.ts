@@ -1508,9 +1508,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
   ) {
     for (const element of changed.values()) {
       if (!element.isDeleted && isBindableElement(element)) {
-        updateBoundElements(element, elements, {
-          changedElements: changed,
-        });
+        updateBoundElements(element, elements);
       }
     }
   }

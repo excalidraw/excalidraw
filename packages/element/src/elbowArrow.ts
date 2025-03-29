@@ -63,7 +63,6 @@ import type {
   ExcalidrawBindableElement,
   FixedPointBinding,
   FixedSegment,
-  NonDeletedExcalidrawElement,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -1221,18 +1220,22 @@ const getElbowArrowData = (
   if (options?.isDragging) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
-      getHoveredElement(
-        origStartGlobalPoint,
-        elementsMap,
+      getHoveredElementForBinding(
+        tupleToCoors(origStartGlobalPoint),
         elements,
+        elementsMap,
         options?.zoom,
+        true,
+        true,
       ) || null;
     hoveredEndElement =
-      getHoveredElement(
-        origEndGlobalPoint,
-        elementsMap,
+      getHoveredElementForBinding(
+        tupleToCoors(origEndGlobalPoint),
         elements,
+        elementsMap,
         options?.zoom,
+        true,
+        true,
       ) || null;
   } else {
     hoveredStartElement = arrow.startBinding
@@ -1254,6 +1257,7 @@ const getElbowArrowData = (
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
+    elementsMap,
     hoveredStartElement,
     options?.isDragging,
   );
@@ -1267,6 +1271,7 @@ const getElbowArrowData = (
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
+    elementsMap,
     hoveredEndElement,
     options?.isDragging,
   );
@@ -2212,6 +2217,7 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
+  elementsMap: NonDeletedSceneElementsMap,
   element?: ExcalidrawBindableElement | null,
   isDragging?: boolean,
 ): GlobalPoint => {
@@ -2221,6 +2227,7 @@ const getGlobalPoint = (
         arrow,
         element,
         startOrEnd,
+        elementsMap,
       );
 
       return snapToMid(element, snapPoint);
@@ -2240,7 +2247,7 @@ const getGlobalPoint = (
       distanceToBindableElement(element, fixedGlobalPoint) -
         FIXED_BINDING_DISTANCE,
     ) > 0.01
-      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd)
+      ? bindPointToSnapToElementOutline(arrow, element, startOrEnd, elementsMap)
       : fixedGlobalPoint;
   }
 
@@ -2268,25 +2275,8 @@ const getBindPointHeading = (
           number,
         ],
       ),
-    elementsMap,
     origPoint,
   );
-
-const getHoveredElement = (
-  origPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  zoom?: AppState["zoom"],
-) => {
-  return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
-    elements,
-    elementsMap,
-    zoom,
-    true,
-    true,
-  );
-};
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];

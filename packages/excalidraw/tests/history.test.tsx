@@ -6,6 +6,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { vi } from "vitest";
+import { FIXED_BINDING_DISTANCE } from "@excalidraw/element/binding";
 import { pointFrom } from "@excalidraw/math";
 
 import { newElementWith } from "@excalidraw/element/mutateElement";
@@ -4779,12 +4780,12 @@ describe("history", () => {
               startBinding: expect.objectContaining({
                 elementId: rect1.id,
                 focus: 0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
                 focus: -0,
-                gap: 1,
+                gap: FIXED_BINDING_DISTANCE,
               }),
               isDeleted: true,
             }),
