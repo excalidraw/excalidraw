@@ -1,6 +1,6 @@
 import { getNonDeletedElements } from "@excalidraw/element";
 import {
-  bindOrUnbindLinearElements,
+  bindOrUnbindLinearElement,
   isBindingEnabled,
 } from "@excalidraw/element/binding";
 import { getCommonBoundingBox } from "@excalidraw/element/bounds";
@@ -12,15 +12,15 @@ import { deepCopyElement } from "@excalidraw/element/duplicate";
 import { resizeMultipleElements } from "@excalidraw/element/resizeElements";
 import {
   isArrowElement,
-  isElbowArrow,
-  isLinearElement,
+  isBindableElement,
+  isBindingElement,
 } from "@excalidraw/element/typeChecks";
 import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
 
 import type {
   ExcalidrawArrowElement,
-  ExcalidrawElbowArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawElement,
   NonDeleted,
   NonDeletedSceneElementsMap,
@@ -160,52 +160,54 @@ const flipElements = (
     },
   );
 
-  bindOrUnbindLinearElements(
-    selectedElements.filter(isLinearElement),
-    elementsMap,
-    app.scene.getNonDeletedElements(),
-    app.scene,
-    isBindingEnabled(appState),
-    [],
-    appState.zoom,
+  const selectedBindables = selectedElements.filter(
+    (e): e is ExcalidrawBindableElement => isBindableElement(e),
   );
-
-  // ---------------------------------------------------------------------------
-  // flipping arrow elements (and potentially other) makes the selection group
-  // "move" across the canvas because of how arrows can bump against the "wall"
-  // of the selection, so we need to center the group back to the original
-  // position so that repeated flips don't accumulate the offset
-
-  const { elbowArrows, otherElements } = selectedElements.reduce(
-    (
-      acc: {
-        elbowArrows: ExcalidrawElbowArrowElement[];
-        otherElements: ExcalidrawElement[];
-      },
-      element,
-    ) =>
-      isElbowArrow(element)
-        ? { ...acc, elbowArrows: acc.elbowArrows.concat(element) }
-        : { ...acc, otherElements: acc.otherElements.concat(element) },
-    { elbowArrows: [], otherElements: [] },
-  );
-
   const { midX: newMidX, midY: newMidY } =
     getCommonBoundingBox(selectedElements);
   const [diffX, diffY] = [midX - newMidX, midY - newMidY];
-  otherElements.forEach((element) =>
+
+  selectedElements.forEach((element) => {
+    fixBindings(element, selectedBindables, app, elementsMap);
+
     mutateElement(element, {
       x: element.x + diffX,
       y: element.y + diffY,
-    }),
-  );
-  elbowArrows.forEach((element) =>
-    mutateElement(element, {
-      x: element.x + diffX,
-      y: element.y + diffY,
-    }),
-  );
-  // ---------------------------------------------------------------------------
+    });
+  });
 
   return selectedElements;
+};
+
+// BEHAVIOR: If you flip a binding element along with its bound elements,
+// the binding should be preserved. If your selected elements doesn't contain
+// the bound element(s), then remove the binding. Also do not "magically"
+// re-bind a binable just because the arrow endpoint is flipped into the
+// binding range. Rationale being the consistency with the fact that arrows
+// don't bind when the arrow is moved into the binding range by its shaft.
+const fixBindings = (
+  element: ExcalidrawElement,
+  selectedBindables: ExcalidrawBindableElement[],
+  app: AppClassProperties,
+  elementsMap: NonDeletedSceneElementsMap,
+) => {
+  if (isBindingElement(element)) {
+    let start = null;
+    let end = null;
+
+    if (isBindingEnabled(app.state)) {
+      start = element.startBinding
+        ? selectedBindables.find(
+            (e) => element.startBinding!.elementId === e.id,
+          ) ?? null
+        : null;
+      end = element.endBinding
+        ? selectedBindables.find(
+            (e) => element.endBinding!.elementId === e.id,
+          ) ?? null
+        : null;
+    }
+
+    bindOrUnbindLinearElement(element, start, end, elementsMap, app.scene);
+  }
 };
