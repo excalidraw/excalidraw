@@ -140,7 +140,9 @@ describe("binding with linear elements", () => {
     expect(linear.startBinding).not.toBe(null);
   });
 
-  it("should remain bound to linear element on small angle change", async () => {
+  // UX RATIONALE: Since we force a fixed distance from elements angle changes
+  // would result in a "jump" the moment the bound object is moved
+  it("should not remain bound to linear element on any angle change", async () => {
     const linear = h.elements[1] as ExcalidrawLinearElement;
     const inputAngle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
@@ -148,7 +150,7 @@ describe("binding with linear elements", () => {
 
     expect(linear.startBinding).not.toBe(null);
     UI.updateInput(inputAngle, String("1"));
-    expect(linear.startBinding).not.toBe(null);
+    expect(linear.startBinding).toBe(null);
   });
 
   it("should unbind linear element on large position change", async () => {

@@ -3,6 +3,8 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
+  isBindableElement,
+  isBindingElement,
   isFrameLikeElement,
   isTextElement,
 } from "@excalidraw/element/typeChecks";
@@ -12,6 +14,11 @@ import {
   getElementsInGroup,
   isInGroup,
 } from "@excalidraw/element/groups";
+
+import {
+  unbindLinearElement,
+  updateBoundElements,
+} from "@excalidraw/element/binding";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -152,6 +159,8 @@ export const moveElement = (
     shouldInformMutation,
   );
 
+  updateBindings(latestElement, elementsMap);
+
   const boundTextElement = getBoundTextElement(
     originalElement,
     originalElementsMap,
@@ -189,4 +198,23 @@ export const getAtomicUnits = (
       });
     });
   return _atomicUnits;
+};
+
+export const updateBindings = (
+  latestElement: ExcalidrawElement,
+  elementsMap: NonDeletedSceneElementsMap,
+  options?: {
+    simultaneouslyUpdated?: readonly ExcalidrawElement[];
+  },
+) => {
+  if (isBindingElement(latestElement)) {
+    if (latestElement.startBinding) {
+      unbindLinearElement(latestElement, "start");
+    }
+    if (latestElement.endBinding) {
+      unbindLinearElement(latestElement, "end");
+    }
+  } else if (isBindableElement(latestElement)) {
+    updateBoundElements(latestElement, elementsMap, options);
+  }
 };

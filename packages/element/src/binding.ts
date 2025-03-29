@@ -234,21 +234,21 @@ const getOriginalBindingsIfStillCloseToArrowEnds = (
       edge as "start" | "end",
       elementsMap,
     );
-  const elementId =
-    edge === "start"
-      ? linearElement.startBinding?.elementId
-      : linearElement.endBinding?.elementId;
-  if (elementId) {
-    const element = elementsMap.get(elementId);
-    if (
-      isBindableElement(element) &&
-      bindingBorderTest(element, coors, elementsMap, zoom)
-    ) {
-      return element;
+    const elementId =
+      edge === "start"
+        ? linearElement.startBinding?.elementId
+        : linearElement.endBinding?.elementId;
+    if (elementId) {
+      const element = elementsMap.get(elementId);
+      if (
+        isBindableElement(element) &&
+        bindingBorderTest(element, coors, elementsMap, zoom)
+      ) {
+        return element;
+      }
     }
-  }
 
-  return null;
+    return null;
   });
 
 const getBindingStrategyForDraggingArrowEndpoints = (
@@ -541,7 +541,7 @@ const isLinearElementSimple = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): boolean => linearElement.points.length < 3;
 
-const unbindLinearElement = (
+export const unbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
 ): ExcalidrawBindableElement["id"] | null => {
