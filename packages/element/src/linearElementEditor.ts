@@ -354,9 +354,16 @@ export class LinearElementEditor {
               ) {
                 globalNewPointPosition = getOutlineAvoidingPoint(
                   element,
-                  pointFrom<GlobalPoint>(
-                    element.x + element.points[pointIndex][0] + deltaX,
-                    element.y + element.points[pointIndex][1] + deltaY,
+                  pointRotateRads(
+                    pointFrom<GlobalPoint>(
+                      element.x + element.points[pointIndex][0] + deltaX,
+                      element.y + element.points[pointIndex][1] + deltaY,
+                    ),
+                    pointFrom<GlobalPoint>(
+                      element.x + element.width / 2,
+                      element.y + element.height / 2,
+                    ),
+                    element.angle,
                   ),
                   pointIndex,
                   app.scene,
