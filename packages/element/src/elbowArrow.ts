@@ -63,7 +63,6 @@ import type {
   ExcalidrawBindableElement,
   FixedPointBinding,
   FixedSegment,
-  NonDeletedExcalidrawElement,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -1221,18 +1220,22 @@ const getElbowArrowData = (
   if (options?.isDragging) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
-      getHoveredElement(
-        origStartGlobalPoint,
-        elementsMap,
+      getHoveredElementForBinding(
+        tupleToCoors(origStartGlobalPoint),
         elements,
+        elementsMap,
         options?.zoom,
+        true,
+        true,
       ) || null;
     hoveredEndElement =
-      getHoveredElement(
-        origEndGlobalPoint,
-        elementsMap,
+      getHoveredElementForBinding(
+        tupleToCoors(origEndGlobalPoint),
         elements,
+        elementsMap,
         options?.zoom,
+        true,
+        true,
       ) || null;
   } else {
     hoveredStartElement = arrow.startBinding
@@ -2274,22 +2277,6 @@ const getBindPointHeading = (
       ),
     origPoint,
   );
-
-const getHoveredElement = (
-  origPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  zoom?: AppState["zoom"],
-) => {
-  return getHoveredElementForBinding(
-    tupleToCoors(origPoint),
-    elements,
-    elementsMap,
-    zoom,
-    true,
-    true,
-  );
-};
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
