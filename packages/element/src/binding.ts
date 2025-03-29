@@ -222,13 +222,17 @@ const bindOrUnbindLinearElementEdge = (
   }
 };
 
-const getOriginalBindingIfStillCloseOfLinearElementEdge = (
+const getOriginalBindingsIfStillCloseToArrowEnds = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
-  edge: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
-): NonDeleted<ExcalidrawElement> | null => {
-  const coors = getLinearElementEdgeCoors(linearElement, edge, elementsMap);
+): (NonDeleted<ExcalidrawElement> | null)[] =>
+  ["start", "end"].map((edge) => {
+    const coors = getLinearElementEdgeCoors(
+      linearElement,
+      edge as "start" | "end",
+      elementsMap,
+    );
   const elementId =
     edge === "start"
       ? linearElement.startBinding?.elementId
@@ -244,21 +248,7 @@ const getOriginalBindingIfStillCloseOfLinearElementEdge = (
   }
 
   return null;
-};
-
-const getOriginalBindingsIfStillCloseToArrowEnds = (
-  linearElement: NonDeleted<ExcalidrawLinearElement>,
-  elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
-): (NonDeleted<ExcalidrawElement> | null)[] =>
-  ["start", "end"].map((edge) =>
-    getOriginalBindingIfStillCloseOfLinearElementEdge(
-      linearElement,
-      edge as "start" | "end",
-      elementsMap,
-      zoom,
-    ),
-  );
+  });
 
 const getBindingStrategyForDraggingArrowEndpoints = (
   selectedElement: NonDeleted<ExcalidrawLinearElement>,
