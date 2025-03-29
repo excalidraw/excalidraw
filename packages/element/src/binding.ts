@@ -274,7 +274,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
   const endDragged = draggingPoints.findIndex((i) => i === endIdx) > -1;
   const start = startDragged
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(
+      ? getEligibleElementForBindingElement(
           selectedElement,
           "start",
           elementsMap,
@@ -284,7 +284,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
       : null // If binding is disabled and start is dragged, break all binds
     : !isElbowArrow(selectedElement)
     ? // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(
+      getEligibleElementForBindingElement(
         selectedElement,
         "start",
         elementsMap,
@@ -294,7 +294,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
     : "keep";
   const end = endDragged
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(
+      ? getEligibleElementForBindingElement(
           selectedElement,
           "end",
           elementsMap,
@@ -304,7 +304,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
       : null // If binding is disabled and end is dragged, break all binds
     : !isElbowArrow(selectedElement)
     ? // We have to update the focus and gap of the binding, so let's rebind
-      getElligibleElementForBindingElement(
+      getEligibleElementForBindingElement(
         selectedElement,
         "end",
         elementsMap,
@@ -335,7 +335,7 @@ const getBindingStrategyForDraggingArrowOrJoints = (
   );
   const start = startIsClose
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(
+      ? getEligibleElementForBindingElement(
           selectedElement,
           "start",
           elementsMap,
@@ -346,7 +346,7 @@ const getBindingStrategyForDraggingArrowOrJoints = (
     : null;
   const end = endIsClose
     ? isBindingEnabled
-      ? getElligibleElementForBindingElement(
+      ? getEligibleElementForBindingElement(
           selectedElement,
           "end",
           elementsMap,
@@ -902,6 +902,13 @@ export const bindPointToSnapToElementOutline = (
   );
   const edgePoint = avoidRectangularCorner(bindableElement, p);
 
+  const otherPointIdx =
+    startOrEnd === "start" ? linearElement.points.length - 1 : 0;
+  const otherPoint = pointFrom<GlobalPoint>(
+    linearElement.x + linearElement.points[otherPointIdx][0],
+    linearElement.y + linearElement.points[otherPointIdx][1],
+  );
+
   const adjacentPointIdx =
     startOrEnd === "start" ? 1 : linearElement.points.length - 2;
   const adjacentPoint =
@@ -964,6 +971,14 @@ export const bindPointToSnapToElementOutline = (
     // Too close to determine vector from intersection to edgePoint
     pointDistanceSq(edgePoint, intersection) < PRECISION
   ) {
+    return edgePoint;
+  }
+
+  const shape = getElementShape(bindableElement, elementsMap);
+  const pointInShape = isPointInShape(edgePoint, shape);
+  const otherPointInShape = isPointInShape(otherPoint, shape);
+
+  if (pointInShape && otherPointInShape) {
     return edgePoint;
   }
 
@@ -1378,7 +1393,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   };
 };
 
-const getElligibleElementForBindingElement = (
+const getEligibleElementForBindingElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
   elementsMap: NonDeletedSceneElementsMap,
