@@ -3,20 +3,36 @@ import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import { getBoundTextElement } from "@excalidraw/element/textElement";
-import { isArrowElement, isElbowArrow } from "@excalidraw/element/typeChecks";
+import {
+  isArrowElement,
+  isBindableElement,
+  isElbowArrow,
+} from "@excalidraw/element/typeChecks";
 
-import type { Degrees } from "@excalidraw/math";
+import {
+  getSuggestedBindingsForArrows,
+  updateBoundElements,
+} from "@excalidraw/element/binding";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { AppState } from "@excalidraw/excalidraw/types";
+
+import type { Degrees, Radians } from "@excalidraw/math";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { angleIcon } from "../icons";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 
-import type { DragInputCallbackType } from "./DragInput";
+import type {
+  DragFinishedCallbackType,
+  DragInputCallbackType,
+} from "./DragInput";
 import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
 
 interface AngleProps {
   element: ExcalidrawElement;
@@ -33,6 +49,8 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   shouldChangeByStepSize,
   nextValue,
   scene,
+  setAppState,
+  originalAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -47,12 +65,23 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       mutateElement(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, elementsMap);
+
+      if (isBindableElement(latestElement)) {
+        updateBoundElements(latestElement, elementsMap);
+      }
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
         mutateElement(boundTextElement, { angle: nextAngle });
       }
+
+      setAppState({
+        suggestedBindings: getSuggestedBindingsForArrows(
+          [latestElement] as NonDeletedExcalidrawElement[],
+          elementsMap,
+          originalAppState.zoom,
+        ),
+      });
 
       return;
     }
@@ -73,11 +102,61 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     mutateElement(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, elementsMap);
+
+    if (isBindableElement(latestElement)) {
+      updateBoundElements(latestElement, elementsMap);
+    }
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
       mutateElement(boundTextElement, { angle: nextAngle });
+    }
+
+    setAppState({
+      suggestedBindings: getSuggestedBindingsForArrows(
+        [latestElement] as NonDeletedExcalidrawElement[],
+        elementsMap,
+        originalAppState.zoom,
+      ),
+    });
+  }
+};
+
+const handleFinished: DragFinishedCallbackType = ({
+  originalElements,
+  originalAppState,
+  scene,
+  accumulatedChange,
+  setAppState,
+}) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const origElement = originalElements[0];
+
+  if (origElement) {
+    const latestElement = elementsMap.get(origElement.id);
+
+    if (latestElement) {
+      updateBindings(latestElement, elementsMap, originalAppState.zoom, () => {
+        const revertAngle = (latestElement.angle -
+          degreesToRadians(accumulatedChange as Degrees)) as Radians;
+
+        mutateElement(latestElement, {
+          angle: revertAngle,
+        });
+
+        const boundTextElement = getBoundTextElement(
+          latestElement,
+          elementsMap,
+        );
+
+        if (boundTextElement && !isArrowElement(latestElement)) {
+          mutateElement(boundTextElement, { angle: revertAngle });
+        }
+
+        setAppState({
+          suggestedBindings: [],
+        });
+      });
     }
   }
 };
@@ -90,6 +169,7 @@ const Angle = ({ element, scene, appState, property }: AngleProps) => {
       value={Math.round((radiansToDegrees(element.angle) % 360) * 100) / 100}
       elements={[element]}
       dragInputCallback={handleDegreeChange}
+      dragFinishedCallback={handleFinished}
       editable={isPropertyEditable(element, "angle")}
       scene={scene}
       appState={appState}

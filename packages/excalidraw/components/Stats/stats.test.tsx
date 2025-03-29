@@ -128,27 +128,19 @@ describe("binding with linear elements", () => {
     restoreOriginalGetBoundingClientRect();
   });
 
-  // UX RATIONALE: Since we force a fixed distance from elements angle changes
-  // would result in a "jump" the moment the bound object is moved
-  it(
-    "should not remain bound to linear element even" +
-      " on small position change",
-    async () => {
-      const linear = h.elements[1] as ExcalidrawLinearElement;
-      const inputX = UI.queryStatsProperty("X")?.querySelector(
-        ".drag-input",
-      ) as HTMLInputElement;
+  it("should remain bound to linear element even on small position change", async () => {
+    const linear = h.elements[1] as ExcalidrawLinearElement;
+    const inputX = UI.queryStatsProperty("X")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
 
-      expect(linear.startBinding).not.toBe(null);
-      expect(inputX).not.toBeNull();
-      UI.updateInput(inputX, String("204"));
-      expect(linear.startBinding).toBe(null);
-    },
-  );
+    expect(linear.startBinding).not.toBe(null);
+    expect(inputX).not.toBeNull();
+    UI.updateInput(inputX, String("204"));
+    expect(linear.startBinding).not.toBe(null);
+  });
 
-  // UX RATIONALE: Since we force a fixed distance from elements angle changes
-  // would result in a "jump" the moment the bound object is moved
-  it("should not remain bound to linear element on any angle change", async () => {
+  it("should remain bound to linear element on any angle change", async () => {
     const linear = h.elements[1] as ExcalidrawLinearElement;
     const inputAngle = UI.queryStatsProperty("A")?.querySelector(
       ".drag-input",
@@ -156,7 +148,7 @@ describe("binding with linear elements", () => {
 
     expect(linear.startBinding).not.toBe(null);
     UI.updateInput(inputAngle, String("1"));
-    expect(linear.startBinding).toBe(null);
+    expect(linear.startBinding).not.toBe(null);
   });
 
   it("should unbind linear element on large position change", async () => {
