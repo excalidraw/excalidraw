@@ -14,14 +14,30 @@ import { encode, decode } from "./encode";
 
 export const getMetadataChunk = async (
   blob: Blob,
-): Promise<{ keyword: string; text: string } | null> => {
+): Promise<{ 
+    keyword: string; 
+    text: string;
+    compressionFlag?: boolean;
+    compressionMethod?: number;
+    languageTag?: string;
+    translatedKeyword?: string;
+  } | null> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
   
   const iTXtChunk = chunks.find((chunk) => chunk.name === "iTXt");
+
   if (iTXtChunk) {
     try {
       const decoded = decodeITXt(iTXtChunk.data);
-      return { keyword: decoded.keyword, text: decoded.text };
+      console.log("Decoded iTXt chunk:", decoded);
+      return { 
+        keyword: decoded.keyword, 
+        text: decoded.text,
+        compressionFlag: decoded.compressed,
+        compressionMethod: decoded.compressedMethod,
+        languageTag: decoded.language || "",
+        translatedKeyword: decoded.translated || ""
+      };
     } catch (error) {
       console.error("Failed to decode iTXt chunk:", error);
     }
@@ -45,7 +61,7 @@ export const encodePngMetadata = async ({
   useITXt?: boolean;
 }) => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
-  
+  debugger;
   const filteredChunks = chunks.filter(
     (chunk) => 
       !(chunk.name === "tEXt" && 

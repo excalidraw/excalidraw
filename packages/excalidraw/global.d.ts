@@ -51,6 +51,8 @@ declare module "png-chunk-itxt" {
   function decode(data: Uint8Array): { 
     keyword: string; 
     text: string;
+    compressed?: boolean;
+    compressedMethod?: number;
     language?: string;
     translated?: string;
   };
