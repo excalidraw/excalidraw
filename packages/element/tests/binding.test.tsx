@@ -10,6 +10,8 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
 
+import "@excalidraw/utils/test-utils";
+
 import { getTransformHandles } from "../src/transformHandles";
 
 const { h } = window;
@@ -510,7 +512,7 @@ describe("element binding", () => {
     "allow non-binding simple (complex) arrow creation while start and end" +
       " points are in the same shape",
     () => {
-      UI.createElement("rectangle", {
+      const rect = UI.createElement("rectangle", {
         x: 0,
         y: 0,
         width: 100,
@@ -526,9 +528,10 @@ describe("element binding", () => {
 
       expect(arrow.startBinding).toBe(null);
       expect(arrow.endBinding).toBe(null);
+      expect(rect.boundElements).toEqual(null);
       expect(arrow.points).toCloselyEqualPoints([
         [0, 0],
-        [95, 95],
+        [92.2855, 92.2855],
       ]);
 
       const rect2 = API.createElement({
@@ -552,32 +555,35 @@ describe("element binding", () => {
 
       expect(arrow2.startBinding).toBe(null);
       expect(arrow2.endBinding).toBe(null);
+      expect(rect2.boundElements).toEqual(null);
       expect(arrow2.points).toCloselyEqualPoints([
         [0, 0],
-        [95, 95],
+        [92.2855, 92.2855],
       ]);
 
-      UI.createElement("rectangle", {
+      const rect3 = UI.createElement("rectangle", {
         x: 0,
-        y: 0,
+        y: 300,
         width: 100,
         height: 100,
       });
 
       const arrow3 = UI.createElement("arrow", {
-        x: 5,
-        y: 5,
-        height: 95,
-        width: 95,
+        x: 10,
+        y: 310,
+        height: 85,
+        width: 84,
         elbowed: true,
       });
 
       expect(arrow3.startBinding).toBe(null);
       expect(arrow3.endBinding).toBe(null);
+      expect(rect3.boundElements).toEqual(null);
       expect(arrow3.points).toCloselyEqualPoints([
         [0, 0],
-        [45, 45],
-        [95, 95],
+        [0, 42.5],
+        [84, 42.5],
+        [84, 85],
       ]);
     },
   );

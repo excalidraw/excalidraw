@@ -2762,7 +2762,6 @@ class App extends React.Component<AppProps, AppState> {
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
-    const nonDeletedElementsMap = this.scene.getNonDeletedElementsMap();
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
@@ -2919,13 +2918,6 @@ class App extends React.Component<AppProps, AppState> {
       maybeBindLinearElement(
         multiElement,
         this.state,
-        tupleToCoors(
-          LinearElementEditor.getPointAtIndexGlobalCoordinates(
-            multiElement,
-            -1,
-            nonDeletedElementsMap,
-          ),
-        ),
         this.scene.getNonDeletedElementsMap(),
         this.scene.getNonDeletedElements(),
       );
@@ -9091,7 +9083,6 @@ class App extends React.Component<AppProps, AppState> {
             maybeBindLinearElement(
               newElement,
               this.state,
-              pointerCoords,
               this.scene.getNonDeletedElementsMap(),
               this.scene.getNonDeletedElements(),
             );

@@ -13,7 +13,7 @@ import {
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
 
-import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
+import { KEYS, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
@@ -153,15 +153,9 @@ export const actionFinalize = register({
         !isLoop &&
         multiPointElement.points.length > 1
       ) {
-        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          multiPointElement,
-          -1,
-          arrayToMap(elements),
-        );
         maybeBindLinearElement(
           multiPointElement,
           appState,
-          { x, y },
           elementsMap,
           elements,
         );
