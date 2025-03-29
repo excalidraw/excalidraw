@@ -26,13 +26,13 @@ For this create a file named `{{diagramType}}.ts` in [`src/parser`](https://gith
 
 The main aim of the parser is :point_down:
 
-1. Determine how elements are connected in the diagram and thus finding arrow and text bindings. 
+1. Determine how elements are connected in the diagram and thus finding arrow and text bindings.
 
 For this you might have to dig in to the parser `diagram.parser.yy` and which attributes to parse for the new diagram.
 
 2. Determine the position and dimensions of each element, for this would be using the `svg`
 
-Once the parser is ready, lets start using it. 
+Once the parser is ready, lets start using it.
 
 Add the diagram type in switch case in [`parseMermaid`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L97) and call the parser for the same.
 
@@ -42,7 +42,7 @@ With the completion of previous step, we have all the data, now we need to trans
 
 Similar to [`FlowChartToExcalidrawSkeletonConverter`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24), you have to write the `{{diagramType}}ToExcalidrawSkeletonConverter` which parses the data received in previous step and returns the [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133).
 
-Thats it, you have added the new diagram type 🥳, now lets test it out!
+That's it, you have added the new diagram type 🥳, now lets test it out!
 
 ## Updating the Playground
 

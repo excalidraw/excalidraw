@@ -37,7 +37,7 @@ const deburredLetters = {
     '\xd9': 'U',  '\xda': 'U', '\xdb': 'U', '\xdc': 'U',
     '\xf9': 'u',  '\xfa': 'u', '\xfb': 'u', '\xfc': 'u',
     '\xdd': 'Y',  '\xfd': 'y', '\xff': 'y',
-    // normaly Ae/ae
+    // normally Ae/ae
     '\xc6': 'E', '\xe6': 'e',
     // normally Th/th
     '\xde': 'T', '\xfe': 't',
