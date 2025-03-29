@@ -17,7 +17,7 @@ export const getMetadataChunk = async (
 ): Promise<{ keyword: string; text: string } | null> => {
   const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(blob)));
   
-  const iTXtChunk = chunks.find((chunk) => chunk.name === PNGChunkType.iTXt);
+  const iTXtChunk = chunks.find((chunk) => chunk.name === "iTXt");
   if (iTXtChunk) {
     try {
       const decoded = decodeITXt(iTXtChunk.data);
@@ -27,7 +27,7 @@ export const getMetadataChunk = async (
     }
   }
   
-  const tEXtChunk = chunks.find((chunk) => chunk.name === PNGChunkType.tEXt);
+  const tEXtChunk = chunks.find((chunk) => chunk.name === "tEXt");
   if (tEXtChunk) {
     return tEXt.decode(tEXtChunk.data);
   }
@@ -48,9 +48,9 @@ export const encodePngMetadata = async ({
   
   const filteredChunks = chunks.filter(
     (chunk) => 
-      !(chunk.name === PNGChunkType.tEXt && 
+      !(chunk.name === "tEXt" && 
         tEXt.decode(chunk.data).keyword === MIME_TYPES.excalidraw) &&
-      !(chunk.name === PNGChunkType.iTXt && 
+      !(chunk.name === "iTXt" && 
         decodeITXt(chunk.data).keyword === MIME_TYPES.excalidraw)
   );
   
