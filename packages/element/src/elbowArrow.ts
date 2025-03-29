@@ -50,7 +50,6 @@ import { isBindableElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
-  type SceneElementsMap,
 } from "./types";
 
 import { aabbForElement, pointInsideBounds } from "./shapes";
@@ -1237,6 +1236,14 @@ const getElbowArrowData = (
         true,
         true,
       ) || null;
+
+    // Inside the same element there is no binding to the shape
+    if (hoveredStartElement === hoveredEndElement) {
+      hoveredStartElement = null;
+      hoveredEndElement = null;
+      arrow.startBinding = null;
+      arrow.endBinding = null;
+    }
   } else {
     hoveredStartElement = arrow.startBinding
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap) ||
@@ -1278,14 +1285,12 @@ const getElbowArrowData = (
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
-    elementsMap,
     hoveredStartElement,
     origStartGlobalPoint,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
-    elementsMap,
     hoveredEndElement,
     origEndGlobalPoint,
   );
@@ -2257,7 +2262,6 @@ const getGlobalPoint = (
 const getBindPointHeading = (
   p: GlobalPoint,
   otherPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
 ): Heading =>

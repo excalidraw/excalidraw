@@ -223,7 +223,7 @@ const bindOrUnbindLinearElementEdge = (
   }
 };
 
-const getOriginalBindingsIfStillCloseToArrowEnds = (
+export const getOriginalBindingsIfStillCloseToArrowEnds = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
@@ -418,10 +418,47 @@ export const getSuggestedBindingsForArrows = (
 export const maybeBindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   appState: AppState,
-  pointerCoords: { x: number; y: number },
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly NonDeletedExcalidrawElement[],
 ): void => {
+  const start = tupleToCoors(
+    LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      linearElement,
+      0,
+      elementsMap,
+    ),
+  );
+  const end = tupleToCoors(
+    LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      linearElement,
+      -1,
+      elementsMap,
+    ),
+  );
+
+  const otherHoveredElement = getHoveredElementForBinding(
+    start,
+    elements,
+    elementsMap,
+    appState.zoom,
+    isElbowArrow(linearElement),
+    isElbowArrow(linearElement),
+  );
+
+  const hoveredElement = getHoveredElementForBinding(
+    end,
+    elements,
+    elementsMap,
+    appState.zoom,
+    isElbowArrow(linearElement),
+    isElbowArrow(linearElement),
+  );
+
+  // Inside the same element there is no binding to the shape
+  if (hoveredElement === otherHoveredElement) {
+    return;
+  }
+
   if (appState.startBoundElement != null) {
     bindLinearElement(
       linearElement,
@@ -430,15 +467,6 @@ export const maybeBindLinearElement = (
       elementsMap,
     );
   }
-
-  const hoveredElement = getHoveredElementForBinding(
-    pointerCoords,
-    elements,
-    elementsMap,
-    appState.zoom,
-    isElbowArrow(linearElement),
-    isElbowArrow(linearElement),
-  );
 
   if (hoveredElement !== null) {
     if (
