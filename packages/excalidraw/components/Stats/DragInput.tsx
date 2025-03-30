@@ -37,10 +37,14 @@ export type DragInputCallbackType<
   setAppState: React.Component<any, AppState>["setState"];
 }) => void;
 
-export type DragFinishedCallbackType<E = ExcalidrawElement> = (props: {
+export type DragFinishedCallbackType<
+  P extends StatsInputProperty,
+  E = ExcalidrawElement,
+> = (props: {
   originalElements: readonly E[];
   originalElementsMap: ElementsMap;
   scene: Scene;
+  property: P;
   originalAppState: AppState;
   accumulatedChange: number;
   setAppState: React.Component<any, AppState>["setState"];
@@ -57,7 +61,7 @@ interface StatsDragInputProps<
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
   dragInputCallback: DragInputCallbackType<T, E>;
-  dragFinishedCallback?: DragFinishedCallbackType<E>;
+  dragFinishedCallback?: DragFinishedCallbackType<T, E>;
   property: T;
   scene: Scene;
   appState: AppState;
@@ -136,6 +140,7 @@ const StatsDragInput = <
     // reason: idempotent to avoid unnecessary
     if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
       stateRef.current.lastUpdatedValue = updatedValue;
+      const originalElementsMap = app.scene.getNonDeletedElementsMap();
       dragInputCallback({
         accumulatedChange: 0,
         instantChange: 0,
@@ -148,6 +153,15 @@ const StatsDragInput = <
         property,
         originalAppState: appState,
         setInputValue: (value) => setInputValue(String(value)),
+        setAppState,
+      });
+      dragFinishedCallback?.({
+        originalElements: elements,
+        originalElementsMap,
+        scene,
+        originalAppState: appState,
+        accumulatedChange: rounded,
+        property,
         setAppState,
       });
       app.syncActionResult({
@@ -303,6 +317,7 @@ const StatsDragInput = <
                   originalElementsMap,
                   scene,
                   originalAppState,
+                  property,
                   accumulatedChange,
                   setAppState,
                 });

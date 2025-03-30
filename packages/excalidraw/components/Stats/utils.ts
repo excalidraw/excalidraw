@@ -204,7 +204,7 @@ export const updateBindings = (
   latestElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
   zoom?: AppState["zoom"],
-  remainedBound?: () => void,
+  bindingElementKeptOriginalBinding?: () => void,
 ) => {
   if (isBindingElement(latestElement)) {
     const [start, end] = getOriginalBindingsIfStillCloseToArrowEnds(
@@ -217,7 +217,7 @@ export const updateBindings = (
       (latestElement.startBinding && start) ||
       (latestElement.endBinding && end)
     ) {
-      remainedBound?.();
+      bindingElementKeptOriginalBinding?.();
     } else {
       if (latestElement.startBinding && !start) {
         unbindLinearElement(latestElement, "start");
@@ -227,9 +227,5 @@ export const updateBindings = (
         unbindLinearElement(latestElement, "end");
       }
     }
-
-    // else if (end) {
-    //   updateBoundElements(end, elementsMap);
-    // }
   }
 };

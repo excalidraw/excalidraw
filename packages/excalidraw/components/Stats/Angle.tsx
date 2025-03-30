@@ -18,10 +18,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type { Degrees, Radians } from "@excalidraw/math";
 
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { angleIcon } from "../icons";
 
@@ -75,14 +72,6 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
         mutateElement(boundTextElement, { angle: nextAngle });
       }
 
-      setAppState({
-        suggestedBindings: getSuggestedBindingsForArrows(
-          [latestElement] as NonDeletedExcalidrawElement[],
-          elementsMap,
-          originalAppState.zoom,
-        ),
-      });
-
       return;
     }
 
@@ -114,7 +103,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
 
     setAppState({
       suggestedBindings: getSuggestedBindingsForArrows(
-        [latestElement] as NonDeletedExcalidrawElement[],
+        [latestElement],
         elementsMap,
         originalAppState.zoom,
       ),
@@ -122,7 +111,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   }
 };
 
-const handleFinished: DragFinishedCallbackType = ({
+const handleFinished: DragFinishedCallbackType<AngleProps["property"]> = ({
   originalElements,
   originalAppState,
   scene,
@@ -137,25 +126,15 @@ const handleFinished: DragFinishedCallbackType = ({
 
     if (latestElement) {
       updateBindings(latestElement, elementsMap, originalAppState.zoom, () => {
-        const revertAngle = (latestElement.angle -
-          degreesToRadians(accumulatedChange as Degrees)) as Radians;
+        const change = degreesToRadians(accumulatedChange as Degrees);
 
         mutateElement(latestElement, {
-          angle: revertAngle,
+          angle: (latestElement.angle - change) as Radians,
         });
+      });
 
-        const boundTextElement = getBoundTextElement(
-          latestElement,
-          elementsMap,
-        );
-
-        if (boundTextElement && !isArrowElement(latestElement)) {
-          mutateElement(boundTextElement, { angle: revertAngle });
-        }
-
-        setAppState({
-          suggestedBindings: [],
-        });
+      setAppState({
+        suggestedBindings: [],
       });
     }
   }
