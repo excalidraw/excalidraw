@@ -56,7 +56,6 @@ declare module "png-chunk-itxt" {
     language?: string;
     translated?: string;
   };
-  export { encodeSync, decodeSync };
 }
 declare module "png-chunks-encode" {
   function encode(chunks: (TEXtChunk | ITXtChunk)[]): Uint8Array;

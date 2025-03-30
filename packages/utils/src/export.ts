@@ -19,6 +19,11 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+import { Buffer } from "buffer";
+
+window.onload = () => {
+  window.Buffer = Buffer;
+}
 
 export { MIME_TYPES };
 
