@@ -7,12 +7,17 @@ import {
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { isImageElement } from "@excalidraw/element/typeChecks";
 
+import { getSuggestedBindingsForArrows } from "@excalidraw/element/binding";
+
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import StatsDragInput from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
+import { getStepSizedValue, moveElement, updateBindings } from "./utils";
 
-import type { DragInputCallbackType } from "./DragInput";
+import type {
+  DragFinishedCallbackType,
+  DragInputCallbackType,
+} from "./DragInput";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
@@ -36,6 +41,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   property,
   scene,
   originalAppState,
+  setAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -122,6 +128,14 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       crop: nextCrop,
     });
 
+    setAppState({
+      suggestedBindings: getSuggestedBindingsForArrows(
+        [origElement],
+        elementsMap,
+        originalAppState.zoom,
+      ),
+    });
+
     return;
   }
 
@@ -135,6 +149,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       elementsMap,
       originalElementsMap,
     );
+
     return;
   }
 
@@ -166,15 +181,51 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     elementsMap,
     originalElementsMap,
   );
+
+  if (origElement) {
+    const latestElement = elementsMap.get(origElement.id);
+
+    if (latestElement) {
+      setAppState({
+        suggestedBindings: getSuggestedBindingsForArrows(
+          [latestElement],
+          elementsMap,
+          originalAppState.zoom,
+        ),
+      });
+    }
+  }
 };
 
-const Position = ({
-  property,
-  element,
-  elementsMap,
+const handleFinished: DragFinishedCallbackType<"x" | "y"> = ({
+  originalElements,
+  originalAppState,
   scene,
-  appState,
-}: PositionProps) => {
+  accumulatedChange,
+  property,
+  setAppState,
+}) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const origElement = originalElements[0];
+
+  if (origElement) {
+    const latestElement = elementsMap.get(origElement.id);
+
+    if (latestElement) {
+      updateBindings(latestElement, elementsMap, originalAppState.zoom, () => {
+        mutateElement(latestElement, {
+          [property]: latestElement[property] - accumulatedChange,
+        });
+      });
+
+      setAppState({
+        suggestedBindings: [],
+      });
+    }
+  }
+};
+
+const Position = ({ property, element, scene, appState }: PositionProps) => {
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(element.x, element.y),
     pointFrom(element.x + element.width / 2, element.y + element.height / 2),
@@ -202,6 +253,7 @@ const Position = ({
       label={property === "x" ? "X" : "Y"}
       elements={[element]}
       dragInputCallback={handlePositionChange}
+      dragFinishedCallback={handleFinished}
       scene={scene}
       value={value}
       property={property}
