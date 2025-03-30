@@ -204,7 +204,8 @@ const handleFinished: DragFinishedCallbackType<"x" | "y"> = ({
   accumulatedChange,
   property,
   setAppState,
-}) => {
+  setInputValue,
+}): boolean => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
 
@@ -212,17 +213,29 @@ const handleFinished: DragFinishedCallbackType<"x" | "y"> = ({
     const latestElement = elementsMap.get(origElement.id);
 
     if (latestElement) {
-      updateBindings(latestElement, elementsMap, originalAppState.zoom, () => {
-        mutateElement(latestElement, {
-          [property]: latestElement[property] - accumulatedChange,
-        });
-      });
-
       setAppState({
         suggestedBindings: [],
       });
+
+      const success = updateBindings(
+        latestElement,
+        elementsMap,
+        originalAppState.zoom,
+      );
+
+      if (!success) {
+        mutateElement(latestElement, {
+          [property]: latestElement[property] - accumulatedChange,
+        });
+
+        setInputValue(latestElement[property] - accumulatedChange);
+      }
+
+      return false;
     }
   }
+
+  return true;
 };
 
 const Position = ({ property, element, scene, appState }: PositionProps) => {

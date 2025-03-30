@@ -48,7 +48,8 @@ export type DragFinishedCallbackType<
   originalAppState: AppState;
   accumulatedChange: number;
   setAppState: React.Component<any, AppState>["setState"];
-}) => void;
+  setInputValue: (value: number) => void;
+}) => boolean;
 
 interface StatsDragInputProps<
   T extends StatsInputProperty,
@@ -155,7 +156,7 @@ const StatsDragInput = <
         setInputValue: (value) => setInputValue(String(value)),
         setAppState,
       });
-      dragFinishedCallback?.({
+      const commit = dragFinishedCallback?.({
         originalElements: elements,
         originalElementsMap,
         scene,
@@ -163,10 +164,13 @@ const StatsDragInput = <
         accumulatedChange: rounded,
         property,
         setAppState,
+        setInputValue: (value) => setInputValue(String(value)),
       });
-      app.syncActionResult({
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-      });
+      if (commit) {
+        app.syncActionResult({
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+      }
     }
   };
 
@@ -311,21 +315,26 @@ const StatsDragInput = <
                 false,
               );
 
+              let commit = true;
               if (originalElements !== null && originalElementsMap !== null) {
-                dragFinishedCallback?.({
-                  originalElements,
-                  originalElementsMap,
-                  scene,
-                  originalAppState,
-                  property,
-                  accumulatedChange,
-                  setAppState,
-                });
+                commit =
+                  dragFinishedCallback?.({
+                    originalElements,
+                    originalElementsMap,
+                    scene,
+                    originalAppState,
+                    property,
+                    accumulatedChange,
+                    setAppState,
+                    setInputValue: (value) => setInputValue(String(value)),
+                  }) ?? true;
               }
 
-              app.syncActionResult({
-                captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-              });
+              if (commit) {
+                app.syncActionResult({
+                  captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+                });
+              }
 
               lastPointer = null;
               accumulatedChange = 0;

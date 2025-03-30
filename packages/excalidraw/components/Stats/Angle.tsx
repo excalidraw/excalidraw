@@ -117,6 +117,7 @@ const handleFinished: DragFinishedCallbackType<AngleProps["property"]> = ({
   scene,
   accumulatedChange,
   setAppState,
+  setInputValue,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -125,19 +126,32 @@ const handleFinished: DragFinishedCallbackType<AngleProps["property"]> = ({
     const latestElement = elementsMap.get(origElement.id);
 
     if (latestElement) {
-      updateBindings(latestElement, elementsMap, originalAppState.zoom, () => {
-        const change = degreesToRadians(accumulatedChange as Degrees);
-
-        mutateElement(latestElement, {
-          angle: (latestElement.angle - change) as Radians,
-        });
-      });
-
       setAppState({
         suggestedBindings: [],
       });
+
+      const success = updateBindings(
+        latestElement,
+        elementsMap,
+        originalAppState.zoom,
+      );
+
+      if (!success) {
+        const change = degreesToRadians(accumulatedChange as Degrees);
+        const angle = (latestElement.angle - change) as Radians;
+
+        mutateElement(latestElement, {
+          angle,
+        });
+
+        setInputValue(angle);
+
+        return false;
+      }
     }
   }
+
+  return true;
 };
 
 const Angle = ({ element, scene, appState, property }: AngleProps) => {
