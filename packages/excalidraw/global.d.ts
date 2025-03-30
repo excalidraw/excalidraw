@@ -43,12 +43,12 @@ declare module "png-chunk-text" {
   function decode(data: Uint8Array): { keyword: string; text: string };
 }
 declare module "png-chunk-itxt" {
-  function encode(
+  function encodeSync(
     keyword: string,
     text: string,
     options?: { compressed?: boolean; compressedMethod: number; language?: string; translated?: string },
   ): { name: "iTXt"; data: Uint8Array };
-  function decode(data: Uint8Array): { 
+  function decodeSync (data: Uint8Array): { 
     keyword: string; 
     text: string;
     compressed?: boolean;
@@ -56,7 +56,7 @@ declare module "png-chunk-itxt" {
     language?: string;
     translated?: string;
   };
-  export { encode, decode };
+  export { encodeSync, decodeSync };
 }
 declare module "png-chunks-encode" {
   function encode(chunks: (TEXtChunk | ITXtChunk)[]): Uint8Array;

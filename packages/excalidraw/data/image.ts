@@ -1,5 +1,5 @@
 import tEXt from "png-chunk-text";
-import { encode as encodeITXt, decode as decodeITXt } from "png-chunk-itxt";
+import { encodeSync, decodeSync} from "png-chunk-itxt";
 import encodePng from "png-chunks-encode";
 import decodePng from "png-chunks-extract";
 
@@ -28,7 +28,7 @@ export const getMetadataChunk = async (
 
   if (iTXtChunk) {
     try {
-      const decoded = decodeITXt(iTXtChunk.data);
+      const decoded = decodeSync(iTXtChunk.data);
       console.log("Decoded iTXt chunk:", decoded);
       return { 
         keyword: decoded.keyword, 
@@ -67,7 +67,7 @@ export const encodePngMetadata = async ({
       !(chunk.name === "tEXt" && 
         tEXt.decode(chunk.data).keyword === MIME_TYPES.excalidraw) &&
       !(chunk.name === "iTXt" && 
-        decodeITXt(chunk.data).keyword === MIME_TYPES.excalidraw)
+        decodeSync(chunk.data).keyword === MIME_TYPES.excalidraw)
   );
   
   const encodedData = JSON.stringify(
@@ -80,7 +80,7 @@ export const encodePngMetadata = async ({
   let metadataChunk;
   try {
     if (useITXt) {
-      metadataChunk = encodeITXt(
+      metadataChunk = encodeSync(
         MIME_TYPES.excalidraw,
         encodedData,
         { 
