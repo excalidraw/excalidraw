@@ -18,6 +18,9 @@ import {
   getGridPoint,
   invariant,
   tupleToCoors,
+  debugDrawPoint,
+  debugClear,
+  debugDrawBounds,
 } from "@excalidraw/common";
 
 // TODO: remove direct dependency on the scene, should be passed in or injected instead
@@ -46,7 +49,9 @@ import {
   isBindingEnabled,
 } from "./binding";
 import {
+  getCommonBoundingBox,
   getElementAbsoluteCoords,
+  getElementBounds,
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
@@ -332,51 +337,50 @@ export class LinearElementEditor {
 
         const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
         const deltaY = newDraggingPointPosition[1] - draggingPoint[1];
-
+        debugClear();
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
-            let newPointPosition = pointFrom<LocalPoint>(
-              element.points[pointIndex][0] + deltaX,
-              element.points[pointIndex][1] + deltaY,
-            );
+            let newPointPosition: LocalPoint =
+              pointIndex === lastClickedPoint
+                ? LinearElementEditor.createPointAt(
+                    element,
+                    elementsMap,
+                    scenePointerX - linearElementEditor.pointerOffset.x,
+                    scenePointerY - linearElementEditor.pointerOffset.y,
+                    event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
+                  )
+                : pointFrom(
+                    element.points[pointIndex][0] + deltaX,
+                    element.points[pointIndex][1] + deltaY,
+                  );
 
-            // Check if point dragging is happening
-            if (pointIndex === lastClickedPoint) {
-              let globalNewPointPosition = pointFrom<GlobalPoint>(
-                scenePointerX - linearElementEditor.pointerOffset.x,
-                scenePointerY - linearElementEditor.pointerOffset.y,
+            if (pointIndex === 0 || pointIndex === element.points.length - 1) {
+              const [, , , , cx, cy] = getElementAbsoluteCoords(
+                element,
+                elementsMap,
+                true,
               );
-
-              if (
-                pointIndex === 0 ||
-                pointIndex === element.points.length - 1
-              ) {
-                globalNewPointPosition = getOutlineAvoidingPoint(
-                  element,
-                  pointRotateRads(
-                    pointFrom<GlobalPoint>(
-                      element.x + element.points[pointIndex][0] + deltaX,
-                      element.y + element.points[pointIndex][1] + deltaY,
-                    ),
-                    pointFrom<GlobalPoint>(
-                      element.x + element.width / 2,
-                      element.y + element.height / 2,
-                    ),
-                    element.angle,
+              const avoidancePoint = getOutlineAvoidingPoint(
+                element,
+                pointRotateRads(
+                  pointFrom<GlobalPoint>(
+                    element.x + newPointPosition[0],
+                    element.y + newPointPosition[1],
                   ),
-                  pointIndex,
-                  app.scene,
-                  app.state.zoom,
-                );
-              }
-
+                  pointFrom<GlobalPoint>(cx, cy),
+                  element.angle,
+                ),
+                pointIndex,
+                app.scene,
+                app.state.zoom,
+              );
               newPointPosition = LinearElementEditor.createPointAt(
                 element,
                 elementsMap,
-                globalNewPointPosition[0],
-                globalNewPointPosition[1],
-                event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
+                avoidancePoint[0] - linearElementEditor.pointerOffset.x,
+                avoidancePoint[1] - linearElementEditor.pointerOffset.y,
+                null,
               );
             }
 
