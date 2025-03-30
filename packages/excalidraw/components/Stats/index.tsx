@@ -289,7 +289,11 @@ export const StatsInner = memo(
                           </StatsRow>
                         )}
 
-                      <StatsRow heading data-testid="stats-element-type">
+                      <StatsRow
+                        heading
+                        data-testid="stats-element-type"
+                        style={{ margin: "0.3125rem 0" }}
+                      >
                         {appState.croppingElementId
                           ? t("labels.imageCropping")
                           : t(`element.${singleElement.type}`)}
