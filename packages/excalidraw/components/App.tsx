@@ -8247,7 +8247,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
-        !isSelectingPointsInLineEditor
+        !isSelectingPointsInLineEditor &&
+        this.state.activeTool.type !== "lasso"
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -8279,8 +8280,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
           !this.state.editingTextElement &&
-          this.state.activeEmbeddable?.state !== "active" &&
-          this.state.activeTool.type !== "lasso"
+          this.state.activeEmbeddable?.state !== "active"
         ) {
           const dragOffset = {
             x: pointerCoords.x - pointerDownState.origin.x,
@@ -9613,6 +9613,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // do not clear selection if lasso is active
+        this.state.activeTool.type !== "lasso" &&
         // not elbow midpoint dragged
         !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
