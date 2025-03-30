@@ -18,9 +18,6 @@ import {
   getGridPoint,
   invariant,
   tupleToCoors,
-  debugDrawPoint,
-  debugClear,
-  debugDrawBounds,
 } from "@excalidraw/common";
 
 // TODO: remove direct dependency on the scene, should be passed in or injected instead
@@ -49,9 +46,7 @@ import {
   isBindingEnabled,
 } from "./binding";
 import {
-  getCommonBoundingBox,
   getElementAbsoluteCoords,
-  getElementBounds,
   getElementPointsCoords,
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
@@ -337,7 +332,7 @@ export class LinearElementEditor {
 
         const deltaX = newDraggingPointPosition[0] - draggingPoint[0];
         const deltaY = newDraggingPointPosition[1] - draggingPoint[1];
-        debugClear();
+
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
