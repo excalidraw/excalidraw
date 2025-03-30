@@ -1,5 +1,6 @@
+import { isServerEnv, promiseTry } from "@excalidraw/common";
+
 import { WorkerInTheMainChunkError, WorkerUrlNotDefinedError } from "../errors";
-import { isServerEnv, promiseTry } from "../utils";
 import { WorkerPool } from "../workers";
 
 import type { Commands } from "./subset-shared.chunk";

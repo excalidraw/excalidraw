@@ -1,18 +1,20 @@
-import { isEraserActive } from "../appState";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import {
   isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
   isTextElement,
-} from "../element/typeChecks";
+} from "@excalidraw/element/typeChecks";
+
+import { getShortcutKey } from "@excalidraw/common";
+
+import { isNodeInFlowchart } from "@excalidraw/element/flowchart";
+
 import { t } from "../i18n";
-
-import { getShortcutKey } from "../utils";
-
-import { isNodeInFlowchart } from "../element/flowchart";
+import { isEraserActive } from "../appState";
 import { isGridModeEnabled } from "../snapping";
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "../constants";
 
 import "./HintViewer.scss";
 

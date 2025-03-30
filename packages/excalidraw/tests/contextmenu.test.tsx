@@ -1,12 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { KEYS, reseed } from "@excalidraw/common";
+
+import { setDateTimeForTests } from "@excalidraw/common";
+
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
-import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
-import { setDateTimeForTests } from "../utils";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

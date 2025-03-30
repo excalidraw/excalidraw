@@ -8,10 +8,35 @@ import {
 import { vi } from "vitest";
 import { pointFrom } from "@excalidraw/math";
 
+import { newElementWith } from "@excalidraw/element/mutateElement";
+
+import {
+  EXPORT_DATA_TYPES,
+  MIME_TYPES,
+  ORIG_ID,
+  KEYS,
+  arrayToMap,
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
+  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+} from "@excalidraw/common";
+
+import "@excalidraw/utils/test-utils";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
+import type {
+  ExcalidrawElbowArrowElement,
+  ExcalidrawFrameElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  FixedPointBinding,
+  FractionalIndex,
+  SceneElementsMap,
+} from "@excalidraw/element/types";
+
 import "../global.d.ts";
-import "../../utils/test-utils";
 
 import {
   actionSendBackward,
@@ -23,17 +48,8 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getDefaultAppState } from "../appState";
 import { HistoryEntry } from "../history";
 import { Excalidraw } from "../index";
-import { KEYS } from "../keys";
 import * as StaticScene from "../renderer/staticScene";
-import { EXPORT_DATA_TYPES, MIME_TYPES, ORIG_ID } from "../constants";
 import { Snapshot, CaptureUpdateAction } from "../store";
-import { arrayToMap } from "../utils";
-import {
-  COLOR_PALETTE,
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
-  DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
-} from "../colors";
-import { newElementWith } from "../element/mutateElement";
 import { AppStateChange, ElementsChange } from "../change";
 
 import { API } from "./helpers/api";
@@ -47,16 +63,6 @@ import {
   getCloneByOrigId,
 } from "./test-utils";
 
-import type {
-  ExcalidrawElbowArrowElement,
-  ExcalidrawFrameElement,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  FixedPointBinding,
-  FractionalIndex,
-  SceneElementsMap,
-} from "../element/types";
 import type { AppState } from "../types";
 
 const { h } = window;
