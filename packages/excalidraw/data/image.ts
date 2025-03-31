@@ -77,19 +77,20 @@ export const encodePngMetadata = async ({
     }),
   );
 
-  let metadataChunk;
+  let metadataChunk: TEXtChunk | ITXtChunk;
   try {
     if (useITXt) {
-      metadataChunk = iTXt.encodeSync(
-        MIME_TYPES.excalidraw,
-        encodedData,
-        { 
-          compressed: true,
-          compressedMethod: 0,
-          language: "en",
-          translated: ""
-        }
-      );
+      metadataChunk = {
+        name: "iTXt",
+        data: iTXt.encodeSync({
+          keyword: MIME_TYPES.excalidraw,
+          text: encodedData,
+          compressionFlag: true,
+          compressionMethod: 0,
+          languageTag: "en",
+          translatedKeyword: ""
+        })
+      };
     } else {
       throw new Error("Fallback to tEXt");
     }

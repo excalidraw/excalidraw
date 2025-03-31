@@ -43,13 +43,17 @@ declare module "png-chunk-text" {
   function decode(data: Uint8Array): { keyword: string; text: string };
 }
 declare module "png-chunk-itxt" {
-  function encodeSync(
-    keyword: string,
-    text: string,
-    options?: { compressed?: boolean; compressedMethod: number; language?: string; translated?: string },
-  ): { name: "iTXt"; data: Uint8Array };
-  function decodeSync (data: Uint8Array): { 
-    keyword: string; 
+  function encodeSync(options: {
+    keyword: string;
+    text: string;
+    compressionFlag?: boolean;
+    compressionMethod?: number;
+    languageTag?: string;
+    translatedKeyword?: string;
+  }): Uint8Array;
+
+  function decodeSync(data: Uint8Array): {
+    keyword: string;
     text: string;
     compressed?: boolean;
     compressedMethod?: number;
