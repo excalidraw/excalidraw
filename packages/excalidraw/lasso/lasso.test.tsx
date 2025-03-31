@@ -23,6 +23,8 @@ import {
 
 import { getElementLineSegments } from "@excalidraw/element/bounds";
 
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { act, render } from "../tests/test-utils";
 import { Excalidraw } from "../index";
 
@@ -30,7 +32,6 @@ import { getSelectedElements } from "../scene";
 
 import { updateSelection } from "./worker";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { ElementsSegmentsMap } from "./types";
 
 const { h } = window;
