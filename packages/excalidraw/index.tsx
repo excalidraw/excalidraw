@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 
+import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
+
 import App from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
-import { DEFAULT_UI_OPTIONS } from "./constants";
 import { defaultLang } from "./i18n";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
-import { isShallowEqual } from "./utils";
 
 import "./css/app.scss";
 import "./css/styles.scss";
@@ -215,10 +215,12 @@ export {
   getSceneVersion,
   hashElementsVersion,
   hashString,
-  isInvisiblySmallElement,
   getNonDeletedElements,
-  getTextFromElements,
-} from "./element";
+} from "@excalidraw/element";
+
+export { getTextFromElements } from "@excalidraw/element/textElement";
+export { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
   restore,
@@ -242,9 +244,9 @@ export {
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
 } from "./data/blob";
-export { getFreeDrawSvgPath } from "./renderer/renderElement";
+export { getFreeDrawSvgPath } from "@excalidraw/element/renderElement";
 export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
-export { isLinearElement } from "./element/typeChecks";
+export { isLinearElement } from "@excalidraw/element/typeChecks";
 
 export {
   FONT_FAMILY,
@@ -253,13 +255,14 @@ export {
   ROUNDNESS,
   DEFAULT_LASER_COLOR,
   UserIdleState,
-} from "./constants";
+  normalizeLink,
+} from "@excalidraw/common";
 
 export {
   mutateElement,
   newElementWith,
   bumpVersion,
-} from "./element/mutateElement";
+} from "@excalidraw/element/mutateElement";
 
 export { CaptureUpdateAction } from "./store";
 
@@ -268,7 +271,7 @@ export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
-} from "./utils";
+} from "@excalidraw/common";
 
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
@@ -283,10 +286,12 @@ export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
 
-export { normalizeLink } from "./data/url";
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";
-export { getCommonBounds, getVisibleSceneBounds } from "./element/bounds";
+export {
+  getCommonBounds,
+  getVisibleSceneBounds,
+} from "@excalidraw/element/bounds";
 
 export {
   elementsOverlappingBBox,
@@ -296,6 +301,6 @@ export {
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
-export { isElementLink } from "./element/elementLink";
+export { isElementLink } from "@excalidraw/element/elementLink";
 
-export { setCustomTextMetricsProvider } from "./element/textMeasurements";
+export { setCustomTextMetricsProvider } from "@excalidraw/element/textMeasurements";

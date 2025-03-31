@@ -24,6 +24,8 @@ interface ImportMetaEnv {
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.
   VITE_APP_DEV_DISABLE_LIVE_RELOAD: string;
+  // To enable bounding box for text containers
+  VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX: string;
 
   FAST_REFRESH: string;
 
@@ -34,8 +36,6 @@ interface ImportMetaEnv {
 
   //Debug flags
 
-  // To enable bounding box for text containers
-  VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX: string;
   VITE_APP_DISABLE_SENTRY: string;
   // Set this flag to false if you want to open the overlay by default
   VITE_APP_COLLAPSE_OVERLAY: string;

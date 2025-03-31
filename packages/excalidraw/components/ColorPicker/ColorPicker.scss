@@ -15,7 +15,7 @@
 
   .color-picker-container {
     display: grid;
-    grid-template-columns: 1fr 20px 1.625rem;
+    grid-template-columns: 1fr 8px 1.625rem;
     padding: 0.25rem 0px;
     align-items: center;
 
@@ -30,13 +30,14 @@
   }
 
   .color-picker__button {
-    --radius: 0.25rem;
+    --radius: 6px;
+    --size: 1.375rem;
 
     padding: 0;
-    margin: 0;
-    width: 1.35rem;
-    height: 1.35rem;
-    border: 1px solid var(--color-gray-30);
+    margin: 1px;
+    width: var(--size);
+    height: var(--size);
+    border: 0;
     border-radius: var(--radius);
     filter: var(--theme-filter);
     background-color: var(--swatch-color);
@@ -45,16 +46,16 @@
     font-family: inherit;
     box-sizing: border-box;
 
-    &:hover {
+    &:hover:not(.active) {
       &::after {
         content: "";
         position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        box-shadow: 0 0 0 1px var(--color-gray-30);
-        border-radius: calc(var(--radius) + 1px);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-shadow: 0 0 0 1px var(--swatch-color);
+        border-radius: var(--radius);
         filter: var(--theme-filter);
       }
     }
@@ -62,10 +63,11 @@
     &.active {
       .color-picker__button-outline {
         position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
+        --offset: -1px;
+        top: var(--offset);
+        left: var(--offset);
+        right: var(--offset);
+        bottom: var(--offset);
         box-shadow: 0 0 0 1px var(--color-primary-darkest);
         z-index: 1; // due hover state so this has preference
         border-radius: calc(var(--radius) + 1px);

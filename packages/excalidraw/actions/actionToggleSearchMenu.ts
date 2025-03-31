@@ -1,6 +1,11 @@
+import {
+  KEYS,
+  CANVAS_SEARCH_TAB,
+  CLASSES,
+  DEFAULT_SIDEBAR,
+} from "@excalidraw/common";
+
 import { searchIcon } from "../components/icons";
-import { CANVAS_SEARCH_TAB, CLASSES, DEFAULT_SIDEBAR } from "../constants";
-import { KEYS } from "../keys";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";

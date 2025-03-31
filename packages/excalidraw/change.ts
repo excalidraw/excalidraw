@@ -1,36 +1,46 @@
-import { ENV } from "./constants";
+import {
+  arrayToMap,
+  arrayToObject,
+  assertNever,
+  isDevEnv,
+  isShallowEqual,
+  isTestEnv,
+  toBrandedType,
+} from "@excalidraw/common";
 import {
   BoundElement,
   BindableElement,
   bindingProperties,
   updateBoundElements,
-} from "./element/binding";
-import { LinearElementEditor } from "./element/linearElementEditor";
-import { mutateElement, newElementWith } from "./element/mutateElement";
+} from "@excalidraw/element/binding";
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import {
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element/mutateElement";
 import {
   getBoundTextElementId,
   redrawTextBoundingBox,
-} from "./element/textElement";
+} from "@excalidraw/element/textElement";
 import {
   hasBoundTextElement,
   isBindableElement,
   isBoundToContainer,
   isImageElement,
   isTextElement,
-} from "./element/typeChecks";
-import { orderByFractionalIndex, syncMovedIndices } from "./fractionalIndex";
-import { getNonDeletedGroupIds } from "./groups";
-import { getObservedAppState } from "./store";
-import {
-  arrayToMap,
-  arrayToObject,
-  assertNever,
-  isShallowEqual,
-  toBrandedType,
-} from "./utils";
+} from "@excalidraw/element/typeChecks";
 
-import type { BindableProp, BindingProp } from "./element/binding";
-import type { ElementUpdate } from "./element/mutateElement";
+import { getNonDeletedGroupIds } from "@excalidraw/element/groups";
+
+import {
+  orderByFractionalIndex,
+  syncMovedIndices,
+} from "@excalidraw/element/fractionalIndex";
+
+import type { BindableProp, BindingProp } from "@excalidraw/element/binding";
+
+import type { ElementUpdate } from "@excalidraw/element/mutateElement";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -40,14 +50,18 @@ import type {
   Ordered,
   OrderedExcalidrawElement,
   SceneElementsMap,
-} from "./element/types";
+} from "@excalidraw/element/types";
+
+import type { SubtypeOf, ValueOf } from "@excalidraw/common/utility-types";
+
+import { getObservedAppState } from "./store";
+
 import type {
   AppState,
   ObservedAppState,
   ObservedElementsAppState,
   ObservedStandaloneAppState,
 } from "./types";
-import type { SubtypeOf, ValueOf } from "./utility-types";
 
 /**
  * Represents the difference between two objects of the same type.
@@ -514,7 +528,7 @@ export class AppStateChange implements Change<AppState> {
       // shouldn't really happen, but just in case
       console.error(`Couldn't apply appstate change`, e);
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
 
@@ -552,7 +566,7 @@ export class AppStateChange implements Change<AppState> {
       // if postprocessing fails it does not make sense to bubble up, but let's make sure we know about it
       console.error(`Couldn't postprocess appstate change deltas.`);
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
     } finally {
@@ -842,7 +856,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       change = new ElementsChange(added, removed, updated);
     }
 
-    if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+    if (isTestEnv() || isDevEnv()) {
       ElementsChange.validate(change, "added", this.satisfiesAddition);
       ElementsChange.validate(change, "removed", this.satisfiesRemoval);
       ElementsChange.validate(change, "updated", this.satisfiesUpdate);
@@ -1106,7 +1120,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
     } catch (e) {
       console.error(`Couldn't apply elements change`, e);
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
 
@@ -1137,7 +1151,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
         e,
       );
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
     } finally {
@@ -1551,7 +1565,7 @@ export class ElementsChange implements Change<SceneElementsMap> {
       // if postprocessing fails, it does not make sense to bubble up, but let's make sure we know about it
       console.error(`Couldn't postprocess elements change deltas.`);
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw e;
       }
     } finally {

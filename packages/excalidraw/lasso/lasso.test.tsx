@@ -14,22 +14,23 @@
  * - selects group if any group from group is selected
  */
 
-import { act, render } from "../tests/test-utils";
-import { Excalidraw } from "../index";
-
 import {
   type GlobalPoint,
   type LocalPoint,
   pointFrom,
   type Radians,
-} from "../../math";
-import { getSelectedElements } from "../scene";
+} from "@excalidraw/math";
 
-import { getElementLineSegments } from "../element/bounds";
+import { getElementLineSegments } from "@excalidraw/element/bounds";
+
+import { act, render } from "../tests/test-utils";
+import { Excalidraw } from "../index";
+
+import { getSelectedElements } from "../scene";
 
 import { updateSelection } from "./worker";
 
-import type { ExcalidrawElement } from "../element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { ElementsSegmentsMap } from "./types";
 
 const { h } = window;

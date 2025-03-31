@@ -1,11 +1,17 @@
 import { simplify } from "points-on-curve";
 
-import { polygonFromPoints, polygonIncludesPoint } from "../../math/polygon";
+import {
+  polygonFromPoints,
+  polygonIncludesPoint,
+} from "@excalidraw/math/polygon";
 
-import { lineSegment, lineSegmentIntersectionPoints } from "../../math/segment";
+import {
+  lineSegment,
+  lineSegmentIntersectionPoints,
+} from "@excalidraw/math/segment";
 
-import type { GlobalPoint, LineSegment } from "../../math/types";
-import type { ExcalidrawElement } from "../element/types";
+import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type {
   ElementsSegmentsMap,

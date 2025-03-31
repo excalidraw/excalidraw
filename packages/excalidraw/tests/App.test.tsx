@@ -1,8 +1,9 @@
 import React from "react";
 import { vi } from "vitest";
 
+import { reseed } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
-import { reseed } from "../random";
 import * as StaticScene from "../renderer/staticScene";
 import { render, queryByTestId, unmountComponent } from "../tests/test-utils";
 
