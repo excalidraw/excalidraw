@@ -31,7 +31,7 @@ import { AnimatedTrail } from "../animated-trail";
 
 import { LassoWorkerPolyfill } from "./lasso-worker-polyfill";
 
-import { WorkerUrl } from "./lasso-worker.chunk";
+import { WorkerUrl } from "./lasso-worker";
 
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
