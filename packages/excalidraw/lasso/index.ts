@@ -31,8 +31,6 @@ import { AnimatedTrail } from "../animated-trail";
 
 import { LassoWorkerPolyfill } from "./lasso-worker-polyfill";
 
-import { WorkerUrl } from "./lasso-worker";
-
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
 
@@ -85,23 +83,27 @@ export class LassoTrail extends AnimatedTrail {
       });
     }
 
-    try {
-      if (typeof Worker !== "undefined" && WorkerUrl) {
-        this.worker = new Worker(WorkerUrl, { type: "module" });
-      } else {
-        this.worker = new LassoWorkerPolyfill();
+    if (!this.worker) {
+      try {
+        const { WorkerUrl } = await import("./lasso-worker.chunk");
+
+        if (typeof Worker !== "undefined" && WorkerUrl) {
+          this.worker = new Worker(WorkerUrl, { type: "module" });
+        } else {
+          this.worker = new LassoWorkerPolyfill();
+        }
+
+        this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
+          const { selectedElementIds } = event.data;
+          this.selectElementsFromIds(selectedElementIds);
+        };
+
+        this.worker.onerror = (error) => {
+          console.error("Worker error:", error);
+        };
+      } catch (error) {
+        console.error("Failed to start worker", error);
       }
-
-      this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
-        const { selectedElementIds } = event.data;
-        this.selectElementsFromIds(selectedElementIds);
-      };
-
-      this.worker.onerror = (error) => {
-        console.error("Worker error:", error);
-      };
-    } catch (error) {
-      console.error("Failed to start worker", error);
     }
   }
 
@@ -226,7 +228,5 @@ export class LassoTrail extends AnimatedTrail {
     this.app.setState({
       lassoSelection: null,
     });
-
-    this.worker?.terminate();
   }
 }
