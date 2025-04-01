@@ -30,7 +30,7 @@ import { Excalidraw } from "../index";
 
 import { getSelectedElements } from "../scene";
 
-import { updateSelection } from "./worker";
+import { updateSelection } from "./utils";
 
 import type { ElementsSegmentsMap } from "./types";
 
