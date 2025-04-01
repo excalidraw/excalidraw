@@ -29,9 +29,9 @@ import { type AnimationFrameHandler } from "../animation-frame-handler";
 
 import { AnimatedTrail } from "../animated-trail";
 
-import LassoWorker from "./lasso-worker.ts?worker";
-
 import { LassoWorkerPolyfill } from "./lasso-worker-polyfill";
+
+import { WorkerUrl } from "./lasso-worker.chunk";
 
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
@@ -67,7 +67,7 @@ export class LassoTrail extends AnimatedTrail {
     });
   }
 
-  startPath(x: number, y: number, keepPreviousSelection = false) {
+  async startPath(x: number, y: number, keepPreviousSelection = false) {
     // clear any existing trails just in case
     this.endPath();
 
@@ -86,10 +86,11 @@ export class LassoTrail extends AnimatedTrail {
     }
 
     try {
-      this.worker =
-        typeof Worker !== "undefined"
-          ? new LassoWorker()
-          : new LassoWorkerPolyfill();
+      if (typeof Worker !== "undefined" && WorkerUrl) {
+        this.worker = new Worker(WorkerUrl, { type: "module" });
+      } else {
+        this.worker = new LassoWorkerPolyfill();
+      }
 
       this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
         const { selectedElementIds } = event.data;

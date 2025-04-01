@@ -2,7 +2,9 @@ import { updateSelection } from "./utils";
 
 import type { LassoWorkerInput } from "./types";
 
-const ctx = self as unknown as Worker;
+export const WorkerUrl: URL | undefined = import.meta.url
+  ? new URL(import.meta.url)
+  : undefined;
 
 // variables to track processing state and latest input data
 // for "backpressure" purposes
@@ -70,5 +72,3 @@ const processInputData = () => {
     }
   }
 };
-
-export default ctx;
