@@ -17,7 +17,7 @@ import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
 
 import { getContainerElement } from "@excalidraw/element/textElement";
 
-import { arrayToMap, easeOut, promiseTry } from "@excalidraw/common";
+import { arrayToMap, easeOut } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -29,9 +29,9 @@ import { type AnimationFrameHandler } from "../animation-frame-handler";
 
 import { AnimatedTrail } from "../animated-trail";
 
-import { WorkerPool } from "../workers";
+import LassoWorker from "./lasso-worker.chunk?worker";
 
-import { updateSelection } from "./utils";
+import { LassoWorkerPolyfill } from "./lasso-worker-polyfill";
 
 import type App from "../components/App";
 import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
@@ -42,6 +42,8 @@ export class LassoTrail extends AnimatedTrail {
   private elementsSegments: Map<string, LineSegment<GlobalPoint>[]> | null =
     null;
   private keepPreviousSelection: boolean = false;
+
+  private worker: Worker | LassoWorkerPolyfill | null = null;
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
     super(animationFrameHandler, app, {
@@ -65,7 +67,7 @@ export class LassoTrail extends AnimatedTrail {
     });
   }
 
-  async startPath(x: number, y: number, keepPreviousSelection = false) {
+  startPath(x: number, y: number, keepPreviousSelection = false) {
     // clear any existing trails just in case
     this.endPath();
 
@@ -81,6 +83,24 @@ export class LassoTrail extends AnimatedTrail {
         selectedGroupIds: {},
         selectedLinearElement: null,
       });
+    }
+
+    try {
+      this.worker =
+        typeof Worker !== "undefined"
+          ? new LassoWorker()
+          : new LassoWorkerPolyfill();
+
+      this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
+        const { selectedElementIds } = event.data;
+        this.selectElementsFromIds(selectedElementIds);
+      };
+
+      this.worker.onerror = (error) => {
+        console.error("Worker error:", error);
+      };
+    } catch (error) {
+      console.error("Failed to start worker", error);
     }
   }
 
@@ -151,11 +171,7 @@ export class LassoTrail extends AnimatedTrail {
     });
   };
 
-  addPointToPath = async (
-    x: number,
-    y: number,
-    keepPreviousSelection = false,
-  ) => {
+  addPointToPath = (x: number, y: number, keepPreviousSelection = false) => {
     super.addPointToPath(x, y);
 
     this.keepPreviousSelection = keepPreviousSelection;
@@ -169,10 +185,10 @@ export class LassoTrail extends AnimatedTrail {
       },
     });
 
-    await this.updateSelection();
+    this.updateSelection();
   };
 
-  private updateSelection = async () => {
+  private updateSelection = () => {
     const lassoPath = super
       .getCurrentTrail()
       ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
@@ -196,15 +212,7 @@ export class LassoTrail extends AnimatedTrail {
         simplifyDistance: 5 / this.app.state.zoom.value,
       };
 
-      const workerPool = await getOrCreateWorkerPool();
-      const result = await workerPool.postMessage(message, {});
-
-      const { selectedElementIds } = result;
-      if (!selectedElementIds || !Array.isArray(selectedElementIds)) {
-        return;
-      }
-
-      this.selectElementsFromIds(selectedElementIds);
+      this.worker?.postMessage(message);
     }
   };
 
@@ -218,66 +226,6 @@ export class LassoTrail extends AnimatedTrail {
       lassoSelection: null,
     });
 
-    getOrCreateWorkerPool()
-      .then((workerPool) => {
-        workerPool.clear();
-      })
-      .catch((error) => {
-        console.error("Failed to clear worker pool", error);
-      });
-  }
-}
-
-let lassoWorker: Promise<typeof import("./lasso-worker.chunk")> | null = null;
-
-const lazyLoadLassoWorkerChunk = async () => {
-  if (!lassoWorker) {
-    lassoWorker = import("./lasso-worker.chunk");
-  }
-
-  return lassoWorker;
-};
-
-let workerPool: Promise<
-  WorkerPool<LassoWorkerInput, LassoWorkerOutput>
-> | null = null;
-
-const getOrCreateWorkerPool = async () => {
-  if (!workerPool) {
-    workerPool = promiseTry(async () => {
-      if (typeof Worker !== "undefined") {
-        const { WorkerUrl } = await lazyLoadLassoWorkerChunk();
-
-        return WorkerPool.create<LassoWorkerInput, LassoWorkerOutput>(
-          WorkerUrl,
-        );
-      }
-      return WorkerPolyfillPool.create() as unknown as WorkerPool<
-        LassoWorkerInput,
-        LassoWorkerOutput
-      >;
-    });
-  }
-  return workerPool;
-};
-
-class WorkerPolyfillPool {
-  static create() {
-    return new WorkerPolyfillPool();
-  }
-
-  async postMessage(data: LassoWorkerInput): Promise<LassoWorkerOutput> {
-    return new Promise((resolve, reject) => {
-      try {
-        const selectedElementIds = updateSelection(data);
-        resolve(selectedElementIds);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  clear() {
-    // no-op for polyfill
+    this.worker?.terminate();
   }
 }
