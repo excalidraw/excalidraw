@@ -68,7 +68,7 @@ export const getDefaultAppState = (): Omit<
     gridStep: DEFAULT_GRID_STEP,
     gridModeEnabled: false,
     isBindingEnabled: true,
-    isShapeSnapEnabled: true,
+    isShapeSnapEnabled: false,
     defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
