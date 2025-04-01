@@ -72,7 +72,7 @@ export const getDefaultAppState = (): Omit<
     isBindingEnabled: true,
     bindingPreference: "enabled",
     isMidpointSnappingEnabled: true,
-    isShapeSnapEnabled: true,
+    isShapeSnapEnabled: false,
     defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
