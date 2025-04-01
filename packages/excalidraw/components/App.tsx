@@ -9091,7 +9091,19 @@ class App extends React.Component<AppProps, AppState> {
 
         if (this.state.isShapeSnapEnabled) {
           const detectedElement = convertToShape(newElement);
+
           if (detectedElement !== newElement) {
+            if (detectedElement.type === "arrow") {
+              mutateElement(
+                detectedElement,
+                {
+                  startArrowhead: this.state.currentItemStartArrowhead,
+                  endArrowhead: this.state.currentItemEndArrowhead,
+                },
+                // TODO: Make arrows bind to nearby elements if possible
+              );
+            }
+
             this.scene.replaceAllElements([
               ...this.scene
                 .getElementsIncludingDeleted()

@@ -169,9 +169,12 @@ export const SelectedShapeActions = ({
         renderAction("changeStrokeWidth")}
 
       {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeStrokeShape")}
-
+        targetElements.some((element) => element.type === "freedraw")) && (
+        <>
+          {renderAction("changeStrokeShape")}
+          {renderAction("toggleShapeSnap")}
+        </>
+      )}
       {(hasStrokeStyle(appState.activeTool.type) ||
         targetElements.some((element) => hasStrokeStyle(element.type))) && (
         <>
