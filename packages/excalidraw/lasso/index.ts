@@ -29,7 +29,7 @@ import { type AnimationFrameHandler } from "../animation-frame-handler";
 
 import { AnimatedTrail } from "../animated-trail";
 
-import LassoWorker from "./lasso-worker?worker";
+import LassoWorker from "./lasso-worker.ts?worker";
 
 import { LassoWorkerPolyfill } from "./lasso-worker-polyfill";
 
