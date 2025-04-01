@@ -9,13 +9,20 @@ import type {
 } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type {
-  ElementsSegmentsMap,
-  LassoWorkerInput,
-  LassoWorkerOutput,
-} from "./types";
+import type { LassoWorkerInput, LassoWorkerOutput } from "./lasso-main";
 
-export const updateSelection = (input: LassoWorkerInput): LassoWorkerOutput => {
+export type ElementsSegmentsMap = Map<string, LineSegment<GlobalPoint>[]>;
+
+/**
+ * Shared commands between the main thread and worker threads.
+ */
+export const Commands = {
+  GET_LASSO_SELECTED_ELEMENT_IDS: "GET_LASSO_SELECTED_ELEMENT_IDS",
+} as const;
+
+export const getLassoSelectedElementIds = (
+  input: LassoWorkerInput,
+): LassoWorkerOutput<typeof Commands.GET_LASSO_SELECTED_ELEMENT_IDS> => {
   const {
     lassoPath,
     elements,

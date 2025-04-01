@@ -23,7 +23,7 @@ export const subsetWoff2GlyphsByCodepoints = async (
   codePoints: Array<number>,
 ): Promise<string> => {
   const { Commands, subsetToBase64, toBase64 } =
-    await lazyLoadSharedSubsetChunk();
+    await lazyLoadSubsetSharedChunk();
 
   if (!shouldUseWorkers) {
     return subsetToBase64(arrayBuffer, codePoints);
@@ -75,7 +75,7 @@ export const subsetWoff2GlyphsByCodepoints = async (
 let subsetWorker: Promise<typeof import("./subset-worker.chunk")> | null = null;
 let subsetShared: Promise<typeof import("./subset-shared.chunk")> | null = null;
 
-const lazyLoadWorkerSubsetChunk = async () => {
+const lazyLoadSubsetWorkerChunk = async () => {
   if (!subsetWorker) {
     subsetWorker = import("./subset-worker.chunk");
   }
@@ -83,7 +83,7 @@ const lazyLoadWorkerSubsetChunk = async () => {
   return subsetWorker;
 };
 
-const lazyLoadSharedSubsetChunk = async () => {
+const lazyLoadSubsetSharedChunk = async () => {
   if (!subsetShared) {
     // load dynamically to force create a shared chunk reused between main thread and the worker thread
     subsetShared = import("./subset-shared.chunk");
@@ -93,17 +93,20 @@ const lazyLoadSharedSubsetChunk = async () => {
 };
 
 // could be extended with multiple commands in the future
-type SubsetWorkerData = {
+export type SubsetWorkerInput = {
   command: typeof Commands.Subset;
   arrayBuffer: ArrayBuffer;
   codePoints: Array<number>;
 };
 
-type SubsetWorkerResult<T extends SubsetWorkerData["command"]> =
+export type SubsetWorkerOutput<T extends SubsetWorkerInput["command"]> =
   T extends typeof Commands.Subset ? ArrayBuffer : never;
 
 let workerPool: Promise<
-  WorkerPool<SubsetWorkerData, SubsetWorkerResult<SubsetWorkerData["command"]>>
+  WorkerPool<
+    SubsetWorkerInput,
+    SubsetWorkerOutput<SubsetWorkerInput["command"]>
+  >
 > | null = null;
 
 /**
@@ -115,11 +118,11 @@ const getOrCreateWorkerPool = () => {
   if (!workerPool) {
     // immediate concurrent-friendly return, to ensure we have only one pool instance
     workerPool = promiseTry(async () => {
-      const { WorkerUrl } = await lazyLoadWorkerSubsetChunk();
+      const { WorkerUrl } = await lazyLoadSubsetWorkerChunk();
 
       const pool = WorkerPool.create<
-        SubsetWorkerData,
-        SubsetWorkerResult<SubsetWorkerData["command"]>
+        SubsetWorkerInput,
+        SubsetWorkerOutput<SubsetWorkerInput["command"]>
       >(WorkerUrl);
 
       return pool;

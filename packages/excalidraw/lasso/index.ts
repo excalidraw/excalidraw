@@ -29,10 +29,12 @@ import { type AnimationFrameHandler } from "../animation-frame-handler";
 
 import { AnimatedTrail } from "../animated-trail";
 
-import { LassoWorkerPolyfill } from "./lasso-worker-polyfill";
+import {
+  getLassoSelectedElementIds,
+  type LassoWorkerInput,
+} from "./lasso-main";
 
 import type App from "../components/App";
-import type { LassoWorkerInput, LassoWorkerOutput } from "./types";
 
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
@@ -40,8 +42,6 @@ export class LassoTrail extends AnimatedTrail {
   private elementsSegments: Map<string, LineSegment<GlobalPoint>[]> | null =
     null;
   private keepPreviousSelection: boolean = false;
-
-  private worker: Worker | LassoWorkerPolyfill | null = null;
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
     super(animationFrameHandler, app, {
@@ -81,29 +81,6 @@ export class LassoTrail extends AnimatedTrail {
         selectedGroupIds: {},
         selectedLinearElement: null,
       });
-    }
-
-    if (!this.worker) {
-      try {
-        const { WorkerUrl } = await import("./lasso-worker.chunk");
-
-        if (typeof Worker !== "undefined" && WorkerUrl) {
-          this.worker = new Worker(WorkerUrl, { type: "module" });
-        } else {
-          this.worker = new LassoWorkerPolyfill();
-        }
-
-        this.worker.onmessage = (event: MessageEvent<LassoWorkerOutput>) => {
-          const { selectedElementIds } = event.data;
-          this.selectElementsFromIds(selectedElementIds);
-        };
-
-        this.worker.onerror = (error) => {
-          console.error("Worker error:", error);
-        };
-      } catch (error) {
-        console.error("Failed to start worker", error);
-      }
     }
   }
 
@@ -191,7 +168,7 @@ export class LassoTrail extends AnimatedTrail {
     this.updateSelection();
   };
 
-  private updateSelection = () => {
+  private updateSelection = async () => {
     const lassoPath = super
       .getCurrentTrail()
       ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
@@ -206,7 +183,8 @@ export class LassoTrail extends AnimatedTrail {
     }
 
     if (lassoPath) {
-      const message: LassoWorkerInput = {
+      // need to omit command, otherwise "shared" chunk will be included in the main bundle by default
+      const message: Omit<LassoWorkerInput, "command"> = {
         lassoPath,
         elements: this.app.visibleElements,
         elementsSegments: this.elementsSegments,
@@ -215,7 +193,9 @@ export class LassoTrail extends AnimatedTrail {
         simplifyDistance: 5 / this.app.state.zoom.value,
       };
 
-      this.worker?.postMessage(message);
+      const { selectedElementIds } = await getLassoSelectedElementIds(message);
+
+      this.selectElementsFromIds(selectedElementIds);
     }
   };
 
