@@ -390,7 +390,6 @@ export const convertToShape = (
       return newArrowElement({
         ...freeDrawElement,
         type: recognizedShape.type,
-        endArrowhead: "arrow", // TODO: Get correct state
         points: [
           recognizedShape.simplified[0],
           recognizedShape.simplified[recognizedShape.simplified.length - 2]

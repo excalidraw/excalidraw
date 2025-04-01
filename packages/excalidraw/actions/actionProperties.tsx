@@ -131,6 +131,8 @@ import {
   ArrowheadCardinalityOneOrManyIcon,
   ArrowheadCardinalityZeroOrManyIcon,
   ArrowheadCardinalityZeroOrOneIcon,
+  snapShapeEnabledIcon,
+  snapShapeDisabledIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -2041,3 +2043,54 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
     );
   },
 });
+
+export const actionToggleShapeSnap = register({
+  name: "toggleShapeSnap",
+  label: "Toggle Snap to Shape",
+  trackEvent: false,
+  perform: (elements, appState) => {
+    return {
+      elements,
+      appState: {
+        ...appState,
+        isShapeSnapEnabled: !appState.isShapeSnapEnabled,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.shapeSnap")}</legend>
+      <ButtonIconSelect
+        group="button"
+        options={[
+          {
+            value: false,
+            text: t("labels.shapeSnapDisable"),
+            icon: snapShapeDisabledIcon,
+          },
+          {
+            value: true,
+            text: t("labels.shapeSnapEnable"),
+            icon: snapShapeEnabledIcon,
+          },
+        ]}
+        value={appState.isShapeSnapEnabled}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
+});
+
+function ButtonIconSelect(props: {
+  onChange: (value: any) => any;
+  group: string;
+  options: { value: any; text: string; icon: any }[];
+  value: any;
+}) {
+  console.error(
+    "ButtonIconSelect is a placeholder component and should be replaced by a properties setting after rebase.",
+  );
+
+  return null;
+}
