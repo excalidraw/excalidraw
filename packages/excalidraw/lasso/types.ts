@@ -1,4 +1,4 @@
-import type { GlobalPoint, LineSegment } from "@excalidraw/math";
+import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 export type ElementsSegmentsMap = Map<string, LineSegment<GlobalPoint>[]>;
