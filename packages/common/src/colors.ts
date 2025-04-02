@@ -134,7 +134,7 @@ export const DEFAULT_ELEMENT_STROKE_COLOR_PALETTE = {
   ...COMMON_ELEMENT_SHADES,
 } as const;
 
-// ORDER matters for positioning in pallete (5x3 grid)s
+// ORDER matters for positioning in palette (5x3 grid)s
 export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   transparent: COLOR_PALETTE.transparent,
   white: COLOR_PALETTE.white,
