@@ -4158,7 +4158,10 @@ class App extends React.Component<AppProps, AppState> {
         // Shape switching
         if (event.key === KEYS.ESCAPE) {
           editorJotaiStore.set(shapeSwitchAtom, null);
-        } else if (event.key === KEYS.TAB) {
+        } else if (
+          event.key === KEYS.TAB &&
+          document.activeElement === this.excalidrawContainerRef?.current
+        ) {
           event.preventDefault();
 
           const { generic, linear } =
