@@ -12,7 +12,7 @@ import { isImageElement } from "@excalidraw/element/typeChecks";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import DragInput from "./DragInput";
-import { getStepSizedValue, isPropertyEditable } from "./utils";
+import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
 import type Scene from "../../scene/Scene";
@@ -118,6 +118,9 @@ const handleDimensionChange: DragInputCallbackType<
           width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
           height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
         });
+
+        updateBindings(element, elementsMap, scene);
+
         return;
       }
 
@@ -149,6 +152,8 @@ const handleDimensionChange: DragInputCallbackType<
         width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
         height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
       });
+
+      updateBindings(element, elementsMap, scene);
 
       return;
     }
@@ -183,6 +188,8 @@ const handleDimensionChange: DragInputCallbackType<
           shouldMaintainAspectRatio: keepAspectRatio,
         },
       );
+
+      updateBindings(origElement, elementsMap, scene);
 
       return;
     }
@@ -230,6 +237,8 @@ const handleDimensionChange: DragInputCallbackType<
         shouldMaintainAspectRatio: keepAspectRatio,
       },
     );
+
+    updateBindings(origElement, elementsMap, scene);
   }
 };
 

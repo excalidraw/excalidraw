@@ -16,8 +16,7 @@ import {
 } from "@excalidraw/element/groups";
 
 import {
-  getOriginalBindingsIfStillCloseToArrowEnds,
-  unbindLinearElement,
+  bindOrUnbindLinearElement,
   updateBoundElements,
 } from "@excalidraw/element/binding";
 
@@ -29,6 +28,8 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
+
+import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { AppState } from "../../types";
 
@@ -203,30 +204,34 @@ export const getAtomicUnits = (
 export const updateBindings = (
   latestElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
-): boolean => {
+  scene: Scene,
+) => {
   if (isBindingElement(latestElement)) {
-    const [start, end] = getOriginalBindingsIfStillCloseToArrowEnds(
-      latestElement,
-      elementsMap,
-      zoom,
-    );
-
-    if (
-      (latestElement.startBinding && start) ||
-      (latestElement.endBinding && end)
-    ) {
-      return false;
+    if (latestElement.startBinding || latestElement.endBinding) {
+      bindOrUnbindLinearElement(latestElement, null, null, elementsMap, scene);
     }
+  } else if (isBindableElement(latestElement)) {
+    updateBoundElements(latestElement, elementsMap);
+  }
+};
 
-    if (latestElement.startBinding && !start) {
-      unbindLinearElement(latestElement, "start");
-    }
+export const updateSelectionBindings = (
+  elements: readonly ExcalidrawElement[],
+  elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
+) => {
+  for (const element of elements) {
+    // Only preserve bindings if the bound element is in the selection
+    if (isBindingElement(element)) {
+      if (elements.find((el) => el.id !== element.startBinding?.elementId)) {
+        bindOrUnbindLinearElement(element, null, "keep", elementsMap, scene);
+      }
 
-    if (latestElement.endBinding && !end) {
-      unbindLinearElement(latestElement, "end");
+      if (elements.find((el) => el.id !== element.endBinding?.elementId)) {
+        bindOrUnbindLinearElement(element, "keep", null, elementsMap, scene);
+      }
+    } else if (isBindableElement(element)) {
+      updateBoundElements(element, elementsMap);
     }
   }
-
-  return true;
 };
