@@ -40,8 +40,8 @@
     justify-content: center;
     gap: 0.2rem;
     border-radius: 0.5rem;
-    background: var(--default-bg-color);
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
     padding: 0.5rem;
   }
 }
