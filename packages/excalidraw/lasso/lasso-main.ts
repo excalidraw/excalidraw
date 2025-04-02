@@ -21,7 +21,8 @@ export const getLassoSelectedElementIds = async (
 ): Promise<
   LassoWorkerOutput<typeof Commands.GET_LASSO_SELECTED_ELEMENT_IDS>
 > => {
-  const { Commands, getLassoSelectedElementIds } = await lazyLoadLassoSharedChunk();
+  const { Commands, getLassoSelectedElementIds } =
+    await lazyLoadLassoSharedChunk();
 
   const inputWithCommand: LassoWorkerInput = {
     ...input,
