@@ -49,7 +49,7 @@ export type DragFinishedCallbackType<
   accumulatedChange: number;
   setAppState: React.Component<any, AppState>["setState"];
   setInputValue: (value: number) => void;
-}) => boolean;
+}) => void;
 
 interface StatsDragInputProps<
   T extends StatsInputProperty,
@@ -156,7 +156,7 @@ const StatsDragInput = <
         setInputValue: (value) => setInputValue(String(value)),
         setAppState,
       });
-      const commit = dragFinishedCallback?.({
+      dragFinishedCallback?.({
         originalElements: elements,
         originalElementsMap,
         scene,
@@ -166,11 +166,9 @@ const StatsDragInput = <
         setAppState,
         setInputValue: (value) => setInputValue(String(value)),
       });
-      if (commit) {
-        app.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
+      app.syncActionResult({
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
     }
   };
 
@@ -315,26 +313,22 @@ const StatsDragInput = <
                 false,
               );
 
-              let commit = true;
               if (originalElements !== null && originalElementsMap !== null) {
-                commit =
-                  dragFinishedCallback?.({
-                    originalElements,
-                    originalElementsMap,
-                    scene,
-                    originalAppState,
-                    property,
-                    accumulatedChange,
-                    setAppState,
-                    setInputValue: (value) => setInputValue(String(value)),
-                  }) ?? true;
-              }
-
-              if (commit) {
-                app.syncActionResult({
-                  captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+                dragFinishedCallback?.({
+                  originalElements,
+                  originalElementsMap,
+                  scene,
+                  originalAppState,
+                  property,
+                  accumulatedChange,
+                  setAppState,
+                  setInputValue: (value) => setInputValue(String(value)),
                 });
               }
+
+              app.syncActionResult({
+                captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+              });
 
               lastPointer = null;
               accumulatedChange = 0;

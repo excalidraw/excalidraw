@@ -569,7 +569,7 @@ const isLinearElementSimple = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
 ): boolean => linearElement.points.length < 3;
 
-export const unbindLinearElement = (
+const unbindLinearElement = (
   linearElement: NonDeleted<ExcalidrawLinearElement>,
   startOrEnd: "start" | "end",
 ): ExcalidrawBindableElement["id"] | null => {

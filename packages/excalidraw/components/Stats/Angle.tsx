@@ -3,20 +3,13 @@ import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import { getBoundTextElement } from "@excalidraw/element/textElement";
-import {
-  isArrowElement,
-  isBindableElement,
-  isElbowArrow,
-} from "@excalidraw/element/typeChecks";
+import { isArrowElement, isElbowArrow } from "@excalidraw/element/typeChecks";
 
-import {
-  getSuggestedBindingsForArrows,
-  updateBoundElements,
-} from "@excalidraw/element/binding";
+import { getSuggestedBindingsForArrows } from "@excalidraw/element/binding";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type { Degrees, Radians } from "@excalidraw/math";
+import type { Degrees } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -63,9 +56,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
         angle: nextAngle,
       });
 
-      if (isBindableElement(latestElement)) {
-        updateBoundElements(latestElement, elementsMap);
-      }
+      updateBindings(latestElement, elementsMap, scene);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -92,9 +83,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       angle: nextAngle,
     });
 
-    if (isBindableElement(latestElement)) {
-      updateBoundElements(latestElement, elementsMap);
-    }
+    updateBindings(latestElement, elementsMap, scene);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
@@ -112,46 +101,11 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
 };
 
 const handleFinished: DragFinishedCallbackType<AngleProps["property"]> = ({
-  originalElements,
-  originalAppState,
-  scene,
-  accumulatedChange,
   setAppState,
-  setInputValue,
 }) => {
-  const elementsMap = scene.getNonDeletedElementsMap();
-  const origElement = originalElements[0];
-
-  if (origElement) {
-    const latestElement = elementsMap.get(origElement.id);
-
-    if (latestElement) {
-      setAppState({
-        suggestedBindings: [],
-      });
-
-      const success = updateBindings(
-        latestElement,
-        elementsMap,
-        originalAppState.zoom,
-      );
-
-      if (!success) {
-        const change = degreesToRadians(accumulatedChange as Degrees);
-        const angle = (latestElement.angle - change) as Radians;
-
-        mutateElement(latestElement, {
-          angle,
-        });
-
-        setInputValue(angle);
-
-        return false;
-      }
-    }
-  }
-
-  return true;
+  setAppState({
+    suggestedBindings: [],
+  });
 };
 
 const Angle = ({ element, scene, appState, property }: AngleProps) => {

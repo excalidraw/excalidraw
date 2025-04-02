@@ -7,8 +7,6 @@ import {
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { isImageElement } from "@excalidraw/element/typeChecks";
 
-import { getSuggestedBindingsForArrows } from "@excalidraw/element/binding";
-
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import StatsDragInput from "./DragInput";
@@ -110,6 +108,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
         crop: nextCrop,
       });
 
+      updateBindings(element, elementsMap, scene);
+
       return;
     }
 
@@ -128,13 +128,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       crop: nextCrop,
     });
 
-    setAppState({
-      suggestedBindings: getSuggestedBindingsForArrows(
-        [origElement],
-        elementsMap,
-        originalAppState.zoom,
-      ),
-    });
+    updateBindings(element, elementsMap, scene);
 
     return;
   }
@@ -149,6 +143,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       elementsMap,
       originalElementsMap,
     );
+
+    updateBindings(origElement, elementsMap, scene);
 
     return;
   }
@@ -182,60 +178,15 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     originalElementsMap,
   );
 
-  if (origElement) {
-    const latestElement = elementsMap.get(origElement.id);
-
-    if (latestElement) {
-      setAppState({
-        suggestedBindings: getSuggestedBindingsForArrows(
-          [latestElement],
-          elementsMap,
-          originalAppState.zoom,
-        ),
-      });
-    }
-  }
+  updateBindings(origElement, elementsMap, scene);
 };
 
 const handleFinished: DragFinishedCallbackType<"x" | "y"> = ({
-  originalElements,
-  originalAppState,
-  scene,
-  accumulatedChange,
-  property,
   setAppState,
-  setInputValue,
-}): boolean => {
-  const elementsMap = scene.getNonDeletedElementsMap();
-  const origElement = originalElements[0];
-
-  if (origElement) {
-    const latestElement = elementsMap.get(origElement.id);
-
-    if (latestElement) {
-      setAppState({
-        suggestedBindings: [],
-      });
-
-      const success = updateBindings(
-        latestElement,
-        elementsMap,
-        originalAppState.zoom,
-      );
-
-      if (!success) {
-        mutateElement(latestElement, {
-          [property]: latestElement[property] - accumulatedChange,
-        });
-
-        setInputValue(latestElement[property] - accumulatedChange);
-      }
-
-      return false;
-    }
-  }
-
-  return true;
+}) => {
+  setAppState({
+    suggestedBindings: [],
+  });
 };
 
 const Position = ({ property, element, scene, appState }: PositionProps) => {

@@ -12,7 +12,12 @@ import type {
 } from "@excalidraw/element/types";
 
 import StatsDragInput from "./DragInput";
-import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
+import {
+  getAtomicUnits,
+  getStepSizedValue,
+  isPropertyEditable,
+  updateSelectionBindings,
+} from "./utils";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
@@ -39,6 +44,7 @@ const moveElements = (
   originalElements: readonly ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   for (let i = 0; i < elements.length; i++) {
     const origElement = originalElements[i];
@@ -68,6 +74,8 @@ const moveElements = (
       false,
     );
   }
+
+  updateSelectionBindings(elements, elementsMap, scene);
 };
 
 const moveGroupTo = (
@@ -76,6 +84,7 @@ const moveGroupTo = (
   originalElements: ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   const [x1, y1, ,] = getCommonBounds(originalElements);
   const offsetX = nextX - x1;
@@ -112,6 +121,8 @@ const moveGroupTo = (
       );
     }
   }
+
+  updateSelectionBindings(originalElements, elementsMap, scene);
 };
 
 const handlePositionChange: DragInputCallbackType<
@@ -152,6 +163,7 @@ const handlePositionChange: DragInputCallbackType<
           elementsInUnit.map((el) => el.original),
           elementsMap,
           originalElementsMap,
+          scene,
         );
       } else {
         const origElement = elementsInUnit[0]?.original;
@@ -204,6 +216,7 @@ const handlePositionChange: DragInputCallbackType<
     originalElements,
     elementsMap,
     originalElementsMap,
+    scene,
   );
 
   scene.triggerUpdate();
