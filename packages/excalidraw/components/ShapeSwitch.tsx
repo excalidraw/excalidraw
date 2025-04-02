@@ -6,7 +6,7 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
 
-import { getElementAbsoluteCoords, refreshTextDimensions } from "../element";
+import { getElementAbsoluteCoords } from "../element";
 import {
   getFontString,
   sceneCoordsToViewportCoords,
@@ -21,10 +21,10 @@ import {
 import { t } from "../i18n";
 
 import {
-  computeBoundTextPosition,
   getBoundTextElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
+  redrawTextBoundingBox,
 } from "../element/textElement";
 import { wrapText } from "../element/textWrapping";
 import { measureText } from "../element/textMeasurements";
@@ -376,30 +376,7 @@ export const adjustBoundTextSize = (
     false,
   );
 
-  const { x, y } = computeBoundTextPosition(container, boundText, elementsMap);
-
-  mutateElement(
-    boundText,
-    {
-      x,
-      y,
-    },
-    false,
-  );
-
-  mutateElement(
-    boundText,
-    {
-      ...refreshTextDimensions(
-        boundText,
-        container,
-        elementsMap,
-        boundText.originalText,
-      ),
-      containerId: container.id,
-    },
-    false,
-  );
+  redrawTextBoundingBox(boundText, container, elementsMap, false);
 };
 
 export const switchShapes = (
