@@ -29,10 +29,7 @@ import { type AnimationFrameHandler } from "../animation-frame-handler";
 
 import { AnimatedTrail } from "../animated-trail";
 
-import {
-  getLassoSelectedElementIds,
-  type LassoWorkerInput,
-} from "./lasso-main";
+import { getLassoSelectedElementIds } from "./utils";
 
 import type App from "../components/App";
 
@@ -183,17 +180,14 @@ export class LassoTrail extends AnimatedTrail {
     }
 
     if (lassoPath) {
-      // need to omit command, otherwise "shared" chunk will be included in the main bundle by default
-      const message: Omit<LassoWorkerInput, "command"> = {
+      const { selectedElementIds } = getLassoSelectedElementIds({
         lassoPath,
         elements: this.app.visibleElements,
         elementsSegments: this.elementsSegments,
         intersectedElements: this.intersectedElements,
         enclosedElements: this.enclosedElements,
         simplifyDistance: 5 / this.app.state.zoom.value,
-      };
-
-      const { selectedElementIds } = await getLassoSelectedElementIds(message);
+      });
 
       this.selectElementsFromIds(selectedElementIds);
     }

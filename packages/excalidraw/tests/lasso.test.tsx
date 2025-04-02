@@ -29,14 +29,11 @@ import { Excalidraw } from "../index";
 
 import { getSelectedElements } from "../scene";
 
-import {
-  Commands,
-  getLassoSelectedElementIds,
-} from "../lasso/lasso-shared.chunk";
+import { getLassoSelectedElementIds } from "../lasso/utils";
 
 import { act, render } from "./test-utils";
 
-import type { ElementsSegmentsMap } from "../lasso/lasso-shared.chunk";
+import type { ElementsSegmentsMap } from "../lasso/utils";
 
 const { h } = window;
 
@@ -68,7 +65,6 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
     }
 
     const result = getLassoSelectedElementIds({
-      command: Commands.GET_LASSO_SELECTED_ELEMENT_IDS,
       lassoPath:
         h.app.lassoTrail
           .getCurrentTrail()
