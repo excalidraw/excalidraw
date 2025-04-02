@@ -4,10 +4,13 @@ import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
   LIBRARY_SIDEBAR_TAB,
-} from "../constants";
+  composeEventHandlers,
+} from "@excalidraw/common";
+
+import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
+
 import { useTunnels } from "../context/tunnels";
 import { useUIAppState } from "../context/ui-appState";
-import { composeEventHandlers } from "../utils";
 
 import "../components/dropdownMenu/DropdownMenu.scss";
 
@@ -18,7 +21,6 @@ import { Sidebar } from "./Sidebar/Sidebar";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
 
-import type { MarkOptional, Merge } from "../utility-types";
 import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 
 const DefaultSidebarTrigger = withInternalFallback(

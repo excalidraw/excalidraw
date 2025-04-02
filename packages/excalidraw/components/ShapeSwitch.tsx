@@ -4,36 +4,45 @@ import clsx from "clsx";
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
-
-import { getElementAbsoluteCoords } from "../element";
-import {
-  getFontString,
-  sceneCoordsToViewportCoords,
-  updateActiveTool,
-} from "../utils";
-import { getSelectedElements } from "../scene";
-import { trackEvent } from "../analytics";
 import {
   getSwitchableTypeFromElements,
   isUsingAdaptiveRadius,
-} from "../element/typeChecks";
-import { t } from "../i18n";
+} from "@excalidraw/element/typeChecks";
+import {
+  getCommonBoundingBox,
+  getElementAbsoluteCoords,
+} from "@excalidraw/element/bounds";
 
 import {
   getBoundTextElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   redrawTextBoundingBox,
-} from "../element/textElement";
-import { wrapText } from "../element/textWrapping";
-import { measureText } from "../element/textMeasurements";
-import { mutateElement } from "../element/mutateElement";
-import { getCommonBoundingBox } from "../element/bounds";
-import { ShapeCache } from "../scene/ShapeCache";
-import { ROUNDNESS } from "../constants";
-import { LinearElementEditor } from "../element/linearElementEditor";
+} from "@excalidraw/element/textElement";
+import { wrapText } from "@excalidraw/element/textWrapping";
+import { getFontString, updateActiveTool } from "@excalidraw/common";
+import { measureText } from "@excalidraw/element/textMeasurements";
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
+  GenericSwitchableToolType,
+  LinearSwitchableToolType,
+} from "@excalidraw/element/types";
+
+import { mutateElement, ROUNDNESS, sceneCoordsToViewportCoords } from "..";
+import { t } from "../i18n";
+import { getSelectedElements } from "../scene";
+import { trackEvent } from "../analytics";
+import { atom, editorJotaiStore, useAtom } from "../editor-jotai";
+
+import "./ShapeSwitch.scss";
 import { ToolButton } from "./ToolButton";
 import {
   ArrowIcon,
@@ -43,18 +52,7 @@ import {
   RectangleIcon,
 } from "./icons";
 
-import "./ShapeSwitch.scss";
-
 import type App from "./App";
-import type {
-  ElementsMap,
-  ExcalidrawElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextContainer,
-  ExcalidrawTextElementWithContainer,
-  GenericSwitchableToolType,
-  LinearSwitchableToolType,
-} from "../element/types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;

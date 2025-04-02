@@ -33,10 +33,6 @@ export class ImageSceneDataError extends Error {
   }
 }
 
-export class InvalidFractionalIndexError extends Error {
-  public code = "ELEMENT_HAS_INVALID_INDEX" as const;
-}
-
 type WorkerErrorCodes = "WORKER_URL_NOT_DEFINED" | "WORKER_IN_THE_MAIN_CHUNK";
 
 export class WorkerUrlNotDefinedError extends Error {
