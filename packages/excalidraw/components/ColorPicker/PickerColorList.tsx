@@ -65,7 +65,7 @@ const PickerColorList = ({
             tabIndex={-1}
             type="button"
             className={clsx(
-              "color-picker__button color-picker__button--large",
+              "color-picker__button color-picker__button--large has-outline",
               {
                 active: colorObj?.colorName === key,
                 "is-transparent": color === "transparent" || !color,
