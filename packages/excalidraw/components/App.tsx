@@ -4898,10 +4898,8 @@ class App extends React.Component<AppProps, AppState> {
     element: ExcalidrawTextElement,
     {
       isExistingElement = false,
-      keepContainerDimensions = false,
     }: {
       isExistingElement?: boolean;
-      keepContainerDimensions?: boolean;
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -5006,7 +5004,6 @@ class App extends React.Component<AppProps, AppState> {
       // the text on edit anyway (and users can select-all from contextmenu
       // if needed)
       autoSelect: !this.device.isTouchScreen,
-      keepContainerDimensions,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
@@ -5239,7 +5236,6 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter = true,
     container,
     autoEdit = true,
-    keepContainerDimensions = false,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5249,7 +5245,6 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
-    keepContainerDimensions?: boolean;
   }) => {
     let shouldBindToContainer = false;
 
@@ -5385,7 +5380,6 @@ class App extends React.Component<AppProps, AppState> {
     if (autoEdit || existingTextElement || container) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
-        keepContainerDimensions,
       });
     } else {
       this.setState({

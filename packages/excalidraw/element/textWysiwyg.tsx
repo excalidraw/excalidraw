@@ -101,7 +101,6 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
-  keepContainerDimensions?: boolean;
 }): SubmitHandler => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
