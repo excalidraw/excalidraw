@@ -408,10 +408,12 @@ export const switchShapes = (
     generic,
     linear,
     nextType,
+    direction = "right",
   }: {
     generic?: boolean;
     linear?: boolean;
     nextType?: GenericSwitchableToolType | LinearSwitchableToolType;
+    direction?: "left" | "right";
   } = {},
 ): boolean => {
   if (!generic && !linear) {
@@ -427,6 +429,8 @@ export const switchShapes = (
     (acc, element) => ({ ...acc, [element.id]: true }),
     {},
   );
+
+  const advancement = direction === "right" ? 1 : -1;
 
   if (generic) {
     const selectedGenericSwitchableElements =
@@ -445,7 +449,8 @@ export const switchShapes = (
     nextType =
       nextType ??
       (GENERIC_SWITCHABLE_SHAPES[
-        (index + 1) % GENERIC_SWITCHABLE_SHAPES.length
+        (index + GENERIC_SWITCHABLE_SHAPES.length + advancement) %
+          GENERIC_SWITCHABLE_SHAPES.length
       ] as GenericSwitchableToolType);
 
     selectedGenericSwitchableElements.forEach((element) => {
@@ -516,7 +521,8 @@ export const switchShapes = (
     nextType =
       nextType ??
       (LINEAR_SWITCHABLE_SHAPES[
-        (index + 1) % LINEAR_SWITCHABLE_SHAPES.length
+        (index + LINEAR_SWITCHABLE_SHAPES.length + advancement) %
+          LINEAR_SWITCHABLE_SHAPES.length
       ] as LinearSwitchableToolType);
 
     selectedElements.forEach((element) => {

@@ -4112,6 +4112,7 @@ class App extends React.Component<AppProps, AppState> {
               switchShapes(this, {
                 generic,
                 linear,
+                direction: event.shiftKey ? "left" : "right",
               })
             ) {
               this.store.shouldCaptureIncrement();
