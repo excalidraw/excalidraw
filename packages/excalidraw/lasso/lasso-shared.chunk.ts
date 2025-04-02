@@ -1,5 +1,3 @@
-import { simplify } from "points-on-curve";
-
 import type {
   GlobalPoint,
   Line,
@@ -270,4 +268,62 @@ function pointFrom<Point extends GlobalPoint | LocalPoint>(
   y: number,
 ): Point {
   return [x, y] as Point;
+}
+
+// Adapated from https://www.npmjs.com/package/points-on-curve/v/1.0.1
+export function simplify(points: any, distance: any) {
+  return simplifyPoints(points, 0, points.length, distance, []);
+}
+// Ramer–Douglas–Peucker algorithm
+// https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
+function simplifyPoints(
+  points: any,
+  start: any,
+  end: any,
+  epsilon: any,
+  newPoints: any[],
+) {
+  const outPoints: any[] = newPoints || [];
+  // find the most distance point from the endpoints
+  const s = points[start];
+  const e = points[end - 1];
+  let maxDistSq = 0;
+  let maxNdx = 1;
+  for (let i = start + 1; i < end - 1; ++i) {
+    const distSq = distanceToSegmentSq(points[i], s, e);
+    if (distSq > maxDistSq) {
+      maxDistSq = distSq;
+      maxNdx = i;
+    }
+  }
+  // if that point is too far, split
+  if (Math.sqrt(maxDistSq) > epsilon) {
+    simplifyPoints(points, start, maxNdx + 1, epsilon, outPoints);
+    simplifyPoints(points, maxNdx, end, epsilon, outPoints);
+  } else {
+    if (!outPoints.length) {
+      outPoints.push(s);
+    }
+    outPoints.push(e);
+  }
+  return outPoints;
+}
+
+// distance between 2 points squared
+function distanceSq(p1: any, p2: any) {
+  return Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2);
+}
+// Sistance squared from a point p to the line segment vw
+function distanceToSegmentSq(p: any, v: any, w: any) {
+  const l2 = distanceSq(v, w);
+  if (l2 === 0) {
+    return distanceSq(p, v);
+  }
+  let t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return distanceSq(p, lerp(v, w, t));
+}
+
+function lerp(a: any, b: any, t: any) {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 }
