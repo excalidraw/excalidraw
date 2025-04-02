@@ -59,6 +59,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
+  "isShapeSnapEnabled": false,
   "lastPointerDownWith": "mouse",
   "multiElement": null,
   "name": "name",

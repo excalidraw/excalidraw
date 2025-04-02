@@ -1887,6 +1887,23 @@ export const eyeClosedIcon = createIcon(
   tablerIconProps,
 );
 
+export const snapShapeEnabledIcon = createIcon(
+  <g stroke="currentColor" fill="none" strokeWidth="1.5">
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <circle cx="16" cy="8" r="1.5" fill="currentColor" />
+  </g>,
+  tablerIconProps,
+);
+
+export const snapShapeDisabledIcon = createIcon(
+  <g stroke="currentColor" fill="none" strokeWidth="1.5">
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <line x1="4" y1="4" x2="20" y2="20" />
+    <line x1="4" y1="20" x2="20" y2="4" />
+  </g>,
+  tablerIconProps,
+);
+
 export const brainIcon = createIcon(
   <g stroke="currentColor" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

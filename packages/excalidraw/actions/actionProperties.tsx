@@ -121,6 +121,8 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
+  snapShapeEnabledIcon,
+  snapShapeDisabledIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1817,4 +1819,42 @@ export const actionChangeArrowType = register({
       </fieldset>
     );
   },
+});
+
+export const actionToggleShapeSnap = register({
+  name: "toggleShapeSnap",
+  label: "Toggle Snap to Shape",
+  trackEvent: false,
+  perform: (elements, appState) => {
+    return {
+      elements,
+      appState: {
+        ...appState,
+        isShapeSnapEnabled: !appState.isShapeSnapEnabled,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.shapeSnap")}</legend>
+      <ButtonIconSelect
+        group="button"
+        options={[
+          {
+            value: false,
+            text: t("labels.shapeSnapDisable"),
+            icon: snapShapeDisabledIcon,
+          },
+          {
+            value: true,
+            text: t("labels.shapeSnapEnable"),
+            icon: snapShapeEnabledIcon,
+          },
+        ]}
+        value={appState.isShapeSnapEnabled}
+        onChange={(value) => updateData(value)}
+      />
+    </fieldset>
+  ),
 });
