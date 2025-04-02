@@ -99,6 +99,7 @@ import {
   isShallowEqual,
   arrayToMap,
   type EXPORT_IMAGE_TYPES,
+  randomInteger,
 } from "@excalidraw/common";
 
 import {
@@ -8485,10 +8486,18 @@ class App extends React.Component<AppProps, AppState> {
             });
             if (
               hitElement &&
+              // hit element may not end up being selected
+              // if we're alt-dragging a common bounding box
+              // over the hit element
+              pointerDownState.hit.wasAddedToSelection &&
               !selectedElements.find((el) => el.id === hitElement.id)
             ) {
               selectedElements.push(hitElement);
             }
+
+            const idsOfElementsToDuplicate = new Map(
+              selectedElements.map((el) => [el.id, el]),
+            );
 
             const { newElements: clonedElements, elementsWithClones } =
               duplicateElements({
@@ -8496,9 +8505,7 @@ class App extends React.Component<AppProps, AppState> {
                 elements,
                 appState: this.state,
                 randomizeSeed: true,
-                idsOfElementsToDuplicate: new Map(
-                  selectedElements.map((el) => [el.id, el]),
-                ),
+                idsOfElementsToDuplicate,
                 overrides: (el) => {
                   const origEl = pointerDownState.originalElements.get(el.id);
 
@@ -8506,6 +8513,7 @@ class App extends React.Component<AppProps, AppState> {
                     return {
                       x: origEl.x,
                       y: origEl.y,
+                      seed: origEl.seed,
                     };
                   }
 
@@ -8525,7 +8533,14 @@ class App extends React.Component<AppProps, AppState> {
             const nextSceneElements = syncMovedIndices(
               mappedNewSceneElements || elementsWithClones,
               arrayToMap(clonedElements),
-            );
+            ).map((el) => {
+              if (idsOfElementsToDuplicate.has(el.id)) {
+                return newElementWith(el, {
+                  seed: randomInteger(),
+                });
+              }
+              return el;
+            });
 
             this.scene.replaceAllElements(nextSceneElements);
             this.maybeCacheVisibleGaps(event, selectedElements, true);
