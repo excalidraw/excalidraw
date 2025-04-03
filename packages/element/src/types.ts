@@ -412,3 +412,6 @@ export type NonDeletedSceneElementsMap = Map<
 export type ElementsMapOrArray =
   | readonly ExcalidrawElement[]
   | Readonly<ElementsMap>;
+
+/** Supported shape types for shape conversion */
+export type ShapeType = "rectangle" | "diamond" | "ellipse";
