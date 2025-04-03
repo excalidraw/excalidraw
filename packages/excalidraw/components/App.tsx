@@ -330,10 +330,13 @@ import type {
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
+import type { ShapeType } from "@excalidraw/element/src/types";
+
 import {
   actionAddToLibrary,
   actionBringForward,
   actionBringToFront,
+  actionChangeShapeType,
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
@@ -522,6 +525,7 @@ import type {
   Offsets,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
+
 import type { Action, ActionResult } from "../actions/types";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
@@ -4131,6 +4135,31 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           this.finishImageCropping();
           return;
+        }
+
+        // Handle shape type change shortcuts
+        if (event.ctrlKey || event.metaKey) {
+          const key = event.key.toLowerCase();
+          let targetType: ShapeType | null = null;
+
+          if (key === "r") {
+            targetType = "rectangle";
+          } else if (key === "d") {
+            targetType = "diamond";
+          } else if (key === "e") {
+            targetType = "ellipse";
+          }
+
+          if (targetType) {
+            event.preventDefault();
+            // Execute the action with the target shape type
+            this.actionManager.executeAction(
+              actionChangeShapeType,
+              "ui",
+              targetType,
+            );
+            return;
+          }
         }
 
         const selectedElements = getSelectedElements(
