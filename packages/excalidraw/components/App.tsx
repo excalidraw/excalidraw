@@ -8581,8 +8581,8 @@ class App extends React.Component<AppProps, AppState> {
             event.shiftKey,
           );
           this.lassoTrail.startPath(
-            pointerCoords.x,
-            pointerCoords.y,
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
             event.shiftKey,
           );
           this.setAppState({
