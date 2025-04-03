@@ -191,7 +191,11 @@ export class AnimatedTrail implements Trail {
       });
 
     const stroke = this.trailAnimation
-      ? _stroke.slice(0, _stroke.length / 2)
+      ? _stroke.slice(
+          // slicing from 6th point to get rid of the initial notch type of thing
+          Math.min(_stroke.length, 6),
+          _stroke.length / 2,
+        )
       : _stroke;
 
     return getSvgPathFromStroke(stroke, true);
