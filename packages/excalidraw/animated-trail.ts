@@ -48,11 +48,11 @@ export class AnimatedTrail implements Trail {
       this.trailAnimation = document.createElementNS(SVG_NS, "animate");
       // TODO: make this configurable
       this.trailAnimation.setAttribute("attributeName", "stroke-dashoffset");
-      this.trailElement.setAttribute("stroke-dasharray", "10 10");
+      this.trailElement.setAttribute("stroke-dasharray", "7 7");
       this.trailElement.setAttribute("stroke-dashoffset", "10");
       this.trailAnimation.setAttribute("from", "0");
-      this.trailAnimation.setAttribute("to", `-20`);
-      this.trailAnimation.setAttribute("dur", "0.2s");
+      this.trailAnimation.setAttribute("to", `-14`);
+      this.trailAnimation.setAttribute("dur", "0.3s");
       this.trailElement.appendChild(this.trailAnimation);
     }
   }
