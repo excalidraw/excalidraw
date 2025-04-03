@@ -58,11 +58,12 @@ export class LassoTrail extends AnimatedTrail {
 
         return Math.min(easeOut(l), easeOut(t));
       },
-      fill: () => "rgba(0,118,255)",
+      fill: () => "rgba(105,101,219,0.05)",
+      stroke: () => "rgba(105,101,219)",
     });
   }
 
-  async startPath(x: number, y: number, keepPreviousSelection = false) {
+  startPath(x: number, y: number, keepPreviousSelection = false) {
     // clear any existing trails just in case
     this.endPath();
 
@@ -159,19 +160,10 @@ export class LassoTrail extends AnimatedTrail {
 
     this.keepPreviousSelection = keepPreviousSelection;
 
-    this.app.setState({
-      lassoSelection: {
-        points:
-          (this.getCurrentTrail()?.originalPoints?.map((p) =>
-            pointFrom<GlobalPoint>(p[0], p[1]),
-          ) as readonly GlobalPoint[]) ?? null,
-      },
-    });
-
     this.updateSelection();
   };
 
-  private updateSelection = async () => {
+  private updateSelection = () => {
     const lassoPath = super
       .getCurrentTrail()
       ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
@@ -205,8 +197,5 @@ export class LassoTrail extends AnimatedTrail {
     this.intersectedElements.clear();
     this.enclosedElements.clear();
     this.elementsSegments = null;
-    this.app.setState({
-      lassoSelection: null,
-    });
   }
 }

@@ -705,33 +705,6 @@ export const renderSelectionElement = (
   context.restore();
 };
 
-export const renderLassoSelection = (
-  lassoPath: AppState["lassoSelection"],
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
-) => {
-  if (!lassoPath || lassoPath.points.length < 2) {
-    return;
-  }
-
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-  context.beginPath();
-
-  for (const point of lassoPath.points) {
-    context.lineTo(point[0], point[1]);
-  }
-
-  context.closePath();
-
-  context.globalAlpha = 0.05;
-  context.fillStyle = selectionColor;
-  context.fill();
-
-  context.restore();
-};
-
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,

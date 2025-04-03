@@ -37,10 +37,7 @@ import {
 
 import { getCornerRadius } from "@excalidraw/element/shapes";
 
-import {
-  renderLassoSelection,
-  renderSelectionElement,
-} from "@excalidraw/element/renderElement";
+import { renderSelectionElement } from "@excalidraw/element/renderElement";
 
 import {
   isSelectedViaGroup,
@@ -837,15 +834,6 @@ const _renderInteractiveScene = ({
     } catch (error: any) {
       console.error(error);
     }
-  }
-
-  if (appState.lassoSelection) {
-    renderLassoSelection(
-      appState.lassoSelection,
-      context,
-      appState,
-      renderConfig.selectionColor,
-    );
   }
 
   if (

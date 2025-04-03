@@ -23,6 +23,7 @@ export interface Trail {
 
 export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
+  stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
 }
 
@@ -161,10 +162,13 @@ export class AnimatedTrail implements Trail {
 
     this.trailElement.setAttribute("d", svgPaths);
     if (this.trailAnimation) {
-      this.trailElement.setAttribute("fill", "transparent");
+      this.trailElement.setAttribute(
+        "fill",
+        (this.options.fill ?? (() => "black"))(this),
+      );
       this.trailElement.setAttribute(
         "stroke",
-        (this.options.fill ?? (() => "black"))(this),
+        (this.options.stroke ?? (() => "black"))(this),
       );
     } else {
       this.trailElement.setAttribute(

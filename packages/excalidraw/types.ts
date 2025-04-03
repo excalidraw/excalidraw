@@ -1,5 +1,3 @@
-import type { GlobalPoint } from "@excalidraw/math";
-
 import type {
   IMAGE_MIME_TYPES,
   UserIdleState,
@@ -214,7 +212,6 @@ export type InteractiveCanvasAppState = Readonly<
     activeEmbeddable: AppState["activeEmbeddable"];
     editingLinearElement: AppState["editingLinearElement"];
     selectionElement: AppState["selectionElement"];
-    lassoSelection: AppState["lassoSelection"];
     selectedGroupIds: AppState["selectedGroupIds"];
     selectedLinearElement: AppState["selectedLinearElement"];
     multiElement: AppState["multiElement"];
@@ -288,9 +285,6 @@ export interface AppState {
    * - set on pointer down, updated during pointer move
    */
   selectionElement: NonDeletedExcalidrawElement | null;
-  lassoSelection: {
-    points: readonly GlobalPoint[];
-  } | null;
   isBindingEnabled: boolean;
   startBoundElement: NonDeleted<ExcalidrawBindableElement> | null;
   suggestedBindings: SuggestedBinding[];
