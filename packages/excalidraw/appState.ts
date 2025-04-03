@@ -52,6 +52,7 @@ export const getDefaultAppState = (): Omit<
       type: "selection",
       customType: null,
       locked: DEFAULT_ELEMENT_PROPS.locked,
+      fromSelection: false,
       lastActiveTool: null,
     },
     penMode: false,

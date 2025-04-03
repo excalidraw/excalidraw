@@ -16,17 +16,15 @@ const ENV_VARS = {
   },
 };
 
-// excludes all external dependencies and bundles only the source code
-const getConfig = (outdir) => ({
-  outdir,
+const rawConfigCommon = {
   bundle: true,
-  splitting: true,
   format: "esm",
-  packages: "external",
   plugins: [sassPlugin()],
-  target: "es2020",
   assetNames: "[dir]/[name]",
   chunkNames: "[dir]/[name]-[hash]",
+  // chunks are always external, so they are not bundled within and get build separately
+  external: ["*.chunk"],
+  packages: "external",
   alias: {
     "@excalidraw/common": path.resolve(__dirname, "../packages/common/src"),
     "@excalidraw/element": path.resolve(__dirname, "../packages/element/src"),
@@ -37,47 +35,57 @@ const getConfig = (outdir) => ({
   loader: {
     ".woff2": "file",
   },
-});
+};
 
-function buildDev(config) {
-  return build({
-    ...config,
+const rawConfigIndex = {
+  ...rawConfigCommon,
+  entryPoints: ["index.tsx"],
+};
+
+const rawConfigChunks = {
+  ...rawConfigCommon,
+  // create a separate chunk for each
+  entryPoints: ["**/*.chunk.ts"],
+  entryNames: "[name]",
+};
+
+function buildDev(chunkConfig) {
+  const config = {
+    ...chunkConfig,
     sourcemap: true,
     define: {
       "import.meta.env": JSON.stringify(ENV_VARS.development),
     },
-  });
+    outdir: "dist/dev",
+  };
+
+  return build(config);
 }
 
-function buildProd(config) {
-  return build({
-    ...config,
+function buildProd(chunkConfig) {
+  const config = {
+    ...chunkConfig,
     minify: true,
     define: {
       "import.meta.env": JSON.stringify(ENV_VARS.production),
     },
-  });
+    outdir: "dist/prod",
+  };
+
+  return build(config);
 }
 
 const createESMRawBuild = async () => {
-  const chunksConfig = {
-    entryPoints: ["index.tsx", "**/*.chunk.ts"],
-    entryNames: "[name]",
-  };
-
   // development unminified build with source maps
-  await buildDev({
-    ...getConfig("dist/dev"),
-    ...chunksConfig,
-  });
+  await buildDev(rawConfigIndex);
+  await buildDev(rawConfigChunks);
 
   // production minified buld without sourcemaps
-  await buildProd({
-    ...getConfig("dist/prod"),
-    ...chunksConfig,
-  });
+  await buildProd(rawConfigIndex);
+  await buildProd(rawConfigChunks);
 };
 
+// otherwise throws "ERROR: Could not resolve "./subset-worker.chunk"
 (async () => {
   await createESMRawBuild();
 })();

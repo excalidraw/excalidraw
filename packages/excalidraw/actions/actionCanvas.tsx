@@ -29,6 +29,7 @@ import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
+  LassoIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -523,6 +524,40 @@ export const actionToggleEraserTool = register({
     };
   },
   keyTest: (event) => event.key === KEYS.E,
+});
+
+export const actionToggleLassoTool = register({
+  name: "toggleLassoTool",
+  label: "toolBar.lasso",
+  icon: LassoIcon,
+  paletteName: "Toggle lasso selection tool",
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (appState.activeTool.type !== "lasso") {
+      activeTool = updateActiveTool(appState, {
+        type: "lasso",
+        fromSelection: false,
+      });
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "selection",
+      });
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
 });
 
 export const actionToggleHandTool = register({

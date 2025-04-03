@@ -16,24 +16,28 @@ class IdleWorker {
 }
 
 /**
- * Pool of idle short-lived workers.
- *
- * IMPORTANT: for simplicity it does not limit the number of newly created workers, leaving it up to the caller to manage the pool size.
+ * Pool of idle short-lived workers, so that they can be reused in a short period of time (`ttl`), instead of having to create a new worker from scratch.
  */
 export class WorkerPool<T, R> {
   private idleWorkers: Set<IdleWorker> = new Set();
+  private activeWorkers: Set<IdleWorker> = new Set();
+
   private readonly workerUrl: URL;
   private readonly workerTTL: number;
+  private readonly maxPoolSize: number;
 
   private constructor(
     workerUrl: URL,
     options: {
       ttl?: number;
+      maxPoolSize?: number;
     },
   ) {
     this.workerUrl = workerUrl;
     // by default, active & idle workers will be terminated after 1s of inactivity
     this.workerTTL = options.ttl || 1000;
+    // by default, active workers are limited to 3 instances
+    this.maxPoolSize = options.maxPoolSize || 3;
   }
 
   /**
@@ -48,6 +52,7 @@ export class WorkerPool<T, R> {
     workerUrl: URL | undefined,
     options: {
       ttl?: number;
+      maxPoolSize?: number;
     } = {},
   ): WorkerPool<T, R> {
     if (!workerUrl) {
@@ -72,12 +77,17 @@ export class WorkerPool<T, R> {
     let worker: IdleWorker;
 
     const idleWorker = Array.from(this.idleWorkers).shift();
+
     if (idleWorker) {
       this.idleWorkers.delete(idleWorker);
       worker = idleWorker;
-    } else {
+    } else if (this.activeWorkers.size < this.maxPoolSize) {
       worker = await this.createWorker();
+    } else {
+      worker = await this.waitForActiveWorker();
     }
+
+    this.activeWorkers.add(worker);
 
     return new Promise((resolve, reject) => {
       worker.instance.onmessage = this.onMessageHandler(worker, resolve);
@@ -101,7 +111,13 @@ export class WorkerPool<T, R> {
       worker.instance.terminate();
     }
 
+    for (const worker of this.activeWorkers) {
+      worker.debounceTerminate.cancel();
+      worker.instance.terminate();
+    }
+
     this.idleWorkers.clear();
+    this.activeWorkers.clear();
   }
 
   /**
@@ -130,9 +146,25 @@ export class WorkerPool<T, R> {
     return worker;
   }
 
+  private waitForActiveWorker(): Promise<IdleWorker> {
+    return Promise.race(
+      Array.from(this.activeWorkers).map(
+        (worker) =>
+          new Promise<IdleWorker>((resolve) => {
+            const originalOnMessage = worker.instance.onmessage;
+            worker.instance.onmessage = (e) => {
+              worker.instance.onmessage = originalOnMessage;
+              resolve(worker);
+            };
+          }),
+      ),
+    );
+  }
+
   private onMessageHandler(worker: IdleWorker, resolve: (value: R) => void) {
     return (e: { data: R }) => {
       worker.debounceTerminate();
+      this.activeWorkers.delete(worker);
       this.idleWorkers.add(worker);
       resolve(e.data);
     };
@@ -143,6 +175,8 @@ export class WorkerPool<T, R> {
     reject: (reason: ErrorEvent) => void,
   ) {
     return (e: ErrorEvent) => {
+      this.activeWorkers.delete(worker);
+
       // terminate the worker immediately before rejection
       worker.debounceTerminate(() => reject(e));
       worker.debounceTerminate.flush();

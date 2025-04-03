@@ -9,6 +9,8 @@
 
 import { Commands, subsetToBinary } from "./subset-shared.chunk";
 
+import type { SubsetWorkerInput } from "./subset-main";
+
 /**
  * Due to this export (and related dynamic import), this worker code will be included in the bundle automatically (as a separate chunk),
  * without the need for esbuild / vite /rollup plugins and special browser / server treatment.
@@ -21,13 +23,7 @@ export const WorkerUrl: URL | undefined = import.meta.url
 
 // run only in the worker context
 if (typeof window === "undefined" && typeof self !== "undefined") {
-  self.onmessage = async (e: {
-    data: {
-      command: typeof Commands.Subset;
-      arrayBuffer: ArrayBuffer;
-      codePoints: Array<number>;
-    };
-  }) => {
+  self.onmessage = async (e: MessageEvent<SubsetWorkerInput>) => {
     switch (e.data.command) {
       case Commands.Subset:
         const buffer = await subsetToBinary(
