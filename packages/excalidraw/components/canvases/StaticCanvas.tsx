@@ -117,12 +117,9 @@ const getRelevantAppStateProps = (
     editingGroupId: appState.editingGroupId,
     currentHoveredFontFamily: appState.currentHoveredFontFamily,
     croppingElementId: appState.croppingElementId,
-    activeTool: appState.activeTool,
   };
 
   if (appState.activeTool.type === "lasso") {
-    delete (relevantAppStateProps as Partial<typeof relevantAppStateProps>)
-      .activeTool;
     delete (relevantAppStateProps as Partial<typeof relevantAppStateProps>)
       .selectedElementIds;
   }

@@ -203,8 +203,6 @@ export type StaticCanvasAppState = Readonly<
     hoveredElementIds: AppState["hoveredElementIds"];
     // Cropping
     croppingElementId: AppState["croppingElementId"];
-    // For reducing unnecessary re-renders
-    activeTool: AppState["activeTool"];
   }
 >;
 
