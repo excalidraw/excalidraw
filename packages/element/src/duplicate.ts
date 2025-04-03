@@ -36,7 +36,10 @@ import {
 
 import { getBoundTextElement, getContainerElement } from "./textElement";
 
-import { fixBindingsAfterDuplication } from "./binding";
+import {
+  fixDuplicatedBindingsAfterDuplication,
+  fixReversedBindings,
+} from "./binding";
 
 import type {
   ElementsMap,
@@ -381,11 +384,19 @@ export const duplicateElements = (
 
   // ---------------------------------------------------------------------------
 
-  fixBindingsAfterDuplication(
+  fixDuplicatedBindingsAfterDuplication(
     newElements,
     oldIdToDuplicatedId,
     duplicatedElementsMap as NonDeletedSceneElementsMap,
   );
+
+  if (reverseOrder) {
+    fixReversedBindings(
+      _idsOfElementsToDuplicate,
+      elementsWithClones,
+      oldIdToDuplicatedId,
+    );
+  }
 
   bindElementsToFramesAfterDuplication(
     elementsWithClones,

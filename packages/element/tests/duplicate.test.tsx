@@ -14,7 +14,7 @@ import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 
 import {
   act,
@@ -698,5 +698,35 @@ describe("duplication z-order", () => {
       { id: arrow.id, selected: true },
       { id: text.id, containerId: arrow.id, selected: true },
     ]);
+  });
+
+  it("reverse-duplicating bindable element with bound arrow should keep the arrow on the duplicate", () => {
+    const rect = UI.createElement("rectangle", {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    const arrow = UI.createElement("arrow", {
+      x: -100,
+      y: 50,
+      width: 95,
+      height: 0,
+    });
+
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(5, 5);
+      mouse.up(15, 15);
+    });
+
+    expect(window.h.elements).toHaveLength(3);
+
+    const newRect = window.h.elements[0];
+
+    expect(arrow.endBinding?.elementId).toBe(newRect.id);
+    expect(newRect.boundElements?.[0]?.id).toBe(arrow.id);
   });
 });
