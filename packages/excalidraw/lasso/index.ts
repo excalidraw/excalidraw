@@ -96,15 +96,6 @@ export class LassoTrail extends AnimatedTrail {
 
       for (const [id] of Object.entries(nextSelectedElementIds)) {
         const element = this.app.scene.getNonDeletedElement(id);
-        if (element && isFrameLikeElement(element)) {
-          const elementsInFrame = getFrameChildren(
-            this.app.scene.getNonDeletedElementsMap(),
-            element.id,
-          );
-          for (const child of elementsInFrame) {
-            delete nextSelectedElementIds[child.id];
-          }
-        }
 
         if (element && isTextElement(element)) {
           const container = getContainerElement(
@@ -114,6 +105,21 @@ export class LassoTrail extends AnimatedTrail {
           if (container) {
             nextSelectedElementIds[container.id] = true;
             delete nextSelectedElementIds[element.id];
+          }
+        }
+      }
+
+      // remove all children of selected frames
+      for (const [id] of Object.entries(nextSelectedElementIds)) {
+        const element = this.app.scene.getNonDeletedElement(id);
+
+        if (element && isFrameLikeElement(element)) {
+          const elementsInFrame = getFrameChildren(
+            this.app.scene.getNonDeletedElementsMap(),
+            element.id,
+          );
+          for (const child of elementsInFrame) {
+            delete nextSelectedElementIds[child.id];
           }
         }
       }
