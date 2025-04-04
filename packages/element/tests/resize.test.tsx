@@ -1052,7 +1052,7 @@ describe("multiple selection", () => {
       0,
     );
     //console.log(JSON.stringify(h.elements));
-    expect(rightBoundArrow.width).toBeCloseTo(100 * scale + 1, 0);
+    expect(rightBoundArrow.width).toBeCloseTo(100 * scale, 0);
     expect(rightBoundArrow.height).toBeCloseTo(0);
     expect(rightBoundArrow.angle).toEqual(0);
     expect(rightBoundArrow.startBinding).toBeNull();

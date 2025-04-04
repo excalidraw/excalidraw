@@ -173,7 +173,7 @@ describe("element binding", () => {
     },
   );
 
-  it("should unbind arrow when moving it with keyboard", () => {
+  it("should not move bound arrows when moving it with keyboard", () => {
     const rectangle = UI.createElement("rectangle", {
       x: 75,
       y: 0,
@@ -208,16 +208,10 @@ describe("element binding", () => {
         Keyboard.keyPress(KEYS.ARROW_LEFT);
       });
     });
-    expect(arrow.endBinding).toBe(null);
 
-    Keyboard.withModifierKeys({ shift: true }, () => {
-      // We have to move a significant distance to return to the binding
-      Array.from({ length: 10 }).forEach(() => {
-        Keyboard.keyPress(KEYS.ARROW_RIGHT);
-      });
-    });
-    // We are back in the binding zone but we shouldn't rebind
-    expect(arrow.endBinding).toBe(null);
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+    expect(arrow.x).toBe(0);
+    expect(arrow.y).toBe(0);
   });
 
   it("should unbind on bound element deletion", () => {
