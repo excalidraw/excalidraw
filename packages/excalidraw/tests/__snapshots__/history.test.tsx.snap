@@ -295,10 +295,10 @@ History {
             "deleted": {
               "endBinding": {
                 "elementId": "id171",
-                "focus": "0.01026",
+                "focus": "0.01065",
                 "gap": 5,
               },
-              "height": "0.96335",
+              "height": "1.00000",
               "points": [
                 [
                   0,
@@ -306,12 +306,12 @@ History {
                 ],
                 [
                   "92.92893",
-                  "-0.96335",
+                  "-1.00000",
                 ],
               ],
               "startBinding": {
                 "elementId": "id170",
-                "focus": "0.03078",
+                "focus": "0.03194",
                 "gap": 5,
               },
               "width": "92.92893",
@@ -322,7 +322,7 @@ History {
                 "focus": "-0.02000",
                 "gap": 5,
               },
-              "height": 0,
+              "height": "0.00002",
               "points": [
                 [
                   0,
@@ -330,7 +330,7 @@ History {
                 ],
                 [
                   "92.92893",
-                  0,
+                  "0.00002",
                 ],
               ],
               "startBinding": {
@@ -404,15 +404,17 @@ History {
                 ],
               ],
               "startBinding": null,
+              "width": "96.42891",
+              "x": "3.53553",
               "y": 0,
             },
             "inserted": {
               "endBinding": {
                 "elementId": "id171",
-                "focus": "0.01026",
+                "focus": "0.01065",
                 "gap": 5,
               },
-              "height": "0.96335",
+              "height": "1.00000",
               "points": [
                 [
                   0,
@@ -420,15 +422,17 @@ History {
                 ],
                 [
                   "92.92893",
-                  "-0.96335",
+                  "-1.00000",
                 ],
               ],
               "startBinding": {
                 "elementId": "id170",
-                "focus": "0.03078",
+                "focus": "0.03194",
                 "gap": 5,
               },
-              "y": "1.00000",
+              "width": "92.92893",
+              "x": "3.53553",
+              "y": "1.03376",
             },
           },
           "id175" => Delta {
@@ -822,8 +826,8 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "type": "arrow",
   "updated": 1,
   "version": 30,
-  "width": "0.00000",
-  "x": "146.46447",
+  "width": "96.46447",
+  "x": 150,
   "y": 0,
 }
 `;
@@ -856,11 +860,11 @@ History {
                   0,
                 ],
                 [
-                  "-0.00000",
+                  0,
                   0,
                 ],
               ],
-              "width": "0.00000",
+              "width": 0,
             },
             "inserted": {
               "points": [
@@ -869,11 +873,11 @@ History {
                   0,
                 ],
                 [
-                  "92.92893",
+                  "89.39340",
                   0,
                 ],
               ],
-              "width": "92.92893",
+              "width": "89.39340",
             },
           },
         },
@@ -930,6 +934,8 @@ History {
                 ],
               ],
               "startBinding": null,
+              "width": "96.46447",
+              "x": 150,
             },
             "inserted": {
               "endBinding": {
@@ -943,7 +949,7 @@ History {
                   0,
                 ],
                 [
-                  "-0.00000",
+                  0,
                   0,
                 ],
               ],
@@ -952,6 +958,8 @@ History {
                 "focus": 0,
                 "gap": 5,
               },
+              "width": 0,
+              "x": "146.46447",
             },
           },
         },
