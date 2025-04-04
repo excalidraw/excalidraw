@@ -525,15 +525,18 @@ export const bindLinearElement = (
     };
   }
   const points = Array.from(linearElement.points);
-  points[edgePointIndex] = toLocalPoint(
-    bindPointToSnapToElementOutline(
+
+  if (isArrowElement(linearElement)) {
+    points[edgePointIndex] = toLocalPoint(
+      bindPointToSnapToElementOutline(
+        linearElement,
+        hoveredElement,
+        startOrEnd,
+        elementsMap,
+      ),
       linearElement,
-      hoveredElement,
-      startOrEnd,
-      elementsMap,
-    ),
-    linearElement,
-  );
+    );
+  }
 
   mutateElement(linearElement, {
     points,

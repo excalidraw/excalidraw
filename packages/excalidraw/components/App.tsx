@@ -5991,20 +5991,25 @@ class App extends React.Component<AppProps, AppState> {
           {
             points: [
               ...points.slice(0, -1),
-              toLocalPoint(
-                getOutlineAvoidingPoint(
-                  multiElement,
-                  pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-                  multiElement.points.length - 1,
-                  this.scene,
-                  this.state.zoom,
-                  pointFrom<GlobalPoint>(
-                    multiElement.x + lastCommittedX + dxFromLastCommitted,
-                    multiElement.y + lastCommittedY + dyFromLastCommitted,
+              isArrowElement(multiElement)
+                ? toLocalPoint(
+                    getOutlineAvoidingPoint(
+                      multiElement,
+                      pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+                      multiElement.points.length - 1,
+                      this.scene,
+                      this.state.zoom,
+                      pointFrom<GlobalPoint>(
+                        multiElement.x + lastCommittedX + dxFromLastCommitted,
+                        multiElement.y + lastCommittedY + dyFromLastCommitted,
+                      ),
+                    ),
+                    multiElement,
+                  )
+                : pointFrom<LocalPoint>(
+                    lastCommittedX + dxFromLastCommitted,
+                    lastCommittedY + dyFromLastCommitted,
                   ),
-                ),
-                multiElement,
-              ),
             ],
           },
           false,
@@ -8711,20 +8716,25 @@ class App extends React.Component<AppProps, AppState> {
               {
                 points: [
                   ...points,
-                  toLocalPoint(
-                    getOutlineAvoidingPoint(
-                      newElement,
-                      pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-                      newElement.points.length - 1,
-                      this.scene,
-                      this.state.zoom,
-                      pointFrom<GlobalPoint>(
-                        newElement.x + dx,
-                        newElement.y + dy,
-                      ),
-                    ),
-                    newElement,
-                  ),
+                  isArrowElement(newElement)
+                    ? toLocalPoint(
+                        getOutlineAvoidingPoint(
+                          newElement,
+                          pointFrom<GlobalPoint>(
+                            pointerCoords.x,
+                            pointerCoords.y,
+                          ),
+                          newElement.points.length - 1,
+                          this.scene,
+                          this.state.zoom,
+                          pointFrom<GlobalPoint>(
+                            newElement.x + dx,
+                            newElement.y + dy,
+                          ),
+                        ),
+                        newElement,
+                      )
+                    : pointFrom<LocalPoint>(dx, dy),
                 ],
               },
               false,
@@ -8738,20 +8748,25 @@ class App extends React.Component<AppProps, AppState> {
               {
                 points: [
                   ...points.slice(0, -1),
-                  toLocalPoint(
-                    getOutlineAvoidingPoint(
-                      newElement,
-                      pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-                      newElement.points.length - 1,
-                      this.scene,
-                      this.state.zoom,
-                      pointFrom<GlobalPoint>(
-                        newElement.x + dx,
-                        newElement.y + dy,
-                      ),
-                    ),
-                    newElement,
-                  ),
+                  isArrowElement(newElement)
+                    ? toLocalPoint(
+                        getOutlineAvoidingPoint(
+                          newElement,
+                          pointFrom<GlobalPoint>(
+                            pointerCoords.x,
+                            pointerCoords.y,
+                          ),
+                          newElement.points.length - 1,
+                          this.scene,
+                          this.state.zoom,
+                          pointFrom<GlobalPoint>(
+                            newElement.x + dx,
+                            newElement.y + dy,
+                          ),
+                        ),
+                        newElement,
+                      )
+                    : pointFrom<LocalPoint>(dx, dy),
                 ],
               },
               false,

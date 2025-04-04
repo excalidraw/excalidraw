@@ -57,6 +57,7 @@ import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
+  isArrowElement,
   isBindingElement,
   isElbowArrow,
   isFixedPointBinding,
@@ -371,14 +372,17 @@ export class LinearElementEditor {
                 app.scene,
                 app.state.zoom,
               );
+
               newPointPosition = LinearElementEditor.createPointAt(
                 element,
                 elementsMap,
-                avoidancePoint[0] === newGlobalPointPosition[0]
+                !isArrowElement(element) ||
+                  avoidancePoint[0] === newGlobalPointPosition[0]
                   ? newGlobalPointPosition[0] -
                       linearElementEditor.pointerOffset.x
                   : avoidancePoint[0],
-                avoidancePoint[1] === newGlobalPointPosition[1]
+                !isArrowElement(element) ||
+                  avoidancePoint[1] === newGlobalPointPosition[1]
                   ? newGlobalPointPosition[1] -
                       linearElementEditor.pointerOffset.y
                   : avoidancePoint[1],

@@ -427,7 +427,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id1",
+      "id": "id40",
       "type": "text",
     },
   ],
@@ -435,7 +435,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id3",
+    "elementId": "id42",
     "focus": -0,
     "gap": 5,
   },
@@ -465,7 +465,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id2",
+    "elementId": "id41",
     "focus": 0,
     "gap": 5,
   },
@@ -488,7 +488,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id0",
+  "containerId": "id39",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -529,7 +529,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id0",
+      "id": "id39",
       "type": "arrow",
     },
   ],
@@ -566,7 +566,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id0",
+      "id": "id39",
       "type": "arrow",
     },
   ],
@@ -603,7 +603,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id1",
+      "id": "id44",
       "type": "text",
     },
   ],
@@ -611,7 +611,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id3",
+    "elementId": "id46",
     "focus": -0,
     "gap": 5,
   },
@@ -641,7 +641,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id2",
+    "elementId": "id45",
     "focus": 0,
     "gap": 5,
   },
@@ -664,7 +664,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id0",
+  "containerId": "id43",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -706,7 +706,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id0",
+      "id": "id43",
       "type": "arrow",
     },
   ],
@@ -752,7 +752,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id0",
+      "id": "id43",
       "type": "arrow",
     },
   ],
