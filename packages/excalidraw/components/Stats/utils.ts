@@ -1,14 +1,11 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import {
-  bindOrUnbindLinearElements,
-  updateBoundElements,
-} from "@excalidraw/element/binding";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
+  isBindableElement,
+  isBindingElement,
   isFrameLikeElement,
-  isLinearElement,
   isTextElement,
 } from "@excalidraw/element/typeChecks";
 
@@ -17,6 +14,11 @@ import {
   getElementsInGroup,
   isInGroup,
 } from "@excalidraw/element/groups";
+
+import {
+  bindOrUnbindLinearElement,
+  updateBoundElements,
+} from "@excalidraw/element/binding";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -27,7 +29,8 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "../../scene/Scene";
+import type Scene from "@excalidraw/excalidraw/scene/Scene";
+
 import type { AppState } from "../../types";
 
 export type StatsInputProperty =
@@ -120,8 +123,6 @@ export const moveElement = (
   newTopLeftY: number,
   originalElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
-  scene: Scene,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
@@ -156,7 +157,10 @@ export const moveElement = (
     },
     shouldInformMutation,
   );
-  updateBindings(latestElement, elementsMap, elements, scene);
+
+  if (isBindableElement(latestElement)) {
+    updateBoundElements(latestElement, elementsMap);
+  }
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -200,25 +204,34 @@ export const getAtomicUnits = (
 export const updateBindings = (
   latestElement: ExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
   scene: Scene,
-  options?: {
-    simultaneouslyUpdated?: readonly ExcalidrawElement[];
-    newSize?: { width: number; height: number };
-    zoom?: AppState["zoom"];
-  },
 ) => {
-  if (isLinearElement(latestElement)) {
-    bindOrUnbindLinearElements(
-      [latestElement],
-      elementsMap,
-      elements,
-      scene,
-      true,
-      [],
-      options?.zoom,
-    );
-  } else {
-    updateBoundElements(latestElement, elementsMap, options);
+  if (isBindingElement(latestElement)) {
+    if (latestElement.startBinding || latestElement.endBinding) {
+      bindOrUnbindLinearElement(latestElement, null, null, elementsMap, scene);
+    }
+  } else if (isBindableElement(latestElement)) {
+    updateBoundElements(latestElement, elementsMap);
+  }
+};
+
+export const updateSelectionBindings = (
+  elements: readonly ExcalidrawElement[],
+  elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
+) => {
+  for (const element of elements) {
+    // Only preserve bindings if the bound element is in the selection
+    if (isBindingElement(element)) {
+      if (elements.find((el) => el.id !== element.startBinding?.elementId)) {
+        bindOrUnbindLinearElement(element, null, "keep", elementsMap, scene);
+      }
+
+      if (elements.find((el) => el.id !== element.endBinding?.elementId)) {
+        bindOrUnbindLinearElement(element, "keep", null, elementsMap, scene);
+      }
+    } else if (isBindableElement(element)) {
+      updateBoundElements(element, elementsMap);
+    }
   }
 };

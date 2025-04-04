@@ -8,12 +8,16 @@ import { getCommonBounds } from "@excalidraw/element/bounds";
 import type {
   ElementsMap,
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import StatsDragInput from "./DragInput";
-import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
+import {
+  getAtomicUnits,
+  getStepSizedValue,
+  isPropertyEditable,
+  updateSelectionBindings,
+} from "./utils";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
@@ -66,12 +70,12 @@ const moveElements = (
       newTopLeftY,
       origElement,
       elementsMap,
-      elements,
-      scene,
       originalElementsMap,
       false,
     );
   }
+
+  updateSelectionBindings(elements, elementsMap, scene);
 };
 
 const moveGroupTo = (
@@ -79,7 +83,6 @@ const moveGroupTo = (
   nextY: number,
   originalElements: ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
@@ -113,13 +116,13 @@ const moveGroupTo = (
         topLeftY + offsetY,
         origElement,
         elementsMap,
-        elements,
-        scene,
         originalElementsMap,
         false,
       );
     }
   }
+
+  updateSelectionBindings(originalElements, elementsMap, scene);
 };
 
 const handlePositionChange: DragInputCallbackType<
@@ -135,7 +138,6 @@ const handlePositionChange: DragInputCallbackType<
   originalAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
 
   if (nextValue !== undefined) {
     for (const atomicUnit of getAtomicUnits(
@@ -160,7 +162,6 @@ const handlePositionChange: DragInputCallbackType<
           newTopLeftY,
           elementsInUnit.map((el) => el.original),
           elementsMap,
-          elements,
           originalElementsMap,
           scene,
         );
@@ -189,8 +190,6 @@ const handlePositionChange: DragInputCallbackType<
             newTopLeftY,
             origElement,
             elementsMap,
-            elements,
-            scene,
             originalElementsMap,
             false,
           );

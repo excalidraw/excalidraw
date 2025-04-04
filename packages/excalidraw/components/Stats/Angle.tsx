@@ -5,6 +5,10 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { isArrowElement, isElbowArrow } from "@excalidraw/element/typeChecks";
 
+import { getSuggestedBindingsForArrows } from "@excalidraw/element/binding";
+
+import type { AppState } from "@excalidraw/excalidraw/types";
+
 import type { Degrees } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
@@ -14,9 +18,11 @@ import { angleIcon } from "../icons";
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 
-import type { DragInputCallbackType } from "./DragInput";
+import type {
+  DragFinishedCallbackType,
+  DragInputCallbackType,
+} from "./DragInput";
 import type Scene from "../../scene/Scene";
-import type { AppState } from "../../types";
 
 interface AngleProps {
   element: ExcalidrawElement;
@@ -33,9 +39,10 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   shouldChangeByStepSize,
   nextValue,
   scene,
+  setAppState,
+  originalAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   if (origElement && !isElbowArrow(origElement)) {
     const latestElement = elementsMap.get(origElement.id);
@@ -48,7 +55,8 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       mutateElement(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, elementsMap, elements, scene);
+
+      updateBindings(latestElement, elementsMap, scene);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -74,13 +82,30 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     mutateElement(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, elementsMap, elements, scene);
+
+    updateBindings(latestElement, elementsMap, scene);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
       mutateElement(boundTextElement, { angle: nextAngle });
     }
+
+    setAppState({
+      suggestedBindings: getSuggestedBindingsForArrows(
+        [latestElement],
+        elementsMap,
+        originalAppState.zoom,
+      ),
+    });
   }
+};
+
+const handleFinished: DragFinishedCallbackType<AngleProps["property"]> = ({
+  setAppState,
+}) => {
+  setAppState({
+    suggestedBindings: [],
+  });
 };
 
 const Angle = ({ element, scene, appState, property }: AngleProps) => {
@@ -91,6 +116,7 @@ const Angle = ({ element, scene, appState, property }: AngleProps) => {
       value={Math.round((radiansToDegrees(element.angle) % 360) * 100) / 100}
       elements={[element]}
       dragInputCallback={handleDegreeChange}
+      dragFinishedCallback={handleFinished}
       editable={isPropertyEditable(element, "angle")}
       scene={scene}
       appState={appState}

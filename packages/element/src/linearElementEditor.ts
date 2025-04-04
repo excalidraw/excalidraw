@@ -42,6 +42,7 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import {
   bindOrUnbindLinearElement,
   getHoveredElementForBinding,
+  getOutlineAvoidingPoint,
   isBindingEnabled,
 } from "./binding";
 import {
@@ -56,6 +57,7 @@ import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { bumpVersion, mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
+  isArrowElement,
   isBindingElement,
   isElbowArrow,
   isFixedPointBinding,
@@ -251,27 +253,28 @@ export class LinearElementEditor {
       pointSceneCoords: { x: number; y: number }[],
     ) => void,
     linearElementEditor: LinearElementEditor,
-    scene: Scene,
   ): LinearElementEditor | null {
     if (!linearElementEditor) {
       return null;
     }
     const { elementId } = linearElementEditor;
-    const elementsMap = scene.getNonDeletedElementsMap();
+    const elementsMap = app.scene.getNonDeletedElementsMap();
     const element = LinearElementEditor.getElement(elementId, elementsMap);
     if (!element) {
       return null;
     }
 
+    const elbowed = isElbowArrow(element);
+
     if (
-      isElbowArrow(element) &&
+      elbowed &&
       !linearElementEditor.pointerDownState.lastClickedIsEndPoint &&
       linearElementEditor.pointerDownState.lastClickedPoint !== 0
     ) {
       return null;
     }
 
-    const selectedPointsIndices = isElbowArrow(element)
+    const selectedPointsIndices = elbowed
       ? [
           !!linearElementEditor.selectedPointsIndices?.includes(0)
             ? 0
@@ -281,7 +284,7 @@ export class LinearElementEditor {
             : undefined,
         ].filter((idx): idx is number => idx !== undefined)
       : linearElementEditor.selectedPointsIndices;
-    const lastClickedPoint = isElbowArrow(element)
+    const lastClickedPoint = elbowed
       ? linearElementEditor.pointerDownState.lastClickedPoint > 0
         ? element.points.length - 1
         : 0
@@ -333,7 +336,7 @@ export class LinearElementEditor {
         LinearElementEditor.movePoints(
           element,
           selectedPointsIndices.map((pointIndex) => {
-            const newPointPosition: LocalPoint =
+            let newPointPosition: LocalPoint =
               pointIndex === lastClickedPoint
                 ? LinearElementEditor.createPointAt(
                     element,
@@ -346,6 +349,46 @@ export class LinearElementEditor {
                     element.points[pointIndex][0] + deltaX,
                     element.points[pointIndex][1] + deltaY,
                   );
+
+            if (pointIndex === 0 || pointIndex === element.points.length - 1) {
+              const [, , , , cx, cy] = getElementAbsoluteCoords(
+                element,
+                elementsMap,
+                true,
+              );
+              const newGlobalPointPosition = pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + newPointPosition[0],
+                  element.y + newPointPosition[1],
+                ),
+                pointFrom<GlobalPoint>(cx, cy),
+                element.angle,
+              );
+              const avoidancePoint = getOutlineAvoidingPoint(
+                element,
+                newGlobalPointPosition,
+                pointIndex,
+                app.scene,
+                app.state.zoom,
+              );
+
+              newPointPosition = LinearElementEditor.createPointAt(
+                element,
+                elementsMap,
+                !isArrowElement(element) ||
+                  avoidancePoint[0] === newGlobalPointPosition[0]
+                  ? newGlobalPointPosition[0] -
+                      linearElementEditor.pointerOffset.x
+                  : avoidancePoint[0],
+                !isArrowElement(element) ||
+                  avoidancePoint[1] === newGlobalPointPosition[1]
+                  ? newGlobalPointPosition[1] -
+                      linearElementEditor.pointerOffset.y
+                  : avoidancePoint[1],
+                null,
+              );
+            }
+
             return {
               index: pointIndex,
               point: newPointPosition,
