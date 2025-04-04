@@ -138,7 +138,10 @@
     "removeAllElementsFromFrame": "",
     "eyeDropper": "Взять образец цвета с холста",
     "textToDiagram": "Текст в диаграмму",
-    "prompt": ""
+    "prompt": "",
+    "toggleGrid": "Переключить сетку",
+    "showFonts": "Показать выбор шрифта",
+    "theme": "Тема"
   },
   "library": {
     "noItems": "Пока ничего не добавлено...",
@@ -189,7 +192,7 @@
     "couldNotCreateShareableLinkTooBig": "Нельзя создать ссылку, чтобы поделиться. Сцена слишком большая",
     "couldNotLoadInvalidFile": "Не удалось загрузить недопустимый файл",
     "importBackendFailed": "Не удалось импортировать из бэкэнда.",
-    "cannotExportEmptyCanvas": "Не может экспортировать пустой холст.",
+    "cannotExportEmptyCanvas": "Невозможно экспортировать пустой холст.",
     "couldNotCopyToClipboard": "Не удалось скопировать в буфер обмена.",
     "decryptFailed": "Не удалось расшифровать данные.",
     "uploadedSecurly": "Загружаемые данные защищена сквозным шифрованием, что означает, что сервер Excalidraw и третьи стороны не могут прочитать содержимое.",
@@ -250,10 +253,10 @@
     "eraser": "Ластик",
     "frame": "",
     "magicframe": "",
-    "embeddable": "",
+    "embeddable": "Веб-вставка",
     "laser": "Лазерная указка",
     "hand": "Рука (перемещение холста)",
-    "extraTools": "",
+    "extraTools": "Дополнительные инструменты",
     "mermaidToExcalidraw": "Из Mermaid в Excalidraw",
     "magicSettings": "Параметры AI"
   },
@@ -267,7 +270,7 @@
     "linearElement": "Нажмите, чтобы начать несколько точек, перетащите для одной линии",
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
-    "embeddable": "",
+    "embeddable": "Нажмите и перетащите, чтобы встроить веб-сайт",
     "text_selected": "Дважды щелкните мышью или нажмите ENTER, чтобы редактировать текст",
     "text_editing": "Нажмите Escape либо Ctrl или Cmd + ENTER для завершения редактирования",
     "linearElementMulti": "Кликните на последней точке или нажмите Escape или Enter чтобы закончить",
@@ -350,7 +353,11 @@
     "zoomToSelection": "Увеличить до выделенного",
     "toggleElementLock": "Заблокировать/разблокировать выделение",
     "movePageUpDown": "Сдвинуть страницу вверх/вниз",
-    "movePageLeftRight": "Сдвинуть страницу вправо/влево"
+    "movePageLeftRight": "Сдвинуть страницу вправо/влево",
+    "cropStart": "Обрезать изображение",
+    "cropFinish": "Завершить обрезку изображения",
+    "createFlowchart": "Создать блок-схему на основе выбранного элемента",
+    "navigateFlowchart": "Навигация по блок-схеме"
   },
   "clearCanvasDialog": {
     "title": "Очистить холст"
@@ -427,12 +434,15 @@
     "scene": "Сцены",
     "selected": "Выбран",
     "storage": "Хранилище",
-    "title": "Статистика для ботаников",
+    "title": "Характеристики",
     "total": "Всего",
     "version": "Версия",
     "versionCopy": "Копировать",
     "versionNotAvailable": "Версия не доступна",
-    "width": "Ширина"
+    "width": "Ширина",
+    "fullTitle": "Свойства холста и фигур",
+    "generalStats": "Общие",
+    "shapes": "Фигуры"
   },
   "toast": {
     "addedToLibrary": "Добавлено в библиотеку",
@@ -444,7 +454,7 @@
     "canvas": "холст",
     "selection": "выделение",
     "pasteAsSingleElement": "Используйте {{shortcut}}, чтобы вставить один объект,\nили вставьте в существующий текстовый редактор",
-    "unableToEmbed": "",
+    "unableToEmbed": "Встраивание этого URL в данный момент запрещено...",
     "unrecognizedLinkFormat": ""
   },
   "colors": {
@@ -518,8 +528,26 @@
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "",
+    "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>, <sequenceLink>последовательности</sequenceLink> и <classLink>классы</classLink>. Остальные типы будут отображаться как изображения в Excalidraw.",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр"
+  },
+  "fontList": {
+    "sceneFonts": "В этой сцене",
+    "availableFonts": "Доступные шрифты",
+    "empty": "Шрифты не найдены"
+  },
+  "quickSearch": {
+    "placeholder": "Быстрый поиск"
+  },
+  "search": {
+    "title": "Поиск на холсте",
+    "noMatch": "Совпадений не найдено...",
+    "singleResult": "результат",
+    "multipleResults": "результаты",
+    "placeholder": "Найти текст на холсте..."
+  },
+  "commandPalette": {
+    "title": "Палитра команд"
   }
 }
