@@ -4375,7 +4375,7 @@ class App extends React.Component<AppProps, AppState> {
         const arrowIdsToRemove = new Set<string>();
 
         selectedElements
-          .filter(isElbowArrow)
+          .filter(isArrowElement)
           .filter((arrow) => {
             const startElementNotInSelection =
               arrow.startBinding &&

@@ -356,16 +356,17 @@ export class LinearElementEditor {
                 elementsMap,
                 true,
               );
+              const newGlobalPointPosition = pointRotateRads(
+                pointFrom<GlobalPoint>(
+                  element.x + newPointPosition[0],
+                  element.y + newPointPosition[1],
+                ),
+                pointFrom<GlobalPoint>(cx, cy),
+                element.angle,
+              );
               const avoidancePoint = getOutlineAvoidingPoint(
                 element,
-                pointRotateRads(
-                  pointFrom<GlobalPoint>(
-                    element.x + newPointPosition[0],
-                    element.y + newPointPosition[1],
-                  ),
-                  pointFrom<GlobalPoint>(cx, cy),
-                  element.angle,
-                ),
+                newGlobalPointPosition,
                 pointIndex,
                 app.scene,
                 app.state.zoom,
@@ -373,8 +374,14 @@ export class LinearElementEditor {
               newPointPosition = LinearElementEditor.createPointAt(
                 element,
                 elementsMap,
-                avoidancePoint[0] - linearElementEditor.pointerOffset.x,
-                avoidancePoint[1] - linearElementEditor.pointerOffset.y,
+                avoidancePoint[0] === newGlobalPointPosition[0]
+                  ? newGlobalPointPosition[0] -
+                      linearElementEditor.pointerOffset.x
+                  : avoidancePoint[0],
+                avoidancePoint[1] === newGlobalPointPosition[1]
+                  ? newGlobalPointPosition[1] -
+                      linearElementEditor.pointerOffset.y
+                  : avoidancePoint[1],
                 null,
               );
             }

@@ -94,7 +94,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 35,
+  "height": 33.53813187180941,
   "id": Any<String>,
   "index": "a2",
   "isDeleted": false,
@@ -427,7 +427,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id40",
+      "id": "id1",
       "type": "text",
     },
   ],
@@ -435,7 +435,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id42",
+    "elementId": "id3",
     "focus": -0,
     "gap": 5,
   },
@@ -465,7 +465,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id41",
+    "elementId": "id2",
     "focus": 0,
     "gap": 5,
   },
@@ -488,7 +488,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id39",
+  "containerId": "id0",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -529,7 +529,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id39",
+      "id": "id0",
       "type": "arrow",
     },
   ],
@@ -566,7 +566,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id39",
+      "id": "id0",
       "type": "arrow",
     },
   ],
@@ -592,7 +592,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "version": 3,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 355,
+  "x": 350,
   "y": 189,
 }
 `;
@@ -603,7 +603,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id44",
+      "id": "id1",
       "type": "text",
     },
   ],
@@ -611,7 +611,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": {
-    "elementId": "id46",
+    "elementId": "id3",
     "focus": -0,
     "gap": 5,
   },
@@ -641,7 +641,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "seed": Any<Number>,
   "startArrowhead": null,
   "startBinding": {
-    "elementId": "id45",
+    "elementId": "id2",
     "focus": 0,
     "gap": 5,
   },
@@ -664,7 +664,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
-  "containerId": "id43",
+  "containerId": "id0",
   "customData": undefined,
   "fillStyle": "solid",
   "fontFamily": 5,
@@ -706,7 +706,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id43",
+      "id": "id0",
       "type": "arrow",
     },
   ],
@@ -752,7 +752,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id43",
+      "id": "id0",
       "type": "arrow",
     },
   ],
@@ -786,7 +786,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
-  "x": 355,
+  "x": 350,
   "y": 226.5,
 }
 `;
@@ -1480,7 +1480,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 0,
+  "height": 7.105427357601002e-15,
   "id": Any<String>,
   "index": "a4",
   "isDeleted": false,

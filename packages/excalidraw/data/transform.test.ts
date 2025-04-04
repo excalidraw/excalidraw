@@ -464,7 +464,7 @@ describe("Test Transform", () => {
       });
 
       expect(ellipse).toMatchObject({
-        x: 355,
+        x: 350,
         y: 189,
         type: "ellipse",
         boundElements: [
@@ -549,7 +549,7 @@ describe("Test Transform", () => {
       });
 
       expect(text3).toMatchObject({
-        x: 355,
+        x: 350,
         y: 226.5,
         type: "text",
         boundElements: [
