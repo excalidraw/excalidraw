@@ -28,6 +28,7 @@ import type {
   PointBinding,
   FixedPointBinding,
   ExcalidrawFlowchartNodeElement,
+  Tuple,
 } from "./types";
 
 export const isInitializedImageElement = (
@@ -338,3 +339,18 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[1] === "number" &&
   typeof box[2] === "number" &&
   typeof box[3] === "number";
+
+export const isTuple = <T, N extends number>(
+  item: readonly T[],
+  count: N,
+): item is Tuple<T, N> => item.length === count;
+
+export const asTuple = <T, N extends number>(
+  item: T[],
+  count: N,
+): Tuple<T, N> | null => {
+  if (isTuple(item, count)) {
+    return item as Tuple<T, N>;
+  }
+  return null;
+};
