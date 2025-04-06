@@ -1,10 +1,12 @@
+import { invariant, isDevEnv, isTestEnv } from "@excalidraw/common";
+
 import {
-  normalizeRadians,
   pointFrom,
   pointRotateRads,
   pointScaleFromOrigin,
-  radiansToDegrees,
+  pointsEqual,
   triangleIncludesPoint,
+  vectorCross,
   vectorFromPoint,
 } from "@excalidraw/math";
 
@@ -13,7 +15,6 @@ import type {
   GlobalPoint,
   Triangle,
   Vector,
-  Radians,
 } from "@excalidraw/math";
 
 import { getCenterForBounds, type Bounds } from "./bounds";
@@ -26,23 +27,23 @@ export const HEADING_LEFT = [-1, 0] as Heading;
 export const HEADING_UP = [0, -1] as Heading;
 export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
 
-export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
-  a: Point,
-  b: Point,
-) => {
-  const angle = radiansToDegrees(
-    normalizeRadians(Math.atan2(b[1] - a[1], b[0] - a[0]) as Radians),
-  );
+// export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
+//   a: Point,
+//   b: Point,
+// ) => {
+//   const angle = radiansToDegrees(
+//     normalizeRadians(Math.atan2(b[1] - a[1], b[0] - a[0]) as Radians),
+//   );
 
-  if (angle >= 315 || angle < 45) {
-    return HEADING_UP;
-  } else if (angle >= 45 && angle < 135) {
-    return HEADING_RIGHT;
-  } else if (angle >= 135 && angle < 225) {
-    return HEADING_DOWN;
-  }
-  return HEADING_LEFT;
-};
+//   if (angle >= 315 || angle < 45) {
+//     return HEADING_UP;
+//   } else if (angle >= 45 && angle < 135) {
+//     return HEADING_RIGHT;
+//   } else if (angle >= 135 && angle < 225) {
+//     return HEADING_DOWN;
+//   }
+//   return HEADING_LEFT;
+// };
 
 export const vectorToHeading = (vec: Vector): Heading => {
   const [x, y] = vec;
@@ -76,6 +77,128 @@ export const headingIsHorizontal = (a: Heading) =>
 
 export const headingIsVertical = (a: Heading) => !headingIsHorizontal(a);
 
+const headingForPointFromDiamondElement = (
+  element: Readonly<ExcalidrawBindableElement>,
+  aabb: Readonly<Bounds>,
+  point: Readonly<GlobalPoint>,
+): Heading => {
+  const midPoint = getCenterForBounds(aabb);
+
+  if (isDevEnv() || isTestEnv()) {
+    invariant(
+      element.width > 0 && element.height > 0,
+      "Diamond element has no width or height",
+    );
+    invariant(
+      !pointsEqual(midPoint, point),
+      "The point is too close to the element mid point to determine heading",
+    );
+  }
+
+  const top = pointRotateRads(
+    pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+    midPoint,
+    element.angle,
+  );
+  const right = pointRotateRads(
+    pointFrom<GlobalPoint>(
+      element.x + element.width,
+      element.y + element.height / 2,
+    ),
+    midPoint,
+    element.angle,
+  );
+  const bottom = pointRotateRads(
+    pointFrom<GlobalPoint>(
+      element.x + element.width / 2,
+      element.y + element.height,
+    ),
+    midPoint,
+    element.angle,
+  );
+  const left = pointRotateRads(
+    pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+    midPoint,
+    element.angle,
+  );
+
+  // Corners
+  if (
+    vectorCross(vectorFromPoint(point, top), vectorFromPoint(top, right)) <=
+      0 &&
+    vectorCross(vectorFromPoint(point, top), vectorFromPoint(top, left)) > 0
+  ) {
+    return headingForPoint(top, midPoint);
+  } else if (
+    vectorCross(
+      vectorFromPoint(point, right),
+      vectorFromPoint(right, bottom),
+    ) <= 0 &&
+    vectorCross(vectorFromPoint(point, right), vectorFromPoint(right, top)) > 0
+  ) {
+    return headingForPoint(right, midPoint);
+  } else if (
+    vectorCross(
+      vectorFromPoint(point, bottom),
+      vectorFromPoint(bottom, left),
+    ) <= 0 &&
+    vectorCross(
+      vectorFromPoint(point, bottom),
+      vectorFromPoint(bottom, right),
+    ) > 0
+  ) {
+    return headingForPoint(bottom, midPoint);
+  } else if (
+    vectorCross(vectorFromPoint(point, left), vectorFromPoint(left, top)) <=
+      0 &&
+    vectorCross(vectorFromPoint(point, left), vectorFromPoint(left, bottom)) > 0
+  ) {
+    return headingForPoint(left, midPoint);
+  }
+
+  // Sides
+  if (
+    vectorCross(
+      vectorFromPoint(point, midPoint),
+      vectorFromPoint(top, midPoint),
+    ) <= 0 &&
+    vectorCross(
+      vectorFromPoint(point, midPoint),
+      vectorFromPoint(right, midPoint),
+    ) > 0
+  ) {
+    const p = element.width > element.height ? top : right;
+    return headingForPoint(p, midPoint);
+  } else if (
+    vectorCross(
+      vectorFromPoint(point, midPoint),
+      vectorFromPoint(right, midPoint),
+    ) <= 0 &&
+    vectorCross(
+      vectorFromPoint(point, midPoint),
+      vectorFromPoint(bottom, midPoint),
+    ) > 0
+  ) {
+    const p = element.width > element.height ? bottom : right;
+    return headingForPoint(p, midPoint);
+  } else if (
+    vectorCross(
+      vectorFromPoint(point, midPoint),
+      vectorFromPoint(bottom, midPoint),
+    ) <= 0 &&
+    vectorCross(
+      vectorFromPoint(point, midPoint),
+      vectorFromPoint(left, midPoint),
+    ) > 0
+  ) {
+    const p = element.width > element.height ? bottom : left;
+    return headingForPoint(p, midPoint);
+  }
+
+  const p = element.width > element.height ? top : left;
+  return headingForPoint(p, midPoint);
+};
+
 // Gets the heading for the point by creating a bounding box around the rotated
 // close fitting bounding box, then creating 4 search cones around the center of
 // the external bbox.
@@ -89,74 +212,7 @@ export const headingForPointFromElement = <Point extends GlobalPoint>(
   const midPoint = getCenterForBounds(aabb);
 
   if (element.type === "diamond") {
-    if (p[0] < element.x) {
-      return HEADING_LEFT;
-    } else if (p[1] < element.y) {
-      return HEADING_UP;
-    } else if (p[0] > element.x + element.width) {
-      return HEADING_RIGHT;
-    } else if (p[1] > element.y + element.height) {
-      return HEADING_DOWN;
-    }
-
-    const top = pointRotateRads(
-      pointScaleFromOrigin(
-        pointFrom(element.x + element.width / 2, element.y),
-        midPoint,
-        SEARCH_CONE_MULTIPLIER,
-      ),
-      midPoint,
-      element.angle,
-    );
-    const right = pointRotateRads(
-      pointScaleFromOrigin(
-        pointFrom(element.x + element.width, element.y + element.height / 2),
-        midPoint,
-        SEARCH_CONE_MULTIPLIER,
-      ),
-      midPoint,
-      element.angle,
-    );
-    const bottom = pointRotateRads(
-      pointScaleFromOrigin(
-        pointFrom(element.x + element.width / 2, element.y + element.height),
-        midPoint,
-        SEARCH_CONE_MULTIPLIER,
-      ),
-      midPoint,
-      element.angle,
-    );
-    const left = pointRotateRads(
-      pointScaleFromOrigin(
-        pointFrom(element.x, element.y + element.height / 2),
-        midPoint,
-        SEARCH_CONE_MULTIPLIER,
-      ),
-      midPoint,
-      element.angle,
-    );
-
-    if (
-      triangleIncludesPoint<Point>([top, right, midPoint] as Triangle<Point>, p)
-    ) {
-      return headingForDiamond(top, right);
-    } else if (
-      triangleIncludesPoint<Point>(
-        [right, bottom, midPoint] as Triangle<Point>,
-        p,
-      )
-    ) {
-      return headingForDiamond(right, bottom);
-    } else if (
-      triangleIncludesPoint<Point>(
-        [bottom, left, midPoint] as Triangle<Point>,
-        p,
-      )
-    ) {
-      return headingForDiamond(bottom, left);
-    }
-
-    return headingForDiamond(left, top);
+    return headingForPointFromDiamondElement(element, aabb, p);
   }
 
   const topLeft = pointScaleFromOrigin(
