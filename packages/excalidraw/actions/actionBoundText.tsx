@@ -226,8 +226,8 @@ export const actionWrapTextInContainer = register({
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
-    const areTextElements = selectedElements.every((el) => isTextElement(el));
-    return selectedElements.length > 0 && areTextElements;
+    const someTextElements = selectedElements.some((el) => isTextElement(el));
+    return selectedElements.length > 0 && someTextElements;
   },
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
