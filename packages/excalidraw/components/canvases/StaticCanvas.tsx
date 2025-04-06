@@ -87,11 +87,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
   return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;
 };
 
-const getRelevantAppStateProps = (
-  appState: AppState,
-):
-  | StaticCanvasAppState
-  | Omit<StaticCanvasAppState, "selectedElementIds" | "activeTool"> => {
+const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
   const relevantAppStateProps = {
     zoom: appState.zoom,
     scrollX: appState.scrollX,
@@ -118,11 +114,6 @@ const getRelevantAppStateProps = (
     currentHoveredFontFamily: appState.currentHoveredFontFamily,
     croppingElementId: appState.croppingElementId,
   };
-
-  if (appState.activeTool.type === "lasso") {
-    delete (relevantAppStateProps as Partial<typeof relevantAppStateProps>)
-      .selectedElementIds;
-  }
 
   return relevantAppStateProps;
 };
