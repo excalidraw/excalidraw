@@ -7423,7 +7423,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         </svg>,
         "label": "labels.elementLock.unlockAll",
         "name": "unlockAllElements",
-        "paletteName": "Unlock all elements",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7574,7 +7573,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "keyTest": [Function],
         "label": "buttons.zenMode",
         "name": "zenMode",
-        "paletteName": "Toggle zen mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7618,7 +7616,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "keyTest": [Function],
         "label": "labels.viewMode",
         "name": "viewMode",
-        "paletteName": "Toggle view mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7692,7 +7689,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         ],
         "label": "stats.fullTitle",
         "name": "stats",
-        "paletteName": "Toggle stats",
         "perform": [Function],
         "trackEvent": {
           "category": "menu",
