@@ -2,12 +2,14 @@ import { invariant, isDevEnv, isTestEnv } from "@excalidraw/common";
 
 import {
   pointFrom,
+  pointFromVector,
   pointRotateRads,
   pointScaleFromOrigin,
   pointsEqual,
   triangleIncludesPoint,
   vectorCross,
   vectorFromPoint,
+  vectorScale,
 } from "@excalidraw/math";
 
 import type {
@@ -26,24 +28,6 @@ export const HEADING_DOWN = [0, 1] as Heading;
 export const HEADING_LEFT = [-1, 0] as Heading;
 export const HEADING_UP = [0, -1] as Heading;
 export type Heading = [1, 0] | [0, 1] | [-1, 0] | [0, -1];
-
-// export const headingForDiamond = <Point extends GlobalPoint | LocalPoint>(
-//   a: Point,
-//   b: Point,
-// ) => {
-//   const angle = radiansToDegrees(
-//     normalizeRadians(Math.atan2(b[1] - a[1], b[0] - a[0]) as Radians),
-//   );
-
-//   if (angle >= 315 || angle < 45) {
-//     return HEADING_UP;
-//   } else if (angle >= 45 && angle < 135) {
-//     return HEADING_RIGHT;
-//   } else if (angle >= 135 && angle < 225) {
-//     return HEADING_DOWN;
-//   }
-//   return HEADING_LEFT;
-// };
 
 export const vectorToHeading = (vec: Vector): Heading => {
   const [x, y] = vec;
@@ -95,31 +79,68 @@ const headingForPointFromDiamondElement = (
     );
   }
 
-  const top = pointRotateRads(
-    pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
-    midPoint,
-    element.angle,
-  );
-  const right = pointRotateRads(
-    pointFrom<GlobalPoint>(
-      element.x + element.width,
-      element.y + element.height / 2,
+  const SHRINK = 0.95; // Rounded elements tolerance
+  const top = pointFromVector(
+    vectorScale(
+      vectorFromPoint(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x + element.width / 2, element.y),
+          midPoint,
+          element.angle,
+        ),
+        midPoint,
+      ),
+      SHRINK,
     ),
     midPoint,
-    element.angle,
   );
-  const bottom = pointRotateRads(
-    pointFrom<GlobalPoint>(
-      element.x + element.width / 2,
-      element.y + element.height,
+  const right = pointFromVector(
+    vectorScale(
+      vectorFromPoint(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width,
+            element.y + element.height / 2,
+          ),
+          midPoint,
+          element.angle,
+        ),
+        midPoint,
+      ),
+      SHRINK,
     ),
     midPoint,
-    element.angle,
   );
-  const left = pointRotateRads(
-    pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+  const bottom = pointFromVector(
+    vectorScale(
+      vectorFromPoint(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(
+            element.x + element.width / 2,
+            element.y + element.height,
+          ),
+          midPoint,
+          element.angle,
+        ),
+        midPoint,
+      ),
+      SHRINK,
+    ),
     midPoint,
-    element.angle,
+  );
+  const left = pointFromVector(
+    vectorScale(
+      vectorFromPoint(
+        pointRotateRads(
+          pointFrom<GlobalPoint>(element.x, element.y + element.height / 2),
+          midPoint,
+          element.angle,
+        ),
+        midPoint,
+      ),
+      SHRINK,
+    ),
+    midPoint,
   );
 
   // Corners
