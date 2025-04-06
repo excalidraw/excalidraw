@@ -1,3 +1,5 @@
+import { newArrowElement } from "@excalidraw/element/newElement";
+
 import { pointCenter, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import React from "react";
@@ -19,7 +21,7 @@ import {
 import * as textElementUtils from "@excalidraw/element/textElement";
 import { wrapText } from "@excalidraw/element/textWrapping";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawElement,
@@ -163,6 +165,24 @@ describe("Test Linear Elements", () => {
     });
     Keyboard.keyPress(KEYS.DELETE);
   };
+
+  it("should normalize the element points at creation", () => {
+    const element = newArrowElement({
+      type: "arrow",
+      points: [pointFrom<LocalPoint>(0.5, 0), pointFrom<LocalPoint>(100, 100)],
+      x: 0,
+      y: 0,
+    });
+    expect(element.points).toEqual([
+      pointFrom<LocalPoint>(0.5, 0),
+      pointFrom<LocalPoint>(100, 100),
+    ]);
+    new LinearElementEditor(element);
+    expect(element.points).toEqual([
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(99.5, 100),
+    ]);
+  });
 
   it("should not drag line and add midpoint until dragged beyond a threshold", () => {
     createTwoPointerLinearElement("line");

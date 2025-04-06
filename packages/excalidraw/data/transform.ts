@@ -36,6 +36,8 @@ import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
 
 import { redrawTextBoundingBox } from "@excalidraw/element/textElement";
 
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
 import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
 
 import type {
@@ -463,7 +465,13 @@ const bindLinearElementToElement = (
     newPoints[endPointIndex][1] += delta;
   }
 
-  Object.assign(linearElement, { points: newPoints });
+  Object.assign(
+    linearElement,
+    LinearElementEditor.getNormalizedPoints({
+      ...linearElement,
+      points: newPoints,
+    }),
+  );
 
   return {
     linearElement,
