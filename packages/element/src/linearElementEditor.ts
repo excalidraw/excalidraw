@@ -133,6 +133,7 @@ export class LinearElementEditor {
     };
     if (!pointsEqual(element.points[0], pointFrom(0, 0))) {
       console.error("Linear element is not normalized", Error().stack);
+      LinearElementEditor.normalizePoints(element);
     }
 
     this.selectedPointsIndices = null;

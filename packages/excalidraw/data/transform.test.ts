@@ -427,7 +427,7 @@ describe("Test Transform", () => {
       const [arrow, text, rectangle, ellipse] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
@@ -512,7 +512,7 @@ describe("Test Transform", () => {
 
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
@@ -730,7 +730,7 @@ describe("Test Transform", () => {
       const [, , arrow, text] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [
           {
