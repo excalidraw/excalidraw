@@ -53,7 +53,6 @@ import type { AppState, Offsets } from "../types";
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   label: "labels.canvasBackground",
-  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -91,7 +90,6 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
-  paletteName: "Clear canvas",
   icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
@@ -530,7 +528,6 @@ export const actionToggleLassoTool = register({
   name: "toggleLassoTool",
   label: "toolBar.lasso",
   icon: LassoIcon,
-  paletteName: "Toggle lasso selection tool",
   trackEvent: { category: "toolbar" },
   perform: (elements, appState, _, app) => {
     let activeTool: AppState["activeTool"];
@@ -563,7 +560,6 @@ export const actionToggleLassoTool = register({
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
   label: "toolBar.hand",
-  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
   icon: handIcon,
   viewMode: false,
