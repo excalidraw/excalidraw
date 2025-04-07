@@ -35,8 +35,6 @@ export const getLassoSelectedElementIds = (input: {
   if (simplifyDistance) {
     path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
   }
-  // close the path to form a polygon for enclosure check
-  const closedPath = polygonFromPoints(path);
   // as the path might not enclose a shape anymore, clear before checking
   enclosedElements.clear();
   for (const element of elements) {
@@ -44,15 +42,11 @@ export const getLassoSelectedElementIds = (input: {
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)
     ) {
-      const enclosed = enclosureTest(closedPath, element, elementsSegments);
+      const enclosed = enclosureTest(path, element, elementsSegments);
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(
-          closedPath,
-          element,
-          elementsSegments,
-        );
+        const intersects = intersectionTest(path, element, elementsSegments);
         if (intersects) {
           intersectedElements.add(element.id);
         }
