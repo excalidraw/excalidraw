@@ -2,7 +2,6 @@ import { simplify } from "points-on-curve";
 
 import {
   polygonFromPoints,
-  polygonIncludesPoint,
   lineSegment,
   lineSegmentIntersectionPoints,
   polygonIncludesPointNonZero,

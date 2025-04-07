@@ -59,11 +59,9 @@ export const polygonIncludesPointNonZero = <Point extends [number, number]>(
           windingNumber++;
         }
       }
-    } else {
-      if (yj <= y) {
-        if ((xj - xi) * (y - yi) - (x - xi) * (yj - yi) < 0) {
-          windingNumber--;
-        }
+    } else if (yj <= y) {
+      if ((xj - xi) * (y - yi) - (x - xi) * (yj - yi) < 0) {
+        windingNumber--;
       }
     }
   }
