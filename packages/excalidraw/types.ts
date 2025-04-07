@@ -136,6 +136,7 @@ export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
 
 export type ToolType =
   | "selection"
+  | "lasso"
   | "rectangle"
   | "diamond"
   | "ellipse"
@@ -308,6 +309,8 @@ export interface AppState {
      */
     lastActiveTool: ActiveTool | null;
     locked: boolean;
+    // indicates if the current tool is temporarily switched on from the selection tool
+    fromSelection: boolean;
   } & ActiveTool;
   penMode: boolean;
   penDetected: boolean;

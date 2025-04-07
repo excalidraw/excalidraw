@@ -385,7 +385,7 @@ export const updateActiveTool = (
         type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { locked?: boolean }) & {
+  ) & { locked?: boolean; fromSelection?: boolean }) & {
     lastActiveToolBeforeEraser?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
@@ -407,6 +407,7 @@ export const updateActiveTool = (
     type: data.type,
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
+    fromSelection: data.fromSelection ?? false,
   };
 };
 

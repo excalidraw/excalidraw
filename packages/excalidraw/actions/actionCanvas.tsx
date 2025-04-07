@@ -29,6 +29,7 @@ import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import {
   handIcon,
+  LassoIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -52,7 +53,6 @@ import type { AppState, Offsets } from "../types";
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",
   label: "labels.canvasBackground",
-  paletteName: "Change canvas background color",
   trackEvent: false,
   predicate: (elements, appState, props, app) => {
     return (
@@ -90,7 +90,6 @@ export const actionChangeViewBackgroundColor = register({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
-  paletteName: "Clear canvas",
   icon: TrashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
@@ -525,10 +524,42 @@ export const actionToggleEraserTool = register({
   keyTest: (event) => event.key === KEYS.E,
 });
 
+export const actionToggleLassoTool = register({
+  name: "toggleLassoTool",
+  label: "toolBar.lasso",
+  icon: LassoIcon,
+  trackEvent: { category: "toolbar" },
+  perform: (elements, appState, _, app) => {
+    let activeTool: AppState["activeTool"];
+
+    if (appState.activeTool.type !== "lasso") {
+      activeTool = updateActiveTool(appState, {
+        type: "lasso",
+        fromSelection: false,
+      });
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "selection",
+      });
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      captureUpdate: CaptureUpdateAction.NEVER,
+    };
+  },
+});
+
 export const actionToggleHandTool = register({
   name: "toggleHandTool",
   label: "toolBar.hand",
-  paletteName: "Toggle hand tool",
   trackEvent: { category: "toolbar" },
   icon: handIcon,
   viewMode: false,

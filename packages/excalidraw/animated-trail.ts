@@ -23,6 +23,8 @@ export interface Trail {
 
 export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
+  stroke?: (trail: AnimatedTrail) => string;
+  animateTrail?: boolean;
 }
 
 export class AnimatedTrail implements Trail {
@@ -31,16 +33,28 @@ export class AnimatedTrail implements Trail {
 
   private container?: SVGSVGElement;
   private trailElement: SVGPathElement;
+  private trailAnimation?: SVGAnimateElement;
 
   constructor(
     private animationFrameHandler: AnimationFrameHandler,
-    private app: App,
+    protected app: App,
     private options: Partial<LaserPointerOptions> &
       Partial<AnimatedTrailOptions>,
   ) {
     this.animationFrameHandler.register(this, this.onFrame.bind(this));
 
     this.trailElement = document.createElementNS(SVG_NS, "path");
+    if (this.options.animateTrail) {
+      this.trailAnimation = document.createElementNS(SVG_NS, "animate");
+      // TODO: make this configurable
+      this.trailAnimation.setAttribute("attributeName", "stroke-dashoffset");
+      this.trailElement.setAttribute("stroke-dasharray", "7 7");
+      this.trailElement.setAttribute("stroke-dashoffset", "10");
+      this.trailAnimation.setAttribute("from", "0");
+      this.trailAnimation.setAttribute("to", `-14`);
+      this.trailAnimation.setAttribute("dur", "0.3s");
+      this.trailElement.appendChild(this.trailAnimation);
+    }
   }
 
   get hasCurrentTrail() {
@@ -104,8 +118,23 @@ export class AnimatedTrail implements Trail {
     }
   }
 
+  getCurrentTrail() {
+    return this.currentTrail;
+  }
+
+  clearTrails() {
+    this.pastTrails = [];
+    this.currentTrail = undefined;
+    this.update();
+  }
+
   private update() {
+    this.pastTrails = [];
     this.start();
+    if (this.trailAnimation) {
+      this.trailAnimation.setAttribute("begin", "indefinite");
+      this.trailAnimation.setAttribute("repeatCount", "indefinite");
+    }
   }
 
   private onFrame() {
@@ -132,14 +161,25 @@ export class AnimatedTrail implements Trail {
     const svgPaths = paths.join(" ").trim();
 
     this.trailElement.setAttribute("d", svgPaths);
-    this.trailElement.setAttribute(
-      "fill",
-      (this.options.fill ?? (() => "black"))(this),
-    );
+    if (this.trailAnimation) {
+      this.trailElement.setAttribute(
+        "fill",
+        (this.options.fill ?? (() => "black"))(this),
+      );
+      this.trailElement.setAttribute(
+        "stroke",
+        (this.options.stroke ?? (() => "black"))(this),
+      );
+    } else {
+      this.trailElement.setAttribute(
+        "fill",
+        (this.options.fill ?? (() => "black"))(this),
+      );
+    }
   }
 
   private drawTrail(trail: LaserPointer, state: AppState): string {
-    const stroke = trail
+    const _stroke = trail
       .getStrokeOutline(trail.options.size / state.zoom.value)
       .map(([x, y]) => {
         const result = sceneCoordsToViewportCoords(
@@ -149,6 +189,14 @@ export class AnimatedTrail implements Trail {
 
         return [result.x, result.y];
       });
+
+    const stroke = this.trailAnimation
+      ? _stroke.slice(
+          // slicing from 6th point to get rid of the initial notch type of thing
+          Math.min(_stroke.length, 6),
+          _stroke.length / 2,
+        )
+      : _stroke;
 
     return getSvgPathFromStroke(stroke, true);
   }

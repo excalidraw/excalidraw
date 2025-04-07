@@ -90,7 +90,6 @@ export const actionToggleElementLock = register({
 
 export const actionUnlockAllElements = register({
   name: "unlockAllElements",
-  paletteName: "Unlock all elements",
   trackEvent: { category: "canvas" },
   viewMode: false,
   icon: UnlockedIcon,
