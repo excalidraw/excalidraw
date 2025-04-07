@@ -41,6 +41,34 @@ export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
   return inside;
 };
 
+export const polygonIncludesPointNonZero = <Point extends [number, number]>(
+  point: Point,
+  polygon: Point[],
+): boolean => {
+  const [x, y] = point;
+  let windingNumber = 0;
+
+  for (let i = 0; i < polygon.length; i++) {
+    const j = (i + 1) % polygon.length;
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+
+    if (yi <= y) {
+      if (yj > y) {
+        if ((xj - xi) * (y - yi) - (x - xi) * (yj - yi) > 0) {
+          windingNumber++;
+        }
+      }
+    } else if (yj <= y) {
+      if ((xj - xi) * (y - yi) - (x - xi) * (yj - yi) < 0) {
+        windingNumber--;
+      }
+    }
+  }
+
+  return windingNumber !== 0;
+};
+
 export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
   p: Point,
   poly: Polygon<Point>,

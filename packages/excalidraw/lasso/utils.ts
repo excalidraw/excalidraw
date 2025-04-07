@@ -2,9 +2,9 @@ import { simplify } from "points-on-curve";
 
 import {
   polygonFromPoints,
-  polygonIncludesPoint,
   lineSegment,
   lineSegmentIntersectionPoints,
+  polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
@@ -35,8 +35,6 @@ export const getLassoSelectedElementIds = (input: {
   if (simplifyDistance) {
     path = simplify(lassoPath, simplifyDistance) as GlobalPoint[];
   }
-  // close the path to form a polygon for enclosure check
-  const closedPath = polygonFromPoints(path);
   // as the path might not enclose a shape anymore, clear before checking
   enclosedElements.clear();
   for (const element of elements) {
@@ -44,15 +42,11 @@ export const getLassoSelectedElementIds = (input: {
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)
     ) {
-      const enclosed = enclosureTest(closedPath, element, elementsSegments);
+      const enclosed = enclosureTest(path, element, elementsSegments);
       if (enclosed) {
         enclosedElements.add(element.id);
       } else {
-        const intersects = intersectionTest(
-          closedPath,
-          element,
-          elementsSegments,
-        );
+        const intersects = intersectionTest(path, element, elementsSegments);
         if (intersects) {
           intersectedElements.add(element.id);
         }
@@ -79,7 +73,9 @@ const enclosureTest = (
   }
 
   return segments.some((segment) => {
-    return segment.some((point) => polygonIncludesPoint(point, lassoPolygon));
+    return segment.some((point) =>
+      polygonIncludesPointNonZero(point, lassoPolygon),
+    );
   });
 };
 
