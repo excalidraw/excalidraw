@@ -1,3 +1,23 @@
+import {
+  getCenterForBounds,
+  getCommonBoundingBox,
+} from "@excalidraw/element/bounds";
+import {
+  newArrowElement,
+  newElement,
+  newLinearElement,
+} from "@excalidraw/element/newElement";
+
+import {
+  angleBetween,
+  perpendicularDistance,
+  pointDistance,
+} from "@excalidraw/math";
+import { ROUNDNESS } from "@excalidraw/common";
+
+import type { LocalPoint } from "@excalidraw/math";
+
+import type { BoundingBox, Bounds } from "@excalidraw/element/bounds";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
@@ -6,12 +26,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
-} from "../excalidraw/element/types";
-import type { BoundingBox, Bounds } from "../excalidraw/element/bounds";
-import { getCenterForBounds, getCommonBoundingBox } from "../excalidraw/element/bounds";
-import { newArrowElement, newElement, newLinearElement } from "../excalidraw/element";
-import { angleBetween, GlobalPoint, LocalPoint, perpendicularDistance, pointDistance } from "@excalidraw/math";
-import { ROUNDNESS } from "@excalidraw/excalidraw/constants";
+} from "@excalidraw/element/types";
 
 type Shape =
   | ExcalidrawRectangleElement["type"]
@@ -53,7 +68,6 @@ const DEFAULT_OPTIONS = {
   ellipseRadiusVarianceThreshold: 0.5,
 } as const; // Use 'as const' for stricter typing of default values
 
-
 // Options for shape recognition, allowing partial overrides
 type ShapeRecognitionOptions = typeof DEFAULT_OPTIONS;
 type PartialShapeRecognitionOptions = Partial<ShapeRecognitionOptions>;
@@ -94,10 +108,9 @@ function simplifyRDP(
     const right = simplifyRDP(points.slice(index), epsilon);
     // Concatenate results (omit duplicate point at junction)
     return left.slice(0, -1).concat(right);
-  } else {
-    // Not enough deviation, return straight line segment (keep only endpoints)
-    return [first, last];
   }
+  // Not enough deviation, return straight line segment (keep only endpoints)
+  return [first, last];
 }
 
 /**
@@ -238,7 +251,10 @@ function checkArrow(
 
   const tipAngle = angleBetween(arrowTip, arrowBase, arrowTailEnd);
 
-  if (tipAngle <= options.arrowMinTipAngle || tipAngle >= options.arrowMaxTipAngle) {
+  if (
+    tipAngle <= options.arrowMinTipAngle ||
+    tipAngle >= options.arrowMaxTipAngle
+  ) {
     return null;
   }
 
@@ -296,10 +312,9 @@ function checkQuadrilateral(
 
   if (isAxisAligned(segments, options.rectangleOrientationAngleThreshold)) {
     return "rectangle";
-  } else {
-    // Not axis-aligned, but quadrilateral => classify as diamond
-    return "diamond";
   }
+  // Not axis-aligned, but quadrilateral => classify as diamond
+  return "diamond";
 }
 
 /** Checks if the points form an ellipse shape. */
@@ -345,13 +360,18 @@ export const recognizeShape = (
   }
 
   const boundingBoxDiagonal = Math.hypot(boundingBox.width, boundingBox.height);
-  const rdpTolerance = boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
+  const rdpTolerance =
+    boundingBoxDiagonal * (options.rdpTolerancePercent / 100);
   const simplifiedPoints = simplifyRDP(points, rdpTolerance);
 
-  const isClosed = isShapeClosed(simplifiedPoints, boundingBoxDiagonal, options);
+  const isClosed = isShapeClosed(
+    simplifiedPoints,
+    boundingBoxDiagonal,
+    options,
+  );
 
   // --- Shape check order matters here ---
-  let recognizedType: Shape =
+  const recognizedType: Shape =
     checkLine(simplifiedPoints, isClosed) ??
     checkArrow(simplifiedPoints, isClosed, options) ??
     checkQuadrilateral(simplifiedPoints, isClosed, options) ??
@@ -365,7 +385,6 @@ export const recognizeShape = (
   };
 };
 
-
 /**
  * Converts a freedraw element to the detected shape
  */
@@ -375,7 +394,9 @@ export const convertToShape = (
   const recognizedShape = recognizeShape(freeDrawElement);
 
   switch (recognizedShape.type) {
-    case "rectangle": case "diamond": case "ellipse": {
+    case "rectangle":
+    case "diamond":
+    case "ellipse": {
       return newElement({
         ...freeDrawElement,
         roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
@@ -392,9 +413,9 @@ export const convertToShape = (
         type: recognizedShape.type,
         points: [
           recognizedShape.simplified[0],
-          recognizedShape.simplified[recognizedShape.simplified.length - 2]
+          recognizedShape.simplified[recognizedShape.simplified.length - 2],
         ],
-        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
       });
     }
     case "line": {
@@ -403,11 +424,12 @@ export const convertToShape = (
         type: recognizedShape.type,
         points: [
           recognizedShape.simplified[0],
-          recognizedShape.simplified[recognizedShape.simplified.length - 1]
+          recognizedShape.simplified[recognizedShape.simplified.length - 1],
         ],
-        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS }
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
       });
     }
-    default: return freeDrawElement
+    default:
+      return freeDrawElement;
   }
 };
