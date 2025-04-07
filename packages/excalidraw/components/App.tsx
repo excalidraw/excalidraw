@@ -166,6 +166,7 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
+  getSwitchableTypeFromElements,
 } from "@excalidraw/element/typeChecks";
 
 import {
@@ -326,6 +327,7 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  GenericSwitchableToolType,
 } from "@excalidraw/element/types";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -461,6 +463,12 @@ import { isOverScrollBars } from "../scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
+import ShapeSwitch, {
+  shapeSwitchAtom,
+  shapeSwitchFontSizeAtom,
+  switchShapes,
+} from "./ShapeSwitch";
+
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -492,7 +500,6 @@ import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
 import type { ExcalidrawElementSkeleton } from "../data/transform";
-
 import type {
   AppClassProperties,
   AppProps,
@@ -1861,6 +1868,7 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        <ShapeSwitch app={this} />
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -4147,6 +4155,53 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
+        // Shape switching
+        if (event.key === KEYS.ESCAPE) {
+          editorJotaiStore.set(shapeSwitchAtom, null);
+        } else if (
+          event.key === KEYS.TAB &&
+          document.activeElement === this.excalidrawContainerRef?.current
+        ) {
+          event.preventDefault();
+
+          const { generic, linear } =
+            getSwitchableTypeFromElements(selectedElements);
+
+          if (editorJotaiStore.get(shapeSwitchAtom)?.type === "panel") {
+            if (
+              switchShapes(this, {
+                generic,
+                linear,
+                direction: event.shiftKey ? "left" : "right",
+              })
+            ) {
+              this.store.shouldCaptureIncrement();
+            }
+          }
+          if (generic || linear) {
+            editorJotaiStore.set(shapeSwitchAtom, {
+              type: "panel",
+            });
+            if (!editorJotaiStore.get(shapeSwitchFontSizeAtom)) {
+              selectedElements.forEach((element) => {
+                const boundText = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+                if (boundText && generic && element) {
+                  editorJotaiStore.set(shapeSwitchFontSizeAtom, {
+                    ...editorJotaiStore.get(shapeSwitchFontSizeAtom),
+                    [element.id]: {
+                      fontSize: boundText.fontSize,
+                      elementType: element.type as GenericSwitchableToolType,
+                    },
+                  });
+                }
+              });
+            }
+          }
+        }
+
         if (
           event.key === KEYS.ESCAPE &&
           this.flowChartCreator.isCreatingChart
@@ -4708,6 +4763,11 @@ class App extends React.Component<AppProps, AppState> {
               canvasOffsets: this.getEditorUIOffsets(),
             });
           }
+
+          editorJotaiStore.set(shapeSwitchAtom, {
+            type: "hint",
+            id: firstNode.id,
+          });
         }
 
         this.flowChartCreator.clear();

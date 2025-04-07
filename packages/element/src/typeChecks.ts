@@ -338,3 +338,55 @@ export const isBounds = (box: unknown): box is Bounds =>
   typeof box[1] === "number" &&
   typeof box[2] === "number" &&
   typeof box[3] === "number";
+
+export const getSwitchableTypeFromElements = (
+  elements: ExcalidrawElement[],
+):
+  | {
+      generic: true;
+      linear: false;
+    }
+  | {
+      linear: true;
+      generic: false;
+    }
+  | {
+      generic: false;
+      linear: false;
+    } => {
+  if (elements.length === 0) {
+    return {
+      generic: false,
+      linear: false,
+    };
+  }
+
+  let onlyLinear = true;
+  for (const element of elements) {
+    if (
+      element.type === "rectangle" ||
+      element.type === "ellipse" ||
+      element.type === "diamond"
+    ) {
+      return {
+        generic: true,
+        linear: false,
+      };
+    }
+    if (element.type !== "arrow" && element.type !== "line") {
+      onlyLinear = false;
+    }
+  }
+
+  if (onlyLinear) {
+    return {
+      linear: true,
+      generic: false,
+    };
+  }
+
+  return {
+    generic: false,
+    linear: false,
+  };
+};

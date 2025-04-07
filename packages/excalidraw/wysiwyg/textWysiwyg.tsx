@@ -45,7 +45,6 @@ import type {
 
 import { actionSaveToActiveFile } from "../actions";
 
-import Scene from "../scene/Scene";
 import { parseClipboard } from "../clipboard";
 import {
   actionDecreaseFontSize,
@@ -81,6 +80,8 @@ const getTransform = (
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
+type SubmitHandler = () => void;
+
 export const textWysiwyg = ({
   id,
   onChange,
@@ -107,7 +108,7 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
   autoSelect?: boolean;
-}) => {
+}): SubmitHandler => {
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -130,8 +131,7 @@ export const textWysiwyg = ({
 
   const updateWysiwygStyle = () => {
     const appState = app.state;
-    const updatedTextElement =
-      Scene.getScene(element)?.getElement<ExcalidrawTextElement>(id);
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
 
     if (!updatedTextElement) {
       return;
@@ -188,7 +188,6 @@ export const textWysiwyg = ({
         }
 
         maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
-
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -544,7 +543,7 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = Scene.getScene(element)?.getElement(
+    const updateElement = app.scene.getElement(
       element.id,
     ) as ExcalidrawTextElement;
     if (!updateElement) {
@@ -740,4 +739,6 @@ export const textWysiwyg = ({
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
+
+  return handleSubmit;
 };
