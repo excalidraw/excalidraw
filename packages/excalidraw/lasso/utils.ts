@@ -5,6 +5,7 @@ import {
   polygonIncludesPoint,
   lineSegment,
   lineSegmentIntersectionPoints,
+  polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
@@ -73,7 +74,9 @@ const enclosureTest = (
   }
 
   return segments.some((segment) => {
-    return segment.some((point) => polygonIncludesPoint(point, lassoPolygon));
+    return segment.some((point) =>
+      polygonIncludesPointNonZero(point, lassoPolygon),
+    );
   });
 };
 
