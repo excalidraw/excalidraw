@@ -9,7 +9,6 @@ export const actionToggleZenMode = register({
   name: "zenMode",
   label: "buttons.zenMode",
   icon: coffeeIcon,
-  paletteName: "Toggle zen mode",
   viewMode: true,
   trackEvent: {
     category: "canvas",

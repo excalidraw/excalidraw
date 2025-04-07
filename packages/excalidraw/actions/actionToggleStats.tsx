@@ -9,7 +9,6 @@ export const actionToggleStats = register({
   name: "stats",
   label: "stats.fullTitle",
   icon: abacusIcon,
-  paletteName: "Toggle stats",
   viewMode: true,
   trackEvent: { category: "menu" },
   keywords: ["edit", "attributes", "customize"],

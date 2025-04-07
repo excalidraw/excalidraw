@@ -5,6 +5,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "activeEmbeddable": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",

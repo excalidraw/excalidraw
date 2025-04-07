@@ -15,7 +15,8 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "build:preview": "yarn build && vite preview --port 5002",
+    "preview": "vite preview --port 5002",
+    "build:preview": "yarn build && yarn preview",
     "build:package": "yarn workspace @excalidraw/excalidraw run build:esm"
   }
 }

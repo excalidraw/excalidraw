@@ -8,7 +8,6 @@ import { register } from "./register";
 export const actionToggleViewMode = register({
   name: "viewMode",
   label: "labels.viewMode",
-  paletteName: "Toggle view mode",
   icon: eyeIcon,
   viewMode: true,
   trackEvent: {
