@@ -482,7 +482,7 @@ const ExcalidrawWrapper = () => {
           collabAPI?.isCollaborating() &&
           !isCollaborationLink(window.location.href)
         ) {
-          collabAPI.stopCollaboration(false);
+          await collabAPI.stopCollaboration(false);
         }
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
@@ -980,9 +980,9 @@ const ExcalidrawWrapper = () => {
                 "exit",
                 "collaboration",
               ],
-              perform: () => {
+              perform: async () => {
                 if (collabAPI) {
-                  collabAPI.stopCollaboration();
+                  await collabAPI.stopCollaboration();
                   if (!collabAPI.isCollaborating()) {
                     setShareDialogState({ isOpen: false });
                   }
