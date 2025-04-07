@@ -8772,6 +8772,25 @@ class App extends React.Component<AppProps, AppState> {
               false,
               { isDragging: true },
             );
+            LinearElementEditor.movePoints(newElement, [
+              {
+                index: 0,
+                isDragging: false,
+                point: toLocalPoint(
+                  getOutlineAvoidingPoint(
+                    newElement,
+                    pointFrom<GlobalPoint>(
+                      pointerDownState.origin.x,
+                      pointerDownState.origin.y,
+                    ),
+                    0,
+                    this.scene,
+                    this.state.zoom,
+                  ),
+                  newElement,
+                ),
+              },
+            ]);
           }
 
           this.setState({
