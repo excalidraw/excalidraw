@@ -108,8 +108,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
       0,
     ],
     [
-      394,
-      34,
+      377.5017739818493,
+      32.53813187180941,
     ],
   ],
   "roughness": 1,
@@ -128,7 +128,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "updated": 1,
   "version": 4,
   "versionNonce": Any<Number>,
-  "width": 395,
+  "width": 378.5017739818493,
   "x": 247.5,
   "y": 420.5,
 }
@@ -164,7 +164,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
       0,
     ],
     [
-      399,
+      397.82801810964474,
       0,
     ],
   ],
@@ -184,7 +184,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "updated": 1,
   "version": 4,
   "versionNonce": Any<Number>,
-  "width": 400,
+  "width": 398.82801810964474,
   "x": 227.5,
   "y": 450,
 }
@@ -354,7 +354,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
       0,
     ],
     [
-      99,
+      299,
       0,
     ],
   ],
@@ -374,7 +374,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "updated": 1,
   "version": 4,
   "versionNonce": Any<Number>,
-  "width": 100,
+  "width": 300,
   "x": 255.5,
   "y": 239,
 }
@@ -456,7 +456,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
       0,
     ],
     [
-      99,
+      89,
       0,
     ],
   ],
@@ -476,7 +476,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "updated": 1,
   "version": 4,
   "versionNonce": Any<Number>,
-  "width": 100,
+  "width": 90,
   "x": 255.5,
   "y": 239,
 }
@@ -632,7 +632,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
       0,
     ],
     [
-      99,
+      89,
       0,
     ],
   ],
@@ -652,7 +652,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "updated": 1,
   "version": 4,
   "versionNonce": Any<Number>,
-  "width": 100,
+  "width": 90,
   "x": 255.5,
   "y": 239,
 }
@@ -1494,8 +1494,8 @@ exports[`Test Transform > should transform the elements correctly when linear el
       0,
     ],
     [
-      271.985,
-      0,
+      272.28487500000006,
+      -0.9999999999999929,
     ],
   ],
   "roughness": 1,
@@ -1516,9 +1516,9 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "updated": 1,
   "version": 4,
   "versionNonce": Any<Number>,
-  "width": 272.985,
+  "width": 273.28487500000006,
   "x": 111.762,
-  "y": 57,
+  "y": 57.5,
 }
 `;
 
