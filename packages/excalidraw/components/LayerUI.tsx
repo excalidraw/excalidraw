@@ -156,7 +156,8 @@ const LayerUI = ({
 }: LayerUIProps) => {
   const device = useDevice();
   const tunnels = useInitializeTunnels();
-
+  const showLibrary =
+    UIOptions.libraryEnabled === undefined ? true : UIOptions.libraryEnabled;
   const TunnelsJotaiProvider = tunnels.tunnelsJotai.Provider;
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
@@ -375,11 +376,11 @@ const LayerUI = ({
       </FixedSideContainer>
     );
   };
-
   const renderSidebars = () => {
     return (
       <DefaultSidebar
         __fallback
+        libraryEnabled={showLibrary}
         onDock={(docked) => {
           trackEvent(
             "sidebar",
