@@ -13,9 +13,11 @@ import {
   handleBindTextResize,
 } from "@excalidraw/element/textElement";
 
-import { isTextElement } from "@excalidraw/element/typeChecks";
+import { isElbowArrow, isTextElement } from "@excalidraw/element/typeChecks";
 
 import { getCommonBounds } from "@excalidraw/utils";
+
+import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
 
 import type {
   ElementsMap,
@@ -80,7 +82,12 @@ const resizeElementInGroup = (
 ) => {
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
-  mutateElement(latestElement, updates, false);
+  if (isElbowArrow(latestElement)) {
+    mutateElbowArrow(latestElement, updates, false, elementsMap);
+  } else {
+    mutateElement(latestElement, updates, false);
+  }
+
   const boundTextElement = getBoundTextElement(
     origElement,
     originalElementsMap,

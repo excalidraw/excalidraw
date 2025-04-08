@@ -21,6 +21,7 @@ import {
 
 import {
   hasBoundTextElement,
+  isElbowArrow,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -33,11 +34,14 @@ import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { newElement } from "@excalidraw/element/newElement";
 
+import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
+
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
+  FixedPointBinding,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -297,7 +301,21 @@ export const actionWrapTextInContainer = register({
             }
 
             if (startBinding || endBinding) {
-              mutateElement(ele, { startBinding, endBinding }, false);
+              const updates = { startBinding, endBinding };
+
+              if (isElbowArrow(ele)) {
+                mutateElbowArrow(
+                  ele,
+                  updates as {
+                    startBinding: FixedPointBinding;
+                    endBinding: FixedPointBinding;
+                  },
+                  false,
+                  app.scene.getNonDeletedElementsMap(),
+                );
+              } else {
+                mutateElement(ele, updates, false);
+              }
             }
           });
         }

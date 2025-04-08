@@ -5,9 +5,12 @@ import {
   bindOrUnbindLinearElement,
 } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
 import { mutateElement } from "@excalidraw/element/mutateElement";
+import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
 import {
   isBindingElement,
+  isElbowArrow,
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
 
@@ -15,6 +18,13 @@ import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+
+import type {
+  ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import type { ElementUpdate } from "@excalidraw/element/mutateElement";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
@@ -85,6 +95,16 @@ export const actionFinalize = register({
       ? appState.newElement
       : null;
 
+    const mutate = (updates: ElementUpdate<ExcalidrawElbowArrowElement>) =>
+      isElbowArrow(multiPointElement as ExcalidrawElbowArrowElement)
+        ? mutateElbowArrow(
+            multiPointElement as ExcalidrawElbowArrowElement,
+            updates,
+            true,
+            elementsMap,
+          )
+        : mutateElement(multiPointElement as ExcalidrawElement, updates);
+
     if (multiPointElement) {
       // pen and mouse have hover
       if (
@@ -96,7 +116,7 @@ export const actionFinalize = register({
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          mutateElement(multiPointElement, {
+          mutate({
             points: multiPointElement.points.slice(0, -1),
           });
         }
@@ -120,7 +140,7 @@ export const actionFinalize = register({
         if (isLoop) {
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
-          mutateElement(multiPointElement, {
+          mutate({
             points: linePoints.map((p, index) =>
               index === linePoints.length - 1
                 ? pointFrom(firstPoint[0], firstPoint[1])

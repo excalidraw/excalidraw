@@ -302,6 +302,10 @@ import {
 
 import { isNonDeletedElement } from "@excalidraw/element";
 
+import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
+
+import type { ElementUpdate } from "@excalidraw/element/mutateElement";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -327,6 +331,7 @@ import type {
   MagicGenerationData,
   ExcalidrawNonSelectionElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
 } from "@excalidraw/element/types";
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
@@ -5485,7 +5490,11 @@ class App extends React.Component<AppProps, AppState> {
 
         if (midPoint && midPoint > -1) {
           this.store.shouldCaptureIncrement();
-          LinearElementEditor.deleteFixedSegment(selectedElements[0], midPoint);
+          LinearElementEditor.deleteFixedSegment(
+            selectedElements[0],
+            this.scene.getNonDeletedElementsMap(),
+            midPoint,
+          );
 
           const nextCoords = LinearElementEditor.getSegmentMidpointHitCoords(
             {
@@ -5991,23 +6000,30 @@ class App extends React.Component<AppProps, AppState> {
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         }
-        // update last uncommitted point
-        mutateElement(
-          multiElement,
-          {
-            points: [
-              ...points.slice(0, -1),
-              pointFrom<LocalPoint>(
-                lastCommittedX + dxFromLastCommitted,
-                lastCommittedY + dyFromLastCommitted,
-              ),
-            ],
-          },
-          false,
-          {
-            isDragging: true,
-          },
-        );
+        const updates = {
+          points: [
+            ...points.slice(0, -1),
+            pointFrom<LocalPoint>(
+              lastCommittedX + dxFromLastCommitted,
+              lastCommittedY + dyFromLastCommitted,
+            ),
+          ],
+        };
+
+        if (isElbowArrow(multiElement)) {
+          mutateElbowArrow(
+            multiElement,
+            updates,
+            false,
+            this.scene.getNonDeletedElementsMap(),
+            {
+              isDragging: true,
+            },
+          );
+        } else {
+          // update last uncommitted point
+          mutateElement(multiElement, updates, false);
+        }
 
         // in this path, we're mutating multiElement to reflect
         // how it will be after adding pointer position as the next point
@@ -8672,25 +8688,33 @@ class App extends React.Component<AppProps, AppState> {
             ));
           }
 
+          const mutate = (
+            updates: ElementUpdate<ExcalidrawLinearElement>,
+            options: { isDragging?: boolean } = {},
+          ) =>
+            isElbowArrow(newElement)
+              ? mutateElbowArrow(
+                  newElement,
+                  updates as ElementUpdate<ExcalidrawElbowArrowElement>,
+                  false,
+                  this.scene.getNonDeletedElementsMap(),
+                  options,
+                )
+              : mutateElement(newElement, updates, false);
+
           if (points.length === 1) {
-            mutateElement(
-              newElement,
-              {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
-              },
-              false,
-            );
+            mutate({
+              points: [...points, pointFrom<LocalPoint>(dx, dy)],
+            });
           } else if (
             points.length === 2 ||
             (points.length > 1 && isElbowArrow(newElement))
           ) {
-            mutateElement(
-              newElement,
+            mutate(
               {
                 points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
               },
-              false,
-              { isDragging: true },
+              { isDragging: true }
             );
           }
 
@@ -8937,7 +8961,12 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
           if (element) {
-            mutateElement(element, {}, true);
+            mutateElbowArrow(
+              element as ExcalidrawElbowArrowElement,
+              {},
+              true,
+              this.scene.getNonDeletedElementsMap(),
+            );
           }
         }
 
@@ -9080,7 +9109,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!pointerDownState.drag.hasOccurred && newElement && !multiElement) {
-          mutateElement(newElement, {
+          const updates = {
             points: [
               ...newElement.points,
               pointFrom<LocalPoint>(
@@ -9088,7 +9117,19 @@ class App extends React.Component<AppProps, AppState> {
                 pointerCoords.y - newElement.y,
               ),
             ],
-          });
+          };
+
+          if (isElbowArrow(newElement)) {
+            mutateElbowArrow(
+              newElement,
+              updates,
+              false,
+              this.scene.getNonDeletedElementsMap(),
+            );
+          } else {
+            mutateElement(newElement, updates, false);
+          }
+
           this.setState({
             multiElement: newElement,
             newElement,

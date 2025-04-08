@@ -264,6 +264,8 @@ export {
   bumpVersion,
 } from "@excalidraw/element/mutateElement";
 
+export { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
+
 export { CaptureUpdateAction } from "./store";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";

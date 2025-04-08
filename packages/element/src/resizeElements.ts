@@ -60,6 +60,8 @@ import {
 
 import { isInGroup } from "./groups";
 
+import { mutateElbowArrow } from "./elbowArrow";
+
 import type { BoundingBox } from "./bounds";
 import type {
   MaybeTransformHandleType,
@@ -545,9 +547,14 @@ const rotateMultipleElements = (
 
       if (isElbowArrow(element)) {
         // Needed to re-route the arrow
-        mutateElement(element, {
-          points: getArrowLocalFixedPoints(element, elementsMap),
-        });
+        mutateElbowArrow(
+          element,
+          {
+            points: getArrowLocalFixedPoints(element, elementsMap),
+          },
+          false,
+          elementsMap,
+        );
       } else {
         mutateElement(
           element,
@@ -1527,10 +1534,14 @@ export const resizeMultipleElements = (
     } of elementsAndUpdates) {
       const { width, height, angle } = update;
 
-      mutateElement(element, update, false, {
-        // needed for the fixed binding point udpate to take effect
-        isDragging: true,
-      });
+      if (isElbowArrow(element)) {
+        mutateElbowArrow(element, update, false, elementsMap, {
+          // needed for the fixed binding point udpate to take effect
+          isDragging: true,
+        });
+      } else {
+        mutateElement(element, update, false);
+      }
 
       updateBoundElements(element, elementsMap as SceneElementsMap, {
         simultaneouslyUpdated: elementsToUpdate,

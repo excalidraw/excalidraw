@@ -22,6 +22,8 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 
+import type { Radians } from "@excalidraw/math";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
@@ -45,8 +47,8 @@ import {
   vectorToHeading,
   headingForPoint,
 } from "./heading";
-import { type ElementUpdate } from "./mutateElement";
-import { isBindableElement } from "./typeChecks";
+import { mutateElement, type ElementUpdate } from "./mutateElement";
+import { isBindableElement, isElbowArrow } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -61,6 +63,7 @@ import type {
   Arrowhead,
   ElementsMap,
   ExcalidrawBindableElement,
+  ExcalidrawElement,
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
@@ -879,6 +882,64 @@ const handleEndpointDrag = (
 
 const MAX_POS = 1e6;
 
+export const elbowArrowNeedsToGetNormalized = (
+  element: Readonly<ExcalidrawElement>,
+  updates: {
+    points?: readonly LocalPoint[];
+    fixedSegments?: readonly FixedSegment[] | null;
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
+  },
+) => {
+  const { points, fixedSegments, startBinding, endBinding } = updates;
+
+  return (
+    isElbowArrow(element) &&
+    (Object.keys(updates).length === 0 || // normalization case
+      typeof points !== "undefined" || // repositioning
+      typeof fixedSegments !== "undefined" || // segment fixing
+      typeof startBinding !== "undefined" ||
+      typeof endBinding !== "undefined") // manual binding to element
+  );
+};
+
+/**
+ * Mutates an elbow arrow element and renormalizes it's properties if necessary.
+ */
+export const mutateElbowArrow = (
+  element: Readonly<ExcalidrawElbowArrowElement>,
+  updates: ElementUpdate<ExcalidrawElbowArrowElement>,
+  informMutation: boolean = true,
+  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap | ElementsMap,
+  options?: {
+    isDragging?: boolean;
+  },
+): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  invariant(
+    !isElbowArrow(element),
+    `Element "${element.type}" is not an elbow arrow! Use \`mutateElement\` instead`,
+  );
+
+  if (!elbowArrowNeedsToGetNormalized(element, updates)) {
+    return mutateElement(element, updates, informMutation);
+  }
+
+  return mutateElement(
+    element,
+    {
+      ...updates,
+      angle: 0 as Radians,
+      ...updateElbowArrowPoints(
+        element,
+        elementsMap as NonDeletedSceneElementsMap,
+        updates,
+        options,
+      ),
+    },
+    informMutation,
+  );
+};
+
 /**
  *
  */
@@ -887,7 +948,7 @@ export const updateElbowArrowPoints = (
   elementsMap: NonDeletedSceneElementsMap,
   updates: {
     points?: readonly LocalPoint[];
-    fixedSegments?: FixedSegment[] | null;
+    fixedSegments?: readonly FixedSegment[] | null;
     startBinding?: FixedPointBinding | null;
     endBinding?: FixedPointBinding | null;
   },

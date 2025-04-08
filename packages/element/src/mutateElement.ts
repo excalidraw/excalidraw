@@ -2,23 +2,20 @@ import {
   getSizeFromPoints,
   randomInteger,
   getUpdatedTimestamp,
-  toBrandedType,
+  invariant,
 } from "@excalidraw/common";
 
 // TODO: remove direct dependency on the scene, should be passed in or injected instead
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import Scene from "@excalidraw/excalidraw/scene/Scene";
 
-import type { Radians } from "@excalidraw/math";
-
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./ShapeCache";
 
-import { updateElbowArrowPoints } from "./elbowArrow";
-import { isElbowArrow } from "./typeChecks";
+import { elbowArrowNeedsToGetNormalized } from "./elbowArrow";
 
-import type { ExcalidrawElement, NonDeletedSceneElementsMap } from "./types";
+import type { ExcalidrawElement } from "./types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -33,54 +30,25 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
   informMutation = true,
-  options?: {
-    // Currently only for elbow arrows.
-    // If true, the elbow arrow tries to bind to the nearest element. If false
-    // it tries to keep the same bound element, if any.
-    isDragging?: boolean;
-  },
 ): TElement => {
   let didChange = false;
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fixedSegments, fileId, startBinding, endBinding } =
+  const { points, fileId, fixedSegments, startBinding, endBinding } =
     updates as any;
 
-  if (
-    isElbowArrow(element) &&
-    (Object.keys(updates).length === 0 || // normalization case
-      typeof points !== "undefined" || // repositioning
-      typeof fixedSegments !== "undefined" || // segment fixing
-      typeof startBinding !== "undefined" ||
-      typeof endBinding !== "undefined") // manual binding to element
-  ) {
-    const elementsMap = toBrandedType<NonDeletedSceneElementsMap>(
-      Scene.getScene(element)?.getNonDeletedElementsMap() ?? new Map(),
-    );
+  invariant(
+    elbowArrowNeedsToGetNormalized(element, {
+      points,
+      fixedSegments,
+      startBinding,
+      endBinding,
+    }),
+    "Elbow arrow should get normalized! Use `mutateElbowArrow` instead.",
+  );
 
-    updates = {
-      ...updates,
-      angle: 0 as Radians,
-      ...updateElbowArrowPoints(
-        {
-          ...element,
-          x: updates.x || element.x,
-          y: updates.y || element.y,
-        },
-        elementsMap,
-        {
-          fixedSegments,
-          points,
-          startBinding,
-          endBinding,
-        },
-        {
-          isDragging: options?.isDragging,
-        },
-      ),
-    };
-  } else if (typeof points !== "undefined") {
+  if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 

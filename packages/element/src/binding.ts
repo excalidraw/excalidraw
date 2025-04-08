@@ -66,7 +66,7 @@ import {
 } from "./typeChecks";
 
 import { aabbForElement, getElementShape, pointInsideBounds } from "./shapes";
-import { updateElbowArrowPoints } from "./elbowArrow";
+import { mutateElbowArrow, updateElbowArrowPoints } from "./elbowArrow";
 
 import type { Bounds } from "./bounds";
 import type { ElementUpdate } from "./mutateElement";
@@ -796,7 +796,20 @@ export const updateBoundElements = (
 
     // `linearElement` is being moved/scaled already, just update the binding
     if (simultaneouslyUpdatedElementIds.has(element.id)) {
-      mutateElement(element, bindings, true);
+      if (isElbowArrow(element)) {
+        mutateElbowArrow(
+          element,
+          bindings as {
+            startBinding: FixedPointBinding;
+            endBinding: FixedPointBinding;
+          },
+          true,
+          elementsMap,
+        );
+      } else {
+        mutateElement(element, bindings, true);
+      }
+
       return;
     }
 

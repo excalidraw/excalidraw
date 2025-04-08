@@ -22,7 +22,7 @@ import {
 
 // TODO: remove direct dependency on the scene, should be passed in or injected instead
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import Scene from "@excalidraw/excalidraw/scene/Scene";
+import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
 import type { Store } from "@excalidraw/excalidraw/store";
 
@@ -50,7 +50,7 @@ import {
   getMinMaxXYFromCurvePathOps,
 } from "./bounds";
 
-import { updateElbowArrowPoints } from "./elbowArrow";
+import { mutateElbowArrow, updateElbowArrowPoints } from "./elbowArrow";
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { bumpVersion, mutateElement } from "./mutateElement";
@@ -794,7 +794,10 @@ export class LinearElementEditor {
         elementsMap,
       );
     } else if (event.altKey && appState.editingLinearElement) {
-      if (linearElementEditor.lastUncommittedPoint == null) {
+      if (
+        linearElementEditor.lastUncommittedPoint == null &&
+        !isElbowArrow(element)
+      ) {
         mutateElement(element, {
           points: [
             ...element.points,
@@ -1219,7 +1222,12 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    mutateElement(element, { points: nextPoints });
+    const updates = { points: nextPoints };
+    if (isElbowArrow(element)) {
+      mutateElbowArrow(element, updates, true, elementsMap);
+    } else {
+      mutateElement(element, updates);
+    }
 
     // temp hack to ensure the line doesn't move when adding point to the end,
     // potentially expanding the bounding box
@@ -1425,9 +1433,12 @@ export class LinearElementEditor {
       ...element.points.slice(segmentMidpoint.index!),
     ];
 
-    mutateElement(element, {
-      points,
-    });
+    const updates = { points };
+    if (isElbowArrow(element)) {
+      mutateElbowArrow(element, updates, true, elementsMap);
+    } else {
+      mutateElement(element, updates);
+    }
 
     ret.pointerDownState = {
       ...linearElementEditor.pointerDownState,
@@ -1479,8 +1490,8 @@ export class LinearElementEditor {
 
       updates.points = Array.from(nextPoints);
 
-      if (!options?.sceneElementsMap || Scene.getScene(element)) {
-        mutateElement(element, updates, true, {
+      if (!options?.sceneElementsMap) {
+        mutateElbowArrow(element, updates, true, options?.sceneElementsMap!, {
           isDragging: options?.isDragging,
         });
       } else {
@@ -1825,9 +1836,14 @@ export class LinearElementEditor {
         .map((segment) => segment.index)
         .reduce((count, idx) => (idx < index ? count + 1 : count), 0);
 
-      mutateElement(element, {
-        fixedSegments: nextFixedSegments,
-      });
+      mutateElbowArrow(
+        element,
+        {
+          fixedSegments: nextFixedSegments,
+        },
+        true,
+        elementsMap,
+      );
 
       const point = pointFrom<GlobalPoint>(
         element.x +
@@ -1859,14 +1875,19 @@ export class LinearElementEditor {
 
   static deleteFixedSegment(
     element: ExcalidrawElbowArrowElement,
+    elementsMap: NonDeletedSceneElementsMap,
     index: number,
   ): void {
-    mutateElement(element, {
-      fixedSegments: element.fixedSegments?.filter(
-        (segment) => segment.index !== index,
-      ),
-    });
-    mutateElement(element, {}, true);
+    mutateElbowArrow(
+      element,
+      {
+        fixedSegments: element.fixedSegments?.filter(
+          (segment) => segment.index !== index,
+        ),
+      },
+      true,
+      elementsMap,
+    );
   }
 }
 
