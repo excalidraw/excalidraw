@@ -6,7 +6,6 @@ import {
   invariant,
   isDevEnv,
   isTestEnv,
-  toLocalPoint,
 } from "@excalidraw/common";
 
 import {
@@ -527,14 +526,18 @@ export const bindLinearElement = (
   const points = Array.from(linearElement.points);
 
   if (isArrowElement(linearElement)) {
-    points[edgePointIndex] = toLocalPoint(
-      bindPointToSnapToElementOutline(
-        linearElement,
-        hoveredElement,
-        startOrEnd,
-        elementsMap,
-      ),
+    const [x, y] = bindPointToSnapToElementOutline(
       linearElement,
+      hoveredElement,
+      startOrEnd,
+      elementsMap,
+    );
+    points[edgePointIndex] = LinearElementEditor.createPointAt(
+      linearElement,
+      elementsMap,
+      x,
+      y,
+      null,
     );
   }
 
