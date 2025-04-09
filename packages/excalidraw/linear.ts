@@ -96,13 +96,7 @@ export function onPointerMoveFromPointerDownOnLinearElement(
       {
         points: [
           ...points,
-          LinearElementEditor.createPointAt(
-            newElement,
-            elementsMap,
-            x,
-            y,
-            app.getEffectiveGridSize(),
-          ),
+          pointFrom<LocalPoint>(x - newElement.x, y - newElement.y),
         ],
       },
       false,
@@ -111,35 +105,28 @@ export function onPointerMoveFromPointerDownOnLinearElement(
     points.length === 2 ||
     (points.length > 1 && isElbowArrow(newElement))
   ) {
-    const targets = [
-      {
+    const targets = [];
+
+    if (isArrowElement(newElement)) {
+      const [endX, endY] = getOutlineAvoidingPoint(
+        newElement,
+        pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
+        points.length - 1,
+        app.scene,
+        app.state.zoom,
+        pointFrom<GlobalPoint>(newElement.x + dx, newElement.y + dy),
+      );
+
+      targets.push({
+        index: points.length - 1,
+        isDragging: true,
+        point: pointFrom<LocalPoint>(endX - newElement.x, endY - newElement.y),
+      });
+    } else {
+      targets.push({
         index: points.length - 1,
         isDragging: true,
         point: pointFrom<LocalPoint>(dx, dy),
-      },
-    ];
-
-    if (isArrowElement(newElement)) {
-      const [x, y] = getOutlineAvoidingPoint(
-        newElement,
-        pointFrom<GlobalPoint>(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        ),
-        0,
-        app.scene,
-        app.state.zoom,
-      );
-      targets.unshift({
-        index: 0,
-        isDragging: false,
-        point: LinearElementEditor.createPointAt(
-          newElement,
-          elementsMap,
-          x,
-          y,
-          app.getEffectiveGridSize(),
-        ),
       });
     }
 
@@ -223,11 +210,9 @@ export function handleCanvasPointerMoveForLinearElement(
     const [gridX, gridY] = getGridPoint(
       scenePointerX,
       scenePointerY,
-      event[KEYS.CTRL_OR_CMD] || isElbowArrow(multiElement)
-        ? null
-        : app.getEffectiveGridSize(),
+      event[KEYS.CTRL_OR_CMD] ? null : app.getEffectiveGridSize(),
     );
-    console.log(points);
+
     const [lastCommittedX, lastCommittedY] =
       multiElement?.lastCommittedPoint ?? [0, 0];
 
@@ -268,13 +253,7 @@ export function handleCanvasPointerMoveForLinearElement(
     LinearElementEditor.movePoints(multiElement, [
       {
         index: points.length - 1,
-        point: LinearElementEditor.createPointAt(
-          multiElement,
-          app.scene.getNonDeletedElementsMap(),
-          x,
-          y,
-          app.getEffectiveGridSize(),
-        ),
+        point: pointFrom<LocalPoint>(x - multiElement.x, y - multiElement.y),
         isDragging: true,
       },
     ]);
