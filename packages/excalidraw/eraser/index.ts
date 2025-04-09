@@ -6,7 +6,6 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import { simplify } from "points-on-curve";
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import { getElementShape } from "@excalidraw/element/shapes";
@@ -32,11 +31,15 @@ import type { AnimationFrameHandler } from "../animation-frame-handler";
 
 import type App from "../components/App";
 
+// just enough to form a segment; this is sufficient for eraser
+const POINTS_ON_TRAIL = 2;
+
 export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
-  private elementsSegments: Map<string, LineSegment<GlobalPoint>[]> = new Map();
-  private shapesCache: Map<string, GeometricShape<GlobalPoint>> = new Map();
+  private segmentsCache: Map<string, LineSegment<GlobalPoint>[]> = new Map();
+  private geometricShapesCache: Map<string, GeometricShape<GlobalPoint>> =
+    new Map();
 
   constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
     super(animationFrameHandler, app, {
@@ -65,9 +68,7 @@ export class EraserTrail extends AnimatedTrail {
   }
 
   startPath(x: number, y: number): void {
-    // clear any existing trails just in case
     this.endPath();
-
     super.startPath(x, y);
     this.elementsToErase.clear();
   }
@@ -85,94 +86,102 @@ export class EraserTrail extends AnimatedTrail {
       .getCurrentTrail()
       ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
 
-    eraserPath = eraserPath?.slice(eraserPath.length - 20);
+    // for efficiency and avoid unnecessary calculations,
+    // take only POINTS_ON_TRAIL points to form some number of segments
+    eraserPath = eraserPath?.slice(eraserPath.length - POINTS_ON_TRAIL);
+
+    if (!eraserPath || eraserPath.length === 0) {
+      return [];
+    }
 
     const visibleElementsMap = arrayToMap(this.app.visibleElements);
 
-    if (eraserPath) {
-      const simplifiedPath = simplify(
-        eraserPath,
-        5 / this.app.state.zoom.value,
-      ) as GlobalPoint[];
+    const pathSegments = eraserPath.reduce((acc, point, index) => {
+      if (index === 0) {
+        return acc;
+      }
+      acc.push(lineSegment(eraserPath[index - 1], point));
+      return acc;
+    }, [] as LineSegment<GlobalPoint>[]);
 
-      for (const element of this.app.visibleElements) {
-        if (restoreToErase && this.elementsToErase.has(element.id)) {
-          const intersects = eraserTest(
-            simplifiedPath,
-            element,
-            this.elementsSegments,
-            this.shapesCache,
-            visibleElementsMap,
-            this.app,
-          );
+    for (const element of this.app.visibleElements) {
+      // restore only if already added to the to-be-erased set
+      if (restoreToErase && this.elementsToErase.has(element.id)) {
+        const intersects = eraserTest(
+          pathSegments,
+          element,
+          this.segmentsCache,
+          this.geometricShapesCache,
+          visibleElementsMap,
+          this.app,
+        );
 
-          if (intersects) {
-            const shallowestGroupId = element.groupIds.at(-1)!;
+        if (intersects) {
+          const shallowestGroupId = element.groupIds.at(-1)!;
 
-            if (this.groupsToErase.has(shallowestGroupId)) {
-              const elementsInGroup = getElementsInGroup(
-                this.app.scene.getNonDeletedElementsMap(),
-                shallowestGroupId,
-              );
-              for (const elementInGroup of elementsInGroup) {
-                this.elementsToErase.delete(elementInGroup.id);
-              }
-              this.groupsToErase.delete(shallowestGroupId);
+          if (this.groupsToErase.has(shallowestGroupId)) {
+            const elementsInGroup = getElementsInGroup(
+              this.app.scene.getNonDeletedElementsMap(),
+              shallowestGroupId,
+            );
+            for (const elementInGroup of elementsInGroup) {
+              this.elementsToErase.delete(elementInGroup.id);
             }
-
-            if (isBoundToContainer(element)) {
-              this.elementsToErase.delete(element.containerId);
-            }
-
-            if (hasBoundTextElement(element)) {
-              const boundText = getBoundTextElementId(element);
-
-              if (boundText) {
-                this.elementsToErase.delete(boundText);
-              }
-            }
-
-            this.elementsToErase.delete(element.id);
+            this.groupsToErase.delete(shallowestGroupId);
           }
-        } else if (!restoreToErase && !this.elementsToErase.has(element.id)) {
-          const intersects = eraserTest(
-            simplifiedPath,
-            element,
-            this.elementsSegments,
-            this.shapesCache,
-            visibleElementsMap,
-            this.app,
-          );
 
-          if (intersects) {
-            const shallowestGroupId = element.groupIds.at(-1)!;
-
-            if (!this.groupsToErase.has(shallowestGroupId)) {
-              const elementsInGroup = getElementsInGroup(
-                this.app.scene.getNonDeletedElementsMap(),
-                shallowestGroupId,
-              );
-
-              for (const elementInGroup of elementsInGroup) {
-                this.elementsToErase.add(elementInGroup.id);
-              }
-              this.groupsToErase.add(shallowestGroupId);
-            }
-
-            if (hasBoundTextElement(element)) {
-              const boundText = getBoundTextElementId(element);
-
-              if (boundText) {
-                this.elementsToErase.add(boundText);
-              }
-            }
-
-            if (isBoundToContainer(element)) {
-              this.elementsToErase.add(element.containerId);
-            }
-
-            this.elementsToErase.add(element.id);
+          if (isBoundToContainer(element)) {
+            this.elementsToErase.delete(element.containerId);
           }
+
+          if (hasBoundTextElement(element)) {
+            const boundText = getBoundTextElementId(element);
+
+            if (boundText) {
+              this.elementsToErase.delete(boundText);
+            }
+          }
+
+          this.elementsToErase.delete(element.id);
+        }
+      } else if (!restoreToErase && !this.elementsToErase.has(element.id)) {
+        const intersects = eraserTest(
+          pathSegments,
+          element,
+          this.segmentsCache,
+          this.geometricShapesCache,
+          visibleElementsMap,
+          this.app,
+        );
+
+        if (intersects) {
+          const shallowestGroupId = element.groupIds.at(-1)!;
+
+          if (!this.groupsToErase.has(shallowestGroupId)) {
+            const elementsInGroup = getElementsInGroup(
+              this.app.scene.getNonDeletedElementsMap(),
+              shallowestGroupId,
+            );
+
+            for (const elementInGroup of elementsInGroup) {
+              this.elementsToErase.add(elementInGroup.id);
+            }
+            this.groupsToErase.add(shallowestGroupId);
+          }
+
+          if (hasBoundTextElement(element)) {
+            const boundText = getBoundTextElementId(element);
+
+            if (boundText) {
+              this.elementsToErase.add(boundText);
+            }
+          }
+
+          if (isBoundToContainer(element)) {
+            this.elementsToErase.add(element.containerId);
+          }
+
+          this.elementsToErase.add(element.id);
         }
       }
     }
@@ -185,12 +194,12 @@ export class EraserTrail extends AnimatedTrail {
     super.clearTrails();
     this.elementsToErase.clear();
     this.groupsToErase.clear();
-    this.elementsSegments.clear();
+    this.segmentsCache.clear();
   }
 }
 
 const eraserTest = (
-  path: GlobalPoint[],
+  pathSegments: LineSegment<GlobalPoint>[],
   element: ExcalidrawElement,
   elementsSegments: ElementsSegmentsMap,
   shapesCache = new Map<string, GeometricShape<GlobalPoint>>(),
@@ -204,7 +213,7 @@ const eraserTest = (
     shapesCache.set(element.id, shape);
   }
 
-  const lastPoint = path[path.length - 1];
+  const lastPoint = pathSegments[pathSegments.length - 1][1];
   if (shouldTestInside(element) && isPointInShape(lastPoint, shape)) {
     return true;
   }
@@ -215,14 +224,6 @@ const eraserTest = (
     elementSegments = getElementLineSegments(element, visibleElementsMap);
     elementsSegments.set(element.id, elementSegments);
   }
-
-  const pathSegments = path.reduce((acc, point, index) => {
-    if (index === 0) {
-      return acc;
-    }
-    acc.push(lineSegment(path[index - 1], point));
-    return acc;
-  }, [] as LineSegment<GlobalPoint>[]);
 
   return pathSegments.some((pathSegment) =>
     elementSegments?.some(
