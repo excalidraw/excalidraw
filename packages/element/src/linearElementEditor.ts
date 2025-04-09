@@ -469,6 +469,7 @@ export class LinearElementEditor {
     editingLinearElement: LinearElementEditor,
     appState: AppState,
     scene: Scene,
+    shouldBind?: boolean,
   ): LinearElementEditor {
     const elementsMap = scene.getNonDeletedElementsMap();
     const elements = scene.getNonDeletedElements();
@@ -528,6 +529,19 @@ export class LinearElementEditor {
             selectedPoint === 0 ? "startBindingElement" : "endBindingElement"
           ] = bindingElement;
         }
+      }
+    }
+
+    if (shouldBind) {
+      const element = scene.getElement(editingLinearElement.elementId);
+      if (isBindingElement(element) && isBindingEnabled(appState)) {
+        bindOrUnbindLinearElement(
+          element,
+          bindings.startBindingElement || "keep",
+          bindings.endBindingElement || "keep",
+          elementsMap,
+          scene,
+        );
       }
     }
 

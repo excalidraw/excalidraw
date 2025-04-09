@@ -8789,20 +8789,8 @@ class App extends React.Component<AppProps, AppState> {
             this.state.selectedLinearElement,
             this.state,
             this.scene,
+            true,
           );
-
-          const { startBindingElement, endBindingElement } =
-            linearElementEditor;
-          const element = this.scene.getElement(linearElementEditor.elementId);
-          if (isBindingElement(element)) {
-            bindOrUnbindLinearElement(
-              element,
-              startBindingElement,
-              endBindingElement,
-              elementsMap,
-              this.scene,
-            );
-          }
 
           if (linearElementEditor !== this.state.selectedLinearElement) {
             this.setState({
