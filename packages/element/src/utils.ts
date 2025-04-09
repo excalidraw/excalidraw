@@ -10,13 +10,13 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
+import { elementCenterPoint } from "@excalidraw/common";
+
 import type { Curve, LineSegment } from "@excalidraw/math";
 
 import { getCornerRadius } from "./shapes";
 
 import { getDiamondPoints } from "./bounds";
-
-import { elementCenterPoint } from "../utils";
 
 import type {
   ExcalidrawDiamondElement,

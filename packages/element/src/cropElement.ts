@@ -14,12 +14,12 @@ import {
 } from "@excalidraw/math";
 import { type Point } from "points-on-curve";
 
+import { elementCenterPoint } from "@excalidraw/common";
+
 import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
-
-import { elementCenterPoint } from "../utils";
 
 import type { TransformHandleType } from "./transformHandles";
 import type {

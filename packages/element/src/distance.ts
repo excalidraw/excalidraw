@@ -1,11 +1,12 @@
 import {
   curvePointDistance,
   distanceToLineSegment,
-  pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
+
+import { elementCenterPoint } from "@excalidraw/common";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
@@ -13,8 +14,6 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
 } from "./utils";
-
-import { elementCenterPoint } from "../utils";
 
 import type {
   ExcalidrawBindableElement,
