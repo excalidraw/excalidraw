@@ -50,7 +50,7 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    angle: container?.angle ?? textElement.angle,
+    angle: textElement.angle,
   };
 
   boundTextUpdates.text = textElement.text;
