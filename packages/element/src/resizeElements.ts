@@ -1534,14 +1534,10 @@ export const resizeMultipleElements = (
     } of elementsAndUpdates) {
       const { width, height, angle } = update;
 
-      if (isElbowArrow(element)) {
-        mutateElbowArrow(element, update, false, elementsMap, {
-          // needed for the fixed binding point udpate to take effect
-          isDragging: true,
-        });
-      } else {
-        mutateElement(element, update, false);
-      }
+      scene.mutateElement(element, update, false, {
+        // needed for the fixed binding point udpate to take effect
+        isDragging: true,
+      });
 
       updateBoundElements(element, elementsMap as SceneElementsMap, {
         simultaneouslyUpdated: elementsToUpdate,
@@ -1550,7 +1546,7 @@ export const resizeMultipleElements = (
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && boundTextFontSize) {
-        mutateElement(
+        scene.mutateElement(
           boundTextElement,
           {
             fontSize: boundTextFontSize,

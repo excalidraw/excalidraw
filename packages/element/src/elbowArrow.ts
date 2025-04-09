@@ -909,7 +909,6 @@ export const elbowArrowNeedsToGetNormalized = (
 export const mutateElbowArrow = (
   element: Readonly<ExcalidrawElbowArrowElement>,
   updates: ElementUpdate<ExcalidrawElbowArrowElement>,
-  informMutation: boolean = true,
   elementsMap: NonDeletedSceneElementsMap | SceneElementsMap | ElementsMap,
   options?: {
     isDragging?: boolean;
@@ -921,23 +920,19 @@ export const mutateElbowArrow = (
   );
 
   if (!elbowArrowNeedsToGetNormalized(element, updates)) {
-    return mutateElement(element, updates, informMutation);
+    return mutateElement(element, updates);
   }
 
-  return mutateElement(
-    element,
-    {
-      ...updates,
-      angle: 0 as Radians,
-      ...updateElbowArrowPoints(
-        element,
-        elementsMap as NonDeletedSceneElementsMap,
-        updates,
-        options,
-      ),
-    },
-    informMutation,
-  );
+  return mutateElement(element, {
+    ...updates,
+    angle: 0 as Radians,
+    ...updateElbowArrowPoints(
+      element,
+      elementsMap as NonDeletedSceneElementsMap,
+      updates,
+      options,
+    ),
+  });
 };
 
 /**

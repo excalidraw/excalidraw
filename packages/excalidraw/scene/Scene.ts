@@ -8,7 +8,10 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import {
+  isElbowArrow,
+  isFrameLikeElement,
+} from "@excalidraw/element/typeChecks";
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import {
@@ -19,7 +22,13 @@ import {
 
 import { getSelectedElements } from "@excalidraw/element/selection";
 
-import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import {
+  mutateElement,
+  type ElementUpdate,
+} from "@excalidraw/element/mutateElement";
+
+import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
+
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -30,14 +39,16 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
+  ExcalidrawElbowArrowElement,
 } from "@excalidraw/element/types";
 
-import type { Assert, SameType } from "@excalidraw/common/utility-types";
+import type {
+  Assert,
+  Mutable,
+  SameType,
+} from "@excalidraw/common/utility-types";
 
 import type { AppState } from "../types";
-
-type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
-type ElementKey = ExcalidrawElement | ElementIdKey;
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
@@ -102,44 +113,7 @@ const hashSelectionOpts = (
 // in our codebase
 export type ExcalidrawElementsIncludingDeleted = readonly ExcalidrawElement[];
 
-const isIdKey = (elementKey: ElementKey): elementKey is ElementIdKey => {
-  if (typeof elementKey === "string") {
-    return true;
-  }
-  return false;
-};
-
 class Scene {
-  // ---------------------------------------------------------------------------
-  // static methods/props
-  // ---------------------------------------------------------------------------
-
-  private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
-  private static sceneMapById = new Map<string, Scene>();
-
-  static mapElementToScene(elementKey: ElementKey, scene: Scene) {
-    if (isIdKey(elementKey)) {
-      // for cases where we don't have access to the element object
-      // (e.g. restore serialized appState with id references)
-      this.sceneMapById.set(elementKey, scene);
-    } else {
-      this.sceneMapByElement.set(elementKey, scene);
-      // if mapping element objects, also cache the id string when later
-      // looking up by id alone
-      this.sceneMapById.set(elementKey.id, scene);
-    }
-  }
-
-  /**
-   * @deprecated pass down `app.scene` and use it directly
-   */
-  static getScene(elementKey: ElementKey): Scene | null {
-    if (isIdKey(elementKey)) {
-      return this.sceneMapById.get(elementKey) || null;
-    }
-    return this.sceneMapByElement.get(elementKey) || null;
-  }
-
   // ---------------------------------------------------------------------------
   // instance methods/props
   // ---------------------------------------------------------------------------
@@ -308,7 +282,6 @@ class Scene {
         nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
-      Scene.mapElementToScene(element, this);
     });
     const nonDeletedElements = getNonDeletedElements(this.elements);
     this.nonDeletedElements = nonDeletedElements.elements;
@@ -352,12 +325,6 @@ class Scene {
     this.selectedElementsCache.selectedElementIds = null;
     this.selectedElementsCache.elements = null;
     this.selectedElementsCache.cache.clear();
-
-    Scene.sceneMapById.forEach((scene, elementKey) => {
-      if (scene === this) {
-        Scene.sceneMapById.delete(elementKey);
-      }
-    });
 
     // done not for memory leaks, but to guard against possible late fires
     // (I guess?)
@@ -455,6 +422,36 @@ class Scene {
     // then, check if the id is a group
     return getElementsInGroup(elementsMap, id);
   };
+
+  // TODO_SCENE: should be accessed as app.scene through the API
+  // TODO_SCENE: inform mutation false is the new default, meaning all mutateElement with nothing should likely use scene instead
+  mutateElement<TElement extends Mutable<ExcalidrawElement>>(
+    element: TElement,
+    updates: ElementUpdate<TElement>,
+    options: {
+      informMutation?: boolean;
+      isDragging?: boolean;
+    } = {
+      informMutation: true,
+    },
+  ) {
+    if (isElbowArrow(element)) {
+      mutateElbowArrow(
+        element,
+        updates as ElementUpdate<ExcalidrawElbowArrowElement>,
+        this.getNonDeletedElementsMap(),
+        options,
+      );
+    } else {
+      mutateElement(element, updates);
+    }
+
+    if (options.informMutation) {
+      this.triggerUpdate();
+    }
+
+    return element;
+  }
 }
 
 export default Scene;

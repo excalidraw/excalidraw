@@ -5,10 +5,6 @@ import {
   invariant,
 } from "@excalidraw/common";
 
-// TODO: remove direct dependency on the scene, should be passed in or injected instead
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./ShapeCache";
@@ -29,7 +25,6 @@ export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
 export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
-  informMutation = true,
 ): TElement => {
   let didChange = false;
 
@@ -117,10 +112,6 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element.version++;
   element.versionNonce = randomInteger();
   element.updated = getUpdatedTimestamp();
-
-  if (informMutation) {
-    Scene.getScene(element)?.triggerUpdate();
-  }
 
   return element;
 };
