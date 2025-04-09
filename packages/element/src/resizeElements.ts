@@ -969,10 +969,7 @@ export const resizeSingleElement = (
 
     mutateElement(latestElement, updates, shouldInformMutation);
 
-    updateBoundElements(latestElement, elementsMap as SceneElementsMap, {
-      // TODO: confirm with MARK if this actually makes sense
-      newSize: { width: nextWidth, height: nextHeight },
-    });
+    updateBoundElements(latestElement, elementsMap as SceneElementsMap);
 
     if (boundTextElement && boundTextFont != null) {
       mutateElement(boundTextElement, {
@@ -1525,7 +1522,7 @@ export const resizeMultipleElements = (
       element,
       update: { boundTextFontSize, ...update },
     } of elementsAndUpdates) {
-      const { width, height, angle } = update;
+      const { angle } = update;
 
       mutateElement(element, update, false, {
         // needed for the fixed binding point udpate to take effect
@@ -1534,7 +1531,6 @@ export const resizeMultipleElements = (
 
       updateBoundElements(element, elementsMap as SceneElementsMap, {
         simultaneouslyUpdated: elementsToUpdate,
-        newSize: { width, height },
       });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);

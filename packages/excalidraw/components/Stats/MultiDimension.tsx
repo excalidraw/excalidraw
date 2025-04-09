@@ -24,7 +24,13 @@ import type {
 } from "@excalidraw/element/types";
 
 import DragInput from "./DragInput";
-import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
+import {
+  getAtomicUnits,
+  getStepSizedValue,
+  isPropertyEditable,
+  updateBindings,
+  updateSelectionBindings,
+} from "./utils";
 import { getElementsInAtomicUnit } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
@@ -87,9 +93,7 @@ const resizeElementInGroup = (
   );
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
-    updateBoundElements(latestElement, elementsMap, {
-      newSize: { width: updates.width, height: updates.height },
-    });
+    updateBoundElements(latestElement, elementsMap);
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
       mutateElement(
@@ -120,6 +124,7 @@ const resizeGroup = (
   originalElements: ExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -145,6 +150,8 @@ const resizeGroup = (
       originalElementsMap,
     );
   }
+
+  updateSelectionBindings(originalElements, elementsMap, scene);
 };
 
 const handleDimensionChange: DragInputCallbackType<
@@ -196,6 +203,7 @@ const handleDimensionChange: DragInputCallbackType<
           originalElements,
           elementsMap,
           originalElementsMap,
+          scene,
         );
       } else {
         const [el] = elementsInUnit;
@@ -244,6 +252,8 @@ const handleDimensionChange: DragInputCallbackType<
               shouldInformMutation: false,
             },
           );
+
+          updateBindings(latestElement, elementsMap, scene);
         }
       }
     }
@@ -303,6 +313,7 @@ const handleDimensionChange: DragInputCallbackType<
         originalElements,
         elementsMap,
         originalElementsMap,
+        scene,
       );
     } else {
       const [el] = elementsInUnit;

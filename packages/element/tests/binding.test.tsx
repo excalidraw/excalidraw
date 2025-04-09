@@ -10,6 +10,8 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { fireEvent, render } from "@excalidraw/excalidraw/tests/test-utils";
 
+import "@excalidraw/utils/test-utils";
+
 import { getTransformHandles } from "../src/transformHandles";
 
 const { h } = window;
@@ -18,7 +20,9 @@ const mouse = new Pointer("mouse");
 
 describe("element binding", () => {
   beforeEach(async () => {
+    localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
+    mouse.reset();
   });
 
   it("should create valid binding if duplicate start/end points", async () => {
@@ -89,46 +93,55 @@ describe("element binding", () => {
     });
   });
 
-  //@TODO fix the test with rotation
-  it.skip("rotation of arrow should rebind both ends", () => {
-    const rectLeft = UI.createElement("rectangle", {
-      x: 0,
-      width: 200,
-      height: 500,
-    });
-    const rectRight = UI.createElement("rectangle", {
-      x: 400,
-      width: 200,
-      height: 500,
-    });
-    const arrow = UI.createElement("arrow", {
-      x: 210,
-      y: 250,
-      width: 180,
-      height: 1,
-    });
-    expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
-    expect(arrow.endBinding?.elementId).toBe(rectRight.id);
+  // UX RATIONALE: We are not aware of any use-case where the user would want to
+  // have the arrow rebind after rotation but not when the arrow shaft is
+  // dragged so either the start or the end point is in the binding range of a
+  // bindable element. So to remain consistent, we only "rebind" if at the end
+  // of the rotation the original binding would remain the same (i.e. like we
+  // would've evaluated binding only at the end of the operation).
+  it(
+    "rotation of arrow should not rebind on both ends if rotated enough to" +
+      " not be in the binding range of the original elements",
+    () => {
+      const rectLeft = UI.createElement("rectangle", {
+        x: 0,
+        width: 200,
+        height: 500,
+      });
+      const rectRight = UI.createElement("rectangle", {
+        x: 400,
+        width: 200,
+        height: 500,
+      });
+      const arrow = UI.createElement("arrow", {
+        x: 210,
+        y: 250,
+        width: 180,
+        height: 1,
+      });
+      expect(arrow.startBinding?.elementId).toBe(rectLeft.id);
+      expect(arrow.endBinding?.elementId).toBe(rectRight.id);
 
-    const rotation = getTransformHandles(
-      arrow,
-      h.state.zoom,
-      arrayToMap(h.elements),
-      "mouse",
-    ).rotation!;
-    const rotationHandleX = rotation[0] + rotation[2] / 2;
-    const rotationHandleY = rotation[1] + rotation[3] / 2;
-    mouse.down(rotationHandleX, rotationHandleY);
-    mouse.move(300, 400);
-    mouse.up();
-    expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
-    expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
-    expect(arrow.startBinding?.elementId).toBe(rectRight.id);
-    expect(arrow.endBinding?.elementId).toBe(rectLeft.id);
-  });
+      const rotation = getTransformHandles(
+        arrow,
+        h.state.zoom,
+        arrayToMap(h.elements),
+        "mouse",
+      ).rotation!;
+      const rotationHandleX = rotation[0] + rotation[2] / 2;
+      const rotationHandleY = rotation[1] + rotation[3] / 2;
+      mouse.down(rotationHandleX, rotationHandleY);
+      mouse.move(300, 400);
+      mouse.up();
+      expect(arrow.angle).toBeGreaterThan(0.7 * Math.PI);
+      expect(arrow.angle).toBeLessThan(1.3 * Math.PI);
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+    },
+  );
 
   // TODO fix & reenable once we rewrite tests to work with concurrency
-  it.skip(
+  it(
     "editing arrow and moving its head to bind it to element A, finalizing the" +
       "editing by clicking on element A should end up selecting A",
     async () => {
@@ -142,7 +155,10 @@ describe("element binding", () => {
       mouse.up(0, 80);
 
       // Edit arrow with multi-point
-      mouse.doubleClick();
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.doubleClick();
+      });
+
       // move arrow head
       mouse.down();
       mouse.up(0, 10);
@@ -152,16 +168,12 @@ describe("element binding", () => {
       // the issue, due to https://github.com/excalidraw/excalidraw/blob/46bff3daceb602accf60c40a84610797260fca94/src/components/App.tsx#L740
       mouse.reset();
       expect(h.state.editingLinearElement).not.toBe(null);
-      mouse.down(0, 0);
-      await new Promise((r) => setTimeout(r, 100));
-      expect(h.state.editingLinearElement).toBe(null);
-      expect(API.getSelectedElement().type).toBe("rectangle");
-      mouse.up();
+      mouse.click();
       expect(API.getSelectedElement().type).toBe("rectangle");
     },
   );
 
-  it("should unbind arrow when moving it with keyboard", () => {
+  it("should not move bound arrows when moving it with keyboard", () => {
     const rectangle = UI.createElement("rectangle", {
       x: 75,
       y: 0,
@@ -187,13 +199,19 @@ describe("element binding", () => {
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
     Keyboard.keyPress(KEYS.ARROW_LEFT);
     expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+    expect(API.getSelectedElement().type).toBe("arrow");
 
     // Sever connection
-    expect(API.getSelectedElement().type).toBe("arrow");
-    Keyboard.keyPress(KEYS.ARROW_LEFT);
-    expect(arrow.endBinding).toBe(null);
-    Keyboard.keyPress(KEYS.ARROW_RIGHT);
-    expect(arrow.endBinding).toBe(null);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      // We have to move a significant distance to get out of the binding zone
+      Array.from({ length: 10 }).forEach(() => {
+        Keyboard.keyPress(KEYS.ARROW_LEFT);
+      });
+    });
+
+    expect(arrow.endBinding?.elementId).toBe(rectangle.id);
+    expect(arrow.x).toBe(0);
+    expect(arrow.y).toBe(0);
   });
 
   it("should unbind on bound element deletion", () => {
@@ -481,4 +499,86 @@ describe("element binding", () => {
       });
     });
   });
+
+  // UX RATIONALE: The arrow might be outside of the shape at high zoom and you
+  // won't see what's going on.
+  it(
+    "allow non-binding simple (complex) arrow creation while start and end" +
+      " points are in the same shape",
+    () => {
+      const rect = UI.createElement("rectangle", {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      const arrow = UI.createElement("arrow", {
+        x: 5,
+        y: 5,
+        height: 95,
+        width: 95,
+      });
+
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+      expect(rect.boundElements).toEqual(null);
+      expect(arrow.points).toCloselyEqualPoints([
+        [0, 0],
+        [92.2855, 92.2855],
+      ]);
+
+      const rect2 = API.createElement({
+        type: "rectangle",
+        x: 300,
+        y: 300,
+        width: 100,
+        height: 100,
+        backgroundColor: "red",
+        fillStyle: "solid",
+      });
+
+      API.setElements([rect2]);
+
+      const arrow2 = UI.createElement("arrow", {
+        x: 305,
+        y: 305,
+        height: 95,
+        width: 95,
+      });
+
+      expect(arrow2.startBinding).toBe(null);
+      expect(arrow2.endBinding).toBe(null);
+      expect(rect2.boundElements).toEqual(null);
+      expect(arrow2.points).toCloselyEqualPoints([
+        [0, 0],
+        [92.2855, 92.2855],
+      ]);
+
+      const rect3 = UI.createElement("rectangle", {
+        x: 0,
+        y: 300,
+        width: 100,
+        height: 100,
+      });
+
+      const arrow3 = UI.createElement("arrow", {
+        x: 10,
+        y: 310,
+        height: 85,
+        width: 84,
+        elbowed: true,
+      });
+
+      expect(arrow3.startBinding).toBe(null);
+      expect(arrow3.endBinding).toBe(null);
+      expect(rect3.boundElements).toEqual(null);
+      expect(arrow3.points).toCloselyEqualPoints([
+        [0, 0],
+        [0, 42.5],
+        [84, 42.5],
+        [84, 85],
+      ]);
+    },
+  );
 });

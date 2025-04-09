@@ -8,7 +8,7 @@ import { deepCopyElement } from "@excalidraw/element/duplicate";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { CaptureUpdateAction } from "../../store";
-import { useApp } from "../App";
+import { useApp, useExcalidrawSetAppState } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
 import { SMALLEST_DELTA } from "./utils";
@@ -34,6 +34,21 @@ export type DragInputCallbackType<
   property: P;
   originalAppState: AppState;
   setInputValue: (value: number) => void;
+  setAppState: React.Component<any, AppState>["setState"];
+}) => void;
+
+export type DragFinishedCallbackType<
+  P extends StatsInputProperty,
+  E = ExcalidrawElement,
+> = (props: {
+  originalElements: readonly E[];
+  originalElementsMap: ElementsMap;
+  scene: Scene;
+  property: P;
+  originalAppState: AppState;
+  accumulatedChange: number;
+  setAppState: React.Component<any, AppState>["setState"];
+  setInputValue: (value: number) => void;
 }) => void;
 
 interface StatsDragInputProps<
@@ -47,6 +62,7 @@ interface StatsDragInputProps<
   editable?: boolean;
   shouldKeepAspectRatio?: boolean;
   dragInputCallback: DragInputCallbackType<T, E>;
+  dragFinishedCallback?: DragFinishedCallbackType<T, E>;
   property: T;
   scene: Scene;
   appState: AppState;
@@ -61,6 +77,7 @@ const StatsDragInput = <
   label,
   icon,
   dragInputCallback,
+  dragFinishedCallback,
   value,
   elements,
   editable = true,
@@ -71,6 +88,7 @@ const StatsDragInput = <
   sensitivity = 1,
 }: StatsDragInputProps<T, E>) => {
   const app = useApp();
+  const setAppState = useExcalidrawSetAppState();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
@@ -123,6 +141,7 @@ const StatsDragInput = <
     // reason: idempotent to avoid unnecessary
     if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
       stateRef.current.lastUpdatedValue = updatedValue;
+      const originalElementsMap = app.scene.getNonDeletedElementsMap();
       dragInputCallback({
         accumulatedChange: 0,
         instantChange: 0,
@@ -134,6 +153,17 @@ const StatsDragInput = <
         nextValue: rounded,
         property,
         originalAppState: appState,
+        setInputValue: (value) => setInputValue(String(value)),
+        setAppState,
+      });
+      dragFinishedCallback?.({
+        originalElements: elements,
+        originalElementsMap,
+        scene,
+        originalAppState: appState,
+        accumulatedChange: rounded,
+        property,
+        setAppState,
         setInputValue: (value) => setInputValue(String(value)),
       });
       app.syncActionResult({
@@ -262,6 +292,7 @@ const StatsDragInput = <
                       scene,
                       originalAppState,
                       setInputValue: (value) => setInputValue(String(value)),
+                      setAppState,
                     });
 
                     stepChange = 0;
@@ -281,6 +312,19 @@ const StatsDragInput = <
                 onPointerMove,
                 false,
               );
+
+              if (originalElements !== null && originalElementsMap !== null) {
+                dragFinishedCallback?.({
+                  originalElements,
+                  originalElementsMap,
+                  scene,
+                  originalAppState,
+                  property,
+                  accumulatedChange,
+                  setAppState,
+                  setInputValue: (value) => setInputValue(String(value)),
+                });
+              }
 
               app.syncActionResult({
                 captureUpdate: CaptureUpdateAction.IMMEDIATELY,

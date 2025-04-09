@@ -1,17 +1,19 @@
-import { pointFrom } from "@excalidraw/math";
+import { type GlobalPoint, pointFrom } from "@excalidraw/math";
 
 import {
   maybeBindLinearElement,
   bindOrUnbindLinearElement,
+  getHoveredElementForBinding,
 } from "@excalidraw/element/binding";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   isBindingElement,
+  isElbowArrow,
   isLinearElement,
 } from "@excalidraw/element/typeChecks";
 
-import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
+import { KEYS, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
@@ -91,10 +93,26 @@ export const actionFinalize = register({
         multiPointElement.type !== "freedraw" &&
         appState.lastPointerDownWith !== "touch"
       ) {
-        const { points, lastCommittedPoint } = multiPointElement;
+        const { x: rx, y: ry, points, lastCommittedPoint } = multiPointElement;
+        const lastGlobalPoint = pointFrom<GlobalPoint>(
+          rx + points[points.length - 1][0],
+          ry + points[points.length - 1][1],
+        );
+        const hoveredElementForBinding = getHoveredElementForBinding(
+          {
+            x: lastGlobalPoint[0],
+            y: lastGlobalPoint[1],
+          },
+          elements,
+          elementsMap,
+          app.state.zoom,
+          true,
+          isElbowArrow(multiPointElement),
+        );
         if (
-          !lastCommittedPoint ||
-          points[points.length - 1] !== lastCommittedPoint
+          !hoveredElementForBinding &&
+          (!lastCommittedPoint ||
+            points[points.length - 1] !== lastCommittedPoint)
         ) {
           mutateElement(multiPointElement, {
             points: multiPointElement.points.slice(0, -1),
@@ -135,15 +153,9 @@ export const actionFinalize = register({
         !isLoop &&
         multiPointElement.points.length > 1
       ) {
-        const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          multiPointElement,
-          -1,
-          arrayToMap(elements),
-        );
         maybeBindLinearElement(
           multiPointElement,
           appState,
-          { x, y },
           elementsMap,
           elements,
         );

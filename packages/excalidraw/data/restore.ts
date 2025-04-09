@@ -20,10 +20,6 @@ import {
 } from "@excalidraw/common";
 import { getNonDeletedElements } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element/binding";
-import {
-  updateElbowArrowPoints,
-  validateElbowPoints,
-} from "@excalidraw/element/elbowArrow";
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import { bumpVersion } from "@excalidraw/element/mutateElement";
 import { getContainerElement } from "@excalidraw/element/textElement";
@@ -57,7 +53,6 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
-  NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   PointBinding,
   StrokeRoundness,
@@ -585,73 +580,7 @@ export const restoreElements = (
     }
   }
 
-  // NOTE (mtolmacs): Temporary fix for extremely large arrows
-  // Need to iterate again so we have attached text nodes in elementsMap
-  return restoredElements.map((element) => {
-    if (
-      isElbowArrow(element) &&
-      element.startBinding == null &&
-      element.endBinding == null &&
-      !validateElbowPoints(element.points)
-    ) {
-      return {
-        ...element,
-        ...updateElbowArrowPoints(
-          element,
-          restoredElementsMap as NonDeletedSceneElementsMap,
-          {
-            points: [
-              pointFrom<LocalPoint>(0, 0),
-              element.points[element.points.length - 1],
-            ],
-          },
-        ),
-        index: element.index,
-      };
-    }
-
-    if (
-      isElbowArrow(element) &&
-      element.startBinding &&
-      element.endBinding &&
-      element.startBinding.elementId === element.endBinding.elementId &&
-      element.points.length > 1 &&
-      element.points.some(
-        ([rx, ry]) => Math.abs(rx) > 1e6 || Math.abs(ry) > 1e6,
-      )
-    ) {
-      console.error("Fixing self-bound elbow arrow", element.id);
-      const boundElement = restoredElementsMap.get(
-        element.startBinding.elementId,
-      );
-      if (!boundElement) {
-        console.error(
-          "Bound element not found",
-          element.startBinding.elementId,
-        );
-        return element;
-      }
-
-      return {
-        ...element,
-        x: boundElement.x + boundElement.width / 2,
-        y: boundElement.y - 5,
-        width: boundElement.width,
-        height: boundElement.height,
-        points: [
-          pointFrom<LocalPoint>(0, 0),
-          pointFrom<LocalPoint>(0, -10),
-          pointFrom<LocalPoint>(boundElement.width / 2 + 5, -10),
-          pointFrom<LocalPoint>(
-            boundElement.width / 2 + 5,
-            boundElement.height / 2 + 5,
-          ),
-        ],
-      };
-    }
-
-    return element;
-  });
+  return restoredElements;
 };
 
 const coalesceAppStateValue = <

@@ -15,6 +15,8 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
+import { FIXED_BINDING_DISTANCE } from "@excalidraw/element/binding";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import { isLinearElement } from "../src/typeChecks";
@@ -195,7 +197,7 @@ describe("generic element", () => {
     UI.resize(rectangle, "w", [50, 0]);
 
     expect(arrow.endBinding?.elementId).toEqual(rectangle.id);
-    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(80, 0);
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(81, 0);
   });
 
   it("resizes with a label", async () => {
@@ -826,8 +828,9 @@ describe("image element", () => {
     UI.resize(image, "nw", [50, 20]);
 
     expect(arrow.endBinding?.elementId).toEqual(image.id);
-    expect(Math.floor(arrow.width + arrow.endBinding!.gap)).toBeCloseTo(
-      30 + imageWidth * scale,
+
+    expect(arrow.width + arrow.endBinding!.gap).toBeCloseTo(
+      30 + imageWidth * scale + 1,
       0,
     );
   });
@@ -1003,14 +1006,14 @@ describe("multiple selection", () => {
       size: 100,
     });
     const leftBoundArrow = UI.createElement("arrow", {
-      x: -110,
+      x: -100 - FIXED_BINDING_DISTANCE,
       y: 50,
       width: 100,
       height: 0,
     });
 
     const rightBoundArrow = UI.createElement("arrow", {
-      x: 210,
+      x: 200 + FIXED_BINDING_DISTANCE,
       y: 50,
       width: -100,
       height: 0,
@@ -1031,27 +1034,29 @@ describe("multiple selection", () => {
       shift: true,
     });
 
-    expect(leftBoundArrow.x).toBeCloseTo(-110);
+    expect(leftBoundArrow.x).toBeCloseTo(-100 - FIXED_BINDING_DISTANCE);
     expect(leftBoundArrow.y).toBeCloseTo(50);
-    expect(leftBoundArrow.width).toBeCloseTo(143, 0);
+    expect(leftBoundArrow.width).toBeCloseTo(146 - FIXED_BINDING_DISTANCE, 0);
     expect(leftBoundArrow.height).toBeCloseTo(7, 0);
     expect(leftBoundArrow.angle).toEqual(0);
     expect(leftBoundArrow.startBinding).toBeNull();
-    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(10);
+    expect(leftBoundArrow.endBinding?.gap).toBeCloseTo(5);
     expect(leftBoundArrow.endBinding?.elementId).toBe(
       leftArrowBinding.elementId,
     );
     expect(leftBoundArrow.endBinding?.focus).toBe(leftArrowBinding.focus);
 
-    expect(rightBoundArrow.x).toBeCloseTo(210);
+    expect(rightBoundArrow.x).toBeCloseTo(210 - FIXED_BINDING_DISTANCE);
     expect(rightBoundArrow.y).toBeCloseTo(
       (selectionHeight - 50) * (1 - scale) + 50,
+      0,
     );
-    expect(rightBoundArrow.width).toBeCloseTo(100 * scale);
+    //console.log(JSON.stringify(h.elements));
+    expect(rightBoundArrow.width).toBeCloseTo(100 * scale, 0);
     expect(rightBoundArrow.height).toBeCloseTo(0);
     expect(rightBoundArrow.angle).toEqual(0);
     expect(rightBoundArrow.startBinding).toBeNull();
-    expect(rightBoundArrow.endBinding?.gap).toBeCloseTo(8.0952);
+    expect(rightBoundArrow.endBinding?.gap).toBeCloseTo(FIXED_BINDING_DISTANCE);
     expect(rightBoundArrow.endBinding?.elementId).toBe(
       rightArrowBinding.elementId,
     );
@@ -1338,8 +1343,8 @@ describe("multiple selection", () => {
 
     expect(boundArrow.x).toBeCloseTo(380 * scaleX);
     expect(boundArrow.y).toBeCloseTo(240 * scaleY);
-    expect(boundArrow.points[1][0]).toBeCloseTo(-60 * scaleX);
-    expect(boundArrow.points[1][1]).toBeCloseTo(-80 * scaleY);
+    expect(boundArrow.points[1][0]).toBeCloseTo(-60 * scaleX - 2, 0);
+    expect(boundArrow.points[1][1]).toBeCloseTo(-80 * scaleY + 2, 0);
 
     expect(arrowLabelPos.x + arrowLabel.width / 2).toBeCloseTo(
       boundArrow.x + boundArrow.points[1][0] / 2,

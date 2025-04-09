@@ -10,9 +10,12 @@ import { isImageElement } from "@excalidraw/element/typeChecks";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import StatsDragInput from "./DragInput";
-import { getStepSizedValue, moveElement } from "./utils";
+import { getStepSizedValue, moveElement, updateBindings } from "./utils";
 
-import type { DragInputCallbackType } from "./DragInput";
+import type {
+  DragFinishedCallbackType,
+  DragInputCallbackType,
+} from "./DragInput";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
@@ -36,9 +39,9 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   property,
   scene,
   originalAppState,
+  setAppState,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   const [cx, cy] = [
     origElement.x + origElement.width / 2,
@@ -105,6 +108,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
         crop: nextCrop,
       });
 
+      updateBindings(element, elementsMap, scene);
+
       return;
     }
 
@@ -123,6 +128,8 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       crop: nextCrop,
     });
 
+    updateBindings(element, elementsMap, scene);
+
     return;
   }
 
@@ -134,10 +141,11 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       newTopLeftY,
       origElement,
       elementsMap,
-      elements,
-      scene,
       originalElementsMap,
     );
+
+    updateBindings(origElement, elementsMap, scene);
+
     return;
   }
 
@@ -167,19 +175,21 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     newTopLeftY,
     origElement,
     elementsMap,
-    elements,
-    scene,
     originalElementsMap,
   );
+
+  updateBindings(origElement, elementsMap, scene);
 };
 
-const Position = ({
-  property,
-  element,
-  elementsMap,
-  scene,
-  appState,
-}: PositionProps) => {
+const handleFinished: DragFinishedCallbackType<"x" | "y"> = ({
+  setAppState,
+}) => {
+  setAppState({
+    suggestedBindings: [],
+  });
+};
+
+const Position = ({ property, element, scene, appState }: PositionProps) => {
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(element.x, element.y),
     pointFrom(element.x + element.width / 2, element.y + element.height / 2),
@@ -207,6 +217,7 @@ const Position = ({
       label={property === "x" ? "X" : "Y"}
       elements={[element]}
       dragInputCallback={handlePositionChange}
+      dragFinishedCallback={handleFinished}
       scene={scene}
       value={value}
       property={property}
