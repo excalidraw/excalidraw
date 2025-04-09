@@ -19,6 +19,7 @@ import {
   type LocalPoint,
   pointFrom,
   type Radians,
+  type ElementsSegmentsMap,
 } from "@excalidraw/math";
 
 import { getElementLineSegments } from "@excalidraw/element/bounds";
@@ -32,8 +33,6 @@ import { getSelectedElements } from "../scene";
 import { getLassoSelectedElementIds } from "../lasso/utils";
 
 import { act, render } from "./test-utils";
-
-import type { ElementsSegmentsMap } from "../lasso/utils";
 
 const { h } = window;
 
