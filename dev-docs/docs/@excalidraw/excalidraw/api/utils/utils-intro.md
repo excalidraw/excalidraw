@@ -88,7 +88,7 @@ loadFromBlob(<br/>&nbsp;
 
 ### loadLibraryFromBlob
 
-This function loads the library from the blob. Additonally takes `defaultStatus` param which sets the default status for library item if not present, defaults to `unpublished`.
+This function loads the library from the blob. Additionally takes `defaultStatus` param which sets the default status for library item if not present, defaults to `unpublished`.
 
 **How to use **
 

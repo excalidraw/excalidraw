@@ -67,7 +67,7 @@ export const ellipseIncludesPoint = <Point extends GlobalPoint | LocalPoint>(
  * @param point The point to test
  * @param ellipse The ellipse to compare against
  * @param threshold The distance to consider a point close enough to be "on" the outline
- * @returns TRUE if the point is on the ellise outline
+ * @returns TRUE if the point is on the ellipse outline
  */
 export const ellipseTouchesPoint = <Point extends GlobalPoint | LocalPoint>(
   point: Point,
@@ -83,7 +83,7 @@ export const ellipseTouchesPoint = <Point extends GlobalPoint | LocalPoint>(
  *
  * @param p The point to consider
  * @param ellipse The ellipse to calculate the distance to
- * @returns The eucledian distance
+ * @returns The euclidean distance
  */
 export const ellipseDistanceFromPoint = <
   Point extends GlobalPoint | LocalPoint,
@@ -137,7 +137,7 @@ export const ellipseDistanceFromPoint = <
 };
 
 /**
- * Calculate a maximum of two intercept points for a line going throug an
+ * Calculate a maximum of two intercept points for a line going through an
  * ellipse.
  */
 export function ellipseSegmentInterceptPoints<
