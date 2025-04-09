@@ -4,6 +4,7 @@ import {
   LINE_CONFIRM_THRESHOLD,
   ROUNDNESS,
   invariant,
+  elementCenterPoint,
 } from "@excalidraw/common";
 import {
   isPoint,
@@ -297,7 +298,7 @@ export const aabbForElement = (
     midY: element.y + element.height / 2,
   };
 
-  const center = pointFrom(bbox.midX, bbox.midY);
+  const center = elementCenterPoint(element);
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(bbox.minX, bbox.minY),
     center,

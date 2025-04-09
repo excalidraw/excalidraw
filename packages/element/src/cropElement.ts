@@ -14,6 +14,8 @@ import {
 } from "@excalidraw/math";
 import { type Point } from "points-on-curve";
 
+import { elementCenterPoint } from "@excalidraw/common";
+
 import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
@@ -61,7 +63,7 @@ export const cropElement = (
 
   const rotatedPointer = pointRotateRads(
     pointFrom(pointerX, pointerY),
-    pointFrom(element.x + element.width / 2, element.y + element.height / 2),
+    elementCenterPoint(element),
     -element.angle as Radians,
   );
 

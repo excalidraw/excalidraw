@@ -20,7 +20,7 @@ import {
   isTextElement,
   isFrameLikeElement,
 } from "@excalidraw/element/typeChecks";
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, arrayToMap, elementCenterPoint } from "@excalidraw/common";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
@@ -151,7 +151,7 @@ export class Keyboard {
 const getElementPointForSelection = (
   element: ExcalidrawElement,
 ): GlobalPoint => {
-  const { x, y, width, height, angle } = element;
+  const { x, y, width, angle } = element;
   const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
@@ -166,7 +166,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = pointFrom(x + width / 2, y + height / 2);
+    center = elementCenterPoint(element);
   }
 
   if (isTextElement(element)) {
