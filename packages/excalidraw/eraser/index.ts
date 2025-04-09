@@ -82,17 +82,14 @@ export class EraserTrail extends AnimatedTrail {
   }
 
   private updateElementsToBeErased(restoreToErase?: boolean) {
-    let eraserPath = super
-      .getCurrentTrail()
-      ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
+    let eraserPath: GlobalPoint[] =
+      super
+        .getCurrentTrail()
+        ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1])) || [];
 
     // for efficiency and avoid unnecessary calculations,
     // take only POINTS_ON_TRAIL points to form some number of segments
     eraserPath = eraserPath?.slice(eraserPath.length - POINTS_ON_TRAIL);
-
-    if (!eraserPath || eraserPath.length === 0) {
-      return [];
-    }
 
     const visibleElementsMap = arrayToMap(this.app.visibleElements);
 
@@ -103,6 +100,10 @@ export class EraserTrail extends AnimatedTrail {
       acc.push(lineSegment(eraserPath[index - 1], point));
       return acc;
     }, [] as LineSegment<GlobalPoint>[]);
+
+    if (pathSegments.length === 0) {
+      return [];
+    }
 
     for (const element of this.app.visibleElements) {
       // restore only if already added to the to-be-erased set
