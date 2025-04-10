@@ -115,3 +115,23 @@
     }
   }
 }
+
+.our-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 1rem;
+  background: var(--color-slider-track);
+  outline: none;
+}
+
+.our-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 16.5px;
+  height: 16.5px;
+  border-radius: 100%;
+  background: #444;
+  cursor: pointer;
+}

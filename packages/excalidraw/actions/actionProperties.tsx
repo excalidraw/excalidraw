@@ -666,6 +666,83 @@ export const actionChangeFontSize = register({
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <fieldset>
       <legend>{t("labels.fontSize")}</legend>
+      {/* New slider */}
+      <input 
+        type="range" 
+        className="our-slider"
+        min="16" 
+        max="36" 
+        step="1"
+        value={
+          getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontSize;
+              }
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
+              return boundTextElement?.fontSize ?? null;
+            },
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+          ) ?? DEFAULT_FONT_SIZE // 👈 Add this fallback
+        }
+        onChange={(event) => {
+          const fontSize = parseInt(event.target.value, 10);
+          updateData(fontSize);
+        }}
+      />
+{/* 
+      <Range
+        elements={elements}
+        appState={appState}
+        updateData={(value) => updateData(Number(value))}
+        getValue={() =>
+          getFormValue(
+            elements,
+            appState,
+            (element) => {
+              if (isTextElement(element)) {
+                return element.fontSize;
+              }
+              const boundTextElement = getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              );
+              return boundTextElement?.fontSize ?? null;
+            },
+            (element) =>
+              isTextElement(element) ||
+              getBoundTextElement(
+                element,
+                app.scene.getNonDeletedElementsMap(),
+              ) !== null,
+            (hasSelection) =>
+              hasSelection
+                ? null
+                : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+          ) ?? DEFAULT_FONT_SIZE
+        }
+        label={t("labels.fontSize")}
+        min={12}
+        max={64}
+        step={1}
+        testId="font-size"
+      /> */}
+
+      {/* Old buttons */}
       <ButtonIconSelect
         group="font-size"
         options={[
