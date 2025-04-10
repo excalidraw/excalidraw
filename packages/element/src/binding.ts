@@ -284,8 +284,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and start is dragged, break all binds
-    : 
-    "keep";
+    : "keep";
   const end = endDragged
     ? isBindingEnabled
       ? getElligibleElementForBindingElement(
@@ -296,8 +295,7 @@ const getBindingStrategyForDraggingArrowEndpoints = (
           zoom,
         )
       : null // If binding is disabled and end is dragged, break all binds
-    : 
-    "keep";
+    : "keep";
 
   return [start, end];
 };
