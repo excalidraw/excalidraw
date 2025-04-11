@@ -53,7 +53,7 @@ import {
   type SceneElementsMap,
 } from "./types";
 
-import { aabbForElement, pointInsideBounds } from "./shapes";
+import { aabbForElement, aabbForPoints, pointInsideBounds } from "./shapes";
 
 import type { Bounds } from "./bounds";
 import type { Heading } from "./heading";
@@ -108,7 +108,30 @@ type ElbowArrowData = {
 };
 
 const DEDUP_TRESHOLD = 1;
-export const BASE_PADDING = 40;
+
+const calculatePadding = (
+  aabb: Bounds,
+  startHeading: Heading,
+  endHeading: Heading,
+) => {
+  const width = aabb[2] - aabb[0];
+  const height = aabb[3] - aabb[1];
+  const size = Math.max(width, height);
+
+  return compareHeading(startHeading, flipHeading(endHeading)) || size > 50
+    ? 40
+    : Math.min(
+        Math.max(
+          headingIsHorizontal(startHeading) ? width / 2 - 1 : height / 2 - 1,
+          10,
+        ),
+        Math.max(
+          headingIsHorizontal(endHeading) ? width / 2 - 1 : height / 2 - 1,
+          10,
+        ),
+        40,
+      );
+};
 
 const handleSegmentRenormalization = (
   arrow: ExcalidrawElbowArrowElement,
@@ -464,6 +487,11 @@ const handleSegmentMove = (
   hoveredStartElement: ExcalidrawBindableElement | null,
   hoveredEndElement: ExcalidrawBindableElement | null,
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
+  const BASE_PADDING = calculatePadding(
+    aabbForElement(arrow),
+    startHeading,
+    endHeading,
+  );
   const activelyModifiedSegmentIdx = fixedSegments
     .map((segment, i) => {
       if (
@@ -708,6 +736,11 @@ const handleEndpointDrag = (
   hoveredStartElement: ExcalidrawBindableElement | null,
   hoveredEndElement: ExcalidrawBindableElement | null,
 ) => {
+  const BASE_PADDING = calculatePadding(
+    aabbForPoints([startGlobalPoint, endGlobalPoint]),
+    startHeading,
+    endHeading,
+  );
   let startIsSpecial = arrow.startIsSpecial ?? null;
   let endIsSpecial = arrow.endIsSpecial ?? null;
   const globalUpdatedPoints = updatedPoints.map((p, i) =>
@@ -1298,6 +1331,11 @@ const getElbowArrowData = (
     endGlobalPoint[0] + 2,
     endGlobalPoint[1] + 2,
   ] as Bounds;
+  const BASE_PADDING = calculatePadding(
+    aabbForPoints([startGlobalPoint, endGlobalPoint]),
+    startHeading,
+    endHeading,
+  );
   const startElementBounds = hoveredStartElement
     ? aabbForElement(
         hoveredStartElement,
