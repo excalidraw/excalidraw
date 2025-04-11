@@ -10,6 +10,8 @@ import {
   type GlobalPoint,
 } from "@excalidraw/math";
 
+import { elementCenterPoint } from "@excalidraw/common";
+
 import type { Curve, LineSegment } from "@excalidraw/math";
 
 import { getCornerRadius } from "./shapes";
@@ -68,10 +70,7 @@ export function deconstructRectanguloidElement(
     return [sides, []];
   }
 
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   const r = rectangle(
     pointFrom(element.x, element.y),
@@ -254,10 +253,7 @@ export function deconstructDiamondElement(
     return [[topRight, bottomRight, bottomLeft, topLeft], []];
   }
 
-  const center = pointFrom<GlobalPoint>(
-    element.x + element.width / 2,
-    element.y + element.height / 2,
-  );
+  const center = elementCenterPoint(element);
 
   const [top, right, bottom, left]: GlobalPoint[] = [
     pointFrom(element.x + topX, element.y + topY),

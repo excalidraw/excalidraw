@@ -1,9 +1,10 @@
-import { average } from "@excalidraw/math";
+import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
 
 import type {
   ExcalidrawBindableElement,
   FontFamilyValues,
   FontString,
+  ExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type {
@@ -385,7 +386,7 @@ export const updateActiveTool = (
         type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { locked?: boolean }) & {
+  ) & { locked?: boolean; fromSelection?: boolean }) & {
     lastActiveToolBeforeEraser?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
@@ -407,6 +408,7 @@ export const updateActiveTool = (
     type: data.type,
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
+    fromSelection: data.fromSelection ?? false,
   };
 };
 
@@ -1200,3 +1202,17 @@ export const escapeDoubleQuotes = (str: string) => {
 
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
+
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
+  const { x, y, width, height } = element;
+
+  const centerXPoint = x + width / 2 + xOffset;
+
+  const centerYPoint = y + height / 2 + yOffset;
+
+  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
+};
