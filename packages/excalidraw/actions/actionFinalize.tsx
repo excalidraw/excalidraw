@@ -56,7 +56,6 @@ export const actionFinalize = register({
             element,
             startBindingElement,
             endBindingElement,
-            elementsMap,
             scene,
           );
         }
@@ -82,7 +81,11 @@ export const actionFinalize = register({
       scene.getElement(appState.pendingImageElementId);
 
     if (pendingImageElement) {
-      mutateElement(pendingImageElement, { isDeleted: true }, false);
+      scene.mutateElement(
+        pendingImageElement,
+        { isDeleted: true },
+        { informMutation: false },
+      );
     }
 
     if (window.document.activeElement instanceof HTMLElement) {
@@ -95,16 +98,6 @@ export const actionFinalize = register({
       ? appState.newElement
       : null;
 
-    const mutate = (updates: ElementUpdate<ExcalidrawElbowArrowElement>) =>
-      isElbowArrow(multiPointElement as ExcalidrawElbowArrowElement)
-        ? mutateElbowArrow(
-            multiPointElement as ExcalidrawElbowArrowElement,
-            updates,
-            true,
-            elementsMap,
-          )
-        : mutateElement(multiPointElement as ExcalidrawElement, updates);
-
     if (multiPointElement) {
       // pen and mouse have hover
       if (
@@ -116,7 +109,7 @@ export const actionFinalize = register({
           !lastCommittedPoint ||
           points[points.length - 1] !== lastCommittedPoint
         ) {
-          mutate({
+          scene.mutateElement(multiPointElement, {
             points: multiPointElement.points.slice(0, -1),
           });
         }
@@ -140,7 +133,7 @@ export const actionFinalize = register({
         if (isLoop) {
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
-          mutate({
+          scene.mutateElement(multiPointElement, {
             points: linePoints.map((p, index) =>
               index === linePoints.length - 1
                 ? pointFrom(firstPoint[0], firstPoint[1])
@@ -160,13 +153,7 @@ export const actionFinalize = register({
           -1,
           arrayToMap(elements),
         );
-        maybeBindLinearElement(
-          multiPointElement,
-          appState,
-          { x, y },
-          elementsMap,
-          elements,
-        );
+        maybeBindLinearElement(multiPointElement, appState, { x, y }, scene);
       }
     }
 
@@ -222,7 +209,7 @@ export const actionFinalize = register({
         // To select the linear element when user has finished mutipoint editing
         selectedLinearElement:
           multiPointElement && isLinearElement(multiPointElement)
-            ? new LinearElementEditor(multiPointElement)
+            ? new LinearElementEditor(multiPointElement, scene)
             : appState.selectedLinearElement,
         pendingImageElementId: null,
       },

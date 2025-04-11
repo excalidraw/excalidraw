@@ -1950,13 +1950,21 @@ class App extends React.Component<AppProps, AppState> {
       // state only.
       // Thus reset so that we prefer local cache (if there was some
       // generationData set previously)
-      this.scene.mutateElement(frameElement, {
-        customData: { generationData: undefined },
-      }, { informMutation: false });
+      this.scene.mutateElement(
+        frameElement,
+        {
+          customData: { generationData: undefined },
+        },
+        { informMutation: false },
+      );
     } else {
-      this.scene.mutateElement(frameElement, {
-        customData: { generationData: data },
-      }, { informMutation: false });
+      this.scene.mutateElement(
+        frameElement,
+        {
+          customData: { generationData: data },
+        },
+        { informMutation: false },
+      );
     }
     this.magicGenerations.set(frameElement.id, data);
     this.triggerRender();
@@ -2926,8 +2934,7 @@ class App extends React.Component<AppProps, AppState> {
             nonDeletedElementsMap,
           ),
         ),
-        this.scene.getNonDeletedElementsMap(),
-        this.scene.getNonDeletedElements(),
+        this.scene,
       );
     }
 
@@ -3452,7 +3459,11 @@ class App extends React.Component<AppProps, AppState> {
             }
             // hack to reset the `y` coord because we vertically center during
             // insertImageElement
-            this.scene.mutateElement(initializedImageElement, { y }, { informMutation: false });
+            this.scene.mutateElement(
+              initializedImageElement,
+              { y },
+              { informMutation: false },
+            );
 
             y = imageElement.y + imageElement.height + 25;
 
@@ -4177,6 +4188,7 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElementsMap(),
               this.state,
               getLinkDirectionFromKey(event.key),
+              this.scene,
             );
           }
 
@@ -4418,12 +4430,16 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         selectedElements.forEach((element) => {
-          this.scene.mutateElement(element, {
-            x: element.x + offsetX,
-            y: element.y + offsetY,
-          }, { informMutation: false });
+          this.scene.mutateElement(
+            element,
+            {
+              x: element.x + offsetX,
+              y: element.y + offsetY,
+            },
+            { informMutation: false },
+          );
 
-          updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
+          updateBoundElements(this.scene, element, {
             simultaneouslyUpdated: selectedElements,
           });
         });
@@ -4457,6 +4473,7 @@ class App extends React.Component<AppProps, AppState> {
                   this.setState({
                     editingLinearElement: new LinearElementEditor(
                       selectedElement,
+                      this.scene,
                     ),
                   });
                 }
@@ -4650,7 +4667,6 @@ class App extends React.Component<AppProps, AppState> {
     if (isArrowKey(event.key)) {
       bindOrUnbindLinearElements(
         this.scene.getSelectedElements(this.state).filter(isLinearElement),
-        this.scene.getNonDeletedElementsMap(),
         this.scene.getNonDeletedElements(),
         this.scene,
         isBindingEnabled(this.state),
@@ -4961,7 +4977,7 @@ class App extends React.Component<AppProps, AppState> {
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false);
         if (isNonDeletedElement(element)) {
-          updateBoundElements(element, this.scene.getNonDeletedElementsMap());
+          updateBoundElements(this.scene, element);
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
@@ -5454,7 +5470,10 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.store.shouldCaptureIncrement();
         this.setState({
-          editingLinearElement: new LinearElementEditor(selectedElements[0]),
+          editingLinearElement: new LinearElementEditor(
+            selectedElements[0],
+            this.scene,
+          ),
         });
         return;
       } else if (
@@ -5480,7 +5499,7 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
           LinearElementEditor.deleteFixedSegment(
             selectedElements[0],
-            this.scene.getNonDeletedElementsMap(),
+            this.scene,
             midPoint,
           );
 
@@ -8113,7 +8132,7 @@ class App extends React.Component<AppProps, AppState> {
           index,
           gridX,
           gridY,
-          this.scene.getNonDeletedElementsMap(),
+          this.scene,
         );
 
         flushSync(() => {
@@ -8218,7 +8237,7 @@ class App extends React.Component<AppProps, AppState> {
             pointerCoords,
             this,
             !event[KEYS.CTRL_OR_CMD],
-            elementsMap,
+            this.scene,
           );
           if (!ret) {
             return;
@@ -8800,7 +8819,10 @@ class App extends React.Component<AppProps, AppState> {
               selectedLinearElement:
                 elementsWithinSelection.length === 1 &&
                 isLinearElement(elementsWithinSelection[0])
-                  ? new LinearElementEditor(elementsWithinSelection[0])
+                  ? new LinearElementEditor(
+                      elementsWithinSelection[0],
+                      this.scene,
+                    )
                   : null,
               showHyperlinkPopup:
                 elementsWithinSelection.length === 1 &&
@@ -8968,7 +8990,6 @@ class App extends React.Component<AppProps, AppState> {
               element,
               startBindingElement,
               endBindingElement,
-              elementsMap,
               this.scene,
             );
           }
@@ -9109,8 +9130,7 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
               this.state,
               pointerCoords,
-              this.scene.getNonDeletedElementsMap(),
-              this.scene.getNonDeletedElements(),
+              this.scene,
             );
           }
           this.setState({ suggestedBindings: [], startBoundElement: null });
@@ -9128,7 +9148,10 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 prevState,
               ),
-              selectedLinearElement: new LinearElementEditor(newElement),
+              selectedLinearElement: new LinearElementEditor(
+                newElement,
+                this.scene,
+              ),
             }));
           } else {
             this.setState((prevState) => ({
@@ -9268,9 +9291,13 @@ class App extends React.Component<AppProps, AppState> {
                   this.state.editingGroupId!,
                 );
 
-                this.scene.mutateElement(element, {
-                  groupIds: element.groupIds.slice(0, index),
-                }, { informMutation: false });
+                this.scene.mutateElement(
+                  element,
+                  {
+                    groupIds: element.groupIds.slice(0, index),
+                  },
+                  { informMutation: false },
+                );
               }
 
               nextElements.forEach((element) => {
@@ -9281,9 +9308,13 @@ class App extends React.Component<AppProps, AppState> {
                     element.groupIds[element.groupIds.length - 1],
                   ).length < 2
                 ) {
-                  this.scene.mutateElement(element, {
-                    groupIds: [],
-                  }, { informMutation: false });
+                  this.scene.mutateElement(
+                    element,
+                    {
+                      groupIds: [],
+                    },
+                    { informMutation: false },
+                  );
                 }
               });
 
@@ -9392,7 +9423,10 @@ class App extends React.Component<AppProps, AppState> {
         // the one we've hit
         if (selectedElements.length === 1) {
           this.setState({
-            selectedLinearElement: new LinearElementEditor(hitElement),
+            selectedLinearElement: new LinearElementEditor(
+              hitElement,
+              this.scene,
+            ),
           });
         }
       }
@@ -9517,7 +9551,10 @@ class App extends React.Component<AppProps, AppState> {
                   selectedLinearElement:
                     newSelectedElements.length === 1 &&
                     isLinearElement(newSelectedElements[0])
-                      ? new LinearElementEditor(newSelectedElements[0])
+                      ? new LinearElementEditor(
+                          newSelectedElements[0],
+                          this.scene,
+                        )
                       : prevState.selectedLinearElement,
                 };
               });
@@ -9591,7 +9628,7 @@ class App extends React.Component<AppProps, AppState> {
               // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
               // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
               prevState.selectedLinearElement?.elementId !== hitElement.id
-                ? new LinearElementEditor(hitElement)
+                ? new LinearElementEditor(hitElement, this.scene)
                 : prevState.selectedLinearElement,
           }));
         }
@@ -9684,7 +9721,6 @@ class App extends React.Component<AppProps, AppState> {
 
         bindOrUnbindLinearElements(
           linearElements,
-          this.scene.getNonDeletedElementsMap(),
           this.scene.getNonDeletedElements(),
           this.scene,
           isBindingEnabled(this.state),
@@ -9845,9 +9881,13 @@ class App extends React.Component<AppProps, AppState> {
     const dataURL =
       this.files[fileId]?.dataURL || (await getDataURL(imageFile));
 
-    const imageElement = this.scene.mutateElement(_imageElement, {
-      fileId,
-    }, { informMutation: false }) as NonDeleted<InitializedExcalidrawImageElement>;
+    const imageElement = this.scene.mutateElement(
+      _imageElement,
+      {
+        fileId,
+      },
+      { informMutation: false },
+    ) as NonDeleted<InitializedExcalidrawImageElement>;
 
     return new Promise<NonDeleted<InitializedExcalidrawImageElement>>(
       async (resolve, reject) => {
@@ -10523,7 +10563,7 @@ class App extends React.Component<AppProps, AppState> {
                 this,
               ),
               selectedLinearElement: isLinearElement(element)
-                ? new LinearElementEditor(element)
+                ? new LinearElementEditor(element, this.scene)
                 : null,
             }
           : this.state),
@@ -10556,6 +10596,7 @@ class App extends React.Component<AppProps, AppState> {
         height: distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
         shouldResizeFromCenter: false,
+        scene: this.scene,
         zoom: this.state.zoom.value,
         informMutation,
       });
@@ -10621,6 +10662,7 @@ class App extends React.Component<AppProps, AppState> {
         : shouldMaintainAspectRatio(event),
       shouldResizeFromCenter: shouldResizeFromCenter(event),
       zoom: this.state.zoom.value,
+      scene: this.scene,
       widthAspectRatio: aspectRatio,
       originOffset: this.state.originSnapOffset,
       informMutation,
@@ -10723,16 +10765,12 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
 
-        updateBoundElements(
-          croppingElement,
-          this.scene.getNonDeletedElementsMap(),
-          {
-            newSize: {
-              width: croppingElement.width,
-              height: croppingElement.height,
-            },
+        updateBoundElements(this.scene, croppingElement, {
+          newSize: {
+            width: croppingElement.width,
+            height: croppingElement.height,
           },
-        );
+        });
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",
@@ -10846,7 +10884,6 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.originalElements,
         transformHandleType,
         selectedElements,
-        this.scene.getElementsMapIncludingDeleted(),
         this.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),

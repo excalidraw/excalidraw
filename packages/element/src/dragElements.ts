@@ -104,7 +104,7 @@ export const dragSelectedElements = (
   );
 
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(pointerDownState, element, adjustedOffset);
+    updateElementCoords(pointerDownState, element, scene, adjustedOffset);
     if (!isArrowElement(element)) {
       // skip arrow labels since we calculate its position during render
       const textElement = getBoundTextElement(
@@ -112,9 +112,14 @@ export const dragSelectedElements = (
         scene.getNonDeletedElementsMap(),
       );
       if (textElement) {
-        updateElementCoords(pointerDownState, textElement, adjustedOffset);
+        updateElementCoords(
+          pointerDownState,
+          textElement,
+          scene,
+          adjustedOffset,
+        );
       }
-      updateBoundElements(element, scene.getElementsMapIncludingDeleted(), {
+      updateBoundElements(scene, element, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });
     }
@@ -155,6 +160,7 @@ const calculateOffset = (
 const updateElementCoords = (
   pointerDownState: PointerDownState,
   element: NonDeletedExcalidrawElement,
+  scene: Scene,
   dragOffset: { x: number; y: number },
 ) => {
   const originalElement =
@@ -163,7 +169,7 @@ const updateElementCoords = (
   const nextX = originalElement.x + dragOffset.x;
   const nextY = originalElement.y + dragOffset.y;
 
-  mutateElement(element, {
+  scene.mutateElement(element, {
     x: nextX,
     y: nextY,
   });
@@ -190,6 +196,7 @@ export const dragNewElement = ({
   shouldMaintainAspectRatio,
   shouldResizeFromCenter,
   zoom,
+  scene,
   widthAspectRatio = null,
   originOffset = null,
   informMutation = true,
@@ -205,6 +212,7 @@ export const dragNewElement = ({
   shouldMaintainAspectRatio: boolean;
   shouldResizeFromCenter: boolean;
   zoom: NormalizedZoomValue;
+  scene: Scene;
   /** whether to keep given aspect ratio when `isResizeWithSidesSameLength` is
       true */
   widthAspectRatio?: number | null;
@@ -285,7 +293,7 @@ export const dragNewElement = ({
       };
     }
 
-    mutateElement(
+    scene.mutateElement(
       newElement,
       {
         x: newX + (originOffset?.x ?? 0),
@@ -295,7 +303,7 @@ export const dragNewElement = ({
         ...textAutoResize,
         ...imageInitialDimension,
       },
-      informMutation,
+      { informMutation },
     );
   }
 };

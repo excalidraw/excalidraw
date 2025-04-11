@@ -244,7 +244,6 @@ const handleDimensionChange: DragInputCallbackType<
             nextHeight,
             latestElement,
             origElement,
-            elementsMap,
             originalElementsMap,
             property === "width" ? "e" : "s",
             {
@@ -347,7 +346,6 @@ const handleDimensionChange: DragInputCallbackType<
           nextHeight,
           latestElement,
           origElement,
-          elementsMap,
           originalElementsMap,
           property === "width" ? "e" : "s",
           {

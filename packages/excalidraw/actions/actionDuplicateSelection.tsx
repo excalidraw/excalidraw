@@ -36,6 +36,8 @@ import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
+import type Scene from "../scene/Scene";
+
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
   label: "labels.duplicateSelection",
@@ -52,7 +54,7 @@ export const actionDuplicateSelection = register({
       try {
         const newAppState = LinearElementEditor.duplicateSelectedPoints(
           appState,
-          app.scene.getNonDeletedElementsMap(),
+          app.scene,
         );
 
         return {
@@ -95,7 +97,7 @@ export const actionDuplicateSelection = register({
       elements: syncMovedIndices(nextElements, arrayToMap(duplicatedElements)),
       appState: {
         ...appState,
-        ...updateLinearElementEditors(duplicatedElements),
+        ...updateLinearElementEditors(duplicatedElements, app.scene),
         ...selectGroupsForSelectedElements(
           {
             editingGroupId: appState.editingGroupId,
@@ -131,7 +133,10 @@ export const actionDuplicateSelection = register({
   ),
 });
 
-const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
+const updateLinearElementEditors = (
+  clonedElements: ExcalidrawElement[],
+  scene: Scene,
+) => {
   const linears = clonedElements.filter(isLinearElement);
   if (linears.length === 1) {
     const linear = linears[0];
@@ -142,7 +147,7 @@ const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
 
     if (onlySingleLinearSelected) {
       return {
-        selectedLinearElement: new LinearElementEditor(linear),
+        selectedLinearElement: new LinearElementEditor(linear, scene),
       };
     }
   }

@@ -15,13 +15,12 @@ export interface Alignment {
 
 export const alignElements = (
   selectedElements: ExcalidrawElement[],
-  elementsMap: ElementsMap,
   alignment: Alignment,
   scene: Scene,
 ): ExcalidrawElement[] => {
   const groups: ExcalidrawElement[][] = getMaximumGroups(
     selectedElements,
-    elementsMap,
+    scene.getNonDeletedElementsMap(),
   );
   const selectionBoundingBox = getCommonBoundingBox(selectedElements);
 
@@ -33,12 +32,12 @@ export const alignElements = (
     );
     return group.map((element) => {
       // update element
-      const updatedEle = mutateElement(element, {
+      const updatedEle = scene.mutateElement(element, {
         x: element.x + translation.x,
         y: element.y + translation.y,
       });
       // update bound elements
-      updateBoundElements(element, scene.getNonDeletedElementsMap(), {
+      updateBoundElements(scene, element, {
         simultaneouslyUpdated: group,
       });
       return updatedEle;

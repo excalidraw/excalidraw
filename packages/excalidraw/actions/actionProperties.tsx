@@ -1670,10 +1670,10 @@ export const actionChangeArrowType = register({
             newElement,
             startHoveredElement,
             "start",
-            elementsMap,
+            app.scene,
           );
         endHoveredElement &&
-          bindLinearElement(newElement, endHoveredElement, "end", elementsMap);
+          bindLinearElement(newElement, endHoveredElement, "end", app.scene);
 
         const startBinding =
           startElement && newElement.startBinding
@@ -1684,7 +1684,6 @@ export const actionChangeArrowType = register({
                   newElement,
                   startElement,
                   "start",
-                  elementsMap,
                 ),
               }
             : null;
@@ -1697,7 +1696,6 @@ export const actionChangeArrowType = register({
                   newElement,
                   endElement,
                   "end",
-                  elementsMap,
                 ),
               }
             : null;
@@ -1729,7 +1727,7 @@ export const actionChangeArrowType = register({
             newElement.startBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (startElement) {
-            bindLinearElement(newElement, startElement, "start", elementsMap);
+            bindLinearElement(newElement, startElement, "start", app.scene);
           }
         }
         if (newElement.endBinding) {
@@ -1737,7 +1735,7 @@ export const actionChangeArrowType = register({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (endElement) {
-            bindLinearElement(newElement, endElement, "end", elementsMap);
+            bindLinearElement(newElement, endElement, "end", app.scene);
           }
         }
       }

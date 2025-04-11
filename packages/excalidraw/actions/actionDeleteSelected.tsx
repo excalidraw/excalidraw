@@ -289,6 +289,7 @@ export const actionDeleteSelected = register({
       deleteSelectedElements(elements, appState, app);
 
     fixBindingsAfterDeletion(
+      app.scene,
       nextElements,
       nextElements.filter((el) => el.isDeleted),
     );
