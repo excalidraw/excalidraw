@@ -117,8 +117,8 @@ const calculatePadding = (
   const width = aabb[2] - aabb[0];
   const height = aabb[3] - aabb[1];
   const size = Math.max(width, height);
-
-  return compareHeading(startHeading, flipHeading(endHeading)) || size > 50
+  // || compareHeading(startHeading, flipHeading(endHeading))
+  return size > 55
     ? 40
     : Math.min(
         Math.max(
