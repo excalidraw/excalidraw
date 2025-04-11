@@ -16,6 +16,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import {
   mutateElement,
+  mutateElementWith,
   newElementWith,
 } from "@excalidraw/element/mutateElement";
 import {
@@ -490,6 +491,7 @@ export class AppStateChange implements Change<AppState> {
               nextElements.get(
                 selectedLinearElementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
             )
           : null;
 
@@ -499,6 +501,7 @@ export class AppStateChange implements Change<AppState> {
               nextElements.get(
                 editingLinearElementId,
               ) as NonDeleted<ExcalidrawLinearElement>,
+              nextElements,
             )
           : null;
 
@@ -1498,7 +1501,12 @@ export class ElementsChange implements Change<SceneElementsMap> {
         continue;
       }
 
-      redrawTextBoundingBox(boundText, container, elements, false);
+      redrawTextBoundingBox(
+        boundText,
+        container,
+        elements,
+        (element, updates) => mutateElementWith(element, elements, updates),
+      );
     }
   }
 

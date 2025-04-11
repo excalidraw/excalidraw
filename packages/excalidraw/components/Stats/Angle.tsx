@@ -1,7 +1,5 @@
 import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { isArrowElement, isElbowArrow } from "@excalidraw/element/typeChecks";
 
@@ -35,7 +33,6 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   scene,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
-  const elements = scene.getNonDeletedElements();
   const origElement = originalElements[0];
   if (origElement && !isElbowArrow(origElement)) {
     const latestElement = elementsMap.get(origElement.id);
@@ -45,14 +42,14 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
 
     if (nextValue !== undefined) {
       const nextAngle = degreesToRadians(nextValue as Degrees);
-      mutateElement(latestElement, {
+      scene.mutate(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, elementsMap, elements, scene);
+      updateBindings(latestElement, scene);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
-        mutateElement(boundTextElement, { angle: nextAngle });
+        scene.mutate(boundTextElement, { angle: nextAngle });
       }
 
       return;
@@ -71,14 +68,14 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
 
     const nextAngle = degreesToRadians(nextAngleInDegrees as Degrees);
 
-    mutateElement(latestElement, {
+    scene.mutate(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, elementsMap, elements, scene);
+    updateBindings(latestElement, scene);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
-      mutateElement(boundTextElement, { angle: nextAngle });
+      scene.mutate(boundTextElement, { angle: nextAngle });
     }
   }
 };

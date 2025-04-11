@@ -17,6 +17,7 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
+
 import { mutateElement } from "./mutateElement";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
@@ -25,6 +26,8 @@ import {
   isArrowElement,
   isTextElement,
 } from "./typeChecks";
+
+import type { ElementUpdate } from "./mutateElement";
 
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
@@ -41,7 +44,10 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   elementsMap: ElementsMap,
-  informMutation = true,
+  mutator: (
+    element: ExcalidrawElement,
+    updates: ElementUpdate<ExcalidrawElement>,
+  ) => ExcalidrawElement,
 ) => {
   let maxWidth = undefined;
   const boundTextUpdates = {
@@ -90,7 +96,7 @@ export const redrawTextBoundingBox = (
         metrics.height,
         container.type,
       );
-      mutateElement(container, { height: nextHeight }, informMutation);
+      mutator(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
     }
     if (metrics.width > maxContainerWidth) {
@@ -98,7 +104,7 @@ export const redrawTextBoundingBox = (
         metrics.width,
         container.type,
       );
-      mutateElement(container, { width: nextWidth }, informMutation);
+      mutator(container, { width: nextWidth });
     }
     const updatedTextElement = {
       ...textElement,
@@ -113,7 +119,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.y = y;
   }
 
-  mutateElement(textElement, boundTextUpdates, informMutation);
+  mutator(textElement, boundTextUpdates);
 };
 
 export const handleBindTextResize = (

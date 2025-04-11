@@ -13,8 +13,6 @@ import type {
   ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
@@ -85,15 +83,13 @@ describe("move element", () => {
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
     const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
-    const elementsMap = h.app.scene.getNonDeletedElementsMap();
     act(() => {
       // bind line to two rectangles
       bindOrUnbindLinearElement(
         arrow.get() as NonDeleted<ExcalidrawLinearElement>,
         rectA.get() as ExcalidrawRectangleElement,
         rectB.get() as ExcalidrawRectangleElement,
-        elementsMap,
-        {} as Scene,
+        h.app.scene,
       );
     });
 

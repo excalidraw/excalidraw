@@ -8,10 +8,7 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
-import {
-  isElbowArrow,
-  isFrameLikeElement,
-} from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
 import { getElementsInGroup } from "@excalidraw/element/groups";
 
 import {
@@ -23,11 +20,9 @@ import {
 import { getSelectedElements } from "@excalidraw/element/selection";
 
 import {
-  mutateElement,
+  mutateElementWith,
   type ElementUpdate,
 } from "@excalidraw/element/mutateElement";
-
-import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
 
 import type {
   ExcalidrawElement,
@@ -39,7 +34,6 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
-  ExcalidrawElbowArrowElement,
 } from "@excalidraw/element/types";
 
 import type {
@@ -424,8 +418,12 @@ class Scene {
   };
 
   // TODO_SCENE: should be accessed as app.scene through the API
+  // TODO_SCENE: in theory actions (and most of the App handlers) should not needs this as they are ending with "replaceAllElements" anyway
   // TODO_SCENE: inform mutation false is the new default, meaning all mutateElement with nothing should likely use scene instead
-  mutateElement<TElement extends Mutable<ExcalidrawElement>>(
+  // TODO_SCENE: think one more time about moving the scene inside element (probably we will end up with it either way)
+  // Mutate an element with passed updates and trigger the component to update. Make sure you
+  // are calling it either from a React event handler or within unstable_batchedUpdates().
+  mutate<TElement extends Mutable<ExcalidrawElement>>(
     element: TElement,
     updates: ElementUpdate<TElement>,
     options: {
@@ -435,16 +433,9 @@ class Scene {
       informMutation: true,
     },
   ) {
-    if (isElbowArrow(element)) {
-      mutateElbowArrow(
-        element,
-        updates as ElementUpdate<ExcalidrawElbowArrowElement>,
-        this.getNonDeletedElementsMap(),
-        options,
-      );
-    } else {
-      mutateElement(element, updates);
-    }
+    const elementsMap = this.getNonDeletedElementsMap();
+
+    mutateElementWith(element, elementsMap, updates, options);
 
     if (options.informMutation) {
       this.triggerUpdate();

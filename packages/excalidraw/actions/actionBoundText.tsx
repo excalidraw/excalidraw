@@ -21,27 +21,22 @@ import {
 
 import {
   hasBoundTextElement,
-  isElbowArrow,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element/typeChecks";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import { measureText } from "@excalidraw/element/textMeasurements";
 
 import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { newElement } from "@excalidraw/element/newElement";
 
-import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
-
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
-  FixedPointBinding,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -81,7 +76,7 @@ export const actionUnbindText = register({
           boundTextElement,
           elementsMap,
         );
-        mutateElement(boundTextElement as ExcalidrawTextElement, {
+        app.scene.mutate(boundTextElement as ExcalidrawTextElement, {
           containerId: null,
           width,
           height,
@@ -89,7 +84,7 @@ export const actionUnbindText = register({
           x,
           y,
         });
-        mutateElement(element, {
+        app.scene.mutate(element, {
           boundElements: element.boundElements?.filter(
             (ele) => ele.id !== boundTextElement.id,
           ),
@@ -154,13 +149,13 @@ export const actionBindText = register({
       textElement = selectedElements[1] as ExcalidrawTextElement;
       container = selectedElements[0] as ExcalidrawTextContainer;
     }
-    mutateElement(textElement, {
+    app.scene.mutate(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
     });
-    mutateElement(container, {
+    app.scene.mutate(container, {
       boundElements: (container.boundElements || []).concat({
         type: "text",
         id: textElement.id,
@@ -171,6 +166,7 @@ export const actionBindText = register({
       textElement,
       container,
       app.scene.getNonDeletedElementsMap(),
+      (...args) => app.scene.mutate(...args),
     );
     // overwritting the cache with original container height so
     // it can be restored when unbind
@@ -301,40 +297,26 @@ export const actionWrapTextInContainer = register({
             }
 
             if (startBinding || endBinding) {
-              const updates = { startBinding, endBinding };
-
-              if (isElbowArrow(ele)) {
-                mutateElbowArrow(
-                  ele,
-                  updates as {
-                    startBinding: FixedPointBinding;
-                    endBinding: FixedPointBinding;
-                  },
-                  false,
-                  app.scene.getNonDeletedElementsMap(),
-                );
-              } else {
-                mutateElement(ele, updates, false);
-              }
+              app.scene.mutate(ele, {
+                startBinding,
+                endBinding,
+              });
             }
           });
         }
 
-        mutateElement(
-          textElement,
-          {
-            containerId: container.id,
-            verticalAlign: VERTICAL_ALIGN.MIDDLE,
-            boundElements: null,
-            textAlign: TEXT_ALIGN.CENTER,
-            autoResize: true,
-          },
-          false,
-        );
+        app.scene.mutate(textElement, {
+          containerId: container.id,
+          verticalAlign: VERTICAL_ALIGN.MIDDLE,
+          boundElements: null,
+          textAlign: TEXT_ALIGN.CENTER,
+          autoResize: true,
+        });
         redrawTextBoundingBox(
           textElement,
           container,
           app.scene.getNonDeletedElementsMap(),
+          (...args) => app.scene.mutate(...args),
         );
 
         updatedElements = pushContainerBelowText(

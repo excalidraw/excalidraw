@@ -75,6 +75,7 @@ const handleFontSizeChange: DragInputCallbackType<
         latestElement,
         scene.getContainerElement(latestElement),
         scene.getNonDeletedElementsMap(),
+        (...args) => scene.mutate(...args),
       );
     }
   }

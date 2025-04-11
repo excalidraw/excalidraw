@@ -3,7 +3,6 @@ import { useMemo } from "react";
 
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import { updateBoundElements } from "@excalidraw/element/binding";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   rescalePointsInElement,
   resizeSingleElement,
@@ -13,11 +12,14 @@ import {
   handleBindTextResize,
 } from "@excalidraw/element/textElement";
 
-import { isElbowArrow, isTextElement } from "@excalidraw/element/typeChecks";
+import { isTextElement } from "@excalidraw/element/typeChecks";
 
 import { getCommonBounds } from "@excalidraw/utils";
 
-import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
+import {
+  mutateElement,
+  mutateElementWith,
+} from "@excalidraw/element/mutateElement";
 
 import type {
   ElementsMap,
@@ -82,11 +84,7 @@ const resizeElementInGroup = (
 ) => {
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
-  if (isElbowArrow(latestElement)) {
-    mutateElbowArrow(latestElement, updates, false, elementsMap);
-  } else {
-    mutateElement(latestElement, updates, false);
-  }
+  mutateElementWith(latestElement, elementsMap, updates);
 
   const boundTextElement = getBoundTextElement(
     origElement,
@@ -99,13 +97,9 @@ const resizeElementInGroup = (
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
-      mutateElement(
-        latestBoundTextElement,
-        {
-          fontSize: newFontSize,
-        },
-        false,
-      );
+      mutateElement(latestBoundTextElement, {
+        fontSize: newFontSize,
+      });
       handleBindTextResize(
         latestElement,
         elementsMap,
@@ -244,8 +238,8 @@ const handleDimensionChange: DragInputCallbackType<
             nextHeight,
             latestElement,
             origElement,
-            elementsMap,
             originalElementsMap,
+            scene,
             property === "width" ? "e" : "s",
             {
               shouldInformMutation: false,
@@ -347,8 +341,8 @@ const handleDimensionChange: DragInputCallbackType<
           nextHeight,
           latestElement,
           origElement,
-          elementsMap,
           originalElementsMap,
+          scene,
           property === "width" ? "e" : "s",
           {
             shouldInformMutation: false,

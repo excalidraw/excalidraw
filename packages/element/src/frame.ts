@@ -21,7 +21,7 @@ import {
   getCommonBounds,
   getElementAbsoluteCoords,
 } from "./bounds";
-import { mutateElement } from "./mutateElement";
+import { mutateElementWith } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
   isFrameElement,
@@ -57,13 +57,9 @@ export const bindElementsToFramesAfterDuplication = (
       if (nextElementId) {
         const nextElement = nextElementMap.get(nextElementId);
         if (nextElement) {
-          mutateElement(
-            nextElement,
-            {
-              frameId: nextFrameId ?? element.frameId,
-            },
-            false,
-          );
+          mutateElementWith(nextElement, nextElementMap, {
+            frameId: nextFrameId ?? element.frameId,
+          });
         }
       }
     }
@@ -567,13 +563,9 @@ export const addElementsToFrame = <T extends ElementsMapOrArray>(
   }
 
   for (const element of finalElementsToAdd) {
-    mutateElement(
-      element,
-      {
-        frameId: frame.id,
-      },
-      false,
-    );
+    mutateElementWith(element, elementsMap, {
+      frameId: frame.id,
+    });
   }
 
   return allElements;
@@ -611,13 +603,9 @@ export const removeElementsFromFrame = (
   }
 
   for (const [, element] of _elementsToRemove) {
-    mutateElement(
-      element,
-      {
-        frameId: null,
-      },
-      false,
-    );
+    mutateElementWith(element, elementsMap, {
+      frameId: null,
+    });
   }
 };
 

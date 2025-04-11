@@ -38,6 +38,10 @@ import { redrawTextBoundingBox } from "@excalidraw/element/textElement";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
+import { mutateElementWith } from "@excalidraw/element/mutateElement";
+
+import { getCommonBounds } from "@excalidraw/element/bounds";
+
 import type { ElementConstructorOpts } from "@excalidraw/element/newElement";
 
 import type {
@@ -62,8 +66,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
-
-import { getCommonBounds } from "..";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";
@@ -240,7 +242,12 @@ const bindTextToContainer = (
     }),
   });
 
-  redrawTextBoundingBox(textElement, container, elementsMap);
+  redrawTextBoundingBox(
+    textElement,
+    container,
+    elementsMap,
+    (element, updates) => mutateElementWith(element, elementsMap, updates),
+  );
   return [container, textElement] as const;
 };
 
@@ -336,6 +343,7 @@ const bindLinearElementToElement = (
         startBoundElement as ExcalidrawBindableElement,
         "start",
         elementsMap,
+        (element, updates) => mutateElementWith(element, elementsMap, updates),
       );
     }
   }
@@ -411,6 +419,7 @@ const bindLinearElementToElement = (
         endBoundElement as ExcalidrawBindableElement,
         "end",
         elementsMap,
+        (element, updates) => mutateElementWith(element, elementsMap, updates),
       );
     }
   }

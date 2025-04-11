@@ -7,6 +7,8 @@ import type {
   PendingExcalidrawElements,
 } from "@excalidraw/excalidraw/types";
 
+import type Scene from "@excalidraw/excalidraw/scene/Scene";
+
 import { bindLinearElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import {
@@ -239,6 +241,7 @@ const addNewNode = (
   elementsMap: ElementsMap,
   appState: AppState,
   direction: LinkDirection,
+  scene: Scene,
 ) => {
   const successors = getSuccessors(element, elementsMap, direction);
   const predeccessors = getPredecessors(element, elementsMap, direction);
@@ -277,6 +280,7 @@ const addNewNode = (
     elementsMap,
     direction,
     appState,
+    scene,
   );
 
   return {
@@ -290,6 +294,7 @@ export const addNewNodes = (
   elementsMap: ElementsMap,
   appState: AppState,
   direction: LinkDirection,
+  scene: Scene,
   numberOfNodes: number,
 ) => {
   // always start from 0 and distribute evenly
@@ -355,6 +360,7 @@ export const addNewNodes = (
       elementsMap,
       direction,
       appState,
+      scene,
     );
 
     newNodes.push(nextNode);
@@ -370,6 +376,7 @@ const createBindingArrow = (
   elementsMap: ElementsMap,
   direction: LinkDirection,
   appState: AppState,
+  scene: Scene,
 ) => {
   let startX: number;
   let startY: number;
@@ -444,13 +451,15 @@ const createBindingArrow = (
     bindingArrow,
     startBindingElement,
     "start",
-    elementsMap as NonDeletedSceneElementsMap,
+    scene.getNonDeletedElementsMap(),
+    (...args) => scene.mutate(...args),
   );
   bindLinearElement(
     bindingArrow,
     endBindingElement,
     "end",
-    elementsMap as NonDeletedSceneElementsMap,
+    scene.getNonDeletedElementsMap(),
+    (...args) => scene.mutate(...args),
   );
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
@@ -635,6 +644,7 @@ export class FlowChartCreator {
     elementsMap: ElementsMap,
     appState: AppState,
     direction: LinkDirection,
+    scene: Scene,
   ) {
     if (direction !== this.direction) {
       const { nextNode, bindingArrow } = addNewNode(
@@ -642,6 +652,7 @@ export class FlowChartCreator {
         elementsMap,
         appState,
         direction,
+        scene,
       );
 
       this.numberOfNodes = 1;
@@ -655,6 +666,7 @@ export class FlowChartCreator {
         elementsMap,
         appState,
         direction,
+        scene,
         this.numberOfNodes,
       );
 
@@ -682,13 +694,9 @@ export class FlowChartCreator {
         )
       ) {
         this.pendingNodes = this.pendingNodes.map((node) =>
-          mutateElement(
-            node,
-            {
-              frameId: startNode.frameId,
-            },
-            false,
-          ),
+          mutateElement(node, {
+            frameId: startNode.frameId,
+          }),
         );
       }
     }

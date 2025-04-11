@@ -2,7 +2,7 @@ import { generateNKeysBetween } from "fractional-indexing";
 
 import { arrayToMap } from "@excalidraw/common";
 
-import { mutateElement } from "./mutateElement";
+import { mutateElementWith } from "./mutateElement";
 import { getBoundTextElement } from "./textElement";
 import { hasBoundTextElement } from "./typeChecks";
 
@@ -176,7 +176,7 @@ export const syncMovedIndices = (
 
     // split mutation so we don't end up in an incosistent state
     for (const [element, update] of elementsUpdates) {
-      mutateElement(element, update, false);
+      mutateElementWith(element, arrayToMap(elements), update);
     }
   } catch (e) {
     // fallback to default sync
@@ -197,7 +197,7 @@ export const syncInvalidIndices = (
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
   for (const [element, update] of elementsUpdates) {
-    mutateElement(element, update, false);
+    mutateElementWith(element, arrayToMap(elements), update);
   }
 
   return elements as OrderedExcalidrawElement[];

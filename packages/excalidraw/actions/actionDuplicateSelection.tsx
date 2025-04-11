@@ -25,7 +25,7 @@ import { syncMovedIndices } from "@excalidraw/element/fractionalIndex";
 
 import { duplicateElements } from "@excalidraw/element/duplicate";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
@@ -52,7 +52,7 @@ export const actionDuplicateSelection = register({
       try {
         const newAppState = LinearElementEditor.duplicateSelectedPoints(
           appState,
-          app.scene.getNonDeletedElementsMap(),
+          app.scene,
         );
 
         return {
@@ -91,11 +91,16 @@ export const actionDuplicateSelection = register({
       }
     }
 
+    syncMovedIndices(nextElements, arrayToMap(duplicatedElements));
+
     return {
-      elements: syncMovedIndices(nextElements, arrayToMap(duplicatedElements)),
+      elements: nextElements,
       appState: {
         ...appState,
-        ...updateLinearElementEditors(duplicatedElements),
+        ...updateLinearElementEditors(
+          duplicatedElements,
+          arrayToMap(nextElements),
+        ),
         ...selectGroupsForSelectedElements(
           {
             editingGroupId: appState.editingGroupId,
@@ -131,7 +136,10 @@ export const actionDuplicateSelection = register({
   ),
 });
 
-const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
+const updateLinearElementEditors = (
+  clonedElements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
+) => {
   const linears = clonedElements.filter(isLinearElement);
   if (linears.length === 1) {
     const linear = linears[0];
@@ -142,7 +150,7 @@ const updateLinearElementEditors = (clonedElements: ExcalidrawElement[]) => {
 
     if (onlySingleLinearSelected) {
       return {
-        selectedLinearElement: new LinearElementEditor(linear),
+        selectedLinearElement: new LinearElementEditor(linear, elementsMap),
       };
     }
   }

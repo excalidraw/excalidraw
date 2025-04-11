@@ -2,16 +2,24 @@ import {
   getSizeFromPoints,
   randomInteger,
   getUpdatedTimestamp,
-  invariant,
 } from "@excalidraw/common";
+
+import type { Radians } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./ShapeCache";
 
-import { elbowArrowNeedsToGetNormalized } from "./elbowArrow";
+import {
+  elbowArrowNeedsToGetNormalized,
+  updateElbowArrowPoints,
+} from "./elbowArrow";
 
-import type { ExcalidrawElement } from "./types";
+import type {
+  ExcalidrawElbowArrowElement,
+  ExcalidrawElement,
+  NonDeletedSceneElementsMap,
+} from "./types";
 
 export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
   Partial<TElement>,
@@ -20,8 +28,48 @@ export type ElementUpdate<TElement extends ExcalidrawElement> = Omit<
 
 // This function tracks updates of text elements for the purposes for collaboration.
 // The version is used to compare updates when more than one user is working in
-// the same drawing. Note: this will trigger the component to update. Make sure you
-// are calling it either from a React event handler or within unstable_batchedUpdates().
+// the same drawing. Note: this won't trigger the component to update, unlike `scene.mutate`.
+export const mutateElementWith = <TElement extends Mutable<ExcalidrawElement>>(
+  element: TElement,
+  elementsMap: Map<string, ExcalidrawElement>,
+  updates: ElementUpdate<TElement>,
+  options?: {
+    isDragging?: boolean;
+  },
+) => {
+  if (
+    elbowArrowNeedsToGetNormalized(
+      element,
+      updates as ElementUpdate<ExcalidrawElbowArrowElement>,
+    )
+  ) {
+    const normalizedUpdates = {
+      ...updates,
+      angle: 0 as Radians,
+      ...updateElbowArrowPoints(
+        element as ExcalidrawElbowArrowElement,
+        elementsMap as NonDeletedSceneElementsMap,
+        updates as ElementUpdate<ExcalidrawElbowArrowElement>,
+        options,
+      ),
+    } as ElementUpdate<ExcalidrawElbowArrowElement>;
+
+    return mutateElement(
+      element as ExcalidrawElbowArrowElement,
+      normalizedUpdates,
+    );
+  }
+
+  return mutateElement(element, updates);
+};
+
+/**
+ * This function tracks updates of text elements for the purposes for collaboration.
+ * The version is used to compare updates when more than one user is working in
+ * the same drawing.
+ *
+ * @deprecated Use `scene.mutate` as direct equivalent, or  `mutateElementWith` in case you don't need to trigger component update.
+ */
 export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
   element: TElement,
   updates: ElementUpdate<TElement>,
@@ -30,18 +78,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fileId, fixedSegments, startBinding, endBinding } =
-    updates as any;
-
-  invariant(
-    elbowArrowNeedsToGetNormalized(element, {
-      points,
-      fixedSegments,
-      startBinding,
-      endBinding,
-    }),
-    "Elbow arrow should get normalized! Use `mutateElbowArrow` instead.",
-  );
+  const { points, fileId } = updates as any;
 
   if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };

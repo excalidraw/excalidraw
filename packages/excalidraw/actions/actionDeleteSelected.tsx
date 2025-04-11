@@ -17,8 +17,6 @@ import {
   selectGroupsForSelectedElements,
 } from "@excalidraw/element/groups";
 
-import { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
-
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
@@ -93,21 +91,14 @@ const deleteSelectedElements = (
         el.boundElements.forEach((candidate) => {
           const bound = app.scene.getNonDeletedElementsMap().get(candidate.id);
           if (bound && isElbowArrow(bound)) {
-            mutateElbowArrow(
-              bound,
-              {
-                startBinding:
-                  el.id === bound.startBinding?.elementId
-                    ? null
-                    : bound.startBinding,
-                endBinding:
-                  el.id === bound.endBinding?.elementId
-                    ? null
-                    : bound.endBinding,
-              },
-              true,
-              app.scene.getNonDeletedElementsMap(),
-            );
+            app.scene.mutate(bound, {
+              startBinding:
+                el.id === bound.startBinding?.elementId
+                  ? null
+                  : bound.startBinding,
+              endBinding:
+                el.id === bound.endBinding?.elementId ? null : bound.endBinding,
+            });
           }
         });
       }

@@ -5,7 +5,6 @@ import {
   MINIMAL_CROP_SIZE,
   getUncroppedWidthAndHeight,
 } from "@excalidraw/element/cropElement";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import { resizeSingleElement } from "@excalidraw/element/resizeElements";
 import { isImageElement } from "@excalidraw/element/typeChecks";
 
@@ -113,7 +112,7 @@ const handleDimensionChange: DragInputCallbackType<
           };
         }
 
-        mutateElement(element, {
+        scene.mutate(element, {
           crop: nextCrop,
           width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
           height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -144,7 +143,7 @@ const handleDimensionChange: DragInputCallbackType<
         height: nextCropHeight,
       };
 
-      mutateElement(element, {
+      scene.mutate(element, {
         crop: nextCrop,
         width: nextCrop.width / (crop.naturalWidth / uncroppedWidth),
         height: nextCrop.height / (crop.naturalHeight / uncroppedHeight),
@@ -176,8 +175,8 @@ const handleDimensionChange: DragInputCallbackType<
         nextHeight,
         latestElement,
         origElement,
-        elementsMap,
         originalElementsMap,
+        scene,
         property === "width" ? "e" : "s",
         {
           shouldMaintainAspectRatio: keepAspectRatio,
@@ -223,8 +222,8 @@ const handleDimensionChange: DragInputCallbackType<
       nextHeight,
       latestElement,
       origElement,
-      elementsMap,
       originalElementsMap,
+      scene,
       property === "width" ? "e" : "s",
       {
         shouldMaintainAspectRatio: keepAspectRatio,

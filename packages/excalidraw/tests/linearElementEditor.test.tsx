@@ -177,7 +177,7 @@ describe("Test Linear Elements", () => {
       pointFrom<LocalPoint>(0.5, 0),
       pointFrom<LocalPoint>(100, 100),
     ]);
-    new LinearElementEditor(element);
+    new LinearElementEditor(element, arrayToMap(h.elements));
     expect(element.points).toEqual([
       pointFrom<LocalPoint>(0, 0),
       pointFrom<LocalPoint>(99.5, 100),

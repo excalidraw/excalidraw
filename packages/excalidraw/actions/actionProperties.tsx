@@ -34,10 +34,7 @@ import {
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 
-import {
-  mutateElement,
-  newElementWith,
-} from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element/mutateElement";
 
 import {
   getBoundTextElement,
@@ -68,7 +65,6 @@ import type {
   FontFamilyValues,
   TextAlign,
   VerticalAlign,
-  NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import { trackEvent } from "../analytics";
@@ -138,6 +134,7 @@ import { register } from "./register";
 
 import type { CaptureUpdateActionType } from "../store";
 import type { AppClassProperties, AppState, Primitive } from "../types";
+import type Scene from "../scene/Scene";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -207,25 +204,22 @@ export const getFormValue = function <T extends Primitive>(
 const offsetElementAfterFontResize = (
   prevElement: ExcalidrawTextElement,
   nextElement: ExcalidrawTextElement,
+  scene: Scene,
 ) => {
   if (isBoundToContainer(nextElement) || !nextElement.autoResize) {
     return nextElement;
   }
-  return mutateElement(
-    nextElement,
-    {
-      x:
-        prevElement.textAlign === "left"
-          ? prevElement.x
-          : prevElement.x +
-            (prevElement.width - nextElement.width) /
-              (prevElement.textAlign === "center" ? 2 : 1),
-      // centering vertically is non-standard, but for Excalidraw I think
-      // it makes sense
-      y: prevElement.y + (prevElement.height - nextElement.height) / 2,
-    },
-    false,
-  );
+  return scene.mutate(nextElement, {
+    x:
+      prevElement.textAlign === "left"
+        ? prevElement.x
+        : prevElement.x +
+          (prevElement.width - nextElement.width) /
+            (prevElement.textAlign === "center" ? 2 : 1),
+    // centering vertically is non-standard, but for Excalidraw I think
+    // it makes sense
+    y: prevElement.y + (prevElement.height - nextElement.height) / 2,
+  });
 };
 
 const changeFontSize = (
@@ -252,9 +246,14 @@ const changeFontSize = (
           newElement,
           app.scene.getContainerElement(oldElement),
           app.scene.getNonDeletedElementsMap(),
+          (...args) => app.scene.mutate(...args),
         );
 
-        newElement = offsetElementAfterFontResize(oldElement, newElement);
+        newElement = offsetElementAfterFontResize(
+          oldElement,
+          newElement,
+          app.scene,
+        );
 
         return newElement;
       }
@@ -269,10 +268,7 @@ const changeFontSize = (
     includeBoundTextElement: true,
   }).forEach((element) => {
     if (isTextElement(element)) {
-      updateBoundElements(
-        element,
-        updatedElementsMap as NonDeletedSceneElementsMap,
-      );
+      updateBoundElements(element, updatedElementsMap);
     }
   });
 
@@ -919,7 +915,7 @@ export const actionChangeFontFamily = register({
 
               if (resetContainers && container && cachedContainer) {
                 // reset the container back to it's cached version
-                mutateElement(container, { ...cachedContainer }, false);
+                app.scene.mutate(container, { ...cachedContainer });
               }
 
               if (!skipFontFaceCheck) {
@@ -954,7 +950,7 @@ export const actionChangeFontFamily = register({
             element,
             container,
             app.scene.getNonDeletedElementsMap(),
-            false,
+            (...args) => app.scene.mutate(...args),
           );
         }
       } else {
@@ -973,7 +969,7 @@ export const actionChangeFontFamily = register({
                 latestElement as ExcalidrawTextElement,
                 latestContainer,
                 app.scene.getNonDeletedElementsMap(),
-                false,
+                (...args) => app.scene.mutate(...args),
               );
             }
           }
@@ -1180,6 +1176,7 @@ export const actionChangeTextAlign = register({
               newElement,
               app.scene.getContainerElement(oldElement),
               app.scene.getNonDeletedElementsMap(),
+              (...args) => app.scene.mutate(...args),
             );
             return newElement;
           }
@@ -1271,6 +1268,7 @@ export const actionChangeVerticalAlign = register({
               newElement,
               app.scene.getContainerElement(oldElement),
               app.scene.getNonDeletedElementsMap(),
+              (...args) => app.scene.mutate(...args),
             );
             return newElement;
           }
@@ -1670,10 +1668,17 @@ export const actionChangeArrowType = register({
             newElement,
             startHoveredElement,
             "start",
-            elementsMap,
+            app.scene.getNonDeletedElementsMap(),
+            (...args) => app.scene.mutate(...args),
           );
         endHoveredElement &&
-          bindLinearElement(newElement, endHoveredElement, "end", elementsMap);
+          bindLinearElement(
+            newElement,
+            endHoveredElement,
+            "end",
+            app.scene.getNonDeletedElementsMap(),
+            (...args) => app.scene.mutate(...args),
+          );
 
         const startBinding =
           startElement && newElement.startBinding
@@ -1684,7 +1689,6 @@ export const actionChangeArrowType = register({
                   newElement,
                   startElement,
                   "start",
-                  elementsMap,
                 ),
               }
             : null;
@@ -1697,7 +1701,6 @@ export const actionChangeArrowType = register({
                   newElement,
                   endElement,
                   "end",
-                  elementsMap,
                 ),
               }
             : null;
@@ -1729,7 +1732,13 @@ export const actionChangeArrowType = register({
             newElement.startBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (startElement) {
-            bindLinearElement(newElement, startElement, "start", elementsMap);
+            bindLinearElement(
+              newElement,
+              startElement,
+              "start",
+              app.scene.getNonDeletedElementsMap(),
+              (...args) => app.scene.mutate(...args),
+            );
           }
         }
         if (newElement.endBinding) {
@@ -1737,7 +1746,13 @@ export const actionChangeArrowType = register({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (endElement) {
-            bindLinearElement(newElement, endElement, "end", elementsMap);
+            bindLinearElement(
+              newElement,
+              endElement,
+              "end",
+              app.scene.getNonDeletedElementsMap(),
+              (...args) => app.scene.mutate(...args),
+            );
           }
         }
       }
@@ -1758,6 +1773,7 @@ export const actionChangeArrowType = register({
       if (selected) {
         newState.selectedLinearElement = new LinearElementEditor(
           selected as ExcalidrawLinearElement,
+          arrayToMap(elements),
         );
       }
     }

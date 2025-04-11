@@ -424,7 +424,6 @@ export class API {
       {
         boundElements: [{ type: "text", id: text.id }],
       },
-      false,
     );
 
     return [rectangle, text];
@@ -459,7 +458,6 @@ export class API {
       {
         boundElements: [{ type: "text", id: text.id }],
       },
-      false,
     );
 
     return [arrow, text];

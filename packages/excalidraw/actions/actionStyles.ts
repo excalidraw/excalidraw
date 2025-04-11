@@ -143,6 +143,7 @@ export const actionPasteStyles = register({
               newElement,
               container,
               app.scene.getNonDeletedElementsMap(),
+              (...args) => app.scene.mutate(...args),
             );
           }
 

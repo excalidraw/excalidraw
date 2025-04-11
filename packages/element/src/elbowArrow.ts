@@ -22,8 +22,6 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 
-import type { Radians } from "@excalidraw/math";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import {
@@ -47,12 +45,11 @@ import {
   vectorToHeading,
   headingForPoint,
 } from "./heading";
-import { mutateElement, type ElementUpdate } from "./mutateElement";
+import { type ElementUpdate } from "./mutateElement";
 import { isBindableElement, isElbowArrow } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
-  type SceneElementsMap,
 } from "./types";
 
 import { aabbForElement, pointInsideBounds } from "./shapes";
@@ -904,38 +901,6 @@ export const elbowArrowNeedsToGetNormalized = (
 };
 
 /**
- * Mutates an elbow arrow element and renormalizes it's properties if necessary.
- */
-export const mutateElbowArrow = (
-  element: Readonly<ExcalidrawElbowArrowElement>,
-  updates: ElementUpdate<ExcalidrawElbowArrowElement>,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap | ElementsMap,
-  options?: {
-    isDragging?: boolean;
-  },
-): ElementUpdate<ExcalidrawElbowArrowElement> => {
-  invariant(
-    !isElbowArrow(element),
-    `Element "${element.type}" is not an elbow arrow! Use \`mutateElement\` instead`,
-  );
-
-  if (!elbowArrowNeedsToGetNormalized(element, updates)) {
-    return mutateElement(element, updates);
-  }
-
-  return mutateElement(element, {
-    ...updates,
-    angle: 0 as Radians,
-    ...updateElbowArrowPoints(
-      element,
-      elementsMap as NonDeletedSceneElementsMap,
-      updates,
-      options,
-    ),
-  });
-};
-
-/**
  *
  */
 export const updateElbowArrowPoints = (
@@ -1329,14 +1294,12 @@ const getElbowArrowData = (
   const startHeading = getBindPointHeading(
     startGlobalPoint,
     endGlobalPoint,
-    elementsMap,
     hoveredStartElement,
     origStartGlobalPoint,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
     startGlobalPoint,
-    elementsMap,
     hoveredEndElement,
     origEndGlobalPoint,
   );
@@ -2306,7 +2269,6 @@ const getGlobalPoint = (
 const getBindPointHeading = (
   p: GlobalPoint,
   otherPoint: GlobalPoint,
-  elementsMap: NonDeletedSceneElementsMap | SceneElementsMap,
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
 ): Heading =>
@@ -2324,7 +2286,6 @@ const getBindPointHeading = (
           number,
         ],
       ),
-    elementsMap,
     origPoint,
   );
 

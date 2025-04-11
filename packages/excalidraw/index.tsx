@@ -259,12 +259,11 @@ export {
 } from "@excalidraw/common";
 
 export {
+  mutateElementWith,
   mutateElement,
   newElementWith,
   bumpVersion,
 } from "@excalidraw/element/mutateElement";
-
-export { mutateElbowArrow } from "@excalidraw/element/elbowArrow";
 
 export { CaptureUpdateAction } from "./store";
 
