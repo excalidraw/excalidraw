@@ -742,6 +742,7 @@ const handleEndpointDrag = (
 
   // Calculate the moving second point connection and add the start point
   {
+    startIsSpecial = arrow.startIsSpecial && globalUpdatedPoints.length > 2;
     const secondPoint = globalUpdatedPoints[startIsSpecial ? 2 : 1];
     const thirdPoint = globalUpdatedPoints[startIsSpecial ? 3 : 2];
     const startIsHorizontal = headingIsHorizontal(startHeading);
@@ -802,6 +803,7 @@ const handleEndpointDrag = (
 
   // Calculate the moving second to last point connection
   {
+    endIsSpecial = arrow.endIsSpecial && globalUpdatedPoints.length > 2;
     const secondToLastPoint =
       globalUpdatedPoints[globalUpdatedPoints.length - (endIsSpecial ? 3 : 2)];
     const thirdToLastPoint =
