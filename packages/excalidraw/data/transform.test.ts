@@ -1,10 +1,11 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
+import type { ExcalidrawArrowElement } from "@excalidraw/element/types";
+
 import { convertToExcalidrawElements } from "./transform";
 
 import type { ExcalidrawElementSkeleton } from "./transform";
-import type { ExcalidrawArrowElement } from "../element/types";
 
 const opts = { regenerateIds: false };
 
@@ -426,7 +427,7 @@ describe("Test Transform", () => {
       const [arrow, text, rectangle, ellipse] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text.id, type: "text" }],
         startBinding: {
@@ -511,7 +512,7 @@ describe("Test Transform", () => {
 
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [{ id: text1.id, type: "text" }],
         startBinding: {
@@ -729,7 +730,7 @@ describe("Test Transform", () => {
       const [, , arrow, text] = excalidrawElements;
       expect(arrow).toMatchObject({
         type: "arrow",
-        x: 255,
+        x: 255.5,
         y: 239,
         boundElements: [
           {

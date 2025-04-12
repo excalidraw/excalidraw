@@ -1,5 +1,9 @@
 import clsx from "clsx";
 
+import { THEME } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
+
 import {
   actionClearCanvas,
   actionLoadScene,
@@ -10,7 +14,6 @@ import {
 } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
-import { THEME } from "../../constants";
 import { useUIAppState } from "../../context/ui-appState";
 import { useSetAtom } from "../../editor-jotai";
 import { useI18n } from "../../i18n";
@@ -43,8 +46,6 @@ import {
 } from "../icons";
 
 import "./DefaultItems.scss";
-
-import type { Theme } from "../../element/types";
 
 export const LoadScene = () => {
   const { t } = useI18n();

@@ -1,21 +1,25 @@
 import throttle from "lodash.throttle";
 
-import { ENV } from "../constants";
-import { isNonDeletedElement } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
+import {
+  randomInteger,
+  arrayToMap,
+  toBrandedType,
+  isDevEnv,
+  isTestEnv,
+} from "@excalidraw/common";
+import { isNonDeletedElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
 import {
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
-} from "../fractionalIndex";
-import { getElementsInGroup } from "../groups";
-import { randomInteger } from "../random";
-import { arrayToMap } from "../utils";
-import { toBrandedType } from "../utils";
+} from "@excalidraw/element/fractionalIndex";
 
-import { getSelectedElements } from "./selection";
+import { getSelectedElements } from "@excalidraw/element/selection";
 
-import type { LinearElementEditor } from "../element/linearElementEditor";
+import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
 import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -26,9 +30,11 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import type { Assert, SameType } from "@excalidraw/common/utility-types";
+
 import type { AppState } from "../types";
-import type { Assert, SameType } from "../utility-types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -57,14 +63,10 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
 
 const validateIndicesThrottled = throttle(
   (elements: readonly ExcalidrawElement[]) => {
-    if (
-      import.meta.env.DEV ||
-      import.meta.env.MODE === ENV.TEST ||
-      window?.DEBUG_FRACTIONAL_INDICES
-    ) {
+    if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
       validateFractionalIndices(elements, {
         // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
-        shouldThrow: import.meta.env.DEV || import.meta.env.MODE === ENV.TEST,
+        shouldThrow: isDevEnv() || isTestEnv(),
         includeBoundTextValidation: true,
       });
     }
