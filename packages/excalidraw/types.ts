@@ -43,6 +43,7 @@ import type {
   MakeBrand,
 } from "@excalidraw/common/utility-types";
 
+import type { ColorTuple } from "./colors";
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
@@ -601,6 +602,8 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  strokeColorTopPicks?: ColorTuple;
+  backgroundColorTopPicks?: ColorTuple;
 }
 
 export type SceneData = {
