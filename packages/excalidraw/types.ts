@@ -3,6 +3,7 @@ import type {
   UserIdleState,
   throttleRAF,
   MIME_TYPES,
+  ColorTuple,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element/binding";
@@ -43,7 +44,6 @@ import type {
   MakeBrand,
 } from "@excalidraw/common/utility-types";
 
-import type { ColorTuple } from "./colors";
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
