@@ -1,9 +1,8 @@
+import { promiseTry, LOCAL_FONT_PROTOCOL } from "@excalidraw/common";
+
+import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
 import { stringToBase64, toByteString } from "../data/encode";
 import { fetchFontFromVault } from "../obsidianUtils";
-import { subsetWoff2GlyphsByCodepoints } from "../subset/subset-main";
-import { promiseTry } from "../utils";
-
-import { LOCAL_FONT_PROTOCOL } from "./FontMetadata";
 
 type DataURL = string;
 

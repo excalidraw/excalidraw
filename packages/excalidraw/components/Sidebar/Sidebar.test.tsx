@@ -1,7 +1,8 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { DEFAULT_SIDEBAR } from "../../constants";
+import { DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import { Excalidraw, Sidebar } from "../../index";
 import {
   act,

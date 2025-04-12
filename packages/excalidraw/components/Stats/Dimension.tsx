@@ -1,19 +1,20 @@
 import { clamp, round } from "@excalidraw/math";
 
-import { MIN_WIDTH_OR_HEIGHT } from "../../constants";
+import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   MINIMAL_CROP_SIZE,
   getUncroppedWidthAndHeight,
-} from "../../element/cropElement";
-import { mutateElement } from "../../element/mutateElement";
-import { resizeSingleElement } from "../../element/resizeElements";
-import { isImageElement } from "../../element/typeChecks";
+} from "@excalidraw/element/cropElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import { resizeSingleElement } from "@excalidraw/element/resizeElements";
+import { isImageElement } from "@excalidraw/element/typeChecks";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type { ExcalidrawElement } from "../../element/types";
 import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 

@@ -1,11 +1,11 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
-
-import { createTestHook } from "../../components/App";
-import { getCommonBounds, getElementPointsCoords } from "../../element/bounds";
-import { cropElement } from "../../element/cropElement";
-import { mutateElement } from "../../element/mutateElement";
+import {
+  getCommonBounds,
+  getElementPointsCoords,
+} from "@excalidraw/element/bounds";
+import { cropElement } from "@excalidraw/element/cropElement";
+import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -13,21 +13,18 @@ import {
   OMIT_SIDES_FOR_MULTIPLE_ELEMENTS,
   type TransformHandle,
   type TransformHandleDirection,
-} from "../../element/transformHandles";
+} from "@excalidraw/element/transformHandles";
 import {
   isLinearElement,
   isFreeDrawElement,
   isTextElement,
   isFrameLikeElement,
-} from "../../element/typeChecks";
-import { KEYS } from "../../keys";
-import { arrayToMap } from "../../utils";
-import { getTextEditor } from "../queries/dom";
-import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
+} from "@excalidraw/element/typeChecks";
+import { KEYS, arrayToMap, elementCenterPoint } from "@excalidraw/common";
 
-import { API } from "./api";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
-import type { TransformHandleType } from "../../element/transformHandles";
+import type { TransformHandleType } from "@excalidraw/element/transformHandles";
 import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
@@ -39,7 +36,14 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   ExcalidrawImageElement,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { createTestHook } from "../../components/App";
+import { getTextEditor } from "../queries/dom";
+import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
+
+import { API } from "./api";
+
 import type { ToolType } from "../../types";
 
 // so that window.h is available when App.tsx is not imported as well.
@@ -147,7 +151,7 @@ export class Keyboard {
 const getElementPointForSelection = (
   element: ExcalidrawElement,
 ): GlobalPoint => {
-  const { x, y, width, height, angle } = element;
+  const { x, y, width, angle } = element;
   const target = pointFrom<GlobalPoint>(
     x +
       (isLinearElement(element) || isFreeDrawElement(element) ? 0 : width / 2),
@@ -162,7 +166,7 @@ const getElementPointForSelection = (
       (bounds[1] + bounds[3]) / 2,
     );
   } else {
-    center = pointFrom(x + width / 2, y + height / 2);
+    center = elementCenterPoint(element);
   }
 
   if (isTextElement(element)) {
@@ -398,7 +402,10 @@ const proxy = <T extends ExcalidrawElement>(
 };
 
 /** Tools that can be used to draw shapes */
-type DrawingToolName = Exclude<ToolType, "lock" | "selection" | "eraser">;
+type DrawingToolName = Exclude<
+  ToolType,
+  "lock" | "selection" | "eraser" | "lasso"
+>;
 
 type Element<T extends DrawingToolName> = T extends "line" | "freedraw"
   ? ExcalidrawLinearElement

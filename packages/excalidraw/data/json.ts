@@ -1,17 +1,23 @@
-import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 import {
   DEFAULT_FILENAME,
   EXPORT_DATA_TYPES,
   EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
-} from "../constants";
-import { clearElementsForDatabase, clearElementsForExport } from "../element";
+} from "@excalidraw/common";
+
+import {
+  clearElementsForDatabase,
+  clearElementsForExport,
+} from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
 
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
-import type { ExcalidrawElement } from "../element/types";
 import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import type {
   ExportedDataState,

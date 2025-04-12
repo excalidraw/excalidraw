@@ -31,6 +31,8 @@ export {
   zoomToFitElements,
 } from "./actionCanvas";
 
+export { actionSetEmbeddableAsActiveTool } from "./actionEmbeddable";
+
 export { actionFinalize } from "./actionFinalize";
 
 export {

@@ -7,8 +7,18 @@ import React, {
   useRef,
 } from "react";
 
+import {
+  LIBRARY_DISABLED_TYPES,
+  randomId,
+  isShallowEqual,
+} from "@excalidraw/common";
+
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
+
 import { trackEvent } from "../analytics";
-import { LIBRARY_DISABLED_TYPES } from "../constants";
 import { useUIAppState } from "../context/ui-appState";
 import {
   distributeLibraryItemsOnSquareGrid,
@@ -16,9 +26,8 @@ import {
 } from "../data/library";
 import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
-import { randomId } from "../random";
+
 import { getSelectedElements } from "../scene";
-import { isShallowEqual } from "../utils";
 
 import {
   useApp,
@@ -32,10 +41,6 @@ import Spinner from "./Spinner";
 
 import "./LibraryMenu.scss";
 
-import type {
-  ExcalidrawElement,
-  NonDeletedExcalidrawElement,
-} from "../element/types";
 import type {
   LibraryItems,
   LibraryItem,

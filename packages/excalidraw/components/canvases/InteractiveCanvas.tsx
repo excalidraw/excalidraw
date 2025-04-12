@@ -1,15 +1,20 @@
 import React, { useEffect, useRef } from "react";
 
-import { CURSOR_TYPE } from "../../constants";
-import { t } from "../../i18n";
-import { isRenderThrottlingEnabled } from "../../reactUtils";
-import { renderInteractiveScene } from "../../renderer/interactiveScene";
-import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
+import {
+  CURSOR_TYPE,
+  isShallowEqual,
+  sceneCoordsToViewportCoords,
+} from "@excalidraw/common";
 
 import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../../element/types";
+} from "@excalidraw/element/types";
+
+import { t } from "../../i18n";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
+import { renderInteractiveScene } from "../../renderer/interactiveScene";
+
 import type {
   InteractiveCanvasRenderConfig,
   RenderableElementsMap,

@@ -1,8 +1,11 @@
 import React from "react";
 
+import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
-import { getNonDeletedElements, showSelectedShapeActions } from "../element";
 import { t } from "../i18n";
 import { calculateScrollCenter, isSomeElementSelected } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
@@ -18,7 +21,6 @@ import { Section } from "./Section";
 import Stack from "./Stack";
 
 import type { ActionManager } from "../actions/manager";
-import type { NonDeletedExcalidrawElement } from "../element/types";
 import type {
   AppClassProperties,
   AppProps,
@@ -31,6 +33,7 @@ import type { JSX } from "react";
 import clsx from "clsx";
 import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 type MobileMenuProps = {
   appState: UIAppState;

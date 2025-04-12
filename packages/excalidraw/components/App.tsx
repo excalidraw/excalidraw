@@ -1,3 +1,10 @@
+import clsx from "clsx";
+import throttle from "lodash.throttle";
+import React, { useContext } from "react";
+import { flushSync } from "react-dom";
+import rough from "roughjs/bin/rough";
+import { nanoid } from "nanoid";
+
 import {
   clamp,
   pointFrom,
@@ -11,15 +18,321 @@ import {
   vectorNormalize,
 } from "@excalidraw/math";
 import { isPointInShape } from "@excalidraw/utils/collision";
-import { getSelectionBoxShape } from "@excalidraw/utils/geometry/shape";
-import clsx from "clsx";
-import throttle from "lodash.throttle";
-import { nanoid } from "nanoid";
-import React, { useContext } from "react";
-import { flushSync } from "react-dom";
-import rough from "roughjs/bin/rough";
+import { getSelectionBoxShape } from "@excalidraw/utils/shape";
+
+import {
+  COLOR_PALETTE,
+  CODES,
+  shouldResizeFromCenter,
+  shouldMaintainAspectRatio,
+  shouldRotateWithDiscreteAngle,
+  isArrowKey,
+  KEYS,
+  APP_NAME,
+  CURSOR_TYPE,
+  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+  DEFAULT_VERTICAL_ALIGN,
+  DRAGGING_THRESHOLD,
+  ELEMENT_SHIFT_TRANSLATE_AMOUNT,
+  ELEMENT_TRANSLATE_AMOUNT,
+  EVENT,
+  FRAME_STYLE,
+  IMAGE_MIME_TYPES,
+  IMAGE_RENDER_TIMEOUT,
+  isBrave,
+  LINE_CONFIRM_THRESHOLD,
+  MAX_ALLOWED_FILE_BYTES,
+  MIME_TYPES,
+  MQ_MAX_HEIGHT_LANDSCAPE,
+  MQ_MAX_WIDTH_LANDSCAPE,
+  MQ_MAX_WIDTH_PORTRAIT,
+  MQ_RIGHT_SIDEBAR_MIN_WIDTH,
+  POINTER_BUTTON,
+  ROUNDNESS,
+  SCROLL_TIMEOUT,
+  TAP_TWICE_TIMEOUT,
+  TEXT_TO_CENTER_SNAP_THRESHOLD,
+  THEME,
+  THEME_FILTER,
+  TOUCH_CTX_MENU_TIMEOUT,
+  VERTICAL_ALIGN,
+  YOUTUBE_STATES,
+  ZOOM_STEP,
+  POINTER_EVENTS,
+  TOOL_TYPE,
+  isIOS,
+  supportsResizeObserver,
+  DEFAULT_COLLISION_THRESHOLD,
+  DEFAULT_TEXT_ALIGN,
+  ARROW_TYPE,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
+  isSafari,
+  isLocalLink,
+  normalizeLink,
+  toValidURL,
+  getGridPoint,
+  getLineHeight,
+  debounce,
+  distance,
+  getFontString,
+  getNearestScrollableContainer,
+  isInputLike,
+  isToolIcon,
+  isWritableElement,
+  sceneCoordsToViewportCoords,
+  tupleToCoors,
+  viewportCoordsToSceneCoords,
+  wrapEvent,
+  updateObject,
+  updateActiveTool,
+  getShortcutKey,
+  isTransparent,
+  easeToValuesRAF,
+  muteFSAbortError,
+  isTestEnv,
+  isDevEnv,
+  easeOut,
+  updateStable,
+  addEventListener,
+  normalizeEOL,
+  getDateTime,
+  isShallowEqual,
+  arrayToMap,
+  type EXPORT_IMAGE_TYPES,
+  randomInteger,
+} from "@excalidraw/common";
+
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  getResizedElementAbsoluteCoords,
+} from "@excalidraw/element/bounds";
+
+import {
+  bindOrUnbindLinearElement,
+  bindOrUnbindLinearElements,
+  fixBindingsAfterDeletion,
+  getHoveredElementForBinding,
+  isBindingEnabled,
+  isLinearElementSimpleAndAlreadyBound,
+  maybeBindLinearElement,
+  shouldEnableBindingForPointerEvent,
+  updateBoundElements,
+  getSuggestedBindingsForArrows,
+} from "@excalidraw/element/binding";
+
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
+import {
+  mutateElement,
+  newElementWith,
+} from "@excalidraw/element/mutateElement";
+
+import {
+  newFrameElement,
+  newFreeDrawElement,
+  newEmbeddableElement,
+  newMagicFrameElement,
+  newIframeElement,
+  newArrowElement,
+  newElement,
+  newImageElement,
+  newLinearElement,
+  newTextElement,
+  refreshTextDimensions,
+} from "@excalidraw/element/newElement";
+
+import {
+  deepCopyElement,
+  duplicateElements,
+} from "@excalidraw/element/duplicate";
+
+import {
+  hasBoundTextElement,
+  isArrowElement,
+  isBindingElement,
+  isBindingElementType,
+  isBoundToContainer,
+  isFrameLikeElement,
+  isImageElement,
+  isEmbeddableElement,
+  isInitializedImageElement,
+  isLinearElement,
+  isLinearElementType,
+  isUsingAdaptiveRadius,
+  isIframeElement,
+  isIframeLikeElement,
+  isMagicFrameElement,
+  isTextBindableContainer,
+  isElbowArrow,
+  isFlowchartNodeElement,
+  isBindableElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
+
+import {
+  getLockedLinearCursorAlignSize,
+  getNormalizedDimensions,
+  isElementCompletelyInViewport,
+  isElementInViewport,
+  isInvisiblySmallElement,
+} from "@excalidraw/element/sizeHelpers";
+
+import {
+  getBoundTextShape,
+  getCornerRadius,
+  getElementShape,
+  isPathALoop,
+} from "@excalidraw/element/shapes";
+
+import {
+  createSrcDoc,
+  embeddableURLValidator,
+  maybeParseEmbedSrc,
+  getEmbedLink,
+} from "@excalidraw/element/embeddable";
+
+import {
+  getInitializedImageElements,
+  loadHTMLImageElement,
+  normalizeSVG,
+  updateImageCache as _updateImageCache,
+} from "@excalidraw/element/image";
+
+import {
+  getBoundTextElement,
+  getContainerCenter,
+  getContainerElement,
+  isValidTextContainer,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+
+import { shouldShowBoundingBox } from "@excalidraw/element/transformHandles";
+
+import {
+  getFrameChildren,
+  isCursorInFrame,
+  addElementsToFrame,
+  replaceAllElementsInFrame,
+  removeElementsFromFrame,
+  getElementsInResizingFrame,
+  getElementsInNewFrame,
+  getContainingFrame,
+  elementOverlapsWithFrame,
+  updateFrameMembershipOfSelectedElements,
+  isElementInFrame,
+  getFrameLikeTitle,
+  getElementsOverlappingFrame,
+  filterElementsEligibleAsFrameChildren,
+} from "@excalidraw/element/frame";
+
+import {
+  hitElementBoundText,
+  hitElementBoundingBoxOnly,
+  hitElementItself,
+} from "@excalidraw/element/collision";
+
+import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
+
+import {
+  FlowChartCreator,
+  FlowChartNavigator,
+  getLinkDirectionFromKey,
+} from "@excalidraw/element/flowchart";
+
+import { cropElement } from "@excalidraw/element/cropElement";
+
+import { wrapText } from "@excalidraw/element/textWrapping";
+
+import {
+  isElementLink,
+  parseElementLinkFromURL,
+} from "@excalidraw/element/elementLink";
+
+import {
+  isMeasureTextSupported,
+  normalizeText,
+  measureText,
+  getLineHeightInPx,
+  getApproxMinLineWidth,
+  getApproxMinLineHeight,
+  getMinTextElementWidth,
+} from "@excalidraw/element/textMeasurements";
+
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import { getRenderOpacity } from "@excalidraw/element/renderElement";
+
+import {
+  editGroupForSelectedElement,
+  getElementsInGroup,
+  getSelectedGroupIdForElement,
+  getSelectedGroupIds,
+  isElementInGroup,
+  isSelectedViaGroup,
+  selectGroupsForSelectedElements,
+} from "@excalidraw/element/groups";
+
+import {
+  syncInvalidIndices,
+  syncMovedIndices,
+} from "@excalidraw/element/fractionalIndex";
+
+import {
+  excludeElementsInFramesFromSelection,
+  makeNextSelectedElementIds,
+} from "@excalidraw/element/selection";
+
+import {
+  getResizeOffsetXY,
+  getResizeArrowDirection,
+  transformElements,
+  getNextSingleWidthAndHeightFromPointer,
+  resizeSingleElement,
+} from "@excalidraw/element/resizeElements";
+
+import {
+  getCursorForResizingElement,
+  getElementWithTransformHandleType,
+  getTransformHandleTypeFromCoords,
+} from "@excalidraw/element/resizeTest";
+
+import {
+  dragNewElement,
+  dragSelectedElements,
+  getDragOffsetXY,
+} from "@excalidraw/element/dragElements";
+
+import { isNonDeletedElement } from "@excalidraw/element";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
+
+import type {
+  ExcalidrawBindableElement,
+  ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawGenericElement,
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeleted,
+  InitializedExcalidrawImageElement,
+  ExcalidrawImageElement,
+  FileId,
+  NonDeletedExcalidrawElement,
+  ExcalidrawTextContainer,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawMagicFrameElement,
+  ExcalidrawIframeLikeElement,
+  IframeData,
+  ExcalidrawIframeElement,
+  ExcalidrawEmbeddableElement,
+  Ordered,
+  MagicGenerationData,
+  ExcalidrawNonSelectionElement,
+  ExcalidrawArrowElement,
+} from "@excalidraw/element/types";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import {
   actionAddToLibrary,
@@ -78,148 +391,13 @@ import {
   isLaserPointerActive,
 } from "../appState";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import {
-  APP_NAME,
-  CURSOR_TYPE,
-  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-  DEFAULT_VERTICAL_ALIGN,
-  DRAGGING_THRESHOLD,
-  ELEMENT_SHIFT_TRANSLATE_AMOUNT,
-  ELEMENT_TRANSLATE_AMOUNT,
-  ENV,
-  EVENT,
-  FRAME_STYLE,
-  IMAGE_MIME_TYPES,
-  IMAGE_RENDER_TIMEOUT,
-  isBrave,
-  LINE_CONFIRM_THRESHOLD,
-  MAX_ALLOWED_FILE_BYTES,
-  MIME_TYPES,
-  MQ_MAX_HEIGHT_LANDSCAPE,
-  MQ_MAX_WIDTH_LANDSCAPE,
-  MQ_MAX_WIDTH_PORTRAIT,
-  MQ_RIGHT_SIDEBAR_MIN_WIDTH,
-  POINTER_BUTTON,
-  ROUNDNESS,
-  SCROLL_TIMEOUT,
-  TAP_TWICE_TIMEOUT,
-  TEXT_TO_CENTER_SNAP_THRESHOLD,
-  THEME,
-  THEME_FILTER,
-  TOUCH_CTX_MENU_TIMEOUT,
-  VERTICAL_ALIGN,
-  YOUTUBE_STATES,
-  ZOOM_STEP,
-  POINTER_EVENTS,
-  TOOL_TYPE,
-  isIOS,
-  supportsResizeObserver,
-  DEFAULT_COLLISION_THRESHOLD,
-  DEFAULT_TEXT_ALIGN,
-  DEFAULT_FONT_SIZE,
-  ARROW_TYPE,
-  DEFAULT_REDUCED_GLOBAL_ALPHA,
-  isSafari,
-  type EXPORT_IMAGE_TYPES,
-} from "../constants";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
-import {
-  dragNewElement,
-  dragSelectedElements,
-  duplicateElement,
-  getCommonBounds,
-  getCursorForResizingElement,
-  getDragOffsetXY,
-  getElementWithTransformHandleType,
-  getNormalizedDimensions,
-  getResizeArrowDirection,
-  getResizeOffsetXY,
-  getLockedLinearCursorAlignSize,
-  getTransformHandleTypeFromCoords,
-  isInvisiblySmallElement,
-  isNonDeletedElement,
-  isTextElement,
-  newElement,
-  newLinearElement,
-  newTextElement,
-  newImageElement,
-  transformElements,
-  refreshTextDimensions,
-  redrawTextBoundingBox,
-  getElementAbsoluteCoords,
-} from "../element";
-import {
-  bindOrUnbindLinearElement,
-  bindOrUnbindLinearElements,
-  fixBindingsAfterDeletion,
-  fixBindingsAfterDuplication,
-  getHoveredElementForBinding,
-  isBindingEnabled,
-  isLinearElementSimpleAndAlreadyBound,
-  maybeBindLinearElement,
-  shouldEnableBindingForPointerEvent,
-  updateBoundElements,
-  getSuggestedBindingsForArrows,
-} from "../element/binding";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { mutateElement, newElementWith } from "../element/mutateElement";
-import {
-  deepCopyElement,
-  duplicateElements,
-  newFrameElement,
-  newFreeDrawElement,
-  newEmbeddableElement,
-  newMagicFrameElement,
-  newIframeElement,
-  newArrowElement,
-} from "../element/newElement";
-import {
-  hasBoundTextElement,
-  isArrowElement,
-  isBindingElement,
-  isBindingElementType,
-  isBoundToContainer,
-  isFrameLikeElement,
-  isImageElement,
-  isEmbeddableElement,
-  isInitializedImageElement,
-  isLinearElement,
-  isLinearElementType,
-  isUsingAdaptiveRadius,
-  isIframeElement,
-  isIframeLikeElement,
-  isMagicFrameElement,
-  isTextBindableContainer,
-  isElbowArrow,
-  isFlowchartNodeElement,
-  isBindableElement,
-} from "../element/typeChecks";
 import { getCenter, getDistance } from "../gesture";
-import {
-  editGroupForSelectedElement,
-  getElementsInGroup,
-  getSelectedGroupIdForElement,
-  getSelectedGroupIds,
-  isElementInGroup,
-  isSelectedViaGroup,
-  selectGroupsForSelectedElements,
-} from "../groups";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
-import {
-  CODES,
-  shouldResizeFromCenter,
-  shouldMaintainAspectRatio,
-  shouldRotateWithDiscreteAngle,
-  isArrowKey,
-  KEYS,
-} from "../keys";
-import {
-  isElementCompletelyInViewport,
-  isElementInViewport,
-} from "../element/sizeHelpers";
+
 import {
   calculateScrollCenter,
   getElementsWithinSelection,
@@ -230,46 +408,6 @@ import {
 } from "../scene";
 import Scene from "../scene/Scene";
 import { getStateForZoom } from "../scene/zoom";
-import {
-  findShapeByKey,
-  getBoundTextShape,
-  getCornerRadius,
-  getElementShape,
-  isPathALoop,
-} from "../shapes";
-import {
-  debounce,
-  distance,
-  getFontString,
-  getNearestScrollableContainer,
-  isInputLike,
-  isToolIcon,
-  isWritableElement,
-  sceneCoordsToViewportCoords,
-  tupleToCoors,
-  viewportCoordsToSceneCoords,
-  wrapEvent,
-  updateObject,
-  updateActiveTool,
-  getShortcutKey,
-  isTransparent,
-  easeToValuesRAF,
-  muteFSAbortError,
-  isTestEnv,
-  easeOut,
-  updateStable,
-  addEventListener,
-  normalizeEOL,
-  getDateTime,
-  isShallowEqual,
-  arrayToMap,
-} from "../utils";
-import {
-  createSrcDoc,
-  embeddableURLValidator,
-  maybeParseEmbedSrc,
-  getEmbedLink,
-} from "../element/embeddable";
 import {
   dataURLToFile,
   dataURLToString,
@@ -286,49 +424,15 @@ import {
   resizeImageFile,
   SVGStringToFile,
 } from "../data/blob";
-import {
-  getInitializedImageElements,
-  loadHTMLImageElement,
-  normalizeSVG,
-  updateImageCache as _updateImageCache,
-} from "../element/image";
+
 import { fileOpen } from "../data/filesystem";
-import {
-  bindTextToShapeAfterDuplication,
-  getBoundTextElement,
-  getContainerCenter,
-  getContainerElement,
-  isValidTextContainer,
-} from "../element/textElement";
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
-import { isLocalLink, normalizeLink, toValidURL } from "../data/url";
-import { shouldShowBoundingBox } from "../element/transformHandles";
-import { Fonts, getLineHeight } from "../fonts";
-import {
-  getFrameChildren,
-  isCursorInFrame,
-  bindElementsToFramesAfterDuplication,
-  addElementsToFrame,
-  replaceAllElementsInFrame,
-  removeElementsFromFrame,
-  getElementsInResizingFrame,
-  getElementsInNewFrame,
-  getContainingFrame,
-  elementOverlapsWithFrame,
-  updateFrameMembershipOfSelectedElements,
-  isElementInFrame,
-  getFrameLikeTitle,
-  getElementsOverlappingFrame,
-  filterElementsEligibleAsFrameChildren,
-} from "../frame";
-import {
-  excludeElementsInFramesFromSelection,
-  makeNextSelectedElementIds,
-} from "../scene/selection";
+
+import { Fonts } from "../fonts";
 import { editorJotaiStore } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
@@ -342,11 +446,9 @@ import {
   getReferenceSnapPoints,
   SnapCache,
   isGridModeEnabled,
-  getGridPoint,
 } from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
-import { ShapeCache } from "../scene/ShapeCache";
 import {
   setEraserCursor,
   setCursor,
@@ -355,48 +457,17 @@ import {
   clearEraserCanvasCache,
 } from "../cursor";
 import { Emitter } from "../emitter";
-import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
-import { COLOR_PALETTE } from "../colors";
+import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { Store, CaptureUpdateAction } from "../store";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
-import { getRenderOpacity } from "../renderer/renderElement";
-import {
-  allowDoubleTapEraser,
-  getExcalidrawContentEl,
-  getMaxZoom,
-  hideFreedrawPenmodeCursor,
-  initializeObsidianUtils,
-  isTouchInPenMode,
-} from "../obsidianUtils";
-import {
-  hitElementBoundText,
-  hitElementBoundingBoxOnly,
-  hitElementItself,
-} from "../element/collision";
-import { textWysiwyg } from "../element/textWysiwyg";
+import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
-import { syncInvalidIndices, syncMovedIndices } from "../fractionalIndex";
-import { getResizedElementAbsoluteCoords, getVisibleSceneBounds } from "../element/bounds";
+
 import { isMaybeMermaidDefinition } from "../mermaid";
-import {
-  FlowChartCreator,
-  FlowChartNavigator,
-  getLinkDirectionFromKey,
-} from "../element/flowchart";
-import { cropElement } from "../element/cropElement";
-import { wrapText } from "../element/textWrapping";
-import { isElementLink, parseElementLinkFromURL } from "../element/elementLink";
-import {
-  isMeasureTextSupported,
-  normalizeText,
-  measureText,
-  getLineHeightInPx,
-  getApproxMinLineWidth,
-  getApproxMinLineHeight,
-  getMinTextElementWidth,
-} from "../element/textMeasurements";
+
+import { LassoTrail } from "../lasso";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -417,40 +488,19 @@ import {
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { Toast } from "./Toast";
 
-import type { Action, ActionName, ActionResult } from "../actions/types";
+import { findShapeByKey } from "./shapes";
+
+import type {
+  RenderInteractiveSceneCallback,
+  ScrollBars,
+} from "../scene/types";
+
 import type { PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
 import type { ExcalidrawElementSkeleton } from "../data/transform";
-import type {
-  ExcalidrawBindableElement,
-  ExcalidrawElement,
-  ExcalidrawFreeDrawElement,
-  ExcalidrawGenericElement,
-  ExcalidrawLinearElement,
-  ExcalidrawTextElement,
-  NonDeleted,
-  InitializedExcalidrawImageElement,
-  ExcalidrawImageElement,
-  FileId,
-  NonDeletedExcalidrawElement,
-  ExcalidrawTextContainer,
-  ExcalidrawFrameLikeElement,
-  ExcalidrawMagicFrameElement,
-  ExcalidrawIframeLikeElement,
-  IframeData,
-  ExcalidrawIframeElement,
-  ExcalidrawEmbeddableElement,
-  Ordered,
-  MagicGenerationData,
-  ExcalidrawNonSelectionElement,
-  ExcalidrawArrowElement,
-} from "../element/types";
-import type {
-  RenderInteractiveSceneCallback,
-  ScrollBars,
-} from "../scene/types";
+
 import type {
   AppClassProperties,
   AppProps,
@@ -479,11 +529,11 @@ import type {
   NullableGridSize,
   Offsets,
 } from "../types";
-import type { ValueOf } from "../utility-types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { Action, ActionName, ActionResult } from "../actions/types";
+import { allowDoubleTapEraser, getExcalidrawContentEl, getMaxZoom, hideFreedrawPenmodeCursor, initializeObsidianUtils, isTouchInPenMode } from "../obsidianUtils";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
-import { getNextSingleWidthAndHeightFromPointer, resizeSingleElement } from "../element/resizeElements";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -654,6 +704,7 @@ class App extends React.Component<AppProps, AppState> {
         ? "rgba(0, 0, 0, 0.2)"
         : "rgba(255, 255, 255, 0.2)",
   });
+  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
 
   onChangeEmitter = new Emitter<
     [
@@ -1691,7 +1742,11 @@ class App extends React.Component<AppProps, AppState> {
                         <div className="excalidraw-contextMenuContainer" />
                         <div className="excalidraw-eye-dropper-container" />
                         <SVGLayer
-                          trails={[this.laserTrails, this.eraserTrail]}
+                          trails={[
+                            this.laserTrails,
+                            this.eraserTrail,
+                            this.lassoTrail,
+                          ]}
                         />
                         {selectedElements.length === 1 &&
                           this.state.openDialog?.name !==
@@ -2545,7 +2600,7 @@ class App extends React.Component<AppProps, AppState> {
       this.excalidrawContainerRef.current;
 
     //zsviczian disabling this code
-    if (false && (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV)) {
+    if (false && (isTestEnv() || isDevEnv())) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
         state: {
@@ -3393,17 +3448,16 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const newElements = duplicateElements(
-      elements.map((element) => {
+    const { newElements } = duplicateElements({
+      type: "everything",
+      elements: elements.map((element) => {
         return newElementWith(element, {
           x: element.x + gridX - minX,
           y: element.y + gridY - minY,
         });
       }),
-      {
-        randomizeSeed: !opts.retainSeed,
-      },
-    );
+      randomizeSeed: !opts.retainSeed,
+    });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
     let nextElements = [...prevElements, ...newElements];
@@ -4220,6 +4274,8 @@ class App extends React.Component<AppProps, AppState> {
       actionBringForward.perform(
         this.scene.getNonDeletedElements(),
         this.state,
+        undefined,
+        this,
       ),
     );
   };
@@ -4243,6 +4299,8 @@ class App extends React.Component<AppProps, AppState> {
       actionSendBackward.perform(
         this.scene.getNonDeletedElements(),
         this.state,
+        undefined,
+        this,
       ),
     );
   };
@@ -5034,7 +5092,10 @@ class App extends React.Component<AppProps, AppState> {
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
         setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-      } else if (this.state.activeTool.type === "selection") {
+      } else if (
+        this.state.activeTool.type === "selection" ||
+        this.state.activeTool.type === "lasso"
+      ) {
         resetCursor(this.interactiveCanvas);
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
@@ -5142,7 +5203,8 @@ class App extends React.Component<AppProps, AppState> {
             }
         )
       | { type: "custom"; customType: string }
-    ) & { locked?: boolean },
+    ) & { locked?: boolean; fromSelection?: boolean },
+    keepSelection = false,
   ) => {
     if (!this.isToolSupported(tool.type)) {
       console.warn(
@@ -5185,7 +5247,21 @@ class App extends React.Component<AppProps, AppState> {
           this.store.shouldCaptureIncrement();
         }
 
-        if (nextActiveTool.type !== "selection") {
+        if (nextActiveTool.type === "lasso") {
+          return {
+            ...prevState,
+            activeTool: nextActiveTool,
+            ...(keepSelection
+              ? {}
+              : {
+                  selectedElementIds: makeNextSelectedElementIds({}, prevState),
+                  selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+                  editingGroupId: null,
+                  multiElement: null,
+                }),
+            ...commonResets,
+          };
+        } else if (nextActiveTool.type !== "selection") {
           return {
             ...prevState,
             activeTool: nextActiveTool,
@@ -5206,8 +5282,8 @@ class App extends React.Component<AppProps, AppState> {
           activeTool: nextActiveTool,
           ...commonResets,
         };
-      }); //zsviczian added timeout because button won't select otherwise
-    });
+      });
+    }); //zsviczian added timeout because button won't select otherwise
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
@@ -6670,7 +6746,12 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({
               activeEmbeddable: { element: hitElement, state: "hover" },
             });
-          } else if (!hitElement || !isElbowArrow(hitElement)) {
+          } else if (
+            !hitElement ||
+            // Ebow arrows can only be moved when unconnected
+            !isElbowArrow(hitElement) ||
+            !(hitElement.startBinding || hitElement.endBinding)
+          ) {
             setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
             if (this.state.activeEmbeddable?.state === "hover") {
               this.setState({ activeEmbeddable: null });
@@ -6863,7 +6944,13 @@ class App extends React.Component<AppProps, AppState> {
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          if (
+            // Ebow arrows can only be moved when unconnected
+            !isElbowArrow(element) ||
+            !(element.startBinding || element.endBinding)
+          ) {
+            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
+          }
         }
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
@@ -7120,6 +7207,7 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.penMode ||
       event.pointerType !== "touch" ||
       this.state.activeTool.type === "selection" ||
+      this.state.activeTool.type === "lasso" ||
       this.state.activeTool.type === "text" ||
       this.state.activeTool.type === "image";
 
@@ -7127,7 +7215,13 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.activeTool.type === "text") {
+    if (this.state.activeTool.type === "lasso") {
+      this.lassoTrail.startPath(
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        event.shiftKey,
+      );
+    } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
@@ -7588,7 +7682,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private clearSelectionIfNotUsingSelection = (): void => {
-    if (this.state.activeTool.type !== "selection") {
+    if (
+      this.state.activeTool.type !== "selection" &&
+      this.state.activeTool.type !== "lasso"
+    ) {
       this.setState({
         selectedElementIds: makeNextSelectedElementIds({}, this.state),
         selectedGroupIds: {},
@@ -8745,6 +8842,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...this.state.selectedLinearElement,
                   pointerDownState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
+                  segmentMidPointHoveredCoords: null,
                 },
               });
             }
@@ -8754,6 +8852,7 @@ class App extends React.Component<AppProps, AppState> {
                   ...this.state.editingLinearElement,
                   pointerDownState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
+                  segmentMidPointHoveredCoords: null,
                 },
               });
             }
@@ -8767,7 +8866,7 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const didDrag = LinearElementEditor.handlePointDragging(
+        const newLinearElementEditor = LinearElementEditor.handlePointDragging(
           event,
           this,
           pointerCoords.x,
@@ -8781,29 +8880,18 @@ class App extends React.Component<AppProps, AppState> {
           linearElementEditor,
           this.scene,
         );
-        if (didDrag) {
+        if (newLinearElementEditor) {
           pointerDownState.lastCoords.x = pointerCoords.x;
           pointerDownState.lastCoords.y = pointerCoords.y;
           pointerDownState.drag.hasOccurred = true;
-          if (
-            this.state.editingLinearElement &&
-            !this.state.editingLinearElement.isDragging
-          ) {
-            this.setState({
-              editingLinearElement: {
-                ...this.state.editingLinearElement,
-                isDragging: true,
-              },
-            });
-          }
-          if (!this.state.selectedLinearElement.isDragging) {
-            this.setState({
-              selectedLinearElement: {
-                ...this.state.selectedLinearElement,
-                isDragging: true,
-              },
-            });
-          }
+
+          this.setState({
+            editingLinearElement: this.state.editingLinearElement
+              ? newLinearElementEditor
+              : null,
+            selectedLinearElement: newLinearElementEditor,
+          });
+
           return;
         }
       }
@@ -8820,7 +8908,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         (hasHitASelectedElement ||
           pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements) &&
-        !isSelectingPointsInLineEditor
+        !isSelectingPointsInLineEditor &&
+        this.state.activeTool.type !== "lasso"
       ) {
         const selectedElements = this.scene.getSelectedElements(this.state);
 
@@ -9029,146 +9118,70 @@ class App extends React.Component<AppProps, AppState> {
 
             pointerDownState.hit.hasBeenDuplicated = true;
 
-            const nextElements = [];
-            const elementsToAppend = [];
-            const groupIdMap = new Map();
-            const oldIdToDuplicatedId = new Map();
-            const hitElement = pointerDownState.hit.element;
-            const selectedElementIds = new Set(
-              this.scene
-                .getSelectedElements({
-                  selectedElementIds: this.state.selectedElementIds,
-                  includeBoundTextElement: true,
-                  includeElementsInFrames: true,
-                })
-                .map((element) => element.id),
-            );
-
             const elements = this.scene.getElementsIncludingDeleted();
-
-            for (const element of elements) {
-              const isInSelection =
-                selectedElementIds.has(element.id) ||
-                // case: the state.selectedElementIds might not have been
-                // updated yet by the time this mousemove event is fired
-                (element.id === hitElement?.id &&
-                  pointerDownState.hit.wasAddedToSelection);
-              // NOTE (mtolmacs): This is a temporary fix for very large scenes
-              if (
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.x) > 1e7 ||
-                Math.abs(element.width) > 1e7 ||
-                Math.abs(element.height) > 1e7
-              ) {
-                console.error(
-                  `Alt+dragging element in scene with invalid dimensions`,
-                  element.x,
-                  element.y,
-                  element.width,
-                  element.height,
-                  isInSelection,
-                );
-
-                return;
-              }
-
-              if (isInSelection) {
-                const duplicatedElement = duplicateElement(
-                  this.state.editingGroupId,
-                  groupIdMap,
-                  element,
-                );
-
-                // NOTE (mtolmacs): This is a temporary fix for very large scenes
-                if (
-                  Math.abs(duplicatedElement.x) > 1e7 ||
-                  Math.abs(duplicatedElement.x) > 1e7 ||
-                  Math.abs(duplicatedElement.width) > 1e7 ||
-                  Math.abs(duplicatedElement.height) > 1e7
-                ) {
-                  console.error(
-                    `Alt+dragging duplicated element with invalid dimensions`,
-                    duplicatedElement.x,
-                    duplicatedElement.y,
-                    duplicatedElement.width,
-                    duplicatedElement.height,
-                  );
-
-                  return;
-                }
-
-                const origElement = pointerDownState.originalElements.get(
-                  element.id,
-                )!;
-
-                // NOTE (mtolmacs): This is a temporary fix for very large scenes
-                if (
-                  Math.abs(origElement.x) > 1e7 ||
-                  Math.abs(origElement.x) > 1e7 ||
-                  Math.abs(origElement.width) > 1e7 ||
-                  Math.abs(origElement.height) > 1e7
-                ) {
-                  console.error(
-                    `Alt+dragging duplicated element with invalid dimensions`,
-                    origElement.x,
-                    origElement.y,
-                    origElement.width,
-                    origElement.height,
-                  );
-
-                  return;
-                }
-
-                mutateElement(duplicatedElement, {
-                  x: origElement.x,
-                  y: origElement.y,
-                });
-
-                // put duplicated element to pointerDownState.originalElements
-                // so that we can snap to the duplicated element without releasing
-                pointerDownState.originalElements.set(
-                  duplicatedElement.id,
-                  duplicatedElement,
-                );
-
-                nextElements.push(duplicatedElement);
-                elementsToAppend.push(element);
-                oldIdToDuplicatedId.set(element.id, duplicatedElement.id);
-              } else {
-                nextElements.push(element);
-              }
+            const hitElement = pointerDownState.hit.element;
+            const selectedElements = this.scene.getSelectedElements({
+              selectedElementIds: this.state.selectedElementIds,
+              includeBoundTextElement: true,
+              includeElementsInFrames: true,
+            });
+            if (
+              hitElement &&
+              // hit element may not end up being selected
+              // if we're alt-dragging a common bounding box
+              // over the hit element
+              pointerDownState.hit.wasAddedToSelection &&
+              !selectedElements.find((el) => el.id === hitElement.id)
+            ) {
+              selectedElements.push(hitElement);
             }
 
-            let nextSceneElements: ExcalidrawElement[] = [
-              ...nextElements,
-              ...elementsToAppend,
-            ];
+            const idsOfElementsToDuplicate = new Map(
+              selectedElements.map((el) => [el.id, el]),
+            );
+
+            const { newElements: clonedElements, elementsWithClones } =
+              duplicateElements({
+                type: "in-place",
+                elements,
+                appState: this.state,
+                randomizeSeed: true,
+                idsOfElementsToDuplicate,
+                overrides: (el) => {
+                  const origEl = pointerDownState.originalElements.get(el.id);
+
+                  if (origEl) {
+                    return {
+                      x: origEl.x,
+                      y: origEl.y,
+                      seed: origEl.seed,
+                    };
+                  }
+
+                  return {};
+                },
+                reverseOrder: true,
+              });
+            clonedElements.forEach((element) => {
+              pointerDownState.originalElements.set(element.id, element);
+            });
 
             const mappedNewSceneElements = this.props.onDuplicate?.(
-              nextSceneElements,
+              elementsWithClones,
               elements,
             );
 
-            nextSceneElements = mappedNewSceneElements || nextSceneElements;
-
-            syncMovedIndices(nextSceneElements, arrayToMap(elementsToAppend));
-
-            bindTextToShapeAfterDuplication(
-              nextElements,
-              elementsToAppend,
-              oldIdToDuplicatedId,
-            );
-            fixBindingsAfterDuplication(
-              nextSceneElements,
-              elementsToAppend,
-              oldIdToDuplicatedId,
-              "duplicatesServeAsOld",
-            );
-            bindElementsToFramesAfterDuplication(
-              nextSceneElements,
-              elementsToAppend,
-              oldIdToDuplicatedId,
-            );
+            const nextSceneElements = syncMovedIndices(
+              mappedNewSceneElements || elementsWithClones,
+              arrayToMap(clonedElements),
+            ).map((el) => {
+              if (idsOfElementsToDuplicate.has(el.id)) {
+                return newElementWith(el, {
+                  seed: randomInteger(),
+                });
+              }
+              return el;
+            });
 
             this.scene.replaceAllElements(nextSceneElements);
             this.maybeCacheVisibleGaps(event, selectedElements, true);
@@ -9182,7 +9195,37 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectionElement) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        this.maybeDragNewGenericElement(pointerDownState, event);
+        if (event.altKey) {
+          this.setActiveTool(
+            { type: "lasso", fromSelection: true },
+            event.shiftKey,
+          );
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+          this.setAppState({
+            selectionElement: null,
+          });
+        } else {
+          this.maybeDragNewGenericElement(pointerDownState, event);
+        }
+      } else if (this.state.activeTool.type === "lasso") {
+        if (!event.altKey && this.state.activeTool.fromSelection) {
+          this.setActiveTool({ type: "selection" });
+          this.createGenericElementOnPointerDown("selection", pointerDownState);
+          pointerDownState.lastCoords.x = pointerCoords.x;
+          pointerDownState.lastCoords.y = pointerCoords.y;
+          this.maybeDragNewGenericElement(pointerDownState, event);
+          this.lassoTrail.endPath();
+        } else {
+          this.lassoTrail.addPointToPath(
+            pointerCoords.x,
+            pointerCoords.y,
+            event.shiftKey,
+          );
+        }
       } else {
         // It is very important to read this.state within each move event,
         // otherwise we would read a stale one!
@@ -9442,6 +9485,8 @@ class App extends React.Component<AppProps, AppState> {
         originSnapOffset: null,
       }));
 
+      // just in case, tool changes mid drag, always clean up
+      this.lassoTrail.endPath();
       this.lastPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
@@ -10158,6 +10203,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // do not clear selection if lasso is active
+        this.state.activeTool.type !== "lasso" &&
         // not elbow midpoint dragged
         !(hitElement && isElbowArrow(hitElement)) &&
         // not dragged
@@ -10256,7 +10303,13 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw") {
+      if (
+        !activeTool.locked &&
+        activeTool.type !== "freedraw" &&
+        (activeTool.type !== "lasso" ||
+          // if lasso is turned on but from selection => reset to selection
+          (activeTool.type === "lasso" && activeTool.fromSelection))
+      ) {
         resetCursor(this.interactiveCanvas);
         this.setState({
           newElement: null,
@@ -11166,7 +11219,7 @@ class App extends React.Component<AppProps, AppState> {
         width: distance(pointerDownState.origin.x, pointerCoords.x),
         height: distance(pointerDownState.origin.y, pointerCoords.y),
         shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter: shouldResizeFromCenter(event),
+        shouldResizeFromCenter: false,
         zoom: this.state.zoom.value,
         informMutation,
       });
@@ -11819,6 +11872,7 @@ class App extends React.Component<AppProps, AppState> {
 // -----------------------------------------------------------------------------
 // TEST HOOKS
 // -----------------------------------------------------------------------------
+/* //zsviczian - I get a type error on h, but anyway I don't need this test hook
 declare global {
   interface Window {
     h: {
@@ -11833,4 +11887,32 @@ declare global {
   }
 }
 
+export const createTestHook = () => {
+  if (isTestEnv() || isDevEnv()) {
+    window.h = window.h || ({} as Window["h"]);
+
+    Object.defineProperties(window.h, {
+      elements: {
+        configurable: true,
+        get() {
+          return this.app?.scene.getElementsIncludingDeleted();
+        },
+        set(elements: ExcalidrawElement[]) {
+          return this.app?.scene.replaceAllElements(
+            syncInvalidIndices(elements),
+          );
+        },
+      },
+      scene: {
+        configurable: true,
+        get() {
+          return this.app?.scene;
+        },
+      },
+    });
+  }
+};
+
+createTestHook();
+*/
 export default App;

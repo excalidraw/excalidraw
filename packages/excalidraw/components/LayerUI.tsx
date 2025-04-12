@@ -1,20 +1,32 @@
 import clsx from "clsx";
 import React from "react";
 
-import { mutateElement } from "../element/mutateElement";
-import { ShapeCache } from "../scene/ShapeCache";
+import {
+  CLASSES,
+  DEFAULT_SIDEBAR,
+  TOOL_TYPE,
+  capitalizeString,
+  isShallowEqual,
+} from "@excalidraw/common";
+
+import { mutateElement } from "@excalidraw/element/mutateElement";
+
+import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
+
+import { ShapeCache } from "@excalidraw/element/ShapeCache";
+
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import Scene from "../scene/Scene";
 import { actionToggleStats } from "../actions";
 import { trackEvent } from "../analytics";
 import { isHandToolActive } from "../appState";
-import { CLASSES, DEFAULT_SIDEBAR, TOOL_TYPE } from "../constants";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
-import { showSelectedShapeActions } from "../element";
+
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { capitalizeString, isShallowEqual } from "../utils";
 
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
@@ -51,7 +63,7 @@ import "./LayerUI.scss";
 import "./Toolbar.scss";
 
 import type { ActionManager } from "../actions/manager";
-import type { NonDeletedExcalidrawElement } from "../element/types";
+
 import type { Language } from "../i18n";
 import type {
   AppProps,
