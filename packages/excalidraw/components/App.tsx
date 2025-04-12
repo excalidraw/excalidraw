@@ -741,6 +741,8 @@ class App extends React.Component<AppProps, AppState> {
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
       name = `${t("labels.untitled")}-${getDateTime()}`,
+      strokeColorTopPicks,
+      backgroundColorTopPicks,
     } = props;
     this.state = {
       ...defaultAppState,
