@@ -63,7 +63,7 @@ import type {
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
 
-import { getCommonBounds } from "..";
+import { getCommonBounds } from "@excalidraw/element/bounds";
 
 export type ValidLinearElement = {
   type: "arrow" | "line";

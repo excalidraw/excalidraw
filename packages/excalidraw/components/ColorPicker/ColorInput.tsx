@@ -13,7 +13,7 @@ import { getColor } from "./ColorPicker";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 import type { ColorPickerType } from "./colorPickerUtils";
-import { COLOR_NAMES } from "@excalidraw/excalidraw/constants";
+import { COLOR_NAMES } from "@excalidraw/common/constants";
 
 interface ColorInputProps {
   color: string;

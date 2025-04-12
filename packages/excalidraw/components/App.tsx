@@ -2600,6 +2600,7 @@ class App extends React.Component<AppProps, AppState> {
       this.excalidrawContainerRef.current;
 
     //zsviczian disabling this code
+    /*
     if (false && (isTestEnv() || isDevEnv())) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -2632,7 +2633,7 @@ class App extends React.Component<AppProps, AppState> {
           value: this.fonts,
         },
       });
-    }
+    }*/
 
     this.store.onStoreIncrementEmitter.on((increment) => {
       this.history.record(increment.elementsChange, increment.appStateChange);

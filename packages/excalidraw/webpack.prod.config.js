@@ -26,8 +26,10 @@ module.exports = {
     extensions: [".js", ".ts", ".tsx", ".css", ".scss"],
     alias: {
       "@excalidraw/excalidraw": path.resolve(__dirname),
-      "@excalidraw/utils": path.resolve(__dirname, "../utils"),
-      "@excalidraw/math": path.resolve(__dirname, "../math"),
+      "@excalidraw/utils": path.resolve(__dirname, "../utils/src"),
+      "@excalidraw/math": path.resolve(__dirname, "../math/src"),
+      "@excalidraw/common": path.resolve(__dirname, "../common/src"),
+      "@excalidraw/element": path.resolve(__dirname, "../element/src"),
     }
   },
   module: {

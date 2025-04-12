@@ -1,4 +1,4 @@
-import { ENV } from "./constants";
+import { ENV } from "@excalidraw/common/constants";
 if (process.env.NODE_ENV !== ENV.TEST) {
   /* eslint-disable */
   /* global __webpack_public_path__:writable */

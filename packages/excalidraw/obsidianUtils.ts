@@ -1,14 +1,13 @@
 import { GlobalPoint } from "@excalidraw/math/types";
-import { FreedrawIcon } from "./components/icons";
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
-import { FONT_FAMILY } from "./constants";
-import type { ElementsMap, ExcalidrawElement, NonDeletedExcalidrawElement } from "./element/types";
+import { FONT_FAMILY } from "@excalidraw/common";
+import type { ElementsMap, ExcalidrawElement, NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 import { Fonts } from "./fonts";
-import type { FontMetadata } from "./fonts/FontMetadata";
-import { FONT_METADATA } from "./fonts/FontMetadata";
+import type { FontMetadata } from "@excalidraw/common";
+import { FONT_METADATA } from "@excalidraw/common";
 import type { AppState } from "./types";
-import { intersectElementWithLineSegment } from "./element/collision";
+import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
@@ -79,7 +78,6 @@ export function registerLocalFont(
 ) {
   FONT_METADATA[FONT_FAMILY["Local Font"]] = {
     metrics: fontMetrics.metrics,
-    icon: FreedrawIcon,
   };
   Fonts.register("Local Font", fontMetrics, { uri });
 }

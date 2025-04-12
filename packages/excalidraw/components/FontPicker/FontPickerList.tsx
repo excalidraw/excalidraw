@@ -74,6 +74,8 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
     case FONT_FAMILY["Comic Shanns"]:
     case FONT_FAMILY.Cascadia:
       return FontFamilyCodeIcon;
+    case FONT_FAMILY["Local Font"]: //zsviczian
+      return FreedrawIcon;
     default:
       return FontFamilyNormalIcon;
   }

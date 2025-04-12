@@ -260,28 +260,29 @@ export {
   exportToBlob,
   exportToSvg,
   exportToClipboard,
-  getCommonBoundingBox, //zsviczian
-  getMaximumGroups, //zsviczian
-  intersectElementWithLine, //zsviczian
-  determineFocusDistance, //zsviczian
-  measureText, //zsviczian
-  getLineHeight, //zsviczian
-  wrapText, //zsviczian
-  getFontString, //zsviczian
-  getBoundTextMaxWidth, //zsviczian
-  mermaidToExcalidraw, //zsviczian
-  destroyObsidianUtils, //zsviczian
-  registerLocalFont, //zsviczian
-  getFontFamilies, //zsviczian
-  getFontFamilyString, //zsviczian
-  registerFontsInCSS, //zsviczian
-  getCSSFontDefinition, //zsviczian
-  loadSceneFonts, //zsviczian
-  loadMermaid, //zsviczian
 } from "@excalidraw/utils/export";
 
 
-export { default as easingsFunctions } from "./renderer/easingFunctions";
+export { getCommonBoundingBox } from "@excalidraw/element/bounds"; //zsviczian
+export { getMaximumGroups } from "@excalidraw/element/groups"; //zsviczian
+export { determineFocusDistance } from "@excalidraw/element/binding"; //zsviczian
+export { measureText } from "@excalidraw/element/textMeasurements"; //zsviczian
+export { wrapText } from "@excalidraw/element/textWrapping"; //zsviczian
+export { getLineHeight } from "@excalidraw/common"; //zsviczian
+export { getFontString, getFontFamilyString } from "@excalidraw/common"; //zsviczian
+export { getBoundTextMaxWidth } from "@excalidraw/element/textElement"; //zsviczian
+export { mermaidToExcalidraw } from "./components/TTDDialog/MermaidToExcalidrawLib"; //zsviczian
+export {
+  destroyObsidianUtils,
+  registerLocalFont,
+  getFontFamilies,
+  registerFontsInCSS,
+  getCSSFontDefinition,
+  loadSceneFonts,
+  getSharedMermaidInstance,
+  loadMermaid,
+  intersectElementWithLine,
+} from "../excalidraw/obsidianUtils"; //zsviczian
 
 export { refreshTextDimensions } from "@excalidraw/element/newElement"; //zsviczian
 

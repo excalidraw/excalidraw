@@ -73,8 +73,8 @@ import type {
 import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import { getAreaLimit, getWidthHeightLimit } from "@excalidraw/excalidraw/obsidianUtils";
-import { easingsFunctions } from "@excalidraw/excalidraw";
-import { isIframeLikeElement } from "@excalidraw/excalidraw/types/excalidraw/element/typeChecks";
+import { isIframeLikeElement } from "@excalidraw/element/typeChecks";
+import easingsFunctions from "./easingFunctions";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
