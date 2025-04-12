@@ -1,9 +1,9 @@
+import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
+
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
 import { AnimatedTrail } from "./animated-trail";
 import { getClientColor } from "./clients";
-import { DEFAULT_LASER_COLOR } from "./constants";
-import { easeOut } from "./utils";
 
 import type { Trail } from "./animated-trail";
 import type { AnimationFrameHandler } from "./animation-frame-handler";

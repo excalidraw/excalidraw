@@ -1,14 +1,17 @@
+import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+
+import { isElbowArrow, isLinearElement } from "@excalidraw/element/typeChecks";
+
+import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
 import { ToolButton } from "../components/ToolButton";
 import { lineEditorIcon } from "../components/icons";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { isElbowArrow, isLinearElement } from "../element/typeChecks";
+
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
-
-import type { ExcalidrawLinearElement } from "../element/types";
 
 export const actionToggleLinearEditor = register({
   name: "toggleLinearEditor",

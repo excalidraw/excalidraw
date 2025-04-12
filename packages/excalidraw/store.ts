@@ -1,14 +1,19 @@
+import { isDevEnv, isShallowEqual, isTestEnv } from "@excalidraw/common";
+
+import { deepCopyElement } from "@excalidraw/element/duplicate";
+
+import { newElementWith } from "@excalidraw/element/mutateElement";
+
+import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import { getDefaultAppState } from "./appState";
 import { AppStateChange, ElementsChange } from "./change";
-import { ENV } from "./constants";
-import { newElementWith } from "./element/mutateElement";
-import { deepCopyElement } from "./element/newElement";
-import { Emitter } from "./emitter";
-import { isShallowEqual } from "./utils";
 
-import type { OrderedExcalidrawElement } from "./element/types";
+import { Emitter } from "./emitter";
+
 import type { AppState, ObservedAppState } from "./types";
-import type { ValueOf } from "./utility-types";
 
 // hidden non-enumerable property for runtime checks
 const hiddenObservedAppStateProp = "__observedAppState";
@@ -256,7 +261,7 @@ export class Store implements IStore {
       const message = `There can be at most three store actions scheduled at the same time, but there are "${this.scheduledActions.size}".`;
       console.error(message, this.scheduledActions.values());
 
-      if (import.meta.env.DEV || import.meta.env.MODE === ENV.TEST) {
+      if (isTestEnv() || isDevEnv()) {
         throw new Error(message);
       }
     }

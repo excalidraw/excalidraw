@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 
+import type { NonDeletedSceneElementsMap } from "@excalidraw/element/types";
+
 import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderNewElementScene } from "../../renderer/renderNewElementScene";
 
-import type { NonDeletedSceneElementsMap } from "../../element/types";
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,

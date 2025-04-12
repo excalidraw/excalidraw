@@ -2,9 +2,11 @@ import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import React, { useLayoutEffect } from "react";
 
-import { supportsResizeObserver } from "../constants";
+import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
+
+import type { MarkRequired } from "@excalidraw/common/utility-types";
+
 import { t } from "../i18n";
-import { isShallowEqual } from "../utils";
 
 import { useExcalidrawActionManager } from "./App";
 import { Island } from "./Island";
@@ -16,7 +18,6 @@ import "./UserList.scss";
 
 import type { ActionManager } from "../actions/manager";
 import type { Collaborator, SocketId } from "../types";
-import type { MarkRequired } from "../utility-types";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

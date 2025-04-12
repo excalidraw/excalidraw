@@ -104,12 +104,12 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "opacity": 100,
   "points": [
     [
-      0.5,
-      0.5,
+      0,
+      0,
     ],
     [
-      394.5,
-      34.5,
+      394,
+      34,
     ],
   ],
   "roughness": 1,
@@ -129,8 +129,8 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "version": 4,
   "versionNonce": Any<Number>,
   "width": 395,
-  "x": 247,
-  "y": 420,
+  "x": 247.5,
+  "y": 420.5,
 }
 `;
 
@@ -160,11 +160,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      399.5,
+      399,
       0,
     ],
   ],
@@ -185,7 +185,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "version": 4,
   "versionNonce": Any<Number>,
   "width": 400,
-  "x": 227,
+  "x": 227.5,
   "y": 450,
 }
 `;
@@ -350,11 +350,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -375,7 +375,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "version": 4,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 255,
+  "x": 255.5,
   "y": 239,
 }
 `;
@@ -452,11 +452,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -477,7 +477,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "version": 4,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 255,
+  "x": 255.5,
   "y": 239,
 }
 `;
@@ -628,11 +628,11 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -653,7 +653,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "version": 4,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 255,
+  "x": 255.5,
   "y": 239,
 }
 `;
@@ -845,11 +845,11 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -866,7 +866,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 20,
 }
 `;
@@ -893,11 +893,11 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -914,7 +914,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 450,
+  "x": 450.5,
   "y": 20,
 }
 `;
@@ -1490,11 +1490,11 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      272.485,
+      271.985,
       0,
     ],
   ],
@@ -1517,7 +1517,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "version": 4,
   "versionNonce": Any<Number>,
   "width": 272.985,
-  "x": 111.262,
+  "x": 111.762,
   "y": 57,
 }
 `;
@@ -1862,11 +1862,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -1883,7 +1883,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 100,
 }
 `;
@@ -1915,11 +1915,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -1936,7 +1936,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 200,
 }
 `;
@@ -1968,11 +1968,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -1989,7 +1989,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 300,
 }
 `;
@@ -2021,11 +2021,11 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "opacity": 100,
   "points": [
     [
-      0.5,
+      0,
       0,
     ],
     [
-      99.5,
+      99,
       0,
     ],
   ],
@@ -2042,7 +2042,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "version": 2,
   "versionNonce": Any<Number>,
   "width": 100,
-  "x": 100,
+  "x": 100.5,
   "y": 400,
 }
 `;

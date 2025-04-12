@@ -1,8 +1,12 @@
 import { queryByTestId } from "@testing-library/react";
-import React from "react";
 
-import { COLOR_PALETTE, DEFAULT_ELEMENT_BACKGROUND_PICKS } from "../colors";
-import { FONT_FAMILY, STROKE_WIDTH } from "../constants";
+import {
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  FONT_FAMILY,
+  STROKE_WIDTH,
+} from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
