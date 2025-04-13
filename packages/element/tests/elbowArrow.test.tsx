@@ -294,11 +294,11 @@ describe("elbow arrow ui", () => {
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
 
-    expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
+    expect(arrow.points).toCloselyEqualPoints([
       [0, 0],
-      [34, 0],
-      [34, 165],
-      [104, 165],
+      [34.9292, 0],
+      [34.48768, 164.6246],
+      [104.333, 164.6246],
     ]);
   });
 
