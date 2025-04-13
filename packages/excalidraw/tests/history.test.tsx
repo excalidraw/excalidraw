@@ -4057,7 +4057,7 @@ describe("history", () => {
             // text element got redrawn!
             x: 205,
             y: 205,
-            angle: 0,
+            angle: 90,
             id: text.id,
             containerId: container.id,
             isDeleted: false,
@@ -4101,7 +4101,7 @@ describe("history", () => {
             ...textProps,
             x: 205,
             y: 205,
-            angle: 0,
+            angle: 90,
             id: text.id,
             containerId: container.id,
             isDeleted: false,
@@ -4123,6 +4123,7 @@ describe("history", () => {
             newElementWith(h.elements[0], {
               x: 205,
               y: 205,
+              angle: 90 as Radians,
             }),
           ],
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,

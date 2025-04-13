@@ -464,9 +464,9 @@ const repairBoundElement = (
     ? elementsMap.get(boundElement.containerId)
     : null;
 
-  if (boundElement.angle) {
-    (boundElement as Mutable<typeof boundElement>).angle = 0 as Radians;
-  }
+  (boundElement as Mutable<typeof boundElement>).angle = (
+    isArrowElement(container) ? 0 : container?.angle ?? 0
+  ) as Radians;
 
   if (!container) {
     boundElement.containerId = null;

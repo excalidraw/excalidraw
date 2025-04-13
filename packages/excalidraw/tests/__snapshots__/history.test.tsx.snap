@@ -4735,10 +4735,12 @@ History {
         "updated": Map {
           "id164" => Delta {
             "deleted": {
+              "angle": 0,
               "x": 15,
               "y": 15,
             },
             "inserted": {
+              "angle": 0,
               "x": 15,
               "y": 15,
             },
@@ -4907,7 +4909,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
 
 exports[`history > multiplayer undo/redo > conflicts in bound text elements and their containers > should redraw remotely added bound text when it's container is updated through the history > [end of test] element 1 1`] = `
 {
-  "angle": 0,
+  "angle": 90,
   "autoResize": true,
   "backgroundColor": "transparent",
   "boundElements": null,
