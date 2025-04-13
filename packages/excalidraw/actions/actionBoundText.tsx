@@ -46,6 +46,8 @@ import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
+import type { Radians } from "../../math/src";
+
 import type { AppState } from "../types";
 
 export const actionUnbindText = register({
@@ -155,6 +157,7 @@ export const actionBindText = register({
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
+      angle: 0 as Radians,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
