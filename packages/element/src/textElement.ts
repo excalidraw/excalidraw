@@ -28,6 +28,8 @@ import {
   isTextElement,
 } from "./typeChecks";
 
+import type { Radians } from "../../math/src";
+
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
   ElementsMap,
@@ -60,11 +62,11 @@ export const redrawTextBoundingBox = (
     text: textElement.text,
     width: textElement.width,
     height: textElement.height,
-    angle: container
+    angle: (container
       ? isArrowElement(container)
         ? 0
         : container.angle
-      : textElement.angle,
+      : textElement.angle) as Radians,
   };
 
   boundTextUpdates.text = textElement.text;
