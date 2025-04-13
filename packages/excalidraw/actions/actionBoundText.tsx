@@ -21,6 +21,7 @@ import {
 
 import {
   hasBoundTextElement,
+  isArrowElement,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -45,6 +46,8 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
+
+import type { Radians } from "../../math/src";
 
 import type { AppState } from "../types";
 
@@ -155,6 +158,7 @@ export const actionBindText = register({
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
+      angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
     });
     mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
