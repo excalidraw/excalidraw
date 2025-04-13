@@ -107,7 +107,10 @@ type ElbowArrowData = {
   hoveredEndElement: ExcalidrawBindableElement | null;
 };
 
-const DEDUP_TRESHOLD = 1;
+const calculateDedupTreshhold = <Point extends GlobalPoint | LocalPoint>(
+  a: Point,
+  b: Point,
+) => 1 + pointDistance(a, b) / 100;
 
 const calculatePadding = (
   aabb: Bounds,
@@ -207,7 +210,11 @@ const handleSegmentRenormalization = (
 
       if (
         // Remove segments that are too short
-        pointDistance(points[i - 2], points[i - 1]) < DEDUP_TRESHOLD
+        pointDistance(points[i - 2], points[i - 1]) <
+        calculateDedupTreshhold(
+          points[i - 3] ?? points[i - 3],
+          points[i] ?? points[i - 1],
+        )
       ) {
         const prevPrevSegmentIdx =
           nextFixedSegments?.findIndex((segment) => segment.index === i - 2) ??
@@ -2228,7 +2235,10 @@ const removeElbowArrowShortSegments = (
 
       const prev = points[idx - 1];
       const prevDist = pointDistance(prev, p);
-      return prevDist > DEDUP_TRESHOLD;
+      return (
+        prevDist >
+        calculateDedupTreshhold(points[idx - 2] ?? prev, points[idx + 1] ?? p)
+      );
     });
   }
 
@@ -2333,13 +2343,16 @@ const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
 
 export const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
   points: readonly P[],
-  tolerance: number = DEDUP_TRESHOLD,
+  tolerance?: number,
 ) =>
   points
     .slice(1)
-    .map(
-      (p, i) =>
-        Math.abs(p[0] - points[i][0]) < tolerance ||
-        Math.abs(p[1] - points[i][1]) < tolerance,
-    )
+    .map((p, i) => {
+      const t =
+        tolerance ??
+        calculateDedupTreshhold(points[i - 1] ?? points[i], points[i + 2] ?? p);
+      return (
+        Math.abs(p[0] - points[i][0]) < t || Math.abs(p[1] - points[i][1]) < t
+      );
+    })
     .every(Boolean);
