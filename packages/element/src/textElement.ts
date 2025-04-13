@@ -351,7 +351,10 @@ export const getTextElementAngle = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawTextContainer | null,
 ) => {
-  if (!container || isArrowElement(container)) {
+  if (isArrowElement(container)) {
+    return 0;
+  }
+  if (!container) {
     return textElement.angle;
   }
   return container.angle;
