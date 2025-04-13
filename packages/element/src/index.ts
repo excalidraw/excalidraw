@@ -1,5 +1,6 @@
 import { isInvisiblySmallElement } from "./sizeHelpers";
 import { isLinearElementType } from "./typeChecks";
+import * as textElement from "./textElement";
 
 import type {
   ExcalidrawElement,
@@ -71,3 +72,6 @@ export const clearElementsForExport = (
 export const clearElementsForLocalStorage = (
   elements: readonly ExcalidrawElement[],
 ) => _clearElements(elements);
+
+export { textElement };
+export * from "./sizeHelpers";

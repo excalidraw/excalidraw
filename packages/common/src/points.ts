@@ -4,6 +4,8 @@ import {
   type LocalPoint,
 } from "@excalidraw/math";
 
+console.log(pointFromPair);
+
 import type { NullableGridSize } from "@excalidraw/excalidraw/types";
 
 export const getSizeFromPoints = (

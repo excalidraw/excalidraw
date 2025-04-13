@@ -1,33 +1,34 @@
-@import "open-color/open-color.scss";
-@import "./variables.module.scss";
+@use "sass:color";
+@use "open-color/open-color.scss";
+@use "variables.module.scss";
 
 .excalidraw {
   --theme-filter: none;
-  --button-destructive-bg-color: #{$oc-red-1};
-  --button-destructive-color: #{$oc-red-9};
-  --button-gray-1: #{$oc-gray-2};
-  --button-gray-2: #{$oc-gray-4};
-  --button-gray-3: #{$oc-gray-5};
-  --button-special-active-bg-color: #{$oc-green-0};
+  --button-destructive-bg-color: #{open-color.$oc-red-1};
+  --button-destructive-color: #{open-color.$oc-red-9};
+  --button-gray-1: #{open-color.$oc-gray-2};
+  --button-gray-2: #{open-color.$oc-gray-4};
+  --button-gray-3: #{open-color.$oc-gray-5};
+  --button-special-active-bg-color: #{open-color.$oc-green-0};
   --dialog-border-color: var(--color-gray-20);
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
-  --focus-highlight-color: #{$oc-blue-2};
+  --focus-highlight-color: #{open-color.$oc-blue-2};
   --icon-fill-color: var(--color-on-surface);
-  --icon-green-fill-color: #{$oc-green-9};
-  --default-bg-color: #{$oc-white};
-  --input-bg-color: #{$oc-white};
-  --input-border-color: #{$oc-gray-4};
-  --input-hover-bg-color: #{$oc-gray-1};
-  --input-label-color: #{$oc-gray-7};
+  --icon-green-fill-color: #{open-color.$oc-green-9};
+  --default-bg-color: #{open-color.$oc-white};
+  --input-bg-color: #{open-color.$oc-white};
+  --input-border-color: #{open-color.$oc-gray-4};
+  --input-hover-bg-color: #{open-color.$oc-gray-1};
+  --input-label-color: #{open-color.$oc-gray-7};
   --island-bg-color: #ffffff;
   --keybinding-color: var(--color-gray-40);
-  --link-color: #{$oc-blue-7};
-  --overlay-bg-color: #{transparentize($oc-white, 0.12)};
+  --link-color: #{open-color.$oc-blue-7};
+  --overlay-bg-color: #{color.adjust(open-color.$oc-white, $alpha: -0.12)};
   --popup-bg-color: var(--island-bg-color);
-  --popup-secondary-bg-color: #{$oc-gray-1};
-  --popup-text-color: #{$oc-black};
-  --popup-text-inverted-color: #{$oc-white};
-  --select-highlight-color: #{$oc-blue-5};
+  --popup-secondary-bg-color: #{open-color.$oc-gray-1};
+  --popup-text-color: #{open-color.$oc-black};
+  --popup-text-inverted-color: #{open-color.$oc-white};
+  --select-highlight-color: #{open-color.$oc-blue-5};
   --shadow-island: 0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
     0px 0px 3.1270833015441895px 0px rgba(0, 0, 0, 0.08),
     0px 7px 14px 0px rgba(0, 0, 0, 0.05);
@@ -80,7 +81,7 @@
 
   --color-selection: #6965db;
 
-  --color-icon-white: #{$oc-white};
+  --color-icon-white: #{open-color.$oc-white};
 
   --color-primary: #6965db;
   --color-primary-darker: #5b57d1;
@@ -172,7 +173,7 @@
   &.theme--dark {
     --theme-filter: invert(93%) hue-rotate(180deg);
     --button-destructive-bg-color: #5a0000;
-    --button-destructive-color: #{$oc-red-3};
+    --button-destructive-color: #{open-color.$oc-red-3};
 
     --button-gray-1: #363636;
     --button-gray-2: #272727;
@@ -180,21 +181,21 @@
     --button-special-active-bg-color: #204624;
     --dialog-border-color: var(--color-gray-80);
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
-    --focus-highlight-color: #{$oc-blue-6};
-    --icon-green-fill-color: #{$oc-green-4};
+    --focus-highlight-color: #{open-color.$oc-blue-6};
+    --icon-green-fill-color: #{open-color.$oc-green-4};
     --default-bg-color: #121212;
     --input-bg-color: #121212;
     --input-border-color: #2e2e2e;
     --input-hover-bg-color: #181818;
-    --input-label-color: #{$oc-gray-2};
+    --input-label-color: #{open-color.$oc-gray-2};
     --island-bg-color: #232329;
     --keybinding-color: var(--color-gray-60);
-    --link-color: #{$oc-blue-4};
-    --overlay-bg-color: #{transparentize($oc-gray-8, 0.88)};
+    --link-color: #{open-color.$oc-blue-4};
+    --overlay-bg-color: #{color.adjust(open-color.$oc-gray-8, $alpha: -0.88)};
     --popup-secondary-bg-color: #222;
-    --popup-text-color: #{$oc-gray-4};
+    --popup-text-color: #{open-color.$oc-gray-4};
     --popup-text-inverted-color: #2c2c2c;
-    --select-highlight-color: #{$oc-blue-4};
+    --select-highlight-color: #{open-color.$oc-blue-4};
     --shadow-island: 0px 0px 0.9310142993927002px 0px rgba(0, 0, 0, 0.17),
       0px 0px 3.1270833015441895px 0px rgba(0, 0, 0, 0.08),
       0px 7px 14px 0px rgba(0, 0, 0, 0.05);
@@ -207,8 +208,8 @@
       0px 2.76726px 2.21381px rgba(0, 0, 0, 0.0196802);
     --avatar-border-color: var(--color-gray-85);
 
-    --scrollbar-thumb: #{$oc-gray-8};
-    --scrollbar-thumb-hover: #{$oc-gray-7};
+    --scrollbar-thumb: #{open-color.$oc-gray-8};
+    --scrollbar-thumb-hover: #{open-color.$oc-gray-7};
 
     --color-slider-track: hsl(244, 23%, 39%);
 

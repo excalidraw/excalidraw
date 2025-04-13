@@ -1,5 +1,10 @@
-@import "./variables.module.scss";
-@import "./theme";
+@use "open-color/open-color.scss" as oc;
+@forward "open-color/open-color.scss" as oc-* with (
+  $oc-gray-2: oc.$oc-gray-2,
+  $oc-red-1: oc.$oc-red-1,
+  $oc-red-9: oc.$oc-red-9
+);
+@forward "./_variables.scss" as *;
 
 :root {
   --zIndex-canvas: 1;
@@ -201,7 +206,7 @@ body.excalidraw-cursor-resize * {
 
   .divider {
     width: 1px;
-    background-color: $oc-gray-2;
+    background-color: oc.$oc-gray-2;
     margin: 1px;
   }
 
@@ -227,7 +232,7 @@ body.excalidraw-cursor-resize * {
     label,
     button,
     .zIndexButton {
-      @include outlineButtonIconStyles;
+      @include variables.outlineButtonIconStyles;
     }
   }
 
@@ -469,8 +474,8 @@ body.excalidraw-cursor-resize * {
   }
 
   .help-icon {
-    @include outlineButtonStyles;
-    @include filledButtonOnCanvas;
+    @include variables.outlineButtonStyles;
+    @include variables.filledButtonOnCanvas;
 
     width: var(--lg-button-size);
     height: var(--lg-button-size);
@@ -503,7 +508,7 @@ body.excalidraw-cursor-resize * {
     margin-inline-start: 0.6em;
   }
 
-  @include isMobile {
+  @include variables.isMobile {
     aside {
       display: none;
     }
@@ -652,7 +657,7 @@ body.excalidraw-cursor-resize * {
   }
 
   .main-menu-trigger {
-    @include filledButtonOnCanvas;
+    @include variables.filledButtonOnCanvas;
   }
 
   .App-mobile-menu,
@@ -705,8 +710,8 @@ body.excalidraw-cursor-resize * {
     justify-content: center;
 
     padding: 40px;
-    background-color: $oc-red-1;
-    border: 3px solid $oc-red-9;
+    background-color: oc.$oc-red-1;
+    border: 3px solid oc.$oc-red-9;
   }
 
   .ErrorSplash-paragraph {

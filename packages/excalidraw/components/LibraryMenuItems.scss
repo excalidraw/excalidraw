@@ -1,4 +1,4 @@
-@import "open-color/open-color";
+@use "../css/styles" as *;
 
 .excalidraw {
   --container-padding-y: 1.5rem;
@@ -6,13 +6,13 @@
 
   .library-menu-items__no-items {
     text-align: center;
-    color: var(--color-gray-70);
+    color: $oc-gray-7;
     line-height: 1.5;
     font-size: 0.875rem;
     width: 100%;
 
     &__label {
-      color: var(--color-primary);
+      color: $oc-blue-7;
       font-weight: 700;
       font-size: 1.125rem;
       margin-bottom: 0.75rem;
@@ -21,7 +21,7 @@
 
   &.theme--dark {
     .library-menu-items__no-items {
-      color: var(--color-gray-40);
+      color: $oc-gray-5;
     }
   }
 
@@ -60,7 +60,7 @@
     }
 
     &__header {
-      color: var(--color-primary);
+      color: $oc-blue-7;
       font-size: 1.125rem;
       font-weight: 700;
       margin-bottom: 0.75rem;
@@ -86,7 +86,7 @@
       font-weight: 500;
       font-size: 0.9rem;
       margin: 0.6em 0.2em;
-      color: var(--text-primary-color);
+      color: $text-primary-color;
     }
   }
 

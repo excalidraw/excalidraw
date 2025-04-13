@@ -1,18 +1,4 @@
-@import "../css/variables.module.scss";
-
-@keyframes successStatusAnimation {
-  0% {
-    transform: scale(0.35);
-  }
-
-  50% {
-    transform: scale(1.25);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
+@use "../css/styles" as styles;
 
 .excalidraw {
   .ExcButton {
@@ -313,5 +299,19 @@
       width: 1.25rem;
       height: 1.25rem;
     }
+  }
+}
+
+@keyframes successStatusAnimation {
+  0% {
+    transform: scale(0.35);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }

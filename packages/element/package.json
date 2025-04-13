@@ -2,23 +2,33 @@
   "name": "@excalidraw/element",
   "version": "0.1.0",
   "type": "module",
-  "types": "./dist/types/element/src/index.d.ts",
   "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
+  "types": "./dist/types/element/src/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/element/src/index.d.ts",
-      "development": "./dist/dev/index.js",
-      "production": "./dist/prod/index.js",
+      "import": "./dist/prod/index.js",
+      "require": "./dist/prod/index.js",
       "default": "./dist/prod/index.js"
     },
-    "./*": {
-      "types": "./../element/dist/types/element/src/*.d.ts"
+    "./textElement": {
+      "types": "./dist/types/element/src/textElement.d.ts",
+      "import": "./dist/prod/index.js",
+      "require": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
+    },
+    "./sizeHelpers": {
+      "types": "./dist/types/element/src/sizeHelpers.d.ts",
+      "import": "./dist/prod/index.js",
+      "require": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
     }
   },
   "files": [
     "dist/*"
   ],
+   
   "description": "Excalidraw elements-related logic",
   "publishConfig": {
     "access": "public"
@@ -50,7 +60,7 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildBase.js && yarn gen:types"
+    "gen:types": "if exist types rmdir /s /q types && tsc",
+    "build:esm": "if exist dist rmdir /s /q dist && node ../../scripts/buildBase.cjs && yarn gen:types"
   }
 }

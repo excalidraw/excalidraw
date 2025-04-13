@@ -1,7 +1,7 @@
-@import "../css/theme";
+@use "../css/styles" as styles;
 
 .excalidraw {
   .excalidraw-button {
-    @include outlineButtonStyles;
+    @include styles.outlineButtonStyles;
   }
 }

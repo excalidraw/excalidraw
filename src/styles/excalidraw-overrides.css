@@ -1,0 +1,16 @@
+/* Fix font-face descriptors */
+@font-face {
+  font-family: 'Virgil';
+  src: url('/node_modules/@excalidraw/excalidraw/dist/Virgil.woff2') format('woff2');
+}
+
+/* Fix align-items rule */
+.excalidraw {
+  align-items: normal !important;
+}
+
+/* Remove problematic rules */
+.excalidraw .invalid-selector,
+.excalidraw .another-invalid-selector {
+  /* These intentionally left blank to override bad selectors */
+}

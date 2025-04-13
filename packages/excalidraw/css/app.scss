@@ -1,4 +1,5 @@
-@import "open-color/open-color.scss";
+@use "open-color/open-color.scss" as oc;
+@use "./styles" as *;
 
 .visually-hidden {
   position: absolute !important;

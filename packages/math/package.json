@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "type": "module",
   "types": "./dist/types/math/src/index.d.ts",
-  "main": "./dist/prod/index.js",
-  "module": "./dist/prod/index.js",
+  "main": "./dist/math.umd.js", 
+  "module": "./dist/math.es.js", 
   "exports": {
     ".": {
       "types": "./dist/types/math/src/index.d.ts",
-      "development": "./dist/dev/index.js",
-      "production": "./dist/prod/index.js",
-      "default": "./dist/prod/index.js"
+      "development": "./dist/math.es.js", 
+      "production": "./dist/math.umd.js", 
+      "default": "./dist/math.umd.js"     
     },
     "./*": {
       "types": "./../math/dist/types/math/src/*.d.ts"
@@ -55,6 +55,11 @@
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildBase.js && yarn gen:types"
+    "build:esm": "rm -rf dist && node ../../scripts/buildBase.js && yarn gen:types",
+    "build": "vite build",
+    "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   }
 }

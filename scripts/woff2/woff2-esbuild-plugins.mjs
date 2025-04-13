@@ -1,10 +1,7 @@
-const { execSync } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-
-const { Font } = require("fonteditor-core");
-const wawoff = require("wawoff2");
-const which = require("which");
+import { createHash } from "crypto";
+import fs from "fs";
+import path from "path";
+import { promisify } from "util";
 
 /**
  * Custom esbuild plugin to:
@@ -17,80 +14,77 @@ const which = require("which");
  *
  * @returns {import("esbuild").Plugin}
  */
-module.exports.woff2ServerPlugin = (options = {}) => {
+export const woff2ServerPlugin = (options = {}) => {
   return {
-    name: "woff2ServerPlugin",
+    name: "woff2-server-plugin",
     setup(build) {
       const fonts = new Map();
 
-      build.onResolve({ filter: /\.woff2$/ }, (args) => {
-        const resolvedPath = path.resolve(args.resolveDir, args.path);
-
+      build.onResolve({ filter: /\.(woff|woff2)$/ }, (args) => {
         return {
-          path: resolvedPath,
-          namespace: "woff2ServerPlugin",
+          path: path.isAbsolute(args.path)
+            ? args.path
+            : path.join(path.dirname(args.importer), args.path),
+          namespace: "woff2-asset",
         };
       });
 
-      build.onLoad(
-        { filter: /.*/, namespace: "woff2ServerPlugin" },
-        async (args) => {
-          let woff2Buffer;
+      build.onLoad({ filter: /.*/, namespace: "woff2-asset" }, async (args) => {
+        let woff2Buffer;
 
-          if (path.isAbsolute(args.path)) {
-            // read local woff2 as a buffer (WARN: `readFileSync` does not work!)
-            woff2Buffer = await fs.promises.readFile(args.path);
-          } else {
-            throw new Error(`Font path has to be absolute! "${args.path}"`);
-          }
+        if (path.isAbsolute(args.path)) {
+          // read local woff2 as a buffer (WARN: `readFileSync` does not work!)
+          woff2Buffer = await promisify(fs.readFile)(args.path);
+        } else {
+          throw new Error(`Font path has to be absolute! "${args.path}"`);
+        }
 
-          // google's brotli decompression into snft
-          const snftBuffer = new Uint8Array(
-            await wawoff.decompress(woff2Buffer),
-          ).buffer;
+        // google's brotli decompression into snft
+        const snftBuffer = new Uint8Array(
+          await wawoff.decompress(woff2Buffer),
+        ).buffer;
 
-          // load font and store per fontfamily & subfamily cache
-          let font;
+        // load font and store per fontfamily & subfamily cache
+        let font;
 
-          try {
-            font = Font.create(snftBuffer, {
-              type: "ttf",
-              hinting: true,
-              kerning: true,
-            });
-          } catch {
-            // if loading as ttf fails, try to load as otf
-            font = Font.create(snftBuffer, {
-              type: "otf",
-              hinting: true,
-              kerning: true,
-            });
-          }
+        try {
+          font = Font.create(snftBuffer, {
+            type: "ttf",
+            hinting: true,
+            kerning: true,
+          });
+        } catch {
+          // if loading as ttf fails, try to load as otf
+          font = Font.create(snftBuffer, {
+            type: "otf",
+            hinting: true,
+            kerning: true,
+          });
+        }
 
-          const fontFamily = font.data.name.fontFamily;
-          const subFamily = font.data.name.fontSubFamily;
+        const fontFamily = font.data.name.fontFamily;
+        const subFamily = font.data.name.fontSubFamily;
 
-          if (!fonts.get(fontFamily)) {
-            fonts.set(fontFamily, {});
-          }
+        if (!fonts.get(fontFamily)) {
+          fonts.set(fontFamily, {});
+        }
 
-          if (!fonts.get(fontFamily)[subFamily]) {
-            fonts.get(fontFamily)[subFamily] = [];
-          }
+        if (!fonts.get(fontFamily)[subFamily]) {
+          fonts.get(fontFamily)[subFamily] = [];
+        }
 
-          // store the snftbuffer per subfamily
-          fonts.get(fontFamily)[subFamily].push(font);
+        // store the snftbuffer per subfamily
+        fonts.get(fontFamily)[subFamily].push(font);
 
-          // inline the woff2 as base64 for server-side use cases
-          // NOTE: "file" loader is broken in commonjs and "dataurl" loader does not produce correct ur
-          return {
-            contents: `data:font/woff2;base64,${woff2Buffer.toString(
-              "base64",
-            )}`,
-            loader: "text",
-          };
-        },
-      );
+        // inline the woff2 as base64 for server-side use cases
+        // NOTE: "file" loader is broken in commonjs and "dataurl" loader does not produce correct ur
+        return {
+          contents: `data:font/woff2;base64,${woff2Buffer.toString(
+            "base64",
+          )}`,
+          loader: "text",
+        };
+      });
 
       build.onEnd(async () => {
         const { outdir } = options;

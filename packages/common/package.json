@@ -2,18 +2,18 @@
   "name": "@excalidraw/common",
   "version": "0.1.0",
   "type": "module",
+  "main": "./dist/common.umd.js",
+  "module": "./dist/common.es.js",
   "types": "./dist/types/common/src/index.d.ts",
-  "main": "./dist/prod/index.js",
-  "module": "./dist/prod/index.js",
+  "dependencies": {
+    "@excalidraw/math": "0.1.0"
+  },
   "exports": {
     ".": {
       "types": "./dist/types/common/src/index.d.ts",
-      "development": "./dist/dev/index.js",
-      "production": "./dist/prod/index.js",
-      "default": "./dist/prod/index.js"
-    },
-    "./*": {
-      "types": "./../common/dist/types/common/src/*.d.ts"
+      "import": "./dist/common.es.js",
+      "require": "./dist/common.umd.js",
+      "default": "./dist/common.es.js"
     }
   },
   "files": [
@@ -50,7 +50,12 @@
   "bugs": "https://github.com/excalidraw/excalidraw/issues",
   "repository": "https://github.com/excalidraw/excalidraw",
   "scripts": {
-    "gen:types": "rm -rf types && tsc",
-    "build:esm": "rm -rf dist && node ../../scripts/buildBase.js && yarn gen:types"
+    "gen:types": "if exist types rmdir /s /q types && tsc",
+    "build:esm": "if exist dist rmdir /s /q dist && node ../../scripts/buildBase.js && yarn gen:types",
+    "build": "vite build",
+    "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
   }
 }

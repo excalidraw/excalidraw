@@ -1,190 +1,79 @@
-@import "open-color/open-color.scss";
-
-@mixin isMobile() {
-  @at-root .excalidraw--mobile#{&} {
-    @content;
-  }
+:root {
+  --color-primary: #6965db;
+  --color-primary-darker: #5653c0;
+  --color-primary-darkest: #4c44b4;
+  --color-primary-hover: #7a75d3;
+  --color-primary-light: #8c7cd5;
+  --color-primary-lighter: #a29be8;
+  --color-primary-lightest: #c3c0f9;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #000000;
+  --color-surface-lowest: #f7f7f7;
+  --color-surface-low: #f2f2f2;
+  --color-surface: #ffffff;
+  --color-surface-high: #f9f9f9;
+  --color-surface-highest: #f7f7f7;
+  --color-surface-primary-container: #4c44b4;
+  --color-disabled: #c3c0f9;
+  --color-gray-90: #333333;
+  --color-on-surface: #333333;
+  --color-on-surface-high: #333333;
+  --color-on-surface-highest: #333333;
+  --color-on-surface-lowest: #333333;
+  --color-on-surface-low: #333333;
+  --color-on-surface-inverse: #ffffff;
+  --color-on-surface-inverse-high: #ffffff;
+  --color-on-surface-inverse-highest: #ffffff;
+  --color-on-surface-inverse-lowest: #ffffff;
+  --color-on-surface-inverse-low: #ffffff;
+  --color-on-surface-inverse-disabled: #c3c0f9;
+  --color-on-surface-disabled: #c3c0f9;
+  --color-on-surface-high-disabled: #c3c0f9;
+  --color-on-surface-highest-disabled: #c3c0f9;
+  --color-on-surface-lowest-disabled: #c3c0f9;
+  --color-on-surface-low-disabled: #c3c0f9;
+  --color-on-surface-inverse-disabled: #c3c0f9;
+  --color-on-surface-inverse-high-disabled: #c3c0f9;
+  --color-on-surface-inverse-highest-disabled: #c3c0f9;
+  --color-on-surface-inverse-lowest-disabled: #c3c0f9;
+  --color-on-surface-inverse-low-disabled: #c3c0f9;
+  --color-on-surface-disabled: #c3c0f9;
+  --color-on-surface-high-disabled: #c3c0f9;
+  --color-on-surface-highest-disabled: #c3c0f9;
+  --color-on-surface-lowest-disabled: #c3c0f9;
+  --color-on-surface-low-disabled: #c3c0f9;
+  --color-on-surface-inverse-disabled: #c3c0f9;
+  --color-on-surface-inverse-high-disabled: #c3c0f9;
+  --color-on-surface-inverse-highest-disabled: #c3c0f9;
+  --color-on-surface-inverse-lowest-disabled: #c3c0f9;
+  --color-on-surface-inverse-low-disabled: #c3c0f9;
+  --button-width: 2.5rem;
+  --button-height: 2.5rem;
+  --default-button-size: 2.5rem;
+  --default-icon-size: 1.5rem;
+  --lg-icon-size: 2rem;
+  --avatar-size: 1.5rem;
+  --border-radius-lg: 0.5rem;
+  --island-bg-color: #ffffff;
+  --text-primary-color: #333333;
+  --button-bg: #ffffff;
+  --button-color: #333333;
+  --button-border: #cccccc;
+  --button-hover-bg: #f7f7f7;
+  --button-hover-color: #333333;
+  --button-hover-border: #cccccc;
+  --button-active-bg: #f2f2f2;
+  --button-active-color: #333333;
+  --button-active-border: #cccccc;
+  --button-selected-bg: #4c44b4;
+  --button-selected-color: #ffffff;
+  --button-selected-border: #4c44b4;
+  --button-selected-hover-bg: #5653c0;
+  --button-selected-hover-color: #ffffff;
+  --button-selected-hover-border: #5653c0;
+  --ui-font: Arial, sans-serif;
 }
 
-@mixin toolbarButtonColorStates {
-  &.fillable {
-    .ToolIcon_type_radio,
-    .ToolIcon_type_checkbox {
-      &:checked + .ToolIcon__icon {
-        --icon-fill-color: var(--color-on-primary-container);
-
-        svg {
-          fill: var(--icon-fill-color);
-        }
-      }
-    }
-  }
-
-  .ToolIcon_type_radio,
-  .ToolIcon_type_checkbox {
-    &:checked + .ToolIcon__icon {
-      background: var(--color-surface-primary-container);
-      --keybinding-color: var(--color-on-primary-container);
-
-      svg {
-        color: var(--color-on-primary-container);
-      }
-    }
-  }
-
-  .ToolIcon__keybinding {
-    bottom: 4px;
-    right: 4px;
-  }
-
-  .ToolIcon__icon {
-    &:hover {
-      background: var(--button-hover-bg);
-    }
-
-    &:active {
-      background: var(--button-hover-bg);
-      border: 1px solid var(--button-active-border);
-
-      svg {
-        color: var(--color-on-primary-container);
-      }
-    }
-
-    &[aria-disabled="true"] {
-      background: initial;
-      border: none;
-
-      svg {
-        color: var(--color-disabled);
-      }
-    }
-  }
-}
-
-@mixin outlineButtonStyles {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.625rem;
-  width: var(--button-width, var(--default-button-size));
-  height: var(--button-height, var(--default-button-size));
-  box-sizing: border-box;
-  border-width: 1px;
-  border-style: solid;
-  border-color: var(--button-border, var(--default-border-color));
-  border-radius: var(--border-radius-lg);
-  cursor: pointer;
-  background-color: var(--button-bg, var(--island-bg-color));
-  color: var(--button-color, var(--color-on-surface));
-  font-family: var(--ui-font);
-
-  svg {
-    width: var(--button-width, var(--lg-icon-size));
-    height: var(--button-height, var(--lg-icon-size));
-  }
-
-  &:hover {
-    background-color: var(--button-hover-bg, var(--island-bg-color));
-    border-color: var(
-      --button-hover-border,
-      var(--button-border, var(--default-border-color))
-    );
-    color: var(
-      --button-hover-color,
-      var(--button-color, var(--text-primary-color, inherit))
-    );
-  }
-
-  &:active {
-    background-color: var(--button-active-bg, var(--island-bg-color));
-    border-color: var(--button-active-border, var(--color-primary-darkest));
-  }
-
-  &.active {
-    background-color: var(
-      --button-selected-bg,
-      var(--color-surface-primary-container)
-    );
-    border-color: var(
-      --button-selected-border,
-      var(--color-surface-primary-container)
-    );
-
-    &:hover {
-      background-color: var(
-        --button-selected-hover-bg,
-        var(--color-surface-primary-container)
-      );
-    }
-
-    svg {
-      color: var(--button-color, var(--color-on-primary-container));
-    }
-  }
-}
-
-@mixin outlineButtonIconStyles {
-  @include outlineButtonStyles;
-  padding: 0;
-
-  svg {
-    width: var(--default-icon-size);
-    height: var(--default-icon-size);
-  }
-}
-
-@mixin avatarStyles {
-  width: var(--avatar-size, 1.5rem);
-  height: var(--avatar-size, 1.5rem);
-  position: relative;
-  border-radius: 100%;
-  outline-offset: 2px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--color-gray-90);
-  flex: 0 0 auto;
-
-  &:active {
-    transform: scale(0.94);
-  }
-
-  &-img {
-    width: 100%;
-    height: 100%;
-    border-radius: 100%;
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -3px;
-    right: -3px;
-    bottom: -3px;
-    left: -3px;
-    border-radius: 100%;
-  }
-
-  &.is-followed::before {
-    border-color: var(--color-primary-hover);
-    box-shadow: 0 0 0 1px var(--color-primary-hover);
-  }
-  &.is-current-user {
-    cursor: auto;
-  }
-}
-
-@mixin filledButtonOnCanvas {
-  border: none;
-  box-shadow: 0 0 0 1px var(--color-surface-lowest);
-  background-color: var(--color-surface-low);
-
-  &:active {
-    box-shadow: 0 0 0 1px var(--color-brand-active);
-  }
-}
+// Theme variables
+$theme-filter: none !default;
+$theme-filter-darker: none !default;

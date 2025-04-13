@@ -1,4 +1,4 @@
-@import "../../css/variables.module.scss";
+@use "../../css/styles" as *;
 
 $verticalBreakpoint: 861px;
 
@@ -241,7 +241,7 @@ $verticalBreakpoint: 861px;
       height: 2.5rem;
 
       font-size: 12px;
-      color: $oc-white;
+      color: oc.$oc-white;
       background-color: var(--color-primary);
       width: 100%;
 

@@ -1,6 +1,4 @@
-@import "open-color/open-color.scss";
-
-$duration: 1.6s;
+@use "../css/styles" as *;
 
 .excalidraw {
   .Spinner {

@@ -1,11 +1,8 @@
 const path = require("path");
-
 const { build } = require("esbuild");
-const { sassPlugin } = require("esbuild-sass-plugin");
 
-const { woff2ServerPlugin } = require("./woff2/woff2-esbuild-plugins");
+console.log("Starting build...");
 
-// contains all dependencies bundled inside
 const getConfig = (outdir) => ({
   outdir,
   bundle: true,
@@ -23,10 +20,10 @@ const getConfig = (outdir) => ({
 });
 
 function buildDev(config) {
+  console.log("Building dev...");
   return build({
     ...config,
     sourcemap: true,
-    plugins: [sassPlugin(), woff2ServerPlugin()],
     define: {
       "import.meta.env": JSON.stringify({ DEV: true }),
     },
@@ -34,15 +31,10 @@ function buildDev(config) {
 }
 
 function buildProd(config) {
+  console.log("Building prod...");
   return build({
     ...config,
     minify: true,
-    plugins: [
-      sassPlugin(),
-      woff2ServerPlugin({
-        outdir: `${config.outdir}/assets`,
-      }),
-    ],
     define: {
       "import.meta.env": JSON.stringify({ PROD: true }),
     },
@@ -50,11 +42,9 @@ function buildProd(config) {
 }
 
 const createESMRawBuild = async () => {
-  // development unminified build with source maps
   await buildDev(getConfig("dist/dev"));
-
-  // production minified build without sourcemaps
   await buildProd(getConfig("dist/prod"));
+  console.log("Build complete.");
 };
 
 (async () => {

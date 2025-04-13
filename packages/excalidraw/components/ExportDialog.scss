@@ -1,4 +1,4 @@
-@import "../css/variables.module.scss";
+@use "../css/styles" as styles;
 
 .excalidraw {
   .ExportDialog__preview {

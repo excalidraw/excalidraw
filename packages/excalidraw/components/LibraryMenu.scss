@@ -1,4 +1,5 @@
-@import "open-color/open-color";
+@use "open-color/open-color.scss" as oc;
+@use "../css/styles" as styles;
 
 .excalidraw {
   .layer-ui__library {
