@@ -69,5 +69,12 @@ export default defineConfig({
         statements: 60,
       },
     },
+    exclude: [
+      "excalidraw-app/components/DebugCanvas.tsx",
+      "packages/utils/src/visualdebug.ts",
+      "node_modules",
+      "examples",
+      "scripts",
+    ],
   },
 });
