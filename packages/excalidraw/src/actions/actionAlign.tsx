@@ -12,7 +12,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { Alignment } from "@excalidraw/element/align";
 
-import { ToolButton } from "../../components/ToolButton";
+import { ToolButton } from "../components/ToolButton";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -20,7 +20,7 @@ import {
   AlignTopIcon,
   CenterHorizontallyIcon,
   CenterVerticallyIcon,
-} from "../../components/icons";
+} from "../components/icons";
 
 import { t } from "../../i18n";
 

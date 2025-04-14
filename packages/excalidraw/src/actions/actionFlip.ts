@@ -29,7 +29,7 @@ import type {
 import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../../store";
 
-import { flipHorizontal, flipVertical } from "../../components/icons";
+import { flipHorizontal, flipVertical } from "../components/icons";
 
 import { register } from "./register";
 

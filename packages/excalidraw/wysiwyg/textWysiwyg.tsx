@@ -57,7 +57,7 @@ import {
   actionZoomOut,
 } from "../src/actions/actionCanvas";
 
-import type App from "../components/App";
+import type App from "../src/components/App";
 import type { AppState } from "../types";
 
 const getTransform = (

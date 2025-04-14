@@ -1,18 +1,18 @@
 import clsx from "clsx";
 
 import { getClientColor } from "../../clients";
-import { Avatar } from "../../components/Avatar";
+import { Avatar } from "../components/Avatar";
 import {
   eyeIcon,
   microphoneIcon,
   microphoneMutedIcon,
-} from "../../components/icons";
+} from "../components/icons";
 import { t } from "../../i18n";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";
 
-import type { GoToCollaboratorComponentProps } from "../../components/UserList";
+import type { GoToCollaboratorComponentProps } from "../components/UserList";
 import type { Collaborator } from "../../types";
 
 export const actionGoToCollaborator = register({

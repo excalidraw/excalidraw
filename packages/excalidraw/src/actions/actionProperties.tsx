@@ -72,14 +72,14 @@ import type {
 } from "@excalidraw/element/types";
 
 import { trackEvent } from "../../analytics";
-import { ButtonIconSelect } from "../../components/ButtonIconSelect";
-import { ColorPicker } from "../../components/ColorPicker/ColorPicker";
-import { FontPicker } from "../../components/FontPicker/FontPicker";
-import { IconPicker } from "../../components/IconPicker";
+import { ButtonIconSelect } from "../components/ButtonIconSelect";
+import { ColorPicker } from "../components/ColorPicker/ColorPicker";
+import { FontPicker } from "../components/FontPicker/FontPicker";
+import { IconPicker } from "../components/IconPicker";
 // TODO barnabasmolnar/editor-redesign
 // TextAlignTopIcon, TextAlignBottomIcon,TextAlignMiddleIcon,
 // ArrowHead icons
-import { Range } from "../../components/Range";
+import { Range } from "../components/Range";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -121,7 +121,7 @@ import {
   ArrowheadCrowfootIcon,
   ArrowheadCrowfootOneIcon,
   ArrowheadCrowfootOneOrManyIcon,
-} from "../../components/icons";
+} from "../components/icons";
 
 import { Fonts } from "../../fonts";
 import { getLanguage, t } from "../../i18n";

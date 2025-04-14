@@ -27,8 +27,8 @@ import { duplicateElements } from "@excalidraw/element/duplicate";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { ToolButton } from "../../components/ToolButton";
-import { DuplicateIcon } from "../../components/icons";
+import { ToolButton } from "../components/ToolButton";
+import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../../i18n";
 import { isSomeElementSelected } from "../scene";

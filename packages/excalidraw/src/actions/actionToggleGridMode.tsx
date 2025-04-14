@@ -1,6 +1,6 @@
 import { CODES, KEYS } from "@excalidraw/common";
 
-import { gridIcon } from "../../components/icons";
+import { gridIcon } from "../components/icons";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";

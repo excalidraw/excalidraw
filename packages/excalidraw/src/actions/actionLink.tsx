@@ -2,9 +2,9 @@ import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
-import { ToolButton } from "../../components/ToolButton";
-import { getContextMenuLabel } from "../../components/hyperlink/Hyperlink";
-import { LinkIcon } from "../../components/icons";
+import { ToolButton } from "../components/ToolButton";
+import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
+import { LinkIcon } from "../components/icons";
 import { t } from "../../i18n";
 
 import { getSelectedElements } from "../scene";

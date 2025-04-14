@@ -9,13 +9,13 @@ import { getNonDeletedElements } from "@excalidraw/element";
 
 import type { Theme } from "@excalidraw/element/types";
 
-import { useDevice } from "../../components/App";
-import { CheckboxItem } from "../../components/CheckboxItem";
-import { DarkModeToggle } from "../../components/DarkModeToggle";
-import { ProjectName } from "../../components/ProjectName";
-import { ToolButton } from "../../components/ToolButton";
-import { Tooltip } from "../../components/Tooltip";
-import { ExportIcon, questionCircle, saveAs } from "../../components/icons";
+import { useDevice } from "../components/App";
+import { CheckboxItem } from "../components/CheckboxItem";
+import { DarkModeToggle } from "../components/DarkModeToggle";
+import { ProjectName } from "../components/ProjectName";
+import { ToolButton } from "../components/ToolButton";
+import { Tooltip } from "../components/Tooltip";
+import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";

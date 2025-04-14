@@ -4,9 +4,9 @@ import { isElbowArrow, isLinearElement } from "@excalidraw/element/typeChecks";
 
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
 
-import { DEFAULT_CATEGORIES } from "../../components/CommandPalette/CommandPalette";
-import { ToolButton } from "../../components/ToolButton";
-import { lineEditorIcon } from "../../components/icons";
+import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
+import { ToolButton } from "../components/ToolButton";
+import { lineEditorIcon } from "../components/icons";
 
 import { t } from "../../i18n";
 import { CaptureUpdateAction } from "../../store";

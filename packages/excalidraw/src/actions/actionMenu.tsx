@@ -4,12 +4,8 @@ import { getNonDeletedElements } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
 
-import { ToolButton } from "../../components/ToolButton";
-import {
-  HamburgerMenuIcon,
-  HelpIconThin,
-  palette,
-} from "../../components/icons";
+import { ToolButton } from "../components/ToolButton";
+import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { t } from "../../i18n";
 
 import { CaptureUpdateAction } from "../../store";
