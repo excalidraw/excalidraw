@@ -20,7 +20,7 @@ import {
 
 import { t } from "../../i18n";
 
-import { isSomeElementSelected } from "../../scene";
+import { isSomeElementSelected } from "../scene";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";

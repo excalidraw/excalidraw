@@ -25,7 +25,7 @@ import { nativeFileSystemSupported } from "../src/data/filesystem";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";
-import { isSomeElementSelected } from "../scene";
+import { isSomeElementSelected } from "../src/scene";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";

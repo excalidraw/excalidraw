@@ -16,7 +16,7 @@ import { SMALLEST_DELTA } from "./utils";
 import "./DragInput.scss";
 
 import type { StatsInputProperty } from "./utils";
-import type Scene from "../../scene/Scene";
+import type Scene from "../../src/scene/Scene";
 import type { AppState } from "../../types";
 
 export type DragInputCallbackType<

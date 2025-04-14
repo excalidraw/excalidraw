@@ -22,7 +22,7 @@ import {
 
 // TODO: remove direct dependency on the scene, should be passed in or injected instead
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
-import Scene from "@excalidraw/excalidraw/scene/Scene";
+import Scene from "@excalidraw/excalidraw/src/scene/Scene";
 
 import type { Store } from "@excalidraw/excalidraw/store";
 

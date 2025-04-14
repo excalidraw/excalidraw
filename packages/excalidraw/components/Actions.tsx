@@ -44,7 +44,7 @@ import {
   hasBackground,
   hasStrokeStyle,
   hasStrokeWidth,
-} from "../scene";
+} from "../src/scene";
 
 import { SHAPES } from "./shapes";
 

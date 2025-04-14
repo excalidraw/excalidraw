@@ -10,7 +10,7 @@ import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { AppState, Offsets, PointerCoords, Zoom } from "../types";
+import type { AppState, Offsets, PointerCoords, Zoom } from "../../types";
 
 const isOutsideViewPort = (appState: AppState, cords: Array<number>) => {
   const [x1, y1, x2, y2] = cords;

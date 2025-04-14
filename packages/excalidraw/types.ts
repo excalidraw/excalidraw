@@ -55,7 +55,7 @@ import type { CaptureUpdateActionType } from "./store";
 import type { ImportedDataState } from "./src/data/types";
 
 import type { Language } from "./i18n";
-import type { isOverScrollBars } from "./scene/scrollbars";
+import type { isOverScrollBars } from "./src/scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
 

@@ -26,7 +26,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { getSelectedElements } from "../../scene";
+import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../../store";
 
 import { flipHorizontal, flipVertical } from "../../components/icons";

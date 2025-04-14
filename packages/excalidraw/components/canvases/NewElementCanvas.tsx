@@ -8,7 +8,7 @@ import { renderNewElementScene } from "../../renderer/renderNewElementScene";
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
-} from "../../scene/types";
+} from "../../src/scene/types";
 import type { AppState } from "../../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 

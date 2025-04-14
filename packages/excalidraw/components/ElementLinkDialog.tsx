@@ -11,7 +11,7 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
-import { getSelectedElements } from "../scene";
+import { getSelectedElements } from "../src/scene";
 
 import DialogActionButton from "./DialogActionButton";
 import { TextField } from "./TextField";

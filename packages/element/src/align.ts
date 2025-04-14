@@ -1,4 +1,4 @@
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
+import type Scene from "@excalidraw/excalidraw/src/scene/Scene";
 
 import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";

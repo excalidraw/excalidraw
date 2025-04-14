@@ -40,7 +40,7 @@ import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
-import type Scene from "../scene/Scene";
+import type Scene from "../src/scene/Scene";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use

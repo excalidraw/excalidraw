@@ -4,9 +4,9 @@ import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { getLanguage } from "../i18n";
+import { getLanguage } from "../../i18n";
 
-import type { InteractiveCanvasAppState } from "../types";
+import type { InteractiveCanvasAppState } from "../../types";
 import type { ScrollBars } from "./types";
 
 export const SCROLLBAR_MARGIN = 4;

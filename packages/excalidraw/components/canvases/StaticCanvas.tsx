@@ -13,7 +13,7 @@ import { renderStaticScene } from "../../renderer/staticScene";
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
-} from "../../scene/types";
+} from "../../src/scene/types";
 import type { AppState, StaticCanvasAppState } from "../../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 

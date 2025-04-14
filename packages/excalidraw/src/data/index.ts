@@ -25,8 +25,8 @@ import {
 } from "../../clipboard";
 
 import { t } from "../../i18n";
-import { getSelectedElements, isSomeElementSelected } from "../../scene";
-import { exportToCanvas, exportToSvg } from "../../scene/export";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { exportToCanvas, exportToSvg } from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
@@ -34,7 +34,7 @@ import { serializeAsJSON } from "./json";
 
 import type { FileSystemHandle } from "./filesystem";
 
-import type { ExportType } from "../../scene/types";
+import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../../types";
 
 export { loadFromBlob } from "./blob";

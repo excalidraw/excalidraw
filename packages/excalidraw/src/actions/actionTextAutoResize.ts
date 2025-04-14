@@ -5,7 +5,7 @@ import { measureText } from "@excalidraw/element/textMeasurements";
 
 import { isTextElement } from "@excalidraw/element/typeChecks";
 
-import { getSelectedElements } from "../../scene";
+import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";

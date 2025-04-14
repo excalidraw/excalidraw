@@ -8,7 +8,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { LockedIcon, UnlockedIcon } from "../../components/icons";
 
-import { getSelectedElements } from "../../scene";
+import { getSelectedElements } from "../scene";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";

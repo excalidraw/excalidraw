@@ -7,8 +7,8 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../src/context/tunnels";
 import { t } from "../i18n";
-import { calculateScrollCenter } from "../scene";
-import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
+import { calculateScrollCenter } from "../src/scene";
+import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../src/scene/scrollbars";
 
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { FixedSideContainer } from "./FixedSideContainer";

@@ -131,7 +131,7 @@ import {
   getSelectedElements,
   getTargetElements,
   isSomeElementSelected,
-} from "../../scene";
+} from "../scene";
 import { CaptureUpdateAction } from "../../store";
 
 import { register } from "./register";

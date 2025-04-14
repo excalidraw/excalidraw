@@ -45,7 +45,7 @@ import type {
 
 import { actionSaveToActiveFile } from "../src/actions";
 
-import Scene from "../scene/Scene";
+import Scene from "../src/scene/Scene";
 import { parseClipboard } from "../clipboard";
 import {
   actionDecreaseFontSize,

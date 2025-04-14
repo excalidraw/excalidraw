@@ -6,7 +6,7 @@ import { ROUGHNESS, isTransparent, assertNever } from "@excalidraw/common";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { EmbedsValidationStatus } from "@excalidraw/excalidraw/types";
-import type { ElementShapes } from "@excalidraw/excalidraw/scene/types";
+import type { ElementShapes } from "@excalidraw/excalidraw/src/scene/types";
 
 import {
   isElbowArrow,

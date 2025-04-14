@@ -17,7 +17,7 @@ import { ShapeCache } from "@excalidraw/element/ShapeCache";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import Scene from "../scene/Scene";
+import Scene from "../src/scene/Scene";
 import { actionToggleStats } from "../src/actions";
 import { trackEvent } from "../analytics";
 import { isHandToolActive } from "../appState";
@@ -26,7 +26,7 @@ import { UIAppStateContext } from "../src/context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";
-import { calculateScrollCenter } from "../scene";
+import { calculateScrollCenter } from "../src/scene";
 
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
