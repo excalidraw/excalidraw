@@ -319,6 +319,9 @@ export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;
 export const MAX_ALLOWED_FILE_BYTES = 4 * 1024 * 1024;
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
+export const SVG_DOCUMENT_PREAMBLE = `<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+`;
 
 export const ENCRYPTION_KEY_BITS = 128;
 
