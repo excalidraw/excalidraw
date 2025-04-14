@@ -135,6 +135,8 @@ export const exportCanvas = async (
     if (type === "svg") {
       return fileSave(
         svgPromise.then((svg) => {
+          // adding SVG preamble so that older software parse the SVG file
+          // properly
           return new Blob([SVG_DOCUMENT_PREAMBLE + svg.outerHTML], {
             type: MIME_TYPES.svg,
           });
