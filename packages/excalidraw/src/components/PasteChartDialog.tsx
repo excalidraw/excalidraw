@@ -3,7 +3,7 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 
 import type { ChartType } from "@excalidraw/element/types";
 
-import { trackEvent } from "../../analytics";
+import { trackEvent } from "../../src/analytics";
 import { renderSpreadsheet } from "../charts";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";

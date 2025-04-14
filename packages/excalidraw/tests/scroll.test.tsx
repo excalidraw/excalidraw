@@ -1,5 +1,3 @@
-import React from "react";
-
 import { KEYS } from "@excalidraw/common";
 
 import { Excalidraw } from "../src/index";

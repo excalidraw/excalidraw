@@ -379,19 +379,19 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { trackEvent } from "../../analytics";
-import { AnimationFrameHandler } from "../../animation-frame-handler";
+import { trackEvent } from "../../src/analytics";
+import { AnimationFrameHandler } from "../../src/animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
-} from "../../appState";
+} from "../../src/appState";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
-import { History } from "../../history";
+import { History } from "../../src/history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
@@ -422,13 +422,8 @@ import {
 } from "../data/blob";
 
 import { fileOpen } from "../data/filesystem";
-import {
-  showHyperlinkTooltip,
-  hideHyperlinkToolip,
-  Hyperlink,
-} from "./hyperlink/Hyperlink";
 
-import { Fonts } from "../../fonts";
+import { Fonts } from "../../src/fonts";
 import { editorJotaiStore } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
@@ -452,17 +447,24 @@ import {
   setCursorForShape,
 } from "../cursor";
 import { Emitter } from "../emitter";
-import { ElementCanvasButtons } from "./ElementCanvasButtons";
+
 import { Store, CaptureUpdateAction } from "../store";
-import { AnimatedTrail } from "../../animated-trail";
+import { AnimatedTrail } from "../../src/animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
-import { textWysiwyg } from "../../wysiwyg/textWysiwyg";
+import { textWysiwyg } from "../../src/wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
 import { LassoTrail } from "../lasso";
+
+import { ElementCanvasButtons } from "./ElementCanvasButtons";
+import {
+  showHyperlinkTooltip,
+  hideHyperlinkToolip,
+  Hyperlink,
+} from "./hyperlink/Hyperlink";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";

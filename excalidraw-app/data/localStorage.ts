@@ -1,7 +1,7 @@
 import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
-} from "@excalidraw/excalidraw/appState";
+} from "@excalidraw/excalidraw/src/appState";
 import { clearElementsForLocalStorage } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";

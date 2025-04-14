@@ -19,12 +19,12 @@ import type {
   FileId,
 } from "@excalidraw/element/types";
 
-import { actionFlipHorizontal, actionFlipVertical } from "../actions";
+import { actionFlipHorizontal, actionFlipVertical } from "../src/actions";
 import { createPasteEvent } from "../src/clipboard";
 import { Excalidraw } from "../src/index";
 
 // Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
-import * as blobModule from "../data/blob";
+import * as blobModule from "../src/data/blob";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

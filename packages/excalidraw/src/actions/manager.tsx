@@ -7,7 +7,7 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { trackEvent } from "../../analytics";
+import { trackEvent } from "../../src/analytics";
 
 import type { AppClassProperties, AppState } from "../types";
 import type {

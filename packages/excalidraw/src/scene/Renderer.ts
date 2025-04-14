@@ -9,8 +9,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { renderInteractiveSceneThrottled } from "../../renderer/interactiveScene";
-import { renderStaticSceneThrottled } from "../../renderer/staticScene";
+import { renderInteractiveSceneThrottled } from "../../src/renderer/interactiveScene";
+import { renderStaticSceneThrottled } from "../../src/renderer/staticScene";
 
 import type Scene from "./Scene";
 import type { RenderableElementsMap } from "./types";

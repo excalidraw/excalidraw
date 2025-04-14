@@ -38,7 +38,7 @@ import type {
   ExcalidrawImageElement,
 } from "@excalidraw/element/types";
 
-import { createTestHook } from "../../components/App";
+import { createTestHook } from "../../src/components/App";
 import { getTextEditor } from "../queries/dom";
 import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 

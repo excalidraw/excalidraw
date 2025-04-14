@@ -18,7 +18,7 @@ import {
 
 import type { ValueOf } from "@excalidraw/common/utility-types";
 
-import { Fonts } from "../../../fonts";
+import { Fonts } from "../../../src/fonts";
 import { t } from "../../i18n";
 import { useApp, useAppProps, useExcalidrawContainer } from "../App";
 import { PropertiesPopover } from "../PropertiesPopover";

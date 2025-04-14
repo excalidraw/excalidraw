@@ -9,6 +9,22 @@ import { isInGroup } from "@excalidraw/element/groups";
 
 import { isTextElement } from "@excalidraw/element/typeChecks";
 
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+
+import {
+  getTextEditor,
+  updateTextEditor,
+} from "@excalidraw/excalidraw/tests/queries/dom";
+
+import {
+  GlobalTestState,
+  mockBoundingClientRect,
+  render,
+  restoreOriginalGetBoundingClientRect,
+} from "@excalidraw/excalidraw/tests/test-utils";
+
 import type { Degrees } from "@excalidraw/math";
 
 import type {
@@ -21,15 +37,6 @@ import { Excalidraw, getCommonBounds, mutateElement } from "../..";
 import { actionGroup } from "../../actions";
 import { t } from "../../i18n";
 import * as StaticScene from "../../renderer/staticScene";
-import { API } from "../../tests/helpers/api";
-import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
-import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
-import {
-  GlobalTestState,
-  mockBoundingClientRect,
-  render,
-  restoreOriginalGetBoundingClientRect,
-} from "../../tests/test-utils";
 
 import { getStepSizedValue } from "./utils";
 

@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 import type * as TExcalidraw from "@excalidraw/excalidraw";
-import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
+import type { ImportedLibraryData } from "@excalidraw/excalidraw/src/data/types";
 import type {
   NonDeletedExcalidrawElement,
   Theme,

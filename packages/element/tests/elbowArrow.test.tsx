@@ -2,9 +2,9 @@ import { ARROW_TYPE } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw, mutateElement } from "@excalidraw/excalidraw/src";
 
-import Scene from "@excalidraw/excalidraw/scene/Scene";
-import { actionSelectAll } from "@excalidraw/excalidraw/actions";
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
+import Scene from "@excalidraw/excalidraw/src/scene/Scene";
+import { actionSelectAll } from "@excalidraw/excalidraw/src/actions";
+import { actionDuplicateSelection } from "@excalidraw/excalidraw/src/actions/actionDuplicateSelection";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";

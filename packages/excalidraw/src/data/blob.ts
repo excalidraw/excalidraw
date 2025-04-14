@@ -12,7 +12,7 @@ import { clearElementsForExport } from "@excalidraw/element";
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
-import { cleanAppStateForExport } from "../../appState";
+import { cleanAppStateForExport } from "../../src/appState";
 
 import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";

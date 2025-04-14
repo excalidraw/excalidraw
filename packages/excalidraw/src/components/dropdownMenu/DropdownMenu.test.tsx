@@ -1,15 +1,14 @@
-import React from "react";
-
 import { KEYS } from "@excalidraw/common";
 
-import { Excalidraw } from "../../index";
-import { Keyboard } from "../../tests/helpers/ui";
+import { Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   render,
   waitFor,
   getByTestId,
   fireEvent,
-} from "../../tests/test-utils";
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import { Excalidraw } from "../../index";
 
 describe("Test <DropdownMenu/>", () => {
   it("should", async () => {

@@ -1,5 +1,5 @@
 import { MIME_TYPES } from "@excalidraw/common";
-import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
+import { getDefaultAppState } from "@excalidraw/excalidraw/src/appState";
 import {
   copyBlobToClipboardAsPng,
   copyTextToSystemClipboard,

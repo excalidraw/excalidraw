@@ -8,7 +8,7 @@ import {
   actionAlignBottom,
   actionAlignLeft,
   actionAlignRight,
-} from "@excalidraw/excalidraw/actions";
+} from "@excalidraw/excalidraw/src/actions";
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/src/i18n";
 import { Excalidraw } from "@excalidraw/excalidraw/src";
 

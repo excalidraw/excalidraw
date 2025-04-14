@@ -1,13 +1,12 @@
-import React from "react";
 import { vi } from "vitest";
 
 import { KEYS, reseed } from "@excalidraw/common";
 
-import { SHAPES } from "../components/shapes";
+import { SHAPES } from "../src/components/shapes";
 
 import { Excalidraw } from "../src/index";
-import * as InteractiveCanvas from "../renderer/interactiveScene";
-import * as StaticScene from "../renderer/staticScene";
+import * as InteractiveCanvas from "../src/renderer/interactiveScene";
+import * as StaticScene from "../src/renderer/staticScene";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";

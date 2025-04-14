@@ -8,8 +8,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { prepareElementsForExport } from "../../data";
-import * as exportUtils from "../../scene/export";
+import { prepareElementsForExport } from "../../src/data";
+import * as exportUtils from "../../src/scene/export";
 import {
   diamondFixture,
   ellipseFixture,

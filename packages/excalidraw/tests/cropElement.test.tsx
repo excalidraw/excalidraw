@@ -11,7 +11,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw, exportToCanvas, exportToSvg } from "../src";
-import { actionFlipHorizontal, actionFlipVertical } from "../actions";
+import { actionFlipHorizontal, actionFlipVertical } from "../src/actions";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";

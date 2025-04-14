@@ -1,5 +1,5 @@
 import { CaptureUpdateAction } from "@excalidraw/excalidraw/src";
-import { compressData } from "@excalidraw/excalidraw/data/encode";
+import { compressData } from "@excalidraw/excalidraw/src/data/encode";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import { t } from "@excalidraw/excalidraw/src/i18n";

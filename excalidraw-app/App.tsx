@@ -31,11 +31,11 @@ import {
   isRunningInIframe,
   isDevEnv,
 } from "@excalidraw/common";
-import polyfill from "@excalidraw/excalidraw/src/src/polyfill";
+import polyfill from "@excalidraw/excalidraw/src/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/src/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/src/hooks/useCallbackRefState";
-import { t } from "@excalidraw/excalidraw/src/src/i18n";
+import { t } from "@excalidraw/excalidraw/src/i18n";
 
 import {
   GithubIcon,
@@ -73,7 +73,7 @@ import type {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
-} from "@excalidraw/excalidraw/src/src/types";
+} from "@excalidraw/excalidraw/src/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
 

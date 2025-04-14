@@ -65,7 +65,7 @@ import type {
 
 import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
 
-import { getDefaultAppState } from "../../appState";
+import { getDefaultAppState } from "../../src/appState";
 
 import {
   getNormalizedGridSize,

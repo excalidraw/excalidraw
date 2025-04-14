@@ -1,4 +1,3 @@
-import React from "react";
 import { vi } from "vitest";
 
 import { FONT_FAMILY, CODES, KEYS, reseed } from "@excalidraw/common";
@@ -8,7 +7,7 @@ import { setDateTimeForTests } from "@excalidraw/common";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../src/index";
-import * as StaticScene from "../renderer/staticScene";
+import * as StaticScene from "../src/renderer/staticScene";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";

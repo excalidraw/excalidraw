@@ -4,12 +4,12 @@ import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import { ToolButton } from "../components/ToolButton";
 import { UndoIcon, RedoIcon } from "../components/icons";
-import { HistoryChangedEvent } from "../../history";
-import { useEmitter } from "../../hooks/useEmitter";
+import { HistoryChangedEvent } from "../../src/history";
+import { useEmitter } from "../../src/hooks/useEmitter";
 import { t } from "../i18n";
 import { CaptureUpdateAction } from "../store";
 
-import type { History } from "../../history";
+import type { History } from "../../src/history";
 import type { Store } from "../store";
 import type { AppClassProperties, AppState } from "../types";
 import type { Action, ActionResult } from "./types";

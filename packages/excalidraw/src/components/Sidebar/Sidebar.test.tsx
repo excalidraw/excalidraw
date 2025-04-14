@@ -3,7 +3,6 @@ import { vi } from "vitest";
 
 import { DEFAULT_SIDEBAR } from "@excalidraw/common";
 
-import { Excalidraw, Sidebar } from "../../index";
 import {
   act,
   fireEvent,
@@ -12,7 +11,9 @@ import {
   render,
   waitFor,
   withExcalidrawDimensions,
-} from "../../tests/test-utils";
+} from "@excalidraw/excalidraw/tests/test-utils";
+
+import { Excalidraw, Sidebar } from "../../index";
 
 import {
   assertExcalidrawWithSidebar,

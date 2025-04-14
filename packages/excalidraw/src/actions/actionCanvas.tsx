@@ -23,7 +23,7 @@ import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
-} from "../../appState";
+} from "../../src/appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";

@@ -2,7 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
-} from "@excalidraw/excalidraw/components/icons";
+} from "@excalidraw/excalidraw/src/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/src/index";
 import React from "react";
 

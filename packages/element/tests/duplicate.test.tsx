@@ -10,7 +10,7 @@ import {
 
 import { Excalidraw } from "@excalidraw/excalidraw/src";
 
-import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
+import { actionDuplicateSelection } from "@excalidraw/excalidraw/src/actions";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 

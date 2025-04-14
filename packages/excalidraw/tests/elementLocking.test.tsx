@@ -4,7 +4,7 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import { KEYS } from "@excalidraw/common";
 
-import { actionSelectAll } from "../actions";
+import { actionSelectAll } from "../src/actions";
 import { t } from "../src/i18n";
 import { Excalidraw } from "../src/index";
 

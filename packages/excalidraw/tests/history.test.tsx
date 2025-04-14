@@ -42,15 +42,18 @@ import {
   actionSendBackward,
   actionBringForward,
   actionSendToBack,
-} from "../actions";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { getDefaultAppState } from "../appState";
-import { HistoryEntry } from "../history";
+} from "../src/actions";
+import {
+  createUndoAction,
+  createRedoAction,
+} from "../src/actions/actionHistory";
+import { actionToggleViewMode } from "../src/actions/actionToggleViewMode";
+import { getDefaultAppState } from "../src/appState";
+import { HistoryEntry } from "../src/history";
 import { Excalidraw } from "../src/index";
-import * as StaticScene from "../renderer/staticScene";
+import * as StaticScene from "../src/renderer/staticScene";
 import { Snapshot, CaptureUpdateAction } from "../src/store.js";
-import { AppStateChange, ElementsChange } from "../change";
+import { AppStateChange, ElementsChange } from "../src/change";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";

@@ -7,10 +7,12 @@ import {
   STROKE_WIDTH,
 } from "@excalidraw/common";
 
+
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { render } from "@excalidraw/excalidraw/tests/test-utils";
+import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+
 import { Excalidraw } from "../index";
-import { API } from "../tests/helpers/api";
-import { UI } from "../tests/helpers/ui";
-import { render } from "../tests/test-utils";
 
 describe("element locking", () => {
   beforeEach(async () => {

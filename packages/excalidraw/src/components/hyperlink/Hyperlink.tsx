@@ -39,7 +39,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { trackEvent } from "../../../analytics";
+import { trackEvent } from "../../../src/analytics";
 import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
 
 import { t } from "../../i18n";

@@ -52,14 +52,14 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../../appState";
+import { getDefaultAppState } from "../../src/appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
 
-import { Fonts } from "../../fonts";
+import { Fonts } from "../../src/fonts";
 
-import { renderStaticScene } from "../../renderer/staticScene";
-import { renderSceneToSvg } from "../../renderer/staticSvgScene";
+import { renderStaticScene } from "../../src/renderer/staticScene";
+import { renderSceneToSvg } from "../../src/renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 

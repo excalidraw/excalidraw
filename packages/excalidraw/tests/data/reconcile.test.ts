@@ -7,9 +7,9 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { reconcileElements } from "../../data/reconcile";
+import { reconcileElements } from "../../src/data/reconcile";
 
-import type { RemoteExcalidrawElement } from "../../data/reconcile";
+import type { RemoteExcalidrawElement } from "../../src/data/reconcile";
 
 import type { AppState } from "../../src/types";
 

@@ -19,8 +19,8 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import Scene from "../scene/Scene";
 import { actionToggleStats } from "../actions";
-import { trackEvent } from "../../analytics";
-import { isHandToolActive } from "../../appState";
+import { trackEvent } from "../../src/analytics";
+import { isHandToolActive } from "../../src/appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";

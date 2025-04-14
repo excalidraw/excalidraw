@@ -33,7 +33,7 @@ import type {
 import { actionToggleZenMode } from "../actions";
 
 import { alignActionsPredicate } from "../actions/actionAlign";
-import { trackEvent } from "../../analytics";
+import { trackEvent } from "../../src/analytics";
 import { useTunnels } from "../context/tunnels";
 
 import { t } from "../i18n";

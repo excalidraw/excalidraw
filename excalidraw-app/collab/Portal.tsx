@@ -1,6 +1,6 @@
 import { CaptureUpdateAction } from "@excalidraw/excalidraw/src";
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { encryptData } from "@excalidraw/excalidraw/data/encryption";
+import { trackEvent } from "@excalidraw/excalidraw/src/analytics";
+import { encryptData } from "@excalidraw/excalidraw/src/data/encryption";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import throttle from "lodash.throttle";
 

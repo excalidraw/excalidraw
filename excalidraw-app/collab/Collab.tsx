@@ -5,7 +5,7 @@ import {
   zoomToFitBounds,
   reconcileElements,
 } from "@excalidraw/excalidraw/src";
-import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
+import { ErrorDialog } from "@excalidraw/excalidraw/src/components/ErrorDialog";
 import { APP_NAME, EVENT } from "@excalidraw/common";
 import {
   IDLE_THRESHOLD,
@@ -18,7 +18,7 @@ import {
   resolvablePromise,
   throttleRAF,
 } from "@excalidraw/common";
-import { decryptData } from "@excalidraw/excalidraw/data/encryption";
+import { decryptData } from "@excalidraw/excalidraw/src/data/encryption";
 import { getVisibleSceneBounds } from "@excalidraw/element/bounds";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import {
@@ -35,8 +35,8 @@ import { PureComponent } from "react";
 import type {
   ReconciledExcalidrawElement,
   RemoteExcalidrawElement,
-} from "@excalidraw/excalidraw/data/reconcile";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+} from "@excalidraw/excalidraw/src/data/reconcile";
+import type { ImportedDataState } from "@excalidraw/excalidraw/src/data/types";
 import type {
   ExcalidrawElement,
   FileId,

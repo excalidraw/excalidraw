@@ -4,7 +4,7 @@ import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeA
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { isHandToolActive } from "../../appState";
+import { isHandToolActive } from "../../src/appState";
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";

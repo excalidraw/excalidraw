@@ -28,7 +28,7 @@ import { atom, editorJotaiStore } from "../editor-jotai";
 
 import { Emitter } from "../emitter";
 import { AbortError } from "../errors";
-import { libraryItemSvgsCache } from "../../hooks/useLibraryItemSvg";
+import { libraryItemSvgsCache } from "../../src/hooks/useLibraryItemSvg";
 import { t } from "../i18n";
 
 import { loadLibraryFromBlob } from "./blob";

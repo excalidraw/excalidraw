@@ -9,8 +9,9 @@ import {
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
 import type { AnimationFrameHandler } from "./animation-frame-handler";
-import type App from "./src/components/App";
 import type { AppState } from "./types";
+
+import type App from "./components/App";
 
 export interface Trail {
   start(container: SVGSVGElement): void;

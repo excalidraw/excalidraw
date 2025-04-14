@@ -42,13 +42,13 @@ import type {
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { getMimeType } from "../../data/blob";
-import { createTestHook } from "../../components/App";
-import { getDefaultAppState } from "../../appState";
+import { getMimeType } from "../../src/data/blob";
+import { createTestHook } from "../../src/components/App";
+import { getDefaultAppState } from "../../src/appState";
 import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
 
-import type { Action } from "../../actions/types";
-import type App from "../../components/App";
+import type { Action } from "../../src/actions/types";
+import type App from "../../src/components/App";
 import type { AppState } from "../../src/types";
 
 

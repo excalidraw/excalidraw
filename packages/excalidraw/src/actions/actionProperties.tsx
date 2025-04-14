@@ -71,7 +71,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { trackEvent } from "../../analytics";
+import { trackEvent } from "../../src/analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
@@ -123,7 +123,7 @@ import {
   ArrowheadCrowfootOneOrManyIcon,
 } from "../components/icons";
 
-import { Fonts } from "../../fonts";
+import { Fonts } from "../../src/fonts";
 import { getLanguage, t } from "../i18n";
 import {
   canHaveArrowheads,

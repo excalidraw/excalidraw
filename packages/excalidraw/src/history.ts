@@ -1,6 +1,6 @@
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
-import { Emitter } from "./src/emitter";
+import { Emitter } from "../src/emitter";
 
 import type { AppStateChange, ElementsChange } from "./change";
 import type { Snapshot } from "./store";

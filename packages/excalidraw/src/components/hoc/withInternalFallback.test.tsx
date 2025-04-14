@@ -1,7 +1,9 @@
-import React from "react";
+import {
+  render,
+  queryAllByTestId,
+} from "@excalidraw/excalidraw/tests/test-utils";
 
 import { Excalidraw, MainMenu } from "../../index";
-import { render, queryAllByTestId } from "../../tests/test-utils";
 
 describe("Test internal component fallback rendering", () => {
   it("should render only one menu per excalidraw instance (custom menu first scenario)", async () => {

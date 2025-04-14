@@ -23,7 +23,7 @@ import {
   actionLinkToElement,
 } from "../../actions/actionElementLink";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { trackEvent } from "../../../analytics";
+import { trackEvent } from "../../../src/analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { deburr } from "../../deburr";
 import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";

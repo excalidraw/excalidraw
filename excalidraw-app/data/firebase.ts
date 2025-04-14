@@ -1,11 +1,11 @@
 import { reconcileElements } from "@excalidraw/excalidraw/src";
 import { MIME_TYPES } from "@excalidraw/common";
-import { decompressData } from "@excalidraw/excalidraw/data/encode";
+import { decompressData } from "@excalidraw/excalidraw/src/data/encode";
 import {
   encryptData,
   decryptData,
-} from "@excalidraw/excalidraw/data/encryption";
-import { restoreElements } from "@excalidraw/excalidraw/data/restore";
+} from "@excalidraw/excalidraw/src/data/encryption";
+import { restoreElements } from "@excalidraw/excalidraw/src/data/restore";
 import { getSceneVersion } from "@excalidraw/element";
 import { initializeApp } from "firebase/app";
 import {
@@ -17,7 +17,7 @@ import {
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 
-import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/src/data/reconcile";
 import type {
   ExcalidrawElement,
   FileId,

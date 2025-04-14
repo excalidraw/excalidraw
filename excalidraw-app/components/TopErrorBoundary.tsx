@@ -1,4 +1,4 @@
-import Trans from "@excalidraw/excalidraw/components/Trans";
+import Trans from "@excalidraw/excalidraw/src/components/Trans";
 import { t } from "@excalidraw/excalidraw/src/i18n";
 import * as Sentry from "@sentry/browser";
 import React from "react";

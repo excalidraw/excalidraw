@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   CANVAS_SEARCH_TAB,
   CLASSES,

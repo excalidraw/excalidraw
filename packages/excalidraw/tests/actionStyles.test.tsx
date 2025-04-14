@@ -2,7 +2,7 @@ import React from "react";
 
 import { CODES } from "@excalidraw/common";
 
-import { copiedStyles } from "../actions/actionStyles";
+import { copiedStyles } from "../src/actions/actionStyles";
 import { Excalidraw } from "../src/index";
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";

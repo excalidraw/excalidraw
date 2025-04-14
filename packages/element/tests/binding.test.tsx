@@ -2,7 +2,7 @@ import { KEYS, arrayToMap } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
 
-import { actionWrapTextInContainer } from "@excalidraw/excalidraw/actions/actionBoundText";
+import { actionWrapTextInContainer } from "@excalidraw/excalidraw/src/actions/actionBoundText";
 
 import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw/src";
 

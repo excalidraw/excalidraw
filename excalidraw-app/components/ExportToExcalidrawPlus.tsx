@@ -2,16 +2,16 @@ import React from "react";
 import { uploadBytes, ref } from "firebase/storage";
 import { nanoid } from "nanoid";
 
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { Card } from "@excalidraw/excalidraw/components/Card";
-import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
-import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
+import { trackEvent } from "@excalidraw/excalidraw/src/analytics";
+import { Card } from "@excalidraw/excalidraw/src/components/Card";
+import { ExcalidrawLogo } from "@excalidraw/excalidraw/src/components/ExcalidrawLogo";
+import { ToolButton } from "@excalidraw/excalidraw/src/components/ToolButton";
 import { MIME_TYPES, getFrame } from "@excalidraw/common";
 import {
   encryptData,
   generateEncryptionKey,
-} from "@excalidraw/excalidraw/data/encryption";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+} from "@excalidraw/excalidraw/src/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/src/data/json";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import { useI18n } from "@excalidraw/excalidraw/src/i18n";
 

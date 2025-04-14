@@ -1,4 +1,4 @@
-import { getNameInitial } from "../clients";
+import { getNameInitial } from "../src/clients";
 
 describe("getClientInitials", () => {
   it("returns substring if one name provided", () => {

@@ -27,13 +27,13 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../src/index";
 
-import { getSelectedElements } from "../scene";
+import { getSelectedElements } from "../src/scene";
 
-import { getLassoSelectedElementIds } from "../lasso/utils";
+import { getLassoSelectedElementIds } from "../src/lasso/utils";
 
 import { act, render } from "./test-utils";
 
-import type { ElementsSegmentsMap } from "../lasso/utils";
+import type { ElementsSegmentsMap } from "../src/lasso/utils";
 
 const { h } = window;
 
