@@ -5,17 +5,17 @@ import {
   CaptureUpdateAction,
   reconcileElements,
 } from "@excalidraw/excalidraw/src";
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
+import { trackEvent } from "@excalidraw/excalidraw/src/analytics";
+import { getDefaultAppState } from "@excalidraw/excalidraw/src/appState";
 import {
   CommandPalette,
   DEFAULT_CATEGORIES,
-} from "@excalidraw/excalidraw/components/CommandPalette/CommandPalette";
-import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
-import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
-import { openConfirmModal } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirmState";
-import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/ShareableLinkDialog";
-import Trans from "@excalidraw/excalidraw/components/Trans";
+} from "@excalidraw/excalidraw/src/components/CommandPalette/CommandPalette";
+import { ErrorDialog } from "@excalidraw/excalidraw/src/components/ErrorDialog";
+import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/src/components/OverwriteConfirm/OverwriteConfirm";
+import { openConfirmModal } from "@excalidraw/excalidraw/src/components/OverwriteConfirm/OverwriteConfirmState";
+import { ShareableLinkDialog } from "@excalidraw/excalidraw/src/components/ShareableLinkDialog";
+import Trans from "@excalidraw/excalidraw/src/components/Trans";
 import {
   APP_NAME,
   EVENT,
@@ -31,11 +31,11 @@ import {
   isRunningInIframe,
   isDevEnv,
 } from "@excalidraw/common";
-import polyfill from "@excalidraw/excalidraw/src/polyfill";
+import polyfill from "@excalidraw/excalidraw/src/src/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
-import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
-import { t } from "@excalidraw/excalidraw/src/i18n";
+import { loadFromBlob } from "@excalidraw/excalidraw/src/data/blob";
+import { useCallbackRefState } from "@excalidraw/excalidraw/src/hooks/useCallbackRefState";
+import { t } from "@excalidraw/excalidraw/src/src/i18n";
 
 import {
   GithubIcon,
@@ -46,19 +46,22 @@ import {
   exportToPlus,
   share,
   youtubeIcon,
-} from "@excalidraw/excalidraw/components/icons";
+} from "@excalidraw/excalidraw/src/components/icons";
 import { isElementLink } from "@excalidraw/element/elementLink";
-import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
+import {
+  restore,
+  restoreAppState,
+} from "@excalidraw/excalidraw/src/data/restore";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
-} from "@excalidraw/excalidraw/data/library";
+} from "@excalidraw/excalidraw/src/data/library";
 
-import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
-import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/src/data/reconcile";
+import type { RestoredDataState } from "@excalidraw/excalidraw/src/data/restore";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
@@ -70,7 +73,7 @@ import type {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
-} from "@excalidraw/excalidraw/src/types";
+} from "@excalidraw/excalidraw/src/src/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
 
