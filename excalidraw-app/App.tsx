@@ -231,7 +231,7 @@ const ConstraintsSettings = ({
         onChange={(e) =>
           setConstraints((s) => ({
             ...s,
-            x: parseInt(e.target.value) ?? 200,
+            width: parseInt(e.target.value) ?? 200,
           }))
         }
       />
@@ -243,7 +243,7 @@ const ConstraintsSettings = ({
         onChange={(e) =>
           setConstraints((s) => ({
             ...s,
-            x: parseInt(e.target.value) ?? 200,
+            height: parseInt(e.target.value) ?? 200,
           }))
         }
       />
