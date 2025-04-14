@@ -54,6 +54,11 @@ const RE_REDDIT =
 const RE_REDDIT_EMBED =
   /^<blockquote[\s\S]*?\shref=["'](https?:\/\/(?:www\.)?reddit\.com\/[^"']*)/i;
 
+const RE_TWITCH_CLIP =
+  /^https?:\/\/(www\.)?twitch\.tv\/[^/]+\/clip\/([a-zA-Z0-9_-]+)/i;
+
+const RE_TWITCH_VIDEO = /^https?:\/\/(www\.)?twitch\.tv\/videos\/(\d+)/i;
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -69,6 +74,9 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
   "giphy.com",
   "reddit.com",
+  "twitch.tv",
+  "clips.twitch.tv",
+  "player.twitch.tv",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -82,6 +90,9 @@ const ALLOW_SAME_ORIGIN = new Set([
   "*.simplepdf.eu",
   "stackblitz.com",
   "reddit.com",
+  "twitch.tv",
+  "clips.twitch.tv",
+  "player.twitch.tv",
 ]);
 
 export const createSrcDoc = (body: string) => {
@@ -268,6 +279,50 @@ export const getEmbedLink = (
     };
     embeddedLinkCache.set(link, ret);
     return ret;
+  }
+
+  const parent = typeof window !== "undefined" ? window.location.hostname : "";
+  const twitchClip = link.match(RE_TWITCH_CLIP);
+  if (twitchClip?.[2]) {
+    link = `https://clips.twitch.tv/embed?clip=${twitchClip[2]}&parent=${parent}&autoplay=false`;
+    type = "video";
+    aspectRatio = { w: 560, h: 315 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
+  }
+
+  const twitchVideo = link.match(RE_TWITCH_VIDEO);
+  if (twitchVideo?.[2]) {
+    const urlObj = new URL(link);
+    const tParam = urlObj.searchParams.get("t") || "";
+    link = `https://player.twitch.tv/?video=${
+      twitchVideo[2]
+    }&parent=${parent}&autoplay=false${tParam ? `&t=${tParam}` : ""}`;
+
+    type = "video";
+    aspectRatio = { w: 560, h: 315 };
+    embeddedLinkCache.set(originalLink, {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    });
+    return {
+      link,
+      intrinsicSize: aspectRatio,
+      type,
+      sandbox: { allowSameOrigin },
+    };
   }
 
   embeddedLinkCache.set(link, {
