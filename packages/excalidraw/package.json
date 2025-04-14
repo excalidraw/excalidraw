@@ -130,6 +130,6 @@
   "homepage": "https://github.com/excalidraw/excalidraw/tree/master/packages/excalidraw",
   "scripts": {
     "gen:types": "rm -rf types && tsc",
-    "build:esm": "cross-env rimraf dist && node ../../scripts/buildPackage.js && yarn gen:types"
+    "build:esm": "rm -rf dist && node ../../../scripts/buildPackage.js && yarn gen:types"
   }
 }
