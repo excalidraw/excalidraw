@@ -19,7 +19,7 @@ module.exports.woff2BrowserPlugin = () => {
     transform(code, id) {
       // using copy / replace as fonts defined in the `.css` don't have to be manually copied over (vite/rollup does this automatically),
       // but at the same time can't be easily prefixed with the `EXCALIDRAW_ASSET_PATH` only for the `excalidraw-app`
-      if (!isDev && id.endsWith("/excalidraw/fonts/fonts.css")) {
+      if (!isDev && id.endsWith("/excalidraw/src/fonts/fonts.css")) {
         return `/* WARN: The following content is generated during excalidraw-app build */
 
       @font-face {
