@@ -170,6 +170,7 @@ const ConstraintsSettings = ({
       ),
     );
     window.location.hash = decodeURIComponent(hash.toString());
+    excalidrawAPI.setScrollConstraints(constraints);
   }, [constraints]);
 
   const [selection, setSelection] = useState<ExcalidrawElement[]>([]);
