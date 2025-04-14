@@ -19,9 +19,9 @@ import {
   actionChangeProjectName,
 } from "../src/actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
-import { prepareElementsForExport } from "../data";
-import { canvasToBlob } from "../data/blob";
-import { nativeFileSystemSupported } from "../data/filesystem";
+import { prepareElementsForExport } from "../src/data";
+import { canvasToBlob } from "../src/data/blob";
+import { nativeFileSystemSupported } from "../src/data/filesystem";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";

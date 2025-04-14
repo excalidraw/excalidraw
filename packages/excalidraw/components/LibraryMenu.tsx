@@ -23,7 +23,7 @@ import { useUIAppState } from "../src/context/ui-appState";
 import {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
-} from "../data/library";
+} from "../src/data/library";
 import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 
@@ -48,7 +48,7 @@ import type {
   UIAppState,
   AppClassProperties,
 } from "../types";
-import type Library from "../data/library";
+import type Library from "../src/data/library";
 
 export const isLibraryMenuOpenAtom = atom(false);
 

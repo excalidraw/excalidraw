@@ -6,7 +6,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useApp } from "../App";
 import { ArrowRightIcon } from "../icons";
-import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { EditorLocalStorage } from "../../src/data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
 

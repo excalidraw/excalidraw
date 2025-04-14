@@ -17,7 +17,7 @@ import {
   pngIcon,
   svgIcon,
 } from "../../components/icons";
-import { exportCanvas, prepareElementsForExport } from "../../data/index";
+import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { t } from "../../i18n";
 
 import { CaptureUpdateAction } from "../../store";

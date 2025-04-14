@@ -4,9 +4,9 @@ import { useCallback, useState } from "react";
 import { muteFSAbortError } from "@excalidraw/common";
 
 import { useUIAppState } from "../src/context/ui-appState";
-import { fileOpen } from "../data/filesystem";
-import { saveLibraryAsJSON } from "../data/json";
-import { libraryItemsAtom } from "../data/library";
+import { fileOpen } from "../src/data/filesystem";
+import { saveLibraryAsJSON } from "../src/data/json";
+import { libraryItemsAtom } from "../src/data/library";
 import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { t } from "../i18n";
@@ -27,7 +27,7 @@ import {
   TrashIcon,
 } from "./icons";
 
-import type Library from "../data/library";
+import type Library from "../src/data/library";
 import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 
 const getSelectedItems = (

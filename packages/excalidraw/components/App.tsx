@@ -390,9 +390,11 @@ import {
   isHandToolActive,
 } from "../appState";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
-import { exportCanvas, loadFromBlob } from "../data";
-import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { restore, restoreElements } from "../data/restore";
+import { exportCanvas, loadFromBlob } from "../src/data";
+import Library, {
+  distributeLibraryItemsOnSquareGrid,
+} from "../src/data/library";
+import { restore, restoreElements } from "../src/data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -422,9 +424,9 @@ import {
   parseLibraryJSON,
   resizeImageFile,
   SVGStringToFile,
-} from "../data/blob";
+} from "../src/data/blob";
 
-import { fileOpen } from "../data/filesystem";
+import { fileOpen } from "../src/data/filesystem";
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
@@ -446,7 +448,7 @@ import {
   SnapCache,
   isGridModeEnabled,
 } from "../snapping";
-import { convertToExcalidrawElements } from "../data/transform";
+import { convertToExcalidrawElements } from "../src/data/transform";
 import { Renderer } from "../scene/Renderer";
 import {
   setEraserCursor,
@@ -494,10 +496,10 @@ import type {
 } from "../scene/types";
 
 import type { PastedMixedContent } from "../clipboard";
-import type { ExportedElements } from "../data";
+import type { ExportedElements } from "../src/data";
 import type { ContextMenuItems } from "./ContextMenu";
-import type { FileSystemHandle } from "../data/filesystem";
-import type { ExcalidrawElementSkeleton } from "../data/transform";
+import type { FileSystemHandle } from "../src/data/filesystem";
+import type { ExcalidrawElementSkeleton } from "../src/data/transform";
 
 import type {
   AppClassProperties,
