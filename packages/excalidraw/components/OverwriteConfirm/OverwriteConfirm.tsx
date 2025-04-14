@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useTunnels } from "../../context/tunnels";
+import { useTunnels } from "../../src/context/tunnels";
 import { useAtom } from "../../editor-jotai";
 import { Dialog } from "../Dialog";
 import { FilledButton } from "../FilledButton";

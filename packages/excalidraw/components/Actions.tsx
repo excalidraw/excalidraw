@@ -34,7 +34,7 @@ import { actionToggleZenMode } from "../src/actions";
 
 import { alignActionsPredicate } from "../src/actions/actionAlign";
 import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
+import { useTunnels } from "../src/context/tunnels";
 
 import { t } from "../i18n";
 import {

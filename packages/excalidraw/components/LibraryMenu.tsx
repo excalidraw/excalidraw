@@ -19,7 +19,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { trackEvent } from "../analytics";
-import { useUIAppState } from "../context/ui-appState";
+import { useUIAppState } from "../src/context/ui-appState";
 import {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,

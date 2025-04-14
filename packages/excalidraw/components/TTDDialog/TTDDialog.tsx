@@ -5,7 +5,7 @@ import { isFiniteNumber } from "@excalidraw/math";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { trackEvent } from "../../analytics";
-import { useUIAppState } from "../../context/ui-appState";
+import { useUIAppState } from "../../src/context/ui-appState";
 import { atom, useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
 import { useApp, useExcalidrawSetAppState } from "../App";
