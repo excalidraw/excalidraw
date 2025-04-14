@@ -49,12 +49,12 @@ export default defineConfig(({ mode }) => {
           find: /^@excalidraw\/excalidraw$/,
           replacement: path.resolve(
             __dirname,
-            "../packages/excalidraw/index.tsx",
+            "../packages/excalidraw/src/index.tsx",
           ),
         },
         {
           find: /^@excalidraw\/excalidraw\/(.*?)/,
-          replacement: path.resolve(__dirname, "../packages/excalidraw/$1"),
+          replacement: path.resolve(__dirname, "../packages/excalidraw/src/$1"),
         },
         {
           find: /^@excalidraw\/math$/,
@@ -95,7 +95,7 @@ export default defineConfig(({ mode }) => {
           // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
           manualChunks(id) {
             if (
-              id.includes("packages/excalidraw/locales") &&
+              id.includes("packages/excalidraw/src/locales") &&
               id.match(/en.json|percentages.json/) === null
             ) {
               const index = id.indexOf("locales/");
