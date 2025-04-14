@@ -8,7 +8,7 @@ import {
 
 import { roundRect } from "./renderer/roundRect";
 
-import type { InteractiveCanvasRenderConfig } from "./src/scene/types";
+import type { InteractiveCanvasRenderConfig } from "./scene/types";
 import type {
   Collaborator,
   InteractiveCanvasAppState,

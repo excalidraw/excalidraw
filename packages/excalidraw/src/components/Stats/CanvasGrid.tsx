@@ -4,7 +4,7 @@ import StatsDragInput from "./DragInput";
 import { getStepSizedValue } from "./utils";
 
 import type Scene from "../../scene/Scene";
-import type { AppState } from "../../../types";
+import type { AppState } from "../../types";
 
 interface PositionProps {
   property: "gridStep";

@@ -6,7 +6,7 @@ import {
 
 import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
 
-import { AbortError } from "../../errors";
+import { AbortError } from "../errors";
 
 import type { FileSystemHandle } from "browser-fs-access";
 

@@ -7,7 +7,7 @@ import {
   bootstrapCanvas,
   getNormalizedCanvasDimensions,
 } from "@excalidraw/excalidraw/renderer/helpers";
-import { type AppState } from "@excalidraw/excalidraw/types";
+import { type AppState } from "@excalidraw/excalidraw/src/types";
 import { throttleRAF } from "@excalidraw/common";
 import { useCallback, useImperativeHandle, useRef } from "react";
 
@@ -18,7 +18,7 @@ import {
 } from "@excalidraw/math";
 import { isCurve } from "@excalidraw/math/curve";
 
-import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
+import type { DebugElement } from "@excalidraw/excalidraw/src/visualdebug";
 
 import type { Curve } from "@excalidraw/math";
 

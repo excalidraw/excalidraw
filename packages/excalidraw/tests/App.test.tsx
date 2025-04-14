@@ -3,7 +3,7 @@ import { vi } from "vitest";
 
 import { reseed } from "@excalidraw/common";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import * as StaticScene from "../renderer/staticScene";
 import { render, queryByTestId, unmountComponent } from "../tests/test-utils";
 

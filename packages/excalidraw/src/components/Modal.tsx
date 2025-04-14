@@ -8,7 +8,7 @@ import { useCreatePortalContainer } from "../hooks/useCreatePortalContainer";
 
 import "./Modal.scss";
 
-import type { AppState } from "../../types";
+import type { AppState } from "../types";
 
 export const Modal: React.FC<{
   className?: string;

@@ -63,7 +63,7 @@ import { renderSceneToSvg } from "../../renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState, BinaryFiles } from "../../types";
+import type { AppState, BinaryFiles } from "../types";
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   if (element.width <= maxWidth) {

@@ -5,7 +5,7 @@ import { type GlobalPoint, pointFrom, type LocalPoint } from "@excalidraw/math";
 import type {
   AppState,
   PendingExcalidrawElements,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import { bindLinearElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";

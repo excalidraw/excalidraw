@@ -1,6 +1,6 @@
 import { ARROW_TYPE } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
-import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
+import { Excalidraw, mutateElement } from "@excalidraw/excalidraw/src";
 
 import Scene from "@excalidraw/excalidraw/scene/Scene";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";

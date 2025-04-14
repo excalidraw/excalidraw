@@ -1,4 +1,7 @@
-import { CaptureUpdateAction, newElementWith } from "@excalidraw/excalidraw";
+import {
+  CaptureUpdateAction,
+  newElementWith,
+} from "@excalidraw/excalidraw/src";
 import {
   createRedoAction,
   createUndoAction,

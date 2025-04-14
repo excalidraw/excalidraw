@@ -1,7 +1,7 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";

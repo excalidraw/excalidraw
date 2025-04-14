@@ -21,7 +21,7 @@
     "paths": {
       "@excalidraw/common": ["./packages/common/src/index.ts"],
       "@excalidraw/common/*": ["./packages/common/src/*"],
-      "@excalidraw/excalidraw": ["./packages/excalidraw/index.tsx"],
+      "@excalidraw/excalidraw": ["packages/excalidraw/src/index.tsx"],
       "@excalidraw/excalidraw/*": ["./packages/excalidraw/*"],
       "@excalidraw/element": ["./packages/element/src/index.ts"],
       "@excalidraw/element/*": ["./packages/element/src/*"],

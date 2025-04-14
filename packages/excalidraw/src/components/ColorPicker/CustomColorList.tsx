@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
-import { useAtom } from "../../../editor-jotai";
+import { useAtom } from "../../editor-jotai";
 
 import HotkeyLabel from "./HotkeyLabel";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";

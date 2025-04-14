@@ -13,8 +13,8 @@ import {
   SendBackwardIcon,
   SendToBackIcon,
 } from "../components/icons";
-import { t } from "../../i18n";
-import { CaptureUpdateAction } from "../../store";
+import { t } from "../i18n";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

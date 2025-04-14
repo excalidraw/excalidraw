@@ -73,7 +73,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<

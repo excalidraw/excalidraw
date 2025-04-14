@@ -1,5 +1,5 @@
 import { getDefaultAppState } from "./appState";
-import { exportToCanvas } from "./src/scene/export";
+import { exportToCanvas } from "./scene/export";
 
 const fs = require("fs");
 

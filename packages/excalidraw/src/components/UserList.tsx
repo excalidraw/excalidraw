@@ -6,7 +6,7 @@ import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
 
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { useExcalidrawActionManager } from "./App";
 import { Island } from "./Island";
@@ -17,7 +17,7 @@ import { Tooltip } from "./Tooltip";
 import "./UserList.scss";
 
 import type { ActionManager } from "../actions/manager";
-import type { Collaborator, SocketId } from "../../types";
+import type { Collaborator, SocketId } from "../types";
 
 export type GoToCollaboratorComponentProps = {
   socketId: SocketId;

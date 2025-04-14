@@ -3,7 +3,7 @@ import { isShallowEqual } from "@excalidraw/common";
 import type {
   AppState,
   InteractiveCanvasAppState,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { isElementInViewport } from "./sizeHelpers";

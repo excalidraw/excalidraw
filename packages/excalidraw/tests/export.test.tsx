@@ -8,7 +8,7 @@ import { getDefaultAppState } from "../appState";
 import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,

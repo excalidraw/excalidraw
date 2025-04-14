@@ -24,12 +24,12 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
-import { atom, editorJotaiStore } from "../../editor-jotai";
+import { atom, editorJotaiStore } from "../editor-jotai";
 
-import { Emitter } from "../../emitter";
-import { AbortError } from "../../errors";
+import { Emitter } from "../emitter";
+import { AbortError } from "../errors";
 import { libraryItemSvgsCache } from "../../hooks/useLibraryItemSvg";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { loadLibraryFromBlob } from "./blob";
 import { restoreLibraryItems } from "./restore";
@@ -42,7 +42,7 @@ import type {
   ExcalidrawImperativeAPI,
   LibraryItemsSource,
   LibraryItems_anyVersion,
-} from "../../types";
+} from "../types";
 
 /**
  * format: hostname or hostname/pathname

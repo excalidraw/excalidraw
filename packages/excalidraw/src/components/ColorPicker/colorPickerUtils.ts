@@ -4,7 +4,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { ColorPickerColor, ColorPaletteCustom } from "@excalidraw/common";
 
-import { atom } from "../../../editor-jotai";
+import { atom } from "../../editor-jotai";
 
 export const getColorNameAndShadeFromColor = ({
   palette,

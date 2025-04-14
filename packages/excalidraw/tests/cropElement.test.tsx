@@ -10,14 +10,14 @@ import type {
   ImageCrop,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, exportToCanvas, exportToSvg } from "..";
+import { Excalidraw, exportToCanvas, exportToSvg } from "../src";
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { act, GlobalTestState, render, unmountComponent } from "./test-utils";
 
-import type { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

@@ -1,4 +1,4 @@
-import { defaultLang } from "@excalidraw/excalidraw/i18n";
+import { defaultLang } from "@excalidraw/excalidraw/src/i18n";
 import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   screen,

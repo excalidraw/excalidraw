@@ -4,7 +4,7 @@ import {
   TTDDialogTrigger,
   CaptureUpdateAction,
   reconcileElements,
-} from "@excalidraw/excalidraw";
+} from "@excalidraw/excalidraw/src";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import {
@@ -31,11 +31,11 @@ import {
   isRunningInIframe,
   isDevEnv,
 } from "@excalidraw/common";
-import polyfill from "@excalidraw/excalidraw/polyfill";
+import polyfill from "@excalidraw/excalidraw/src/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/hooks/useCallbackRefState";
-import { t } from "@excalidraw/excalidraw/i18n";
+import { t } from "@excalidraw/excalidraw/src/i18n";
 
 import {
   GithubIcon,
@@ -70,7 +70,7 @@ import type {
   BinaryFiles,
   ExcalidrawInitialDataState,
   UIAppState,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 import type { ResolutionType } from "@excalidraw/common/utility-types";
 import type { ResolvablePromise } from "@excalidraw/common/utils";
 

@@ -13,7 +13,7 @@ import {
 
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
@@ -25,7 +25,7 @@ import "./PublishLibrary.scss";
 
 import type { ReactNode } from "react";
 import type { ExportedLibraryData } from "../data/types";
-import type { LibraryItems, LibraryItem, UIAppState } from "../../types";
+import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 
 interface PublishLibraryDataParams {
   authorName: string;

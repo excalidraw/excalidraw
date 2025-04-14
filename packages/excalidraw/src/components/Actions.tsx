@@ -36,7 +36,7 @@ import { alignActionsPredicate } from "../actions/actionAlign";
 import { trackEvent } from "../../analytics";
 import { useTunnels } from "../context/tunnels";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -65,12 +65,7 @@ import {
   LassoIcon,
 } from "./icons";
 
-import type {
-  AppClassProperties,
-  AppProps,
-  UIAppState,
-  Zoom,
-} from "../../types";
+import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
 
 export const canChangeStrokeColor = (

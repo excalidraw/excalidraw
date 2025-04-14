@@ -5,8 +5,8 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 import { KEYS } from "@excalidraw/common";
 
 import { actionSelectAll } from "../actions";
-import { t } from "../i18n";
-import { Excalidraw } from "../index";
+import { t } from "../src/i18n";
+import { Excalidraw } from "../src/index";
 
 import { API } from "../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../tests/helpers/ui";

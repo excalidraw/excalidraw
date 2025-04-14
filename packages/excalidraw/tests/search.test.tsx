@@ -9,7 +9,7 @@ import {
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";

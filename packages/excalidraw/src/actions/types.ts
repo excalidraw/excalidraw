@@ -3,14 +3,14 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { CaptureUpdateActionType } from "../../store";
+import type { CaptureUpdateActionType } from "../store";
 import type {
   AppClassProperties,
   AppState,
   ExcalidrawProps,
   BinaryFiles,
   UIAppState,
-} from "../../types";
+} from "../types";
 import type React from "react";
 
 export type ActionSource =

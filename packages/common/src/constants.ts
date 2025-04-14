@@ -2,7 +2,7 @@ import type {
   ExcalidrawElement,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
+import type { AppProps, AppState } from "@excalidraw/excalidraw/src/types";
 
 import { COLOR_PALETTE } from "./colors";
 

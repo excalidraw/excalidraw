@@ -1,6 +1,6 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw/src";
 import {
   KEYS,
   getSizeFromPoints,

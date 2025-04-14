@@ -8,7 +8,7 @@ import {
   isPrimitive,
 } from "@excalidraw/common";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw/src";
 
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
 

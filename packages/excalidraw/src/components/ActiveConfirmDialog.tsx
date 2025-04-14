@@ -1,6 +1,6 @@
 import { actionClearCanvas } from "../actions";
-import { atom, useAtom } from "../../editor-jotai";
-import { t } from "../../i18n";
+import { atom, useAtom } from "../editor-jotai";
+import { t } from "../i18n";
 
 import { useExcalidrawActionManager } from "./App";
 import ConfirmDialog from "./ConfirmDialog";

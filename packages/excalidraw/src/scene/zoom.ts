@@ -1,4 +1,4 @@
-import type { AppState, NormalizedZoomValue } from "../../types";
+import type { AppState, NormalizedZoomValue } from "../types";
 
 export const getStateForZoom = (
   {

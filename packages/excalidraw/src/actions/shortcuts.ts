@@ -2,7 +2,7 @@ import { isDarwin, getShortcutKey } from "@excalidraw/common";
 
 import type { SubtypeOf } from "@excalidraw/common/utility-types";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import type { ActionName } from "./types";
 

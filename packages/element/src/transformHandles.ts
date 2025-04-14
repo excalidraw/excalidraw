@@ -12,7 +12,7 @@ import type {
   Device,
   InteractiveCanvasAppState,
   Zoom,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {

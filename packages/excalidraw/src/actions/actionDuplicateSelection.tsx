@@ -30,9 +30,9 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

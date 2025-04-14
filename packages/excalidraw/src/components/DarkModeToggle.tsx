@@ -2,7 +2,7 @@ import { THEME } from "@excalidraw/common";
 
 import type { Theme } from "@excalidraw/element/types";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { ToolButton } from "./ToolButton";
 

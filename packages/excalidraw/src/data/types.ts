@@ -8,7 +8,7 @@ import type {
   BinaryFiles,
   LibraryItems,
   LibraryItems_anyVersion,
-} from "../../types";
+} from "../types";
 
 export interface ExportedDataState {
   type: string;

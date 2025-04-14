@@ -18,13 +18,13 @@ import {
   actionChangeExportScale,
   actionChangeProjectName,
 } from "../actions/actionExport";
-import { probablySupportsClipboardBlob } from "../../clipboard";
+import { probablySupportsClipboardBlob } from "../clipboard";
 import { prepareElementsForExport } from "../data";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
@@ -38,7 +38,7 @@ import "./ImageExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 
-import type { AppClassProperties, BinaryFiles, UIAppState } from "../../types";
+import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;

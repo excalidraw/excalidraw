@@ -24,7 +24,7 @@ import type {
   ElementsPendingErasure,
   PendingExcalidrawElements,
   NormalizedZoomValue,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import type {
   StaticCanvasRenderConfig,

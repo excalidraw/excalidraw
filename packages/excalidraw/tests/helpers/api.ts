@@ -49,7 +49,7 @@ import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";
 
 import type { Action } from "../../actions/types";
 import type App from "../../components/App";
-import type { AppState } from "../../types";
+import type { AppState } from "../../src/types";
 
 
 const readFile = util.promisify(fs.readFile);

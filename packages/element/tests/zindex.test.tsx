@@ -8,7 +8,7 @@ import {
   actionDuplicateSelection,
 } from "@excalidraw/excalidraw/actions";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw/src";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import {
@@ -18,7 +18,7 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
+import type { AppState } from "@excalidraw/excalidraw/src/types";
 
 import { selectGroupsForSelectedElements } from "../src/groups";
 

@@ -24,8 +24,8 @@ import {
   distributeLibraryItemsOnSquareGrid,
   libraryItemsAtom,
 } from "../data/library";
-import { atom, useAtom } from "../../editor-jotai";
-import { t } from "../../i18n";
+import { atom, useAtom } from "../editor-jotai";
+import { t } from "../i18n";
 
 import { getSelectedElements } from "../scene";
 
@@ -47,7 +47,7 @@ import type {
   ExcalidrawProps,
   UIAppState,
   AppClassProperties,
-} from "../../types";
+} from "../types";
 import type Library from "../data/library";
 
 export const isLibraryMenuOpenAtom = atom(false);

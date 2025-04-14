@@ -14,7 +14,7 @@ import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
 import { cleanAppStateForExport } from "../../appState";
 
-import { CanvasError, ImageSceneDataError } from "../../errors";
+import { CanvasError, ImageSceneDataError } from "../errors";
 import { calculateScrollCenter } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
 
@@ -23,7 +23,7 @@ import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
 
-import type { AppState, DataURL, LibraryItem } from "../../types";
+import type { AppState, DataURL, LibraryItem } from "../types";
 
 import type { FileSystemHandle } from "./filesystem";
 import type { ImportedLibraryData } from "./types";

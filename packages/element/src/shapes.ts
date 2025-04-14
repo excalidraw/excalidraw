@@ -26,7 +26,10 @@ import {
   type GeometricShape,
 } from "@excalidraw/utils/shape";
 
-import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
+import type {
+  NormalizedZoomValue,
+  Zoom,
+} from "@excalidraw/excalidraw/src/types";
 
 import { shouldTestInside } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";

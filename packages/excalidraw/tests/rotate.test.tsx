@@ -3,7 +3,7 @@ import { expect } from "vitest";
 
 import { reseed } from "@excalidraw/common";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { UI } from "./helpers/ui";
 import { render, unmountComponent } from "./test-utils";

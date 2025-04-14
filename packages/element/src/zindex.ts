@@ -1,6 +1,6 @@
 import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
+import type { AppState } from "@excalidraw/excalidraw/src/types";
 
 import type Scene from "@excalidraw/excalidraw/src/scene/Scene";
 

@@ -5,7 +5,7 @@ import { COLOR_PALETTE } from "@excalidraw/common";
 import type {
   AppState,
   EmbedsValidationStatus,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 import type {
   ElementShape,
   ElementShapes,

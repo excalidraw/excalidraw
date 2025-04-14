@@ -3,7 +3,7 @@ import {
   ExcalLogo,
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
-import { MainMenu } from "@excalidraw/excalidraw/index";
+import { MainMenu } from "@excalidraw/excalidraw/src/index";
 import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";

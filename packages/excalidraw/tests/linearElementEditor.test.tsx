@@ -30,7 +30,7 @@ import type {
   FontString,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, mutateElement } from "../index";
+import { Excalidraw, mutateElement } from "../src/index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 import { API } from "../tests/helpers/api";

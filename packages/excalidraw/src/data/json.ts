@@ -21,7 +21,7 @@ import {
 import { isImageFileHandle, loadFromBlob, normalizeFile } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
 
-import type { AppState, BinaryFiles, LibraryItems } from "../../types";
+import type { AppState, BinaryFiles, LibraryItems } from "../types";
 import type {
   ExportedDataState,
   ImportedDataState,

@@ -20,8 +20,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import { actionFlipHorizontal, actionFlipVertical } from "../actions";
-import { createPasteEvent } from "../clipboard";
-import { Excalidraw } from "../index";
+import { createPasteEvent } from "../src/clipboard";
+import { Excalidraw } from "../src/index";
 
 // Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
 import * as blobModule from "../data/blob";
@@ -37,7 +37,7 @@ import {
   waitFor,
 } from "./test-utils";
 
-import type { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

@@ -5,7 +5,7 @@ import { KEYS, reseed } from "@excalidraw/common";
 
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";

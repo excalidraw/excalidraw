@@ -22,14 +22,14 @@ import {
   CenterVerticallyIcon,
 } from "../components/icons";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState, UIAppState } from "../../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 export const alignActionsPredicate = (
   appState: UIAppState,

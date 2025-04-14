@@ -18,7 +18,7 @@ import type {
   SocketId,
   Device,
   PendingExcalidrawElements,
-} from "../../types";
+} from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Drawable } from "roughjs/bin/core";
 

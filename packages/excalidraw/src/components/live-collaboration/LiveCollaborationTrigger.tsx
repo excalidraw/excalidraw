@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-import { t } from "../../../i18n";
+import { t } from "../../i18n";
 import { Button } from "../Button";
 import { share } from "../icons";
 import { useUIAppState } from "../../context/ui-appState";

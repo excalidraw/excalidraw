@@ -13,7 +13,7 @@ import { duplicateElements } from "@excalidraw/element/duplicate";
 import { serializeLibraryAsJSON } from "../data/json";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../hooks/useScrollPosition";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { LibraryMenuControlButtons } from "./LibraryMenuControlButtons";
 import { LibraryDropdownMenu } from "./LibraryMenuHeaderContent";
@@ -32,7 +32,7 @@ import type {
   LibraryItem,
   LibraryItems,
   UIAppState,
-} from "../../types";
+} from "../types";
 
 // using an odd number of items per batch so the rendering creates an irregular
 // pattern which looks more organic

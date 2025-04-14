@@ -2,7 +2,7 @@ import { useLayoutEffect } from "react";
 
 import { useApp } from "../App";
 
-import type { GenerateDiagramToCode } from "../../../types";
+import type { GenerateDiagramToCode } from "../../types";
 
 export const DiagramToCodePlugin = (props: {
   generate: GenerateDiagramToCode;

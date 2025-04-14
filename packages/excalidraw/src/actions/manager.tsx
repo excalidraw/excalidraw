@@ -9,7 +9,7 @@ import type {
 
 import { trackEvent } from "../../analytics";
 
-import type { AppClassProperties, AppState } from "../../types";
+import type { AppClassProperties, AppState } from "../types";
 import type {
   Action,
   UpdaterFn,

@@ -8,7 +8,7 @@ import { actionSaveFileToDisk } from "../actions/actionExport";
 
 import { trackEvent } from "../../analytics";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { Card } from "./Card";
 import { Dialog } from "./Dialog";
@@ -19,7 +19,7 @@ import "./ExportDialog.scss";
 
 import type { ActionManager } from "../actions/manager";
 
-import type { ExportOpts, BinaryFiles, UIAppState } from "../../types";
+import type { ExportOpts, BinaryFiles, UIAppState } from "../types";
 
 export type ExportCB = (
   elements: readonly NonDeletedExcalidrawElement[],

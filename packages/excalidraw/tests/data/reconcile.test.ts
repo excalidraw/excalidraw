@@ -11,7 +11,7 @@ import { reconcileElements } from "../../data/reconcile";
 
 import type { RemoteExcalidrawElement } from "../../data/reconcile";
 
-import type { AppState } from "../../types";
+import type { AppState } from "../../src/types";
 
 type Id = string;
 type ElementLike = {

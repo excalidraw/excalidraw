@@ -9,7 +9,7 @@ import { PlusIcon } from "./icons";
 
 import "./LibraryUnit.scss";
 
-import type { LibraryItem } from "../../types";
+import type { LibraryItem } from "../types";
 import type { SvgCache } from "../hooks/useLibraryItemSvg";
 
 export const LibraryUnit = memo(

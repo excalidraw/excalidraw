@@ -6,9 +6,9 @@ import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeA
 
 import { ToolButton } from "../components/ToolButton";
 import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

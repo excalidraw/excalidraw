@@ -16,14 +16,14 @@ import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { setCursorForShape } from "../../cursor";
+import { setCursorForShape } from "../cursor";
 import { frameToolIcon } from "../components/icons";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState, UIAppState } from "../../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 
 const isSingleFrameSelected = (
   appState: UIAppState,

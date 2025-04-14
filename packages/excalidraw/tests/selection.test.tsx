@@ -5,7 +5,7 @@ import { KEYS, reseed } from "@excalidraw/common";
 
 import { SHAPES } from "../components/shapes";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 

@@ -7,7 +7,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 import { useApp } from "../App";
 import { ArrowRightIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import { t } from "../../../i18n";
+import { t } from "../../i18n";
 import Trans from "../Trans";
 
 import { TTDDialogInput } from "./TTDDialogInput";
@@ -23,7 +23,7 @@ import {
 
 import "./MermaidToExcalidraw.scss";
 
-import type { BinaryFiles } from "../../../types";
+import type { BinaryFiles } from "../../types";
 import type { MermaidToExcalidrawLibProps } from "./common";
 
 const MERMAID_EXAMPLE =

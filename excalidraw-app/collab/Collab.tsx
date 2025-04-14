@@ -4,7 +4,7 @@ import {
   restoreElements,
   zoomToFitBounds,
   reconcileElements,
-} from "@excalidraw/excalidraw";
+} from "@excalidraw/excalidraw/src";
 import { ErrorDialog } from "@excalidraw/excalidraw/components/ErrorDialog";
 import { APP_NAME, EVENT } from "@excalidraw/common";
 import {
@@ -25,9 +25,9 @@ import {
   isImageElement,
   isInitializedImageElement,
 } from "@excalidraw/element/typeChecks";
-import { AbortError } from "@excalidraw/excalidraw/errors";
-import { t } from "@excalidraw/excalidraw/i18n";
-import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
+import { AbortError } from "@excalidraw/excalidraw/src/errors";
+import { t } from "@excalidraw/excalidraw/src/i18n";
+import { withBatchedUpdates } from "@excalidraw/excalidraw/src/reactUtils";
 
 import throttle from "lodash.throttle";
 import { PureComponent } from "react";
@@ -49,7 +49,7 @@ import type {
   SocketId,
   Collaborator,
   Gesture,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import { appJotaiStore, atom } from "../app-jotai";

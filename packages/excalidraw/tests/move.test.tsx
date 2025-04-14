@@ -15,7 +15,7 @@ import type {
 
 import type Scene from "@excalidraw/excalidraw/scene/Scene";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 

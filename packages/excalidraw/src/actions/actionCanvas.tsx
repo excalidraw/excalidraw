@@ -38,17 +38,17 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import { setCursor } from "../../cursor";
+import { setCursor } from "../cursor";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppState, Offsets } from "../../types";
+import type { AppState, Offsets } from "../types";
 
 export const actionChangeViewBackgroundColor = register({
   name: "changeViewBackgroundColor",

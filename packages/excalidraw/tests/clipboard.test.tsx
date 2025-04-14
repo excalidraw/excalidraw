@@ -7,9 +7,9 @@ import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
 
 import { getElementBounds } from "@excalidraw/element/bounds";
 
-import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
+import { createPasteEvent, serializeAsClipboardJSON } from "../src/clipboard";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
@@ -21,7 +21,7 @@ import {
   unmountComponent,
 } from "./test-utils";
 
-import type { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../src/types";
 
 const { h } = window;
 

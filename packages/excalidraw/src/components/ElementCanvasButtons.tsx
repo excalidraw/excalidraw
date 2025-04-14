@@ -10,7 +10,7 @@ import { useExcalidrawAppState } from "./App";
 
 import "./ElementCanvasButtons.scss";
 
-import type { AppState } from "../../types";
+import type { AppState } from "../types";
 
 const CONTAINER_PADDING = 5;
 

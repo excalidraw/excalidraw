@@ -47,9 +47,9 @@ import { createUndoAction, createRedoAction } from "../actions/actionHistory";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { getDefaultAppState } from "../appState";
 import { HistoryEntry } from "../history";
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import * as StaticScene from "../renderer/staticScene";
-import { Snapshot, CaptureUpdateAction } from "../store";
+import { Snapshot, CaptureUpdateAction } from "../src/store.js";
 import { AppStateChange, ElementsChange } from "../change";
 
 import { API } from "./helpers/api";
@@ -63,7 +63,7 @@ import {
   getCloneByOrigId,
 } from "./test-utils";
 
-import type { AppState } from "../types";
+import type { AppState } from "../src/types.js";
 
 const { h } = window;
 

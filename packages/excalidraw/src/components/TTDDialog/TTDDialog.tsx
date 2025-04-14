@@ -6,8 +6,8 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { trackEvent } from "../../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
-import { atom, useAtom } from "../../../editor-jotai";
-import { t } from "../../../i18n";
+import { atom, useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
 import { useApp, useExcalidrawSetAppState } from "../App";
 import { Dialog } from "../Dialog";
 import { InlineIcon } from "../InlineIcon";
@@ -36,7 +36,7 @@ import "./TTDDialog.scss";
 import type { ChangeEventHandler } from "react";
 import type { MermaidToExcalidrawLibProps } from "./common";
 
-import type { BinaryFiles } from "../../../types";
+import type { BinaryFiles } from "../../types";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 1000;
