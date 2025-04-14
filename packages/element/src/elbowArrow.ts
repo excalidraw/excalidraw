@@ -123,17 +123,7 @@ const calculatePadding = (
 
   return size > 75
     ? 40
-    : Math.min(
-        Math.max(
-          headingIsHorizontal(startHeading) ? width / 2 - 1 : height / 2 - 1,
-          10,
-        ),
-        Math.max(
-          headingIsHorizontal(endHeading) ? width / 2 - 1 : height / 2 - 1,
-          10,
-        ),
-        40,
-      );
+    : Math.min(Math.max(Math.min(width / 2 - 1, height / 2 - 1), 10), 40);
 };
 
 const handleSegmentRenormalization = (
