@@ -1171,6 +1171,48 @@ export const snapToMid = (
       center,
       angle,
     );
+  } else if (element.type === "diamond") {
+    const sqrtFixedDistance = Math.sqrt(FIXED_BINDING_DISTANCE);
+    const topLeft = pointFrom<GlobalPoint>(
+      x + width / 4 - sqrtFixedDistance,
+      y + height / 4 - sqrtFixedDistance,
+    );
+    const topRight = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + sqrtFixedDistance,
+      y + height / 4 - sqrtFixedDistance,
+    );
+    const bottomLeft = pointFrom<GlobalPoint>(
+      x + width / 4 - sqrtFixedDistance,
+      y + (3 * height) / 4 + sqrtFixedDistance,
+    );
+    const bottomRight = pointFrom<GlobalPoint>(
+      x + (3 * width) / 4 + sqrtFixedDistance,
+      y + (3 * height) / 4 + sqrtFixedDistance,
+    );
+    if (
+      pointDistance(topLeft, p) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(topLeft, center, angle);
+    }
+    if (
+      pointDistance(topRight, p) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(topRight, center, angle);
+    }
+    if (
+      pointDistance(bottomLeft, p) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(bottomLeft, center, angle);
+    }
+    if (
+      pointDistance(bottomRight, p) <
+      Math.max(horizontalThrehsold, verticalThrehsold)
+    ) {
+      return pointRotateRads(bottomRight, center, angle);
+    }
   }
 
   return p;
