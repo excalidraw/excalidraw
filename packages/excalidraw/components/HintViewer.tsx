@@ -1,15 +1,24 @@
-import { t } from "../i18n";
-import { AppClassProperties, Device, UIAppState } from "../types";
+import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+
 import {
+  isFlowchartNodeElement,
   isImageElement,
   isLinearElement,
   isTextBindableContainer,
   isTextElement,
-} from "../element/typeChecks";
-import { getShortcutKey } from "../utils";
+} from "@excalidraw/element/typeChecks";
+
+import { getShortcutKey } from "@excalidraw/common";
+
+import { isNodeInFlowchart } from "@excalidraw/element/flowchart";
+
+import { t } from "../i18n";
 import { isEraserActive } from "../appState";
+import { isGridModeEnabled } from "../snapping";
 
 import "./HintViewer.scss";
+
+import type { AppClassProperties, Device, UIAppState } from "../types";
 
 interface HintViewerProps {
   appState: UIAppState;
@@ -18,9 +27,22 @@ interface HintViewerProps {
   app: AppClassProperties;
 }
 
-const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
+const getHints = ({
+  appState,
+  isMobile,
+  device,
+  app,
+}: HintViewerProps): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
+
+  if (
+    appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+    appState.openSidebar.tab === CANVAS_SEARCH_TAB &&
+    appState.searchMatches?.length
+  ) {
+    return t("hints.dismissSearch");
+  }
 
   if (appState.openSidebar && !device.editor.canFitSidebar) {
     return null;
@@ -30,10 +52,13 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.eraserRevert");
   }
   if (activeTool.type === "arrow" || activeTool.type === "line") {
-    if (!multiMode) {
-      return t("hints.linearElement");
+    if (multiMode) {
+      return t("hints.linearElementMulti");
     }
-    return t("hints.linearElementMulti");
+    if (activeTool.type === "arrow") {
+      return t("hints.arrowTool", { arrowShortcut: getShortcutKey("A") });
+    }
+    return t("hints.linearElement");
   }
 
   if (activeTool.type === "freedraw") {
@@ -76,26 +101,34 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
     return t("hints.text_selected");
   }
 
-  if (appState.editingElement && isTextElement(appState.editingElement)) {
+  if (appState.editingTextElement) {
     return t("hints.text_editing");
+  }
+
+  if (appState.croppingElementId) {
+    return t("hints.leaveCropEditor");
+  }
+
+  if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
+    return t("hints.enterCropEditor");
   }
 
   if (activeTool.type === "selection") {
     if (
-      appState.draggingElement?.type === "selection" &&
+      appState.selectionElement &&
       !selectedElements.length &&
-      !appState.editingElement &&
+      !appState.editingTextElement &&
       !appState.editingLinearElement
     ) {
-      return t("hints.deepBoxSelect");
+      return [t("hints.deepBoxSelect")];
     }
 
-    if (appState.gridSize && appState.draggingElement) {
+    if (isGridModeEnabled(app) && appState.selectedElementsAreBeingDragged) {
       return t("hints.disableSnapping");
     }
 
     if (!selectedElements.length && !isMobile) {
-      return t("hints.canvasPanning");
+      return [t("hints.canvasPanning")];
     }
 
     if (selectedElements.length === 1) {
@@ -108,9 +141,23 @@ const getHints = ({ appState, isMobile, device, app }: HintViewerProps) => {
         return t("hints.lineEditor_info");
       }
       if (
-        !appState.draggingElement &&
+        !appState.newElement &&
+        !appState.selectedElementsAreBeingDragged &&
         isTextBindableContainer(selectedElements[0])
       ) {
+        if (isFlowchartNodeElement(selectedElements[0])) {
+          if (
+            isNodeInFlowchart(
+              selectedElements[0],
+              app.scene.getNonDeletedElementsMap(),
+            )
+          ) {
+            return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+          }
+
+          return [t("hints.bindTextToElement"), t("hints.createFlowchart")];
+        }
+
         return t("hints.bindTextToElement");
       }
     }
@@ -125,17 +172,24 @@ export const HintViewer = ({
   device,
   app,
 }: HintViewerProps) => {
-  let hint = getHints({
+  const hints = getHints({
     appState,
     isMobile,
     device,
     app,
   });
-  if (!hint) {
+
+  if (!hints) {
     return null;
   }
 
-  hint = getShortcutKey(hint);
+  const hint = Array.isArray(hints)
+    ? hints
+        .map((hint) => {
+          return getShortcutKey(hint).replace(/\. ?$/, "");
+        })
+        .join(". ")
+    : getShortcutKey(hints);
 
   return (
     <div className="HintViewer">

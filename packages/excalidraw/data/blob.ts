@@ -1,20 +1,34 @@
 import { nanoid } from "nanoid";
+
+import {
+  IMAGE_MIME_TYPES,
+  MIME_TYPES,
+  bytesToHexString,
+  isPromiseLike,
+} from "@excalidraw/common";
+
+import { clearElementsForExport } from "@excalidraw/element";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
+
 import { cleanAppStateForExport } from "../appState";
-import { IMAGE_MIME_TYPES, MIME_TYPES } from "../constants";
-import { clearElementsForExport } from "../element";
-import { ExcalidrawElement, FileId } from "../element/types";
+
 import { CanvasError, ImageSceneDataError } from "../errors";
-import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { AppState, DataURL, LibraryItem } from "../types";
-import { ValueOf } from "../utility-types";
-import { bytesToHexString, isPromiseLike } from "../utils";
-import { FileSystemHandle, nativeFileSystemSupported } from "./filesystem";
+import { decodeSvgBase64Payload } from "../scene/export";
+
+import { base64ToString, stringToBase64, toByteString } from "./encode";
+import { nativeFileSystemSupported } from "./filesystem";
 import { isValidExcalidrawData, isValidLibrary } from "./json";
 import { restore, restoreLibraryItems } from "./restore";
-import { ImportedLibraryData } from "./types";
 
-const parseFileContents = async (blob: Blob | File) => {
+import type { AppState, DataURL, LibraryItem } from "../types";
+
+import type { FileSystemHandle } from "./filesystem";
+import type { ImportedLibraryData } from "./types";
+
+const parseFileContents = async (blob: Blob | File): Promise<string> => {
   let contents: string;
 
   if (blob.type === MIME_TYPES.png) {
@@ -23,11 +37,11 @@ const parseFileContents = async (blob: Blob | File) => {
     } catch (error: any) {
       if (error.message === "INVALID") {
         throw new ImageSceneDataError(
-          t("alerts.imageDoesNotContainScene"),
+          "Image doesn't contain scene",
           "IMAGE_NOT_CONTAINS_SCENE_DATA",
         );
       } else {
-        throw new ImageSceneDataError(t("alerts.cannotRestoreFromImage"));
+        throw new ImageSceneDataError("Error: cannot restore image");
       }
     }
   } else {
@@ -46,19 +60,17 @@ const parseFileContents = async (blob: Blob | File) => {
     }
     if (blob.type === MIME_TYPES.svg) {
       try {
-        return await (
-          await import("./image")
-        ).decodeSvgMetadata({
+        return decodeSvgBase64Payload({
           svg: contents,
         });
       } catch (error: any) {
         if (error.message === "INVALID") {
           throw new ImageSceneDataError(
-            t("alerts.imageDoesNotContainScene"),
+            "Image doesn't contain scene",
             "IMAGE_NOT_CONTAINS_SCENE_DATA",
           );
         } else {
-          throw new ImageSceneDataError(t("alerts.cannotRestoreFromImage"));
+          throw new ImageSceneDataError("Error: cannot restore image");
         }
       }
     }
@@ -107,11 +119,15 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+export const isSupportedImageFileType = (type: string | null | undefined) => {
+  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+};
+
 export const isSupportedImageFile = (
   blob: Blob | null | undefined,
 ): blob is Blob & { type: ValueOf<typeof IMAGE_MIME_TYPES> } => {
   const { type } = blob || {};
-  return !!type && (Object.values(IMAGE_MIME_TYPES) as string[]).includes(type);
+  return isSupportedImageFileType(type);
 };
 
 export const loadSceneOrLibraryFromBlob = async (
@@ -130,7 +146,7 @@ export const loadSceneOrLibraryFromBlob = async (
     } catch (error: any) {
       if (isSupportedImageFile(blob)) {
         throw new ImageSceneDataError(
-          t("alerts.imageDoesNotContainScene"),
+          "Image doesn't contain scene",
           "IMAGE_NOT_CONTAINS_SCENE_DATA",
         );
       }
@@ -163,12 +179,12 @@ export const loadSceneOrLibraryFromBlob = async (
         data,
       };
     }
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    throw new Error("Error: invalid file");
   } catch (error: any) {
     if (error instanceof ImageSceneDataError) {
       throw error;
     }
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    throw new Error("Error: invalid file");
   }
 };
 
@@ -187,7 +203,7 @@ export const loadFromBlob = async (
     fileHandle,
   );
   if (ret.type !== MIME_TYPES.excalidraw) {
-    throw new Error(t("alerts.couldNotLoadInvalidFile"));
+    throw new Error("Error: invalid file");
   }
   return ret.data;
 };
@@ -222,10 +238,7 @@ export const canvasToBlob = async (
       canvas.toBlob((blob) => {
         if (!blob) {
           return reject(
-            new CanvasError(
-              t("canvasError.canvasTooBig"),
-              "CANVAS_POSSIBLY_TOO_BIG",
-            ),
+            new CanvasError("Error: Canvas too big", "CANVAS_POSSIBLY_TOO_BIG"),
           );
         }
         resolve(blob);
@@ -252,6 +265,7 @@ export const generateIdFromFile = async (file: File): Promise<FileId> => {
   }
 };
 
+/** async. For sync variant, use getDataURL_sync */
 export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -262,6 +276,16 @@ export const getDataURL = async (file: Blob | File): Promise<DataURL> => {
     reader.onerror = (error) => reject(error);
     reader.readAsDataURL(file);
   });
+};
+
+export const getDataURL_sync = (
+  data: string | Uint8Array | ArrayBuffer,
+  mimeType: ValueOf<typeof MIME_TYPES>,
+): DataURL => {
+  return `data:${mimeType};base64,${stringToBase64(
+    toByteString(data),
+    true,
+  )}` as DataURL;
 };
 
 export const dataURLToFile = (dataURL: DataURL, filename = "") => {
@@ -275,6 +299,10 @@ export const dataURLToFile = (dataURL: DataURL, filename = "") => {
     ia[i] = byteString.charCodeAt(i);
   }
   return new File([ab], filename, { type: mimeType });
+};
+
+export const dataURLToString = (dataURL: DataURL) => {
+  return base64ToString(dataURL.slice(dataURL.indexOf(",") + 1));
 };
 
 export const resizeImageFile = async (
@@ -314,11 +342,11 @@ export const resizeImageFile = async (
   }
 
   if (!isSupportedImageFile(file)) {
-    throw new Error(t("errors.unsupportedFileType"));
+    throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
   }
 
   return new File(
-    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight })],
+    [await reduce.toBlob(file, { max: opts.maxWidthOrHeight, alpha: true })],
     file.name,
     {
       type: opts.outputType || file.type,
@@ -340,11 +368,11 @@ export const ImageURLToFile = async (
   try {
     response = await fetch(imageUrl);
   } catch (error: any) {
-    throw new Error(t("errors.failedToFetchImage"));
+    throw new Error("Error: failed to fetch image", { cause: "FETCH_ERROR" });
   }
 
   if (!response.ok) {
-    throw new Error(t("errors.failedToFetchImage"));
+    throw new Error("Error: failed to fetch image", { cause: "FETCH_ERROR" });
   }
 
   const blob = await response.blob();
@@ -354,7 +382,7 @@ export const ImageURLToFile = async (
     return new File([blob], name, { type: blob.type });
   }
 
-  throw new Error(t("errors.unsupportedFileType"));
+  throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
 };
 
 export const getFileFromEvent = async (

@@ -1,25 +1,41 @@
 import {
-  copyBlobToClipboardAsPng,
-  copyTextToSystemClipboard,
-} from "../clipboard";
-import { DEFAULT_EXPORT_PADDING, isFirefox, MIME_TYPES } from "../constants";
-import { getNonDeletedElements } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import {
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FILENAME,
+  IMAGE_MIME_TYPES,
+  isFirefox,
+  MIME_TYPES,
+  cloneJSON,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+
+import { getElementsOverlappingFrame } from "@excalidraw/element/frame";
+
+import type {
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import {
+  copyBlobToClipboardAsPng,
+  copyTextToSystemClipboard,
+} from "../clipboard";
+
 import { t } from "../i18n";
-import { isSomeElementSelected, getSelectedElements } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { exportToCanvas, exportToSvg } from "../scene/export";
-import { ExportType } from "../scene/types";
-import { AppState, BinaryFiles } from "../types";
-import { cloneJSON } from "../utils";
+
 import { canvasToBlob } from "./blob";
-import { fileSave, FileSystemHandle } from "./filesystem";
+import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
-import { getElementsOverlappingFrame } from "../frame";
+
+import type { FileSystemHandle } from "./filesystem";
+
+import type { ExportType } from "../scene/types";
+import type { AppState, BinaryFiles } from "../types";
 
 export { loadFromBlob } from "./blob";
 export { loadFromJSON, saveAsJSON } from "./json";
@@ -84,14 +100,15 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
-    name,
+    name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    name: string;
+    /** filename, if applicable */
+    name?: string;
     fileHandle?: FileSystemHandle | null;
     exportingFrame: ExcalidrawFrameLikeElement | null;
   },
@@ -123,13 +140,17 @@ export const exportCanvas = async (
           description: "Export to SVG",
           name,
           extension: appState.exportEmbedScene ? "excalidraw.svg" : "svg",
+          mimeTypes: [IMAGE_MIME_TYPES.svg],
           fileHandle,
         },
       );
     } else if (type === "clipboard-svg") {
-      await copyTextToSystemClipboard(
-        await svgPromise.then((svg) => svg.outerHTML),
-      );
+      const svg = await svgPromise.then((svg) => svg.outerHTML);
+      try {
+        await copyTextToSystemClipboard(svg);
+      } catch (e) {
+        throw new Error(t("errors.copyToSystemClipboardFailed"));
+      }
       return;
     }
   }
@@ -158,9 +179,8 @@ export const exportCanvas = async (
     return fileSave(blob, {
       description: "Export to PNG",
       name,
-      // FIXME reintroduce `excalidraw.png` when most people upgrade away
-      // from 111.0.5563.64 (arm64), see #6349
-      extension: /* appState.exportEmbedScene ? "excalidraw.png" : */ "png",
+      extension: appState.exportEmbedScene ? "excalidraw.png" : "png",
+      mimeTypes: [IMAGE_MIME_TYPES.png],
       fileHandle,
     });
   } else if (type === "clipboard") {
@@ -170,7 +190,7 @@ export const exportCanvas = async (
     } catch (error: any) {
       console.warn(error);
       if (error.name === "CANVAS_POSSIBLY_TOO_BIG") {
-        throw error;
+        throw new Error(t("canvasError.canvasTooBig"));
       }
       // TypeError *probably* suggests ClipboardItem not defined, which
       // people on Firefox can enable through a flag, so let's tell them.

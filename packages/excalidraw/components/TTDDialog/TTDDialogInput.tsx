@@ -1,6 +1,8 @@
-import { ChangeEventHandler, useEffect, useRef } from "react";
-import { EVENT } from "../../constants";
-import { KEYS } from "../../keys";
+import { useEffect, useRef } from "react";
+
+import { EVENT, KEYS } from "@excalidraw/common";
+
+import type { ChangeEventHandler } from "react";
 
 interface TTDDialogInputProps {
   input: string;

@@ -1,8 +1,14 @@
-import { CODES, KEYS } from "../keys";
+import { CODES, KEYS } from "@excalidraw/common";
+
+import { coffeeIcon } from "../components/icons";
+import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
 
 export const actionToggleZenMode = register({
   name: "zenMode",
+  label: "buttons.zenMode",
+  icon: coffeeIcon,
   viewMode: true,
   trackEvent: {
     category: "canvas",
@@ -14,14 +20,13 @@ export const actionToggleZenMode = register({
         ...appState,
         zenModeEnabled: !this.checked!(appState),
       },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState) => appState.zenModeEnabled,
   predicate: (elements, appState, appProps) => {
     return typeof appProps.zenModeEnabled === "undefined";
   },
-  contextItemLabel: "buttons.zenMode",
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.Z,
 });

@@ -1,14 +1,19 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
+
+import type { ColorPaletteCustom } from "@excalidraw/common";
+
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
+
+import HotkeyLabel from "./HotkeyLabel";
 import {
   activeColorPickerSectionAtom,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
-import HotkeyLabel from "./HotkeyLabel";
-import { ColorPaletteCustom } from "../../colors";
-import { TranslationKeys, t } from "../../i18n";
+
+import type { TranslationKeys } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;
@@ -60,7 +65,7 @@ const PickerColorList = ({
             tabIndex={-1}
             type="button"
             className={clsx(
-              "color-picker__button color-picker__button--large",
+              "color-picker__button color-picker__button--large has-outline",
               {
                 active: colorObj?.colorName === key,
                 "is-transparent": color === "transparent" || !color,

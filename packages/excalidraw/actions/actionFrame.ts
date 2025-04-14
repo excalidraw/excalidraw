@@ -1,15 +1,34 @@
-import { getNonDeletedElements } from "../element";
-import { ExcalidrawElement } from "../element/types";
-import { removeAllElementsFromFrame } from "../frame";
-import { getFrameChildren } from "../frame";
-import { KEYS } from "../keys";
-import { AppClassProperties, AppState } from "../types";
-import { updateActiveTool } from "../utils";
-import { setCursorForShape } from "../cursor";
-import { register } from "./register";
-import { isFrameLikeElement } from "../element/typeChecks";
+import { getNonDeletedElements } from "@excalidraw/element";
+import { mutateElement } from "@excalidraw/element/mutateElement";
+import { newFrameElement } from "@excalidraw/element/newElement";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import {
+  addElementsToFrame,
+  removeAllElementsFromFrame,
+} from "@excalidraw/element/frame";
+import { getFrameChildren } from "@excalidraw/element/frame";
 
-const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
+import { KEYS, updateActiveTool } from "@excalidraw/common";
+
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
+import { getCommonBounds } from "@excalidraw/element/bounds";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { setCursorForShape } from "../cursor";
+import { frameToolIcon } from "../components/icons";
+import { getSelectedElements } from "../scene";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
+
+import type { AppClassProperties, AppState, UIAppState } from "../types";
+
+const isSingleFrameSelected = (
+  appState: UIAppState,
+  app: AppClassProperties,
+) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
   return (
@@ -19,6 +38,7 @@ const isSingleFrameSelected = (appState: AppState, app: AppClassProperties) => {
 
 export const actionSelectAllElementsInFrame = register({
   name: "selectAllElementsInFrame",
+  label: "labels.selectAllElementsInFrame",
   trackEvent: { category: "canvas" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -39,23 +59,23 @@ export const actionSelectAllElementsInFrame = register({
             return acc;
           }, {} as Record<ExcalidrawElement["id"], true>),
         },
-        commitToHistory: false,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
     return {
       elements,
       appState,
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  contextItemLabel: "labels.selectAllElementsInFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
   name: "removeAllElementsFromFrame",
+  label: "labels.removeAllElementsFromFrame",
   trackEvent: { category: "history" },
   perform: (elements, appState, _, app) => {
     const selectedElement =
@@ -70,23 +90,23 @@ export const actionRemoveAllElementsFromFrame = register({
             [selectedElement.id]: true,
           },
         },
-        commitToHistory: true,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     }
 
     return {
       elements,
       appState,
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  contextItemLabel: "labels.removeAllElementsFromFrame",
   predicate: (elements, appState, _, app) =>
     isSingleFrameSelected(appState, app),
 });
 
 export const actionupdateFrameRendering = register({
   name: "updateFrameRendering",
+  label: "labels.updateFrameRendering",
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (elements, appState) => {
@@ -99,16 +119,18 @@ export const actionupdateFrameRendering = register({
           enabled: !appState.frameRendering.enabled,
         },
       },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  contextItemLabel: "labels.updateFrameRendering",
   checked: (appState: AppState) => appState.frameRendering.enabled,
 });
 
 export const actionSetFrameAsActiveTool = register({
   name: "setFrameAsActiveTool",
+  label: "toolBar.frame",
   trackEvent: { category: "toolbar" },
+  icon: frameToolIcon,
+  viewMode: false,
   perform: (elements, appState, _, app) => {
     const nextActiveTool = updateActiveTool(appState, {
       type: "frame",
@@ -127,7 +149,7 @@ export const actionSetFrameAsActiveTool = register({
           type: "frame",
         }),
       },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) =>
@@ -135,4 +157,68 @@ export const actionSetFrameAsActiveTool = register({
     !event.shiftKey &&
     !event.altKey &&
     event.key.toLocaleLowerCase() === KEYS.F,
+});
+
+export const actionWrapSelectionInFrame = register({
+  name: "wrapSelectionInFrame",
+  label: "labels.wrapSelectionInFrame",
+  trackEvent: { category: "element" },
+  predicate: (elements, appState, _, app) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    return (
+      selectedElements.length > 0 &&
+      !selectedElements.some((element) => isFrameLikeElement(element))
+    );
+  },
+  perform: (elements, appState, _, app) => {
+    const selectedElements = getSelectedElements(elements, appState);
+
+    const [x1, y1, x2, y2] = getCommonBounds(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+    );
+    const PADDING = 16;
+    const frame = newFrameElement({
+      x: x1 - PADDING,
+      y: y1 - PADDING,
+      width: x2 - x1 + PADDING * 2,
+      height: y2 - y1 + PADDING * 2,
+    });
+
+    // for a selected partial group, we want to remove it from the remainder of the group
+    if (appState.editingGroupId) {
+      const elementsInGroup = getElementsInGroup(
+        selectedElements,
+        appState.editingGroupId,
+      );
+
+      for (const elementInGroup of elementsInGroup) {
+        const index = elementInGroup.groupIds.indexOf(appState.editingGroupId);
+
+        mutateElement(
+          elementInGroup,
+          {
+            groupIds: elementInGroup.groupIds.slice(0, index),
+          },
+          false,
+        );
+      }
+    }
+
+    const nextElements = addElementsToFrame(
+      [...app.scene.getElementsIncludingDeleted(), frame],
+      selectedElements,
+      frame,
+      appState,
+    );
+
+    return {
+      elements: nextElements,
+      appState: {
+        selectedElementIds: { [frame.id]: true },
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
 });

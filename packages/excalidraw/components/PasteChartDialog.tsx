@@ -1,15 +1,20 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
+
+import type { ChartType } from "@excalidraw/element/types";
+
 import { trackEvent } from "../analytics";
-import { ChartElements, renderSpreadsheet, Spreadsheet } from "../charts";
-import { ChartType } from "../element/types";
+import { renderSpreadsheet } from "../charts";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
-import { UIAppState } from "../types";
+
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
 
 import "./PasteChartDialog.scss";
+
+import type { ChartElements, Spreadsheet } from "../charts";
+import type { UIAppState } from "../types";
 
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
 
@@ -47,6 +52,9 @@ const ChartPreviewBtn = (props: {
           viewBackgroundColor: oc.white,
         },
         null, // files
+        {
+          skipInliningFonts: true,
+        },
       );
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
@@ -64,6 +72,7 @@ const ChartPreviewBtn = (props: {
 
   return (
     <button
+      type="button"
       className="ChartPreview"
       onClick={() => {
         if (chartElements) {

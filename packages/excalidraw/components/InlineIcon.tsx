@@ -1,4 +1,4 @@
-export const InlineIcon = ({ icon }: { icon: JSX.Element }) => {
+export const InlineIcon = ({ icon }: { icon: React.ReactNode }) => {
   return (
     <span
       style={{

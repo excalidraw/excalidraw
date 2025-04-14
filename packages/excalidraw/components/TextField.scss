@@ -3,16 +3,29 @@
 .excalidraw {
   --ExcTextField--color: var(--color-on-surface);
   --ExcTextField--label-color: var(--color-on-surface);
-  --ExcTextField--background: transparent;
+  --ExcTextField--background: var(--color-surface-low);
   --ExcTextField--readonly--background: var(--color-surface-high);
   --ExcTextField--readonly--color: var(--color-on-surface);
-  --ExcTextField--border: var(--color-border-outline);
+  --ExcTextField--border: var(--color-gray-20);
   --ExcTextField--readonly--border: var(--color-border-outline-variant);
   --ExcTextField--border-hover: var(--color-brand-hover);
   --ExcTextField--border-active: var(--color-brand-active);
   --ExcTextField--placeholder: var(--color-border-outline-variant);
 
   .ExcTextField {
+    position: relative;
+
+    svg {
+      position: absolute;
+      top: 50%; // 50% is not exactly in the center of the input
+      transform: translateY(-50%);
+      left: 0.75rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--color-gray-40);
+      z-index: 1;
+    }
+
     &--fullWidth {
       width: 100%;
       flex-grow: 1;
@@ -37,13 +50,14 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      padding: 0 1rem;
 
       height: 3rem;
 
       background: var(--ExcTextField--background);
       border: 1px solid var(--ExcTextField--border);
       border-radius: 0.5rem;
+
+      padding: 0 0.75rem;
 
       &:not(&--readonly) {
         &:hover {
@@ -80,10 +94,6 @@
 
         width: 100%;
 
-        &::placeholder {
-          color: var(--ExcTextField--placeholder);
-        }
-
         &:not(:focus) {
           &:hover {
             background-color: initial;
@@ -104,6 +114,10 @@
           color: var(--ExcTextField--readonly--color);
         }
       }
+    }
+
+    &--hasIcon .ExcTextField__input {
+      padding-left: 2.5rem;
     }
   }
 }

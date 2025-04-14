@@ -1,10 +1,14 @@
-import { LaserPointerOptions } from "@excalidraw/laser-pointer";
-import { AnimatedTrail, Trail } from "./animated-trail";
-import { AnimationFrameHandler } from "./animation-frame-handler";
-import type App from "./components/App";
-import { SocketId } from "./types";
-import { easeOut } from "./utils";
+import { DEFAULT_LASER_COLOR, easeOut } from "@excalidraw/common";
+
+import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
+
+import { AnimatedTrail } from "./animated-trail";
 import { getClientColor } from "./clients";
+
+import type { Trail } from "./animated-trail";
+import type { AnimationFrameHandler } from "./animation-frame-handler";
+import type App from "./components/App";
+import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
   public localTrail: AnimatedTrail;
@@ -20,7 +24,7 @@ export class LaserTrails implements Trail {
 
     this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
-      fill: () => "red",
+      fill: () => DEFAULT_LASER_COLOR,
     });
   }
 
@@ -78,13 +82,15 @@ export class LaserTrails implements Trail {
       return;
     }
 
-    for (const [key, collabolator] of this.app.state.collaborators.entries()) {
+    for (const [key, collaborator] of this.app.state.collaborators.entries()) {
       let trail!: AnimatedTrail;
 
       if (!this.collabTrails.has(key)) {
         trail = new AnimatedTrail(this.animationFrameHandler, this.app, {
           ...this.getTrailOptions(),
-          fill: () => getClientColor(key),
+          fill: () =>
+            collaborator.pointer?.laserColor ||
+            getClientColor(key, collaborator),
         });
         trail.start(this.container);
 
@@ -93,21 +99,21 @@ export class LaserTrails implements Trail {
         trail = this.collabTrails.get(key)!;
       }
 
-      if (collabolator.pointer && collabolator.pointer.tool === "laser") {
-        if (collabolator.button === "down" && !trail.hasCurrentTrail) {
-          trail.startPath(collabolator.pointer.x, collabolator.pointer.y);
+      if (collaborator.pointer && collaborator.pointer.tool === "laser") {
+        if (collaborator.button === "down" && !trail.hasCurrentTrail) {
+          trail.startPath(collaborator.pointer.x, collaborator.pointer.y);
         }
 
         if (
-          collabolator.button === "down" &&
+          collaborator.button === "down" &&
           trail.hasCurrentTrail &&
-          !trail.hasLastPoint(collabolator.pointer.x, collabolator.pointer.y)
+          !trail.hasLastPoint(collaborator.pointer.x, collaborator.pointer.y)
         ) {
-          trail.addPointToPath(collabolator.pointer.x, collabolator.pointer.y);
+          trail.addPointToPath(collaborator.pointer.x, collaborator.pointer.y);
         }
 
-        if (collabolator.button === "up" && trail.hasCurrentTrail) {
-          trail.addPointToPath(collabolator.pointer.x, collabolator.pointer.y);
+        if (collaborator.button === "up" && trail.hasCurrentTrail) {
+          trail.addPointToPath(collaborator.pointer.x, collaborator.pointer.y);
           trail.endPath();
         }
       }

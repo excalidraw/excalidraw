@@ -1,8 +1,10 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+
+import { useAtom } from "../../editor-jotai";
+
 import HotkeyLabel from "./HotkeyLabel";
+import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 
 interface CustomColorListProps {
   colors: string[];
@@ -38,7 +40,7 @@ export const CustomColorList = ({
             tabIndex={-1}
             type="button"
             className={clsx(
-              "color-picker__button color-picker__button--large",
+              "color-picker__button color-picker__button--large has-outline",
               {
                 active: color === c,
                 "is-transparent": c === "transparent" || !c,
@@ -54,7 +56,7 @@ export const CustomColorList = ({
             key={i}
           >
             <div className="color-picker__button-outline" />
-            <HotkeyLabel color={c} keyLabel={i + 1} isCustomColor />
+            <HotkeyLabel color={c} keyLabel={i + 1} />
           </button>
         );
       })}

@@ -1,9 +1,11 @@
-import { atom, useAtom } from "jotai";
+import { exportToSvg } from "@excalidraw/utils/export";
 import { useEffect, useState } from "react";
-import { COLOR_PALETTE } from "../colors";
-import { jotaiScope } from "../jotai";
-import { exportToSvg } from "../../utils/export";
-import { LibraryItem } from "../types";
+
+import { COLOR_PALETTE } from "@excalidraw/common";
+
+import { atom, useAtom } from "../editor-jotai";
+
+import type { LibraryItem } from "../types";
 
 export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 
@@ -18,6 +20,7 @@ const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
     },
     files: null,
     renderEmbeddables: false,
+    skipInliningFonts: true,
   });
 };
 
@@ -40,6 +43,7 @@ export const useLibraryItemSvg = (
           // When there is no svg in cache export it and save to cache
           (async () => {
             const exportedSvg = await exportLibraryItemToSvg(elements);
+            // TODO: should likely be removed for custom fonts
             exportedSvg.querySelector(".style-fonts")?.remove();
 
             if (exportedSvg) {
@@ -62,7 +66,7 @@ export const useLibraryItemSvg = (
 };
 
 export const useLibraryCache = () => {
-  const [svgCache] = useAtom(libraryItemSvgsCache, jotaiScope);
+  const [svgCache] = useAtom(libraryItemSvgsCache);
 
   const clearLibraryCache = () => svgCache.clear();
 

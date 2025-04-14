@@ -1,12 +1,14 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > arrow 1`] = `1`;
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > arrow 3`] = `1`;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > arrow 2`] = `
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > arrow 4`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
+  "elbowed": false,
   "endArrowhead": "arrow",
   "endBinding": null,
   "fillStyle": "solid",
@@ -14,6 +16,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "groupIds": [],
   "height": 50,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
@@ -41,26 +44,28 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "strokeWidth": 2,
   "type": "arrow",
   "updated": 1,
-  "version": 3,
-  "versionNonce": 401146281,
+  "version": 4,
+  "versionNonce": 2019559783,
   "width": 30,
   "x": 30,
   "y": 20,
 }
 `;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > diamond 1`] = `1`;
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > diamond 3`] = `1`;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > diamond 2`] = `
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > diamond 4`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 50,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -75,26 +80,28 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "strokeWidth": 2,
   "type": "diamond",
   "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
+  "version": 3,
+  "versionNonce": 401146281,
   "width": 30,
   "x": 30,
   "y": 20,
 }
 `;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > ellipse 1`] = `1`;
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > ellipse 3`] = `1`;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > ellipse 2`] = `
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > ellipse 4`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 50,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -109,19 +116,20 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "strokeWidth": 2,
   "type": "ellipse",
   "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
+  "version": 3,
+  "versionNonce": 401146281,
   "width": 30,
   "x": 30,
   "y": 20,
 }
 `;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > line 1`] = `
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > line 3`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "endArrowhead": null,
   "endBinding": null,
   "fillStyle": "solid",
@@ -129,6 +137,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "groupIds": [],
   "height": 50,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "lastCommittedPoint": null,
   "link": null,
@@ -156,26 +165,28 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "strokeWidth": 2,
   "type": "line",
   "updated": 1,
-  "version": 3,
-  "versionNonce": 401146281,
+  "version": 4,
+  "versionNonce": 2019559783,
   "width": 30,
   "x": 30,
   "y": 20,
 }
 `;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > rectangle 1`] = `1`;
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > rectangle 3`] = `1`;
 
-exports[`Test dragCreate > add element to the scene when pointer dragging long enough > rectangle 2`] = `
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > rectangle 4`] = `
 {
   "angle": 0,
   "backgroundColor": "transparent",
   "boundElements": null,
+  "customData": undefined,
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
   "height": 50,
   "id": "id0",
+  "index": "a0",
   "isDeleted": false,
   "link": null,
   "locked": false,
@@ -190,8 +201,8 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 2,
-  "versionNonce": 453191,
+  "version": 3,
+  "versionNonce": 401146281,
   "width": 30,
   "x": 30,
   "y": 20,

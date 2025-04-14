@@ -1,19 +1,27 @@
-import { HamburgerMenuIcon, palette } from "../components/icons";
+import { KEYS } from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeActions";
+
 import { ToolButton } from "../components/ToolButton";
+import { HamburgerMenuIcon, HelpIconThin, palette } from "../components/icons";
 import { t } from "../i18n";
-import { showSelectedShapeActions, getNonDeletedElements } from "../element";
+
+import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
-import { KEYS } from "../keys";
 
 export const actionToggleCanvasMenu = register({
   name: "toggleCanvasMenu",
+  label: "buttons.menu",
   trackEvent: { category: "menu" },
   perform: (_, appState) => ({
     appState: {
       ...appState,
       openMenu: appState.openMenu === "canvas" ? null : "canvas",
     },
-    commitToHistory: false,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ appState, updateData }) => (
     <ToolButton
@@ -28,13 +36,14 @@ export const actionToggleCanvasMenu = register({
 
 export const actionToggleEditMenu = register({
   name: "toggleEditMenu",
+  label: "buttons.edit",
   trackEvent: { category: "menu" },
   perform: (_elements, appState) => ({
     appState: {
       ...appState,
       openMenu: appState.openMenu === "shape" ? null : "shape",
     },
-    commitToHistory: false,
+    captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
     <ToolButton
@@ -53,6 +62,8 @@ export const actionToggleEditMenu = register({
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
+  label: "welcomeScreen.defaults.helpHint",
+  icon: HelpIconThin,
   viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {
@@ -69,7 +80,7 @@ export const actionShortcuts = register({
                 name: "help",
               },
       },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   keyTest: (event) => event.key === KEYS.QUESTION_MARK,

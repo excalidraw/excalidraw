@@ -1,9 +1,6 @@
-import {
-  Spreadsheet,
-  tryParseCells,
-  tryParseNumber,
-  VALID_SPREADSHEET,
-} from "./charts";
+import { tryParseCells, tryParseNumber, VALID_SPREADSHEET } from "./charts";
+
+import type { Spreadsheet } from "./charts";
 
 describe("charts", () => {
   describe("tryParseNumber", () => {

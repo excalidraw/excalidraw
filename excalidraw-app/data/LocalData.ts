@@ -10,20 +10,35 @@
  *   (localStorage, indexedDB).
  */
 
-import { createStore, entries, del, getMany, set, setMany } from "idb-keyval";
-import { clearAppStateForLocalStorage } from "../../packages/excalidraw/appState";
-import { clearElementsForLocalStorage } from "../../packages/excalidraw/element";
+import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
 import {
-  ExcalidrawElement,
-  FileId,
-} from "../../packages/excalidraw/element/types";
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+  debounce,
+} from "@excalidraw/common";
+import { clearElementsForLocalStorage } from "@excalidraw/element";
 import {
+  createStore,
+  entries,
+  del,
+  getMany,
+  set,
+  setMany,
+  get,
+} from "idb-keyval";
+
+import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
+import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
-} from "../../packages/excalidraw/types";
-import { debounce } from "../../packages/excalidraw/utils";
+} from "@excalidraw/excalidraw/types";
+import type { MaybePromise } from "@excalidraw/common/utility-types";
+
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
+
 import { FileManager } from "./FileManager";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
@@ -55,13 +70,22 @@ const saveDataStateToLocalStorage = (
   appState: AppState,
 ) => {
   try {
+    const _appState = clearAppStateForLocalStorage(appState);
+
+    if (
+      _appState.openSidebar?.name === DEFAULT_SIDEBAR.name &&
+      _appState.openSidebar.tab === CANVAS_SEARCH_TAB
+    ) {
+      _appState.openSidebar = null;
+    }
+
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
       JSON.stringify(clearElementsForLocalStorage(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(clearAppStateForLocalStorage(appState)),
+      JSON.stringify(_appState),
     );
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
   } catch (error: any) {
@@ -159,8 +183,8 @@ export class LocalData {
       );
     },
     async saveFiles({ addedFiles }) {
-      const savedFiles = new Map<FileId, true>();
-      const erroredFiles = new Map<FileId, true>();
+      const savedFiles = new Map<FileId, BinaryFileData>();
+      const erroredFiles = new Map<FileId, BinaryFileData>();
 
       // before we use `storage` event synchronization, let's update the flag
       // optimistically. Hopefully nothing fails, and an IDB read executed
@@ -171,10 +195,10 @@ export class LocalData {
         [...addedFiles].map(async ([id, fileData]) => {
           try {
             await set(id, fileData, filesStore);
-            savedFiles.set(id, true);
+            savedFiles.set(id, fileData);
           } catch (error: any) {
             console.error(error);
-            erroredFiles.set(id, true);
+            erroredFiles.set(id, fileData);
           }
         }),
       );
@@ -182,4 +206,53 @@ export class LocalData {
       return { savedFiles, erroredFiles };
     },
   });
+}
+export class LibraryIndexedDBAdapter {
+  /** IndexedDB database and store name */
+  private static idb_name = STORAGE_KEYS.IDB_LIBRARY;
+  /** library data store key */
+  private static key = "libraryData";
+
+  private static store = createStore(
+    `${LibraryIndexedDBAdapter.idb_name}-db`,
+    `${LibraryIndexedDBAdapter.idb_name}-store`,
+  );
+
+  static async load() {
+    const IDBData = await get<LibraryPersistedData>(
+      LibraryIndexedDBAdapter.key,
+      LibraryIndexedDBAdapter.store,
+    );
+
+    return IDBData || null;
+  }
+
+  static save(data: LibraryPersistedData): MaybePromise<void> {
+    return set(
+      LibraryIndexedDBAdapter.key,
+      data,
+      LibraryIndexedDBAdapter.store,
+    );
+  }
+}
+
+/** LS Adapter used only for migrating LS library data
+ * to indexedDB */
+export class LibraryLocalStorageMigrationAdapter {
+  static load() {
+    const LSData = localStorage.getItem(
+      STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY,
+    );
+    if (LSData != null) {
+      const libraryItems: ImportedDataState["libraryItems"] =
+        JSON.parse(LSData);
+      if (libraryItems) {
+        return { libraryItems };
+      }
+    }
+    return null;
+  }
+  static clear() {
+    localStorage.removeItem(STORAGE_KEYS.__LEGACY_LOCAL_STORAGE_LIBRARY);
+  }
 }

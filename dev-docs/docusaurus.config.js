@@ -66,7 +66,7 @@ const config = {
             label: "Docs",
           },
           {
-            to: "https://blog.excalidraw.com",
+            to: "https://plus.excalidraw.com/blog",
             label: "Blog",
             position: "left",
           },
@@ -111,7 +111,7 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: "https://blog.excalidraw.com",
+                to: "https://plus.excalidraw.com/blog",
               },
               {
                 label: "GitHub",
@@ -149,6 +149,29 @@ const config = {
         systemvars: true,
       },
     ],
+    function () {
+      return {
+        name: "disable-fully-specified-error",
+        configureWebpack() {
+          return {
+            module: {
+              rules: [
+                {
+                  test: /\.m?js$/,
+                  resolve: {
+                    fullySpecified: false,
+                  },
+                },
+              ],
+            },
+            optimization: {
+              // disable terser minification
+              minimize: false,
+            },
+          };
+        },
+      };
+    },
   ],
 };
 

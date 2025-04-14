@@ -1,11 +1,13 @@
 import { actionLoadScene, actionShortcuts } from "../../actions";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+import { useTunnels } from "../../context/tunnels";
+import { useUIAppState } from "../../context/ui-appState";
 import { t, useI18n } from "../../i18n";
 import { useDevice, useExcalidrawActionManager } from "../App";
-import { useTunnels } from "../../context/tunnels";
-import { HelpIcon, LoadIcon, usersIcon } from "../icons";
-import { useUIAppState } from "../../context/ui-appState";
 import { ExcalidrawLogo } from "../ExcalidrawLogo";
+import { HelpIcon, LoadIcon, usersIcon } from "../icons";
+
+import type { JSX } from "react";
 
 const WelcomeScreenMenuItemContent = ({
   icon,
@@ -109,7 +111,7 @@ Center.displayName = "Center";
 
 const Logo = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className="welcome-screen-center__logo virgil welcome-screen-decor">
+    <div className="welcome-screen-center__logo excalifont welcome-screen-decor">
       {children || <ExcalidrawLogo withText />}
     </div>
   );
@@ -118,7 +120,7 @@ Logo.displayName = "Logo";
 
 const Heading = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="welcome-screen-center__heading welcome-screen-decor virgil">
+    <div className="welcome-screen-center__heading welcome-screen-decor excalifont">
       {children}
     </div>
   );

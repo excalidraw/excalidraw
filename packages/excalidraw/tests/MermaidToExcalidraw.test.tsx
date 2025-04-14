@@ -1,28 +1,15 @@
-import { act, fireEvent, render, waitFor } from "./test-utils";
-import { Excalidraw } from "../index";
 import React from "react";
-import { expect, vi } from "vitest";
-import * as MermaidToExcalidraw from "@excalidraw/mermaid-to-excalidraw";
+import { expect } from "vitest";
+
+import { Excalidraw } from "../index";
+
+import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
+import { render, waitFor } from "./test-utils";
 
-vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
-  const module = (await importActual()) as any;
-
-  return {
-    __esModule: true,
-    ...module,
-  };
-});
-const parseMermaidToExcalidrawSpy = vi.spyOn(
-  MermaidToExcalidraw,
-  "parseMermaidToExcalidraw",
-);
-
-parseMermaidToExcalidrawSpy.mockImplementation(
-  async (
-    definition: string,
-    options?: MermaidToExcalidraw.MermaidOptions | undefined,
-  ) => {
+mockMermaidToExcalidraw({
+  mockRef: true,
+  parseMermaidToExcalidraw: async (definition) => {
     const firstLine = definition.split("\n")[0];
     return new Promise((resolve, reject) => {
       if (firstLine === "flowchart TD") {
@@ -88,12 +75,6 @@ parseMermaidToExcalidrawSpy.mockImplementation(
       }
     });
   },
-);
-
-vi.spyOn(React, "useRef").mockReturnValue({
-  current: {
-    parseMermaidToExcalidraw: parseMermaidToExcalidrawSpy,
-  },
 });
 
 describe("Test <MermaidToExcalidraw/>", () => {
@@ -111,21 +92,8 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
   it("should open mermaid popup when active tool is mermaid", async () => {
     const dialog = document.querySelector(".ttd-dialog")!;
-    await waitFor(() => dialog.querySelector("canvas"));
+    await waitFor(() => expect(dialog.querySelector("canvas")).not.toBeNull());
     expect(dialog.outerHTML).toMatchSnapshot();
-  });
-
-  it("should close the popup and set the tool to selection when close button clicked", () => {
-    const dialog = document.querySelector(".ttd-dialog")!;
-    const closeBtn = dialog.querySelector(".Dialog__close")!;
-    fireEvent.click(closeBtn);
-    expect(document.querySelector(".ttd-dialog")).toBe(null);
-    expect(window.h.state.activeTool).toStrictEqual({
-      customType: null,
-      lastActiveTool: null,
-      locked: false,
-      type: "selection",
-    });
   });
 
   it("should show error in preview when mermaid library throws error", async () => {
@@ -138,19 +106,9 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
-    expect(editor.textContent).toMatchInlineSnapshot(`
-      "flowchart TD
-       A[Christmas] -->|Get money| B(Go shopping)
-       B --> C{Let me think}
-       C -->|One| D[Laptop]
-       C -->|Two| E[iPhone]
-       C -->|Three| F[Car]"
-    `);
+    expect(editor.textContent).toMatchSnapshot();
 
-    await act(async () => {
-      updateTextEditor(editor, "flowchart TD1");
-      await new Promise((cb) => setTimeout(cb, 0));
-    });
+    updateTextEditor(editor, "flowchart TD1");
     editor = await getTextEditor(selector, false);
 
     expect(editor.textContent).toBe("flowchart TD1");

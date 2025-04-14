@@ -1,13 +1,22 @@
-import React, { forwardRef, useState } from "react";
 import clsx from "clsx";
+import React, { forwardRef, useState } from "react";
+
+import { isPromiseLike } from "@excalidraw/common";
+
+import { AbortError } from "../errors";
+
+import Spinner from "./Spinner";
+import { tablerCheckIcon } from "./icons";
 
 import "./FilledButton.scss";
-import { AbortError } from "../errors";
-import Spinner from "./Spinner";
-import { isPromiseLike } from "../utils";
 
 export type ButtonVariant = "filled" | "outlined" | "icon";
-export type ButtonColor = "primary" | "danger" | "warning" | "muted";
+export type ButtonColor =
+  | "primary"
+  | "danger"
+  | "warning"
+  | "muted"
+  | "success";
 export type ButtonSize = "medium" | "large";
 
 export type FilledButtonProps = {
@@ -15,6 +24,7 @@ export type FilledButtonProps = {
 
   children?: React.ReactNode;
   onClick?: (event: React.MouseEvent) => void;
+  status?: null | "loading" | "success";
 
   variant?: ButtonVariant;
   color?: ButtonColor;
@@ -37,6 +47,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       size = "medium",
       fullWidth,
       className,
+      status,
     },
     ref,
   ) => {
@@ -46,8 +57,11 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
       const ret = onClick?.(event);
 
       if (isPromiseLike(ret)) {
-        try {
+        // delay loading state to prevent flicker in case of quick response
+        const timer = window.setTimeout(() => {
           setIsLoading(true);
+        }, 50);
+        try {
           await ret;
         } catch (error: any) {
           if (!(error instanceof AbortError)) {
@@ -56,10 +70,14 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
             console.warn(error);
           }
         } finally {
+          clearTimeout(timer);
           setIsLoading(false);
         }
       }
     };
+
+    const _status = isLoading ? "loading" : status;
+    color = _status === "success" ? "success" : color;
 
     return (
       <button
@@ -68,6 +86,7 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
           `ExcButton--color-${color}`,
           `ExcButton--variant-${variant}`,
           `ExcButton--size-${size}`,
+          `ExcButton--status-${_status}`,
           { "ExcButton--fullWidth": fullWidth },
           className,
         )}
@@ -75,10 +94,16 @@ export const FilledButton = forwardRef<HTMLButtonElement, FilledButtonProps>(
         type="button"
         aria-label={label}
         ref={ref}
-        disabled={isLoading}
+        disabled={_status === "loading" || _status === "success"}
       >
         <div className="ExcButton__contents">
-          {isLoading && <Spinner />}
+          {_status === "loading" ? (
+            <Spinner className="ExcButton__statusIcon" />
+          ) : (
+            _status === "success" && (
+              <div className="ExcButton__statusIcon">{tablerCheckIcon}</div>
+            )
+          )}
           {icon && (
             <div className="ExcButton__icon" aria-hidden>
               {icon}

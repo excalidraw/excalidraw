@@ -1,39 +1,50 @@
-import { questionCircle, saveAs } from "../components/icons";
+import {
+  KEYS,
+  DEFAULT_EXPORT_PADDING,
+  EXPORT_SCALES,
+  THEME,
+} from "@excalidraw/common";
+
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import type { Theme } from "@excalidraw/element/types";
+
+import { useDevice } from "../components/App";
+import { CheckboxItem } from "../components/CheckboxItem";
+import { DarkModeToggle } from "../components/DarkModeToggle";
 import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
-import { DarkModeToggle } from "../components/DarkModeToggle";
+import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
-import { resaveAsImageWithScene } from "../data/resave";
-import { t } from "../i18n";
-import { useDevice } from "../components/App";
-import { KEYS } from "../keys";
-import { register } from "./register";
-import { CheckboxItem } from "../components/CheckboxItem";
-import { getExportSize } from "../scene/export";
-import { DEFAULT_EXPORT_PADDING, EXPORT_SCALES, THEME } from "../constants";
-import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { getNonDeletedElements } from "../element";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
-import { Theme } from "../element/types";
+import { resaveAsImageWithScene } from "../data/resave";
+
+import { t } from "../i18n";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { getExportSize } from "../scene/export";
+import { CaptureUpdateAction } from "../store";
 
 import "../components/ToolIcon.scss";
 
+import { register } from "./register";
+
 export const actionChangeProjectName = register({
   name: "changeProjectName",
+  label: "labels.fileTitle",
   trackEvent: false,
   perform: (_elements, appState, value) => {
-    return { appState: { ...appState, name: value }, commitToHistory: false };
+    return {
+      appState: { ...appState, name: value },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
   },
-  PanelComponent: ({ appState, updateData, appProps, data }) => (
+  PanelComponent: ({ appState, updateData, appProps, data, app }) => (
     <ProjectName
       label={t("labels.fileTitle")}
-      value={appState.name || "Unnamed"}
+      value={app.getName()}
       onChange={(name: string) => updateData(name)}
-      isNameEditable={
-        typeof appProps.name === "undefined" && !appState.viewModeEnabled
-      }
       ignoreFocus={data?.ignoreFocus ?? false}
     />
   ),
@@ -41,11 +52,12 @@ export const actionChangeProjectName = register({
 
 export const actionChangeExportScale = register({
   name: "changeExportScale",
+  label: "imageExportDialog.scale",
   trackEvent: { category: "export", action: "scale" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportScale: value },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements: allElements, appState, updateData }) => {
@@ -90,11 +102,12 @@ export const actionChangeExportScale = register({
 
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
+  label: "imageExportDialog.label.withBackground",
   trackEvent: { category: "export", action: "toggleBackground" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportBackground: value },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -109,11 +122,12 @@ export const actionChangeExportBackground = register({
 
 export const actionChangeExportEmbedScene = register({
   name: "changeExportEmbedScene",
+  label: "imageExportDialog.tooltip.embedScene",
   trackEvent: { category: "export", action: "embedScene" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportEmbedScene: value },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ appState, updateData }) => (
@@ -131,6 +145,8 @@ export const actionChangeExportEmbedScene = register({
 
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
+  label: "buttons.save",
+  icon: ExportIcon,
   trackEvent: { category: "export" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -144,11 +160,16 @@ export const actionSaveToActiveFile = register({
 
     try {
       const { fileHandle } = isImageFileHandle(appState.fileHandle)
-        ? await resaveAsImageWithScene(elements, appState, app.files)
-        : await saveAsJSON(elements, appState, app.files);
+        ? await resaveAsImageWithScene(
+            elements,
+            appState,
+            app.files,
+            app.getName(),
+          )
+        : await saveAsJSON(elements, appState, app.files, app.getName());
 
       return {
-        commitToHistory: false,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
           ...appState,
           fileHandle,
@@ -170,7 +191,7 @@ export const actionSaveToActiveFile = register({
       } else {
         console.warn(error);
       }
-      return { commitToHistory: false };
+      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
   },
   keyTest: (event) =>
@@ -179,6 +200,8 @@ export const actionSaveToActiveFile = register({
 
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
+  label: "exportDialog.disk_title",
+  icon: ExportIcon,
   viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
@@ -190,9 +213,10 @@ export const actionSaveFileToDisk = register({
           fileHandle: null,
         },
         app.files,
+        app.getName(),
       );
       return {
-        commitToHistory: false,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
           ...appState,
           openDialog: null,
@@ -206,7 +230,7 @@ export const actionSaveFileToDisk = register({
       } else {
         console.warn(error);
       }
-      return { commitToHistory: false };
+      return { captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
   },
   keyTest: (event) =>
@@ -227,6 +251,7 @@ export const actionSaveFileToDisk = register({
 
 export const actionLoadScene = register({
   name: "loadScene",
+  label: "buttons.load",
   trackEvent: { category: "export" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -244,7 +269,7 @@ export const actionLoadScene = register({
         elements: loadedElements,
         appState: loadedAppState,
         files,
-        commitToHistory: true,
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {
@@ -255,7 +280,7 @@ export const actionLoadScene = register({
         elements,
         appState: { ...appState, errorMessage: error.message },
         files: app.files,
-        commitToHistory: false,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
   },
@@ -264,11 +289,12 @@ export const actionLoadScene = register({
 
 export const actionExportWithDarkMode = register({
   name: "exportWithDarkMode",
+  label: "imageExportDialog.label.darkMode",
   trackEvent: { category: "export", action: "toggleTheme" },
   perform: (_elements, appState, value) => {
     return {
       appState: { ...appState, exportWithDarkMode: value },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ appState, updateData }) => (

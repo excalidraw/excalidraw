@@ -1,46 +1,51 @@
 import {
   compressData,
   decompressData,
-} from "../../packages/excalidraw/data/encode";
+} from "@excalidraw/excalidraw/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "../../packages/excalidraw/data/encryption";
-import { serializeAsJSON } from "../../packages/excalidraw/data/json";
-import { restore } from "../../packages/excalidraw/data/restore";
-import { ImportedDataState } from "../../packages/excalidraw/data/types";
-import { SceneBounds } from "../../packages/excalidraw/element/bounds";
-import { isInvisiblySmallElement } from "../../packages/excalidraw/element/sizeHelpers";
-import { isInitializedImageElement } from "../../packages/excalidraw/element/typeChecks";
-import {
+} from "@excalidraw/excalidraw/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { restore } from "@excalidraw/excalidraw/data/restore";
+import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
+import { t } from "@excalidraw/excalidraw/i18n";
+import { bytesToHexString } from "@excalidraw/common";
+
+import type { UserIdleState } from "@excalidraw/common";
+import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { SceneBounds } from "@excalidraw/element/bounds";
+import type {
   ExcalidrawElement,
   FileId,
-} from "../../packages/excalidraw/element/types";
-import { t } from "../../packages/excalidraw/i18n";
-import {
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
+import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
   SocketId,
-  UserIdleState,
-} from "../../packages/excalidraw/types";
-import { bytesToHexString } from "../../packages/excalidraw/utils";
+} from "@excalidraw/excalidraw/types";
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
 import {
   DELETED_ELEMENT_TIMEOUT,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
-  WS_SUBTYPES,
 } from "../app_constants";
+
 import { encodeFilesForUpload } from "./FileManager";
 import { saveFilesToFirebase } from "./firebase";
 
-export type SyncableExcalidrawElement = ExcalidrawElement & {
-  _brand: "SyncableExcalidrawElement";
-};
+import type { WS_SUBTYPES } from "../app_constants";
+
+export type SyncableExcalidrawElement = OrderedExcalidrawElement &
+  MakeBrand<"SyncableExcalidrawElement">;
 
 export const isSyncableElement = (
-  element: ExcalidrawElement,
+  element: OrderedExcalidrawElement,
 ): element is SyncableExcalidrawElement => {
   if (element.isDeleted) {
     if (element.updated > Date.now() - DELETED_ELEMENT_TIMEOUT) {
@@ -51,7 +56,9 @@ export const isSyncableElement = (
   return !isInvisiblySmallElement(element);
 };
 
-export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
+export const getSyncableElements = (
+  elements: readonly OrderedExcalidrawElement[],
+) =>
   elements.filter((element) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
@@ -266,7 +273,6 @@ export const loadScene = async (
     // in the scene database/localStorage, and instead fetch them async
     // from a different database
     files: data.files,
-    commitToHistory: false,
   };
 };
 

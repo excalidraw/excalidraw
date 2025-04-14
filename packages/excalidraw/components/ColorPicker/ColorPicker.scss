@@ -20,23 +20,29 @@
     align-items: center;
 
     @include isMobile {
-      max-width: 175px;
+      max-width: 11rem;
     }
   }
 
   .color-picker__top-picks {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   .color-picker__button {
-    --radius: 0.25rem;
+    --radius: 4px;
+    --size: 1.375rem;
+
+    &.has-outline {
+      box-shadow: inset 0 0 0 1px #d9d9d9;
+    }
 
     padding: 0;
     margin: 0;
-    width: 1.35rem;
-    height: 1.35rem;
-    border: 1px solid var(--color-gray-30);
+    width: var(--size);
+    height: var(--size);
+    border: 0;
     border-radius: var(--radius);
     filter: var(--theme-filter);
     background-color: var(--swatch-color);
@@ -45,16 +51,20 @@
     font-family: inherit;
     box-sizing: border-box;
 
-    &:hover {
+    &:hover:not(.active):not(.color-picker__button--large) {
+      transform: scale(1.075);
+    }
+
+    &:hover:not(.active).color-picker__button--large {
       &::after {
         content: "";
         position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
+        top: -1px;
+        left: -1px;
+        right: -1px;
+        bottom: -1px;
         box-shadow: 0 0 0 1px var(--color-gray-30);
-        border-radius: calc(var(--radius) + 1px);
+        border-radius: var(--radius);
         filter: var(--theme-filter);
       }
     }
@@ -62,13 +72,14 @@
     &.active {
       .color-picker__button-outline {
         position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
+        --offset: -1px;
+        top: var(--offset);
+        left: var(--offset);
+        right: var(--offset);
+        bottom: var(--offset);
         box-shadow: 0 0 0 1px var(--color-primary-darkest);
         z-index: 1; // due hover state so this has preference
-        border-radius: calc(var(--radius) + 1px);
+        border-radius: var(--radius);
         filter: var(--theme-filter);
       }
     }
@@ -123,10 +134,11 @@
 
   .color-picker__button__hotkey-label {
     position: absolute;
-    right: 4px;
-    bottom: 4px;
+    right: 5px;
+    bottom: 3px;
     filter: none;
     font-size: 11px;
+    font-weight: 500;
   }
 
   .color-picker {

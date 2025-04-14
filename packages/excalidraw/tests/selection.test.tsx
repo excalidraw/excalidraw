@@ -1,25 +1,32 @@
-import ReactDOM from "react-dom";
+import React from "react";
+import { vi } from "vitest";
+
+import { KEYS, reseed } from "@excalidraw/common";
+
+import { SHAPES } from "../components/shapes";
+
+import { Excalidraw } from "../index";
+import * as InteractiveCanvas from "../renderer/interactiveScene";
+import * as StaticScene from "../renderer/staticScene";
+
+import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   render,
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
+  unmountComponent,
 } from "./test-utils";
-import { Excalidraw } from "../index";
-import * as Renderer from "../renderer/renderScene";
-import { KEYS } from "../keys";
-import { reseed } from "../random";
-import { API } from "./helpers/api";
-import { Keyboard, Pointer, UI } from "./helpers/ui";
-import { SHAPES } from "../shapes";
-import { vi } from "vitest";
 
-// Unmount ReactDOM from root
-ReactDOM.unmountComponentAtNode(document.getElementById("root")!);
+unmountComponent();
 
-const renderInteractiveScene = vi.spyOn(Renderer, "renderInteractiveScene");
-const renderStaticScene = vi.spyOn(Renderer, "renderStaticScene");
+const renderInteractiveScene = vi.spyOn(
+  InteractiveCanvas,
+  "renderInteractiveScene",
+);
+const renderStaticScene = vi.spyOn(StaticScene, "renderStaticScene");
 
 beforeEach(() => {
   localStorage.clear();
@@ -55,7 +62,7 @@ describe("box-selection", () => {
       height: 50,
     });
 
-    h.elements = [rect1, rect2];
+    API.setElements([rect1, rect2]);
 
     mouse.downAt(175, -20);
     mouse.moveTo(85, 70);
@@ -83,7 +90,7 @@ describe("box-selection", () => {
       fillStyle: "solid",
     });
 
-    h.elements = [rect1];
+    API.setElements([rect1]);
 
     mouse.downAt(75, -20);
     mouse.moveTo(-15, 70);
@@ -128,7 +135,7 @@ describe("inner box-selection", () => {
       width: 50,
       height: 50,
     });
-    h.elements = [rect1, rect2, rect3];
+    API.setElements([rect1, rect2, rect3]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(40, 40);
       mouse.moveTo(290, 290);
@@ -164,7 +171,7 @@ describe("inner box-selection", () => {
       height: 50,
       groupIds: ["A"],
     });
-    h.elements = [rect1, rect2, rect3];
+    API.setElements([rect1, rect2, rect3]);
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(40, 40);
@@ -202,7 +209,7 @@ describe("inner box-selection", () => {
       height: 50,
       groupIds: ["A"],
     });
-    h.elements = [rect1, rect2, rect3];
+    API.setElements([rect1, rect2, rect3]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       mouse.downAt(rect2.x - 20, rect2.y - 20);
       mouse.moveTo(rect2.x + rect2.width + 10, rect2.y + rect2.height + 10);
@@ -309,8 +316,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -341,8 +348,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -373,8 +380,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 45, clientY: 20 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -418,8 +425,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -462,8 +469,8 @@ describe("select single element on the scene", () => {
     fireEvent.pointerDown(canvas, { clientX: 40, clientY: 40 });
     fireEvent.pointerUp(canvas);
 
-    expect(renderInteractiveScene).toHaveBeenCalledTimes(9);
-    expect(renderStaticScene).toHaveBeenCalledTimes(7);
+    expect(renderInteractiveScene).toHaveBeenCalledTimes(8);
+    expect(renderStaticScene).toHaveBeenCalledTimes(6);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(1);
     expect(h.state.selectedElementIds[h.elements[0].id]).toBeTruthy();
@@ -502,7 +509,7 @@ describe("selectedElementIds stability", () => {
       height: 10,
     });
 
-    h.elements = [rectangle];
+    API.setElements([rectangle]);
 
     const selectedElementIds_1 = h.state.selectedElementIds;
 

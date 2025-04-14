@@ -1,13 +1,17 @@
+import React from "react";
+
+import { KEYS } from "@excalidraw/common";
+
+import { Excalidraw } from "../index";
+
+import { API } from "./helpers/api";
+import { Keyboard } from "./helpers/ui";
 import {
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
   waitFor,
 } from "./test-utils";
-import { Excalidraw } from "../index";
-import { API } from "./helpers/api";
-import { Keyboard } from "./helpers/ui";
-import { KEYS } from "../keys";
 
 const { h } = window;
 
@@ -98,13 +102,13 @@ describe("appState", () => {
 
     const zoom = h.state.zoom.value;
     // Assert we scroll properly when zoomed in
-    h.setState({ zoom: { value: (zoom * 1.1) as typeof zoom } });
+    API.setAppState({ zoom: { value: (zoom * 1.1) as typeof zoom } });
     scrollTest();
     // Assert we scroll properly when zoomed out
-    h.setState({ zoom: { value: (zoom * 0.9) as typeof zoom } });
+    API.setAppState({ zoom: { value: (zoom * 0.9) as typeof zoom } });
     scrollTest();
     // Assert we scroll properly with normal zoom
-    h.setState({ zoom: { value: zoom } });
+    API.setAppState({ zoom: { value: zoom } });
     scrollTest();
     restoreOriginalGetBoundingClientRect();
   });

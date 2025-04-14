@@ -1,5 +1,6 @@
 import * as RadixTabs from "@radix-ui/react-tabs";
-import { SidebarTabName } from "../../types";
+
+import type { SidebarTabName } from "../../types";
 
 export const SidebarTabTrigger = ({
   children,

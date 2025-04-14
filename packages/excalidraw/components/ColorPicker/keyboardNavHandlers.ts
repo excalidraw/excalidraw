@@ -1,17 +1,19 @@
-import { KEYS } from "../../keys";
-import {
+import { COLORS_PER_ROW, COLOR_PALETTE, KEYS } from "@excalidraw/common";
+
+import type {
   ColorPickerColor,
   ColorPalette,
   ColorPaletteCustom,
-  COLORS_PER_ROW,
-  COLOR_PALETTE,
-} from "../../colors";
-import { ValueOf } from "../../utility-types";
+} from "@excalidraw/common";
+
+import type { ValueOf } from "@excalidraw/common/utility-types";
+
 import {
-  ActiveColorPickerSectionAtomType,
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
+
+import type { ActiveColorPickerSectionAtomType } from "./colorPickerUtils";
 
 const arrowHandler = (
   eventKey: string,

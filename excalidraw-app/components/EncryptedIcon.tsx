@@ -1,6 +1,6 @@
-import { shield } from "../../packages/excalidraw/components/icons";
-import { Tooltip } from "../../packages/excalidraw/components/Tooltip";
-import { useI18n } from "../../packages/excalidraw/i18n";
+import { Tooltip } from "@excalidraw/excalidraw/components/Tooltip";
+import { shield } from "@excalidraw/excalidraw/components/icons";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 
 export const EncryptedIcon = () => {
   const { t } = useI18n();
@@ -8,7 +8,7 @@ export const EncryptedIcon = () => {
   return (
     <a
       className="encrypted-icon tooltip"
-      href="https://blog.excalidraw.com/end-to-end-encryption/"
+      href="https://plus.excalidraw.com/blog/end-to-end-encryption"
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("encrypted.link")}

@@ -1,14 +1,18 @@
-import { ExcalidrawElement } from "../element/types";
-import { AppState, BinaryFiles } from "../types";
-import { exportCanvas, prepareElementsForExport } from ".";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import { getFileHandleType, isImageFileHandleType } from "./blob";
+
+import { exportCanvas, prepareElementsForExport } from ".";
+
+import type { AppState, BinaryFiles } from "../types";
 
 export const resaveAsImageWithScene = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
+  name: string,
 ) => {
-  const { exportBackground, viewBackgroundColor, name, fileHandle } = appState;
+  const { exportBackground, viewBackgroundColor, fileHandle } = appState;
 
   const fileHandleType = getFileHandleType(fileHandle);
 

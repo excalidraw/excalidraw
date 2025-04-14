@@ -1,4 +1,26 @@
+import throttle from "lodash.throttle";
+
 import {
+  randomInteger,
+  arrayToMap,
+  toBrandedType,
+  isDevEnv,
+  isTestEnv,
+} from "@excalidraw/common";
+import { isNonDeletedElement } from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { getElementsInGroup } from "@excalidraw/element/groups";
+
+import {
+  syncInvalidIndices,
+  syncMovedIndices,
+  validateFractionalIndices,
+} from "@excalidraw/element/fractionalIndex";
+
+import { getSelectedElements } from "@excalidraw/element/selection";
+
+import type { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import type {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
@@ -6,15 +28,13 @@ import {
   ElementsMapOrArray,
   SceneElementsMap,
   NonDeletedSceneElementsMap,
-} from "../element/types";
-import { isNonDeletedElement } from "../element";
-import { LinearElementEditor } from "../element/linearElementEditor";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { getSelectedElements } from "./selection";
-import { AppState } from "../types";
-import { Assert, SameType } from "../utility-types";
-import { randomInteger } from "../random";
-import { toBrandedType } from "../utils";
+  OrderedExcalidrawElement,
+  Ordered,
+} from "@excalidraw/element/types";
+
+import type { Assert, SameType } from "@excalidraw/common/utility-types";
+
+import type { AppState } from "../types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
@@ -32,11 +52,28 @@ const getNonDeletedElements = <T extends ExcalidrawElement>(
   for (const element of allElements) {
     if (!element.isDeleted) {
       elements.push(element as NonDeleted<T>);
-      elementsMap.set(element.id, element as NonDeletedExcalidrawElement);
+      elementsMap.set(
+        element.id,
+        element as Ordered<NonDeletedExcalidrawElement>,
+      );
     }
   }
   return { elementsMap, elements };
 };
+
+const validateIndicesThrottled = throttle(
+  (elements: readonly ExcalidrawElement[]) => {
+    if (isDevEnv() || isTestEnv() || window?.DEBUG_FRACTIONAL_INDICES) {
+      validateFractionalIndices(elements, {
+        // throw only in dev & test, to remain functional on `DEBUG_FRACTIONAL_INDICES`
+        shouldThrow: isDevEnv() || isTestEnv(),
+        includeBoundTextValidation: true,
+      });
+    }
+  },
+  1000 * 60,
+  { leading: true, trailing: false },
+);
 
 const hashSelectionOpts = (
   opts: Parameters<InstanceType<typeof Scene>["getSelectedElements"]>[0],
@@ -80,32 +117,22 @@ class Scene {
   private static sceneMapByElement = new WeakMap<ExcalidrawElement, Scene>();
   private static sceneMapById = new Map<string, Scene>();
 
-  static mapElementToScene(
-    elementKey: ElementKey,
-    scene: Scene,
-    /**
-     * needed because of frame exporting hack.
-     * elementId:Scene mapping will be removed completely, soon.
-     */
-    mapElementIds = true,
-  ) {
+  static mapElementToScene(elementKey: ElementKey, scene: Scene) {
     if (isIdKey(elementKey)) {
-      if (!mapElementIds) {
-        return;
-      }
       // for cases where we don't have access to the element object
       // (e.g. restore serialized appState with id references)
       this.sceneMapById.set(elementKey, scene);
     } else {
       this.sceneMapByElement.set(elementKey, scene);
-      if (!mapElementIds) {
-        // if mapping element objects, also cache the id string when later
-        // looking up by id alone
-        this.sceneMapById.set(elementKey.id, scene);
-      }
+      // if mapping element objects, also cache the id string when later
+      // looking up by id alone
+      this.sceneMapById.set(elementKey.id, scene);
     }
   }
 
+  /**
+   * @deprecated pass down `app.scene` and use it directly
+   */
   static getScene(elementKey: ElementKey): Scene | null {
     if (isIdKey(elementKey)) {
       return this.sceneMapById.get(elementKey) || null;
@@ -119,11 +146,13 @@ class Scene {
 
   private callbacks: Set<SceneStateCallback> = new Set();
 
-  private nonDeletedElements: readonly NonDeletedExcalidrawElement[] = [];
+  private nonDeletedElements: readonly Ordered<NonDeletedExcalidrawElement>[] =
+    [];
   private nonDeletedElementsMap = toBrandedType<NonDeletedSceneElementsMap>(
     new Map(),
   );
-  private elements: readonly ExcalidrawElement[] = [];
+  // ideally all elements within the scene should be wrapped around with `Ordered` type, but right now there is no real benefit doing so
+  private elements: readonly OrderedExcalidrawElement[] = [];
   private nonDeletedFramesLikes: readonly NonDeleted<ExcalidrawFrameLikeElement>[] =
     [];
   private frames: readonly ExcalidrawFrameLikeElement[] = [];
@@ -137,10 +166,16 @@ class Scene {
     elements: null,
     cache: new Map(),
   };
-  private versionNonce: number | undefined;
+  /**
+   * Random integer regenerated each scene update.
+   *
+   * Does not relate to elements versions, it's only a renderer
+   * cache-invalidation nonce at the moment.
+   */
+  private sceneNonce: number | undefined;
 
-  getElementsMapIncludingDeleted() {
-    return this.elementsMap;
+  getSceneNonce() {
+    return this.sceneNonce;
   }
 
   getNonDeletedElementsMap() {
@@ -151,7 +186,11 @@ class Scene {
     return this.elements;
   }
 
-  getNonDeletedElements(): readonly NonDeletedExcalidrawElement[] {
+  getElementsMapIncludingDeleted() {
+    return this.elementsMap;
+  }
+
+  getNonDeletedElements() {
     return this.nonDeletedElements;
   }
 
@@ -213,10 +252,6 @@ class Scene {
     return (this.elementsMap.get(id) as T | undefined) || null;
   }
 
-  getVersionNonce() {
-    return this.versionNonce;
-  }
-
   getNonDeletedElement(
     id: ExcalidrawElement["id"],
   ): NonDeleted<ExcalidrawElement> | null {
@@ -256,20 +291,24 @@ class Scene {
     return didChange;
   }
 
-  replaceAllElements(nextElements: ElementsMapOrArray, mapElementIds = true) {
-    this.elements =
+  replaceAllElements(nextElements: ElementsMapOrArray) {
+    const _nextElements =
       // ts doesn't like `Array.isArray` of `instanceof Map`
       nextElements instanceof Array
         ? nextElements
         : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
+
+    validateIndicesThrottled(_nextElements);
+
+    this.elements = syncInvalidIndices(_nextElements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
         nextFrameLikes.push(element);
       }
       this.elementsMap.set(element.id, element);
-      Scene.mapElementToScene(element, this, mapElementIds);
+      Scene.mapElementToScene(element, this);
     });
     const nonDeletedElements = getNonDeletedElements(this.elements);
     this.nonDeletedElements = nonDeletedElements.elements;
@@ -278,18 +317,18 @@ class Scene {
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
 
-    this.informMutation();
+    this.triggerUpdate();
   }
 
-  informMutation() {
-    this.versionNonce = randomInteger();
+  triggerUpdate() {
+    this.sceneNonce = randomInteger();
 
     for (const callback of Array.from(this.callbacks)) {
       callback();
     }
   }
 
-  addCallback(cb: SceneStateCallback): SceneStateCallbackRemover {
+  onUpdate(cb: SceneStateCallback): SceneStateCallbackRemover {
     if (this.callbacks.has(cb)) {
       throw new Error();
     }
@@ -305,8 +344,8 @@ class Scene {
   }
 
   destroy() {
-    this.nonDeletedElements = [];
     this.elements = [];
+    this.nonDeletedElements = [];
     this.nonDeletedFramesLikes = [];
     this.frames = [];
     this.elementsMap.clear();
@@ -331,35 +370,58 @@ class Scene {
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
+
     const nextElements = [
       ...this.elements.slice(0, index),
       element,
       ...this.elements.slice(index),
     ];
+
+    syncMovedIndices(nextElements, arrayToMap([element]));
+
     this.replaceAllElements(nextElements);
   }
 
   insertElementsAtIndex(elements: ExcalidrawElement[], index: number) {
+    if (!elements.length) {
+      return;
+    }
+
     if (!Number.isFinite(index) || index < 0) {
       throw new Error(
         "insertElementAtIndex can only be called with index >= 0",
       );
     }
+
     const nextElements = [
       ...this.elements.slice(0, index),
       ...elements,
       ...this.elements.slice(index),
     ];
 
+    syncMovedIndices(nextElements, arrayToMap(elements));
+
     this.replaceAllElements(nextElements);
   }
 
-  addNewElement = (element: ExcalidrawElement) => {
-    if (element.frameId) {
-      this.insertElementAtIndex(element, this.getElementIndex(element.frameId));
-    } else {
-      this.replaceAllElements([...this.elements, element]);
+  insertElement = (element: ExcalidrawElement) => {
+    const index = element.frameId
+      ? this.getElementIndex(element.frameId)
+      : this.elements.length;
+
+    this.insertElementAtIndex(element, index);
+  };
+
+  insertElements = (elements: ExcalidrawElement[]) => {
+    if (!elements.length) {
+      return;
     }
+
+    const index = elements[0]?.frameId
+      ? this.getElementIndex(elements[0].frameId)
+      : this.elements.length;
+
+    this.insertElementsAtIndex(elements, index);
   };
 
   getElementIndex(elementId: string) {
@@ -380,6 +442,18 @@ class Scene {
       return this.getElement(element.containerId) || null;
     }
     return null;
+  };
+
+  getElementsFromId = (id: string): ExcalidrawElement[] => {
+    const elementsMap = this.getNonDeletedElementsMap();
+    // first check if the id is an element
+    const el = elementsMap.get(id);
+    if (el) {
+      return [el];
+    }
+
+    // then, check if the id is a group
+    return getElementsInGroup(elementsMap, id);
   };
 }
 

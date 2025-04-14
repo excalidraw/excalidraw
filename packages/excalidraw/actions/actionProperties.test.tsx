@@ -1,12 +1,16 @@
-import { Excalidraw } from "../index";
 import { queryByTestId } from "@testing-library/react";
-import { render } from "../tests/test-utils";
-import { UI } from "../tests/helpers/ui";
-import { API } from "../tests/helpers/api";
-import { COLOR_PALETTE, DEFAULT_ELEMENT_BACKGROUND_PICKS } from "../colors";
-import { FONT_FAMILY, STROKE_WIDTH } from "../constants";
 
-const { h } = window;
+import {
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  FONT_FAMILY,
+  STROKE_WIDTH,
+} from "@excalidraw/common";
+
+import { Excalidraw } from "../index";
+import { API } from "../tests/helpers/api";
+import { UI } from "../tests/helpers/ui";
+import { render } from "../tests/test-utils";
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -22,7 +26,7 @@ describe("element locking", () => {
       // just in case we change it in the future
       expect(color).not.toBe(COLOR_PALETTE.transparent);
 
-      h.setState({
+      API.setAppState({
         currentItemBackgroundColor: color,
       });
       const activeColor = queryByTestId(
@@ -40,14 +44,14 @@ describe("element locking", () => {
       // just in case we change it in the future
       expect(color).not.toBe(COLOR_PALETTE.transparent);
 
-      h.setState({
+      API.setAppState({
         currentItemBackgroundColor: color,
         currentItemFillStyle: "hachure",
       });
       const hachureFillButton = queryByTestId(document.body, `fill-hachure`);
 
       expect(hachureFillButton).toHaveClass("active");
-      h.setState({
+      API.setAppState({
         currentItemFillStyle: "solid",
       });
       const solidFillStyle = queryByTestId(document.body, `fill-solid`);
@@ -57,7 +61,7 @@ describe("element locking", () => {
     it("should not show fill style when background transparent", () => {
       UI.clickTool("rectangle");
 
-      h.setState({
+      API.setAppState({
         currentItemBackgroundColor: COLOR_PALETTE.transparent,
         currentItemFillStyle: "hachure",
       });
@@ -69,7 +73,7 @@ describe("element locking", () => {
     it("should show horizontal text align for text tool", () => {
       UI.clickTool("text");
 
-      h.setState({
+      API.setAppState({
         currentItemTextAlign: "right",
       });
 
@@ -85,7 +89,7 @@ describe("element locking", () => {
         backgroundColor: "red",
         fillStyle: "cross-hatch",
       });
-      h.elements = [rect];
+      API.setElements([rect]);
       API.setSelectedElements([rect]);
 
       const crossHatchButton = queryByTestId(document.body, `fill-cross-hatch`);
@@ -98,7 +102,7 @@ describe("element locking", () => {
         backgroundColor: COLOR_PALETTE.transparent,
         fillStyle: "cross-hatch",
       });
-      h.elements = [rect];
+      API.setElements([rect]);
       API.setSelectedElements([rect]);
 
       const crossHatchButton = queryByTestId(document.body, `fill-cross-hatch`);
@@ -114,7 +118,7 @@ describe("element locking", () => {
         type: "rectangle",
         strokeWidth: STROKE_WIDTH.thin,
       });
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
       API.setSelectedElements([rect1, rect2]);
 
       const thinStrokeWidthButton = queryByTestId(
@@ -133,7 +137,7 @@ describe("element locking", () => {
         type: "rectangle",
         strokeWidth: STROKE_WIDTH.bold,
       });
-      h.elements = [rect1, rect2];
+      API.setElements([rect1, rect2]);
       API.setSelectedElements([rect1, rect2]);
 
       expect(queryByTestId(document.body, `strokeWidth-thin`)).not.toBe(null);
@@ -155,13 +159,15 @@ describe("element locking", () => {
       });
       const text = API.createElement({
         type: "text",
-        fontFamily: FONT_FAMILY.Cascadia,
+        fontFamily: FONT_FAMILY["Comic Shanns"],
       });
-      h.elements = [rect, text];
+      API.setElements([rect, text]);
       API.setSelectedElements([rect, text]);
 
       expect(queryByTestId(document.body, `strokeWidth-bold`)).toBeChecked();
-      expect(queryByTestId(document.body, `font-family-code`)).toBeChecked();
+      expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
+        "active",
+      );
     });
   });
 });

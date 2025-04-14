@@ -1,36 +1,46 @@
 import {
-  isTextElement,
-  isExcalidrawElement,
-  redrawTextBoundingBox,
-} from "../element";
-import { CODES, KEYS } from "../keys";
-import { t } from "../i18n";
-import { register } from "./register";
-import { newElementWith } from "../element/mutateElement";
-import {
   DEFAULT_FONT_SIZE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_TEXT_ALIGN,
-} from "../constants";
-import {
-  getBoundTextElement,
-  getDefaultLineHeight,
-} from "../element/textElement";
+  CODES,
+  KEYS,
+  getLineHeight,
+} from "@excalidraw/common";
+
+import { newElementWith } from "@excalidraw/element/mutateElement";
+
 import {
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
-} from "../element/typeChecks";
+  isExcalidrawElement,
+  isTextElement,
+} from "@excalidraw/element/typeChecks";
+
+import {
+  getBoundTextElement,
+  redrawTextBoundingBox,
+} from "@excalidraw/element/textElement";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
+import { paintIcon } from "../components/icons";
+
+import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
-import { ExcalidrawTextElement } from "../element/types";
+import { CaptureUpdateAction } from "../store";
+
+import { register } from "./register";
 
 // `copiedStyles` is exported only for tests.
 export let copiedStyles: string = "{}";
 
 export const actionCopyStyles = register({
   name: "copyStyles",
+  label: "labels.copyStyles",
+  icon: paintIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = [];
@@ -51,23 +61,24 @@ export const actionCopyStyles = register({
         ...appState,
         toast: { message: t("toast.copyStyles") },
       },
-      commitToHistory: false,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  contextItemLabel: "labels.copyStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.C,
 });
 
 export const actionPasteStyles = register({
   name: "pasteStyles",
+  label: "labels.pasteStyles",
+  icon: paintIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     const elementsCopied = JSON.parse(copiedStyles);
     const pastedElement = elementsCopied[0];
     const boundTextElement = elementsCopied[1];
     if (!isExcalidrawElement(pastedElement)) {
-      return { elements, commitToHistory: false };
+      return { elements, captureUpdate: CaptureUpdateAction.EVENTUALLY };
     }
 
     const selectedElements = getSelectedElements(elements, appState, {
@@ -117,7 +128,7 @@ export const actionPasteStyles = register({
                 DEFAULT_TEXT_ALIGN,
               lineHeight:
                 (elementStylesToCopyFrom as ExcalidrawTextElement).lineHeight ||
-                getDefaultLineHeight(fontFamily),
+                getLineHeight(fontFamily),
             });
             let container = null;
             if (newElement.containerId) {
@@ -128,7 +139,11 @@ export const actionPasteStyles = register({
                     element.id === newElement.containerId,
                 ) || null;
             }
-            redrawTextBoundingBox(newElement, container);
+            redrawTextBoundingBox(
+              newElement,
+              container,
+              app.scene.getNonDeletedElementsMap(),
+            );
           }
 
           if (
@@ -152,10 +167,9 @@ export const actionPasteStyles = register({
         }
         return element;
       }),
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  contextItemLabel: "labels.pasteStyles",
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.V,
 });

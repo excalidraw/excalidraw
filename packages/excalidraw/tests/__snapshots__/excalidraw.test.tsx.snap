@@ -11,11 +11,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
   >
     <button
       class="dropdown-menu-item dropdown-menu-item-base"
-      type="button"
     >
-      <div
-        class="dropdown-menu-item__icon"
-      />
       <div
         class="dropdown-menu-item__text"
       >
@@ -28,9 +24,6 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       rel="noreferrer"
       target="_blank"
     >
-      <div
-        class="dropdown-menu-item__icon"
-      />
       <div
         class="dropdown-menu-item__text"
       >
@@ -51,7 +44,6 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
       title="Help"
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -122,7 +114,6 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="load-button"
       title="Open"
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -160,7 +151,6 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="json-export-button"
       title="Save to..."
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -193,7 +183,6 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="image-export-button"
       title="Export image..."
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -251,11 +240,59 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       </div>
     </button>
     <button
+      aria-label="Find on canvas"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="search-menu-button"
+      title="Find on canvas"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-width="1.5"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"
+            />
+            <path
+              d="M21 21l-6 -6"
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        Find on canvas
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Ctrl+F
+      </div>
+    </button>
+    <button
       aria-label="Help"
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="help-menu-item"
       title="Help"
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -313,7 +350,6 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="clear-canvas-button"
       title="Reset the canvas"
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -481,7 +517,6 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       class="dropdown-menu-item dropdown-menu-item-base"
       data-testid="toggle-dark-mode"
       title="Dark mode"
-      type="button"
     >
       <div
         class="dropdown-menu-item__icon"
@@ -537,7 +572,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               class="color-picker__top-picks"
             >
               <button
-                class="color-picker__button active"
+                class="color-picker__button active has-outline"
                 data-testid="color-top-pick-#ffffff"
                 style="--swatch-color: #ffffff;"
                 title="#ffffff"
@@ -548,7 +583,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
                 />
               </button>
               <button
-                class="color-picker__button"
+                class="color-picker__button has-outline"
                 data-testid="color-top-pick-#f8f9fa"
                 style="--swatch-color: #f8f9fa;"
                 title="#f8f9fa"
@@ -559,7 +594,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
                 />
               </button>
               <button
-                class="color-picker__button"
+                class="color-picker__button has-outline"
                 data-testid="color-top-pick-#f5faff"
                 style="--swatch-color: #f5faff;"
                 title="#f5faff"
@@ -570,7 +605,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
                 />
               </button>
               <button
-                class="color-picker__button"
+                class="color-picker__button has-outline"
                 data-testid="color-top-pick-#fffce8"
                 style="--swatch-color: #fffce8;"
                 title="#fffce8"
@@ -581,7 +616,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
                 />
               </button>
               <button
-                class="color-picker__button"
+                class="color-picker__button has-outline"
                 data-testid="color-top-pick-#fdf8f6"
                 style="--swatch-color: #fdf8f6;"
                 title="#fdf8f6"
@@ -593,14 +628,14 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               </button>
             </div>
             <div
-              style="width: 1px; height: 100%; margin: 0px auto;"
+              style="width: 1px; height: 1rem; margin: 0px auto;"
             />
             <button
               aria-controls="radix-:r0:"
               aria-expanded="false"
               aria-haspopup="dialog"
               aria-label="Canvas background"
-              class="color-picker__button active-color"
+              class="color-picker__button active-color properties-trigger has-outline"
               data-state="closed"
               style="--swatch-color: #ffffff;"
               title="Show background color picker"

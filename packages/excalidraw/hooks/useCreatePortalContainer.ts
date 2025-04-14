@@ -1,4 +1,7 @@
 import { useState, useLayoutEffect } from "react";
+
+import { THEME } from "@excalidraw/common";
+
 import { useDevice, useExcalidrawContainer } from "../components/App";
 import { useUIAppState } from "../context/ui-appState";
 
@@ -18,7 +21,7 @@ export const useCreatePortalContainer = (opts?: {
       div.className = "";
       div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
       div.classList.toggle("excalidraw--mobile", device.editor.isMobile);
-      div.classList.toggle("theme--dark", theme === "dark");
+      div.classList.toggle("theme--dark", theme === THEME.DARK);
     }
   }, [div, theme, device.editor.isMobile, opts?.className]);
 

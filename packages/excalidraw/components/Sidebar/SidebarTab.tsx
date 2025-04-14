@@ -1,5 +1,6 @@
 import * as RadixTabs from "@radix-ui/react-tabs";
-import { SidebarTabName } from "../../types";
+
+import type { SidebarTabName } from "../../types";
 
 export const SidebarTab = ({
   tab,
@@ -10,7 +11,7 @@ export const SidebarTab = ({
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <RadixTabs.Content {...rest} value={tab}>
+    <RadixTabs.Content {...rest} value={tab} data-testid={tab}>
       {children}
     </RadixTabs.Content>
   );

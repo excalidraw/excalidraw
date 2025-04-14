@@ -1,6 +1,8 @@
-import { UserToFollow } from "../../types";
 import { CloseIcon } from "../icons";
+
 import "./FollowMode.scss";
+
+import type { UserToFollow } from "../../types";
 
 interface FollowModeProps {
   width: number;
@@ -27,7 +29,11 @@ const FollowMode = ({
             {userToFollow.username}
           </span>
         </div>
-        <button onClick={onDisconnect} className="follow-mode__disconnect-btn">
+        <button
+          type="button"
+          onClick={onDisconnect}
+          className="follow-mode__disconnect-btn"
+        >
           {CloseIcon}
         </button>
       </div>

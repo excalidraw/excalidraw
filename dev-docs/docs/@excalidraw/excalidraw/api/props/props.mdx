@@ -5,30 +5,31 @@ All `props` are _optional_.
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | [`initialData`](/docs/@excalidraw/excalidraw/api/props/initialdata) | `object` &#124; `null` &#124; <code>Promise<object &#124; null></code> | `null` | The initial data with which app loads. |
-| [`excalidrawAPI`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) | `function` | _ | Callback triggered with the excalidraw api once rendered |
-| [`isCollaborating`](#iscollaborating) | `boolean` | _ | This indicates if the app is in `collaboration` mode |
-| [`onChange`](#onchange) | `function` | _ | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw `elements` and the current `app state`. |
-| [`onPointerUpdate`](#onpointerupdate) | `function` | _ | Callback triggered when mouse pointer is updated. |
-| [`onPointerDown`](#onpointerdown) | `function` | _ | This prop if passed gets triggered on pointer down evenets |
-| [`onScrollChange`](#onscrollchange) | `function` | _ | This prop if passed gets triggered when scrolling the canvas. |
-| [`onPaste`](#onpaste) | `function` | _ | Callback to be triggered if passed when the something is pasted in to the scene |
-| [`onLibraryChange`](#onlibrarychange) | `function` | _ | The callback if supplied is triggered when the library is updated and receives the library items. |
-| [`onLinkOpen`](#onlinkopen) | `function` | _ | The callback if supplied is triggered when any link is opened. |
+| [`excalidrawAPI`](/docs/@excalidraw/excalidraw/api/props/excalidraw-api) | `function` | \_ | Callback triggered with the excalidraw api once rendered |
+| [`isCollaborating`](#iscollaborating) | `boolean` | \_ | This indicates if the app is in `collaboration` mode |
+| [`onChange`](#onchange) | `function` | \_ | This callback is triggered whenever the component updates due to any change. This callback will receive the excalidraw `elements` and the current `app state`. |
+| [`onPointerUpdate`](#onpointerupdate) | `function` | \_ | Callback triggered when mouse pointer is updated. |
+| [`onPointerDown`](#onpointerdown) | `function` | \_ | This prop if passed gets triggered on pointer down events |
+| [`onScrollChange`](#onscrollchange) | `function` | \_ | This prop if passed gets triggered when scrolling the canvas. |
+| [`onPaste`](#onpaste) | `function` | \_ | Callback to be triggered if passed when something is pasted into the scene |
+| [`onLibraryChange`](#onlibrarychange) | `function` | \_ | The callback if supplied is triggered when the library is updated and receives the library items. |
+| [`generateLinkForSelection`](#generatelinkforselection) | `function` | \_ | Allows you to override `url` generation when linking to Excalidraw elements. |
+| [`onLinkOpen`](#onlinkopen) | `function` | \_ | The callback if supplied is triggered when any link is opened. |
 | [`langCode`](#langcode) | `string` | `en` | Language code string to be used in Excalidraw |
-| [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | _ | Render function that renders custom UI in top right corner |
-| [`renderCustomStats`](/docs/@excalidraw/excalidraw/api/props/render-props#rendercustomstats) | `function` | _ | Render function that can be used to render custom stats on the stats dialog. |
-| [`viewModeEnabled`](#viewmodeenabled) | `boolean` | _ | This indicates if the app is in `view` mode. |
-| [`zenModeEnabled`](#zenmodeenabled) | `boolean` | _ | This indicates if the `zen` mode is enabled |
-| [`gridModeEnabled`](#gridmodeenabled) | `boolean` | _ | This indicates if the `grid` mode is enabled |
-| [`libraryReturnUrl`](#libraryreturnurl) | `string` | _ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
+| [`renderTopRightUI`](/docs/@excalidraw/excalidraw/api/props/render-props#rendertoprightui) | `function` | \_ | Render function that renders custom UI in top right corner |
+| [`renderCustomStats`](/docs/@excalidraw/excalidraw/api/props/render-props#rendercustomstats) | `function` | \_ | Render function that can be used to render custom stats on the stats dialog. |
+| [`viewModeEnabled`](#viewmodeenabled) | `boolean` | \_ | This indicates if the app is in `view` mode. |
+| [`zenModeEnabled`](#zenmodeenabled) | `boolean` | \_ | This indicates if the `zen` mode is enabled |
+| [`gridModeEnabled`](#gridmodeenabled) | `boolean` | \_ | This indicates if the `grid` mode is enabled |
+| [`libraryReturnUrl`](#libraryreturnurl) | `string` | \_ | What URL should [libraries.excalidraw.com](https://libraries.excalidraw.com) be installed to |
 | [`theme`](#theme) | `"light"` &#124; `"dark"` | `"light"` | The theme of the Excalidraw component |
 | [`name`](#name) | `string` |  | Name of the drawing |
 | [`UIOptions`](/docs/@excalidraw/excalidraw/api/props/ui-options) | `object` | [DEFAULT UI OPTIONS](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/constants.ts#L151) | To customise UI options. Currently we support customising [`canvas actions`](/docs/@excalidraw/excalidraw/api/props/ui-options#canvasactions) |
 | [`detectScroll`](#detectscroll) | `boolean` | `true` | Indicates whether to update the offsets when nearest ancestor is scrolled. |
 | [`handleKeyboardGlobally`](#handlekeyboardglobally) | `boolean` | `false` | Indicates whether to bind the keyboard events to document. |
-| [`autoFocus`](#autofocus) | `boolean` | `false` | indicates whether to focus the Excalidraw component on page load |
-| [`generateIdForFile`](#generateidforfile) | `function` | _ | Allows you to override `id` generation for files added on canvas |
-| [`validateEmbeddable`](#validateEmbeddable) | string[] | `boolean | RegExp | RegExp[] | ((link: string) => boolean | undefined)` | \_ | use for custom src url validation |
+| [`autoFocus`](#autofocus) | `boolean` | `false` | Indicates whether to focus the Excalidraw component on page load |
+| [`generateIdForFile`](#generateidforfile) | `function` | \_ | Allows you to override `id` generation for files added on canvas |
+| [`validateEmbeddable`](#validateembeddable) | `string[]` \| `boolean` \| `RegExp` \| `RegExp[]` \| <code>((link: string) => boolean &#124; undefined)</code> | \_ | use for custom src url validation |
 | [`renderEmbeddable`](/docs/@excalidraw/excalidraw/api/props/render-props#renderEmbeddable) | `function` | \_ | Render function that can override the built-in `<iframe>` |
 
 ### Storing custom data on Excalidraw elements
@@ -93,9 +94,8 @@ This callback is triggered when mouse pointer is updated.
 
 This prop if passed will be triggered on pointer down events and has the below signature.
 
-
 <pre>
-(activeTool:{" "}
+  (activeTool:{" "}
   <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L115">
     {" "}
     AppState["activeTool"]
@@ -142,6 +142,14 @@ This callback if supplied will get triggered when the library is updated and has
 </pre>
 
 It is invoked with empty items when user clears the library. You can use this callback when you want to do something additional when library is updated for example persisting it to local storage.
+
+### generateLinkForSelection
+
+This prop if passed will be used to replace the default link generation function. The idea is that the host app can take over the creation of element links, which can be used to navigate to a particular element or a group. If the host app chooses a different key for element link id, then the host app should also take care of the handling and the navigation in `onLinkOpen`.
+
+```tsx
+(id: string, type: "element" | "group") => string;
+```
 
 ### onLinkOpen
 
@@ -207,8 +215,7 @@ This prop indicates whether the shows the grid. When supplied, the value takes p
 
 ### libraryReturnUrl
 
-If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com).  
-Defaults to _window.location.origin + window.location.pathname_. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
+If supplied, this URL will be used when user tries to install a library from [libraries.excalidraw.com](https://libraries.excalidraw.com). Defaults to _window.location.origin + window.location.pathname_. To install the libraries in the same tab from which it was opened, you need to set `window.name` (to any alphanumeric string) — if it's not set it will open in a new tab.
 
 ### theme
 
@@ -219,7 +226,6 @@ You can use [`THEME`](/docs/@excalidraw/excalidraw/api/utils#theme) to specify t
 ### name
 
 This prop sets the `name` of the drawing which will be used when exporting the drawing. When supplied, the value takes precedence over _intialData.appState.name_, the `name` will be fully controlled by host app and the users won't be able to edit from within Excalidraw.
-
 
 ### detectScroll
 

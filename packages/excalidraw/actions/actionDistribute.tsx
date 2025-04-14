@@ -1,19 +1,31 @@
+import { getNonDeletedElements } from "@excalidraw/element";
+
+import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+
+import { CODES, KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
+
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
+
+import { distributeElements } from "@excalidraw/element/distribute";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Distribution } from "@excalidraw/element/distribute";
+
+import { ToolButton } from "../components/ToolButton";
 import {
   DistributeHorizontallyIcon,
   DistributeVerticallyIcon,
 } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
-import { distributeElements, Distribution } from "../distribute";
-import { getNonDeletedElements } from "../element";
-import { isFrameLikeElement } from "../element/typeChecks";
-import { ExcalidrawElement } from "../element/types";
-import { updateFrameMembershipOfSelectedElements } from "../frame";
+
 import { t } from "../i18n";
-import { CODES, KEYS } from "../keys";
+
 import { isSomeElementSelected } from "../scene";
-import { AppClassProperties, AppState } from "../types";
-import { arrayToMap, getShortcutKey } from "../utils";
+import { CaptureUpdateAction } from "../store";
+
 import { register } from "./register";
+
+import type { AppClassProperties, AppState } from "../types";
 
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);
@@ -49,6 +61,7 @@ const distributeSelectedElements = (
 
 export const distributeHorizontally = register({
   name: "distributeHorizontally",
+  label: "labels.distributeHorizontally",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -57,7 +70,7 @@ export const distributeHorizontally = register({
         space: "between",
         axis: "x",
       }),
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>
@@ -79,6 +92,7 @@ export const distributeHorizontally = register({
 
 export const distributeVertically = register({
   name: "distributeVertically",
+  label: "labels.distributeVertically",
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -87,7 +101,7 @@ export const distributeVertically = register({
         space: "between",
         axis: "y",
       }),
-      commitToHistory: true,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   keyTest: (event) =>
