@@ -1,5 +1,5 @@
-import type { ActionManager } from "../../actions/manager";
-import type { Action } from "../../actions/types";
+import type { ActionManager } from "../../src/actions/manager";
+import type { Action } from "../../src/actions/types";
 import type { UIAppState } from "../../types";
 
 export type CommandPaletteItem = {

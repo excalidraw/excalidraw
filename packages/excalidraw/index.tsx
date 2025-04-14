@@ -286,7 +286,7 @@ export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
 
-export { zoomToFitBounds } from "./actions/actionCanvas";
+export { zoomToFitBounds } from "./src/actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";
 export {
   getCommonBounds,

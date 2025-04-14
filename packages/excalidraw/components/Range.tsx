@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { getFormValue } from "../actions/actionProperties";
+import { getFormValue } from "../src/actions/actionProperties";
 import { t } from "../i18n";
 
 import "./Range.scss";

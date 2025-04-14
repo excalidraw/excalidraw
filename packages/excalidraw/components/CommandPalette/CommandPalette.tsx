@@ -17,12 +17,12 @@ import {
   actionClearCanvas,
   actionLink,
   actionToggleSearchMenu,
-} from "../../actions";
+} from "../../src/actions";
 import {
   actionCopyElementLink,
   actionLinkToElement,
-} from "../../actions/actionElementLink";
-import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+} from "../../src/actions/actionElementLink";
+import { getShortcutFromShortcutName } from "../../src/actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { deburr } from "../../deburr";
@@ -63,9 +63,9 @@ import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
 import type { AppProps, AppState, UIAppState } from "../../types";
-import type { ShortcutName } from "../../actions/shortcuts";
+import type { ShortcutName } from "../../src/actions/shortcuts";
 import type { TranslationKeys } from "../../i18n";
-import type { Action } from "../../actions/types";
+import type { Action } from "../../src/actions/types";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);
 

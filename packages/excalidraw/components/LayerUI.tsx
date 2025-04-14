@@ -18,7 +18,7 @@ import { ShapeCache } from "@excalidraw/element/ShapeCache";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import Scene from "../scene/Scene";
-import { actionToggleStats } from "../actions";
+import { actionToggleStats } from "../src/actions";
 import { trackEvent } from "../analytics";
 import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
@@ -62,7 +62,7 @@ import { LaserPointerButton } from "./LaserPointerButton";
 import "./LayerUI.scss";
 import "./Toolbar.scss";
 
-import type { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../src/actions/manager";
 
 import type { Language } from "../i18n";
 import type {

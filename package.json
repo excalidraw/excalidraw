@@ -72,7 +72,7 @@
     "fix:other": "yarn prettier --write",
     "fix": "yarn fix:other && yarn fix:code",
     "locales-coverage": "node scripts/build-locales-coverage.js",
-    "locales-coverage:description": "node scripts/locales-coverage-description.js",
+    "locales-coverage:description": "node scripts/locales-cov+erage-description.js",
     "prepare": "husky install",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "autorelease": "node scripts/autorelease.js",

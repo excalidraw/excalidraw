@@ -11,8 +11,8 @@ import {
   actionShortcuts,
   actionToggleSearchMenu,
   actionToggleTheme,
-} from "../../actions";
-import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+} from "../../src/actions";
+import { getShortcutFromShortcutName } from "../../src/actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
 import { useSetAtom } from "../../editor-jotai";
