@@ -19,7 +19,7 @@ import {
   type Heading,
 } from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
-import { mutateElement } from "./mutateElement";
+import { mutateElementWith } from "./mutateElement";
 import { newArrowElement, newElement } from "./newElement";
 import { aabbForElement } from "./shapes";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
@@ -678,7 +678,7 @@ export class FlowChartCreator {
         )
       ) {
         this.pendingNodes = this.pendingNodes.map((node) =>
-          mutateElement(node, {
+          mutateElementWith(node, elementsMap, {
             frameId: startNode.frameId,
           }),
         );

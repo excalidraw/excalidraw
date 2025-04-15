@@ -5,7 +5,6 @@ import {
   getElementPointsCoords,
 } from "@excalidraw/element/bounds";
 import { cropElement } from "@excalidraw/element/cropElement";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -519,7 +518,7 @@ export class UI {
 
     if (angle !== 0) {
       act(() => {
-        mutateElement(origElement, { angle });
+        h.app.scene.mutate(origElement, { angle });
       });
     }
 

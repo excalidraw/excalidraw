@@ -6,7 +6,6 @@ import { pointFrom, type LocalPoint, type Radians } from "@excalidraw/math";
 
 import { DEFAULT_VERTICAL_ALIGN, ROUNDNESS, assertNever } from "@excalidraw/common";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   newArrowElement,
   newElement,
@@ -100,10 +99,10 @@ export class API {
 
   // eslint-disable-next-line prettier/prettier
   static updateElement = <T extends ExcalidrawElement>(
-    ...args: Parameters<typeof mutateElement<T>>
+    ...args: Parameters<typeof h.app.scene.mutate<T>>
   ) => {
     act(() => {
-      mutateElement<T>(...args);
+      h.app.scene.mutate(...args);
     });
   };
 
@@ -419,7 +418,7 @@ export class API {
 
     });
 
-    mutateElement(
+    h.app.scene.mutate(
       rectangle,
       {
         boundElements: [{ type: "text", id: text.id }],
@@ -453,7 +452,7 @@ export class API {
           : opts?.label?.frameId ?? null,
     });
 
-    mutateElement(
+    h.app.scene.mutate(
       arrow,
       {
         boundElements: [{ type: "text", id: text.id }],

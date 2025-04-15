@@ -1686,7 +1686,7 @@ class App extends React.Component<AppProps, AppState> {
                             <Hyperlink
                               key={firstSelectedElement.id}
                               element={firstSelectedElement}
-                              elementsMap={allElementsMap}
+                              scene={this.scene}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
                               setToast={this.setToast}

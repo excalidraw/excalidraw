@@ -47,7 +47,7 @@ import {
 } from "./bounds";
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
-import { mutateElementWith, mutateElement } from "./mutateElement";
+import { mutateElementWith } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isBindingElement,
@@ -356,7 +356,7 @@ export class LinearElementEditor {
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        handleBindTextResize(element, elementsMap, false);
+        handleBindTextResize(element, scene, false);
       }
 
       // suggest bindings for first and last point if selected
@@ -1571,7 +1571,7 @@ export class LinearElementEditor {
       elementsMap,
     );
     if (points.length < 2) {
-      mutateElement(boundTextElement, { isDeleted: true });
+      mutateElementWith(boundTextElement, elementsMap, { isDeleted: true });
     }
     let x = 0;
     let y = 0;

@@ -490,7 +490,7 @@ const LayerUI = ({
               openDialog: null,
             });
           }}
-          elementsMap={app.scene.getNonDeletedElementsMap()}
+          scene={app.scene}
           appState={appState}
           generateLinkForSelection={generateLinkForSelection}
         />

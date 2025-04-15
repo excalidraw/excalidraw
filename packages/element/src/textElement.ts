@@ -18,7 +18,6 @@ import {
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
 
-import { mutateElement } from "./mutateElement";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
@@ -126,10 +125,11 @@ export const redrawTextBoundingBox = (
 
 export const handleBindTextResize = (
   container: NonDeletedExcalidrawElement,
-  elementsMap: ElementsMap,
+  scene: Scene,
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
     return;
@@ -182,20 +182,20 @@ export const handleBindTextResize = (
           transformHandleType === "n")
           ? container.y - diff
           : container.y;
-      mutateElement(container, {
+      scene.mutate(container, {
         height: containerHeight,
         y: updatedY,
       });
     }
 
-    mutateElement(textElement, {
+    scene.mutate(textElement, {
       text,
       width: nextWidth,
       height: nextHeight,
     });
 
     if (!isArrowElement(container)) {
-      mutateElement(
+      scene.mutate(
         textElement,
         computeBoundTextPosition(container, textElement, elementsMap),
       );

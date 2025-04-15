@@ -99,7 +99,7 @@ const resizeElementInGroup = (
       });
       handleBindTextResize(
         latestElement,
-        elementsMap,
+        scene,
         property === "width" ? "e" : "s",
         true,
       );

@@ -30,7 +30,7 @@ import type {
   FontString,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, mutateElement } from "../index";
+import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 import { API } from "../tests/helpers/api";
@@ -118,7 +118,7 @@ describe("Test Linear Elements", () => {
       ],
       roundness,
     });
-    mutateElement(line, { points: line.points });
+    h.app.scene.mutate(line, { points: line.points });
     API.setElements([line]);
     mouse.clickAt(p1[0], p1[1]);
     return line;

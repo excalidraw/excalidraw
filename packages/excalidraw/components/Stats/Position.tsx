@@ -4,7 +4,6 @@ import {
   getFlipAdjustedCropPosition,
   getUncroppedWidthAndHeight,
 } from "@excalidraw/element/cropElement";
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import { isImageElement } from "@excalidraw/element/typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
@@ -101,7 +100,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
         };
       }
 
-      mutateElement(element, {
+      scene.mutate(element, {
         crop: nextCrop,
       });
 
@@ -119,7 +118,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       y: clamp(crop.y + changeInY, 0, crop.naturalHeight - crop.height),
     };
 
-    mutateElement(element, {
+    scene.mutate(element, {
       crop: nextCrop,
     });
 

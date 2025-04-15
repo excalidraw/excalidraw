@@ -15,7 +15,7 @@ import {
 } from "@excalidraw/element/containerCache";
 
 import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
-import { bumpVersion, mutateElement } from "@excalidraw/element/mutateElement";
+import { bumpVersion } from "@excalidraw/element/mutateElement";
 import {
   getBoundTextElementId,
   getContainerElement,
@@ -199,7 +199,7 @@ export const textWysiwyg = ({
             container.type,
           );
 
-          mutateElement(container, { height: targetContainerHeight });
+          app.scene.mutate(container, { height: targetContainerHeight });
           return;
         } else if (
           // autoshrink container height until original container height
@@ -212,7 +212,7 @@ export const textWysiwyg = ({
             height,
             container.type,
           );
-          mutateElement(container, { height: targetContainerHeight });
+          app.scene.mutate(container, { height: targetContainerHeight });
         } else {
           const { y } = computeBoundTextPosition(
             container,
@@ -285,7 +285,7 @@ export const textWysiwyg = ({
         editable.style.fontFamily = getFontFamilyString(updatedTextElement);
       }
 
-      mutateElement(updatedTextElement, { x: coordX, y: coordY });
+      app.scene.mutate(updatedTextElement, { x: coordX, y: coordY });
     }
   };
 
@@ -557,7 +557,7 @@ export const textWysiwyg = ({
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
-          mutateElement(container, {
+          app.scene.mutate(container, {
             boundElements: (container.boundElements || []).concat({
               type: "text",
               id: element.id,
@@ -568,7 +568,7 @@ export const textWysiwyg = ({
           bumpVersion(container);
         }
       } else {
-        mutateElement(container, {
+        app.scene.mutate(container, {
           boundElements: container.boundElements?.filter(
             (ele) =>
               !isTextElement(

@@ -25,7 +25,6 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { mutateElement } from "../src/mutateElement";
 import { duplicateElement, duplicateElements } from "../src/duplicate";
 
 import type { ExcalidrawLinearElement } from "../src/types";
@@ -63,7 +62,7 @@ describe("duplicating single elements", () => {
     // @ts-ignore
     element.__proto__ = { hello: "world" };
 
-    mutateElement(element, {
+    h.app.scene.mutate(element, {
       points: [pointFrom<LocalPoint>(1, 2), pointFrom<LocalPoint>(3, 4)],
     });
 

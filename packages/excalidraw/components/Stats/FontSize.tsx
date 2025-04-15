@@ -1,4 +1,3 @@
-import { mutateElement } from "@excalidraw/element/mutateElement";
 import {
   getBoundTextElement,
   redrawTextBoundingBox,
@@ -69,7 +68,7 @@ const handleFontSizeChange: DragInputCallbackType<
     }
 
     if (nextFontSize) {
-      mutateElement(latestElement, {
+      scene.mutate(latestElement, {
         fontSize: nextFontSize,
       });
       redrawTextBoundingBox(

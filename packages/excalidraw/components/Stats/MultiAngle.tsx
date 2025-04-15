@@ -1,7 +1,5 @@
 import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 
-import { mutateElement } from "@excalidraw/element/mutateElement";
-
 import { getBoundTextElement } from "@excalidraw/element/textElement";
 import { isArrowElement } from "@excalidraw/element/typeChecks";
 
@@ -55,13 +53,13 @@ const handleDegreeChange: DragInputCallbackType<
       if (!element) {
         continue;
       }
-      mutateElement(element, {
+      scene.mutate(element, {
         angle: nextAngle,
       });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement && !isArrowElement(element)) {
-        mutateElement(boundTextElement, { angle: nextAngle });
+        scene.mutate(boundTextElement, { angle: nextAngle });
       }
     }
 
@@ -89,13 +87,13 @@ const handleDegreeChange: DragInputCallbackType<
 
     const nextAngle = degreesToRadians(nextAngleInDegrees as Degrees);
 
-    mutateElement(latestElement, {
+    scene.mutate(latestElement, {
       angle: nextAngle,
     });
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {
-      mutateElement(boundTextElement, { angle: nextAngle });
+      scene.mutate(boundTextElement, { angle: nextAngle });
     }
   }
   scene.triggerUpdate();

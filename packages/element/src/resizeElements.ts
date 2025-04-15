@@ -962,8 +962,6 @@ export const resizeSingleElement = (
       informMutation: shouldInformMutation,
     });
 
-    const elementsMap = scene.getNonDeletedElementsMap();
-
     updateBoundElements(latestElement, scene, {
       // TODO: confirm with MARK if this actually makes sense
       newSize: { width: nextWidth, height: nextHeight },
@@ -976,7 +974,7 @@ export const resizeSingleElement = (
     }
     handleBindTextResize(
       latestElement,
-      elementsMap,
+      scene,
       handleDirection,
       shouldMaintainAspectRatio,
     );
@@ -1536,7 +1534,7 @@ export const resizeMultipleElements = (
           fontSize: boundTextFontSize,
           angle: isLinearElement(element) ? undefined : angle,
         });
-        handleBindTextResize(element, elementsMap, handleDirection, true);
+        handleBindTextResize(element, scene, handleDirection, true);
       }
     }
 

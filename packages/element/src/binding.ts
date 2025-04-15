@@ -48,7 +48,7 @@ import {
   type Heading,
 } from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
-import { mutateElementWith, mutateElement } from "./mutateElement";
+import { mutateElementWith } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   isArrowElement,
@@ -848,7 +848,7 @@ export const updateBoundElements = (
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
-      handleBindTextResize(element, elementsMap, false);
+      handleBindTextResize(element, scene, false);
     }
   });
 };
@@ -1499,7 +1499,7 @@ const fixReversedBindingsForBindables = (
         (el) => el.id === newArrowId,
       )! as ExcalidrawArrowElement;
 
-      mutateElement(newArrow, {
+      mutateElementWith(newArrow, originalElements, {
         startBinding:
           oldArrow.startBinding?.elementId === binding.id
             ? {
@@ -1515,7 +1515,7 @@ const fixReversedBindingsForBindables = (
               }
             : newArrow.endBinding,
       });
-      mutateElement(duplicate, {
+      mutateElementWith(duplicate, originalElements, {
         boundElements: [
           ...(duplicate.boundElements ?? []).filter(
             (el) => el.id !== binding.id && el.id !== newArrowId,
@@ -1529,7 +1529,7 @@ const fixReversedBindingsForBindables = (
     } else {
       // Linked arrow is outside the selection,
       // so we move the binding to the duplicate
-      mutateElement(oldArrow, {
+      mutateElementWith(oldArrow, originalElements, {
         startBinding:
           oldArrow.startBinding?.elementId === original.id
             ? {
@@ -1545,7 +1545,7 @@ const fixReversedBindingsForBindables = (
               }
             : oldArrow.endBinding,
       });
-      mutateElement(duplicate, {
+      mutateElementWith(duplicate, originalElements, {
         boundElements: [
           ...(duplicate.boundElements ?? []),
           {
@@ -1554,7 +1554,7 @@ const fixReversedBindingsForBindables = (
           },
         ],
       });
-      mutateElement(original, {
+      mutateElementWith(original, originalElements, {
         boundElements:
           original.boundElements?.filter((_, i) => i !== idx) ?? null,
       });
@@ -1580,13 +1580,13 @@ const fixReversedBindingsForArrows = (
       const newBindable = elementsWithClones.find(
         (el) => el.id === newBindableId,
       ) as ExcalidrawBindableElement;
-      mutateElement(duplicate, {
+      mutateElementWith(duplicate, originalElements, {
         [bindingProp]: {
           ...original[bindingProp],
           elementId: newBindableId,
         },
       });
-      mutateElement(newBindable, {
+      mutateElementWith(newBindable, originalElements, {
         boundElements: [
           ...(newBindable.boundElements ?? []).filter(
             (el) => el.id !== original.id && el.id !== duplicate.id,
@@ -1603,13 +1603,13 @@ const fixReversedBindingsForArrows = (
         (el) => el.id === oldBindableId,
       );
       if (originalBindable) {
-        mutateElement(duplicate, {
+        mutateElementWith(duplicate, originalElements, {
           [bindingProp]: original[bindingProp],
         });
-        mutateElement(original, {
+        mutateElementWith(original, originalElements, {
           [bindingProp]: null,
         });
-        mutateElement(originalBindable, {
+        mutateElementWith(originalBindable, originalElements, {
           boundElements: [
             ...(originalBindable.boundElements?.filter(
               (el) => el.id !== original.id,
@@ -1671,8 +1671,12 @@ export const fixBindingsAfterDeletion = (
   const elements = arrayToMap(sceneElements);
 
   for (const element of deletedElements) {
-    BoundElement.unbindAffected(elements, element, mutateElement);
-    BindableElement.unbindAffected(elements, element, mutateElement);
+    BoundElement.unbindAffected(elements, element, (element, updates) =>
+      mutateElementWith(element, elements, updates),
+    );
+    BindableElement.unbindAffected(elements, element, (element, updates) =>
+      mutateElementWith(element, elements, updates),
+    );
   }
 };
 
