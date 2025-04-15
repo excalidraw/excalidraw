@@ -444,7 +444,7 @@ const repairContainerElement = (
             // if defined, lest boundElements is stale
             !boundElement.containerId
           ) {
-            (boundElement as Mutable<ExcalidrawTextElement>).containerId =
+            (boundElement as Mutable<typeof boundElement>).containerId =
               container.id;
           }
         }
@@ -468,6 +468,10 @@ const repairBoundElement = (
   const container = boundElement.containerId
     ? elementsMap.get(boundElement.containerId)
     : null;
+
+  (boundElement as Mutable<typeof boundElement>).angle = (
+    isArrowElement(container) ? 0 : container?.angle ?? 0
+  ) as Radians;
 
   if (!container) {
     boundElement.containerId = null;
