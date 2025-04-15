@@ -42,7 +42,7 @@ import type {
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { getMimeType } from "../../data/blob";
+import { getMimeType } from "../../src/data/blob";
 import { createTestHook } from "../../components/App";
 import { getDefaultAppState } from "../../appState";
 import { GlobalTestState, createEvent, fireEvent, act } from "../test-utils";

@@ -10,8 +10,8 @@ import { MIME_TYPES, getFrame } from "@excalidraw/common";
 import {
   encryptData,
   generateEncryptionKey,
-} from "@excalidraw/excalidraw/data/encryption";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+} from "@excalidraw/excalidraw/src/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/src/data/json";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 

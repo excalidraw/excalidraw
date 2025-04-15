@@ -24,7 +24,7 @@ import * as toolQueries from "./queries/toolQueries";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
-import type { ImportedDataState } from "../data/types";
+import type { ImportedDataState } from "../src/data/types";
 
 export { cleanup as unmountComponent };
 

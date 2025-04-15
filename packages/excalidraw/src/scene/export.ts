@@ -53,13 +53,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../../appState";
-import {
-  base64ToString,
-  decode,
-  encode,
-  stringToBase64,
-} from "../../data/encode";
-import { serializeAsJSON } from "../../data/json";
+import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
+import { serializeAsJSON } from "../data/json";
 
 import { Fonts } from "../../fonts";
 

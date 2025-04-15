@@ -27,8 +27,8 @@ import {
   get,
 } from "idb-keyval";
 
-import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { LibraryPersistedData } from "@excalidraw/excalidraw/src/data/library";
+import type { ImportedDataState } from "@excalidraw/excalidraw/src/data/types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import type {
   AppState,

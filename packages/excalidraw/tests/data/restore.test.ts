@@ -15,10 +15,10 @@ import type {
 import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
-import * as restore from "../../data/restore";
+import * as restore from "../../src/data/restore";
 import { getDefaultAppState } from "../../appState";
 
-import type { ImportedDataState } from "../../data/types";
+import type { ImportedDataState } from "../../src/data/types";
 
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");

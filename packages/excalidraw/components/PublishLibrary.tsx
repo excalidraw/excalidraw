@@ -11,8 +11,8 @@ import {
   chunk,
 } from "@excalidraw/common";
 
-import { EditorLocalStorage } from "../data/EditorLocalStorage";
-import { canvasToBlob, resizeImageFile } from "../data/blob";
+import { EditorLocalStorage } from "../src/data/EditorLocalStorage";
+import { canvasToBlob, resizeImageFile } from "../src/data/blob";
 import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
@@ -24,7 +24,7 @@ import { CloseIcon } from "./icons";
 import "./PublishLibrary.scss";
 
 import type { ReactNode } from "react";
-import type { ExportedLibraryData } from "../data/types";
+import type { ExportedLibraryData } from "../src/data/types";
 import type { LibraryItems, LibraryItem, UIAppState } from "../types";
 
 interface PublishLibraryDataParams {

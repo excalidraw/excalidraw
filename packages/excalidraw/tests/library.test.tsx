@@ -8,9 +8,9 @@ import { getCommonBoundingBox } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawGenericElement } from "@excalidraw/element/types";
 
-import { parseLibraryJSON } from "../data/blob";
-import { serializeLibraryAsJSON } from "../data/json";
-import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import { parseLibraryJSON } from "../src/data/blob";
+import { serializeLibraryAsJSON } from "../src/data/json";
+import { distributeLibraryItemsOnSquareGrid } from "../src/data/library";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";

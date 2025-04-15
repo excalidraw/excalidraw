@@ -10,7 +10,7 @@ import { MIME_TYPES, arrayToMap } from "@excalidraw/common";
 
 import { duplicateElements } from "@excalidraw/element/duplicate";
 
-import { serializeLibraryAsJSON } from "../data/json";
+import { serializeLibraryAsJSON } from "../src/data/json";
 import { useLibraryCache } from "../src/hooks/useLibraryItemSvg";
 import { useScrollPosition } from "../src/hooks/useScrollPosition";
 import { t } from "../i18n";

@@ -33,7 +33,7 @@ import {
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
+import { loadFromBlob } from "@excalidraw/excalidraw/src/data/blob";
 import { useCallbackRefState } from "@excalidraw/excalidraw/src/hooks/useCallbackRefState";
 import { t } from "@excalidraw/excalidraw/i18n";
 
@@ -48,17 +48,20 @@ import {
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element/elementLink";
-import { restore, restoreAppState } from "@excalidraw/excalidraw/data/restore";
+import {
+  restore,
+  restoreAppState,
+} from "@excalidraw/excalidraw/src/data/restore";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
   useHandleLibrary,
-} from "@excalidraw/excalidraw/data/library";
+} from "@excalidraw/excalidraw/src/data/library";
 
-import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
-import type { RestoredDataState } from "@excalidraw/excalidraw/data/restore";
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/src/data/reconcile";
+import type { RestoredDataState } from "@excalidraw/excalidraw/src/data/restore";
 import type {
   FileId,
   NonDeletedExcalidrawElement,

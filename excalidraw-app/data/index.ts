@@ -1,21 +1,21 @@
 import {
   compressData,
   decompressData,
-} from "@excalidraw/excalidraw/data/encode";
+} from "@excalidraw/excalidraw/src/data/encode";
 import {
   decryptData,
   generateEncryptionKey,
   IV_LENGTH_BYTES,
-} from "@excalidraw/excalidraw/data/encryption";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { restore } from "@excalidraw/excalidraw/data/restore";
+} from "@excalidraw/excalidraw/src/data/encryption";
+import { serializeAsJSON } from "@excalidraw/excalidraw/src/data/json";
+import { restore } from "@excalidraw/excalidraw/src/data/restore";
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { bytesToHexString } from "@excalidraw/common";
 
 import type { UserIdleState } from "@excalidraw/common";
-import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { ImportedDataState } from "@excalidraw/excalidraw/src/data/types";
 import type { SceneBounds } from "@excalidraw/element/bounds";
 import type {
   ExcalidrawElement,

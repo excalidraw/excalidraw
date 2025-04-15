@@ -24,7 +24,7 @@ import { createPasteEvent } from "../clipboard";
 import { Excalidraw } from "../index";
 
 // Importing to spy on it and mock the implementation (mocking does not work with simple vi.mock for some reason)
-import * as blobModule from "../data/blob";
+import * as blobModule from "../src/data/blob";
 
 import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";

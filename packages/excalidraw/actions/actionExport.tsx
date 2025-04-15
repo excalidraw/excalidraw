@@ -16,10 +16,10 @@ import { ProjectName } from "../components/ProjectName";
 import { ToolButton } from "../components/ToolButton";
 import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
-import { loadFromJSON, saveAsJSON } from "../data";
-import { isImageFileHandle } from "../data/blob";
-import { nativeFileSystemSupported } from "../data/filesystem";
-import { resaveAsImageWithScene } from "../data/resave";
+import { loadFromJSON, saveAsJSON } from "../src/data";
+import { isImageFileHandle } from "../src/data/blob";
+import { nativeFileSystemSupported } from "../src/data/filesystem";
+import { resaveAsImageWithScene } from "../src/data/resave";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../src/scene";

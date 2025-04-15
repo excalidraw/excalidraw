@@ -22,7 +22,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { ExcalidrawError } from "./errors";
-import { createFile, isSupportedImageFileType } from "./data/blob";
+import { createFile, isSupportedImageFileType } from "./src/data/blob";
 import { tryParseSpreadsheet, VALID_SPREADSHEET } from "./charts";
 
 import type { Spreadsheet } from "./charts";

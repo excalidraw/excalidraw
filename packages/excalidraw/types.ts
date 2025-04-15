@@ -47,12 +47,12 @@ import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
-import type Library from "./data/library";
-import type { FileSystemHandle } from "./data/filesystem";
+import type Library from "./src/data/library";
+import type { FileSystemHandle } from "./src/data/filesystem";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { CaptureUpdateActionType } from "./store";
-import type { ImportedDataState } from "./data/types";
+import type { ImportedDataState } from "./src/data/types";
 
 import type { Language } from "./i18n";
 import type { isOverScrollBars } from "./src/scene/scrollbars";

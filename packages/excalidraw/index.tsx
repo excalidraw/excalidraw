@@ -227,9 +227,9 @@ export {
   restoreAppState,
   restoreElements,
   restoreLibraryItems,
-} from "./data/restore";
+} from "./src/data/restore";
 
-export { reconcileElements } from "./data/reconcile";
+export { reconcileElements } from "./src/data/reconcile";
 
 export {
   exportToCanvas,
@@ -238,14 +238,14 @@ export {
   exportToClipboard,
 } from "@excalidraw/utils/export";
 
-export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
+export { serializeAsJSON, serializeLibraryAsJSON } from "./src/data/json";
 export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
-} from "./data/blob";
+} from "./src/data/blob";
 export { getFreeDrawSvgPath } from "@excalidraw/element/renderElement";
-export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
+export { mergeLibraryItems, getLibraryItemsHash } from "./src/data/library";
 export { isLinearElement } from "@excalidraw/element/typeChecks";
 
 export {
@@ -266,7 +266,10 @@ export {
 
 export { CaptureUpdateAction } from "./store";
 
-export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
+export {
+  parseLibraryTokensFromUrl,
+  useHandleLibrary,
+} from "./src/data/library";
 
 export {
   sceneCoordsToViewportCoords,
@@ -287,7 +290,7 @@ export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
 
 export { zoomToFitBounds } from "./actions/actionCanvas";
-export { convertToExcalidrawElements } from "./data/transform";
+export { convertToExcalidrawElements } from "./src/data/transform";
 export {
   getCommonBounds,
   getVisibleSceneBounds,
@@ -300,7 +303,7 @@ export {
 } from "@excalidraw/utils/withinBounds";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
-export { getDataURL } from "./data/blob";
+export { getDataURL } from "./src/data/blob";
 export { isElementLink } from "@excalidraw/element/elementLink";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element/textMeasurements";

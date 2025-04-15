@@ -5,8 +5,8 @@ import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidra
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { EditorLocalStorage } from "../../data/EditorLocalStorage";
-import { canvasToBlob } from "../../data/blob";
+import { EditorLocalStorage } from "../../src/data/EditorLocalStorage";
+import { canvasToBlob } from "../../src/data/blob";
 import { t } from "../../i18n";
 import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 

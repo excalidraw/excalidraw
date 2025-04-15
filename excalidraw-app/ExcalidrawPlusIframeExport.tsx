@@ -1,4 +1,4 @@
-import { base64urlToString } from "@excalidraw/excalidraw/data/encode";
+import { base64urlToString } from "@excalidraw/excalidraw/src/data/encode";
 import { ExcalidrawError } from "@excalidraw/excalidraw/errors";
 import { useLayoutEffect, useRef } from "react";
 
