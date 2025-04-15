@@ -18,18 +18,18 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw, getCommonBounds, mutateElement } from "../..";
-import { actionGroup } from "../../src/actions";
+import { actionGroup } from "../../../src/actions";
 import { t } from "../../i18n";
-import * as StaticScene from "../../src/renderer/staticScene";
-import { API } from "../../tests/helpers/api";
-import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
-import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";
+import * as StaticScene from "../../../src/renderer/staticScene";
+import { API } from "../../../tests/helpers/api";
+import { Keyboard, Pointer, UI } from "../../../tests/helpers/ui";
+import { getTextEditor, updateTextEditor } from "../../../tests/queries/dom";
 import {
   GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
-} from "../../tests/test-utils";
+} from "../../../tests/test-utils";
 
 import { getStepSizedValue } from "./utils";
 

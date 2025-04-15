@@ -10,7 +10,7 @@ import type {
   ImageCrop,
 } from "@excalidraw/element/types";
 
-import { Excalidraw, exportToCanvas, exportToSvg } from "..";
+import { Excalidraw, exportToCanvas, exportToSvg } from "../src";
 import { actionFlipHorizontal, actionFlipVertical } from "../src/actions";
 
 import { API } from "./helpers/api";

@@ -1,9 +1,10 @@
+import { API } from ".././tests/helpers/api";
+
 import {
   createPasteEvent,
   parseClipboard,
   serializeAsClipboardJSON,
 } from "./clipboard";
-import { API } from "./tests/helpers/api";
 
 describe("parseClipboard()", () => {
   it("should parse JSON as plaintext if not excalidraw-api/clipboard data", async () => {

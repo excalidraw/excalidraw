@@ -18,7 +18,7 @@ import {
 } from "@excalidraw/math";
 import { isCurve } from "@excalidraw/math/curve";
 
-import type { DebugElement } from "@excalidraw/excalidraw/visualdebug";
+import type { DebugElement } from "@excalidraw/excalidraw/src/visualdebug";
 
 import type { Curve } from "@excalidraw/math";
 
