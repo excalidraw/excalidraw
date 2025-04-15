@@ -33,9 +33,9 @@ If the diagram isn't supported, this svg is converted to `dataURL` and can be re
 
 ### Parsing the mermaid syntax
 
-For this we first need to process the options along with mermaid defination for diagram provided by the user.
+For this we first need to process the options along with mermaid definition for diagram provided by the user.
 
-[`processMermaidTextWithOptions`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L13) takes the mermaid defination and options and returns the full defination including the mermaid [directives ](https://mermaid.js.org/config/directives.html).
+[`processMermaidTextWithOptions`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L13) takes the mermaid definition and options and returns the full definition including the mermaid [directives ](https://mermaid.js.org/config/directives.html).
 
 ![image](https://github.com/excalidraw/excalidraw/assets/11256141/3a4825d8-9704-468c-a02f-7e507f4d5b7a)
 
@@ -49,7 +49,7 @@ Next we write our own parser to parse this diagram.
 
 ### Parsing the Diagram
 
-For each diagram type, we need a parser as the result of every diagram would differ and dependinng on the data we have to write the parser. Since currently we support flowchart, so here is the [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parser/flowchart.ts#L256) to parse the flowchart diagram.
+For each diagram type, we need a parser as the result of every diagram would differ and depending on the data we have to write the parser. Since currently we support flowchart, so here is the [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parser/flowchart.ts#L256) to parse the flowchart diagram.
 
 If you want to understand how flowchart parser works, you can navigate to [Flowchart Parser](http://localhost:3003/docs/@excalidraw/mermaid-to-excalidraw/codebase/parser/flowchart).
 

@@ -20,7 +20,7 @@ export const withInternalFallback = <P,>(
     // for rerenders
     const [, setCounter] = useAtom(renderAtom);
     // for initial & subsequent renders. Tracked as component state
-    // due to excalidraw multi-instance scanerios.
+    // due to excalidraw multi-instance scenarios.
     const metaRef = useRef({
       // flag set on initial render to tell the fallback component to skip the
       // render until mount counter are initialized. This is because the counter
