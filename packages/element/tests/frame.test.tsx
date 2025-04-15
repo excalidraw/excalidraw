@@ -1,7 +1,7 @@
 import {
   convertToExcalidrawElements,
   Excalidraw,
-} from "@excalidraw/excalidraw";
+} from "@excalidraw/excalidraw/src";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";

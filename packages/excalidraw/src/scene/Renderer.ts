@@ -15,7 +15,7 @@ import { renderStaticSceneThrottled } from "../renderer/staticScene";
 import type Scene from "./Scene";
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState } from "../../types";
+import type { AppState } from "../types";
 
 export class Renderer {
   private scene: Scene;

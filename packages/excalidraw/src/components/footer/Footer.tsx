@@ -14,7 +14,7 @@ import { Section } from "../Section";
 import Stack from "../Stack";
 
 import type { ActionManager } from "../../actions/manager";
-import type { UIAppState } from "../../../types";
+import type { UIAppState } from "../../types";
 
 const Footer = ({
   appState,

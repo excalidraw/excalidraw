@@ -80,9 +80,9 @@ import {
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
 } from "../scene/scrollbars";
-import { type InteractiveCanvasAppState } from "../../types";
+import { type InteractiveCanvasAppState } from "../types";
 
-import { getClientColor, renderRemoteCursors } from "../../clients";
+import { getClientColor, renderRemoteCursors } from "../clients";
 
 import {
   bootstrapCanvas,

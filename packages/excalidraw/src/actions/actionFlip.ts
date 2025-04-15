@@ -27,13 +27,13 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { flipHorizontal, flipVertical } from "../components/icons";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../../types";
+import type { AppClassProperties, AppState } from "../types";
 
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",

@@ -5,7 +5,7 @@
 If you are using a module bundler (for instance, Webpack), you can import it as an ES6 module as shown below
 
 ```js
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw/src";
 ```
 
 :::info
@@ -39,7 +39,7 @@ If you want to only import `Excalidraw` component you can do :point_down:
 ```jsx showLineNumbers
 import dynamic from "next/dynamic";
 const Excalidraw = dynamic(
-  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
+  async () => (await import("@excalidraw/excalidraw/src")).Excalidraw,
   {
     ssr: false,
   },
@@ -58,7 +58,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
 
   ```jsx showLineNumbers
   "use client";
-  import { Excalidraw, convertToExcalidrawElements } from "@excalidraw/excalidraw";
+  import { Excalidraw, convertToExcalidrawElements } from "@excalidraw/excalidraw/src";
 
   import "@excalidraw/excalidraw/index.css";
 
@@ -131,7 +131,7 @@ If you are using `pages router` then importing the wrapper dynamically would wor
 {/* Link  should be updated to point to the latest! */}
 Here is a [source code](https://github.com/excalidraw/excalidraw/tree/master/examples/with-nextjs) for the example with app and pages router. You you can try it out [here](https://excalidraw-package-example-with-nextjs.vercel.app/).
 
-The `types` are available at `@excalidraw/excalidraw/types`, check [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example for details.
+The `types` are available at `@excalidraw/excalidraw/src/types`, check [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example for details.
 
 ### Preact
 

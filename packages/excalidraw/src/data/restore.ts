@@ -65,7 +65,7 @@ import type {
 
 import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
 
-import { getDefaultAppState } from "../../appState";
+import { getDefaultAppState } from "../appState";
 
 import {
   getNormalizedGridSize,
@@ -73,7 +73,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<

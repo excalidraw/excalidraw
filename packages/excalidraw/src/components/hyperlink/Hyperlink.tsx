@@ -39,10 +39,10 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { trackEvent } from "../../../analytics";
+import { trackEvent } from "../../analytics";
 import { getTooltipDiv, updateTooltipPosition } from "../Tooltip";
 
-import { t } from "../../../i18n";
+import { t } from "../../i18n";
 
 import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
 import { ToolButton } from "../ToolButton";
@@ -53,7 +53,7 @@ import { getLinkHandleFromCoords } from "./helpers";
 
 import "./Hyperlink.scss";
 
-import type { AppState, ExcalidrawProps, UIAppState } from "../../../types";
+import type { AppState, ExcalidrawProps, UIAppState } from "../../types";
 
 const POPUP_WIDTH = 380;
 const POPUP_HEIGHT = 42;

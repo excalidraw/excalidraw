@@ -26,7 +26,7 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
+import type { FrameNameBounds } from "@excalidraw/excalidraw/src/types";
 
 import { getBoundTextShape, isPathALoop } from "./shapes";
 import { getElementBounds } from "./bounds";

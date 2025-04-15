@@ -16,15 +16,15 @@ import { isPathALoop } from "@excalidraw/element/shapes";
 
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 
-import { t } from "../../i18n";
-import { resetCursor } from "../../cursor";
+import { t } from "../i18n";
+import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppState } from "../../types";
+import type { AppState } from "../types";
 
 export const actionFinalize = register({
   name: "finalize",

@@ -1,5 +1,5 @@
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
-import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/clipboard";
+import { trackEvent } from "@excalidraw/excalidraw/src/analytics";
+import { copyTextToSystemClipboard } from "@excalidraw/excalidraw/src/clipboard";
 import { Dialog } from "@excalidraw/excalidraw/src/components/Dialog";
 import { FilledButton } from "@excalidraw/excalidraw/src/components/FilledButton";
 import { TextField } from "@excalidraw/excalidraw/src/components/TextField";
@@ -14,7 +14,7 @@ import {
 } from "@excalidraw/excalidraw/src/components/icons";
 import { useUIAppState } from "@excalidraw/excalidraw/src/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/src/hooks/useCopiedIndicator";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { useI18n } from "@excalidraw/excalidraw/src/i18n";
 import { KEYS, getFrame } from "@excalidraw/common";
 import { useEffect, useRef, useState } from "react";
 

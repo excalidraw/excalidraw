@@ -21,10 +21,10 @@ import { isTextElement } from "@excalidraw/element/typeChecks";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
-import { atom, useAtom } from "../../editor-jotai";
+import { atom, useAtom } from "../editor-jotai";
 
 import { useStable } from "../hooks/useStable";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "./App";
 import { Button } from "./Button";
@@ -33,7 +33,7 @@ import { collapseDownIcon, upIcon, searchIcon } from "./icons";
 
 import "./SearchMenu.scss";
 
-import type { AppClassProperties } from "../../types";
+import type { AppClassProperties } from "../types";
 
 const searchQueryAtom = atom<string>("");
 export const searchItemInFocusAtom = atom<number | null>(null);

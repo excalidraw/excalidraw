@@ -10,7 +10,7 @@
  *   (localStorage, indexedDB).
  */
 
-import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
+import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/src/appState";
 import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
@@ -34,7 +34,7 @@ import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
 import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";

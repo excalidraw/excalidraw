@@ -24,7 +24,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import Scene from "@excalidraw/excalidraw/src/scene/Scene";
 
-import type { Store } from "@excalidraw/excalidraw/store";
+import type { Store } from "@excalidraw/excalidraw/src/store";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -35,7 +35,7 @@ import type {
   AppClassProperties,
   NullableGridSize,
   Zoom,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 

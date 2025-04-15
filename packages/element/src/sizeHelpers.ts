@@ -3,7 +3,7 @@ import {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
-import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
+import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/src/types";
 
 import { getCommonBounds, getElementBounds } from "./bounds";
 import { mutateElement } from "./mutateElement";

@@ -9,7 +9,7 @@ import { SIDE_RESIZING_THRESHOLD } from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
-import type { AppState, Device, Zoom } from "@excalidraw/excalidraw/types";
+import type { AppState, Device, Zoom } from "@excalidraw/excalidraw/src/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {

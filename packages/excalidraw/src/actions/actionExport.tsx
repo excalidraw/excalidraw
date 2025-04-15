@@ -21,10 +21,10 @@ import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { resaveAsImageWithScene } from "../data/resave";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { getExportSize } from "../scene/export";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import "../../src/components/ToolIcon.scss";
 

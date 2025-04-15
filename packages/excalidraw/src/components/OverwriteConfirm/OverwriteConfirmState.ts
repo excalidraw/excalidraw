@@ -1,4 +1,4 @@
-import { atom, editorJotaiStore } from "../../../editor-jotai";
+import { atom, editorJotaiStore } from "../../editor-jotai";
 
 import type React from "react";
 

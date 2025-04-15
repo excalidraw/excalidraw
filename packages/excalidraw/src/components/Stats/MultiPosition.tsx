@@ -19,7 +19,7 @@ import { getElementsInAtomicUnit, moveElement } from "./utils";
 import type { DragInputCallbackType } from "./DragInput";
 import type { AtomicUnit } from "./utils";
 import type Scene from "../../scene/Scene";
-import type { AppState } from "../../../types";
+import type { AppState } from "../../types";
 
 interface MultiPositionProps {
   property: "x" | "y";

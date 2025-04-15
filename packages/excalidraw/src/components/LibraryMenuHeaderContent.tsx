@@ -7,9 +7,9 @@ import { useUIAppState } from "../context/ui-appState";
 import { fileOpen } from "../data/filesystem";
 import { saveLibraryAsJSON } from "../data/json";
 import { libraryItemsAtom } from "../data/library";
-import { useAtom } from "../../editor-jotai";
+import { useAtom } from "../editor-jotai";
 import { useLibraryCache } from "../hooks/useLibraryItemSvg";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "./App";
 import ConfirmDialog from "./ConfirmDialog";
@@ -28,7 +28,7 @@ import {
 } from "./icons";
 
 import type Library from "../data/library";
-import type { LibraryItem, LibraryItems, UIAppState } from "../../types";
+import type { LibraryItem, LibraryItems, UIAppState } from "../types";
 
 const getSelectedItems = (
   libraryItems: LibraryItems,

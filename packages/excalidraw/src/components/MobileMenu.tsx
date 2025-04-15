@@ -4,9 +4,9 @@ import { showSelectedShapeActions } from "@excalidraw/element/showSelectedShapeA
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { isHandToolActive } from "../../appState";
+import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
@@ -28,7 +28,7 @@ import type {
   Device,
   ExcalidrawProps,
   UIAppState,
-} from "../../types";
+} from "../types";
 import type { JSX } from "react";
 
 type MobileMenuProps = {

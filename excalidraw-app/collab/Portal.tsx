@@ -1,5 +1,5 @@
-import { CaptureUpdateAction } from "@excalidraw/excalidraw";
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
+import { CaptureUpdateAction } from "@excalidraw/excalidraw/src";
+import { trackEvent } from "@excalidraw/excalidraw/src/analytics";
 import { encryptData } from "@excalidraw/excalidraw/src/data/encryption";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import throttle from "lodash.throttle";
@@ -9,7 +9,7 @@ import type { OrderedExcalidrawElement } from "@excalidraw/element/types";
 import type {
   OnUserFollowedPayload,
   SocketId,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import { WS_EVENTS, FILE_UPLOAD_TIMEOUT, WS_SUBTYPES } from "../app_constants";
 import { isSyncableElement } from "../data";

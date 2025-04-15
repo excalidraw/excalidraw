@@ -3,8 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { KEYS, getShortcutKey } from "@excalidraw/common";
 
-import { useAtom } from "../../../editor-jotai";
-import { t } from "../../../i18n";
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
 import { useDevice } from "../App";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { eyeDropperIcon } from "../icons";

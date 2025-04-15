@@ -14,7 +14,7 @@ restoreAppState(appState: <a href="https://github.com/excalidraw/excalidraw/blob
 **_How to use_**
 
 ```js
-import { restoreAppState } from "@excalidraw/excalidraw";
+import { restoreAppState } from "@excalidraw/excalidraw/src";
 ```
 
 This function will make sure all the `keys` have appropriate `values` in [appState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) and if any key is missing, it will be set to its `default` value.
@@ -58,7 +58,7 @@ The extra optional parameter to configure restored elements. It has the followin
 **_How to use_**
 
 ```js
-import { restoreElements } from "@excalidraw/excalidraw";
+import { restoreElements } from "@excalidraw/excalidraw/src";
 ```
 
 This function will make sure all properties of element is correctly set and if any attribute is missing, it will be set to its default value.
@@ -84,7 +84,7 @@ See [`restoreAppState()`](https://github.com/excalidraw/excalidraw/blob/master/p
 **_How to use_**
 
 ```js
-import { restore } from "@excalidraw/excalidraw";
+import { restore } from "@excalidraw/excalidraw/src";
 ```
 
 This function makes sure elements and state is set to appropriate values and set to default value if not present. It is a combination of [restoreElements](#restoreelements) and [restoreAppState](#restoreappstate).
@@ -101,7 +101,7 @@ defaultStatus: "published" | "unpublished")
 **_How to use_**
 
 ```js
-import { restoreLibraryItems } from "@excalidraw/excalidraw";
+import { restoreLibraryItems } from "@excalidraw/excalidraw/src";
 
 restoreLibraryItems(libraryItems, "unpublished");
 ```

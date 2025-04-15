@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 
 import { useTunnels } from "../../context/tunnels";
-import { atom } from "../../../editor-jotai";
+import { atom } from "../../editor-jotai";
 
 export const withInternalFallback = <P,>(
   componentName: string,

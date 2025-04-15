@@ -2,7 +2,7 @@ import { queries, buildQueries } from "@testing-library/react";
 
 import { TOOL_TYPE } from "@excalidraw/common";
 
-import type { ToolType } from "@excalidraw/excalidraw/types";
+import type { ToolType } from "@excalidraw/excalidraw/src/types";
 
 const _getAllByToolName = (container: HTMLElement, tool: ToolType | "lock") => {
   const toolTitle = tool === "lock" ? "lock" : TOOL_TYPE[tool];

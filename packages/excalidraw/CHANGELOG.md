@@ -86,13 +86,13 @@ Depending on the environment, this is how imports should look like with the `ESM
 
 ```ts
 // excalidraw library with public API
-import * as excalidrawLib from "@excalidraw/excalidraw";
+import * as excalidrawLib from "@excalidraw/excalidraw/src";
 // excalidraw react component
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw } from "@excalidraw/excalidraw/src";
 // excalidraw styles, usually auto-processed by the build tool (i.e. vite, next, etc.)
 import "@excalidraw/excalidraw/index.css";
 // excalidraw types (optional)
-import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/src/types";
 ```
 
 **Without bundler (Browser)**
@@ -176,7 +176,7 @@ updateScene({ elements, appState, commitToHistory: true }); // A
 updateScene({ elements, appState, commitToHistory: false }); // B
 
 // after
-import { CaptureUpdateAction } from "@excalidraw/excalidraw";
+import { CaptureUpdateAction } from "@excalidraw/excalidraw/src";
 updateScene({
   elements,
   appState,
@@ -2020,7 +2020,7 @@ Check out the [release notes](https://github.com/excalidraw/excalidraw/releases/
   #### BREAKING CHANGE
   - `width/height` props have been removed. Instead now it takes `100%` of `width` and `height` of the container so you need to make sure the container in which you are rendering Excalidraw has non zero dimensions (It should have non zero width and height so Excalidraw can match the dimensions of containing block)
 - Calculate offsets when excalidraw container resizes using resize observer api [#3374](https://github.com/excalidraw/excalidraw/pull/3374).
-- Export types for the package so now it can be used with typescript [#3337](https://github.com/excalidraw/excalidraw/pull/3337). The types are available at `@excalidraw/excalidraw/types`.
+- Export types for the package so now it can be used with typescript [#3337](https://github.com/excalidraw/excalidraw/pull/3337). The types are available at `@excalidraw/excalidraw/src/types`.
 - Add `renderCustomStats` prop to render extra stats on host, and expose `setToastMessage` API via refs which can be used to show toast with custom message [#3360](https://github.com/excalidraw/excalidraw/pull/3360).
 - Support passing a CSRF token when importing libraries to prevent prompting before installation. The token is passed from [https://libraries.excalidraw.com](https://libraries.excalidraw.com/) using the `token` URL key [#3329](https://github.com/excalidraw/excalidraw/pull/3329).
 - #### BREAKING CHANGE

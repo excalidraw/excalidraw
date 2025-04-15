@@ -6,11 +6,11 @@ import { measureText } from "@excalidraw/element/textMeasurements";
 import { isTextElement } from "@excalidraw/element/typeChecks";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppClassProperties } from "../../types";
+import type { AppClassProperties } from "../types";
 
 export const actionTextAutoResize = register({
   name: "autoResize",

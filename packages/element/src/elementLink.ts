@@ -4,7 +4,7 @@
 
 import { ELEMENT_LINK_KEY, normalizeLink } from "@excalidraw/common";
 
-import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
+import type { AppProps, AppState } from "@excalidraw/excalidraw/src/types";
 
 import { elementsAreInSameGroup } from "./groups";
 

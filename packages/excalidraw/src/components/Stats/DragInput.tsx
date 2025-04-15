@@ -7,7 +7,7 @@ import { deepCopyElement } from "@excalidraw/element/duplicate";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
-import { CaptureUpdateAction } from "../../../store";
+import { CaptureUpdateAction } from "../../store";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
 
@@ -17,7 +17,7 @@ import "./DragInput.scss";
 
 import type { StatsInputProperty } from "./utils";
 import type Scene from "../../scene/Scene";
-import type { AppState } from "../../../types";
+import type { AppState } from "../../types";
 
 export type DragInputCallbackType<
   P extends StatsInputProperty,

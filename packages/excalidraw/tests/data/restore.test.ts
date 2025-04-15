@@ -12,7 +12,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
-import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
+import type { NormalizedZoomValue } from "@excalidraw/excalidraw/src/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../src/data/restore";

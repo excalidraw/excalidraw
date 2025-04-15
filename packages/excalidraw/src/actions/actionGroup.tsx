@@ -37,14 +37,14 @@ import type {
 import { ToolButton } from "../components/ToolButton";
 import { UngroupIcon, GroupIcon } from "../components/icons";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../../types";
+import type { AppClassProperties, AppState } from "../types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {

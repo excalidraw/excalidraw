@@ -19,13 +19,13 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import Scene from "../scene/Scene";
 import { actionToggleStats } from "../actions";
-import { trackEvent } from "../../analytics";
-import { isHandToolActive } from "../../appState";
+import { trackEvent } from "../analytics";
+import { isHandToolActive } from "../appState";
 import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
-import { useAtom, useAtomValue } from "../../editor-jotai";
+import { useAtom, useAtomValue } from "../editor-jotai";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
 
 import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
@@ -64,7 +64,7 @@ import "./Toolbar.scss";
 
 import type { ActionManager } from "../actions/manager";
 
-import type { Language } from "../../i18n";
+import type { Language } from "../i18n";
 import type {
   AppProps,
   AppState,
@@ -72,7 +72,7 @@ import type {
   BinaryFiles,
   UIAppState,
   AppClassProperties,
-} from "../../types";
+} from "../types";
 
 interface LayerUIProps {
   actionManager: ActionManager;

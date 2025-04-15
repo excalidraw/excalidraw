@@ -46,7 +46,7 @@ import type {
 import { actionSaveToActiveFile } from "../actions";
 
 import Scene from "../scene/Scene";
-import { parseClipboard } from "../../clipboard";
+import { parseClipboard } from "../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
@@ -58,7 +58,7 @@ import {
 } from "../actions/actionCanvas";
 
 import type App from "../components/App";
-import type { AppState } from "../../types";
+import type { AppState } from "../types";
 
 const getTransform = (
   width: number,

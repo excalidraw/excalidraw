@@ -379,26 +379,20 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
-import { trackEvent } from "../../analytics";
+import { trackEvent } from "../analytics";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
-} from "../../appState";
-import { copyTextToSystemClipboard, parseClipboard } from "../../clipboard";
+} from "../appState";
+import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restore, restoreElements } from "../data/restore";
-import { getCenter, getDistance } from "../../gesture";
-import { History } from "../../history";
-import {
-  defaultLang,
-  getLanguage,
-  languages,
-  setLanguage,
-  t,
-} from "../../i18n";
+import { getCenter, getDistance } from "../gesture";
+import { History } from "../history";
+import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
   calculateScrollCenter,
@@ -434,9 +428,9 @@ import {
   Hyperlink,
 } from "./hyperlink/Hyperlink";
 
-import { Fonts } from "../../fonts";
-import { editorJotaiStore } from "../../editor-jotai";
-import { ImageSceneDataError } from "../../errors";
+import { Fonts } from "../fonts";
+import { editorJotaiStore } from "../editor-jotai";
+import { ImageSceneDataError } from "../errors";
 import {
   getSnapLinesAtPointer,
   snapDraggedElements,
@@ -448,7 +442,7 @@ import {
   getReferenceSnapPoints,
   SnapCache,
   isGridModeEnabled,
-} from "../../snapping";
+} from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
 import {
@@ -456,20 +450,17 @@ import {
   setCursor,
   resetCursor,
   setCursorForShape,
-} from "../../cursor";
-import { Emitter } from "../../emitter";
+} from "../cursor";
+import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "./ElementCanvasButtons";
-import { Store, CaptureUpdateAction } from "../../store";
+import { Store, CaptureUpdateAction } from "../store";
 import { AnimatedTrail } from "../animated-trail";
-import { LaserTrails } from "../../laser-trails";
-import {
-  withBatchedUpdates,
-  withBatchedUpdatesThrottled,
-} from "../../reactUtils";
+import { LaserTrails } from "../laser-trails";
+import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
 
-import { isMaybeMermaidDefinition } from "../../mermaid";
+import { isMaybeMermaidDefinition } from "../mermaid";
 
 import { LassoTrail } from "../lasso";
 
@@ -499,7 +490,7 @@ import type {
   ScrollBars,
 } from "../scene/types";
 
-import type { PastedMixedContent } from "../../clipboard";
+import type { PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
@@ -532,7 +523,7 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   Offsets,
-} from "../../types";
+} from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
 

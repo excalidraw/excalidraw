@@ -9,8 +9,8 @@ import {
   actionAlignLeft,
   actionAlignRight,
 } from "@excalidraw/excalidraw/src/actions";
-import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { defaultLang, setLanguage } from "@excalidraw/excalidraw/src/i18n";
+import { Excalidraw } from "@excalidraw/excalidraw/src";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Pointer, Keyboard } from "@excalidraw/excalidraw/tests/helpers/ui";

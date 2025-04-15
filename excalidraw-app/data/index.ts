@@ -11,7 +11,7 @@ import { serializeAsJSON } from "@excalidraw/excalidraw/src/data/json";
 import { restore } from "@excalidraw/excalidraw/src/data/restore";
 import { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
-import { t } from "@excalidraw/excalidraw/i18n";
+import { t } from "@excalidraw/excalidraw/src/i18n";
 import { bytesToHexString } from "@excalidraw/common";
 
 import type { UserIdleState } from "@excalidraw/common";
@@ -27,7 +27,7 @@ import type {
   BinaryFileData,
   BinaryFiles,
   SocketId,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 import type { MakeBrand } from "@excalidraw/common/utility-types";
 
 import {

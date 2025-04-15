@@ -8,7 +8,7 @@ import React, {
   cloneElement,
 } from "react";
 
-import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type * as TExcalidraw from "@excalidraw/excalidraw/src";
 import type { ImportedLibraryData } from "@excalidraw/excalidraw/data/types";
 import type {
   NonDeletedExcalidrawElement,
@@ -22,7 +22,7 @@ import type {
   Gesture,
   LibraryItems,
   PointerDownState as ExcalidrawPointerDownState,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import initialData from "../initialData";
 import {

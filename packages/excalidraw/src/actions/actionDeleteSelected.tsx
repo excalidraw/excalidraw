@@ -22,15 +22,15 @@ import {
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 import { TrashIcon } from "../components/icons";
 import { ToolButton } from "../components/ToolButton";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../../types";
+import type { AppClassProperties, AppState } from "../types";
 
 const deleteSelectedElements = (
   elements: readonly ExcalidrawElement[],

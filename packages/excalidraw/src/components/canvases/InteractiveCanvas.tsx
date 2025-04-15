@@ -11,8 +11,8 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { t } from "../../../i18n";
-import { isRenderThrottlingEnabled } from "../../../reactUtils";
+import { t } from "../../i18n";
+import { isRenderThrottlingEnabled } from "../../reactUtils";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import type {
@@ -20,11 +20,7 @@ import type {
   RenderableElementsMap,
   RenderInteractiveSceneCallback,
 } from "../../scene/types";
-import type {
-  AppState,
-  Device,
-  InteractiveCanvasAppState,
-} from "../../../types";
+import type { AppState, Device, InteractiveCanvasAppState } from "../../types";
 import type { DOMAttributes } from "react";
 
 type InteractiveCanvasProps = {

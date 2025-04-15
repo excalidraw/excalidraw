@@ -1,4 +1,4 @@
-import { reconcileElements } from "@excalidraw/excalidraw";
+import { reconcileElements } from "@excalidraw/excalidraw/src";
 import { MIME_TYPES } from "@excalidraw/common";
 import { decompressData } from "@excalidraw/excalidraw/src/data/encode";
 import {
@@ -28,7 +28,7 @@ import type {
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 

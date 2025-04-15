@@ -3,8 +3,8 @@ import { isDevEnv } from "@excalidraw/common";
 import type { NestedKeyOf } from "@excalidraw/common/utility-types";
 
 import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
-import fallbackLangData from "./src/locales/en.json";
-import percentages from "./src/locales/percentages.json";
+import fallbackLangData from "./locales/en.json";
+import percentages from "./locales/percentages.json";
 
 const COMPLETION_THRESHOLD = 85;
 

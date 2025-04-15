@@ -2,13 +2,13 @@ import type { VERSIONS } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { cleanAppStateForExport } from "../../appState";
+import type { cleanAppStateForExport } from "../appState";
 import type {
   AppState,
   BinaryFiles,
   LibraryItems,
   LibraryItems_anyVersion,
-} from "../../types";
+} from "../types";
 
 export interface ExportedDataState {
   type: string;

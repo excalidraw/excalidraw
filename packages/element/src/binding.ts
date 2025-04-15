@@ -33,7 +33,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type Scene from "@excalidraw/excalidraw/src/scene/Scene";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
+import type { AppState } from "@excalidraw/excalidraw/src/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 

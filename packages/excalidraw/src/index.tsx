@@ -2,18 +2,18 @@ import React, { useEffect } from "react";
 
 import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
 
-import App from "./src/components/App";
-import { InitializeApp } from "./src/components/InitializeApp";
-import Footer from "./src/components/footer/FooterCenter";
-import LiveCollaborationTrigger from "./src/components/live-collaboration/LiveCollaborationTrigger";
-import MainMenu from "./src/components/main-menu/MainMenu";
-import WelcomeScreen from "./src/components/welcome-screen/WelcomeScreen";
+import App from "./components/App";
+import { InitializeApp } from "./components/InitializeApp";
+import Footer from "./components/footer/FooterCenter";
+import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
+import MainMenu from "./components/main-menu/MainMenu";
+import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 
-import "./src/css/app.scss";
-import "./src/css/styles.scss";
+import "./css/app.scss";
+import "./css/styles.scss";
 import "./fonts/fonts.css";
 
 import type { AppProps, ExcalidrawProps } from "./types";
@@ -227,9 +227,9 @@ export {
   restoreAppState,
   restoreElements,
   restoreLibraryItems,
-} from "./src/data/restore";
+} from "./data/restore";
 
-export { reconcileElements } from "./src/data/reconcile";
+export { reconcileElements } from "./data/reconcile";
 
 export {
   exportToCanvas,
@@ -238,14 +238,14 @@ export {
   exportToClipboard,
 } from "@excalidraw/utils/export";
 
-export { serializeAsJSON, serializeLibraryAsJSON } from "./src/data/json";
+export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
-} from "./src/data/blob";
+} from "./data/blob";
 export { getFreeDrawSvgPath } from "@excalidraw/element/renderElement";
-export { mergeLibraryItems, getLibraryItemsHash } from "./src/data/library";
+export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
 export { isLinearElement } from "@excalidraw/element/typeChecks";
 
 export {
@@ -266,31 +266,28 @@ export {
 
 export { CaptureUpdateAction } from "./store";
 
-export {
-  parseLibraryTokensFromUrl,
-  useHandleLibrary,
-} from "./src/data/library";
+export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 
 export {
   sceneCoordsToViewportCoords,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
-export { Sidebar } from "./src/components/Sidebar/Sidebar";
-export { Button } from "./src/components/Button";
+export { Sidebar } from "./components/Sidebar/Sidebar";
+export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
-export { useDevice } from "./src/components/App";
+export { useDevice } from "./components/App";
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
-export { Stats } from "./src/components/Stats";
+export { Stats } from "./components/Stats";
 
-export { DefaultSidebar } from "./src/components/DefaultSidebar";
-export { TTDDialog } from "./src/components/TTDDialog/TTDDialog";
-export { TTDDialogTrigger } from "./src/components/TTDDialog/TTDDialogTrigger";
+export { DefaultSidebar } from "./components/DefaultSidebar";
+export { TTDDialog } from "./components/TTDDialog/TTDDialog";
+export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
 
-export { zoomToFitBounds } from "./src/actions/actionCanvas";
-export { convertToExcalidrawElements } from "./src/data/transform";
+export { zoomToFitBounds } from "./actions/actionCanvas";
+export { convertToExcalidrawElements } from "./data/transform";
 export {
   getCommonBounds,
   getVisibleSceneBounds,
@@ -302,8 +299,8 @@ export {
   elementPartiallyOverlapsWithOrContainsBBox,
 } from "@excalidraw/utils/withinBounds";
 
-export { DiagramToCodePlugin } from "./src/components/DiagramToCodePlugin/DiagramToCodePlugin";
-export { getDataURL } from "./src/data/blob";
+export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
+export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element/elementLink";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element/textMeasurements";

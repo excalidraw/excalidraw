@@ -48,7 +48,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
-import type { AppState, BinaryFiles } from "../../types";
+import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 

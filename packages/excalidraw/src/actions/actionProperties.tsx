@@ -71,7 +71,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { trackEvent } from "../../analytics";
+import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
@@ -123,8 +123,8 @@ import {
   ArrowheadCrowfootOneOrManyIcon,
 } from "../components/icons";
 
-import { Fonts } from "../../fonts";
-import { getLanguage, t } from "../../i18n";
+import { Fonts } from "../fonts";
+import { getLanguage, t } from "../i18n";
 import {
   canHaveArrowheads,
   getCommonAttributeOfSelectedElements,
@@ -132,12 +132,12 @@ import {
   getTargetElements,
   isSomeElementSelected,
 } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { CaptureUpdateActionType } from "../../store";
-import type { AppClassProperties, AppState, Primitive } from "../../types";
+import type { CaptureUpdateActionType } from "../store";
+import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 

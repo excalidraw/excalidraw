@@ -6,11 +6,11 @@ import {
 } from "@excalidraw/common";
 
 import { searchIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppState } from "../../types";
+import type { AppState } from "../types";
 
 export const actionToggleSearchMenu = register({
   name: "searchMenu",

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 
 import "@excalidraw/excalidraw/index.css";
 
-import type * as TExcalidraw from "@excalidraw/excalidraw";
+import type * as TExcalidraw from "@excalidraw/excalidraw/src";
 
 import App from "./components/ExampleApp";
 

@@ -18,14 +18,14 @@ import {
   DistributeVerticallyIcon,
 } from "../components/icons";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../../types";
+import type { AppClassProperties, AppState } from "../types";
 
 const enableActionGroup = (appState: AppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements(appState);

@@ -23,11 +23,11 @@ import {
   actionLinkToElement,
 } from "../../actions/actionElementLink";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
-import { trackEvent } from "../../../analytics";
+import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
-import { deburr } from "../../../deburr";
-import { atom, useAtom, editorJotaiStore } from "../../../editor-jotai";
-import { t } from "../../../i18n";
+import { deburr } from "../../deburr";
+import { atom, useAtom, editorJotaiStore } from "../../editor-jotai";
+import { t } from "../../i18n";
 import {
   useApp,
   useAppProps,
@@ -62,9 +62,9 @@ import * as defaultItems from "./defaultCommandPaletteItems";
 import "./CommandPalette.scss";
 
 import type { CommandPaletteItem } from "./types";
-import type { AppProps, AppState, UIAppState } from "../../../types";
+import type { AppProps, AppState, UIAppState } from "../../types";
 import type { ShortcutName } from "../../actions/shortcuts";
-import type { TranslationKeys } from "../../../i18n";
+import type { TranslationKeys } from "../../i18n";
 import type { Action } from "../../actions/types";
 
 const lastUsedPaletteItem = atom<CommandPaletteItem | null>(null);

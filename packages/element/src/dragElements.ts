@@ -9,7 +9,7 @@ import type {
   NormalizedZoomValue,
   NullableGridSize,
   PointerDownState,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import type Scene from "@excalidraw/excalidraw/src/scene/Scene";
 

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useTunnels } from "../../context/tunnels";
-import { useAtom } from "../../../editor-jotai";
+import { useAtom } from "../../editor-jotai";
 import { Dialog } from "../Dialog";
 import { FilledButton } from "../FilledButton";
 import { withInternalFallback } from "../hoc/withInternalFallback";

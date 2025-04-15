@@ -1,8 +1,8 @@
-import { CaptureUpdateAction } from "@excalidraw/excalidraw";
+import { CaptureUpdateAction } from "@excalidraw/excalidraw/src";
 import { compressData } from "@excalidraw/excalidraw/src/data/encode";
 import { newElementWith } from "@excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
-import { t } from "@excalidraw/excalidraw/i18n";
+import { t } from "@excalidraw/excalidraw/src/i18n";
 
 import type {
   ExcalidrawElement,
@@ -15,7 +15,7 @@ import type {
   BinaryFileMetadata,
   ExcalidrawImperativeAPI,
   BinaryFiles,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 type FileVersion = Required<BinaryFileData>["version"];
 

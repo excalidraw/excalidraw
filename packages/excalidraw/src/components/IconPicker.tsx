@@ -4,8 +4,8 @@ import React, { useEffect } from "react";
 
 import { isArrowKey, KEYS } from "@excalidraw/common";
 
-import { atom, useAtom } from "../../editor-jotai";
-import { getLanguage, t } from "../../i18n";
+import { atom, useAtom } from "../editor-jotai";
+import { getLanguage, t } from "../i18n";
 
 import Collapsible from "./Stats/Collapsible";
 import { useDevice } from "./App";

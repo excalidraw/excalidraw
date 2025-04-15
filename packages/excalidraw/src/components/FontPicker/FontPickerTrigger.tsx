@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
-import { t } from "../../../i18n";
+import { t } from "../../i18n";
 import { ButtonIcon } from "../ButtonIcon";
 import { TextIcon } from "../icons";
 

@@ -12,7 +12,7 @@ This API receives the mermaid syntax as the input, and resolves to skeleton Exca
 
 ```ts
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
-import { convertToExcalidrawElements}  from "@excalidraw/excalidraw"
+import { convertToExcalidrawElements}  from "@excalidraw/excalidraw/src"
 try {
   const { elements, files } = await parseMermaidToExcalidraw(mermaidSyntax: string, {
     fontSize: number,

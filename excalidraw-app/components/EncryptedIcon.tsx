@@ -1,6 +1,6 @@
 import { Tooltip } from "@excalidraw/excalidraw/src/components/Tooltip";
 import { shield } from "@excalidraw/excalidraw/src/components/icons";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { useI18n } from "@excalidraw/excalidraw/src/i18n";
 
 export const EncryptedIcon = () => {
   const { t } = useI18n();

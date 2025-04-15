@@ -14,7 +14,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { AppState, UIAppState } from "../../../types";
+import type { AppState, UIAppState } from "../../types";
 
 export const EXTERNAL_LINK_IMG = document.createElement("img");
 EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(

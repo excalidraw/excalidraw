@@ -14,8 +14,8 @@ import { elementsAreInSameGroup } from "@excalidraw/element/groups";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { t } from "../../../i18n";
-import { isGridModeEnabled } from "../../../snapping";
+import { t } from "../../i18n";
+import { isGridModeEnabled } from "../../snapping";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { Island } from "../Island";
 import { CloseIcon } from "../icons";
@@ -38,7 +38,7 @@ import type {
   AppClassProperties,
   AppState,
   ExcalidrawProps,
-} from "../../../types";
+} from "../../types";
 
 interface StatsProps {
   app: AppClassProperties;

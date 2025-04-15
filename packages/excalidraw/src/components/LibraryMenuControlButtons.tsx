@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import LibraryMenuBrowseButton from "./LibraryMenuBrowseButton";
 
-import type { ExcalidrawProps, UIAppState } from "../../types";
+import type { ExcalidrawProps, UIAppState } from "../types";
 
 export const LibraryMenuControlButtons = ({
   libraryReturnUrl,

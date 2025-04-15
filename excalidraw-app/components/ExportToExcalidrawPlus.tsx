@@ -2,7 +2,7 @@ import React from "react";
 import { uploadBytes, ref } from "firebase/storage";
 import { nanoid } from "nanoid";
 
-import { trackEvent } from "@excalidraw/excalidraw/analytics";
+import { trackEvent } from "@excalidraw/excalidraw/src/analytics";
 import { Card } from "@excalidraw/excalidraw/src/components/Card";
 import { ExcalidrawLogo } from "@excalidraw/excalidraw/src/components/ExcalidrawLogo";
 import { ToolButton } from "@excalidraw/excalidraw/src/components/ToolButton";
@@ -13,7 +13,7 @@ import {
 } from "@excalidraw/excalidraw/src/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/src/data/json";
 import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
-import { useI18n } from "@excalidraw/excalidraw/i18n";
+import { useI18n } from "@excalidraw/excalidraw/src/i18n";
 
 import type {
   FileId,
@@ -23,7 +23,7 @@ import type {
   AppState,
   BinaryFileData,
   BinaryFiles,
-} from "@excalidraw/excalidraw/types";
+} from "@excalidraw/excalidraw/src/types";
 
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";

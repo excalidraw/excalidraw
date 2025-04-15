@@ -7,7 +7,7 @@ import {
   bootstrapCanvas,
   getNormalizedCanvasDimensions,
 } from "@excalidraw/excalidraw/src/renderer/helpers";
-import { type AppState } from "@excalidraw/excalidraw/types";
+import { type AppState } from "@excalidraw/excalidraw/src/types";
 import { throttleRAF } from "@excalidraw/common";
 import { useCallback, useImperativeHandle, useRef } from "react";
 

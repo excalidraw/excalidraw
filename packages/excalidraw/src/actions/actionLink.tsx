@@ -5,10 +5,10 @@ import { KEYS, getShortcutKey } from "@excalidraw/common";
 import { ToolButton } from "../components/ToolButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
-import { t } from "../../i18n";
+import { t } from "../i18n";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

@@ -1,7 +1,7 @@
 import { CODES, KEYS } from "@excalidraw/common";
 
 import { coffeeIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

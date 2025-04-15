@@ -3,8 +3,8 @@ import { useEffect, useRef } from "react";
 
 import type { ColorPaletteCustom } from "@excalidraw/common";
 
-import { useAtom } from "../../../editor-jotai";
-import { t } from "../../../i18n";
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
 
 import HotkeyLabel from "./HotkeyLabel";
 import {
@@ -13,7 +13,7 @@ import {
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
 
-import type { TranslationKeys } from "../../../i18n";
+import type { TranslationKeys } from "../../i18n";
 
 interface PickerColorListProps {
   palette: ColorPaletteCustom;

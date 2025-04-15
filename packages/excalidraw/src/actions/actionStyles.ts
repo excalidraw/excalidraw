@@ -28,9 +28,9 @@ import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { paintIcon } from "../components/icons";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../../store";
+import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 

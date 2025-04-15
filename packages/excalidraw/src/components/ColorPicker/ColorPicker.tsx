@@ -12,8 +12,8 @@ import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { useAtom } from "../../../editor-jotai";
-import { t } from "../../../i18n";
+import { useAtom } from "../../editor-jotai";
+import { t } from "../../i18n";
 import { useExcalidrawContainer } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
@@ -29,7 +29,7 @@ import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
-import type { AppState } from "../../../types";
+import type { AppState } from "../../types";
 
 const isValidColor = (color: string) => {
   const style = new Option().style;

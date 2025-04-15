@@ -30,7 +30,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "@excalidraw/excalidraw",
+      label: "@excalidraw/excalidraw/src",
       collapsed: false,
       items: [
         "@excalidraw/excalidraw/installation",

@@ -10,7 +10,7 @@ import { mutateElement } from "@excalidraw/element/mutateElement";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
-import { t } from "../../i18n";
+import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
 
 import DialogActionButton from "./DialogActionButton";
@@ -20,7 +20,7 @@ import { TrashIcon } from "./icons";
 
 import "./ElementLinkDialog.scss";
 
-import type { AppProps, AppState, UIAppState } from "../../types";
+import type { AppProps, AppState, UIAppState } from "../types";
 
 const ElementLinkDialog = ({
   sourceElementId,

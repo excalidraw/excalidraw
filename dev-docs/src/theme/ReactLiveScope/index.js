@@ -7,7 +7,7 @@ import "@excalidraw/excalidraw/index.css";
 
 let ExcalidrawComp = {};
 if (ExecutionEnvironment.canUseDOM) {
-  ExcalidrawComp = require("@excalidraw/excalidraw");
+  ExcalidrawComp = require("@excalidraw/excalidraw/src");
 }
 const Excalidraw = React.forwardRef((props, ref) => {
   if (!window.EXCALIDRAW_ASSET_PATH) {

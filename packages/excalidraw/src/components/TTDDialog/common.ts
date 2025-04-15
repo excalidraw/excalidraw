@@ -7,10 +7,10 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { canvasToBlob } from "../../data/blob";
-import { t } from "../../../i18n";
-import { convertToExcalidrawElements, exportToCanvas } from "../../../index";
+import { t } from "../../i18n";
+import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 
-import type { AppClassProperties, BinaryFiles } from "../../../types";
+import type { AppClassProperties, BinaryFiles } from "../../types";
 
 const resetPreview = ({
   canvasRef,
