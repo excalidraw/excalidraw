@@ -11,13 +11,13 @@ import type { ExcalidrawGenericElement } from "@excalidraw/element/types";
 import { parseLibraryJSON } from "../src/data/blob";
 import { serializeLibraryAsJSON } from "../src/data/json";
 import { distributeLibraryItemsOnSquareGrid } from "../src/data/library";
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
 import { fireEvent, getCloneByOrigId, render, waitFor } from "./test-utils";
 
-import type { LibraryItem, LibraryItems } from "../types";
+import type { LibraryItem, LibraryItems } from "../src/types";
 
 const { h } = window;
 

@@ -1,6 +1,6 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { Excalidraw } from "../../index";
+import { Excalidraw } from "../../src/index";
 import { API } from "../../tests/helpers/api";
 import { render } from "../../tests/test-utils";
 

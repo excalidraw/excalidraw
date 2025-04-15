@@ -7,7 +7,7 @@ import {
   STROKE_WIDTH,
 } from "@excalidraw/common";
 
-import { Excalidraw } from "../../index";
+import { Excalidraw } from "../../src/index";
 import { API } from "../../tests/helpers/api";
 import { UI } from "../../tests/helpers/ui";
 import { render } from "../../tests/test-utils";

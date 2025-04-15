@@ -16,7 +16,7 @@ import type {
   ExcalidrawTextElementWithContainer,
 } from "@excalidraw/element/types";
 
-import { Excalidraw } from "../../index";
+import { Excalidraw } from "../../src/index";
 import { API } from "../../tests/helpers/api";
 import { Keyboard, Pointer, UI } from "../../tests/helpers/ui";
 import { getTextEditor, updateTextEditor } from "../../tests/queries/dom";

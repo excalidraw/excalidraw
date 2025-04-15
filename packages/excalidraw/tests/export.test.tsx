@@ -4,11 +4,11 @@ import { SVG_NS } from "@excalidraw/common";
 
 import type { FileId } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../appState";
+import { getDefaultAppState } from "../src/appState";
 import { getDataURL } from "../src/data/blob";
 import { encodePngMetadata } from "../src/data/image";
 import { serializeAsJSON } from "../src/data/json";
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,

@@ -6,7 +6,7 @@ import { KEYS, reseed } from "@excalidraw/common";
 import { setDateTimeForTests } from "@excalidraw/common";
 
 import { copiedStyles } from "../src/actions/actionStyles";
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import * as StaticScene from "../src/renderer/staticScene";
 
 import { API } from "./helpers/api";

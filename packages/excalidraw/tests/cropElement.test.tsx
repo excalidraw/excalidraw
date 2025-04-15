@@ -17,7 +17,7 @@ import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { act, GlobalTestState, render, unmountComponent } from "./test-utils";
 
-import type { NormalizedZoomValue } from "../types";
+import type { NormalizedZoomValue } from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");

@@ -48,12 +48,12 @@ import {
   createRedoAction,
 } from "../src/actions/actionHistory.js";
 import { actionToggleViewMode } from "../src/actions/actionToggleViewMode.js";
-import { getDefaultAppState } from "../appState";
-import { HistoryEntry } from "../history";
-import { Excalidraw } from "../index";
+import { getDefaultAppState } from "../src/appState";
+import { HistoryEntry } from "../src/history";
+import { Excalidraw } from "../src/index";
 import * as StaticScene from "../src/renderer/staticScene";
-import { Snapshot, CaptureUpdateAction } from "../store";
-import { AppStateChange, ElementsChange } from "../change";
+import { Snapshot, CaptureUpdateAction } from "../src/store";
+import { AppStateChange, ElementsChange } from "../src/change";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -66,7 +66,7 @@ import {
   getCloneByOrigId,
 } from "./test-utils";
 
-import type { AppState } from "../types";
+import type { AppState } from "../src/types";
 
 const { h } = window;
 

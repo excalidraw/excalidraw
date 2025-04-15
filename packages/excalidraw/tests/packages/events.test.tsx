@@ -3,12 +3,12 @@ import { vi } from "vitest";
 
 import { resolvablePromise } from "@excalidraw/common";
 
-import { Excalidraw, CaptureUpdateAction } from "../../index";
+import { Excalidraw, CaptureUpdateAction } from "../../src/index";
 import { API } from "../helpers/api";
 import { Pointer } from "../helpers/ui";
 import { render } from "../test-utils";
 
-import type { ExcalidrawImperativeAPI } from "../../types";
+import type { ExcalidrawImperativeAPI } from "../../src/types";
 
 describe("event callbacks", () => {
   const h = window.h;

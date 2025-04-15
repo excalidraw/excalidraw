@@ -4,8 +4,8 @@ import { useMemo } from "react";
 
 import { THEME } from "@excalidraw/common";
 
-import { t } from "../i18n";
-import { Excalidraw, Footer, MainMenu } from "../index";
+import { t } from "../src/i18n";
+import { Excalidraw, Footer, MainMenu } from "../src/index";
 
 import { fireEvent, GlobalTestState, toggleMenu, render } from "./test-utils";
 

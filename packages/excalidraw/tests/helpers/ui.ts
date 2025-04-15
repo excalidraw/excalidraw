@@ -38,13 +38,13 @@ import type {
   ExcalidrawImageElement,
 } from "@excalidraw/element/types";
 
-import { createTestHook } from "../../components/App";
+import { createTestHook } from "../../src/components/App";
 import { getTextEditor } from "../queries/dom";
 import { act, fireEvent, GlobalTestState, screen } from "../test-utils";
 
 import { API } from "./api";
 
-import type { ToolType } from "../../types";
+import type { ToolType } from "../../src/types";
 
 // so that window.h is available when App.tsx is not imported as well.
 createTestHook();

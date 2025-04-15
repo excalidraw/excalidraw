@@ -2,7 +2,7 @@ import React from "react";
 
 import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";

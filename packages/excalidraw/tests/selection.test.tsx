@@ -3,9 +3,9 @@ import { vi } from "vitest";
 
 import { KEYS, reseed } from "@excalidraw/common";
 
-import { SHAPES } from "../components/shapes";
+import { SHAPES } from "../src/components/shapes";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 import * as InteractiveCanvas from "../src/renderer/interactiveScene";
 import * as StaticScene from "../src/renderer/staticScene";
 

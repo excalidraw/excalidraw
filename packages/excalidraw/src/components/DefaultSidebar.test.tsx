@@ -2,7 +2,7 @@ import React from "react";
 
 import { DEFAULT_SIDEBAR } from "@excalidraw/common";
 
-import { DefaultSidebar } from "../index";
+import { DefaultSidebar } from "../src/index";
 import {
   fireEvent,
   waitFor,

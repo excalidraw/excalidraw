@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Excalidraw, MainMenu } from "../../index";
+import { Excalidraw, MainMenu } from "../../src/index";
 import { render, queryAllByTestId } from "../../tests/test-utils";
 
 describe("Test internal component fallback rendering", () => {

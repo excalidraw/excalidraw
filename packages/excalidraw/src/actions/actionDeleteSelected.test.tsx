@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Excalidraw, mutateElement } from "../../index";
+import { Excalidraw, mutateElement } from "../../src/index";
 import { API } from "../../tests/helpers/api";
 import { act, assertElements, render } from "../../tests/test-utils";
 

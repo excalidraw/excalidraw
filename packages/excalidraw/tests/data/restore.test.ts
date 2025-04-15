@@ -16,7 +16,7 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/src/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../src/data/restore";
-import { getDefaultAppState } from "../../appState";
+import { getDefaultAppState } from "../../src/appState";
 
 import type { ImportedDataState } from "../../src/data/types";
 

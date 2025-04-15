@@ -2,7 +2,7 @@ import React from "react";
 
 import { KEYS } from "@excalidraw/common";
 
-import { Excalidraw } from "../../index";
+import { Excalidraw } from "../../src/index";
 import { Keyboard } from "../../tests/helpers/ui";
 import {
   render,

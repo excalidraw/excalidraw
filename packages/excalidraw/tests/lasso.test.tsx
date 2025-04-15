@@ -25,7 +25,7 @@ import { getElementLineSegments } from "@excalidraw/element/bounds";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { Excalidraw } from "../index";
+import { Excalidraw } from "../src/index";
 
 import { getSelectedElements } from "../src/scene";
 

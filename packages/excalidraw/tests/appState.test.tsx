@@ -4,8 +4,8 @@ import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../appState";
-import { Excalidraw } from "../index";
+import { getDefaultAppState } from "../src/appState";
+import { Excalidraw } from "../src/index";
 
 import { API } from "./helpers/api";
 import { Pointer, UI } from "./helpers/ui";

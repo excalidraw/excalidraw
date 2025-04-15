@@ -1,7 +1,7 @@
 import { queryByTestId, fireEvent } from "@testing-library/react";
 import React from "react";
 
-import { Excalidraw } from "../../index";
+import { Excalidraw } from "../../src/index";
 import { API } from "../../tests/helpers/api";
 import { Pointer, UI } from "../../tests/helpers/ui";
 import { render } from "../../tests/test-utils";

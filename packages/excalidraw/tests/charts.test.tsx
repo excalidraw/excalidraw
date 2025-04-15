@@ -1,4 +1,4 @@
-import { tryParseSpreadsheet } from "../charts";
+import { tryParseSpreadsheet } from "../src/charts";
 
 describe("tryParseSpreadsheet", () => {
   it("works for numbers with comma in them", () => {
