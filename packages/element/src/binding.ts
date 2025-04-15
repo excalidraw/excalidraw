@@ -27,7 +27,9 @@ import {
   PRECISION,
 } from "@excalidraw/math";
 
-import { isPointOnShape } from "@excalidraw/utils/collision";
+import { isPointInShape, isPointOnShape } from "@excalidraw/utils/collision";
+
+import { getEllipseShape, getPolygonShape } from "@excalidraw/utils/shape";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
@@ -909,8 +911,14 @@ const getDistanceForBinding = (
     bindableElement.height,
     zoom,
   );
+  const isInside = isPointInShape(
+    point,
+    bindableElement.type === "ellipse"
+      ? getEllipseShape(bindableElement)
+      : getPolygonShape(bindableElement),
+  );
 
-  return distance > bindDistance ? null : distance;
+  return distance > bindDistance && !isInside ? null : distance;
 };
 
 export const bindPointToSnapToElementOutline = (
