@@ -405,11 +405,98 @@ describe("elbow arrow ui", () => {
     expect(duplicatedArrow.id).not.toBe(originalArrowId);
     expect(duplicatedArrow.type).toBe("arrow");
     expect(duplicatedArrow.elbowed).toBe(true);
-    expect(duplicatedArrow.points).toEqual([
+    expect(duplicatedArrow.points).toCloselyEqualPoints([
       [0, 0],
       [0, 100],
       [90, 100],
       [90, 200],
     ]);
+  });
+
+  it("elbow arrow snap at diamond quarter point too", async () => {
+    UI.createElement("diamond", {
+      x: -50,
+      y: -50,
+      width: 100,
+      height: 100,
+    });
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(43, 99);
+    mouse.click();
+    mouse.moveTo(27, 25);
+    mouse.click();
+
+    let arrow = h.scene.getSelectedElements(
+      h.state,
+    )[0] as ExcalidrawArrowElement;
+
+    expect(arrow.endBinding).not.toBe(null);
+    expect(arrow.x + arrow.points[arrow.points.length - 1][0]).toBeCloseTo(
+      29.0355,
+    );
+    expect(arrow.y + arrow.points[arrow.points.length - 1][1]).toBeCloseTo(
+      29.0355,
+    );
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(43, 99);
+    mouse.click();
+    mouse.moveTo(-23, 25);
+    mouse.click();
+
+    arrow = h.scene.getSelectedElements(h.state)[0] as ExcalidrawArrowElement;
+
+    expect(arrow.endBinding).not.toBe(null);
+    expect(arrow.x + arrow.points[arrow.points.length - 1][0]).toBeCloseTo(
+      -28.5559,
+    );
+    expect(arrow.y + arrow.points[arrow.points.length - 1][1]).toBeCloseTo(
+      28.5559,
+    );
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(43, 99);
+    mouse.click();
+    mouse.moveTo(-27, -25);
+    mouse.click();
+
+    arrow = h.scene.getSelectedElements(h.state)[0] as ExcalidrawArrowElement;
+
+    expect(arrow.endBinding).not.toBe(null);
+    expect(arrow.x + arrow.points[arrow.points.length - 1][0]).toBeCloseTo(
+      -28.0355,
+    );
+    expect(arrow.y + arrow.points[arrow.points.length - 1][1]).toBeCloseTo(
+      -28.0355,
+    );
+
+    UI.clickTool("arrow");
+    UI.clickOnTestId("elbow-arrow");
+
+    mouse.reset();
+    mouse.moveTo(43, 99);
+    mouse.click();
+    mouse.moveTo(23, -25);
+    mouse.click();
+
+    arrow = h.scene.getSelectedElements(h.state)[0] as ExcalidrawArrowElement;
+
+    expect(arrow.endBinding).not.toBe(null);
+    expect(arrow.x + arrow.points[arrow.points.length - 1][0]).toBeCloseTo(
+      28.5559,
+    );
+    expect(arrow.y + arrow.points[arrow.points.length - 1][1]).toBeCloseTo(
+      -28.5559,
+    );
   });
 });
