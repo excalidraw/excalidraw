@@ -44,7 +44,6 @@ import { intersectElementWithLineSegment } from "./collision";
 import { distanceToBindableElement } from "./distance";
 import {
   headingForPointFromElement,
-  headingIsHorizontal,
   vectorToHeading,
   type Heading,
 } from "./heading";
@@ -947,23 +946,16 @@ export const bindPointToSnapToElementOutline = (
 
   let intersection: GlobalPoint | null = null;
   if (elbowed) {
-    const isHorizontal = headingIsHorizontal(
-      headingForPointFromElement(bindableElement, aabb, globalP),
-    );
-    const otherPoint = pointFrom<GlobalPoint>(
-      isHorizontal ? center[0] : edgePoint[0],
-      !isHorizontal ? center[1] : edgePoint[1],
-    );
     intersection = intersectElementWithLineSegment(
       bindableElement,
       lineSegment(
-        otherPoint,
+        center,
         pointFromVector(
           vectorScale(
-            vectorNormalize(vectorFromPoint(edgePoint, otherPoint)),
+            vectorNormalize(vectorFromPoint(edgePoint, center)),
             Math.max(bindableElement.width, bindableElement.height) * 2,
           ),
-          otherPoint,
+          center,
         ),
       ),
     )[0];
@@ -1190,25 +1182,25 @@ export const snapToMid = (
       y + (3 * height) / 4 + sqrtFixedDistance,
     );
     if (
-      pointDistance(topLeft, p) <
+      pointDistance(topLeft, nonRotated) <
       Math.max(horizontalThrehsold, verticalThrehsold)
     ) {
       return pointRotateRads(topLeft, center, angle);
     }
     if (
-      pointDistance(topRight, p) <
+      pointDistance(topRight, nonRotated) <
       Math.max(horizontalThrehsold, verticalThrehsold)
     ) {
       return pointRotateRads(topRight, center, angle);
     }
     if (
-      pointDistance(bottomLeft, p) <
+      pointDistance(bottomLeft, nonRotated) <
       Math.max(horizontalThrehsold, verticalThrehsold)
     ) {
       return pointRotateRads(bottomLeft, center, angle);
     }
     if (
-      pointDistance(bottomRight, p) <
+      pointDistance(bottomRight, nonRotated) <
       Math.max(horizontalThrehsold, verticalThrehsold)
     ) {
       return pointRotateRads(bottomRight, center, angle);
