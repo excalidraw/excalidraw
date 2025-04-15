@@ -5,6 +5,7 @@ import {
   isFirefox,
   MIME_TYPES,
   cloneJSON,
+  SVG_DOCUMENT_PREAMBLE,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -134,7 +135,11 @@ export const exportCanvas = async (
     if (type === "svg") {
       return fileSave(
         svgPromise.then((svg) => {
-          return new Blob([svg.outerHTML], { type: MIME_TYPES.svg });
+          // adding SVG preamble so that older software parse the SVG file
+          // properly
+          return new Blob([SVG_DOCUMENT_PREAMBLE + svg.outerHTML], {
+            type: MIME_TYPES.svg,
+          });
         }),
         {
           description: "Export to SVG",
