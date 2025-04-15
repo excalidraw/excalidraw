@@ -79,7 +79,7 @@ import {
   getScrollBars,
   SCROLLBAR_COLOR,
   SCROLLBAR_WIDTH,
-} from "../scene/scrollbars";
+} from "../src/scene/scrollbars";
 import { type InteractiveCanvasAppState } from "../types";
 
 import { getClientColor, renderRemoteCursors } from "../clients";
@@ -94,7 +94,7 @@ import type {
   InteractiveCanvasRenderConfig,
   InteractiveSceneRenderConfig,
   RenderableElementsMap,
-} from "../scene/types";
+} from "../src/scene/types";
 
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,

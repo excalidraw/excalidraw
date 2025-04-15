@@ -41,9 +41,9 @@ import {
 import { setCursor } from "../cursor";
 
 import { t } from "../i18n";
-import { getNormalizedZoom } from "../scene";
-import { centerScrollOn } from "../scene/scroll";
-import { getStateForZoom } from "../scene/zoom";
+import { getNormalizedZoom } from "../src/scene";
+import { centerScrollOn } from "../src/scene/scroll";
+import { getStateForZoom } from "../src/scene/zoom";
 import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";

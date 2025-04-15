@@ -9,7 +9,7 @@ import type {
 import type {
   ElementShape,
   ElementShapes,
-} from "@excalidraw/excalidraw/scene/types";
+} from "@excalidraw/excalidraw/src/scene/types";
 
 import { _generateElementShape } from "./Shape";
 

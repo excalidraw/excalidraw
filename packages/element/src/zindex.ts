@@ -2,7 +2,7 @@ import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
+import type Scene from "@excalidraw/excalidraw/src/scene/Scene";
 
 import { isFrameLikeElement } from "./typeChecks";
 

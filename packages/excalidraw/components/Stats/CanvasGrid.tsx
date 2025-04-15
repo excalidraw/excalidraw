@@ -1,9 +1,9 @@
-import { getNormalizedGridStep } from "../../scene";
+import { getNormalizedGridStep } from "../../src/scene";
 
 import StatsDragInput from "./DragInput";
 import { getStepSizedValue } from "./utils";
 
-import type Scene from "../../scene/Scene";
+import type Scene from "../../src/scene/Scene";
 import type { AppState } from "../../types";
 
 interface PositionProps {

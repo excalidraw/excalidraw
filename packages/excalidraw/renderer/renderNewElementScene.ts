@@ -4,7 +4,7 @@ import { renderElement } from "@excalidraw/element/renderElement";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 
-import type { NewElementSceneRenderConfig } from "../scene/types";
+import type { NewElementSceneRenderConfig } from "../src/scene/types";
 
 const _renderNewElementScene = ({
   canvas,

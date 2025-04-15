@@ -52,18 +52,23 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../appState";
-import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
-import { serializeAsJSON } from "../data/json";
+import { getDefaultAppState } from "../../appState";
+import {
+  base64ToString,
+  decode,
+  encode,
+  stringToBase64,
+} from "../../data/encode";
+import { serializeAsJSON } from "../../data/json";
 
-import { Fonts } from "../fonts";
+import { Fonts } from "../../fonts";
 
-import { renderStaticScene } from "../renderer/staticScene";
-import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import { renderStaticScene } from "../../renderer/staticScene";
+import { renderSceneToSvg } from "../../renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState, BinaryFiles } from "../types";
+import type { AppState, BinaryFiles } from "../../types";
 
 const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
   if (element.width <= maxWidth) {

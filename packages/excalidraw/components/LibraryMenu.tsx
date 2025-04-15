@@ -27,7 +27,7 @@ import {
 import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 
-import { getSelectedElements } from "../scene";
+import { getSelectedElements } from "../src/scene";
 
 import {
   useApp,

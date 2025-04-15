@@ -30,7 +30,7 @@ import type {
   StaticCanvasRenderConfig,
   RenderableElementsMap,
   InteractiveCanvasRenderConfig,
-} from "@excalidraw/excalidraw/scene/types";
+} from "@excalidraw/excalidraw/src/scene/types";
 
 import { getElementAbsoluteCoords } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";

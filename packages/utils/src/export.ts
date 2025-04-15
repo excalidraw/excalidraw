@@ -11,7 +11,7 @@ import { restore } from "@excalidraw/excalidraw/data/restore";
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
-} from "@excalidraw/excalidraw/scene/export";
+} from "@excalidraw/excalidraw/src/scene/export";
 
 import type {
   ExcalidrawElement,

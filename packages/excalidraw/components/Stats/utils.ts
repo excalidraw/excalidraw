@@ -27,7 +27,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type Scene from "../../scene/Scene";
+import type Scene from "../../src/scene/Scene";
 import type { AppState } from "../../types";
 
 export type StatsInputProperty =

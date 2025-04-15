@@ -22,7 +22,7 @@ import StatsDragInput from "./DragInput";
 import { getStepSizedValue } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type Scene from "../../scene/Scene";
+import type Scene from "../../src/scene/Scene";
 import type { AppState } from "../../types";
 
 interface MultiFontSizeProps {

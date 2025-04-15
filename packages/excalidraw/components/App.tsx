@@ -401,9 +401,9 @@ import {
   getSelectedElements,
   hasBackground,
   isSomeElementSelected,
-} from "../scene";
-import Scene from "../scene/Scene";
-import { getStateForZoom } from "../scene/zoom";
+} from "../src/scene";
+import Scene from "../src/scene/Scene";
+import { getStateForZoom } from "../src/scene/zoom";
 import {
   dataURLToFile,
   dataURLToString,
@@ -444,7 +444,7 @@ import {
   isGridModeEnabled,
 } from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
-import { Renderer } from "../scene/Renderer";
+import { Renderer } from "../src/scene/Renderer";
 import {
   setEraserCursor,
   setCursor,
@@ -458,7 +458,7 @@ import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
-import { isOverScrollBars } from "../scene/scrollbars";
+import { isOverScrollBars } from "../src/scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
@@ -488,7 +488,7 @@ import { findShapeByKey } from "./shapes";
 import type {
   RenderInteractiveSceneCallback,
   ScrollBars,
-} from "../scene/types";
+} from "../src/scene/types";
 
 import type { PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";

@@ -6,7 +6,7 @@ import type { ChartType } from "@excalidraw/element/types";
 import { trackEvent } from "../analytics";
 import { renderSpreadsheet } from "../charts";
 import { t } from "../i18n";
-import { exportToSvg } from "../scene/export";
+import { exportToSvg } from "../src/scene/export";
 
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";

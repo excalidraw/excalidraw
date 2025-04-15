@@ -71,7 +71,7 @@ import {
   getNormalizedGridSize,
   getNormalizedGridStep,
   getNormalizedZoom,
-} from "../scene";
+} from "../src/scene";
 
 import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";

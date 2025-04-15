@@ -34,7 +34,7 @@ import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
-} from "../scene/types";
+} from "../src/scene/types";
 import type { StaticCanvasAppState, Zoom } from "../types";
 
 const GridLineColor = {

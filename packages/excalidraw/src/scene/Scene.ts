@@ -34,7 +34,7 @@ import type {
 
 import type { Assert, SameType } from "@excalidraw/common/utility-types";
 
-import type { AppState } from "../types";
+import type { AppState } from "../../types";
 
 type ElementIdKey = InstanceType<typeof LinearElementEditor>["elementId"];
 type ElementKey = ExcalidrawElement | ElementIdKey;
