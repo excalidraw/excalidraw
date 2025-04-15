@@ -380,7 +380,7 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { trackEvent } from "../analytics";
-import { AnimationFrameHandler } from "../animation-frame-handler";
+import { AnimationFrameHandler } from "../src/animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
@@ -454,7 +454,7 @@ import {
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { Store, CaptureUpdateAction } from "../store";
-import { AnimatedTrail } from "../animated-trail";
+import { AnimatedTrail } from "../src/animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { textWysiwyg } from "../src/wysiwyg/textWysiwyg";
@@ -462,7 +462,7 @@ import { isOverScrollBars } from "../src/scene/scrollbars";
 
 import { isMaybeMermaidDefinition } from "../mermaid";
 
-import { LassoTrail } from "../lasso";
+import { LassoTrail } from "../src/lasso";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import BraveMeasureTextError from "./BraveMeasureTextError";

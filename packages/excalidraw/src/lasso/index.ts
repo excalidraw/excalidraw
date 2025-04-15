@@ -31,7 +31,7 @@ import { AnimatedTrail } from "../animated-trail";
 
 import { getLassoSelectedElementIds } from "./utils";
 
-import type App from "../components/App";
+import type App from "../../components/App";
 
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
