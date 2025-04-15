@@ -3,7 +3,7 @@ const path = require("path");
 const { build } = require("esbuild");
 const { sassPlugin } = require("esbuild-sass-plugin");
 
-const { parseEnvVariables } = require("../packages/excalidraw/env.cjs");
+const { parseEnvVariables } = require("../packages/excalidraw/src/env.cjs");
 
 const ENV_VARS = {
   development: {
@@ -30,6 +30,10 @@ const getConfig = (outdir) => ({
   alias: {
     "@excalidraw/common": path.resolve(__dirname, "../packages/common/src"),
     "@excalidraw/element": path.resolve(__dirname, "../packages/element/src"),
+    "@excalidraw/excalidraw": path.resolve(
+      __dirname,
+      "../packages/excalidraw/src",
+    ),
     "@excalidraw/excalidraw/src": path.resolve(
       __dirname,
       "../packages/excalidraw/src",
@@ -64,7 +68,10 @@ function buildProd(config) {
 
 const createESMRawBuild = async () => {
   const chunksConfig = {
-    entryPoints: ["index.tsx", "**/*.chunk.ts"],
+    entryPoints: [
+      path.resolve(__dirname, "../packages/excalidraw/src/index.tsx"),
+      path.resolve(__dirname, "../packages/excalidraw/src/**/*.chunk.ts"),
+    ],
     entryNames: "[name]",
   };
 

@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const { readFileSync } = require("fs");
-const pkg = require("./package.json");
+const pkg = require("../package.json");
 const parseEnvVariables = (filepath) => {
   const envVars = Object.entries(dotenv.parse(readFileSync(filepath))).reduce(
     (env, [key, value]) => {
