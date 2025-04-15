@@ -3,8 +3,6 @@ import { isPointWithinBounds, pointFrom } from "@excalidraw/math";
 import { doLineSegmentsIntersect } from "@excalidraw/utils/bbox";
 import { elementsOverlappingBBox } from "@excalidraw/utils/withinBounds";
 
-import type { ExcalidrawElementsIncludingDeleted } from "@excalidraw/excalidraw/scene/Scene";
-
 import type {
   AppClassProperties,
   AppState,
@@ -28,6 +26,8 @@ import {
   isFrameLikeElement,
   isTextElement,
 } from "./typeChecks";
+
+import type { ExcalidrawElementsIncludingDeleted } from "./Scene";
 
 import type {
   ElementsMap,

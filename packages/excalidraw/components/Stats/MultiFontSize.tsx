@@ -16,13 +16,14 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
+import type Scene from "@excalidraw/element/Scene";
+
 import { fontSizeIcon } from "../icons";
 
 import StatsDragInput from "./DragInput";
 import { getStepSizedValue } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface MultiFontSizeProps {
@@ -91,8 +92,7 @@ const handleFontSizeChange: DragInputCallbackType<
       redrawTextBoundingBox(
         textElement,
         scene.getContainerElement(textElement),
-        elementsMap,
-        (...args) => scene.mutate(...args),
+        scene,
       );
     }
 
@@ -120,8 +120,7 @@ const handleFontSizeChange: DragInputCallbackType<
       redrawTextBoundingBox(
         latestElement,
         scene.getContainerElement(latestElement),
-        elementsMap,
-        (...args) => scene.mutate(...args),
+        scene,
       );
     }
 

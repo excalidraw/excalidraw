@@ -9,11 +9,12 @@ import { isImageElement } from "@excalidraw/element/typeChecks";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
+import type Scene from "@excalidraw/element/Scene";
+
 import StatsDragInput from "./DragInput";
 import { getStepSizedValue, moveElement } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface PositionProps {

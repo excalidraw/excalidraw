@@ -577,12 +577,8 @@ export const textWysiwyg = ({
           ),
         });
       }
-      redrawTextBoundingBox(
-        updateElement,
-        container,
-        app.scene.getNonDeletedElementsMap(),
-        (...args) => app.scene.mutate(...args),
-      );
+
+      redrawTextBoundingBox(updateElement, container, app.scene);
     }
 
     onSubmit({

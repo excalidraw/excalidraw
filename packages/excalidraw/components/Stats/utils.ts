@@ -25,7 +25,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type Scene from "../../scene/Scene";
+import type Scene from "@excalidraw/element/Scene";
+
 import type { AppState } from "../../types";
 
 export type StatsInputProperty =
@@ -206,10 +207,6 @@ export const updateBindings = (
   if (isLinearElement(latestElement)) {
     bindOrUnbindLinearElements([latestElement], true, [], scene, options?.zoom);
   } else {
-    updateBoundElements(
-      latestElement,
-      scene.getNonDeletedElementsMap(),
-      options,
-    );
+    updateBoundElements(latestElement, scene, options);
   }
 };

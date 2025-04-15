@@ -7,8 +7,6 @@ import type {
   PendingExcalidrawElements,
 } from "@excalidraw/excalidraw/types";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import { bindLinearElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import {
@@ -40,6 +38,8 @@ import {
   type Ordered,
   type OrderedExcalidrawElement,
 } from "./types";
+
+import type Scene from "./Scene";
 
 type LinkDirection = "up" | "right" | "down" | "left";
 
@@ -445,20 +445,8 @@ const createBindingArrow = (
 
   const elementsMap = scene.getNonDeletedElementsMap();
 
-  bindLinearElement(
-    bindingArrow,
-    startBindingElement,
-    "start",
-    elementsMap,
-    (...args) => scene.mutate(...args),
-  );
-  bindLinearElement(
-    bindingArrow,
-    endBindingElement,
-    "end",
-    elementsMap,
-    (...args) => scene.mutate(...args),
-  );
+  bindLinearElement(bindingArrow, startBindingElement, "start", scene);
+  bindLinearElement(bindingArrow, endBindingElement, "end", scene);
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(
@@ -474,7 +462,7 @@ const createBindingArrow = (
     bindingArrow as OrderedExcalidrawElement,
   );
 
-  LinearElementEditor.movePoints(bindingArrow, elementsMap, [
+  LinearElementEditor.movePoints(bindingArrow, scene, [
     {
       index: 1,
       point: bindingArrow.points[1],

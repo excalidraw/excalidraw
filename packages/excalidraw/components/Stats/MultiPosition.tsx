@@ -7,13 +7,14 @@ import { getCommonBounds } from "@excalidraw/element/bounds";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
+import type Scene from "@excalidraw/element/Scene";
+
 import StatsDragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
 import { getElementsInAtomicUnit, moveElement } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
 import type { AtomicUnit } from "./utils";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface MultiPositionProps {

@@ -27,7 +27,7 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import type { ElementUpdate } from "./mutateElement";
+import type Scene from "./Scene";
 
 import type { MaybeTransformHandleType } from "./transformHandles";
 import type {
@@ -43,12 +43,10 @@ import type {
 export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
-  elementsMap: ElementsMap,
-  mutator: (
-    element: ExcalidrawElement,
-    updates: ElementUpdate<ExcalidrawElement>,
-  ) => ExcalidrawElement,
+  scene: Scene,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+
   let maxWidth = undefined;
   const boundTextUpdates = {
     x: textElement.x,
@@ -96,30 +94,34 @@ export const redrawTextBoundingBox = (
         metrics.height,
         container.type,
       );
-      mutator(container, { height: nextHeight });
+      scene.mutate(container, { height: nextHeight });
       updateOriginalContainerCache(container.id, nextHeight);
     }
+
     if (metrics.width > maxContainerWidth) {
       const nextWidth = computeContainerDimensionForBoundText(
         metrics.width,
         container.type,
       );
-      mutator(container, { width: nextWidth });
+      scene.mutate(container, { width: nextWidth });
     }
+
     const updatedTextElement = {
       ...textElement,
       ...boundTextUpdates,
     } as ExcalidrawTextElementWithContainer;
+
     const { x, y } = computeBoundTextPosition(
       container,
       updatedTextElement,
       elementsMap,
     );
+
     boundTextUpdates.x = x;
     boundTextUpdates.y = y;
   }
 
-  mutator(textElement, boundTextUpdates);
+  scene.mutate(textElement, boundTextUpdates);
 };
 
 export const handleBindTextResize = (

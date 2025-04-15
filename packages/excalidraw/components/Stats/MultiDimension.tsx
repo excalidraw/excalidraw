@@ -16,16 +16,13 @@ import { isTextElement } from "@excalidraw/element/typeChecks";
 
 import { getCommonBounds } from "@excalidraw/utils";
 
-import {
-  mutateElement,
-  mutateElementWith,
-} from "@excalidraw/element/mutateElement";
-
 import type {
   ElementsMap,
   ExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
+
+import type Scene from "@excalidraw/element/Scene";
 
 import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
@@ -33,7 +30,6 @@ import { getElementsInAtomicUnit } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
 import type { AtomicUnit } from "./utils";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface MultiDimensionProps {
@@ -79,12 +75,13 @@ const resizeElementInGroup = (
   scale: number,
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
-  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
-  mutateElementWith(latestElement, elementsMap, updates);
+  scene.mutate(latestElement, updates);
 
   const boundTextElement = getBoundTextElement(
     origElement,
@@ -92,12 +89,12 @@ const resizeElementInGroup = (
   );
   if (boundTextElement) {
     const newFontSize = boundTextElement.fontSize * scale;
-    updateBoundElements(latestElement, elementsMap, {
+    updateBoundElements(latestElement, scene, {
       newSize: { width: updates.width, height: updates.height },
     });
     const latestBoundTextElement = elementsMap.get(boundTextElement.id);
     if (latestBoundTextElement && isTextElement(latestBoundTextElement)) {
-      mutateElement(latestBoundTextElement, {
+      scene.mutate(latestBoundTextElement, {
         fontSize: newFontSize,
       });
       handleBindTextResize(
@@ -119,8 +116,8 @@ const resizeGroup = (
   property: MultiDimensionProps["property"],
   latestElements: ExcalidrawElement[],
   originalElements: ExcalidrawElement[],
-  elementsMap: NonDeletedSceneElementsMap,
   originalElementsMap: ElementsMap,
+  scene: Scene,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -142,8 +139,8 @@ const resizeGroup = (
       scale,
       latestElement,
       origElement,
-      elementsMap,
       originalElementsMap,
+      scene,
     );
   }
 };
@@ -195,8 +192,8 @@ const handleDimensionChange: DragInputCallbackType<
           property,
           latestElements,
           originalElements,
-          elementsMap,
           originalElementsMap,
+          scene,
         );
       } else {
         const [el] = elementsInUnit;
@@ -302,8 +299,8 @@ const handleDimensionChange: DragInputCallbackType<
         property,
         latestElements,
         originalElements,
-        elementsMap,
         originalElementsMap,
+        scene,
       );
     } else {
       const [el] = elementsInUnit;

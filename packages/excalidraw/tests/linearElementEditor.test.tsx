@@ -1384,7 +1384,7 @@ describe("Test Linear Elements", () => {
       const [origStartX, origStartY] = [line.x, line.y];
 
       act(() => {
-        LinearElementEditor.movePoints(line, arrayToMap(h.elements), [
+        LinearElementEditor.movePoints(line, h.app.scene, [
           {
             index: 0,
             point: pointFrom(line.points[0][0] + 10, line.points[0][1] + 10),

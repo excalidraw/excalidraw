@@ -11,8 +11,6 @@ import type {
   PointerDownState,
 } from "@excalidraw/excalidraw/types";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { updateBoundElements } from "./binding";
@@ -27,6 +25,8 @@ import {
   isImageElement,
   isTextElement,
 } from "./typeChecks";
+
+import type Scene from "./Scene";
 
 import type { Bounds } from "./bounds";
 import type { ExcalidrawElement } from "./types";
@@ -118,7 +118,7 @@ export const dragSelectedElements = (
           adjustedOffset,
         );
       }
-      updateBoundElements(element, scene.getNonDeletedElementsMap(), {
+      updateBoundElements(element, scene, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });
     }

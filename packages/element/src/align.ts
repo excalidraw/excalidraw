@@ -1,8 +1,8 @@
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import { updateBoundElements } from "./binding";
 import { getCommonBoundingBox } from "./bounds";
 import { getMaximumGroups } from "./groups";
+
+import type Scene from "./Scene";
 
 import type { BoundingBox } from "./bounds";
 import type { ExcalidrawElement } from "./types";
@@ -38,7 +38,7 @@ export const alignElements = (
       });
 
       // update bound elements
-      updateBoundElements(element, elementsMap, {
+      updateBoundElements(element, scene, {
         simultaneouslyUpdated: group,
       });
       return updatedEle;

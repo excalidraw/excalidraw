@@ -162,12 +162,7 @@ export const actionBindText = register({
       }),
     });
     const originalContainerHeight = container.height;
-    redrawTextBoundingBox(
-      textElement,
-      container,
-      app.scene.getNonDeletedElementsMap(),
-      (...args) => app.scene.mutate(...args),
-    );
+    redrawTextBoundingBox(textElement, container, app.scene);
     // overwritting the cache with original container height so
     // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
@@ -312,12 +307,8 @@ export const actionWrapTextInContainer = register({
           textAlign: TEXT_ALIGN.CENTER,
           autoResize: true,
         });
-        redrawTextBoundingBox(
-          textElement,
-          container,
-          app.scene.getNonDeletedElementsMap(),
-          (...args) => app.scene.mutate(...args),
-        );
+
+        redrawTextBoundingBox(textElement, container, app.scene);
 
         updatedElements = pushContainerBelowText(
           [...updatedElements, container],

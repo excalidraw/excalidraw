@@ -17,8 +17,6 @@ import {
 
 import type { GlobalPoint } from "@excalidraw/math";
 
-import type Scene from "@excalidraw/excalidraw/scene/Scene";
-
 import type { PointerDownState } from "@excalidraw/excalidraw/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -59,6 +57,8 @@ import {
 } from "./typeChecks";
 
 import { isInGroup } from "./groups";
+
+import type Scene from "./Scene";
 
 import type { BoundingBox } from "./bounds";
 import type {
@@ -103,7 +103,7 @@ export const transformElements = (
           pointerY,
           shouldRotateWithDiscreteAngle,
         );
-        updateBoundElements(element, elementsMap);
+        updateBoundElements(element, scene);
       }
     } else if (isTextElement(element) && transformHandleType) {
       resizeSingleTextElement(
@@ -115,7 +115,7 @@ export const transformElements = (
         pointerX,
         pointerY,
       );
-      updateBoundElements(element, elementsMap);
+      updateBoundElements(element, scene);
       return true;
     } else if (transformHandleType) {
       const elementId = selectedElements[0].id;
@@ -554,7 +554,7 @@ const rotateMultipleElements = (
 
       scene.mutate(element, updates);
 
-      updateBoundElements(element, elementsMap, {
+      updateBoundElements(element, scene, {
         simultaneouslyUpdated: elements,
       });
 
@@ -964,7 +964,7 @@ export const resizeSingleElement = (
 
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    updateBoundElements(latestElement, elementsMap, {
+    updateBoundElements(latestElement, scene, {
       // TODO: confirm with MARK if this actually makes sense
       newSize: { width: nextWidth, height: nextHeight },
     });
@@ -1525,7 +1525,7 @@ export const resizeMultipleElements = (
         isDragging: true,
       });
 
-      updateBoundElements(element, scene.getNonDeletedElementsMap(), {
+      updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdate,
         newSize: { width, height },
       });

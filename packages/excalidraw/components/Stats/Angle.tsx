@@ -7,13 +7,14 @@ import type { Degrees } from "@excalidraw/math";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
+import type Scene from "@excalidraw/element/Scene";
+
 import { angleIcon } from "../icons";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable, updateBindings } from "./utils";
 
 import type { DragInputCallbackType } from "./DragInput";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 interface AngleProps {

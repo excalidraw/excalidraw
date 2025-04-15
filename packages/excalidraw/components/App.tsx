@@ -299,6 +299,8 @@ import {
 
 import { isNonDeletedElement } from "@excalidraw/element";
 
+import Scene from "@excalidraw/element/Scene";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -400,7 +402,6 @@ import {
   hasBackground,
   isSomeElementSelected,
 } from "../scene";
-import Scene from "../scene/Scene";
 import { getStateForZoom } from "../scene/zoom";
 import {
   dataURLToFile,
@@ -3332,12 +3333,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(
-          newElement,
-          container,
-          this.scene.getElementsMapIncludingDeleted(),
-          (...args) => this.scene.mutate(...args),
-        );
+        redrawTextBoundingBox(newElement, container, this.scene);
       }
     });
 
@@ -4439,7 +4435,7 @@ class App extends React.Component<AppProps, AppState> {
             { informMutation: false },
           );
 
-          updateBoundElements(element, this.scene.getNonDeletedElementsMap(), {
+          updateBoundElements(element, this.scene, {
             simultaneouslyUpdated: selectedElements,
           });
         });
@@ -4976,7 +4972,7 @@ class App extends React.Component<AppProps, AppState> {
       onChange: withBatchedUpdates((nextOriginalText) => {
         updateElement(nextOriginalText, false);
         if (isNonDeletedElement(element)) {
-          updateBoundElements(element, this.scene.getNonDeletedElementsMap());
+          updateBoundElements(element, this.scene);
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
@@ -5883,7 +5879,6 @@ class App extends React.Component<AppProps, AppState> {
         scenePointerX,
         scenePointerY,
         this,
-        this.scene.getNonDeletedElementsMap(),
       );
 
       if (
@@ -10762,16 +10757,12 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
 
-        updateBoundElements(
-          croppingElement,
-          this.scene.getNonDeletedElementsMap(),
-          {
-            newSize: {
-              width: croppingElement.width,
-              height: croppingElement.height,
-            },
+        updateBoundElements(croppingElement, this.scene, {
+          newSize: {
+            width: croppingElement.width,
+            height: croppingElement.height,
           },
-        );
+        });
 
         this.setState({
           isCropping: transformHandleType && transformHandleType !== "rotation",

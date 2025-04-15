@@ -259,7 +259,7 @@ export const actionDeleteSelected = register({
 
       LinearElementEditor.deletePoints(
         element,
-        elementsMap,
+        app.scene,
         selectedPointsIndices,
       );
 

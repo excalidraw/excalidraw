@@ -7,6 +7,8 @@ import { deepCopyElement } from "@excalidraw/element/duplicate";
 
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
+import type Scene from "@excalidraw/element/Scene";
+
 import { CaptureUpdateAction } from "../../store";
 import { useApp } from "../App";
 import { InlineIcon } from "../InlineIcon";
@@ -16,7 +18,6 @@ import { SMALLEST_DELTA } from "./utils";
 import "./DragInput.scss";
 
 import type { StatsInputProperty } from "./utils";
-import type Scene from "../../scene/Scene";
 import type { AppState } from "../../types";
 
 export type DragInputCallbackType<

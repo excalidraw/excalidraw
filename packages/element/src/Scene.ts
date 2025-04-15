@@ -34,6 +34,7 @@ import type {
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
   Ordered,
+  ElementsMap,
 } from "@excalidraw/element/types";
 
 import type {
@@ -42,7 +43,7 @@ import type {
   SameType,
 } from "@excalidraw/common/utility-types";
 
-import type { AppState } from "../types";
+import type { AppState } from "../../excalidraw/types";
 
 type SceneStateCallback = () => void;
 type SceneStateCallbackRemover = () => void;
@@ -164,6 +165,12 @@ class Scene {
 
   getFramesIncludingDeleted() {
     return this.frames;
+  }
+
+  constructor(elementsMap: ElementsMap | null = null) {
+    if (elementsMap) {
+      this.replaceAllElements(elementsMap);
+    }
   }
 
   getSelectedElements(opts: {
@@ -419,7 +426,6 @@ class Scene {
 
   // TODO_SCENE: should be accessed as app.scene through the API
   // TODO_SCENE: inform mutation false is the new default, meaning all mutateElement with nothing should likely use scene instead
-  // TODO_SCENE: think one more time about moving the scene inside element (probably we will end up with it either way)
   // Mutate an element with passed updates and trigger the component to update. Make sure you
   // are calling it either from a React event handler or within unstable_batchedUpdates().
   mutate<TElement extends Mutable<ExcalidrawElement>>(
