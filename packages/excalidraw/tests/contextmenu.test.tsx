@@ -5,7 +5,7 @@ import { KEYS, reseed } from "@excalidraw/common";
 
 import { setDateTimeForTests } from "@excalidraw/common";
 
-import { copiedStyles } from "../actions/actionStyles";
+import { copiedStyles } from "../src/actions/actionStyles";
 import { Excalidraw } from "../index";
 import * as StaticScene from "../src/renderer/staticScene";
 
@@ -25,8 +25,8 @@ import {
   unmountComponent,
 } from "./test-utils";
 
-import type { ShortcutName } from "../actions/shortcuts";
-import type { ActionName } from "../actions/types";
+import type { ShortcutName } from "../src/actions/shortcuts";
+import type { ActionName } from "../src/actions/types";
 
 const checkpoint = (name: string) => {
   expect(renderStaticScene.mock.calls.length).toMatchSnapshot(

@@ -2,7 +2,7 @@ import { CaptureUpdateAction, newElementWith } from "@excalidraw/excalidraw";
 import {
   createRedoAction,
   createUndoAction,
-} from "@excalidraw/excalidraw/actions/actionHistory";
+} from "@excalidraw/excalidraw/src/actions/actionHistory";
 import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";

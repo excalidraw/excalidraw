@@ -1,5 +1,5 @@
-import { actionLoadScene, actionShortcuts } from "../../actions";
-import { getShortcutFromShortcutName } from "../../actions/shortcuts";
+import { actionLoadScene, actionShortcuts } from "../../src/actions";
+import { getShortcutFromShortcutName } from "../../src/actions/shortcuts";
 import { useTunnels } from "../../src/context/tunnels";
 import { useUIAppState } from "../../src/context/ui-appState";
 import { t, useI18n } from "../../i18n";

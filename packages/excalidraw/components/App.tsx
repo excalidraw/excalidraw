@@ -362,23 +362,26 @@ import {
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
   actionToggleCropEditor,
-} from "../actions";
-import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
-import { actionPaste } from "../actions/actionClipboard";
-import { actionCopyElementLink } from "../actions/actionElementLink";
-import { actionUnlockAllElements } from "../actions/actionElementLock";
+} from "../src/actions";
+import { actionWrapTextInContainer } from "../src/actions/actionBoundText";
+import { actionToggleHandTool, zoomToFit } from "../src/actions/actionCanvas";
+import { actionPaste } from "../src/actions/actionClipboard";
+import { actionCopyElementLink } from "../src/actions/actionElementLink";
+import { actionUnlockAllElements } from "../src/actions/actionElementLock";
 import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
   actionWrapSelectionInFrame,
-} from "../actions/actionFrame";
-import { createRedoAction, createUndoAction } from "../actions/actionHistory";
-import { actionTextAutoResize } from "../actions/actionTextAutoResize";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { ActionManager } from "../actions/manager";
-import { actions } from "../actions/register";
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
+} from "../src/actions/actionFrame";
+import {
+  createRedoAction,
+  createUndoAction,
+} from "../src/actions/actionHistory";
+import { actionTextAutoResize } from "../src/actions/actionTextAutoResize";
+import { actionToggleViewMode } from "../src/actions/actionToggleViewMode";
+import { ActionManager } from "../src/actions/manager";
+import { actions } from "../src/actions/register";
+import { getShortcutFromShortcutName } from "../src/actions/shortcuts";
 import { trackEvent } from "../analytics";
 import { AnimationFrameHandler } from "../src/animation-frame-handler";
 import {
@@ -527,7 +530,7 @@ import type {
   Offsets,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
-import type { Action, ActionResult } from "../actions/types";
+import type { Action, ActionResult } from "../src/actions/types";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);

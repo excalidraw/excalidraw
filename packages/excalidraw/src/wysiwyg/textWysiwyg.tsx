@@ -43,19 +43,19 @@ import type {
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
-import { actionSaveToActiveFile } from "../../actions";
+import { actionSaveToActiveFile } from "../actions";
 
 import Scene from "../scene/Scene";
 import { parseClipboard } from "../../clipboard";
 import {
   actionDecreaseFontSize,
   actionIncreaseFontSize,
-} from "../../actions/actionProperties";
+} from "../actions/actionProperties";
 import {
   actionResetZoom,
   actionZoomIn,
   actionZoomOut,
-} from "../../actions/actionCanvas";
+} from "../actions/actionCanvas";
 
 import type App from "../../components/App";
 import type { AppState } from "../../types";

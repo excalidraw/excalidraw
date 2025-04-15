@@ -19,7 +19,7 @@ import type {
   FileId,
 } from "@excalidraw/element/types";
 
-import { actionFlipHorizontal, actionFlipVertical } from "../actions";
+import { actionFlipHorizontal, actionFlipVertical } from "../src/actions";
 import { createPasteEvent } from "../clipboard";
 import { Excalidraw } from "../index";
 

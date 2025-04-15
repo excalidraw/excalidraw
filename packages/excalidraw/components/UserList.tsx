@@ -16,7 +16,7 @@ import { Tooltip } from "./Tooltip";
 
 import "./UserList.scss";
 
-import type { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../src/actions/manager";
 import type { Collaborator, SocketId } from "../types";
 
 export type GoToCollaboratorComponentProps = {

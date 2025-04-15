@@ -1,4 +1,4 @@
-import { actionClearCanvas } from "../actions";
+import { actionClearCanvas } from "../src/actions";
 import { atom, useAtom } from "../editor-jotai";
 import { t } from "../i18n";
 

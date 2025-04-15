@@ -42,9 +42,12 @@ import {
   actionSendBackward,
   actionBringForward,
   actionSendToBack,
-} from "../actions";
-import { createUndoAction, createRedoAction } from "../actions/actionHistory";
-import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+} from "../src/actions/index.js";
+import {
+  createUndoAction,
+  createRedoAction,
+} from "../src/actions/actionHistory.js";
+import { actionToggleViewMode } from "../src/actions/actionToggleViewMode.js";
 import { getDefaultAppState } from "../appState";
 import { HistoryEntry } from "../history";
 import { Excalidraw } from "../index";

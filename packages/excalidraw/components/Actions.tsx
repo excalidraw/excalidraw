@@ -30,9 +30,9 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import { actionToggleZenMode } from "../actions";
+import { actionToggleZenMode } from "../src/actions";
 
-import { alignActionsPredicate } from "../actions/actionAlign";
+import { alignActionsPredicate } from "../src/actions/actionAlign";
 import { trackEvent } from "../analytics";
 import { useTunnels } from "../src/context/tunnels";
 
@@ -66,7 +66,7 @@ import {
 } from "./icons";
 
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
-import type { ActionManager } from "../actions/manager";
+import type { ActionManager } from "../src/actions/manager";
 
 export const canChangeStrokeColor = (
   appState: UIAppState,

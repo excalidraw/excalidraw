@@ -6,7 +6,7 @@ import {
   actionBringToFront,
   actionSendToBack,
   actionDuplicateSelection,
-} from "@excalidraw/excalidraw/actions";
+} from "@excalidraw/excalidraw/src/actions";
 
 import { Excalidraw } from "@excalidraw/excalidraw";
 

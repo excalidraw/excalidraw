@@ -43,7 +43,7 @@ import type {
   MakeBrand,
 } from "@excalidraw/common/utility-types";
 
-import type { Action } from "./actions/types";
+import type { Action } from "./src/actions/types";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";

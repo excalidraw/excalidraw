@@ -31,7 +31,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../../tests/test-utils";
-import { actionBindText } from "../../actions";
+import { actionBindText } from "../actions";
 
 unmountComponent();
 

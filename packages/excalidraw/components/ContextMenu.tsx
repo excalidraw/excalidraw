@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React from "react";
 
-import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { getShortcutFromShortcutName } from "../src/actions/shortcuts";
 import { t } from "../i18n";
 
 import { useExcalidrawAppState, useExcalidrawElements } from "./App";
@@ -10,9 +10,9 @@ import { Popover } from "./Popover";
 
 import "./ContextMenu.scss";
 
-import type { ActionManager } from "../actions/manager";
-import type { ShortcutName } from "../actions/shortcuts";
-import type { Action } from "../actions/types";
+import type { ActionManager } from "../src/actions/manager";
+import type { ShortcutName } from "../src/actions/shortcuts";
+import type { Action } from "../src/actions/types";
 
 import type { TranslationKeys } from "../i18n";
 
